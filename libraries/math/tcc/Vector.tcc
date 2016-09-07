@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Tensor.tcc (math)
+//  File:     Vector.tcc (math)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@ namespace math
     // ConstVectorReference
     //  
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ElementType ConstVectorReference<ElementType, Orientation>::operator[] (size_t index) const
     {
         // TODO check index<size
@@ -30,7 +30,7 @@ namespace math
         return _pData[index * _stride];
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ElementType ConstVectorReference<ElementType, Orientation>::Norm2() const
     {
 #ifdef USE_BLAS
@@ -40,19 +40,19 @@ namespace math
 #endif
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ElementType ConstVectorReference<ElementType, Orientation>::Norm1() const
     {
         return Aggregate([](ElementType x) { return std::abs(x); });
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ElementType ConstVectorReference<ElementType, Orientation>::Norm0() const
     {
         return Aggregate([](ElementType x) { return x!=0 ? 1 : 0; });
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ElementType ConstVectorReference<ElementType, Orientation>::Min() const
     {
         ElementType result = *_pData;
@@ -69,7 +69,7 @@ namespace math
         return result;
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ElementType ConstVectorReference<ElementType, Orientation>::Max() const
     {
         ElementType result = *_pData;
@@ -86,25 +86,25 @@ namespace math
         return result;
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetReference() const
     {
         return ConstVectorReference<ElementType, Orientation>(_pData, _size, _stride);
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier) const
     {
         return ConstVectorReference<ElementType, Orientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, FlipOrientation<Orientation>::value> ConstVectorReference<ElementType, Orientation>::Transpose() const
     {
         return ConstVectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _stride);
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     bool ConstVectorReference<ElementType, Orientation>::operator==(const ConstVectorReference<ElementType, Orientation>& other) const
     {
         if (_size != other._size)
@@ -128,13 +128,13 @@ namespace math
         return true;
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation>::ConstVectorReference(ElementType * pData, size_t size, size_t stride) : _pData(pData), _size(size), _stride(stride)
     {
         // TODO check that pData != 0
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     template<typename MapperType>
     ElementType ConstVectorReference<ElementType, Orientation>::Aggregate(MapperType mapper) const
     {
@@ -153,13 +153,13 @@ namespace math
     // VectorReference
     //
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::Reset()
     {
         Fill(0);
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::Fill(ElementType value)
     {
         ElementType* current = _pData;
@@ -171,7 +171,7 @@ namespace math
         }
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::Generate(std::function<ElementType()> generator)
     {
         ElementType* current = _pData;
@@ -183,7 +183,7 @@ namespace math
         }
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     ElementType& VectorReference<ElementType, Orientation>::operator[] (size_t index)
     {
         // TODO check index<size
@@ -191,43 +191,43 @@ namespace math
         return _pData[index * _stride];
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator+=(ElementType scalar)
     {
         ForEach([scalar](ElementType x) { return x+scalar; });
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator-=(ElementType scalar)
     {
         ForEach([scalar](ElementType x) { return x-scalar; });
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator*=(ElementType scalar)
     {
         ForEach([scalar](ElementType x) { return x*scalar; });
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetReference()
     {
         return VectorReference<ElementType, Orientation>(_pData, _size, _stride);
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier)
     {
         return VectorReference<ElementType, Orientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, FlipOrientation<Orientation>::value> VectorReference<ElementType, Orientation>::Transpose()
     {
         return VectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _stride);
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     template<typename MapperType>
     void VectorReference<ElementType, Orientation>::ForEach(MapperType mapper)
     {
@@ -244,31 +244,31 @@ namespace math
     // Vector
     //
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     Vector<ElementType, Orientation>::Vector(size_t size) : _data(size), VectorReference<ElementType, Orientation>(nullptr, size, 1)
     {
         _pData = _data.data();
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     Vector<ElementType, Orientation>::Vector(std::initializer_list<ElementType> list) : _data(list.begin(), list.end()), VectorReference<ElementType, Orientation>(nullptr, list.size(), 1)
     {
         _pData = _data.data(); // TODO do this in a privat emember called setDataPointer
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     void Vector<ElementType, Orientation>::Reset()
     {
         std::fill(_data.begin(), _data.end(), static_cast<ElementType>(0));
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
+    template<typename ElementType, VectorOrientation Orientation>
     void Vector<ElementType, Orientation>::Fill(ElementType value)
     {
         std::fill(_data.begin(), _data.end(), value);
     }
 
-    template <typename ElementType, TensorOrientation Orientation>
+    template <typename ElementType, VectorOrientation Orientation>
     ElementType& Vector<ElementType, Orientation>::operator[] (size_t index)
     {
         // TODO check index<size
@@ -276,7 +276,7 @@ namespace math
         return _pData[index];
     }
 
-    template <typename ElementType, TensorOrientation Orientation>
+    template <typename ElementType, VectorOrientation Orientation>
     ElementType Vector<ElementType, Orientation>::operator[] (size_t index) const
     {
         // TODO check index<size

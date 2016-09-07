@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Tensor.h (math)
+//  File:     Vector.h (math)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,36 +17,36 @@
 namespace math
 {
     /// <summary> Enum of possible matrix and vector orientations. </summary>
-    enum class TensorOrientation { rowMajor, columnMajor };
+    enum class VectorOrientation { row, column };
 
     /// <summary> Helper class that flips orientation at compile time. </summary>
     ///
     /// <typeparam name="Orientation"> The original orientation. </typeparam>
-    template<TensorOrientation Orientation>
+    template<VectorOrientation Orientation>
     struct FlipOrientation 
     {};
 
-    /// <summary> Helper class that flips rowMajor to columnMajor at compile time.  </summary>
+    /// <summary> Helper class that flips row to column at compile time.  </summary>
     template<>
-    struct FlipOrientation<TensorOrientation::rowMajor>
+    struct FlipOrientation<VectorOrientation::row>
     {
         /// <summary> The flipped orientation value. </summary>
-        static constexpr TensorOrientation value = TensorOrientation::columnMajor;
+        static constexpr VectorOrientation value = VectorOrientation::column;
     };
 
-    /// <summary> Helper class that flips columnMajor to rowMajor at compile time.  </summary>
+    /// <summary> Helper class that flips column to row at compile time.  </summary>
     template<>
-    struct FlipOrientation<TensorOrientation::columnMajor>
+    struct FlipOrientation<VectorOrientation::column>
     {
         /// <summary> The flipped orientation value. </summary>
-        static constexpr TensorOrientation value = TensorOrientation::rowMajor;
+        static constexpr VectorOrientation value = VectorOrientation::row;
     };
 
     /// <summary> A reference to a constant algebraic vector. </summary>
     ///
     /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
     /// <typeparam name="Orientation"> The orientation. </typeparam>
-    template <typename ElementType, TensorOrientation Orientation>
+    template <typename ElementType, VectorOrientation Orientation>
     class ConstVectorReference 
     {
     public:
@@ -114,15 +114,15 @@ namespace math
         bool operator==(const ConstVectorReference<ElementType, Orientation>& other) const;
 
     protected:
-        // allow operations defined in the TensorOperations struct to access raw data vector
-        friend struct TensorOperations;
+        // allow operations defined in the Operations struct to access raw data vector
+        friend struct Operations;
         const ElementType* GetDataPointer() const { return _pData; }
         
         // protected ctor accessible only through derived classes
         ConstVectorReference(ElementType* pData, size_t size, size_t stride);
 
-        // allow operations defined in the TensorOperations struct to access stride
-        friend struct TensorOperations;
+        // allow operations defined in the Operations struct to access stride
+        friend struct Operations;
         size_t GetStride() const { return _stride; }
 
         ElementType* _pData;
@@ -138,7 +138,7 @@ namespace math
     ///
     /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
     /// <typeparam name="Orientation"> The orientation. </typeparam>
-    template <typename ElementType, TensorOrientation Orientation>
+    template <typename ElementType, VectorOrientation Orientation>
     class VectorReference : public ConstVectorReference<ElementType, Orientation>
     {
     public:
@@ -197,8 +197,8 @@ namespace math
         VectorReference<ElementType, FlipOrientation<Orientation>::value> Transpose();
 
     protected:
-        // allow operations defined in the TensorOperations struct to access raw data vector
-        friend struct TensorOperations;
+        // allow operations defined in the Operations struct to access raw data vector
+        friend struct Operations;
         ElementType* GetDataPointer() { return _pData; }
         
         // protected ctor accessible only through derived classes
@@ -212,8 +212,8 @@ namespace math
     /// <summary> An algebraic vector. </summary>
     ///
     /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
-    /// <typeparam name="Orientation"> The orientationL rowMajor or colMajor. </typeparam>
-    template <typename ElementType, TensorOrientation Orientation>
+    /// <typeparam name="Orientation"> The orientationL row or colMajor. </typeparam>
+    template <typename ElementType, VectorOrientation Orientation>
     class Vector : public VectorReference<ElementType, Orientation>
     {
     public:
@@ -255,15 +255,15 @@ namespace math
         using ConstVectorReference<ElementType, Orientation>::_pData; // TODO
     };
 
-    typedef Vector<double, TensorOrientation::columnMajor> DoubleColumnVector;
-    typedef Vector<double, TensorOrientation::rowMajor> DoubleRowVector;
-    typedef ConstVectorReference<double, TensorOrientation::columnMajor> DoubleColumnConstVectorReference;
-    typedef ConstVectorReference<double, TensorOrientation::rowMajor> DoubleRowConstVectorReference;
+    typedef Vector<double, VectorOrientation::column> DoubleColumnVector;
+    typedef Vector<double, VectorOrientation::row> DoubleRowVector;
+    typedef ConstVectorReference<double, VectorOrientation::column> DoubleColumnConstVectorReference;
+    typedef ConstVectorReference<double, VectorOrientation::row> DoubleRowConstVectorReference;
 
-    typedef Vector<float, TensorOrientation::columnMajor> SingleColumnVector;
-    typedef Vector<float, TensorOrientation::rowMajor> SingleRowVector;
-    typedef ConstVectorReference<float, TensorOrientation::columnMajor> SingleColumnConstVectorReference;
-    typedef ConstVectorReference<float, TensorOrientation::rowMajor> SingleRowConstVectorReference;
+    typedef Vector<float, VectorOrientation::column> SingleColumnVector;
+    typedef Vector<float, VectorOrientation::row> SingleRowVector;
+    typedef ConstVectorReference<float, VectorOrientation::column> SingleColumnConstVectorReference;
+    typedef ConstVectorReference<float, VectorOrientation::row> SingleRowConstVectorReference;
 }
 
-#include "../tcc/Tensor.tcc"
+#include "../tcc/Vector.tcc"

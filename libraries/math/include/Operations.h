@@ -1,26 +1,26 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     TensorOperations.h (math)
+//  File:     Operations.h (math)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "Tensor.h"
+#include "Vector.h"
 
 namespace math
 {
-    /// <summary> A struct that holds all of the binary tensor operations. </summary>
-    struct TensorOperations
+    /// <summary> A struct that holds all of the binary Vector operations. </summary>
+    struct Operations
     {
         /// <summary> Adds a scalar to a vector. </summary>
         ///
         /// <typeparam name="ElementType"> Element type. </typeparam>
         /// <param name="rhsScalar"> The scalar being added. </param>
         /// <param name="lhsVector"> [in,out] The vector to which the scalar is added. </param>
-        template<typename ElementType, TensorOrientation Orientation>
+        template<typename ElementType, VectorOrientation Orientation>
         static void AddTo(ElementType rhsScalar, VectorReference<ElementType, Orientation>& lhsVector);
 
         /// <summary> Adds a scaled vector to another vector. </summary>
@@ -30,7 +30,7 @@ namespace math
         /// <param name="rhsScalar"> The scalar that multiplies the rhs vector. </param>
         /// <param name="rhsVector"> The vector being added to lhs. </param>
         /// <param name="lhsVector"> [in,out] The vector to which the rhs is added. </param>
-        template<typename ElementType, TensorOrientation Orientation>
+        template<typename ElementType, VectorOrientation Orientation>
         static void AddTo(ElementType rhsScalar, ConstVectorReference<ElementType, Orientation>& rhsVector, VectorReference<ElementType, Orientation>& lhsVector);
 
         /// <summary> Calculates a vector dot product (between vectors in any orientation). </summary>
@@ -40,7 +40,7 @@ namespace math
         /// <param name="vector2"> The second vector, in any orientation. </param>
         ///
         /// <returns> The dot product. </returns>
-        template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
+        template<typename ElementType, VectorOrientation Orientation1, VectorOrientation Orientation2>
         static ElementType Dot(ConstVectorReference<ElementType, Orientation1>& vector1, ConstVectorReference<ElementType, Orientation2>& vector2);
 
         /// <summary> Calculates the product of a row vector with a column vector. </summary>
@@ -50,8 +50,8 @@ namespace math
         /// <param name="rhsVector2"> The right vector on the rhs, in column orientation. </param>
         /// <param name="lhsScalar"> [out] The lhs scalar used to store the result. </param>
         template<typename ElementType>
-        static void Product(ConstVectorReference<ElementType, TensorOrientation::rowMajor>& rhsVector1, ConstVectorReference<ElementType, TensorOrientation::columnMajor>& rhsVector2, ElementType& lhsScalar);
+        static void Product(ConstVectorReference<ElementType, VectorOrientation::row>& rhsVector1, ConstVectorReference<ElementType, VectorOrientation::column>& rhsVector2, ElementType& lhsScalar);
     };
 }
 
-#include "../tcc/TensorOperations.tcc"
+#include "../tcc/Operations.tcc"

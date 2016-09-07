@@ -6,8 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Tensor.h"
-#include "TensorOperations.h"
+#include "Vector.h"
+#include "Operations.h"
 
 // testing
 #include "testing.h"
@@ -149,34 +149,34 @@ void TestDoubleVectorProduct()
 {
     math::DoubleRowVector u{ 0, 1, 0, 1, 0 };
     math::DoubleColumnVector v{ 1, 2, 3, 4, 5 };
-    auto dot = math::TensorOperations::Dot(u, v);
-    testing::ProcessTest("TensorOperations::Dot(Vector, Vector)", dot == 6);
+    auto dot = math::Operations::Dot(u, v);
+    testing::ProcessTest("Operations::Dot(Vector, Vector)", dot == 6);
 
     double result;
-    math::TensorOperations::Product(u, v, result);
-    testing::ProcessTest("TensorOperations::Product(Vector, Vector)", result == 6);
+    math::Operations::Product(u, v, result);
+    testing::ProcessTest("Operations::Product(Vector, Vector)", result == 6);
 }
 
 void TestSingleVectorProduct()
 {
     math::SingleRowVector u{ 0, 1, 0, 1, 0 };
     math::SingleColumnVector v{ 1, 2, 3, 4, 5 };
-    auto dot = math::TensorOperations::Dot(u, v);
-    testing::ProcessTest("TensorOperations::Dot(Vector, Vector)", dot == 6);
+    auto dot = math::Operations::Dot(u, v);
+    testing::ProcessTest("Operations::Dot(Vector, Vector)", dot == 6);
 
     float result;
-    math::TensorOperations::Product(u, v, result);
-    testing::ProcessTest("TensorOperations::Product(Vector, Vector)", result == 6);
+    math::Operations::Product(u, v, result);
+    testing::ProcessTest("Operations::Product(Vector, Vector)", result == 6);
 }
 
 void TestDoubleAddTo()
 {
     math::DoubleRowVector u{ 1, 2, 3, 4, 5 };
     math::DoubleRowVector v{ 0, 1, 0, 1, 0 };
-    math::TensorOperations::AddTo(2.0, v, u);
+    math::Operations::AddTo(2.0, v, u);
 
     math::DoubleRowVector z{ 1, 4, 3, 6, 5 };
-    testing::ProcessTest("TensorOperations::AddTo(scalar, Vector, Vector)", u == z);
+    testing::ProcessTest("Operations::AddTo(scalar, Vector, Vector)", u == z);
 
 }
 

@@ -15,11 +15,11 @@ endif()
 set (SRC src/BlasWrapper.cpp)
 
 set (INCLUDE include/BlasWrapper.h
-             include/Tensor.h
-             include/TensorOperations.h)
+             include/Vector.h
+             include/Operations.h)
 
-set (TCC tcc/Tensor.tcc
-         tcc/TensorOperations.tcc)
+set (TCC tcc/Vector.tcc
+         tcc/Operations.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

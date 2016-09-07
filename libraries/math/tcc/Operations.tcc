@@ -1,21 +1,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     TensorOperations.tcc (math)
+//  File:     Operations.tcc (math)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace math
 {
-    template<typename ElementType, TensorOrientation Orientation>
-    void TensorOperations::AddTo(ElementType rhsScalar, VectorReference<ElementType, Orientation>& lhsVector)
+    template<typename ElementType, VectorOrientation Orientation>
+    void Operations::AddTo(ElementType rhsScalar, VectorReference<ElementType, Orientation>& lhsVector)
     {
         lhsVector += rhsScalar;
     }
 
-    template<typename ElementType, TensorOrientation Orientation>
-    void TensorOperations::AddTo(ElementType rhsScalar, ConstVectorReference<ElementType, Orientation>& rhsVector, VectorReference<ElementType, Orientation>& lhsVector)
+    template<typename ElementType, VectorOrientation Orientation>
+    void Operations::AddTo(ElementType rhsScalar, ConstVectorReference<ElementType, Orientation>& rhsVector, VectorReference<ElementType, Orientation>& lhsVector)
     {
         size_t lhsSize = lhsVector.Size();
         size_t rhsSize = rhsVector.Size();
@@ -41,8 +41,8 @@ namespace math
 #endif
     }
 
-    template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
-    ElementType TensorOperations::Dot(ConstVectorReference<ElementType, Orientation1>& vector1, ConstVectorReference<ElementType, Orientation2>& vector2)
+    template<typename ElementType, VectorOrientation Orientation1, VectorOrientation Orientation2>
+    ElementType Operations::Dot(ConstVectorReference<ElementType, Orientation1>& vector1, ConstVectorReference<ElementType, Orientation2>& vector2)
     {
         size_t size1 = vector1.Size();
         size_t size2 = vector2.Size();
@@ -71,7 +71,7 @@ namespace math
     }
 
     template<typename ElementType>
-    void TensorOperations::Product(ConstVectorReference<ElementType, TensorOrientation::rowMajor>& rhsVector1, ConstVectorReference<ElementType, TensorOrientation::columnMajor>& rhsVector2, ElementType& lhsScalar)
+    void Operations::Product(ConstVectorReference<ElementType, VectorOrientation::row>& rhsVector1, ConstVectorReference<ElementType, VectorOrientation::column>& rhsVector2, ElementType& lhsScalar)
     {
         lhsScalar = Dot(rhsVector1, rhsVector2);
     }
