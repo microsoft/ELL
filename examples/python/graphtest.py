@@ -109,11 +109,34 @@ def GetAdjacencyList(nodes, index):
     CheckAdjacencyList(adj)
     return adj
 
+def DFSRoot(adj, state, u, m, n):
+    '''
+       m = number edges
+       n = number vertices
+    '''
+    state[u] = 'D'
+    n = n + 1
+    for v in adj[u]:
+        if state[v] == 'U':
+            m = m + 1
+            (m,n) = DFSRoot(adj, state, v, m, n)
+    state[u] = 'C'
+    return (m, n)
+
+def DFS(adj):
+    '''Depth First Search'''
+    state = ['U' for x in adj]
+    m = n = 0
+    for u in range(1,len(adj)):
+        if state[u] == 'U':
+            (m,n) = DFSRoot(adj, state, u, m, n)
+    return state, (m, n)
+
 def work(key):
     model = EMLL.LoadModel(key)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
-    state, p = BFS(adj, 1)
+    state, (m, n) = DFS(adj)
     # determine if the graph is connected
     V = len(index)
     ans = True
@@ -125,6 +148,8 @@ def work(key):
         print key, "is connected"
     else:
         print key, "is disjoint"
+    if m != n - 1:
+        raise ValueError, "cycle detected"
 
 def test():
     keys = ['[1]','[2]','[3]','[tree_0]','[tree_1]','[tree_2]','[tree_3]']
