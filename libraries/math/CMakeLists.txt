@@ -15,18 +15,18 @@ endif()
 set (SRC src/BlasWrapper.cpp)
 
 set (INCLUDE include/BlasWrapper.h
-             include/Tensor.h)
+             include/Tensor.h
+             include/TensorOperations.h)
 
-set (TCC tcc/Tensor.tcc)
+set (TCC tcc/Tensor.tcc
+         tcc/TensorOperations.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-set (OpenBLASDirectory ../../private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include)
-
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PUBLIC include ${OpenBLASDirectory})
+target_include_directories(${PROJ_NAME} PUBLIC include ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
