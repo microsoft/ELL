@@ -37,9 +37,6 @@ namespace utilities
         /// <param name="outputStream"> The stream to write data to. </summary>
         XmlArchiver(std::ostream& outputStream);
 
-        /// <summary> Default Destructor </summary>
-        ~XmlArchiver();
-
     protected:
         DECLARE_ARCHIVE_VALUE_OVERRIDE(bool);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(char);
@@ -62,6 +59,8 @@ namespace utilities
 
         virtual void BeginArchiveObject(const char* name, const IArchivable& value) override;
         virtual void EndArchiveObject(const char* name, const IArchivable& value) override;
+
+        virtual void EndArchiving() override;
 
     private:
         // Serialization
@@ -101,9 +100,6 @@ namespace utilities
         /// <param name="inputStream"> The stream to read data from. </summary>
         SimpleXmlUnarchiver(std::istream& inputStream, SerializationContext context);
 
-        /// <summary> Default Destructor </summary>
-        ~SimpleXmlUnarchiver();
-
     protected:
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(bool);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(char);
@@ -129,6 +125,8 @@ namespace utilities
 
         virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName) override;
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName) override;
+
+        virtual void EndUnarchiving() override;
 
     private:
         // Deserialization

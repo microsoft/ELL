@@ -137,6 +137,9 @@ namespace utilities
             std::string _propertyName;
         };
 
+        /// <summary> Destructor </summary>        
+        virtual ~Archiver() { EndArchiving(); }
+
         /// <summary> Add value to an archive. </summary>
         ///
         /// <param name="value"> The value to add to the archive. </param>
@@ -242,6 +245,9 @@ namespace utilities
         /// <param name="context"> The initial `SerializationContext` to use </param>
         Unarchiver(SerializationContext context);
 
+        /// <summary> Destructor </summary>        
+        virtual ~Unarchiver() { EndUnarchiving(); }
+
         /// <summary> Read value from an archive. </summary>
         ///
         /// <param name="value"> The value to read into. </param>
@@ -309,6 +315,8 @@ namespace utilities
         virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName);
         virtual void UnarchiveObject(const char* name, IArchivable& value);
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName);
+
+        virtual void EndUnarchiving() {}
 
     private:
         SerializationContext _baseContext;

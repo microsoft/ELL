@@ -33,11 +33,6 @@ namespace utilities
         WriteFileHeader();
     }
 
-    XmlArchiver::~XmlArchiver()
-    {
-        CloseStream();
-    }
-
     void XmlArchiver::WriteFileHeader()
     {
         // Write XML declaration
@@ -136,14 +131,10 @@ namespace utilities
         _indent = indent;
     }
 
-    void XmlArchiver::CloseStream()
+    void XmlArchiver::EndArchiving()
     {
-        if(_ready)
-        {
-            WriteFileFooter();
-            _out.flush();
-            _ready = false;
-        }
+        WriteFileFooter();
+        _out.flush();
     }
 
     //
@@ -157,11 +148,6 @@ namespace utilities
     SimpleXmlUnarchiver::SimpleXmlUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, "<>?=/'\"")
     {
         ReadFileHeader();
-    }
-
-    SimpleXmlUnarchiver::~SimpleXmlUnarchiver()
-    {
-        ReadFileFooter();
     }
 
     IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, bool);
@@ -271,6 +257,11 @@ namespace utilities
     void SimpleXmlUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
         _tokenizer.MatchTokens({ "<", "/", "Array", ">" });
+    }
+
+    void SimpleXmlUnarchiver::EndUnarchiving()
+    {
+        ReadFileFooter();
     }
 
     //
