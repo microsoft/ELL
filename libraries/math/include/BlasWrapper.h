@@ -69,6 +69,15 @@ namespace math
         /// <param name="secondStride"> The stride of the second array. </param>
         /// <returns> The dot product. </returns>
         double Dot(size_t size, const double* pFirst, size_t firstStride, const double* pSecond, size_t secondStride);
+
+
+        // gemm
+        // gemv
+        // axpy
+        // acpby
+        // scal
+        // asum
+        // stride_dot
     }
 
 }
