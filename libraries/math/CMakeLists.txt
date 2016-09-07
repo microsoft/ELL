@@ -23,11 +23,11 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if(${APPLE})
   set (BLASDirectory /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/)
   set (BLASLibrary cblas)
 elseif(${WIN32})
-  set (BLASDirectory ../../private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include)
+  set (BLASDirectory ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include)
   set (BLASLibrary ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/libopenblas.a)
 endif()
 
