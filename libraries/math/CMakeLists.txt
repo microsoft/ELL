@@ -26,11 +26,9 @@ source_group("tcc" FILES ${TCC})
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set (BLASDirectory /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/)
   set (BLASLibrary cblas)
-#  link_directories(${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/)
 elseif(${WIN32})
   set (BLASDirectory ../../private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include)
-  set (BLASLibrary libopenblas.a)
-  link_directories(${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/)
+  set (BLASLibrary ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/libopenblas.a)
 endif()
 
 
@@ -40,7 +38,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
 
-#target_link_libraries(${PROJ_NAME} utilities ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/libopenblas.a)
+#target_link_libraries(${PROJ_NAME} utilities )
 target_link_libraries(${PROJ_NAME} utilities ${BLASLibrary})
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
