@@ -41,14 +41,4 @@ namespace utilities
     {
         SetValue(value);
     }
-
-    //
-    // IDescribable
-    //
-    template <typename ValueType>
-    static ValueType CreateObject(const Archiver& archiver)
-    {
-        // TODO: force archiver to "deserialize" if necessary (?)
-        return archiver.GetValue<ValueType>();
-    }
 }

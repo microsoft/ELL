@@ -19,7 +19,7 @@
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
-    class SingleElementThresholdPredictor : public IPredictor<bool>, public utilities::IDescribable
+    class SingleElementThresholdPredictor : public IPredictor<bool>, public utilities::IArchivable
     {
     public:
         /// <summary> Constructs a single-element threshold rule. </summary>

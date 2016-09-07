@@ -83,7 +83,7 @@ namespace model
     };
 
     /// <summary> Represents a contiguous set of values from an output port </summary>
-    class PortRange : public utilities::IDescribable
+    class PortRange : public utilities::IArchivable
     {
     public:
         PortRange() = default;
@@ -164,7 +164,7 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class PortElementsBase : public utilities::IDescribable
+    class PortElementsBase : public utilities::IArchivable
     {
     public:
         virtual ~PortElementsBase() = default;

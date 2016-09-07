@@ -23,7 +23,7 @@
 #include <vector>
 #include <sstream>
 
-class InnerObject : public utilities::IDescribable
+class InnerObject : public utilities::IArchivable
 {
 public:
     InnerObject() = default;
@@ -77,7 +77,7 @@ private:
     std::string _c = "";
 };
 
-class OuterObject : public utilities::IDescribable
+class OuterObject : public utilities::IArchivable
 {
 public:
     OuterObject() = default;
@@ -190,7 +190,7 @@ void TestGetObjectArchive()
     testing::ProcessTest("ObjectArchive", derivedDescription["c"].GetValue<std::string>() == "derived");
 }
 
-void TestSerializeIDescribable()
+void TestSerializeIArchivable()
 {
     utilities::SerializationContext context;
     std::stringstream strstream;
@@ -215,15 +215,15 @@ void TestSerializeIDescribable()
     InnerObject deserializedInner;
 
     unarchiver["inner"] >> deserializedInner;
-    testing::ProcessTest("Deserialize IDescribable check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
+    testing::ProcessTest("Deserialize IArchivable check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
 
     OuterObject deserializedOuter;
     unarchiver["outer"] >> deserializedOuter;
-    testing::ProcessTest("Deserialize IDescribable check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
+    testing::ProcessTest("Deserialize IArchivable check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
 
     DerivedObject deserializedDerived;
     unarchiver["derived"] >> deserializedDerived;
-    testing::ProcessTest("Deserialize IDescribable check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
+    testing::ProcessTest("Deserialize IArchivable check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
 }
 
 void TestObjectArchiver()

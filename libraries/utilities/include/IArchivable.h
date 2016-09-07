@@ -18,11 +18,26 @@
 
 namespace utilities
 {
+    class ObjectArchive;
+
     /// <summary> IArchivable interface </summary>
     class IArchivable
     {
     public:
         virtual ~IArchivable() = default;
+
+        /// <summary> Create an `ObjectArchive` from an object </summary>
+        ///
+        /// <returns> The `ObjectArchive` describing the object </returns>
+        ObjectArchive GetDescription() const;
+
+        /// <summary> Creates an object from an `ObjectArchive` </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the object to retrieve </typeparam>
+        /// <param name="archiver"> The `Archiver` to get the object from </param>
+        /// <returns> The new object </returns>
+        template <typename ValueType>
+        static ValueType CreateObject(const ObjectArchive& archiver);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -45,3 +60,6 @@ namespace utilities
         static std::string GetTypeName() { return "IArchivable"; }
     };
 }
+
+#include "../tcc/IArchivable.tcc"
+

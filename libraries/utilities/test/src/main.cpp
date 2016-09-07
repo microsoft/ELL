@@ -117,7 +117,7 @@ int main()
         // ObjectArchive tests
         TestGetTypeDescription();
         TestGetObjectArchive();
-        TestSerializeIDescribable();
+        TestSerializeIArchivable();
         TestObjectArchiver();
     }
     catch(const utilities::Exception& exception)

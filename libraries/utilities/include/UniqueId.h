@@ -18,7 +18,7 @@
 namespace utilities
 {
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
-    class UniqueId : public IDescribable
+    class UniqueId : public IArchivable
     {
     public:
         /// <summary> Constructor </summary>

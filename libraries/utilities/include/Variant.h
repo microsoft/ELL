@@ -147,7 +147,7 @@ namespace utilities
 
     private:
         friend std::string to_string(const Variant& variant);
-        friend class IDescribable;
+        friend class IArchivable;
 
         template <typename ValueType, typename... Args>
         friend Variant MakeVariant(Args&&... args);

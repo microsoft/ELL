@@ -122,36 +122,7 @@ namespace utilities
         mutable std::unordered_map<std::string, ObjectArchive> _properties;
 
         // friends
-        friend class IDescribable;
-    };
-    
-    /// <summary>
-    /// IDescribable is the Base class for describable objects. In order to be able to use the
-    /// IDescribable interface for serialization, you must also implement GetRuntimeTypeName, GetTypeName,
-    /// and the static GetTypeDescription functions.
-    /// </summary>
-    class IDescribable : public IArchivable
-    {
-    public:
-        virtual ~IDescribable() = default;
-
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <returns> The ObjectArchive for the object </returns>
-        ObjectArchive GetDescription() const;
-
-        /// <summary> Creates an object from an `Archiver` </summary>
-        ///
-        /// <typeparam name="ValueType"> The type of the object to retrieve </typeparam>
-        /// <param name="archiver"> The `Archiver` to get the object from </param>
-        /// <returns> The new object </returns>
-        template <typename ValueType>
-        static ValueType CreateObject(const Archiver& archiver);
-
-        /// <summary> Gets the name of this type. </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "IDescribable"; }
+        friend class IArchivable;
     };
 }
 

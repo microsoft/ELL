@@ -17,6 +17,7 @@ set (SRC src/CompressedIntegerList.cpp
          src/CompressedIntegerList.cpp
          src/Files.cpp
          src/Format.cpp
+         src/IArchivable.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
          src/ObjectArchive.cpp
@@ -64,6 +65,7 @@ set (TCC tcc/AnyIterator.tcc
          tcc/CommandLineParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
+         tcc/IArchivable.tcc
          tcc/JsonArchiver.tcc
          tcc/ObjectArchive.tcc
          tcc/ObjectArchiver.tcc

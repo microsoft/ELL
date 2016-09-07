@@ -19,7 +19,7 @@
 namespace predictors
 {
     /// <summary> A predictor that ignores its input and outputs a constant number. This class is used to define decision trees. </summary>
-    class ConstantPredictor : public IPredictor<double>, public utilities::IDescribable
+    class ConstantPredictor : public IPredictor<double>, public utilities::IArchivable
     {
     public:
         ConstantPredictor() = default;

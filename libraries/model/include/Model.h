@@ -55,7 +55,7 @@ namespace model
     };
 
     /// <summary> Model class. Represents a graph of computation </summary>
-    class Model : public utilities::IDescribable
+    class Model : public utilities::IArchivable
     {
     public:
         /// <summary> Factory method used to create nodes and add them to the model. </summary>

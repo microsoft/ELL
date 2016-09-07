@@ -28,7 +28,7 @@ namespace model
     class ModelTransformer;
 
     /// <summary> Superclass for all node types. </summary>
-    class Node : public utilities::IDescribable
+    class Node : public utilities::IArchivable
     {
     public:
         Node() = default;

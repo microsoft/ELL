@@ -26,7 +26,7 @@
 namespace predictors
 {
     /// <summary> A linear binary predictor. </summary>
-    class LinearPredictor : public IPredictor<double>, public utilities::IDescribable
+    class LinearPredictor : public IPredictor<double>, public utilities::IArchivable
     {
     public:
         /// <summary> Default Constructor. </summary>

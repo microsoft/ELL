@@ -64,10 +64,10 @@ namespace utilities
     }
 
     //
-    // IDescribable
+    // IArchivable
     //
 
-    ObjectArchive IDescribable::GetDescription() const
+    ObjectArchive IArchivable::GetDescription() const
     {
         utilities::SerializationContext context;
         utilities::ObjectArchiver archiver(context);
