@@ -20,8 +20,8 @@ namespace math
         /// <typeparam name="ElementType"> Element type. </typeparam>
         /// <param name="rhsScalar"> The scalar being added. </param>
         /// <param name="lhsVector"> [in,out] The vector to which the scalar is added. </param>
-        template<typename ElementType>
-        static void AddTo(ElementType rhsScalar, VectorReferenceBase<ElementType>& lhsVector);
+        template<typename ElementType, TensorOrientation Orientation>
+        static void AddTo(ElementType rhsScalar, VectorReference<ElementType, Orientation>& lhsVector);
 
         /// <summary> Adds a scaled vector to another vector. </summary>
         ///
@@ -31,7 +31,7 @@ namespace math
         /// <param name="rhsVector"> The vector being added to lhs. </param>
         /// <param name="lhsVector"> [in,out] The vector to which the rhs is added. </param>
         template<typename ElementType, TensorOrientation Orientation>
-        static void AddTo(ElementType rhsScalar, const  VectorReference<ElementType, Orientation>& rhsVector, VectorReference<ElementType, Orientation>& lhsVector);
+        static void AddTo(ElementType rhsScalar, const ConstVectorReference<ElementType, Orientation>& rhsVector, VectorReference<ElementType, Orientation>& lhsVector);
 
         /// <summary> Calculates a vector dot product (between vectors in any orientation). </summary>
         ///
@@ -40,8 +40,8 @@ namespace math
         /// <param name="vector2"> The second vector, in any orientation. </param>
         ///
         /// <returns> The dot product. </returns>
-        template<typename ElementType>
-        static ElementType Dot(const VectorReferenceBase<ElementType>& vector1, const VectorReferenceBase<ElementType>& vector2);
+        template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
+        static ElementType Dot(const ConstVectorReference<ElementType, Orientation1>& vector1, const ConstVectorReference<ElementType, Orientation2>& vector2);
 
         /// <summary> Calculates the product of a row vector with a column vector. </summary>
         ///
@@ -50,7 +50,7 @@ namespace math
         /// <param name="rhsVector2"> The right vector on the rhs, in column orientation. </param>
         /// <param name="lhsScalar"> [out] The lhs scalar used to store the result. </param>
         template<typename ElementType>
-        static void Product(const VectorReference<ElementType, TensorOrientation::rowMajor>& rhsVector1, const VectorReference<ElementType, TensorOrientation::columnMajor>& rhsVector2, ElementType& lhsScalar);
+        static void Product(const ConstVectorReference<ElementType, TensorOrientation::rowMajor>& rhsVector1, const ConstVectorReference<ElementType, TensorOrientation::columnMajor>& rhsVector2, ElementType& lhsScalar);
     };
 }
 

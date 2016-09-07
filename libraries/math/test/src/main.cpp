@@ -80,7 +80,7 @@ void TestSingleVector()
 void TestDoubleVectorReference()
 {
     math::DoubleColumnVector u(10);
-    const auto v = u.GetReference();
+    auto v = u.GetReference();
     auto w = v.GetSubVector(1, 3, 2);
     w.Fill(1);
     math::DoubleColumnVector y{ 0, 1, 0, 1, 0, 1, 0, 0, 0, 0 };
@@ -183,9 +183,9 @@ void TestDoubleAddTo()
 void TestConstDoubleVector()
 {
     const math::DoubleRowVector u{ 0, 1, 0, 1, 0 };
-    auto v = u.GetReference();
+    const auto v = u.GetReference();
     // decltype(u.GetReference()) v = u.GetReference(); // won't compile
-    v += 3; // how does this compile and work?
+    //v += 3; // how does this compile and work?
 }
 
 

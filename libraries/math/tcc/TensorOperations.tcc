@@ -8,14 +8,14 @@
 
 namespace math
 {
-    template<typename ElementType>
-    void TensorOperations::AddTo(ElementType rhsScalar, VectorReferenceBase<ElementType>& lhsVector)
+    template<typename ElementType, TensorOrientation Orientation>
+    void TensorOperations::AddTo(ElementType rhsScalar, VectorReference<ElementType, Orientation>& lhsVector)
     {
         lhsVector += rhsScalar;
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    void TensorOperations::AddTo(ElementType rhsScalar, const VectorReference<ElementType, Orientation>& rhsVector, VectorReference<ElementType, Orientation>& lhsVector)
+    void TensorOperations::AddTo(ElementType rhsScalar, const ConstVectorReference<ElementType, Orientation>& rhsVector, VectorReference<ElementType, Orientation>& lhsVector)
     {
         size_t lhsSize = lhsVector.Size();
         size_t rhsSize = rhsVector.Size();
@@ -41,8 +41,8 @@ namespace math
 #endif
     }
 
-    template<typename ElementType>
-    ElementType TensorOperations::Dot(const VectorReferenceBase<ElementType>& vector1, const VectorReferenceBase<ElementType>& vector2)
+    template<typename ElementType, TensorOrientation Orientation1, TensorOrientation Orientation2>
+    ElementType TensorOperations::Dot(const ConstVectorReference<ElementType, Orientation1>& vector1, const ConstVectorReference<ElementType, Orientation2>& vector2)
     {
         size_t size1 = vector1.Size();
         size_t size2 = vector2.Size();
@@ -71,7 +71,7 @@ namespace math
     }
 
     template<typename ElementType>
-    void TensorOperations::Product(const VectorReference<ElementType, TensorOrientation::rowMajor>& rhsVector1, const VectorReference<ElementType, TensorOrientation::columnMajor>& rhsVector2, ElementType& lhsScalar)
+    void TensorOperations::Product(const ConstVectorReference<ElementType, TensorOrientation::rowMajor>& rhsVector1, const ConstVectorReference<ElementType, TensorOrientation::columnMajor>& rhsVector2, ElementType& lhsScalar)
     {
         lhsScalar = Dot(rhsVector1, rhsVector2);
     }
