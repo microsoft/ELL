@@ -89,16 +89,16 @@ namespace utilities
     };
 
     /// <summary> An unarchiver that reads data encoded in an XML format. </summary>
-    class SimpleXmlUnarchiver : public Unarchiver
+    class XmlUnarchiver : public Unarchiver
     {
     public:
         /// <summary> Default Constructor --- reads from standard input. </summary>
-        SimpleXmlUnarchiver(SerializationContext context);
+        XmlUnarchiver(SerializationContext context);
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="inputStream"> The stream to read data from. </summary>
-        SimpleXmlUnarchiver(std::istream& inputStream, SerializationContext context);
+        XmlUnarchiver(std::istream& inputStream, SerializationContext context);
 
     protected:
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(bool);

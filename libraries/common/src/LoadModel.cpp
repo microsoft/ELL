@@ -245,7 +245,7 @@ namespace common
                 auto filestream = utilities::OpenIfstream(filename);
                 if (ext == "xml")
                 {
-                    return LoadArchviedModel<utilities::SimpleXmlUnarchiver>(filestream);
+                    return LoadArchviedModel<utilities::XmlUnarchiver>(filestream);
                 }
                 else if (ext == "json")
                 {

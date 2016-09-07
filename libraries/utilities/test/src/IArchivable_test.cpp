@@ -333,5 +333,5 @@ void TestXmlArchiver()
 
 void TestXmlUnarchiver()
 {
-    TestUnarchiver<utilities::XmlArchiver, utilities::SimpleXmlUnarchiver>();
+    TestUnarchiver<utilities::XmlArchiver, utilities::XmlUnarchiver>();
 }

@@ -140,26 +140,26 @@ namespace utilities
     //
     // Deserialization
     //
-    SimpleXmlUnarchiver::SimpleXmlUnarchiver(SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(std::cin, "<>=/'\"")
+    XmlUnarchiver::XmlUnarchiver(SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(std::cin, "<>=/'\"")
     {
         ReadFileHeader();
     }
 
-    SimpleXmlUnarchiver::SimpleXmlUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, "<>?=/'\"")
+    XmlUnarchiver::XmlUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, "<>?=/'\"")
     {
         ReadFileHeader();
     }
 
-    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, bool);
-    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, char);
-    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, short);
-    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, int);
-    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, size_t);
-    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, float);
-    IMPLEMENT_UNARCHIVE_VALUE(SimpleXmlUnarchiver, double);
+    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, bool);
+    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, char);
+    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, short);
+    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, int);
+    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, size_t);
+    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, float);
+    IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, double);
 
     // TODO: add a "read tag"-type function
-    void SimpleXmlUnarchiver::ReadFileHeader()
+    void XmlUnarchiver::ReadFileHeader()
     {
         _tokenizer.MatchTokens({ "<", "?", "xml" });
         while (_tokenizer.PeekNextToken() != "?")
@@ -170,19 +170,19 @@ namespace utilities
         _tokenizer.MatchTokens({ "<", "emll", "version", "=", "\"", "1.0", "\"", ">" });
     }
 
-    void SimpleXmlUnarchiver::ReadFileFooter()
+    void XmlUnarchiver::ReadFileFooter()
     {
         _tokenizer.MatchTokens({ "<", "/", "emll", ">" });
     }
 
     // strings
-    void SimpleXmlUnarchiver::UnarchiveValue(const char* name, std::string& value)
+    void XmlUnarchiver::UnarchiveValue(const char* name, std::string& value)
     {
         ReadScalar(name, value);
     }
 
     // IArchivable
-    std::string SimpleXmlUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
+    std::string XmlUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
         auto rawTypeName = typeName;
@@ -198,7 +198,7 @@ namespace utilities
         return readTypeName;
     }
 
-    void SimpleXmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
+    void XmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
         auto EncodedTypeName = XmlUtilities::EncodeTypeName(typeName);
         _tokenizer.MatchTokens({ "<", "/", EncodedTypeName, ">" });
@@ -207,20 +207,20 @@ namespace utilities
     //
     // Arrays
     //
-    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, bool);
-    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, char);
-    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, short);
-    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, int);
-    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, size_t);
-    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, float);
-    IMPLEMENT_UNARCHIVE_ARRAY(SimpleXmlUnarchiver, double);
+    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, bool);
+    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, char);
+    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, short);
+    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, int);
+    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, size_t);
+    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, float);
+    IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, double);
 
-    void SimpleXmlUnarchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
+    void XmlUnarchiver::UnarchiveArray(const char* name, std::vector<std::string>& array)
     {
         ReadArray(name, array);
     }
 
-    void SimpleXmlUnarchiver::BeginUnarchiveArray(const char* name, const std::string& typeName)
+    void XmlUnarchiver::BeginUnarchiveArray(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
 
@@ -233,7 +233,7 @@ namespace utilities
         _tokenizer.MatchTokens({ "type", "=", "'", typeName, "'", ">" });
     }
 
-    bool SimpleXmlUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
+    bool XmlUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
         // check for '</'
         auto token1 = _tokenizer.ReadNextToken();
@@ -250,16 +250,16 @@ namespace utilities
         }
     }
 
-    void SimpleXmlUnarchiver::EndUnarchiveArrayItem(const std::string& typeName)
+    void XmlUnarchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
     }
 
-    void SimpleXmlUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
+    void XmlUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
         _tokenizer.MatchTokens({ "<", "/", "Array", ">" });
     }
 
-    void SimpleXmlUnarchiver::EndUnarchiving()
+    void XmlUnarchiver::EndUnarchiving()
     {
         ReadFileFooter();
     }

@@ -129,7 +129,7 @@ namespace utilities
     // Deserialization
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleXmlUnarchiver::ReadScalar(const char* name, ValueType& value)
+    void XmlUnarchiver::ReadScalar(const char* name, ValueType& value)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
@@ -150,7 +150,7 @@ namespace utilities
     }
 
     template <>
-    inline void SimpleXmlUnarchiver::ReadScalar(const char* name, bool& value)
+    inline void XmlUnarchiver::ReadScalar(const char* name, bool& value)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<bool>::GetName());
         bool hasName = name != std::string("");
@@ -170,7 +170,7 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Read* functions
-    inline void SimpleXmlUnarchiver::ReadScalar(const char* name, std::string& value) 
+    inline void XmlUnarchiver::ReadScalar(const char* name, std::string& value) 
     {
         auto typeName = "string";
         bool hasName = name != std::string("");
@@ -190,7 +190,7 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleXmlUnarchiver::ReadArray(const char* name, std::vector<ValueType>& array)
+    void XmlUnarchiver::ReadArray(const char* name, std::vector<ValueType>& array)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
@@ -222,7 +222,7 @@ namespace utilities
         _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }
 
-    inline void SimpleXmlUnarchiver::ReadArray(const char* name, std::vector<std::string>& array)
+    inline void XmlUnarchiver::ReadArray(const char* name, std::vector<std::string>& array)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<std::string>::GetName());
         bool hasName = name != std::string("");

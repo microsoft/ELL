@@ -211,7 +211,7 @@ void TestSerializeIArchivable()
         std::cout << strstream.str() << std::endl;
     }
 
-    utilities::SimpleXmlUnarchiver unarchiver(strstream, context);
+    utilities::XmlUnarchiver unarchiver(strstream, context);
     InnerObject deserializedInner;
 
     unarchiver["inner"] >> deserializedInner;
