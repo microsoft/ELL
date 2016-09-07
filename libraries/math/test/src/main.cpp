@@ -173,7 +173,6 @@ void TestConstDoubleVector()
     const math::DoubleRowVector u{ 0, 1, 0, 1, 0 };
     auto v = u.GetReference();
     // decltype(u.GetReference()) v = u.GetReference(); // won't compile
-    std::cout << "typeof(v): " << typeid(v).name() << std::endl;
     v += 3; // how does this compile and work?
 }
 
