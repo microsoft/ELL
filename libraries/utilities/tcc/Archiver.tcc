@@ -72,7 +72,7 @@ namespace utilities
     }
 
     // Vector of serializable objects
-    template <typename ValueType, IsSerializable<ValueType> concept>
+    template <typename ValueType, IsArchivable<ValueType> concept>
     void Archiver::ArchiveItem(const char* name, const std::vector<ValueType>& array)
     {
         auto baseTypeName = ValueType::GetTypeName();
@@ -85,7 +85,7 @@ namespace utilities
     }
 
     // Vector of serializable pointers
-    template <typename ValueType, IsSerializable<ValueType> concept>
+    template <typename ValueType, IsArchivable<ValueType> concept>
     void Archiver::ArchiveItem(const char* name, const std::vector<const ValueType*>& array)
     {
         auto baseTypeName = ValueType::GetTypeName();
@@ -134,7 +134,7 @@ namespace utilities
     }
 
     // pointer to non-serializable type
-    template <typename ValueType, IsNotSerializable<ValueType> concept>
+    template <typename ValueType, IsNotArchivable<ValueType> concept>
     void Unarchiver::UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value)
     {
         auto ptr = std::make_unique<ValueType>();
@@ -143,7 +143,7 @@ namespace utilities
     }
 
     // pointer to serializable type
-    template <typename ValueType, IsSerializable<ValueType> concept>
+    template <typename ValueType, IsArchivable<ValueType> concept>
     void Unarchiver::UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value)
     {
         auto baseTypeName = ValueType::GetTypeName();
@@ -171,7 +171,7 @@ namespace utilities
     }
 
     // Vector of serializable objects
-    template <typename ValueType, IsSerializable<ValueType> concept>
+    template <typename ValueType, IsArchivable<ValueType> concept>
     void Unarchiver::UnarchiveItem(const char* name, std::vector<ValueType>& arr)
     {
         arr.clear();
@@ -193,7 +193,7 @@ namespace utilities
     }
 
     // Vector of unique pointers to serializable objects
-    template <typename ValueType, IsSerializable<ValueType> concept>
+    template <typename ValueType, IsArchivable<ValueType> concept>
     void Unarchiver::UnarchiveItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr)
     {
         arr.clear();
@@ -215,7 +215,7 @@ namespace utilities
     }
 
     // Vector of raw pointers to serializable objects
-    template <typename ValueType, IsSerializable<ValueType> concept>
+    template <typename ValueType, IsArchivable<ValueType> concept>
     void Unarchiver::UnarchiveItem(const char* name, std::vector<const ValueType*>& arr)
     {
         arr.clear();

@@ -172,7 +172,7 @@ namespace model
     };
 
     /// <summary> A serialization context used during Model deserialization. Created by the
-    /// model during serialization --- clients shouldn't have to interact directly with this class. </summary>
+    /// model during archival --- clients shouldn't have to interact directly with this class. </summary>
     class ModelSerializationContext: public utilities::SerializationContext
     {
     public:

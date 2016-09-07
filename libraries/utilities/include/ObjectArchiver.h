@@ -32,10 +32,10 @@ namespace utilities
         /// <summary> Constructor for writing </summary>
         /// <param name="context"> The `SerializationContext` to use </param>
         ObjectArchiver(SerializationContext context);
- 
+
         /// <summary> Constructor for reading </summary>
         ///
-        /// <param name="objectDescription"> The description to deserialize data from. </summary>
+        /// <param name="objectDescription"> The description to read data from. </summary>
         /// <param name="context"> The `SerializationContext` to use </param>
         ObjectArchiver(const ObjectArchive& objectDescription, SerializationContext context);
 
@@ -85,12 +85,12 @@ namespace utilities
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(float);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(double);
         virtual void UnarchiveArray(const char* name, std::vector<std::string>& array) override;
-        
+
         virtual void UnarchiveObject(const char* name, IArchivable& value) override;
         virtual bool BeginUnarchiveArrayItem(const std::string& typeName) override;
         virtual void EndUnarchiveArrayItem(const std::string& typeName) override;
 
-   private:
+    private:
         // Serialization
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void WriteScalar(const char* name, const ValueType& value);
@@ -101,7 +101,7 @@ namespace utilities
         template <typename ValueType>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsArchivable<ValueType> concept = 0>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
         // Deserialization

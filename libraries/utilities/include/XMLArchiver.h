@@ -34,7 +34,7 @@ namespace utilities
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="outputStream"> The stream to serialize data to. </summary>
+        /// <param name="outputStream"> The stream to write data to. </summary>
         XmlArchiver(std::ostream& outputStream);
 
         /// <summary> Default Destructor </summary>
@@ -92,7 +92,7 @@ namespace utilities
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="inputStream"> The stream to deserialize data from. </summary>
+        /// <param name="inputStream"> The stream to read data from. </summary>
         SimpleXmlUnarchiver(std::istream& inputStream, SerializationContext context);
 
         /// <summary> Default Destructor </summary>

@@ -71,9 +71,9 @@ namespace utilities
         return _value->IsPrimitiveType();
     }
 
-    bool Variant::IsSerializable() const
+    bool Variant::IsArchivable() const
     {
-        return _value->IsSerializable();
+        return _value->IsArchivable();
     }
 
     bool Variant::IsPointer() const
@@ -81,15 +81,14 @@ namespace utilities
         return _value->IsPointer();
     }
 
-    void Variant::SerializeProperty(const char* name, Archiver& archiver) const
+    void Variant::ArchiveProperty(const char* name, Archiver& archiver) const
     {
-        _value->SerializeProperty(name, archiver);
+        _value->ArchiveProperty(name, archiver);
     }
 
-    // #### TODO: special-case vectors of pointers 
-    void Variant::DeserializeProperty(const char* name, Unarchiver& archiver, SerializationContext& context)
+    void Variant::UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context)
     {
-        _value->DeserializeProperty(name, archiver, context);
+        _value->UnarchiveProperty(name, archiver, context);
     }
 
     std::string to_string(const Variant& variant)

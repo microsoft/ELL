@@ -26,11 +26,11 @@ namespace utilities
 
     /// <summary> Enabled if ValueType inherits from IArchivable. </summary>
     template <typename ValueType>
-    using IsSerializable = typename std::enable_if_t<std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value, int>;
+    using IsArchivable = typename std::enable_if_t<std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value, int>;
 
     /// <summary> Enabled if ValueType does not inherit from IArchivable. </summary>
     template <typename ValueType>
-    using IsNotSerializable = typename std::enable_if_t<(!std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
+    using IsNotArchivable = typename std::enable_if_t<(!std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
 
     /// <summary> A context object used during deserialization. Contains a GenericTypeFactory. </summary>
     class SerializationContext
@@ -123,7 +123,7 @@ namespace utilities
         class PropertyArchiver
         {
         public:
-            /// <summary> Serializes the property. </summary>
+            /// <summary> Write the property to the archiver. </summary>
             ///
             /// <typeparam name="ValueType"> The type of the property. </typeparam>
             /// <param name="value"> The property to serialize. </param>
@@ -202,10 +202,10 @@ namespace utilities
 
         void ArchiveItem(const char* name, const std::vector<std::string>& value);
 
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsArchivable<ValueType> concept = 0>
         void ArchiveItem(const char* name, const std::vector<ValueType>& value);
 
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsArchivable<ValueType> concept = 0>
         void ArchiveItem(const char* name, const std::vector<const ValueType*>& value);
     };
 
@@ -319,11 +319,11 @@ namespace utilities
         void UnarchiveItem(const char* name, ValueType&& value);
 
         // pointer to non-archivable object
-        template <typename ValueType, IsNotSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsNotArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value);
 
         // pointer to archivable object
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value);
 
         // vector of fundamental values
@@ -334,15 +334,15 @@ namespace utilities
         void UnarchiveItem(const char* name, std::vector<std::string>& value);
 
         // vector of IArchivable values
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::vector<ValueType>& value);
 
         // vector of unique pointers to IArchivable
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::vector<std::unique_ptr<ValueType>>& value);
 
         // vector of pointers to IArchivable
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::vector<const ValueType*>& value);
     };
 }

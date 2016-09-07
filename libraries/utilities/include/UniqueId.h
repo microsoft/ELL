@@ -55,7 +55,7 @@ namespace utilities
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(Unarchiver& archiver) override;
-   
+
     private:
         friend std::hash<UniqueId>;
         size_t _id = 0;

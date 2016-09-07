@@ -68,7 +68,7 @@ namespace utilities
     {
         _contexts.push_back(context);
     }
-    
+
     void Unarchiver::UnarchiveValue(const char* name, IArchivable& value)
     {
         auto typeName = BeginUnarchiveObject(name, value.GetRuntimeTypeName());

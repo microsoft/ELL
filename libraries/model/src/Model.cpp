@@ -55,7 +55,7 @@ namespace model
         ModelSerializationContext modelContext(archiver.GetContext(), this);
         archiver.PushContext(modelContext);
 
-        // Deserialize nodes into big array
+        // read nodes into big array
         std::vector<std::unique_ptr<Node>> nodes;
         archiver["nodes"] >> nodes;
 

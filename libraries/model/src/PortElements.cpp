@@ -79,7 +79,7 @@ namespace model
         Node* newNode = newContext.GetNodeFromId(newId);
         if (newNode == nullptr)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find deserialized node.");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find archived node.");
         }
 
         auto ports = newNode->GetOutputPorts();
@@ -94,12 +94,12 @@ namespace model
         }
         if (_referencedPort == newPort)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error deserializing port.");
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error unarchiving port.");
         }
         _referencedPort = newPort;
         if (newPort == nullptr)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't deserialize model::PortRange port");
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive model::PortRange port");
         }
     }
 

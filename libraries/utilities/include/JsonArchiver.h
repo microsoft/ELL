@@ -34,7 +34,7 @@ namespace utilities
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="outputStream"> The stream to serialize data to. </param>
+        /// <param name="outputStream"> The stream to write data to. </param>
         JsonArchiver(std::ostream& outputStream);
 
     protected:
@@ -74,7 +74,7 @@ namespace utilities
         template <typename ValueType>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
-        template <typename ValueType, IsSerializable<ValueType> concept = 0>
+        template <typename ValueType, IsArchivable<ValueType> concept = 0>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
         std::ostream& _out;
@@ -95,7 +95,7 @@ namespace utilities
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="inputStream"> The stream to deserialize data from. </summary>
+        /// <param name="inputStream"> The stream to read data from. </summary>
         JsonUnarchiver(std::istream& inputStream, SerializationContext context);
 
     protected:
@@ -116,7 +116,7 @@ namespace utilities
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(float);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(double);
         virtual void UnarchiveArray(const char* name, std::vector<std::string>& array) override;
-        
+
         virtual void BeginUnarchiveArray(const char* name, const std::string& typeName) override;
         virtual bool BeginUnarchiveArrayItem(const std::string& typeName) override;
         virtual void EndUnarchiveArrayItem(const std::string& typeName) override;
@@ -125,7 +125,6 @@ namespace utilities
         virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName) override;
         virtual void UnarchiveObject(const char* name, IArchivable& value) override;
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName) override;
-
 
     private:
         template <typename ValueType, IsFundamental<ValueType> concept = 0>

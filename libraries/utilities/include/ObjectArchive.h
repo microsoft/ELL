@@ -115,7 +115,6 @@ namespace utilities
         template <typename ValueType>
         void operator<<(ValueType&& value);
 
-
     private:
         std::string _typeName;
         Variant _value;

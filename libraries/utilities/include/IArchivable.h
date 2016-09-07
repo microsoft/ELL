@@ -44,12 +44,12 @@ namespace utilities
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const { return "IArchivable"; }
 
-        /// <summary> Serializes the object. </summary>
+        /// <summary> Writes the object to an archiver. </summary>
         ///
-        /// <param name="archiver">  The archiver. </param>
+        /// <param name="archiver"> The archiver. </param>
         virtual void WriteToArchive(Archiver& archiver) const = 0;
 
-        /// <summary> Deserializes the object. </summary>
+        /// <summary> Reads the object from an unarchiver. </summary>
         ///
         /// <param name="archiver"> The unarchiver. </param>
         virtual void ReadFromArchive(Unarchiver& archiver) = 0;
@@ -62,4 +62,3 @@ namespace utilities
 }
 
 #include "../tcc/IArchivable.tcc"
-

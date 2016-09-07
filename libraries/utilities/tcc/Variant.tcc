@@ -128,13 +128,13 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void VariantDerived<ValueType>::SerializeProperty(const char* name, Archiver& archiver) const
+    void VariantDerived<ValueType>::ArchiveProperty(const char* name, Archiver& archiver) const
     {
         archiver.Archive(name, GetValue());
     }
 
     template <typename ValueType>
-    void VariantDerived<ValueType>::DeserializeProperty(const char* name, Unarchiver& archiver, SerializationContext& context) 
+    void VariantDerived<ValueType>::UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context) 
     {
         archiver.Unarchive(name, _value);
     }
