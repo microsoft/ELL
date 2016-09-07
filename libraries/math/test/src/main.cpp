@@ -169,6 +169,17 @@ void TestSingleVectorProduct()
     testing::ProcessTest("TensorOperations::Product(Vector, Vector)", result == 6);
 }
 
+void TestDoubleAddTo()
+{
+    math::DoubleRowVector u{ 1, 2, 3, 4, 5 };
+    math::DoubleRowVector v{ 0, 1, 0, 1, 0 };
+    math::TensorOperations::AddTo(2.0, v, u);
+
+    math::DoubleRowVector z{ 1, 4, 3, 6, 5 };
+    testing::ProcessTest("TensorOperations::AddTo(scalar, Vector, Vector)", u == z);
+
+}
+
 void TestConstDoubleVector()
 {
     const math::DoubleRowVector u{ 0, 1, 0, 1, 0 };
@@ -187,6 +198,7 @@ int main()
     TestSingleVector();
     TestSingleVectorReference();
     TestSingleVectorProduct();
+    TestDoubleAddTo();
     TestConstDoubleVector();
 
     if(testing::DidTestFail())

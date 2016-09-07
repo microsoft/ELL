@@ -9,6 +9,39 @@
 namespace math
 {
     template<typename ElementType>
+    void TensorOperations::AddTo(ElementType rhsScalar, VectorReferenceBase<ElementType>& lhsVector)
+    {
+        lhsVector += rhsScalar;
+    }
+
+    template<typename ElementType, TensorOrientation Orientation>
+    void TensorOperations::AddTo(ElementType rhsScalar, const VectorReference<ElementType, Orientation>& rhsVector, VectorReference<ElementType, Orientation>& lhsVector)
+    {
+        size_t lhsSize = lhsVector.Size();
+        size_t rhsSize = rhsVector.Size();
+
+        // TODO check inputs for equal size
+
+        ElementType* pLhs = lhsVector.GetDataPointer();
+        size_t lhsStride = lhsVector.GetStride();
+        const ElementType* pRhs = rhsVector.GetDataPointer();
+        size_t rhsStride = rhsVector.GetStride();
+
+#ifdef USE_BLAS
+        return Blas::Axpy(lhsSize, pRhs, rhsStride, pLhs, lhsStride);
+#else
+        const ElementType* pEnd = pLhs + lhsSize;
+
+        while (pLhs < pEnd)
+        {
+            (*pLhs) += rhsScalar * (*pRhs);
+            pLhs += lhsStride;
+            pRhs += rhsStride;
+        }
+#endif
+    }
+
+    template<typename ElementType>
     ElementType TensorOperations::Dot(const VectorReferenceBase<ElementType>& vector1, const VectorReferenceBase<ElementType>& vector2)
     {
         size_t size1 = vector1.Size();
@@ -38,8 +71,8 @@ namespace math
     }
 
     template<typename ElementType>
-    void TensorOperations::Product(const VectorReference<ElementType, TensorOrientation::rowMajor>& left, const VectorReference<ElementType, TensorOrientation::columnMajor>& right, ElementType& result)
+    void TensorOperations::Product(const VectorReference<ElementType, TensorOrientation::rowMajor>& rhsVector1, const VectorReference<ElementType, TensorOrientation::columnMajor>& rhsVector2, ElementType& lhsScalar)
     {
-        result = Dot(left, right);
+        lhsScalar = Dot(rhsVector1, rhsVector2);
     }
 }
