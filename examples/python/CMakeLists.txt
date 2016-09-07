@@ -1,7 +1,7 @@
 #
 # python example projects
 #
-set (PYTHON_EXAMPLES sgd.py run.bat run.sh swigtest.py testing.py lossfunctiontest.py)
+set (PYTHON_EXAMPLES sgd.py run.bat run.sh swigtest.py testing.py lossfunctiontest.py graphtest.py)
 add_custom_target(python_examples ALL DEPENDS ${PYTHON_EXAMPLES} SOURCES ${PYTHON_EXAMPLES})
 
 # copy python example code

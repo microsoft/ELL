@@ -5,14 +5,15 @@ sys.path.append('../../interfaces/python')
 sys.path.append('../../interfaces/python/Release')
 sys.path.append('../../interfaces/python/Debug')
 
-import EMLL
-from EMLL import *
 import lossfunctiontest
+import graphtest
+
+tests = [lossfunctiontest.test, graphtest.test]
 
 def swig_test():
-    if lossfunctiontest.test() == 0:
-        sys.exit(0)
-    else:
-        sys.exit(1)
+    rc = 0
+    for test in tests:
+        rc = rc | test()
+    sys.exit(rc)
 
 swig_test()
