@@ -91,19 +91,19 @@ namespace math
         /// <param name="scalar"> The scalar. </param>
         void operator*=(ElementType scalar);
 
-        /// <summary> Computes the squared 2-norm of the vector. </summary>
+        /// <summary> Computes the 2-norm of the vector (not squared 2-norm). </summary>
         ///
-        /// <returns> The squared 2-norm. </returns>
-        ElementType Norm2() const;
+        /// <returns> The 2-norm. </returns>
+        ElementType Norm2() const; 
 
         /// <summary> Computes the 1-norm of the vector. </summary>
         ///
-        /// <returns> The squared 1-norm. </returns>
+        /// <returns> The 1-norm. </returns>
         ElementType Norm1() const;
 
         /// <summary> Computes the 0-norm of the vector. </summary>
         ///
-        /// <returns> The squared 0-norm. </returns>
+        /// <returns> The 0-norm. </returns>
         ElementType Norm0() const;
 
         /// <summary> Gets the minimal element in the vector. </summary>

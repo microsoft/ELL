@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BlasWrapper.h"
-//#define USE_BLAS
+#define USE_BLAS
 
 // utilities
 #include "Exception.h"
@@ -107,7 +107,7 @@ namespace math
 #ifdef USE_BLAS
         return Blas::Nrm2(_size, _pData, _stride);
 #else
-        return Aggregate([](ElementType x){ return x*x; });
+        return std::sqrt(Aggregate([](ElementType x){ return x*x; }));
 #endif
     }
 

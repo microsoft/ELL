@@ -30,7 +30,7 @@ void TestDoubleVector()
     math::DoubleColumnVector a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("DoubleColumnVector::operator[]", v == a);
 
-    testing::ProcessTest("DoubleColumnVector::Norm2", a.Norm2() == 7*7+9*9);
+    testing::ProcessTest("DoubleColumnVector::Norm2", testing::IsEqual(a.Norm2(), std::sqrt(7*7+9*9)));
     testing::ProcessTest("DoubleColumnVector::Norm1", a.Norm1() == 7+9);
     testing::ProcessTest("DoubleColumnVector::Norm0", a.Norm0() == 2);
     testing::ProcessTest("DoubleColumnVector::Min", a.Min() == 0);
@@ -61,7 +61,7 @@ void TestSingleVector()
     math::SingleColumnVector a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("SingleColumnVector::operator[]", v == a);
 
-    testing::ProcessTest("SingleColumnVector::Norm2", a.Norm2() == 7*7+9*9);
+    testing::ProcessTest("SingleColumnVector::Norm2", testing::IsEqual(a.Norm2(), std::sqrtf(7*7+9*9)));
     testing::ProcessTest("SingleColumnVector::Norm1", a.Norm1() == 7+9);
     testing::ProcessTest("SingleColumnVector::Norm0", a.Norm0() == 2);
     testing::ProcessTest("SingleColumnVector::Min", a.Min() == 0);
@@ -95,7 +95,7 @@ void TestDoubleVectorReference()
     testing::ProcessTest("DoubleColumnVectorReference::operator[]", u == a);
 
     auto b = w.GetSubVector(0, 2);
-    testing::ProcessTest("DoubleColumnVectorReference::Norm2", b.Norm2() == 7*7);
+    testing::ProcessTest("DoubleColumnVectorReference::Norm2", testing::IsEqual(b.Norm2(), std::sqrt(7*7)));
     testing::ProcessTest("DoubleColumnVectorReference::Norm1", b.Norm1() == 7);
     testing::ProcessTest("DoubleColumnVectorReference::Norm0", b.Norm0() == 1);
     testing::ProcessTest("DoubleColumnVectorReference::Min", b.Min() == 0);
@@ -129,7 +129,7 @@ void TestSingleVectorReference()
     testing::ProcessTest("SingleColumnVectorReference::operator[]", u == a);
 
     auto b = w.GetSubVector(0, 2);
-    testing::ProcessTest("SingleColumnVectorReference::Norm2", b.Norm2() == 7*7);
+    testing::ProcessTest("SingleColumnVectorReference::Norm2", testing::IsEqual(b.Norm2(), std::sqrtf(7*7)));
     testing::ProcessTest("SingleColumnVectorReference::Norm1", b.Norm1() == 7);
     testing::ProcessTest("SingleColumnVectorReference::Norm0", b.Norm0() == 1);
     testing::ProcessTest("SingleColumnVectorReference::Min", b.Min() == 0);

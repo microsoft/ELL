@@ -10,22 +10,22 @@ namespace math
 {
     namespace Blas
     {
-        /// <summary> Wraps the BLAS NRM2 function, which computes the squared 2-norm of a vector . </summary>
+        /// <summary> Wraps the BLAS NRM2 function, which computes the 2-norm of a vector . </summary>
         ///
         /// <param name="size"> The size of the vector. </param>
         /// <param name="ptr"> Pointer to the first element of the array. </param>
         /// <param name="stride"> The stride of the array. </param>
         ///
-        /// <returns> The squard 2-norm of the vector. </returns>
+        /// <returns> The 2-norm of the vector. </returns>
         float Nrm2(size_t size, const float* ptr, size_t stride);
 
-        /// <summary> Wraps the BLAS NRM2 function, which computes the squared 2-norm of a vector . </summary>
+        /// <summary> Wraps the BLAS NRM2 function, which computes the 2-norm of a vector . </summary>
         ///
         /// <param name="size"> The size of the vector. </param>
         /// <param name="ptr"> Pointer to the first element of the array. </param>
         /// <param name="stride"> The stride of the array. </param>
         ///
-        /// <returns> The squard 2-norm of the vector. </returns>
+        /// <returns> The 2-norm of the vector. </returns>
         double Nrm2(size_t size, double* ptr, size_t stride);
 
         /// <summary> Wraps the BLAS AXPY function: v += alpha * u </summary>
