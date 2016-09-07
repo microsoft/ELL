@@ -19,16 +19,6 @@
 namespace math
 {
     //
-    // TensorReferenceBase
-    //
-
-    //template<typename ElementType>
-    //math::TensorReferenceBase<ElementType>::TensorReferenceBase(ElementType* pData) : _pData(pData)
-    //{
-    //    // TODO assert pData!= 0
-    //}
-
-    //
     // ConstVectorReference
     //  
 
