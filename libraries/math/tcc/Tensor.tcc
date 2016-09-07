@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BlasWrapper.h"
-#define USE_BLAS
+// #define USE_BLAS
 
 // utilities
 #include "Exception.h"
@@ -15,7 +15,6 @@
 // stl
 #include <memory> // for std::move
 #include <algorithm> // for std::generate
-#include "..\include\Tensor.h"
 
 namespace math
 {
