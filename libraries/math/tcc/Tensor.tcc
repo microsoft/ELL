@@ -97,19 +97,19 @@ namespace math
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    const ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetReference() const
+    ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetReference() const
     {
         return ConstVectorReference<ElementType, Orientation>(_pData, _size, _stride);
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    const ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier) const
+    ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier) const
     {
         return ConstVectorReference<ElementType, Orientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
     }
 
     template<typename ElementType, TensorOrientation Orientation>
-    const ConstVectorReference<ElementType, FlipOrientation<Orientation>::value> ConstVectorReference<ElementType, Orientation>::Transpose() const
+    ConstVectorReference<ElementType, FlipOrientation<Orientation>::value> ConstVectorReference<ElementType, Orientation>::Transpose() const
     {
         return ConstVectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _stride);
     }

@@ -183,9 +183,8 @@ void TestDoubleAddTo()
 void TestConstDoubleVector()
 {
     const math::DoubleRowVector u{ 0, 1, 0, 1, 0 };
-    const auto v = u.GetReference();
-    // decltype(u.GetReference()) v = u.GetReference(); // won't compile
-    //v += 3; // how does this compile and work?
+    auto v = u.GetReference();
+    //v += 3; // should not compile
 }
 
 

@@ -16,28 +16,6 @@
 
 namespace math
 {
-    /// <summary> Base class for tensor reference classes. </summary>
-    ///
-    /// <typeparam name="ElementPointerType"> Tensor element type. </typeparam>
-    //template <typename ElementType>
-    //class TensorReferenceBase
-    //{
-    //public:
-    //    TensorReferenceBase(TensorReferenceBase&&) = default;
-    //    TensorReferenceBase(const TensorReferenceBase&) = default;
-
-    //protected:
-    //    // protected ctor accessible only through derived classes
-    //    TensorReferenceBase(ElementType* pData);
-
-    //    // allow operations defined in the TensorOperations struct to access raw data vector
-    //    friend struct TensorOperations;
-    //    ElementType* GetDataPointer() { return _pData; }
-    //    const ElementType* GetDataPointer() const { return _pData; }
-
-    //    ElementType* _pData;
-    //};
-
     /// <summary> Enum of possible matrix and vector orientations. </summary>
     enum class TensorOrientation { rowMajor, columnMajor };
 
@@ -112,7 +90,7 @@ namespace math
         /// <summary> Gets a reference to this vector. </summary>
         ///
         /// <returns> A reference to this vector. </returns>
-        const ConstVectorReference<ElementType, Orientation> GetReference() const;
+        ConstVectorReference<ElementType, Orientation> GetReference() const;
 
         /// <summary> Gets a reference to a sub-vector. </summary>
         ///
@@ -121,12 +99,12 @@ namespace math
         /// <param name="strideMultiplier"> The stride multiplier of the sub-vector, defaults to 1. </param>
         ///
         /// <returns> The sub vector. </returns>
-        const ConstVectorReference<ElementType, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier=1) const;
+        ConstVectorReference<ElementType, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier=1) const;
 
         /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
         /// <returns> A reference to the transpose of this vector. </returns>
-        const ConstVectorReference<ElementType, FlipOrientation<Orientation>::value> Transpose() const;
+        ConstVectorReference<ElementType, FlipOrientation<Orientation>::value> Transpose() const;
 
         /// <summary> Equality operator. </summary>
         ///
