@@ -22,10 +22,6 @@
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
-    // Temporary
-    using Archiver = Archiver; // ObjectArchive;
-    using Unarchiver = Unarchiver; // ObjectArchive;
-
     /// <summary> Holds information describing the properties (fields) of an object </summary>
     class ObjectArchive
     {
@@ -124,20 +120,9 @@ namespace utilities
         std::string _typeName;
         Variant _value;
         mutable std::unordered_map<std::string, ObjectArchive> _properties;
-        mutable std::function<ObjectArchive(const ObjectArchive* self)> _fillInPropertiesFunction;
 
         // friends
         friend class IDescribable;
-
-        // overload that gets called for IDescribable properties
-        template <typename ValueType>
-        void SetGetPropertiesFunction(std::true_type);
-
-        // overload that gets called for non-IDescribable properties
-        template <typename ValueType>
-        void SetGetPropertiesFunction(std::false_type);
-
-        void FillInDescription() const;
     };
     
     /// <summary>

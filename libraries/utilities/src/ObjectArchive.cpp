@@ -22,19 +22,11 @@ namespace utilities
     //
     const ObjectArchive::PropertyCollection& ObjectArchive::GetProperties() const
     {
-        for(const auto& prop: _properties)
-        {
-            prop.second.FillInDescription();
-        }
         return _properties;
     }
 
     ObjectArchive::PropertyCollection& ObjectArchive::GetProperties()
     {
-        for(const auto& prop: _properties)
-        {
-            prop.second.FillInDescription();
-        }
         return _properties;
     }
 
@@ -55,16 +47,6 @@ namespace utilities
         }
     }
 
-    void ObjectArchive::FillInDescription() const 
-    { 
-        if(_fillInPropertiesFunction)
-        {
-            auto newProperties = _fillInPropertiesFunction(this);
-            _properties = newProperties._properties;
-            // _fillInPropertiesFunction = nullptr; // Note: can't nullify function here --- it needs to get called more than once (why?)
-        }
-    }
-
     const ObjectArchive& ObjectArchive::operator[](const std::string& propertyName) const
     {
         auto iter = _properties.find(propertyName); 
@@ -72,7 +54,6 @@ namespace utilities
         {
             throw InputException(InputExceptionErrors::badData);
         }
-        iter->second.FillInDescription();
         return iter->second;
     }
 
