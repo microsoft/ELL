@@ -16,7 +16,7 @@ BasedOnStyle:  Mozilla
 AlignAfterOpenBracket: Align
 AlignTrailingComments: false
 AllowShortBlocksOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Inline
 AllowShortIfStatementsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
@@ -27,7 +27,7 @@ BinPackParameters: true
 ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 4
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ColumnLimit: 160
+ColumnLimit: 0
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 BreakBeforeBraces: Custom
