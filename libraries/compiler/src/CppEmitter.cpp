@@ -189,28 +189,28 @@ namespace emll
 		{
 			switch (cmp)
 			{
-				case ComparisonType::Eq:
-				case ComparisonType::EqF:
+				case ComparisonType::eq:
+				case ComparisonType::eqF:
 					_writer.Write("==");
 					break;
-				case ComparisonType::Lt:
-				case ComparisonType::LtF:
+				case ComparisonType::lt:
+				case ComparisonType::ltF:
 					_writer.Write('<');
 					break;
-				case ComparisonType::Lte:
-				case ComparisonType::LteF:
+				case ComparisonType::lte:
+				case ComparisonType::lteF:
 					_writer.Write("<=");
 					break;
-				case ComparisonType::Gt:
-				case ComparisonType::GtF:
+				case ComparisonType::gt:
+				case ComparisonType::gtF:
 					_writer.Write('>');
 					break;
-				case ComparisonType::Gte:
-				case ComparisonType::GteF:
+				case ComparisonType::gte:
+				case ComparisonType::gteF:
 					_writer.Write(">=");
 					break;
-				case ComparisonType::Neq:
-				case ComparisonType::NeqF:
+				case ComparisonType::neq:
+				case ComparisonType::neqF:
 					_writer.Write("!=");
 					break;
 				default:

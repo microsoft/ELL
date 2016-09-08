@@ -73,29 +73,29 @@ namespace emll
 		{
 			None = 0,
 			///<summary>Integer Equal</summary>
-			Eq,
+			eq,
 			///<summary>Integer Less than</summary>
-			Lt,
+			lt,
 			///<summary>Integer Less than equals</summary>
-			Lte,
+			lte,
 			///<summary>Integer Greater than</summary>
-			Gt,
+			gt,
 			///<summary>Integer Greater than equals</summary>
-			Gte,
+			gte,
 			///<summary>Integer Not Equals</summary>
-			Neq,
+			neq,
 			///<summary>Floating point Equal</summary>
-			EqF,
+			eqF,
 			///<summary>Floating point less than </summary>
-			LtF,
+			ltF,
 			///<summary>Floating point less than equals</summary>
-			LteF,
+			lteF,
 			///<summary>Floating point greater than</summary>
-			GtF,
+			gtF,
 			///<summary>Floating point less than equals</summary>
-			GteF,
+			gteF,
 			///<summary>Floating point Not equals</summary>
-			NeqF
+			neqF
 		};
 
 		///<summary>A collection of types</summary>

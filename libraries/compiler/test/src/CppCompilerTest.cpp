@@ -24,7 +24,7 @@ void TestCppCompilerGeneral()
 	compiler.EnsureEmitted(*varV2);
 	compiler.Function().For("i", 32);
 	{
-		compiler.Function().If("j", ComparisonType::Gte, 143);
+		compiler.Function().If("j", ComparisonType::gte, 143);
 		compiler.Function().EndIf();
 	}
 	compiler.Function().EndFor();

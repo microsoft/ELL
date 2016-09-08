@@ -234,27 +234,27 @@ namespace emll
 
 			switch (type)
 			{
-				case ComparisonType::Eq:
+				case ComparisonType::eq:
 					return _builder.CreateICmpEQ(pLVal, pRVal);
-				case ComparisonType::Lt:
+				case ComparisonType::lt:
 					return _builder.CreateICmpSLT(pLVal, pRVal);
-				case ComparisonType::Lte:
+				case ComparisonType::lte:
 					return _builder.CreateICmpSLE(pLVal, pRVal);
-				case ComparisonType::Gt:
+				case ComparisonType::gt:
 					return _builder.CreateICmpSGT(pLVal, pRVal);
-				case ComparisonType::Gte:
+				case ComparisonType::gte:
 					return _builder.CreateICmpSGE(pLVal, pRVal);
-				case ComparisonType::Neq:
+				case ComparisonType::neq:
 					return _builder.CreateICmpNE(pLVal, pRVal);
-				case ComparisonType::EqF:
+				case ComparisonType::eqF:
 					return _builder.CreateFCmpOEQ(pLVal, pRVal);
-				case ComparisonType::LtF:
+				case ComparisonType::ltF:
 					return _builder.CreateFCmpOLT(pLVal, pRVal);
-				case ComparisonType::LteF:
+				case ComparisonType::lteF:
 					return _builder.CreateFCmpOLE(pLVal, pRVal);
-				case ComparisonType::GtF:
+				case ComparisonType::gtF:
 					return _builder.CreateFCmpOGT(pLVal, pRVal);
-				case ComparisonType::GteF:
+				case ComparisonType::gteF:
 					return _builder.CreateFCmpOGE(pLVal, pRVal);
 				default:
 					throw new CompilerException(CompilerError::comparisonTypeNotSupported);

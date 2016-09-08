@@ -259,7 +259,7 @@ namespace emll
 				_pCurBlock->Var<int>(iVarName).Space()
 					.Assign().Space()
 					.Literal(0).Semicolon().Space()
-					.Cmp<int>(iVarName, ComparisonType::Lt, count).Semicolon().Space()
+					.Cmp<int>(iVarName, ComparisonType::lt, count).Semicolon().Space()
 					.Identifier(iVarName).Increment();
 			}
 			_pCurBlock->CloseParan().NewLine();

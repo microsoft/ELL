@@ -87,11 +87,11 @@ void TestLLVM()
 
 		//auto itemInt = fnMain.CastFloatToInt(item);
 		IRIfEmitter ife(fnMain);
-		ife.If(ComparisonType::LtF, item, fnMain.Literal(5.7));
+		ife.If(ComparisonType::ltF, item, fnMain.Literal(5.7));
 		{
 			fnMain.Print("First IF!\n");
 		}
-		ife.If(ComparisonType::EqF, item, fnMain.Literal(6.6));
+		ife.If(ComparisonType::eqF, item, fnMain.Literal(6.6));
 		{
 			fnMain.Print("Second If!\n");
 		}
@@ -695,27 +695,50 @@ model::Model MakeForestDeep()
 
 void TestForest()
 {
-	//model::Model model = MakeForest();
-	model::Model model = MakeForestDeep();
+	model::Model model = MakeForest();
+	//model::Model model = MakeForestDeep();
 
 	std::vector<double> data = { 0.2, 0.5, 0.0 };
 
 	IRCompiler compiler;
 	compiler.CompileModel("TestForest", model);
-	auto& module = compiler.Module();
-	/*
-	module.DeclarePrintf();
+	compiler.DebugDump();
 
+	auto& module = compiler.Module();
+	module.DeclarePrintf();
 
 	auto fnMain = module.AddMain();
 	llvm::Value* pData = module.Constant("c_data", data);
-	llvm::Value* pResult = fnMain.Var(ValueType::Double, 1);
- 	fnMain.Call("TestForest", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
+	llvm::Value* pResult = nullptr;
+	auto args = module.GetFunction("TestForest")->args();
+	IRValueList callArgs;
+	callArgs.push_back(fnMain.PtrOffset(pData, 0));
+	size_t i = 0;
+	for (auto &arg : args)
+	{
+		if (i > 0)
+		{
+			llvm::Value* pArg = nullptr;  
+			if (pResult == nullptr)
+			{
+				pArg = fnMain.Var(ValueType::Double, 1);
+				pResult = pArg;
+			}
+			else
+			{
+				pArg = fnMain.Var(ValueType::Int32, 1);
+			}
+			callArgs.push_back(fnMain.PtrOffset(pArg, 0));
+		}
+		++i;
+	}
+ 	//fnMain.Call("TestForest", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
+	fnMain.Call("TestForest", callArgs);
 
 	fnMain.PrintForEach("%f\n", pResult, 1);
 	fnMain.Ret();
 	fnMain.Verify();
-	*/
+
 	compiler.DebugDump();
 	module.WriteBitcodeToFile("C:\\temp\\emll\\forest.bc");
 	module.WriteAsmToFile("C:\\temp\\emll\\forest.asm");

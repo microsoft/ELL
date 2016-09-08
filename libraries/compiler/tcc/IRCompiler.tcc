@@ -474,7 +474,7 @@ namespace emll
 			else
 			{
 				IRIfEmitter ife = _fn.If();
-				ife.If(ComparisonType::Eq, pSelectorVal, _fn.Literal(0));
+				ife.If(ComparisonType::eq, pSelectorVal, _fn.Literal(0));
 				{
 					_fn.Store(pResult, LoadVar(pElements->GetInputElement(0)));
 				}

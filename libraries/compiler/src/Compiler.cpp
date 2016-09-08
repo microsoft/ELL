@@ -559,15 +559,21 @@ namespace emll
 		template<>
 		ComparisonType Compiler::GetComparison<double>(const nodes::BinaryPredicateNode<double>& node) const
 		{
-			using Bop = nodes::BinaryPredicateNode<double>;
+			using BNode = nodes::BinaryPredicateNode<double>;
 			switch (node.GetPredicateType())
 			{
-				case Bop::PredicateType::equal:
-					return ComparisonType::EqF;
-				case Bop::PredicateType::greater:
-					return ComparisonType::GtF;
-				case Bop::PredicateType::less:
-					return ComparisonType::LtF;
+				case BNode::PredicateType::equal:
+					return ComparisonType::eqF;
+				case BNode::PredicateType::notEqual:
+					return ComparisonType::neqF;
+				case BNode::PredicateType::greater:
+					return ComparisonType::gtF;
+				case BNode::PredicateType::greaterOrEqual:
+					return ComparisonType::gteF;
+				case BNode::PredicateType::less:
+					return ComparisonType::ltF;
+				case BNode::PredicateType::lessOrEqual:
+					return ComparisonType::lteF;
 				default:
 					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
 			}
@@ -576,15 +582,21 @@ namespace emll
 		template<>
 		ComparisonType Compiler::GetComparison<int>(const nodes::BinaryPredicateNode<int>& node) const
 		{
-			using Bop = nodes::BinaryPredicateNode<int>;
+			using BNode = nodes::BinaryPredicateNode<int>;
 			switch (node.GetPredicateType())
 			{
-				case Bop::PredicateType::equal:
-					return ComparisonType::Eq;
-				case Bop::PredicateType::greater:
-					return ComparisonType::Gt;
-				case Bop::PredicateType::less:
-					return ComparisonType::Lt;
+				case BNode::PredicateType::equal:
+					return ComparisonType::eq;
+				case BNode::PredicateType::notEqual:
+					return ComparisonType::neq;
+				case BNode::PredicateType::greater:
+					return ComparisonType::gt;
+				case BNode::PredicateType::greaterOrEqual:
+					return ComparisonType::gte;
+				case BNode::PredicateType::less:
+					return ComparisonType::lt;
+				case BNode::PredicateType::lessOrEqual:
+					return ComparisonType::lte;
 				default:
 					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
 			}

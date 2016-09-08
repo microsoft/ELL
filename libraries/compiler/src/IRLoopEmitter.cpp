@@ -46,7 +46,7 @@ namespace emll
 		{
 			CreateBlocks();
 			EmitIterationVar(ValueType::Int32, _fn.Literal(iStartAt));
-			EmitCondition(ComparisonType::Lt, _fn.Literal(iMaxValue));
+			EmitCondition(ComparisonType::lt, _fn.Literal(iMaxValue));
 			EmitIncrement(ValueType::Int32, _fn.Literal(stepSize));
 			return PrepareBody();
 		}
@@ -57,7 +57,7 @@ namespace emll
 
 			CreateBlocks();
 			EmitIterationVar(ValueType::Int32, _fn.Literal(0));
-			EmitCondition(ComparisonType::Lt, pRepeatCount);
+			EmitCondition(ComparisonType::lt, pRepeatCount);
 			EmitIncrement(ValueType::Int32, _fn.Literal(1));
 			return PrepareBody();
 		}
