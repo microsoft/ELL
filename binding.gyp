@@ -68,6 +68,7 @@
             ],
             'sources': [
                 '<(include_path_prefix)/EMLL/interfaces/common/src/DataLoadersInterface.cpp',                
+                '<(include_path_prefix)/EMLL/interfaces/common/src/DataLoadersInterface.cpp',
                 '<(include_path_prefix)/EMLL/interfaces/common/src/RowDatasetInterface.cpp',
                 '<(include_path_prefix)/EMLL/build/interfaces/javascript/EMLLJAVASCRIPT_wrap.cxx'
             ],
