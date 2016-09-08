@@ -7,13 +7,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Vector.h"
+#include "Matrix.h"
 #include "Operations.h"
+#include "Print.h"
 
 // testing
 #include "testing.h"
 
 // stl
 #include <random>
+#include <iostream>
 
 void TestDoubleVector()
 {
@@ -187,6 +190,22 @@ void TestConstDoubleVector()
     //v += 3; // should not compile
 }
 
+void TestDoubleMatrix()
+{
+    math::DoubleColumnMatrix M(15, 10);
+
+    auto N = M.GetSubMatrix(2, 5, 3, 3, 3, 2);
+    N(0, 0) = 1.0;
+    N(1, 1) = 2.0;
+    N(2, 2) = 3.0;
+
+    math::Print(N, std::cout);
+    std::cout << std::endl;
+
+    math::Print(M, std::cout);
+    std::cout << std::endl;
+
+}
 
 /// Runs all tests
 ///
@@ -200,6 +219,8 @@ int main()
     TestSingleVectorProduct();
     TestDoubleAddTo();
     TestConstDoubleVector();
+
+    TestDoubleMatrix();
 
     if(testing::DidTestFail())
     {

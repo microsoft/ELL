@@ -260,7 +260,7 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     Vector<ElementType, Orientation>::Vector(std::initializer_list<ElementType> list) : _data(list.begin(), list.end()), VectorReference<ElementType, Orientation>(nullptr, list.size(), 1)
     {
-        _pData = _data.data(); // TODO do this in a privat emember called setDataPointer
+        _pData = _data.data(); 
     }
 
     template<typename ElementType, VectorOrientation Orientation>

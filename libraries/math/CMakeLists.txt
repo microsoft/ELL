@@ -15,11 +15,15 @@ endif()
 set (SRC src/BlasWrapper.cpp)
 
 set (INCLUDE include/BlasWrapper.h
+             include/Matrix.h
              include/Vector.h
-             include/Operations.h)
+             include/Operations.h
+             include/Print.h)
 
-set (TCC tcc/Vector.tcc
-         tcc/Operations.tcc)
+set (TCC tcc/Matrix.tcc
+         tcc/Vector.tcc
+         tcc/Operations.tcc
+         tcc/Print.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -29,10 +33,12 @@ if(${APPLE})
   set (BLASDirectory /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/)
   set (BLASLibrary cblas)
 elseif(${WIN32})
-  set (BLASDirectory ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include)
-  set (BLASLibrary ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/libopenblas.a)
-endif()
+  set (BLASDirectory ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include)
+  set (BLASLibrary ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/lib/libopenblas.dll.a)
 
+  set (BLASDLLDirectory ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/bin)
+  add_custom_command(TARGET math POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLASDLLDirectory}/libopenblas.dll $<TARGET_FILE_DIR:math>)
+endif()
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include ${BLASDirectory})

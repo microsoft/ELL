@@ -16,7 +16,7 @@
 
 namespace math
 {
-    /// <summary> Enum of possible matrix and vector orientations. </summary>
+    /// <summary> Enum of possible vector orientations. </summary>
     enum class VectorOrientation { row, column };
 
     /// <summary> Helper class that flips orientation at compile time. </summary>
