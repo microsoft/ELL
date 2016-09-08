@@ -57,8 +57,7 @@ namespace utilities
     /// <summary>
     /// The Archiver and Unarchiver abstract base classes facilitate serialization and
     /// deserialization of some fundamental types, `std::string`s, `std::vector`s, and
-    /// classes that derive from the IArchivable abstract base class, as well as implementing a
-    /// static method called `GetTypeName`. Serializing a couple of
+    /// classes that implement the necessary functions. Serializing a couple of
     /// variables to a string stream is as simple as
     ///
     ///     double x = 5.3;
@@ -111,7 +110,7 @@ namespace utilities
     /// A typical implementation of ReadFromArchive() will include a similar sequence of calls to
     /// archiver.ReadFromArchive().
     ///
-    /// Serialization and deserialization of std::unique_pointers to archivable objects
+    /// Serialization and deserialization of pointers and `std::unique_pointer`s to archivable objects
     /// (that is, classes that derive from IArchivable, have a default constructor, and implement
     /// the static `GetTypeName` function) is supported as well.
     ///

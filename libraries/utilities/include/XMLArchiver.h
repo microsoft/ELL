@@ -143,7 +143,7 @@ namespace utilities
         Tokenizer _tokenizer;
     };
 
-    // XML utility functions
+    /// <summary> XML utility functions --- for internal use by `XMLArchiver` and `XMLUnarchiver` </summary>
     class XmlUtilities
     {
     public:
