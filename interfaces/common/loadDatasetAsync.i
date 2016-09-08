@@ -62,7 +62,7 @@
 		{
 			Nan::HandleScope scope;
 			// passing out a new pointer to JS world, why cant we send a copy??
-			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_dataiterator), SWIGTYPE_p_utilities__AnyIteratorT_dataset__SupervisedExampleT_dataset__IDataVector_t_t, 0 | 0);
+			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_dataiterator), SWIGTYPE_p_utilities__AnyIteratorT_dataset__ExampleT_dataset__IDataVector_dataset__WeightLabel_t_t, 0 | 0);
 			
 			v8::Local<v8::Value> argv[] = { jsresult };
 			callback->Call(1, argv);
