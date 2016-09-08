@@ -170,8 +170,8 @@ void TestAccumulatorCpp(bool expanded)
 
 void TestForestCpp()
 {
-	model::Model model = MakeForestDeep();
-	//model::Model model = MakeForest();
+	//model::Model model = MakeForestDeep();
+	model::Model model = MakeForest();
 
 	std::vector<double> data = { 0.2, 0.5, 0.0 };
 

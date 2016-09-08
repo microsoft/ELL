@@ -108,6 +108,7 @@ namespace emll
 			CppBlockList _blocks;
 			CppBlock* _pVariables;
 			CppBlock* _pCurBlock = nullptr;
+			//int _mergeCount = 0;
 		};
 	}
 }

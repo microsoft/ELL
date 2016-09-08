@@ -417,6 +417,10 @@ namespace emll
 		CppEmitter& CppEmitter::Append(CppEmitter& emitter)
 		{
 			std::string code = emitter.Code();
+			if (code.length() == 0)
+			{
+				return *this;
+			}
 			int indentDelta = Indent() - emitter.Indent();
 			if (indentDelta <= 0)
 			{ 

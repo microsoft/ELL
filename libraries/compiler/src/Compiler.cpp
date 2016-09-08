@@ -42,6 +42,7 @@ namespace emll
 		static const std::string c_UnaryNodeType = "UnaryOperationNode";
 		static const std::string c_BinaryPredicateNodeType = "BinaryPredicateNode";
 		static const std::string c_MultiplexerNodeType = "MultiplexerNode";
+		static const std::string c_TypecastNodeType = "TypeCastNode";
 
 		/// <summary>Base class for ML Compiler.</summary>
 		Compiler::Compiler()
@@ -56,7 +57,7 @@ namespace emll
 			model.Visit([this](const model::Node& node) {
 				std::string typeName = node.GetRuntimeTypeName();					
 				//
-				// TODO: Make this a lookup table
+				// TODO: Make this a lookup table when node exposes a stable Type name that does not have type information (double, int etc) embedded
 				//
 				if (IsNodeType(typeName, c_BinaryNodeType))
 				{
@@ -102,10 +103,13 @@ namespace emll
 				{
 					CompileMultiplexerNode(node);
 				}
+				else if (IsNodeType(typeName, c_TypecastNodeType))
+				{
+					CompileTypecastNode(node);
+				}
 				else
 				{
-					//throw new CompilerException(CompilerError::modelNodeTypeNotSupported);
-					std::cout << typeName << std::endl;
+					throw new CompilerException(CompilerError::modelNodeTypeNotSupported);
 				}
 			});
 			EndFunction();
@@ -481,12 +485,32 @@ namespace emll
 
 		void Compiler::CompileMultiplexerNode(const model::Node& node)
 		{
-			auto value = node.GetInputPorts()[0];
-			auto selector = node.GetInputPorts()[1];
-			if (value->GetType() == model::Port::PortType::real &&
-				selector->GetType() == model::Port::PortType::boolean)
+			auto valueType = node.GetInputPorts()[0]->GetType();
+			auto selectorType = node.GetInputPorts()[1]->GetType();
+			if (valueType == model::Port::PortType::real &&
+				selectorType == model::Port::PortType::boolean)
 			{
 				CompileMultiplexerNode(static_cast<const nodes::MultiplexerNode<double, bool>&>(node));
+			}
+			else if (valueType == model::Port::PortType::boolean &&
+				selectorType == model::Port::PortType::boolean)
+			{
+				CompileMultiplexerNode(static_cast<const nodes::MultiplexerNode<bool, bool>&>(node));
+			}
+			else
+			{
+				throw new CompilerException(CompilerError::portTypeNotSupported);
+			}
+		}
+
+		void Compiler::CompileTypecastNode(const model::Node& node)
+		{
+			auto sourceType = node.GetInputPorts()[0]->GetType();
+			auto destType = node.GetOutputPorts()[0]->GetType();
+			if (sourceType == model::Port::PortType::boolean &&
+				destType == model::Port::PortType::integer)
+			{
+				CompileTypecastNode(static_cast<const nodes::TypeCastNode<bool, int>&>(node));
 			}
 			else
 			{

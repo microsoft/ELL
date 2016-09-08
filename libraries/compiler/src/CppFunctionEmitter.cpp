@@ -23,6 +23,12 @@ namespace emll
 		CppBlock* CppFunctionEmitter::MergeBlocks(CppBlock* pTarget, CppBlock* pSrc)
 		{
 			assert(pTarget != nullptr);
+			/*
+			++_mergeCount;
+			std::stringstream comment;
+			comment << "Merge" << _mergeCount;
+			pTarget->Comment(comment.str());
+			*/
 			pTarget->Append(pSrc);
 			if (pSrc == _pCurBlock)
 			{
@@ -74,9 +80,9 @@ namespace emll
 
 		CppFunctionEmitter& CppFunctionEmitter::End()
 		{
-			_pCurBlock->EndBlock();
 			_pVariables->NewLine();
 			MergeBlocks();
+			_pCurBlock->EndBlock();
 			return *this;
 		}
 

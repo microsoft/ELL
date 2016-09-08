@@ -27,6 +27,7 @@
 #include "UnaryOperationNode.h"
 #include "MultiplexerNode.h"
 #include "BinaryPredicateNode.h"
+#include "TypeCastNode.h"
 
 #include <functional>
 #include <unordered_map>
@@ -98,6 +99,10 @@ namespace emll
 			virtual void CompileDelayNode(const model::Node& node);
 			///<summary>Compile a UnaryNode</summary>
 			virtual void CompileUnaryNode(const model::Node& node);
+			///<summary>Compile a MultiplexerNode</summary>
+			virtual void CompileMultiplexerNode(const model::Node& node);
+			///<summary>Compile a Typecast node</summary>
+			virtual void CompileTypecastNode(const model::Node& node);
 
 			//---------------------------------------------------
 			//
@@ -136,10 +141,12 @@ namespace emll
 			virtual void CompileUnaryNode(const nodes::UnaryOperationNode<double>& node) { NotSupported(); }
 			///<summary>Compile a UnaryNode</summary>
 			virtual void CompileUnaryNode(const nodes::UnaryOperationNode<int>& node) { NotSupported(); }
-
-			///<summary>Compile an ElementSelectorNode</summary>
-			virtual void CompileMultiplexerNode(const model::Node& node);
-			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<double, bool>& node) = 0;
+			///<summary>Compile a MultiplexerNode</summary>
+			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<double, bool>& node) { NotSupported(); }
+			///<summary>Compile a MultiplexerNode</summary>
+			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<bool, bool>& node) { NotSupported(); }
+			///<summary>Compile a TypecastNode</summary>
+			virtual void CompileTypecastNode(const nodes::TypeCastNode<bool, int>& node) { NotSupported(); };
 
 			///<summary>Ensure a variable is emitted</summary>
 			virtual void EnsureVarEmitted(Variable* pVar) = 0;

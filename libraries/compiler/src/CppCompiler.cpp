@@ -34,6 +34,10 @@ namespace emll
 			{
 				for (auto parentNode : input->GetParentNodes())
 				{
+					if (!ModelEx::HasSingleDescendant(*parentNode))
+					{
+						return nullptr;
+					}
 					CppBlock* pNodeBlock = _nodeBlocks.Get(parentNode);
 					if (pNodeBlock != nullptr)
 					{
@@ -53,6 +57,8 @@ namespace emll
 		{
 			CppBlock* pBlock = _pfn->AppendBlock();
 			_nodeBlocks.Set(node, pBlock);
+			//_pfn->Comment(node.GetRuntimeTypeName());
+			//_pfn->Comment(_pfn->CurrentBlock()->IdString());
 		}
 
 		bool CppCompiler::TryMergeCodeBlock(const model::Node& node)
@@ -66,7 +72,6 @@ namespace emll
 			const model::Node* pParentNode = GetUniqueParent(node);
 			if (pParentNode == nullptr)
 			{
-				//_pfn->Comment(_pfn->CurrentBlock()->IdString());
 				return false;
 			}
 
@@ -127,12 +132,18 @@ namespace emll
 		{
 			if (var.HasEmittedName())
 			{
-				return;
+				if (var.IsLiteral() && var.IsScalar())
+				{
+					Emit(var);
+				}
 			}
-			AllocVar(var);
-			if (var.IsNew())
+			else
 			{
-				Emit(var);
+				AllocVar(var);
+				if (var.IsNew())
+				{
+					Emit(var);
+				}
 			}
 		}
 
@@ -198,6 +209,25 @@ namespace emll
 		const std::string& CppCompiler::LoopVarName()
 		{
 			return c_LoopVarName;
+		}
+
+		void CppCompiler::CompileTypecastNode(const nodes::TypeCastNode<bool, int>& node)
+		{
+			NewCodeBlock(node);
+
+			// The Cpp compiler currently implements bools using integers. So we don't actually need to do a typecast.
+			// We'll just use the already created variable. 
+
+			// Typecast has 1 input and 1 output port
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			VerifyIsScalar(*pInput);
+			VerifyIsScalar(*pOutput);
+
+			Variable* pVar = GetVariableFor(pInput->GetInputElement(0));
+			SetVariableFor(pOutput, pVar);
+			
+			TryMergeCodeBlock(node);
 		}
 	}
 }

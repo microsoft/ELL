@@ -75,6 +75,10 @@ namespace emll
 			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<double>& node) override { CompileBinaryPredicate<double>(node); }
 			///<summary>Compile a binary predicate</summary>
 			virtual void CompileBinaryPredicateNode(const nodes::BinaryPredicateNode<int>& node) override { CompileBinaryPredicate<int>(node);}
+
+			///<summary>Compile a TypecastNode</summary>
+			virtual void CompileTypecastNode(const nodes::TypeCastNode<bool, int>& node);
+
 			///<summary>Ensure a variable is emitted</summary>
 			virtual void EnsureVarEmitted(Variable* pVar) override { EnsureEmitted(*pVar);}
 			virtual void HandleLeafNode(const model::Node& node) override {}
@@ -180,10 +184,9 @@ namespace emll
 			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
 
 			///<summary>Compile an elementselectorNode</summary>
-			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<double, bool>& node) override
-			{
-				CompileMultiplexer<double, bool>(node);
-			}
+			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<double, bool>& node) override { CompileMultiplexer<double, bool>(node);}
+			///<summary>Compile an elementselectorNode</summary>
+			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<bool, bool>& node) override { CompileMultiplexer<bool, bool>(node);}
 			///<summary>Compile an element selector node</summary>
 			template<typename T, typename SelectorType>
 			void CompileMultiplexer(const nodes::MultiplexerNode<T, SelectorType>& node);

@@ -31,9 +31,9 @@ void TestIRCompiler()
 
 void TestCppCompiler()
 {
-	TestAccumulatorCpp(true);
-	TestAccumulatorCpp(false);
 	TestForestCpp();
+	TestAccumulatorCpp(false);
+	TestAccumulatorCpp(true);
 	TestSumCpp(true);
 	TestSumCpp(false);
 	TestMultiplexerCpp();

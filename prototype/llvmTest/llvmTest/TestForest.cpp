@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Tests.h"
 
-double TestForest(double* input0)
+double TestForestOld(double* input0)
 {
 	int t_0;
 	double t_1;
@@ -84,4 +84,120 @@ double TestForest(double* input0)
 	t_22 += 0;
 	/* Block26 */
 	return t_22;
+}
+
+double TestForest(double* input0)
+{
+	int t_0;
+	double t_1;
+	double t_2;
+	int t_3;
+	double t_4;
+	double t_5;
+	int t_6;
+	double t_7;
+	double t_8;
+	int t_9;
+	int t_10;
+	int t_11;
+	int t_12;
+	int t_13;
+	int t_14;
+	int t_15;
+	int t_16;
+	int t_17;
+	int t_18;
+	int t_19;
+	int t_20;
+
+	/* BinaryPredicateNode<double> */
+	/* Block4 */
+	t_0 = (input0[0] > 0.90000000000000002);
+	/* BinaryPredicateNode<double> */
+	/* Block7 */
+	t_3 = (input0[0] > 0.59999999999999998);
+	/* BinaryPredicateNode<double> */
+	/* Block10 */
+	t_6 = (input0[0] > 0.29999999999999999);
+	/* MultiplexerNode<double,bool> */
+	/* Block11 */
+	if (t_6)
+	{
+		/* Merge3 */
+		/* MultiplexerNode<double,bool> */
+		/* Block5 */
+		t_1 = (t_0) ? 4 : -4;
+		/* Merge1 */
+		/* BinaryOperationNode<double> */
+		/* Block6 */
+		t_2 = 1 + t_1;
+		t_7 = t_2;
+	}
+	else
+	{
+		/* Merge4 */
+		/* MultiplexerNode<double,bool> */
+		/* Block8 */
+		t_4 = (t_3) ? 2 : -2;
+		/* Merge2 */
+		/* BinaryOperationNode<double> */
+		/* Block9 */
+		t_5 = -1 + t_4;
+		t_7 = t_5;
+	}
+	/* Merge5 */
+	/* SumNode<double> */
+	/* Block12 */
+	t_8 = 0;
+	t_8 += t_7;
+	t_8 += 0;
+	/* TypeCastNode<bool,int32> */
+	/* Block13 */
+	/* BinaryPredicateNode<int32> */
+	/* Block14 */
+	t_9 = (t_6 == 0);
+	/* Merge6 */
+	/* MultiplexerNode<bool,bool> */
+	/* Block15 */
+	t_10 = (t_9) ? 1 : 0;
+	/* TypeCastNode<bool,int32> */
+	/* Block16 */
+	/* BinaryPredicateNode<int32> */
+	/* Block17 */
+	t_11 = (t_3 == 0);
+	/* Merge7 */
+	/* MultiplexerNode<bool,bool> */
+	/* Block18 */
+	t_12 = (t_11) ? t_10 : 0;
+	/* BinaryPredicateNode<int32> */
+	/* Block19 */
+	t_13 = (t_3 == 1);
+	/* Merge8 */
+	/* MultiplexerNode<bool,bool> */
+	/* Block20 */
+	t_14 = (t_13) ? t_10 : 0;
+	/* BinaryPredicateNode<int32> */
+	/* Block21 */
+	t_15 = (t_6 == 1);
+	/* Merge9 */
+	/* MultiplexerNode<bool,bool> */
+	/* Block22 */
+	t_16 = (t_15) ? 1 : 0;
+	/* TypeCastNode<bool,int32> */
+	/* Block23 */
+	/* BinaryPredicateNode<int32> */
+	/* Block24 */
+	t_17 = (t_0 == 0);
+	/* Merge10 */
+	/* MultiplexerNode<bool,bool> */
+	/* Block25 */
+	t_18 = (t_17) ? t_16 : 0;
+	/* BinaryPredicateNode<int32> */
+	/* Block26 */
+	t_19 = (t_0 == 1);
+	/* Merge11 */
+	/* MultiplexerNode<bool,bool> */
+	/* Block27 */
+	t_20 = (t_19) ? t_16 : 0;
+	return t_8;
 }
