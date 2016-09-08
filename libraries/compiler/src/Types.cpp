@@ -120,22 +120,22 @@ namespace emll
 		template<>
 		OperatorType GetAddForValueType<double>()
 		{
-			return OperatorType::AddF;
+			return OperatorType::addF;
 		}
 		template<>
 		OperatorType GetAddForValueType<int>()
 		{
-			return OperatorType::Add;
+			return OperatorType::add;
 		}
 		template<>
 		OperatorType GetMultiplyForValueType<double>()
 		{
-			return OperatorType::MultiplyF;
+			return OperatorType::multiplyF;
 		}
 		template<>
 		OperatorType GetMultiplyForValueType<int>()
 		{
-			return OperatorType::Multiply;
+			return OperatorType::multiply;
 		}
 
 		bool IsSigned(ValueType type)

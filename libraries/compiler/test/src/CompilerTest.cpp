@@ -78,9 +78,9 @@ void TestLLVM()
 
 		auto i = forLoop.LoadIterationVar();
 		auto item = fnMain.ValueAt(pData, i);
-		auto sum = fnMain.Op(OperatorType::AddF, fnMain.Literal(0.3), item);
+		auto sum = fnMain.Op(OperatorType::addF, fnMain.Literal(0.3), item);
 		fnMain.SetValueAt(pOutput, i, sum);
-		fnMain.OpAndUpdate(pTotal, OperatorType::AddF, sum);
+		fnMain.OpAndUpdate(pTotal, OperatorType::addF, sum);
 
 		llvm::Value* pRegisterSum = fnMain.PtrOffset(pRegisters, i, fnMain.Literal(1));
 		fnMain.Store(pRegisterSum, sum);
@@ -116,7 +116,7 @@ void TestLLVM()
 
 		llvm::Value* pRegisterSum = fnMain.Load(fnMain.PtrOffset(pRegisters, ival, fnMain.Literal(1)));
 
-		fnMain.OpAndUpdate(pOtherTotal, OperatorType::AddF, v);
+		fnMain.OpAndUpdate(pOtherTotal, OperatorType::addF, v);
 		fnMain.Printf({ fnMain.Literal("%f, %f\n"), v, pRegisterSum });
 	}
 	forLoop.End();

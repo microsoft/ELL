@@ -206,21 +206,21 @@ namespace emll
 
 			switch (type)
 			{
-				case OperatorType::Add:
+				case OperatorType::add:
 					return _builder.CreateAdd(pLVal, pRVal, varName);
-				case OperatorType::Subtract:
+				case OperatorType::subtract:
 					return _builder.CreateSub(pLVal, pRVal, varName);
-				case OperatorType::Multiply:
+				case OperatorType::multiply:
 					return _builder.CreateMul(pLVal, pRVal, varName);
-				case OperatorType::DivideS:
+				case OperatorType::divideS:
 					return _builder.CreateSDiv(pLVal, pRVal, varName);
-				case OperatorType::AddF:
+				case OperatorType::addF:
 					return _builder.CreateFAdd(pLVal, pRVal, varName);
-				case OperatorType::SubtractF:
+				case OperatorType::subtractF:
 					return _builder.CreateFSub(pLVal, pRVal, varName);
-				case OperatorType::MultiplyF:
+				case OperatorType::multiplyF:
 					return _builder.CreateFMul(pLVal, pRVal, varName);
-				case OperatorType::DivideF:
+				case OperatorType::divideF:
 					return _builder.CreateFDiv(pLVal, pRVal, varName);
 				default:
 					throw new CompilerException(CompilerError::operatorTypeNotSupported);

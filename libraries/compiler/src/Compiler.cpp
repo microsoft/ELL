@@ -525,13 +525,13 @@ namespace emll
 			switch (node.GetOperation())
 			{
 				case Bop::OperationType::add:
-					return OperatorType::AddF;
+					return OperatorType::addF;
 				case Bop::OperationType::subtract:
-					return OperatorType::SubtractF;
+					return OperatorType::subtractF;
 				case Bop::OperationType::coordinatewiseMultiply:
-					return OperatorType::MultiplyF;
+					return OperatorType::multiplyF;
 				case Bop::OperationType::divide:
-					return OperatorType::DivideF;
+					return OperatorType::divideF;
 				default:
 					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
 			}
@@ -544,13 +544,13 @@ namespace emll
 			switch (node.GetOperation())
 			{
 				case Bop::OperationType::add:
-					return OperatorType::Add;
+					return OperatorType::add;
 				case Bop::OperationType::subtract:
-					return OperatorType::Subtract;
+					return OperatorType::subtract;
 				case Bop::OperationType::coordinatewiseMultiply:
-					return OperatorType::Multiply;
+					return OperatorType::multiply;
 				case Bop::OperationType::divide:
-					return OperatorType::DivideS;
+					return OperatorType::divideS;
 				default:
 					throw new CompilerException(CompilerError::binaryOperationTypeNotSupported);
 			}

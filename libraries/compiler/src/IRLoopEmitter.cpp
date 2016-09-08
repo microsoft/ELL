@@ -89,7 +89,7 @@ namespace emll
 		void IRForLoopEmitter::EmitIncrement(ValueType type, llvm::Value* pIncValue)
 		{
 			_fn.CurrentBlock(_pIncBlock);
-			_fn.OpAndUpdate(_pIterationVar, OperatorType::Add, pIncValue);
+			_fn.OpAndUpdate(_pIterationVar, OperatorType::add, pIncValue);
 			_fn.Branch(_pConditionBlock);
 		}
 

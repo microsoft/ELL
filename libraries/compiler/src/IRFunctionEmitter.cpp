@@ -119,9 +119,9 @@ namespace emll
 			{
 				auto i = forLoop.LoadIterationVar();
 
-				llvm::Value* lOffset = Op(OperatorType::Add, i, Literal(startAtL));
+				llvm::Value* lOffset = Op(OperatorType::add, i, Literal(startAtL));
 				llvm::Value* pLItem = ValueAt(pLVal, lOffset);				
-				llvm::Value* rOffset = Op(OperatorType::Add, i, Literal(startAtR));
+				llvm::Value* rOffset = Op(OperatorType::add, i, Literal(startAtR));
 				llvm::Value* pRItem = ValueAt(pRVal, rOffset);
 				llvm::Value* pTemp = Op(type, pLItem, pRItem);				
 				aggregator(i, pTemp);
@@ -354,16 +354,16 @@ namespace emll
 		void IRFunctionEmitter::DotProductF(int count, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest)
 		{
 			Store(pDest, Literal(0.0));
-			OpV(OperatorType::MultiplyF, count, pLVal, pRVal, [&pDest, this](llvm::Value* i, llvm::Value* pValue) {
-				OpAndUpdate(pDest, OperatorType::AddF, pValue);
+			OpV(OperatorType::multiplyF, count, pLVal, pRVal, [&pDest, this](llvm::Value* i, llvm::Value* pValue) {
+				OpAndUpdate(pDest, OperatorType::addF, pValue);
 			});
 		}
 
 		void IRFunctionEmitter::DotProductF(llvm::Value* pCount, llvm::Value* pLVal, llvm::Value* pRVal, llvm::Value* pDest)
 		{
 			Store(pDest, Literal(0.0));
-			OpV(OperatorType::MultiplyF, pCount, pLVal, pRVal, [&pDest, this](llvm::Value* i, llvm::Value* pValue) {
-				OpAndUpdate(pDest, OperatorType::AddF, pValue);
+			OpV(OperatorType::multiplyF, pCount, pLVal, pRVal, [&pDest, this](llvm::Value* i, llvm::Value* pValue) {
+				OpAndUpdate(pDest, OperatorType::addF, pValue);
 			});
 		}
 

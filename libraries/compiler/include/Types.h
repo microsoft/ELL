@@ -49,29 +49,29 @@ namespace emll
 		///<summary>An enumeration of strongly TYPED operations on numbers</summary>
 		enum class OperatorType
 		{
-			None = 0,
+			none = 0,
 			///<summary>Integer addition</summary>
-			Add,
+			add,
 			///<summary>Integer subtraction</summary>
-			Subtract,
+			subtract,
 			///<summary>Integer multiplication</summary>
-			Multiply,
+			multiply,
 			///<summary>Signed division - returns an integer</summary>
-			DivideS,
+			divideS,
 			///<summary>Floating point addition</summary>
-			AddF,
+			addF,
 			///<summary>Floating point subtraction</summary>
-			SubtractF,
+			subtractF,
 			///<summary>Floating point multiplication</summary>
-			MultiplyF,
+			multiplyF,
 			///<summary>Floating point division</summary>
-			DivideF,
+			divideF,
 		};
 
 		///<summary>An enumeration of strongly TYPED comparisons on numbers</summary>
 		enum class ComparisonType
 		{
-			None = 0,
+			none = 0,
 			///<summary>Integer Equal</summary>
 			eq,
 			///<summary>Integer Less than</summary>

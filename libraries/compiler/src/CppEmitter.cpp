@@ -163,20 +163,20 @@ namespace emll
 		{
 			switch (op)
 			{
-				case OperatorType::Add:
-				case OperatorType::AddF:
+				case OperatorType::add:
+				case OperatorType::addF:
 					_writer.Write('+');
 					break;
-				case OperatorType::Subtract:
-				case OperatorType::SubtractF:
+				case OperatorType::subtract:
+				case OperatorType::subtractF:
 					_writer.Write('-');
 					break;
-				case OperatorType::Multiply:
-				case OperatorType::MultiplyF:
+				case OperatorType::multiply:
+				case OperatorType::multiplyF:
 					_writer.Write('*');
 					break;
-				case emll::compiler::OperatorType::DivideS:
-				case emll::compiler::OperatorType::DivideF:
+				case emll::compiler::OperatorType::divideS:
+				case emll::compiler::OperatorType::divideF:
 					_writer.Write('/');
 					break;
 				default:
