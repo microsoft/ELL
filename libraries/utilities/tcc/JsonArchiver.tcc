@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     JsonSerializer.tcc (utilities)
+//  File:     JsonArchiver.tcc (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,7 +12,7 @@ namespace utilities
     // Serialization
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void JsonSerializer::WriteScalar(const char* name, const ValueType& value)
+    void JsonArchiver::WriteScalar(const char* name, const ValueType& value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");        
@@ -30,7 +30,7 @@ namespace utilities
 
     // Specialization for bool (though perhaps this should be an overload, not a specialization)
     template <>
-    inline void JsonSerializer::WriteScalar(const char* name, const bool& value)
+    inline void JsonArchiver::WriteScalar(const char* name, const bool& value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");        
@@ -47,7 +47,7 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Write* functions
-    inline void JsonSerializer::WriteScalar(const char* name, const char* value)
+    inline void JsonArchiver::WriteScalar(const char* name, const char* value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -63,7 +63,7 @@ namespace utilities
         SetEndOfLine(endOfLine);
     }
 
-    inline void JsonSerializer::WriteScalar(const char* name, const std::string& value)
+    inline void JsonArchiver::WriteScalar(const char* name, const std::string& value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -80,7 +80,7 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void JsonSerializer::WriteArray(const char* name, const std::vector<ValueType>& array)
+    void JsonArchiver::WriteArray(const char* name, const std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
@@ -99,7 +99,7 @@ namespace utilities
         auto numItems = array.size();
         for(size_t index = 0; index < numItems; ++index)
         {
-            Serialize(array[index]);
+            Archive(array[index]);
             if(index != numItems-1)
             {
                 _out << ", ";
@@ -114,7 +114,7 @@ namespace utilities
     // Deserialization
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void JsonDeserializer::ReadScalar(const char* name, ValueType& value)
+    void JsonUnarchiver::ReadScalar(const char* name, ValueType& value)
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -138,7 +138,7 @@ namespace utilities
     }
 
     template <>
-    inline void JsonDeserializer::ReadScalar(const char* name, bool& value)
+    inline void JsonUnarchiver::ReadScalar(const char* name, bool& value)
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -161,7 +161,7 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Read* functions
-    inline void JsonDeserializer::ReadScalar(const char* name, std::string& value) 
+    inline void JsonUnarchiver::ReadScalar(const char* name, std::string& value) 
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -185,7 +185,7 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void JsonDeserializer::ReadArray(const char* name, std::vector<ValueType>& array, SerializationContext& context)
+    void JsonUnarchiver::ReadArray(const char* name, std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -203,7 +203,7 @@ namespace utilities
             }
 
             ValueType obj;
-            Deserialize(obj, context);
+            Unarchive(obj);
             array.push_back(obj);
 
             if(_tokenizer.PeekNextToken() == ",")
@@ -214,7 +214,7 @@ namespace utilities
         _tokenizer.MatchToken("]");
     }
 
-    inline void JsonDeserializer::ReadArray(const char* name, std::vector<std::string>& array, SerializationContext& context)
+    inline void JsonUnarchiver::ReadArray(const char* name, std::vector<std::string>& array)
     {
         bool hasName = name != std::string("");
         if(hasName)
@@ -232,7 +232,7 @@ namespace utilities
             }
 
             std::string obj;
-            Deserialize(obj, context);
+            Unarchive(obj);
             array.push_back(obj);
 
             if(_tokenizer.PeekNextToken() == ",")

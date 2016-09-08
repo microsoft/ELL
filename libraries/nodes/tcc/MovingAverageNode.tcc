@@ -63,21 +63,21 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void MovingAverageNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void MovingAverageNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("windowSize", _windowSize);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
+        archiver["windowSize"] << _windowSize;
     }
 
     template <typename ValueType>
-    void MovingAverageNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void MovingAverageNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("windowSize", _windowSize, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
+        archiver["windowSize"] >> _windowSize;
 
         auto dimension = _input.Size();
         _samples.clear();

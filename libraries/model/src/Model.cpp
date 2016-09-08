@@ -37,27 +37,27 @@ namespace model
         return NodeIterator(this, outputNodes);
     }
 
-    void Model::Serialize(utilities::Serializer& serializer) const
+    void Model::WriteToArchive(utilities::Archiver& archiver) const
     {
         std::vector<const Node*> nodes;
         auto nodeIter = GetNodeIterator();
         while(nodeIter.IsValid())
         {
-            const auto& node = nodeIter.Get();
-            nodes.push_back(node);
+            nodes.push_back(nodeIter.Get());
             nodeIter.Next();
         }
 
-        serializer.Serialize("nodes", nodes);
+        archiver["nodes"] << nodes;
     }
 
-    void Model::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) 
+    void Model::ReadFromArchive(utilities::Unarchiver& archiver) 
     {
-        ModelSerializationContext modelContext(context, this);
-        
-        // Deserialize nodes into big array
+        ModelSerializationContext modelContext(archiver.GetContext(), this);
+        archiver.PushContext(modelContext);
+
+        // read nodes into big array
         std::vector<std::unique_ptr<Node>> nodes;
-        serializer.Deserialize("nodes", nodes, modelContext);
+        archiver["nodes"] >> nodes;
 
         // Now add them to the model
         for(auto& node: nodes)
@@ -66,6 +66,7 @@ namespace model
             sharedNode->RegisterDependencies();
             _idToNodeMap[sharedNode->GetId()] = sharedNode;
         }
+        archiver.PopContext();
     }
 
     //
@@ -170,7 +171,7 @@ namespace model
     //
     // ModelSerializationContext
     //    
-    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model) : _originalContext(otherContext), _model(model) 
+    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model) : _originalContext(otherContext), _model(model) 
     {
     }
     

@@ -43,17 +43,16 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void InputNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void InputNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
-        Node::Deserialize(serializer, newContext);
-        serializer.Deserialize("output", _output, context);
+        Node::ReadFromArchive(archiver);
+        archiver[outputPortName] >> _output;
     }
 }

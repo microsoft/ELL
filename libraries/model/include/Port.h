@@ -10,7 +10,7 @@
 
 // utilities
 #include "UniqueId.h"
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 // stl
 #include <vector>
@@ -23,11 +23,9 @@ namespace model
     class Node;
 
     /// <summary> Port is the common base class for InputPort and OutputPort. </summary>
-    class Port: public utilities::ISerializable
+    class Port: public utilities::IArchivable
     {
     public:
-        virtual ~Port() = default;
-
         enum class PortType
         {
             none,
@@ -36,6 +34,10 @@ namespace model
             categorical,
             boolean
         };
+
+        Port() = default;
+        Port(const Port& other) = delete;
+        virtual ~Port() = default;
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
         ///
@@ -73,21 +75,19 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        /// <summary> Writes to a Serializer. </summary>
-        ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
-
-        /// <summary> Reads from a Deserializer. </summary>
-        ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
         
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
     protected:
         Port(const class Node* node, std::string name, PortType type) : _node(node), _name(name), _type(type) {}
-        Port(const Port& other) = delete;
 
     private:
         // _node keeps info on where the input is coming from

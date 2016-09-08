@@ -33,6 +33,24 @@ namespace nodes
     }
 
     template <typename ValueType, bool max>
+    void ExtremalValueNode<ValueType, max>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[valPortName] << _val;
+        archiver[argValPortName] << _argVal;
+    }
+
+    template <typename ValueType, bool max>
+    void ExtremalValueNode<ValueType, max>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[valPortName] >> _val;
+        archiver[argValPortName] >> _argVal;
+    }
+    
+    template <typename ValueType, bool max>
     void ExtremalValueNode<ValueType, max>::Compute() const
     {
         auto inputValues = _input.GetValue();

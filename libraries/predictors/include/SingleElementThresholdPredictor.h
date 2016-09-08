@@ -11,7 +11,7 @@
 #include "IPredictor.h"
 
 // utilities
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 // stl
 #include <iostream>
@@ -19,7 +19,7 @@
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
-    class SingleElementThresholdPredictor : public IPredictor<bool>, public utilities::ISerializable
+    class SingleElementThresholdPredictor : public IPredictor<bool>, public utilities::IArchivable
     {
     public:
         /// <summary> Constructs a single-element threshold rule. </summary>
@@ -38,16 +38,15 @@ namespace predictors
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Gets the index of the element used to define the rule. </summary>
         ///

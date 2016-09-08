@@ -31,9 +31,23 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
+    InputPort<ValueType>::InputPort() : InputPortBase(nullptr, _input, "")
+    {
+        ComputeParents();
+    }
+
+    template <typename ValueType>
     InputPort<ValueType>::InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, name), _input(input)
     {
         ComputeParents();
+    }
+
+    template <typename ValueType>
+    InputPort<ValueType>& InputPort<ValueType>::operator=(const InputPort<ValueType>& other)
+    {
+        _input = other._input;
+        ComputeParents();
+        return *this;
     }
 
     template <typename ValueType>
@@ -80,18 +94,17 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void InputPort<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        InputPortBase::Serialize(serializer);
-        serializer.Serialize("input", _input);
+        Port::WriteToArchive(archiver);
+        archiver["input"] << _input;
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void InputPort<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        InputPortBase::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-
+        Port::ReadFromArchive(archiver);
+        archiver["input"] >> _input;
         ComputeParents();
-    }
+    }  
 }

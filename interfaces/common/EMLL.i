@@ -91,7 +91,6 @@ namespace std
 // Interface for NaN callbacks
 %include callback.i
 
-
 // Define some namespaces so we can refer to them later
 namespace lossFunctions {};
 namespace predictors {};
@@ -101,8 +100,9 @@ namespace dataset {};
 %ignore dataset::RowDataset::operator[];
 %import "RowDataset.h"
 %import "IDataVector.h"
+%import "ObjectArchive.h"
 %import "Variant.h"
-%import "ISerializable.h"
+%import "IArchivable.h"
 
 #ifndef SWIGXML
 %template () std::vector<dataset::IDataVector>;

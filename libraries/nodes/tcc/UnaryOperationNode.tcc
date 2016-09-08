@@ -90,22 +90,22 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void UnaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("operation", static_cast<int>(_operation));
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
+        archiver["operation"] << static_cast<int>(_operation);
     }
 
     template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void UnaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        int op = 0;
-        serializer.Deserialize("operation", op, context);
-        _operation = static_cast<OperationType>(op);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
+        int operation = 0;
+        archiver["operation"] >> operation;
+        _operation = static_cast<OperationType>(operation);
     }
 }

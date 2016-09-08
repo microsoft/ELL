@@ -167,24 +167,24 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void BinaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("operation", static_cast<int>(_operation));
-        serializer.Serialize("input1", _input1);
-        serializer.Serialize("input2", _input2);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[input1PortName] << _input1;
+        archiver[input2PortName] << _input2;
+        archiver[outputPortName] << _output;
+        archiver["operation"] << static_cast<int>(_operation);
     }
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void BinaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        int op = 0;
-        serializer.Deserialize("operation", op, context);
-        _operation = static_cast<OperationType>(op);
-        serializer.Deserialize("input1", _input1, context);
-        serializer.Deserialize("input2", _input2, context);
-        serializer.Deserialize("output", _output, context);
-   }
+        Node::ReadFromArchive(archiver);
+        archiver[input1PortName] >> _input1;
+        archiver[input2PortName] >> _input2;
+        archiver[outputPortName] >> _output;
+        int operation = 0;
+        archiver["operation"] >> operation;
+        _operation = static_cast<OperationType>(operation);
+    }
 }

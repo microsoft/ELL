@@ -11,7 +11,8 @@
 #include "ModelTransformer.h"
 
 // utilities
-#include "ISerializable.h"
+#include "IArchivable.h"
+#include "IArchivable.h"
 
 // stl
 #include <unordered_set>
@@ -19,7 +20,7 @@
 /// <summary> model namespace </summary>
 namespace model
 {
-    Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) : _inputs(inputs), _outputs(outputs), _id(NodeId())
+    Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) : _id(NodeId()), _inputs(inputs), _outputs(outputs)
     {};
 
     void Node::AddInputPort(InputPortBase* input)
@@ -77,16 +78,17 @@ namespace model
         return false;
     }
 
-    void Node::Serialize(utilities::Serializer& serializer) const
+    void Node::WriteToArchive(utilities::Archiver& archiver) const
     {
-        serializer.Serialize("id", _id);
+        archiver["id"] << _id;
     }
 
-    void Node::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void Node::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         NodeId oldId;
-        serializer.Deserialize("id", oldId, context);
+        archiver["id"] >> oldId;
+        auto& context = archiver.GetContext();
+        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         newContext.MapNode(oldId, this);
     }
 }

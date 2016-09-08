@@ -36,25 +36,25 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void DemultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
+    void  DemultiplexerNode<ValueType, SelectorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("selector", _selector);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("defaultValue", _defaultValue);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[selectorPortName] << _selector;
+        archiver[outputPortName] << _output;
+        archiver["defaultValue"] << _defaultValue;
     }
 
     template <typename ValueType, typename SelectorType>
-    void DemultiplexerNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void DemultiplexerNode<ValueType, SelectorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("selector", _selector, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("defaultValue", _defaultValue, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[selectorPortName] >> _selector;
+        archiver[outputPortName] >> _output;
+        archiver["defaultValue"] >> _defaultValue;
     }
-
+    
     template <typename ValueType, typename SelectorType>
     void DemultiplexerNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
     {
@@ -73,7 +73,7 @@ namespace nodes
     }
 
     template <>
-    model::PortElements<int> CastIfNecessary<int>(const model::PortElements<int>& values, model::ModelTransformer& transformer)
+    inline model::PortElements<int> CastIfNecessary<int>(const model::PortElements<int>& values, model::ModelTransformer& transformer)
     {
         return values;
     }

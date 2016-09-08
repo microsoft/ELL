@@ -36,23 +36,23 @@ namespace nodes
     };
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void ValueSelectorNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("condition", _condition);
-        serializer.Serialize("input1", _input1);
-        serializer.Serialize("input2", _input2);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[input1PortName] << _input1;
+        archiver[input2PortName] << _input2;
+        archiver[conditionPortName] << _condition;
+        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
-    void ValueSelectorNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void ValueSelectorNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("condition", _condition, context);
-        serializer.Deserialize("input1", _input1, context);
-        serializer.Deserialize("input2", _input2, context);
-        serializer.Deserialize("output", _output, context);
+        Node::ReadFromArchive(archiver);
+        archiver[input1PortName] >> _input1;
+        archiver[input2PortName] >> _input2;
+        archiver[conditionPortName] >> _condition;
+        archiver[outputPortName] >> _output;
     }
 
     template <typename ValueType>
@@ -64,6 +64,6 @@ namespace nodes
 
         auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newPortElements1, newPortElements2);
 
-         transformer.MapNodeOutput(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 }
