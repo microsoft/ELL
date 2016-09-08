@@ -19,8 +19,10 @@ namespace emll
 		class IRRuntime
 		{
 		public:
+			///<summary>Construct a new runtime</summary>
 			IRRuntime(IRModuleEmitter& module);
 
+			///<summary>Get the dot product function for floating point</summary>
 			llvm::Function* DotProductF();
 
 			///<summary>Get the sqrt function</summary>

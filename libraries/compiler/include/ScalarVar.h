@@ -18,13 +18,11 @@ namespace emll
 		class ScalarVar : public Variable
 		{
 		public:
+			///<summary>Construct a new scalar variable</summary>
 			ScalarVar(const VariableScope scope, int flags = VariableFlags::isMutable);
 
-			virtual bool IsScalar() const override
-			{
-				return true;
-			}
-
+			///<summary>Returns true</summary>
+			virtual bool IsScalar() const override { return true;}
 		};
 
 		///<summary>A literal scalar</summary>
@@ -32,12 +30,11 @@ namespace emll
 		class LiteralVar : public ScalarVar<T>
 		{
 		public:
+			///<summary>Construct a new literal</summary>
 			LiteralVar(T data);
 
-			T& Data()
-			{
-				return _data;
-			}
+			///<summary>The literal value</summary>
+			const T& Data() const { return _data; }
 
 		private:
 			T _data;
@@ -48,12 +45,11 @@ namespace emll
 		class InitializedScalarVar : public ScalarVar<T>
 		{
 		public:
+			///<summary>Construct a scalar that will have the given initial value</summary>
 			InitializedScalarVar(const VariableScope scope, T data, bool isMutable = true);
 
-			T& Data()
-			{
-				return _data;
-			}
+			///<summary>Initial value for this scalar</summary>
+			const T& Data() const { return _data;}
 
 		private:
 			T _data;
@@ -64,18 +60,14 @@ namespace emll
 		class VectorElementVar : public ScalarVar<T>
 		{
 		public:
+			///<summary>Construct a vector element</summary>
 			VectorElementVar(Variable& src, int offset);
 
 			///<summary>The source vector this is an offset into</summary>
-			Variable& Src() const
-			{
-				return _src;
-			}
+			Variable& Src() const { return _src;}
+
 			///<summary>Offset into vector</summary>
-			const int Offset() const
-			{
-				return _offset;
-			}
+			const int Offset() const { return _offset;}
 
 		private:
 			Variable& _src;
