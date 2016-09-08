@@ -6,15 +6,35 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define USE_BLAS
+
 #include <cstddef> // size_t
 
 namespace math
 {
     namespace Blas
     {
+        /// <summary> Wraps the BLAS ASUM function, which computes the 1-norm of a vector . </summary>
+        ///
+        /// <param name="size"> The size of the array that stores the vector. </param>
+        /// <param name="ptr"> Pointer to the first element of the array. </param>
+        /// <param name="stride"> The stride of the array. </param>
+        ///
+        /// <returns> The 1-norm of the vector. </returns>
+        float Asum(size_t size, const float* ptr, size_t stride);
+
+        /// <summary> Wraps the BLAS ASUM function, which computes the 1-norm of a vector . </summary>
+        ///
+        /// <param name="size"> The size of the array that stores the vector. </param>
+        /// <param name="ptr"> Pointer to the first element of the array. </param>
+        /// <param name="stride"> The stride of the array. </param>
+        ///
+        /// <returns> The 1-norm of the vector. </returns>
+        double Asum(size_t size, double* ptr, size_t stride);
+
         /// <summary> Wraps the BLAS NRM2 function, which computes the 2-norm of a vector . </summary>
         ///
-        /// <param name="size"> The size of the vector. </param>
+        /// <param name="size"> The size of the array that stores the vector. </param>
         /// <param name="ptr"> Pointer to the first element of the array. </param>
         /// <param name="stride"> The stride of the array. </param>
         ///
@@ -23,16 +43,32 @@ namespace math
 
         /// <summary> Wraps the BLAS NRM2 function, which computes the 2-norm of a vector . </summary>
         ///
-        /// <param name="size"> The size of the vector. </param>
+        /// <param name="size"> The size of the array that stores the vector. </param>
         /// <param name="ptr"> Pointer to the first element of the array. </param>
         /// <param name="stride"> The stride of the array. </param>
         ///
         /// <returns> The 2-norm of the vector. </returns>
         double Nrm2(size_t size, double* ptr, size_t stride);
 
+        /// <summary> Wraps the BLAS SCAL function, which multiplies a vector by a scalar. </summary>
+        ///
+        /// <param name="size"> The size of the array that stores the vector. </param>
+        /// <param name="alpha"> The scalar that multiplies the vector. </param>
+        /// <param name="pLhs"> [in,out] Pointer to the first element of the array. </param>
+        /// <param name="lhsStride"> The stride of the array. </param>
+        void Scal(size_t size, float alpha, float* pLhs, size_t lhsStride);
+        
+        /// <summary> Wraps the BLAS SCAL function, which multiplies a vector by a scalar. </summary>
+        ///
+        /// <param name="size"> The size of the array that stores the vector. </param>
+        /// <param name="alpha"> The scalar that multiplies the vector. </param>
+        /// <param name="pLhs"> [in,out] Pointer to the first element of the array. </param>
+        /// <param name="lhsStride"> The stride of the array. </param>
+        void Scal(size_t size, double alpha, double* pLhs, size_t lhsStride);
+
         /// <summary> Wraps the BLAS AXPY function: v += alpha * u </summary>
         ///
-        /// <param name="size"> The size of the vectors. </param>
+        /// <param name="size"> The size of each of the arrays that store the vectors. </param>
         /// <param name="alpha"> The scalar that multiplies the right-hand-side array. </param>
         /// <param name="pRhs"> Pointer to the first element of the right-hand-side array. </param>
         /// <param name="rhsStride"> The stride of the right-hand-side array. </param>
@@ -42,7 +78,7 @@ namespace math
 
         /// <summary> Wraps the BLAS AXPY function: v += alpha * u </summary>
         ///
-        /// <param name="size"> The size of the vectors. </param>
+        /// <param name="size"> The size of each of the arrays that store the vectors. </param>
         /// <param name="alpha"> The scalar that multiplies the right-hand-side array. </param>
         /// <param name="pRhs"> Pointer to the first element of the right-hand-side array. </param>
         /// <param name="rhsStride"> The stride of the right-hand-side array. </param>
@@ -52,7 +88,7 @@ namespace math
 
         /// <summary> Wraps the BLAS DOT function, which computes the dot product of two vectors. </summary>
         ///
-        /// <param name="size"> The size of the vectors. </param>
+        /// <param name="size"> The size of each of the arrays that store the vectors. </param>
         /// <param name="pFirst"> Pointer to the first element of the first array. </param>
         /// <param name="firstStride"> The stride of the first array. </param>
         /// <param name="pSecond"> Pointer to the first element of the second array. </param>
@@ -62,7 +98,7 @@ namespace math
 
         /// <summary> Wraps the BLAS DOT function, which computes the dot product of two vectors. </summary>
         ///
-        /// <param name="size"> The size of the vectors. </param>
+        /// <param name="size"> The size of each of the arrays that store the vectors. </param>
         /// <param name="pFirst"> Pointer to the first element of the first array. </param>
         /// <param name="firstStride"> The stride of the first array. </param>
         /// <param name="pSecond"> Pointer to the first element of the second array. </param>
@@ -73,10 +109,8 @@ namespace math
 
         // gemm
         // gemv
-        // axpy
+
         // acpby
-        // scal
-        // asum
         // stride_dot
     }
 

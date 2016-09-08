@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BlasWrapper.h"
-//#define USE_BLAS
 
 // utilities
 #include "Exception.h"
@@ -43,7 +42,11 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     ElementType ConstVectorReference<ElementType, Orientation>::Norm1() const
     {
+#ifdef USE_BLAS
+        return Blas::Asum(_size, _pData, _stride);
+#else
         return Aggregate([](ElementType x) { return std::abs(x); });
+#endif
     }
 
     template<typename ElementType, VectorOrientation Orientation>
@@ -206,7 +209,11 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator*=(ElementType scalar)
     {
+#ifdef USE_BLAS
+        Blas::Scal(_size, scalar, _pData, _stride);
+#else
         ForEach([scalar](ElementType x) { return x*scalar; });
+#endif
     }
 
     template<typename ElementType, VectorOrientation Orientation>

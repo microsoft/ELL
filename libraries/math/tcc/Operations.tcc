@@ -28,7 +28,7 @@ namespace math
         size_t rhsStride = rhsVector.GetStride();
 
 #ifdef USE_BLAS
-        return Blas::Axpy(lhsSize, pRhs, rhsStride, pLhs, lhsStride);
+        return Blas::Axpy(lhsSize, rhsScalar, pRhs, rhsStride, pLhs, lhsStride);
 #else
         const ElementType* pEnd = pLhs + lhsSize;
 
