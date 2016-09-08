@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PortElements.h"
-#include "Node.h"
 #include "Model.h"
+#include "Node.h"
 
 #include <cassert>
 
@@ -20,18 +20,22 @@ namespace model
     //
     // PortElementBase
     //
-    PortElementBase::PortElementBase(const OutputPortBase& port, size_t index) : _referencedPort(&port), _index(index) {}
+    PortElementBase::PortElementBase(const OutputPortBase& port, size_t index)
+        : _referencedPort(&port), _index(index) {}
 
     bool PortElementBase::operator==(const PortElementBase& other) const { return (_referencedPort == other._referencedPort) && (_index == other._index); }
 
     //
     // PortRange
     //
-    PortRange::PortRange(const OutputPortBase& port) : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
+    PortRange::PortRange(const OutputPortBase& port)
+        : _referencedPort(&port), _startIndex(0), _numValues(port.Size()), _isFixedSize(false) {}
 
-    PortRange::PortRange(const OutputPortBase& port, size_t index) : _referencedPort(&port), _startIndex(index), _numValues(1), _isFixedSize(true) {}
+    PortRange::PortRange(const OutputPortBase& port, size_t index)
+        : _referencedPort(&port), _startIndex(index), _numValues(1), _isFixedSize(true) {}
 
-    PortRange::PortRange(const OutputPortBase& port, size_t startIndex, size_t numValues) : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
+    PortRange::PortRange(const OutputPortBase& port, size_t startIndex, size_t numValues)
+        : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
 
     size_t PortRange::Size() const
     {

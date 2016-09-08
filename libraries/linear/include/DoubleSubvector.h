@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "IVector.h"
 #include "DoubleVector.h"
+#include "IVector.h"
 #include "IndexValue.h"
 
 // utilities
@@ -17,14 +17,14 @@
 
 // stl
 #include <cstdint>
-#include <iostream>
 #include <functional>
+#include <iostream>
 #include <vector>
 
 namespace linear
 {
     /// <summary> Implements a class that references a subvector. </summary>
-    class DoubleSubvector: public IVector
+    class DoubleSubvector : public IVector
     {
     public:
         using Iterator = utilities::StlIndexValueIterator<const double*, double>;
@@ -72,12 +72,10 @@ namespace linear
         /// <summary> Prints the vector to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        virtual void Print(std::ostream & os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     private:
         const double* _ptr;
         uint64_t _size;
     };
 }
-
-

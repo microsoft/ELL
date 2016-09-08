@@ -10,7 +10,8 @@
 
 namespace linear
 {
-    DoubleSubvector::DoubleSubvector(const DoubleVector& vec, uint64_t offset, uint64_t size) : _ptr(vec.GetDataPointer() + offset), _size(size)
+    DoubleSubvector::DoubleSubvector(const DoubleVector& vec, uint64_t offset, uint64_t size)
+        : _ptr(vec.GetDataPointer() + offset), _size(size)
     {
         if (_size > vec.Size())
         {
@@ -18,8 +19,10 @@ namespace linear
         }
     }
 
-    DoubleSubvector::DoubleSubvector(const double * ptr, uint64_t size) : _ptr(ptr), _size(size)
-    {}
+    DoubleSubvector::DoubleSubvector(const double* ptr, uint64_t size)
+        : _ptr(ptr), _size(size)
+    {
+    }
 
     double DoubleSubvector::Norm2() const
     {
@@ -40,7 +43,6 @@ namespace linear
         }
     }
 
-
     double DoubleSubvector::Dot(const double* p_other) const
     {
         double result = 0.0;
@@ -52,7 +54,7 @@ namespace linear
         return result;
     }
 
-    void DoubleSubvector::Print(std::ostream & os) const
+    void DoubleSubvector::Print(std::ostream& os) const
     {
         auto iterator = GetIterator();
         while (iterator.IsValid())

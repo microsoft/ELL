@@ -13,9 +13,9 @@
 
 // stl
 #include <cstdint>
-#include <vector>
 #include <functional>
 #include <memory>
+#include <vector>
 
 namespace dataset
 {
@@ -39,7 +39,7 @@ namespace dataset
         ///
         /// <returns> The total number of nonzeros. </returns>
         virtual uint64_t NumNonzeros() const = 0;
-        
+
         /// <summary> Makes a deep copy of the datavector </summary>
         ///
         /// <returns> A deep copy of the datavector </summary>

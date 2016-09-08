@@ -9,11 +9,11 @@
 #pragma once
 
 // stl
+#include <random>
 #include <string>
 #include <vector>
-#include <random>
 
-namespace utilities 
+namespace utilities
 {
     /// <summary> Gets a vector of random engines. </summary>
     ///

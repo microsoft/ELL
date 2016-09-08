@@ -18,7 +18,6 @@ namespace linear
     class Base
     {
     public:
-
         virtual ~Base() = default;
 
         /// <summary> Human readable printout to an output stream. </summary>

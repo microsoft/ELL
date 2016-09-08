@@ -9,19 +9,19 @@
 #pragma once
 
 #include "Archiver.h"
-#include "TypeFactory.h"
-#include "TypeName.h"
 #include "Exception.h"
 #include "Tokenizer.h"
+#include "TypeFactory.h"
+#include "TypeName.h"
 
 // stl
 #include <cstdint>
-#include <string>
-#include <sstream>
-#include <ostream>
-#include <vector>
-#include <type_traits>
 #include <memory>
+#include <ostream>
+#include <sstream>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace utilities
 {

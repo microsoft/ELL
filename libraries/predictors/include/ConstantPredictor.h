@@ -50,10 +50,13 @@ namespace predictors
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> A function that ignores its input and returns a constant value. </summary>
-        /// 
+        ///
         /// <returns> A constant value. </returns>
-        template<typename AnyType>
-        double Predict(const AnyType&) const { return _value; }
+        template <typename AnyType>
+        double Predict(const AnyType&) const
+        {
+            return _value;
+        }
 
         /// <summary> Gets the constant value. </summary>
         ///

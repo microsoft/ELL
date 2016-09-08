@@ -7,14 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // LossFunction
-#include "SquaredLoss.h"
-#include "LogLoss.h"
 #include "HingeLoss.h"
+#include "LogLoss.h"
+#include "SquaredLoss.h"
 
 // evaluators
+#include "AUCAggregator.h"
 #include "BinaryErrorAggregator.h"
 #include "LossAggregator.h"
-#include "AUCAggregator.h"
 
 namespace common
 {

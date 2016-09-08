@@ -9,8 +9,8 @@
 #include "CommandLineParser.h"
 
 // stl
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 
 namespace utilities
@@ -30,21 +30,25 @@ namespace utilities
     //
     // CommandLineParseResult class
     //
-    CommandLineParseResult::CommandLineParseResult(bool ok) : _isOK(ok)
+    CommandLineParseResult::CommandLineParseResult(bool ok)
+        : _isOK(ok)
     {
     }
 
-    CommandLineParseResult::CommandLineParseResult(const char* message) : _isOK(false)
-    {
-        _messages.emplace_back(message);
-    }
-
-    CommandLineParseResult::CommandLineParseResult(const std::string& message) : _isOK(false)
+    CommandLineParseResult::CommandLineParseResult(const char* message)
+        : _isOK(false)
     {
         _messages.emplace_back(message);
     }
 
-    CommandLineParseResult::CommandLineParseResult(const std::vector<std::string>& messages) : _messages(messages)
+    CommandLineParseResult::CommandLineParseResult(const std::string& message)
+        : _isOK(false)
+    {
+        _messages.emplace_back(message);
+    }
+
+    CommandLineParseResult::CommandLineParseResult(const std::vector<std::string>& messages)
+        : _messages(messages)
     {
         _isOK = _messages.size() == 0;
     }
@@ -52,15 +56,18 @@ namespace utilities
     //
     // ParseError class
     //
-    ParseError::ParseError(const std::string& message) : _message(message)
+    ParseError::ParseError(const std::string& message)
+        : _message(message)
     {
     }
 
     //
     // OptionInfo internal class
     //
-    CommandLineParser::OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback) : name(name), shortName(shortName), description(description), defaultValueString(defaultValue), set_value_callbacks({ set_value_callback })
-    {}
+    CommandLineParser::OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback)
+        : name(name), shortName(shortName), description(description), defaultValueString(defaultValue), set_value_callbacks({ set_value_callback })
+    {
+    }
 
     std::string CommandLineParser::OptionInfo::optionNameString() const
     {
@@ -91,12 +98,12 @@ namespace utilities
     //
     // CommandLineParser class
     //
-    CommandLineParser::CommandLineParser(int argc, char* argv[]) 
+    CommandLineParser::CommandLineParser(int argc, char* argv[])
     {
         SetArgs(argc, const_cast<const char**>(argv));
     }
 
-    CommandLineParser::CommandLineParser(int argc, const char* argv[]) 
+    CommandLineParser::CommandLineParser(int argc, const char* argv[])
     {
         SetArgs(argc, argv);
     }
@@ -171,8 +178,8 @@ namespace utilities
                     if (option == "" && arg != "--") // "--" is the special "ignore this" option --- used to put between flag arguments and the filepath
                     {
                         std::string errorMessage = "Error: unknown option " + arg;
-                        throw CommandLineParserErrorException("Unknown option", {errorMessage});
-                        if (index < argc - 1 && _originalArgs[index + 1][0] != '-')  // skip the Next value as well, unless it's an option
+                        throw CommandLineParserErrorException("Unknown option", { errorMessage });
+                        if (index < argc - 1 && _originalArgs[index + 1][0] != '-') // skip the Next value as well, unless it's an option
                         {
                             index++;
                         }
@@ -290,7 +297,7 @@ namespace utilities
         _postParseCallbacks.push_back(callback);
     }
 
-    inline bool FindBestMatch(std::string str, const std::vector<std::string>& val_names, std::string& resultString)  // TODO: this std::function is not used anywhere -erase it?
+    inline bool FindBestMatch(std::string str, const std::vector<std::string>& val_names, std::string& resultString) // TODO: this std::function is not used anywhere -erase it?
     {
         bool didFindOne = false;
         for (const auto& valName : val_names)
@@ -340,7 +347,6 @@ namespace utilities
                     ++iter;
                 }
             }
-
         }
         else
         {
@@ -352,7 +358,7 @@ namespace utilities
 
     void CommandLineParser::AddOptionSet(ParsedArgSet& options)
     {
-        AddPostParseCallback([this, &options](CommandLineParser& p) { return options.PostProcess(p);});
+        AddPostParseCallback([this, &options](CommandLineParser& p) { return options.PostProcess(p); });
         options.AddArgs(*this);
     }
 
@@ -381,32 +387,32 @@ namespace utilities
         {
             switch (entry.EntryType)
             {
-            case DocumentationEntry::Type::option:
-            {
-                const OptionInfo& info = _options[entry.EntryString];
-                std::string option_name = info.optionNameString();
-                uint64_t thisOptionNameLen = info.optionNameHelpLength();
-                uint64_t pad_len = 2 + (longest_name - thisOptionNameLen);
-                std::string padding(pad_len, ' ');
-                out << "\t--" << option_name << padding << info.description;
-                if (info.enumValues.size() > 0)
+                case DocumentationEntry::Type::option:
                 {
-                    out << "  {";
-                    std::string sep = "";
-                    out << info.enumValues[0];
-                    for (int index = 1; index < info.enumValues.size(); ++index)
+                    const OptionInfo& info = _options[entry.EntryString];
+                    std::string option_name = info.optionNameString();
+                    uint64_t thisOptionNameLen = info.optionNameHelpLength();
+                    uint64_t pad_len = 2 + (longest_name - thisOptionNameLen);
+                    std::string padding(pad_len, ' ');
+                    out << "\t--" << option_name << padding << info.description;
+                    if (info.enumValues.size() > 0)
                     {
-                        out << " | " << info.enumValues[index];
+                        out << "  {";
+                        std::string sep = "";
+                        out << info.enumValues[0];
+                        for (int index = 1; index < info.enumValues.size(); ++index)
+                        {
+                            out << " | " << info.enumValues[index];
+                        }
+                        out << "}";
                     }
-                    out << "}";
+                    out << std::endl;
                 }
-                out << std::endl;
-            }
-            break;
-
-            case DocumentationEntry::Type::str:
-                out << entry.EntryString << std::endl;
                 break;
+
+                case DocumentationEntry::Type::str:
+                    out << entry.EntryString << std::endl;
+                    break;
             }
         }
 

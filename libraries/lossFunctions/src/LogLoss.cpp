@@ -13,18 +13,20 @@
 
 namespace lossFunctions
 {
-    LogLoss::LogLoss(double scale) : _scale(scale)
-    {}
+    LogLoss::LogLoss(double scale)
+        : _scale(scale)
+    {
+    }
 
     double LogLoss::Evaluate(double prediction, double label) const
     {
         double scaled_margin = _scale * prediction * label;
 
-        if(scaled_margin <= -18.0)
+        if (scaled_margin <= -18.0)
         {
             return -prediction * label;
         }
-        else 
+        else
         {
             double exp_neg_scaled_margin = std::exp(-scaled_margin);
             return std::log(1.0 + exp_neg_scaled_margin) / _scale;
@@ -35,12 +37,12 @@ namespace lossFunctions
     {
         double scaled_margin = prediction * label * _scale;
 
-        if(scaled_margin <= 0.0)
+        if (scaled_margin <= 0.0)
         {
             double exp_scaled_margin = std::exp(scaled_margin);
             return -label / (1.0 + exp_scaled_margin);
         }
-        else 
+        else
         {
             double exp_neg_scaled_margin = std::exp(-scaled_margin);
             return -label * exp_neg_scaled_margin / (1.0 + exp_neg_scaled_margin);

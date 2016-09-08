@@ -15,11 +15,13 @@ namespace interfaces
     //
     // RowDataset
     //
-    GenericRowDataset::GenericRowDataset(const GenericRowDataset& other) : _dataset(other._dataset)
+    GenericRowDataset::GenericRowDataset(const GenericRowDataset& other)
+        : _dataset(other._dataset)
     {
     }
 
-    GenericRowDataset::GenericRowDataset(dataset::GenericRowDataset&& dataset) : _dataset(std::move(dataset))
+    GenericRowDataset::GenericRowDataset(dataset::GenericRowDataset&& dataset)
+        : _dataset(std::move(dataset))
     {
     }
 
@@ -35,11 +37,11 @@ namespace interfaces
 
     dataset::GenericSupervisedExample GenericRowDataset::GetExample(uint64_t index) const
     {
-        if(index >= NumExamples())
+        if (index >= NumExamples())
         {
             throw std::runtime_error("Out of bounds");
         }
-        
+
         std::cout << "Dataset size: " << NumExamples() << std::endl;
         std::cout << "Dataset[" << index << "]: ";
         auto result = static_cast<dataset::GenericSupervisedExample>(_dataset.GetExample(index));
@@ -50,14 +52,14 @@ namespace interfaces
 
     dataset::DenseSupervisedExample GenericRowDataset::GetDenseSupervisedExample(uint64_t index) const
     {
-        if(index >= NumExamples())
+        if (index >= NumExamples())
         {
             throw std::runtime_error("Out of bounds");
         }
 
         const auto& example = _dataset.GetExample(index); // GenericSupervisedExample
         const auto& exampleData = example.GetDataVector();
-        auto exampleDataArray = exampleData.ToArray();        
+        auto exampleDataArray = exampleData.ToArray();
         auto resultData = std::make_shared<dataset::DoubleDataVector>(exampleDataArray);
         dataset::DenseSupervisedExample result(resultData, example.GetMetadata());
         return result;

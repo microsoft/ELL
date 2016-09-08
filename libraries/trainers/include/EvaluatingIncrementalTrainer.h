@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "IIncrementalTrainer.h"
 #include "Evaluator.h"
+#include "IIncrementalTrainer.h"
 
 // stl
 #include <memory>
@@ -26,7 +26,6 @@ namespace trainers
     class EvaluatingIncrementalTrainer : public IIncrementalTrainer<PredictorType>
     {
     public:
-
         typedef IIncrementalTrainer<PredictorType> InternalTrainerType;
         typedef evaluators::IEvaluator<PredictorType> EvaluatorType;
 

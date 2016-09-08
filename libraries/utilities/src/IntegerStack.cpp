@@ -17,7 +17,7 @@ namespace utilities
     {
         uint64_t top;
 
-        if(_stack.empty())
+        if (_stack.empty())
         {
             top = _smallestUnpopped;
             _smallestUnpopped++;
@@ -32,7 +32,7 @@ namespace utilities
     }
     uint64_t IntegerStack::Top() const
     {
-        if(_stack.empty())
+        if (_stack.empty())
         {
             return _smallestUnpopped;
         }

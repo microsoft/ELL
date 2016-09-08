@@ -39,7 +39,7 @@ namespace trainers
         };
 
         // Gets a vector of sorted unique values from each feature, with counts
-        template<typename ExampleIteratorType>
+        template <typename ExampleIteratorType>
         UniqueValuesResult UniqueValues(ExampleIteratorType exampleIterator) const;
 
     private:
@@ -50,14 +50,13 @@ namespace trainers
     class ExhaustiveThresholdFinder : public ThresholdFinder
     {
     public:
-
         /// <summary> Returns a vector of SingleElementThresholdPredictor. </summary>
         ///
         /// <typeparam name="ExampleIteratorType"> Type of example iterator. </typeparam>
         /// <param name="exampleIterator"> The example iterator. </param>
         ///
         /// <returns> The thresholds. </returns>
-        template<typename ExampleIteratorType>
+        template <typename ExampleIteratorType>
         std::vector<predictors::SingleElementThresholdPredictor> GetThresholds(ExampleIteratorType exampleIterator) const;
     };
 }

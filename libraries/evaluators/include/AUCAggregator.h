@@ -19,7 +19,6 @@ namespace evaluators
     class AUCAggregator
     {
     public:
-
         /// <summary> Updates this aggregator. </summary>
         ///
         /// <param name="prediction"> The real valued prediction. </param>
@@ -41,7 +40,6 @@ namespace evaluators
         std::vector<std::string> GetValueNames() const;
 
     private:
-
         struct Aggregate
         {
             double prediction;

@@ -8,17 +8,17 @@
 #pragma once
 
 // dataset
-#include "RowDataset.h"
 #include "DenseDataVector.h"
 #include "Example.h"
+#include "RowDataset.h"
 
 // utilities
-#include "StlIterator.h"
 #include "AnyIterator.h"
+#include "StlIterator.h"
 
 // stl
-#include <vector>
 #include <random>
+#include <vector>
 
 namespace dataset
 {
@@ -30,7 +30,7 @@ namespace interfaces
     class GenericRowDataset
     {
     public:
-        GenericRowDataset() {};
+        GenericRowDataset(){};
         GenericRowDataset(const GenericRowDataset& other);
         GenericRowDataset(GenericRowDataset&& other) = default;
         const GenericRowDataset& operator=(GenericRowDataset&& other)
@@ -60,14 +60,14 @@ namespace interfaces
         ///
         /// <returns> Reference to the specified example. </returns>
         dataset::GenericSupervisedExample GetExample(uint64_t index) const;
-                
+
         /// <summary> Returns an example as a `DoubleDataVector`. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
         dataset::DenseSupervisedExample GetDenseSupervisedExample(uint64_t index) const;
-                
+
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
         /// <param name="firstExample"> Zero-based index of the first example to iterate over. </param>
@@ -99,4 +99,3 @@ namespace interfaces
         dataset::GenericRowDataset _dataset;
     };
 }
-

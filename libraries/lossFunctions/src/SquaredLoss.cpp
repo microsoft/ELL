@@ -27,6 +27,6 @@ namespace lossFunctions
 
     double SquaredLoss::BregmanGenerator(double value) const
     {
-        return value*value;
+        return value * value;
     }
 }

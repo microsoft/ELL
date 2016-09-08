@@ -8,17 +8,17 @@
 
 #pragma once
 
-#include "Node.h"
 #include "InputPort.h"
+#include "Node.h"
 #include "OutputPort.h"
 
 // utilities
 #include "TypeName.h"
 
 // stl
-#include <vector>
-#include <memory>
 #include <exception>
+#include <memory>
+#include <vector>
 
 /// <summary> nodes namespace </summary>
 namespace nodes

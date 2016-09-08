@@ -16,8 +16,8 @@
 #include "IArchivable.h"
 
 // stl
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 
 /// <summary> model namespace </summary>
@@ -76,7 +76,7 @@ namespace model
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) = 0;
-        
+
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 

@@ -23,8 +23,10 @@ namespace model
         _isNodeCompilableFunction = [](const Node& node) { return false; };
     }
 
-    TransformContext::TransformContext(const std::function<bool(const Node&)>& isNodeCompilable) : _isNodeCompilableFunction(isNodeCompilable)
-    {}
+    TransformContext::TransformContext(const std::function<bool(const Node&)>& isNodeCompilable)
+        : _isNodeCompilableFunction(isNodeCompilable)
+    {
+    }
 
     bool TransformContext::IsNodeCompilable(const Node& node) const
     {
@@ -66,42 +68,40 @@ namespace model
 
             // one refinement pass
             bool didRefineAny = false;
-            currentModel.Visit([this, &didRefineAny](const Node& node) 
-            { 
-                bool didRefineNode = node.InvokeRefine(*this); 
+            currentModel.Visit([this, &didRefineAny](const Node& node) {
+                bool didRefineNode = node.InvokeRefine(*this);
                 didRefineAny |= didRefineNode;
             });
 
             // concatenate new port map onto existing port map
-            if(currentElementToElementMap.size() > 0)
+            if (currentElementToElementMap.size() > 0)
             {
                 std::unordered_map<PortElementBase, PortElementBase> newElementToElementMap;
-                for(const auto& entry : currentElementToElementMap)
+                for (const auto& entry : currentElementToElementMap)
                 {
                     newElementToElementMap[entry.first] = _elementToElementMap[entry.second];
                 }
                 _elementToElementMap = newElementToElementMap;
             }
 
-            // return if we didn't make any progress 
-            if(!didRefineAny)
+            // return if we didn't make any progress
+            if (!didRefineAny)
             {
                 break;
             }
 
             // die after too many iterations
-            if(++iterationCount >= maxRefinementIterations)
+            if (++iterationCount >= maxRefinementIterations)
             {
                 std::string firstUncompilableNodeName;
                 auto uncompilableNodes = FindUncompilableNodes(currentModel, context);
-                if(uncompilableNodes.size() > 0)
+                if (uncompilableNodes.size() > 0)
                 {
                     firstUncompilableNodeName = uncompilableNodes[0]->GetRuntimeTypeName();
                 }
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxRefinementIterations) + " refinement iterations, first uncompilable node: " + firstUncompilableNodeName);
             }
-        }
-        while(!_isModelCompilable);
+        } while (!_isModelCompilable);
 
         // clear out the context
         _context = TransformContext();
@@ -111,12 +111,12 @@ namespace model
     std::vector<const Node*> ModelTransformer::FindUncompilableNodes(const Model& model, const TransformContext& context) const
     {
         std::vector<const Node*> uncompilableNodes;
-        
+
         auto iter = model.GetNodeIterator();
-        while(iter.IsValid())
+        while (iter.IsValid())
         {
             auto node = iter.Get();
-            if(!context.IsNodeCompilable(*node))
+            if (!context.IsNodeCompilable(*node))
             {
                 uncompilableNodes.push_back(node);
             }

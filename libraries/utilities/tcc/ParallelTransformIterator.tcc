@@ -18,7 +18,8 @@ namespace utilities
     //
 
     template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
-    ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::ParallelTransformIterator(InputIteratorType& inIter, FuncType transformFunction) : _inIter(inIter), _transformFunction(transformFunction), _currentOutputValid(false), _currentIndex(0), _endIndex(-1)
+    ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::ParallelTransformIterator(InputIteratorType& inIter, FuncType transformFunction)
+        : _inIter(inIter), _transformFunction(transformFunction), _currentOutputValid(false), _currentIndex(0), _endIndex(-1)
     {
         // Fill the buffer with futures that are the result of calling std::async(transformFunction) on inIter
         int maxTasks = MaxTasks == 0 ? std::thread::hardware_concurrency() : MaxTasks;
@@ -28,9 +29,9 @@ namespace utilities
         }
 
         _futures.reserve(maxTasks);
-        for(int index = 0; index < maxTasks; index++)
+        for (int index = 0; index < maxTasks; index++)
         {
-            if(!_inIter.IsValid())
+            if (!_inIter.IsValid())
             {
                 break;
             }
@@ -43,33 +44,33 @@ namespace utilities
     template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
     void ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::Next()
     {
-        if(!IsValid())
+        if (!IsValid())
         {
             return;
         }
         _currentOutputValid = false;
-        
+
         // If necessary, create new std::future to handle next input
-        if(_inIter.IsValid())
+        if (_inIter.IsValid())
         {
             _futures[_currentIndex] = std::async(std::launch::async, _transformFunction, _inIter.Get());
             _inIter.Next();
         }
         else
         {
-            if(_endIndex < 0) // Check if we've already noted the end index
+            if (_endIndex < 0) // Check if we've already noted the end index
             {
                 _endIndex = _currentIndex;
             }
         }
-        _currentIndex = (_currentIndex+1)%_futures.size();
+        _currentIndex = (_currentIndex + 1) % _futures.size();
     };
-    
+
     template <typename InputIteratorType, typename OutType, typename FuncType, int MaxTasks>
     OutType ParallelTransformIterator<InputIteratorType, OutType, FuncType, MaxTasks>::Get() const
     {
         // Need to cache output of current std::future, because calling std::future::get() twice is an error
-        if(!_currentOutputValid)
+        if (!_currentOutputValid)
         {
             _currentOutput = _futures[_currentIndex].get();
             _currentOutputValid = true;

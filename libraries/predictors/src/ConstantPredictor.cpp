@@ -13,8 +13,10 @@
 
 namespace predictors
 {
-    ConstantPredictor::ConstantPredictor(double value) : _value(value)
-    {}
+    ConstantPredictor::ConstantPredictor(double value)
+        : _value(value)
+    {
+    }
 
     void ConstantPredictor::WriteToArchive(utilities::Archiver& archiver) const
     {

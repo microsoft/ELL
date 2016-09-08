@@ -9,12 +9,12 @@
 #pragma once
 
 // dataset
-#include "RowDataset.h" 
+#include "RowDataset.h"
 
 // stl
 #include <memory>
-#include <vector>
 #include <tuple>
+#include <vector>
 
 namespace evaluators
 {
@@ -25,7 +25,6 @@ namespace evaluators
     class IEvaluator
     {
     public:
-
         virtual ~IEvaluator() = default;
 
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
@@ -55,11 +54,10 @@ namespace evaluators
     ///
     /// <typeparam name="PredictorType"> The predictor type. </typeparam>
     /// <typeparam name="AggregatorTypes"> The aggregator types. </typeparam>
-    template<typename PredictorType, typename... AggregatorTypes>
+    template <typename PredictorType, typename... AggregatorTypes>
     class Evaluator : public IEvaluator<PredictorType>
     {
     public:
-
         /// <summary> Constructs an instance of Evaluator with a given dataset and given aggregators. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
@@ -86,7 +84,7 @@ namespace evaluators
         /// produced by the j'th aggregator on the i'th evaluation. </summary>
         ///
         /// <returns> A reference to the evaluation values. </returns>
-        const std::vector<std::vector<std::vector<double>>>&  GetValues() const { return _values; }
+        const std::vector<std::vector<std::vector<double>>>& GetValues() const { return _values; }
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
@@ -96,13 +94,13 @@ namespace evaluators
     protected:
         void EvaluateZero();
 
-        template<std::size_t ...Sequence>
+        template <std::size_t... Sequence>
         void DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Sequence...>);
 
-        template<std::size_t ...Sequence>
+        template <std::size_t... Sequence>
         void Aggregate(std::index_sequence<Sequence...>);
 
-        template<std::size_t ...Sequence>
+        template <std::size_t... Sequence>
         std::vector<std::vector<std::string>> DispatchGetValueNames(std::index_sequence<Sequence...>) const;
 
         // member variables
@@ -121,7 +119,7 @@ namespace evaluators
     /// <param name="aggregators"> The aggregators. </param>
     ///
     /// <returns> A shared_ptr to an IEvaluator. </returns>
-    template<typename PredictorType, typename... AggregatorTypes>
+    template <typename PredictorType, typename... AggregatorTypes>
     std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 

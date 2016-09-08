@@ -13,7 +13,7 @@ namespace nodes
         template <typename ValueType>
         ValueType Add(ValueType a, ValueType b)
         {
-            return a+b;
+            return a + b;
         }
 
         template <>
@@ -25,7 +25,7 @@ namespace nodes
         template <typename ValueType>
         ValueType Subtract(ValueType a, ValueType b)
         {
-            return a-b;
+            return a - b;
         }
 
         template <>
@@ -37,7 +37,7 @@ namespace nodes
         template <typename ValueType>
         ValueType Multiply(ValueType a, ValueType b)
         {
-            return a*b;
+            return a * b;
         }
 
         template <>
@@ -49,7 +49,7 @@ namespace nodes
         template <typename ValueType>
         ValueType Divide(ValueType a, ValueType b)
         {
-            return a/b;
+            return a / b;
         }
 
         template <>
@@ -60,7 +60,7 @@ namespace nodes
 
         //
         // Logical operations
-        // 
+        //
         template <typename ValueType>
         ValueType LogicalAnd(ValueType a, ValueType b)
         {
@@ -70,7 +70,7 @@ namespace nodes
         template <>
         inline bool LogicalAnd(bool a, bool b)
         {
-            return a&&b;
+            return a && b;
         }
 
         template <typename ValueType>
@@ -99,11 +99,14 @@ namespace nodes
     }
 
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode() : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
-    {}
+    BinaryOperationNode<ValueType>::BinaryOperationNode()
+        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
+    {
+    }
 
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, OperationType operation)
+        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
     {
         if (input1.Size() != input2.Size())
         {

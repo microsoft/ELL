@@ -9,15 +9,15 @@
 #include "IArchivable_test.h"
 
 // utilities
-#include "UniqueId.h"
-#include "IArchivable.h"
 #include "Archiver.h"
+#include "IArchivable.h"
 #include "JsonArchiver.h"
+#include "UniqueId.h"
 #include "XMLArchiver.h"
 
 // model
-#include "Model.h"
 #include "InputNode.h"
+#include "Model.h"
 #include "OutputNode.h"
 
 // nodes
@@ -29,16 +29,17 @@
 
 // stl
 #include <iostream>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 struct TestStruct : public utilities::IArchivable
 {
-    int a=0;
-    float b=0.0f;
-    double c=0.0;
+    int a = 0;
+    float b = 0.0f;
+    double c = 0.0;
     TestStruct() = default;
-    TestStruct(int a, float b, double c) : a(a), b(b), c(c) {}
+    TestStruct(int a, float b, double c)
+        : a(a), b(b), c(c) {}
     static std::string GetTypeName() { return "TestStruct"; }
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
@@ -74,7 +75,6 @@ void TestArchiver()
     auto constNode = g.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
-
 
     std::stringstream strstream;
     ArchiverType archiver(strstream);
@@ -166,7 +166,7 @@ void TestUnarchiver()
         std::stringstream strstream;
         {
             ArchiverType archiver(strstream);
-            std::vector<int> arr{ 1,2,3 };
+            std::vector<int> arr{ 1, 2, 3 };
             archiver.Archive("arr", arr);
         }
 
@@ -187,7 +187,7 @@ void TestUnarchiver()
         UnarchiverType unarchiver(strstream, context);
         TestStruct val;
         unarchiver.Unarchive("s", val);
-        testing::ProcessTest("Deserialize IArchivable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);        
+        testing::ProcessTest("Deserialize IArchivable check", val.a == 1 && val.b == 2.2f && val.c == 3.3);
     }
 
     {
@@ -231,8 +231,8 @@ void TestUnarchiver()
         unarchiver.Unarchive("node4", newNodePtr);
         unarchiver.Unarchive("node5", newBinaryOpNode);
         unarchiver.PopContext();
-        testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNode.GetValues()));
-        testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNodePtr->GetValues()));
+        testing::ProcessTest("Deserialize nodes check", testing::IsEqual(constVector, newConstNode.GetValues()));
+        testing::ProcessTest("Deserialize nodes check", testing::IsEqual(constVector, newConstNodePtr->GetValues()));
     }
 
     {
@@ -255,13 +255,13 @@ void TestUnarchiver()
         unarchiver.Unarchive("vec1", newDoubleVector);
         unarchiver.Unarchive("vec2", newStructVector);
 
-        testing::ProcessTest("Deserialize array check",  testing::IsEqual(doubleVector, newDoubleVector));
-        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].a, newStructVector[0].a));
-        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].b, newStructVector[0].b));
-        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].c, newStructVector[0].c));
-        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[1].a, newStructVector[1].a));
-        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[1].b, newStructVector[1].b));
-        testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[1].c, newStructVector[1].c));
+        testing::ProcessTest("Deserialize array check", testing::IsEqual(doubleVector, newDoubleVector));
+        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[0].a, newStructVector[0].a));
+        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[0].b, newStructVector[0].b));
+        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[0].c, newStructVector[0].c));
+        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[1].a, newStructVector[1].a));
+        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[1].b, newStructVector[1].b));
+        testing::ProcessTest("Deserialize array check", testing::IsEqual(structVector[1].c, newStructVector[1].c));
     }
 
     {
@@ -308,11 +308,11 @@ void TestUnarchiver()
             ArchiverType archiver(strstream);
             archiver.Archive("str", stringVal);
         }
-        
+
         UnarchiverType unarchiver(strstream, context);
         std::string val;
         unarchiver.Unarchive("str", val);
-        testing::ProcessTest("Deserialize string check", val == stringVal);    
+        testing::ProcessTest("Deserialize string check", val == stringVal);
     }
 }
 

@@ -32,7 +32,7 @@ namespace trainers
     {
         double regularization;
     };
-    
+
     /// <summary>
     /// Implements the averaged stochastic gradient descent algorithm on an L2 regularized empirical
     /// loss.
@@ -62,7 +62,6 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
     private:
-
         void UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator);
         void UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator);
 

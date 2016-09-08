@@ -23,7 +23,6 @@ namespace evaluators
     class IIncrementalEvaluator
     {
     public:
-
         virtual ~IIncrementalEvaluator() = default;
 
         /// <summary>
@@ -47,11 +46,10 @@ namespace evaluators
         virtual void Print(std::ostream& os) const = 0;
     };
 
-    template<typename BasePredictorType, typename... AggregatorTypes>
+    template <typename BasePredictorType, typename... AggregatorTypes>
     class IncrementalEvaluator : public Evaluator<BasePredictorType, AggregatorTypes...>, public IIncrementalEvaluator<BasePredictorType>
     {
     public:
-
         using BaseClassType = Evaluator<BasePredictorType, AggregatorTypes...>;
 
         /// <summary> Constructs an instance of IncrementalEvaluator with a given dataset and given aggregators. </summary>
@@ -93,7 +91,7 @@ namespace evaluators
     /// <param name="aggregators"> The aggregators. </param>
     ///
     /// <returns> A unique_ptr to an IEvaluator. </returns>
-    template<typename BasePredictorType, typename... AggregatorTypes>
+    template <typename BasePredictorType, typename... AggregatorTypes>
     std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 

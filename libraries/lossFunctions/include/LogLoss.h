@@ -14,7 +14,6 @@ namespace lossFunctions
     class LogLoss
     {
     public:
-
         /// <summary> Constructs a LogLoss object. </summary>
         ///
         /// <param name="scale"> The loss scale. </param>

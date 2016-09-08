@@ -104,9 +104,9 @@ namespace utilities
         {
             _out << " name='" << name << "'";
         }
-        _out << " type='" << typeName <<  "'>" << std::endl;
+        _out << " type='" << typeName << "'>" << std::endl;
 
-        // Indent the next line (the line with the array elements), and then 
+        // Indent the next line (the line with the array elements), and then
         // set the indent to 0 (so there isn't indentation inside the line)
         auto oldIndent = _indent;
         IncrementIndent();
@@ -134,19 +134,19 @@ namespace utilities
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
 
-        _tokenizer.MatchTokens({"<", typeName});
-        if(hasName)
+        _tokenizer.MatchTokens({ "<", typeName });
+        if (hasName)
         {
-            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+            _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
         }
-        _tokenizer.MatchTokens({"value", "=", "'"});
+        _tokenizer.MatchTokens({ "value", "=", "'" });
 
         // read value
         auto valueToken = _tokenizer.ReadNextToken();
         std::stringstream valueStream(valueToken);
         valueStream >> value;
 
-        _tokenizer.MatchTokens({"'", "/", ">"});
+        _tokenizer.MatchTokens({ "'", "/", ">" });
     }
 
     template <>
@@ -155,38 +155,38 @@ namespace utilities
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<bool>::GetName());
         bool hasName = name != std::string("");
 
-        _tokenizer.MatchTokens({"<", typeName});
-        if(hasName)
+        _tokenizer.MatchTokens({ "<", typeName });
+        if (hasName)
         {
-            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+            _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
         }
-        _tokenizer.MatchTokens({"value", "=", "'"});
+        _tokenizer.MatchTokens({ "value", "=", "'" });
 
         // read value
         auto valueToken = _tokenizer.ReadNextToken();
         value = (valueToken == "true");
 
-        _tokenizer.MatchTokens({"'", "/", ">"});
+        _tokenizer.MatchTokens({ "'", "/", ">" });
     }
 
     // This function is inline just so it appears next to the other Read* functions
-    inline void XmlUnarchiver::ReadScalar(const char* name, std::string& value) 
+    inline void XmlUnarchiver::ReadScalar(const char* name, std::string& value)
     {
         auto typeName = "string";
         bool hasName = name != std::string("");
 
-        _tokenizer.MatchTokens({"<", typeName});
-        if(hasName)
+        _tokenizer.MatchTokens({ "<", typeName });
+        if (hasName)
         {
-            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+            _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
         }
-        _tokenizer.MatchTokens({"value", "=", "'"});
+        _tokenizer.MatchTokens({ "value", "=", "'" });
 
         // read value
         auto valueToken = _tokenizer.ReadNextToken();
         value = XmlUtilities::DecodeAttributeString(valueToken);
 
-        _tokenizer.MatchTokens({"'", "/", ">"});
+        _tokenizer.MatchTokens({ "'", "/", ">" });
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
@@ -195,31 +195,31 @@ namespace utilities
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
 
-        _tokenizer.MatchTokens({"<", "Array"});
-        if(hasName)
+        _tokenizer.MatchTokens({ "<", "Array" });
+        if (hasName)
         {
-            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+            _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
         }
-                
-        _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
-        while(true)
+
+        _tokenizer.MatchTokens({ "type", "=", "'", typeName, "'", ">" });
+        while (true)
         {
             ValueType obj;
             Unarchive(obj);
             array.push_back(obj);
-            
+
             // check for '</'
             auto token1 = _tokenizer.ReadNextToken();
             auto token2 = _tokenizer.ReadNextToken();
             _tokenizer.PutBackToken(token2);
             _tokenizer.PutBackToken(token1);
-            if(token1+token2 == "</")
+            if (token1 + token2 == "</")
             {
                 break;
             }
         }
 
-        _tokenizer.MatchTokens({"<", "/", "Array", ">"});
+        _tokenizer.MatchTokens({ "<", "/", "Array", ">" });
     }
 
     inline void XmlUnarchiver::ReadArray(const char* name, std::vector<std::string>& array)
@@ -227,32 +227,32 @@ namespace utilities
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<std::string>::GetName());
         bool hasName = name != std::string("");
 
-        _tokenizer.MatchTokens({"<", "Array"});
-        if(hasName)
+        _tokenizer.MatchTokens({ "<", "Array" });
+        if (hasName)
         {
-            _tokenizer.MatchTokens({"name", "=", "'", name, "'"});
+            _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
         }
-                
-        _tokenizer.MatchTokens({"type", "=", "'", typeName, "'", ">"});
+
+        _tokenizer.MatchTokens({ "type", "=", "'", typeName, "'", ">" });
 
         std::string nextToken = "";
-        while(true)
+        while (true)
         {
             std::string obj;
             Unarchive(obj);
             array.push_back(obj);
-            
+
             // check for '</'
             auto token1 = _tokenizer.ReadNextToken();
             auto token2 = _tokenizer.ReadNextToken();
             _tokenizer.PutBackToken(token2);
             _tokenizer.PutBackToken(token1);
-            if(token1+token2 == "</")
+            if (token1 + token2 == "</")
             {
                 break;
             }
         }
 
-        _tokenizer.MatchTokens({"<", "/", "Array", ">"});
+        _tokenizer.MatchTokens({ "<", "/", "Array", ">" });
     }
 }

@@ -28,8 +28,7 @@ namespace utilities
     template <typename T, typename U>
     void CommandLineParser::AddOption(T& option, std::string name, std::string shortName, std::string description, const U& defaultValue)
     {
-        auto callback = [&option, this](std::string optionVal)
-        {
+        auto callback = [&option, this](std::string optionVal) {
             bool didParse = ParseVal<T>(optionVal, option);
             return didParse;
         };
@@ -41,36 +40,35 @@ namespace utilities
     template <typename T>
     void CommandLineParser::AddOption(T& option, std::string name, std::string shortName, std::string description, std::initializer_list<std::pair<std::string, T>> enumValues, std::string defaultValue)
     {
-		// transform initializer list into useful things that will stick around
-		std::vector<std::string> valueNameStrings;
-		std::vector<std::pair<std::string, T>> valueNamesTable;
-		for (auto v : enumValues)
-		{
-			valueNameStrings.push_back(v.first);
-			valueNamesTable.push_back(v);
-		}
+        // transform initializer list into useful things that will stick around
+        std::vector<std::string> valueNameStrings;
+        std::vector<std::pair<std::string, T>> valueNamesTable;
+        for (auto v : enumValues)
+        {
+            valueNameStrings.push_back(v.first);
+            valueNamesTable.push_back(v);
+        }
 
-		auto callback = [&option, this, name, valueNamesTable](std::string optionVal)
-		{
-			std::string optionString;
-			bool didParse = ParseVal<T>(optionVal, valueNamesTable, option, optionString);
-			if (didParse)
-			{
-				_options[name].currentValueString = optionString;
-				return true;
-			}
-			else
-			{
-				throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Could not parse value for option " + name);
-				return false;
-			}
-		};
+        auto callback = [&option, this, name, valueNamesTable](std::string optionVal) {
+            std::string optionString;
+            bool didParse = ParseVal<T>(optionVal, valueNamesTable, option, optionString);
+            if (didParse)
+            {
+                _options[name].currentValueString = optionString;
+                return true;
+            }
+            else
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Could not parse value for option " + name);
+                return false;
+            }
+        };
 
-		OptionInfo info(name, shortName, description, defaultValue, callback);
-		info.enumValues = valueNameStrings;
-		AddOption(info);
-	}
-    
+        OptionInfo info(name, shortName, description, defaultValue, callback);
+        info.enumValues = valueNameStrings;
+        AddOption(info);
+    }
+
     template <typename T>
     bool CommandLineParser::ParseVal(std::string str, T& result)
     {
@@ -117,7 +115,7 @@ namespace utilities
         return true;
     }
 
-    template<>
+    template <>
     inline std::string CommandLineParser::ToString<bool>(const bool& val)
     {
         return val ? "true" : "false";

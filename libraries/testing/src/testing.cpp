@@ -24,22 +24,22 @@ namespace testing
     {
         return IsScalarEqual(a, b);
     }
-    
+
     bool IsEqual(char a, char b)
     {
         return IsScalarEqual(a, b);
     }
-    
+
     bool IsEqual(int a, int b)
     {
         return IsScalarEqual(a, b);
     }
-    
+
     bool IsEqual(size_t a, size_t b)
     {
         return IsScalarEqual(a, b);
     }
-    
+
     bool IsEqual(const std::string& a, const std::string& b)
     {
         return IsScalarEqual(a, b);
@@ -77,7 +77,7 @@ namespace testing
         }
         return true;
     }
-        template <typename ValueType>
+    template <typename ValueType>
     bool IsVectorApproxEqual(const std::vector<ValueType>& a, const std::vector<ValueType>& b, ValueType tolerance)
     {
         // allow vectors of different size, provided that they differ by a suffix of zeros

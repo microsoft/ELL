@@ -11,9 +11,9 @@
 // Our interface classes
 #include "RowDatasetInterface.h"
 
+#include "AnyIterator.h"
 #include "DataLoadArguments.h"
 #include "Example.h"
-#include "AnyIterator.h"
 
 namespace interfaces
 {

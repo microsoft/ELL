@@ -8,25 +8,24 @@
 
 #pragma once
 
-#include "RowMatrix.h"
 #include "IMatrix.h"
+#include "RowMatrix.h"
 
 // stl
 #include <cstdint>
-#include <vector>
 #include <iostream>
 #include <random>
+#include <vector>
 
 namespace linear
 {
     /// <summary> Base class for RowMatrix. </summary>
     ///
     /// <typeparam name="DataVectorType"> Type of the data vector type. </typeparam>
-    template<typename DataVectorType>
+    template <typename DataVectorType>
     class RowMatrix : public IMatrix
     {
     public:
-
         using IMatrix::Gemv;
         using IMatrix::Gevm;
 
@@ -34,7 +33,6 @@ namespace linear
         class Iterator
         {
         public:
-
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;
@@ -60,7 +58,6 @@ namespace linear
             const DataVectorType& Get() const;
 
         private:
-
             // private ctor, can only be called from RowMatrix class
             Iterator(const RowMatrix& table, uint64_t firstRow, uint64_t maxRow);
             friend RowMatrix<DataVectorType>;
@@ -120,7 +117,7 @@ namespace linear
         ///
         /// <typeparam name="Args"> Types for the row constructor. </typeparam>
         /// <param name="args"> Variables for the row constructor. </param>
-        template<typename... Args >
+        template <typename... Args>
         void EmplaceBackRow(Args&&... args);
 
         /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>

@@ -14,8 +14,8 @@
 #include "IArchivable.h"
 
 // stl
-#include <vector>
 #include <memory>
+#include <vector>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -75,7 +75,7 @@ namespace model
     {
     public:
         OutputPort() = default;
-        OutputPort(const OutputPort&) = default; 
+        OutputPort(const OutputPort&) = default;
 
         /// <summary> Constructor </summary>
         ///

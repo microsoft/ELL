@@ -10,7 +10,7 @@
 
 namespace common
 {
-    void ParsedForestTrainerArguments::AddArgs(utilities::CommandLineParser& parser) 
+    void ParsedForestTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(minSplitGain,
                          "minSplitGain",
@@ -47,7 +47,7 @@ namespace common
                          "cpi",
                          "The number of split candidates to create per input element",
                          8);
-        
+
         parser.AddOption(sortingTrainer,
                          "sortingTrainer",
                          "st",

@@ -12,8 +12,8 @@
 #include "LogitBooster.h"
 
 // predictors
-#include "SingleElementThresholdPredictor.h"
 #include "ConstantPredictor.h"
+#include "SingleElementThresholdPredictor.h"
 
 namespace trainers
 {
@@ -27,7 +27,7 @@ namespace trainers
     ///
     /// <typeparam name="LossFunctionType"> Loss function type. </typeparam>
     /// <typeparam name="BoosterType"> Booster type. </typeparam>
-    template <typename LossFunctionType, typename BoosterType> 
+    template <typename LossFunctionType, typename BoosterType>
     class SortingForestTrainer : public ForestTrainer<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor, BoosterType>
     {
     public:
@@ -67,7 +67,7 @@ namespace trainers
     /// <param name="parameters"> The trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a simple forest trainer. </returns>
-    template<typename LossFunctionType, typename BoosterType>
+    template <typename LossFunctionType, typename BoosterType>
     std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const SortingForestTrainerParameters& parameters);
 }
 

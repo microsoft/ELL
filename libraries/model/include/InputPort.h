@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "Port.h"
 #include "OutputPort.h"
+#include "Port.h"
 #include "PortElements.h"
 
 // utilities
@@ -17,8 +17,8 @@
 #include "IArchivable.h"
 
 // stl
-#include <vector>
 #include <cassert>
+#include <vector>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -77,7 +77,7 @@ namespace model
     public:
         /// <summary> Default Constructor </summary>
         InputPort();
-        
+
         /// <summary> Creates an input port </summary>
         ///
         /// <param name="owningNode"> The node this port belongs to </param>

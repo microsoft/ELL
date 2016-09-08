@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "IIncrementalTrainer.h"
 #include "EvaluatingIncrementalTrainer.h"
+#include "IIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
 
 // dataset
@@ -19,10 +19,10 @@
 #include "Evaluator.h"
 
 //stl
-#include <utility>
 #include <memory>
 #include <random>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace trainers
@@ -34,7 +34,6 @@ namespace trainers
     class SweepingIncrementalTrainer : public IIncrementalTrainer<PredictorType>
     {
     public:
-
         typedef EvaluatingIncrementalTrainer<PredictorType> EvaluatingTrainerType;
 
         /// <summary> Constructs an instance of SweepingIncrementalTrainer. </summary>
