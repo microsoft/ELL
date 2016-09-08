@@ -181,7 +181,7 @@ namespace common
     }
 
     template <typename UnarchiverType>
-    model::Model LoadArchviedModel(std::istream& stream)
+    model::Model LoadArchivedModel(std::istream& stream)
     {
         try
         {
@@ -245,11 +245,11 @@ namespace common
                 auto filestream = utilities::OpenIfstream(filename);
                 if (ext == "xml")
                 {
-                    return LoadArchviedModel<utilities::XmlUnarchiver>(filestream);
+                    return LoadArchivedModel<utilities::XmlUnarchiver>(filestream);
                 }
                 else if (ext == "json")
                 {
-                    return LoadArchviedModel<utilities::JsonUnarchiver>(filestream);
+                    return LoadArchivedModel<utilities::JsonUnarchiver>(filestream);
                 }
             }
 
