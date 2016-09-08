@@ -604,7 +604,7 @@ model::Model MakeForest()
 	auto root = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 } });
 	forest.Split(SplitAction{ forest.GetChildId(root, 0), SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 } });
 	forest.Split(SplitAction{ forest.GetChildId(root, 1), SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 } });
-	//forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 } });
+	forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 } });
 
 	// build the model
 	model::Model model;
@@ -615,7 +615,7 @@ model::Model MakeForest()
 	model::TransformContext context;
 	model::ModelTransformer transformer;
 	auto refinedModel = transformer.RefineModel(model, context);
-
+	/*
 	auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
 	auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->output });
 	auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->treeOutputs });
@@ -635,7 +635,7 @@ model::Model MakeForest()
 
 	//  expected output is -3.0
 	testing::ProcessTest("Testing SimpleForestNode refine (output)", testing::IsEqual(outputValue, refinedOutputValue));
-
+	*/
 	return refinedModel;
 }
 
@@ -668,6 +668,7 @@ model::Model MakeForestDeep()
 	model::TransformContext context;
 	model::ModelTransformer transformer;
 	auto refinedModel =  transformer.RefineModel(model, context);
+	/*
 	auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
 	auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->output });
 	auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->treeOutputs });
@@ -687,6 +688,7 @@ model::Model MakeForestDeep()
 
 	//  expected output is -3.0
 	testing::ProcessTest("Testing SimpleForestNode refine (output)", testing::IsEqual(outputValue, refinedOutputValue));
+	*/
 
 	return refinedModel;
 }
@@ -700,20 +702,20 @@ void TestForest()
 
 	IRCompiler compiler;
 	compiler.CompileModel("TestForest", model);
-
-
 	auto& module = compiler.Module();
+	/*
 	module.DeclarePrintf();
 
 
 	auto fnMain = module.AddMain();
 	llvm::Value* pData = module.Constant("c_data", data);
 	llvm::Value* pResult = fnMain.Var(ValueType::Double, 1);
-	fnMain.Call("TestForest", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
+ 	fnMain.Call("TestForest", { fnMain.PtrOffset(pData, 0), fnMain.PtrOffset(pResult, 0) });
 
 	fnMain.PrintForEach("%f\n", pResult, 1);
 	fnMain.Ret();
 	fnMain.Verify();
+	*/
 	compiler.DebugDump();
 	module.WriteBitcodeToFile("C:\\temp\\emll\\forest.bc");
 	module.WriteAsmToFile("C:\\temp\\emll\\forest.asm");

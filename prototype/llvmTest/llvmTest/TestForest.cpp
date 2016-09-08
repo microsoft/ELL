@@ -86,7 +86,7 @@ double TestForestOld(double* input0)
 	return t_22;
 }
 
-double TestForest(double* input0)
+double TestForest3(double* input0)
 {
 	int t_0;
 	double t_1;
@@ -200,4 +200,74 @@ double TestForest(double* input0)
 	/* Block27 */
 	t_20 = (t_19) ? t_16 : 0;
 	return t_8;
+}
+
+double TestForest(double* input0)
+{
+	int t_0;
+	double t_1;
+	int t_2;
+	double t_3;
+	double t_4;
+	int t_5;
+	double t_6;
+	double t_7;
+	int t_8;
+	double t_9;
+	double t_10;
+	int t_11;
+	int t_12;
+	int t_13;
+	int t_14;
+	int t_15;
+	int t_16;
+	int t_17;
+	int t_18;
+	int t_19;
+	int t_20;
+	int t_21;
+	int t_22;
+	int t_23;
+	int t_24;
+	int t_25;
+	int t_26;
+
+	t_0 = (input0[0] > 0.20000000000000001);
+	t_1 = (t_0) ? 3 : -3;
+	t_2 = (input0[0] > 0.90000000000000002);
+	t_5 = (input0[0] > 0.59999999999999998);
+	t_8 = (input0[0] > 0.29999999999999999);
+	if (t_8)
+	{
+		t_3 = (t_2) ? 4 : -4;
+		t_4 = 1 + t_3;
+		t_9 = t_4;
+	}
+	else
+	{
+		t_6 = (t_5) ? 2 : -2;
+		t_7 = -1 + t_6;
+		t_9 = t_7;
+	}
+	t_10 = 0;
+	t_10 += t_9;
+	t_10 += t_1;
+	t_10 += 0;
+	t_11 = (t_8 == 0);
+	t_12 = (t_11) ? 1 : 0;
+	t_13 = (t_5 == 0);
+	t_14 = (t_13) ? t_12 : 0;
+	t_15 = (t_5 == 1);
+	t_16 = (t_15) ? t_12 : 0;
+	t_17 = (t_8 == 1);
+	t_18 = (t_17) ? 1 : 0;
+	t_19 = (t_2 == 0);
+	t_20 = (t_19) ? t_18 : 0;
+	t_21 = (t_2 == 1);
+	t_22 = (t_21) ? t_18 : 0;
+	t_23 = (t_0 == 0);
+	t_24 = (t_23) ? 1 : 0;
+	t_25 = (t_0 == 1);
+	t_26 = (t_25) ? 1 : 0;
+	return t_10;
 }

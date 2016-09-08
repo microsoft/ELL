@@ -58,7 +58,7 @@ namespace emll
 			CppBlock* pBlock = _pfn->AppendBlock();
 			_nodeBlocks.Set(node, pBlock);
 			//_pfn->Comment(node.GetRuntimeTypeName());
-			//_pfn->Comment(_pfn->CurrentBlock()->IdString());
+			_pfn->Comment(_pfn->CurrentBlock()->IdString());
 		}
 
 		bool CppCompiler::TryMergeCodeBlock(const model::Node& node)

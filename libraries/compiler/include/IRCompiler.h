@@ -81,6 +81,8 @@ namespace emll
 			virtual void CompileUnaryNode(const nodes::UnaryOperationNode<double>& node) { CompileUnary<double>(node); }
 			///<summary>Compile a UnaryNode</summary>
 			virtual void CompileUnaryNode(const nodes::UnaryOperationNode<int>& node) { CompileUnary<int>(node); }
+			///<summary>Compile a TypecastNode</summary>
+			virtual void CompileTypecastNode(const nodes::TypeCastNode<bool, int>& node);
 
 			///<summary>Begins the IR function that will contain our compiled model</summary>
 			virtual void BeginFunction(const std::string& functionName, NamedValueTypeList& args) override;
@@ -218,10 +220,10 @@ namespace emll
 			void CompileBinaryPredicate(const nodes::BinaryPredicateNode<T>& node);
 
 			///<summary>Compile an elementselectorNode</summary>
-			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<double, bool>& node) override
-			{
-				CompileMultiplexer<double, bool>(node);
-			}
+			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<double, bool>& node) override { CompileMultiplexer<double, bool>(node);}
+			///<summary>Compile a MultiplexerNode</summary>
+			virtual void CompileMultiplexerNode(const nodes::MultiplexerNode<bool, bool>& node) override { CompileMultiplexer<bool, bool>(node); }
+
 			///<summary>Compile an element selector node</summary>
 			template<typename T, typename SelectorType>
 			void CompileMultiplexer(const nodes::MultiplexerNode<T, SelectorType>& node);

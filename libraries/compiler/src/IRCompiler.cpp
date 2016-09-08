@@ -207,6 +207,20 @@ namespace emll
 			return LoadVar(pPort->GetInputElement(0));
 		}
 
+		void IRCompiler::CompileTypecastNode(const nodes::TypeCastNode<bool, int>& node)
+		{
+			// The IR compiler currently implements bools using integers. We'll just use the already created variable. 
+
+			// Typecast has 1 input and 1 output port
+			auto pInput = node.GetInputPorts()[0];
+			auto pOutput = node.GetOutputPorts()[0];
+			VerifyIsScalar(*pInput);
+			VerifyIsScalar(*pOutput);
+
+			Variable* pVar = GetVariableFor(pInput->GetInputElement(0));
+			SetVariableFor(pOutput, pVar);
+		}
+
 		void IRCompiler::SetVar(Variable& var, llvm::Value* pDest, int offset, llvm::Value* pValue)
 		{
 			assert(pValue != nullptr);

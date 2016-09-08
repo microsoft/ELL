@@ -6,6 +6,8 @@ using namespace emll::compiler;
 
 void TestIRCompiler()
 {
+	TestForest();
+
 	TestBinaryVector(false);
 	TestBinaryVector(true);
 	TestBinaryScalar();
@@ -22,7 +24,6 @@ void TestIRCompiler()
 	TestDotProductOutput();
 
 	TestLinearPredictor();
-	//TestForest();
 
 	TestLLVM();
 	TestLLVMShiftRegister();
