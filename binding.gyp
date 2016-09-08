@@ -67,10 +67,7 @@
                 '<(include_path_prefix)/EMLL/interfaces/common/include'
             ],
             'sources': [
-                '<(include_path_prefix)/EMLL/interfaces/common/src/DataLoadersInterface.cpp',
-                '<(include_path_prefix)/EMLL/interfaces/common/src/LoadModelInterface.cpp',
-                '<(include_path_prefix)/EMLL/interfaces/common/src/MapInterface.cpp',
-                '<(include_path_prefix)/EMLL/interfaces/common/src/ModelInterface.cpp',
+                '<(include_path_prefix)/EMLL/interfaces/common/src/DataLoadersInterface.cpp',                
                 '<(include_path_prefix)/EMLL/interfaces/common/src/RowDatasetInterface.cpp',
                 '<(include_path_prefix)/EMLL/build/interfaces/javascript/EMLLJAVASCRIPT_wrap.cxx'
             ],
