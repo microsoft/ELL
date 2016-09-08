@@ -27,7 +27,7 @@ namespace emll
 
 		template<typename T>
 		LiteralVarV<T>::LiteralVarV(std::vector<T> data)
-			:	VectorVar(VariableScope::Literal, data.size(), VariableFlags::none),
+			:	VectorVar(VariableScope::literal, data.size(), VariableFlags::none),
 				_data(std::move(data))
 		{
 		}

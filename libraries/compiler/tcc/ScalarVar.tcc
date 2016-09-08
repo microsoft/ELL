@@ -19,7 +19,7 @@ namespace emll
 
 		template<typename T>
 		LiteralVar<T>::LiteralVar(T data)
-			: ScalarVar(VariableScope::Literal, VariableFlags::none), 
+			: ScalarVar(VariableScope::literal, VariableFlags::none), 
 			 _data(data)
 		{
 		}
@@ -33,7 +33,7 @@ namespace emll
 
 		template<typename T>
 		VectorElementVar<T>::VectorElementVar(Variable& src, int offset)
-			: ScalarVar(VariableScope::Local, VariableFlags::isVectorRef),
+			: ScalarVar(VariableScope::local, VariableFlags::isVectorRef),
 			_src(src),
 			_offset(offset)
 		{

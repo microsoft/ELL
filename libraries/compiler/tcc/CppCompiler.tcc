@@ -31,10 +31,10 @@ namespace emll
 		{
 			switch (var.Scope())
 			{
-				case VariableScope::Literal:
+				case VariableScope::literal:
 					EmitLiteral<T>(static_cast<LiteralVar<T>&>(var));
 					break;
-				case VariableScope::Local:
+				case VariableScope::local:
 					if (var.IsVectorRef())
 					{
 						EmitRef<T>(static_cast<VectorElementVar<T>&>(var));
@@ -49,11 +49,11 @@ namespace emll
 					}
 					break;
 
-				case VariableScope::Global:
+				case VariableScope::global:
 					EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
 					break;	
 
-				case VariableScope::RValue:
+				case VariableScope::rValue:
 					EmitRValue<T>(var);
 					break;
 
@@ -67,10 +67,10 @@ namespace emll
 		{
 			switch (var.Scope())
 			{
-				case VariableScope::Literal:
+				case VariableScope::literal:
 					EmitLiteralVector<T>(static_cast<LiteralVarV<T>&>(var));
 					break;
-				case VariableScope::Global:
+				case VariableScope::global:
 					if (var.HasInitValue())
 					{
 						EmitGlobalVector<T>(static_cast<InitializedVectorVar<T>&>(var));
@@ -343,7 +343,7 @@ namespace emll
 			// Accumulators are always long lived - either globals or heap. Currently, we use globals
 			auto pInput = node.GetInputPorts()[0];
 			auto pOutput = node.GetOutputPorts()[0];
-			Variable* pVar = Variables().AddVectorVariable(VariableScope::Global, GetValueType<T>(), pOutput->Size());
+			Variable* pVar = Variables().AddVectorVariable(VariableScope::global, GetValueType<T>(), pOutput->Size());
 			SetVariableFor(pOutput, pVar);
 
 			if (ModelEx::IsPureVector(*pInput) &&

@@ -126,27 +126,27 @@ namespace emll
 			const std::string* pPrefix = nullptr;
 			switch (var.Scope())
 			{
-				case VariableScope::Literal:
+				case VariableScope::literal:
 					emittedVar = _literalVars.Alloc();
 					pPrefix = &c_literalVar;
 					break;
-				case VariableScope::Local:
+				case VariableScope::local:
 					emittedVar = _localVars.Alloc();
 					pPrefix = &c_localVar;
 					break;
-				case VariableScope::Global:
+				case VariableScope::global:
 					emittedVar = _globalVars.Alloc();
 					pPrefix = &c_globalVar;
 					break;
-				case VariableScope::RValue:
+				case VariableScope::rValue:
 					emittedVar = _rValueVars.Alloc();
 					pPrefix = (var.IsTreeNode()) ? &c_nodeVar : &c_fnVar;
 					break;
-				case VariableScope::Input:
+				case VariableScope::input:
 					emittedVar = _inputVars.Alloc();
 					pPrefix = &c_inputVar;
 					break;
-				case VariableScope::Output:
+				case VariableScope::output:
 					emittedVar = _outputVars.Alloc();
 					pPrefix = &c_outputVar;
 					break;
@@ -166,15 +166,15 @@ namespace emll
 			VariableScope scope = var.Scope();
 			switch (scope)
 			{
-				case VariableScope::Local:
+				case VariableScope::local:
 					_localVars.Free(var.GetAssignedVar());
 					break;
-				case VariableScope::Global:
+				case VariableScope::global:
 					_globalVars.Free(var.GetAssignedVar());
 					break;
 				default:
 					// We never free other types
-					assert(scope != VariableScope::Local && scope != VariableScope::Global);
+					assert(scope != VariableScope::local && scope != VariableScope::global);
 					break;
 			}
 		}
@@ -191,7 +191,7 @@ namespace emll
 			}
 			else
 			{
-				pVar = _variables.AddVectorVariable(VariableScope::Global, type, pPort->Size());
+				pVar = _variables.AddVectorVariable(VariableScope::global, type, pPort->Size());
 			}
 			SetVariableFor(pPort, pVar);
 			return pVar;
@@ -200,7 +200,7 @@ namespace emll
 		Variable* Compiler::AllocArg(const model::OutputPortBase* pPort, bool isInput)
 		{
 			ValueType varType = ToValueType(pPort->GetType());
-			VariableScope scope = isInput ? VariableScope::Input : VariableScope::Output;
+			VariableScope scope = isInput ? VariableScope::input : VariableScope::output;
 			//
 			// For now, all inputs and outputs are modelled as Vectors... unlike regular variables, we don't optimize for scalars
 			//

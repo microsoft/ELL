@@ -54,15 +54,15 @@ namespace emll
 		{
 			switch (scope)
 			{
-				case VariableScope::Literal:
+				case VariableScope::literal:
 					return _literals.Get(name);
 				
-				case VariableScope::Global:
+				case VariableScope::global:
 					return _globals.Get(name);
 
-				case VariableScope::Local:
-				case VariableScope::Input:
-				case VariableScope::Output:
+				case VariableScope::local:
+				case VariableScope::input:
+				case VariableScope::output:
 					return _locals.Get(name);
 				
 				default:

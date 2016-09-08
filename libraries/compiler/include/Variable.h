@@ -25,6 +25,7 @@ namespace emll
 			///<summary>Variable #</summary>
 			uint64_t varIndex = 0;
 
+			///<summary>Set fields to default</summary>
 			void Clear();
 		};
 
@@ -32,7 +33,6 @@ namespace emll
 		class EmittedVarAllocator
 		{
 		public:
-
 			///<summary>Alloc a variable</summary>
 			EmittedVar Alloc();
 			///<summary>Free a variable</summary>
@@ -46,19 +46,19 @@ namespace emll
 		enum class VariableScope
 		{
 			///<summary>Literal variable</summary>
-			Literal,
+			literal,
 			///<summary>Local (stack) variable</summary>
-			Local,
+			local,
 			///<summary>Global variable</summary>
-			Global,
+			global,
 			///<summary>Heap allocated variable</summary>
-			Heap,
+			heap,
 			///<summary>Variable returned by a helper function</summary>
-			RValue,
+			rValue,
 			///<summary>Input function argument</summary>
-			Input,
+			input,
 			///<summary>Output function argument</summary>
-			Output
+			output
 		};
 
 		class VariableAllocator;
@@ -128,16 +128,17 @@ namespace emll
 			///<summary>Is this a literal variable?</summary>
 			bool IsLiteral() const
 			{
-				return (_scope == VariableScope::Literal);
+				return (_scope == VariableScope::literal);
 			}
 			///<summary>Is this a global variable?</summary>
 			bool IsGlobal() const
 			{
-				return (_scope == VariableScope::Global);
+				return (_scope == VariableScope::global);
 			}
+			///<summary>Is this an RValue variable?</summary>
 			bool IsRValue() const
 			{
-				return (_scope == VariableScope::RValue);
+				return (_scope == VariableScope::rValue);
 			}
 			///<summary>Is this a variable mutable?</summary>
 			bool IsMutable() const
@@ -164,10 +165,12 @@ namespace emll
 			{
 				return TestFlags(VariableFlags::hasInitValue);
 			}
+			///<summary>True if this a new variable. False it has it already been declared?</summary>
 			bool IsNew() const
 			{
 				return _emittedVar.isNew;
 			}
+			///<summary>Test if the given set of flags are set</summary>
 			bool TestFlags(int flags) const
 			{
 				return ((_flags & flags) != 0);
@@ -178,6 +181,7 @@ namespace emll
 			{
 				_emittedVar = var;
 			}
+			///<summary>Get the physical variable bound to this logical variable</summary>
 			EmittedVar GetAssignedVar()
 			{
 				return _emittedVar;
@@ -214,7 +218,7 @@ namespace emll
 			///<summary>Add a scalar</summary>
 			Variable* AddLocalScalarVariable(ValueType type)
 			{
-				return AddLocalScalarVariable(VariableScope::Local, type);
+				return AddLocalScalarVariable(VariableScope::local, type);
 			}
 			///<summary>Add a scalar</summary>
 			Variable* AddLocalScalarVariable(VariableScope scope, ValueType type);

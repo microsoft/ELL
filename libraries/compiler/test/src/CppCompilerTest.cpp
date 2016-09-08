@@ -17,8 +17,8 @@ void TestCppCompilerGeneral()
 	NamedValueTypeList args({ {"input", ValueType::PDouble }, {"output", ValueType::PDouble} });
 	compiler.BeginFunction("Predict", args);
 	auto var = compiler.Variables().AddLocalScalarVariable(ValueType::Double);
-	auto varV = compiler.Variables().AddVectorVariable(VariableScope::Global, ValueType::Double, 9);
-	auto varV2 = compiler.Variables().AddVariable<InitializedVectorVar<double>>(VariableScope::Global, data);
+	auto varV = compiler.Variables().AddVectorVariable(VariableScope::global, ValueType::Double, 9);
+	auto varV2 = compiler.Variables().AddVariable<InitializedVectorVar<double>>(VariableScope::global, data);
 	compiler.EnsureEmitted(*var);
 	compiler.EnsureEmitted(*varV);
 	compiler.EnsureEmitted(*varV2);

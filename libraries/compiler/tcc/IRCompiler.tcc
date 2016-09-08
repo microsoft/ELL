@@ -32,11 +32,11 @@ namespace emll
 			llvm::Value* pVal = nullptr;
 			switch (var.Scope())
 			{
-				case VariableScope::Literal:
+				case VariableScope::literal:
 					pVal = EmitLiteral<T>(static_cast<LiteralVar<T>&>(var));
 					_literals.Set(var.EmittedName(), pVal);
 					break;
-				case VariableScope::Local:
+				case VariableScope::local:
 					if (var.IsVectorRef())
 					{
 						pVal = EmitRef<T>(static_cast<VectorElementVar<T>&>(var));
@@ -52,7 +52,7 @@ namespace emll
 					_locals.Set(var.EmittedName(), pVal);
 					break;
 
-				case VariableScope::Global:
+				case VariableScope::global:
 					pVal = EmitGlobal<T>(static_cast<InitializedScalarVar<T>&>(var));
 					break;
 
@@ -68,11 +68,11 @@ namespace emll
 			llvm::Value* pVal = nullptr;
 			switch (var.Scope())
 			{
-				case VariableScope::Literal:
+				case VariableScope::literal:
 					pVal = EmitLiteralVector<T>(static_cast<LiteralVarV<T>&>(var));
 					_literals.Set(var.EmittedName(), pVal);
 					break;
-				case VariableScope::Global:
+				case VariableScope::global:
 					if (var.HasInitValue())
 					{
 						pVal = EmitGlobalVector<T>(static_cast<InitializedVectorVar<T>&>(var));
@@ -326,7 +326,7 @@ namespace emll
 			// Accumulators are always long lived - either globals or heap. Currently, we use globals
 			auto pInput = node.GetInputPorts()[0];
 			auto pOutput = node.GetOutputPorts()[0];
-			Variable* pVar = Variables().AddVectorVariable(VariableScope::Global, GetValueType<T>(), pOutput->Size());
+			Variable* pVar = Variables().AddVectorVariable(VariableScope::global, GetValueType<T>(), pOutput->Size());
 			SetVariableFor(pOutput, pVar);
 
 			if (ModelEx::IsPureVector(*pInput) && 
@@ -382,10 +382,10 @@ namespace emll
 			// Each sample chunk is of size == sampleSize. The number of chunks we hold onto == windowSize
 			// We need two buffers - one for the entire lot, one for the "last" chunk forwarded to the next operator
 			// 
-			Variable* pVarAllWindows = Variables().AddVariable<VectorVar<T>>(VariableScope::Global, bufferSize);
+			Variable* pVarAllWindows = Variables().AddVariable<VectorVar<T>>(VariableScope::global, bufferSize);
 			llvm::Value* pAllWindows = EnsureEmitted(pVarAllWindows);
 
-			Variable* pVarOutputBuffer = Variables().AddVariable<VectorVar<T>>(VariableScope::Global, sampleSize);
+			Variable* pVarOutputBuffer = Variables().AddVariable<VectorVar<T>>(VariableScope::global, sampleSize);
 			SetVariableFor(pOutput, pVarOutputBuffer);
 			llvm::Value* pOutputBuffer = EnsureEmitted(pVarOutputBuffer);
 			//
