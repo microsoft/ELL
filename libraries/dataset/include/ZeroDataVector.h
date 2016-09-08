@@ -22,12 +22,10 @@ namespace dataset
     class ZeroDataVector : public IDataVector
     {
     public:
-
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
         class Iterator : public linear::IIndexValueIterator
         {
         public:
-
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;

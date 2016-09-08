@@ -8,17 +8,17 @@
 
 #pragma once
 
+#include "Exception.h"
 #include "TypeFactory.h"
 #include "TypeName.h"
-#include "Exception.h"
 #include "TypeTraits.h"
 
 // stl
 #include <cstdint>
+#include <functional>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
-#include <functional>
 
 namespace utilities
 {
@@ -136,7 +136,7 @@ namespace utilities
             std::string _propertyName;
         };
 
-        /// <summary> Destructor </summary>        
+        /// <summary> Destructor </summary>
         virtual ~Archiver() { EndArchiving(); }
 
         /// <summary> Add value to an archive. </summary>
@@ -244,7 +244,7 @@ namespace utilities
         /// <param name="context"> The initial `SerializationContext` to use </param>
         Unarchiver(SerializationContext context);
 
-        /// <summary> Destructor </summary>        
+        /// <summary> Destructor </summary>
         virtual ~Unarchiver() { EndUnarchiving(); }
 
         /// <summary> Read value from an archive. </summary>
@@ -355,11 +355,15 @@ namespace utilities
 }
 
 /// <summary> Macros to make repetitive boilerplate code in archiver implementations easier to implement. </summary>
-#define IMPLEMENT_ARCHIVE_VALUE(base, type) void base::ArchiveValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
-#define IMPLEMENT_ARCHIVE_ARRAY(base, type) void base::ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
+#define IMPLEMENT_ARCHIVE_VALUE(base, type) \
+    void base::ArchiveValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
+#define IMPLEMENT_ARCHIVE_ARRAY(base, type) \
+    void base::ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
 
 /// <summary> Macros to make repetitive boilerplate code in unarchiver implementations easier to implement. </summary>
-#define IMPLEMENT_UNARCHIVE_VALUE(base, type) void base::UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name, value); }
-#define IMPLEMENT_UNARCHIVE_ARRAY(base, type) void base::UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name, value); }
+#define IMPLEMENT_UNARCHIVE_VALUE(base, type) \
+    void base::UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name, value); }
+#define IMPLEMENT_UNARCHIVE_ARRAY(base, type) \
+    void base::UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name, value); }
 
 #include "../tcc/Archiver.tcc"

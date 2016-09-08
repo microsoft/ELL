@@ -10,7 +10,7 @@
 
 namespace common
 {
-    void ParsedSGDIncrementalTrainerArguments::AddArgs(utilities::CommandLineParser& parser) 
+    void ParsedSGDIncrementalTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(regularization,
                          "regularization",

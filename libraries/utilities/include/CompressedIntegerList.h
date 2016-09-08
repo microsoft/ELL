@@ -10,8 +10,8 @@
 
 // stl
 #include <cstdint>
-#include <vector>
 #include <iterator>
+#include <vector>
 
 namespace utilities
 {
@@ -20,12 +20,10 @@ namespace utilities
     class CompressedIntegerList
     {
     public:
-
         /// <summary> A read-only forward std::iterator for the CompressedIntegerList. </summary>
         class Iterator
         {
         public:
-
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;
@@ -46,9 +44,8 @@ namespace utilities
             uint64_t Get() const { return _value; }
 
         private:
-
             // private ctor, can only be called from CompressedIntegerList class
-            Iterator(const uint8_t *iter, const uint8_t *end);
+            Iterator(const uint8_t* iter, const uint8_t* end);
             friend class CompressedIntegerList;
 
             // members
@@ -67,7 +64,7 @@ namespace utilities
 
         ~CompressedIntegerList() = default;
 
-        void operator= (const CompressedIntegerList&) = delete;
+        void operator=(const CompressedIntegerList&) = delete;
 
         /// <summary> Returns The number of entries in the list. </summary>
         ///

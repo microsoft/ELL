@@ -13,13 +13,13 @@
 #include "OutputNode.h"
 
 // nodes
-#include "ConstantNode.h"
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
-#include "SumNode.h"
-#include "UnaryOperationNode.h"
+#include "ConstantNode.h"
 #include "DemultiplexerNode.h"
 #include "MultiplexerNode.h"
+#include "SumNode.h"
+#include "UnaryOperationNode.h"
 #include "ValueSelectorNode.h"
 
 namespace common
@@ -36,14 +36,14 @@ namespace common
         AddNodeType<nodes::BinaryOperationNode<double>>();
         AddNodeType<nodes::BinaryPredicateNode<int>>();
         AddNodeType<nodes::BinaryPredicateNode<double>>();
-        AddNodeType<nodes::DemultiplexerNode<bool,bool>>();
-        AddNodeType<nodes::DemultiplexerNode<double,bool>>();
+        AddNodeType<nodes::DemultiplexerNode<bool, bool>>();
+        AddNodeType<nodes::DemultiplexerNode<double, bool>>();
         AddNodeType<nodes::SumNode<double>>();
-        AddNodeType<nodes::TypeCastNode<bool,int>>();
+        AddNodeType<nodes::TypeCastNode<bool, int>>();
         AddNodeType<nodes::UnaryOperationNode<bool>>();
         AddNodeType<nodes::UnaryOperationNode<double>>();
-        AddNodeType<nodes::MultiplexerNode<bool,bool>>();
-        AddNodeType<nodes::MultiplexerNode<double,bool>>();
+        AddNodeType<nodes::MultiplexerNode<bool, bool>>();
+        AddNodeType<nodes::MultiplexerNode<double, bool>>();
     }
 
     bool IsNodeCompilable::operator()(const model::Node& node)

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <string>
 #include <exception>
+#include <string>
 
 namespace utilities
 {
@@ -18,7 +18,7 @@ namespace utilities
     {
     public:
         virtual ~Exception() = default;
-        
+
         /// <summary> Gets the message. </summary>
         ///
         /// <returns> A message string; </returns>

@@ -10,12 +10,12 @@
 namespace nodes
 {
     template <typename InputValueType, typename OutputValueType>
-    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode() : Node({&_input}, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
-    {};
+    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
 
     template <typename InputValueType, typename OutputValueType>
-    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode(const model::PortElements<InputValueType>& input) : Node({&_input}, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size())
-    {};
+    TypeCastNode<InputValueType, OutputValueType>::TypeCastNode(const model::PortElements<InputValueType>& input)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
 
     template <typename InputValueType, typename OutputValueType>
     void TypeCastNode<InputValueType, OutputValueType>::Compute() const

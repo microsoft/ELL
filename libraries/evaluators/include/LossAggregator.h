@@ -22,7 +22,6 @@ namespace evaluators
     class LossAggregator
     {
     public:
-
         /// <summary> Constructs an instance of LossAggregator with a given loss. </summary>
         ///
         /// <param name="lossFunction"> The loss function. </param>

@@ -14,8 +14,8 @@
 #include "Parser.h"
 
 // stl
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace common
 {
@@ -23,7 +23,7 @@ namespace common
     {
         parser.AddOption(
             inputDataFilename,
-            "inputDataFilename", 
+            "inputDataFilename",
             "idf",
             "Path to the input data file",
             "");

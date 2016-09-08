@@ -11,8 +11,8 @@
 #include "IIncrementalTrainer.h"
 
 // dataset
-#include "RowDataset.h"
 #include "DenseDataVector.h"
+#include "RowDataset.h"
 
 // predictors
 #include "ForestPredictor.h"
@@ -21,9 +21,9 @@
 #include "OutputStreamImpostor.h"
 
 // stl
-#include <queue>
-#include <memory>
 #include <iostream>
+#include <memory>
+#include <queue>
 
 /// <summary> trainers namespace </summary>
 namespace trainers
@@ -60,7 +60,7 @@ namespace trainers
         };
 
         // describes the range of training examples associated with a given node and its children
-        class NodeRanges 
+        class NodeRanges
         {
         public:
             NodeRanges(const Range& totalRange);
@@ -73,7 +73,7 @@ namespace trainers
         };
 
         // metadata that the forest trainer keeps with each example
-        struct ExampleMetadata 
+        struct ExampleMetadata
         {
             void Print(std::ostream& os) const;
 
@@ -94,10 +94,10 @@ namespace trainers
             const Sums& GetTotalSums() const { return _totalSums; }
             void SetChildSums(std::vector<Sums> childSums);
             const Sums& GetChildSums(size_t position) const;
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
+            void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
         private:
-            Sums _totalSums; 
+            Sums _totalSums;
             std::vector<Sums> _childSums;
         };
     };
@@ -107,9 +107,9 @@ namespace trainers
     /// </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
-    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType> 
-    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> 
-    { 
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>>
+    {
     public:
         /// <summary> Constructs an instance of ForestTrainer. </summary>
         ///
@@ -127,12 +127,12 @@ namespace trainers
         /// <returns> A shared pointer to the current predictor. </returns>
         virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const override { return _forest; };
 
-    protected:       
+    protected:
         //
-        // Private internal structs 
+        // Private internal structs
         //
-        
-        // node identifier - borrowed from the forest predictor class 
+
+        // node identifier - borrowed from the forest predictor class
         using SplittableNodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
         // keeps info about the gain maximizing split of each splittable node in the forest - the greedy algo maintains a priority queue of these
@@ -152,13 +152,13 @@ namespace trainers
         // a priority queue of SplitCandidates
         struct SplitCandidatePriorityQueue : public std::priority_queue<SplitCandidate>
         {
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
+            void PrintLine(std::ostream& os, size_t tabs = 0) const;
             using std::priority_queue<SplitCandidate>::size;
         };
 
         //
         // private member functions
-        // 
+        //
 
         // loads a dataset and initializes the currentOutput field in the metadata
         void LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
@@ -178,16 +178,16 @@ namespace trainers
 
         //
         // implementation specific functions that must be implemented by a derived class
-        // 
+        //
 
         virtual SplitCandidate GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) = 0;
         virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) = 0;
-        
+
         //
         // member variables
         //
 
-        // user defined parameters 
+        // user defined parameters
         BoosterType _booster;
         ForestTrainerParameters _parameters;
 
@@ -198,7 +198,7 @@ namespace trainers
         SplitCandidatePriorityQueue _queue;
 
         // the dataset
-        using ForestTrainerExample = dataset::Example<dataset::DoubleDataVector, ExampleMetadata>; 
+        using ForestTrainerExample = dataset::Example<dataset::DoubleDataVector, ExampleMetadata>;
         dataset::RowDataset<ForestTrainerExample> _dataset;
     };
 }

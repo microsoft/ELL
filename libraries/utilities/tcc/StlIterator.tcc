@@ -9,8 +9,10 @@
 namespace utilities
 {
     template <typename IteratorType, typename ValueType>
-    StlIterator<IteratorType, ValueType>::StlIterator(IteratorType begin, IteratorType end) : _current(begin), _end(end)
-    {}
+    StlIterator<IteratorType, ValueType>::StlIterator(IteratorType begin, IteratorType end)
+        : _current(begin), _end(end)
+    {
+    }
 
     template <typename IteratorType, typename ValueType>
     void StlIterator<IteratorType, ValueType>::Next()
@@ -32,5 +34,4 @@ namespace utilities
     {
         return StlIterator<typename ContainerType::iterator, typename ContainerType::value_type>(container.begin(), container.end());
     }
-
 }

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "DataLoadArguments.h" 
+#include "DataLoadArguments.h"
 
 // dataset
 #include "RowDataset.h"
@@ -18,7 +18,6 @@
 
 // stl
 #include <string>
-
 
 namespace common
 {
@@ -36,4 +35,3 @@ namespace common
     /// <returns> The row dataset. </returns>
     dataset::GenericRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments);
 }
-

@@ -30,7 +30,7 @@ int main()
         TestAccumulatorNodeCompute();
         TestDelayNodeCompute();
         TestMovingAverageNodeCompute();
-        TestMovingVarianceNodeCompute(); 
+        TestMovingVarianceNodeCompute();
         TestUnaryOperationNodeCompute();
         TestBinaryOperationNodeCompute();
         TestLinearPredictorNodeCompute();
@@ -41,7 +41,7 @@ int main()
         TestSimpleForestNodeRefine();
         TestDemultiplexerNodeRefine();
     }
-    catch(const utilities::Exception& exception)
+    catch (const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
         throw;

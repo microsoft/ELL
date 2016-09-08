@@ -10,13 +10,13 @@
 
 // stl
 #include <cstdint>
+#include <functional>
 #include <iostream>
-#include <vector>
 #include <map>
 #include <set>
-#include <functional>
-#include <string>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace utilities
 {
@@ -28,7 +28,6 @@ namespace utilities
     class CommandLineParseResult
     {
     public:
-
         CommandLineParseResult() = default;
 
         /// <summary> Result indicating result with no message </summary>
@@ -39,7 +38,7 @@ namespace utilities
         /// <summary> Result indicating an error with a message</summary>
         ///
         /// <param name="message"> The message accompanying this result </param>
-        CommandLineParseResult(const char *message);
+        CommandLineParseResult(const char* message);
 
         /// <summary> Result indicating an error with a message</summary>
         ///
@@ -67,7 +66,6 @@ namespace utilities
     class CommandLineParser
     {
     public:
-
         /// <summary> Constructs a new CommandLineParser with the given argument strings </summary>
         ///
         /// <param name="argc"> The number of argument strings in the array of arguments </param>
@@ -77,7 +75,7 @@ namespace utilities
 
         /// <summary> Adds a new option to the command-line parser </summary>
         ///
-        /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param> 
+        /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param>
         /// <param name="name"> The long name for the option. The option will be specified by '--' plus the long name (e.g., '--help') </param>
         /// <param name="shortName"> [optional] The short name for the option. The option will be secified by '-' plus the short name (e.g., '-h') </param>
         /// <param name="description"> The descriptive text that appears when help is requested </param>
@@ -87,14 +85,14 @@ namespace utilities
 
         /// <summary> Adds a new enumerated-value option to the command-line parser </summary>
         ///
-        /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param> 
+        /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param>
         /// <param name="name"> The long name for the option. The option will be specified by '--' plus the long name (e.g., '--help') </param>
         /// <param name="shortName"> [optional] The short name for the option. The option will be secified by '-' plus the short name (e.g., '-h') </param>
         /// <param name="description"> The descriptive text that appears when help is requested </param>
         /// <param name="enumValues"> A list of allowed option strings and their values for this option.</param>
         /// <param name="defaultValue"> The default value for this option. The optionValue argument gets set to this if no value is specified on the command line </param>
-		template <typename T>
-		void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, std::initializer_list<std::pair<std::string, T>> enumValues, std::string defaultValue);
+        template <typename T>
+        void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, std::initializer_list<std::pair<std::string, T>> enumValues, std::string defaultValue);
 
         /// <summary> Adds a ParsedArgSet representing a bundle of options to the commandline parser </summary>
         ///
@@ -145,7 +143,6 @@ namespace utilities
         bool HasShortName(std::string shortName);
 
     private:
-
         CommandLineParser(const CommandLineParser&) = delete;
 
         void SetArgs(int argc, const char* argv[]);
@@ -161,11 +158,16 @@ namespace utilities
 
         struct DocumentationEntry
         {
-            enum Type { option, str };
+            enum Type
+            {
+                option,
+                str
+            };
             Type EntryType;
             std::string EntryString; // option name for option, docstring for std::string
 
-            DocumentationEntry(Type t, std::string str) : EntryType(t), EntryString(str) {}
+            DocumentationEntry(Type t, std::string str)
+                : EntryType(t), EntryString(str) {}
         };
 
         struct OptionInfo
@@ -176,13 +178,14 @@ namespace utilities
             std::string defaultValueString;
             std::string currentValueString;
             std::vector<std::string> enumValues;
-            
+
             std::vector<std::function<bool(std::string)>> set_value_callbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
             std::vector<std::function<bool(std::string)>> didSetValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
-            
+
             OptionInfo()
-            {}
-            
+            {
+            }
+
             OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
 
             std::string optionNameString() const;
@@ -206,11 +209,10 @@ namespace utilities
     class ParsedArgSet
     {
     public:
-
         ParsedArgSet() = default;
         virtual ~ParsedArgSet() = default;
 
-        /// <summary> 
+        /// <summary>
         /// Adds the arguments stored in this arg set to the command-line parser.
         /// Subclasses should override this method and add their arguments to the parser.
         /// </summary>
@@ -224,13 +226,14 @@ namespace utilities
         virtual CommandLineParseResult PostProcess(const CommandLineParser& parser);
     };
 
-    // Exceptions thrown by CommandLineParser: 
+    // Exceptions thrown by CommandLineParser:
     //
     /// <summary> The base class for all command-line parser-related exceptions. </summary>
     class CommandLineParserException : public std::runtime_error
     {
     public:
-        CommandLineParserException(const char* message) : std::runtime_error(message) {};
+        CommandLineParserException(const char* message)
+            : std::runtime_error(message){};
     };
 
     /// <summary> An object containing a parsing error message from the command-line parser. </summary>
@@ -244,6 +247,7 @@ namespace utilities
 
         /// <summary> Constructor for ParseError class. Used by CommandLineParserErrorException. </summary>
         ParseError(const std::string& message);
+
     private:
         std::string _message;
     };
@@ -258,8 +262,10 @@ namespace utilities
         const std::vector<ParseError>& GetParseErrors() const { return _errors; }
 
         /// <summary> Constructor. Called by command-line parser </summary>
-        CommandLineParserErrorException(const char* message) : CommandLineParserException(message) {}
-        CommandLineParserErrorException(const char* message, std::vector<ParseError> errors) : CommandLineParserException(message), _errors(errors) {}
+        CommandLineParserErrorException(const char* message)
+            : CommandLineParserException(message) {}
+        CommandLineParserErrorException(const char* message, std::vector<ParseError> errors)
+            : CommandLineParserException(message), _errors(errors) {}
     private:
         std::vector<ParseError> _errors;
     };
@@ -274,7 +280,8 @@ namespace utilities
         std::string GetHelpText() const { return _helpText; }
 
         /// <summary> Constructor. Called by command-line parser </summary>
-        CommandLineParserPrintHelpException(std::string helpText) : CommandLineParserException(""), _helpText(helpText) {}
+        CommandLineParserPrintHelpException(std::string helpText)
+            : CommandLineParserException(""), _helpText(helpText) {}
 
     private:
         std::string _helpText;
@@ -284,7 +291,8 @@ namespace utilities
     class CommandLineParserInvalidOptionsException : public CommandLineParserException
     {
     public:
-        CommandLineParserInvalidOptionsException(const char* what) : CommandLineParserException(what) {}
+        CommandLineParserInvalidOptionsException(const char* what)
+            : CommandLineParserException(what) {}
     };
 }
 

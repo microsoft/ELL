@@ -13,17 +13,20 @@ namespace utilities
     //
     // VariantBase implementation
     //
-    VariantBase::VariantBase(std::type_index type) : _type(type){};
+    VariantBase::VariantBase(std::type_index type)
+        : _type(type){};
 
     //
     // Variant implementation
     //
-    Variant::Variant() : _type(std::type_index(typeid(void)))
+    Variant::Variant()
+        : _type(std::type_index(typeid(void)))
     {
         _value = nullptr;
     }
 
-    Variant::Variant(const Variant& other) : _type(other._type)
+    Variant::Variant(const Variant& other)
+        : _type(other._type)
     {
         if (other._value)
         {
@@ -35,7 +38,8 @@ namespace utilities
         }
     }
 
-    Variant::Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue) : _type(type)
+    Variant::Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue)
+        : _type(type)
     {
         _value = std::move(variantValue);
     }

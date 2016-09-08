@@ -26,7 +26,6 @@ namespace trainers
     class IIncrementalTrainer
     {
     public:
-
         virtual ~IIncrementalTrainer() = default;
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>

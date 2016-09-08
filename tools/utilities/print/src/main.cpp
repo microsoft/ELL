@@ -10,23 +10,23 @@
 #include "PrintModel.h"
 
 // common
-#include "ModelLoadArguments.h"
 #include "LoadModel.h"
+#include "ModelLoadArguments.h"
 
 // utilities
-#include "Files.h"
-#include "OutputStreamImpostor.h"
 #include "CommandLineParser.h"
 #include "Exception.h"
+#include "Files.h"
+#include "OutputStreamImpostor.h"
 
 // model
 #include "Model.h"
 
 // stl
-#include <iostream>
 #include <fstream>
-#include <stdexcept>
+#include <iostream>
 #include <memory>
+#include <stdexcept>
 
 int main(int argc, char* argv[])
 {
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 
         // open model file
         auto model = common::LoadModel(modelLoadArguments.inputModelFile);
-        
+
         // print model
         utilities::OutputStreamImpostor out = printArguments.outputStream;
         PrintModel(model, out);

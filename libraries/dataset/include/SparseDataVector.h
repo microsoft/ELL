@@ -27,16 +27,14 @@ namespace dataset
     ///
     /// <typeparam name="ValueType">     Type of the value type. </typeparam>
     /// <typeparam name="tegerListType"> Type of the teger list type. </typeparam>
-    template<typename ValueType, typename IntegerListType>
+    template <typename ValueType, typename IntegerListType>
     class SparseDataVector : public IDataVector
     {
     public:
-
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
         class Iterator : public linear::IIndexValueIterator
         {
         public:
-
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;
@@ -55,7 +53,6 @@ namespace dataset
             linear::IndexValue Get() const { return linear::IndexValue{ _index_iterator.Get(), (double)*_value_iterator }; }
 
         private:
-            
             // define typenames to improve readability
             using IndexIteratorType = typename IntegerListType::Iterator;
             using ValueIteratorType = typename std::vector<ValueType>::const_iterator;
@@ -74,7 +71,7 @@ namespace dataset
         /// <summary> Constructs an instance of SparseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
+        template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         SparseDataVector(IndexValueIteratorType indexValueIterator);
 
         SparseDataVector(SparseDataVector<ValueType, IntegerListType>&& other) = default;
@@ -142,8 +139,8 @@ namespace dataset
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const override;
 
-   private:
-        IntegerListType _indices; 
+    private:
+        IntegerListType _indices;
         std::vector<ValueType> _values;
     };
 
@@ -170,4 +167,3 @@ namespace dataset
 }
 
 #include "../tcc/SparseDataVector.tcc"
-

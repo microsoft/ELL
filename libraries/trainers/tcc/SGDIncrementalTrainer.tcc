@@ -7,20 +7,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // stl
-#include <cmath>
 #include <cassert>
+#include <cmath>
 
 // dataset
 #include "RowDataset.h"
 
 namespace trainers
 {
-    template<typename LossFunctionType>
-    SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters) :
-        _lossFunction(lossFunction), _parameters(parameters), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(std::make_shared<PredictorType>(dim)) // iterations start from 1 to prevent divide-by-zero
-    {}
+    template <typename LossFunctionType>
+    SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
+        : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(std::make_shared<PredictorType>(dim)) // iterations start from 1 to prevent divide-by-zero
+    {
+    }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         UpdateSparse(std::move(exampleIterator));
@@ -32,7 +33,7 @@ namespace trainers
         return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, lossFunction, parameters);
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // get references to the vector and biases
@@ -52,7 +53,7 @@ namespace trainers
         const double historyWeight = sigma - std::log(T_prev) - 0.5 / T_prev;
         vLast.AddTo(vAvg, historyWeight);
         bAvg += bLast * historyWeight;
-        while(exampleIterator.IsValid())
+        while (exampleIterator.IsValid())
         {
             ++_total_iterations;
             double t = (double)_total_iterations;
@@ -63,18 +64,18 @@ namespace trainers
             double weight = example.GetMetadata().weight;
             const auto& dataVector = example.GetDataVector();
 
-            // calculate the prediction 
-            double alpha = T_prev / (t-1) * _lastPredictor.Predict(dataVector);
+            // calculate the prediction
+            double alpha = T_prev / (t - 1) * _lastPredictor.Predict(dataVector);
 
             // calculate the loss derivative
             double beta = weight * _lossFunction.GetDerivative(alpha, label);
 
             // Update vLast and vAvg
-            double lastCoeff = -eta*beta;
+            double lastCoeff = -eta * beta;
             dataVector.AddTo(vLast, lastCoeff);
             bLast += lastCoeff;
 
-            double avgCoeff = lastCoeff*(sigma - std::log(t) - 0.5/t);
+            double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
             dataVector.AddTo(vAvg, avgCoeff);
             bAvg += avgCoeff;
 
@@ -91,7 +92,7 @@ namespace trainers
         bAvg *= scale;
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // get references to the vector and biases
@@ -101,7 +102,7 @@ namespace trainers
         double& bLast = _lastPredictor.GetBias();
         double& bAvg = _averagedPredictor->GetBias();
 
-        while(exampleIterator.IsValid())
+        while (exampleIterator.IsValid())
         {
             ++_total_iterations;
             double t = (double)_total_iterations;
@@ -128,10 +129,10 @@ namespace trainers
             bLast += updateCoefficient;
 
             // update average
-            double averageingCoefficient = (t-1) / t;
+            double averageingCoefficient = (t - 1) / t;
             vAvg.Scale(averageingCoefficient); // dense operation
             bAvg *= averageingCoefficient;
-            vLast.AddTo(vAvg, 1/t); // dense operation
+            vLast.AddTo(vAvg, 1 / t); // dense operation
             bAvg += bLast / t;
 
             exampleIterator.Next();

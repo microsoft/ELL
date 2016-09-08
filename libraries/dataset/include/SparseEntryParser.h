@@ -12,9 +12,9 @@
 #include "IndexValue.h"
 
 // stl
-#include <string>
 #include <iostream>
 #include <memory>
+#include <string>
 
 namespace dataset
 {
@@ -22,11 +22,9 @@ namespace dataset
     class SparseEntryParser
     {
     public:
-
         class Iterator : public linear::IIndexValueIterator
         {
         public:
-
             Iterator(Iterator&) = default;
 
             Iterator(Iterator&&) = default;
@@ -63,5 +61,4 @@ namespace dataset
         /// <returns> The iterator. </returns>
         Iterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
     };
-
 }

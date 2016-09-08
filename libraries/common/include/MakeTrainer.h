@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "TrainerArguments.h"
-#include "SGDIncrementalTrainerArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
 #include "ForestTrainerArguments.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
+#include "SGDIncrementalTrainerArguments.h"
+#include "TrainerArguments.h"
 
 // predictors
 #include "LinearPredictor.h"

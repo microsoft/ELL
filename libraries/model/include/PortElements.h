@@ -8,17 +8,17 @@
 
 #pragma once
 
-#include "Port.h"
 #include "OutputPort.h"
+#include "Port.h"
 
 // utilities
 #include "Exception.h"
 #include "IArchivable.h"
 
 // stl
-#include <vector>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
+#include <vector>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -74,7 +74,8 @@ namespace model
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        PortElement(const OutputPortBase& port, size_t index) : PortElementBase(port, index) {}
+        PortElement(const OutputPortBase& port, size_t index)
+            : PortElementBase(port, index) {}
 
         /// <summary> The port this element refers to </summary>
         ///

@@ -10,26 +10,26 @@
 
 // common
 #include "DataLoadArguments.h"
-#include "RowDatasetInterface.h"
 #include "DataLoaders.h"
+#include "RowDatasetInterface.h"
 
 // dataset
+#include "Example.h"
+#include "ParsingIterator.h"
 #include "SequentialLineIterator.h"
 #include "SparseEntryParser.h"
-#include "ParsingIterator.h"
-#include "Example.h"
 
 // utilties
 #include "Files.h"
 
 namespace
 {
-    template<typename RowIteratorType, typename VectorEntryParserType>
+    template <typename RowIteratorType, typename VectorEntryParserType>
     dataset::ParsingIterator<RowIteratorType, VectorEntryParserType> MakeParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser)
     {
         return dataset::ParsingIterator<RowIteratorType, VectorEntryParserType>(std::move(row_iter), std::move(parser));
     }
-    
+
     // (Temporary) dense file I/O
     void ReadTsvStream(std::istream& stream, dataset::GenericRowDataset& dataset)
     {
@@ -75,16 +75,16 @@ namespace
             {
                 auto labelValue = label == "Other" ? 0.0 : 1.0;
                 auto dataVector = std::static_pointer_cast<dataset::IDataVector>(std::make_shared<dataset::DoubleDataVector>(features));
-                dataset::GenericSupervisedExample example(dataVector, dataset::WeightLabel{1, labelValue});
+                dataset::GenericSupervisedExample example(dataVector, dataset::WeightLabel{ 1, labelValue });
                 dataset.AddExample(std::move(example));
-//                _rows.emplace_back(label, timestamp, features);
+                //                _rows.emplace_back(label, timestamp, features);
             }
         }
     }
-    
+
     bool EndsWith(const std::string& str, const std::string& suffix)
     {
-        return(str.rfind(suffix) == str.length() - suffix.length());
+        return (str.rfind(suffix) == str.length() - suffix.length());
     }
 }
 
@@ -107,7 +107,7 @@ namespace interfaces
     {
         dataset::GenericRowDataset rowDataset;
         // load dense TSV file if filename ends in .tsv
-        if(EndsWith(dataFilename, ".tsv"))
+        if (EndsWith(dataFilename, ".tsv"))
         {
             auto inputStream = utilities::OpenIfstream(dataFilename);
             ReadTsvStream(inputStream, rowDataset);
@@ -123,7 +123,7 @@ namespace interfaces
                 dataIterator->Next();
             }
         }
-        
+
         return interfaces::GenericRowDataset(std::move(rowDataset));
     }
 }

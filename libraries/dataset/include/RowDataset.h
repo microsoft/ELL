@@ -8,23 +8,23 @@
 
 #pragma once
 
-#include "RowDataset.h"
 #include "Example.h"
 #include "IDataVector.h"
+#include "RowDataset.h"
 
 // utilities
 #include "StlIterator.h"
 
 // stl
-#include <vector>
-#include <random>
 #include <ostream>
+#include <random>
+#include <vector>
 
 namespace dataset
 {
     /// <summary> A row-major dataset of examples. </summary>
-    template<typename ExampleType>
-    class RowDataset 
+    template <typename ExampleType>
+    class RowDataset
     {
     public:
         typedef utilities::VectorIterator<ExampleType> Iterator;
@@ -103,7 +103,7 @@ namespace dataset
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
         /// <param name="prefixSize"> Size of the prefix that should be uniformly distributed, zero to permute the entire dataset. </param>
-        void RandomPermute(std::default_random_engine& rng, size_t prefixSize=0);
+        void RandomPermute(std::default_random_engine& rng, size_t prefixSize = 0);
 
         /// <summary> Randomly permutes a range of rows in the dataset so that a prefix of them is uniformly distributed. </summary>
         ///
@@ -111,7 +111,7 @@ namespace dataset
         /// <param name="rangeFirstIndex"> Zero-based index of the firest example in the range. </param>
         /// <param name="rangeSize"> Size of the range. </param>
         /// <param name="prefixSize"> Size of the prefix that should be uniformly distributed, zero to permute the entire range. </param>
-        void RandomPermute(std::default_random_engine& rng, size_t rangeFirstIndex, size_t rangeSize, size_t prefixSize=0);
+        void RandomPermute(std::default_random_engine& rng, size_t rangeFirstIndex, size_t rangeSize, size_t prefixSize = 0);
 
         /// <summary> Choses an example uniformly from a given range and swaps it with a given example (which can either be inside or outside of the range).
         ///
@@ -127,7 +127,7 @@ namespace dataset
         /// <param name="sortKey"> A function that takes const reference to ExampleType and returns a sort key. </param>
         /// <param name="fromRowIndex"> Zero-based index of the first row to sort. </param>
         /// <param name="size"> The number of examples to sort. </param>
-        template<typename SortKeyType>
+        template <typename SortKeyType>
         void Sort(SortKeyType sortKey, uint64_t fromRowIndex = 0, uint64_t size = 0);
 
         /// <summary> Partitions an iterval of examples by a certain Boolean predicate (similar to sorting
@@ -138,7 +138,7 @@ namespace dataset
         ///  bool. </param>
         /// <param name="fromRowIndex"> Zero-based index of the first row of the interval. </param>
         /// <param name="size"> The number of examples in the interval. </param>
-        template<typename PartitionKeyType>
+        template <typename PartitionKeyType>
         void Partition(PartitionKeyType partitionKey, uint64_t fromRowIndex = 0, uint64_t size = 0);
 
         /// <summary> Prints this object. </summary>
@@ -157,8 +157,8 @@ namespace dataset
     };
 
     typedef RowDataset<GenericSupervisedExample> GenericRowDataset;
-    
-    template<typename ExampleType>
+
+    template <typename ExampleType>
     std::ostream& operator<<(std::ostream& os, RowDataset<ExampleType>& dataset);
 }
 

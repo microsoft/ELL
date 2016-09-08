@@ -18,13 +18,12 @@
 
 // utilities
 #include "Exception.h"
-#include "TypeName.h"
 #include "IArchivable.h"
+#include "TypeName.h"
 
 // stl
 #include <memory>
 #include <vector>
-
 
 /// <summary> nodes namespace </summary>
 namespace nodes

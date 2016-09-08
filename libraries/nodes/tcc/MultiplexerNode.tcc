@@ -10,11 +10,14 @@
 namespace nodes
 {
     template <typename ValueType, typename SelectorType>
-    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode() : Node({ &_elements, &_selector }, { &_output }), _elements(this, {}, elementsPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 1)
-    {}
-    
+    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode()
+        : Node({ &_elements, &_selector }, { &_output }), _elements(this, {}, elementsPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 1)
+    {
+    }
+
     template <typename ValueType, typename SelectorType>
-    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector) : Node({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, 1)
+    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector)
+        : Node({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, 1)
     {
         if (selector.Size() != 1)
         {
@@ -30,7 +33,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  MultiplexerNode<ValueType, SelectorType>::WriteToArchive(utilities::Archiver& archiver) const
+    void MultiplexerNode<ValueType, SelectorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
         archiver["elements"] << _elements;
@@ -39,7 +42,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  MultiplexerNode<ValueType, SelectorType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    void MultiplexerNode<ValueType, SelectorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
         archiver["elements"] >> _elements;

@@ -14,11 +14,11 @@
 #include "DelayNode.h"
 
 // model
-#include "Node.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
 #include "InputPort.h"
+#include "ModelTransformer.h"
+#include "Node.h"
 #include "OutputPort.h"
+#include "PortElements.h"
 
 // utilities
 #include "TypeName.h"

@@ -6,11 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SparseDataVector.h"
 #include "DenseDataVector.h"
-#include "SparseBinaryDataVector.h"
-#include "ZeroDataVector.h"
 #include "OnesDataVector.h"
+#include "SparseBinaryDataVector.h"
+#include "SparseDataVector.h"
+#include "ZeroDataVector.h"
 
 // testing
 #include "testing.h"
@@ -23,8 +23,8 @@
 
 // stl
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
 /// Generates a linear::DoubleVector
 ///
@@ -65,7 +65,7 @@ linear::DoubleVector getBinaryVector()
 
 /// Tests the Dot() member of DataVectors
 ///
-template<typename DataVectorType>
+template <typename DataVectorType>
 void dotTest()
 {
     auto a = getVector();
@@ -116,7 +116,7 @@ void dotTest()
 
 /// Adds a DataVector to a linear::DoubleVector in two different ways and checks that the result is the same
 ///
-template<typename DataVectorType1, typename DataVectorType2>
+template <typename DataVectorType1, typename DataVectorType2>
 void addToTest()
 {
     auto a1 = getVector();
@@ -136,7 +136,7 @@ void addToTest()
 
     std::string name1 = typeid(DataVectorType1).name();
     std::string name2 = typeid(DataVectorType2).name();
-    
+
     testing::ProcessTest("Comparing AddTo() in " + name1 + " and " + name2, testing::IsEqual(a1, a2));
 }
 
@@ -187,7 +187,7 @@ void addToTest()
 
 /// Casts one DataVector type into another and checks that the result is the same
 ///
-template<typename DataVectorType1, typename DataVectorType2>
+template <typename DataVectorType1, typename DataVectorType2>
 void iteratorConstructorTest(const linear::DoubleVector& a)
 {
     DataVectorType1 b(a.GetIterator());
@@ -277,7 +277,7 @@ void iteratorConstructorTest()
 
 /// Tests that two DataVector types print identically
 ///
-template<typename DataVectorType1, typename DataVectorType2>
+template <typename DataVectorType1, typename DataVectorType2>
 void printTest(const linear::DoubleVector& a)
 {
     DataVectorType1 b1(a.GetIterator());
@@ -301,7 +301,7 @@ void printTest(const linear::DoubleVector& a)
 void printTestOnesDataVector()
 {
     dataset::DoubleDataVector a;
-    for(int i = 0; i<15; ++i)
+    for (int i = 0; i < 15; ++i)
     {
         a.AppendEntry(i, 1);
     }
@@ -366,14 +366,10 @@ int main()
     iteratorConstructorTest();
     printTest();
 
-    if(testing::DidTestFail())
+    if (testing::DidTestFail())
     {
         return 1;
     }
 
     return 0;
 }
-
-
-
-

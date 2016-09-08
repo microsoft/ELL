@@ -8,22 +8,22 @@
 
 #pragma once
 
-#include "Model.h"
-#include "Port.h"
 #include "InputPort.h"
-#include "OutputPort.h"
-#include "PortElements.h"
+#include "Model.h"
 #include "Node.h"
+#include "OutputPort.h"
+#include "Port.h"
+#include "PortElements.h"
 
 // utilities
 #include "Exception.h"
 
 // stl
-#include <memory>
-#include <vector>
-#include <unordered_map>
 #include <exception>
 #include <functional>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
 /// <summary> model namespace </summary>
 namespace model

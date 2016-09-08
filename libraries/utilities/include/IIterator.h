@@ -20,7 +20,6 @@ namespace utilities
     class IIterator
     {
     public:
-
         virtual ~IIterator() = default;
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>

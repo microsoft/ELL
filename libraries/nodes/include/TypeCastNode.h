@@ -8,13 +8,13 @@
 
 #pragma once
 
+#include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
-#include "ModelTransformer.h"
 
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
 
 /// <summary> nodes namespace </summary>
 namespace nodes

@@ -9,10 +9,10 @@
 #pragma once
 
 // stl
-#include <string>
-#include <ostream>
 #include <fstream>
 #include <memory>
+#include <ostream>
+#include <string>
 
 namespace utilities
 {
@@ -20,9 +20,13 @@ namespace utilities
     class OutputStreamImpostor
     {
     public:
-
         /// <summary> Types of standard output streams, that are not file streams. </summary>
-        enum class StreamType { cout, cerr, null };
+        enum class StreamType
+        {
+            cout,
+            cerr,
+            null
+        };
 
         OutputStreamImpostor() = default;
         OutputStreamImpostor(const OutputStreamImpostor&) = default;
@@ -37,15 +41,15 @@ namespace utilities
         /// <param name="filename">A filename</param>
         OutputStreamImpostor(std::string filename);
 
-        /// <summary> Casting operator that returns a reference to an ostream. This allows us to use an OutputStreamImpostor 
+        /// <summary> Casting operator that returns a reference to an ostream. This allows us to use an OutputStreamImpostor
         /// in most places where an ostream would be accepted. </summary>
         operator std::ostream&() & { return *_outputStream; }
 
-        /// <summary> Casting operator that returns a const reference to an ostream. This allows us to use an OutputStreamImpostor 
+        /// <summary> Casting operator that returns a const reference to an ostream. This allows us to use an OutputStreamImpostor
         /// in most places where a const ostream reference would be accepted. </summary>
         operator std::ostream const&() const & { return *_outputStream; }
 
-    private:      
+    private:
         std::shared_ptr<std::ofstream> _outputFileStream;
         std::shared_ptr<std::ostream> _outputStream;
     };

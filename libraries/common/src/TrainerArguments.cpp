@@ -28,11 +28,11 @@ namespace common
 
         parser.AddOption(
             lossArguments.lossFunction,
-           "lossFunction",
-           "lf",
-           "Choice of loss function",
-           {{"squared", LossArguments::LossFunction::squared}, {"hinge", LossArguments::LossFunction::hinge}, {"log", LossArguments::LossFunction::log}},
-           "squared");
+            "lossFunction",
+            "lf",
+            "Choice of loss function",
+            { { "squared", LossArguments::LossFunction::squared }, { "hinge", LossArguments::LossFunction::hinge }, { "log", LossArguments::LossFunction::log } },
+            "squared");
 
         parser.AddOption(
             lossArguments.lossFunctionParameter,

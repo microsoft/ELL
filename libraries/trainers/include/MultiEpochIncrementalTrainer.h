@@ -17,10 +17,10 @@
 #include "Evaluator.h"
 
 //stl
-#include <utility>
 #include <memory>
 #include <random>
 #include <string>
+#include <utility>
 
 namespace trainers
 {

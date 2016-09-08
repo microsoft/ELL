@@ -11,9 +11,9 @@
 
 // stl
 #include <cassert>
-#include <sstream>
-#include <iostream>
 #include <cctype>
+#include <iostream>
+#include <sstream>
 
 namespace utilities
 {
@@ -44,13 +44,13 @@ namespace utilities
             {
                 tokenStream << (char)ch;
                 bool isStringDelimiter = _stringDelimiters.find(ch) != std::string::npos;
-                if(_currentStringDelimiter == '\0') // didn't just finish parsing a string, so set the delimiter if we got one
+                if (_currentStringDelimiter == '\0') // didn't just finish parsing a string, so set the delimiter if we got one
                 {
                     _currentStringDelimiter = isStringDelimiter ? ch : '\0';
                 }
-                else // did just finished parsing a delimiter or a string 
+                else // did just finished parsing a delimiter or a string
                 {
-                    if(isStringDelimiter)
+                    if (isStringDelimiter)
                     {
                         assert(_currentStringDelimiter == ch);
                         _currentStringDelimiter = '\0';
@@ -61,7 +61,7 @@ namespace utilities
                     }
                 }
 
-                if (_tokenStartChars.find(ch) == std::string::npos) // if we didn't hit a token-stop char, break out of this loop and keep reading 
+                if (_tokenStartChars.find(ch) == std::string::npos) // if we didn't hit a token-stop char, break out of this loop and keep reading
                 {
                     break;
                 }
@@ -136,15 +136,15 @@ namespace utilities
         auto nextToken = ReadNextToken();
         if (nextToken != token)
         {
-            std::cout << "Failed to match token " << token <<  ", got: " <<  nextToken;
+            std::cout << "Failed to match token " << token << ", got: " << nextToken;
             assert(false);
-            throw InputException(InputExceptionErrors::badStringFormat, std::string{"Failed to match token "} + token + ", got: " + nextToken);
+            throw InputException(InputExceptionErrors::badStringFormat, std::string{ "Failed to match token " } + token + ", got: " + nextToken);
         }
     }
 
     void Tokenizer::MatchTokens(const std::initializer_list<std::string>& tokens)
     {
-        for(const auto& token: tokens)
+        for (const auto& token : tokens)
         {
             MatchToken(token);
         }

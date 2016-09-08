@@ -64,7 +64,7 @@ namespace predictors
         /// <param name="dataVector"> The input vector. </param>
         ///
         /// <returns> The result of the split rule. </returns>
-        template<typename RandomAccessVectorType>
+        template <typename RandomAccessVectorType>
         bool Predict(const RandomAccessVectorType& inputVector) const;
 
         /// <summary> Returns the number of outputs (the max output value plus one). </summary>
@@ -76,7 +76,7 @@ namespace predictors
         ///
         /// <param name="os"> The output stream. </param>
         ///  <param name="tabs"> The number of tabs. </param>
-        void PrintLine(std::ostream& os, size_t tabs=0) const;
+        void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
     private:
         size_t _index;

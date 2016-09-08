@@ -9,14 +9,14 @@
 #pragma once
 
 // model
-#include "Node.h"
 #include "Model.h"
 #include "ModelTransformer.h"
+#include "Node.h"
 
 // predictors
+#include "ConstantNode.h"
 #include "ForestPredictor.h"
 #include "SingleElementThresholdPredictor.h"
-#include "ConstantNode.h"
 
 // stl
 #include <string>
@@ -27,7 +27,7 @@ namespace nodes
     ///
     /// <typeparam name="SplitRuleType"> The split rule type. </typeparam>
     /// <typeparam name="EdgePredictorType"> The edge predictor type. </typeparam>
-    template<typename SplitRuleType, typename EdgePredictorType>
+    template <typename SplitRuleType, typename EdgePredictorType>
     class ForestNode : public model::Node
     {
     public:
@@ -44,13 +44,13 @@ namespace nodes
 
         /// <summary> Default Constructor </summary>
         ForestNode();
-        
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The predictor's input. </param>
         /// <param name="forest"> The forest predictor. </param>
         ForestNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest);
-        
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -96,7 +96,7 @@ namespace nodes
     };
 
     /// <summary> Defines an alias representing a simple forest node, which holds a forest with a SingleElementThresholdPredictor as the split rule and ConstantPredictors on the edges. </summary>
-    typedef ForestNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor>  SimpleForestNode;
+    typedef ForestNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor> SimpleForestNode;
 }
 
 #include "../tcc/ForestNode.tcc"

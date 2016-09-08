@@ -6,10 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SparseDataVector.h"
-#include "SparseBinaryDataVector.h"
 #include "DenseDataVector.h"
 #include "OnesDataVector.h"
+#include "SparseBinaryDataVector.h"
+#include "SparseDataVector.h"
 #include "ZeroDataVector.h"
 
 // stl
@@ -17,7 +17,7 @@
 
 namespace dataset
 {
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept>
     std::unique_ptr<IDataVector> DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIteratorType IndexValueIterator)
     {
@@ -29,19 +29,19 @@ namespace dataset
         bool containsNonShorts = false;
         uint64_t numNonZeros = 0;
 
-        while(IndexValueIterator.IsValid())
+        while (IndexValueIterator.IsValid())
         {
             // add entry to vector
             auto entry = IndexValueIterator.Get();
             up_vec->AppendEntry(entry.index, entry.value);
 
             // Update VectorStats
-            if(entry.value != 1.0)
+            if (entry.value != 1.0)
             {
                 containsNonBinary = true;
             }
 
-            if(((short)entry.value) != entry.value)
+            if (((short)entry.value) != entry.value)
             {
                 containsNonShorts = true;
             }
@@ -53,18 +53,18 @@ namespace dataset
         }
 
         // Logic to choose the best representation
-        
+
         // sparse
-        if(numNonZeros * 3 < up_vec->Size())
+        if (numNonZeros * 3 < up_vec->Size())
         {
             // binary
-            if(!containsNonBinary)
+            if (!containsNonBinary)
             {
                 return std::make_unique<SparseBinaryDataVector>(up_vec->GetIterator());
             }
 
             // short sparse
-            else if(!containsNonShorts)
+            else if (!containsNonShorts)
             {
                 return std::make_unique<SparseShortDataVector>(up_vec->GetIterator());
             }
@@ -87,13 +87,13 @@ namespace dataset
         else
         {
             // all zeros (this is considered a dense vector since its Size() is zero, so the fraction of nonZeros is 0/0)
-            if(numNonZeros == 0)
+            if (numNonZeros == 0)
             {
                 return std::make_unique<ZeroDataVector>();
             }
 
             // all ones
-            else if(!containsNonBinary && numNonZeros == up_vec->Size())
+            else if (!containsNonBinary && numNonZeros == up_vec->Size())
             {
                 return std::make_unique<OnesDataVector>(up_vec->Size());
             }
@@ -101,7 +101,7 @@ namespace dataset
             // other dense
             else
             {
-                if(std::is_same<DefaultDataVectorType, FloatDataVector>::value)
+                if (std::is_same<DefaultDataVectorType, FloatDataVector>::value)
                 {
                     return std::move(up_vec);
                 }

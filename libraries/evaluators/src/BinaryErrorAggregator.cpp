@@ -46,7 +46,7 @@ namespace evaluators
         double recall = _sumTruePositives == 0.0 ? 0.0 : _sumTruePositives / (_sumTruePositives + _sumFalseNegatives);
         double f1 = (precision + recall) == 0.0 ? 0.0 : 2 * (precision * recall) / (precision + recall);
 
-        return{ errorRate, precision, recall, f1 };
+        return { errorRate, precision, recall, f1 };
     }
 
     void BinaryErrorAggregator::Reset()
@@ -58,7 +58,7 @@ namespace evaluators
     }
 
     std::vector<std::string> BinaryErrorAggregator::GetValueNames() const
-    { 
-        return {"ErrorRate", "Precision", "Recall", "F1-Score"}; 
+    {
+        return { "ErrorRate", "Precision", "Recall", "F1-Score" };
     }
 }

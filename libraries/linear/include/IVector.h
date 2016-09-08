@@ -24,7 +24,6 @@ namespace linear
     class IVector : public Base
     {
     public:
-
         /// <summary> Returns the Size of the vector. </summary>
         ///
         /// <returns> The size of the vector. </returns>

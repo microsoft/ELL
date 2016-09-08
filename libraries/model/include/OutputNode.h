@@ -8,17 +8,17 @@
 
 #pragma once
 
+#include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
-#include "ModelTransformer.h"
 
 // utilities
 #include "IArchivable.h"
 
 // stl
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
 
 /// <summary> model namespace </summary>
 namespace model

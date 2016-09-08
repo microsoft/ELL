@@ -19,7 +19,7 @@ namespace trainers
         /// <summary> Constructs an instance of LogitBooster. </summary>
         ///
         /// <param name="scale"> The scale applied to the exponent in the logloss. </param>
-        LogitBooster(double scale=1.0);
+        LogitBooster(double scale = 1.0);
 
         /// <summary> Calculates weak weight and weak label. </summary>
         ///

@@ -9,9 +9,9 @@
 #pragma once
 
 // model
-#include "Node.h"
 #include "Model.h"
 #include "ModelTransformer.h"
+#include "Node.h"
 
 // predictors
 #include "LinearPredictor.h"

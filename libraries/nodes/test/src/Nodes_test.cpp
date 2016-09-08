@@ -7,21 +7,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Nodes_test.h"
-#include "MovingAverageNode.h"
-#include "MovingVarianceNode.h"
-#include "DelayNode.h"
 #include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
-#include "UnaryOperationNode.h"
+#include "DelayNode.h"
+#include "DemultiplexerNode.h"
+#include "ForestNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
-#include "ForestNode.h"
-#include "DemultiplexerNode.h"
+#include "MovingAverageNode.h"
+#include "MovingVarianceNode.h"
+#include "UnaryOperationNode.h"
 
 // model
+#include "InputNode.h"
 #include "Model.h"
 #include "Node.h"
-#include "InputNode.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -33,10 +33,10 @@
 #include "testing.h"
 
 // stl
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <cmath>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace nodes;
 
@@ -273,11 +273,11 @@ void TestDemultiplexerNodeCompute()
 
     selectorNode->SetInput(false); // output[0] should get the input
     auto outputVec = model.ComputeOutput(muxNode->output);
-    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, {5.0, 0}));
+    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, { 5.0, 0 }));
 
     selectorNode->SetInput(true); // output[1] should get the input
     outputVec = model.ComputeOutput(muxNode->output);
-    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, {0.0, 5.0}));
+    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, { 0.0, 5.0 }));
 }
 
 //
@@ -410,7 +410,7 @@ void TestDemultiplexerNodeRefine()
 
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newSelectorNode = transformer.GetCorrespondingInputNode(selectorNode);
-    auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output); 
+    auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output);
 
     std::vector<double> inputValue{ 5.0 };
     inputNode->SetInput(inputValue);

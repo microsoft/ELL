@@ -10,10 +10,10 @@
 
 // stl
 #include <cstdint>
-#include <vector>
+#include <cstdint>
 #include <memory>
 #include <string>
-#include <cstdint>
+#include <vector>
 
 namespace utilities
 {

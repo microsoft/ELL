@@ -13,7 +13,8 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, std::string name) : Port(owningNode, name, Port::GetPortType<ValueType>()), _inputElements(inputs)
+    InputPortBase::InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, std::string name)
+        : Port(owningNode, name, Port::GetPortType<ValueType>()), _inputElements(inputs)
     {
     }
 
@@ -31,13 +32,15 @@ namespace model
     // InputPort
     //
     template <typename ValueType>
-    InputPort<ValueType>::InputPort() : InputPortBase(nullptr, _input, "")
+    InputPort<ValueType>::InputPort()
+        : InputPortBase(nullptr, _input, "")
     {
         ComputeParents();
     }
 
     template <typename ValueType>
-    InputPort<ValueType>::InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name) : InputPortBase(owningNode, _input, name), _input(input)
+    InputPort<ValueType>::InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name)
+        : InputPortBase(owningNode, _input, name), _input(input)
     {
         ComputeParents();
     }
@@ -56,7 +59,7 @@ namespace model
         std::vector<ValueType> result;
         size_t size = Size();
         result.reserve(size);
-        for(size_t index = 0; index < size; ++index)
+        for (size_t index = 0; index < size; ++index)
         {
             auto element = _input.GetElement(index);
             auto typedOutput = static_cast<const OutputPort<ValueType>*>(element.ReferencedPort());
@@ -106,5 +109,5 @@ namespace model
         Port::ReadFromArchive(archiver);
         archiver["input"] >> _input;
         ComputeParents();
-    }  
+    }
 }
