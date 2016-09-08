@@ -318,6 +318,18 @@ public:
     static constexpr const char* inputPortName = "input";
     static constexpr const char* outputPortName = "output";
 
+    virtual void WriteToArchive(utilities::Archiver& archiver) const override
+    {
+        archiver["input"] << _input;
+        archiver["output"] << _output;
+    }
+
+    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
+    {
+        archiver["input"] >> _input;
+        archiver["output"] >> _output;
+    }
+
 protected:
     virtual void Compute() const override { _output.SetOutput(_input.GetValue()); }
 

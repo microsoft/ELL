@@ -158,7 +158,7 @@ namespace model
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Unarchiver. Deserialization is handled explicitly because we need to modify the SerializationContext. </summary>
+        /// <summary> Reads from a Unarchiver. </summary>
         ///
         /// <param name="archiver"> The archiver. </param>
         /// <param name="context"> The serialization context. </param>
@@ -171,11 +171,15 @@ namespace model
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _idToNodeMap;
     };
 
-    /// <summary> A serialization context used during Model deserialization. Created by the
-    /// model during archival --- clients shouldn't have to interact directly with this class. </summary>
+    /// <summary> A serialization context used during model deserialization. Wraps an existing `SerializationContext`
+    /// and adds access to the model being constructed. </summary>
     class ModelSerializationContext: public utilities::SerializationContext
     {
     public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="otherContext"> The `SerializationContext` to wrap </param>
+        /// <param name="model"> The model being constructed </param>
         ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model);
 
         /// <summary> Gets the type factory associated with this context. </summary>

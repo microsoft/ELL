@@ -27,7 +27,7 @@ namespace model
     {
     public:
         OutputPortBase() = default;
-        OutputPortBase(const OutputPortBase& other) = default;
+        OutputPortBase(const OutputPortBase& other) = delete;
 
         /// <summary> Notify this port that it is being referenced </summary>
         void ReferencePort() const { _isReferenced = true; }

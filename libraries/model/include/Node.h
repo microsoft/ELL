@@ -70,13 +70,12 @@ namespace model
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const = 0;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) = 0;
         
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);

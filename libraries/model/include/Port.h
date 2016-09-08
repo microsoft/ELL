@@ -36,7 +36,7 @@ namespace model
         };
 
         Port() = default;
-        Port(const Port& other) = default;
+        Port(const Port& other) = delete;
         virtual ~Port() = default;
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
