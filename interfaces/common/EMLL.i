@@ -8,6 +8,15 @@
  
 %module "EMLL"
 
+// IMPORTANT: need to include these before anything else, because they include windows.h or other platform-related things
+#if defined(SWIGJAVASCRIPT)
+%{
+#include <node.h>
+#include <v8.h>
+#include <nan.h>
+%}
+#endif
+
 // Common stuff
 #ifdef SWIGPYTHON
 #pragma SWIG nowarn=325,341,362,401,503
