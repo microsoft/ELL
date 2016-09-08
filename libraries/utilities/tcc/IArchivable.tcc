@@ -1,14 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ISerializable_test.h (utilities)
-//  Authors:  Ofer Dekel
+//  File:     IArchivable.tcc (utilities)
+//  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
-void TestGetTypeDescription();
-void TestGetObjectDescription();
-void TestSerializeIDescribable();
-void TestObjectDescriptionArchiver();
+namespace utilities
+{
+    template <typename ValueType>
+    static ValueType CreateObject(const ObjectArchive& archive)
+    {
+        return archive.GetValue<ValueType>();
+    }
+}

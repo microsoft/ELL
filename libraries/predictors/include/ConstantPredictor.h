@@ -11,7 +11,7 @@
 #include "IPredictor.h"
 
 // utilities
-#include "ObjectDescription.h"
+#include "IArchivable.h"
 
 //stl
 #include <iostream>
@@ -19,7 +19,7 @@
 namespace predictors
 {
     /// <summary> A predictor that ignores its input and outputs a constant number. This class is used to define decision trees. </summary>
-    class ConstantPredictor : public IPredictor<double>, public utilities::IDescribable
+    class ConstantPredictor : public IPredictor<double>, public utilities::IArchivable
     {
     public:
         ConstantPredictor() = default;
@@ -42,12 +42,12 @@ namespace predictors
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void Deserialize(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> A function that ignores its input and returns a constant value. </summary>
         /// 

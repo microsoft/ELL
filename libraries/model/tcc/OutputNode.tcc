@@ -32,17 +32,17 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputNode<ValueType>::Serialize(utilities::Archiver& archiver) const
+    void OutputNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(archiver);
+        Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
-    void OutputNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
+    void OutputNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(archiver);
+        Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
     }

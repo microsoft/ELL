@@ -21,9 +21,9 @@ namespace utilities
             return baseType;
         }
         std::string result = baseType + "<";
-        for(size_t index = 0; index < subtypes.size(); ++index)
+        for (size_t index = 0; index < subtypes.size(); ++index)
         {
-            if(index != 0)
+            if (index != 0)
             {
                 result += ",";
             }

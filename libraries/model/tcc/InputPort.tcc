@@ -94,16 +94,16 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::Serialize(utilities::Archiver& archiver) const
+    void InputPort<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Port::Serialize(archiver);
+        Port::WriteToArchive(archiver);
         archiver["input"] << _input;
     }
 
     template <typename ValueType>
-    void InputPort<ValueType>::Deserialize(utilities::Unarchiver& archiver)
+    void InputPort<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Port::Deserialize(archiver);
+        Port::ReadFromArchive(archiver);
         archiver["input"] >> _input;
         ComputeParents();
     }  

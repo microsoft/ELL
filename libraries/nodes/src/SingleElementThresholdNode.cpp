@@ -23,17 +23,17 @@ namespace nodes
         assert(input.Size() > predictor.GetElementIndex());
     }
 
-    void SingleElementThresholdNode::Serialize(utilities::Archiver& archiver) const
+    void SingleElementThresholdNode::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(archiver);
+        Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
         archiver["predictor"] << _predictor;
     }
 
-    void SingleElementThresholdNode::Deserialize(utilities::Unarchiver& archiver)
+    void SingleElementThresholdNode::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(archiver);
+        Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
         archiver["predictor"] >> _predictor;

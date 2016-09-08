@@ -10,7 +10,7 @@
 
 // utilities
 #include "UniqueId.h"
-#include "ObjectDescription.h"
+#include "IArchivable.h"
 
 // stl
 #include <vector>
@@ -23,7 +23,7 @@ namespace model
     class Node;
 
     /// <summary> Port is the common base class for InputPort and OutputPort. </summary>
-    class Port: public utilities::IDescribable
+    class Port: public utilities::IArchivable
     {
     public:
         enum class PortType
@@ -79,12 +79,12 @@ namespace model
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void Deserialize(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
         Port(const class Node* node, std::string name, PortType type) : _node(node), _name(name), _type(type) {}

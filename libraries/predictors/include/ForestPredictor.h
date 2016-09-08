@@ -16,7 +16,7 @@
 #include "DenseDataVector.h"
 
 // utilities
-#include "ObjectDescription.h"
+#include "IArchivable.h"
 
 // stl
 #include <vector>
@@ -40,7 +40,7 @@ namespace predictors
     /// <typeparam name="SplitRuleType"> Type of split rule to use in interior nodes. </typeparam>
     /// <typeparam name="EdgePredictorType"> Type of predictor to associate with each edge. </typeparam>
     template<typename SplitRuleType, typename EdgePredictorType>
-    class ForestPredictor : public IPredictor<double>, public utilities::IDescribable
+    class ForestPredictor : public IPredictor<double>, public utilities::IArchivable
     {
     public:
         /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be
@@ -93,7 +93,7 @@ namespace predictors
             std::vector<EdgePredictorType> _edgePredictors;
         };
 
-        class Edge : public utilities::IDescribable
+        class Edge : public utilities::IArchivable
         {
         public:            
             Edge() = default;
@@ -131,12 +131,12 @@ namespace predictors
             /// <summary> Adds an object's properties to an `Archiver` </summary>
             ///
             /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-            virtual void Serialize(utilities::Archiver& archiver) const override;
+            virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
             /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
             ///
             /// <param name="archiver"> The `Archiver` to get state from </param>
-            virtual void Deserialize(utilities::Unarchiver& archiver) override;
+            virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
             /// <summary> Prints a human readable description of the edge, indented by a given number of tabs - used for debugging. </summary>
             ///
@@ -152,7 +152,7 @@ namespace predictors
         };
 
         /// <summary> Represents an interior node of one of the trees in the forest. </summary>
-        class InteriorNode : public utilities::IDescribable
+        class InteriorNode : public utilities::IArchivable
         {
         public:
             InteriorNode() = default;
@@ -191,12 +191,12 @@ namespace predictors
             /// <summary> Adds an object's properties to an `Archiver` </summary>
             ///
             /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-            virtual void Serialize(utilities::Archiver& archiver) const override;
+            virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
             /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
             ///
             /// <param name="archiver"> The `Archiver` to get state from </param>
-            virtual void Deserialize(utilities::Unarchiver& archiver) override;
+            virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
@@ -351,12 +351,12 @@ namespace predictors
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void Deserialize(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
         //

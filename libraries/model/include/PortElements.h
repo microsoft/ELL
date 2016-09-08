@@ -13,7 +13,7 @@
 
 // utilities
 #include "Exception.h"
-#include "ObjectDescription.h"
+#include "IArchivable.h"
 
 // stl
 #include <vector>
@@ -83,7 +83,7 @@ namespace model
     };
 
     /// <summary> Represents a contiguous set of values from an output port </summary>
-    class PortRange : public utilities::IDescribable
+    class PortRange : public utilities::IArchivable
     {
     public:
         PortRange() = default;
@@ -144,12 +144,12 @@ namespace model
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void Deserialize(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Equality operator. </summary>
         ///
@@ -164,7 +164,7 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class PortElementsBase : public utilities::IDescribable
+    class PortElementsBase : public utilities::IArchivable
     {
     public:
         virtual ~PortElementsBase() = default;
@@ -208,12 +208,12 @@ namespace model
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void Deserialize(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
         PortElementsBase(const OutputPortBase& port);

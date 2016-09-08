@@ -1,15 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ISerializable_test.h (utilities)
+//  File:     IArchivable_test.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-void TestJsonSerializer();
-void TestJsonDeserializer();
+void TestJsonArchiver();
+void TestJsonUnarchiver();
 
-void TestXmlSerializer();
-void TestXmlDeserializer();
+void TestXmlArchiver();
+void TestXmlUnarchiver();

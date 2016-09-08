@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     SimpleXmlSerializer.tcc (utilities)
+//  File:     XmlArchiver.tcc (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,7 +12,7 @@ namespace utilities
     // Serialization
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleXmlSerializer::WriteScalar(const char* name, const ValueType& value)
+    void XmlArchiver::WriteScalar(const char* name, const ValueType& value)
     {
         using std::to_string;
         auto indent = GetCurrentIndent();
@@ -33,7 +33,7 @@ namespace utilities
 
     // Specialization for bool (though perhaps this should be an overload, not a specialization)
     template <>
-    inline void SimpleXmlSerializer::WriteScalar(const char* name, const bool& value)
+    inline void XmlArchiver::WriteScalar(const char* name, const bool& value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -57,7 +57,7 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Write* functions
-    inline void SimpleXmlSerializer::WriteScalar(const char* name, const char* value)
+    inline void XmlArchiver::WriteScalar(const char* name, const char* value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -74,7 +74,7 @@ namespace utilities
         _out << " value='" << XmlUtilities::EncodeAttributeString(value) << "'/>" << endOfLine;
     }
 
-    inline void SimpleXmlSerializer::WriteScalar(const char* name, const std::string& value)
+    inline void XmlArchiver::WriteScalar(const char* name, const std::string& value)
     {
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -92,7 +92,7 @@ namespace utilities
     }
 
     template <typename ValueType>
-    void SimpleXmlSerializer::WriteArray(const char* name, const std::vector<ValueType>& array)
+    void XmlArchiver::WriteArray(const char* name, const std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
@@ -108,17 +108,18 @@ namespace utilities
 
         // Indent the next line (the line with the array elements), and then 
         // set the indent to 0 (so there isn't indentation inside the line)
-        ++_indent;
-        _out << GetCurrentIndent();
+        auto oldIndent = _indent;
+        IncrementIndent();
+        indent = GetCurrentIndent();
+        _out << indent;
 
-        auto oldIndent = _indent-1;
-        _indent = 0;
+        SetIndent(0);
         for (const auto& item : array)
         {
-            Serialize(item);
+            Archive(item);
             _out << " ";
         }
-        _indent = oldIndent;
+        SetIndent(oldIndent);
         _out << std::endl;
         _out << indent;
         _out << "</Array>" << std::endl;
@@ -128,7 +129,7 @@ namespace utilities
     // Deserialization
     //
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleXmlDeserializer::ReadScalar(const char* name, ValueType& value)
+    void XmlUnarchiver::ReadScalar(const char* name, ValueType& value)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
@@ -149,7 +150,7 @@ namespace utilities
     }
 
     template <>
-    inline void SimpleXmlDeserializer::ReadScalar(const char* name, bool& value)
+    inline void XmlUnarchiver::ReadScalar(const char* name, bool& value)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<bool>::GetName());
         bool hasName = name != std::string("");
@@ -169,7 +170,7 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Read* functions
-    inline void SimpleXmlDeserializer::ReadScalar(const char* name, std::string& value) 
+    inline void XmlUnarchiver::ReadScalar(const char* name, std::string& value) 
     {
         auto typeName = "string";
         bool hasName = name != std::string("");
@@ -189,7 +190,7 @@ namespace utilities
     }
 
     template <typename ValueType, IsFundamental<ValueType> concept>
-    void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<ValueType>& array)
+    void XmlUnarchiver::ReadArray(const char* name, std::vector<ValueType>& array)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
         bool hasName = name != std::string("");
@@ -204,7 +205,7 @@ namespace utilities
         while(true)
         {
             ValueType obj;
-            Deserialize(obj);
+            Unarchive(obj);
             array.push_back(obj);
             
             // check for '</'
@@ -221,7 +222,7 @@ namespace utilities
         _tokenizer.MatchTokens({"<", "/", "Array", ">"});
     }
 
-    inline void SimpleXmlDeserializer::ReadArray(const char* name, std::vector<std::string>& array)
+    inline void XmlUnarchiver::ReadArray(const char* name, std::vector<std::string>& array)
     {
         auto typeName = XmlUtilities::EncodeTypeName(TypeName<std::string>::GetName());
         bool hasName = name != std::string("");
@@ -238,7 +239,7 @@ namespace utilities
         while(true)
         {
             std::string obj;
-            Deserialize(obj);
+            Unarchive(obj);
             array.push_back(obj);
             
             // check for '</'

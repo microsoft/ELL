@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ObjectDescription.h (utilities)
+//  File:     ObjectArchive.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,7 +10,6 @@
 
 #include "Variant.h"
 #include "Exception.h"
-#include "ISerializable.h"
 
 // stl
 #include <unordered_map>
@@ -23,12 +22,12 @@
 namespace utilities
 {
     /// <summary> Holds information describing the properties (fields) of an object </summary>
-    class ObjectDescription
+    class ObjectArchive
     {
     public:
-        using PropertyCollection = std::unordered_map<std::string, ObjectDescription>;
+        using PropertyCollection = std::unordered_map<std::string, ObjectArchive>;
 
-        ObjectDescription() = default;
+        ObjectArchive() = default;
 
         /// <summary> Gets the string representing the type name of this object </summary>
         ///
@@ -62,13 +61,13 @@ namespace utilities
         ///
         /// <param name="propertyName"> The name of the property to retrieve </param>
         /// <returns> The property's description </returns>
-        const ObjectDescription& operator[](const std::string& propertyName) const;
+        const ObjectArchive& operator[](const std::string& propertyName) const;
 
         /// <summary> Retrieves an object property given its name </summary>
         ///
         /// <param name="propertyName"> The name of the property to retrieve </param>
         /// <returns> The property's description </returns>
-        ObjectDescription& operator[](const std::string& propertyName);
+        ObjectArchive& operator[](const std::string& propertyName);
 
         /// <summary> Tells if the object description has a value associated with it. </summary>
         ///
@@ -115,72 +114,14 @@ namespace utilities
         template <typename ValueType>
         void operator<<(ValueType&& value);
 
-
     private:
         std::string _typeName;
         Variant _value;
-        mutable std::unordered_map<std::string, ObjectDescription> _properties;
-        mutable std::function<ObjectDescription(const ObjectDescription* self)> _fillInPropertiesFunction;
+        mutable std::unordered_map<std::string, ObjectArchive> _properties;
 
         // friends
-        friend class IDescribable;
-
-        // overload that gets called for IDescribable properties
-        template <typename ValueType>
-        void SetGetPropertiesFunction(std::true_type);
-
-        // overload that gets called for non-IDescribable properties
-        template <typename ValueType>
-        void SetGetPropertiesFunction(std::false_type);
-
-        void FillInDescription() const;
+        friend class IArchivable;
     };
-    
-    // Temporary
-    using Archiver = Serializer; // ObjectDescription;
-    using Unarchiver = Deserializer; // ObjectDescription;
-
-    /// <summary>
-    /// IDescribable is the Base class for describable objects. In order to be able to use the
-    /// IDescribable interface for serialization, you must also implement GetRuntimeTypeName, GetTypeName,
-    /// and the static GetTypeDescription functions.
-    /// </summary>
-    class IDescribable : public ISerializable
-    {
-    public:
-        virtual ~IDescribable() = default;
-
-        /// <summary> Creates an `ObjectDescription` from the object </summary>
-        ///
-        /// <returns> The ObjectDescription for the object </returns>
-        ObjectDescription GetDescription() const;
-
-        /// <summary> Creates an object from an `ObjectDescription` </summary>
-        ///
-        /// <typeparam name="ValueType"> The type of the object to retrieve </typeparam>
-        /// <param name="description"> The `ObjectDescription` to get the object from </param>
-        /// <returns> The new object </returns>
-        template <typename ValueType>
-        static ValueType CreateObject(const ObjectDescription& description);
-
-        /// <summary> Gets the name of this type. </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "IDescribable"; }
-
-        /// <summary> Gets the name of this type (for serialization). </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override = 0;
-    };
-
-    /// <summary> Enabled if ValueType inherits from IDescribable. </summary>
-    template <typename ValueType>
-    using IsDescribable = typename std::enable_if_t<std::is_base_of<IDescribable, typename std::decay<ValueType>::type>::value, int>;
-
-    /// <summary> Enabled if ValueType does not inherit from IDescribable. </summary>
-    template <typename ValueType>
-    using IsNotDescribable = typename std::enable_if_t<(!std::is_base_of<IDescribable, typename std::decay<ValueType>::type>::value) && (!std::is_fundamental<typename std::decay<ValueType>::type>::value), int>;
 }
 
-#include "../tcc/ObjectDescription.tcc"
+#include "../tcc/ObjectArchive.tcc"

@@ -13,8 +13,7 @@ namespace utilities
     //
     // VariantBase implementation
     //
-    VariantBase::VariantBase(std::type_index type) : _type(type)
-    {};
+    VariantBase::VariantBase(std::type_index type) : _type(type){};
 
     //
     // Variant implementation
@@ -24,7 +23,7 @@ namespace utilities
         _value = nullptr;
     }
 
-    Variant::Variant(const Variant& other) : _type(other._type) 
+    Variant::Variant(const Variant& other) : _type(other._type)
     {
         if (other._value)
         {
@@ -36,9 +35,9 @@ namespace utilities
         }
     }
 
-    Variant::Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue) : _type(type) 
-    { 
-        _value = std::move(variantValue); 
+    Variant::Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue) : _type(type)
+    {
+        _value = std::move(variantValue);
     }
 
     Variant& Variant::operator=(const Variant& other)
@@ -71,9 +70,9 @@ namespace utilities
         return _value->IsPrimitiveType();
     }
 
-    bool Variant::IsSerializable() const
+    bool Variant::IsArchivable() const
     {
-        return _value->IsSerializable();
+        return _value->IsArchivable();
     }
 
     bool Variant::IsPointer() const
@@ -81,15 +80,14 @@ namespace utilities
         return _value->IsPointer();
     }
 
-    void Variant::SerializeProperty(const char* name, Serializer& serializer) const
+    void Variant::ArchiveProperty(const char* name, Archiver& archiver) const
     {
-        _value->SerializeProperty(name, serializer);
+        _value->ArchiveProperty(name, archiver);
     }
 
-    // #### TODO: special-case vectors of pointers 
-    void Variant::DeserializeProperty(const char* name, Deserializer& serializer, SerializationContext& context)
+    void Variant::UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context)
     {
-        _value->DeserializeProperty(name, serializer, context);
+        _value->UnarchiveProperty(name, archiver, context);
     }
 
     std::string to_string(const Variant& variant)

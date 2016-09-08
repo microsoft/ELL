@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Iterator_test.h"
-#include "ISerializable_test.h"
-#include "ObjectDescription_test.h"
+#include "IArchivable_test.h"
+#include "ObjectArchive_test.h"
 #include "TypeFactory_test.h"
 #include "Variant_test.h"
 
@@ -108,17 +108,17 @@ int main()
         TestVectorVariant();
 
         // Serialization tests
-        TestJsonSerializer();
-        TestJsonDeserializer();
+        TestJsonArchiver();
+        TestJsonUnarchiver();
 
-        TestXmlSerializer();
-        TestXmlDeserializer();
+        TestXmlArchiver();
+        TestXmlUnarchiver();
 
-        // ObjectDescription tests
+        // ObjectArchive tests
         TestGetTypeDescription();
-        TestGetObjectDescription();
-        TestSerializeIDescribable();
-        TestObjectDescriptionArchiver();
+        TestGetObjectArchive();
+        TestSerializeIArchivable();
+        TestObjectArchiver();
     }
     catch(const utilities::Exception& exception)
     {

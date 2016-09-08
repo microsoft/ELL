@@ -90,18 +90,18 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Serialize(utilities::Archiver& archiver) const
+    void UnaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(archiver);
+        Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
         archiver["operation"] << static_cast<int>(_operation);
     }
 
     template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Deserialize(utilities::Unarchiver& archiver)
+    void UnaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(archiver);
+        Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
         int operation = 0;

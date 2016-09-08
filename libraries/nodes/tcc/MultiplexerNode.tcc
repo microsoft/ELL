@@ -30,18 +30,18 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  MultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Archiver& archiver) const
+    void  MultiplexerNode<ValueType, SelectorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(archiver);
+        Node::WriteToArchive(archiver);
         archiver["elements"] << _elements;
         archiver["selector"] << _selector;
         archiver[outputPortName] << _output;
     }
 
     template <typename ValueType, typename SelectorType>
-    void  MultiplexerNode<ValueType, SelectorType>::Deserialize(utilities::Unarchiver& archiver)
+    void  MultiplexerNode<ValueType, SelectorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(archiver);
+        Node::ReadFromArchive(archiver);
         archiver["elements"] >> _elements;
         archiver["selector"] >> _selector;
         archiver[outputPortName] >> _output;

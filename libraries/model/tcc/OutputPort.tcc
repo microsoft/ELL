@@ -29,14 +29,14 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::Serialize(utilities::Archiver& archiver) const
+    void OutputPort<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        OutputPortBase::Serialize(archiver);
+        OutputPortBase::WriteToArchive(archiver);
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::Deserialize(utilities::Unarchiver& archiver)
+    void OutputPort<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        OutputPortBase::Deserialize(archiver);
+        OutputPortBase::ReadFromArchive(archiver);
     }    
 }

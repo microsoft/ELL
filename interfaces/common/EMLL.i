@@ -100,9 +100,9 @@ namespace dataset {};
 %ignore dataset::RowDataset::operator[];
 %import "RowDataset.h"
 %import "IDataVector.h"
-%import "ObjectDescription.h"
+%import "ObjectArchive.h"
 %import "Variant.h"
-%import "ISerializable.h"
+%import "IArchivable.h"
 
 #ifndef SWIGXML
 %template () std::vector<dataset::IDataVector>;

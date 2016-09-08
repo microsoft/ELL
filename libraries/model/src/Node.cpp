@@ -11,8 +11,8 @@
 #include "ModelTransformer.h"
 
 // utilities
-#include "ISerializable.h"
-#include "ObjectDescription.h"
+#include "IArchivable.h"
+#include "IArchivable.h"
 
 // stl
 #include <unordered_set>
@@ -78,12 +78,12 @@ namespace model
         return false;
     }
 
-    void Node::Serialize(utilities::Archiver& archiver) const
+    void Node::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["id"] << _id;
     }
 
-    void Node::Deserialize(utilities::Unarchiver& archiver)
+    void Node::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         NodeId oldId;
         archiver["id"] >> oldId;

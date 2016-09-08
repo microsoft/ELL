@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ObjectDescription.h"
+#include "IArchivable.h"
 
 #include <functional>
 #include <ostream>
@@ -18,7 +18,7 @@
 namespace utilities
 {
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
-    class UniqueId : public IDescribable
+    class UniqueId : public IArchivable
     {
     public:
         /// <summary> Constructor </summary>
@@ -49,13 +49,13 @@ namespace utilities
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(Archiver& archiver) const override;
+        virtual void WriteToArchive(Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void Deserialize(Unarchiver& archiver) override;
-   
+        virtual void ReadFromArchive(Unarchiver& archiver) override;
+
     private:
         friend std::hash<UniqueId>;
         size_t _id = 0;

@@ -36,9 +36,9 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void  DemultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Archiver& archiver) const
+    void  DemultiplexerNode<ValueType, SelectorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(archiver);
+        Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[selectorPortName] << _selector;
         archiver[outputPortName] << _output;
@@ -46,9 +46,9 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void DemultiplexerNode<ValueType, SelectorType>::Deserialize(utilities::Unarchiver& archiver)
+    void DemultiplexerNode<ValueType, SelectorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(archiver);
+        Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
         archiver[selectorPortName] >> _selector;
         archiver[outputPortName] >> _output;

@@ -2,18 +2,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ObjectDescription_test.cpp (utilities)
+//  File:     ObjectArchive_test.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ObjectDescription_test.h"
+#include "ObjectArchive_test.h"
 
 // utilities
-#include "ObjectDescription.h"
-#include "Serializer.h"
-#include "XmlSerializer.h"
-#include "ObjectDescriptionArchiver.h"
+#include "IArchivable.h"
+#include "Archiver.h"
+#include "XmlArchiver.h"
+#include "ObjectArchiver.h"
 
 // testing
 #include "testing.h"
@@ -23,7 +23,7 @@
 #include <vector>
 #include <sstream>
 
-class InnerObject : public utilities::IDescribable
+class InnerObject : public utilities::IArchivable
 {
 public:
     InnerObject() = default;
@@ -31,13 +31,13 @@ public:
     int GetA() const { return _a; }
     double GetB() const { return _b; }
 
-    virtual void Serialize(utilities::Archiver& archiver) const override
+    virtual void WriteToArchive(utilities::Archiver& archiver) const override
     {
         archiver["a"] << _a;
         archiver["b"] << _b;
     }
 
-    virtual void Deserialize(utilities::Unarchiver& archiver) override
+    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
         archiver["a"] >> _a;
         archiver["b"] >> _b;
@@ -58,15 +58,15 @@ public:
     DerivedObject(int a, double b, std::string c) : InnerObject(a, b), _c(c) {}
     std::string GetC() { return _c; }
 
-    virtual void Serialize(utilities::Archiver& archiver) const override
+    virtual void WriteToArchive(utilities::Archiver& archiver) const override
     {
-        InnerObject::Serialize(archiver);
+        InnerObject::WriteToArchive(archiver);
         archiver["c"] << _c;
     }
 
-    virtual void Deserialize(utilities::Unarchiver& archiver) override
+    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
-        InnerObject::Deserialize(archiver);
+        InnerObject::ReadFromArchive(archiver);
         archiver["c"] >> _c;
     }
 
@@ -77,7 +77,7 @@ private:
     std::string _c = "";
 };
 
-class OuterObject : public utilities::IDescribable
+class OuterObject : public utilities::IArchivable
 {
 public:
     OuterObject() = default;
@@ -85,13 +85,13 @@ public:
     std::string GetName() { return _name; }
     InnerObject GetInner() { return _inner; }
 
-    virtual void Serialize(utilities::Archiver& archiver) const override
+    virtual void WriteToArchive(utilities::Archiver& archiver) const override
     {
         archiver["name"] << _name;
         archiver["obj"] << _inner;
     }
 
-    virtual void Deserialize(utilities::Unarchiver& archiver) override
+    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
         archiver["name"] >> _name;
         archiver["obj"] >> _inner;
@@ -105,7 +105,7 @@ private:
     InnerObject _inner;
 };
 
-void PrintDescription(const utilities::ObjectDescription& description, std::string name="", size_t indentCount = 0)
+void PrintDescription(const utilities::ObjectArchive& description, std::string name="", size_t indentCount = 0)
 {
     std::string indent(4*indentCount, ' ');
     std::cout << indent << name << " Type: " << description.GetObjectTypeName(); 
@@ -149,7 +149,7 @@ void TestGetTypeDescription()
     testing::ProcessTest("GetDescription", derivedDescription.HasProperty("c"));
 }
 
-void TestGetObjectDescription()
+void TestGetObjectArchive()
 {
     InnerObject innerObj(3, 4.5);
     auto innerDescription = innerObj.GetDescription();
@@ -167,106 +167,106 @@ void TestGetObjectDescription()
     std::cout << std::endl;
 
     // Inner
-    testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("a"));
-    testing::ProcessTest("ObjectDescription", innerDescription.HasProperty("b"));
-    testing::ProcessTest("ObjectDescription", !innerDescription.HasProperty("c"));
-    testing::ProcessTest("ObjectDescription", innerDescription["a"].GetValue<int>() == 3);
-    testing::ProcessTest("ObjectDescription", innerDescription["b"].GetValue<double>() == 4.5);
+    testing::ProcessTest("ObjectArchive", innerDescription.HasProperty("a"));
+    testing::ProcessTest("ObjectArchive", innerDescription.HasProperty("b"));
+    testing::ProcessTest("ObjectArchive", !innerDescription.HasProperty("c"));
+    testing::ProcessTest("ObjectArchive", innerDescription["a"].GetValue<int>() == 3);
+    testing::ProcessTest("ObjectArchive", innerDescription["b"].GetValue<double>() == 4.5);
 
     // Outer
-    testing::ProcessTest("ObjectDescription", outerDescription.HasProperty("name"));
-    testing::ProcessTest("ObjectDescription", outerDescription.HasProperty("obj"));
-    testing::ProcessTest("ObjectDescription", outerDescription["name"].GetValue<std::string>() == "Outer");
+    testing::ProcessTest("ObjectArchive", outerDescription.HasProperty("name"));
+    testing::ProcessTest("ObjectArchive", outerDescription.HasProperty("obj"));
+    testing::ProcessTest("ObjectArchive", outerDescription["name"].GetValue<std::string>() == "Outer");
     auto outerInnerDescription = outerDescription["obj"];
-    testing::ProcessTest("ObjectDescription", outerInnerDescription["a"].GetValue<int>() == 5);
-    testing::ProcessTest("ObjectDescription", outerInnerDescription["b"].GetValue<double>() == 6.5);
+    testing::ProcessTest("ObjectArchive", outerInnerDescription["a"].GetValue<int>() == 5);
+    testing::ProcessTest("ObjectArchive", outerInnerDescription["b"].GetValue<double>() == 6.5);
 
     // Derived
-    testing::ProcessTest("ObjectDescription", derivedDescription.HasProperty("a"));
-    testing::ProcessTest("ObjectDescription", derivedDescription.HasProperty("b"));
-    testing::ProcessTest("ObjectDescription", derivedDescription.HasProperty("c"));
-    testing::ProcessTest("ObjectDescription", derivedDescription["a"].GetValue<int>() == 8);
-    testing::ProcessTest("ObjectDescription", derivedDescription["b"].GetValue<double>() == 9.5);
-    testing::ProcessTest("ObjectDescription", derivedDescription["c"].GetValue<std::string>() == "derived");
+    testing::ProcessTest("ObjectArchive", derivedDescription.HasProperty("a"));
+    testing::ProcessTest("ObjectArchive", derivedDescription.HasProperty("b"));
+    testing::ProcessTest("ObjectArchive", derivedDescription.HasProperty("c"));
+    testing::ProcessTest("ObjectArchive", derivedDescription["a"].GetValue<int>() == 8);
+    testing::ProcessTest("ObjectArchive", derivedDescription["b"].GetValue<double>() == 9.5);
+    testing::ProcessTest("ObjectArchive", derivedDescription["c"].GetValue<std::string>() == "derived");
 }
 
-void TestSerializeIDescribable()
+void TestSerializeIArchivable()
 {
     utilities::SerializationContext context;
     std::stringstream strstream;
     {
-        utilities::SimpleXmlSerializer serializer(strstream);
+        utilities::XmlArchiver archiver(strstream);
      
         InnerObject innerObj(3, 4.5);
-        serializer.Serialize("inner", innerObj);
+        archiver["inner"] << innerObj;
 
         OuterObject outerObj("Outer", 5, 6.5);
-        serializer.Serialize("outer", outerObj);
+        archiver["outer"] << outerObj;
 
         DerivedObject derivedObj(8, 9.5, "derived");
-        serializer.Serialize("derived", derivedObj);
+        archiver["derived"] << derivedObj;
 
         // print
         std::cout << "Serialized stream:" << std::endl;
         std::cout << strstream.str() << std::endl;
     }
 
-    utilities::SimpleXmlDeserializer deserializer(strstream, context);
+    utilities::XmlUnarchiver unarchiver(strstream, context);
     InnerObject deserializedInner;
 
-    deserializer.Deserialize("inner", deserializedInner);
-    testing::ProcessTest("Deserialize IDescribable check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
+    unarchiver["inner"] >> deserializedInner;
+    testing::ProcessTest("Deserialize IArchivable check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
 
     OuterObject deserializedOuter;
-    deserializer.Deserialize("outer", deserializedOuter);
-    testing::ProcessTest("Deserialize IDescribable check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
+    unarchiver["outer"] >> deserializedOuter;
+    testing::ProcessTest("Deserialize IArchivable check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
 
     DerivedObject deserializedDerived;
-    deserializer.Deserialize("derived", deserializedDerived);
-    testing::ProcessTest("Deserialize IDescribable check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
+    unarchiver["derived"] >> deserializedDerived;
+    testing::ProcessTest("Deserialize IArchivable check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
 }
 
-void TestObjectDescriptionArchiver()
+void TestObjectArchiver()
 {
     utilities::SerializationContext context;
-    utilities::ObjectDescriptionArchiver serializer1;
-    utilities::ObjectDescriptionArchiver serializer2;
-    utilities::ObjectDescriptionArchiver serializer3;
+    utilities::ObjectArchiver archiver1(context);
+    utilities::ObjectArchiver archiver2(context);
+    utilities::ObjectArchiver archiver3(context);
     
     InnerObject innerObj(3, 4.5);
-    serializer1.Serialize(innerObj);
+    archiver1 << innerObj;
 
     OuterObject outerObj("Outer", 5, 6.5);
-    serializer2.Serialize(outerObj);
+    archiver2 << outerObj;
 
     DerivedObject derivedObj(8, 9.5, "derived");
-    serializer3.Serialize(derivedObj);
+    archiver3 << derivedObj;
 
-    auto objectDescription1 = serializer1.GetObjectDescription();
+    auto objectDescription1 = archiver1.GetObjectArchive();
     PrintDescription(objectDescription1);
     std::cout << std::endl;
 
-    auto objectDescription2 = serializer2.GetObjectDescription();
+    auto objectDescription2 = archiver2.GetObjectArchive();
     PrintDescription(objectDescription2);
     std::cout << std::endl;
 
-    auto objectDescription3 = serializer3.GetObjectDescription();
+    auto objectDescription3 = archiver3.GetObjectArchive();
     PrintDescription(objectDescription3);
     std::cout << std::endl;
 
-    utilities::ObjectDescriptionUnarchiver deserializer1(objectDescription1, context);
+    utilities::ObjectArchiver dearchiver1(objectDescription1, context);
     InnerObject deserializedInner;
-    deserializer1.Deserialize(deserializedInner);
-    testing::ProcessTest("Deserialize with ObjectDescriptionArchiver check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
+    dearchiver1 >> deserializedInner;
+    testing::ProcessTest("Deserialize with ObjectArchiver check",  deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);        
 
     // TODO: fix error with deserializing compound objects
-    utilities::ObjectDescriptionUnarchiver deserializer2(objectDescription2, context);
+    utilities::ObjectArchiver dearchiver2(objectDescription2, context);
     OuterObject deserializedOuter;
-    deserializer2.Deserialize(deserializedOuter);
-    testing::ProcessTest("Deserialize with ObjectDescriptionArchiver check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
+    dearchiver2 >> deserializedOuter;
+    testing::ProcessTest("Deserialize with ObjectArchiver check",  deserializedOuter.GetName() == "Outer" && deserializedOuter.GetInner().GetA() == 5);        
 
-    utilities::ObjectDescriptionUnarchiver deserializer3(objectDescription3, context);
+    utilities::ObjectArchiver dearchiver3(objectDescription3, context);
     DerivedObject deserializedDerived;
-    deserializer3.Deserialize(deserializedDerived);
-    testing::ProcessTest("Deserialize with ObjectDescriptionArchiver check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
+    dearchiver3 >> deserializedDerived;
+    testing::ProcessTest("Deserialize with ObjectArchiver check",  deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");        
 }

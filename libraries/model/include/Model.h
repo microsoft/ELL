@@ -14,7 +14,7 @@
 
 // utilities
 #include "IIterator.h"
-#include "ObjectDescription.h"
+#include "IArchivable.h"
 
 // stl
 #include <vector>
@@ -55,7 +55,7 @@ namespace model
     };
 
     /// <summary> Model class. Represents a graph of computation </summary>
-    class Model : public utilities::IDescribable
+    class Model : public utilities::IArchivable
     {
     public:
         /// <summary> Factory method used to create nodes and add them to the model. </summary>
@@ -156,13 +156,13 @@ namespace model
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void Serialize(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. Deserialization is handled explicitly because we need to modify the SerializationContext. </summary>
+        /// <summary> Reads from a Unarchiver. Deserialization is handled explicitly because we need to modify the SerializationContext. </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="archiver"> The archiver. </param>
         /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         friend class NodeIterator;
@@ -172,7 +172,7 @@ namespace model
     };
 
     /// <summary> A serialization context used during Model deserialization. Created by the
-    /// model during serialization --- clients shouldn't have to interact directly with this class. </summary>
+    /// model during archival --- clients shouldn't have to interact directly with this class. </summary>
     class ModelSerializationContext: public utilities::SerializationContext
     {
     public:
