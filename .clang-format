@@ -27,7 +27,7 @@ BinPackParameters: true
 ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 4
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ColumnLimit: 0
+ColumnLimit: 160
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 BreakBeforeBraces: Custom
