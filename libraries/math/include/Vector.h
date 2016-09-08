@@ -89,8 +89,13 @@ namespace math
 
         /// <summary> Gets a reference to this vector. </summary>
         ///
-        /// <returns> A reference to this vector. </returns>
+        /// <returns> A constant reference to this vector. </returns>
         ConstVectorReference<ElementType, Orientation> GetReference() const;
+
+        /// <summary> Gets a reference to this vector. </summary>
+        ///
+        /// <returns> A constant reference to this vector. </returns>
+        ConstVectorReference<ElementType, Orientation> GetConstantReference() const { return GetReference(); }
 
         /// <summary> Gets a reference to a sub-vector. </summary>
         ///
@@ -160,6 +165,7 @@ namespace math
         ///
         /// <returns> Reference to the specified element. </returns>
         ElementType& operator[] (size_t index);
+        using ConstVectorReference<ElementType, Orientation>::operator[];
 
         /// <summary> Addition assignment operator. </summary>
         ///
@@ -190,11 +196,13 @@ namespace math
         ///
         /// <returns> The sub vector. </returns>
         VectorReference<ElementType, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier=1);
+        using ConstVectorReference<ElementType, Orientation>::GetSubVector;
 
         /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
         /// <returns> A reference to the transpose of this vector. </returns>
         VectorReference<ElementType, FlipOrientation<Orientation>::value> Transpose();
+        using ConstVectorReference<ElementType, Orientation>::Transpose;
 
     protected:
         // allow operations defined in the Operations struct to access raw data vector
