@@ -17,6 +17,7 @@ AlignAfterOpenBracket: Align
 AlignTrailingComments: false
 AllowShortBlocksOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AccessModifierOffset: -4
@@ -26,7 +27,7 @@ BinPackParameters: true
 ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 4
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ColumnLimit: 2000
+ColumnLimit: 0
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 BreakBeforeBraces: Custom
@@ -46,6 +47,6 @@ ReflowComments: false
 PenaltyBreakBeforeFirstCallParameter: 100000
 PenaltyBreakComment: 100000
 # Standard: Cpp11
-SortIncludes: false
+SortIncludes: true
 UseTab: Never
 ...
