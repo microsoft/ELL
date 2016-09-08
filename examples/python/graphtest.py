@@ -41,42 +41,6 @@ def GetNodesAndIndex(model):
     nodes.insert(0, None)               # align nodes with index so that
     return nodes, index                 # index[GetName[nodes[i]]] == i is True for 1 .. V
 
-def BFS(adj, s):
-    '''Breadth First Search of the adjacency list starting 
-    at root index 's'
-
-    adj[i][j] is one-based index of the j'th neighbor of node i
-
-    where
-                      
-                      1 <= i <= V
-                      0 <= j < #Neighbors of Node i
-
-    It is expected that the adj represents an undirected graph
-    so the edges must be symmetric, that is 
-
-               adj[adj[i][j]] contains i
-               for i in 1 ..V and j in 0 <= j < len(adj[i])
-
-    Returns a state and parent list. The states can be either
-    'U' (Undiscovered) or 'C' (Completely discoverd). If 
-    state[i] == 'C' for 1 <= i <= V then the graph with 
-    root node s is connected. The parent list is not used here.
-    '''
-    p = map(lambda x: None, adj)
-    state = map(lambda x: 'U', adj)
-    Q = [s]
-    while len(Q) > 0:
-        u = Q[0]
-        Q = Q[1:]
-        for v in adj[u]:
-            if state[v] == 'U':
-                state[v] = 'D'
-                p[v] = u
-                Q.append(v)
-        state[u] = 'C'
-    return state, p
-
 def CheckAdjacencyList(adj):
     '''Checks the adjacency list for symmetry of edges'''
     V = len(adj) - 1
@@ -109,47 +73,82 @@ def GetAdjacencyList(nodes, index):
     CheckAdjacencyList(adj)
     return adj
 
-def DFSRoot(adj, state, u, m, n):
-    '''
-       m = number edges
-       n = number vertices
-    '''
-    state[u] = 'D'
-    n = n + 1
-    for v in adj[u]:
-        if state[v] == 'U':
-            m = m + 1
-            (m,n) = DFSRoot(adj, state, v, m, n)
-    state[u] = 'C'
-    return (m, n)
 
-def DFS(adj):
-    '''Depth First Search'''
-    state = ['U' for x in adj]
-    m = n = 0
-    for u in range(1,len(adj)):
-        if state[u] == 'U':
-            (m,n) = DFSRoot(adj, state, u, m, n)
-    return state, (m, n)
+def DFS(u, baggage):
+    (adj, vertexStates, parents, processEdge, processVertex, vertices, edges) = baggage
+    vertexStates[u] = 'D'
+    processVertex(u, vertices)
+    for v in adj[u]:
+        processEdge(u, v, edges)
+        if vertexStates[v] == 'U':
+            parents[v] = u
+            DFS(v, baggage)
+    vertexStates[u] = 'C'
+
+def processVertex(u, vertices):
+    try:
+        i = vertices.index(u)
+        print "already seen vertex", u
+    except ValueError:
+        vertices.append(u)
+
+def processEdge(u, v, edges):
+    try:
+        i = edges.index((u,v))
+    except ValueError:
+        # record the edge in both directions
+        edges.append((u,v))
+        edges.append((v,u))
+
+def GetGraphStats(adj):
+    '''
+    Enumerates the subgraphs of a graph
+
+    adj = one-based symmetric adjacency list defining an undirected graph
+
+        e.g.   1 -- 2 -- 3 has adj = [None,[2],[1,3],[2]]
+
+    Returns an array of (V,E) pairs where V and E are the count of 
+    vertices and edges of each disjoint subgraph
+    '''
+    parents = [None for x in adj]
+    vertexStates = ['U' for x in adj]
+    vertexStates[0] = None
+    edges = []
+    vertices = []
+    baggage = (adj, vertexStates, parents, processEdge, processVertex, vertices, edges)
+    V = 0
+    E = 0
+    stats = []
+    for u in range(1, len(adj)):
+        if vertexStates[u] == 'U':
+            DFS(u, baggage)
+            V1 = len(vertices)
+            E1 = len(edges) / 2
+            stats.append(((V1-V), (E1-E)))
+            V = V1
+            E = E1
+    return stats
 
 def work(key):
     model = EMLL.LoadModel(key)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
-    state, (m, n) = DFS(adj)
-    # determine if the graph is connected
-    V = len(index)
-    ans = True
-    for i in range(1, V+1):
-        if state[i] != 'C':
-            ans = False
-            break
-    if ans:
-        print key, "is connected"
+    print key,
+    stats = GetGraphStats(adj)
+    n = len(stats)
+    if n == 0:
+        print "No subgraphs"
     else:
-        print key, "is disjoint"
-    if m != n - 1:
-        raise ValueError, "cycle detected"
+        if n > 1:
+            print "%d subgraphs" % (len(subgraphs))
+        elif n == 1:
+            print "One subgraph"
+        print "    Subgraph Vertices Edges Cycles"
+        for i in range(n):
+            (V,E) = stats[i]
+            C = E - V + 1 # number of cycles
+            print "    %-8d %-8d %-5d %-5d" % (i, V, E, C)
 
 def test():
     keys = ['[1]','[2]','[3]','[tree_0]','[tree_1]','[tree_2]','[tree_3]']
