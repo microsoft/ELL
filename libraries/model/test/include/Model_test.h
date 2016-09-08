@@ -1,7 +1,7 @@
 #pragma once
 //
 // Model tests
-// 
+//
 
 void TestNodeIterator();
 void TestStaticModel();

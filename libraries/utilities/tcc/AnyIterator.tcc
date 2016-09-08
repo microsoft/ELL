@@ -8,10 +8,10 @@
 
 #include "IIterator.h"
 
-#include <memory>
-#include <utility>
-#include <stdexcept>
 #include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <utility>
 
 namespace utilities
 {
@@ -24,8 +24,9 @@ namespace utilities
     public:
         IteratorWrapper(const IteratorWrapper<IteratorType, ValueType>& other) = default;
         IteratorWrapper(IteratorWrapper<IteratorType, ValueType>&& other) = default;
-        
-        IteratorWrapper(IteratorType&& inputIterator) : _iterator(inputIterator) {} 
+
+        IteratorWrapper(IteratorType&& inputIterator)
+            : _iterator(inputIterator) {}
 
         virtual bool IsValid() const override { return _iterator.IsValid(); }
         virtual bool HasSize() const override { return _iterator.HasSize(); }
@@ -40,7 +41,8 @@ namespace utilities
     // AnyIterator class implementation
     //
     template <typename ValueType>
-    AnyIterator<ValueType>::AnyIterator(std::shared_ptr<IIterator<ValueType>> iterator) : _iterator(iterator)
+    AnyIterator<ValueType>::AnyIterator(std::shared_ptr<IIterator<ValueType>> iterator)
+        : _iterator(iterator)
     {
     }
 
@@ -69,7 +71,7 @@ namespace utilities
     template <typename ValueType>
     uint64_t AnyIterator<ValueType>::NumIteratesLeft() const
     {
-        if(_iterator == nullptr)
+        if (_iterator == nullptr)
         {
             std::string funcName = __func__;
             throw std::runtime_error(funcName + ": invalid iterator");
@@ -80,7 +82,7 @@ namespace utilities
     template <typename ValueType>
     void AnyIterator<ValueType>::Next()
     {
-        if(_iterator == nullptr)
+        if (_iterator == nullptr)
         {
             std::string funcName = __func__;
             throw std::runtime_error(funcName + ": invalid iterator");
@@ -91,7 +93,7 @@ namespace utilities
     template <typename ValueType>
     ValueType AnyIterator<ValueType>::Get() const
     {
-        if(_iterator == nullptr)
+        if (_iterator == nullptr)
         {
             std::string funcName = __func__;
             throw std::runtime_error(funcName + ": invalid iterator");

@@ -33,5 +33,4 @@ namespace linear
 
         return Dot(other.data());
     }
-
 }

@@ -9,14 +9,17 @@
 namespace nodes
 {
     template <typename ValueType>
-    MovingAverageNode<ValueType>::MovingAverageNode() : Node({&_input}, {&_output}), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _windowSize(0)
-    {}
+    MovingAverageNode<ValueType>::MovingAverageNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _windowSize(0)
+    {
+    }
 
     template <typename ValueType>
-    MovingAverageNode<ValueType>::MovingAverageNode(const model::PortElements<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
+    MovingAverageNode<ValueType>::MovingAverageNode(const model::PortElements<ValueType>& input, size_t windowSize)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = _input.Size();
-        for(size_t index = 0; index < _windowSize; ++index)
+        for (size_t index = 0; index < _windowSize; ++index)
         {
             _samples.push_back(std::vector<ValueType>(dimension));
         }
@@ -32,9 +35,9 @@ namespace nodes
         _samples.erase(_samples.begin());
 
         std::vector<ValueType> result(_input.Size());
-        for(size_t index = 0; index < inputSample.size(); ++index)
+        for (size_t index = 0; index < inputSample.size(); ++index)
         {
-            _runningSum[index] += (inputSample[index]-lastBufferedSample[index]);
+            _runningSum[index] += (inputSample[index] - lastBufferedSample[index]);
             result[index] = _runningSum[index] / _windowSize;
         }
         _output.SetOutput(result);
@@ -63,26 +66,26 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void MovingAverageNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void MovingAverageNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("windowSize", _windowSize);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
+        archiver["windowSize"] << _windowSize;
     }
 
     template <typename ValueType>
-    void MovingAverageNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void MovingAverageNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("windowSize", _windowSize, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
+        archiver["windowSize"] >> _windowSize;
 
         auto dimension = _input.Size();
         _samples.clear();
         _samples.reserve(_windowSize);
-        for(size_t index = 0; index < _windowSize; ++index)
+        for (size_t index = 0; index < _windowSize; ++index)
         {
             _samples.push_back(std::vector<ValueType>(dimension));
         }

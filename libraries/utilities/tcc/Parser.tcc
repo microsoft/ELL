@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // stl
+#include <cctype>
 #include <cstdlib>
 #include <stdexcept>
-#include <cctype>
 
 namespace utilities
 {
@@ -29,7 +29,7 @@ namespace utilities
     inline void cParse(const char* pStr, char*& pEnd, unsigned int& value)
     {
         unsigned long x = strtoul(pStr, &pEnd, 0);
-        if(x != (unsigned int)x)
+        if (x != (unsigned int)x)
         {
             errno = ERANGE;
         }
@@ -40,7 +40,7 @@ namespace utilities
     inline void cParse(const char* pStr, char*& pEnd, uint64_t& value)
     {
         unsigned long x = strtoul(pStr, &pEnd, 0);
-        if(x != (uint64_t)x)
+        if (x != (uint64_t)x)
         {
             errno = ERANGE;
         }
@@ -51,7 +51,7 @@ namespace utilities
     inline void cParse(const char* pStr, char*& pEnd, int& value)
     {
         long x = strtol(pStr, &pEnd, 0);
-        if(x != (int)x)
+        if (x != (int)x)
         {
             errno = ERANGE;
         }
@@ -75,7 +75,7 @@ namespace utilities
     inline void cParse(const char* pStr, char*& pEnd, unsigned short& value)
     {
         unsigned long x = strtoul(pStr, &pEnd, 0);
-        if(x != (unsigned short)x)
+        if (x != (unsigned short)x)
         {
             errno = ERANGE;
         }
@@ -86,7 +86,7 @@ namespace utilities
     inline void cParse(const char* pStr, char*& pEnd, short& value)
     {
         long x = strtol(pStr, &pEnd, 0);
-        if(x != (short)x)
+        if (x != (short)x)
         {
             errno = ERANGE;
         }
@@ -105,29 +105,29 @@ namespace utilities
         pEnd = const_cast<char*>(iter);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     ParseResult Parse(const char*& pStr, ValueType& value)
-    { 
+    {
         // trim whitespace
         Trim(pStr);
 
         // check for eof
-        if(*pStr == '\0')
+        if (*pStr == '\0')
         {
             return ParseResult::endOfString;
         }
 
         // check for "//" comment indicator
-        if(*pStr == '/')
+        if (*pStr == '/')
         {
-            if(*(pStr+1) == '/')
+            if (*(pStr + 1) == '/')
             {
                 return ParseResult::beginComment;
             }
         }
 
         // check for "#" comment indicator
-        if(*pStr == '#')
+        if (*pStr == '#')
         {
             return ParseResult::beginComment;
         }
@@ -140,13 +140,13 @@ namespace utilities
 
         // try to parse
         cParse(pStr, pEnd, value);
-        
+
         // check for parse errors
-        if(pStr == pEnd)
+        if (pStr == pEnd)
         {
             return ParseResult::badFormat;
         }
-        if(errno == ERANGE)
+        if (errno == ERANGE)
         {
             return ParseResult::outOfRange;
         }
@@ -155,7 +155,7 @@ namespace utilities
         errno = state;
 
         // increment pointer
-        pStr = pEnd; 
+        pStr = pEnd;
 
         return ParseResult::success;
     }

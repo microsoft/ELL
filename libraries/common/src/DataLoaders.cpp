@@ -12,10 +12,10 @@
 #include "Files.h"
 
 // dataset
-#include "SequentialLineIterator.h"
-#include "SparseEntryParser.h"
 #include "ParsingIterator.h"
 #include "RowDataset.h"
+#include "SequentialLineIterator.h"
+#include "SparseEntryParser.h"
 
 // stl
 #include <cstdint>

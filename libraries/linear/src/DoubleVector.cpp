@@ -13,13 +13,15 @@
 
 namespace linear
 {
-    DoubleVector::DoubleVector(uint64_t size) : _data(size)
-    {}
+    DoubleVector::DoubleVector(uint64_t size)
+        : _data(size)
+    {
+    }
 
     double DoubleVector::Norm2() const
     {
         double result = 0.0;
-        for(double element : _data)
+        for (double element : _data)
         {
             result += element * element;
         }
@@ -28,7 +30,7 @@ namespace linear
 
     void DoubleVector::AddTo(double* p_other, double scalar) const
     {
-        for(uint64_t i = 0; i<Size(); ++i)
+        for (uint64_t i = 0; i < Size(); ++i)
         {
             p_other[i] += scalar * _data[i];
         }
@@ -36,7 +38,7 @@ namespace linear
 
     void DoubleVector::Scale(double s)
     {
-        for (uint64_t i = 0; i<Size(); ++i)
+        for (uint64_t i = 0; i < Size(); ++i)
         {
             (*this)[i] *= s;
         }
@@ -45,15 +47,15 @@ namespace linear
     double DoubleVector::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for(uint64_t i = 0; i<Size(); ++i)
+        for (uint64_t i = 0; i < Size(); ++i)
         {
             result += (*this)[i] * p_other[i];
         }
-        
+
         return result;
     }
 
-    void DoubleVector::Print(std::ostream & os) const
+    void DoubleVector::Print(std::ostream& os) const
     {
         auto iterator = GetIterator();
         while (iterator.IsValid())

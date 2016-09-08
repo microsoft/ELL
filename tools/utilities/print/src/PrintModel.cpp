@@ -9,8 +9,8 @@
 #include "PrintModel.h"
 
 // utilities
-#include "OutputStreamImpostor.h"
 #include "Exception.h"
+#include "OutputStreamImpostor.h"
 
 // model
 #include "Model.h"

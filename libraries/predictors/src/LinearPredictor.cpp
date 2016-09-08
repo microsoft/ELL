@@ -13,11 +13,15 @@
 
 namespace predictors
 {
-    LinearPredictor::LinearPredictor() : _b(0)
-    {}
+    LinearPredictor::LinearPredictor()
+        : _b(0)
+    {
+    }
 
-    LinearPredictor::LinearPredictor(uint64_t dim) : _w(dim), _b(0)
-    {}
+    LinearPredictor::LinearPredictor(uint64_t dim)
+        : _w(dim), _b(0)
+    {
+    }
 
     void LinearPredictor::Reset()
     {
@@ -47,18 +51,17 @@ namespace predictors
         _b *= scalar;
     }
 
-    void LinearPredictor::Serialize(utilities::Serializer& serializer) const
+    void LinearPredictor::WriteToArchive(utilities::Archiver& archiver) const
     {
-        std::vector<double> weights = _w;
-        serializer.Serialize("w", weights);
-        serializer.Serialize("b", _b);
+        archiver["w"] << static_cast<std::vector<double>>(_w);
+        archiver["b"] << _b;
     }
 
-    void LinearPredictor::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void LinearPredictor::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        std::vector<double> weights;
-        serializer.Deserialize("w", weights, context);
-        _w = weights;
-        serializer.Deserialize("b", _b, context);
+        std::vector<double> w;
+        archiver["w"] >> w;
+        _w = w;
+        archiver["b"] >> _b;
     }
 }

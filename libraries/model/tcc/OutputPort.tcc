@@ -13,13 +13,15 @@ namespace model
     // OutputPort
     //
     template <typename ValueType>
-    OutputPort<ValueType>::OutputPort(const class Node* node, std::string name, size_t size) : OutputPortBase(node, name, OutputPortBase::GetPortType<ValueType>(), size)
-    {}
+    OutputPort<ValueType>::OutputPort(const class Node* node, std::string name, size_t size)
+        : OutputPortBase(node, name, OutputPortBase::GetPortType<ValueType>(), size)
+    {
+    }
 
     template <typename ValueType>
     ValueType OutputPort<ValueType>::GetOutput(size_t index) const
-    { 
-        return _cachedOutput[index]; 
+    {
+        return _cachedOutput[index];
     }
 
     template <typename ValueType>
@@ -29,14 +31,14 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void OutputPort<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        OutputPortBase::Serialize(serializer);
+        OutputPortBase::WriteToArchive(archiver);
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void OutputPort<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        OutputPortBase::Deserialize(serializer, context);
+        OutputPortBase::ReadFromArchive(archiver);
     }
 }

@@ -7,38 +7,41 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SingleElementThresholdNode.h"
-#include "ConstantNode.h"
 #include "BinaryPredicateNode.h"
+#include "ConstantNode.h"
 
 // dataset
 #include "DenseDataVector.h"
 
 namespace nodes
 {
-    SingleElementThresholdNode::SingleElementThresholdNode() : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
-    {}
+    SingleElementThresholdNode::SingleElementThresholdNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
+    {
+    }
 
-    SingleElementThresholdNode::SingleElementThresholdNode(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
+    SingleElementThresholdNode::SingleElementThresholdNode(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
     {
         assert(input.Size() > predictor.GetElementIndex());
     }
 
-    void SingleElementThresholdNode::Serialize(utilities::Serializer& serializer) const
+    void SingleElementThresholdNode::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("predictor", _predictor);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
+        archiver["predictor"] << _predictor;
     }
 
-    void SingleElementThresholdNode::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void SingleElementThresholdNode::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("predictor", _predictor, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
+        archiver["predictor"] >> _predictor;
     }
-    
+
     void SingleElementThresholdNode::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());

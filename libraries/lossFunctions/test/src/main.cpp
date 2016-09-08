@@ -14,9 +14,9 @@
 #include "testing.h"
 
 // stl
-#include <iostream>
-#include<string>
 #include <cmath>
+#include <iostream>
+#include <string>
 
 void hingeLossTest()
 {
@@ -46,12 +46,12 @@ void logLossTest()
     testing::ProcessTest("Testing lossFunctions::LogLoss::Evaluate(0,1)", testing::IsEqual(logLoss.Evaluate(0, 1), std::log(2)));
     testing::ProcessTest("Testing lossFunctions::LogLoss::Evaluate(0,-1)", testing::IsEqual(logLoss.Evaluate(0, -1), std::log(2)));
 
-    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(2,1)", testing::IsEqual(logLoss.GetDerivative(2, 1), -1/(1+std::exp(2))));
-    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(-2,-1)", testing::IsEqual(logLoss.GetDerivative(-2, -1), 1/(1 + std::exp(2))));
-    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(2,-1)", testing::IsEqual(logLoss.GetDerivative(2, -1), 1/(1 + std::exp(-2))));
-    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(-2,1)", testing::IsEqual(logLoss.GetDerivative(-2, 1), -1/(1 + std::exp(-2))));
-    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(0,1)", testing::IsEqual(logLoss.GetDerivative(0, 1), -1/2.0));
-    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(0,-1)", testing::IsEqual(logLoss.GetDerivative(0, -1), 1/2.0));
+    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(2,1)", testing::IsEqual(logLoss.GetDerivative(2, 1), -1 / (1 + std::exp(2))));
+    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(-2,-1)", testing::IsEqual(logLoss.GetDerivative(-2, -1), 1 / (1 + std::exp(2))));
+    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(2,-1)", testing::IsEqual(logLoss.GetDerivative(2, -1), 1 / (1 + std::exp(-2))));
+    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(-2,1)", testing::IsEqual(logLoss.GetDerivative(-2, 1), -1 / (1 + std::exp(-2))));
+    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(0,1)", testing::IsEqual(logLoss.GetDerivative(0, 1), -1 / 2.0));
+    testing::ProcessTest("Testing lossFunctions::LogLoss::GetDerivative(0,-1)", testing::IsEqual(logLoss.GetDerivative(0, -1), 1 / 2.0));
 }
 
 void squaredLossTest()
@@ -74,14 +74,10 @@ int main()
     logLossTest();
     squaredLossTest();
 
-    if(testing::DidTestFail())
+    if (testing::DidTestFail())
     {
         return 1;
     }
 
     return 0;
 }
-
-
-
-

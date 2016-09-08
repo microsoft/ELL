@@ -23,7 +23,6 @@ namespace treeLayout
     class QpLayoutGenerator
     {
     public:
-
         /// <summary> User configurable parameters of the Layout algorithm. </summary>
         struct Parameters
         {
@@ -93,11 +92,10 @@ namespace treeLayout
         /// <param name="Children"> The children vector. </param>
         ///
         /// <returns> A Layout. </returns>
-        template<typename ChildrenVectorType>
+        template <typename ChildrenVectorType>
         Layout generate(const ChildrenVectorType& Children);
 
     private:
-
         struct VertexInfo
         {
             VertexInfo(uint64_t i, double s);
@@ -106,28 +104,28 @@ namespace treeLayout
             double space_left;
         };
 
-        template<typename ChildrenVectorType>
+        template <typename ChildrenVectorType>
         void BuildLayers(const ChildrenVectorType& Children);
 
-        template<typename ChildrenVectorType>
+        template <typename ChildrenVectorType>
         void BuildLayers(const ChildrenVectorType& Children, uint64_t index, std::vector<uint64_t>& ancestors, std::vector<std::vector<uint64_t>>& prev_layer_ancestors);
 
-        template<typename ChildrenVectorType>
+        template <typename ChildrenVectorType>
         void Optimize(const ChildrenVectorType& Children);
 
-        template<typename ChildrenVectorType>
+        template <typename ChildrenVectorType>
         void GdStep(const ChildrenVectorType& Children, double step_size);
 
-        template<typename ChildrenVectorType>
+        template <typename ChildrenVectorType>
         void ComputeGradient(const ChildrenVectorType& Children, const std::vector<double>& offsets, const std::vector<uint64_t>& depths, double step_size, std::vector<double>& grad);
 
-        template<typename ChildrenVectorType>
+        template <typename ChildrenVectorType>
         void MoveParents(const ChildrenVectorType& Children, uint64_t node_index, double step_size);
 
-        template<typename ChildrenVectorType>
+        template <typename ChildrenVectorType>
         std::vector<std::pair<double, double>> SimpleLayout(const ChildrenVectorType& Children, uint64_t node_index, uint64_t depth);
 
-        template<typename ChildrenVectorType>
+        template <typename ChildrenVectorType>
         void IncrementOffsets(const ChildrenVectorType& Children, uint64_t node_index, double displacement);
 
         void Project();
@@ -145,5 +143,3 @@ namespace treeLayout
 }
 
 #include "../tcc/QpLayoutGenerator.tcc"
-
-

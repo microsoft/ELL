@@ -15,8 +15,8 @@
 #include "Parser.h"
 
 // stl
-#include<string>
 #include <memory>
+#include <string>
 
 namespace dataset
 {
@@ -24,11 +24,10 @@ namespace dataset
     ///
     /// <typeparam name="VectorEntryParserType"> Type of the vector entry parser type. </typeparam>
     /// <typeparam name="DefaultDataVectorType"> Type of the default data vector type. </typeparam>
-    template<typename VectorEntryParserType, typename DefaultDataVectorType> 
+    template <typename VectorEntryParserType, typename DefaultDataVectorType>
     class SupervisedExampleBuilder
     {
     public:
-
         /// <summary> Ctor. </summary>
         ///
         /// <param name="parser"> The parser. </param>

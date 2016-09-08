@@ -19,7 +19,6 @@ namespace evaluators
     class BinaryErrorAggregator
     {
     public:
-
         /// <summary> Updates this aggregator. </summary>
         ///
         /// <param name="prediction"> The real valued prediction. </param>

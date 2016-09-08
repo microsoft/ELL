@@ -11,11 +11,11 @@
 #include "Port.h"
 
 // utilities
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 // stl
-#include <vector>
 #include <memory>
+#include <vector>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -26,6 +26,9 @@ namespace model
     class OutputPortBase : public Port
     {
     public:
+        OutputPortBase() = default;
+        OutputPortBase(const OutputPortBase& other) = delete;
+
         /// <summary> Notify this port that it is being referenced </summary>
         void ReferencePort() const { _isReferenced = true; }
 
@@ -49,16 +52,15 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
         OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
@@ -72,7 +74,8 @@ namespace model
     class OutputPort : public OutputPortBase
     {
     public:
-        OutputPort(const OutputPort&) = delete;
+        OutputPort() = default;
+        OutputPort(const OutputPort&) = default;
 
         /// <summary> Constructor </summary>
         ///
@@ -107,16 +110,15 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         mutable std::vector<ValueType> _cachedOutput;

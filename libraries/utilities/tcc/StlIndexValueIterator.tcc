@@ -12,7 +12,8 @@ namespace utilities
     // StlIndexValueIterator implementation
     //
     template <typename IteratorType, typename ValueType>
-    StlIndexValueIterator<IteratorType, ValueType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end) : _begin(begin), _end(end), _index(0)
+    StlIndexValueIterator<IteratorType, ValueType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end)
+        : _begin(begin), _end(end), _index(0)
     {
         SkipZeros();
     }
@@ -45,7 +46,7 @@ namespace utilities
     }
 
     // specialization for IndexValueIterators
-    template<typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType>>
+    template <typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType>>
     void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array)
     {
         std::fill(array.begin(), array.end(), 0);
@@ -60,5 +61,4 @@ namespace utilities
             indexValueIterator.Next();
         }
     }
-
 }

@@ -10,10 +10,10 @@
 
 // stl
 #include <cstdint>
-#include <vector>
+#include <cstdint>
 #include <memory>
 #include <string>
-#include <cstdint>
+#include <vector>
 
 namespace utilities
 {
@@ -69,8 +69,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the bool type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<bool>
     {
@@ -81,8 +79,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the 8-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<char>
     {
@@ -93,8 +89,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the 8-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<int8_t>
     {
@@ -105,8 +99,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the unsigned 8-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<uint8_t>
     {
@@ -117,8 +109,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the 16-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<int16_t>
     {
@@ -129,8 +119,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the unsigned 16-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<uint16_t>
     {
@@ -141,8 +129,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the 32-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<int32_t>
     {
@@ -153,8 +139,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the unsigned 32-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<uint32_t>
     {
@@ -165,8 +149,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the 64-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<int64_t>
     {
@@ -177,8 +159,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the unsigned 64-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<uint64_t>
     {
@@ -189,8 +169,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the unsigned 64-bit integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<const uint64_t&>
     {
@@ -201,8 +179,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the unsigned long integer type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<unsigned long>
     {
@@ -213,8 +189,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the float type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<float>
     {
@@ -225,8 +199,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the double type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<double>
     {
@@ -237,8 +209,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the double type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<std::string>
     {
@@ -248,9 +218,27 @@ namespace utilities
         static std::string GetName() { return "std::string"; }
     };
 
+    /// <summary> Class used to get information about the void type. </summary>
+    template <>
+    struct TypeName<void>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "void"; }
+    };
+
+    /// <summary> Class used to get information about the void* type. </summary>
+    template <>
+    struct TypeName<void*>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "void*"; }
+    };
+
     /// <summary> Class used to get information about the std::true_type type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<std::true_type>
     {
@@ -261,8 +249,6 @@ namespace utilities
     };
 
     /// <summary> Class used to get information about the std::false_type type. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
     template <>
     struct TypeName<std::false_type>
     {

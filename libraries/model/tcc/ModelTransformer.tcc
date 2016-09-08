@@ -64,9 +64,9 @@ namespace model
         // TODO: verify `oldPort` is from old model and `newPort` is from new model
         auto size = oldPort.Size();
         assert(newPort.Size() == size);
-        for(size_t index = 0; index < size; ++index)
+        for (size_t index = 0; index < size; ++index)
         {
-            _elementToElementMap[{oldPort, index}] = {newPort, index};
+            _elementToElementMap[{ oldPort, index }] = { newPort, index };
         }
     }
 
@@ -74,11 +74,11 @@ namespace model
     void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElements<ValueType>& newElements)
     {
         // TODO: verify `oldPort` is from old model and `newElements` are from new model
-        auto size = oldPort.Size(); 
+        auto size = oldPort.Size();
         assert(newElements.Size() == size);
-        for(size_t index = 0; index < size; ++index)
+        for (size_t index = 0; index < size; ++index)
         {
-            _elementToElementMap[{oldPort, index}] = newElements.GetElement(index);
+            _elementToElementMap[{ oldPort, index }] = newElements.GetElement(index);
         }
     }
 
@@ -86,12 +86,12 @@ namespace model
     void ModelTransformer::MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements)
     {
         // TODO: verify `oldElements` are from old model and `newElements` are from new model
-         auto size = oldElements.Size();
-         assert(oldElements.Size() == size);
-         for(size_t index = 0; index < size; ++index)
-         {
-             _elementToElementMap[oldElements.GetElement(index)] = newElements.GetElement(index);
-         }
+        auto size = oldElements.Size();
+        assert(oldElements.Size() == size);
+        for (size_t index = 0; index < size; ++index)
+        {
+            _elementToElementMap[oldElements.GetElement(index)] = newElements.GetElement(index);
+        }
     }
 
     template <typename NodeType, typename... Args>

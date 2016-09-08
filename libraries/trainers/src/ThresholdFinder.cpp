@@ -9,8 +9,8 @@
 #include "ThresholdFinder.h"
 
 #include <algorithm>
-#include <vector>
 #include <functional>
+#include <vector>
 
 namespace trainers
 {

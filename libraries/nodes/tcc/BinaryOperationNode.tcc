@@ -13,7 +13,7 @@ namespace nodes
         template <typename ValueType>
         ValueType Add(ValueType a, ValueType b)
         {
-            return a+b;
+            return a + b;
         }
 
         template <>
@@ -25,7 +25,7 @@ namespace nodes
         template <typename ValueType>
         ValueType Subtract(ValueType a, ValueType b)
         {
-            return a-b;
+            return a - b;
         }
 
         template <>
@@ -37,7 +37,7 @@ namespace nodes
         template <typename ValueType>
         ValueType Multiply(ValueType a, ValueType b)
         {
-            return a*b;
+            return a * b;
         }
 
         template <>
@@ -49,7 +49,7 @@ namespace nodes
         template <typename ValueType>
         ValueType Divide(ValueType a, ValueType b)
         {
-            return a/b;
+            return a / b;
         }
 
         template <>
@@ -60,7 +60,7 @@ namespace nodes
 
         //
         // Logical operations
-        // 
+        //
         template <typename ValueType>
         ValueType LogicalAnd(ValueType a, ValueType b)
         {
@@ -70,7 +70,7 @@ namespace nodes
         template <>
         inline bool LogicalAnd(bool a, bool b)
         {
-            return a&&b;
+            return a && b;
         }
 
         template <typename ValueType>
@@ -99,11 +99,14 @@ namespace nodes
     }
 
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode() : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
-    {}
+    BinaryOperationNode<ValueType>::BinaryOperationNode()
+        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
+    {
+    }
 
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, OperationType operation) : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, OperationType operation)
+        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
     {
         if (input1.Size() != input2.Size())
         {
@@ -167,24 +170,24 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void BinaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("operation", static_cast<int>(_operation));
-        serializer.Serialize("input1", _input1);
-        serializer.Serialize("input2", _input2);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[input1PortName] << _input1;
+        archiver[input2PortName] << _input2;
+        archiver[outputPortName] << _output;
+        archiver["operation"] << static_cast<int>(_operation);
     }
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void BinaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        int op = 0;
-        serializer.Deserialize("operation", op, context);
-        _operation = static_cast<OperationType>(op);
-        serializer.Deserialize("input1", _input1, context);
-        serializer.Deserialize("input2", _input2, context);
-        serializer.Deserialize("output", _output, context);
-   }
+        Node::ReadFromArchive(archiver);
+        archiver[input1PortName] >> _input1;
+        archiver[input2PortName] >> _input2;
+        archiver[outputPortName] >> _output;
+        int operation = 0;
+        archiver["operation"] >> operation;
+        _operation = static_cast<OperationType>(operation);
+    }
 }

@@ -1,6 +1,6 @@
 //
 // Model tests
-// 
+//
 
 #include "Model_test.h"
 #include "PortElements_test.h"
@@ -31,7 +31,7 @@ int main()
         TestSlice();
         TestAppend();
     }
-    catch(const utilities::Exception& exception)
+    catch (const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
         throw;

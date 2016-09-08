@@ -9,9 +9,9 @@
 #pragma once
 
 // stl
-#include <string>
 #include <fstream>
 #include <memory>
+#include <string>
 
 namespace dataset
 {
@@ -19,7 +19,6 @@ namespace dataset
     class SequentialLineIterator
     {
     public:
-
         /// <summary> Constructs a sequential line iterator. </summary>
         ///
         /// <param name="filepath"> The filepath. </param>

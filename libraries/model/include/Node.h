@@ -12,11 +12,12 @@
 #include "UniqueId.h"
 
 // utilities
-#include "ISerializable.h"
+#include "IArchivable.h"
+#include "IArchivable.h"
 
 // stl
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 
 /// <summary> model namespace </summary>
@@ -27,7 +28,7 @@ namespace model
     class ModelTransformer;
 
     /// <summary> Superclass for all node types. </summary>
-    class Node : public utilities::ISerializable
+    class Node : public utilities::IArchivable
     {
     public:
         Node() = default;
@@ -66,17 +67,16 @@ namespace model
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "Node"; }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const = 0;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
-        
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) = 0;
+
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 

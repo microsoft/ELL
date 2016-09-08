@@ -9,16 +9,16 @@
 #pragma once
 
 // model
-#include "Node.h"
 #include "Model.h"
 #include "ModelTransformer.h"
+#include "Node.h"
 
 // predictors
 #include "SingleElementThresholdPredictor.h"
 
 namespace nodes
 {
-    /// <summary> A node that represents a linear predictor. </summary>
+    /// <summary> A node that represents a single-element threshold predictor. </summary>
     class SingleElementThresholdNode : public model::Node
     {
     public:
@@ -48,16 +48,15 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;

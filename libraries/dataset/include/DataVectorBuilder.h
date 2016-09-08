@@ -19,11 +19,10 @@ namespace dataset
     /// <summary> DataVectorBuilder Base class. </summary>
     ///
     /// <typeparam name="DefaultDataVectorType"> Type of the default data vector type. </typeparam>
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     class DataVectorBuilder
     {
     public:
-
         /// <summary> Chooses the optimal DataVector representation for a list of index-value pairs. </summary>
         ///
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>

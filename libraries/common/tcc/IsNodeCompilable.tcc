@@ -1,0 +1,16 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     IsNodeCompilable.tcc (common)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace common
+{
+    template <typename NodeType>
+    void IsNodeCompilable::AddNodeType()
+    {
+        _nodeNames.insert(NodeType::GetTypeName());
+    }
+}

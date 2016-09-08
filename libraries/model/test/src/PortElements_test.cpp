@@ -5,8 +5,8 @@
 #include "PortElements_test.h"
 
 // model
-#include "Model.h"
 #include "InputNode.h"
+#include "Model.h"
 #include "PortElements.h"
 
 // testing

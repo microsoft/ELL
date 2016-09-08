@@ -5,17 +5,17 @@
 #include "Model_test.h"
 
 // model
+#include "InputNode.h"
+#include "InputPort.h"
 #include "Model.h"
 #include "ModelTransformer.h"
-#include "InputNode.h"
 #include "OutputNode.h"
-#include "InputPort.h"
 #include "OutputPort.h"
 
 // nodes
 #include "ConstantNode.h"
-#include "MovingAverageNode.h"
 #include "ExtremalValueNode.h"
+#include "MovingAverageNode.h"
 #include "ValueSelectorNode.h"
 
 // common
@@ -164,7 +164,8 @@ void TestNodeIterator()
     testing::ProcessTest("Testing Size() and iterator count", size1 == size2);
     testing::ProcessTest("Testing Size() and known node count", size1 == 5);
 
-    std::cout << std::endl << std::endl;
+    std::cout << std::endl
+              << std::endl;
 }
 
 void TestExampleModel()
@@ -215,8 +216,8 @@ void TestInputRouting2()
     model::PortElements<double> ranges = { { in->output, 0 }, { in->output, 2 } };
 
     auto minAndArgMin1 = model.AddNode<nodes::ArgMinNode<double>>(in->output); // a "standard" node that takes its input from an output port
-    auto minAndArgMin2 = model.AddNode<nodes::ArgMinNode<double>>(range);      // a node that takes its input from a range --- a subset of outputs from a port
-    auto minAndArgMin3 = model.AddNode<nodes::ArgMinNode<double>>(ranges);     // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
+    auto minAndArgMin2 = model.AddNode<nodes::ArgMinNode<double>>(range); // a node that takes its input from a range --- a subset of outputs from a port
+    auto minAndArgMin3 = model.AddNode<nodes::ArgMinNode<double>>(ranges); // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
 
     auto minAndArgMin4 = model.AddNode<nodes::ArgMinNode<double>>(model::PortElements<double>(in->output, 0, 2));
     auto minAndArgMin5 = model.AddNode<nodes::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 } });
@@ -275,8 +276,10 @@ template <typename ValueType>
 class SplittingNode : public model::Node
 {
 public:
-    SplittingNode() : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
-    SplittingNode(const model::PortElements<ValueType>& input) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
+    SplittingNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
+    SplittingNode(const model::PortElements<ValueType>& input)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
 
     static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SplittingNode"); }
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
@@ -309,7 +312,7 @@ public:
         model::PortElements<ValueType> elem1(newNode1->output);
         model::PortElements<ValueType> elem2(newNode2->output);
         model::PortElements<ValueType> newOutput({ elem1, elem2 });
-        
+
         transformer.MapNodeOutput({ output }, newOutput);
         return true;
     }
@@ -317,6 +320,18 @@ public:
     const model::OutputPort<ValueType>& output = _output;
     static constexpr const char* inputPortName = "input";
     static constexpr const char* outputPortName = "output";
+
+    virtual void WriteToArchive(utilities::Archiver& archiver) const override
+    {
+        archiver["input"] << _input;
+        archiver["output"] << _output;
+    }
+
+    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
+    {
+        archiver["input"] >> _input;
+        archiver["output"] >> _output;
+    }
 
 protected:
     virtual void Compute() const override { _output.SetOutput(_input.GetValue()); }

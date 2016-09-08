@@ -8,22 +8,21 @@
 
 #pragma once
 
-#include "IDataVector.h"
 #include "DenseDataVector.h"
+#include "IDataVector.h"
 
 // stl
+#include <algorithm> // for std::swap
 #include <cstdint>
 #include <memory>
-#include <algorithm> // for std::swap
 
 namespace dataset
 {
     /// <summary> A supervised example. </summary>
-    template<typename DataVectorType, typename MetadataType>
-    class Example 
+    template <typename DataVectorType, typename MetadataType>
+    class Example
     {
     public:
-
         Example() = default;
 
         explicit Example(const Example<DataVectorType, MetadataType>& other) = default;
@@ -95,7 +94,7 @@ namespace dataset
     /// <param name="example"> The example. </param>
     ///
     /// <returns> The shifted ostream. </returns>
-    template<typename DataVectorType, typename MetadataType>
+    template <typename DataVectorType, typename MetadataType>
     std::ostream& operator<<(std::ostream& ostream, const Example<DataVectorType, MetadataType>& example);
 }
 

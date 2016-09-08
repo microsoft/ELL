@@ -8,16 +8,17 @@
 
 #pragma once
 
-#include "Port.h"
 #include "OutputPort.h"
+#include "Port.h"
 #include "PortElements.h"
 
 // utilities
 #include "Exception.h"
+#include "IArchivable.h"
 
 // stl
-#include <vector>
 #include <cassert>
+#include <vector>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -74,11 +75,20 @@ namespace model
     class InputPort : public InputPortBase
     {
     public:
+        /// <summary> Default Constructor </summary>
+        InputPort();
+
         /// <summary> Creates an input port </summary>
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
         InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name);
+
+        /// <summary> Assignment operator </summary>
+        ///
+        /// <param name="other"> The port to assign to this one </param>
+        /// <returns> A reference to this port </returns>
+        InputPort& operator=(const InputPort& other);
 
         /// <summary> Returns the (already-computed) output value corresponding to this input </summary>
         ///
@@ -112,16 +122,15 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         PortElements<ValueType> _input;

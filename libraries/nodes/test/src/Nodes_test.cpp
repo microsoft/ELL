@@ -7,21 +7,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Nodes_test.h"
-#include "MovingAverageNode.h"
-#include "MovingVarianceNode.h"
-#include "DelayNode.h"
 #include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
-#include "UnaryOperationNode.h"
+#include "DelayNode.h"
+#include "DemultiplexerNode.h"
+#include "ForestNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
-#include "ForestNode.h"
-#include "DemultiplexerNode.h"
+#include "MovingAverageNode.h"
+#include "MovingVarianceNode.h"
+#include "UnaryOperationNode.h"
 
 // model
+#include "InputNode.h"
 #include "Model.h"
 #include "Node.h"
-#include "InputNode.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -33,10 +33,10 @@
 #include "testing.h"
 
 // stl
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <cmath>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace nodes;
 
@@ -98,8 +98,6 @@ void TestL2NormNodeCompute()
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
     auto outputNode = model.AddNode<nodes::L2NormNode<double>>(inputNode->output);
 
-    bool okSize = true;
-    bool okResult = true;
     for (int index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
@@ -123,7 +121,6 @@ void TestAccumulatorNodeCompute()
 
     std::vector<double> accumOutput(data[0].size());
 
-    bool ok = true;
     for (int index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
@@ -150,7 +147,6 @@ void TestDelayNodeCompute()
 
     std::vector<double> outputVec;
 
-    bool ok = true;
     for (int index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
@@ -277,11 +273,11 @@ void TestDemultiplexerNodeCompute()
 
     selectorNode->SetInput(false); // output[0] should get the input
     auto outputVec = model.ComputeOutput(muxNode->output);
-    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, {5.0, 0}));
+    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, { 5.0, 0 }));
 
     selectorNode->SetInput(true); // output[1] should get the input
     outputVec = model.ComputeOutput(muxNode->output);
-    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, {0.0, 5.0}));
+    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, { 0.0, 5.0 }));
 }
 
 //
@@ -299,7 +295,6 @@ void TestMovingAverageNodeRefine()
     auto meanNode = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, windowSize);
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
-    double expectedOutput = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
 
     model::TransformContext context{ common::IsNodeCompilable() };
     model::ModelTransformer transformer;
@@ -327,7 +322,6 @@ void TestSimpleForestNodeRefine()
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
     using SplitRule = predictors::SingleElementThresholdPredictor;
     using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
-    using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
     // build a forest
     predictors::SimpleForestPredictor forest;
@@ -416,7 +410,7 @@ void TestDemultiplexerNodeRefine()
 
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newSelectorNode = transformer.GetCorrespondingInputNode(selectorNode);
-    auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output); 
+    auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output);
 
     std::vector<double> inputValue{ 5.0 };
     inputNode->SetInput(inputValue);

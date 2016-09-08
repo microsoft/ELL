@@ -10,12 +10,12 @@
 namespace model
 {
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode() : Node({&_input}, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
-    {};
+    OutputNode<ValueType>::OutputNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input) : Node({&_input}, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size())
-    {};
+    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
 
     template <typename ValueType>
     void OutputNode<ValueType>::Compute() const
@@ -32,18 +32,18 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void OutputNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
-    void OutputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void OutputNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
     }
 }

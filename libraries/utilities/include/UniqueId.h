@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 #include <functional>
 #include <ostream>
@@ -18,7 +18,7 @@
 namespace utilities
 {
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
-    class UniqueId : public ISerializable
+    class UniqueId : public IArchivable
     {
     public:
         /// <summary> Constructor </summary>
@@ -46,20 +46,19 @@ namespace utilities
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, SerializationContext& context) override;
-        
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(Unarchiver& archiver) override;
+
     private:
         friend std::hash<UniqueId>;
-        size_t _id;
+        size_t _id = 0;
         static size_t _nextId;
     };
 }

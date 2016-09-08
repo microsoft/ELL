@@ -8,23 +8,23 @@
 
 #pragma once
 
-#include "ConstantNode.h"
 #include "BinaryPredicateNode.h"
-#include "TypeCastNode.h"
+#include "ConstantNode.h"
 #include "MultiplexerNode.h"
+#include "TypeCastNode.h"
 
 // model
-#include "Node.h"
 #include "InputPort.h"
+#include "Node.h"
 #include "OutputPort.h"
 
 // utilities
 #include "TypeName.h"
 
 // stl
-#include <vector>
-#include <memory>
 #include <exception>
+#include <memory>
+#include <vector>
 
 /// <summary> model namespace </summary>
 namespace nodes
@@ -50,7 +50,7 @@ namespace nodes
         ///
         /// <param name="input"> The input value. </param>
         /// <param name="selector"> The index of the chosen element to recieve the value </param>
-        DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue=0);
+        DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue = 0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -62,16 +62,15 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;

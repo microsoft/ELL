@@ -16,7 +16,7 @@ namespace trainers
     {
         double regularization = 1.0;
     };
-     
+
     template <typename LossFunctionType>
     class SGDIncrementalTrainer
     {

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <vector>
 #include <tuple>
+#include <vector>
 
 namespace common
 {
@@ -27,8 +27,10 @@ namespace common
         /// <summary> Constructs an instance of ParametersEnumerator. </summary>
         ///
         /// <param name="parameterValues"> Variable number of parameter value vectors. The number and order of these types should match the constructor of ParametersType. </param>
-        ParametersEnumerator(std::vector<ValueTypes>... parameterValues) : _valueVectorTuple(std::make_tuple(parameterValues...))
-        {}
+        ParametersEnumerator(std::vector<ValueTypes>... parameterValues)
+            : _valueVectorTuple(std::make_tuple(parameterValues...))
+        {
+        }
 
         /// <summary> Gets the number of different parameter configurations. </summary>
         ///

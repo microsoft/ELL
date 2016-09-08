@@ -8,17 +8,19 @@
 
 #pragma once
 
+#include "Archiver.h"
 #include "Exception.h"
 #include "TypeName.h"
 
 // stl
+#include <cassert>
 #include <memory>
-#include <typeindex>
 #include <string>
 #include <type_traits>
+#include <typeindex>
 #include <utility>
 
-class ISerializable;
+class IArchivable;
 
 /// <summary> utilities namespace </summary>
 namespace utilities
@@ -37,8 +39,10 @@ namespace utilities
         virtual std::string ToString() const = 0;
         virtual std::string GetStoredTypeName() const = 0;
         virtual bool IsPrimitiveType() const = 0;
-        virtual bool IsSerializable() const = 0;
+        virtual bool IsArchivable() const = 0;
         virtual bool IsPointer() const = 0;
+        virtual void ArchiveProperty(const char* name, Archiver& archiver) const = 0;
+        virtual void UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context) = 0;
 
     private:
         friend class Variant;
@@ -64,8 +68,10 @@ namespace utilities
         virtual std::string ToString() const override;
         virtual std::string GetStoredTypeName() const override;
         virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
-        virtual bool IsSerializable() const override { return !IsPrimitiveType(); }
+        virtual bool IsArchivable() const override { return !IsPrimitiveType(); }
         virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
+        virtual void ArchiveProperty(const char* name, Archiver& archiver) const override;
+        virtual void UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context) override;
 
     private:
         friend class Variant;
@@ -73,11 +79,18 @@ namespace utilities
 
         ValueType _value;
     };
-    
-    /// <summary> A class that can hold any kind of value and provide a type-safe way to access it
+
+    /// <summary> A class that can hold any kind of value and provide a type-safe way to access it </summary>
     class Variant
     {
     public:
+        /// <summary> Default Constructor </summary>
+        Variant();
+
+        /// <summary> Constructor from basic (non-variant) types. </summary>
+        template <typename ValueType>
+        explicit Variant(ValueType&& value);
+
         /// <summary> Copy constructor. </summary>
         Variant(const Variant& other);
         Variant(Variant&& other) = default;
@@ -95,7 +108,12 @@ namespace utilities
         /// <returns> The variant's current value. </returns>
         template <typename ValueType>
         ValueType GetValue() const;
-    
+
+        /// <summary> Checks if the variant has a value assigned to it. </summary>
+        ///
+        /// <returns> True if the variant currently holds a value. </returns>
+        bool IsEmpty() const;
+
         /// <summary> Checks the current type of the variant. </summary>
         ///
         /// <returns> True if the variant currently holds a value of type `ValueType`. </returns>
@@ -107,10 +125,10 @@ namespace utilities
         /// <returns> True if the variant currently holds a primitive value. </returns>
         bool IsPrimitiveType() const;
 
-        /// <summary> Checks if the variant is holding a serializable object. </summary>
+        /// <summary> Checks if the variant is holding an archivable object. </summary>
         ///
-        /// <returns> True if the variant currently holds a serializable object. </returns>
-        bool IsSerializable() const;
+        /// <returns> True if the variant currently holds a archivable object. </returns>
+        bool IsArchivable() const;
 
         /// <summary> Checks if the variant is holding a pointer. </summary>
         ///
@@ -129,11 +147,15 @@ namespace utilities
 
     private:
         friend std::string to_string(const Variant& variant);
+        friend class IArchivable;
 
         template <typename ValueType, typename... Args>
         friend Variant MakeVariant(Args&&... args);
 
-        Variant(std::type_index type, std::unique_ptr<VariantBase>&& variantValue);
+        Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue);
+        void ArchiveProperty(const char* name, Archiver& archiver) const;
+        void UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context);
+        void SetVariantValue(const Variant& value);
 
         std::type_index _type;
         std::unique_ptr<VariantBase> _value;

@@ -21,9 +21,15 @@ namespace utilities
         ++_nextId;
     }
 
-    bool UniqueId::operator==(const UniqueId& other) const { return _id == other._id; }
+    bool UniqueId::operator==(const UniqueId& other) const
+    {
+        return _id == other._id;
+    }
 
-    bool UniqueId::operator!=(const UniqueId& other) const { return !(other == *this); }
+    bool UniqueId::operator!=(const UniqueId& other) const
+    {
+        return !(other == *this);
+    }
 
     std::ostream& operator<<(std::ostream& stream, const UniqueId& id)
     {
@@ -31,14 +37,14 @@ namespace utilities
         return stream;
     }
 
-    void UniqueId::Serialize(Serializer& serializer) const
+    void UniqueId::WriteToArchive(Archiver& archiver) const
     {
-        serializer.Serialize("id", _id);
+        archiver["id"] << _id;
     }
 
-    void UniqueId::Deserialize(Deserializer& serializer, SerializationContext& context) 
+    void UniqueId::ReadFromArchive(Unarchiver& archiver)
     {
-        serializer.Deserialize("id", _id, context);
+        archiver["id"] >> _id;
     }
 
     std::string to_string(const UniqueId& id)

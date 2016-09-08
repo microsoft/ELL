@@ -14,9 +14,9 @@ namespace lossFunctions
     {
         double scaled_margin = prediction * label;
 
-        if(scaled_margin <= 1.0)
+        if (scaled_margin <= 1.0)
         {
-            return 1.0-scaled_margin;
+            return 1.0 - scaled_margin;
         }
 
         return 0.0;
@@ -24,7 +24,7 @@ namespace lossFunctions
 
     double HingeLoss::GetDerivative(double prediction, double label) const
     {
-        if(prediction * label <= 1.0)
+        if (prediction * label <= 1.0)
         {
             return -label;
         }

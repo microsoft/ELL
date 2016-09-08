@@ -8,17 +8,17 @@
 
 #pragma once
 
-#include "Port.h"
 #include "OutputPort.h"
+#include "Port.h"
 
 // utilities
 #include "Exception.h"
-#include "ISerializable.h"
+#include "IArchivable.h"
 
 // stl
-#include <vector>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
+#include <vector>
 
 /// <summary> model namespace </summary>
 namespace model
@@ -69,12 +69,13 @@ namespace model
     {
     public:
         PortElement() = default;
-        
+
         /// <summary> Creates a PortElement representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to take a value from </param>
         /// <param name="index"> The index of the value </param>
-        PortElement(const OutputPortBase& port, size_t index) : PortElementBase(port, index) {}
+        PortElement(const OutputPortBase& port, size_t index)
+            : PortElementBase(port, index) {}
 
         /// <summary> The port this element refers to </summary>
         ///
@@ -83,7 +84,7 @@ namespace model
     };
 
     /// <summary> Represents a contiguous set of values from an output port </summary>
-    class PortRange : public utilities::ISerializable
+    class PortRange : public utilities::IArchivable
     {
     public:
         PortRange() = default;
@@ -141,16 +142,15 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Equality operator. </summary>
         ///
@@ -165,7 +165,7 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class PortElementsBase : public utilities::ISerializable
+    class PortElementsBase : public utilities::IArchivable
     {
     public:
         virtual ~PortElementsBase() = default;
@@ -189,7 +189,7 @@ namespace model
         ///
         /// <param name="numRanges"> The number of ranges to reserve space for </param>
         void Reserve(size_t numRanges);
-                
+
         /// <summary> Gets an element in the elements. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
@@ -206,16 +206,15 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
         PortElementsBase(const OutputPortBase& port);
@@ -224,7 +223,7 @@ namespace model
         PortElementsBase(const PortRange& range);
         PortElementsBase(const std::vector<PortRange>& ranges);
         PortElementsBase(){};
-        
+
         void ComputeSize();
         void AddRange(const PortRange& range);
 
@@ -267,7 +266,7 @@ namespace model
         ///
         /// <param name="elements"> The vector of elements to concantenate together </param>
         PortElements(const std::vector<PortElement<ValueType>>& element);
-    
+
         /// <summary> Creates a PortElements by concatenating a set of them together </summary>
         ///
         /// <param name="groups"> The list of groups to concantenate together </param>
@@ -277,7 +276,7 @@ namespace model
         ///
         /// <param name="groups"> The vector of groups to concantenate together </param>
         PortElements(const std::vector<PortElements<ValueType>>& groups);
-    
+
         /// <summary> Creates a PortElements representing a single value from a given PortElements </summary>
         ///
         /// <param name="elements"> The PortElements to take a value from </param>

@@ -23,7 +23,7 @@ namespace common
             "");
     }
 
-    utilities::CommandLineParseResult ParsedModelLoadArguments::PostProcess(const utilities::CommandLineParser & parser)
+    utilities::CommandLineParseResult ParsedModelLoadArguments::PostProcess(const utilities::CommandLineParser& parser)
     {
         std::vector<std::string> parseErrorMessages;
 
