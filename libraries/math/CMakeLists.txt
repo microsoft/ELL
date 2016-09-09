@@ -35,9 +35,6 @@ if(${APPLE})
 elseif(${WIN32})
   set (BLASDirectory ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include)
   set (BLASLibrary ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/lib/libopenblas.dll.a)
-
-  set (BLASDLLDirectory ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/bin)
-  add_custom_command(TARGET math POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLASDLLDirectory}/libopenblas.dll $<TARGET_FILE_DIR:math>)
 endif()
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
@@ -68,6 +65,12 @@ add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
 target_link_libraries(${TEST_NAME} math testing)
 
+if(${WIN32})
+  set (BLASDLLDirectory ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/bin)
+  add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLASDLLDirectory}/libopenblas.dll $<TARGET_FILE_DIR:math_test>)
+endif()
+
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+
