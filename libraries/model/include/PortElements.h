@@ -344,16 +344,17 @@ namespace model
     template <typename RefType, typename... Refs>
     RefType Concat(const RefType& ref1, Refs&&... refs);
 }
+}
 
 // custom specialization of std::hash so we can keep PortRanges in containers that require hashable types
 namespace std
 {
     /// <summary> Implements a hash function for the PortRange class, so that it can be used with associative containers (maps, sets, and the like). </summary>
     template <>
-    class hash<model::PortElementBase>
+    class hash<emll::model::PortElementBase>
     {
     public:
-        typedef model::PortElementBase argument_type;
+        typedef emll::model::PortElementBase argument_type;
         typedef std::size_t result_type;
 
         /// <summary> Computes a hash of the input value. </summary>
@@ -363,10 +364,10 @@ namespace std
     };
 
     template <>
-    class hash<model::PortRange>
+    class hash<emll::model::PortRange>
     {
     public:
-        typedef model::PortRange argument_type;
+        typedef emll::model::PortRange argument_type;
         typedef std::size_t result_type;
 
         /// <summary> Computes a hash of the input value. </summary>
@@ -374,7 +375,6 @@ namespace std
         /// <returns> A hash value for the given input. </returns>
         result_type operator()(argument_type const& id) const;
     };
-}
 }
 
 #include "../tcc/PortElements.tcc"

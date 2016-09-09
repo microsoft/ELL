@@ -81,7 +81,7 @@ namespace model
         archiver["referencedPortName"] >> portName;
 
         auto& context = archiver.GetContext();
-        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
+        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         Node* newNode = newContext.GetNodeFromId(newId);
         if (newNode == nullptr)
         {
@@ -105,7 +105,7 @@ namespace model
         _referencedPort = newPort;
         if (newPort == nullptr)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive model::PortRange port");
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive PortRange port");
         }
     }
 
@@ -186,22 +186,22 @@ namespace model
         ComputeSize();
     }
 }
+}
 
 //
 // hash functions for PortElementUntyped and PortRange
 //
-std::hash<model::PortElementBase>::result_type std::hash<model::PortElementBase>::operator()(argument_type const& element) const
+std::hash<emll::model::PortElementBase>::result_type std::hash<emll::model::PortElementBase>::operator()(argument_type const& element) const
 {
-    auto hash1 = std::hash<const model::OutputPortBase*>()(element.ReferencedPort());
+    auto hash1 = std::hash<const emll::model::OutputPortBase*>()(element.ReferencedPort());
     auto hash2 = std::hash<size_t>()(element.GetIndex());
     return hash1 ^ (hash2 << 1);
 }
 
-std::hash<model::PortRange>::result_type std::hash<model::PortRange>::operator()(argument_type const& range) const
+std::hash<emll::model::PortRange>::result_type std::hash<emll::model::PortRange>::operator()(argument_type const& range) const
 {
-    auto hash1 = std::hash<const model::OutputPortBase*>()(range.ReferencedPort());
+    auto hash1 = std::hash<const emll::model::OutputPortBase*>()(range.ReferencedPort());
     auto hash2 = std::hash<size_t>()(range.Size());
     auto hash3 = std::hash<size_t>()(range.GetStartIndex());
     return hash1 ^ ((hash2 ^ (hash3 << 1)) << 1);
-}
 }
