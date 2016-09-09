@@ -39,36 +39,7 @@
 	private:
 		std::string _filename;
 		interfaces::GenericRowDataset _dataset;
-	};
-
-	class GetDataIteratorWorker : public Nan::AsyncWorker
-	{
-	public:
-		GetDataIteratorWorker(Nan::Callback* doneCallback, std::string filename) : Nan::AsyncWorker(doneCallback), _filename(filename)
-		{
-		}
-
-		virtual void Execute() override
-		{
-			// Invoke GetDataIterator syncronously
-			_dataiterator = interfaces::GetDataIterator(_filename);
-			
-		}
-
-		virtual void HandleOKCallback() override
-		{
-			Nan::HandleScope scope;
-			// passing out a new pointer to JS world, why cant we send a copy??
-			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_dataiterator), SWIGTYPE_p_utilities__AnyIteratorT_dataset__ExampleT_dataset__IDataVector_dataset__WeightLabel_t_t, 0 | 0);
-			
-			v8::Local<v8::Value> argv[] = { jsresult };
-			callback->Call(1, argv);
-		}
-
-	private:
-		std::string _filename;
-		utilities::AnyIterator<dataset::GenericSupervisedExample> _dataiterator;		
-	};
+	};	
 %}
 
 %inline {
@@ -76,11 +47,5 @@
     {
        auto doneCallback = doneCb.GetFunction();
        Nan::AsyncQueueWorker(new GetDatasetWorker(doneCallback, dataFilename));
-    }
-
-	void GetDataIteratorAsync(std::string dataFilename, Callback doneCb)
-    {
-       auto doneCallback = doneCb.GetFunction();
-       Nan::AsyncQueueWorker(new GetDataIteratorWorker(doneCallback, dataFilename));
-    }
+    }	
 }

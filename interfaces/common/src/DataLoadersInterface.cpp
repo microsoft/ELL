@@ -90,19 +90,6 @@ namespace
 
 namespace interfaces
 {
-    utilities::AnyIterator<dataset::GenericSupervisedExample> GetDataIterator(const std::string& dataFilename)
-    {
-        // create parser for sparse vectors (SVMLight format)
-        dataset::SparseEntryParser sparseEntryParser;
-
-        // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataFilename);
-
-        // Create iterator
-        auto parsingIterator = MakeParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));
-        return utilities::MakeAnyIterator(parsingIterator); // Why does this work?
-    }
-
     interfaces::GenericRowDataset GetDataset(const std::string& dataFilename)
     {
         dataset::GenericRowDataset rowDataset;
