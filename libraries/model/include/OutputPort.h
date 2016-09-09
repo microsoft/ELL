@@ -75,7 +75,7 @@ namespace model
     {
     public:
         OutputPort() = default;
-        OutputPort(const OutputPort&) = default;
+        OutputPort(const OutputPort&) = delete;
 
         /// <summary> Constructor </summary>
         ///
