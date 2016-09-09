@@ -17,6 +17,8 @@
 #include <cstdint>
 #include <iostream>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> OnesDataVector Base class. </summary>
@@ -126,4 +128,5 @@ namespace dataset
     private:
         uint64_t _size = 0;
     };
+}
 }

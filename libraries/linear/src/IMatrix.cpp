@@ -8,6 +8,8 @@
 
 #include "IMatrix.h"
 
+namespace emll
+{
 namespace linear
 {
     void IMatrix::Gemv(const std::vector<double>& x, std::vector<double>& y, double alpha, double beta) const
@@ -19,4 +21,5 @@ namespace linear
     {
         Gevm(&x[0], &y[0], alpha, beta);
     }
+}
 }

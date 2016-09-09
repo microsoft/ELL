@@ -17,4 +17,7 @@
 // stl
 #include <ostream>
 
+namespace emll
+{
 void PrintModel(const model::Model& model, std::ostream& out);
+}

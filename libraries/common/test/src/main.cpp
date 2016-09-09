@@ -21,6 +21,8 @@
 ///
 int main()
 {
+    using namespace emll;
+
     try
     {
         TestLoadSampleModels();

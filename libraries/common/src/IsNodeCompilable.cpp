@@ -22,6 +22,8 @@
 #include "UnaryOperationNode.h"
 #include "ValueSelectorNode.h"
 
+namespace emll
+{
 namespace common
 {
     IsNodeCompilable::IsNodeCompilable()
@@ -58,4 +60,5 @@ namespace common
             return false;
         }
     }
+}
 }

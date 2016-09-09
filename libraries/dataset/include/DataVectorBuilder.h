@@ -13,6 +13,8 @@
 // stl
 #include <memory>
 
+namespace emll
+{
 /// <summary> dataset namespace </summary>
 namespace dataset
 {
@@ -32,6 +34,7 @@ namespace dataset
         template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         static std::unique_ptr<IDataVector> Build(IndexValueIteratorType IndexValueIterator);
     };
+}
 }
 
 #include "../tcc/DataVectorBuilder.tcc"

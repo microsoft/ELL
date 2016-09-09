@@ -8,6 +8,8 @@
 
 #pragma once
 
+namespace emll
+{
 namespace lossFunctions
 {
     /// <summary> Implements the log-loss functions: loss(x) = log(1 + exp(-x)) </summary>
@@ -38,4 +40,5 @@ namespace lossFunctions
     private:
         double _scale = 1.0;
     };
+}
 }

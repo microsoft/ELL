@@ -11,6 +11,8 @@
 #include <tuple>
 #include <vector>
 
+namespace emll
+{
 namespace common
 {
     /// <summary> Implements a factory class that enumerates all possible combinations of parameter values. </summary>
@@ -89,6 +91,7 @@ namespace common
     {
         return ParametersEnumerator<ParametersType, ValueTypes...>(parameterValues...);
     }
+}
 }
 
 #include "../tcc/ParametersEnumerator.tcc"

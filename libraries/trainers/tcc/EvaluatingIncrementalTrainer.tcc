@@ -9,6 +9,8 @@
 // stl
 #include <utility>
 
+namespace emll
+{
 namespace trainers
 {
     template <typename PredictorType>
@@ -35,4 +37,5 @@ namespace trainers
     {
         return EvaluatingIncrementalTrainer<PredictorType>(std::move(internalTrainer), evaluator);
     }
+}
 }

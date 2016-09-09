@@ -21,6 +21,8 @@
 #include <cmath>
 #include <string>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that takes a vector input and returns its magnitude </summary>
@@ -75,6 +77,7 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+}
 }
 
 #include "../tcc/L2NormNode.tcc"

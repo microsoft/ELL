@@ -19,6 +19,8 @@
 #include <memory>
 #include <vector>
 
+namespace emll
+{
 /// <summary> nodes namespace </summary>
 namespace nodes
 {
@@ -133,6 +135,7 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
     };
+}
 }
 
 #include "../tcc/ExtremalValueNode.tcc"

@@ -12,6 +12,8 @@
 // stl
 #include <sstream>
 
+namespace emll
+{
 namespace utilities
 {
     // format of argv: Main.exe [options]
@@ -120,4 +122,5 @@ namespace utilities
     {
         return val ? "true" : "false";
     }
+}
 }

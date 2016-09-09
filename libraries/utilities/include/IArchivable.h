@@ -17,6 +17,8 @@
 #include <ostream>
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     class ObjectArchive;
@@ -64,6 +66,7 @@ namespace utilities
         /// <param name="archiver"> The unarchiver. </param>
         virtual void ReadFromArchive(Unarchiver& archiver) = 0;
     };
+}
 }
 
 #include "../tcc/IArchivable.tcc"

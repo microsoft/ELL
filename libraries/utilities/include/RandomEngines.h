@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> Gets a vector of random engines. </summary>
@@ -29,4 +31,5 @@ namespace utilities
     ///
     /// <returns> The random engine. </returns>
     std::default_random_engine GetRandomEngine(std::string seed_string = "");
+}
 }

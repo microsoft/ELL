@@ -22,6 +22,8 @@
 
 class IArchivable;
 
+namespace emll
+{
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
@@ -167,6 +169,7 @@ namespace utilities
 
     /// <summary> Get string representation of a Variant </summary>
     std::string to_string(const Variant& variant);
+}
 }
 
 #include "../tcc/Variant.tcc"

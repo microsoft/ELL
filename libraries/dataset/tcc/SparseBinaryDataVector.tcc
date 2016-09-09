@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace dataset
 {
     template <typename IntegerListType>
@@ -34,4 +36,5 @@ namespace dataset
 
         return vector;
     }
+}
 }

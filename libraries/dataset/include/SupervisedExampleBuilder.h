@@ -18,6 +18,8 @@
 #include <memory>
 #include <string>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> A supervised example builder. </summary>
@@ -48,6 +50,7 @@ namespace dataset
         VectorEntryParserType _instanceParser;
         bool _hasWeight;
     };
+}
 }
 
 #include "../tcc/SupervisedExampleBuilder.tcc"

@@ -20,6 +20,8 @@
 // stl
 #include <iostream>
 
+using namespace emll;
+
 /// Runs all tests
 ///
 int main()

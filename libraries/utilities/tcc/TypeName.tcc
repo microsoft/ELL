@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     template <typename T>
@@ -32,4 +34,5 @@ namespace utilities
         auto typeStrings = std::vector<std::string>{ TypeName<Types>::GetName()... };
         return GetCompositeTypeName(baseType, typeStrings);
     }
+}
 }

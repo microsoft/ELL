@@ -14,6 +14,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 namespace common
 {
 
@@ -52,4 +54,5 @@ namespace common
         /// <param name="parser"> [in,out] The parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
     };
+}
 }

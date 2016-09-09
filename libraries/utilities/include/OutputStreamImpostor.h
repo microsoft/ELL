@@ -14,6 +14,8 @@
 #include <ostream>
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> An imposter class that can stand in for a std::ostream object </summary>
@@ -47,10 +49,11 @@ namespace utilities
 
         /// <summary> Casting operator that returns a const reference to an ostream. This allows us to use an OutputStreamImpostor
         /// in most places where a const ostream reference would be accepted. </summary>
-        operator std::ostream const&() const & { return *_outputStream; }
+        operator std::ostream const&() const& { return *_outputStream; }
 
     private:
         std::shared_ptr<std::ofstream> _outputFileStream;
         std::shared_ptr<std::ostream> _outputStream;
     };
+}
 }

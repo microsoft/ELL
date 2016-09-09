@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> An adapter that transforms a pair of STL iterators into a read-only forward iterator with IsValid, Next, and Get functions</summary>
@@ -77,6 +79,7 @@ namespace utilities
     /// <returns> A StlIterator over the container</returns>
     template <typename ContainerType>
     auto MakeStlIterator(ContainerType& container) -> StlIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
+}
 }
 
 #include "../tcc/StlIterator.tcc"

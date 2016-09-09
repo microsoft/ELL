@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> nodes namespace </summary>
 namespace nodes
 {
@@ -54,4 +56,5 @@ namespace nodes
         archiver[outputPortName] >> _output;
         archiver["values"] >> _values;
     }
+}
 }

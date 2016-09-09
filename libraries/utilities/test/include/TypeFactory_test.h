@@ -8,4 +8,7 @@
 
 #pragma once
 
+namespace emll
+{
 void TypeFactoryTest();
+}

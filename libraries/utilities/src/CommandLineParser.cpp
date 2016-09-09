@@ -13,6 +13,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -127,7 +129,6 @@ namespace utilities
 
     void CommandLineParser::Parse()
     {
-        // TODO: should probably throw an exception here ?
         if (_originalArgs.size() == 0)
             return;
 
@@ -297,7 +298,7 @@ namespace utilities
         _postParseCallbacks.push_back(callback);
     }
 
-    inline bool FindBestMatch(std::string str, const std::vector<std::string>& val_names, std::string& resultString) // TODO: this std::function is not used anywhere -erase it?
+    inline bool FindBestMatch(std::string str, const std::vector<std::string>& val_names, std::string& resultString)
     {
         bool didFindOne = false;
         for (const auto& valName : val_names)
@@ -486,4 +487,5 @@ namespace utilities
             return "";
         }
     }
+}
 }

@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that represents a unary function of its input </summary>
@@ -92,6 +94,7 @@ namespace nodes
         // Operation
         OperationType _operation;
     };
+}
 }
 
 #include "../tcc/UnaryOperationNode.tcc"

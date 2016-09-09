@@ -8,6 +8,8 @@
 
 #pragma once
 
+namespace emll
+{
 void TestL2NormNodeCompute();
 void TestAccumulatorNodeCompute();
 void TestDelayNodeCompute();
@@ -23,3 +25,4 @@ void TestMovingAverageNodeRefine();
 void TestLinearPredictorNodeRefine();
 void TestSimpleForestPredictorNodeRefine();
 void TestDemultiplexerNodeRefine();
+}

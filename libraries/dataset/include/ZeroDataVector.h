@@ -16,6 +16,8 @@
 // stl
 #include <cstdint>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> ZeroDataVector Base class. </summary>
@@ -115,4 +117,5 @@ namespace dataset
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const override { return std::vector<double>(0); }
     };
+}
 }

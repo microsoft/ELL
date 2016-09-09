@@ -22,6 +22,8 @@
 #include <unordered_set>
 #include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -208,6 +210,7 @@ namespace model
         const Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };
+}
 }
 
 #include "../tcc/Model.tcc"

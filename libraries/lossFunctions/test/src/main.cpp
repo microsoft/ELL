@@ -18,6 +18,8 @@
 #include <iostream>
 #include <string>
 
+using namespace emll;
+
 void hingeLossTest()
 {
     lossFunctions::HingeLoss hingeLoss;

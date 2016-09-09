@@ -14,6 +14,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary> Base class for matrices of double numbers. </summary>
@@ -62,4 +64,5 @@ namespace linear
         /// <param name="beta"> The beta parameter. </param>
         virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const = 0;
     };
+}
 }

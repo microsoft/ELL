@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary>
@@ -51,6 +53,7 @@ namespace linear
     private:
         RowMatrixType _transp;
     };
+}
 }
 
 #include "../tcc/BiMatrix.tcc"

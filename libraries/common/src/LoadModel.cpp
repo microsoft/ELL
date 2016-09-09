@@ -39,6 +39,8 @@
 #include "JsonArchiver.h"
 #include "XMLArchiver.h"
 
+namespace emll
+{
 namespace common
 {
     model::Model GetModel1()
@@ -276,4 +278,5 @@ namespace common
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
         }
     }
+}
 }

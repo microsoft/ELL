@@ -12,6 +12,8 @@
 
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -103,4 +105,5 @@ namespace utilities
     void Unarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
     }
+}
 }

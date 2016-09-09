@@ -8,6 +8,8 @@
 
 #include "ModelSaveArguments.h"
 
+namespace emll
+{
 namespace common
 {
     void ParsedModelSaveArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -38,4 +40,5 @@ namespace common
         std::vector<std::string> parseErrorMessages;
         return parseErrorMessages;
     }
+}
 }

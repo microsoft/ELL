@@ -13,6 +13,8 @@
 #include <memory>
 #include <string>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> An iterator that reads a long text line by line. </summary>
@@ -47,4 +49,5 @@ namespace dataset
         std::ifstream _iFStream;
         char _delim;
     };
+}
 }

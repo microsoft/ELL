@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     template <typename ValueType>
@@ -13,4 +15,5 @@ namespace utilities
     {
         return archive.GetValue<ValueType>();
     }
+}
 }

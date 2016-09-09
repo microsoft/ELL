@@ -11,6 +11,8 @@
 // utilites
 #include "Exception.h"
 
+namespace emll
+{
 namespace trainers
 {
     //
@@ -128,4 +130,5 @@ namespace trainers
         _childSums[1].Print(os);
         os << "\n";
     }
+}
 }

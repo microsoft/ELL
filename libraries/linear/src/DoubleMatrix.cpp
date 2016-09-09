@@ -14,6 +14,8 @@
 // stl
 #include <cassert>
 
+namespace emll
+{
 namespace linear
 {
 
@@ -318,4 +320,5 @@ namespace linear
         // TODO (oferd) - replace the line below with optimized code for this type of matrix
         DoubleMatrixBase::Gevm(p_x, p_y, alpha, beta);
     }
+}
 }

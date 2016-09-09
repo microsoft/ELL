@@ -9,6 +9,8 @@
 // utilities
 #include "RandomEngines.h"
 
+namespace emll
+{
 namespace trainers
 {
     template <typename PredictorType>
@@ -47,7 +49,7 @@ namespace trainers
     template <typename PredictorType>
     const std::shared_ptr<const PredictorType> SweepingIncrementalTrainer<PredictorType>::GetPredictor() const
     {
-        double bestGoodness = _evaluatingTrainers[0].GetEvaluator()->GetGoodness(); // TODO make nicer
+        double bestGoodness = _evaluatingTrainers[0].GetEvaluator()->GetGoodness();
         int best = 0;
         for (int i = 1; i < _evaluatingTrainers.size(); ++i)
         {
@@ -67,4 +69,5 @@ namespace trainers
     {
         return std::make_unique<SweepingIncrementalTrainer<PredictorType>>(std::move(evaluatingTrainers), parameters);
     }
+}
 }

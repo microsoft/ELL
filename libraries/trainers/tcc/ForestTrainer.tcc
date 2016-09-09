@@ -9,6 +9,8 @@
 //#define VERBOSE_MODE( x ) x   // uncomment this for very verbose mode
 #define VERBOSE_MODE(x) // uncomment this for nonverbose mode
 
+namespace emll
+{
 namespace trainers
 {
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
@@ -227,4 +229,5 @@ namespace trainers
         splitRule.PrintLine(os, tabs);
         stats.PrintLine(os, tabs);
     }
+}
 }

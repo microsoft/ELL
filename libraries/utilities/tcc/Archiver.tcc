@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -235,4 +237,5 @@ namespace utilities
         }
         EndUnarchiveArray(name, typeName);
     }
+}
 }

@@ -23,6 +23,8 @@
 #include <cstdint>
 #include <memory>
 
+namespace emll
+{
 namespace predictors
 {
     /// <summary> A linear binary predictor. </summary>
@@ -108,4 +110,5 @@ namespace predictors
         linear::DoubleVector _w;
         double _b;
     };
+}
 }

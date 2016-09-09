@@ -25,6 +25,8 @@
 #include <thread>
 #include <vector>
 
+using namespace emll;
+
 template <typename... Args>
 void testMatchFormat(utilities::MatchResult expectedResult, const char* content, const char* format, Args... args)
 {

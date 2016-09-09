@@ -16,6 +16,8 @@
 #include <sstream>
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     ObjectArchiver::ObjectArchiver(SerializationContext context)
@@ -169,4 +171,5 @@ namespace utilities
     void ObjectArchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
     }
+}
 }

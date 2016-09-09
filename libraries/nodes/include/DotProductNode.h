@@ -24,6 +24,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that takes two vector inputs and returns their dot product </summary>
@@ -84,6 +86,7 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+}
 }
 
 #include "../tcc/DotProductNode.tcc"

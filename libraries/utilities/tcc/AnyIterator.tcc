@@ -13,6 +13,8 @@
 #include <stdexcept>
 #include <utility>
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -107,4 +109,5 @@ namespace utilities
         auto wrapper = std::make_shared<IteratorWrapper<IteratorType, ValueType>>(std::forward<IteratorType>(iter));
         return AnyIterator<ValueType>(wrapper);
     }
+}
 }

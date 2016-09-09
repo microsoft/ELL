@@ -16,6 +16,8 @@
 #include <utility>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> A read-only forward index-value iterator for an STL container </summary>
@@ -67,6 +69,7 @@ namespace utilities
     /// <param name="indexValueIterator"> The IndexValueIterator to copy values from </param>
     template <typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> = 0>
     void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array);
+}
 }
 
 #include "../tcc/StlIndexValueIterator.tcc"

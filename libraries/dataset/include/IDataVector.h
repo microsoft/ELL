@@ -17,6 +17,8 @@
 #include <memory>
 #include <vector>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> Base class for infinite-dimensional vectors of double numbers. Each implementation of
@@ -50,4 +52,5 @@ namespace dataset
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const = 0;
     };
+}
 }

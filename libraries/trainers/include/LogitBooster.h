@@ -11,6 +11,8 @@
 // dataset
 #include "Example.h"
 
+namespace emll
+{
 namespace trainers
 {
     class LogitBooster
@@ -32,4 +34,5 @@ namespace trainers
     private:
         double _scale;
     };
+}
 }

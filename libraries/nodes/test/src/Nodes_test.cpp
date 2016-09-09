@@ -38,6 +38,8 @@
 #include <sstream>
 #include <string>
 
+namespace emll
+{
 using namespace nodes;
 
 //
@@ -252,13 +254,10 @@ void TestLinearPredictorNodeCompute()
 {
     const int dim = 10;
     predictors::LinearPredictor predictor(dim);
-    // TODO: set its vector and bias
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dim);
     auto predNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
-
-    // TODO: test it
 }
 
 void TestDemultiplexerNodeCompute()
@@ -284,8 +283,6 @@ void TestDemultiplexerNodeCompute()
 // Node refinements
 //
 
-// TODO: make a generic TestModelsEqual function that takes 2 models, 2 output nodes, and a test message string
-
 void TestMovingAverageNodeRefine()
 {
     const int windowSize = 4;
@@ -300,7 +297,7 @@ void TestMovingAverageNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ meanNode->output }); // TODO: cleanup
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ meanNode->output });
 
     std::cout << "MovingAverage model compilable: " << (transformer.IsModelCompilable() ? "yes" : "no") << std::endl;
     std::cout << "Original nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
@@ -383,7 +380,7 @@ void TestLinearPredictorNodeRefine()
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ linearPredictorNode->output }); // TODO: cleanup
+    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ linearPredictorNode->output });
     inputNode->SetInput({ 1.0, 1.0, 1.0 });
     newInputNode->SetInput({ 1.0, 1.0, 1.0 });
     auto modelOutputValue = model.ComputeOutput(linearPredictorNode->output)[0];
@@ -427,4 +424,5 @@ void TestDemultiplexerNodeRefine()
     outputVec = model.ComputeOutput(muxNode->output);
     newOutputVec = refinedModel.ComputeOutput(newMuxNodeElements);
     testing::ProcessTest("Testing DemultiplexerNode refine", testing::IsEqual(outputVec, newOutputVec));
+}
 }

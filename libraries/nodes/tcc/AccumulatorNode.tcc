@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     template <typename ValueType>
@@ -58,4 +60,5 @@ namespace nodes
         auto dimension = _input.Size();
         _accumulator = std::vector<ValueType>(dimension);
     }
+}
 }

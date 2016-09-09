@@ -17,6 +17,8 @@
 #include <stdexcept>
 #include <type_traits>
 
+namespace emll
+{
 namespace utilities
 {
     Match::Match(const char* pStr)
@@ -159,4 +161,5 @@ namespace utilities
             case MatchResult::success:; // nothing
         }
     }
+}
 }

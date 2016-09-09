@@ -24,6 +24,8 @@
 #include <iterator>
 #include <vector>
 
+namespace emll
+{
 namespace predictors
 {
     /// <summary> Implements a forest of decision/regression trees. Split rules: Each interior node in
@@ -382,6 +384,7 @@ namespace predictors
 
     /// <summary> A simple binary tree with single-input threshold rules and constant predictors in its edges. </summary>
     typedef ForestPredictor<SingleElementThresholdPredictor, ConstantPredictor> SimpleForestPredictor;
+}
 }
 
 #include "../tcc/ForestPredictor.tcc"

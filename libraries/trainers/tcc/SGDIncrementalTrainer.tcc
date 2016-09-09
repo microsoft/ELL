@@ -13,6 +13,8 @@
 // dataset
 #include "RowDataset.h"
 
+namespace emll
+{
 namespace trainers
 {
     template <typename LossFunctionType>
@@ -138,4 +140,5 @@ namespace trainers
             exampleIterator.Next();
         }
     }
+}
 }

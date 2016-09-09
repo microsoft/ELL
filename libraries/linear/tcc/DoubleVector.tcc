@@ -8,6 +8,8 @@
 
 #include <functional>
 
+namespace emll
+{
 namespace linear
 {
     inline DoubleVector::DoubleVector(const std::vector<double>& v)
@@ -37,4 +39,5 @@ namespace linear
     {
         return _data[index];
     }
+}
 }

@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     LinearPredictorNode::LinearPredictorNode()
@@ -90,4 +92,5 @@ namespace nodes
     {
         return transformer.AddNode<LinearPredictorNode>(input, predictor);
     }
+}
 }

@@ -15,6 +15,8 @@
 #include <random>
 #include <stdexcept>
 
+namespace emll
+{
 namespace dataset
 {
     template <typename ExampleType>
@@ -169,4 +171,5 @@ namespace dataset
         }
         return size;
     }
+}
 }

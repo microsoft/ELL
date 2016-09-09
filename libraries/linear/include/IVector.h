@@ -14,6 +14,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace linear
 {
     class DoubleVector;
@@ -62,4 +64,5 @@ namespace linear
         /// <returns> A dot product. </returns>
         virtual double Dot(const double* p_other) const = 0;
     };
+}
 }

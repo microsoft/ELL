@@ -12,6 +12,8 @@
 // stl
 #include <cassert>
 
+namespace emll
+{
 namespace linear
 {
     void IVector::AddTo(std::vector<double>& other, double scalar) const
@@ -33,4 +35,5 @@ namespace linear
 
         return Dot(other.data());
     }
+}
 }

@@ -16,6 +16,8 @@
 //stl
 #include <iostream>
 
+namespace emll
+{
 namespace predictors
 {
     /// <summary> A predictor that ignores its input and outputs a constant number. This class is used to define decision trees. </summary>
@@ -77,4 +79,5 @@ namespace predictors
     private:
         double _value = 0.0;
     };
+}
 }

@@ -8,5 +8,8 @@
 
 #pragma once
 
+namespace emll
+{
 void TestScalarVariant();
 void TestVectorVariant();
+}

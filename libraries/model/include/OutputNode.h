@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -72,6 +74,7 @@ namespace model
         InputPort<ValueType> _input;
         OutputPort<ValueType> _output;
     };
+}
 }
 
 #include "../tcc/OutputNode.tcc"

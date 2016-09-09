@@ -16,6 +16,8 @@
 #include <cstring>
 #include <stdexcept>
 
+namespace emll
+{
 namespace utilities
 {
 
@@ -136,4 +138,5 @@ namespace utilities
         _last = UINT64_MAX;
         _size = 0;
     }
+}
 }

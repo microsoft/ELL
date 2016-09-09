@@ -23,6 +23,8 @@
 #include <type_traits>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> An archiver that encodes data in an ObjectArchive </summary>
@@ -118,6 +120,7 @@ namespace utilities
         // The object description
         ObjectArchive _objectDescription;
     };
+}
 }
 
 #include "../tcc/ObjectArchiver.tcc"

@@ -8,6 +8,8 @@
 
 #include "Base.h"
 
+namespace emll
+{
 namespace linear
 {
     std::ostream& operator<<(std::ostream& os, const Base& v)
@@ -15,4 +17,5 @@ namespace linear
         v.Print(os);
         return os;
     }
+}
 }

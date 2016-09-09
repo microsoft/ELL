@@ -26,6 +26,8 @@
 #include <sstream>
 #include <string>
 
+using namespace emll;
+
 /// Generates a linear::DoubleVector
 ///
 linear::DoubleVector getVector()

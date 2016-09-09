@@ -9,6 +9,8 @@
 // utilities
 #include "RandomEngines.h"
 
+namespace emll
+{
 namespace trainers
 {
     template <typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
@@ -107,4 +109,5 @@ namespace trainers
     {
         return std::make_unique<HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>>(lossFunction, booster, thresholdFinder, parameters);
     }
+}
 }

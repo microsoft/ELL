@@ -21,6 +21,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> Implements a forest node, which wraps the forest predictor. </summary>
@@ -97,6 +99,7 @@ namespace nodes
 
     /// <summary> Defines an alias representing a simple forest node, which holds a forest with a SingleElementThresholdPredictor as the split rule and ConstantPredictors on the edges. </summary>
     typedef ForestPredictorNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor> SimpleForestPredictorNode;
+}
 }
 
 #include "../tcc/ForestPredictorNode.tcc"
