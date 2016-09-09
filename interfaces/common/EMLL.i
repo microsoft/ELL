@@ -165,6 +165,5 @@ typedef emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>:
 class emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::PredictorType {};
 
 #if !defined(SWIGXML) && !defined(SWIGR) && !defined(SWIGJAVASCRIPT)
-// TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
 %shared_ptr(RowDataset)
 #endif
