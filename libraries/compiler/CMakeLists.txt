@@ -63,6 +63,7 @@ set (INCLUDE include/LLVMInclude.h
 )
 
 set (TCC tcc/SymbolTable.tcc
+		tcc/Types.tcc
 		 tcc/Variable.tcc
 		 tcc/ScalarVar.tcc
 		 tcc/VectorVar.tcc

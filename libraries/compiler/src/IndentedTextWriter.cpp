@@ -123,7 +123,7 @@ namespace emll
 
 		void IndentedTextWriter::WriteIndent(int count)
 		{
-			for (uint32_t i = 0; i < count; ++i)
+			for (int i = 0; i < count; ++i)
 			{
 				_buffer << _tabString;
 			}
