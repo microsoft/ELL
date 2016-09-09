@@ -12,16 +12,18 @@
 #include "Files.h"
 
 // dataset
-#include "SequentialLineIterator.h"
-#include "SparseEntryParser.h"
 #include "ParsingIterator.h"
 #include "RowDataset.h"
+#include "SequentialLineIterator.h"
+#include "SparseEntryParser.h"
 
 // stl
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
 
+namespace emll
+{
 namespace common
 {
     //
@@ -51,4 +53,5 @@ namespace common
 
         return rowDataset;
     }
+}
 }

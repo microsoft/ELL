@@ -6,15 +6,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     template <typename ValueType>
-    AccumulatorNode<ValueType>::AccumulatorNode() : Node({&_input}, {&_output}), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+    AccumulatorNode<ValueType>::AccumulatorNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
     {
     }
 
     template <typename ValueType>
-    AccumulatorNode<ValueType>::AccumulatorNode(const model::PortElements<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size())
+    AccumulatorNode<ValueType>::AccumulatorNode(const model::PortElements<ValueType>& input)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size())
     {
         auto dimension = input.Size();
         _accumulator = std::vector<ValueType>(dimension);
@@ -23,7 +27,7 @@ namespace nodes
     template <typename ValueType>
     void AccumulatorNode<ValueType>::Compute() const
     {
-        for(size_t index = 0; index < _input.Size(); ++index)
+        for (size_t index = 0; index < _input.Size(); ++index)
         {
             _accumulator[index] += _input[index];
         }
@@ -56,4 +60,5 @@ namespace nodes
         auto dimension = _input.Size();
         _accumulator = std::vector<ValueType>(dimension);
     }
+}
 }

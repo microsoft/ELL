@@ -8,13 +8,17 @@
 
 #include <functional>
 
+namespace emll
+{
 namespace linear
 {
-    inline DoubleVector::DoubleVector(const std::vector<double>& v) : _data(v) {};
+    inline DoubleVector::DoubleVector(const std::vector<double>& v)
+        : _data(v){};
 
-    inline DoubleVector::DoubleVector(std::vector<double>&& v) : _data(std::forward<std::vector<double>>(v)) {};
+    inline DoubleVector::DoubleVector(std::vector<double>&& v)
+        : _data(std::forward<std::vector<double>>(v)){};
 
-    template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept>
+    template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept>
     inline DoubleVector::DoubleVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
@@ -26,15 +30,14 @@ namespace linear
         }
     }
 
-
     inline double& DoubleVector::operator[](uint64_t index)
     {
-        return _data[index]; 
+        return _data[index];
     }
-    
+
     inline double DoubleVector::operator[](uint64_t index) const
     {
         return _data[index];
     }
 }
-
+}

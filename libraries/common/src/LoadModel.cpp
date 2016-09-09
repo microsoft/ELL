@@ -10,35 +10,37 @@
 #include "IsNodeCompilable.h"
 
 // model
-#include "Model.h"
 #include "InputNode.h"
+#include "Model.h"
 #include "OutputNode.h"
 
 // nodes
-#include "ExtremalValueNode.h"
-#include "MovingAverageNode.h"
-#include "MovingVarianceNode.h"
-#include "LinearPredictorNode.h"
-#include "L2NormNode.h"
-#include "DelayNode.h"
-#include "DotProductNode.h"
-#include "UnaryOperationNode.h"
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
+#include "DelayNode.h"
+#include "DotProductNode.h"
+#include "ExtremalValueNode.h"
+#include "ForestPredictorNode.h"
+#include "L2NormNode.h"
+#include "LinearPredictorNode.h"
+#include "MovingAverageNode.h"
+#include "MovingVarianceNode.h"
 #include "MultiplexerNode.h"
-#include "ForestNode.h"
+#include "UnaryOperationNode.h"
 
 // predictors
-#include "LinearPredictor.h"
 #include "ForestPredictor.h"
+#include "LinearPredictor.h"
 #include "SingleElementThresholdPredictor.h"
 
 // utilities
-#include "Files.h"
 #include "Archiver.h"
+#include "Files.h"
 #include "JsonArchiver.h"
 #include "XMLArchiver.h"
 
+namespace emll
+{
 namespace common
 {
     model::Model GetModel1()
@@ -137,8 +139,8 @@ namespace common
         auto forest = CreateForest(numSplits);
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
-        auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
-        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestNode->output);
+        auto simpleForestPredictorNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
+        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestPredictorNode->output);
         return model;
     }
 
@@ -173,10 +175,10 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::DemultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool,int>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
     }
 
@@ -254,26 +256,27 @@ namespace common
             }
 
             model::Model emptyModel;
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");   
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
         }
     }
 
     void SaveModel(const model::Model& model, const std::string& filename)
     {
         auto ext = utilities::GetFileExtension(filename);
-        if(ext == "xml")
+        if (ext == "xml")
         {
             auto filestream = utilities::OpenOfstream(filename);
             SaveArchivedModel<utilities::XmlArchiver>(model, filestream);
         }
-        else if(ext == "json")
+        else if (ext == "json")
         {
             auto filestream = utilities::OpenOfstream(filename);
             SaveArchivedModel<utilities::JsonArchiver>(model, filestream);
         }
         else
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");   
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
         }
     }
+}
 }

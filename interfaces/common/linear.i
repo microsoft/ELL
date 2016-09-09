@@ -15,17 +15,17 @@
 #include "IMatrix.h"
 %}
 
-%ignore linear::DoubleVector::GetIterator;
-%ignore linear::DoubleSubvector::GetIterator;
-%ignore linear::DoubleVector::GetDataPointer;
-%ignore linear::DoubleVector::DoubleVector(DoubleVector &&);
-%ignore linear::DoubleVector::DoubleVector(std::vector<double> &&);
+%ignore emll::linear::DoubleVector::GetIterator;
+%ignore emll::linear::DoubleSubvector::GetIterator;
+%ignore emll::linear::DoubleVector::GetDataPointer;
+%ignore emll::linear::DoubleVector::DoubleVector(DoubleVector &&);
+%ignore emll::linear::DoubleVector::DoubleVector(std::vector<double> &&);
 
-%ignore linear::DoubleVector::operator[];
-%ignore linear::DoubleSubvector::operator[];
-%rename (GetValue) linear::DoubleVector::operator[](uint64_t) const;
-%rename (GetValue) linear::DoubleSubvector::operator[](uint64_t) const;
-%ignore linear::DoubleMatrixBase::operator()const;
+%ignore emll::linear::DoubleVector::operator[];
+%ignore emll::linear::DoubleSubvector::operator[];
+%rename (GetValue) emll::linear::DoubleVector::operator[](uint64_t) const;
+%rename (GetValue) emll::linear::DoubleSubvector::operator[](uint64_t) const;
+%ignore emll::linear::DoubleMatrixBase::operator()const;
 
 
 %include "DoubleVector.h"
@@ -35,11 +35,11 @@
 //%include "IVector.h"
 %include "IMatrix.h"
 
-WRAP_OP_AT(linear::DoubleVector, double)
-// WRAP_OP_AT(linear::DoubleSubvector, double)
+WRAP_OP_AT(emll::linear::DoubleVector, double)
+// WRAP_OP_AT(emll::linear::DoubleSubvector, double)
 
 #ifdef SWIGPYTHON
-%extend linear::DoubleMatrix
+%extend emll::linear::DoubleMatrix
 {
     const double& __getitem__(size_t i, size_t j)
     {
@@ -49,6 +49,6 @@ WRAP_OP_AT(linear::DoubleVector, double)
 
 #endif
 
-WRAP_PRINT_TO_STR(linear::DoubleVector)
-WRAP_PRINT_TO_STR(linear::DoubleSubvector)
-WRAP_PRINT_TO_STR(linear::DoubleMatrix)
+WRAP_PRINT_TO_STR(emll::linear::DoubleVector)
+WRAP_PRINT_TO_STR(emll::linear::DoubleSubvector)
+WRAP_PRINT_TO_STR(emll::linear::DoubleMatrix)

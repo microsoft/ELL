@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <type_traits>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary> An entry in a vector </summary>
@@ -15,9 +17,12 @@ namespace linear
         double value;
     };
 
-    // parent classes for iterators 
-    struct IIndexValueIterator {};
+    // parent classes for iterators
+    struct IIndexValueIterator
+    {
+    };
 
     template <typename IteratorType>
     using IsIndexValueIterator = typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IteratorType>::value, int>;
+}
 }

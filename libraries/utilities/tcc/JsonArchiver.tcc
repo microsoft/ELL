@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -15,14 +17,14 @@ namespace utilities
     void JsonArchiver::WriteScalar(const char* name, const ValueType& value)
     {
         auto indent = GetCurrentIndent();
-        bool hasName = name != std::string("");        
+        bool hasName = name != std::string("");
         auto endOfLine = hasName ? ",\n" : "";
 
         FinishPreviousLine();
         _out << indent;
         if (hasName)
         {
-            _out  << "\"" << name << "\": ";
+            _out << "\"" << name << "\": ";
         }
         _out << value;
         SetEndOfLine(endOfLine);
@@ -33,14 +35,14 @@ namespace utilities
     inline void JsonArchiver::WriteScalar(const char* name, const bool& value)
     {
         auto indent = GetCurrentIndent();
-        bool hasName = name != std::string("");        
+        bool hasName = name != std::string("");
         auto endOfLine = hasName ? ",\n" : "";
 
         FinishPreviousLine();
         _out << indent;
         if (hasName)
         {
-            _out  << "\"" << name << "\": ";
+            _out << "\"" << name << "\": ";
         }
         _out << (value ? "true" : "false");
         SetEndOfLine(endOfLine);
@@ -57,7 +59,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out  << "\"" << name << "\": ";
+            _out << "\"" << name << "\": ";
         }
         _out << "\"" << JsonUtilities::EncodeString(value) << "\"";
         SetEndOfLine(endOfLine);
@@ -73,7 +75,7 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out  << "\"" << name << "\": ";
+            _out << "\"" << name << "\": ";
         }
         _out << "\"" << JsonUtilities::EncodeString(value) << "\"";
         SetEndOfLine(endOfLine);
@@ -90,17 +92,17 @@ namespace utilities
         _out << indent;
         if (hasName)
         {
-            _out  << "\"" << name << "\": ";
+            _out << "\"" << name << "\": ";
         }
 
         _out << "[";
 
         // reset indent
         auto numItems = array.size();
-        for(size_t index = 0; index < numItems; ++index)
+        for (size_t index = 0; index < numItems; ++index)
         {
             Archive(array[index]);
-            if(index != numItems-1)
+            if (index != numItems - 1)
             {
                 _out << ", ";
             }
@@ -117,7 +119,7 @@ namespace utilities
     void JsonUnarchiver::ReadScalar(const char* name, ValueType& value)
     {
         bool hasName = name != std::string("");
-        if(hasName)
+        if (hasName)
         {
             MatchFieldName(name);
         }
@@ -128,9 +130,9 @@ namespace utilities
         valueStream >> value;
 
         // eat a comma if it exists
-        if(hasName)
+        if (hasName)
         {
-            if(_tokenizer.PeekNextToken() == ",")
+            if (_tokenizer.PeekNextToken() == ",")
             {
                 _tokenizer.ReadNextToken();
             }
@@ -141,7 +143,7 @@ namespace utilities
     inline void JsonUnarchiver::ReadScalar(const char* name, bool& value)
     {
         bool hasName = name != std::string("");
-        if(hasName)
+        if (hasName)
         {
             MatchFieldName(name);
         }
@@ -151,9 +153,9 @@ namespace utilities
         value = (valueToken == "true");
 
         // eat a comma if it exists
-        if(hasName)
+        if (hasName)
         {
-            if(_tokenizer.PeekNextToken() == ",")
+            if (_tokenizer.PeekNextToken() == ",")
             {
                 _tokenizer.ReadNextToken();
             }
@@ -161,10 +163,10 @@ namespace utilities
     }
 
     // This function is inline just so it appears next to the other Read* functions
-    inline void JsonUnarchiver::ReadScalar(const char* name, std::string& value) 
+    inline void JsonUnarchiver::ReadScalar(const char* name, std::string& value)
     {
         bool hasName = name != std::string("");
-        if(hasName)
+        if (hasName)
         {
             MatchFieldName(name);
         }
@@ -175,9 +177,9 @@ namespace utilities
         _tokenizer.MatchToken("\"");
 
         // eat a comma if it exists
-        if(hasName)
+        if (hasName)
         {
-            if(_tokenizer.PeekNextToken() == ",")
+            if (_tokenizer.PeekNextToken() == ",")
             {
                 _tokenizer.ReadNextToken();
             }
@@ -188,16 +190,16 @@ namespace utilities
     void JsonUnarchiver::ReadArray(const char* name, std::vector<ValueType>& array)
     {
         bool hasName = name != std::string("");
-        if(hasName)
+        if (hasName)
         {
             MatchFieldName(name);
         }
-                
+
         _tokenizer.MatchToken("[");
-        while(true)
+        while (true)
         {
             auto maybeEndArray = _tokenizer.PeekNextToken();
-            if(maybeEndArray == "]")
+            if (maybeEndArray == "]")
             {
                 break;
             }
@@ -206,7 +208,7 @@ namespace utilities
             Unarchive(obj);
             array.push_back(obj);
 
-            if(_tokenizer.PeekNextToken() == ",")
+            if (_tokenizer.PeekNextToken() == ",")
             {
                 _tokenizer.ReadNextToken();
             }
@@ -217,16 +219,16 @@ namespace utilities
     inline void JsonUnarchiver::ReadArray(const char* name, std::vector<std::string>& array)
     {
         bool hasName = name != std::string("");
-        if(hasName)
+        if (hasName)
         {
             MatchFieldName(name);
         }
-                
+
         _tokenizer.MatchToken("[");
-        while(true)
+        while (true)
         {
             auto maybeEndArray = _tokenizer.PeekNextToken();
-            if(maybeEndArray == "]")
+            if (maybeEndArray == "]")
             {
                 break;
             }
@@ -235,11 +237,12 @@ namespace utilities
             Unarchive(obj);
             array.push_back(obj);
 
-            if(_tokenizer.PeekNextToken() == ",")
+            if (_tokenizer.PeekNextToken() == ",")
             {
                 _tokenizer.ReadNextToken();
             }
         }
         _tokenizer.MatchToken("]");
     }
+}
 }

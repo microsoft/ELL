@@ -8,19 +8,21 @@
 
 #pragma once
 
-#include "Node.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
 #include "InputPort.h"
+#include "ModelTransformer.h"
+#include "Node.h"
 #include "OutputPort.h"
+#include "PortElements.h"
 
 // utilities
 #include "TypeName.h"
 
 // stl
-#include <string>
 #include <cmath>
+#include <string>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that takes a vector input and returns its magnitude </summary>
@@ -64,7 +66,7 @@ namespace nodes
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-        
+
     protected:
         virtual void Compute() const override;
 
@@ -75,6 +77,7 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+}
 }
 
 #include "../tcc/L2NormNode.tcc"

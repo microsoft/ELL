@@ -12,10 +12,12 @@
 #include "Exception.h"
 
 // stl
-#include <memory>
-#include <locale>
 #include <ios>
+#include <locale>
+#include <memory>
 
+namespace emll
+{
 namespace utilities
 {
     std::ifstream OpenIfstream(std::string filepath)
@@ -24,7 +26,7 @@ namespace utilities
         auto fs = std::ifstream(filepath);
 
         // check that it opened
-        if(!fs.is_open())
+        if (!fs.is_open())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "error openning file " + filepath);
         }
@@ -52,7 +54,7 @@ namespace utilities
         std::ifstream fs(filepath);
 
         // check that it opened
-        if(fs.is_open())
+        if (fs.is_open())
         {
             return true;
         }
@@ -63,14 +65,14 @@ namespace utilities
     std::string GetFileExtension(std::string filepath, bool toLowercase)
     {
         auto dotPos = filepath.find_last_of('.');
-        if(dotPos == std::string::npos)
+        if (dotPos == std::string::npos)
         {
             return "";
         }
         else
         {
-            auto ext = filepath.substr(dotPos+1);
-            if(toLowercase)
+            auto ext = filepath.substr(dotPos + 1);
+            if (toLowercase)
             {
                 return ext;
             }
@@ -80,4 +82,5 @@ namespace utilities
             }
         }
     }
+}
 }

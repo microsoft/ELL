@@ -14,11 +14,11 @@
 #include "DelayNode.h"
 
 // model
-#include "Node.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
 #include "InputPort.h"
+#include "ModelTransformer.h"
+#include "Node.h"
 #include "OutputPort.h"
+#include "PortElements.h"
 
 // utilities
 #include "TypeName.h"
@@ -27,6 +27,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that takes a vector input and returns its mean over some window of time. </summary>
@@ -90,6 +92,7 @@ namespace nodes
         mutable std::vector<ValueType> _runningSum;
         size_t _windowSize;
     };
+}
 }
 
 #include "../tcc/MovingAverageNode.tcc"

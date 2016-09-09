@@ -8,16 +8,19 @@
 
 #pragma once
 
+namespace emll
+{
 namespace predictors
 {
     /// <summary> Base class for predictors. </summary>
     ///
     /// <typeparam name="T"> The type of the predictions made by this predictor. </typeparam>
-    template<typename T>
+    template <typename T>
     class IPredictor
     {
     public:
         /// <summary> The prediction type. </summary>
         using PredictionType = T;
     };
+}
 }

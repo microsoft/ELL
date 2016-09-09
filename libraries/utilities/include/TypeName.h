@@ -10,11 +10,13 @@
 
 // stl
 #include <cstdint>
-#include <vector>
+#include <cstdint>
 #include <memory>
 #include <string>
-#include <cstdint>
+#include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     const char typeNameLeftBracket = '(';
@@ -270,6 +272,7 @@ namespace utilities
     /// <param name="baseType"> The base type (e.g., 'Vector') </param>
     /// <param name="subtypes"> The list of templated types (e.g., 'double') </param>
     std::string GetCompositeTypeName(std::string baseType, const std::vector<std::string>& subtypes);
+}
 }
 
 #include "../tcc/TypeName.tcc"

@@ -9,20 +9,22 @@
 #pragma once
 
 #include "Archiver.h"
-#include "TypeFactory.h"
-#include "TypeName.h"
 #include "Exception.h"
 #include "ObjectArchive.h"
+#include "TypeFactory.h"
+#include "TypeName.h"
 
 // stl
 #include <cstdint>
-#include <string>
-#include <sstream>
-#include <ostream>
-#include <vector>
-#include <type_traits>
 #include <memory>
+#include <ostream>
+#include <sstream>
+#include <string>
+#include <type_traits>
+#include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> An archiver that encodes data in an ObjectArchive </summary>
@@ -118,6 +120,7 @@ namespace utilities
         // The object description
         ObjectArchive _objectDescription;
     };
+}
 }
 
 #include "../tcc/ObjectArchiver.tcc"

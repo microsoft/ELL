@@ -8,8 +8,11 @@
 
 #pragma once
 
+namespace emll
+{
 void TestJsonArchiver();
 void TestJsonUnarchiver();
 
 void TestXmlArchiver();
 void TestXmlUnarchiver();
+}

@@ -12,28 +12,38 @@
 
 // stl
 #include <cstdint>
-#include <vector>
 #include <iostream>
+#include <vector>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary> Values that represent different matrix structures. </summary>
-    enum class MatrixStructure { column, row, columnSquare, rowSquare, rowSquareUptriangular, diagonal };
+    enum class MatrixStructure
+    {
+        column,
+        row,
+        columnSquare,
+        rowSquare,
+        rowSquareUptriangular,
+        diagonal
+    };
 
     /// <summary>
     /// Templated DoubleMatrix class with StructureType template arguments.
     /// </summary>
     ///
     /// <typeparam name="StructureType"> Type of the matrix structure to use. </typeparam>
-    template<MatrixStructure StructureType = MatrixStructure::row>
+    template <MatrixStructure StructureType = MatrixStructure::row>
     class DoubleMatrix
-    {};
+    {
+    };
 
     /// <summary> DoubleMatrix Base class. </summary>
     class DoubleMatrixBase : public std::vector<double>, public IMatrix
     {
     public:
-
         DoubleMatrixBase(DoubleMatrixBase&&) = default;
 
         DoubleMatrixBase(const DoubleMatrixBase&) = delete;
@@ -64,7 +74,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double& operator()(uint64_t i, uint64_t j) =0;
+        virtual double& operator()(uint64_t i, uint64_t j) = 0;
 
         /// <summary> Returns a reference to a matrix element </summary>
         ///
@@ -72,7 +82,7 @@ namespace linear
         /// <param name="j"> Zero-based column index. </param>
         ///
         /// <returns> A reference to the specified element. </returns>
-        virtual double operator()(uint64_t i, uint64_t j) const =0;    
+        virtual double operator()(uint64_t i, uint64_t j) const = 0;
 
         /// <summary> Performs a general matrix-vector product: y = alpha * M * x + beta * y. </summary>
         ///
@@ -109,11 +119,10 @@ namespace linear
     };
 
     /// <summary> Templated DoubleMatrix class specialization for column-major matrices. </summary>
-    template<>
+    template <>
     class DoubleMatrix<MatrixStructure::column> : public DoubleMatrixBase
     {
     public:
-
         /// <summary> Constructs a column major dense matrix. </summary>
         ///
         /// <param name="numRows"> Number of rows. </param>
@@ -138,11 +147,10 @@ namespace linear
     };
 
     /// <summary> Templated DoubleMatrix class specialization for row-major matrices. </summary>
-    template<>
+    template <>
     class DoubleMatrix<MatrixStructure::row> : public DoubleMatrixBase
     {
     public:
-
         /// <summary> Constructs a row major dense matrix. </summary>
         ///
         /// <param name="numRows"> Number of rows. </param>
@@ -169,11 +177,10 @@ namespace linear
     /// <summary>
     /// Templated DoubleMatrix class specialization for column-major square matrices.
     /// </summary>
-    template<>
+    template <>
     class DoubleMatrix<MatrixStructure::columnSquare> : public DoubleMatrix<MatrixStructure::column>
     {
     public:
-
         /// <summary> Constructs a column major square dense matrix. </summary>
         ///
         /// <param name="dimension"> The dimension. </param>
@@ -181,11 +188,10 @@ namespace linear
     };
 
     /// <summary> Templated DoubleMatrix class specialization for row-major square matrices. </summary>
-    template<>
+    template <>
     class DoubleMatrix<MatrixStructure::rowSquare> : public DoubleMatrix<MatrixStructure::row>
     {
     public:
-
         /// <summary> Constructs a row major square dense matrix. </summary>
         ///
         /// <param name="dimension"> The dimension. </param>
@@ -195,11 +201,10 @@ namespace linear
     /// <summary>
     /// Templated DoubleMatrix class specialization for row-major square upper-triangular matrices.
     /// </summary>
-    template<>
+    template <>
     class DoubleMatrix<MatrixStructure::rowSquareUptriangular> : public DoubleMatrixBase
     {
     public:
-
         /// <summary> Constructs a row major square upper-triangular dense matrix. </summary>
         ///
         /// <param name="dimension"> The dimension. </param>
@@ -251,11 +256,10 @@ namespace linear
     };
 
     /// <summary> Templated DoubleMatrix class specialization for diagonal matrices. </summary>
-    template<>
+    template <>
     class DoubleMatrix<MatrixStructure::diagonal> : public DoubleMatrixBase
     {
     public:
-
         /// <summary> Constructs a row major square upper-triangular dense matrix. </summary>
         ///
         /// <param name="dimension"> The dimension. </param>
@@ -305,4 +309,5 @@ namespace linear
     private:
         double _dummy = 0;
     };
+}
 }

@@ -8,19 +8,21 @@
 
 #pragma once
 
-#include "Node.h"
 #include "Model.h"
 #include "ModelTransformer.h"
+#include "Node.h"
 
 // utilities
 #include "Exception.h"
-#include "TypeName.h"
 #include "IArchivable.h"
+#include "TypeName.h"
 
 // stl
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs. </summary>
@@ -99,6 +101,7 @@ namespace nodes
         // Operation
         OperationType _operation;
     };
+}
 }
 
 #include "../tcc/BinaryOperationNode.tcc"

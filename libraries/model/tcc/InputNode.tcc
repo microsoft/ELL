@@ -6,20 +6,23 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
     template <typename ValueType>
-    InputNode<ValueType>::InputNode() : Node({}, { &_output }), _output(this, outputPortName, 0)
-    {};
+    InputNode<ValueType>::InputNode()
+        : Node({}, { &_output }), _output(this, outputPortName, 0){};
 
     template <typename ValueType>
-    InputNode<ValueType>::InputNode(size_t dimension) : Node({}, { &_output }), _output(this, outputPortName, dimension){};
+    InputNode<ValueType>::InputNode(size_t dimension)
+        : Node({}, { &_output }), _output(this, outputPortName, dimension){};
 
     template <typename ValueType>
     void InputNode<ValueType>::SetInput(ValueType inputValue)
     {
-        SetInput(std::vector<ValueType>{inputValue});
+        SetInput(std::vector<ValueType>{ inputValue });
     }
 
     template <typename ValueType>
@@ -55,4 +58,5 @@ namespace model
         Node::ReadFromArchive(archiver);
         archiver[outputPortName] >> _output;
     }
+}
 }

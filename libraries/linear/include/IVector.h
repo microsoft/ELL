@@ -14,6 +14,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace linear
 {
     class DoubleVector;
@@ -24,7 +26,6 @@ namespace linear
     class IVector : public Base
     {
     public:
-
         /// <summary> Returns the Size of the vector. </summary>
         ///
         /// <returns> The size of the vector. </returns>
@@ -63,4 +64,5 @@ namespace linear
         /// <returns> A dot product. </returns>
         virtual double Dot(const double* p_other) const = 0;
     };
+}
 }

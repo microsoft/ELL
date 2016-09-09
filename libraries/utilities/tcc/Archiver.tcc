@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -177,17 +179,17 @@ namespace utilities
         arr.clear();
         auto typeName = ValueType::GetTypeName();
         BeginUnarchiveArray(name, typeName);
-        while(true)
+        while (true)
         {
             auto good = BeginUnarchiveArrayItem(typeName);
-            if(!good)
+            if (!good)
             {
                 break;
             }
             ValueType value;
             Unarchive(value);
             arr.push_back(value);
-            EndUnarchiveArrayItem(typeName);            
+            EndUnarchiveArrayItem(typeName);
         }
         EndUnarchiveArray(name, typeName);
     }
@@ -199,17 +201,17 @@ namespace utilities
         arr.clear();
         auto typeName = ValueType::GetTypeName();
         BeginUnarchiveArray(name, typeName);
-        while(true)
+        while (true)
         {
-            auto good = BeginUnarchiveArrayItem(typeName);            
-            if(!good)
+            auto good = BeginUnarchiveArrayItem(typeName);
+            if (!good)
             {
                 break;
             }
             std::unique_ptr<ValueType> newPtr;
             Unarchive(newPtr);
             arr.push_back(std::move(newPtr));
-            EndUnarchiveArrayItem(typeName);            
+            EndUnarchiveArrayItem(typeName);
         }
         EndUnarchiveArray(name, typeName);
     }
@@ -221,18 +223,19 @@ namespace utilities
         arr.clear();
         auto typeName = ValueType::GetTypeName();
         BeginUnarchiveArray(name, typeName);
-        while(true)
+        while (true)
         {
-            auto good = BeginUnarchiveArrayItem(typeName);            
-            if(!good)
+            auto good = BeginUnarchiveArrayItem(typeName);
+            if (!good)
             {
                 break;
             }
             std::unique_ptr<ValueType> newPtr;
             Unarchive(newPtr);
             arr.push_back(newPtr.release());
-            EndUnarchiveArrayItem(typeName);            
+            EndUnarchiveArrayItem(typeName);
         }
         EndUnarchiveArray(name, typeName);
     }
+}
 }

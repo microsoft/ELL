@@ -10,9 +10,9 @@
 #include "Iterator_test.h"
 
 #include "IIterator.h"
+#include "ParallelTransformIterator.h"
 #include "StlIterator.h"
 #include "TransformIterator.h"
-#include "ParallelTransformIterator.h"
 
 // testing
 #include "testing.h"
@@ -23,21 +23,23 @@
 #include <numeric>
 #include <thread>
 
+namespace emll
+{
 void TestIteratorAdapter()
 {
     // utilities::StlIterator test
-    std::vector<int> vec { 1, 2, 3, 4, 5, 6 };
+    std::vector<int> vec{ 1, 2, 3, 4, 5, 6 };
     auto it = utilities::MakeStlIterator(vec.begin(), vec.end());
-    
+
     bool passed = true;
     int index = 0;
-    while(it.IsValid())
+    while (it.IsValid())
     {
         passed = passed && (it.Get() == vec[index]);
         it.Next();
         index++;
     }
-            
+
     testing::ProcessTest("utilities::StlIterator.Get", passed);
     testing::ProcessTest("utilities::StlIteratorlength", index == vec.size());
 }
@@ -45,9 +47,9 @@ void TestIteratorAdapter()
 float twoPointFiveTimes(int x)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    return float(2.5*x);
+    return float(2.5 * x);
 }
- 
+
 template <typename FuncType>
 std::chrono::milliseconds::rep timeIt(FuncType fn)
 {
@@ -60,7 +62,8 @@ std::chrono::milliseconds::rep timeIt(FuncType fn)
 class MillisecondTimer
 {
 public:
-    MillisecondTimer() : _start(std::chrono::system_clock::now()), _running(true) {}
+    MillisecondTimer()
+        : _start(std::chrono::system_clock::now()), _running(true) {}
     void Start()
     {
         _start = std::chrono::system_clock::now();
@@ -83,7 +86,6 @@ public:
         return std::chrono::duration_cast<std::chrono::milliseconds>(_end - _start).count();
     }
 
-
 private:
     std::chrono::system_clock::time_point _start;
     std::chrono::system_clock::time_point _end;
@@ -101,9 +103,9 @@ void TestTransformIterator()
     MillisecondTimer timer;
     bool passed = true;
     int index = 0;
-    while(transIt.IsValid())
+    while (transIt.IsValid())
     {
-        passed = passed && transIt.Get() == float(2.5*vec[index]);
+        passed = passed && transIt.Get() == float(2.5 * vec[index]);
         transIt.Next();
         index++;
     }
@@ -124,13 +126,14 @@ void TestParallelTransformIterator()
     bool passed = true;
     MillisecondTimer timer;
     int index = 0;
-    while(transIt.IsValid())
+    while (transIt.IsValid())
     {
-        passed = passed && transIt.Get() == float(2.5*vec[index]);
+        passed = passed && transIt.Get() == float(2.5 * vec[index]);
         transIt.Next();
         index++;
     }
     testing::ProcessTest("utilities::ParallelTransformIterator.Get", passed);
     auto elapsed = timer.Elapsed();
     std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
+}
 }

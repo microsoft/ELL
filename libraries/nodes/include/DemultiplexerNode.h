@@ -8,24 +8,26 @@
 
 #pragma once
 
-#include "ConstantNode.h"
 #include "BinaryPredicateNode.h"
-#include "TypeCastNode.h"
+#include "ConstantNode.h"
 #include "MultiplexerNode.h"
+#include "TypeCastNode.h"
 
 // model
-#include "Node.h"
 #include "InputPort.h"
+#include "Node.h"
 #include "OutputPort.h"
 
 // utilities
 #include "TypeName.h"
 
 // stl
-#include <vector>
-#include <memory>
 #include <exception>
+#include <memory>
+#include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace nodes
 {
@@ -50,7 +52,7 @@ namespace nodes
         ///
         /// <param name="input"> The input value. </param>
         /// <param name="selector"> The index of the chosen element to recieve the value </param>
-        DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue=0);
+        DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue = 0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -92,6 +94,7 @@ namespace nodes
         // Default value
         ValueType _defaultValue;
     };
+}
 }
 
 #include "../tcc/DemultiplexerNode.tcc"

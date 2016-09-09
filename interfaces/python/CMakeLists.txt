@@ -14,7 +14,6 @@ include_directories(${PYTHON_INCLUDE_PATH})
 
 generate_interface(python ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "" ${PYTHON_INCLUDE_PATH})
 
-# Note: need to use /usr/bin/python on my OS X install -- TODO: autodetect where python is
 # tests
 #add_test(NAME python_interface_test
 #         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} 

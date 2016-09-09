@@ -8,19 +8,21 @@
 
 #pragma once
 
-#include "Node.h"
 #include "Model.h"
 #include "ModelTransformer.h"
+#include "Node.h"
 
 // utilities
 #include "Exception.h"
-#include "TypeName.h"
 #include "IArchivable.h"
+#include "TypeName.h"
 
 // stl
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that performs a coordinatewise binary boolean-valued operation on its inputs. </summary>
@@ -98,6 +100,7 @@ namespace nodes
         // Operation
         PredicateType _predicate;
     };
+}
 }
 
 #include "../tcc/BinaryPredicateNode.tcc"

@@ -11,13 +11,19 @@
 // stl
 #include <memory>
 
+namespace emll
+{
 namespace predictors
 {
-    LinearPredictor::LinearPredictor() : _b(0)
-    {}
+    LinearPredictor::LinearPredictor()
+        : _b(0)
+    {
+    }
 
-    LinearPredictor::LinearPredictor(uint64_t dim) : _w(dim), _b(0)
-    {}
+    LinearPredictor::LinearPredictor(uint64_t dim)
+        : _w(dim), _b(0)
+    {
+    }
 
     void LinearPredictor::Reset()
     {
@@ -60,4 +66,5 @@ namespace predictors
         _w = w;
         archiver["b"] >> _b;
     }
+}
 }

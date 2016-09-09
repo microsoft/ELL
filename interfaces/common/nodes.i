@@ -21,8 +21,8 @@
 #include "MovingVarianceNode.h"
 %}
 
-%ignore nodes::LinearPredictorSubModelOutputs;
-%ignore nodes::BuildSubModel;
+%ignore emll::nodes::LinearPredictorSubModelOutputs;
+%ignore emll::nodes::BuildSubModel;
 
 %include "AccumulatorNode.h"
 %include "BinaryOperationNode.h"

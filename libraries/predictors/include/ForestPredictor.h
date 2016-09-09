@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include "ConstantPredictor.h"
 #include "IPredictor.h"
 #include "SingleElementThresholdPredictor.h"
-#include "ConstantPredictor.h"
 
 // dataset
 #include "DenseDataVector.h"
@@ -19,11 +19,13 @@
 #include "IArchivable.h"
 
 // stl
-#include <vector>
 #include <algorithm>
-#include <iterator>
 #include <functional>
+#include <iterator>
+#include <vector>
 
+namespace emll
+{
 namespace predictors
 {
     /// <summary> Implements a forest of decision/regression trees. Split rules: Each interior node in
@@ -39,14 +41,14 @@ namespace predictors
     ///
     /// <typeparam name="SplitRuleType"> Type of split rule to use in interior nodes. </typeparam>
     /// <typeparam name="EdgePredictorType"> Type of predictor to associate with each edge. </typeparam>
-    template<typename SplitRuleType, typename EdgePredictorType>
+    template <typename SplitRuleType, typename EdgePredictorType>
     class ForestPredictor : public IPredictor<double>, public utilities::IArchivable
     {
     public:
         /// <summary> A struct that identifies a splittable node in the forest. The splittable node can be
         /// the root of a new tree, or a node in an existing tree. This stuct can only be created by
         /// calling GetNewRootId() or GetChildId(). </summary>
-        class SplittableNodeId 
+        class SplittableNodeId
         {
         public:
             /// <summary> Prints the node Id. </summary>
@@ -56,7 +58,8 @@ namespace predictors
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
-            SplittableNodeId() : _isRoot(true) {}
+            SplittableNodeId()
+                : _isRoot(true) {}
             SplittableNodeId(size_t parentNodeIndex, size_t childPosition);
 
             bool _isRoot;
@@ -84,18 +87,18 @@ namespace predictors
             ///
             /// <param name="os"> The output stream. </param>
             /// <param name="tabs"> The number of tabs. </param>
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
+            void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
             SplittableNodeId _nodeId;
-            SplitRuleType _splitRule;           
+            SplitRuleType _splitRule;
             std::vector<EdgePredictorType> _edgePredictors;
         };
 
         class Edge : public utilities::IArchivable
         {
-        public:            
+        public:
             Edge() = default;
 
             /// <summary> Constructs an instance of Edge. </summary>
@@ -142,7 +145,7 @@ namespace predictors
             ///
             /// <param name="os"> [in,out] Stream to write data to. </param>
             /// <param name="tabs"> The tabs. </param>
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
+            void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
@@ -156,7 +159,7 @@ namespace predictors
         {
         public:
             InteriorNode() = default;
-            
+
             /// <summary> Gets the split rule. </summary>
             ///
             /// <returns> The split rule. </returns>
@@ -176,7 +179,7 @@ namespace predictors
             ///
             /// <param name="os"> [in,out] The output stream. </param>
             /// <param name="tabs"> The number of tabs. </param>
-            void PrintLine(std::ostream& os, size_t tabs=0) const;
+            void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
@@ -210,7 +213,7 @@ namespace predictors
         ///
         /// <returns> true if the forest is trivial. </returns>
         bool IsTrivial() const;
-        
+
         /// <summary> Gets the number of trees in the forest. </summary>
         ///
         /// <returns> The number of tress. </returns>
@@ -249,7 +252,7 @@ namespace predictors
         /// <param name="input"> The input vector. </param>
         ///
         /// <returns> The prediction. </returns>
-        template<typename RandomAccessVectorType>
+        template <typename RandomAccessVectorType>
         double Predict(const RandomAccessVectorType& input) const;
 
         /// <summary> Returns the output of a given subtree for a given input. </summary>
@@ -260,7 +263,7 @@ namespace predictors
         /// <param name="treeIndex"> The index of the subtree root. </param>
         ///
         /// <returns> The prediction. </returns>
-        template<typename RandomAccessVectorType>
+        template <typename RandomAccessVectorType>
         double Predict(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
 
         /// <summary> Generates the edge path indicator vector of the entire forest. </summary>
@@ -270,7 +273,7 @@ namespace predictors
         /// <param name="input"> The input vector. </param>
         ///
         /// <returns> The edge indicator vector. </returns>
-        template<typename RandomAccessVectorType>
+        template <typename RandomAccessVectorType>
         std::vector<bool> GetEdgeIndicatorVector(const RandomAccessVectorType& input) const;
 
         /// <summary> Generates the edge path indicator vector of a given subtree for a given input. The
@@ -282,7 +285,7 @@ namespace predictors
         /// <param name="interiorNodeIndex"> Zero-based index of the interior node. </param>
         ///
         /// <returns> The edge indicator vector. </returns>
-        template<typename RandomAccessVectorType>
+        template <typename RandomAccessVectorType>
         std::vector<bool> GetEdgeIndicatorVector(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
 
         /// <summary> Gets a SplittableNodeId that represents the root of a new tree. </summary>
@@ -336,7 +339,7 @@ namespace predictors
         ///
         /// <param name="os"> [in,out] The output stream. </param>
         /// <param name="tabs"> The number of tabs. </param>
-        void PrintLine(std::ostream& os, size_t tabs=0) const;
+        void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -361,13 +364,13 @@ namespace predictors
     protected:
         //
         // protected member functions
-        // 
-        template<typename RandomAccessVectorType>
+        //
+        template <typename RandomAccessVectorType>
         void SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& edgeIndicator, size_t interiorNodeIndex) const;
 
         size_t AddInteriorNode(const SplitAction& splitAction);
 
-        template<typename RandomAccessVectorType>
+        template <typename RandomAccessVectorType>
         void VisitEdgePathToLeaf(const RandomAccessVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const;
 
         //
@@ -376,11 +379,12 @@ namespace predictors
         std::vector<InteriorNode> _interiorNodes;
         std::vector<size_t> _rootIndices;
         double _bias = 0.0;
-        size_t _numEdges = 0; 
+        size_t _numEdges = 0;
     };
 
     /// <summary> A simple binary tree with single-input threshold rules and constant predictors in its edges. </summary>
     typedef ForestPredictor<SingleElementThresholdPredictor, ConstantPredictor> SimpleForestPredictor;
+}
 }
 
 #include "../tcc/ForestPredictor.tcc"

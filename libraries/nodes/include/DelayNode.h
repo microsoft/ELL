@@ -9,21 +9,23 @@
 #pragma once
 
 // model
-#include "Node.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
 #include "InputPort.h"
+#include "ModelTransformer.h"
+#include "Node.h"
 #include "OutputPort.h"
+#include "PortElements.h"
 
 // utilities
 #include "Exception.h"
-#include "TypeName.h"
 #include "IArchivable.h"
+#include "TypeName.h"
 
 // stl
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that returns a delayed sample of the input signal. </summary>
@@ -45,7 +47,7 @@ namespace nodes
         /// <param name="input"> The signal to delay </param>
         /// <param name="windowSize"> The number of samples to delay the signal </param>
         DelayNode(const model::PortElements<ValueType>& input, size_t windowSize);
-        
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -83,6 +85,7 @@ namespace nodes
         mutable std::vector<std::vector<ValueType>> _samples;
         size_t _windowSize;
     };
+}
 }
 
 #include "../tcc/DelayNode.tcc"

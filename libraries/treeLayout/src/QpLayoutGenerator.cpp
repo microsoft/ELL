@@ -8,14 +8,19 @@
 
 #include "QpLayoutGenerator.h"
 
+namespace emll
+{
 namespace treeLayout
 {
-    QpLayoutGenerator::QpLayoutGenerator(const Parameters& parameters) : _parameters(parameters)
-    {}
+    QpLayoutGenerator::QpLayoutGenerator(const Parameters& parameters)
+        : _parameters(parameters)
+    {
+    }
 
-    QpLayoutGenerator::VertexInfo::VertexInfo(uint64_t i, double s) :
-        index(i), space_left(s)
-    {}
+    QpLayoutGenerator::VertexInfo::VertexInfo(uint64_t i, double s)
+        : index(i), space_left(s)
+    {
+    }
 
     void QpLayoutGenerator::Project()
     {
@@ -30,7 +35,7 @@ namespace treeLayout
         // get current layer and its Size
         auto& layer = _layers[layer_index];
         uint64_t size = (uint64_t)layer.size();
-        uint64_t first_unset = 0;    // index of the first coordinate in the layer that is not yet set
+        uint64_t first_unset = 0; // index of the first coordinate in the layer that is not yet set
 
         // iterate until all offsets at this layer are set
         while (first_unset < size)
@@ -42,7 +47,7 @@ namespace treeLayout
             for (uint64_t i = 1; first_unset + i < size; ++i)
             {
                 shifted_sum += _offsets[layer[first_unset + i].index] - layer[first_unset + i].space_left;
-                double shifted_mean = shifted_sum / (i+1);
+                double shifted_mean = shifted_sum / (i + 1);
                 if (shifted_mean <= min_shifted_mean)
                 {
                     min_shifted_mean = shifted_mean;
@@ -96,4 +101,5 @@ namespace treeLayout
 
         return l;
     }
+}
 }

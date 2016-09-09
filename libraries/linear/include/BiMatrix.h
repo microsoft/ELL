@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary>
@@ -20,11 +22,10 @@ namespace linear
     /// </summary>
     ///
     /// <typeparam name="RowMatrixType"> The type used to store each copy of the matrix. </typeparam>
-    template<typename RowMatrixType>
+    template <typename RowMatrixType>
     class BiMatrix : public RowMatrixType
     {
     public:
-        
         /// <summary> The type of each row. </summary>
         using RowType = typename RowMatrixType::RowType;
 
@@ -52,6 +53,7 @@ namespace linear
     private:
         RowMatrixType _transp;
     };
+}
 }
 
 #include "../tcc/BiMatrix.tcc"

@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -13,13 +15,15 @@ namespace model
     // OutputPort
     //
     template <typename ValueType>
-    OutputPort<ValueType>::OutputPort(const class Node* node, std::string name, size_t size) : OutputPortBase(node, name, OutputPortBase::GetPortType<ValueType>(), size)
-    {}
+    OutputPort<ValueType>::OutputPort(const class Node* node, std::string name, size_t size)
+        : OutputPortBase(node, name, OutputPortBase::GetPortType<ValueType>(), size)
+    {
+    }
 
     template <typename ValueType>
     ValueType OutputPort<ValueType>::GetOutput(size_t index) const
-    { 
-        return _cachedOutput[index]; 
+    {
+        return _cachedOutput[index];
     }
 
     template <typename ValueType>
@@ -38,5 +42,6 @@ namespace model
     void OutputPort<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         OutputPortBase::ReadFromArchive(archiver);
-    }    
+    }
+}
 }

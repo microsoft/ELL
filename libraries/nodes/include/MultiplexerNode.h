@@ -8,19 +8,21 @@
 
 #pragma once
 
-#include "Node.h"
 #include "InputPort.h"
+#include "Node.h"
 #include "OutputPort.h"
 
 // utilities
-#include "TypeName.h"
 #include "IArchivable.h"
+#include "TypeName.h"
 
 // stl
-#include <vector>
-#include <memory>
 #include <exception>
+#include <memory>
+#include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace nodes
 {
@@ -80,6 +82,7 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+}
 }
 
 #include "../tcc/MultiplexerNode.tcc"

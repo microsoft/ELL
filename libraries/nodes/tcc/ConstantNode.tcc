@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> nodes namespace </summary>
 namespace nodes
 {
@@ -13,16 +15,18 @@ namespace nodes
 
     // Default constructor
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode() : Node({}, { &_output }), _output(this, outputPortName, 1) {};
+    ConstantNode<ValueType>::ConstantNode()
+        : Node({}, { &_output }), _output(this, outputPortName, 1){};
 
     // Constructor for a scalar constant
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(ValueType value) : Node({}, { &_output }), _output(this, outputPortName, 1), _values({ value })
-    {};
+    ConstantNode<ValueType>::ConstantNode(ValueType value)
+        : Node({}, { &_output }), _output(this, outputPortName, 1), _values({ value }){};
 
     // Constructor for a vector constant
     template <typename ValueType>
-    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values) : Node({}, { &_output }), _output(this, outputPortName, values.size()), _values(values){};
+    ConstantNode<ValueType>::ConstantNode(const std::vector<ValueType>& values)
+        : Node({}, { &_output }), _output(this, outputPortName, values.size()), _values(values){};
 
     template <typename ValueType>
     void ConstantNode<ValueType>::Compute() const
@@ -34,7 +38,7 @@ namespace nodes
     void ConstantNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newNode = transformer.AddNode<ConstantNode<ValueType>>(_values);
-         transformer.MapNodeOutput(output, newNode->output);
+        transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
@@ -52,4 +56,5 @@ namespace nodes
         archiver[outputPortName] >> _output;
         archiver["values"] >> _values;
     }
+}
 }

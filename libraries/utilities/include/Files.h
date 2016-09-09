@@ -12,6 +12,8 @@
 #include <fstream>
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> Opens an std::ifstream and throws an exception if a problem occurs. </summary>
@@ -40,5 +42,6 @@ namespace utilities
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> The file extension, not including the ".". </returns>
-    std::string GetFileExtension(std::string filepath, bool toLowercase=false);
+    std::string GetFileExtension(std::string filepath, bool toLowercase = false);
+}
 }

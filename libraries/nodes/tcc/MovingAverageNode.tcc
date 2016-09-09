@@ -6,17 +6,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     template <typename ValueType>
-    MovingAverageNode<ValueType>::MovingAverageNode() : Node({&_input}, {&_output}), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _windowSize(0)
-    {}
+    MovingAverageNode<ValueType>::MovingAverageNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _windowSize(0)
+    {
+    }
 
     template <typename ValueType>
-    MovingAverageNode<ValueType>::MovingAverageNode(const model::PortElements<ValueType>& input, size_t windowSize) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
+    MovingAverageNode<ValueType>::MovingAverageNode(const model::PortElements<ValueType>& input, size_t windowSize)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _windowSize(windowSize)
     {
         auto dimension = _input.Size();
-        for(size_t index = 0; index < _windowSize; ++index)
+        for (size_t index = 0; index < _windowSize; ++index)
         {
             _samples.push_back(std::vector<ValueType>(dimension));
         }
@@ -32,9 +37,9 @@ namespace nodes
         _samples.erase(_samples.begin());
 
         std::vector<ValueType> result(_input.Size());
-        for(size_t index = 0; index < inputSample.size(); ++index)
+        for (size_t index = 0; index < inputSample.size(); ++index)
         {
-            _runningSum[index] += (inputSample[index]-lastBufferedSample[index]);
+            _runningSum[index] += (inputSample[index] - lastBufferedSample[index]);
             result[index] = _runningSum[index] / _windowSize;
         }
         _output.SetOutput(result);
@@ -82,10 +87,11 @@ namespace nodes
         auto dimension = _input.Size();
         _samples.clear();
         _samples.reserve(_windowSize);
-        for(size_t index = 0; index < _windowSize; ++index)
+        for (size_t index = 0; index < _windowSize; ++index)
         {
             _samples.push_back(std::vector<ValueType>(dimension));
         }
         _runningSum = std::vector<ValueType>(dimension);
     }
+}
 }

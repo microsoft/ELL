@@ -8,20 +8,22 @@
 
 #pragma once
 
-#include "Node.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
 #include "InputPort.h"
+#include "ModelTransformer.h"
+#include "Node.h"
 #include "OutputPort.h"
+#include "PortElements.h"
 
 // utilities
 #include "TypeName.h"
 
 // stl
-#include <string>
 #include <cmath>
+#include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that represents a unary function of its input </summary>
@@ -41,7 +43,7 @@ namespace nodes
         {
             none,
             sqrt, // real only
-            logicalNot   // bool only
+            logicalNot // bool only
         };
 
         /// <summary> Default Constructor </summary>
@@ -82,7 +84,7 @@ namespace nodes
     private:
         template <typename Operation>
         std::vector<ValueType> ComputeOutput(Operation&& function) const;
- 
+
         // Inputs
         model::InputPort<ValueType> _input;
 
@@ -92,6 +94,7 @@ namespace nodes
         // Operation
         OperationType _operation;
     };
+}
 }
 
 #include "../tcc/UnaryOperationNode.tcc"

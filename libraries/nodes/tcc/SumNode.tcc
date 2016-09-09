@@ -6,15 +6,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     template <typename ValueType>
-    SumNode<ValueType>::SumNode() : Node({&_input}, {&_output}), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
+    SumNode<ValueType>::SumNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
     {
     }
 
     template <typename ValueType>
-    SumNode<ValueType>::SumNode(const model::PortElements<ValueType>& input) : Node({&_input}, {&_output}), _input(this, input, inputPortName), _output(this, outputPortName, 1)
+    SumNode<ValueType>::SumNode(const model::PortElements<ValueType>& input)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1)
     {
     }
 
@@ -22,7 +26,7 @@ namespace nodes
     void SumNode<ValueType>::Compute() const
     {
         ValueType result = 0;
-        for(size_t index = 0; index < _input.Size(); ++index)
+        for (size_t index = 0; index < _input.Size(); ++index)
         {
             auto v = _input[index];
             result += v;
@@ -53,4 +57,5 @@ namespace nodes
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
     }
+}
 }

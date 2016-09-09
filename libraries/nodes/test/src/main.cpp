@@ -20,6 +20,8 @@
 // stl
 #include <iostream>
 
+using namespace emll;
+
 /// Runs all tests
 ///
 int main()
@@ -30,7 +32,7 @@ int main()
         TestAccumulatorNodeCompute();
         TestDelayNodeCompute();
         TestMovingAverageNodeCompute();
-        TestMovingVarianceNodeCompute(); 
+        TestMovingVarianceNodeCompute();
         TestUnaryOperationNodeCompute();
         TestBinaryOperationNodeCompute();
         TestLinearPredictorNodeCompute();
@@ -38,10 +40,10 @@ int main()
 
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();
-        TestSimpleForestNodeRefine();
+        TestSimpleForestPredictorNodeRefine();
         TestDemultiplexerNodeRefine();
     }
-    catch(const utilities::Exception& exception)
+    catch (const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
         throw;

@@ -11,6 +11,8 @@
 // utilites
 #include "Exception.h"
 
+namespace emll
+{
 namespace trainers
 {
     //
@@ -32,7 +34,7 @@ namespace trainers
 
     double ForestTrainerBase::Sums::GetMeanLabel() const
     {
-        if(sumWeights == 0)
+        if (sumWeights == 0)
         {
             throw utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "Can't compute mean because sum of weights equals zero");
         }
@@ -47,7 +49,8 @@ namespace trainers
     //
     // NodeRanges
     //
-    ForestTrainerBase::NodeRanges::NodeRanges(const Range& totalRange) : _firstIndex(2)
+    ForestTrainerBase::NodeRanges::NodeRanges(const Range& totalRange)
+        : _firstIndex(2)
     {
         _firstIndex[0] = totalRange.firstIndex;
         _firstIndex[1] = totalRange.firstIndex + totalRange.size;
@@ -60,41 +63,43 @@ namespace trainers
 
     ForestTrainerBase::Range ForestTrainerBase::NodeRanges::GetChildRange(size_t childPosition) const
     {
-        if(childPosition+1 >= _firstIndex.size())
+        if (childPosition + 1 >= _firstIndex.size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }
 
-        return Range{ _firstIndex[childPosition], _firstIndex[childPosition+1] - _firstIndex[childPosition] };
+        return Range{ _firstIndex[childPosition], _firstIndex[childPosition + 1] - _firstIndex[childPosition] };
     }
 
     void ForestTrainerBase::NodeRanges::SplitChildRange(size_t childPosition, size_t size)
     {
-        if(childPosition+1 >= _firstIndex.size())
+        if (childPosition + 1 >= _firstIndex.size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }
 
         auto childIterator = _firstIndex.begin() + childPosition;
-        if(*childIterator + size > *(childIterator+1))
+        if (*childIterator + size > *(childIterator + 1))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "size too big");
         }
 
-        _firstIndex.insert(childIterator+1, *childIterator + size);
+        _firstIndex.insert(childIterator + 1, *childIterator + size);
     }
 
     //
     // NodeStats
     //
 
-    void ForestTrainerBase::NodeStats::SetChildSums(std::vector<Sums> childSums) 
-    { 
-        _childSums = childSums; 
-    } 
+    void ForestTrainerBase::NodeStats::SetChildSums(std::vector<Sums> childSums)
+    {
+        _childSums = childSums;
+    }
 
-    ForestTrainerBase::NodeStats::NodeStats(const Sums& totalSums) : _totalSums(totalSums), _childSums(2)
-    {}
+    ForestTrainerBase::NodeStats::NodeStats(const Sums& totalSums)
+        : _totalSums(totalSums), _childSums(2)
+    {
+    }
 
     const ForestTrainerBase::Sums& ForestTrainerBase::NodeStats::GetChildSums(size_t position) const
     {
@@ -104,7 +109,7 @@ namespace trainers
     //
     // debugging code
     //
-    void ForestTrainerBase::ExampleMetadata::Print(std::ostream & os) const
+    void ForestTrainerBase::ExampleMetadata::Print(std::ostream& os) const
     {
         os << "(" << strong.weight << ", " << strong.label << ", " << weak.weight << ", " << weak.label << ", " << currentOutput << ")";
     }
@@ -113,16 +118,17 @@ namespace trainers
     {
         os << std::string(tabs * 4, ' ') << "stats:\n";
 
-        os << std::string((tabs+1) * 4, ' ') <<  "sums:\t";
+        os << std::string((tabs + 1) * 4, ' ') << "sums:\t";
         _totalSums.Print(os);
         os << "\n";
 
-        os << std::string((tabs+1) * 4, ' ') <<  "sums0:\t";
+        os << std::string((tabs + 1) * 4, ' ') << "sums0:\t";
         _childSums[0].Print(os);
         os << "\n";
 
-        os << std::string((tabs+1) * 4, ' ') <<  "sums1:\t";
+        os << std::string((tabs + 1) * 4, ' ') << "sums1:\t";
         _childSums[1].Print(os);
         os << "\n";
     }
+}
 }

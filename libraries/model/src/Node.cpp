@@ -17,11 +17,13 @@
 // stl
 #include <unordered_set>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
-    Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) : _id(NodeId()), _inputs(inputs), _outputs(outputs)
-    {};
+    Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs)
+        : _id(NodeId()), _inputs(inputs), _outputs(outputs){};
 
     void Node::AddInputPort(InputPortBase* input)
     {
@@ -41,14 +43,14 @@ namespace model
         return std::vector<const Node*>{ nodes.begin(), nodes.end() };
     }
 
-    void Node::AddDependent(const Node* dependent) const 
+    void Node::AddDependent(const Node* dependent) const
     {
-        _dependentNodes.push_back(dependent); 
+        _dependentNodes.push_back(dependent);
     }
 
     void Node::RegisterDependencies() const
     {
-        for (const auto& input : _inputs) 
+        for (const auto& input : _inputs)
         {
             for (const auto& node : input->GetParentNodes())
             {
@@ -91,4 +93,5 @@ namespace model
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         newContext.MapNode(oldId, this);
     }
+}
 }

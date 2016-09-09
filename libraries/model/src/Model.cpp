@@ -7,12 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Model.h"
-#include "Port.h"
 #include "Node.h"
+#include "Port.h"
 
 // stl
 #include <unordered_map>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -41,7 +43,7 @@ namespace model
     {
         std::vector<const Node*> nodes;
         auto nodeIter = GetNodeIterator();
-        while(nodeIter.IsValid())
+        while (nodeIter.IsValid())
         {
             nodes.push_back(nodeIter.Get());
             nodeIter.Next();
@@ -50,7 +52,7 @@ namespace model
         archiver["nodes"] << nodes;
     }
 
-    void Model::ReadFromArchive(utilities::Unarchiver& archiver) 
+    void Model::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         ModelSerializationContext modelContext(archiver.GetContext(), this);
         archiver.PushContext(modelContext);
@@ -60,7 +62,7 @@ namespace model
         archiver["nodes"] >> nodes;
 
         // Now add them to the model
-        for(auto& node: nodes)
+        for (auto& node : nodes)
         {
             std::shared_ptr<Node> sharedNode = std::shared_ptr<Node>(node.release());
             sharedNode->RegisterDependencies();
@@ -73,7 +75,8 @@ namespace model
     // NodeIterator implementation
     //
 
-    NodeIterator::NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes) : _model(model)
+    NodeIterator::NodeIterator(const Model* model, const std::vector<const Node*>& outputNodes)
+        : _model(model)
     {
         _currentNode = nullptr;
         _visitFullModel = false;
@@ -146,7 +149,6 @@ namespace model
                     for (const auto& child : ModelImpl::Reverse(dependentNodes)) // Visiting the children in reverse order more closely retains the order the nodes were originally created
                     {
                         // note: this is kind of inefficient --- we're going to push multiple copies of child on the stack. But we'll check if we've visited it already when we pop it off.
-                        // TODO: optimize this if it's a problem
                         _stack.push_back(child);
                     }
                 }
@@ -170,11 +172,12 @@ namespace model
 
     //
     // ModelSerializationContext
-    //    
-    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model) : _originalContext(otherContext), _model(model) 
+    //
+    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model)
+        : _originalContext(otherContext), _model(model)
     {
     }
-    
+
     Node* ModelSerializationContext::GetNodeFromId(const Node::NodeId& id)
     {
         return _oldToNewNodeMap[id];
@@ -184,4 +187,5 @@ namespace model
     {
         _oldToNewNodeMap[id] = node;
     }
+}
 }

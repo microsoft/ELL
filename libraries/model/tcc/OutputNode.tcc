@@ -6,16 +6,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode() : Node({&_input}, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
-    {};
+    OutputNode<ValueType>::OutputNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
 
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input) : Node({&_input}, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size())
-    {};
+    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
 
     template <typename ValueType>
     void OutputNode<ValueType>::Compute() const
@@ -46,4 +48,5 @@ namespace model
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
     }
+}
 }

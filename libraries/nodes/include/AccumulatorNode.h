@@ -9,19 +9,21 @@
 #pragma once
 
 // model
-#include "Node.h"
 #include "Model.h"
 #include "ModelTransformer.h"
+#include "Node.h"
 
 // utilities
 #include "Exception.h"
-#include "TypeName.h"
 #include "IArchivable.h"
+#include "TypeName.h"
 
 // stl
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that accumulates a running sum of its input. </summary>
@@ -79,6 +81,7 @@ namespace nodes
         // Buffer
         mutable std::vector<ValueType> _accumulator;
     };
+}
 }
 
 #include "../tcc/AccumulatorNode.tcc"

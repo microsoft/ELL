@@ -7,22 +7,24 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // utilities
-#include "CommandLineParser.h" 
-#include "OutputStreamImpostor.h"
+#include "CommandLineParser.h"
 #include "Exception.h"
+#include "OutputStreamImpostor.h"
 
 // model
+#include "InputNode.h"
 #include "Model.h"
 #include "ModelTransformer.h"
-#include "InputNode.h"
 
 // common
 #include "LoadModel.h"
 
 // stl
-#include<iostream>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
+
+using namespace emll;
 
 int main(int argc, char* argv[])
 {
@@ -41,7 +43,6 @@ int main(int argc, char* argv[])
         model::TransformContext context;
         model::ModelTransformer transformer;
         auto newModel = transformer.RefineModel(model, context);
-        // TODO: need to get the output port we care about somehow
 
         auto inputNodes = newModel.GetNodesByType<model::InputNode<double>>();
         // auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);

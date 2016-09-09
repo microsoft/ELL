@@ -7,18 +7,23 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SingleElementThresholdNode.h"
-#include "ConstantNode.h"
 #include "BinaryPredicateNode.h"
+#include "ConstantNode.h"
 
 // dataset
 #include "DenseDataVector.h"
 
+namespace emll
+{
 namespace nodes
 {
-    SingleElementThresholdNode::SingleElementThresholdNode() : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
-    {}
+    SingleElementThresholdNode::SingleElementThresholdNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
+    {
+    }
 
-    SingleElementThresholdNode::SingleElementThresholdNode(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
+    SingleElementThresholdNode::SingleElementThresholdNode(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
     {
         assert(input.Size() > predictor.GetElementIndex());
     }
@@ -38,7 +43,7 @@ namespace nodes
         archiver[outputPortName] >> _output;
         archiver["predictor"] >> _predictor;
     }
-    
+
     void SingleElementThresholdNode::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
@@ -76,4 +81,5 @@ namespace nodes
     {
         return transformer.AddNode<SingleElementThresholdNode>(input, predictor);
     }
+}
 }

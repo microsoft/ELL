@@ -8,20 +8,22 @@
 
 #pragma once
 
-#include "Node.h"
 #include "InputPort.h"
+#include "Node.h"
 #include "OutputPort.h"
 
 // utilities
-#include "IIterator.h"
 #include "IArchivable.h"
+#include "IIterator.h"
 
 // stl
-#include <vector>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -173,7 +175,7 @@ namespace model
 
     /// <summary> A serialization context used during model deserialization. Wraps an existing `SerializationContext`
     /// and adds access to the model being constructed. </summary>
-    class ModelSerializationContext: public utilities::SerializationContext
+    class ModelSerializationContext : public utilities::SerializationContext
     {
     public:
         /// <summary> Constructor </summary>
@@ -202,12 +204,13 @@ namespace model
         /// <param name="id"> The serialized ID of the node. </param>
         /// <param name="node"> A pointer to the serialized node. </param>
         void MapNode(const Node::NodeId& id, Node* node);
-    
+
     private:
         utilities::SerializationContext& _originalContext;
         const Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };
+}
 }
 
 #include "../tcc/Model.tcc"

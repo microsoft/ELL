@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     namespace UnaryOperations
@@ -35,14 +37,15 @@ namespace nodes
         }
     }
 
-
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode() : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _operation(OperationType::none)
+    UnaryOperationNode<ValueType>::UnaryOperationNode()
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _operation(OperationType::none)
     {
     }
 
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::PortElements<ValueType>& input, OperationType operation) : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _operation(operation)
+    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::PortElements<ValueType>& input, OperationType operation)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _operation(operation)
     {
     }
 
@@ -74,7 +77,7 @@ namespace nodes
                 output = ComputeOutput(UnaryOperations::LogicalNot<ValueType>);
             }
             break;
-            
+
             default:
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
         }
@@ -108,4 +111,5 @@ namespace nodes
         archiver["operation"] >> operation;
         _operation = static_cast<OperationType>(operation);
     }
+}
 }

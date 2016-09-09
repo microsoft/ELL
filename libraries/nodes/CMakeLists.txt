@@ -20,7 +20,7 @@ set (INCLUDE include/AccumulatorNode.h
              include/DotProductNode.h
              include/ExtremalValueNode.h
              include/MultiplexerNode.h
-             include/ForestNode.h
+             include/ForestPredictorNode.h
              include/LinearPredictorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
@@ -44,7 +44,7 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/DotProductNode.tcc
          tcc/ExtremalValueNode.tcc
          tcc/MultiplexerNode.tcc
-         tcc/ForestNode.tcc
+         tcc/ForestPredictorNode.tcc
          tcc/L2NormNode.tcc
          tcc/MovingAverageNode.tcc
          tcc/MovingVarianceNode.tcc

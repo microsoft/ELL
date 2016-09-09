@@ -8,6 +8,8 @@
 
 #include "MultiEpochIncrementalTrainerArguments.h"
 
+namespace emll
+{
 namespace common
 {
     void ParsedMultiEpochIncrementalTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -30,4 +32,5 @@ namespace common
                          "Seed for the random generator that controls data permutation between epochs.",
                          "123456");
     }
+}
 }

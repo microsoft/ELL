@@ -8,15 +8,17 @@
 
 #pragma once
 
-#include "TypeName.h"
 #include "Archiver.h"
 #include "Exception.h"
 #include "ObjectArchive.h"
+#include "TypeName.h"
 
 // stl
-#include <string>
 #include <ostream>
+#include <string>
 
+namespace emll
+{
 namespace utilities
 {
     class ObjectArchive;
@@ -64,6 +66,7 @@ namespace utilities
         /// <param name="archiver"> The unarchiver. </param>
         virtual void ReadFromArchive(Unarchiver& archiver) = 0;
     };
+}
 }
 
 #include "../tcc/IArchivable.tcc"

@@ -10,19 +10,23 @@
 #include "Archiver.h"
 #include "IArchivable.h"
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <cctype>
 #include <cassert>
+#include <cctype>
+#include <iostream>
+#include <sstream>
+#include <string>
 
+namespace emll
+{
 namespace utilities
 {
-    ObjectArchiver::ObjectArchiver(SerializationContext context) : Unarchiver(context)
+    ObjectArchiver::ObjectArchiver(SerializationContext context)
+        : Unarchiver(context)
     {
     }
 
-    ObjectArchiver::ObjectArchiver(const ObjectArchive& objectDescription, SerializationContext context) : Unarchiver(std::move(context)), _objectDescription(objectDescription)
+    ObjectArchiver::ObjectArchiver(const ObjectArchive& objectDescription, SerializationContext context)
+        : Unarchiver(std::move(context)), _objectDescription(objectDescription)
     {
     }
 
@@ -167,4 +171,5 @@ namespace utilities
     void ObjectArchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
     }
+}
 }

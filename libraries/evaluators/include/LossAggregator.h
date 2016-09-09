@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace evaluators
 {
     /// <summary> An evaluation aggregator that computes mean loss. </summary>
@@ -22,7 +24,6 @@ namespace evaluators
     class LossAggregator
     {
     public:
-
         /// <summary> Constructs an instance of LossAggregator with a given loss. </summary>
         ///
         /// <param name="lossFunction"> The loss function. </param>
@@ -56,6 +57,7 @@ namespace evaluators
 
     template <typename LossFunctionType>
     LossAggregator<LossFunctionType> MakeLossAggregator(LossFunctionType lossFunction);
+}
 }
 
 #include "../tcc/LossAggregator.tcc"

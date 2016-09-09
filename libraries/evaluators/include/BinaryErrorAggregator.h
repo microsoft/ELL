@@ -13,13 +13,14 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace evaluators
 {
     /// <summary> An evaluation aggregator that computes a binary confusion matrix. </summary>
     class BinaryErrorAggregator
     {
     public:
-
         /// <summary> Updates this aggregator. </summary>
         ///
         /// <param name="prediction"> The real valued prediction. </param>
@@ -46,4 +47,5 @@ namespace evaluators
         double _sumFalsePositives = 0.0;
         double _sumFalseNegatives = 0.0;
     };
+}
 }

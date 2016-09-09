@@ -11,24 +11,28 @@
 #include "IArchivable.h"
 
 // stl
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <cctype>
 #include <algorithm>
 #include <cassert>
+#include <cctype>
+#include <iostream>
+#include <sstream>
+#include <string>
 
+namespace emll
+{
 namespace utilities
 {
     //
     // Serialization
     //
-    XmlArchiver::XmlArchiver() : _out(std::cout), _ready(true)
-    {        
+    XmlArchiver::XmlArchiver()
+        : _out(std::cout), _ready(true)
+    {
         WriteFileHeader();
     }
 
-    XmlArchiver::XmlArchiver(std::ostream& outputStream) : _out(outputStream), _ready(true)
+    XmlArchiver::XmlArchiver(std::ostream& outputStream)
+        : _out(outputStream), _ready(true)
     {
         WriteFileHeader();
     }
@@ -140,12 +144,14 @@ namespace utilities
     //
     // Deserialization
     //
-    XmlUnarchiver::XmlUnarchiver(SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(std::cin, "<>=/'\"")
+    XmlUnarchiver::XmlUnarchiver(SerializationContext context)
+        : Unarchiver(std::move(context)), _tokenizer(std::cin, "<>=/'\"")
     {
         ReadFileHeader();
     }
 
-    XmlUnarchiver::XmlUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, "<>?=/'\"")
+    XmlUnarchiver::XmlUnarchiver(std::istream& inputStream, SerializationContext context)
+        : Unarchiver(std::move(context)), _tokenizer(inputStream, "<>?=/'\"")
     {
         ReadFileHeader();
     }
@@ -158,7 +164,6 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, float);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, double);
 
-    // TODO: add a "read tag"-type function
     void XmlUnarchiver::ReadFileHeader()
     {
         _tokenizer.MatchTokens({ "<", "?", "xml" });
@@ -364,4 +369,5 @@ namespace utilities
         std::replace(result.begin(), result.end(), ')', '>');
         return result;
     }
+}
 }

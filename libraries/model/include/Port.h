@@ -9,21 +9,23 @@
 #pragma once
 
 // utilities
-#include "UniqueId.h"
 #include "IArchivable.h"
+#include "UniqueId.h"
 
 // stl
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
     class Node;
 
     /// <summary> Port is the common base class for InputPort and OutputPort. </summary>
-    class Port: public utilities::IArchivable
+    class Port : public utilities::IArchivable
     {
     public:
         enum class PortType
@@ -75,7 +77,7 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-        
+
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
@@ -87,7 +89,8 @@ namespace model
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
-        Port(const class Node* node, std::string name, PortType type) : _node(node), _name(name), _type(type) {}
+        Port(const class Node* node, std::string name, PortType type)
+            : _node(node), _name(name), _type(type) {}
 
     private:
         // _node keeps info on where the input is coming from
@@ -95,4 +98,5 @@ namespace model
         std::string _name;
         PortType _type = PortType::none;
     };
+}
 }

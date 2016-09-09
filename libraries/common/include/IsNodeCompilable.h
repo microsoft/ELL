@@ -15,6 +15,8 @@
 #include <string>
 #include <unordered_set>
 
+namespace emll
+{
 namespace common
 {
     /// <summary> Functor for the default implementation of the IsNodeCompilable function. </summary>
@@ -33,11 +35,12 @@ namespace common
 
     protected:
         std::unordered_set<std::string> _nodeNames;
-    
+
     private:
         template <typename NodeType>
         void AddNodeType();
     };
+}
 }
 
 #include "../tcc/IsNodeCompilable.tcc"

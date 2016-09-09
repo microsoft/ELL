@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 /// <summary> %treeLayout namespace </summary>
 namespace treeLayout
 {
@@ -22,7 +24,6 @@ namespace treeLayout
     class VertexPosition
     {
     public:
-        
         VertexPosition() = default;
 
         /// <summary> Constructs a vertex position with specific depth and offset. </summary>
@@ -59,10 +60,10 @@ namespace treeLayout
     /// <summary>
     /// Contains the Layout of an entire tree (the return value of a Layout generating algorithm)
     /// </summary>
-    class Layout {
+    class Layout
+    {
 
     public:
-
         /// <summary> Constructs a layout. </summary>
         Layout(){};
 
@@ -133,4 +134,5 @@ namespace treeLayout
         double _minDepth = 0;
         double _maxDepth = 0;
     };
+}
 }

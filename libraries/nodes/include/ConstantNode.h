@@ -18,14 +18,15 @@
 
 // utilities
 #include "Exception.h"
-#include "TypeName.h"
 #include "IArchivable.h"
+#include "TypeName.h"
 
 // stl
 #include <memory>
 #include <vector>
 
-
+namespace emll
+{
 /// <summary> nodes namespace </summary>
 namespace nodes
 {
@@ -100,6 +101,7 @@ namespace nodes
     ///
     /// <returns> The node added to the model. </returns>
     ConstantNode<double>* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::ConstantPredictor& predictor, model::ModelTransformer& transformer);
+}
 }
 
 #include "../tcc/ConstantNode.tcc"

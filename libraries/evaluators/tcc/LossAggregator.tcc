@@ -6,13 +6,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace evaluators
 {
-    template<typename LossFunctionType>
-    LossAggregator<LossFunctionType>::LossAggregator(LossFunctionType lossFunction) : _lossFunction(std::move(lossFunction))
-    {}
+    template <typename LossFunctionType>
+    LossAggregator<LossFunctionType>::LossAggregator(LossFunctionType lossFunction)
+        : _lossFunction(std::move(lossFunction))
+    {
+    }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     void LossAggregator<LossFunctionType>::Update(double prediction, double label, double weight)
     {
         double loss = _lossFunction.Evaluate(prediction, label);
@@ -20,14 +24,14 @@ namespace evaluators
         _sumWeightedLosses += weight * loss;
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     std::vector<double> LossAggregator<LossFunctionType>::GetResult() const
     {
         double meanLoss = _sumWeights == 0.0 ? 0.0 : _sumWeightedLosses / _sumWeights;
         return { meanLoss };
     }
 
-    template<typename LossFunctionType>
+    template <typename LossFunctionType>
     void LossAggregator<LossFunctionType>::Reset()
     {
         _sumWeights = 0.0;
@@ -35,9 +39,9 @@ namespace evaluators
     }
 
     template <typename LossFunctionType>
-    std::vector<std::string> LossAggregator<LossFunctionType>::GetValueNames() const 
-    { 
-        return {"MeanLoss"}; 
+    std::vector<std::string> LossAggregator<LossFunctionType>::GetValueNames() const
+    {
+        return { "MeanLoss" };
     }
 
     template <typename LossFunctionType>
@@ -45,4 +49,5 @@ namespace evaluators
     {
         return LossAggregator<LossFunctionType>(std::move(lossFunction));
     }
+}
 }

@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -29,7 +31,8 @@ namespace utilities
     //
 
     template <typename ValueType>
-    VariantDerived<ValueType>::VariantDerived(const ValueType& val) : VariantBase(typeid(ValueType)), _value(val)
+    VariantDerived<ValueType>::VariantDerived(const ValueType& val)
+        : VariantBase(typeid(ValueType)), _value(val)
     {
     }
 
@@ -44,7 +47,8 @@ namespace utilities
     // Variant implementation
     //
     template <typename ValueType>
-    Variant::Variant(ValueType&& value) : _type(std::type_index(typeid(ValueType)))
+    Variant::Variant(ValueType&& value)
+        : _type(std::type_index(typeid(ValueType)))
     {
         auto derivedPtr = new VariantDerived<typename std::decay<ValueType>::type>(std::forward<ValueType>(value));
         auto basePtr = static_cast<VariantBase*>(derivedPtr);
@@ -141,4 +145,5 @@ namespace utilities
     {
         archiver.Unarchive(name, _value);
     }
+}
 }

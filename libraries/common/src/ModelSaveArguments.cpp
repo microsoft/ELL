@@ -8,6 +8,8 @@
 
 #include "ModelSaveArguments.h"
 
+namespace emll
+{
 namespace common
 {
     void ParsedModelSaveArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -22,11 +24,11 @@ namespace common
 
     utilities::CommandLineParseResult ParsedModelSaveArguments::PostProcess(const utilities::CommandLineParser& parser)
     {
-        if(outputModelFilename == "null")
+        if (outputModelFilename == "null")
         {
             outputModelStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
         }
-        else if(outputModelFilename == "")
+        else if (outputModelFilename == "")
         {
             outputModelStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
         }
@@ -38,4 +40,5 @@ namespace common
         std::vector<std::string> parseErrorMessages;
         return parseErrorMessages;
     }
+}
 }

@@ -9,6 +9,8 @@
 #include "Port.h"
 #include "Node.h"
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -49,4 +51,5 @@ namespace model
         archiver["type"] >> typeCode;
         _type = static_cast<PortType>(typeCode);
     }
+}
 }

@@ -8,12 +8,14 @@
 
 #pragma once
 
-#include "IIncrementalTrainer.h"
 #include "Evaluator.h"
+#include "IIncrementalTrainer.h"
 
 // stl
 #include <memory>
 
+namespace emll
+{
 namespace trainers
 {
     /// <summary>
@@ -26,7 +28,6 @@ namespace trainers
     class EvaluatingIncrementalTrainer : public IIncrementalTrainer<PredictorType>
     {
     public:
-
         typedef IIncrementalTrainer<PredictorType> InternalTrainerType;
         typedef evaluators::IEvaluator<PredictorType> EvaluatorType;
 
@@ -67,6 +68,7 @@ namespace trainers
     EvaluatingIncrementalTrainer<PredictorType> MakeEvaluatingIncrementalTrainer(
         std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer,
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
+}
 }
 
 #include "../tcc/EvaluatingIncrementalTrainer.tcc"

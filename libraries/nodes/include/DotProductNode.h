@@ -11,12 +11,12 @@
 #include "SumNode.h"
 
 // model
-#include "Node.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
-#include "InputPort.h"
-#include "OutputPort.h"
 #include "BinaryOperationNode.h"
+#include "InputPort.h"
+#include "ModelTransformer.h"
+#include "Node.h"
+#include "OutputPort.h"
+#include "PortElements.h"
 
 // utilities
 #include "TypeName.h"
@@ -24,6 +24,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that takes two vector inputs and returns their dot product </summary>
@@ -69,7 +71,7 @@ namespace nodes
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-        
+
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(model::ModelTransformer& transformer) const override;
 
@@ -84,6 +86,7 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+}
 }
 
 #include "../tcc/DotProductNode.tcc"

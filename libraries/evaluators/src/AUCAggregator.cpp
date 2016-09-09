@@ -11,6 +11,8 @@
 // stl
 #include <algorithm>
 
+namespace emll
+{
 namespace evaluators
 {
     void AUCAggregator::Update(double prediction, double label, double weight)
@@ -49,7 +51,7 @@ namespace evaluators
         {
             auc = sumOrderedWeights / sumPositiveWeights / sumNegativeWeights;
         }
-        
+
         return { auc };
     }
 
@@ -60,14 +62,15 @@ namespace evaluators
 
     bool AUCAggregator::Aggregate::operator<(const Aggregate& other) const
     {
-        // order by prediction (ascending) and then by label (descending) - this will produce the most pessimistic AUC 
+        // order by prediction (ascending) and then by label (descending) - this will produce the most pessimistic AUC
         if (prediction < other.prediction) return true;
         if (prediction > other.prediction) return false;
         return label > other.label;
     }
 
-    std::vector<std::string> AUCAggregator::GetValueNames() const 
-    { 
-        return {"AUC"}; 
+    std::vector<std::string> AUCAggregator::GetValueNames() const
+    {
+        return { "AUC" };
     }
+}
 }

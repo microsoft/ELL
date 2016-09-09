@@ -12,7 +12,7 @@
 
 namespace std
 {
-    %feature("novaluewrapper") unique_ptr; // TODO: check if we really need this or not
+    %feature("novaluewrapper") unique_ptr; 
 
     // Skeleton of unique_ptr definition
     template< class T>

@@ -14,26 +14,30 @@
 // utilities
 #include "Exception.h"
 
+namespace emll
+{
 namespace dataset
 {
-    template<typename VectorEntryParserType, typename DefaultDataVectorType>
-    SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::SupervisedExampleBuilder(VectorEntryParserType parser, bool hasWeight) : _instanceParser(parser), _hasWeight(hasWeight)
-    {}
+    template <typename VectorEntryParserType, typename DefaultDataVectorType>
+    SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::SupervisedExampleBuilder(VectorEntryParserType parser, bool hasWeight)
+        : _instanceParser(parser), _hasWeight(hasWeight)
+    {
+    }
 
-    template<typename VectorEntryParserType, typename DefaultDataVectorType>
+    template <typename VectorEntryParserType, typename DefaultDataVectorType>
     GenericSupervisedExample SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
     {
-        const char* pStr = spExampleString->c_str(); 
+        const char* pStr = spExampleString->c_str();
 
         double label = 0.0;
         double weight = 1.0;
 
         // parse weight
-        if(_hasWeight)
+        if (_hasWeight)
         {
             auto result = utilities::Parse(pStr, weight);
 
-            if(result != utilities::ParseResult::success)
+            if (result != utilities::ParseResult::success)
             {
                 HandleErrors(result, *spExampleString);
             }
@@ -42,7 +46,7 @@ namespace dataset
         // parse label
         auto result = utilities::Parse(pStr, label);
 
-        if(result != utilities::ParseResult::success)
+        if (result != utilities::ParseResult::success)
         {
             HandleErrors(result, *spExampleString);
         }
@@ -54,10 +58,10 @@ namespace dataset
         auto instance = DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIterator);
 
         // return supervised example
-        return GenericSupervisedExample(std::move(instance), WeightLabel{weight, label});
+        return GenericSupervisedExample(std::move(instance), WeightLabel{ weight, label });
     }
 
-    template<typename VectorEntryParserType, typename DefaultDataVectorType>
+    template <typename VectorEntryParserType, typename DefaultDataVectorType>
     void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::HandleErrors(utilities::ParseResult result, const std::string& str)
     {
         if (result == utilities::ParseResult::badFormat)
@@ -73,4 +77,5 @@ namespace dataset
             throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "real value out of double precision range in '" + str + "'");
         }
     }
+}
 }

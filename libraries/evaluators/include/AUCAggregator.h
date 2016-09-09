@@ -13,13 +13,14 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace evaluators
 {
     /// <summary> An evaluation aggregator that computes AUC. </summary>
     class AUCAggregator
     {
     public:
-
         /// <summary> Updates this aggregator. </summary>
         ///
         /// <param name="prediction"> The real valued prediction. </param>
@@ -41,7 +42,6 @@ namespace evaluators
         std::vector<std::string> GetValueNames() const;
 
     private:
-
         struct Aggregate
         {
             double prediction;
@@ -53,4 +53,5 @@ namespace evaluators
 
         mutable std::vector<Aggregate> _aggregates; // mutable because Get() const has to sort this vector
     };
+}
 }

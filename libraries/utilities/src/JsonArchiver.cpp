@@ -10,22 +10,26 @@
 #include "Archiver.h"
 #include "IArchivable.h"
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <cctype>
 #include <cassert>
+#include <cctype>
+#include <iostream>
+#include <sstream>
+#include <string>
 
+namespace emll
+{
 namespace utilities
 {
     //
     // Serialization
     //
-    JsonArchiver::JsonArchiver() : _out(std::cout)
+    JsonArchiver::JsonArchiver()
+        : _out(std::cout)
     {
     }
 
-    JsonArchiver::JsonArchiver(std::ostream& outputStream) : _out(outputStream)
+    JsonArchiver::JsonArchiver(std::ostream& outputStream)
+        : _out(outputStream)
     {
     }
 
@@ -137,11 +141,13 @@ namespace utilities
     //
     // Deserialization
     //
-    JsonUnarchiver::JsonUnarchiver(SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(std::cin, ",:{}[]'\"")
+    JsonUnarchiver::JsonUnarchiver(SerializationContext context)
+        : Unarchiver(std::move(context)), _tokenizer(std::cin, ",:{}[]'\"")
     {
     }
 
-    JsonUnarchiver::JsonUnarchiver(std::istream& inputStream, SerializationContext context) : Unarchiver(std::move(context)), _tokenizer(inputStream, ",:{}[]'\"")
+    JsonUnarchiver::JsonUnarchiver(std::istream& inputStream, SerializationContext context)
+        : Unarchiver(std::move(context)), _tokenizer(inputStream, ",:{}[]'\"")
     {
     }
 
@@ -355,4 +361,5 @@ namespace utilities
     {
         return str;
     }
+}
 }

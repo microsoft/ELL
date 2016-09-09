@@ -7,21 +7,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Nodes_test.h"
-#include "MovingAverageNode.h"
-#include "MovingVarianceNode.h"
-#include "DelayNode.h"
 #include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
-#include "UnaryOperationNode.h"
+#include "DelayNode.h"
+#include "DemultiplexerNode.h"
+#include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
-#include "ForestNode.h"
-#include "DemultiplexerNode.h"
+#include "MovingAverageNode.h"
+#include "MovingVarianceNode.h"
+#include "UnaryOperationNode.h"
 
 // model
+#include "InputNode.h"
 #include "Model.h"
 #include "Node.h"
-#include "InputNode.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -33,11 +33,13 @@
 #include "testing.h"
 
 // stl
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <cmath>
+#include <iostream>
+#include <sstream>
+#include <string>
 
+namespace emll
+{
 using namespace nodes;
 
 //
@@ -252,13 +254,10 @@ void TestLinearPredictorNodeCompute()
 {
     const int dim = 10;
     predictors::LinearPredictor predictor(dim);
-    // TODO: set its vector and bias
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dim);
     auto predNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
-
-    // TODO: test it
 }
 
 void TestDemultiplexerNodeCompute()
@@ -273,18 +272,16 @@ void TestDemultiplexerNodeCompute()
 
     selectorNode->SetInput(false); // output[0] should get the input
     auto outputVec = model.ComputeOutput(muxNode->output);
-    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, {5.0, 0}));
+    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, { 5.0, 0 }));
 
     selectorNode->SetInput(true); // output[1] should get the input
     outputVec = model.ComputeOutput(muxNode->output);
-    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, {0.0, 5.0}));
+    testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, { 0.0, 5.0 }));
 }
 
 //
 // Node refinements
 //
-
-// TODO: make a generic TestModelsEqual function that takes 2 models, 2 output nodes, and a test message string
 
 void TestMovingAverageNodeRefine()
 {
@@ -300,7 +297,7 @@ void TestMovingAverageNodeRefine()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ meanNode->output }); // TODO: cleanup
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ meanNode->output });
 
     std::cout << "MovingAverage model compilable: " << (transformer.IsModelCompilable() ? "yes" : "no") << std::endl;
     std::cout << "Original nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
@@ -316,7 +313,7 @@ void TestMovingAverageNodeRefine()
     }
 }
 
-void TestSimpleForestNodeRefine()
+void TestSimpleForestPredictorNodeRefine()
 {
     // define some abbreviations
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
@@ -333,33 +330,33 @@ void TestSimpleForestNodeRefine()
     // build the model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
+    auto simpleForestPredictorNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
 
     // refine
     model::TransformContext context{ common::IsNodeCompilable() };
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->output });
-    auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestNode->treeOutputs });
-    auto refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(model::PortElements<bool>{ simpleForestNode->edgeIndicatorVector });
-    testing::ProcessTest("Testing SimpleForestNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestPredictorNode->output });
+    auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestPredictorNode->treeOutputs });
+    auto refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(model::PortElements<bool>{ simpleForestPredictorNode->edgeIndicatorVector });
+    testing::ProcessTest("Testing SimpleForestPredictorNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     // check equivalence
     inputNode->SetInput({ 0.2, 0.5, 0.0 });
     refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
-    auto outputValue = model.ComputeOutput(simpleForestNode->output)[0];
-    auto treeOutputsValue = model.ComputeOutput(simpleForestNode->treeOutputs);
-    auto edgeIndicatorVectorValue = model.ComputeOutput(simpleForestNode->edgeIndicatorVector);
+    auto outputValue = model.ComputeOutput(simpleForestPredictorNode->output)[0];
+    auto treeOutputsValue = model.ComputeOutput(simpleForestPredictorNode->treeOutputs);
+    auto edgeIndicatorVectorValue = model.ComputeOutput(simpleForestPredictorNode->edgeIndicatorVector);
 
     auto refinedOutputValue = refinedModel.ComputeOutput(refinedOutputElements)[0];
     auto refinedTreeOutputsValue = refinedModel.ComputeOutput(refinedTreeOutputsElements);
     auto refinedEdgeIndicatorVectorValue = refinedModel.ComputeOutput(refinedEdgeIndicatorVectorElements);
 
     //  expected output is -3.0
-    testing::ProcessTest("Testing SimpleForestNode refine (output)", testing::IsEqual(outputValue, refinedOutputValue));
-    testing::ProcessTest("Testing SimpleForestNode refine (treeOutputs)", testing::IsEqual(treeOutputsValue, refinedTreeOutputsValue));
-    testing::ProcessTest("Testing SimpleForestNode refine (edgeIndicatorVector)", testing::IsEqual(edgeIndicatorVectorValue, refinedEdgeIndicatorVectorValue));
+    testing::ProcessTest("Testing SimpleForestPredictorNode refine (output)", testing::IsEqual(outputValue, refinedOutputValue));
+    testing::ProcessTest("Testing SimpleForestPredictorNode refine (treeOutputs)", testing::IsEqual(treeOutputsValue, refinedTreeOutputsValue));
+    testing::ProcessTest("Testing SimpleForestPredictorNode refine (edgeIndicatorVector)", testing::IsEqual(edgeIndicatorVectorValue, refinedEdgeIndicatorVectorValue));
 }
 
 void TestLinearPredictorNodeRefine()
@@ -383,7 +380,7 @@ void TestLinearPredictorNodeRefine()
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ linearPredictorNode->output }); // TODO: cleanup
+    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ linearPredictorNode->output });
     inputNode->SetInput({ 1.0, 1.0, 1.0 });
     newInputNode->SetInput({ 1.0, 1.0, 1.0 });
     auto modelOutputValue = model.ComputeOutput(linearPredictorNode->output)[0];
@@ -410,7 +407,7 @@ void TestDemultiplexerNodeRefine()
 
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newSelectorNode = transformer.GetCorrespondingInputNode(selectorNode);
-    auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output); 
+    auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output);
 
     std::vector<double> inputValue{ 5.0 };
     inputNode->SetInput(inputValue);
@@ -427,4 +424,5 @@ void TestDemultiplexerNodeRefine()
     outputVec = model.ComputeOutput(muxNode->output);
     newOutputVec = refinedModel.ComputeOutput(newMuxNodeElements);
     testing::ProcessTest("Testing DemultiplexerNode refine", testing::IsEqual(outputVec, newOutputVec));
+}
 }

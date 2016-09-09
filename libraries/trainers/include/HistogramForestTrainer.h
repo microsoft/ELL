@@ -12,13 +12,15 @@
 #include "LogitBooster.h"
 
 // predictors
-#include "SingleElementThresholdPredictor.h"
 #include "ConstantPredictor.h"
+#include "SingleElementThresholdPredictor.h"
 
 // stl
 #include <random>
 #include <tuple>
 
+namespace emll
+{
 namespace trainers
 {
     /// <summary> Parameters for the forest trainer. </summary>
@@ -34,7 +36,7 @@ namespace trainers
     /// <typeparam name="LossFunctionType"> The loss function type. </typeparam>
     /// <typeparam name="BoosterType"> The booster type. </typeparam>
     /// <typeparam name="ThresholdFinderType"> Type of the threshold finder to use. </typeparam>
-    template <typename LossFunctionType, typename BoosterType, typename ThresholdFinderType> 
+    template <typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
     class HistogramForestTrainer : public ForestTrainer<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor, BoosterType>
     {
     public:
@@ -60,7 +62,6 @@ namespace trainers
         virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) override;
 
     private:
-
         struct EvaluateSplitRuleResult
         {
             Sums sums0;
@@ -86,8 +87,9 @@ namespace trainers
     /// <param name="parameters"> The trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a simple forest trainer. </returns>
-    template<typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
+    template <typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
     std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters);
+}
 }
 
 #include "../tcc/HistogramForestTrainer.tcc"

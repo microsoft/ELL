@@ -8,16 +8,18 @@
 
 #pragma once
 
-#include "Variant.h"
 #include "Exception.h"
+#include "Variant.h"
 
 // stl
-#include <unordered_map>
-#include <string>
 #include <cassert>
 #include <functional>
+#include <string>
 #include <type_traits>
+#include <unordered_map>
 
+namespace emll
+{
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
@@ -79,7 +81,10 @@ namespace utilities
         /// <typeparam name="ValueType"> The type of the return value. </typeparam>
         /// <returns> The value of this object. </returns>
         template <typename ValueType>
-        ValueType GetValue() const { return _value.GetValue<ValueType>(); }
+        ValueType GetValue() const
+        {
+            return _value.GetValue<ValueType>();
+        }
 
         /// <summary> Copies this object's value to a variable. </summary>
         ///
@@ -122,6 +127,7 @@ namespace utilities
         // friends
         friend class IArchivable;
     };
+}
 }
 
 #include "../tcc/ObjectArchive.tcc"

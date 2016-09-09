@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ObjectArchive.h"
-#include "ObjectArchiver.h"
 #include "IArchivable.h"
+#include "ObjectArchiver.h"
 
 // utiliites
 #include "Exception.h"
@@ -16,6 +16,8 @@
 // stl
 #include <memory>
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -75,4 +77,5 @@ namespace utilities
         archiver.Archive(*this);
         return archiver.GetObjectArchive();
     }
+}
 }

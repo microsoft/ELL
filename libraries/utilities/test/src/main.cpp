@@ -6,8 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Iterator_test.h"
 #include "IArchivable_test.h"
+#include "Iterator_test.h"
 #include "ObjectArchive_test.h"
 #include "TypeFactory_test.h"
 #include "Variant_test.h"
@@ -20,14 +20,15 @@
 
 // stl
 #include <iostream>
-#include <string>
-#include <vector>
 #include <numeric>
+#include <string>
 #include <thread>
+#include <vector>
 
+using namespace emll;
 
-template <typename ... Args>
-void testMatchFormat(utilities::MatchResult expectedResult, const char* content, const char* format, Args ...args)
+template <typename... Args>
+void testMatchFormat(utilities::MatchResult expectedResult, const char* content, const char* format, Args... args)
 {
     auto result = utilities::MatchFormat(content, format, args...);
     testing::ProcessTest("utilities::Format:MatchFormat", result == expectedResult);
@@ -54,8 +55,8 @@ void TestMatchFormat()
 
     using utilities::Match;
 
-    // match a string 
-    testMatchFormat(MatchResult::success, "integer 123 and float -33.3", "integer % and % %", int(), Match("float") , double());
+    // match a string
+    testMatchFormat(MatchResult::success, "integer 123 and float -33.3", "integer % and % %", int(), Match("float"), double());
 
     // match two strings in a row
     testMatchFormat(MatchResult::success, "integer hello float", "integer %% float", Match("he"), Match("llo"));
@@ -84,7 +85,6 @@ void TestMatchFormat()
     // parser error
     testMatchFormat(MatchResult::parserError, "integer X and float -33.3", "integer % and float %", int(), double());
 }
-
 
 /// Runs all tests
 ///
@@ -120,12 +120,12 @@ int main()
         TestSerializeIArchivable();
         TestObjectArchiver();
     }
-    catch(const utilities::Exception& exception)
+    catch (const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
         throw;
     }
-  
+
     if (testing::DidTestFail())
     {
         return 1;

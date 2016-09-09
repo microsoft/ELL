@@ -15,21 +15,24 @@
 #include <memory>
 #include <utility>
 
+namespace emll
+{
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
     // Forward declaration necessary so we can declare the MakeAnyIterator functions, so we can then declare them as friends.
-    template <typename ValueType> class AnyIterator;
+    template <typename ValueType>
+    class AnyIterator;
 
 #ifndef SWIG
     template <typename IteratorType, typename ValueType = typename std::decay<decltype(std::declval<IteratorType>().Get())>::type>
     AnyIterator<ValueType> MakeAnyIterator(IteratorType&& inIterator);
 #endif
 
-    /// <summary> 
-    /// A type-erased wrapper for an iterator over a collection of objects of type T. 
+    /// <summary>
+    /// A type-erased wrapper for an iterator over a collection of objects of type T.
     /// Note: the original iterator must be movable or copyable.
-    ///</summary>    
+    ///</summary>
     ///
     /// <typeparam name="ValueType"> Type of the elements being iterated over. </typeparam>
     template <typename ValueType>
@@ -37,7 +40,7 @@ namespace utilities
     {
     public:
         /// <summary> Constructor that takes a shared pointer to an IIterator (used by MakeAnyIterator helper function) </summary>
-        AnyIterator(std::shared_ptr<IIterator<ValueType>> iterator); 
+        AnyIterator(std::shared_ptr<IIterator<ValueType>> iterator);
 
         /// <summary> Default destructor </summary>
         ~AnyIterator() = default;
@@ -70,6 +73,7 @@ namespace utilities
     private:
         std::shared_ptr<IIterator<ValueType>> _iterator = nullptr;
     };
+}
 }
 
 #include "../tcc/AnyIterator.tcc"

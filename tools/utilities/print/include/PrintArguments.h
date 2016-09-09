@@ -15,6 +15,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 /// <summary> Arguments for print. </summary>
 struct PrintArguments
 {
@@ -37,3 +39,4 @@ struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArg
     /// <returns> An utilities::CommandLineParseResult. </returns>
     virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
 };
+}
