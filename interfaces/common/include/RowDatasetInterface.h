@@ -34,7 +34,6 @@ namespace interfaces
     public:
         GenericRowDataset(){};
         GenericRowDataset(const GenericRowDataset& other);
-        GenericRowDataset(GenericRowDataset&& other) = default;
         const GenericRowDataset& operator=(GenericRowDataset&& other)
         {
             _dataset = std::move(other._dataset);

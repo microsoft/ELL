@@ -18,6 +18,9 @@
 
 %ignore emll::dataset::RowDataset::operator[];
 
+%import "CompressedIntegerList.h"
+%import "SparseDataVector.h"
+
 namespace emll::dataset
 {
     %ignore IDataVector::Clone;

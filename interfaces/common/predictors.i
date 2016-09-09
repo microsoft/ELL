@@ -14,7 +14,7 @@
 #include "LinearPredictor.h"
 %}
 
-#if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
+#if !defined(SWIGXML) && !defined(SWIGR) && !defined(SWIGJAVASCRIPT)
 %shared_ptr(emll::predictors::LinearPredictor) 
 #endif
 

@@ -34,7 +34,7 @@
 %include "std_vector.i"
 #endif 
 
-#if !defined(SWIGJAVASCRIPT) && !defined(SWIGXML)
+#if !defined(SWIGJAVASCRIPT) && !defined(SWIGR) && !defined(SWIGXML)
 %include "std_shared_ptr.i"
 #endif
 
@@ -116,17 +116,12 @@ namespace emll::dataset
 typedef emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample> emll::dataset::GenericRowDataset;
 typedef emll::dataset::GenericRowDataset::Iterator emll::dataset::GenericRowIterator;
 
-namespace emll::utilities
-{    
-    template <typename IteratorType, typename ValueType> class StlIterator {};
-    %template () StlIterator<typename std::vector<emll::dataset::IDataVector>::const_iterator, emll::dataset::IDataVector>;
+    // template <typename IteratorType, typename ValueType> class StlIterator {};
+    // %template () StlIterator<typename std::vector<emll::dataset::IDataVector>::const_iterator, emll::dataset::IDataVector>;
 
-    template <typename IteratorType, typename ValueType> class StlIndexValueIterator {};
-    %template () StlIndexValueIterator<typename std::vector<emll::dataset::IDataVector>::const_iterator, emll::dataset::IDataVector>;
-}
+    // template <typename IteratorType, typename ValueType> class StlIndexValueIterator {};
+    // %template () StlIndexValueIterator<typename std::vector<emll::dataset::IDataVector>::const_iterator, emll::dataset::IDataVector>;
 
-// %template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample,std::allocator<emll::dataset::GenericSupervisedExample>>::const_iterator, emll::dataset::GenericSupervisedExample>;
-// typedef emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample>::const_iterator, emll::dataset::GenericSupervisedExample> emll::dataset::GenericRowIterator;
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i
@@ -169,7 +164,7 @@ namespace emll::utilities
 typedef emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::PredictorType emll::predictors::LinearPredictor;
 class emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::PredictorType {};
 
-#if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
+#if !defined(SWIGXML) && !defined(SWIGR) && !defined(SWIGJAVASCRIPT)
 // TODO: Review rules on when to apply the %shared_ptr() directive and get rid of these altogether if they're not in the right place 
 %shared_ptr(RowDataset)
 #endif
