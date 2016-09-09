@@ -149,7 +149,6 @@ namespace model
                     for (const auto& child : ModelImpl::Reverse(dependentNodes)) // Visiting the children in reverse order more closely retains the order the nodes were originally created
                     {
                         // note: this is kind of inefficient --- we're going to push multiple copies of child on the stack. But we'll check if we've visited it already when we pop it off.
-                        // TODO: optimize this if it's a problem
                         _stack.push_back(child);
                     }
                 }

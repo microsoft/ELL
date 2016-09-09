@@ -34,6 +34,5 @@
 
 %extend emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::LogLoss>
 {
-    // TODO: return some other type of thing
     LinearPredictorProxy GetPred() const { return LinearPredictorProxy(($self)->GetPredictor()); }
 }

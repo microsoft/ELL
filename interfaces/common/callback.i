@@ -10,7 +10,6 @@
 %{
     //
     // Callback wrapper types
-    // TODO: make them templates or something so we don't have to replicate code
     //
     class CallbackBase
     {

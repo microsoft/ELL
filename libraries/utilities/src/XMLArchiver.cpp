@@ -164,7 +164,6 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, float);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, double);
 
-    // TODO: add a "read tag"-type function
     void XmlUnarchiver::ReadFileHeader()
     {
         _tokenizer.MatchTokens({ "<", "?", "xml" });

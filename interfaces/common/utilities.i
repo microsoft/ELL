@@ -63,5 +63,3 @@ WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
 %template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
 
 typedef emll::predictors::LinearPredictor emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::Predictor;
-
-// TODO: wrap print

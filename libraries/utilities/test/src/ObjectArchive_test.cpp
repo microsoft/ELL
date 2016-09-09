@@ -264,7 +264,6 @@ void TestObjectArchiver()
     dearchiver1 >> deserializedInner;
     testing::ProcessTest("Deserialize with ObjectArchiver check", deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);
 
-    // TODO: fix error with deserializing compound objects
     utilities::ObjectArchiver dearchiver2(objectDescription2, context);
     OuterObject deserializedOuter;
     dearchiver2 >> deserializedOuter;

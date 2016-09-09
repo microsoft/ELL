@@ -12,7 +12,6 @@ namespace emll
 namespace model
 {
     // Hiding some stuff in this namespace that's unlikely to confict with anything
-    // TODO: put this in some utility place
     namespace ModelImpl
     {
         template <typename ContainerType>

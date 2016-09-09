@@ -43,7 +43,6 @@ int main(int argc, char* argv[])
         model::TransformContext context;
         model::ModelTransformer transformer;
         auto newModel = transformer.RefineModel(model, context);
-        // TODO: need to get the output port we care about somehow
 
         auto inputNodes = newModel.GetNodesByType<model::InputNode<double>>();
         // auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
