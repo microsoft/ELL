@@ -38,7 +38,7 @@ int main()
 
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();
-        TestSimpleForestNodeRefine();
+        TestSimpleForestPredictorNodeRefine();
         TestDemultiplexerNodeRefine();
     }
     catch (const utilities::Exception& exception)
