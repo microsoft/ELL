@@ -32,9 +32,11 @@
 
 template <typename IteratorType, typename ValueType> class StlIterator {};
 
-%import "UniqueId.h"
-%import "ObjectArchive.h"
+%include "IArchivable.h"
 %import "Archiver.h"
+%import "ObjectArchive.h"
+%include "UniqueId.h"
+%include "Variant.h"
 
 %include "AnyIterator.h"
 %include "RandomEngines.h"
@@ -42,11 +44,7 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 
 %include "SGDIncrementalTrainer_wrap.h"
 
-%include "IArchivable.h"
-%include "UniqueId.h"
-%include "Variant.h"
 
-WRAP_OSTREAM_OUT_TO_STR(utilities::UniqueId)
 
 // This is necessary for us to avoid leaking memory:
 #ifndef SWIGXML
@@ -65,3 +63,5 @@ WRAP_OSTREAM_OUT_TO_STR(utilities::UniqueId)
 typedef predictors::LinearPredictor trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::Predictor;
 
 // TODO: wrap print
+
+WRAP_OSTREAM_OUT_TO_STR(utilities::UniqueId)
