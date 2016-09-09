@@ -22,6 +22,8 @@
 // utilties
 #include "Files.h"
 
+namespace emll
+{
 namespace
 {
     template <typename RowIteratorType, typename VectorEntryParserType>
@@ -126,4 +128,5 @@ namespace interfaces
 
         return interfaces::GenericRowDataset(std::move(rowDataset));
     }
+}
 }

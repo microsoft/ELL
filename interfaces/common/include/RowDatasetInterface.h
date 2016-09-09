@@ -20,6 +20,8 @@
 #include <random>
 #include <vector>
 
+namespace emll
+{
 namespace dataset
 {
     typedef GenericRowDataset::Iterator GenericRowIterator;
@@ -98,4 +100,5 @@ namespace interfaces
     private:
         dataset::GenericRowDataset _dataset;
     };
+}
 }

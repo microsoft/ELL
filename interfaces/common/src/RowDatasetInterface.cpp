@@ -10,6 +10,8 @@
 #include "RowDataset.h"
 #include <string>
 
+namespace emll
+{
 namespace interfaces
 {
     //
@@ -84,4 +86,5 @@ namespace interfaces
     {
         _dataset.RandomPermute(rng, count);
     }
+}
 }
