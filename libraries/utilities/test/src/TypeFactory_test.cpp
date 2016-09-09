@@ -15,6 +15,8 @@
 #include <memory>
 #include <string>
 
+namespace emll
+{
 class Base
 {
 public:
@@ -91,4 +93,5 @@ void TypeFactoryTest()
     auto derived2 = factory.Construct(Derived2::GetTypeName());
 
     testing::ProcessTest("TypeFactory", derived1->GetRuntimeTypeName() == Derived1::GetTypeName() && derived2->GetRuntimeTypeName() == Derived2::GetTypeName());
+}
 }

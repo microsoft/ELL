@@ -23,6 +23,8 @@
 #include <sstream>
 #include <vector>
 
+namespace emll
+{
 class InnerObject : public utilities::IArchivable
 {
 public:
@@ -272,4 +274,5 @@ void TestObjectArchiver()
     DerivedObject deserializedDerived;
     dearchiver3 >> deserializedDerived;
     testing::ProcessTest("Deserialize with ObjectArchiver check", deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");
+}
 }

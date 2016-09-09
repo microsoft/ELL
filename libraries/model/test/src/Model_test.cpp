@@ -28,6 +28,9 @@
 #include <iostream>
 #include <unordered_map>
 
+namespace emll
+{
+
 void NodePrinter(const model::Node& node)
 {
     bool isFirstInputPort = true;
@@ -368,4 +371,5 @@ void TestRefineSplitOutputs()
         testing::ProcessTest("testing refined splitting model", testing::IsEqual(output[0], newOutput[0]));
         testing::ProcessTest("testing refined splitting model", testing::IsEqual(output[1], newOutput[1]));
     }
+}
 }

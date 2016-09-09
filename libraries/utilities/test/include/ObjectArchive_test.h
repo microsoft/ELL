@@ -8,7 +8,10 @@
 
 #pragma once
 
+namespace emll
+{
 void TestGetTypeDescription();
 void TestGetObjectArchive();
 void TestSerializeIArchivable();
 void TestObjectArchiver();
+}

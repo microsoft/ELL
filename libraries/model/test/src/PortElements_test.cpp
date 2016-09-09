@@ -15,6 +15,9 @@
 // stl
 #include <iostream>
 
+namespace emll
+{
+
 void PrintRange(const model::PortRange& range)
 {
     std::cout << "[" << range.ReferencedPort()->GetNode()->GetId() << ", " << range.GetStartIndex() << "--" << (range.GetStartIndex() + range.Size() - 1) << "]";
@@ -65,4 +68,5 @@ void TestAppend()
 
     testing::ProcessTest("Testing Append", testing::IsEqual(elements1.Size(), (size_t)5));
     testing::ProcessTest("Testing Append", testing::IsEqual(elements2.Size(), (size_t)7));
+}
 }

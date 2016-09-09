@@ -23,6 +23,8 @@
 #include <numeric>
 #include <thread>
 
+namespace emll
+{
 void TestIteratorAdapter()
 {
     // utilities::StlIterator test
@@ -133,4 +135,5 @@ void TestParallelTransformIterator()
     testing::ProcessTest("utilities::ParallelTransformIterator.Get", passed);
     auto elapsed = timer.Elapsed();
     std::cout << "Elapsed time: " << elapsed << " ms" << std::endl;
+}
 }

@@ -20,6 +20,8 @@
 #include <string>
 #include <typeinfo>
 
+using namespace emll;
+
 /// Fills a matrix with binary numbers (using a random generator with fixed seed)
 ///
 template <typename MatrixType>

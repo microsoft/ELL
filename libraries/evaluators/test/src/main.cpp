@@ -8,6 +8,11 @@
 
 /// Runs all tests
 ///
+
+#include "Evaluator.h"
+
+using namespace emll;
+
 int main()
 {
     return 0;
