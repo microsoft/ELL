@@ -17,7 +17,7 @@
 namespace math
 {
     /// <summary> Enum of possible vector orientations. </summary>
-    enum class VectorOrientation { row, column };
+    enum class VectorOrientation { column, row };
 
     /// <summary> Helper class that flips orientation at compile time. </summary>
     ///
@@ -101,10 +101,9 @@ namespace math
         ///
         /// <param name="offset"> The index of the first element in the sub-vector. </param>
         /// <param name="size"> The size of the sub-vector. </param>
-        /// <param name="strideMultiplier"> The stride multiplier of the sub-vector, defaults to 1. </param>
         ///
         /// <returns> The sub vector. </returns>
-        ConstVectorReference<ElementType, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier=1) const;
+        ConstVectorReference<ElementType, Orientation> GetSubVector(size_t offset, size_t size) const;
 
         /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
@@ -124,15 +123,15 @@ namespace math
         const ElementType* GetDataPointer() const { return _pData; }
         
         // protected ctor accessible only through derived classes
-        ConstVectorReference(ElementType* pData, size_t size, size_t stride);
+        ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 
-        // allow operations defined in the Operations struct to access stride
+        // allow operations defined in the Operations struct to access increment 
         friend struct Operations;
-        size_t GetStride() const { return _stride; }
+        size_t GetIncrement() const { return _increment ; }
 
         ElementType* _pData;
         size_t _size;
-        size_t _stride;
+        size_t _increment ;
 
     private:
         template<typename MapperType>
@@ -192,10 +191,9 @@ namespace math
         ///
         /// <param name="offset"> The index of the first element in the sub-vector. </param>
         /// <param name="size"> The size of the sub-vector. </param>
-        /// <param name="strideMultiplier"> The stride multiplier of the sub-vector, defaults to 1. </param>
         ///
         /// <returns> The sub vector. </returns>
-        VectorReference<ElementType, Orientation> GetSubVector(size_t offset, size_t size, size_t strideMultiplier=1);
+        VectorReference<ElementType, Orientation> GetSubVector(size_t offset, size_t size);
         using ConstVectorReference<ElementType, Orientation>::GetSubVector;
 
         /// <summary> Gets a reference to the transpose of this vector. </summary>

@@ -18,30 +18,33 @@
 #include <random>
 #include <iostream>
 
-void TestDoubleVector()
+template<typename ElementType>
+void TestVector()
 {
-    math::DoubleColumnVector v(10);
+    using ColumnVector = math::Vector<ElementType, math::VectorOrientation::column>;
+
+    ColumnVector v(10);
     v.Fill(2);
-    math::DoubleColumnVector u{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+    ColumnVector u{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
     testing::ProcessTest("DoubleColumnVector construction and Fill", v == u);
 
     v.Reset();
-    math::DoubleColumnVector z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    ColumnVector z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     testing::ProcessTest("DoubleColumnVector::Reset", v == z);
 
     v[3] = 7;
     v[7] = 9;
-    math::DoubleColumnVector a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
+    ColumnVector a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("DoubleColumnVector::operator[]", v == a);
 
-    testing::ProcessTest("DoubleColumnVector::Norm2", testing::IsEqual(a.Norm2(), std::sqrt(7*7+9*9)));
+    testing::ProcessTest("DoubleColumnVector::Norm2", testing::IsEqual(a.Norm2(), static_cast<ElementType>(std::sqrt(7*7+9*9))));
     testing::ProcessTest("DoubleColumnVector::Norm1", a.Norm1() == 7+9);
     testing::ProcessTest("DoubleColumnVector::Norm0", a.Norm0() == 2);
     testing::ProcessTest("DoubleColumnVector::Min", a.Min() == 0);
     testing::ProcessTest("DoubleColumnVector::Max", a.Max() == 9);
 
     std::default_random_engine rng;
-    std::normal_distribution<double> normal(0, 1.0);
+    std::normal_distribution<ElementType> normal(0, 1.0);
     auto generator = [&]() { return normal(rng); };
     v.Generate(generator);
 
@@ -49,138 +52,70 @@ void TestDoubleVector()
     testing::ProcessTest("DoubleColumnVector::operator *=", v == z);
 }
 
-void TestSingleVector()
+template<typename ElementType>
+void TestVectorReference()
 {
-    math::SingleColumnVector v(10);
-    v.Fill(2);
-    math::SingleColumnVector u{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
-    testing::ProcessTest("SingleColumnVector construction and Fill", v == u);
+    using ColumnVector = math::Vector<ElementType, math::VectorOrientation::column>;
 
-    v.Reset();
-    math::SingleColumnVector z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    testing::ProcessTest("SingleColumnVector::Reset", v == z);
-
-    v[3] = 7;
-    v[7] = 9;
-    math::SingleColumnVector a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
-    testing::ProcessTest("SingleColumnVector::operator[]", v == a);
-
-    testing::ProcessTest("SingleColumnVector::Norm2", testing::IsEqual(a.Norm2(), std::sqrtf(7*7+9*9)));
-    testing::ProcessTest("SingleColumnVector::Norm1", a.Norm1() == 7+9);
-    testing::ProcessTest("SingleColumnVector::Norm0", a.Norm0() == 2);
-    testing::ProcessTest("SingleColumnVector::Min", a.Min() == 0);
-    testing::ProcessTest("SingleColumnVector::Max", a.Max() == 9);
-
-    std::default_random_engine rng;
-    std::normal_distribution<float> normal(0, 1.0);
-    auto generator = [&]() { return normal(rng); };
-    v.Generate(generator);
-
-    v *= 0;
-    testing::ProcessTest("SingleColumnVector::operator *=", v == z);
-}
-
-void TestDoubleVectorReference()
-{
-    math::DoubleColumnVector u(10);
+    ColumnVector u(10);
     auto v = u.GetReference();
-    auto w = v.GetSubVector(1, 3, 2);
+    auto w = v.GetSubVector(1, 3);
     w.Fill(1);
-    math::DoubleColumnVector y{ 0, 1, 0, 1, 0, 1, 0, 0, 0, 0 };
-    testing::ProcessTest("DoubleColumnVectorReference::Fill", u == y);
+    ColumnVector y{ 0, 1, 1, 1, 0, 0, 0, 0, 0, 0 };
+    testing::ProcessTest("ColumnVectorReference::Fill", u == y);
 
     w.Reset();
-    math::DoubleColumnVector z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    testing::ProcessTest("DoubleColumnVectorReference::Reset", u == z);
+    ColumnVector z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    testing::ProcessTest("ColumnVectorReference::Reset", u == z);
 
     w[0] = 7;
     w[2] = 9;
-    math::DoubleColumnVector a{ 0, 7, 0, 0, 0, 9, 0, 0, 0, 0 };
-    testing::ProcessTest("DoubleColumnVectorReference::operator[]", u == a);
+    ColumnVector a{ 0, 7, 0, 9, 0, 0, 0, 0, 0, 0 };
+    testing::ProcessTest("ColumnVectorReference::operator[]", u == a);
 
     auto b = w.GetSubVector(0, 2);
-    testing::ProcessTest("DoubleColumnVectorReference::Norm2", testing::IsEqual(b.Norm2(), std::sqrt(7*7)));
-    testing::ProcessTest("DoubleColumnVectorReference::Norm1", b.Norm1() == 7);
-    testing::ProcessTest("DoubleColumnVectorReference::Norm0", b.Norm0() == 1);
-    testing::ProcessTest("DoubleColumnVectorReference::Min", b.Min() == 0);
-    testing::ProcessTest("DoubleColumnVectorReference::Max", b.Max() == 7);
+    testing::ProcessTest("ColumnVectorReference::Norm2", testing::IsEqual(b.Norm2(), static_cast<ElementType>(std::sqrt(7*7))));
+    testing::ProcessTest("ColumnVectorReference::Norm1", b.Norm1() == 7);
+    testing::ProcessTest("ColumnVectorReference::Norm0", b.Norm0() == 1);
+    testing::ProcessTest("ColumnVectorReference::Min", b.Min() == 0);
+    testing::ProcessTest("ColumnVectorReference::Max", b.Max() == 7);
 
     std::default_random_engine rng;
-    std::normal_distribution<double> normal(0, 1.0);
-    auto generator = [&]() { return normal(rng); };
-    w.Generate(generator);
-
-    //    v *= 0;
-    //    testing::ProcessTest("DoubleColumnVectorReference::operator *=", v == z);
-}
-
-void TestSingleVectorReference()
-{
-    math::SingleColumnVector u(10);
-    auto v = u.GetReference();
-    auto w = v.GetSubVector(1, 3, 2);
-    w.Fill(1);
-    math::SingleColumnVector y{ 0, 1, 0, 1, 0, 1, 0, 0, 0, 0 };
-    testing::ProcessTest("SingleColumnVectorReference::Fill", u == y);
-
-    w.Reset();
-    math::SingleColumnVector z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    testing::ProcessTest("SingleColumnVectorReference::Reset", u == z);
-
-    w[0] = 7;
-    w[2] = 9;
-    math::SingleColumnVector a{ 0, 7, 0, 0, 0, 9, 0, 0, 0, 0 };
-    testing::ProcessTest("SingleColumnVectorReference::operator[]", u == a);
-
-    auto b = w.GetSubVector(0, 2);
-    testing::ProcessTest("SingleColumnVectorReference::Norm2", testing::IsEqual(b.Norm2(), std::sqrtf(7*7)));
-    testing::ProcessTest("SingleColumnVectorReference::Norm1", b.Norm1() == 7);
-    testing::ProcessTest("SingleColumnVectorReference::Norm0", b.Norm0() == 1);
-    testing::ProcessTest("SingleColumnVectorReference::Min", b.Min() == 0);
-    testing::ProcessTest("SingleColumnVectorReference::Max", b.Max() == 7);
-
-    std::default_random_engine rng;
-    std::normal_distribution<float> normal(0, 1.0);
+    std::normal_distribution<ElementType> normal(0, 1.0);
     auto generator = [&]() { return normal(rng); };
     w.Generate(generator);
 
     v *= 0;
-    testing::ProcessTest("SingleColumnVectorReference::operator *=", v == z);
+    testing::ProcessTest("ColumnVectorReference::operator *=", v == z);
 }
 
-void TestDoubleVectorProduct()
+template<typename ElementType>
+void TestVectorProduct()
 {
-    math::DoubleRowVector u{ 0, 1, 0, 1, 0 };
-    math::DoubleColumnVector v{ 1, 2, 3, 4, 5 };
+    using ColumnVector = math::Vector<ElementType, math::VectorOrientation::column>;
+    using RowVector = math::Vector<ElementType, math::VectorOrientation::row>;
+
+    RowVector u{ 0, 1, 0, 1, 0 };
+    ColumnVector v{ 1, 2, 3, 4, 5 };
     auto dot = math::Operations::Dot(u, v);
     testing::ProcessTest("Operations::Dot(Vector, Vector)", dot == 6);
 
-    double result;
+    ElementType result;
     math::Operations::Product(u, v, result);
     testing::ProcessTest("Operations::Product(Vector, Vector)", result == 6);
 }
 
-void TestSingleVectorProduct()
+template<typename ElementType>
+void TestAddTo()
 {
-    math::SingleRowVector u{ 0, 1, 0, 1, 0 };
-    math::SingleColumnVector v{ 1, 2, 3, 4, 5 };
-    auto dot = math::Operations::Dot(u, v);
-    testing::ProcessTest("Operations::Dot(Vector, Vector)", dot == 6);
+    using RowVector = math::Vector<ElementType, math::VectorOrientation::row>;
 
-    float result;
-    math::Operations::Product(u, v, result);
-    testing::ProcessTest("Operations::Product(Vector, Vector)", result == 6);
-}
+    RowVector u{ 1, 2, 3, 4, 5 };
+    RowVector v{ 0, 1, 0, 1, 0 };
+    math::Operations::AddTo(static_cast<ElementType>(2.0), v, u);
 
-void TestDoubleAddTo()
-{
-    math::DoubleRowVector u{ 1, 2, 3, 4, 5 };
-    math::DoubleRowVector v{ 0, 1, 0, 1, 0 };
-    math::Operations::AddTo(2.0, v, u);
-
-    math::DoubleRowVector z{ 1, 4, 3, 6, 5 };
+    RowVector z{ 1, 4, 3, 6, 5 };
     testing::ProcessTest("Operations::AddTo(scalar, Vector, Vector)", u == z);
-
 }
 
 void TestConstDoubleVector()
@@ -194,7 +129,7 @@ void TestDoubleMatrix()
 {
     math::DoubleColumnMatrix M(15, 10);
 
-    auto N = M.GetSubMatrix(2, 5, 3, 3, 3, 2);
+    auto N = M.GetBlock(2, 5, 3, 3);
     N(0, 0) = 1.0;
     N(1, 1) = 2.0;
     N(2, 2) = 3.0;
@@ -211,13 +146,14 @@ void TestDoubleMatrix()
 ///
 int main()
 {
-    TestDoubleVector();
-    TestDoubleVectorReference();
-    TestDoubleVectorProduct();
-    TestSingleVector();
-    TestSingleVectorReference();
-    TestSingleVectorProduct();
-    TestDoubleAddTo();
+    TestVector<float>();
+    TestVector<double>();
+    TestVectorReference<float>();
+    TestVectorReference<double>();
+    TestVectorProduct<float>();
+    TestVectorProduct<double>();
+    TestAddTo<float>();
+    TestAddTo<double>();
     TestConstDoubleVector();
 
     TestDoubleMatrix();

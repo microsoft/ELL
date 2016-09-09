@@ -15,59 +15,59 @@ namespace math
 {
     namespace Blas
     {
-        float Asum(size_t size, const float* ptr, size_t stride)
+        float Asum(size_t size, const float* ptr, size_t Increment)
         {
-            auto result = cblas_sasum(static_cast<int>(size), ptr, static_cast<int>(stride));
+            auto result = cblas_sasum(static_cast<int>(size), ptr, static_cast<int>(Increment));
             return result;
         }
 
-        double Asum(size_t size, double* ptr, size_t stride)
+        double Asum(size_t size, double* ptr, size_t Increment)
         {
-            auto result = cblas_dasum(static_cast<int>(size), ptr, static_cast<int>(stride));
+            auto result = cblas_dasum(static_cast<int>(size), ptr, static_cast<int>(Increment));
             return result;
         }
 
-        float Nrm2(size_t size, const float* ptr, size_t stride)
+        float Nrm2(size_t size, const float* ptr, size_t Increment)
         {
-            auto result = cblas_snrm2(static_cast<int>(size), ptr, static_cast<int>(stride));
+            auto result = cblas_snrm2(static_cast<int>(size), ptr, static_cast<int>(Increment));
             return result;
         }
 
-        double Nrm2(size_t size, double* ptr, size_t stride)
+        double Nrm2(size_t size, double* ptr, size_t Increment)
         {
-            auto result = cblas_dnrm2(static_cast<int>(size), ptr, static_cast<int>(stride));
+            auto result = cblas_dnrm2(static_cast<int>(size), ptr, static_cast<int>(Increment));
             return result;
         }
 
-        void Scal(size_t size, float alpha, float* pLhs, size_t lhsStride)
+        void Scal(size_t size, float alpha, float* pLhs, size_t lhsIncrement)
         {
-            cblas_sscal(static_cast<int>(size), alpha, pLhs, static_cast<int>(lhsStride));
+            cblas_sscal(static_cast<int>(size), alpha, pLhs, static_cast<int>(lhsIncrement));
         }
 
-        void Scal(size_t size, double alpha, double* pLhs, size_t lhsStride)
+        void Scal(size_t size, double alpha, double* pLhs, size_t lhsIncrement)
         {
-            cblas_dscal(static_cast<int>(size), alpha, pLhs, static_cast<int>(lhsStride));
+            cblas_dscal(static_cast<int>(size), alpha, pLhs, static_cast<int>(lhsIncrement));
         }
 
-        void Axpy(size_t size, float alpha, const float * pRhs, size_t rhsStride, float * pLhs, size_t lhsStride)
+        void Axpy(size_t size, float alpha, const float * pRhs, size_t rhsIncrement, float * pLhs, size_t lhsIncrement)
         {
-            cblas_saxpy(static_cast<int>(size), alpha, pRhs, static_cast<int>(rhsStride), pLhs, static_cast<int>(lhsStride));
+            cblas_saxpy(static_cast<int>(size), alpha, pRhs, static_cast<int>(rhsIncrement), pLhs, static_cast<int>(lhsIncrement));
         }
 
-        void Axpy(size_t size, double alpha, const double * pRhs, size_t rhsStride, double * pLhs, size_t lhsStride)
+        void Axpy(size_t size, double alpha, const double * pRhs, size_t rhsIncrement, double * pLhs, size_t lhsIncrement)
         {
-            cblas_daxpy(static_cast<int>(size), alpha, pRhs, static_cast<int>(rhsStride), pLhs, static_cast<int>(lhsStride));
+            cblas_daxpy(static_cast<int>(size), alpha, pRhs, static_cast<int>(rhsIncrement), pLhs, static_cast<int>(lhsIncrement));
         }
 
-        float Dot(size_t size, const float * pFirst, size_t firstStride, const float * pSecond, size_t secondStride)
+        float Dot(size_t size, const float * pFirst, size_t firstIncrement, const float * pSecond, size_t secondIncrement)
         {
-            auto result = cblas_sdot(static_cast<int>(size), pFirst, static_cast<int>(firstStride), pSecond, static_cast<int>(secondStride));
+            auto result = cblas_sdot(static_cast<int>(size), pFirst, static_cast<int>(firstIncrement), pSecond, static_cast<int>(secondIncrement));
             return result;
         }
 
-        double Dot(size_t size, const double* pFirst, size_t firstStride, const double* pSecond, size_t secondStride)
+        double Dot(size_t size, const double* pFirst, size_t firstIncrement, const double* pSecond, size_t secondIncrement)
         {
-            auto result = cblas_ddot(static_cast<int>(size), pFirst, static_cast<int>(firstStride), pSecond, static_cast<int>(secondStride));
+            auto result = cblas_ddot(static_cast<int>(size), pFirst, static_cast<int>(firstIncrement), pSecond, static_cast<int>(secondIncrement));
             return result;
         }
     }

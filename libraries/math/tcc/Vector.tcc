@@ -26,14 +26,14 @@ namespace math
     {
         // TODO check index<size
         // 
-        return _pData[index * _stride];
+        return _pData[index * _increment ];
     }
 
     template<typename ElementType, VectorOrientation Orientation>
     ElementType ConstVectorReference<ElementType, Orientation>::Norm2() const
     {
 #ifdef USE_BLAS
-        return Blas::Nrm2(_size, _pData, _stride);
+        return Blas::Nrm2(_size, _pData, _increment );
 #else
         return std::sqrt(Aggregate([](ElementType x){ return x*x; }));
 #endif
@@ -43,7 +43,7 @@ namespace math
     ElementType ConstVectorReference<ElementType, Orientation>::Norm1() const
     {
 #ifdef USE_BLAS
-        return Blas::Asum(_size, _pData, _stride);
+        return Blas::Asum(_size, _pData, _increment );
 #else
         return Aggregate([](ElementType x) { return std::abs(x); });
 #endif
@@ -60,14 +60,14 @@ namespace math
     {
         ElementType result = *_pData;
         const ElementType* ptr = _pData+1;
-        const ElementType* end = _pData + _size * _stride;
+        const ElementType* end = _pData + _size * _increment ;
         while(ptr < end)
         {
             if((*ptr) < result)
             {
                 result = *ptr;
             }
-            ptr += _stride;
+            ptr += _increment ;
         }
         return result;
     }
@@ -77,14 +77,14 @@ namespace math
     {
         ElementType result = *_pData;
         const ElementType* ptr = _pData+1;
-        const ElementType* end = _pData + _size * _stride;
+        const ElementType* end = _pData + _size * _increment ;
         while(ptr < end)
         {
             if((*ptr) > result)
             {
                 result = *ptr;
             }
-            ptr += _stride;
+            ptr += _increment ;
         }
         return result;
     }
@@ -92,19 +92,19 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetReference() const
     {
-        return ConstVectorReference<ElementType, Orientation>(_pData, _size, _stride);
+        return ConstVectorReference<ElementType, Orientation>(_pData, _size, _increment );
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier) const
+    ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size) const
     {
-        return ConstVectorReference<ElementType, Orientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
+        return ConstVectorReference<ElementType, Orientation>(_pData + offset * _increment , size, _increment );
     }
 
     template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, FlipOrientation<Orientation>::value> ConstVectorReference<ElementType, Orientation>::Transpose() const
     {
-        return ConstVectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _stride);
+        return ConstVectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _increment );
     }
 
     template<typename ElementType, VectorOrientation Orientation>
@@ -132,7 +132,7 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    ConstVectorReference<ElementType, Orientation>::ConstVectorReference(ElementType * pData, size_t size, size_t stride) : _pData(pData), _size(size), _stride(stride)
+    ConstVectorReference<ElementType, Orientation>::ConstVectorReference(ElementType * pData, size_t size, size_t increment) : _pData(pData), _size(size), _increment(increment)
     {
         // TODO check that pData != 0
     }
@@ -143,11 +143,11 @@ namespace math
     {
         ElementType result = 0;
         const ElementType* ptr = _pData;
-        const ElementType* end = _pData + _size * _stride;
+        const ElementType* end = _pData + _size * _increment ;
         while(ptr < end)
         {
             result += mapper(*ptr);
-            ptr += _stride;
+            ptr += _increment ;
         }
         return result;
     }
@@ -166,11 +166,11 @@ namespace math
     void VectorReference<ElementType, Orientation>::Fill(ElementType value)
     {
         ElementType* current = _pData;
-        ElementType* end = _pData + _size * _stride;
+        ElementType* end = _pData + _size * _increment ;
         while(current < end)
         {
             *current = value;
-            current += _stride;
+            current += _increment ;
         }
     }
 
@@ -178,11 +178,11 @@ namespace math
     void VectorReference<ElementType, Orientation>::Generate(std::function<ElementType()> generator)
     {
         ElementType* current = _pData;
-        ElementType* end = _pData + _size * _stride;
+        ElementType* end = _pData + _size * _increment ;
         while(current < end)
         {
             *current = generator();
-            current += _stride;
+            current += _increment ;
         }
     }
 
@@ -191,7 +191,7 @@ namespace math
     {
         // TODO check index<size
         // 
-        return _pData[index * _stride];
+        return _pData[index * _increment ];
     }
 
     template<typename ElementType, VectorOrientation Orientation>
@@ -210,7 +210,7 @@ namespace math
     void VectorReference<ElementType, Orientation>::operator*=(ElementType scalar)
     {
 #ifdef USE_BLAS
-        Blas::Scal(_size, scalar, _pData, _stride);
+        Blas::Scal(_size, scalar, _pData, _increment );
 #else
         ForEach([scalar](ElementType x) { return x*scalar; });
 #endif
@@ -219,19 +219,19 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetReference()
     {
-        return VectorReference<ElementType, Orientation>(_pData, _size, _stride);
+        return VectorReference<ElementType, Orientation>(_pData, _size, _increment );
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size, size_t strideMultiplier)
+    VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size)
     {
-        return VectorReference<ElementType, Orientation>(_pData + offset * _stride, size, strideMultiplier * _stride);
+        return VectorReference<ElementType, Orientation>(_pData + offset * _increment , size, _increment );
     }
 
     template<typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, FlipOrientation<Orientation>::value> VectorReference<ElementType, Orientation>::Transpose()
     {
-        return VectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _stride);
+        return VectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _increment );
     }
 
     template<typename ElementType, VectorOrientation Orientation>
@@ -239,11 +239,11 @@ namespace math
     void VectorReference<ElementType, Orientation>::ForEach(MapperType mapper)
     {
         ElementType* ptr = _pData;
-        const ElementType* end = _pData + _size * _stride;
+        const ElementType* end = _pData + _size * _increment ;
         while(ptr < end)
         {
             *ptr = mapper(*ptr);
-            ptr += _stride;
+            ptr += _increment ;
         }
     }
 

@@ -23,20 +23,20 @@ namespace math
         // TODO check inputs for equal size
 
         ElementType* pLhs = lhsVector.GetDataPointer();
-        size_t lhsStride = lhsVector.GetStride();
+        size_t lhsIncrement = lhsVector.GetIncrement();
         const ElementType* pRhs = rhsVector.GetDataPointer();
-        size_t rhsStride = rhsVector.GetStride();
+        size_t rhsIncrement = rhsVector.GetIncrement();
 
 #ifdef USE_BLAS
-        return Blas::Axpy(lhsSize, rhsScalar, pRhs, rhsStride, pLhs, lhsStride);
+        return Blas::Axpy(lhsSize, rhsScalar, pRhs, rhsIncrement, pLhs, lhsIncrement);
 #else
         const ElementType* pEnd = pLhs + lhsSize;
 
         while (pLhs < pEnd)
         {
             (*pLhs) += rhsScalar * (*pRhs);
-            pLhs += lhsStride;
-            pRhs += rhsStride;
+            pLhs += lhsIncrement;
+            pRhs += rhsIncrement;
         }
 #endif
     }
@@ -50,12 +50,12 @@ namespace math
         // TODO check inputs for equal size
 
         const ElementType* ptr1 = vector1.GetDataPointer();
-        size_t stride1 = vector1.GetStride();
+        size_t Increment1 = vector1.GetIncrement();
         const ElementType* ptr2 = vector2.GetDataPointer();
-        size_t stride2 = vector2.GetStride();
+        size_t Increment2 = vector2.GetIncrement();
 
 #ifdef USE_BLAS
-        return Blas::Dot(size1, ptr1, stride1, ptr2, stride2);
+        return Blas::Dot(size1, ptr1, Increment1, ptr2, Increment2);
 #else
         ElementType result = 0;
         const ElementType* end1 = ptr1 + size1;
@@ -63,8 +63,8 @@ namespace math
         while (ptr1 < end1)
         {
             result += (*ptr1) * (*ptr2);
-            ptr1 += stride1;
-            ptr2 += stride2;
+            ptr1 += Increment1;
+            ptr2 += Increment2;
         }
         return result;
 #endif
