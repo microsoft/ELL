@@ -207,21 +207,21 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Serialize(utilities::Serializer& serializer) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        serializer.Serialize("interiorNodes", _interiorNodes);
-        serializer.Serialize("rootIndices", _rootIndices);
-        serializer.Serialize("bias", _bias);
-        serializer.Serialize("numEdges", _numEdges);
+        archiver["interiorNodes"] << _interiorNodes;
+        archiver["rootIndices"] << _rootIndices;
+        archiver["bias"] << _bias;
+        archiver["numEdges"] << _numEdges;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        serializer.Deserialize("interiorNodes", _interiorNodes, context);
-        serializer.Deserialize("rootIndices", _rootIndices, context);
-        serializer.Deserialize("bias", _bias, context);
-        serializer.Deserialize("numEdges", _numEdges, context);
+        archiver["interiorNodes"] >> _interiorNodes;
+        archiver["rootIndices"] >> _rootIndices;
+        archiver["bias"] >> _bias;
+        archiver["numEdges"] >> _numEdges;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
@@ -270,7 +270,7 @@ namespace predictors
             const auto& interiorNode = _interiorNodes[nodeIndex];
 
             // which way do we go?
-            int edgePosition = interiorNode._splitRule.Predict(input);
+            int edgePosition = static_cast<int>(interiorNode._splitRule.Predict(input));
 
             // check for early eject
             if (edgePosition < 0)
@@ -282,7 +282,7 @@ namespace predictors
             operation(interiorNode, edgePosition);
             
             //follow the edge to the next node
-            auto edge = interiorNode._outgoingEdges[edgePosition];
+            const auto& edge = interiorNode._outgoingEdges[edgePosition];
             nodeIndex = edge.GetTargetNodeIndex();
         }
         while (nodeIndex != 0);
@@ -298,19 +298,19 @@ namespace predictors
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::Serialize(utilities::Serializer& serializer) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::WriteToArchive(utilities::Archiver& archiver) const
     {
-        serializer.Serialize("splitRule", _splitRule);
-        serializer.Serialize("outgoingEdges", _outgoingEdges);
-        serializer.Serialize("firstEdgeIndex", _firstEdgeIndex);
+        archiver["splitRule"] << _splitRule;
+        archiver["outgoingEdges"] << _outgoingEdges;
+        archiver["firstEdgeIndex"] << _firstEdgeIndex;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::InteriorNode::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        serializer.Deserialize("splitRule", _splitRule, context);
-        serializer.Deserialize("outgoingEdges", _outgoingEdges, context);
-        serializer.Deserialize("firstEdgeIndex", _firstEdgeIndex, context);
+        archiver["splitRule"] >> _splitRule;
+        archiver["outgoingEdges"] >> _outgoingEdges;
+        archiver["firstEdgeIndex"] >> _firstEdgeIndex;
     }
 
     //
@@ -392,18 +392,17 @@ namespace predictors
         return _targetNodeIndex == 0 ? false : true;
     }
 
-
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Serialize(utilities::Serializer& serializer) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::WriteToArchive(utilities::Archiver& archiver) const
     {
-        serializer.Serialize("predictor", _predictor);
-        serializer.Serialize("targetNodeIndex", _targetNodeIndex);
+        archiver["predictor"] << _predictor;
+        archiver["targetNodeIndex"] << _targetNodeIndex;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::Edge::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        serializer.Deserialize("predictor", _predictor, context);
-        serializer.Deserialize("targetNodeIndex", _targetNodeIndex, context);
+        archiver["predictor"] >> _predictor;
+        archiver["targetNodeIndex"] >> _targetNodeIndex;
     }
 }

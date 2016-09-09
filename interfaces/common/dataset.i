@@ -12,7 +12,7 @@
 #include "DenseDataVector.h"
 #include "IDataVector.h"
 #include "SparseDataVector.h"
-#include "SupervisedExample.h"
+#include "Example.h"
 #include "RowDatasetInterface.h"
 %}
 
@@ -21,7 +21,6 @@
 namespace dataset
 {
     %ignore IDataVector::Clone;
-    %ignore SupervisedExample<IDataVector>::SupervisedExample(SupervisedExample&&);
     %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&&);
     %ignore GenericSupervisedExample::GetDataVector;
     %ignore GenericSupervisedExample::GenericSupervisedExample;
@@ -34,7 +33,7 @@ namespace dataset
     %ignore SparseDataVector<short, utilities::CompressedIntegerList>;
 }
 
-%ignore dataset::SupervisedExample<dataset::DoubleDataVector>::SupervisedExample(SupervisedExample&&);
+%ignore dataset::DenseSupervisedExample::DenseSupervisedExample(DenseSupervisedExample&&);
 %ignore interfaces::GenericRowDataset::GenericRowDataset(GenericRowDataset &&);
 
 %include "noncopyable.i"
@@ -43,19 +42,8 @@ namespace dataset
 %include "IDataVector.h"
 %include "DenseDataVector.h"
 %include "SparseDataVector.h"
-%include "SupervisedExample.h"
+%include "Example.h"
 %include "RowDataset.h"
-
-%template() dataset::RowDataset<dataset::IDataVector>;
-%template() dataset::DenseDataVector<double>;
-%template(DenseSupervisedExample) dataset::SupervisedExample<dataset::DoubleDataVector>;
-
-namespace dataset
-{
-    wrap_noncopyable(SupervisedExample<IDataVector>);
-    %template() SupervisedExample<IDataVector>;
-    %template() RowDataset<IDataVector>;
-}
 
 %include "RowDatasetInterface.h"
 %import "RowDataset.h"
@@ -63,31 +51,25 @@ namespace dataset
 %include "unique_ptr.i"
 wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)
 
+%template() dataset::RowDataset<dataset::GenericSupervisedExample>;
+%template() dataset::DenseDataVector<double>;
 
-namespace dataset
-{
-    // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
-    %template () DenseDataVector<double>;
-    %template () DenseDataVector<float>;
-    %template () SparseDataVector<double, utilities::CompressedIntegerList>;
-    %template () SparseDataVector<float, utilities::CompressedIntegerList>;
-    %template () SparseDataVector<short, utilities::CompressedIntegerList>;
-    %template () RowDataset<IDataVector>;
-    
-    // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
-    // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;
-    // %template (SparseFloatDataVectorBase) SparseDataVector<float, utilities::CompressedIntegerList>;
-    // %template (SparseShortDataVectorBase) SparseDataVector<short, utilities::CompressedIntegerList>;
+// The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
+%template () dataset::DenseDataVector<double>;
+%template () dataset::DenseDataVector<float>;
+%template () dataset::SparseDataVector<double, utilities::CompressedIntegerList>;
+%template () dataset::SparseDataVector<float, utilities::CompressedIntegerList>;
+%template () dataset::SparseDataVector<short, utilities::CompressedIntegerList>;
+%template () dataset::RowDataset<GenericSupervisedExample>;
 
-    // wrap operator[] for python
-    WRAP_OP_AT(DoubleDataVector, double)
+// wrap operator[] for python
+WRAP_OP_AT(dataset::DoubleDataVector, double)
 
-    // wrap "Print" method for python
-    WRAP_PRINT_TO_STR(SupervisedExample<IDataVector>)
-    WRAP_PRINT_TO_STR(FloatDataVector)
-    WRAP_PRINT_TO_STR(DoubleDataVector)
+// wrap "Print" method for python
+//    WRAP_PRINT_TO_STR(GenericSupervisedExample)
+WRAP_PRINT_TO_STR(dataset::FloatDataVector)
+WRAP_PRINT_TO_STR(dataset::DoubleDataVector)
 
-    WRAP_PRINT_TO_STR(SparseDoubleDataVector)
-    WRAP_PRINT_TO_STR(SparseFloatDataVector) 
-    WRAP_PRINT_TO_STR(SparseShortDataVector)
-}
+WRAP_PRINT_TO_STR(dataset::SparseDoubleDataVector)
+WRAP_PRINT_TO_STR(dataset::SparseFloatDataVector) 
+WRAP_PRINT_TO_STR(dataset::SparseShortDataVector)

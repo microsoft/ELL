@@ -22,10 +22,7 @@ namespace model
     //
     PortElementBase::PortElementBase(const OutputPortBase& port, size_t index) : _referencedPort(&port), _index(index) {}
 
-    bool PortElementBase::operator==(const PortElementBase& other) const
-    {
-        return (_referencedPort == other._referencedPort) && (_index == other._index);
-    }
+    bool PortElementBase::operator==(const PortElementBase& other) const { return (_referencedPort == other._referencedPort) && (_index == other._index); }
 
     //
     // PortRange
@@ -48,62 +45,65 @@ namespace model
         }
     }
 
-    bool PortRange::IsFullPortRange() const
-    {
-        return GetStartIndex() == 0 && Size() == ReferencedPort()->Size();
-    }
+    bool PortRange::IsFullPortRange() const { return GetStartIndex() == 0 && Size() == ReferencedPort()->Size(); }
 
-    void PortRange::Serialize(utilities::Serializer& serializer) const
+    void PortRange::WriteToArchive(utilities::Archiver& archiver) const
     {
-        serializer.Serialize("startIndex", _startIndex);
-        serializer.Serialize("numValues", _numValues);
-        serializer.Serialize("isFixedSize", _isFixedSize);
-        serializer.Serialize("referencedNodeId", _referencedPort->GetNode()->GetId());
-        serializer.Serialize("referencedPortName", _referencedPort->GetName());
-    }
-
-    void PortRange::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
-    {
-        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
-        serializer.Deserialize("startIndex", _startIndex, newContext);
-        serializer.Deserialize("numValues", _numValues, newContext);
-        serializer.Deserialize("isFixedSize", _isFixedSize, newContext);
-        Node::NodeId newId;
-        serializer.Deserialize("referencedNodeId", newId, newContext);
-        std::string portName;
-        serializer.Deserialize("referencedPortName", portName, newContext);
-        
-        Node* newNode = newContext.GetNodeFromId(newId);
-        if(newNode == nullptr)
+        archiver["startIndex"] << _startIndex;
+        archiver["numValues"] << _numValues;
+        archiver["isFixedSize"] << _isFixedSize;
+        if (_referencedPort != nullptr)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find deserialized node.");
+            archiver["referencedNodeId"] << _referencedPort->GetNode()->GetId();
+            archiver["referencedPortName"] << _referencedPort->GetName();
+        }
+        else
+        {
+            archiver["referencedNodeId"] << utilities::UniqueId();
+            archiver["referencedPortName"] << std::string{ "" };
+        }
+    }
+
+    void PortRange::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        archiver["startIndex"] >> _startIndex;
+        archiver["numValues"] >> _numValues;
+        archiver["isFixedSize"] >> _isFixedSize;
+        Node::NodeId newId;
+        archiver["referencedNodeId"] >> newId;
+        std::string portName;
+        archiver["referencedPortName"] >> portName;
+
+        auto& context = archiver.GetContext();
+        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
+        Node* newNode = newContext.GetNodeFromId(newId);
+        if (newNode == nullptr)
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find archived node.");
         }
 
         auto ports = newNode->GetOutputPorts();
         OutputPortBase* newPort = nullptr;
-        for(auto port: ports)
+        for (auto port : ports)
         {
-            if(port->GetName() == portName)
+            if (port->GetName() == portName)
             {
                 newPort = port;
                 break;
             }
         }
-        if(_referencedPort == newPort)
+        if (_referencedPort == newPort)
         {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error deserializing port.");        
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error unarchiving port.");
         }
         _referencedPort = newPort;
-        if(newPort == nullptr)
+        if (newPort == nullptr)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't deserialize model::PortRange port");
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive model::PortRange port");
         }
     }
 
-    bool PortRange::operator==(const PortRange& other) const
-    {
-        return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_numValues == other._numValues);
-    }
+    bool PortRange::operator==(const PortRange& other) const { return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_numValues == other._numValues); }
 
     //
     // PortElementsBase
@@ -137,11 +137,8 @@ namespace model
         _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
         ComputeSize();
     }
-    
-    void PortElementsBase::Reserve(size_t numRanges)
-    {
-        _ranges.reserve(numRanges);
-    }
+
+    void PortElementsBase::Reserve(size_t numRanges) { _ranges.reserve(numRanges); }
 
     void PortElementsBase::AddRange(const PortRange& range)
     {
@@ -172,17 +169,14 @@ namespace model
         }
     }
 
-    void PortElementsBase::Serialize(utilities::Serializer& serializer) const
+    void PortElementsBase::WriteToArchive(utilities::Archiver& archiver) const
     {
-        serializer.Serialize("ranges", _ranges);
+        archiver["ranges"] << _ranges;
     }
 
-    void PortElementsBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void PortElementsBase::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        model::ModelSerializationContext& newContext = dynamic_cast<model::ModelSerializationContext&>(context);
-        std::vector<PortRange> ranges;
-        serializer.Deserialize("ranges", ranges, newContext);
-        _ranges = ranges;
+        archiver["ranges"] >> _ranges;
         ComputeSize();
     }
 }

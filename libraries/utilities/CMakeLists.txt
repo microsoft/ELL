@@ -17,17 +17,20 @@ set (SRC src/CompressedIntegerList.cpp
          src/CompressedIntegerList.cpp
          src/Files.cpp
          src/Format.cpp
+         src/IArchivable.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
+         src/ObjectArchive.cpp
+         src/ObjectArchiver.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
-         src/Serializer.cpp
-         src/JsonSerializer.cpp
+         src/Archiver.cpp
+         src/JsonArchiver.cpp
          src/Tokenizer.cpp
-         src/XMLSerializer.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
-         src/Variant.cpp)
+         src/Variant.cpp
+         src/XMLArchiver.cpp)
 
 set (INCLUDE include/CompressedIntegerList.h
              include/CommandLineParser.h
@@ -37,40 +40,45 @@ set (INCLUDE include/CompressedIntegerList.h
              include/IIterator.h
              include/IntegerList.h
              include/IntegerStack.h
-             include/ISerializable.h
+             include/IArchivable.h
+             include/JsonArchiver.h
+             include/ObjectArchive.h
+             include/ObjectArchiver.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
              include/RandomEngines.h
-             include/Serializer.h
-             include/JsonSerializer.h
-             include/Tokenizer.h
-             include/XMLSerializer.h
+             include/Archiver.h
              include/StlIndexValueIterator.h
              include/StlIterator.h
+             include/Tokenizer.h
              include/TransformIterator.h
              include/TypeFactory.h
              include/TypeName.h
              include/TypeTraits.h
              include/UniqueId.h
-             include/Variant.h)
+             include/Variant.h
+             include/XMLArchiver.h)
 
 set (TCC tcc/AnyIterator.tcc
          tcc/CommandLineParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
+         tcc/IArchivable.tcc
+         tcc/JsonArchiver.tcc
+         tcc/ObjectArchive.tcc
+         tcc/ObjectArchiver.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
-         tcc/Serializer.tcc
-         tcc/JsonSerializer.tcc
-         tcc/XMLSerializer.tcc
+         tcc/Archiver.tcc
          tcc/StlIndexValueIterator.tcc
          tcc/StlIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
          tcc/TypeTraits.tcc
-         tcc/Variant.tcc)
+         tcc/Variant.tcc
+         tcc/XMLArchiver.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -99,13 +107,17 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp 
-              test/src/ISerializable_test.cpp
+              test/src/IArchivable_test.cpp
+              test/src/Iterator_test.cpp
+              test/src/ObjectArchive_test.cpp
               test/src/TypeFactory_test.cpp
               test/src/Variant_test.cpp)
 
-set (TEST_INCLUDE test/include/ISerializable_test.h
-                  test/include/TypeFactory_test.h
-                  test/include/Variant_test.h)
+set (TEST_INCLUDE test/include/IArchivable_test.h
+                  test/include/Iterator_test.h
+                  test/include/ObjectArchive_test.h
+                  test/src/TypeFactory_test.cpp
+                  test/src/Variant_test.cpp)
                   
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

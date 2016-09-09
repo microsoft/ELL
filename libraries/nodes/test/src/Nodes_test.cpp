@@ -98,8 +98,6 @@ void TestL2NormNodeCompute()
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
     auto outputNode = model.AddNode<nodes::L2NormNode<double>>(inputNode->output);
 
-    bool okSize = true;
-    bool okResult = true;
     for (int index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
@@ -123,7 +121,6 @@ void TestAccumulatorNodeCompute()
 
     std::vector<double> accumOutput(data[0].size());
 
-    bool ok = true;
     for (int index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
@@ -150,7 +147,6 @@ void TestDelayNodeCompute()
 
     std::vector<double> outputVec;
 
-    bool ok = true;
     for (int index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
@@ -299,7 +295,6 @@ void TestMovingAverageNodeRefine()
     auto meanNode = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, windowSize);
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
-    double expectedOutput = VectorMean({ 7.0, 8.0, 9.0, 10.0 });
 
     model::TransformContext context{ common::IsNodeCompilable() };
     model::ModelTransformer transformer;
@@ -327,7 +322,6 @@ void TestSimpleForestNodeRefine()
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
     using SplitRule = predictors::SingleElementThresholdPredictor;
     using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
-    using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
     // build a forest
     predictors::SimpleForestPredictor forest;

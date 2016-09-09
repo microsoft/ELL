@@ -39,19 +39,19 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void AccumulatorNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void AccumulatorNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
-    void AccumulatorNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void AccumulatorNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
 
         auto dimension = _input.Size();
         _accumulator = std::vector<ValueType>(dimension);

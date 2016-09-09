@@ -10,7 +10,7 @@
 // dataset
 #include "RowDataset.h"
 #include "DenseDataVector.h"
-#include "SupervisedExample.h"
+#include "Example.h"
 
 // utilities
 #include "StlIterator.h"
@@ -66,7 +66,7 @@ namespace interfaces
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        dataset::SupervisedExample<dataset::DoubleDataVector> GetDenseSupervisedExample(uint64_t index) const;
+        dataset::DenseSupervisedExample GetDenseSupervisedExample(uint64_t index) const;
                 
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///

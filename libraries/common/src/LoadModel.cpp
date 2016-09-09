@@ -35,9 +35,9 @@
 
 // utilities
 #include "Files.h"
-#include "Serializer.h"
-#include "JsonSerializer.h"
-#include "XMLSerializer.h"
+#include "Archiver.h"
+#include "JsonArchiver.h"
+#include "XMLArchiver.h"
 
 namespace common
 {
@@ -180,16 +180,16 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
     }
 
-    template <typename DeserializerType>
-    model::Model DeserializeModel(std::istream& stream)
+    template <typename UnarchiverType>
+    model::Model LoadArchivedModel(std::istream& stream)
     {
         try
         {
-            DeserializerType deserializer(stream);
             utilities::SerializationContext context;
             RegisterNodeTypes(context);
+            UnarchiverType unarchiver(stream, context);
             model::Model model;
-            deserializer.Deserialize(model, context);
+            unarchiver.Unarchive(model);
             return model;
         }
         catch (const std::exception&)
@@ -198,11 +198,11 @@ namespace common
         }
     }
 
-    template <typename SerializerType>
-    void SerializeModel(const model::Model& model, std::ostream& stream)
+    template <typename ArchiverType>
+    void SaveArchivedModel(const model::Model& model, std::ostream& stream)
     {
-        SerializerType serializer(stream);
-        serializer.Serialize(model);
+        ArchiverType archiver(stream);
+        archiver.Archive(model);
     }
 
     bool IsKnownExtension(const std::string& ext)
@@ -245,11 +245,11 @@ namespace common
                 auto filestream = utilities::OpenIfstream(filename);
                 if (ext == "xml")
                 {
-                    return DeserializeModel<utilities::SimpleXmlDeserializer>(filestream);
+                    return LoadArchivedModel<utilities::XmlUnarchiver>(filestream);
                 }
                 else if (ext == "json")
                 {
-                    return DeserializeModel<utilities::JsonDeserializer>(filestream);
+                    return LoadArchivedModel<utilities::JsonUnarchiver>(filestream);
                 }
             }
 
@@ -264,12 +264,12 @@ namespace common
         if(ext == "xml")
         {
             auto filestream = utilities::OpenOfstream(filename);
-            SerializeModel<utilities::SimpleXmlSerializer>(model, filestream);
+            SaveArchivedModel<utilities::XmlArchiver>(model, filestream);
         }
         else if(ext == "json")
         {
             auto filestream = utilities::OpenOfstream(filename);
-            SerializeModel<utilities::JsonSerializer>(model, filestream);
+            SaveArchivedModel<utilities::JsonArchiver>(model, filestream);
         }
         else
         {

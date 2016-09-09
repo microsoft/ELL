@@ -1,20 +1,19 @@
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ISerializable_test.cpp (utilities)
+//  File:     IArchivable_test.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ISerializable_test.h"
+#include "IArchivable_test.h"
 
 // utilities
 #include "UniqueId.h"
-#include "ISerializable.h"
-#include "Serializer.h"
-#include "JsonSerializer.h"
-#include "XMLSerializer.h"
+#include "IArchivable.h"
+#include "Archiver.h"
+#include "JsonArchiver.h"
+#include "XMLArchiver.h"
 
 // model
 #include "Model.h"
@@ -33,7 +32,7 @@
 #include <vector>
 #include <sstream>
 
-struct TestStruct : public utilities::ISerializable
+struct TestStruct : public utilities::IArchivable
 {
     int a=0;
     float b=0.0f;
@@ -43,24 +42,24 @@ struct TestStruct : public utilities::ISerializable
     static std::string GetTypeName() { return "TestStruct"; }
     virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    virtual void Serialize(utilities::Serializer& serializer) const override
+    virtual void WriteToArchive(utilities::Archiver& archiver) const override
     {
-        serializer.Serialize("a", a);
-        serializer.Serialize("b", b);
-        serializer.Serialize("c", c);
+        archiver.Archive("a", a);
+        archiver.Archive("b", b);
+        archiver.Archive("c", c);
     }
 
-    virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override
+    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
         // what about _type?
-        serializer.Deserialize("a", a, context);
-        serializer.Deserialize("b", b, context);
-        serializer.Deserialize("c", c, context);
+        archiver.Unarchive("a", a);
+        archiver.Unarchive("b", b);
+        archiver.Unarchive("c", c);
     }
 };
 
-template <typename SerializerType>
-void TestSerializer()
+template <typename ArchiverType>
+void TestArchiver()
 {
     bool boolVal = true;
     int intVal = 1;
@@ -76,146 +75,119 @@ void TestSerializer()
     auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
-    SerializerType serializer;
-    std::cout << "--Serializing bool--" << std::endl;
-    serializer.Serialize(boolVal);
-    std::cout << std::endl;
 
-    std::cout << "--Serializing int--" << std::endl;
-    serializer.Serialize(intVal);
-    std::cout << std::endl;
+    std::stringstream strstream;
+    ArchiverType archiver(strstream);
+    archiver.Archive(boolVal);
 
-    std::cout << "--Serializing float--" << std::endl;
-    serializer.Serialize(floatVal);
-    std::cout << std::endl;
+    archiver.Archive(intVal);
 
-    std::cout << "--Serializing double--" << std::endl;
-    serializer.Serialize(doubleVal);
-    std::cout << std::endl;
+    archiver.Archive(floatVal);
 
-    std::cout << "--Serializing TestStruct--" << std::endl;
-    serializer.Serialize(testStruct);
-    std::cout << std::endl;
+    archiver.Archive(doubleVal);
 
-    std::cout << "--Serializing UniqueId--" << std::endl;
-    serializer.Serialize(id);
-    std::cout << std::endl;
+    archiver.Archive(testStruct);
 
-    std::cout << "--Serializing input node--" << std::endl;
-    serializer.Serialize(*in);
-    std::cout << std::endl;
+    archiver.Archive(id);
 
-    std::cout << "\n--Serializing output node--" << std::endl;
-    serializer.Serialize(*out);
-    std::cout << std::endl;
+    archiver.Archive(*in);
 
-    std::cout << "\n--Serializing constant node--" << std::endl;
-    serializer.Serialize(*constNode);
-    std::cout << std::endl;
+    archiver.Archive(*out);
 
-    std::cout << "\n--Serializing binary operation node--" << std::endl;
-    serializer.Serialize(*binaryOpNode);
-    std::cout << std::endl;
+    archiver.Archive(*constNode);
 
-    std::cout << "\n--Serializing model--" << std::endl;
-    serializer.Serialize(g);
-    std::cout << std::endl;
-    std::cout << "------------------------" << std::endl;
-    std::cout << std::endl;
+    archiver.Archive(*binaryOpNode);
+
+    archiver.Archive(g);
 
     // simple stuff
-    serializer.Serialize(5);
-    std::cout << std::endl;
+    archiver.Archive(5);
 
-    serializer.Serialize(3.1415);
-    std::cout << std::endl;
+    archiver.Archive(3.1415);
 
     std::vector<int> intArray{ 1, 2, 3 };
-    serializer.Serialize("intArray", intArray);
-    std::cout << std::endl;
+    archiver.Archive("intArray", intArray);
 
     std::vector<bool> boolArray{ true, false, true };
-    serializer.Serialize("boolArray", boolArray);
-    std::cout << std::endl;
+    archiver.Archive("boolArray", boolArray);
 
     std::vector<TestStruct> structArray;
     structArray.emplace_back(1, 2.0f, 3.0);
     structArray.emplace_back(4, 5.0f, 6.0);
     structArray.emplace_back(7, 8.0f, 9.0);
-    serializer.Serialize("structArray", structArray);
-    std::cout << std::endl;
+    archiver.Archive("structArray", structArray);
 }
 
-template <typename SerializerType, typename DeserializerType>
-void TestDeserializer()
+template <typename ArchiverType, typename UnarchiverType>
+void TestUnarchiver()
 {
     utilities::SerializationContext context;
 
     {
         std::stringstream strstream;
         {
-            SerializerType serializer(strstream);
-            serializer.Serialize("true", true);
+            ArchiverType archiver(strstream);
+            archiver.Archive("true", true);
         }
 
-        DeserializerType deserializer(strstream);
+        UnarchiverType unarchiver(strstream, context);
         bool val = false;
-        deserializer.Deserialize("true", val, context);
+        unarchiver.Unarchive("true", val);
         testing::ProcessTest("Deserialize bool check", val == true);
     }
 
     {
         std::stringstream strstream;
         {
-            SerializerType serializer(strstream);
-            serializer.Serialize("pi", 3.14159);
+            ArchiverType archiver(strstream);
+            archiver.Archive("pi", 3.14159);
         }
 
-        DeserializerType deserializer(strstream);
+        UnarchiverType unarchiver(strstream, context);
         double val = 0;
-        deserializer.Deserialize("pi", val, context);
+        unarchiver.Unarchive("pi", val);
         testing::ProcessTest("Deserialize float check", val == 3.14159);
     }
 
     {
         std::stringstream strstream;
         {
-            SerializerType serializer(strstream);
-            serializer.Serialize("pie", std::string{ "cherry pie" });
+            ArchiverType archiver(strstream);
+            archiver.Archive("pie", std::string{ "cherry pie" });
         }
 
-        DeserializerType deserializer(strstream);
+        UnarchiverType unarchiver(strstream, context);
         std::string val;
-        deserializer.Deserialize("pie", val, context);
+        unarchiver.Unarchive("pie", val);
         testing::ProcessTest("Deserialize string check", val == "cherry pie");
     }
 
     {
         std::stringstream strstream;
         {
-            SerializerType serializer(strstream);
+            ArchiverType archiver(strstream);
             std::vector<int> arr{ 1,2,3 };
-            serializer.Serialize("arr", arr);
+            archiver.Archive("arr", arr);
         }
 
-        DeserializerType deserializer(strstream);
+        UnarchiverType unarchiver(strstream, context);
         std::vector<int> val;
-        deserializer.Deserialize("arr", val, context);
+        unarchiver.Unarchive("arr", val);
         testing::ProcessTest("Deserialize vector<int> check", val[0] == 1 && val[1] == 2 && val[2] == 3);
     }
 
     {
         std::stringstream strstream;
         {
-            SerializerType serializer(strstream);
+            ArchiverType archiver(strstream);
             TestStruct testStruct{ 1, 2.2f, 3.3 };
-            serializer.Serialize("s", testStruct);
+            archiver.Archive("s", testStruct);
         }
 
-        DeserializerType deserializer(strstream);
+        UnarchiverType unarchiver(strstream, context);
         TestStruct val;
-        deserializer.Deserialize("s", val, context);
-        testing::ProcessTest("Deserialize ISerializable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);        
+        unarchiver.Unarchive("s", val);
+        testing::ProcessTest("Deserialize IArchivable check",  val.a == 1 && val.b == 2.2f && val.c == 3.3);        
     }
 
     {
@@ -232,32 +204,33 @@ void TestDeserializer()
         auto constVector = std::vector<double>{ 1.0, 2.0, 3.0 };
 
         {
-            SerializerType serializer(strstream);
+            ArchiverType archiver(strstream);
             auto in = g.AddNode<model::InputNode<double>>(3);
             auto constNode = g.AddNode<nodes::ConstantNode<double>>(constVector);
             auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
             auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
-            serializer.Serialize("node1", *constNode);
-            serializer.Serialize("node2", *in);
-            serializer.Serialize("node3", constNode);
-            serializer.Serialize("node4", constNode);
-            serializer.Serialize("node5", binaryOpNode);
+            archiver.Archive("node1", *constNode);
+            archiver.Archive("node2", *in);
+            archiver.Archive("node3", constNode);
+            archiver.Archive("node4", constNode);
+            archiver.Archive("node5", binaryOpNode);
         }
 
-        DeserializerType deserializer(strstream);
+        UnarchiverType unarchiver(strstream, context);
+        unarchiver.PushContext(modelContext);
         nodes::ConstantNode<double> newConstNode;
         model::InputNode<double> newIn;
         nodes::BinaryOperationNode<double> newBinaryOpNode;
         std::unique_ptr<nodes::ConstantNode<double>> newConstNodePtr = nullptr;
         std::unique_ptr<model::Node> newNodePtr = nullptr;
         std::unique_ptr<nodes::BinaryOperationNode<double>> newBinaryOpNodePtr = nullptr;
-        deserializer.Deserialize("node1", newConstNode, modelContext);
-        deserializer.Deserialize("node2", newIn, modelContext);
-        deserializer.Deserialize("node3", newConstNodePtr, modelContext);
-        deserializer.Deserialize("node4", newNodePtr, modelContext);
-        deserializer.Deserialize("node5", newBinaryOpNode, modelContext);
-
+        unarchiver.Unarchive("node1", newConstNode);
+        unarchiver.Unarchive("node2", newIn);
+        unarchiver.Unarchive("node3", newConstNodePtr);
+        unarchiver.Unarchive("node4", newNodePtr);
+        unarchiver.Unarchive("node5", newBinaryOpNode);
+        unarchiver.PopContext();
         testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNode.GetValues()));
         testing::ProcessTest("Deserialize nodes check",  testing::IsEqual(constVector, newConstNodePtr->GetValues()));
     }
@@ -271,20 +244,16 @@ void TestDeserializer()
         structVector.push_back(TestStruct{ 4, 5.5f, 6.6 });
 
         {
-            SerializerType serializer(strstream);
-            serializer.Serialize("vec1", doubleVector);
-            serializer.Serialize("vec2", structVector);
+            ArchiverType archiver(strstream);
+            archiver.Archive("vec1", doubleVector);
+            archiver.Archive("vec2", structVector);
         }
-        std::cout << "Serialized string:" << std::endl;
-        std::cout << strstream.str() << std::endl;
 
-        DeserializerType deserializer(strstream);
+        UnarchiverType unarchiver(strstream, context);
         std::vector<double> newDoubleVector;
         std::vector<TestStruct> newStructVector;
-        deserializer.Deserialize("vec1", newDoubleVector, context);
-        std::cout << "Done with vec1" << std::endl;
-        deserializer.Deserialize("vec2", newStructVector, context);
-        std::cout << "Done with vec2" << std::endl;
+        unarchiver.Unarchive("vec1", newDoubleVector);
+        unarchiver.Unarchive("vec2", newStructVector);
 
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(doubleVector, newDoubleVector));
         testing::ProcessTest("Deserialize array check",  testing::IsEqual(structVector[0].a, newStructVector[0].a));
@@ -312,21 +281,22 @@ void TestDeserializer()
 
         std::stringstream strstream;
         {
-            SerializerType serializer(strstream);
+            ArchiverType archiver(strstream);
 
-            serializer.Serialize(g);
+            archiver.Archive(g);
             // std::cout << "Graph output:" << std::endl;
             // std::cout << strstream.str() << std::endl;
         }
 
-        DeserializerType deserializer(strstream);
+        UnarchiverType unarchiver(strstream, context);
+        unarchiver.PushContext(modelContext);
         model::Model newGraph;
-        deserializer.Deserialize(newGraph, modelContext);
+        unarchiver.Unarchive(newGraph);
 
         std::stringstream strstream2;
-        SerializerType serializer2(strstream2);
+        ArchiverType archiver2(strstream2);
 
-        serializer2.Serialize(newGraph);
+        archiver2.Archive(newGraph);
         // std::cout << "New graph output:" << std::endl;
         // std::cout << strstream2.str() << std::endl;
     }
@@ -335,33 +305,33 @@ void TestDeserializer()
         auto stringVal = std::string{ "Hi there! Here's a tab character: \t, as well as some 'quoted' text." };
         std::stringstream strstream;
         {
-            SerializerType serializer(strstream);
-            serializer.Serialize("str", stringVal);
+            ArchiverType archiver(strstream);
+            archiver.Archive("str", stringVal);
         }
         
-        DeserializerType deserializer(strstream);
+        UnarchiverType unarchiver(strstream, context);
         std::string val;
-        deserializer.Deserialize("str", val, context);
+        unarchiver.Unarchive("str", val);
         testing::ProcessTest("Deserialize string check", val == stringVal);    
     }
 }
 
-void TestJsonSerializer()
+void TestJsonArchiver()
 {
-    TestSerializer<utilities::JsonSerializer>();
+    TestArchiver<utilities::JsonArchiver>();
 }
 
-void TestJsonDeserializer()
+void TestJsonUnarchiver()
 {
-    TestDeserializer<utilities::JsonSerializer, utilities::JsonDeserializer>();
+    TestUnarchiver<utilities::JsonArchiver, utilities::JsonUnarchiver>();
 }
 
-void TestXmlSerializer()
+void TestXmlArchiver()
 {
-    TestSerializer<utilities::SimpleXmlSerializer>();
+    TestArchiver<utilities::XmlArchiver>();
 }
 
-void TestXmlDeserializer()
+void TestXmlUnarchiver()
 {
-    TestDeserializer<utilities::SimpleXmlSerializer, utilities::SimpleXmlDeserializer>();
+    TestUnarchiver<utilities::XmlArchiver, utilities::XmlUnarchiver>();
 }

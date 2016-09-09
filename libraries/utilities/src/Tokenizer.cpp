@@ -136,6 +136,8 @@ namespace utilities
         auto nextToken = ReadNextToken();
         if (nextToken != token)
         {
+            std::cout << "Failed to match token " << token <<  ", got: " <<  nextToken;
+            assert(false);
             throw InputException(InputExceptionErrors::badStringFormat, std::string{"Failed to match token "} + token + ", got: " + nextToken);
         }
     }

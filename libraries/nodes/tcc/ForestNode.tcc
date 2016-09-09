@@ -29,25 +29,25 @@ namespace nodes
     {}
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::Serialize(utilities::Serializer& serializer) const
+    void ForestNode<SplitRuleType, EdgePredictorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("treeOutputs", _treeOutputs);
-        serializer.Serialize("edgeIndicatorVector", _edgeIndicatorVector);
-        serializer.Serialize("forest", _forest);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
+        archiver[treeOutputsPortName] << _treeOutputs;
+        archiver[edgeIndicatorVectorPortName] << _edgeIndicatorVector;
+        archiver["forest"] << _forest;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void ForestNode<SplitRuleType, EdgePredictorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("treeOutputs", _treeOutputs, context);
-        serializer.Deserialize("edgeIndicatorVector", _edgeIndicatorVector, context);
-        serializer.Deserialize("forest", _forest, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
+        archiver[treeOutputsPortName] >> _treeOutputs;
+        archiver[edgeIndicatorVectorPortName] >> _edgeIndicatorVector;
+        archiver["forest"] >> _forest;
     }
 
     template<typename SplitRuleType, typename EdgePredictorType>

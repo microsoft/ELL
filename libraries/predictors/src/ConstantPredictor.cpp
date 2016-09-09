@@ -16,14 +16,14 @@ namespace predictors
     ConstantPredictor::ConstantPredictor(double value) : _value(value)
     {}
 
-    void ConstantPredictor::Serialize(utilities::Serializer& serializer) const
+    void ConstantPredictor::WriteToArchive(utilities::Archiver& archiver) const
     {
-        serializer.Serialize("value", _value);
+        archiver["value"] << _value;
     }
 
-    void ConstantPredictor::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void ConstantPredictor::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        serializer.Deserialize("value", _value, context);
+        archiver["value"] >> _value;
     }
 
     void ConstantPredictor::Print(std::ostream& os) const

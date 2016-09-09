@@ -104,27 +104,27 @@ namespace nodes
     };
 
     template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void BinaryPredicateNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("predicate", static_cast<int>(_predicate));
-        serializer.Serialize("input1", _input1);
-        serializer.Serialize("input2", _input2);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[input1PortName] << _input1;
+        archiver[input2PortName] << _input2;
+        archiver[outputPortName] << _output;
+        archiver["predicate"] << static_cast<int>(_predicate);
     }
 
     template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void BinaryPredicateNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        int pred = 0;
-        serializer.Deserialize("predicate", pred, context);
-        _predicate = static_cast<PredicateType>(pred);
-        serializer.Deserialize("input1", _input1, context);
-        serializer.Deserialize("input2", _input2, context);
-        serializer.Deserialize("output", _output, context);
+        Node::ReadFromArchive(archiver);
+        archiver[input1PortName] >> _input1;
+        archiver[input2PortName] >> _input2;
+        archiver[outputPortName] >> _output;
+        int predicate = 0;
+        archiver["predicate"] >> predicate;
+        _predicate = static_cast<PredicateType>(predicate);
     }
-
+    
     template <typename ValueType>
     void BinaryPredicateNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {

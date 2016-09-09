@@ -1,15 +1,11 @@
-Embedded Machine Learning Library (EMLL) style guide
-====================================================
-
+# Embedded Machine Learning Library (EMLL) style guide
 This is the C++ coding style guide for the EMLL project.
 
-File names and extensions
--------------------------
+## File names and extensions
 Header files use the extension ".h". Source code files use the extension ".cpp" if they are compiled into a .lib or .exe, and ".tcc" if they contain templated source code.
 Each file should typically contain a single class and its name should match the class name.
 
-Projects
---------
+## Projects
 A project is a set of source files that compile into a single executable or library, or that implement a single template library.
 
 Naming:  
@@ -29,9 +25,10 @@ Each project is contained in a directory. The directory contains a CMakeLists.tx
 
 Additionally, the directory can contain a README.md file.  
 
-Naming
-------
-All names should be as descriptive as possible. Prefer whole words to abbreviations, especially if those abbreviations could be ambiguous. Example: prefer `GetFunctionDefinition` to `GetFuncDef`
+## Naming
+Names should be descriptive and self-evident, rather than terse. Use whole words rather than abbreviations. Example: use `GetFunctionDefinition` instead of `GetFuncDef`. Exceptions to this rule are:
+
+* use "Num" as abbreviation for "Number"
 
 Classes, structs, and enum classes:
 use PascalCase, e.g., `class MyClass {};`
@@ -40,7 +37,7 @@ Functions, member and non-member:
 use PascalCase, e.g., `int GetValue() const { return _value; }`  
 
 When possible, function names should be imperative mood verbs, e.g., `GetValue()` and `Permute()`. Specifically, accessor member functions should start with `Get`, e.g., `GetOutputVector()`. 
-A few exceptions are:
+Exceptions to this rule are:
 
 * a member functions that returns the size of an object, which can simply be `Size()`
 * type conversion functions, which can start with `To`, e.g., `ToString()`
@@ -52,15 +49,13 @@ Use `_` (underscore) followed by camelCase, e.g., `_myMemberVariable`
 Template typenames: 
 Use PascalCase and add the suffix "Type", e.g., `template <typename SparseVectorType>`
 
-File structure
---------------
+## File structure
 All source code files should start with a header that specifies project name, file name, and author list (see example below)
 
 .h files should indicate `#pragma once` immediately after the header
 
 Next, indicate all `#include` statements. First, include files from the local project. Second, include files from other projects, grouping by project and adding the project name as a comment. Finally, include standard libraries.
 
-    ******** begin example ********
     //////////////////////////////////////////////////////////////////////////////////////////////////// 
     // 
     //  Project:  Embedded Machine Learning Library (EMLL)
@@ -83,10 +78,8 @@ Next, indicate all `#include` statements. First, include files from the local pr
     // stl
     #include <vector>
     #include <string>
-    ******** end example ********
 
-Function implementations
-------------------------
+## Function implementations
 Almost all function implementations belong in .cpp and .tcc files. The exception is short single-instruction implementations of parameterless functions, which should appear in the .h file on the same line as the function declaration. For example:
 
     double GetValue() const { return _value; }  // inline implementation in .h file
@@ -100,8 +93,10 @@ Almost all function implementations belong in .cpp and .tcc files. The exception
         return _index;
     }
 
-Documentation
--------------
+## Formatting
+Use clang-format to enforce correct formatting. Use the definitions in the file `.clang-format`, which is found in the main project directory. 
+
+## Documentation
 All public classes, functions, and variables that are declared in .h files should be preceded by an XML documentation block. The only exception is functions that are defined with =default or =delete, which should not be documented. Each documentation row should begin with three slashes (///) and the first line in a documentation block should contain a summary tag. Follow this example:
 
     /// <summary> Mathematical power operation. </summary>

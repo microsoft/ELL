@@ -38,18 +38,18 @@ namespace nodes
     }
 
     template <typename InputValueType, typename OutputValueType>
-    void TypeCastNode<InputValueType, OutputValueType>::Serialize(utilities::Serializer& serializer) const
+    void TypeCastNode<InputValueType, OutputValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[outputPortName] << _output;
     }
 
     template <typename InputValueType, typename OutputValueType>
-    void TypeCastNode<InputValueType, OutputValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void TypeCastNode<InputValueType, OutputValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("output", _output, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[outputPortName] >> _output;
     }
 }

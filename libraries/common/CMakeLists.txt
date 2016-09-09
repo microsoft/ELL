@@ -12,8 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/BaggingIncrementalTrainerArguments.cpp
-         src/DataLoadArguments.cpp
+set (SRC src/DataLoadArguments.cpp
          src/DataSaveArguments.cpp
          src/DataLoaders.cpp
          src/EvaluatorArguments.cpp
@@ -24,11 +23,11 @@ set (SRC src/BaggingIncrementalTrainerArguments.cpp
          src/ModelSaveArguments.cpp
          src/MultiEpochIncrementalTrainerArguments.cpp
          src/SGDIncrementalTrainerArguments.cpp
+         src/ForestTrainerArguments.cpp
          src/TrainerArguments.cpp
 )
 
-set (INCLUDE include/BaggingIncrementalTrainerArguments.h
-             include/DataLoadArguments.h
+set (INCLUDE include/DataLoadArguments.h
              include/DataSaveArguments.h
              include/DataLoaders.h
              include/EvaluatorArguments.h
@@ -41,10 +40,12 @@ set (INCLUDE include/BaggingIncrementalTrainerArguments.h
              include/MultiEpochIncrementalTrainerArguments.h
              include/ParametersEnumerator.h
              include/SGDIncrementalTrainerArguments.h
+             include/ForestTrainerArguments.h
              include/TrainerArguments.h
 )
 
-set (TCC tcc/MakeEvaluator.tcc
+set (TCC tcc/IsNodeCompilable.tcc
+         tcc/MakeEvaluator.tcc
          tcc/ParametersEnumerator.tcc
 )
 

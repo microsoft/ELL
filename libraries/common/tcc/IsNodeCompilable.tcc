@@ -1,9 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Nothing.cpp (trainers)
-//  Authors:  Ofer Dekel
+//  File:     IsNodeCompilable.tcc (common)
+//  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Empty file, to ensure that CMake creates a project for this library
+namespace common
+{
+    template <typename NodeType>
+    void IsNodeCompilable::AddNodeType()
+    {
+        _nodeNames.insert(NodeType::GetTypeName());
+    }
+}
