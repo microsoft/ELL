@@ -11,6 +11,8 @@
 // utilities
 #include "Files.h"
 
+namespace emll
+{
 void ParsedPrintArguments::AddArgs(utilities::CommandLineParser& parser)
 {
     parser.AddOption(outputFilename, "outputFilename", "of", "Path to the output file", "");
@@ -33,4 +35,5 @@ utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilit
 
     std::vector<std::string> parseErrorMessages;
     return parseErrorMessages;
+}
 }
