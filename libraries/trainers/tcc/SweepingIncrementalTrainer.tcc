@@ -9,6 +9,8 @@
 // utilities
 #include "RandomEngines.h"
 
+namespace emll
+{
 namespace trainers
 {
     template <typename PredictorType>
@@ -67,4 +69,5 @@ namespace trainers
     {
         return std::make_unique<SweepingIncrementalTrainer<PredictorType>>(std::move(evaluatingTrainers), parameters);
     }
+}
 }

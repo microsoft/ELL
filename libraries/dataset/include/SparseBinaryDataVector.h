@@ -22,6 +22,8 @@
 #include <iostream>
 #include <type_traits>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> Implements a sparse binary vector as an increasing list of the coordinates where the
@@ -160,6 +162,7 @@ namespace dataset
     public:
         using SparseBinaryDataVectorBase<utilities::IntegerList>::SparseBinaryDataVectorBase;
     };
+}
 }
 
 #include "../tcc/SparseBinaryDataVector.tcc"

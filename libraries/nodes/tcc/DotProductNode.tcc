@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     template <typename ValueType>
@@ -70,4 +72,5 @@ namespace nodes
         archiver[input2PortName] >> _input2;
         archiver[outputPortName] >> _output;
     }
+}
 }

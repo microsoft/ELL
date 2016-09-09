@@ -17,6 +17,8 @@
 #include <memory>
 #include <vector>
 
+namespace emll
+{
 namespace dataset
 {
     using IParsingIterator = typename utilities::IIterator<GenericSupervisedExample>;
@@ -65,6 +67,7 @@ namespace dataset
     /// <returns> The parsing iterator. </returns>
     template <typename RowIteratorType, typename VectorEntryParserType>
     std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser);
+}
 }
 
 #include "../tcc/ParsingIterator.tcc"

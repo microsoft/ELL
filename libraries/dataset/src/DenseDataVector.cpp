@@ -11,6 +11,8 @@
 // stl
 #include <cassert>
 
+namespace emll
+{
 namespace dataset
 {
 
@@ -112,4 +114,5 @@ namespace dataset
 
     template class DenseDataVector<float>;
     template class DenseDataVector<double>;
+}
 }

@@ -8,6 +8,8 @@
 
 #include "Format.h"
 
+namespace emll
+{
 namespace utilities
 {
     void PrintFormat(std::ostream& os, const char* format)
@@ -74,4 +76,5 @@ namespace utilities
 
         return MatchResult::success;
     }
+}
 }

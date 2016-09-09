@@ -8,6 +8,8 @@
 
 #include "Exception.h"
 
+namespace emll
+{
 namespace predictors
 {
     template <typename RandomAccessVectorType>
@@ -20,4 +22,5 @@ namespace predictors
 
         return inputVector[_index] > _threshold;
     }
+}
 }

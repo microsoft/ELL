@@ -10,6 +10,8 @@
 
 #include <string>
 
+namespace emll
+{
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
@@ -57,4 +59,5 @@ namespace utilities
 std::hash<utilities::UniqueId>::result_type std::hash<utilities::UniqueId>::operator()(argument_type const& id) const
 {
     return std::hash<size_t>()(id._id);
+}
 }

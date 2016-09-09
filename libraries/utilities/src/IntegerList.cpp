@@ -14,6 +14,8 @@
 // stl
 #include <stdexcept>
 
+namespace emll
+{
 namespace utilities
 {
     IntegerList::Iterator::Iterator(const vector_iterator& begin, const vector_iterator& end)
@@ -45,4 +47,5 @@ namespace utilities
     {
         return Iterator(_list.cbegin(), _list.cend());
     }
+}
 }

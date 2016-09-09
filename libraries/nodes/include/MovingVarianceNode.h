@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that takes a vector input and returns its variance over some window of time. </summary>
@@ -82,6 +84,7 @@ namespace nodes
         mutable std::vector<ValueType> _runningSquaredSum;
         size_t _windowSize;
     };
+}
 }
 
 #include "../tcc/MovingVarianceNode.tcc"

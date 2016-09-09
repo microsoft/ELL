@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -96,4 +98,5 @@ namespace model
         std::string _name;
         PortType _type = PortType::none;
     };
+}
 }

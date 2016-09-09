@@ -16,6 +16,8 @@
 #include <memory>
 #include <string>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> Parses and iterates over a stringstream of index-value pairs. </summary>
@@ -61,4 +63,5 @@ namespace dataset
         /// <returns> The iterator. </returns>
         Iterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
     };
+}
 }

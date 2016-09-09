@@ -11,6 +11,8 @@
 // stl
 #include <cassert>
 
+namespace emll
+{
 namespace utilities
 {
     uint64_t IntegerStack::Pop()
@@ -47,4 +49,5 @@ namespace utilities
 
         assert(value < _smallestUnpopped);
     }
+}
 }

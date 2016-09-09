@@ -8,6 +8,8 @@
 
 #include "DoubleSubvector.h"
 
+namespace emll
+{
 namespace linear
 {
     DoubleSubvector::DoubleSubvector(const DoubleVector& vec, uint64_t offset, uint64_t size)
@@ -64,4 +66,5 @@ namespace linear
             iterator.Next();
         }
     }
+}
 }

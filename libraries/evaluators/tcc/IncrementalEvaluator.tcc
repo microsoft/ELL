@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace evaluators
 {
     template <typename BasePredictorType, typename... AggregatorTypes>
@@ -63,4 +65,5 @@ namespace evaluators
     {
         return std::make_unique<IncrementalEvaluator<BasePredictorType, AggregatorTypes...>>(exampleIterator, evaluatorParameters, aggregators...);
     }
+}
 }

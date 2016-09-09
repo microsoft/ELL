@@ -14,6 +14,8 @@
 #include <ostream>
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> An imposter class that can stand in for a std::ostream object </summary>
@@ -53,4 +55,5 @@ namespace utilities
         std::shared_ptr<std::ofstream> _outputFileStream;
         std::shared_ptr<std::ostream> _outputStream;
     };
+}
 }

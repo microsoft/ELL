@@ -15,6 +15,8 @@
 #include <string>
 #include <unordered_set>
 
+namespace emll
+{
 namespace common
 {
     /// <summary> Functor for the default implementation of the IsNodeCompilable function. </summary>
@@ -38,6 +40,7 @@ namespace common
         template <typename NodeType>
         void AddNodeType();
     };
+}
 }
 
 #include "../tcc/IsNodeCompilable.tcc"

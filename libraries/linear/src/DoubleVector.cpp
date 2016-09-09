@@ -11,6 +11,8 @@
 // stl
 #include <algorithm>
 
+namespace emll
+{
 namespace linear
 {
     DoubleVector::DoubleVector(uint64_t size)
@@ -65,4 +67,5 @@ namespace linear
             iterator.Next();
         }
     }
+}
 }

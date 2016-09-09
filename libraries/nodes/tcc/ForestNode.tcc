@@ -18,6 +18,8 @@
 #include <memory>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     template <typename SplitRuleType, typename EdgePredictorType>
@@ -184,4 +186,5 @@ namespace nodes
         auto edgeIndicator = _forest.GetEdgeIndicatorVector(_input);
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
+}
 }

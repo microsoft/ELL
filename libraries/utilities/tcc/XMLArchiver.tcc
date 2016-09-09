@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -255,4 +257,5 @@ namespace utilities
 
         _tokenizer.MatchTokens({ "<", "/", "Array", ">" });
     }
+}
 }

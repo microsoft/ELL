@@ -14,6 +14,8 @@
 // trainers
 #include "MultiEpochIncrementalTrainer.h"
 
+namespace emll
+{
 namespace common
 {
     using MultiEpochIncrementalTrainerArguments = trainers::MultiEpochIncrementalTrainerParameters;
@@ -26,4 +28,5 @@ namespace common
         /// <param name="parser"> [in,out] The command line parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
     };
+}
 }

@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     class IArchivable;
@@ -365,5 +367,6 @@ namespace utilities
     void base::UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name, value); }
 #define IMPLEMENT_UNARCHIVE_ARRAY(base, type) \
     void base::UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name, value); }
+}
 
 #include "../tcc/Archiver.tcc"

@@ -11,6 +11,8 @@
 // stl
 #include <cmath>
 
+namespace emll
+{
 namespace lossFunctions
 {
     LogLoss::LogLoss(double scale)
@@ -48,4 +50,5 @@ namespace lossFunctions
             return -label * exp_neg_scaled_margin / (1.0 + exp_neg_scaled_margin);
         }
     }
+}
 }

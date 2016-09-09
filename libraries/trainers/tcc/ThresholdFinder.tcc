@@ -11,6 +11,8 @@
 // stl
 #include <algorithm>
 
+namespace emll
+{
 namespace trainers
 {
     template <typename ExampleIteratorType>
@@ -68,4 +70,5 @@ namespace trainers
 
         return thresholdPredictors;
     }
+}
 }

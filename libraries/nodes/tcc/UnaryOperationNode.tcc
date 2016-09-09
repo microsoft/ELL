@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     namespace UnaryOperations
@@ -109,4 +111,5 @@ namespace nodes
         archiver["operation"] >> operation;
         _operation = static_cast<OperationType>(operation);
     }
+}
 }

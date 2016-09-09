@@ -11,6 +11,8 @@
 // stl
 #include <vector>
 
+namespace emll
+{
 namespace common
 {
     void ParsedDataSaveArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -41,4 +43,5 @@ namespace common
         std::vector<std::string> parseErrorMessages;
         return parseErrorMessages;
     }
+}
 }

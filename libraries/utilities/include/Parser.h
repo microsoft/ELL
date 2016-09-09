@@ -8,6 +8,8 @@
 
 #pragma once
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> The results of the parse command: success = Parsing succeeded; badFormat = The string
@@ -38,6 +40,7 @@ namespace utilities
     ///
     /// <param name="pStr"> The string pointer. </param>
     inline void Trim(const char*& pStr);
+}
 }
 
 #include "../tcc/Parser.tcc"

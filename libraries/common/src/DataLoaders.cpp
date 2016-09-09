@@ -22,6 +22,8 @@
 #include <memory>
 #include <stdexcept>
 
+namespace emll
+{
 namespace common
 {
     //
@@ -51,4 +53,5 @@ namespace common
 
         return rowDataset;
     }
+}
 }

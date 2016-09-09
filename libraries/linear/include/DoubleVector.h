@@ -20,6 +20,8 @@
 #include <iostream>
 #include <type_traits>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary> A double vector. </summary>
@@ -144,6 +146,7 @@ namespace linear
     private:
         std::vector<double> _data;
     };
+}
 }
 
 #include "../tcc/DoubleVector.tcc"

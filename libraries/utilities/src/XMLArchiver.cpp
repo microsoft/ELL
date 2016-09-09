@@ -18,6 +18,8 @@
 #include <sstream>
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -368,4 +370,5 @@ namespace utilities
         std::replace(result.begin(), result.end(), ')', '>');
         return result;
     }
+}
 }

@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -101,4 +103,5 @@ namespace model
         _isModelCompilable &= _context.IsNodeCompilable(*newNode);
         return newNode;
     }
+}
 }

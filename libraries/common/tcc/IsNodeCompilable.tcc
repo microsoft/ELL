@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace common
 {
     template <typename NodeType>
@@ -13,4 +15,5 @@ namespace common
     {
         _nodeNames.insert(NodeType::GetTypeName());
     }
+}
 }

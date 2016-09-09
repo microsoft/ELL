@@ -18,6 +18,8 @@
 #include <type_traits>
 #include <unordered_map>
 
+namespace emll
+{
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
@@ -125,6 +127,7 @@ namespace utilities
         // friends
         friend class IArchivable;
     };
+}
 }
 
 #include "../tcc/ObjectArchive.tcc"

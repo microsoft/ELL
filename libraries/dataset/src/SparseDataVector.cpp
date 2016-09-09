@@ -8,6 +8,8 @@
 
 #include "SparseDataVector.h"
 
+namespace emll
+{
 namespace dataset
 {
     template <typename ValueType, typename IntegerListType>
@@ -117,4 +119,5 @@ namespace dataset
     template class SparseDataVector<double, utilities::CompressedIntegerList>;
     template class SparseDataVector<float, utilities::CompressedIntegerList>;
     template class SparseDataVector<short, utilities::CompressedIntegerList>;
+}
 }

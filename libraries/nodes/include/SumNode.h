@@ -20,6 +20,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that takes a vector input and returns the sum of its elements. </summary>
@@ -74,6 +76,7 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+}
 }
 
 #include "../tcc/SumNode.tcc"

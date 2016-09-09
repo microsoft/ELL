@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -142,4 +144,5 @@ namespace utilities
             _objectDescription[name] >> array;
         }
     }
+}
 }

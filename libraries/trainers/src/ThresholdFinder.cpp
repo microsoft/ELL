@@ -12,6 +12,8 @@
 #include <functional>
 #include <vector>
 
+namespace emll
+{
 namespace trainers
 {
     size_t ThresholdFinder::SortReduceDuplicates(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const
@@ -39,4 +41,5 @@ namespace trainers
         }
         return current - begin + 1;
     }
+}
 }

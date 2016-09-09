@@ -25,6 +25,8 @@
 #include <utility>
 #include <vector>
 
+namespace emll
+{
 namespace trainers
 {
     /// <summary> A class that runs multiple internal trainers and chooses the best performing predictor. </summary>
@@ -66,6 +68,7 @@ namespace trainers
     /// <returns> A unique_ptr to a sweeping trainer. </returns>
     template <typename PredictorType>
     std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeSweepingIncrementalTrainer(std::vector<EvaluatingIncrementalTrainer<PredictorType>>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters);
+}
 }
 
 #include "../tcc/SweepingIncrementalTrainer.tcc"

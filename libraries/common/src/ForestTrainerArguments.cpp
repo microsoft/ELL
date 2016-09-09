@@ -8,6 +8,8 @@
 
 #include "ForestTrainerArguments.h"
 
+namespace emll
+{
 namespace common
 {
     void ParsedForestTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -54,4 +56,5 @@ namespace common
                          "Use the sorting trainer instead of the histogram trainer",
                          false);
     }
+}
 }

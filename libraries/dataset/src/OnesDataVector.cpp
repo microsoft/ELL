@@ -15,6 +15,8 @@
 // utilities
 #include "Exception.h"
 
+namespace emll
+{
 namespace dataset
 {
     OnesDataVector::Iterator::Iterator(uint64_t size)
@@ -69,4 +71,5 @@ namespace dataset
         std::fill(vector.begin(), vector.end(), 1.0);
         return vector;
     }
+}
 }

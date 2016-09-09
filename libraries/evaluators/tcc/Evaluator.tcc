@@ -8,6 +8,8 @@
 
 #include "BinaryErrorAggregator.h"
 
+namespace emll
+{
 namespace evaluators
 {
     template <typename PredictorType, typename... AggregatorTypes>
@@ -157,4 +159,5 @@ namespace evaluators
     {
         return std::make_unique<Evaluator<PredictorType, AggregatorTypes...>>(exampleIterator, evaluatorParameters, aggregators...);
     }
+}
 }

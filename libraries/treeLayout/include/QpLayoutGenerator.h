@@ -14,6 +14,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace treeLayout
 {
     /// <summary>
@@ -140,6 +142,7 @@ namespace treeLayout
         std::vector<double> _gd_increment;
         Parameters _parameters;
     };
+}
 }
 
 #include "../tcc/QpLayoutGenerator.tcc"

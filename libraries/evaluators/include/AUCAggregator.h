@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace evaluators
 {
     /// <summary> An evaluation aggregator that computes AUC. </summary>
@@ -51,4 +53,5 @@ namespace evaluators
 
         mutable std::vector<Aggregate> _aggregates; // mutable because Get() const has to sort this vector
     };
+}
 }

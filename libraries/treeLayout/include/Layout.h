@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 /// <summary> %treeLayout namespace </summary>
 namespace treeLayout
 {
@@ -132,4 +134,5 @@ namespace treeLayout
         double _minDepth = 0;
         double _maxDepth = 0;
     };
+}
 }

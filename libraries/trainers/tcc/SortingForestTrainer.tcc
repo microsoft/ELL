@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace trainers
 {
     template <typename LossFunctionType, typename BoosterType>
@@ -97,4 +99,5 @@ namespace trainers
     {
         return std::make_unique<SortingForestTrainer<LossFunctionType, BoosterType>>(lossFunction, booster, parameters);
     }
+}
 }

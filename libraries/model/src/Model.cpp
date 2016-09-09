@@ -13,6 +13,8 @@
 // stl
 #include <unordered_map>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -186,4 +188,5 @@ namespace model
     {
         _oldToNewNodeMap[id] = node;
     }
+}
 }

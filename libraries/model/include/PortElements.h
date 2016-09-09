@@ -20,6 +20,8 @@
 #include <cassert>
 #include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -372,6 +374,7 @@ namespace std
         /// <returns> A hash value for the given input. </returns>
         result_type operator()(argument_type const& id) const;
     };
+}
 }
 
 #include "../tcc/PortElements.tcc"

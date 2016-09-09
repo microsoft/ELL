@@ -14,6 +14,8 @@
 // utilities
 #include "Exception.h"
 
+namespace emll
+{
 namespace dataset
 {
     template <typename VectorEntryParserType, typename DefaultDataVectorType>
@@ -75,4 +77,5 @@ namespace dataset
             throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "real value out of double precision range in '" + str + "'");
         }
     }
+}
 }

@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that returns a delayed sample of the input signal. </summary>
@@ -83,6 +85,7 @@ namespace nodes
         mutable std::vector<std::vector<ValueType>> _samples;
         size_t _windowSize;
     };
+}
 }
 
 #include "../tcc/DelayNode.tcc"

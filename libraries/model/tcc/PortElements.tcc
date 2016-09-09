@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -151,4 +153,5 @@ namespace model
     {
         return RefType({ ref1, refs... });
     }
+}
 }

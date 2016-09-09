@@ -16,6 +16,8 @@
 // stl
 #include <iostream>
 
+namespace emll
+{
 namespace predictors
 {
     /// <summary> A split rule that compares a single feature to a threshold. </summary>
@@ -82,6 +84,7 @@ namespace predictors
         size_t _index;
         double _threshold;
     };
+}
 }
 
 #include "../tcc/SingleElementThresholdPredictor.tcc"

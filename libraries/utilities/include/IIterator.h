@@ -11,6 +11,8 @@
 // stl
 #include <cstdint>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> Abstract base class for an iterator over a collection of objects of type T. </summary>
@@ -47,4 +49,5 @@ namespace utilities
         /// <returns> A const reference to the current item; </returns>
         virtual ValueType Get() const = 0;
     };
+}
 }

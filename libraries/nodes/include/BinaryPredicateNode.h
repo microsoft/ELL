@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that performs a coordinatewise binary boolean-valued operation on its inputs. </summary>
@@ -98,6 +100,7 @@ namespace nodes
         // Operation
         PredicateType _predicate;
     };
+}
 }
 
 #include "../tcc/BinaryPredicateNode.tcc"

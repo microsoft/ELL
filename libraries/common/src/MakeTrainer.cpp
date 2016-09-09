@@ -22,6 +22,8 @@
 #include "SortingForestTrainer.h"
 #include "ThresholdFinder.h"
 
+namespace emll
+{
 namespace common
 {
     std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments)
@@ -71,4 +73,5 @@ namespace common
                 throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
+}
 }

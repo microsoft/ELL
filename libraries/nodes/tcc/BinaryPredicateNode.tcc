@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     namespace BinaryPredicates
@@ -136,4 +138,5 @@ namespace nodes
         auto newNode = transformer.AddNode<BinaryPredicateNode<ValueType>>(PortElements1, PortElements2, _predicate);
         transformer.MapNodeOutput(output, newNode->output);
     }
+}
 }

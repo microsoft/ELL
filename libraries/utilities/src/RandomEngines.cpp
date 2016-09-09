@@ -8,6 +8,8 @@
 
 #include "RandomEngines.h"
 
+namespace emll
+{
 namespace utilities
 {
     std::vector<std::default_random_engine> GetRandomEngines(int num, std::string seed_string)
@@ -41,4 +43,5 @@ namespace utilities
     {
         return GetRandomEngines(1, seed_string)[0];
     }
+}
 }

@@ -38,6 +38,8 @@
 #include <sstream>
 #include <string>
 
+namespace emll
+{
 using namespace nodes;
 
 //
@@ -427,4 +429,5 @@ void TestDemultiplexerNodeRefine()
     outputVec = model.ComputeOutput(muxNode->output);
     newOutputVec = refinedModel.ComputeOutput(newMuxNodeElements);
     testing::ProcessTest("Testing DemultiplexerNode refine", testing::IsEqual(outputVec, newOutputVec));
+}
 }

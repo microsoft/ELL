@@ -21,6 +21,8 @@
 #include <type_traits>
 #include <vector>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> Implements a sparse vector as an increasing list of indices and their values.
@@ -164,6 +166,7 @@ namespace dataset
     public:
         using SparseDataVector<short, utilities::CompressedIntegerList>::SparseDataVector;
     };
+}
 }
 
 #include "../tcc/SparseDataVector.tcc"

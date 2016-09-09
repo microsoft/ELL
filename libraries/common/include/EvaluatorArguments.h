@@ -14,6 +14,8 @@
 // evaluators
 #include "Evaluator.h"
 
+namespace emll
+{
 namespace common
 {
     using EvaluatorArguments = evaluators::EvaluatorParameters;
@@ -26,4 +28,5 @@ namespace common
         /// <param name="parser"> [in,out] The parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
     };
+}
 }

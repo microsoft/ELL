@@ -25,6 +25,8 @@
 #include <memory>
 #include <queue>
 
+namespace emll
+{
 /// <summary> trainers namespace </summary>
 namespace trainers
 {
@@ -201,6 +203,7 @@ namespace trainers
         using ForestTrainerExample = dataset::Example<dataset::DoubleDataVector, ExampleMetadata>;
         dataset::RowDataset<ForestTrainerExample> _dataset;
     };
+}
 }
 
 #include "../tcc/ForestTrainer.tcc"

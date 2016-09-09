@@ -13,6 +13,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -486,4 +488,5 @@ namespace utilities
             return "";
         }
     }
+}
 }

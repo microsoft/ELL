@@ -14,6 +14,8 @@
 #include <ostream>
 #include <string>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace utilities
 {
@@ -79,4 +81,5 @@ namespace std
         /// <returns> A hash value for the given input. </returns>
         result_type operator()(argument_type const& id) const;
     };
+}
 }

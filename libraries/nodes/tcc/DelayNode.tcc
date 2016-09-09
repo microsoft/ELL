@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     template <typename ValueType>
@@ -67,4 +69,5 @@ namespace nodes
             _samples.push_back(std::vector<ValueType>(dimension));
         }
     }
+}
 }

@@ -15,6 +15,8 @@
 #include <memory>
 #include <utility>
 
+namespace emll
+{
 /// <summary> utilities namespace </summary>
 namespace utilities
 {
@@ -71,6 +73,7 @@ namespace utilities
     private:
         std::shared_ptr<IIterator<ValueType>> _iterator = nullptr;
     };
+}
 }
 
 #include "../tcc/AnyIterator.tcc"

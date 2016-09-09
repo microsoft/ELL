@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace nodes
 {
@@ -101,4 +103,5 @@ namespace nodes
         transformer.MapNodeOutput(output, outputElements);
         return true;
     }
+}
 }

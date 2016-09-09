@@ -25,6 +25,8 @@
 #include <unordered_map>
 #include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -159,6 +161,7 @@ namespace model
         // the maximal number of refinement iterations to allow
         const int maxRefinementIterations = 10;
     };
+}
 }
 
 #include "../tcc/ModelTransformer.tcc"

@@ -17,6 +17,8 @@
 #include <memory>
 #include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -123,6 +125,7 @@ namespace model
     private:
         mutable std::vector<ValueType> _cachedOutput;
     };
+}
 }
 
 #include "../tcc/OutputPort.tcc"

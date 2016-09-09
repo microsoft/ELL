@@ -14,6 +14,8 @@
 // utilities
 #include "Exception.h"
 
+namespace emll
+{
 namespace dataset
 {
     linear::IndexValue ZeroDataVector::Iterator::Get() const
@@ -41,4 +43,5 @@ namespace dataset
     void ZeroDataVector::Print(std::ostream& os) const
     {
     }
+}
 }

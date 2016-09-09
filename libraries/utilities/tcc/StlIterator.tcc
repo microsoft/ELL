@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     template <typename IteratorType, typename ValueType>
@@ -34,4 +36,5 @@ namespace utilities
     {
         return StlIterator<typename ContainerType::iterator, typename ContainerType::value_type>(container.begin(), container.end());
     }
+}
 }

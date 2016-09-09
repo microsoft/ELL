@@ -8,6 +8,8 @@
 
 #include "BinaryErrorAggregator.h"
 
+namespace emll
+{
 namespace evaluators
 {
     void BinaryErrorAggregator::Update(double prediction, double label, double weight)
@@ -61,4 +63,5 @@ namespace evaluators
     {
         return { "ErrorRate", "Precision", "Recall", "F1-Score" };
     }
+}
 }

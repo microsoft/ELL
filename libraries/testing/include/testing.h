@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 /// <summary> testing namespace </summary>
 namespace testing
 {
@@ -119,4 +121,5 @@ namespace testing
     ///
     /// <returns> true if one of the tests failed. </returns>
     bool DidTestFail();
+}
 }

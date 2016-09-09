@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace nodes
 {
     template <typename ValueType>
@@ -91,4 +93,5 @@ namespace nodes
         }
         _runningSum = std::vector<ValueType>(dimension);
     }
+}
 }

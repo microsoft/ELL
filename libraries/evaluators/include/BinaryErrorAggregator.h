@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace evaluators
 {
     /// <summary> An evaluation aggregator that computes a binary confusion matrix. </summary>
@@ -45,4 +47,5 @@ namespace evaluators
         double _sumFalsePositives = 0.0;
         double _sumFalseNegatives = 0.0;
     };
+}
 }

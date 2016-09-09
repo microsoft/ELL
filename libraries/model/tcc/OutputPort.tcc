@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -41,4 +43,5 @@ namespace model
     {
         OutputPortBase::ReadFromArchive(archiver);
     }
+}
 }

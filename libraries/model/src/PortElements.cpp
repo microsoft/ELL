@@ -15,6 +15,8 @@
 // utilities
 #include "Exception.h"
 
+namespace emll
+{
 namespace model
 {
     //
@@ -201,4 +203,5 @@ std::hash<model::PortRange>::result_type std::hash<model::PortRange>::operator()
     auto hash2 = std::hash<size_t>()(range.Size());
     auto hash3 = std::hash<size_t>()(range.GetStartIndex());
     return hash1 ^ ((hash2 ^ (hash3 << 1)) << 1);
+}
 }

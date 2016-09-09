@@ -8,6 +8,8 @@
 
 #pragma once
 
+namespace emll
+{
 /// <summary> %lossFunctions namespace </summary>
 namespace lossFunctions
 {
@@ -32,4 +34,5 @@ namespace lossFunctions
         /// <returns> The loss derivative. </returns>
         double GetDerivative(double prediction, double label) const;
     };
+}
 }

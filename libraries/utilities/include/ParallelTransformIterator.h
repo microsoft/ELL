@@ -12,6 +12,8 @@
 #include <future>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> A read-only forward iterator that transforms the items from an input collection. processes items in parallel when possible </summary>
@@ -57,6 +59,7 @@ namespace utilities
     /// <returns> A ParallelTransformIterator over the input sequence using the specified transform function</returns>
     template <typename InputIteratorType, typename FuncType>
     auto MakeParallelTransformIterator(InputIteratorType& inIterator, FuncType transformFunction) -> ParallelTransformIterator<InputIteratorType, decltype(transformFunction(inIterator.Get())), FuncType>;
+}
 }
 
 #include "../tcc/ParallelTransformIterator.tcc"

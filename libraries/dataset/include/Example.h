@@ -16,6 +16,8 @@
 #include <cstdint>
 #include <memory>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> A supervised example. </summary>
@@ -96,6 +98,7 @@ namespace dataset
     /// <returns> The shifted ostream. </returns>
     template <typename DataVectorType, typename MetadataType>
     std::ostream& operator<<(std::ostream& ostream, const Example<DataVectorType, MetadataType>& example);
+}
 }
 
 #include "../tcc/Example.tcc"

@@ -8,6 +8,8 @@
 
 #include "Variant.h"
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -98,4 +100,5 @@ namespace utilities
     {
         return variant.ToString();
     }
+}
 }

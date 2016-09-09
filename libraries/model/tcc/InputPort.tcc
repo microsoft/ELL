@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -110,4 +112,5 @@ namespace model
         archiver["input"] >> _input;
         ComputeParents();
     }
+}
 }

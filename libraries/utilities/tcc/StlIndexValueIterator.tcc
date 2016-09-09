@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -61,4 +63,5 @@ namespace utilities
             indexValueIterator.Next();
         }
     }
+}
 }
