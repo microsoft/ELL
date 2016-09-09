@@ -380,7 +380,7 @@ void TestLinearPredictorNodeRefine()
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ linearPredictorNode->output }); // TODO: cleanup
+    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ linearPredictorNode->output });
     inputNode->SetInput({ 1.0, 1.0, 1.0 });
     newInputNode->SetInput({ 1.0, 1.0, 1.0 });
     auto modelOutputValue = model.ComputeOutput(linearPredictorNode->output)[0];

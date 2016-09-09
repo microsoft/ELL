@@ -176,7 +176,7 @@ namespace trainers
         void UpdateCurrentOutputs(Range range, const EdgePredictorType& edgePredictor);
 
         // after performing a split, we rearrange the dataset to ensure that each node's examples occupy contiguous rows in the dataset
-        void SortNodeDataset(Range range, const SplitRuleType& splitRule); // TODO implement bucket sort
+        void SortNodeDataset(Range range, const SplitRuleType& splitRule);
 
         //
         // implementation specific functions that must be implemented by a derived class
