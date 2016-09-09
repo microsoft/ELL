@@ -29,7 +29,7 @@ ConstructorInitializerIndentWidth: 4
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ColumnLimit: 0
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: All
+NamespaceIndentation: Inner
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterClass:      true

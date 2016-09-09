@@ -66,7 +66,7 @@ namespace linear
         operator std::vector<double>&() & { return std::ref(_data); }
 
         /// <summary> Type-conversion operator into a const std::vector<double> reference
-        operator std::vector<double> const&() const & { return std::cref(_data); }
+        operator std::vector<double> const&() const& { return std::cref(_data); }
 
 /// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
 //        operator std::vector<double> && () && { return std::move(_data); }
