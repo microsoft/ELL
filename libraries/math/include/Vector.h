@@ -130,7 +130,7 @@ namespace math
         const ElementType* GetDataPointer() const { return _pData; }
         
         // protected ctor accessible only through derived classes and friends
-        friend class VectorConstructor;
+        friend class VectorReferenceConstructor;
         ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 
         // allow operations defined in the Operations struct to access increment 
@@ -216,7 +216,7 @@ namespace math
         ElementType* GetDataPointer() { return _pData; }
         
         // protected ctor accessible only through derived classes
-        friend class VectorConstructor;
+        friend class VectorReferenceConstructor;
         using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
 
     private:

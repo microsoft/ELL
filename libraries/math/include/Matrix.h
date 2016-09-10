@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Matrix.h (math)
+//  File:    Matrix.h (math)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,27 +22,41 @@ namespace math
     template<typename ElementType, MatrixLayout Layout>
     class MatrixBase;
 
-    class VectorConstructor
+    /// <summary> A helper class that constructs vector reference objects. </summary>
+    class VectorReferenceConstructor
     {
     protected:
-        template<typename ElementType, VectorOrientation Orientation>
-        VectorReference<ElementType, Orientation> ConstructVector(ElementType* pData, size_t size, size_t increment)
-        {
-            return VectorReference<ElementType, Orientation>(pData, size, increment);
-        }
 
+        /// <summary> Constructs a vector reference. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <param name="pData"> Pointer to the first element in the vector. </param>
+        /// <param name="size"> The vector size. </param>
+        /// <param name="increment"> The vector increment. </param>
+        ///
+        /// <returns> A vector reference; </returns>
         template<typename ElementType, VectorOrientation Orientation>
-        ConstVectorReference<ElementType, Orientation> ConstructVector(ElementType* pData, size_t size, size_t increment) const
-        {
-            return ConstVectorReference<ElementType, Orientation>(pData, size, increment);
-        }
+        VectorReference<ElementType, Orientation> ConstructVectorReference(ElementType* pData, size_t size, size_t increment);
+
+        /// <summary> Constructs a const vector reference. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <param name="pData"> Pointer to the first element in the vector. </param>
+        /// <param name="size"> The vector size. </param>
+        /// <param name="increment"> The vector increment. </param>
+        ///
+        /// <returns> A const vector reference. </returns>
+        template<typename ElementType, VectorOrientation Orientation>
+        ConstVectorReference<ElementType, Orientation> ConstructConstVectorReference(ElementType* pData, size_t size, size_t increment) const;
     };
 
     /// <summary> Base class for rectangular dense matrices. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
     template <typename ElementType>
-    class RectangularMatrixBase : public VectorConstructor
+    class RectangularMatrixBase : public VectorReferenceConstructor
     {
     public:
         /// <summary> Gets the number of rows. </summary>
@@ -57,12 +71,12 @@ namespace math
 
     protected:
         // allow operations defined in the Operations struct to access raw data vector
-        RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns) : _pData(pData), _numRows(numRows), _numColumns(numColumns)
-        {}
+        RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
 
         ElementType* _pData;
         size_t _numRows;
         size_t _numColumns;
+        size_t _increment;
     };
 
     /// <summary> Base class for column major rectangular dense matrices. </summary>
@@ -71,38 +85,14 @@ namespace math
     template<typename ElementType>
     class MatrixBase<ElementType, MatrixLayout::columnMajor> : public RectangularMatrixBase<ElementType>
     {
-    public:
-        static constexpr MatrixLayout transposeLayout = MatrixLayout::rowMajor;
-
     protected:
-        MatrixBase(size_t numRows, size_t numColumns) : RectangularMatrixBase<ElementType>(nullptr, numRows, numColumns), _columnIncrement(numRows)
-        {}
+        using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
+       MatrixBase(size_t numRows, size_t numColumns);
 
-        MatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment) : RectangularMatrixBase<ElementType>(pData, numRows, numColumns), _columnIncrement(increment)
-        {}
-
-        static constexpr MatrixLayout GetLayout() 
-        {
-            return MatrixLayout::columnMajor;
-        }
-
-        size_t GetIncrement() const
-        {
-            return _columnIncrement;
-        }
-
-        size_t GetRowIncrement() const
-        {
-            return 1;
-        }
-
-        size_t GetColumnIncrement() const
-        {
-            return _columnIncrement;
-        }
-
-    private:
-        size_t _columnIncrement;
+        static constexpr MatrixLayout transposeLayout = MatrixLayout::rowMajor;
+        static constexpr MatrixLayout layout = MatrixLayout::columnMajor;
+        static constexpr size_t _rowIncrement = 1;
+        const size_t& _columnIncrement = _increment;
     };
 
     /// <summary> Base class for row major rectangular dense matrices. </summary>
@@ -111,39 +101,14 @@ namespace math
     template<typename ElementType>
     class MatrixBase<ElementType, MatrixLayout::rowMajor> : public RectangularMatrixBase<ElementType>
     {
-    public:
-        static constexpr MatrixLayout transposeLayout = MatrixLayout::columnMajor;
-
     protected:
-        MatrixBase(size_t numRows, size_t numColumns) : RectangularMatrixBase<ElementType>(nullptr, numRows, numColumns), _rowIncrement(numColumns)
-        {}
+        using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
+       MatrixBase(size_t numRows, size_t numColumns);
 
-        MatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment) : RectangularMatrixBase<ElementType>(pData, numRows, numColumns), _rowIncrement(increment)
-        {}
-
-        static constexpr MatrixLayout GetLayout()
-        {
-            return MatrixLayout::rowMajor;
-        }
-
-
-        size_t GetIncrement() const
-        {
-            return _rowIncrement;
-        }
-
-        size_t GetRowIncrement() const
-        {
-            return _rowIncrement;
-        }
-
-        size_t GetColumnIncrement() const
-        {
-            return 1;
-        }
-
-    private:
-        size_t _rowIncrement;
+        static constexpr MatrixLayout transposeLayout = MatrixLayout::columnMajor;
+        static constexpr MatrixLayout layout = MatrixLayout::rowMajor;
+        const size_t& _rowIncrement = _increment;
+        static constexpr size_t _columnIncrement = 1;
     };
 
     /// <summary> Const reference to a dense matrix. </summary>
@@ -154,23 +119,15 @@ namespace math
     class ConstMatrixReference : public MatrixBase<ElementType, Layout>
     {
     public:
-
         /// <summary> Matrix element access operator. </summary>
         ///
         /// <returns> A copy of the element in a given position. </returns>
-        ElementType operator() (size_t rowIndex, size_t columnIndex)  const
-        { 
-            return _pData[rowIndex * GetRowIncrement() + columnIndex * GetColumnIncrement()];
-        }
+        ElementType operator() (size_t rowIndex, size_t columnIndex)  const;
 
-        auto Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>
-        {
-            // TODO check inputs
-            return ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>(_pData, _numColumns, _numRows, GetIncrement());
-        }
-
-
-
+        /// <summary> Gets a reference to the matrix transpose. </summary>
+        ///
+        /// <returns> A reference to the matrix transpose. </returns>
+        auto Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
 
         /// <summary> Gets a constant reference to a block-shaped sub-matrix. </summary>
         ///
@@ -180,57 +137,51 @@ namespace math
         /// <param name="numColumns"> Number of columns in the block. </param>
         ///
         /// <returns> The constant reference to a block. </returns>
-        ConstMatrixReference<ElementType, Layout> GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns) const
-        {
-            // TODO check inputs
-            return ConstMatrixReference<ElementType, Layout>(_pData + firstRow * GetRowIncrement() + firstColumn * GetColumnIncrement(), numRows, numColumns, GetIncrement());
-        }
+        ConstMatrixReference<ElementType, Layout> GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns) const;
 
-        ConstVectorReference<ElementType, VectorOrientation::column> GetColumn(size_t index) const
-        {
-            return ConstructVector<ElementType, VectorOrientation::column>(_pData + index * GetColumnIncrement(), NumRows(), GetRowIncrement());
-        }
+        /// <summary> Gets a const reference to a column of the matrix. </summary>
+        ///
+        /// <param name="index"> Zero-based column index. </param>
+        ///
+        /// <returns> A const reference to the matrix column. </returns>
+        ConstVectorReference<ElementType, VectorOrientation::column> GetColumn(size_t index) const;
 
-        ConstVectorReference<ElementType, VectorOrientation::row> GetRow(size_t index) const
-        {
-            return ConstructVector<ElementType, VectorOrientation::row>(_pData + index * GetRowIncrement(), NumColumns(), GetColumnIncrement());
-        }
+        /// <summary> Gets a const reference to a row of the matrix. </summary>
+        ///
+        /// <param name="index"> Zero-based row index. </param>
+        ///
+        /// <returns> A const reference to the matrix row. </returns>
+        ConstVectorReference<ElementType, VectorOrientation::row> GetRow(size_t index) const;
 
+        /// <summary> Gets a const reference to the matrix diagonal. </summary>
+        ///
+        /// <typeparam name="Orientation"> User must specify whether the return value is a column or row vector. </typeparam>
+        ///
+        /// <returns> A const reference to the matrix diagnoal. </returns>
         template<VectorOrientation Orientation>
-        ConstVectorReference<ElementType, Orientation> GetDiagonal() const
-        {
-            auto size = std::min(NumColumns(), NumRows());
-            return <ElementType, Orientation>(_pData, size, GetIncrement()+1);
-        }
+        ConstVectorReference<ElementType, Orientation> GetDiagonal() const;
 
+        /// <summary> Equality operator. </summary>
+        ///
+        /// <typeparam name="OtherLayout"> The layout of the other matrix. </typeparam>
+        /// <param name="other"> The other matrix. </param>
+        ///
+        /// <returns> true if the two matrices are equivalent. </returns>
         template<MatrixLayout OtherLayout>
-        bool operator==(const ConstMatrixReference<ElementType, OtherLayout>& other) const // TODO, compare matrices with different layout
-        {
-            if(NumRows() != other.NumRows() || NumColumns() != other.NumColumns())
-            {
-                return false;
-            }
+        bool operator==(const ConstMatrixReference<ElementType, OtherLayout>& other) const;
 
-            for (size_t i = 0; i < NumRows(); ++i)
-            {
-                if (GetRow(i) != other.GetRow(i))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
+        /// <summary> Inequality operator. </summary>
+        ///
+        /// <typeparam name="OtherLayout"> The layout of the other matrix. </typeparam>
+        /// <param name="other"> The other matrix. </param>
+        ///
+        /// <returns> true if the two matrices are not equivalent. </returns>
         template<MatrixLayout OtherLayout>
-        bool operator !=(const ConstMatrixReference<ElementType, OtherLayout>& other)
-        {
-            return !(*this == other);
-        }
+        bool operator !=(const ConstMatrixReference<ElementType, OtherLayout>& other);
 
     protected:
         friend ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
-
     };
 
     /// <summary> Non-const reference to a dense matrix. </summary>
@@ -244,18 +195,14 @@ namespace math
         /// <summary> Matrix element access operator. </summary>
         ///
         /// <returns> A reference to an element in a given position. </returns>
-        ElementType& operator() (size_t rowIndex, size_t columnIndex)  
-        { 
-            return _pData[rowIndex * GetRowIncrement() + columnIndex * GetColumnIncrement()];
-        }
+        ElementType& operator() (size_t rowIndex, size_t columnIndex);
 
-        auto Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>
-        {
-            // TODO check inputs
-            return MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>(_pData, _numColumns, _numRows, GetIncrement());
-        }
+        /// <summary> Gets a reference to the matrix transpose. </summary>
+        ///
+        /// <returns> A reference to the matrix transpose. </returns>
+        auto Transpose() const->MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
 
-        /// <summary> Gets a constant reference to a block-shaped sub-matrix. </summary>
+        /// <summary> Gets a const reference to a block-shaped sub-matrix. </summary>
         ///
         /// <param name="firstRow"> The first row in the block. </param>
         /// <param name="firstColumn"> The first column in the block. </param>
@@ -263,36 +210,36 @@ namespace math
         /// <param name="numColumns"> Number of columns in the block. </param>
         ///
         /// <returns> The constant reference to a block. </returns>
-        MatrixReference<ElementType, Layout> GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns)
-        {
-            // TODO check inputs
-            return MatrixReference<ElementType, Layout>(_pData + firstRow * GetRowIncrement() + firstColumn * GetColumnIncrement(), numRows, numColumns, GetIncrement());
-        }
+        MatrixReference<ElementType, Layout> GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns);
 
-        VectorReference<ElementType, VectorOrientation::column> GetColumn(size_t index) 
-        {
-            return ConstructVector<ElementType, VectorOrientation::column>(_pData + index * GetColumnIncrement(), NumRows(), GetRowIncrement());
-        }
+        /// <summary> Gets a reference to a column of the matrix. </summary>
+        ///
+        /// <param name="index"> Zero-based column index. </param>
+        ///
+        /// <returns> A reference to the matrix column. </returns>
+        VectorReference<ElementType, VectorOrientation::column> GetColumn(size_t index);
 
-        VectorReference<ElementType, VectorOrientation::row> GetRow(size_t index)
-        {
-            return ConstructVector<ElementType, VectorOrientation::row>(_pData + index * GetRowIncrement(), NumColumns(), GetColumnIncrement());
-        }
+        /// <summary> Gets a reference to a row of the matrix. </summary>
+        ///
+        /// <param name="index"> Zero-based row index. </param>
+        ///
+        /// <returns> A reference to the matrix row. </returns>
+        VectorReference<ElementType, VectorOrientation::row> GetRow(size_t index);
 
+        /// <summary> Gets a reference to the matrix diagonal. </summary>
+        ///
+        /// <typeparam name="Orientation"> User must specify whether the return value is a column or row vector. </typeparam>
+        ///
+        /// <returns> A const reference to the matrix diagnoal. </returns>
         template<VectorOrientation Orientation>
-        VectorReference<ElementType, Orientation> GetDiagonal() 
-        {
-            auto size = std::min(NumColumns(), NumRows());
-            return ConstructVector<ElementType, Orientation>(_pData, size, GetIncrement() + 1);
-        }
+        VectorReference<ElementType, Orientation> GetDiagonal();
 
     protected:
         friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
         using ConstMatrixReference<ElementType, Layout>::ConstMatrixReference;
     };
 
-
-    /// <summary> A matrix. </summary>
+    /// <summary> A dense matrix. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
     /// <typeparam name="Layout"> Matrix layout. </typeparam>
@@ -305,29 +252,12 @@ namespace math
         ///
         /// <param name="numRows"> Number of rows in the matrix. </param>
         /// <param name="numColumns"> Number of columns in the matrix. </param>
-        Matrix(size_t numRows, size_t numColumns) : MatrixReference<ElementType, Layout>(numRows, numColumns), _data(numRows*numColumns) 
-        {
-            _pData = _data.data();
-        }
+       Matrix(size_t numRows, size_t numColumns);
 
-        Matrix(std::initializer_list<std::initializer_list<ElementType>> list) : MatrixReference<ElementType, Layout>(list.size(), list.begin()->size()), _data(list.size() * list.begin()->size())
-        {
-            _pData = _data.data();
-           
-            size_t i = 0;
-            for(auto rowIter = list.begin(); rowIter < list.end(); ++rowIter)
-            {
-                // check that the length of the row is the same as NumColumns();
-
-                size_t j = 0;
-                for(auto elementIter = rowIter->begin(); elementIter < rowIter->end(); ++elementIter)
-                {
-                    (*this)(i, j) = *elementIter;
-                    ++j;
-                }
-                ++i;
-            }
-        }
+        /// <summary> Constructs a matrix from an initialization list. </summary>
+        ///
+        /// <param name="list"> A list of initialization lists (row by row). </param>
+       Matrix(std::initializer_list<std::initializer_list<ElementType>> list);
 
     private:
         std::vector<ElementType> _data;
