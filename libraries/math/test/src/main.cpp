@@ -127,14 +127,18 @@ void TestConstDoubleVector()
 
 void TestDoubleMatrix()
 {
-    math::DoubleColumnMatrix M(15, 10);
+    math::DoubleColumnMatrix M(3, 4);
+    M(0, 0) = 1;
+    M(0, 2) = 4;
+    M(2, 3) = 7;
 
-    auto N = M.GetBlock(2, 5, 3, 3);
-    N(0, 0) = 1.0;
-    N(1, 1) = 2.0;
-    N(2, 2) = 3.0;
+    math::DoubleColumnMatrix S{{1, 0, 4, 0},
+                               {0, 0, 0, 0},
+                               {0, 0, 0, 7}};
 
-    math::Print(N, std::cout);
+    auto r = M == S;
+
+    math::Print(S, std::cout);
     std::cout << std::endl;
 
     math::Print(M, std::cout);

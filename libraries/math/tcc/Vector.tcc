@@ -116,7 +116,7 @@ namespace math
         }
 
         const ElementType* pThis = _pData;
-        const ElementType* pThisEnd = _pData + _size;
+        const ElementType* pThisEnd = _pData + _size * _increment;
         const ElementType* pOther = other._pData;
 
         while (pThis < pThisEnd)
@@ -125,8 +125,8 @@ namespace math
             {
                 return false;
             }
-            ++pThis;
-            ++pOther;
+            pThis += _increment;
+            pOther += other._increment;
         }
         return true;
     }
