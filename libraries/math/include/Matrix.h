@@ -71,6 +71,9 @@ namespace math
     template<typename ElementType>
     class MatrixBase<ElementType, MatrixLayout::columnMajor> : public RectangularMatrixBase<ElementType>
     {
+    public:
+        static constexpr MatrixLayout transposeLayout = MatrixLayout::rowMajor;
+
     protected:
         MatrixBase(size_t numRows, size_t numColumns) : RectangularMatrixBase<ElementType>(nullptr, numRows, numColumns), _columnIncrement(numRows)
         {}
@@ -78,7 +81,7 @@ namespace math
         MatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment) : RectangularMatrixBase<ElementType>(pData, numRows, numColumns), _columnIncrement(increment)
         {}
 
-        MatrixLayout GetLayout() const
+        static constexpr MatrixLayout GetLayout() 
         {
             return MatrixLayout::columnMajor;
         }
@@ -108,6 +111,9 @@ namespace math
     template<typename ElementType>
     class MatrixBase<ElementType, MatrixLayout::rowMajor> : public RectangularMatrixBase<ElementType>
     {
+    public:
+        static constexpr MatrixLayout transposeLayout = MatrixLayout::columnMajor;
+
     protected:
         MatrixBase(size_t numRows, size_t numColumns) : RectangularMatrixBase<ElementType>(nullptr, numRows, numColumns), _rowIncrement(numColumns)
         {}
@@ -115,10 +121,11 @@ namespace math
         MatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment) : RectangularMatrixBase<ElementType>(pData, numRows, numColumns), _rowIncrement(increment)
         {}
 
-        MatrixLayout GetLayout() const
+        static constexpr MatrixLayout GetLayout()
         {
             return MatrixLayout::rowMajor;
         }
+
 
         size_t GetIncrement() const
         {
@@ -155,6 +162,15 @@ namespace math
         { 
             return _pData[rowIndex * GetRowIncrement() + columnIndex * GetColumnIncrement()];
         }
+
+        auto Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>
+        {
+            // TODO check inputs
+            return ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>(_pData, _numColumns, _numRows, GetIncrement());
+        }
+
+
+
 
         /// <summary> Gets a constant reference to a block-shaped sub-matrix. </summary>
         ///
@@ -212,6 +228,7 @@ namespace math
         }
 
     protected:
+        friend ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
 
     };
@@ -230,6 +247,12 @@ namespace math
         ElementType& operator() (size_t rowIndex, size_t columnIndex)  
         { 
             return _pData[rowIndex * GetRowIncrement() + columnIndex * GetColumnIncrement()];
+        }
+
+        auto Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>
+        {
+            // TODO check inputs
+            return MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>(_pData, _numColumns, _numRows, GetIncrement());
         }
 
         /// <summary> Gets a constant reference to a block-shaped sub-matrix. </summary>
@@ -264,6 +287,7 @@ namespace math
         }
 
     protected:
+        friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
         using ConstMatrixReference<ElementType, Layout>::ConstMatrixReference;
     };
 

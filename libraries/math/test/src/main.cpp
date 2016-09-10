@@ -181,7 +181,46 @@ void TestMatrix()
         { 0, 8, 9, 6 }
     };
     testing::ProcessTest("Matrix::GetDiagonal()", M == S5);
+
+    auto T = M.Transpose();
+    math::ColumnMatrix<ElementType> S6
+    {
+        { 9, 0, 0 },
+        { 2, 9, 8 },
+        { 4, 3, 9 },
+        { 0, 0, 6 }
+    };
+    testing::ProcessTest("Matrix::GetDiagonal()", T == S6);
 }
+
+template<typename ElementType, math::MatrixLayout Layout>
+void TestMatrix2()
+{
+    math::Matrix<ElementType, Layout> M(7, 7);
+
+    auto N = M.GetBlock(1, 1, 5, 5);
+    N.GetRow(0).Fill(1);
+    N.GetRow(4).Fill(1);
+    N.GetDiagonal<math::VectorOrientation::column>().Fill(1);
+
+    auto T = N.Transpose();
+    T.GetRow(0).Fill(1);
+    T.GetRow(4).Fill(1);
+
+    math::ColumnMatrix<ElementType> C
+    {
+        { 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 1, 1, 1, 1, 1, 0 },
+        { 0, 1, 1, 0, 0, 1, 0 },
+        { 0, 1, 0, 1, 0, 1, 0 },
+        { 0, 1, 0, 0, 1, 1, 0 },
+        { 0, 1, 1, 1, 1, 1, 0 },
+        { 0, 0, 0, 0, 0, 0, 0 }
+    };
+    testing::ProcessTest("Matrix::GetDiagonal()", M == C);
+}
+
+
 
 /// Runs all tests
 ///
@@ -201,6 +240,9 @@ int main()
     TestMatrix<float, math::MatrixLayout::columnMajor>();
     TestMatrix<double, math::MatrixLayout::rowMajor>();
     TestMatrix<double, math::MatrixLayout::columnMajor>();
+
+    TestMatrix2<double, math::MatrixLayout::rowMajor>();
+    TestMatrix2<double, math::MatrixLayout::columnMajor>();
 
     if(testing::DidTestFail())
     {
