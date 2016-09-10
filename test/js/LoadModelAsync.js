@@ -16,7 +16,7 @@ const EMLL = require("emll");
 
 
 console.log("Loaded EMLL");
-var modelsync = EMLL.LoadModelGraph("");
+var modelsync = EMLL.LoadModel("[1]");
 if(modelsync)
 {
   console.log("Sync Mode Size:" + modelsync.Size());

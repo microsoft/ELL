@@ -18,11 +18,12 @@ const EMLL = require("emll");
 console.log("Loaded EMLL");
 var dataiter = EMLL.GetDataIterator("../data/testData.txt");
 console.log(dataiter);
+/*var dataiter = EMLL.GetDataIterator("../data/testData.txt");
 if(dataiter)
 {
   console.log("Sync Mode Size:" + dataiter.HasSize());
   tap.pass('Test GetDataIterator');
-}
+}*/
 
 EMLL.GetDataIteratorAsync("../data/testData.txt", function(dataiterasync)
 {
