@@ -117,12 +117,20 @@ namespace math
         /// <returns> true if the vectors are considered equivalent. </returns>
         bool operator==(const ConstVectorReference<ElementType, Orientation>& other) const;
 
+        /// <summary> Inequality operator. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        ///
+        /// <returns> true if the vectors are not considered equivalent. </returns>
+        bool operator!=(const ConstVectorReference<ElementType, Orientation>& other) const;
+
     protected:
         // allow operations defined in the Operations struct to access raw data vector
         friend struct Operations;
         const ElementType* GetDataPointer() const { return _pData; }
         
-        // protected ctor accessible only through derived classes
+        // protected ctor accessible only through derived classes and friends
+        friend class VectorConstructor;
         ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 
         // allow operations defined in the Operations struct to access increment 
@@ -208,6 +216,7 @@ namespace math
         ElementType* GetDataPointer() { return _pData; }
         
         // protected ctor accessible only through derived classes
+        friend class VectorConstructor;
         using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
 
     private:
@@ -261,15 +270,15 @@ namespace math
         using ConstVectorReference<ElementType, Orientation>::_pData; // TODO
     };
 
-    typedef Vector<double, VectorOrientation::column> DoubleColumnVector;
-    typedef Vector<double, VectorOrientation::row> DoubleRowVector;
-    typedef ConstVectorReference<double, VectorOrientation::column> DoubleColumnConstVectorReference;
-    typedef ConstVectorReference<double, VectorOrientation::row> DoubleRowConstVectorReference;
+    //
+    // friendly names
+    //
 
-    typedef Vector<float, VectorOrientation::column> SingleColumnVector;
-    typedef Vector<float, VectorOrientation::row> SingleRowVector;
-    typedef ConstVectorReference<float, VectorOrientation::column> SingleColumnConstVectorReference;
-    typedef ConstVectorReference<float, VectorOrientation::row> SingleRowConstVectorReference;
+    template<typename ElementType>
+    using ColumnVector = Vector<ElementType, VectorOrientation::column>;
+
+    template<typename ElementType>
+    using RowVector = Vector<ElementType, VectorOrientation::row>;
 }
 
 #include "../tcc/Vector.tcc"

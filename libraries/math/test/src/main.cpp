@@ -21,20 +21,18 @@
 template<typename ElementType>
 void TestVector()
 {
-    using ColumnVector = math::Vector<ElementType, math::VectorOrientation::column>;
-
-    ColumnVector v(10);
+    math::ColumnVector<ElementType> v(10);
     v.Fill(2);
-    ColumnVector u{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+    math::ColumnVector<ElementType> u{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
     testing::ProcessTest("DoubleColumnVector construction and Fill", v == u);
 
     v.Reset();
-    ColumnVector z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    math::ColumnVector<ElementType> z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     testing::ProcessTest("DoubleColumnVector::Reset", v == z);
 
     v[3] = 7;
     v[7] = 9;
-    ColumnVector a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
+    math::ColumnVector<ElementType> a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("DoubleColumnVector::operator[]", v == a);
 
     testing::ProcessTest("DoubleColumnVector::Norm2", testing::IsEqual(a.Norm2(), static_cast<ElementType>(std::sqrt(7*7+9*9))));
@@ -55,22 +53,20 @@ void TestVector()
 template<typename ElementType>
 void TestVectorReference()
 {
-    using ColumnVector = math::Vector<ElementType, math::VectorOrientation::column>;
-
-    ColumnVector u(10);
+    math::ColumnVector<ElementType> u(10);
     auto v = u.GetReference();
     auto w = v.GetSubVector(1, 3);
     w.Fill(1);
-    ColumnVector y{ 0, 1, 1, 1, 0, 0, 0, 0, 0, 0 };
+    math::ColumnVector<ElementType> y{ 0, 1, 1, 1, 0, 0, 0, 0, 0, 0 };
     testing::ProcessTest("ColumnVectorReference::Fill", u == y);
 
     w.Reset();
-    ColumnVector z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    math::ColumnVector<ElementType> z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     testing::ProcessTest("ColumnVectorReference::Reset", u == z);
 
     w[0] = 7;
     w[2] = 9;
-    ColumnVector a{ 0, 7, 0, 9, 0, 0, 0, 0, 0, 0 };
+    math::ColumnVector<ElementType> a{ 0, 7, 0, 9, 0, 0, 0, 0, 0, 0 };
     testing::ProcessTest("ColumnVectorReference::operator[]", u == a);
 
     auto b = w.GetSubVector(0, 2);
@@ -92,11 +88,8 @@ void TestVectorReference()
 template<typename ElementType>
 void TestVectorProduct()
 {
-    using ColumnVector = math::Vector<ElementType, math::VectorOrientation::column>;
-    using RowVector = math::Vector<ElementType, math::VectorOrientation::row>;
-
-    RowVector u{ 0, 1, 0, 1, 0 };
-    ColumnVector v{ 1, 2, 3, 4, 5 };
+    math::RowVector<ElementType> u{ 0, 1, 0, 1, 0 };
+    math::ColumnVector<ElementType> v{ 1, 2, 3, 4, 5 };
     auto dot = math::Operations::Dot(u, v);
     testing::ProcessTest("Operations::Dot(Vector, Vector)", dot == 6);
 
@@ -108,42 +101,86 @@ void TestVectorProduct()
 template<typename ElementType>
 void TestAddTo()
 {
-    using RowVector = math::Vector<ElementType, math::VectorOrientation::row>;
-
-    RowVector u{ 1, 2, 3, 4, 5 };
-    RowVector v{ 0, 1, 0, 1, 0 };
+    math::RowVector<ElementType> u{ 1, 2, 3, 4, 5 };
+    math::RowVector<ElementType> v{ 0, 1, 0, 1, 0 };
     math::Operations::AddTo(static_cast<ElementType>(2.0), v, u);
 
-    RowVector z{ 1, 4, 3, 6, 5 };
+    math::RowVector<ElementType> z{ 1, 4, 3, 6, 5 };
     testing::ProcessTest("Operations::AddTo(scalar, Vector, Vector)", u == z);
 }
 
 void TestConstDoubleVector()
 {
-    const math::DoubleRowVector u{ 0, 1, 0, 1, 0 };
+    const math::RowVector<double> u{ 0, 1, 0, 1, 0 };
     auto v = u.GetReference();
     //v += 3; // should not compile
 }
 
-void TestDoubleMatrix()
+template<typename ElementType, math::MatrixLayout Layout>
+void TestMatrix()
 {
-    math::DoubleColumnMatrix M(3, 4);
+    math::Matrix<ElementType, Layout> M(3, 4);
     M(0, 0) = 1;
     M(0, 2) = 4;
     M(2, 3) = 7;
 
-    math::DoubleColumnMatrix S{{1, 0, 4, 0},
-                               {0, 0, 0, 0},
-                               {0, 0, 0, 7}};
+    math::ColumnMatrix<ElementType> S1
+    { 
+        { 1, 0, 4, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 7 } 
+    };
+    testing::ProcessTest("Matrix::Operator()", M == S1);
 
-    auto r = M == S;
+    auto N = M.GetBlock(1, 1, 2, 2);
+    N(0, 0) = 3;
+    N(0, 1) = 3;
+    N(1, 0) = 3;
+    N(1, 1) = 3;
 
-    math::Print(S, std::cout);
-    std::cout << std::endl;
+    math::ColumnMatrix<ElementType> S2
+    {
+        { 1, 0, 4, 0 },
+        { 0, 3, 3, 0 },
+        { 0, 3, 3, 7 }
+    };
+    testing::ProcessTest("Matrix::GetBlock()", M == S2);
 
-    math::Print(M, std::cout);
-    std::cout << std::endl;
+    auto v = M.GetRow(2);
+    v[2] = 5;
+    v[3] = 6;
 
+    math::ColumnMatrix<ElementType> S3
+    {
+        { 1, 0, 4, 0 },
+        { 0, 3, 3, 0 },
+        { 0, 3, 5, 6 }
+    };
+    testing::ProcessTest("Matrix::GetRow()", M == S3);
+
+    auto u = M.GetColumn(1);
+    u[0] = 2;
+    u[1] = 2;
+    u[2] = 8;
+
+    math::ColumnMatrix<ElementType> S4
+    {
+        { 1, 2, 4, 0 },
+        { 0, 2, 3, 0 },
+        { 0, 8, 5, 6 }
+    };
+    testing::ProcessTest("Matrix::GetColumn()", M == S4);
+
+    auto w = M.GetDiagonal<math::VectorOrientation::column>();
+    w.Fill(9);
+
+    math::ColumnMatrix<ElementType> S5
+    {
+        { 9, 2, 4, 0 },
+        { 0, 9, 3, 0 },
+        { 0, 8, 9, 6 }
+    };
+    testing::ProcessTest("Matrix::GetDiagonal()", M == S5);
 }
 
 /// Runs all tests
@@ -160,7 +197,10 @@ int main()
     TestAddTo<double>();
     TestConstDoubleVector();
 
-    TestDoubleMatrix();
+    TestMatrix<float, math::MatrixLayout::rowMajor>();
+    TestMatrix<float, math::MatrixLayout::columnMajor>();
+    TestMatrix<double, math::MatrixLayout::rowMajor>();
+    TestMatrix<double, math::MatrixLayout::columnMajor>();
 
     if(testing::DidTestFail())
     {

@@ -132,6 +132,12 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
+    bool ConstVectorReference<ElementType, Orientation>::operator!=(const ConstVectorReference<ElementType, Orientation>& other) const
+    {
+        return !(*this == other);
+    }
+    
+    template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation>::ConstVectorReference(ElementType * pData, size_t size, size_t increment) : _pData(pData), _size(size), _increment(increment)
     {
         // TODO check that pData != 0
