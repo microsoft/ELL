@@ -9,11 +9,13 @@
 #pragma once
 
 // stl
+#include <initializer_list>
 #include <istream>
 #include <string>
 #include <vector>
-#include <initializer_list>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> A very simple tokenizer suitable for XML and JSON deserialization </summary>
@@ -21,15 +23,16 @@ namespace utilities
     {
     public:
         /// <summary> Constructor </summary>
-        /// 
+        ///
         /// <param name=inputStream> Stream to read from </param>
-        /// <param name=tokenStartChars> Set of characters that indicate the beginning of a new token. </param> 
-        Tokenizer(std::istream& inputStream, const std::string tokenStartChars): _in(inputStream), _tokenStartChars(tokenStartChars) {}
+        /// <param name=tokenStartChars> Set of characters that indicate the beginning of a new token. </param>
+        Tokenizer(std::istream& inputStream, const std::string tokenStartChars)
+            : _in(inputStream), _tokenStartChars(tokenStartChars) {}
 
         /// <summary> Constructor </summary>
-        /// 
+        ///
         /// <param name=filename> Filename to read from </param>
-        /// <param name=tokenStartChars> Set of characters that indicate the beginning of a new token. </param> 
+        /// <param name=tokenStartChars> Set of characters that indicate the beginning of a new token. </param>
         Tokenizer(std::string filename, const std::string tokenStartChars);
 
         /// <summary> Gets the next token from the input stream. </summary>
@@ -69,4 +72,5 @@ namespace utilities
 
         char _currentStringDelimiter = '\0'; // '\0' if we're not currently parsing a string
     };
+}
 }

@@ -9,14 +9,16 @@
 #include "PrintModel.h"
 
 // utilities
-#include "OutputStreamImpostor.h"
 #include "Exception.h"
+#include "OutputStreamImpostor.h"
 
 // model
 #include "Model.h"
 
 #include <iostream>
 
+namespace emll
+{
 void PrintNode(const model::Node& node, std::ostream& out)
 {
     bool isFirstInputPort = true;
@@ -70,4 +72,5 @@ void PrintNode(const model::Node& node, std::ostream& out)
 void PrintModel(const model::Model& model, std::ostream& out)
 {
     model.Visit([&out](const model::Node& node) { PrintNode(node, out); });
+}
 }

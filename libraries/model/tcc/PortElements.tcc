@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -14,17 +16,20 @@ namespace model
     //
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port) : PortElementsBase(port)
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port)
+        : PortElementsBase(port)
     {
     }
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex) : PortElementsBase(PortRange(port, startIndex))
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex)
+        : PortElementsBase(PortRange(port, startIndex))
     {
     }
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues) : PortElementsBase(PortRange(port, startIndex, numValues))
+    PortElements<ValueType>::PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues)
+        : PortElementsBase(PortRange(port, startIndex, numValues))
     {
     }
 
@@ -37,9 +42,9 @@ namespace model
     template <typename ValueType>
     PortElements<ValueType>::PortElements(const std::vector<PortElement<ValueType>>& elements)
     {
-        for(const auto& element: elements)
+        for (const auto& element : elements)
         {
-            AddRange({element.ReferencedPort(), element.GetIndex()});
+            AddRange({ element.ReferencedPort(), element.GetIndex() });
         }
     }
 
@@ -68,12 +73,15 @@ namespace model
     }
 
     template <typename ValueType>
-    PortElements<ValueType>::PortElements(const PortElements<ValueType>& elements, size_t index) : PortElements(elements, index, 1) {}
+    PortElements<ValueType>::PortElements(const PortElements<ValueType>& elements, size_t index)
+        : PortElements(elements, index, 1)
+    {
+    }
 
     template <typename ValueType>
     PortElements<ValueType>::PortElements(const PortElements<ValueType>& elements, size_t startIndex, size_t numValues)
     {
-        if(startIndex + numValues > elements.Size())
+        if (startIndex + numValues > elements.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid slice.");
         }
@@ -81,17 +89,17 @@ namespace model
         auto rangeIterator = elements.GetRanges().begin();
         auto endIterator = elements.GetRanges().end();
         // skip ranges that come before the desired elements
-        while(rangeIterator != endIterator && rangeIterator->Size() <= startIndex)
+        while (rangeIterator != endIterator && rangeIterator->Size() <= startIndex)
         {
             startIndex -= rangeIterator->Size();
             ++rangeIterator;
         }
 
         // now extract portions from ranges until done
-        while(rangeIterator != endIterator && numValues > 0)
+        while (rangeIterator != endIterator && numValues > 0)
         {
-            size_t numRangeValues = std::min(rangeIterator->Size()-startIndex, numValues);
-            AddRange({*rangeIterator->ReferencedPort(), startIndex, numRangeValues});
+            size_t numRangeValues = std::min(rangeIterator->Size() - startIndex, numValues);
+            AddRange({ *rangeIterator->ReferencedPort(), startIndex, numRangeValues });
             numValues -= numRangeValues;
             ++rangeIterator;
             startIndex = 0; // after the first time through, we'll always take the first part of a range
@@ -110,7 +118,7 @@ namespace model
     template <typename ValueType>
     void PortElements<ValueType>::Append(const PortElements<ValueType>& other)
     {
-        for(const auto& range: other.GetRanges())
+        for (const auto& range : other.GetRanges())
         {
             AddRange(range);
         }
@@ -145,4 +153,5 @@ namespace model
     {
         return RefType({ ref1, refs... });
     }
+}
 }

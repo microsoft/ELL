@@ -14,6 +14,8 @@
 // utilities
 #include "Exception.h"
 
+namespace emll
+{
 namespace dataset
 {
     linear::IndexValue ZeroDataVector::Iterator::Get() const
@@ -23,20 +25,23 @@ namespace dataset
 
     void ZeroDataVector::AppendEntry(uint64_t index, double value)
     {
-        if(value != 0)
+        if (value != 0)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
         }
     }
 
     void ZeroDataVector::AddTo(double* p_other, double scalar) const
-    {}
+    {
+    }
 
     double ZeroDataVector::Dot(const double* p_other) const
     {
         return 0.0;
     }
 
-    void ZeroDataVector::Print(std::ostream & os) const
-    {}
+    void ZeroDataVector::Print(std::ostream& os) const
+    {
+    }
+}
 }

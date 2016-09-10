@@ -1,8 +1,10 @@
 #pragma once
 //
 // Model tests
-// 
+//
 
+namespace emll
+{
 void TestNodeIterator();
 void TestStaticModel();
 void TestNodeIterator();
@@ -14,3 +16,4 @@ void TestInputRouting2();
 void TestCopyModel();
 
 void TestRefineSplitOutputs();
+}

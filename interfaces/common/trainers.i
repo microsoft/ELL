@@ -21,19 +21,18 @@
     class LinearPredictorProxy
     {
     public:
-        LinearPredictorProxy(const std::shared_ptr<const predictors::LinearPredictor>& pred) : _pred(*pred) {}
-        const predictors::LinearPredictor& GetPred() { return _pred; }
+        LinearPredictorProxy(const std::shared_ptr<const emll::predictors::LinearPredictor>& pred) : _pred(*pred) {}
+        const emll::predictors::LinearPredictor& GetPred() { return _pred; }
     private:
-        predictors::LinearPredictor _pred;
+        emll::predictors::LinearPredictor _pred;
     };
 %}
 
-%template (LogLossSGDTrainer) trainers::SGDIncrementalTrainer<lossFunctions::LogLoss>;
-%template (HingeLossSGDTrainer) trainers::SGDIncrementalTrainer<lossFunctions::HingeLoss>;
-%template (SquaredLossSGDTrainer) trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
+%template (LogLossSGDTrainer) emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::LogLoss>;
+%template (HingeLossSGDTrainer) emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::HingeLoss>;
+%template (SquaredLossSGDTrainer) emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
 
-%extend trainers::SGDIncrementalTrainer<lossFunctions::LogLoss>
+%extend emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::LogLoss>
 {
-    // TODO: return some other type of thing
     LinearPredictorProxy GetPred() const { return LinearPredictorProxy(($self)->GetPredictor()); }
 }

@@ -7,36 +7,36 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // utilities
-#include "Files.h"
-#include "OutputStreamImpostor.h" 
-#include "CommandLineParser.h" 
-#include "RandomEngines.h"
+#include "CommandLineParser.h"
 #include "Exception.h"
+#include "Files.h"
+#include "OutputStreamImpostor.h"
+#include "RandomEngines.h"
 
 // dataset
 #include "Example.h"
 
 // common
-#include "SGDIncrementalTrainerArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
-#include "TrainerArguments.h"
-#include "DataLoadArguments.h" 
-#include "ModelLoadArguments.h"
-#include "ModelSaveArguments.h"
+#include "DataLoadArguments.h"
+#include "DataLoaders.h"
 #include "EvaluatorArguments.h"
 #include "LoadModel.h"
-#include "DataLoaders.h"
-#include "MakeTrainer.h"
 #include "MakeEvaluator.h"
+#include "MakeTrainer.h"
+#include "ModelLoadArguments.h"
+#include "ModelSaveArguments.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
+#include "SGDIncrementalTrainerArguments.h"
+#include "TrainerArguments.h"
 
 // trainers
-#include "SGDIncrementalTrainer.h"
-#include "MultiEpochIncrementalTrainer.h"
 #include "EvaluatingIncrementalTrainer.h"
+#include "MultiEpochIncrementalTrainer.h"
+#include "SGDIncrementalTrainer.h"
 
 // evaluators
-#include "Evaluator.h"
 #include "BinaryErrorAggregator.h"
+#include "Evaluator.h"
 #include "LossAggregator.h"
 
 // lossFunctions
@@ -44,17 +44,19 @@
 #include "LogLoss.h"
 
 // model
-#include "Model.h"
 #include "InputNode.h"
+#include "Model.h"
 
 // nodes
 #include "LinearPredictorNode.h"
 
 // stl
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <tuple>
-#include <memory>
+
+using namespace emll;
 
 int main(int argc, char* argv[])
 {
@@ -81,14 +83,14 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
-        if(trainerArguments.verbose)
+        if (trainerArguments.verbose)
         {
             std::cout << "Stochastic Gradient Descent Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
         // load dataset
-        if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
+        if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments);
         size_t numColumns = dataLoadArguments.parsedDataDimension;
 
@@ -100,7 +102,7 @@ int main(int argc, char* argv[])
 
         // in verbose mode, create evaluator
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
-        if(trainerArguments.verbose)
+        if (trainerArguments.verbose)
         {
             evaluator = common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
             sgdIncrementalTrainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator));
@@ -109,13 +111,13 @@ int main(int argc, char* argv[])
         auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);
 
         // train
-        if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
+        if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
         trainer->Update(trainSetIterator);
         auto predictor = trainer->GetPredictor();
 
         // print loss and errors
-        if(trainerArguments.verbose)
+        if (trainerArguments.verbose)
         {
             std::cout << "Finished training.\n";
 
@@ -126,11 +128,11 @@ int main(int argc, char* argv[])
         }
 
         // save predictor model
-        if(modelSaveArguments.outputModelFilename != "")
+        if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
             model::Model model;
-            auto inputNode = model.AddNode<model::InputNode<double>>(predictor->GetDimension());            
+            auto inputNode = model.AddNode<model::InputNode<double>>(predictor->GetDimension());
             model.AddNode<nodes::LinearPredictorNode>(inputNode->output, *predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }

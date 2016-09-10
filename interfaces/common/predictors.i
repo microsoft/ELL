@@ -6,16 +6,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-%ignore predictors::LinearPredictor::GetWeights() const;
-%ignore predictors::LinearPredictor::GetBias() const;
+%ignore emll::predictors::LinearPredictor::GetWeights() const;
+%ignore emll::predictors::LinearPredictor::GetBias() const;
 
 %{
 #define SWIG_FILE_WITH_INIT
 #include "LinearPredictor.h"
 %}
 
-#if !defined(SWIGXML) && !defined(SWIGJAVASCRIPT)
-%shared_ptr(predictors::LinearPredictor) 
+#if !defined(SWIGXML) && !defined(SWIGR) && !defined(SWIGJAVASCRIPT)
+%shared_ptr(emll::predictors::LinearPredictor) 
 #endif
 
 %include "LinearPredictor.h"

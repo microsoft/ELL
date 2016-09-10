@@ -14,10 +14,14 @@
 // stl
 #include <stdexcept>
 
+namespace emll
+{
 namespace utilities
 {
-    IntegerList::Iterator::Iterator(const vector_iterator& begin, const vector_iterator& end) : _begin(begin), _end(end)
-    {}
+    IntegerList::Iterator::Iterator(const vector_iterator& begin, const vector_iterator& end)
+        : _begin(begin), _end(end)
+    {
+    }
 
     void IntegerList::Reserve(uint64_t size)
     {
@@ -26,12 +30,12 @@ namespace utilities
 
     uint64_t IntegerList::Max() const
     {
-        if(_list.size()==0)
+        if (_list.size() == 0)
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can't get max of empty list");
         }
 
-        return _list[Size()-1];
+        return _list[Size() - 1];
     }
 
     void IntegerList::Append(uint64_t value)
@@ -43,4 +47,5 @@ namespace utilities
     {
         return Iterator(_list.cbegin(), _list.cend());
     }
+}
 }

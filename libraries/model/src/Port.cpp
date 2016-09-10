@@ -9,6 +9,8 @@
 #include "Port.h"
 #include "Node.h"
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -33,20 +35,21 @@ namespace model
         return Port::PortType::boolean;
     }
 
-    void Port::Serialize(utilities::Serializer& serializer) const
+    void Port::WriteToArchive(utilities::Archiver& archiver) const
     {
-        serializer.Serialize("nodeId", _node->GetId());
-        serializer.Serialize("name", _name);
-        serializer.Serialize("type", static_cast<int>(_type));
+        archiver["nodeId"] << _node->GetId();
+        archiver["name"] << _name;
+        archiver["type"] << static_cast<int>(_type);
     }
 
-    void Port::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void Port::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::NodeId id;
-        serializer.Deserialize("nodeId", id, context);
-        serializer.Deserialize("name", _name, context);
-        int typeCode = 0;
-        serializer.Deserialize("type", typeCode, context);
+        archiver["nodeId"] >> id; // ignore it
+        archiver["name"] >> _name;
+        int typeCode;
+        archiver["type"] >> typeCode;
         _type = static_cast<PortType>(typeCode);
     }
+}
 }

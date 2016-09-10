@@ -12,15 +12,13 @@
 #include "LoadModel.h"
 %}
 
-%ignore common::GetDataset;
+%ignore emll::common::GetDataset;
 
 %include "DataLoadArguments.h"
 %include "LoadModel.h"
 
 // Modified versions of interfaces
 %include "DataLoadersInterface.h"
-
-%template (GenericSupervisedExampleIterator) utilities::AnyIterator<dataset::GenericSupervisedExample>;
 
 #if defined(SWIGJAVASCRIPT)
 %include "loadModelAsync.i"

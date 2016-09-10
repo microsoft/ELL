@@ -8,23 +8,25 @@
 
 #pragma once
 
-#include "Model.h"
-#include "Port.h"
 #include "InputPort.h"
-#include "OutputPort.h"
-#include "PortElements.h"
+#include "Model.h"
 #include "Node.h"
+#include "OutputPort.h"
+#include "Port.h"
+#include "PortElements.h"
 
 // utilities
 #include "Exception.h"
 
 // stl
-#include <memory>
-#include <vector>
-#include <unordered_map>
 #include <exception>
 #include <functional>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -159,6 +161,7 @@ namespace model
         // the maximal number of refinement iterations to allow
         const int maxRefinementIterations = 10;
     };
+}
 }
 
 #include "../tcc/ModelTransformer.tcc"

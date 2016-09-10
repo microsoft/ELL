@@ -1,7 +1,6 @@
 import sys
 
-# Different environments put the DLL in different places. 
-# TODO: Fix this to somehow only add the correct path.
+# Different configurations put the DLL in different places. 
 sys.path.append('.')
 sys.path.append('../../interfaces/python')
 sys.path.append('../../interfaces/python/Release')
@@ -41,7 +40,6 @@ def sgd():
     params.regularization = l2Regularization
     trainer = LogLossSGDTrainer(dataDimension, loss, params)
 
-    # TODO: create evaluator
     # evaluator = LinearLogLossClassificationEvaluator(loss)
 
     numExamples = dataset.NumExamples()

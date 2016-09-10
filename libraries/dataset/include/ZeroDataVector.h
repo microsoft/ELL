@@ -16,18 +16,18 @@
 // stl
 #include <cstdint>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> ZeroDataVector Base class. </summary>
     class ZeroDataVector : public IDataVector
     {
     public:
-
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
         class Iterator : public linear::IIndexValueIterator
         {
         public:
-
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;
@@ -117,4 +117,5 @@ namespace dataset
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const override { return std::vector<double>(0); }
     };
+}
 }

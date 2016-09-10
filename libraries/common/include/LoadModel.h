@@ -11,6 +11,8 @@
 // model
 #include "Model.h"
 
+namespace emll
+{
 namespace common
 {
     /// <summary> Loads a model from a file, or creates a new one if given an empty filename. </summary>
@@ -24,4 +26,5 @@ namespace common
     /// <param name="model"> The model. </param>
     /// <param name="filename"> The filename. </param>
     void SaveModel(const model::Model& model, const std::string& filename);
+}
 }

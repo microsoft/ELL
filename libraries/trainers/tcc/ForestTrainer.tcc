@@ -7,14 +7,17 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //#define VERBOSE_MODE( x ) x   // uncomment this for very verbose mode
-#define VERBOSE_MODE( x )       // uncomment this for nonverbose mode
+#define VERBOSE_MODE(x) // uncomment this for nonverbose mode
 
+namespace emll
+{
 namespace trainers
-{    
+{
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters) :
-        _booster(booster), _parameters(parameters), _forest(std::make_shared<predictors::SimpleForestPredictor>())
-    {}
+    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters)
+        : _booster(booster), _parameters(parameters), _forest(std::make_shared<predictors::SimpleForestPredictor>())
+    {
+    }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
@@ -23,7 +26,7 @@ namespace trainers
         LoadData(exampleIterator);
 
         // boosting loop (outer loop)
-        for(size_t round = 0; round < _parameters.numRounds; ++round)
+        for (size_t round = 0; round < _parameters.numRounds; ++round)
         {
             // call the booster and compute sums for the entire dataset
             Sums sums = SetWeakWeightsLabels();
@@ -38,16 +41,16 @@ namespace trainers
             VERBOSE_MODE(_forest->PrintLine(std::cout, 1));
 
             // find split candidate for root node and push it onto the priority queue
-            auto rootSplit = GetBestSplitRuleAtNode(_forest->GetNewRootId(), Range{0, _dataset.NumExamples()}, sums);
+            auto rootSplit = GetBestSplitRuleAtNode(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
 
-            // check for positive gain 
-            if(rootSplit.gain < _parameters.minSplitGain || _parameters.maxSplitsPerRound == 0)
+            // check for positive gain
+            if (rootSplit.gain < _parameters.minSplitGain || _parameters.maxSplitsPerRound == 0)
             {
                 return;
             }
 
             // reset the queue and add the root split from the graph
-            if(_queue.size() > 0)
+            if (_queue.size() > 0)
             {
                 _queue = SplitCandidatePriorityQueue();
             }
@@ -58,12 +61,13 @@ namespace trainers
         }
     }
 
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums)
+        : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
+    {
+    }
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums) : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
-    {}
-
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
     {
         // reset the dataset
@@ -86,7 +90,7 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     auto ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SetWeakWeightsLabels() -> Sums
     {
         Sums sums;
@@ -98,7 +102,7 @@ namespace trainers
             sums.Increment(metadata.weak);
         }
 
-        if(sums.sumWeights == 0.0)
+        if (sums.sumWeights == 0.0)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::badData, "sum of weights in data is zero");
         }
@@ -106,7 +110,7 @@ namespace trainers
         return sums;
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::UpdateCurrentOutputs(double value)
     {
         for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
@@ -116,7 +120,7 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::UpdateCurrentOutputs(Range range, const EdgePredictorType& edgePredictor)
     {
         for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
@@ -149,7 +153,7 @@ namespace trainers
 
             // update current output field in metadata
             auto edgePredictors = GetEdgePredictors(stats);
-            for(size_t i = 0; i<splitCandidate.splitRule.NumOutputs(); ++i)
+            for (size_t i = 0; i < splitCandidate.splitRule.NumOutputs(); ++i)
             {
                 UpdateCurrentOutputs(ranges.GetChildRange(i), edgePredictors[i]);
             }
@@ -170,7 +174,7 @@ namespace trainers
             }
 
             // queue new split candidates
-            for (size_t i = 0; i<splitCandidate.splitRule.NumOutputs(); ++i)
+            for (size_t i = 0; i < splitCandidate.splitRule.NumOutputs(); ++i)
             {
                 auto splitCandidate = GetBestSplitRuleAtNode(_forest->GetChildId(interiorNodeIndex, i), ranges.GetChildRange(i), stats.GetChildSums(i));
                 if (splitCandidate.gain > _parameters.minSplitGain)
@@ -181,10 +185,10 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SortNodeDataset(Range range, const SplitRuleType& splitRule)
     {
-        if(splitRule.NumOutputs() == 2)
+        if (splitRule.NumOutputs() == 2)
         {
             _dataset.Partition([splitRule](const ForestTrainerExample& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
                                range.firstIndex,
@@ -201,13 +205,13 @@ namespace trainers
     //
     // debugging code
     //
- 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidatePriorityQueue::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "Priority Queue Size: " << size() << "\n";
 
-        for(const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
+        for (const auto& candidate : std::priority_queue<SplitCandidate>::c) // c is a protected member of std::priority_queue
         {
             os << "\n";
             candidate.PrintLine(os, tabs + 1);
@@ -215,7 +219,7 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "gain = " << gain << "\n";
@@ -225,4 +229,5 @@ namespace trainers
         splitRule.PrintLine(os, tabs);
         stats.PrintLine(os, tabs);
     }
+}
 }

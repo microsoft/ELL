@@ -44,7 +44,8 @@ set (INCLUDE include/DataLoadArguments.h
              include/TrainerArguments.h
 )
 
-set (TCC tcc/MakeEvaluator.tcc
+set (TCC tcc/IsNodeCompilable.tcc
+         tcc/MakeEvaluator.tcc
          tcc/ParametersEnumerator.tcc
 )
 

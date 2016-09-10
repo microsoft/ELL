@@ -14,16 +14,18 @@
 #include "Parser.h"
 
 // stl
-#include <vector>
 #include <string>
+#include <vector>
 
+namespace emll
+{
 namespace common
 {
     void ParsedDataLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
             inputDataFilename,
-            "inputDataFilename", 
+            "inputDataFilename",
             "idf",
             "Path to the input data file",
             "");
@@ -72,4 +74,5 @@ namespace common
 
         return parseErrorMessages;
     }
+}
 }

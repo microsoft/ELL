@@ -9,15 +9,17 @@
 // utilities
 #include "RandomEngines.h"
 
+namespace emll
+{
 namespace trainers
 {
     template <typename PredictorType>
-    MultiEpochIncrementalTrainer<PredictorType>::MultiEpochIncrementalTrainer(std::unique_ptr<InternalTrainerType>&& internalTrainer, const MultiEpochIncrementalTrainerParameters& parameters) :
-        _internalTrainer(std::move(internalTrainer)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
+    MultiEpochIncrementalTrainer<PredictorType>::MultiEpochIncrementalTrainer(std::unique_ptr<InternalTrainerType>&& internalTrainer, const MultiEpochIncrementalTrainerParameters& parameters)
+        : _internalTrainer(std::move(internalTrainer)), _parameters(parameters), _random(utilities::GetRandomEngine(parameters.dataPermutationRandomSeed))
     {
         assert(_internalTrainer != nullptr);
     }
-    
+
     template <typename PredictorType>
     void MultiEpochIncrementalTrainer<PredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
     {
@@ -25,12 +27,12 @@ namespace trainers
 
         // calculate epoch size
         uint64_t epochSize = _parameters.epochSize;
-        if(epochSize == 0 || epochSize >  rowDataset.NumExamples())
+        if (epochSize == 0 || epochSize > rowDataset.NumExamples())
         {
             epochSize = rowDataset.NumExamples();
         }
 
-        for(int epoch = 0; epoch < _parameters.numEpochs; ++epoch)
+        for (int epoch = 0; epoch < _parameters.numEpochs; ++epoch)
         {
             // randomly permute the data
             rowDataset.RandomPermute(_random, epochSize);
@@ -46,4 +48,5 @@ namespace trainers
     {
         return std::make_unique<MultiEpochIncrementalTrainer<PredictorType>>(std::move(internalTrainer), parameters);
     }
+}
 }

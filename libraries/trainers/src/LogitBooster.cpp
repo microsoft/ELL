@@ -10,15 +10,19 @@
 
 #include <cmath>
 
+namespace emll
+{
 namespace trainers
 {
-    LogitBooster::LogitBooster(double scale) : _scale(scale)
-    {}
+    LogitBooster::LogitBooster(double scale)
+        : _scale(scale)
+    {
+    }
 
     dataset::WeightLabel LogitBooster::GetWeakWeightLabel(const dataset::WeightLabel& strongWeightLabel, double prediction) const
     {
         double scaledMargin = _scale * strongWeightLabel.label * prediction;
-        if(scaledMargin > 0)
+        if (scaledMargin > 0)
         {
             double expNegativeScaledMargin = exp(-scaledMargin);
             return { strongWeightLabel.weight * expNegativeScaledMargin / (1.0 + expNegativeScaledMargin), strongWeightLabel.label };
@@ -28,4 +32,5 @@ namespace trainers
             return { strongWeightLabel.weight / (1.0 + exp(scaledMargin)), strongWeightLabel.label };
         }
     }
+}
 }

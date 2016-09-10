@@ -14,13 +14,14 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary> Base class for matrices of double numbers. </summary>
     class IMatrix : public Base
     {
     public:
-
         /// <summary> Returns the number of rows in the matrix. </summary>
         ///
         /// <returns> The total number of rows. </returns>
@@ -45,7 +46,7 @@ namespace linear
         /// <param name="p_y"> [in,out] The y vector. </param>
         /// <param name="alpha"> The alpha parameter. </param>
         /// <param name="beta"> The beta parameter. </param>
-        virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const =0;
+        virtual void Gemv(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const = 0;
 
         /// <summary> Performs a general vector-matrix product: y = alpha * x * M + beta * y. </summary>
         ///
@@ -61,6 +62,7 @@ namespace linear
         /// <param name="p_y"> [in,out] The y vector. </param>
         /// <param name="alpha"> The alpha parameter. </param>
         /// <param name="beta"> The beta parameter. </param>
-        virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const =0;
+        virtual void Gevm(const double* p_x, double* p_y, double alpha = 1.0, double beta = 0.0) const = 0;
     };
+}
 }

@@ -6,18 +6,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
     // Hiding some stuff in this namespace that's unlikely to confict with anything
-    // TODO: put this in some utility place
     namespace ModelImpl
     {
         template <typename ContainerType>
         class ReverseRange
         {
         public:
-            ReverseRange(const ContainerType& container) : _begin(container.crbegin()), _end(container.crend()) {}
+            ReverseRange(const ContainerType& container)
+                : _begin(container.crbegin()), _end(container.crend()) {}
 
             typename ContainerType::const_reverse_iterator begin() const { return _begin; }
 
@@ -63,7 +65,7 @@ namespace model
     {
         // get set of nodes to make sure we visit
         std::unordered_set<const Node*> usedNodes;
-        for(const auto& range: elements.GetRanges())
+        for (const auto& range : elements.GetRanges())
         {
             usedNodes.insert(range.ReferencedPort()->GetNode());
         }
@@ -75,7 +77,7 @@ namespace model
         // Now construct the output
         auto numElements = elements.Size();
         std::vector<ValueType> result(numElements);
-        for(size_t index = 0; index < numElements; ++index)
+        for (size_t index = 0; index < numElements; ++index)
         {
             auto element = elements.GetElement(index);
             auto port = element.ReferencedPort();
@@ -92,9 +94,8 @@ namespace model
     std::vector<const NodeType*> Model::GetNodesByType()
     {
         std::vector<const NodeType*> result;
-        auto findNodes = [&result](const Node& node) 
-        {
-            if(typeid(node) == typeid(NodeType))
+        auto findNodes = [&result](const Node& node) {
+            if (typeid(node) == typeid(NodeType))
             {
                 result.push_back(dynamic_cast<const NodeType*>(&node));
             }
@@ -127,10 +128,11 @@ namespace model
     void Model::Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const
     {
         auto iter = GetNodeIterator(outputNodes);
-        while(iter.IsValid())
+        while (iter.IsValid())
         {
             visitor(*iter.Get());
             iter.Next();
         }
     }
+}
 }

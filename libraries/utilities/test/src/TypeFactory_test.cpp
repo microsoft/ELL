@@ -12,18 +12,20 @@
 #include "testing.h"
 
 //stl
-#include <string>
 #include <memory>
+#include <string>
 
+namespace emll
+{
 class Base
 {
 public:
     virtual ~Base() = default;
 
     static std::string GetTypeName() { return "Base"; }
-    
+
     virtual std::string GetRuntimeTypeName() const = 0;
-    
+
     // for the purpose of testing
     virtual void Set() = 0;
     virtual bool Check() = 0;
@@ -72,7 +74,7 @@ public:
 
     virtual bool Check() override
     {
-        if(v.size() != 2) return false;
+        if (v.size() != 2) return false;
         if (v[0] == 7.0f && v[1] == 8.0f) return true;
         return false;
     }
@@ -91,4 +93,5 @@ void TypeFactoryTest()
     auto derived2 = factory.Construct(Derived2::GetTypeName());
 
     testing::ProcessTest("TypeFactory", derived1->GetRuntimeTypeName() == Derived1::GetTypeName() && derived2->GetRuntimeTypeName() == Derived2::GetTypeName());
+}
 }

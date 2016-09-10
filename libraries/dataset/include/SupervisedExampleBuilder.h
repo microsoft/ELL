@@ -15,20 +15,21 @@
 #include "Parser.h"
 
 // stl
-#include<string>
 #include <memory>
+#include <string>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> A supervised example builder. </summary>
     ///
     /// <typeparam name="VectorEntryParserType"> Type of the vector entry parser type. </typeparam>
     /// <typeparam name="DefaultDataVectorType"> Type of the default data vector type. </typeparam>
-    template<typename VectorEntryParserType, typename DefaultDataVectorType> 
+    template <typename VectorEntryParserType, typename DefaultDataVectorType>
     class SupervisedExampleBuilder
     {
     public:
-
         /// <summary> Ctor. </summary>
         ///
         /// <param name="parser"> The parser. </param>
@@ -49,6 +50,7 @@ namespace dataset
         VectorEntryParserType _instanceParser;
         bool _hasWeight;
     };
+}
 }
 
 #include "../tcc/SupervisedExampleBuilder.tcc"

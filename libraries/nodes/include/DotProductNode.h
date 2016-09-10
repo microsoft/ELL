@@ -11,12 +11,12 @@
 #include "SumNode.h"
 
 // model
-#include "Node.h"
-#include "ModelTransformer.h"
-#include "PortElements.h"
-#include "InputPort.h"
-#include "OutputPort.h"
 #include "BinaryOperationNode.h"
+#include "InputPort.h"
+#include "ModelTransformer.h"
+#include "Node.h"
+#include "OutputPort.h"
+#include "PortElements.h"
 
 // utilities
 #include "TypeName.h"
@@ -24,6 +24,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that takes two vector inputs and returns their dot product </summary>
@@ -57,20 +59,19 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-        
+
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(model::ModelTransformer& transformer) const override;
 
@@ -85,6 +86,7 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+}
 }
 
 #include "../tcc/DotProductNode.tcc"

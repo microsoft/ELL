@@ -13,9 +13,11 @@
 
 // stl
 #include <cassert>
-#include <stdexcept>
 #include <cstring>
+#include <stdexcept>
 
+namespace emll
+{
 namespace utilities
 {
 
@@ -46,13 +48,16 @@ namespace utilities
         _value += delta;
     }
 
-    CompressedIntegerList::Iterator::Iterator(const uint8_t *iter, const uint8_t *end) : _iter(iter), _end(end), _value(0), _iter_increment(0)
+    CompressedIntegerList::Iterator::Iterator(const uint8_t* iter, const uint8_t* end)
+        : _iter(iter), _end(end), _value(0), _iter_increment(0)
     {
         Next();
     }
 
-    CompressedIntegerList::CompressedIntegerList() : _last(UINT64_MAX), _size(0)
-    {}
+    CompressedIntegerList::CompressedIntegerList()
+        : _last(UINT64_MAX), _size(0)
+    {
+    }
 
     uint64_t CompressedIntegerList::Size() const
     {
@@ -61,12 +66,12 @@ namespace utilities
 
     void CompressedIntegerList::Reserve(uint64_t size)
     {
-        _data.reserve(size*2); // guess that, on average, every entry will occupy 2 bytes
+        _data.reserve(size * 2); // guess that, on average, every entry will occupy 2 bytes
     }
 
     uint64_t CompressedIntegerList::Max() const
     {
-        if(_size == 0)
+        if (_size == 0)
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can't get max of empty list");
         }
@@ -77,7 +82,7 @@ namespace utilities
     /// adds an integer at the end of the list
     void CompressedIntegerList::Append(uint64_t value)
     {
-        assert(value != UINT64_MAX);    // special value reserved for initialization
+        assert(value != UINT64_MAX); // special value reserved for initialization
 
         // calculate the delta from the previous number pushed
         uint64_t delta = 0;
@@ -117,7 +122,7 @@ namespace utilities
 
         int total_bytes = 1 << log2bytes;
         _data.resize(_data.size() + total_bytes); // make room for new data
-        uint8_t *buf = _data.data() + _data.size() - total_bytes; // get pointer to correct place in array
+        uint8_t* buf = _data.data() + _data.size() - total_bytes; // get pointer to correct place in array
         unsigned int mask = log2bytes << 6; // mask == log2(# bytes) shifted to be high-order 2 bits of a byte
         // splice the data length encoding in as the top 2 bits of the first byte
         // So, move all high-order bits of the delta over by 2 to make room, Add the mask, and Add the residual low-order bits of the delta
@@ -133,4 +138,5 @@ namespace utilities
         _last = UINT64_MAX;
         _size = 0;
     }
+}
 }

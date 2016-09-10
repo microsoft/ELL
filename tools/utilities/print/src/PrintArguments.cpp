@@ -11,18 +11,20 @@
 // utilities
 #include "Files.h"
 
-void ParsedPrintArguments::AddArgs(utilities::CommandLineParser & parser)
+namespace emll
+{
+void ParsedPrintArguments::AddArgs(utilities::CommandLineParser& parser)
 {
     parser.AddOption(outputFilename, "outputFilename", "of", "Path to the output file", "");
 }
 
-utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser & parser)
+utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser& parser)
 {
-    if(outputFilename == "null")
+    if (outputFilename == "null")
     {
         outputStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
     }
-    else if(outputFilename == "")
+    else if (outputFilename == "")
     {
         outputStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
     }
@@ -34,4 +36,4 @@ utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilit
     std::vector<std::string> parseErrorMessages;
     return parseErrorMessages;
 }
-
+}

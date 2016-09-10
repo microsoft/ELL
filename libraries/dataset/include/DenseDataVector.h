@@ -18,18 +18,20 @@
 
 // stl
 #include <cstdint>
-#include <vector>
 #include <iostream>
 #include <type_traits>
+#include <vector>
 
 #define DEFAULT_DENSE_VECTOR_CAPACITY 1000
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> DenseDataVector Base class. </summary>
     ///
     /// <typeparam name="ValueType"> Type of the value type. </typeparam>
-    template<typename ValueType>
+    template <typename ValueType>
     class DenseDataVector : public IDataVector
     {
     public:
@@ -45,14 +47,14 @@ namespace dataset
         /// <summary> Constructs an instance of DenseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
+        template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
         ///
         /// <param name="data"> The std::vector. </param>
         DenseDataVector(std::vector<ValueType> data);
-        
+
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the desired element. </param>
@@ -109,7 +111,7 @@ namespace dataset
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
-        
+
         /// <summary> Makes a deep copy of the datavector </summary>
         ///
         /// <returns> A deep copy of the datavector </summary>
@@ -126,7 +128,7 @@ namespace dataset
     };
 
     /// <summary> A float data vector. </summary>
-    class FloatDataVector : public DenseDataVector<float> 
+    class FloatDataVector : public DenseDataVector<float>
     {
     public:
         using DenseDataVector<float>::DenseDataVector;
@@ -138,6 +140,7 @@ namespace dataset
     public:
         using DenseDataVector<double>::DenseDataVector;
     };
+}
 }
 
 #include "../tcc/DenseDataVector.tcc"

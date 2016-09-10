@@ -16,10 +16,12 @@
 
 // stl
 #include <cstdint>
+#include <functional>
 #include <iostream>
 #include <type_traits>
-#include <functional>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary> A double vector. </summary>
@@ -56,17 +58,17 @@ namespace linear
         /// <typeparam name="IIndexValueIterator"> Type of the index value iterator. </typeparam>
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="indexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
+        template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         DoubleVector(IndexValueIteratorType indexValueIterator);
 
 #ifndef SWIG
         /// <summary> Type-conversion operator into a std::vector<double>, allowing non-const ref
-        operator std::vector<double> & () & { return std::ref(_data); }
+        operator std::vector<double>&() & { return std::ref(_data); }
 
         /// <summary> Type-conversion operator into a const std::vector<double> reference
-        operator std::vector<double> const & () const & { return std::cref(_data); }
+        operator std::vector<double> const&() const& { return std::cref(_data); }
 
-        /// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
+/// <summary> Type-conversion operator into a std::vector<double>, allowing move semantics
 //        operator std::vector<double> && () && { return std::move(_data); }
 #endif
         /// <summary>
@@ -145,6 +147,6 @@ namespace linear
         std::vector<double> _data;
     };
 }
+}
 
 #include "../tcc/DoubleVector.tcc"
-

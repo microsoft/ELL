@@ -25,6 +25,8 @@
 #include <cstdint>
 #include <memory>
 
+namespace emll
+{
 namespace trainers
 {
     /// <summary> Parameters for the stochastic gradient descent trainer. </summary>
@@ -32,7 +34,7 @@ namespace trainers
     {
         double regularization;
     };
-    
+
     /// <summary>
     /// Implements the averaged stochastic gradient descent algorithm on an L2 regularized empirical
     /// loss.
@@ -62,7 +64,6 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
     private:
-
         void UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator);
         void UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator);
 
@@ -84,6 +85,7 @@ namespace trainers
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
     std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
+}
 }
 
 #include "../tcc/SGDIncrementalTrainer.tcc"

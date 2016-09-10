@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "TrainerArguments.h"
-#include "SGDIncrementalTrainerArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
 #include "ForestTrainerArguments.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
+#include "SGDIncrementalTrainerArguments.h"
+#include "TrainerArguments.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -22,6 +22,8 @@
 // stl
 #include <memory>
 
+namespace emll
+{
 namespace common
 {
     /// <summary> Makes a stochastic gradient descent incremental trainer. </summary>
@@ -48,4 +50,5 @@ namespace common
     ///
     /// <returns> A unique_ptr to a forest trainer. </returns>
     std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments);
+}
 }

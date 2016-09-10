@@ -11,6 +11,8 @@
 // stl
 #include <cstdint>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> Abstract base class for an iterator over a collection of objects of type T. </summary>
@@ -20,7 +22,6 @@ namespace utilities
     class IIterator
     {
     public:
-
         virtual ~IIterator() = default;
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -48,4 +49,5 @@ namespace utilities
         /// <returns> A const reference to the current item; </returns>
         virtual ValueType Get() const = 0;
     };
+}
 }

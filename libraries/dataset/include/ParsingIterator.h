@@ -14,9 +14,11 @@
 #include "IIterator.h"
 
 // stl
-#include <vector>
 #include <memory>
+#include <vector>
 
+namespace emll
+{
 namespace dataset
 {
     using IParsingIterator = typename utilities::IIterator<GenericSupervisedExample>;
@@ -26,11 +28,10 @@ namespace dataset
     ///
     /// <typeparam name="RowIteratorType"> Type of the row iterator type. </typeparam>
     /// <typeparam name="VectorEntryParserType"> Type of the vector entry parser type. </typeparam>
-    template<typename RowIteratorType, typename VectorEntryParserType>
+    template <typename RowIteratorType, typename VectorEntryParserType>
     class ParsingIterator : public IParsingIterator
     {
     public:
-
         /// <summary> Constructs a parsing iterator \param row_iter An input iterator of strings, that
         /// traverses the textual dataset row by row. </summary>
         ///
@@ -64,8 +65,9 @@ namespace dataset
     /// <param name="parser">   The parser. </param>
     ///
     /// <returns> The parsing iterator. </returns>
-    template<typename RowIteratorType, typename VectorEntryParserType>
+    template <typename RowIteratorType, typename VectorEntryParserType>
     std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser);
+}
 }
 
 #include "../tcc/ParsingIterator.tcc"

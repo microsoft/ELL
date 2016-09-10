@@ -11,6 +11,8 @@
 // stl
 #include <cmath>
 
+namespace emll
+{
 namespace lossFunctions
 {
     double SquaredLoss::Evaluate(double prediction, double label) const
@@ -27,6 +29,7 @@ namespace lossFunctions
 
     double SquaredLoss::BregmanGenerator(double value) const
     {
-        return value*value;
+        return value * value;
     }
+}
 }

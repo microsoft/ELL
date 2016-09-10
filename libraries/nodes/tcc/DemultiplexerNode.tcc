@@ -6,15 +6,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace nodes
 {
     template <typename ValueType, typename SelectorType>
-    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode() : Node({ &_input, &_selector }, { &_output }), _input(this, {}, inputPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 0), _defaultValue(0)
-    {}
+    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode()
+        : Node({ &_input, &_selector }, { &_output }), _input(this, {}, inputPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 0), _defaultValue(0)
+    {
+    }
 
     template <typename ValueType, typename SelectorType>
-    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue) : Node({ &_input, &_selector }, { &_output }), _input(this, input, inputPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, outputSize), _defaultValue(defaultValue)
+    DemultiplexerNode<ValueType, SelectorType>::DemultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector, size_t outputSize, ValueType defaultValue)
+        : Node({ &_input, &_selector }, { &_output }), _input(this, input, inputPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, outputSize), _defaultValue(defaultValue)
     {
         if (selector.Size() != 1)
         {
@@ -36,34 +41,33 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void DemultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
+    void DemultiplexerNode<ValueType, SelectorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("input", _input);
-        serializer.Serialize("selector", _selector);
-        serializer.Serialize("output", _output);
-        serializer.Serialize("defaultValue", _defaultValue);
+        Node::WriteToArchive(archiver);
+        archiver[inputPortName] << _input;
+        archiver[selectorPortName] << _selector;
+        archiver[outputPortName] << _output;
+        archiver["defaultValue"] << _defaultValue;
     }
 
     template <typename ValueType, typename SelectorType>
-    void DemultiplexerNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void DemultiplexerNode<ValueType, SelectorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("input", _input, context);
-        serializer.Deserialize("selector", _selector, context);
-        serializer.Deserialize("output", _output, context);
-        serializer.Deserialize("defaultValue", _defaultValue, context);
+        Node::ReadFromArchive(archiver);
+        archiver[inputPortName] >> _input;
+        archiver[selectorPortName] >> _selector;
+        archiver[outputPortName] >> _output;
+        archiver["defaultValue"] >> _defaultValue;
     }
 
     template <typename ValueType, typename SelectorType>
     void DemultiplexerNode<ValueType, SelectorType>::Copy(model::ModelTransformer& transformer) const
     {
-        auto newInput= transformer.TransformPortElements(_input.GetPortElements());
+        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
         auto newNode = transformer.AddNode<DemultiplexerNode<ValueType, SelectorType>>(newInput, newSelector, output.Size(), _defaultValue);
         transformer.MapNodeOutput(output, newNode->output);
     }
-
 
     template <typename ValueType>
     model::PortElements<int> CastIfNecessary(const model::PortElements<ValueType>& values, model::ModelTransformer& transformer)
@@ -73,14 +77,14 @@ namespace nodes
     }
 
     template <>
-    model::PortElements<int> CastIfNecessary<int>(const model::PortElements<int>& values, model::ModelTransformer& transformer)
+    inline model::PortElements<int> CastIfNecessary<int>(const model::PortElements<int>& values, model::ModelTransformer& transformer)
     {
         return values;
     }
 
     template <typename ValueType, typename SelectorType>
     bool DemultiplexerNode<ValueType, SelectorType>::Refine(model::ModelTransformer& transformer) const
-    {        
+    {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newSelector = transformer.TransformPortElements(_selector.GetPortElements());
         auto newSelectorInt = CastIfNecessary(newSelector, transformer);
@@ -88,15 +92,16 @@ namespace nodes
         auto defaultNode = transformer.AddNode<ConstantNode<ValueType>>(_defaultValue);
         model::PortElements<ValueType> outputElements;
         auto size = _output.Size();
-        for(size_t index = 0; index < size; ++index)
+        for (size_t index = 0; index < size; ++index)
         {
             auto indexNode = transformer.AddNode<ConstantNode<int>>(static_cast<int>(index));
             auto isEqualNode = transformer.AddNode<BinaryPredicateNode<int>>(newSelectorInt, indexNode->output, BinaryPredicateNode<int>::PredicateType::equal);
-            auto ifNode = transformer.AddNode<nodes::MultiplexerNode<ValueType, bool>>(model::PortElements<ValueType>{defaultNode->output, newInput}, isEqualNode->output);
+            auto ifNode = transformer.AddNode<nodes::MultiplexerNode<ValueType, bool>>(model::PortElements<ValueType>{ defaultNode->output, newInput }, isEqualNode->output);
             outputElements.Append(ifNode->output);
         }
-      
+
         transformer.MapNodeOutput(output, outputElements);
         return true;
     }
+}
 }

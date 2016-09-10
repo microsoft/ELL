@@ -11,9 +11,11 @@
 // stl
 #include <algorithm>
 
+namespace emll
+{
 namespace trainers
 {
-    template<typename ExampleIteratorType>
+    template <typename ExampleIteratorType>
     ThresholdFinder::UniqueValuesResult ThresholdFinder::UniqueValues(ExampleIteratorType exampleIterator) const
     {
         std::vector<std::vector<ValueWeight>> result;
@@ -51,21 +53,22 @@ namespace trainers
         return { result, totalWeight };
     }
 
-    template<typename ExampleIteratorType>
+    template <typename ExampleIteratorType>
     std::vector<predictors::SingleElementThresholdPredictor> trainers::ExhaustiveThresholdFinder::GetThresholds(ExampleIteratorType exampleIterator) const
     {
         auto uniqueValuesResult = UniqueValues(exampleIterator);
         std::vector<predictors::SingleElementThresholdPredictor> thresholdPredictors;
 
-        for(size_t j = 0; j < uniqueValuesResult.weightedValues.size(); ++j)
+        for (size_t j = 0; j < uniqueValuesResult.weightedValues.size(); ++j)
         {
             const auto& featureValues = uniqueValuesResult.weightedValues[j];
-            for(size_t i = 0; i<featureValues.size()-1; ++i)
+            for (size_t i = 0; i < featureValues.size() - 1; ++i)
             {
-                thresholdPredictors.push_back({ j, 0.5 * (featureValues[i].value + featureValues[i+1].value) });
+                thresholdPredictors.push_back({ j, 0.5 * (featureValues[i].value + featureValues[i + 1].value) });
             }
         }
 
         return thresholdPredictors;
     }
+}
 }

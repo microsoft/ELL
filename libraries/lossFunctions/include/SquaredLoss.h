@@ -8,6 +8,8 @@
 
 #pragma once
 
+namespace emll
+{
 namespace lossFunctions
 {
     /// <summary> Implements the squared loss function: loss(x) = x*x. </summary>
@@ -37,4 +39,5 @@ namespace lossFunctions
         /// <returns> The output of the convex function. </returns>
         double BregmanGenerator(double value) const;
     };
+}
 }

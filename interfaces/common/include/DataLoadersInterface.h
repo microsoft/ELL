@@ -11,10 +11,12 @@
 // Our interface classes
 #include "RowDatasetInterface.h"
 
+#include "AnyIterator.h"
 #include "DataLoadArguments.h"
 #include "Example.h"
-#include "AnyIterator.h"
 
+namespace emll
+{
 namespace interfaces
 {    
     /// <summary> Gets a row dataset from data filename. </summary>
@@ -23,4 +25,5 @@ namespace interfaces
     ///
     /// <returns> The row dataset. </returns>
     interfaces::GenericRowDataset GetDataset(const std::string& dataFilename);
+}
 }

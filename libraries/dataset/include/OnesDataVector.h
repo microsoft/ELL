@@ -17,18 +17,18 @@
 #include <cstdint>
 #include <iostream>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> OnesDataVector Base class. </summary>
     class OnesDataVector : public IDataVector
     {
     public:
-
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
         class Iterator : public linear::IIndexValueIterator
         {
         public:
-
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;
@@ -118,7 +118,7 @@ namespace dataset
         /// <summary> Makes a deep copy of the datavector </summary>
         ///
         /// <returns> A deep copy of the datavector </summary>
-        virtual std::unique_ptr<IDataVector> Clone() const override {return std::make_unique<OnesDataVector>(*this); }
+        virtual std::unique_ptr<IDataVector> Clone() const override { return std::make_unique<OnesDataVector>(*this); }
 
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
@@ -128,4 +128,5 @@ namespace dataset
     private:
         uint64_t _size = 0;
     };
+}
 }

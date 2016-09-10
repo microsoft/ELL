@@ -8,19 +8,25 @@
 
 #pragma once
 
+// model
+#include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
-#include "ModelTransformer.h"
 
 // predictors
 #include "ConstantPredictor.h"
 
 // utilities
+#include "Exception.h"
+#include "IArchivable.h"
 #include "TypeName.h"
 
-#include <vector>
+// stl
 #include <memory>
+#include <vector>
 
+namespace emll
+{
 /// <summary> nodes namespace </summary>
 namespace nodes
 {
@@ -63,16 +69,15 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
-        /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
@@ -96,6 +101,7 @@ namespace nodes
     ///
     /// <returns> The node added to the model. </returns>
     ConstantNode<double>* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::ConstantPredictor& predictor, model::ModelTransformer& transformer);
+}
 }
 
 #include "../tcc/ConstantNode.tcc"

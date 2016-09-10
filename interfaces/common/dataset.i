@@ -16,9 +16,12 @@
 #include "RowDatasetInterface.h"
 %}
 
-%ignore dataset::RowDataset::operator[];
+%ignore emll::dataset::RowDataset::operator[];
 
-namespace dataset
+%import "CompressedIntegerList.h"
+%import "SparseDataVector.h"
+
+namespace emll::dataset
 {
     %ignore IDataVector::Clone;
     %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&&);
@@ -28,12 +31,12 @@ namespace dataset
     %ignore DenseDataVector::operator[];
     %ignore DenseDataVector<double>;
     %ignore DenseDataVector<float>;
-    %ignore SparseDataVector<double, utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<float, utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<short, utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<double, emll::utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<float, emll::utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<short, emll::utilities::CompressedIntegerList>;
 }
 
-%ignore dataset::DenseSupervisedExample::DenseSupervisedExample(DenseSupervisedExample&&);
+%ignore emll::dataset::DenseSupervisedExample::DenseSupervisedExample(DenseSupervisedExample&&);
 %ignore interfaces::GenericRowDataset::GenericRowDataset(GenericRowDataset &&);
 
 %include "noncopyable.i"
@@ -45,40 +48,31 @@ namespace dataset
 %include "Example.h"
 %include "RowDataset.h"
 
-%template() dataset::RowDataset<dataset::GenericSupervisedExample>;
-%template() dataset::DenseDataVector<double>;
-
 %include "RowDatasetInterface.h"
 %import "RowDataset.h"
 
 %include "unique_ptr.i"
-wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)
+wrap_unique_ptr(IDataVectorPtr, emll::dataset::IDataVector)
 
+%template() emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>;
+%template() emll::dataset::DenseDataVector<double>;
 
-namespace dataset
-{
-    // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
-    %template () DenseDataVector<double>;
-    %template () DenseDataVector<float>;
-    %template () SparseDataVector<double, utilities::CompressedIntegerList>;
-    %template () SparseDataVector<float, utilities::CompressedIntegerList>;
-    %template () SparseDataVector<short, utilities::CompressedIntegerList>;
-    %template () RowDataset<GenericSupervisedExample>;
-    
-    // Bafflingly, the below causes SWIG to give an error about no default constructor for SparseDataVector<>
-    // %template (SparseDoubleDataVectorBase) SparseDataVector<double, utilities::CompressedIntegerList>;
-    // %template (SparseFloatDataVectorBase) SparseDataVector<float, utilities::CompressedIntegerList>;
-    // %template (SparseShortDataVectorBase) SparseDataVector<short, utilities::CompressedIntegerList>;
+// The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
+%template () emll::dataset::DenseDataVector<double>;
+%template () emll::dataset::DenseDataVector<float>;
+%template () emll::dataset::SparseDataVector<double, emll::utilities::CompressedIntegerList>;
+%template () emll::dataset::SparseDataVector<float, emll::utilities::CompressedIntegerList>;
+%template () emll::dataset::SparseDataVector<short, emll::utilities::CompressedIntegerList>;
+%template () emll::dataset::RowDataset<GenericSupervisedExample>;
 
-    // wrap operator[] for python
-    WRAP_OP_AT(DoubleDataVector, double)
+// wrap operator[] for python
+WRAP_OP_AT(emll::dataset::DoubleDataVector, double)
 
-    // wrap "Print" method for python
+// wrap "Print" method for python
 //    WRAP_PRINT_TO_STR(GenericSupervisedExample)
-    WRAP_PRINT_TO_STR(FloatDataVector)
-    WRAP_PRINT_TO_STR(DoubleDataVector)
+WRAP_PRINT_TO_STR(emll::dataset::FloatDataVector)
+WRAP_PRINT_TO_STR(emll::dataset::DoubleDataVector)
 
-    WRAP_PRINT_TO_STR(SparseDoubleDataVector)
-    WRAP_PRINT_TO_STR(SparseFloatDataVector) 
-    WRAP_PRINT_TO_STR(SparseShortDataVector)
-}
+WRAP_PRINT_TO_STR(emll::dataset::SparseDoubleDataVector)
+WRAP_PRINT_TO_STR(emll::dataset::SparseFloatDataVector) 
+WRAP_PRINT_TO_STR(emll::dataset::SparseShortDataVector)
