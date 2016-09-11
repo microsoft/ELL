@@ -13,19 +13,19 @@ namespace utilities
     template <typename T>
     std::string TypeName<T*>::GetName()
     {
-        return std::string("ptr") + typeNameLeftBracket + TypeName<T>::GetName() + typeNameRightBracket;
+        return GetCompositeTypeName<T>("ptr");
     }
 
     template <typename T>
     std::string TypeName<std::unique_ptr<T>>::GetName()
     {
-        return std::string("unique_ptr") + typeNameLeftBracket + TypeName<T>::GetName() + typeNameRightBracket;
+        return GetCompositeTypeName<T>("unique_ptr");
     }
 
     template <typename T>
     std::string TypeName<std::vector<T>>::GetName()
     {
-        return std::string("vector") + typeNameLeftBracket + TypeName<T>::GetName() + typeNameRightBracket;
+        return GetCompositeTypeName<T>("vector");
     }
 
     template <typename... Types>

@@ -50,7 +50,11 @@ void TestMapCreate()
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     assert(outputNodes.size() == 1);
-    auto map = model::Map<double>(model, std::make_tuple(MakePortElements(outputNodes[0]->output)), { "doubleOutput" });
+    auto map = model::MakeMap(model,
+                              std::make_tuple(inputNodes[0]),
+                              { "doubleInput" },
+                              std::make_tuple(MakePortElements(outputNodes[0]->output)),
+                              { "doubleOutput" });
 }
 
 void TestMapCompute()
@@ -59,29 +63,41 @@ void TestMapCompute()
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     assert(outputNodes.size() == 1);
-    auto map = model::Map<double>(model, std::make_tuple(MakePortElements(outputNodes[0]->output)), { "doubleOutput" });
+    auto map = model::MakeMap(model,
+                              std::make_tuple(inputNodes[0]),
+                              { "doubleInput" },
+                              std::make_tuple(MakePortElements(outputNodes[0]->output)),
+                              { "doubleOutput" });
 
     assert(inputNodes.size() == 1);
-    auto inputNode = inputNodes[0];
-    inputNode->SetInput({1.0, 2.0, 3.0});
+    map.SetInputs(std::make_tuple(std::vector<double>{1.0, 2.0, 3.0}));
 
     auto resultTuple = map.Compute();
-    auto result = std::get<0>(resultTuple);
-    std::cout << "Output size: " << result.size() << std::endl;
+    std::cout << "map compute result type: " << utilities::TypeName<decltype(resultTuple)>::GetName() << std::endl;
+//    auto result = std::get<0>(resultTuple);
+//    std::cout << "Output size: " << result.size() << std::endl;
 }
 
 void TestMapRefine()
 {
     auto model = GetSimpleModel();
+    auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     assert(outputNodes.size() == 1);
-    auto map1 = model::Map<double>(model, std::make_tuple(MakePortElements(outputNodes[0]->output)), { "doubleOutput" });
-    auto map2 = model::Map<double>(model, std::make_tuple(MakePortElements(outputNodes[0]->output)), { "doubleOutput" });
+
+    auto map1 = model::MakeMap(model,
+                               std::make_tuple(inputNodes[0]),
+                               { "doubleInput" },
+                               std::make_tuple(MakePortElements(outputNodes[0]->output)),
+                               { "doubleOutput" });
+
+    auto map2 = model::MakeMap(model,
+                               std::make_tuple(inputNodes[0]),
+                               { "doubleInput" },
+                               std::make_tuple(MakePortElements(outputNodes[0]->output)),
+                               { "doubleOutput" });
 
     model::TransformContext context{ common::IsNodeCompilable() };
     map2.Refine(context);
-
-
 }
-
 }

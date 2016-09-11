@@ -307,6 +307,18 @@ namespace model
         ///
         /// <param name="other"> The PortElements to append to this one. </param>
         void Append(const PortElements<ValueType>& other);
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("PortElements"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        using type = ValueType;
     };
 
     //
