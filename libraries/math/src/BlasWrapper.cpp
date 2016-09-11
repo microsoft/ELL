@@ -8,67 +8,68 @@
 
 #include "BlasWrapper.h"
 
-// OpenBlas
-#include "cblas.h"
-
 namespace math
 {
     namespace Blas
     {
-        float Asum(size_t size, const float* ptr, size_t Increment)
+        float Asum(int n, const float* x, int incx)
         {
-            auto result = cblas_sasum(static_cast<int>(size), ptr, static_cast<int>(Increment));
-            return result;
+            return cblas_sasum(n, x, incx);
         }
 
-        double Asum(size_t size, double* ptr, size_t Increment)
+        double Asum(int n, const double* x, int incx)
         {
-            auto result = cblas_dasum(static_cast<int>(size), ptr, static_cast<int>(Increment));
-            return result;
+            return cblas_dasum(n, x, incx);
         }
 
-        float Nrm2(size_t size, const float* ptr, size_t Increment)
+        float Nrm2(int n, const float* x, int incx)
         {
-            auto result = cblas_snrm2(static_cast<int>(size), ptr, static_cast<int>(Increment));
-            return result;
+            return cblas_snrm2(n, x, incx);
         }
 
-        double Nrm2(size_t size, double* ptr, size_t Increment)
+        double Nrm2(int n, const double* x, int incx)
         {
-            auto result = cblas_dnrm2(static_cast<int>(size), ptr, static_cast<int>(Increment));
-            return result;
+            return cblas_dnrm2(n, x, incx);
         }
 
-        void Scal(size_t size, float alpha, float* pLhs, size_t lhsIncrement)
+        void Scal(int n, float alpha, float* x, int incx)
         {
-            cblas_sscal(static_cast<int>(size), alpha, pLhs, static_cast<int>(lhsIncrement));
+            cblas_sscal(n, alpha, x, incx);
         }
 
-        void Scal(size_t size, double alpha, double* pLhs, size_t lhsIncrement)
+        void Scal(int n, double alpha, double* x, int incx)
         {
-            cblas_dscal(static_cast<int>(size), alpha, pLhs, static_cast<int>(lhsIncrement));
+            cblas_dscal(n, alpha, x, incx);
         }
 
-        void Axpy(size_t size, float alpha, const float * pRhs, size_t rhsIncrement, float * pLhs, size_t lhsIncrement)
+        void Axpy(int n, float alpha, const float* x, int incx, float* y, int incy)
         {
-            cblas_saxpy(static_cast<int>(size), alpha, pRhs, static_cast<int>(rhsIncrement), pLhs, static_cast<int>(lhsIncrement));
+            cblas_saxpy(n, alpha, x, incx, y, incy);
         }
 
-        void Axpy(size_t size, double alpha, const double * pRhs, size_t rhsIncrement, double * pLhs, size_t lhsIncrement)
+        void Axpy(int n, double alpha, const double* x, int incx, double* y, int incy)
         {
-            cblas_daxpy(static_cast<int>(size), alpha, pRhs, static_cast<int>(rhsIncrement), pLhs, static_cast<int>(lhsIncrement));
+            cblas_daxpy(n, alpha, x, incx, y, incy);
         }
 
-        float Dot(size_t size, const float * pFirst, size_t firstIncrement, const float * pSecond, size_t secondIncrement)
+        float Dot(int n, const float* x, int incx, const float* y, int incy)
         {
-            auto result = cblas_sdot(static_cast<int>(size), pFirst, static_cast<int>(firstIncrement), pSecond, static_cast<int>(secondIncrement));
-            return result;
+            return cblas_sdot(n, x, incx, y, incy);
         }
 
-        double Dot(size_t size, const double* pFirst, size_t firstIncrement, const double* pSecond, size_t secondIncrement)
+        double Dot(int n, const double* x, int incx, const double* y, int incy)
         {
-            auto result = cblas_ddot(static_cast<int>(size), pFirst, static_cast<int>(firstIncrement), pSecond, static_cast<int>(secondIncrement));
-            return result;
+            return cblas_ddot(n, x, incx, y, incy);
+        }
+
+        void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, float alpha, const float* M, int lda, const float* x, int incx, float beta, float* y, int incy)
+        {
+            cblas_sgemv(order, transpose, m, n, alpha, M, lda, x, incx, beta, y, incy);
+        }
+
+        void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, double alpha, const double* M, int lda, const double* x, int incx, double beta, double* y, int incy)
+        {
+            cblas_dgemv(order, transpose, m, n, alpha, M, lda, x, incx, beta, y, incy);
         }
     }
 }

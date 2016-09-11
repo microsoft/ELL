@@ -28,7 +28,7 @@ namespace math
         size_t rhsIncrement = rhsVector.GetIncrement();
 
 #ifdef USE_BLAS
-        return Blas::Axpy(lhsSize, rhsScalar, pRhs, rhsIncrement, pLhs, lhsIncrement);
+        return Blas::Axpy(static_cast<int>(lhsSize), rhsScalar, pRhs, static_cast<int>(rhsIncrement), pLhs, static_cast<int>(lhsIncrement));
 #else
         const ElementType* pEnd = pLhs + lhsSize;
 
@@ -50,12 +50,12 @@ namespace math
         // TODO check inputs for equal size
 
         const ElementType* ptr1 = vector1.GetDataPointer();
-        size_t Increment1 = vector1.GetIncrement();
+        size_t increment1 = vector1.GetIncrement();
         const ElementType* ptr2 = vector2.GetDataPointer();
-        size_t Increment2 = vector2.GetIncrement();
+        size_t increment2 = vector2.GetIncrement();
 
 #ifdef USE_BLAS
-        return Blas::Dot(size1, ptr1, Increment1, ptr2, Increment2);
+        return Blas::Dot(static_cast<int>(size1), ptr1, static_cast<int>(increment1), ptr2, static_cast<int>(increment2));
 #else
         ElementType result = 0;
         const ElementType* end1 = ptr1 + size1;
@@ -63,8 +63,8 @@ namespace math
         while (ptr1 < end1)
         {
             result += (*ptr1) * (*ptr2);
-            ptr1 += Increment1;
-            ptr2 += Increment2;
+            ptr1 += increment1;
+            ptr2 += increment2;
         }
         return result;
 #endif

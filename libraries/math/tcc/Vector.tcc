@@ -32,7 +32,7 @@ namespace math
     ElementType ConstVectorReference<ElementType, Orientation>::Norm2() const
     {
 #ifdef USE_BLAS
-        return Blas::Nrm2(_size, _pData, _increment );
+        return Blas::Nrm2(static_cast<int>(_size), _pData, static_cast<int>(_increment));
 #else
         return std::sqrt(Aggregate([](ElementType x){ return x*x; }));
 #endif
@@ -42,7 +42,7 @@ namespace math
     ElementType ConstVectorReference<ElementType, Orientation>::Norm1() const
     {
 #ifdef USE_BLAS
-        return Blas::Asum(_size, _pData, _increment );
+        return Blas::Asum(static_cast<int>(_size), _pData, static_cast<int>(_increment));
 #else
         return Aggregate([](ElementType x) { return std::abs(x); });
 #endif
@@ -215,7 +215,7 @@ namespace math
     void VectorReference<ElementType, Orientation>::operator*=(ElementType scalar)
     {
 #ifdef USE_BLAS
-        Blas::Scal(_size, scalar, _pData, _increment );
+        Blas::Scal(static_cast<int>(_size), scalar, _pData, static_cast<int>(_increment));
 #else
         ForEach([scalar](ElementType x) { return x*scalar; });
 #endif

@@ -52,6 +52,31 @@ namespace math
         /// <param name="lhsScalar"> [out] The lhs scalar used to store the result. </param>
         template<typename ElementType>
         static void Product(ConstVectorReference<ElementType, VectorOrientation::row>& rhsVector1, ConstVectorReference<ElementType, VectorOrientation::column>& rhsVector2, ElementType& lhsScalar);
+
+        /// <summary> Matrix vector product, y = alpha * M * x + beta y. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
+        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <param name="alpha"> The scalar alpha that multiplies the right hand side. </param>
+        /// <param name="M"> The matrix. </param>
+        /// <param name="x"> The column vector x that multiplies the matrix on the right. </param>
+        /// <param name="beta"> The scalar beta that multiplies the left hand side vector y. </param>
+        /// <param name="y"> The column vector y, multiplied by beta, also used to store the result. </param>
+        template<typename ElementType, MatrixLayout Layout>
+        static void Product(ElementType alpha, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& x, ElementType beta, VectorReference<ElementType, VectorOrientation::column>& y);
+
+        /// <summary> Matrix vector product, y = alpha * M * x + beta y. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
+        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <param name="alpha"> The scalar alpha that multiplies the right hand side. </param>
+        /// <param name="M"> The matrix. </param>
+        /// <param name="x"> The row vector x that multiplies the matrix on the left. </param>
+        /// <param name="beta"> The scalar beta that multiplies the left hand side vector y. </param>
+        /// <param name="y"> The row vector y, multiplied by beta, also used to store the result. </param>
+        template<typename ElementType, MatrixLayout Layout>
+        static void Product(ElementType alpha, ConstVectorReference<ElementType, VectorOrientation::row>& x, ConstMatrixReference<ElementType, Layout>& M, ElementType beta, VectorReference<ElementType, VectorOrientation::row>& y);
+
     };
 }
 
