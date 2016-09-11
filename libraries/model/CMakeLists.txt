@@ -22,6 +22,7 @@ set (SRC src/Model.cpp
 
 set (INCLUDE include/InputNode.h
              include/InputPort.h
+             include/Map.h
              include/Model.h
              include/ModelTransformer.h
              include/Node.h
@@ -33,6 +34,7 @@ set (INCLUDE include/InputNode.h
 
 set (TCC tcc/InputNode.tcc
          tcc/InputPort.tcc
+         tcc/Map.tcc
          tcc/Model.tcc
          tcc/ModelTransformer.tcc
          tcc/OutputNode.tcc
@@ -63,9 +65,11 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp
+              test/src/Map_test.cpp
               test/src/Model_test.cpp
               test/src/PortElements_test.cpp)
 set (TEST_INCLUDE test/include/PortElements_test.h
+                  test/include/Map_test.h
                   test/include/Model_test.h)
 
 source_group("src" FILES ${TEST_SRC})

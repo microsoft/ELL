@@ -80,7 +80,14 @@ namespace model
         /// <typeparam name="NodeType"> The type of the node </typeparam>
         /// <returns> A vector of nodes of the requested type </returns>
         template <typename NodeType>
-        std::vector<const NodeType*> GetNodesByType();
+        std::vector<const NodeType*> GetNodesByType() const;
+
+        /// <summary> Retrieves a set of nodes by type </summary>
+        ///
+        /// <typeparam name="NodeType"> The type of the node </typeparam>
+        /// <returns> A vector of nodes of the requested type </returns>
+        template <typename NodeType>
+        std::vector<NodeType*> GetNodesByType();
 
         /// <summary> Returns part of the output computed by the model </summary>
         ///

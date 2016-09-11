@@ -4,6 +4,7 @@
 
 #include "Model_test.h"
 #include "PortElements_test.h"
+#include "Map_test.h"
 
 // testing
 #include "testing.h"
@@ -20,6 +21,7 @@ int main()
 {
     try
     {
+        // Model tests
         TestStaticModel();
         TestNodeIterator();
         TestExampleModel();
@@ -32,6 +34,11 @@ int main()
         // PortElements tests
         TestSlice();
         TestAppend();
+
+        // Map tests
+        TestMapCreate();
+        TestMapRefine();
+        TestMapCompute();
     }
     catch (const utilities::Exception& exception)
     {

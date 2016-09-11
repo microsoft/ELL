@@ -63,13 +63,13 @@
 %extend emll::model::Model 
 {
     // get input nodes
-    std::vector<const emll::model::InputNode<double>*> GetDoubleInputNodes()
+    std::vector<const emll::model::InputNode<double>*> GetDoubleInputNodes() const
     {
         return $self->GetNodesByType<emll::model::InputNode<double>>();
     }
 
     // get output nodes
-    std::vector<const emll::model::OutputNode<double>*> GetDoubleOutputNodes()
+    std::vector<const emll::model::OutputNode<double>*> GetDoubleOutputNodes() const
     {
         return $self->GetNodesByType<emll::model::OutputNode<double>>();
     }

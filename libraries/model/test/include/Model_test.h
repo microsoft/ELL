@@ -1,10 +1,18 @@
 #pragma once
+
+#include "Model.h"
+
 //
 // Model tests
 //
 
 namespace emll
 {
+// Helpful stuff
+void PrintModel(const model::Model& model);
+void PrintModel(const model::Model& model, const model::Node* output);
+
+// Tests
 void TestNodeIterator();
 void TestStaticModel();
 void TestNodeIterator();

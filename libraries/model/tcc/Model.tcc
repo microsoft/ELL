@@ -91,13 +91,27 @@ namespace model
     // Get nodes by type
     //
     template <typename NodeType>
-    std::vector<const NodeType*> Model::GetNodesByType()
+    std::vector<const NodeType*> Model::GetNodesByType() const
     {
         std::vector<const NodeType*> result;
         auto findNodes = [&result](const Node& node) {
             if (typeid(node) == typeid(NodeType))
             {
                 result.push_back(dynamic_cast<const NodeType*>(&node));
+            }
+        };
+        Visit(findNodes);
+        return result;
+    }
+
+    template <typename NodeType>
+    std::vector<NodeType*> Model::GetNodesByType()
+    {
+        std::vector<NodeType*> result;
+        auto findNodes = [&result](const Node& node) {
+            if (typeid(node) == typeid(NodeType))
+            {
+                result.push_back(const_cast<NodeType*>(dynamic_cast<const NodeType*>(&node)));
             }
         };
         Visit(findNodes);
