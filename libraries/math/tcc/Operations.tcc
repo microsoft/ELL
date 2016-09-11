@@ -75,4 +75,10 @@ namespace math
     {
         lhsScalar = Dot(rhsVector1, rhsVector2);
     }
+
+    template<typename ElementType, MatrixLayout Layout>
+    void Operations::Product(ElementType s, ConstMatrixReference<ElementType, Layout>& A, ConstVectorReference<ElementType, VectorOrientation::column>& u, ElementType t, VectorReference<ElementType, VectorOrientation::column>& v)
+    {
+
+    }
 }
