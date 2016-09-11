@@ -132,7 +132,8 @@ namespace math
         ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 
         // allow operations defined in the Operations struct to access raw data vector and increment
-        friend struct Operations;
+        friend struct NativeOperations;
+        friend struct BlasOperations;
 
         ElementType* _pData;
         size_t _size;
@@ -208,10 +209,6 @@ namespace math
         using ConstVectorReference<ElementType, Orientation>::Transpose;
 
     protected:
-        // allow operations defined in the Operations struct to access raw data vector
-        friend struct Operations;
-        ElementType* GetDataPointer() { return _pData; }
-        
         // protected ctor accessible only through derived classes
         friend class VectorReferenceConstructor;
         friend class VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;

@@ -90,28 +90,28 @@ void TestVectorReference()
     testing::ProcessTest("ColumnVectorReference::operator *=", v == z);
 }
 
-template<typename ElementType>
+template<typename ElementType, math::Implementation Implementation>
 void TestVectorMultiply()
 {
     math::RowVector<ElementType> u{ 0, 1, 0, 1, 0 };
     math::ColumnVector<ElementType> v{ 1, 2, 3, 4, 5 };
-    auto dot = math::Operations::Dot(u, v);
-    testing::ProcessTest("Operations::Dot(Vector, Vector)", dot == 6);
+    auto nativeDot = math::ImplementedOperations<Implementation>::Dot(u, v);
+    testing::ProcessTest("ImplementedOperations::Dot(Vector, Vector)", nativeDot == 6);
 
     ElementType result;
-    math::Operations::Multiply(u, v, result);
-    testing::ProcessTest("Operations::Multiply(Vector, Vector)", result == 6);
+    math::ImplementedOperations<Implementation>::Multiply(u, v, result);
+    testing::ProcessTest("ImplementedOperations::Multiply(Vector, Vector)", result == 6);
 }
 
-template<typename ElementType>
+template<typename ElementType, math::Implementation Implementation>
 void TestAddTo()
 {
     math::RowVector<ElementType> u{ 1, 2, 3, 4, 5 };
     math::RowVector<ElementType> v{ 0, 1, 0, 1, 0 };
-    math::Operations::AddTo(static_cast<ElementType>(2.0), v, u);
+    math::ImplementedOperations<Implementation>::AddTo(static_cast<ElementType>(2.0), v, u);
 
     math::RowVector<ElementType> z{ 1, 4, 3, 6, 5 };
-    testing::ProcessTest("Operations::AddTo(scalar, Vector, Vector)", u == z);
+    testing::ProcessTest("ImplementedOperations::AddTo(scalar, Vector, Vector)", u == z);
 }
 
 void TestConstDoubleVector()
@@ -223,7 +223,7 @@ void TestMatrix2()
     testing::ProcessTest("Matrix::GetDiagonal()", M == C);
 }
 
-template<typename ElementType, math::MatrixLayout Layout>
+template<typename ElementType, math::MatrixLayout Layout, math::Implementation Implementation>
 void TestMatrixMultiply()
 {
     math::Matrix<ElementType, Layout> M
@@ -240,10 +240,10 @@ void TestMatrixMultiply()
     ElementType t = 3;
 
     // u = s * M * v + t * u
-    math::Operations::Multiply(s, M, v, t, u);
+    math::ImplementedOperations<Implementation>::Multiply(s, M, v, t, u);
 
     math::ColumnVector<ElementType> uu{9, 11, 28};
-    testing::ProcessTest("Operations::Multiply(Matrix, vector)", u == uu);
+    testing::ProcessTest("ImplementedOperations::Multiply(Matrix, vector)", u == uu);
 }
 
 /// Runs all tests
@@ -254,10 +254,14 @@ int main()
     TestVector<double>();
     TestVectorReference<float>();
     TestVectorReference<double>();
-    TestVectorMultiply<float>();
-    TestVectorMultiply<double>();
-    TestAddTo<float>();
-    TestAddTo<double>();
+    TestVectorMultiply<float, math::Implementation::native>();
+    TestVectorMultiply<double, math::Implementation::native>();
+    TestVectorMultiply<float, math::Implementation::blas>();
+    TestVectorMultiply<double, math::Implementation::blas>();
+    TestAddTo<float, math::Implementation::native>();
+    TestAddTo<double, math::Implementation::native>();
+    TestAddTo<float, math::Implementation::blas>();
+    TestAddTo<double, math::Implementation::blas>();
     TestConstDoubleVector();
 
     TestMatrix1<float, math::MatrixLayout::rowMajor>();
@@ -270,12 +274,14 @@ int main()
     TestMatrix2<double, math::MatrixLayout::rowMajor>();
     TestMatrix2<double, math::MatrixLayout::columnMajor>();
 
-//    TestMatrixMultiply<float, math::MatrixLayout::rowMajor>();
-    TestMatrixMultiply<float, math::MatrixLayout::columnMajor>();
-//    TestMatrixMultiply<double, math::MatrixLayout::rowMajor>();
-    TestMatrixMultiply<double, math::MatrixLayout::columnMajor>();
-
-
+    TestMatrixMultiply<float, math::MatrixLayout::rowMajor, math::Implementation::native>();
+    TestMatrixMultiply<float, math::MatrixLayout::columnMajor, math::Implementation::native>();
+    TestMatrixMultiply<double, math::MatrixLayout::rowMajor, math::Implementation::native>();
+    TestMatrixMultiply<double, math::MatrixLayout::columnMajor, math::Implementation::native>();
+    TestMatrixMultiply<float, math::MatrixLayout::rowMajor, math::Implementation::blas>();
+    TestMatrixMultiply<float, math::MatrixLayout::columnMajor, math::Implementation::blas>();
+    TestMatrixMultiply<double, math::MatrixLayout::rowMajor, math::Implementation::blas>();
+    TestMatrixMultiply<double, math::MatrixLayout::columnMajor, math::Implementation::blas>();
 
     if(testing::DidTestFail())
     {

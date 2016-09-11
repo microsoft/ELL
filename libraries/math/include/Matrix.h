@@ -73,7 +73,8 @@ namespace math
         RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
 
         // allow operations defined in the Operations struct to access raw data
-        friend struct Operations;
+        friend struct NativeOperations;
+        friend struct BlasOperations;
 
         ElementType* _pData;
         size_t _numRows;
