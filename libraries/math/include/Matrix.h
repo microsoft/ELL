@@ -69,8 +69,11 @@ namespace math
         size_t NumColumns() const { return _numColumns; }
 
     protected:
-        // allow operations defined in the Operations struct to access raw data vector
+        // protected ctor accessible only through derived classes
         RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
+
+        // allow operations defined in the Operations struct to access raw data
+        friend struct Operations;
 
         ElementType* _pData;
         size_t _numRows;

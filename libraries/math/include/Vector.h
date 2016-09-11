@@ -126,22 +126,17 @@ namespace math
         bool operator!=(const ConstVectorReference<ElementType, Orientation>& other) const;
 
     protected:
-        // allow operations defined in the Operations struct to access raw data vector
-        friend struct Operations;
-        const ElementType* GetDataPointer() const { return _pData; }
-        
         // protected ctor accessible only through derived classes and friends
         friend class VectorReferenceConstructor;
         friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
         ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 
-        // allow operations defined in the Operations struct to access increment 
+        // allow operations defined in the Operations struct to access raw data vector and increment
         friend struct Operations;
-        size_t GetIncrement() const { return _increment ; }
 
         ElementType* _pData;
         size_t _size;
-        size_t _increment ;
+        size_t _increment;
 
     private:
         template<typename MapperType>

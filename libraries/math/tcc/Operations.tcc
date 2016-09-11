@@ -6,79 +6,98 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Exception.h"
+
 namespace math
 {
     template<typename ElementType, VectorOrientation Orientation>
-    void Operations::AddTo(ElementType rhsScalar, VectorReference<ElementType, Orientation>& lhsVector)
+    void Operations::AddTo(ElementType s, VectorReference<ElementType, Orientation>& v)
     {
-        lhsVector += rhsScalar;
+        v += s;
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void Operations::AddTo(ElementType rhsScalar, ConstVectorReference<ElementType, Orientation>& rhsVector, VectorReference<ElementType, Orientation>& lhsVector)
+    void Operations::AddTo(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
-        size_t lhsSize = lhsVector.Size();
-        size_t rhsSize = rhsVector.Size();
 
         // TODO check inputs for equal size
 
-        ElementType* pLhs = lhsVector.GetDataPointer();
-        size_t lhsIncrement = lhsVector.GetIncrement();
-        const ElementType* pRhs = rhsVector.GetDataPointer();
-        size_t rhsIncrement = rhsVector.GetIncrement();
+        ElementType* uData = u._pData;
+        size_t uIncrement = u._increment;
+        const ElementType* vData = v._pData;
+        size_t vIncrement = v._increment;
 
 #ifdef USE_BLAS
-        return Blas::Axpy(static_cast<int>(lhsSize), rhsScalar, pRhs, static_cast<int>(rhsIncrement), pLhs, static_cast<int>(lhsIncrement));
+        return Blas::Axpy(static_cast<int>(u.Size()), s, vData, static_cast<int>(vIncrement), uData, static_cast<int>(uIncrement));
 #else
-        const ElementType* pEnd = pLhs + lhsSize;
+        const ElementType* end = uData + u.Size();
 
-        while (pLhs < pEnd)
+        while (uData < end)
         {
-            (*pLhs) += rhsScalar * (*pRhs);
-            pLhs += lhsIncrement;
-            pRhs += rhsIncrement;
+            (*uData) += s * (*vData);
+            uData += uIncrement;
+            vData += vIncrement;
         }
 #endif
     }
 
     template<typename ElementType, VectorOrientation Orientation1, VectorOrientation Orientation2>
-    ElementType Operations::Dot(ConstVectorReference<ElementType, Orientation1>& vector1, ConstVectorReference<ElementType, Orientation2>& vector2)
+    ElementType Operations::Dot(ConstVectorReference<ElementType, Orientation1>& u, ConstVectorReference<ElementType, Orientation2>& v)
     {
-        size_t size1 = vector1.Size();
-        size_t size2 = vector2.Size();
-
         // TODO check inputs for equal size
 
-        const ElementType* ptr1 = vector1.GetDataPointer();
-        size_t increment1 = vector1.GetIncrement();
-        const ElementType* ptr2 = vector2.GetDataPointer();
-        size_t increment2 = vector2.GetIncrement();
+        const ElementType* uData = u._pData;
+        size_t uIncrement = u._increment;
+        const ElementType* vData = v._pData;
+        size_t vIncrement = v._increment;
 
 #ifdef USE_BLAS
-        return Blas::Dot(static_cast<int>(size1), ptr1, static_cast<int>(increment1), ptr2, static_cast<int>(increment2));
+        return Blas::Dot(static_cast<int>(u.Size()), uData, static_cast<int>(uIncrement), vData, static_cast<int>(vIncrement));
 #else
         ElementType result = 0;
-        const ElementType* end1 = ptr1 + size1;
+        const ElementType* end = uData + u.Size();
 
-        while (ptr1 < end1)
+        while (uData < end)
         {
-            result += (*ptr1) * (*ptr2);
-            ptr1 += increment1;
-            ptr2 += increment2;
+            result += (*uData) * (*vData);
+            uData += uIncrement;
+            vData += vIncrement;
         }
         return result;
 #endif
     }
 
     template<typename ElementType>
-    void Operations::Product(ConstVectorReference<ElementType, VectorOrientation::row>& rhsVector1, ConstVectorReference<ElementType, VectorOrientation::column>& rhsVector2, ElementType& lhsScalar)
+    void Operations::Multiply(ConstVectorReference<ElementType, VectorOrientation::row>& rhsVector1, ConstVectorReference<ElementType, VectorOrientation::column>& rhsVector2, ElementType& lhsScalar)
     {
         lhsScalar = Dot(rhsVector1, rhsVector2);
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    void Operations::Product(ElementType s, ConstMatrixReference<ElementType, Layout>& A, ConstVectorReference<ElementType, VectorOrientation::column>& u, ElementType t, VectorReference<ElementType, VectorOrientation::column>& v)
+    void Operations::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u)
     {
 
+        // TODO check inputs for equal size
+
+#ifdef USE_BLAS
+
+        // map Layout to CBLAS_ORDER
+        CBLAS_ORDER order;
+        switch (M.GetLayout())
+        {
+        case MatrixLayout::rowMajor:
+            order = CBLAS_ORDER::CblasRowMajor;
+            break;
+        case MatrixLayout::columnMajor:
+            order = CBLAS_ORDER::CblasColMajor;
+            break;
+        default:
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Layout not supported");
+        }
+        
+        Blas::Gemv(order, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(M.NumRows()), static_cast<int>(M.NumColumns()), s, M._pData, static_cast<int>(M._increment), v._pData, static_cast<int>(v._increment), t, u._pData, static_cast<int>(u._increment));
+#else
+        ElementType result = 0;
+#endif
     }
 }

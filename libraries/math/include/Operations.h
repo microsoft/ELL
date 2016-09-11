@@ -15,7 +15,7 @@ namespace math
 {
     /// <summary>
     /// A struct that contains vector matrix operations. Function arguments follow these naming
-    /// conventions: r,s,t represent scalars; u,v represent vectors; A,B represent matrices.
+    /// conventions: r,s,t represent scalars; u,v,w represent vectors; M,A,B represent matrices.
     /// </summary>
     struct Operations
     {
@@ -24,22 +24,22 @@ namespace math
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
         /// <param name="s"> The scalar being added. </param>
-        /// <param name="r"> [in,out] The vector to which the scalar is added. </param>
+        /// <param name="v"> [in,out] The vector to which the scalar is added. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void AddTo(ElementType s, VectorReference<ElementType, Orientation>& r);
+        static void AddTo(ElementType s, VectorReference<ElementType, Orientation>& v);
 
-        /// <summary> Adds a scaled vector to another vector, v += s * u. </summary>
+        /// <summary> Adds a scaled vector to another vector, u += s * v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
         /// <typeparam name="Orientation"> Orientation of the two vectors. </typeparam>
-        /// <param name="s"> The scalar that multiplies the right hand side vector. </param>
-        /// <param name="u"> The vector being added to lefr hand side. </param>
-        /// <param name="v"> [in,out] The vector to which the right hand side is added. </param>
+        /// <param name="s"> The scalar that multiplies the right hand side vector v. </param>
+        /// <param name="v"> The right hand side vector. </param>
+        /// <param name="u"> [in,out] The left hand side vector. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void AddTo(ElementType s, ConstVectorReference<ElementType, Orientation>& u, VectorReference<ElementType, Orientation>& v);
+        static void AddTo(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
 
         /// <summary>
-        /// Calculates a vector dot product (between vectors in any orientation), u * v.
+        /// Calculates a vector dot Multiply (between vectors in any orientation), u * v.
         /// </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
@@ -48,7 +48,7 @@ namespace math
         /// <param name="u"> The first vector, in any orientation. </param>
         /// <param name="v"> The second vector, in any orientation. </param>
         ///
-        /// <returns> The dot product. </returns>
+        /// <returns> The dot Multiply. </returns>
         template<typename ElementType, VectorOrientation OrientationV, VectorOrientation OrientationU>
         static ElementType Dot(ConstVectorReference<ElementType, OrientationV>& u, ConstVectorReference<ElementType, OrientationU>& v);
 
@@ -59,19 +59,19 @@ namespace math
         /// <param name="v"> The right vector in column orientation. </param>
         /// <param name="r"> [out] The scalar used to store the result. </param>
         template<typename ElementType>
-        static void Product(ConstVectorReference<ElementType, VectorOrientation::row>& u, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType& r);
+        static void Multiply(ConstVectorReference<ElementType, VectorOrientation::row>& u, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType& r);
 
-        /// <summary> Generalized matrix vector product, v = s * A * u + t * v. </summary>
+        /// <summary> Generalized matrix vector multiplication, u = s * M * v + t * u. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
         /// <typeparam name="Layout"> Matrix layout. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
-        /// <param name="A"> The matrix. </param>
-        /// <param name="u"> The column vector that multiplies the matrix on the right. </param>
-        /// <param name="t"> The scalar that multiplies v. </param>
-        /// <param name="v"> [in,out] A column vector, multiplied by t and used to store the result. </param>
+        /// <param name="M"> The matrix. </param>
+        /// <param name="v"> A column vector, multiplied by t and used to store the result. </param>
+        /// <param name="t"> The scalar that multiplies u. </param>
+        /// <param name="u"> [in,out] The column vector that multiplies the matrix on the right. </param>
         template<typename ElementType, MatrixLayout Layout>
-        static void Product(ElementType s, ConstMatrixReference<ElementType, Layout>& A, ConstVectorReference<ElementType, VectorOrientation::column>& u, ElementType t, VectorReference<ElementType, VectorOrientation::column>& v);
+        static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u);
     };
 }
 
