@@ -6,8 +6,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// stl
+#include <algorithm> // for std::generate
+
 namespace math
 {
+    //
+    // VectorReferenceConstructor
+    // 
+
     template<typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, Orientation> VectorReferenceConstructor::ConstructVectorReference(ElementType * pData, size_t size, size_t increment)
     {
@@ -20,9 +27,17 @@ namespace math
         return ConstVectorReference<ElementType, Orientation>(pData, size, increment);
     }
 
+    //
+    // RectangularMatrixBase
+    // 
+
     template<typename ElementType>
     RectangularMatrixBase<ElementType>::RectangularMatrixBase(ElementType * pData, size_t numRows, size_t numColumns, size_t increment) : _pData(pData), _numRows(numRows), _numColumns(numColumns), _increment(increment)
     {}
+
+    //
+    // MatrixBase
+    // 
 
     template<typename ElementType>
     MatrixBase<ElementType, MatrixLayout::rowMajor>::MatrixBase(size_t numRows, size_t numColumns) : RectangularMatrixBase<ElementType>(nullptr, numRows, numColumns, numColumns)
@@ -31,6 +46,10 @@ namespace math
     template<typename ElementType>
     MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(size_t numRows, size_t numColumns) : RectangularMatrixBase<ElementType>(nullptr, numRows, numColumns, numRows)
     {}
+
+    //
+    // ConstMatrixReference
+    // 
 
     template<typename ElementType, MatrixLayout Layout>
     ElementType ConstMatrixReference<ElementType, Layout>::operator() (size_t rowIndex, size_t columnIndex)  const
@@ -98,11 +117,36 @@ namespace math
         return !(*this == other);
     }
 
+    //
+    // MatrixReference
+    // 
+
     template<typename ElementType, MatrixLayout Layout>
     ElementType& MatrixReference<ElementType, Layout>::operator() (size_t rowIndex, size_t columnIndex)
     {
         return _pData[rowIndex * _rowIncrement + columnIndex * _columnIncrement];
     }
+
+    template<typename ElementType, MatrixLayout Layout>
+    void MatrixReference<ElementType, Layout>::Fill(ElementType value)
+    {
+        for (size_t i = 0; i < _numIntervals; ++i)
+        {
+            auto begin = _pData + i * _increment;
+            std::fill(begin, begin + _intervalLength, value);
+        }
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    void MatrixReference<ElementType, Layout>::Generate(std::function<ElementType()> generator)
+    {
+        for (size_t i = 0; i < _numIntervals; ++i)
+        {
+            auto begin = _pData + i * _increment;
+            std::generate(begin, begin + _intervalLength, generator);
+        }
+    }
+
 
     template<typename ElementType, MatrixLayout Layout>
     auto MatrixReference<ElementType, Layout>::Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>
@@ -138,6 +182,10 @@ namespace math
         return ConstructVectorReference<ElementType, Orientation>(_pData, size, _increment + 1);
     }
 
+    //
+    // Matrix
+    // 
+
     template<typename ElementType, MatrixLayout Layout>
     Matrix<ElementType, Layout>::Matrix(size_t numRows, size_t numColumns) : MatrixReference<ElementType, Layout>(numRows, numColumns), _data(numRows*numColumns)
     {
@@ -164,5 +212,15 @@ namespace math
         }
     }
 
+    template<typename ElementType, MatrixLayout Layout>
+    void Matrix<ElementType, Layout>::Fill(ElementType value)
+    {
+        std::fill(_data.begin(), _data.end(), value);
+    }
 
+    template<typename ElementType, MatrixLayout Layout>
+    void Matrix<ElementType, Layout>::Generate(std::function<ElementType()> generator)
+    {
+        std::generate(_data.begin(), _data.end(), generator);
+    }
 }

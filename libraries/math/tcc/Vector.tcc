@@ -12,7 +12,6 @@
 #include "Exception.h"
 
 // stl
-#include <memory> // for std::move
 #include <algorithm> // for std::generate
 
 namespace math
@@ -102,9 +101,9 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    ConstVectorReference<ElementType, FlipOrientation<Orientation>::value> ConstVectorReference<ElementType, Orientation>::Transpose() const
+    auto ConstVectorReference<ElementType, Orientation>::Transpose() const -> ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
     {
-        return ConstVectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _increment );
+        return ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment );
     }
 
     template<typename ElementType, VectorOrientation Orientation>
@@ -235,9 +234,9 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    VectorReference<ElementType, FlipOrientation<Orientation>::value> VectorReference<ElementType, Orientation>::Transpose()
+    auto VectorReference<ElementType, Orientation>::Transpose() -> VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
     {
-        return VectorReference<ElementType, FlipOrientation<Orientation>::value>(_pData, _size, _increment );
+        return VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment );
     }
 
     template<typename ElementType, VectorOrientation Orientation>
@@ -279,6 +278,12 @@ namespace math
     void Vector<ElementType, Orientation>::Fill(ElementType value)
     {
         std::fill(_data.begin(), _data.end(), value);
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void Vector<ElementType, Orientation>::Generate(std::function<ElementType()> generator)
+    {
+        std::generate(_data.begin(), _data.end(), generator);
     }
 
     template <typename ElementType, VectorOrientation Orientation>

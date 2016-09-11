@@ -26,7 +26,6 @@ namespace math
     class VectorReferenceConstructor
     {
     protected:
-
         /// <summary> Constructs a vector reference. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
@@ -87,12 +86,13 @@ namespace math
     {
     protected:
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
-       MatrixBase(size_t numRows, size_t numColumns);
+        MatrixBase(size_t numRows, size_t numColumns);
 
         static constexpr MatrixLayout transposeLayout = MatrixLayout::rowMajor;
-        static constexpr MatrixLayout layout = MatrixLayout::columnMajor;
         static constexpr size_t _rowIncrement = 1;
-        const size_t& _columnIncrement = _increment;
+        const size_t _numIntervals = _numColumns;
+        const size_t _intervalLength = _numRows;
+        const size_t _columnIncrement = _increment;
     };
 
     /// <summary> Base class for row major rectangular dense matrices. </summary>
@@ -103,11 +103,12 @@ namespace math
     {
     protected:
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
-       MatrixBase(size_t numRows, size_t numColumns);
+        MatrixBase(size_t numRows, size_t numColumns);
 
         static constexpr MatrixLayout transposeLayout = MatrixLayout::columnMajor;
-        static constexpr MatrixLayout layout = MatrixLayout::rowMajor;
-        const size_t& _rowIncrement = _increment;
+        const size_t _numIntervals = _numRows;
+        const size_t _intervalLength = _numColumns;
+        const size_t _rowIncrement = _increment;
         static constexpr size_t _columnIncrement = 1;
     };
 
@@ -123,6 +124,11 @@ namespace math
         ///
         /// <returns> A copy of the element in a given position. </returns>
         ElementType operator() (size_t rowIndex, size_t columnIndex)  const;
+
+        /// <summary> Gets the matrix layout. </summary>
+        ///
+        /// <returns> The matrix layout. </returns>
+        MatrixLayout GetLayout() const { return Layout; }
 
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
@@ -197,6 +203,18 @@ namespace math
         /// <returns> A reference to an element in a given position. </returns>
         ElementType& operator() (size_t rowIndex, size_t columnIndex);
 
+        /// <summary> Sets all matrix elements to zero. </summary>
+        void Reset() { Fill(0); }
+
+        /// <summary> Sets all matrix elements to a given value. </summary>
+        ///
+        /// <param name="value"> The value. </param>
+        void Fill(ElementType value);
+
+        /// <summary> Generates elements of the vector by repeatedly calling a generator function (such as a random number generator). </summary>
+        /// <param name="generator"> The generator function. </param>
+        void Generate(std::function<ElementType()> generator);
+
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
@@ -258,6 +276,18 @@ namespace math
         ///
         /// <param name="list"> A list of initialization lists (row by row). </param>
        Matrix(std::initializer_list<std::initializer_list<ElementType>> list);
+
+       /// <summary> Sets all matrix elements to zero. </summary>
+       void Reset() { Fill(0); }
+
+       /// <summary> Sets all matrix elements to a given value. </summary>
+       ///
+       /// <param name="value"> The value. </param>
+       void Fill(ElementType value);
+
+       /// <summary> Generates elements of the vector by repeatedly calling a generator function (such as a random number generator). </summary>
+       /// <param name="generator"> The generator function. </param>
+       void Generate(std::function<ElementType()> generator);
 
     private:
         std::vector<ElementType> _data;

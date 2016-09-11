@@ -19,27 +19,28 @@ namespace math
     /// <summary> Enum of possible vector orientations. </summary>
     enum class VectorOrientation { column, row };
 
-    /// <summary> Helper class that flips orientation at compile time. </summary>
+    /// <summary> Base class for vectors. </summary>
     ///
-    /// <typeparam name="Orientation"> The original orientation. </typeparam>
+    /// <typeparam name="Orientation"> The vector orientation. </typeparam>
     template<VectorOrientation Orientation>
-    struct FlipOrientation 
-    {};
+    class VectorBase;
 
-    /// <summary> Helper class that flips row to column at compile time.  </summary>
+    /// <summary> Base class for row vectors. </summary>
     template<>
-    struct FlipOrientation<VectorOrientation::row>
+    class VectorBase<VectorOrientation::row>
     {
-        /// <summary> The flipped orientation value. </summary>
-        static constexpr VectorOrientation value = VectorOrientation::column;
+    protected:
+        static constexpr VectorOrientation orientation = VectorOrientation::row;
+        static constexpr VectorOrientation transposeOrientation = VectorOrientation::column;
     };
 
-    /// <summary> Helper class that flips column to row at compile time.  </summary>
+    /// <summary> Base class for column vectors. </summary>
     template<>
-    struct FlipOrientation<VectorOrientation::column>
+    class VectorBase<VectorOrientation::column>
     {
-        /// <summary> The flipped orientation value. </summary>
-        static constexpr VectorOrientation value = VectorOrientation::row;
+    protected:
+        static constexpr VectorOrientation orientation = VectorOrientation::column;
+        static constexpr VectorOrientation transposeOrientation = VectorOrientation::row;
     };
 
     /// <summary> A reference to a constant algebraic vector. </summary>
@@ -47,7 +48,7 @@ namespace math
     /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
     /// <typeparam name="Orientation"> The orientation. </typeparam>
     template <typename ElementType, VectorOrientation Orientation>
-    class ConstVectorReference 
+    class ConstVectorReference : public VectorBase<Orientation>
     {
     public:
         /// <summary> Array indexer operator. </summary>
@@ -108,7 +109,7 @@ namespace math
         /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
         /// <returns> A reference to the transpose of this vector. </returns>
-        ConstVectorReference<ElementType, FlipOrientation<Orientation>::value> Transpose() const;
+        auto Transpose() const->ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
 
         /// <summary> Equality operator. </summary>
         ///
@@ -131,6 +132,7 @@ namespace math
         
         // protected ctor accessible only through derived classes and friends
         friend class VectorReferenceConstructor;
+        friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
         ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 
         // allow operations defined in the Operations struct to access increment 
@@ -154,10 +156,10 @@ namespace math
     class VectorReference : public ConstVectorReference<ElementType, Orientation>
     {
     public:
-        /// <summary> Resets all the vector elements to zero. </summary>
+        /// <summary> Sets all vector elements to zero. </summary>
         void Reset();
 
-        /// <summary> Fills all of the vector elements with a given value. </summary>
+        /// <summary> Sets all vector elements to a given value. </summary>
         ///
         /// <param name="value"> The value. </param>
         void Fill(ElementType value);
@@ -207,7 +209,7 @@ namespace math
         /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
         /// <returns> A reference to the transpose of this vector. </returns>
-        VectorReference<ElementType, FlipOrientation<Orientation>::value> Transpose();
+        auto Transpose()->VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
         using ConstVectorReference<ElementType, Orientation>::Transpose;
 
     protected:
@@ -217,6 +219,7 @@ namespace math
         
         // protected ctor accessible only through derived classes
         friend class VectorReferenceConstructor;
+        friend class VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
         using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
 
     private:
@@ -242,13 +245,17 @@ namespace math
         /// <param name="list"> The initalizer list. </param>
         Vector(std::initializer_list<ElementType> list);
 
-        /// <summary> Resets all the vector elements to zero. </summary>
+        /// <summary> Sets all vector elements to zero. </summary>
         void Reset();
 
-        /// <summary> Fills all of the vector elements with a given value. </summary>
+        /// <summary> Sets all vector elements to a given value. </summary>
         ///
         /// <param name="value"> The value. </param>
         void Fill(ElementType value);
+
+        /// <summary> Generates elements of the vector by repeatedly calling a generator function (such as a random number generator). </summary>
+        /// <param name="generator"> The generator function. </param>
+        void Generate(std::function<ElementType()> generator);
 
         /// <summary> Array indexer operator. </summary>
         ///

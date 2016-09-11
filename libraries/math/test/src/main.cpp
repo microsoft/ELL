@@ -81,6 +81,11 @@ void TestVectorReference()
     auto generator = [&]() { return normal(rng); };
     w.Generate(generator);
 
+    v.Fill(3);
+    math::RowVector<ElementType> c{ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
+    auto t = v.Transpose();
+    testing::ProcessTest("ColumnVectorReference::Transpose()", c == t);
+
     v *= 0;
     testing::ProcessTest("ColumnVectorReference::operator *=", v == z);
 }
@@ -132,17 +137,15 @@ void TestMatrix()
     };
     testing::ProcessTest("Matrix::Operator()", M == S1);
 
-    auto N = M.GetBlock(1, 1, 2, 2);
-    N(0, 0) = 3;
-    N(0, 1) = 3;
-    N(1, 0) = 3;
-    N(1, 1) = 3;
+    auto N = M.GetBlock(1, 1, 2, 3);
+    N.Fill(3);
+    N(0, 1) = 4;
 
     math::ColumnMatrix<ElementType> S2
     {
         { 1, 0, 4, 0 },
-        { 0, 3, 3, 0 },
-        { 0, 3, 3, 7 }
+        { 0, 3, 4, 3 },
+        { 0, 3, 3, 3 }
     };
     testing::ProcessTest("Matrix::GetBlock()", M == S2);
 
@@ -153,7 +156,7 @@ void TestMatrix()
     math::ColumnMatrix<ElementType> S3
     {
         { 1, 0, 4, 0 },
-        { 0, 3, 3, 0 },
+        { 0, 3, 4, 3 },
         { 0, 3, 5, 6 }
     };
     testing::ProcessTest("Matrix::GetRow()", M == S3);
@@ -166,7 +169,7 @@ void TestMatrix()
     math::ColumnMatrix<ElementType> S4
     {
         { 1, 2, 4, 0 },
-        { 0, 2, 3, 0 },
+        { 0, 2, 4, 3 },
         { 0, 8, 5, 6 }
     };
     testing::ProcessTest("Matrix::GetColumn()", M == S4);
@@ -177,7 +180,7 @@ void TestMatrix()
     math::ColumnMatrix<ElementType> S5
     {
         { 9, 2, 4, 0 },
-        { 0, 9, 3, 0 },
+        { 0, 9, 4, 3 },
         { 0, 8, 9, 6 }
     };
     testing::ProcessTest("Matrix::GetDiagonal()", M == S5);
@@ -187,8 +190,8 @@ void TestMatrix()
     {
         { 9, 0, 0 },
         { 2, 9, 8 },
-        { 4, 3, 9 },
-        { 0, 0, 6 }
+        { 4, 4, 9 },
+        { 0, 3, 6 }
     };
     testing::ProcessTest("Matrix::GetDiagonal()", T == S6);
 }
@@ -219,8 +222,6 @@ void TestMatrix2()
     };
     testing::ProcessTest("Matrix::GetDiagonal()", M == C);
 }
-
-
 
 /// Runs all tests
 ///
