@@ -37,8 +37,8 @@ int main()
 
         // Map tests
         TestMapCreate();
-        TestMapRefine();
         TestMapCompute();
+        TestMapRefine();
     }
     catch (const utilities::Exception& exception)
     {

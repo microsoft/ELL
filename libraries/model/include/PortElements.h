@@ -159,6 +159,17 @@ namespace model
         /// <returns> true if this range is equivalent to other. </returns>
         bool operator==(const PortRange& other) const;
 
+        /// <summary> Checks if another range immediately follows this one </summary>
+        ///
+        /// <param name="other"> The other range </param>
+        /// <returns> `true` if the other range's elements immediately follow this range's elements in the same port </returns>
+        bool IsAdjacent(const PortRange& other) const;
+        
+        /// <summary> Adds the elements from another range to the end of this range, if they're contiguous </summary>
+        ///
+        /// <param name="other"> The other range </param>
+        void Append(const PortRange& other);
+        
     private:
         const OutputPortBase* _referencedPort = nullptr;
         size_t _startIndex = 0;
@@ -217,6 +228,9 @@ namespace model
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        
+        /// <summary> Consolidates adjacent ranges </summary>
+        virtual void Consolidate();
 
     protected:
         PortElementsBase(const OutputPortBase& port);

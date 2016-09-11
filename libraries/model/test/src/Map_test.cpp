@@ -89,7 +89,6 @@ void TestMapCompute()
     for (auto x : resultValues)
         std::cout << x << "  ";
     std::cout << std::endl;
-    std::cout << "Output size: " << resultValues.size() << std::endl;
 }
 
 void TestMapRefine()
@@ -118,15 +117,30 @@ void TestMapRefine()
     map1.SetInputs(std::make_tuple(inputVec));
     map2.SetInputs(std::make_tuple(inputVec));
     
-    std::cout << "Model 1" << std::endl;
-    PrintModel(map1.GetModel());
-    
-    std::cout << "\nModel 2" << std::endl;
-    PrintModel(map2.GetModel());
-    
-    auto out1 = map1.Compute();
-//    auto out2 = map2.Compute(); // error! segfault
+    auto input = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
+        { 4.0, 5.0, 6.0 },
+        { 7.0, 8.0, 9.0 },
+        { 10.0, 11.0, 12.0 } };
+    decltype(map1.Compute()) result1;
+    decltype(map2.Compute()) result2;
+    for (const auto& inVec : input)
+    {
+        map1.SetInputs(std::make_tuple(inVec));
+        map2.SetInputs(std::make_tuple(inVec));
+        result1 = map1.Compute();
+        result2 = map2.Compute();
+    }
 
     // make sure they're the same
+    auto resultValues1 = std::get<0>(result1);
+    for (auto x : resultValues1)
+        std::cout << x << "  ";
+    std::cout << std::endl;
+
+    auto resultValues2 = std::get<0>(result2);
+    for (auto x : resultValues2)
+        std::cout << x << "  ";
+    std::cout << std::endl;
+
 }
 }

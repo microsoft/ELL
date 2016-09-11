@@ -109,7 +109,23 @@ namespace model
         }
     }
 
-    bool PortRange::operator==(const PortRange& other) const { return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_numValues == other._numValues); }
+    bool PortRange::IsAdjacent(const PortRange& other) const
+    {
+        return (ReferencedPort() == other.ReferencedPort()) && (GetStartIndex() + Size() == other.GetStartIndex());
+    }
+    
+    void PortRange::Append(const PortRange& other)
+    {
+        if(IsAdjacent(other) && _isFixedSize)
+        {
+            _numValues += other.Size();
+        }
+    }
+    
+    bool PortRange::operator==(const PortRange& other) const
+    {
+        return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_numValues == other._numValues);
+    }
 
     //
     // PortElementsBase
@@ -175,6 +191,35 @@ namespace model
         }
     }
 
+    void PortElementsBase::Consolidate()
+    {
+        if(_ranges.size() > 1)
+        {
+            auto oldSize = Size();
+            
+            // For each range, check if it's adjacent to the next one. If so, combine them
+            std::vector<PortRange> newRanges;
+            newRanges.push_back(_ranges[0]);
+            auto numRanges = _ranges.size();
+            for(size_t index = 1; index < numRanges; ++index)
+            {
+                const auto r = _ranges[index];
+                if(newRanges.back().IsAdjacent(r))
+                {
+                    newRanges.back().Append(r);
+                }
+                else
+                {
+                    newRanges.push_back(r);
+                }
+            }
+            _ranges = newRanges;
+            
+            ComputeSize();
+            assert(oldSize == Size());
+        }
+    }
+    
     void PortElementsBase::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["ranges"] << _ranges;

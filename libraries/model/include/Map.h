@@ -120,11 +120,17 @@ namespace model
         std::array<std::string, std::tuple_size<OutputTypesTuple>::value> _outputNames;
 
         // Remap
+        template <typename InputNodeType>
+        void RemapInputNode(InputNodeType& input, ModelTransformer& modelTransformer);
+        
+        template <size_t... Sequence>
+        void RemapInputNodes(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer);
+
         template <typename OutputElementsType>
         void RemapOutputElement(OutputElementsType& output, ModelTransformer& modelTransformer);
-
+        
         template <size_t... Sequence>
-        void RemapOutputElementsHelper(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer);
+        void RemapOutputElements(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer);
 
         // SetInput
         template <typename InputNodeType, typename InputType>

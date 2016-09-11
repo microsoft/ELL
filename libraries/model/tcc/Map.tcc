@@ -33,6 +33,21 @@ namespace model
     // Refine
     //
     template <typename InputTypesTuple, typename OutputTypesTuple>
+    template <typename InputNodeType>
+    void Map<InputTypesTuple, OutputTypesTuple>::RemapInputNode(InputNodeType& input, ModelTransformer& modelTransformer)
+    {
+        auto refinedInput = modelTransformer.GetCorrespondingInputNode(input);
+        input = refinedInput;
+    }
+    
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    template <size_t... Sequence>
+    void Map<InputTypesTuple, OutputTypesTuple>::RemapInputNodes(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
+    {
+        RemapInputNode(std::get<Sequence>(_inputs)..., modelTransformer);
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
     template <typename OutputElementsType>
     void Map<InputTypesTuple, OutputTypesTuple>::RemapOutputElement(OutputElementsType& output, ModelTransformer& modelTransformer)
     {
@@ -42,7 +57,7 @@ namespace model
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::RemapOutputElementsHelper(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
+    void Map<InputTypesTuple, OutputTypesTuple>::RemapOutputElements(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
     {
         RemapOutputElement(std::get<Sequence>(_outputs)..., modelTransformer);
     }
@@ -52,7 +67,8 @@ namespace model
     {
         ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(_model, context);
-        RemapOutputElementsHelper(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), transformer);
+        RemapInputNodes(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), transformer);
+        RemapOutputElements(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), transformer);
         _model = refinedModel;
     }
 

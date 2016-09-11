@@ -29,7 +29,7 @@ namespace model
             auto newPort = static_cast<const OutputPort<ValueType>*>(newElement.ReferencedPort());
             result.Append({ *newPort, newElement.GetIndex() });
         }
-        // result.Consolidate();
+        result.Consolidate();
         return result;
     }
 
