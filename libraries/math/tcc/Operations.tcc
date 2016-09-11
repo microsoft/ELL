@@ -22,15 +22,14 @@ namespace math
 
         // TODO check inputs for equal size
 
+#ifdef USE_BLAS
+        return Blas::Axpy(static_cast<int>(u.Size()), s, vData, static_cast<int>(v._increment), uData, static_cast<int>(u._increment));
+#else
         ElementType* uData = u._pData;
         size_t uIncrement = u._increment;
         const ElementType* vData = v._pData;
         size_t vIncrement = v._increment;
-
-#ifdef USE_BLAS
-        return Blas::Axpy(static_cast<int>(u.Size()), s, vData, static_cast<int>(vIncrement), uData, static_cast<int>(uIncrement));
-#else
-        const ElementType* end = uData + u.Size();
+        const ElementType* end = uData + uIncrement * u.Size();
 
         while (uData < end)
         {
@@ -55,7 +54,7 @@ namespace math
         return Blas::Dot(static_cast<int>(u.Size()), uData, static_cast<int>(uIncrement), vData, static_cast<int>(vIncrement));
 #else
         ElementType result = 0;
-        const ElementType* end = uData + u.Size();
+        const ElementType* end = uData + uIncrement * u.Size();
 
         while (uData < end)
         {
@@ -68,9 +67,9 @@ namespace math
     }
 
     template<typename ElementType>
-    void Operations::Multiply(ConstVectorReference<ElementType, VectorOrientation::row>& rhsVector1, ConstVectorReference<ElementType, VectorOrientation::column>& rhsVector2, ElementType& lhsScalar)
+    void Operations::Multiply(ConstVectorReference<ElementType, VectorOrientation::row>& u, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType& r)
     {
-        lhsScalar = Dot(rhsVector1, rhsVector2);
+        r = Dot(u, v);
     }
 
     template<typename ElementType, MatrixLayout Layout>
@@ -97,7 +96,11 @@ namespace math
         
         Blas::Gemv(order, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(M.NumRows()), static_cast<int>(M.NumColumns()), s, M._pData, static_cast<int>(M._increment), v._pData, static_cast<int>(v._increment), t, u._pData, static_cast<int>(u._increment));
 #else
-        ElementType result = 0;
+        for (size_t i = 0; i < M.NumRows(); ++i)
+        {
+            auto row = M.GetRow(i);
+            u[i] = s * Dot(row, v) + t * u[i];
+        }
 #endif
     }
 }

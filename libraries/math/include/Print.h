@@ -15,18 +15,31 @@
 
 namespace math
 {
-    template <typename ElementType, MatrixLayout Layout>
-    void Print(const ConstMatrixReference<ElementType, Layout>& matrix, std::ostream& os)
+    template <typename ElementType, VectorOrientation Orientation>
+    void Print(const ConstVectorReference<ElementType, Orientation>& v, std::ostream& os)
     {
-        for(size_t i = 0; i < matrix.NumRows(); ++i)
+        os << '{' << v[0];
+        for (size_t i = 1; i < v.Size(); ++i)
         {
-            os << matrix(i, 0);
-            for(size_t j = 1; j < matrix.NumColumns(); ++j)
-            {
-                os << '\t' << matrix(i, j);
-            }
-            os << '\n';
+            os << '\t' << v[i];
         }
+        os << '}';
+    }
+
+    template <typename ElementType, MatrixLayout Layout>
+    void Print(const ConstMatrixReference<ElementType, Layout>& M, std::ostream& os)
+    {
+        os << '{'
+        for(size_t i = 0; i < M.NumRows(); ++i)
+        {
+            os << "\t{" << M(i, 0);
+            for(size_t j = 1; j < M.NumColumns(); ++j)
+            {
+                os << '\t' << M(i, j);
+            }
+            os << '}\n';
+        }
+        os << '}';
     }
 
 }

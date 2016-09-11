@@ -233,8 +233,8 @@ void TestMatrixMultiply()
         {2, 2}
     };
 
-    math::ColumnVector<ElementType> u { 3, 4 };
-    math::ColumnVector<ElementType> v { 1, 1, 0 };
+    math::ColumnVector<ElementType> u { 1, 1, 0 };
+    math::ColumnVector<ElementType> v { 3, 4 };
     
     ElementType s = 2;
     ElementType t = 3;
@@ -242,6 +242,8 @@ void TestMatrixMultiply()
     // u = s * M * v + t * u
     math::Operations::Multiply(s, M, v, t, u);
 
+    math::ColumnVector<ElementType> uu{9, 11, 28};
+    testing::ProcessTest("Operations::Multiply(Matrix, vector)", u == uu);
 }
 
 /// Runs all tests
@@ -268,7 +270,10 @@ int main()
     TestMatrix2<double, math::MatrixLayout::rowMajor>();
     TestMatrix2<double, math::MatrixLayout::columnMajor>();
 
-    TestMatrixMultiply<float, math::MatrixLayout::rowMajor>();
+//    TestMatrixMultiply<float, math::MatrixLayout::rowMajor>();
+    TestMatrixMultiply<float, math::MatrixLayout::columnMajor>();
+//    TestMatrixMultiply<double, math::MatrixLayout::rowMajor>();
+    TestMatrixMultiply<double, math::MatrixLayout::columnMajor>();
 
 
 

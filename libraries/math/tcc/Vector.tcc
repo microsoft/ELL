@@ -58,15 +58,15 @@ namespace math
     ElementType ConstVectorReference<ElementType, Orientation>::Min() const
     {
         ElementType result = *_pData;
-        const ElementType* ptr = _pData+1;
+        const ElementType* current = _pData+1;
         const ElementType* end = _pData + _size * _increment ;
-        while(ptr < end)
+        while(current < end)
         {
-            if((*ptr) < result)
+            if((*current) < result)
             {
-                result = *ptr;
+                result = *current;
             }
-            ptr += _increment ;
+            current += _increment ;
         }
         return result;
     }
@@ -75,15 +75,15 @@ namespace math
     ElementType ConstVectorReference<ElementType, Orientation>::Max() const
     {
         ElementType result = *_pData;
-        const ElementType* ptr = _pData+1;
+        const ElementType* current = _pData+1;
         const ElementType* end = _pData + _size * _increment ;
-        while(ptr < end)
+        while(current < end)
         {
-            if((*ptr) > result)
+            if((*current) > result)
             {
-                result = *ptr;
+                result = *current;
             }
-            ptr += _increment ;
+            current += _increment ;
         }
         return result;
     }
@@ -147,12 +147,12 @@ namespace math
     ElementType ConstVectorReference<ElementType, Orientation>::Aggregate(MapperType mapper) const
     {
         ElementType result = 0;
-        const ElementType* ptr = _pData;
+        const ElementType* current = _pData;
         const ElementType* end = _pData + _size * _increment ;
-        while(ptr < end)
+        while(current < end)
         {
-            result += mapper(*ptr);
-            ptr += _increment ;
+            result += mapper(*current);
+            current += _increment ;
         }
         return result;
     }
@@ -243,12 +243,12 @@ namespace math
     template<typename MapperType>
     void VectorReference<ElementType, Orientation>::ForEach(MapperType mapper)
     {
-        ElementType* ptr = _pData;
+        ElementType* current = _pData;
         const ElementType* end = _pData + _size * _increment ;
-        while(ptr < end)
+        while(current < end)
         {
-            *ptr = mapper(*ptr);
-            ptr += _increment ;
+            *current = mapper(*current);
+            current += _increment ;
         }
     }
 
