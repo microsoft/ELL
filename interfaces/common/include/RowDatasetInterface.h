@@ -20,47 +20,47 @@
 #include <random>
 #include <vector>
 
-
 namespace emll
 {
-
 namespace interfaces
 {
-	class GenericRowIterator 
-	{
-	public:		
-		GenericRowIterator(const dataset::GenericRowDataset::Iterator& iter) : _iterator(iter) {}
+    class GenericRowIterator
+    {
+    public:
+        GenericRowIterator(const dataset::GenericRowDataset::Iterator& iter)
+            : _iterator(iter) {}
 
-		bool IsValid() const {
-			return _iterator.IsValid();
-		}
+        bool IsValid() const
+        {
+            return _iterator.IsValid();
+        }
 
-		/// <summary> Returns true if the iterator knows its size. </summary>
-		///
-		/// <returns> true if NumIteratesLeft returns a valid number, false if not. </returns>
-		bool HasSize() const { return _iterator.HasSize(); }
+        /// <summary> Returns true if the iterator knows its size. </summary>
+        ///
+        /// <returns> true if NumIteratesLeft returns a valid number, false if not. </returns>
+        bool HasSize() const { return _iterator.HasSize(); }
 
-		/// <summary>
-		/// Returns the number of iterates left in this iterator, including the current one.
-		/// </summary>
-		///
-		/// <returns> The total number of iterates left. </returns>
-		uint64_t NumIteratesLeft() const {
-			return _iterator.NumIteratesLeft();
-		}
+        /// <summary>
+        /// Returns the number of iterates left in this iterator, including the current one.
+        /// </summary>
+        ///
+        /// <returns> The total number of iterates left. </returns>
+        uint64_t NumIteratesLeft() const
+        {
+            return _iterator.NumIteratesLeft();
+        }
 
-		/// <summary> Proceeds to the Next iterate. </summary>
-		void Next() { _iterator.Next(); }
+        /// <summary> Proceeds to the Next iterate. </summary>
+        void Next() { _iterator.Next(); }
 
-		/// <summary> Returns the value of the current iterate. </summary>
-		///
-		/// <returns> The value of the current iterate. </returns>
-		const dataset::GenericSupervisedExample& Get() const { return _iterator.Get(); }
+        /// <summary> Returns the value of the current iterate. </summary>
+        ///
+        /// <returns> The value of the current iterate. </returns>
+        const dataset::GenericSupervisedExample& Get() const { return _iterator.Get(); }
 
-	private:
-		dataset::GenericRowDataset::Iterator _iterator;
-
-	};
+    private:
+        dataset::GenericRowDataset::Iterator _iterator;
+    };
 
     class GenericRowDataset
     {
