@@ -30,16 +30,11 @@ namespace emll
 {
 namespace model
 {
-    template <typename T>
-    struct VectorOf
-    {
-        using type = std::vector<T>;
-    };
-
+    // Variadic helper class to transform input types into a std::tuple<std::vector<T1>, std::vector<T2>, ...>
     template <typename... Types>
     struct TupleOfVectors
     {
-        using type = std::tuple<typename VectorOf<Types>::type...>;
+        using type = std::tuple<std::vector<Types>...>;
     };
 
     template <typename TupleType, size_t... Sequence>
