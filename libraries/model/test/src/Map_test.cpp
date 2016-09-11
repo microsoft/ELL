@@ -32,15 +32,17 @@
 //
 namespace emll
 {
+
+// Returns a model with 1 3-dimensional double input and 1 2-dimensional double output
 model::Model GetSimpleModel()
 {
     model::Model g;
     auto in = g.AddNode<model::InputNode<double>>(3);
     auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
     auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 8);
-    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 8);
-    auto meanOutputs = g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
+    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 2);
+    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 2);
+    g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
     return g;
 }
 
@@ -52,9 +54,9 @@ void TestMapCreate()
     assert(outputNodes.size() == 1);
     auto map = model::MakeMap(model,
                               std::make_tuple(inputNodes[0]),
-                              { "doubleInput" },
+                              { {"doubleInput"} },
                               std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                              { "doubleOutput" });
+                              { {"doubleOutput"} });
 }
 
 void TestMapCompute()
@@ -65,17 +67,29 @@ void TestMapCompute()
     assert(outputNodes.size() == 1);
     auto map = model::MakeMap(model,
                               std::make_tuple(inputNodes[0]),
-                              { "doubleInput" },
+                              { {"doubleInput"} },
                               std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                              { "doubleOutput" });
+                              { {"doubleOutput"} });
 
     assert(inputNodes.size() == 1);
-    map.SetInputs(std::make_tuple(std::vector<double>{1.0, 2.0, 3.0}));
 
-    auto resultTuple = map.Compute();
-    std::cout << "map compute result type: " << utilities::TypeName<decltype(resultTuple)>::GetName() << std::endl;
-//    auto result = std::get<0>(resultTuple);
-//    std::cout << "Output size: " << result.size() << std::endl;
+    auto input = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
+                                                   { 4.0, 5.0, 6.0 },
+                                                   { 7.0, 8.0, 9.0 },
+                                                   { 10.0, 11.0, 12.0 } };
+    decltype(map.Compute()) result;
+    for (const auto& inVec : input)
+    {
+        map.SetInputs(std::make_tuple(inVec));
+        result = map.Compute(); 
+    }
+
+    std::cout << "map compute result type: " << utilities::TypeName<decltype(result)>::GetName() << std::endl;
+    auto resultValues = std::get<0>(result);
+    for (auto x : resultValues)
+        std::cout << x << "  ";
+    std::cout << std::endl;
+    std::cout << "Output size: " << resultValues.size() << std::endl;
 }
 
 void TestMapRefine()
@@ -87,17 +101,32 @@ void TestMapRefine()
 
     auto map1 = model::MakeMap(model,
                                std::make_tuple(inputNodes[0]),
-                               { "doubleInput" },
+                               { {"doubleInput"} },
                                std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                               { "doubleOutput" });
+                               { {"doubleOutput"} });
 
     auto map2 = model::MakeMap(model,
                                std::make_tuple(inputNodes[0]),
-                               { "doubleInput" },
+                               { {"doubleInput"} },
                                std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                               { "doubleOutput" });
+                               { {"doubleOutput"} });
 
     model::TransformContext context{ common::IsNodeCompilable() };
     map2.Refine(context);
+
+    auto inputVec = std::vector<double>{ 1.0, 2.0, 3.0 };
+    map1.SetInputs(std::make_tuple(inputVec));
+    map2.SetInputs(std::make_tuple(inputVec));
+    
+    std::cout << "Model 1" << std::endl;
+    PrintModel(map1.GetModel());
+    
+    std::cout << "\nModel 2" << std::endl;
+    PrintModel(map2.GetModel());
+    
+    auto out1 = map1.Compute();
+//    auto out2 = map2.Compute(); // error! segfault
+
+    // make sure they're the same
 }
 }

@@ -75,20 +75,20 @@ namespace model
     };
 
     /// <summary> Class that wraps a model and its designated outputs </summary>
-    template <typename InputNodeTypesTuple, typename OutputPortTypesTuple>
-    class Map // : utilities::IArchivable
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    class Map
     {
     public:
         Map(const Model& model,
-            const InputNodeTypesTuple& inputs,
-            const std::array<std::string, std::tuple_size<InputNodeTypesTuple>::value>& inputNames,
-            const OutputPortTypesTuple& outputs,
-            const std::array<std::string, std::tuple_size<OutputPortTypesTuple>::value>& outputNames);
+            const InputTypesTuple& inputs,
+            const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
+            const OutputTypesTuple& outputs,
+            const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<InputNodeTypesTuple, OutputPortTypesTuple>("Map"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<InputTypesTuple, OutputTypesTuple>("Map"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -104,27 +104,20 @@ namespace model
         template <typename... InputNodeTypes>
         void SetInputs(const std::tuple<std::vector<InputNodeTypes>...>& inputValues);
 
+        // TODO: have SetInputs forward its args to tuple constructors (a la make_tuple)
+
+
         /// <summary> Computes the output of the map from its current input values </summary>
-        typename TupleVectorMakerFromPortElements<OutputPortTypesTuple>::type Compute() const;
-
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        // virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        // virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        typename TupleVectorMakerFromPortElements<OutputTypesTuple>::type Compute() const;
 
     private:
         Model _model;
 
-        std::array<std::string, std::tuple_size<InputNodeTypesTuple>::value> _inputNames;
-        InputNodeTypesTuple _inputs; // this is a tuple of InputNode<T>*
+        InputTypesTuple _inputs; // this is a tuple of InputNode<T>*
+        std::array<std::string, std::tuple_size<InputTypesTuple>::value> _inputNames;
 
-        std::array<std::string, std::tuple_size<OutputPortTypesTuple>::value> _outputNames;
-        OutputPortTypesTuple _outputs; // This is a tuple of PortElements<T>
+        OutputTypesTuple _outputs; // This is a tuple of PortElements<T>
+        std::array<std::string, std::tuple_size<OutputTypesTuple>::value> _outputNames;
 
         // Remap
         template <typename OutputElementsType>
@@ -145,15 +138,15 @@ namespace model
         void ComputeElements(PortElementsType& elements, OutputType& output) const;
 
         template <size_t... Sequence>
-        void ComputeElementsHelper(std::index_sequence<Sequence...>, typename TupleVectorMakerFromPortElements<OutputPortTypesTuple>::type& outputValues) const;
+        void ComputeElementsHelper(std::index_sequence<Sequence...>, typename TupleVectorMakerFromPortElements<OutputTypesTuple>::type& outputValues) const;
     };
 
-    template <typename InputNodeTypesTuple, typename OutputPortTypesTuple>
+    template <typename InputTypesTuple, typename OutputTypesTuple>
     auto MakeMap(const Model& model,
-                 const InputNodeTypesTuple& inputs,
-                 const std::array<std::string, std::tuple_size<InputNodeTypesTuple>::value>& inputNames,
-                 const OutputPortTypesTuple& outputs,
-                 const std::array<std::string, std::tuple_size<OutputPortTypesTuple>::value>& outputNames);
+                 const InputTypesTuple& inputs,
+                 const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
+                 const OutputTypesTuple& outputs,
+                 const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames);
 }
 }
 
