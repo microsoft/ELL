@@ -12,9 +12,9 @@ namespace model
 {
     template <typename InputTypesTuple, typename OutputTypesTuple>
     Map<InputTypesTuple, OutputTypesTuple>::Map(const Model& model, const InputTypesTuple& inputs,
-                                                        const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
-                                                        const OutputTypesTuple& outputs,
-                                                        const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
+                                                const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
+                                                const OutputTypesTuple& outputs,
+                                                const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
         : _model(model), _inputs(inputs), _inputNames(inputNames), _outputs(outputs), _outputNames(outputNames)
     {
     }
@@ -39,7 +39,7 @@ namespace model
         auto refinedInput = modelTransformer.GetCorrespondingInputNode(input);
         input = refinedInput;
     }
-    
+
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::RemapInputNodes(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
@@ -86,15 +86,23 @@ namespace model
     template <typename InputNodesTupleType, size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::SetInputElementsHelper(std::index_sequence<Sequence...> seq, const InputNodesTupleType& inputValues)
     {
-        std::cout << "Index sequence size: " << seq.size() << ", stored size: " << std::tuple_size<InputTypesTuple>::value << ", passed-in size: " << std::tuple_size<InputNodesTupleType>::value << std::endl;
-       SetNodeInput(std::get<Sequence>(_inputs)..., std::get<Sequence>(inputValues)...);
+        SetNodeInput(std::get<Sequence>(_inputs)..., std::get<Sequence>(inputValues)...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <typename... InputNodeTypes>
-    void Map<InputTypesTuple, OutputTypesTuple>::SetInputs(const std::tuple<std::vector<InputNodeTypes>...>& inputValues)
+    void Map<InputTypesTuple, OutputTypesTuple>::SetInputTuple(const std::tuple<std::vector<InputNodeTypes>...>& inputTuple)
     {
-        SetInputElementsHelper(std::index_sequence_for<InputNodeTypes...>(), inputValues);    
+        SetInputElementsHelper(std::index_sequence_for<InputNodeTypes...>(), inputTuple);
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    template <typename... InputTypes>
+    void Map<InputTypesTuple, OutputTypesTuple>::SetInputs(std::vector<InputTypes>... inputs)
+    {
+        auto tuple = std::tuple<std::vector<InputTypes>...>(inputs...);
+        auto x = 5;
+        SetInputTuple(tuple);
     }
 
     //
@@ -104,21 +112,21 @@ namespace model
     template <typename PortElementsType, typename OutputType>
     void Map<InputTypesTuple, OutputTypesTuple>::ComputeElements(PortElementsType& elements, OutputType& output) const
     {
-        auto elementOutput = _model.ComputeOutput(elements); // elementOutput is a vector<T>, output param is PortElements<T>&... 
+        auto elementOutput = _model.ComputeOutput(elements); // elementOutput is a vector<T>, output param is PortElements<T>&...
         output = elementOutput;
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::ComputeElementsHelper(std::index_sequence<Sequence...>, typename TupleVectorMakerFromPortElements<OutputTypesTuple>::type& outputValues) const
+    void Map<InputTypesTuple, OutputTypesTuple>::ComputeElementsHelper(std::index_sequence<Sequence...>, ComputeOutputType& outputValues) const
     {
         ComputeElements(std::get<Sequence>(_outputs)..., std::get<Sequence>(outputValues)...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    typename TupleVectorMakerFromPortElements<OutputTypesTuple>::type Map<InputTypesTuple, OutputTypesTuple>::Compute() const
+    auto Map<InputTypesTuple, OutputTypesTuple>::Compute() const -> ComputeOutputType
     {
-        typename TupleVectorMakerFromPortElements<OutputTypesTuple>::type result;
+        ComputeOutputType result;
         ComputeElementsHelper(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), result);
         return result;
     }

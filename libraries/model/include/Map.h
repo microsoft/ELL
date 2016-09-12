@@ -32,46 +32,29 @@ namespace model
 {
     // Variadic helper class to transform input types into a std::tuple<std::vector<T1>, std::vector<T2>, ...>
     template <typename... Types>
-    struct TupleOfVectors
+    struct ToVectorElements
     {
         using type = std::tuple<std::vector<Types>...>;
     };
 
+    // Here, TupleType is a tuple<PortElements<T1>, PortElements<T2>, ...>
     template <typename TupleType, size_t... Sequence>
-    auto MakeTupleOfVectorsFromTypeTupleHelper(const TupleType& tuple, std::index_sequence<Sequence...>)
+    auto MakeTupleOfVectorsFromPortElementsHelper(const TupleType& tuple, std::index_sequence<Sequence...>)
     {
-        return typename TupleOfVectors<typename std::tuple_element<Sequence, TupleType>::type...>::type();
+        return typename ToVectorElements<typename std::tuple_element<Sequence, TupleType>::type::type...>::type();
     }
 
     template <typename TupleType>
-    auto MakeTupleOfVectorsFromTypeTuple(const TupleType& tuple)
+    auto MakeTupleOfVectorsFromPortElements(const TupleType& tuple)
     {
-        return MakeTupleOfVectorsFromTypeTupleHelper(tuple, std::make_index_sequence<std::tuple_size<TupleType>::value>());
+        return MakeTupleOfVectorsFromPortElementsHelper(tuple, std::make_index_sequence<std::tuple_size<TupleType>::value>());
     }
 
-    // TupleType is a tuple<PortElements<T1>, PortElements<T2>, ...>
-    template <typename TupleType, size_t... Sequence>
-    auto MakeTupleOfVectorsFromPortElementsTupleHelper(const TupleType& tuple, std::index_sequence<Sequence...>)
-    {
-        return typename TupleOfVectors<typename std::tuple_element<Sequence, TupleType>::type::type...>::type();
-    }
-
+    // Converts from a tuple of PortElements<T>s tuple of std::vector<T>s
     template <typename TupleType>
-    auto MakeTupleOfVectorsFromPortElementsTuple(const TupleType& tuple)
+    struct TupleOfVectorsFromPortElements
     {
-        return MakeTupleOfVectorsFromPortElementsTupleHelper(tuple, std::make_index_sequence<std::tuple_size<TupleType>::value>());
-    }
-
-    template <typename TupleType>
-    struct TupleVectorMaker
-    {
-        using type = decltype(MakeTupleOfVectorsFromTypeTuple(TupleType{}));
-    };
-
-    template <typename TupleType>
-    struct TupleVectorMakerFromPortElements
-    {
-        using type = decltype(MakeTupleOfVectorsFromPortElementsTuple(TupleType{}));
+        using type = decltype(MakeTupleOfVectorsFromPortElements(TupleType{}));
     };
 
     /// <summary> Class that wraps a model and its designated outputs </summary>
@@ -100,15 +83,20 @@ namespace model
         /// <summary> Refines the model wrapped by this map </summary>
         void Refine(const TransformContext& context);
 
-        // <summary> Set inputs </summary>
-        template <typename... InputNodeTypes>
-        void SetInputs(const std::tuple<std::vector<InputNodeTypes>...>& inputValues);
+        /// <summary> Set inputs </summary>
+        ///
+        /// <typeparam name="InputTypes"> The datatypes of the input nodes </typeparam>
+        /// <param name="inputs"> The inputs to be routed to the input nodes </param>
+        template <typename... InputTypes>
+        void SetInputs(std::vector<InputTypes>... inputs);
 
-        // TODO: have SetInputs forward its args to tuple constructors (a la make_tuple)
-
+        /// <summary> Type alias for the tuple of vectors returned by `Compute` </summary>
+        using ComputeOutputType = typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
 
         /// <summary> Computes the output of the map from its current input values </summary>
-        typename TupleVectorMakerFromPortElements<OutputTypesTuple>::type Compute() const;
+        ///
+        /// <returns> A tuple of vectors of output values </returns>
+        ComputeOutputType Compute() const;
 
     private:
         Model _model;
@@ -122,17 +110,20 @@ namespace model
         // Remap
         template <typename InputNodeType>
         void RemapInputNode(InputNodeType& input, ModelTransformer& modelTransformer);
-        
+
         template <size_t... Sequence>
         void RemapInputNodes(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer);
 
         template <typename OutputElementsType>
         void RemapOutputElement(OutputElementsType& output, ModelTransformer& modelTransformer);
-        
+
         template <size_t... Sequence>
         void RemapOutputElements(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer);
 
         // SetInput
+        template <typename... InputNodeTypes>
+        void SetInputTuple(const std::tuple<std::vector<InputNodeTypes>...>& inputTuple);
+
         template <typename InputNodeType, typename InputType>
         void SetNodeInput(InputNode<InputNodeType>* inputNode, const InputType& inputValues);
 
@@ -144,7 +135,7 @@ namespace model
         void ComputeElements(PortElementsType& elements, OutputType& output) const;
 
         template <size_t... Sequence>
-        void ComputeElementsHelper(std::index_sequence<Sequence...>, typename TupleVectorMakerFromPortElements<OutputTypesTuple>::type& outputValues) const;
+        void ComputeElementsHelper(std::index_sequence<Sequence...>, ComputeOutputType& outputValues) const;
     };
 
     template <typename InputTypesTuple, typename OutputTypesTuple>

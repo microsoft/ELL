@@ -80,12 +80,15 @@ void TestMapCompute()
     decltype(map.Compute()) result;
     for (const auto& inVec : input)
     {
-        map.SetInputs(std::make_tuple(inVec));
+        map.SetInputs(inVec);
         result = map.Compute(); 
     }
 
-    std::cout << "map compute result type: " << utilities::TypeName<decltype(result)>::GetName() << std::endl;
     auto resultValues = std::get<0>(result);
+
+    testing::ProcessTest("Testing min value", testing::IsEqual(resultValues[0], 8.5));
+    testing::ProcessTest("Testing max value", testing::IsEqual(resultValues[1], 10.5));
+
     for (auto x : resultValues)
         std::cout << x << "  ";
     std::cout << std::endl;
@@ -112,10 +115,6 @@ void TestMapRefine()
 
     model::TransformContext context{ common::IsNodeCompilable() };
     map2.Refine(context);
-
-    auto inputVec = std::vector<double>{ 1.0, 2.0, 3.0 };
-    map1.SetInputs(std::make_tuple(inputVec));
-    map2.SetInputs(std::make_tuple(inputVec));
     
     auto input = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
         { 4.0, 5.0, 6.0 },
@@ -125,22 +124,16 @@ void TestMapRefine()
     decltype(map2.Compute()) result2;
     for (const auto& inVec : input)
     {
-        map1.SetInputs(std::make_tuple(inVec));
-        map2.SetInputs(std::make_tuple(inVec));
+        map1.SetInputs(inVec);
+        map2.SetInputs(inVec);
+
         result1 = map1.Compute();
         result2 = map2.Compute();
     }
 
     // make sure they're the same
     auto resultValues1 = std::get<0>(result1);
-    for (auto x : resultValues1)
-        std::cout << x << "  ";
-    std::cout << std::endl;
-
     auto resultValues2 = std::get<0>(result2);
-    for (auto x : resultValues2)
-        std::cout << x << "  ";
-    std::cout << std::endl;
-
+    testing::ProcessTest("Testing refined map compute", testing::IsEqual(resultValues1, resultValues2));
 }
 }
