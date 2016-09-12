@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace nodes
 {
@@ -58,4 +60,5 @@ namespace nodes
         auto newNode = transformer.AddNode<MultiplexerNode<ValueType, SelectorType>>(newElements, newSelector);
         transformer.MapNodeOutput(output, newNode->output);
     }
+}
 }

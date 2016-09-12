@@ -18,6 +18,8 @@
 #include <sstream>
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -162,7 +164,6 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, float);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, double);
 
-    // TODO: add a "read tag"-type function
     void XmlUnarchiver::ReadFileHeader()
     {
         _tokenizer.MatchTokens({ "<", "?", "xml" });
@@ -368,4 +369,5 @@ namespace utilities
         std::replace(result.begin(), result.end(), ')', '>');
         return result;
     }
+}
 }

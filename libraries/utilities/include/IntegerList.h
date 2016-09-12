@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> A non-decreasing list of nonegative integers, with a forward Iterator. </summary>
@@ -94,4 +96,5 @@ namespace utilities
         // The list
         std::vector<uint64_t> _list;
     };
+}
 }

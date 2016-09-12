@@ -8,6 +8,8 @@
 
 #include "SingleElementThresholdPredictor.h"
 
+namespace emll
+{
 namespace predictors
 {
     SingleElementThresholdPredictor::SingleElementThresholdPredictor(size_t index, double threshold)
@@ -31,4 +33,5 @@ namespace predictors
     {
         os << std::string(tabs * 4, ' ') << "index = " << _index << ", threshold = " << _threshold << "\n";
     }
+}
 }

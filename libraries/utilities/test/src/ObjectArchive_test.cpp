@@ -23,6 +23,8 @@
 #include <sstream>
 #include <vector>
 
+namespace emll
+{
 class InnerObject : public utilities::IArchivable
 {
 public:
@@ -262,7 +264,6 @@ void TestObjectArchiver()
     dearchiver1 >> deserializedInner;
     testing::ProcessTest("Deserialize with ObjectArchiver check", deserializedInner.GetA() == 3 && deserializedInner.GetB() == 4.5f);
 
-    // TODO: fix error with deserializing compound objects
     utilities::ObjectArchiver dearchiver2(objectDescription2, context);
     OuterObject deserializedOuter;
     dearchiver2 >> deserializedOuter;
@@ -272,4 +273,5 @@ void TestObjectArchiver()
     DerivedObject deserializedDerived;
     dearchiver3 >> deserializedDerived;
     testing::ProcessTest("Deserialize with ObjectArchiver check", deserializedDerived.GetA() == 8 && deserializedDerived.GetB() == 9.5 && deserializedDerived.GetC() == "derived");
+}
 }

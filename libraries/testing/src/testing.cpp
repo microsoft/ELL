@@ -12,6 +12,8 @@
 // stl
 #include <iostream>
 
+namespace emll
+{
 namespace testing
 {
     template <typename ValueType>
@@ -156,4 +158,5 @@ namespace testing
     {
         return testFailedFlag;
     }
+}
 }

@@ -9,6 +9,8 @@
 // utilities
 #include "RandomEngines.h"
 
+namespace emll
+{
 namespace trainers
 {
     template <typename PredictorType>
@@ -46,4 +48,5 @@ namespace trainers
     {
         return std::make_unique<MultiEpochIncrementalTrainer<PredictorType>>(std::move(internalTrainer), parameters);
     }
+}
 }

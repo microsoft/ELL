@@ -16,6 +16,8 @@
 #include <locale>
 #include <memory>
 
+namespace emll
+{
 namespace utilities
 {
     std::ifstream OpenIfstream(std::string filepath)
@@ -80,4 +82,5 @@ namespace utilities
             }
         }
     }
+}
 }

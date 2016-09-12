@@ -20,6 +20,8 @@
 #include <random>
 #include <vector>
 
+namespace emll
+{
 namespace dataset
 {
     typedef GenericRowDataset::Iterator GenericRowIterator;
@@ -32,7 +34,6 @@ namespace interfaces
     public:
         GenericRowDataset(){};
         GenericRowDataset(const GenericRowDataset& other);
-        GenericRowDataset(GenericRowDataset&& other) = default;
         const GenericRowDataset& operator=(GenericRowDataset&& other)
         {
             _dataset = std::move(other._dataset);
@@ -98,4 +99,5 @@ namespace interfaces
     private:
         dataset::GenericRowDataset _dataset;
     };
+}
 }

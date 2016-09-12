@@ -8,9 +8,9 @@
 
 %include "stl.i"
 
-%ignore utilities::operator<<;
-%ignore utilities::MakeAnyIterator;
-%ignore utilities::IteratorWrapper;
+%ignore emll::utilities::operator<<;
+%ignore emll::utilities::MakeAnyIterator;
+%ignore emll::utilities::IteratorWrapper;
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -30,7 +30,7 @@
 #include "SGDIncrementalTrainer.h"
 %}
 
-template <typename IteratorType, typename ValueType> class StlIterator {};
+template <typename IteratorType, typename ValueType> class emll::utilities::StlIterator {};
 
 %import "UniqueId.h"
 %import "ObjectArchive.h"
@@ -46,22 +46,20 @@ template <typename IteratorType, typename ValueType> class StlIterator {};
 %include "UniqueId.h"
 %include "Variant.h"
 
-WRAP_OSTREAM_OUT_TO_STR(utilities::UniqueId)
+WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
 
 // This is necessary for us to avoid leaking memory:
 #ifndef SWIGXML
-%template () std::vector<dataset::GenericSupervisedExample>;
-%template () utilities::StlIterator<typename std::vector<dataset::GenericSupervisedExample>::const_iterator, dataset::GenericSupervisedExample>;
+%template () std::vector<emll::dataset::GenericSupervisedExample>;
+%template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample>::const_iterator, emll::dataset::GenericSupervisedExample>;
 #endif
 
 %include "LogLoss.h"
 %include "HingeLoss.h"
 %include "SquaredLoss.h"
 
-%template () trainers::SGDIncrementalTrainer<lossFunctions::LogLoss>;
-%template () trainers::SGDIncrementalTrainer<lossFunctions::HingeLoss>;
-%template () trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>;
+%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::LogLoss>;
+%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::HingeLoss>;
+%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
 
-typedef predictors::LinearPredictor trainers::SGDIncrementalTrainer<lossFunctions::SquaredLoss>::Predictor;
-
-// TODO: wrap print
+typedef emll::predictors::LinearPredictor emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::Predictor;

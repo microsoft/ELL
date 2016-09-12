@@ -15,6 +15,8 @@
 #include "HistogramForestTrainer.h"
 #include "SortingForestTrainer.h"
 
+namespace emll
+{
 namespace common
 {
     struct ForestTrainerArguments : public trainers::SortingForestTrainerParameters, public trainers::HistogramForestTrainerParameters
@@ -30,4 +32,5 @@ namespace common
         /// <param name="parser"> [in,out] The command line parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
     };
+}
 }

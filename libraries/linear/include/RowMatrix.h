@@ -17,6 +17,8 @@
 #include <random>
 #include <vector>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary> Base class for RowMatrix. </summary>
@@ -145,6 +147,7 @@ namespace linear
         std::vector<DataVectorType> _rows;
         uint64_t _numColumns = 0;
     };
+}
 }
 
 #include "../tcc/RowMatrix.tcc"

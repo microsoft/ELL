@@ -18,6 +18,8 @@
 #include <ostream>
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     class NullStreamBuf : public std::streambuf
@@ -51,4 +53,5 @@ namespace utilities
         _outputFileStream = std::make_shared<std::ofstream>(utilities::OpenOfstream(filename));
         _outputStream = std::make_shared<std::ostream>(_outputFileStream->rdbuf());
     }
+}
 }

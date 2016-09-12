@@ -14,6 +14,8 @@
 #include <random>
 #include <stdexcept>
 
+namespace emll
+{
 namespace linear
 {
     template <typename DataVectorType>
@@ -147,4 +149,5 @@ namespace linear
             os << "Row " << i << "\t" << this->GetRow(i) << std::endl;
         }
     }
+}
 }

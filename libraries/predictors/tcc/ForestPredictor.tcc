@@ -11,6 +11,8 @@
 // utilities
 #include "Exception.h"
 
+namespace emll
+{
 namespace predictors
 {
     template <typename SplitRuleType, typename EdgePredictorType>
@@ -411,4 +413,5 @@ namespace predictors
         archiver["predictor"] >> _predictor;
         archiver["targetNodeIndex"] >> _targetNodeIndex;
     }
+}
 }

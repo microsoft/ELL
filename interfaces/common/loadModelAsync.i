@@ -31,7 +31,7 @@
 		virtual void Execute() override
 		{
 			// call load model here
-			_model = common::LoadModel(_filename);
+			_model = emll::common::LoadModel(_filename);
 		}
 
 		virtual void HandleOKCallback() override
@@ -45,7 +45,7 @@
 
 	private:
 		std::string _filename;
-		model::Model _model;
+		emll::model::Model _model;
 	};
 %}
 

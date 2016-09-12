@@ -20,6 +20,8 @@
 // stl
 #include <iostream>
 
+using namespace emll;
+
 /// Runs all tests
 ///
 int main()
@@ -38,7 +40,7 @@ int main()
 
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();
-        TestSimpleForestNodeRefine();
+        TestSimpleForestPredictorNodeRefine();
         TestDemultiplexerNodeRefine();
     }
     catch (const utilities::Exception& exception)

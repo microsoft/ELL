@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -46,4 +48,5 @@ namespace model
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
     }
+}
 }

@@ -11,6 +11,8 @@
 // utilities
 #include "Files.h"
 
+namespace emll
+{
 namespace dataset
 {
     SequentialLineIterator::SequentialLineIterator(const std::string& filepath, char delim)
@@ -33,4 +35,5 @@ namespace dataset
             _spCurrentLine = spNextLine;
         }
     }
+}
 }

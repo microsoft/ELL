@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -143,4 +145,5 @@ namespace utilities
     {
         archiver.Unarchive(name, _value);
     }
+}
 }

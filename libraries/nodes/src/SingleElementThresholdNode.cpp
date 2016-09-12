@@ -13,6 +13,8 @@
 // dataset
 #include "DenseDataVector.h"
 
+namespace emll
+{
 namespace nodes
 {
     SingleElementThresholdNode::SingleElementThresholdNode()
@@ -79,4 +81,5 @@ namespace nodes
     {
         return transformer.AddNode<SingleElementThresholdNode>(input, predictor);
     }
+}
 }

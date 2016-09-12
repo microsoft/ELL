@@ -20,6 +20,8 @@
 #include <cassert>
 #include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -135,6 +137,7 @@ namespace model
     private:
         PortElements<ValueType> _input;
     };
+}
 }
 
 #include "../tcc/InputPort.tcc"

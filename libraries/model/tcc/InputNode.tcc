@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -56,4 +58,5 @@ namespace model
         Node::ReadFromArchive(archiver);
         archiver[outputPortName] >> _output;
     }
+}
 }

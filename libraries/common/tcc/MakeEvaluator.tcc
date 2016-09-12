@@ -16,6 +16,8 @@
 #include "BinaryErrorAggregator.h"
 #include "LossAggregator.h"
 
+namespace emll
+{
 namespace common
 {
     template <typename PredictorType>
@@ -59,4 +61,5 @@ namespace common
                 throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this evaluator");
         }
     }
+}
 }

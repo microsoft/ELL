@@ -22,6 +22,8 @@
 #include <string>
 #include <utility>
 
+namespace emll
+{
 namespace trainers
 {
     /// <summary> Parameters for the multi-epoch meta-trainer. </summary>
@@ -74,6 +76,7 @@ namespace trainers
     std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(
         std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer,
         const MultiEpochIncrementalTrainerParameters& parameters);
+}
 }
 
 #include "../tcc/MultiEpochIncrementalTrainer.tcc"

@@ -8,6 +8,8 @@
 
 #pragma once
 
+namespace emll
+{
 namespace predictors
 {
     /// <summary> Base class for predictors. </summary>
@@ -20,4 +22,5 @@ namespace predictors
         /// <summary> The prediction type. </summary>
         using PredictionType = T;
     };
+}
 }

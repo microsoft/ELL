@@ -17,6 +17,8 @@
 // stl
 #include <unordered_set>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -91,4 +93,5 @@ namespace model
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         newContext.MapNode(oldId, this);
     }
+}
 }

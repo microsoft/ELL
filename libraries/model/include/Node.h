@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -106,4 +108,5 @@ namespace model
 
         mutable std::vector<const Node*> _dependentNodes;
     };
+}
 }

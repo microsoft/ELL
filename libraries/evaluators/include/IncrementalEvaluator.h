@@ -14,6 +14,8 @@
 #include <memory>
 #include <vector>
 
+namespace emll
+{
 namespace evaluators
 {
     /// <summary> Interface to an incremental evaluator (used to evaluate ensembles). </summary>
@@ -93,6 +95,7 @@ namespace evaluators
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template <typename BasePredictorType, typename... AggregatorTypes>
     std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+}
 }
 
 #include "../tcc/IncrementalEvaluator.tcc"

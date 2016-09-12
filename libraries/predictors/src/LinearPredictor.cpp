@@ -11,6 +11,8 @@
 // stl
 #include <memory>
 
+namespace emll
+{
 namespace predictors
 {
     LinearPredictor::LinearPredictor()
@@ -64,4 +66,5 @@ namespace predictors
         _w = w;
         archiver["b"] >> _b;
     }
+}
 }

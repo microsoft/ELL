@@ -21,6 +21,8 @@
 #include <iostream>
 #include <vector>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary> Implements a class that references a subvector. </summary>
@@ -78,4 +80,5 @@ namespace linear
         const double* _ptr;
         uint64_t _size;
     };
+}
 }

@@ -14,6 +14,8 @@
 // linear
 #include "DoubleVector.h"
 
+using namespace emll;
+
 void ForestPredictorTest()
 {
     // define some abbreviations

@@ -15,6 +15,8 @@
 #include <iostream>
 #include <vector>
 
+namespace emll
+{
 namespace linear
 {
     /// <summary> Values that represent different matrix structures. </summary>
@@ -307,4 +309,5 @@ namespace linear
     private:
         double _dummy = 0;
     };
+}
 }

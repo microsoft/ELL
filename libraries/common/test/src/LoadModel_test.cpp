@@ -17,6 +17,8 @@
 // stl
 #include <iostream>
 
+namespace emll
+{
 void TestLoadSampleModels()
 {
     auto model1 = common::LoadModel("[1]");
@@ -66,4 +68,5 @@ void TestSaveModels(std::string ext)
     auto newTree1 = common::LoadModel("tree_1." + ext);
     auto newTree2 = common::LoadModel("tree_2." + ext);
     auto newTree3 = common::LoadModel("tree_3." + ext);
+}
 }

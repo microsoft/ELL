@@ -17,6 +17,8 @@
 #include <unordered_map>
 #include <utility>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary>
@@ -122,6 +124,7 @@ namespace utilities
     private:
         std::unordered_map<std::string, std::shared_ptr<TypeConstructorBase>> _typeConstructorMap;
     };
+}
 }
 
 #include "../tcc/TypeFactory.tcc"

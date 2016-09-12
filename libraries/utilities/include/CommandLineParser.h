@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary>
@@ -294,6 +296,7 @@ namespace utilities
         CommandLineParserInvalidOptionsException(const char* what)
             : CommandLineParserException(what) {}
     };
+}
 }
 
 #include "../tcc/CommandLineParser.tcc"

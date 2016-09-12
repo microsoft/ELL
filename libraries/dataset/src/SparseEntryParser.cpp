@@ -16,6 +16,8 @@
 #include <memory>
 #include <stdexcept>
 
+namespace emll
+{
 namespace dataset
 {
     std::string getSnippet(const char* pos)
@@ -93,4 +95,5 @@ namespace dataset
     {
         return Iterator(spExampleString, pStr);
     }
+}
 }

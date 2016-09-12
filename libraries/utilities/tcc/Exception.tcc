@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     template <typename ErrorCodeType>
@@ -13,4 +15,5 @@ namespace utilities
         : _errorCode(errorCode), _message(message)
     {
     }
+}
 }

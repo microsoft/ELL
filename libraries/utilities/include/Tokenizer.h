@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> A very simple tokenizer suitable for XML and JSON deserialization </summary>
@@ -70,4 +72,5 @@ namespace utilities
 
         char _currentStringDelimiter = '\0'; // '\0' if we're not currently parsing a string
     };
+}
 }

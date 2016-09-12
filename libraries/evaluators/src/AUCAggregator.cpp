@@ -11,6 +11,8 @@
 // stl
 #include <algorithm>
 
+namespace emll
+{
 namespace evaluators
 {
     void AUCAggregator::Update(double prediction, double label, double weight)
@@ -70,4 +72,5 @@ namespace evaluators
     {
         return { "AUC" };
     }
+}
 }

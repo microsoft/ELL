@@ -12,6 +12,8 @@
 // utilities
 #include "Exception.h"
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -124,4 +126,5 @@ namespace model
         }
         return uncompilableNodes;
     }
+}
 }

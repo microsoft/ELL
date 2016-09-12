@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace common
 {
     template <typename ParametersType, typename... ValueTypes>
@@ -43,4 +45,5 @@ namespace common
     {
         return ParametersType{ std::get<Sequence>(valueTuple)... };
     }
+}
 }

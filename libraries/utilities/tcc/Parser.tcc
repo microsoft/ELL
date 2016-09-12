@@ -11,6 +11,8 @@
 #include <cstdlib>
 #include <stdexcept>
 
+namespace emll
+{
 namespace utilities
 {
     // wrapper for strtof
@@ -167,4 +169,5 @@ namespace utilities
             ++pStr;
         }
     }
+}
 }

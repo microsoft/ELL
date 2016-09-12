@@ -23,6 +23,8 @@
 #include <type_traits>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> An archiver that encodes data in an XML format. </summary>
@@ -152,6 +154,7 @@ namespace utilities
         static std::string EncodeTypeName(const std::string& str);
         static std::string DecodeTypeName(const std::string& str);
     };
+}
 }
 
 #include "../tcc/XMLArchiver.tcc"

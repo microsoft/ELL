@@ -11,6 +11,8 @@
 // stl
 #include <stdexcept>
 
+namespace emll
+{
 namespace treeLayout
 {
     VertexPosition::VertexPosition(double depth, double offset)
@@ -42,4 +44,5 @@ namespace treeLayout
     {
         return _positions[index];
     }
+}
 }

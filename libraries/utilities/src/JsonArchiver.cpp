@@ -16,6 +16,8 @@
 #include <sstream>
 #include <string>
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -359,4 +361,5 @@ namespace utilities
     {
         return str;
     }
+}
 }

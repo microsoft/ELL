@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace common
 {
     void ParsedDataLoadArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -72,4 +74,5 @@ namespace common
 
         return parseErrorMessages;
     }
+}
 }

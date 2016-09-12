@@ -13,6 +13,8 @@
 // stl
 #include <cassert>
 
+namespace emll
+{
 namespace dataset
 {
     template <typename IntegerListType>
@@ -88,4 +90,5 @@ namespace dataset
     // Explicit instantiation
     template class SparseBinaryDataVectorBase<utilities::CompressedIntegerList>;
     template class SparseBinaryDataVectorBase<utilities::IntegerList>;
+}
 }

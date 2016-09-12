@@ -15,6 +15,8 @@
 #include "DataLoadArguments.h"
 #include "Example.h"
 
+namespace emll
+{
 namespace interfaces
 {
     /// <summary> Gets a data iterator from a data file, based on data load arguments. </summary>
@@ -30,4 +32,5 @@ namespace interfaces
     ///
     /// <returns> The row dataset. </returns>
     interfaces::GenericRowDataset GetDataset(const std::string& dataFilename);
+}
 }

@@ -11,6 +11,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 namespace predictors
 {
     ConstantPredictor::ConstantPredictor(double value)
@@ -39,4 +41,5 @@ namespace predictors
         Print(os);
         os << "\n";
     }
+}
 }

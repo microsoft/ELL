@@ -16,9 +16,12 @@
 #include "RowDatasetInterface.h"
 %}
 
-%ignore dataset::RowDataset::operator[];
+%ignore emll::dataset::RowDataset::operator[];
 
-namespace dataset
+%import "CompressedIntegerList.h"
+%import "SparseDataVector.h"
+
+namespace emll::dataset
 {
     %ignore IDataVector::Clone;
     %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&&);
@@ -28,12 +31,12 @@ namespace dataset
     %ignore DenseDataVector::operator[];
     %ignore DenseDataVector<double>;
     %ignore DenseDataVector<float>;
-    %ignore SparseDataVector<double, utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<float, utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<short, utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<double, emll::utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<float, emll::utilities::CompressedIntegerList>;
+    %ignore SparseDataVector<short, emll::utilities::CompressedIntegerList>;
 }
 
-%ignore dataset::DenseSupervisedExample::DenseSupervisedExample(DenseSupervisedExample&&);
+%ignore emll::dataset::DenseSupervisedExample::DenseSupervisedExample(DenseSupervisedExample&&);
 %ignore interfaces::GenericRowDataset::GenericRowDataset(GenericRowDataset &&);
 
 %include "noncopyable.i"
@@ -49,27 +52,27 @@ namespace dataset
 %import "RowDataset.h"
 
 %include "unique_ptr.i"
-wrap_unique_ptr(IDataVectorPtr, dataset::IDataVector)
+wrap_unique_ptr(IDataVectorPtr, emll::dataset::IDataVector)
 
-%template() dataset::RowDataset<dataset::GenericSupervisedExample>;
-%template() dataset::DenseDataVector<double>;
+%template() emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>;
+%template() emll::dataset::DenseDataVector<double>;
 
 // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
-%template () dataset::DenseDataVector<double>;
-%template () dataset::DenseDataVector<float>;
-%template () dataset::SparseDataVector<double, utilities::CompressedIntegerList>;
-%template () dataset::SparseDataVector<float, utilities::CompressedIntegerList>;
-%template () dataset::SparseDataVector<short, utilities::CompressedIntegerList>;
-%template () dataset::RowDataset<GenericSupervisedExample>;
+%template () emll::dataset::DenseDataVector<double>;
+%template () emll::dataset::DenseDataVector<float>;
+%template () emll::dataset::SparseDataVector<double, emll::utilities::CompressedIntegerList>;
+%template () emll::dataset::SparseDataVector<float, emll::utilities::CompressedIntegerList>;
+%template () emll::dataset::SparseDataVector<short, emll::utilities::CompressedIntegerList>;
+%template () emll::dataset::RowDataset<GenericSupervisedExample>;
 
 // wrap operator[] for python
-WRAP_OP_AT(dataset::DoubleDataVector, double)
+WRAP_OP_AT(emll::dataset::DoubleDataVector, double)
 
 // wrap "Print" method for python
 //    WRAP_PRINT_TO_STR(GenericSupervisedExample)
-WRAP_PRINT_TO_STR(dataset::FloatDataVector)
-WRAP_PRINT_TO_STR(dataset::DoubleDataVector)
+WRAP_PRINT_TO_STR(emll::dataset::FloatDataVector)
+WRAP_PRINT_TO_STR(emll::dataset::DoubleDataVector)
 
-WRAP_PRINT_TO_STR(dataset::SparseDoubleDataVector)
-WRAP_PRINT_TO_STR(dataset::SparseFloatDataVector) 
-WRAP_PRINT_TO_STR(dataset::SparseShortDataVector)
+WRAP_PRINT_TO_STR(emll::dataset::SparseDoubleDataVector)
+WRAP_PRINT_TO_STR(emll::dataset::SparseFloatDataVector) 
+WRAP_PRINT_TO_STR(emll::dataset::SparseShortDataVector)

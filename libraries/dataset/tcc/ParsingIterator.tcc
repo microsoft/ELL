@@ -9,6 +9,8 @@
 #include "DenseDataVector.h"
 #include "SupervisedExampleBuilder.h"
 
+namespace emll
+{
 namespace dataset
 {
     template <typename RowIteratorType, typename VectorEntryParserType>
@@ -29,4 +31,5 @@ namespace dataset
     {
         return std::make_unique<ParsingIterator<RowIteratorType, VectorEntryParserType>>(std::move(row_iter), std::move(parser));
     }
+}
 }

@@ -56,6 +56,8 @@
 #include <stdexcept>
 #include <tuple>
 
+using namespace emll;
+
 int main(int argc, char* argv[])
 {
     try

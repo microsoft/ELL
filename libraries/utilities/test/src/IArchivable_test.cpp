@@ -32,6 +32,8 @@
 #include <sstream>
 #include <vector>
 
+namespace emll
+{
 struct TestStruct : public utilities::IArchivable
 {
     int a = 0;
@@ -334,4 +336,5 @@ void TestXmlArchiver()
 void TestXmlUnarchiver()
 {
     TestUnarchiver<utilities::XmlArchiver, utilities::XmlUnarchiver>();
+}
 }

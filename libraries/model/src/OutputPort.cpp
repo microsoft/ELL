@@ -8,6 +8,8 @@
 
 #include "OutputPort.h"
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -27,4 +29,5 @@ namespace model
         Port::ReadFromArchive(archiver);
         archiver["size"] >> _size;
     }
+}
 }

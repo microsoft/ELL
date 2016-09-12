@@ -11,6 +11,8 @@
 // utilities
 #include "Files.h"
 
+namespace emll
+{
 namespace common
 {
     void ParsedModelLoadArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -37,4 +39,5 @@ namespace common
 
         return parseErrorMessages;
     }
+}
 }

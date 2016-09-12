@@ -11,6 +11,8 @@
 // stl
 #include <utility>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> A read-only forward iterator that transforms the items from an input collection </summary>
@@ -50,6 +52,7 @@ namespace utilities
     /// <returns> A TransformIterator over the input sequence using the specified transform function</returns>
     template <typename InputIteratorType, typename FnType>
     auto MakeTransformIterator(InputIteratorType& inIterator, FnType transformFunction) -> TransformIterator<InputIteratorType, decltype(transformFunction(inIterator.Get())), FnType>;
+}
 }
 
 #include "../tcc/TransformIterator.tcc"

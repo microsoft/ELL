@@ -10,6 +10,8 @@
 
 #include <cmath>
 
+namespace emll
+{
 namespace trainers
 {
     LogitBooster::LogitBooster(double scale)
@@ -30,4 +32,5 @@ namespace trainers
             return { strongWeightLabel.weight / (1.0 + exp(scaledMargin)), strongWeightLabel.label };
         }
     }
+}
 }

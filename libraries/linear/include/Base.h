@@ -11,6 +11,8 @@
 // stl
 #include <iostream>
 
+namespace emll
+{
 /// <summary> linear namespace </summary>
 namespace linear
 {
@@ -33,4 +35,5 @@ namespace linear
     ///
     /// <returns> The stream. </returns>
     std::ostream& operator<<(std::ostream& os, const Base& v);
+}
 }

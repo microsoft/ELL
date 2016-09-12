@@ -8,6 +8,8 @@
 
 #include "EvaluatorArguments.h"
 
+namespace emll
+{
 namespace common
 {
     void ParsedEvaluatorArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -26,4 +28,5 @@ namespace common
             "Add an evaluation using the constant zero predictor",
             true);
     }
+}
 }

@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace dataset
 {
     template <typename DataVectorType, typename MetadataType>
@@ -28,4 +30,5 @@ namespace dataset
         example.Print(ostream);
         return ostream;
     }
+}
 }

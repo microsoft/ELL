@@ -19,6 +19,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that represents a linear predictor. </summary>
@@ -92,4 +94,5 @@ namespace nodes
     ///
     /// <returns> The node added to the model. </returns>
     LinearPredictorNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer);
+}
 }

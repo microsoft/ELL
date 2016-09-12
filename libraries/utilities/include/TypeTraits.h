@@ -10,6 +10,8 @@
 
 #include <type_traits>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> Utility class to test if a type is a specialization of std::vector. Used by IsVector/IsNotVector, below. </summary>
@@ -46,6 +48,7 @@ namespace utilities
     /// <summary> Enabled if ValueType is not a specialization of std::vector. </summary>
     template <typename ValueType>
     using IsNotVector = typename std::enable_if_t<!IsVectorType<typename std::decay<ValueType>::type>::value, int>;
+}
 }
 
 #include "../tcc/TypeTraits.tcc"

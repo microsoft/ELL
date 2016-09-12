@@ -16,6 +16,8 @@
 // predictors
 #include "SingleElementThresholdPredictor.h"
 
+namespace emll
+{
 namespace nodes
 {
     /// <summary> A node that represents a single-element threshold predictor. </summary>
@@ -86,4 +88,5 @@ namespace nodes
     ///
     /// <returns> The node added to the model. </returns>
     SingleElementThresholdNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer);
+}
 }

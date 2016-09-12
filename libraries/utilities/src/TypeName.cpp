@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     std::string GetCompositeTypeName(std::string baseType, const std::vector<std::string>& subtypes)
@@ -32,4 +34,5 @@ namespace utilities
         result += ">";
         return result;
     }
+}
 }

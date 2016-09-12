@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace evaluators
 {
     template <typename LossFunctionType>
@@ -47,4 +49,5 @@ namespace evaluators
     {
         return LossAggregator<LossFunctionType>(std::move(lossFunction));
     }
+}
 }

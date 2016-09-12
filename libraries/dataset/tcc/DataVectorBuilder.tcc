@@ -15,6 +15,8 @@
 // stl
 #include <type_traits>
 
+namespace emll
+{
 namespace dataset
 {
     template <typename DefaultDataVectorType>
@@ -114,4 +116,5 @@ namespace dataset
 
         // this point should never be reached
     }
+}
 }

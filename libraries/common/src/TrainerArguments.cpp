@@ -8,6 +8,8 @@
 
 #include "TrainerArguments.h"
 
+namespace emll
+{
 namespace common
 {
     void ParsedTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -41,4 +43,5 @@ namespace common
             "Parameter of the loss function",
             1.0);
     }
+}
 }

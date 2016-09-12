@@ -14,6 +14,8 @@
 // stl
 #include <iostream>
 
+using namespace emll;
+
 int main()
 {
     try

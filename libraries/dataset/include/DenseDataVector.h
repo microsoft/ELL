@@ -24,6 +24,8 @@
 
 #define DEFAULT_DENSE_VECTOR_CAPACITY 1000
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> DenseDataVector Base class. </summary>
@@ -138,6 +140,7 @@ namespace dataset
     public:
         using DenseDataVector<double>::DenseDataVector;
     };
+}
 }
 
 #include "../tcc/DenseDataVector.tcc"

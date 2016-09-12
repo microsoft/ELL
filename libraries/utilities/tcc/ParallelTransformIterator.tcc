@@ -11,6 +11,8 @@
 
 #define DEFAULT_MAX_TASKS 8
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -85,4 +87,5 @@ namespace utilities
         using OutType = decltype(transformFunction(inIterator.Get()));
         return ParallelTransformIterator<InputIteratorType, OutType, FuncType>(inIterator, transformFunction);
     }
+}
 }

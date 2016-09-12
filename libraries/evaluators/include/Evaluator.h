@@ -16,6 +16,8 @@
 #include <tuple>
 #include <vector>
 
+namespace emll
+{
 namespace evaluators
 {
     /// <summary> Interface to an evaluator. </summary>
@@ -121,6 +123,7 @@ namespace evaluators
     /// <returns> A shared_ptr to an IEvaluator. </returns>
     template <typename PredictorType, typename... AggregatorTypes>
     std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+}
 }
 
 #include "../tcc/Evaluator.tcc"

@@ -8,6 +8,8 @@
 
 #include "HingeLoss.h"
 
+namespace emll
+{
 namespace lossFunctions
 {
     double HingeLoss::Evaluate(double prediction, double label) const
@@ -31,4 +33,5 @@ namespace lossFunctions
 
         return 0.0;
     }
+}
 }

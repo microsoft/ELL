@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace linear
 {
     template <typename RowMatrixType>
@@ -19,4 +21,5 @@ namespace linear
     {
         _transp.Gemv(p_x, p_y, alpha, beta);
     }
+}
 }

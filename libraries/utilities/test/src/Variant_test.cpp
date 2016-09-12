@@ -19,6 +19,8 @@
 // stl
 #include <vector>
 
+namespace emll
+{
 void TestScalarVariant()
 {
     utilities::Variant v = utilities::MakeVariant<int>(5);
@@ -47,4 +49,5 @@ void TestVectorVariant()
     testing::ProcessTest("Variant check type", !v.IsType<bool>());
 
     testing::ProcessTest("Variant check value", v.GetValue<std::vector<int>>()[0] == 3);
+}
 }

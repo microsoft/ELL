@@ -11,6 +11,8 @@
 // stl
 #include <iostream>
 
+namespace emll
+{
 namespace utilities
 {
     const char substitutionSymbol = '%';
@@ -154,6 +156,7 @@ namespace utilities
     /// <returns> Either MatchResult::success or an error code. </returns>
     template <typename... ArgTypes>
     void MatchFormatThrowsExceptions(const char*& content, const char* format, ArgTypes&&... args);
+}
 }
 
 #include "../tcc/Format.tcc"

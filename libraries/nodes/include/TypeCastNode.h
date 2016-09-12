@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+namespace emll
+{
 /// <summary> nodes namespace </summary>
 namespace nodes
 {
@@ -68,6 +70,7 @@ namespace nodes
         model::InputPort<InputValueType> _input;
         model::OutputPort<OutputValueType> _output;
     };
+}
 }
 
 #include "../tcc/TypeCastNode.tcc"

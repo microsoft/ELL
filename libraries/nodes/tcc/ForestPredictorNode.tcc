@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ForestNode.cpp (nodes)
+//  File:     ForestPredictorNode.cpp (nodes)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,7 +9,7 @@
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
 #include "DemultiplexerNode.h"
-#include "ForestNode.h"
+#include "ForestPredictorNode.h"
 #include "MultiplexerNode.h"
 #include "SingleElementThresholdNode.h"
 #include "SumNode.h"
@@ -18,22 +18,24 @@
 #include <memory>
 #include <vector>
 
+namespace emll
+{
 namespace nodes
 {
     template <typename SplitRuleType, typename EdgePredictorType>
-    ForestNode<SplitRuleType, EdgePredictorType>::ForestNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest)
+    ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest)
         : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, forest.NumTrees()), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, forest.NumEdges()), _forest(forest)
     {
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    ForestNode<SplitRuleType, EdgePredictorType>::ForestNode()
+    ForestPredictorNode<SplitRuleType, EdgePredictorType>::ForestPredictorNode()
         : Node({ &_input }, { &_output, &_treeOutputs, &_edgeIndicatorVector }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _treeOutputs(this, treeOutputsPortName, 0), _edgeIndicatorVector(this, edgeIndicatorVectorPortName, 0)
     {
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::WriteToArchive(utilities::Archiver& archiver) const
+    void ForestPredictorNode<SplitRuleType, EdgePredictorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
@@ -44,7 +46,7 @@ namespace nodes
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    void ForestPredictorNode<SplitRuleType, EdgePredictorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
@@ -55,17 +57,17 @@ namespace nodes
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::Copy(model::ModelTransformer& transformer) const
+    void ForestPredictorNode<SplitRuleType, EdgePredictorType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<ForestNode<SplitRuleType, EdgePredictorType>>(newPortElements, _forest);
+        auto newNode = transformer.AddNode<ForestPredictorNode<SplitRuleType, EdgePredictorType>>(newPortElements, _forest);
         transformer.MapNodeOutput(output, newNode->output);
         transformer.MapNodeOutput(treeOutputs, newNode->treeOutputs);
         transformer.MapNodeOutput(edgeIndicatorVector, newNode->edgeIndicatorVector);
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    bool ForestNode<SplitRuleType, EdgePredictorType>::Refine(model::ModelTransformer& transformer) const
+    bool ForestPredictorNode<SplitRuleType, EdgePredictorType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         const auto& interiorNodes = _forest.GetInteriorNodes();
@@ -167,7 +169,7 @@ namespace nodes
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    void ForestNode<SplitRuleType, EdgePredictorType>::Compute() const
+    void ForestPredictorNode<SplitRuleType, EdgePredictorType>::Compute() const
     {
         // forest output
         _output.SetOutput({ _forest.Predict(_input) });
@@ -184,4 +186,5 @@ namespace nodes
         auto edgeIndicator = _forest.GetEdgeIndicatorVector(_input);
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
+}
 }

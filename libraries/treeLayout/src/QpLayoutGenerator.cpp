@@ -8,6 +8,8 @@
 
 #include "QpLayoutGenerator.h"
 
+namespace emll
+{
 namespace treeLayout
 {
     QpLayoutGenerator::QpLayoutGenerator(const Parameters& parameters)
@@ -99,4 +101,5 @@ namespace treeLayout
 
         return l;
     }
+}
 }

@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace utilities
 {
     //
@@ -23,4 +25,5 @@ namespace utilities
         using OutType = decltype(transformFunction(inIterator.Get()));
         return TransformIterator<InputIteratorType, OutType, FnType>(inIterator, transformFunction);
     }
+}
 }

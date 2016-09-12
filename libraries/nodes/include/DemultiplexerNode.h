@@ -26,6 +26,8 @@
 #include <memory>
 #include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace nodes
 {
@@ -92,6 +94,7 @@ namespace nodes
         // Default value
         ValueType _defaultValue;
     };
+}
 }
 
 #include "../tcc/DemultiplexerNode.tcc"

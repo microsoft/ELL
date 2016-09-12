@@ -15,6 +15,8 @@
 #include "ConstantPredictor.h"
 #include "SingleElementThresholdPredictor.h"
 
+namespace emll
+{
 namespace trainers
 {
     /// <summary> Parameters for the sorting forest trainer. </summary>
@@ -69,6 +71,7 @@ namespace trainers
     /// <returns> A unique_ptr to a simple forest trainer. </returns>
     template <typename LossFunctionType, typename BoosterType>
     std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const SortingForestTrainerParameters& parameters);
+}
 }
 
 #include "../tcc/SortingForestTrainer.tcc"

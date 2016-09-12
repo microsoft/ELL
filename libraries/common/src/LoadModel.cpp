@@ -20,7 +20,7 @@
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
-#include "ForestNode.h"
+#include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
 #include "MovingAverageNode.h"
@@ -39,6 +39,8 @@
 #include "JsonArchiver.h"
 #include "XMLArchiver.h"
 
+namespace emll
+{
 namespace common
 {
     model::Model GetModel1()
@@ -137,8 +139,8 @@ namespace common
         auto forest = CreateForest(numSplits);
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
-        auto simpleForestNode = model.AddNode<nodes::SimpleForestNode>(inputNode->output, forest);
-        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestNode->output);
+        auto simpleForestPredictorNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
+        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestPredictorNode->output);
         return model;
     }
 
@@ -173,7 +175,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::DemultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, int>>();
@@ -276,4 +278,5 @@ namespace common
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
         }
     }
+}
 }

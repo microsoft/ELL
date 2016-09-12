@@ -15,6 +15,8 @@
 #include <iostream>
 #include <stdexcept>
 
+namespace emll
+{
 namespace treeLayout
 {
     template <typename ChildrenVectorType>
@@ -279,4 +281,5 @@ namespace treeLayout
             _offsets[node_index] += step_size * (midpt - parent_offset); // equivalent to above
         }
     }
+}
 }

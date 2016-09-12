@@ -20,6 +20,8 @@
 #include <random>
 #include <vector>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> A row-major dataset of examples. </summary>
@@ -160,6 +162,7 @@ namespace dataset
 
     template <typename ExampleType>
     std::ostream& operator<<(std::ostream& os, RowDataset<ExampleType>& dataset);
+}
 }
 
 #include "../tcc/RowDataset.tcc"

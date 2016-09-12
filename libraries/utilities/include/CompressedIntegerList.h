@@ -13,6 +13,8 @@
 #include <iterator>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> A non-decreasing list of nonegative integers, with a forward Iterator, stored in a
@@ -99,4 +101,5 @@ namespace utilities
         uint64_t _last;
         uint64_t _size;
     };
+}
 }

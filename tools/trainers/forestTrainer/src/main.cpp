@@ -37,6 +37,8 @@
 #include <iostream>
 #include <stdexcept>
 
+using namespace emll;
+
 int main(int argc, char* argv[])
 {
     try

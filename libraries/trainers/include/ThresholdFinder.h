@@ -17,6 +17,8 @@
 // stl
 #include <vector>
 
+namespace emll
+{
 namespace trainers
 {
     /// <summary> Base class for threshold predictor finders. </summary>
@@ -59,6 +61,7 @@ namespace trainers
         template <typename ExampleIteratorType>
         std::vector<predictors::SingleElementThresholdPredictor> GetThresholds(ExampleIteratorType exampleIterator) const;
     };
+}
 }
 
 #include "../tcc/ThresholdFinder.tcc"

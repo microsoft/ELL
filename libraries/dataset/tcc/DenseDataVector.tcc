@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 namespace dataset
 {
     template <typename ValueType>
@@ -34,4 +36,5 @@ namespace dataset
         std::copy(_data.cbegin(), _data.cend(), vector.begin());
         return vector;
     }
+}
 }
