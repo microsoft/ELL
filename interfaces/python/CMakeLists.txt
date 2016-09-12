@@ -19,13 +19,14 @@ generate_interface(python ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "" ${P
 #         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} 
 #         COMMAND python sgd.py ../../../examples/data/testData.txt)
 
-add_test(NAME python_swig_test
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMAND python ./../../examples/python/swigtest.py)
-message("CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")
+#add_test(NAME python_interface_test
+#        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#        COMMAND python ./../../../interfaces/python/test/test.py)
 
 add_dependencies(_EMLL_python EMLL_common)
 
 else()
   message(WARNING "Couldn't find Python libraries, python interfaces skipped.")
 endif() # PYTHONLIBS_FOUND
+
+add_subdirectory(test)
