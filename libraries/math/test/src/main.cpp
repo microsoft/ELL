@@ -228,7 +228,7 @@ void TestMatrix2()
     T.GetRow(0).Fill(1);
     T.GetRow(4).Fill(1);
 
-    math::ColumnMatrix<ElementType> C
+    math::ColumnMatrix<ElementType> R1
     {
         { 0, 0, 0, 0, 0, 0, 0 },
         { 0, 1, 1, 1, 1, 1, 0 },
@@ -238,7 +238,22 @@ void TestMatrix2()
         { 0, 1, 1, 1, 1, 1, 0 },
         { 0, 0, 0, 0, 0, 0, 0 }
     };
-    testing::ProcessTest("Matrix::GetDiagonal()", M == C);
+    testing::ProcessTest("Matrix::GetDiagonal()", M == R1);
+
+    auto S = N.GetBlock(1, 1, 3, 3);
+    S.Fill(8);
+
+    math::ColumnMatrix<ElementType> R2
+    {
+        { 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 1, 1, 1, 1, 1, 0 },
+        { 0, 1, 8, 8, 8, 1, 0 },
+        { 0, 1, 8, 8, 8, 1, 0 },
+        { 0, 1, 8, 8, 8, 1, 0 },
+        { 0, 1, 1, 1, 1, 1, 0 },
+        { 0, 0, 0, 0, 0, 0, 0 }
+    };
+    testing::ProcessTest("Matrix::Fill()", M == R2);
 }
 
 template<typename ElementType, math::MatrixLayout Layout, Implementation Implementation>
