@@ -8,6 +8,8 @@
 
 #include "Exception.h"
 
+namespace emll
+{
 namespace math
 {
     template<typename ElementType, VectorOrientation Orientation>
@@ -72,4 +74,5 @@ namespace math
 
         Blas::Gemv(order, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(M.NumRows()), static_cast<int>(M.NumColumns()), s, M._pData, static_cast<int>(M._increment), v._pData, static_cast<int>(v._increment), t, u._pData, static_cast<int>(u._increment));
     }
+}
 }

@@ -14,6 +14,8 @@
 // stl
 #include<string>
 
+namespace emll
+{
 namespace math
 {
     /// <summary>
@@ -199,7 +201,7 @@ namespace math
 #endif
     using Operations = BlasOperations;
 }
-
+}
 #include "../tcc/NativeOperations.tcc"
 
 #ifdef USE_BLAS

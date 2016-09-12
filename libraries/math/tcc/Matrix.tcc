@@ -9,6 +9,8 @@
 // stl
 #include <algorithm> // for std::generate
 
+namespace emll
+{
 namespace math
 {
     //
@@ -223,4 +225,5 @@ namespace math
     {
         std::generate(_data.begin(), _data.end(), generator);
     }
+}
 }

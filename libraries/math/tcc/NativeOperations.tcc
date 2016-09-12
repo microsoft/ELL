@@ -9,6 +9,8 @@
 #include "Exception.h"
 #include "..\include\Operations.h"
 
+namespace emll
+{
 namespace math
 {
     //
@@ -125,4 +127,5 @@ namespace math
             u[i] = s * Dot(row, v) + t * u[i];
         }
     }
+}
 }

@@ -8,6 +8,8 @@
 
 #include "BlasWrapper.h"
 
+namespace emll
+{
 namespace math
 {
     namespace Blas
@@ -73,4 +75,4 @@ namespace math
         }
     }
 }
-
+}

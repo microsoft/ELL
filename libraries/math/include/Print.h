@@ -13,33 +13,28 @@
 // stl
 #include <iostream>
 
+namespace emll
+{
 namespace math
 {
+    /// <summary> Prints a vector in initializer list format. </summary>
+    ///
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
+    /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+    /// <param name="v"> The vector. </param>
+    /// <param name="os"> [in,out] The output stream. </param>
     template <typename ElementType, VectorOrientation Orientation>
-    void Print(const ConstVectorReference<ElementType, Orientation>& v, std::ostream& os)
-    {
-        os << "{ " << v[0];
-        for (size_t i = 1; i < v.Size(); ++i)
-        {
-            os << ', ' << v[i];
-        }
-        os << " }";
-    }
+    void Print(const ConstVectorReference<ElementType, Orientation>& v, std::ostream& os);
 
+    /// <summary> Prints a matrix in initializer list format. </summary>
+    ///
+    /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+    /// <typeparam name="Layout"> Matrix layout. </typeparam>
+    /// <param name="M"> The matrix. </param>
+    /// <param name="os"> [in,out] The output stream. </param>
     template <typename ElementType, MatrixLayout Layout>
-    void Print(const ConstMatrixReference<ElementType, Layout>& M, std::ostream& os)
-    {
-        os << "{\n";
-        for(size_t i = 0; i < M.NumRows(); ++i)
-        {
-            os << "\t{ " << M(i, 0);
-            for(size_t j = 1; j < M.NumColumns(); ++j)
-            {
-                os << ", " << M(i, j);
-            }
-            os << " }\n";
-        }
-        os << '}';
-    }
-
+    void Print(const ConstMatrixReference<ElementType, Layout>& M, std::ostream& os);
 }
+}
+
+#include "../tcc/Print.tcc"

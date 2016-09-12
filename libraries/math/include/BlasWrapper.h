@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma once
+
 #define USE_BLAS
 
 // OpenBlas
@@ -14,6 +16,8 @@
 // stl
 #include <cstddef> // size_t
 
+namespace emll
+{
 namespace math
 {
     namespace Blas
@@ -100,7 +104,6 @@ namespace math
         void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, float alpha, const float* M, int lda, const float* x, int incx, float beta, float* y, int incy);
         void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, double alpha, const double* M, int lda, const double* x, int incx, double beta, double* y, int incy);
         /// @}
-
     }
-
+}
 }

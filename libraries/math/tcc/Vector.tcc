@@ -14,6 +14,8 @@
 // stl
 #include <algorithm> // for std::generate
 
+namespace emll
+{
 namespace math
 {
     //
@@ -191,4 +193,5 @@ namespace math
         // 
         return _pData[index];
     }
+}
 }

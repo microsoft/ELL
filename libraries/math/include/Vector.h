@@ -14,6 +14,8 @@
 #include <functional>
 #include <cmath>
 
+namespace emll
+{
 namespace math
 {
     /// <summary> Enum of possible vector orientations. </summary>
@@ -235,5 +237,5 @@ namespace math
     template<typename ElementType>
     using RowVector = Vector<ElementType, VectorOrientation::row>;
 }
-
+}
 #include "../tcc/Vector.tcc"

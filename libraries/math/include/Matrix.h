@@ -10,6 +10,8 @@
 
 #include "Vector.h"
 
+namespace emll
+{
 namespace math
 {
     /// <summary> Enum of possible matrix layouts. </summary>
@@ -306,5 +308,5 @@ namespace math
     template<typename ElementType>
     using RowMatrix = Matrix<ElementType, MatrixLayout::rowMajor>;
 }
-
+}
 #include "../tcc/Matrix.tcc"
