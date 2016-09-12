@@ -8,4 +8,5 @@ namespace emll
     void TestMapCreate();
     void TestMapRefine();
     void TestMapCompute();
+    void TestNamedInputOutput();
 }

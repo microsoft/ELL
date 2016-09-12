@@ -54,9 +54,9 @@ void TestMapCreate()
     assert(outputNodes.size() == 1);
     auto map = model::MakeMap(model,
                               std::make_tuple(inputNodes[0]),
-                              { {"doubleInput"} },
+                              { { "doubleInput" } },
                               std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                              { {"doubleOutput"} });
+                              { { "doubleOutput" } });
 }
 
 void TestMapCompute()
@@ -67,9 +67,9 @@ void TestMapCompute()
     assert(outputNodes.size() == 1);
     auto map = model::MakeMap(model,
                               std::make_tuple(inputNodes[0]),
-                              { {"doubleInput"} },
+                              { { "doubleInput" } },
                               std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                              { {"doubleOutput"} });
+                              { { "doubleOutput" } });
 
     assert(inputNodes.size() == 1);
 
@@ -81,7 +81,7 @@ void TestMapCompute()
     for (const auto& inVec : input)
     {
         map.SetInputs(inVec);
-        result = map.Compute(); 
+        result = map.Compute();
     }
 
     auto resultValues = std::get<0>(result);
@@ -103,23 +103,23 @@ void TestMapRefine()
 
     auto map1 = model::MakeMap(model,
                                std::make_tuple(inputNodes[0]),
-                               { {"doubleInput"} },
+                               { { "doubleInput" } },
                                std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                               { {"doubleOutput"} });
+                               { { "doubleOutput" } });
 
     auto map2 = model::MakeMap(model,
                                std::make_tuple(inputNodes[0]),
-                               { {"doubleInput"} },
+                               { { "doubleInput" } },
                                std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                               { {"doubleOutput"} });
+                               { { "doubleOutput" } });
 
     model::TransformContext context{ common::IsNodeCompilable() };
     map2.Refine(context);
-    
+
     auto input = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
-        { 4.0, 5.0, 6.0 },
-        { 7.0, 8.0, 9.0 },
-        { 10.0, 11.0, 12.0 } };
+                                                   { 4.0, 5.0, 6.0 },
+                                                   { 7.0, 8.0, 9.0 },
+                                                   { 10.0, 11.0, 12.0 } };
     decltype(map1.Compute()) result1;
     decltype(map2.Compute()) result2;
     for (const auto& inVec : input)
@@ -135,5 +135,39 @@ void TestMapRefine()
     auto resultValues1 = std::get<0>(result1);
     auto resultValues2 = std::get<0>(result2);
     testing::ProcessTest("Testing refined map compute", testing::IsEqual(resultValues1, resultValues2));
+}
+
+void TestNamedInputOutput()
+{
+    auto model = GetSimpleModel();
+    auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
+    auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
+    assert(outputNodes.size() == 1);
+    auto map = model::MakeMap(model,
+                              std::make_tuple(inputNodes[0]),
+                              { { "doubleInput" } },
+                              std::make_tuple(MakePortElements(outputNodes[0]->output)),
+                              { { "doubleOutput" } });
+
+    assert(inputNodes.size() == 1);
+
+    auto input = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
+                                                   { 4.0, 5.0, 6.0 },
+                                                   { 7.0, 8.0, 9.0 },
+                                                   { 10.0, 11.0, 12.0 } };
+    decltype(map.Compute()) result;
+    for (const auto& inVec : input)
+    {
+        map.SetInput("doubleInput", inVec);
+        result = map.ComputeOutput<double>("doubleOutput");
+    }
+
+    auto resultValues = std::get<0>(result);
+
+    testing::ProcessTest("Testing named input / output", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
+
+    for (auto x : resultValues)
+        std::cout << x << "  ";
+    std::cout << std::endl;
 }
 }

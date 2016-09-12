@@ -17,14 +17,14 @@
 // utilities
 #include "TypeName.h"
 #include "IArchivable.h"
+#include "Exception.h"
 
 // stl
 #include <string>
 #include <vector>
 #include <array>
 #include <utility> // for integer_sequence
-
-#include <iostream>
+#include <unordered_map>
 
 namespace emll
 {
@@ -90,6 +90,14 @@ namespace model
         template <typename... InputTypes>
         void SetInputs(std::vector<InputTypes>... inputs);
 
+        /// <summary> Set a single InputNode's input </summary>
+        ///
+        /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
+        /// <param name="inputName"> The name assigned to the input node </param>
+        /// <param name="inputValues"> The values to set on the input node </param>
+        template <typename ValueType>
+        void SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues);
+
         /// <summary> Type alias for the tuple of vectors returned by `Compute` </summary>
         using ComputeOutputType = typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
 
@@ -98,14 +106,30 @@ namespace model
         /// <returns> A tuple of vectors of output values </returns>
         ComputeOutputType Compute() const;
 
+        template <typename ValueType>
+        std::vector<ValueType> ComputeOutput(const std::string& outputName);
+
     private:
         Model _model;
 
-        InputTypesTuple _inputs; // this is a tuple of InputNode<T>*
+        InputTypesTuple _inputs; // InputTypesTuple is a std::tuple<InputNode<T1>*, InputNode<T2>*, ...>
         std::array<std::string, std::tuple_size<InputTypesTuple>::value> _inputNames;
+        std::unordered_map<std::string, Node*> _inputNodeMap;
 
-        OutputTypesTuple _outputs; // This is a tuple of PortElements<T>
+        OutputTypesTuple _outputs; // OutputTypesTuple is a std::tuple<PortElements<T1>, PortElements<T2>, ...>
         std::array<std::string, std::tuple_size<OutputTypesTuple>::value> _outputNames;
+        std::unordered_map<std::string, const PortElementsBase&> _outputElementsMap;
+
+        // Adding to name->value maps
+        template <size_t... Sequence>
+        void AddInputsToNameMap(std::index_sequence<Sequence...>,
+                                InputTypesTuple& inputs,
+                                const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames);
+
+        template <size_t... Sequence>
+        void AddOutputsToNameMap(std::index_sequence<Sequence...>,
+                                 OutputTypesTuple& outputs,
+                                 const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames);
 
         // Remap
         template <typename InputNodeType>

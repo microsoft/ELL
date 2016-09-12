@@ -39,6 +39,7 @@ int main()
         TestMapCreate();
         TestMapCompute();
         TestMapRefine();
+        TestNamedInputOutput();
     }
     catch (const utilities::Exception& exception)
     {

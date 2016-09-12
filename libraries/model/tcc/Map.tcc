@@ -11,12 +11,15 @@ namespace emll
 namespace model
 {
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    Map<InputTypesTuple, OutputTypesTuple>::Map(const Model& model, const InputTypesTuple& inputs,
+    Map<InputTypesTuple, OutputTypesTuple>::Map(const Model& model,
+                                                const InputTypesTuple& inputs,
                                                 const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
                                                 const OutputTypesTuple& outputs,
                                                 const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
         : _model(model), _inputs(inputs), _inputNames(inputNames), _outputs(outputs), _outputNames(outputNames)
     {
+        AddInputsToNameMap(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), _inputs, _inputNames);
+        AddOutputsToNameMap(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), _outputs, _outputNames);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -27,6 +30,24 @@ namespace model
                  const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
     {
         return Map<InputTypesTuple, OutputTypesTuple>(model, inputs, inputNames, outputs, outputNames);
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    template <size_t... Sequence>
+    void Map<InputTypesTuple, OutputTypesTuple>::AddInputsToNameMap(std::index_sequence<Sequence...>,
+                                                                    InputTypesTuple& inputs,
+                                                                    const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames)
+    {
+        _inputNodeMap.insert({ std::get<Sequence>(inputNames)..., static_cast<Node*>(std::get<Sequence>(inputs))... });
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    template <size_t... Sequence>
+    void Map<InputTypesTuple, OutputTypesTuple>::AddOutputsToNameMap(std::index_sequence<Sequence...>,
+                                                                     OutputTypesTuple& outputs,
+                                                                     const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
+    {
+        _outputElementsMap.insert({ std::get<Sequence>(outputNames)..., static_cast<PortElementsBase&>(std::get<Sequence>(outputs))... });
     }
 
     //
@@ -100,9 +121,28 @@ namespace model
     template <typename... InputTypes>
     void Map<InputTypesTuple, OutputTypesTuple>::SetInputs(std::vector<InputTypes>... inputs)
     {
-        auto tuple = std::tuple<std::vector<InputTypes>...>(inputs...);
-        auto x = 5;
-        SetInputTuple(tuple);
+        SetInputTuple(std::tuple<std::vector<InputTypes>...>(inputs...));
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    template <typename ValueType>
+    void Map<InputTypesTuple, OutputTypesTuple>::SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues)
+    {
+        auto iter = _inputNodeMap.find(inputName);
+        if (iter == _inputNodeMap.end())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+
+        auto node = dynamic_cast<InputNode<ValueType>*>(iter->second);
+        if (node != nullptr)
+        {
+            node->SetInput(inputValues);
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
     }
 
     //
@@ -112,8 +152,7 @@ namespace model
     template <typename PortElementsType, typename OutputType>
     void Map<InputTypesTuple, OutputTypesTuple>::ComputeElements(PortElementsType& elements, OutputType& output) const
     {
-        auto elementOutput = _model.ComputeOutput(elements); // elementOutput is a vector<T>, output param is PortElements<T>&...
-        output = elementOutput;
+        output = _model.ComputeOutput(elements); // elementOutput is a vector<T>, output param is PortElements<T>&...
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -129,6 +168,20 @@ namespace model
         ComputeOutputType result;
         ComputeElementsHelper(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), result);
         return result;
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    template <typename ValueType>
+    std::vector<ValueType> Map<InputTypesTuple, OutputTypesTuple>::ComputeOutput(const std::string& outputName)
+    {
+        auto iter = _outputElementsMap.find(outputName);
+        if (iter == _outputElementsMap.end())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+
+        auto elements = dynamic_cast<const PortElements<ValueType>&>(iter->second);
+        return _model.ComputeOutput(elements);
     }
 }
 }
