@@ -77,11 +77,11 @@ void TestMapCompute()
                                                    { 4.0, 5.0, 6.0 },
                                                    { 7.0, 8.0, 9.0 },
                                                    { 10.0, 11.0, 12.0 } };
-    decltype(map.Compute()) result;
+    decltype(map.ComputeOutput()) result;
     for (const auto& inVec : input)
     {
         map.SetInputs(inVec);
-        result = map.Compute();
+        result = map.ComputeOutput();
     }
 
     auto resultValues = std::get<0>(result);
@@ -120,15 +120,15 @@ void TestMapRefine()
                                                    { 4.0, 5.0, 6.0 },
                                                    { 7.0, 8.0, 9.0 },
                                                    { 10.0, 11.0, 12.0 } };
-    decltype(map1.Compute()) result1;
-    decltype(map2.Compute()) result2;
+    decltype(map1.ComputeOutput()) result1;
+    decltype(map2.ComputeOutput()) result2;
     for (const auto& inVec : input)
     {
         map1.SetInputs(inVec);
         map2.SetInputs(inVec);
 
-        result1 = map1.Compute();
-        result2 = map2.Compute();
+        result1 = map1.ComputeOutput();
+        result2 = map2.ComputeOutput();
     }
 
     // make sure they're the same
@@ -155,14 +155,12 @@ void TestNamedInputOutput()
                                                    { 4.0, 5.0, 6.0 },
                                                    { 7.0, 8.0, 9.0 },
                                                    { 10.0, 11.0, 12.0 } };
-    decltype(map.Compute()) result;
+    std::vector<double> resultValues;
     for (const auto& inVec : input)
     {
         map.SetInput("doubleInput", inVec);
-        result = map.ComputeOutput<double>("doubleOutput");
+        resultValues = map.ComputeOutput<double>("doubleOutput");
     }
-
-    auto resultValues = std::get<0>(result);
 
     testing::ProcessTest("Testing named input / output", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
 

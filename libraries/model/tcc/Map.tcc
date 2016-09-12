@@ -163,7 +163,7 @@ namespace model
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    auto Map<InputTypesTuple, OutputTypesTuple>::Compute() const -> ComputeOutputType
+    auto Map<InputTypesTuple, OutputTypesTuple>::ComputeOutput() const -> ComputeOutputType
     {
         ComputeOutputType result;
         ComputeElementsHelper(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), result);

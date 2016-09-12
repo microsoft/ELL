@@ -41,7 +41,8 @@ namespace model
     template <typename TupleType, size_t... Sequence>
     auto MakeTupleOfVectorsFromPortElementsHelper(const TupleType& tuple, std::index_sequence<Sequence...>)
     {
-        return typename ToVectorElements<typename std::tuple_element<Sequence, TupleType>::type::type...>::type();
+        using ElementType = typename std::tuple_element<Sequence..., TupleType>::type...;
+        return typename ToVectorElements<typename ElementType::type>::type{};
     }
 
     template <typename TupleType>
@@ -104,8 +105,11 @@ namespace model
         /// <summary> Computes the output of the map from its current input values </summary>
         ///
         /// <returns> A tuple of vectors of output values </returns>
-        ComputeOutputType Compute() const;
+        ComputeOutputType ComputeOutput() const;
 
+        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        ///
+        /// <returns> A vector of output values </returns>
         template <typename ValueType>
         std::vector<ValueType> ComputeOutput(const std::string& outputName);
 
