@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Exception.h"
-#include "..\include\Operations.h"
 
 namespace emll
 {
@@ -135,6 +134,12 @@ namespace math
             auto row = M.GetRow(i);
             u[i] = s * Dot(row, v) + t * u[i];
         }
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    void NativeOperations::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row>& v, ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u)
+    {
+        // TODO
     }
 }
 }

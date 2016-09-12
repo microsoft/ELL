@@ -16,7 +16,7 @@ namespace math
         os << "{ " << v[0];
         for (size_t i = 1; i < v.Size(); ++i)
         {
-            os << ', ' << v[i];
+            os << ", " << v[i];
         }
         os << " }";
     }

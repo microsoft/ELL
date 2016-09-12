@@ -286,18 +286,21 @@ void TestMatrixOperations()
 
     // u = s * M * v + t * u
     ImplementedOperations<Implementation>::Multiply(s, M, v, t, u);
-
-    math::ColumnVector<ElementType> uu{9, 11, 28};
-    testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Vector)", u == uu);
+    math::ColumnVector<ElementType> r0{9, 11, 28};
+    testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Vector)", u == r0);
 
     auto A = M.GetBlock(1, 0, 2, 2);
     auto w = M.GetRow(0).Transpose();
     
-    // v = s * a * w + t * v;
+    // v = s * A * w + t * v;
     ImplementedOperations<Implementation>::Multiply(s, A, w, t, v);
+    math::ColumnVector<ElementType> r1{ 9, 16 };
+    testing::ProcessTest(implementationName + "Operations::Multiply(MatrixReference, VectorReference)", v == r1);
 
-    math::ColumnVector<ElementType> vv{ 9, 16 };
-    testing::ProcessTest("implementationName + Operations::Multiply(MatrixReference, VectorReference)", v == vv);
+    // v = s * M.Transpose * u + t * v;
+    ImplementedOperations<Implementation>::Multiply(s, M.Transpose(), u, t, v);
+    math::ColumnVector<ElementType> r2{ 157, 182 };
+    testing::ProcessTest(implementationName + "Operations::Multiply(Matrix.Transpose, Vector)", v == r2);
 }
 
 /// Runs all tests

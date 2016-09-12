@@ -82,5 +82,11 @@ namespace math
 
         Blas::Gemv(order, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(M._numRows), static_cast<int>(M._numColumns), s, M._pData, static_cast<int>(M._increment), v._pData, static_cast<int>(v._increment), t, u._pData, static_cast<int>(u._increment));
     }
+
+    template<typename ElementType, MatrixLayout Layout>
+    void BlasOperations::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row>& v, ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u)
+    {
+        // TODO
+    }
 }
 }

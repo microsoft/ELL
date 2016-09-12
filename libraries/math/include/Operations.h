@@ -104,17 +104,34 @@ namespace math
         template<typename ElementType>
         static void Multiply(ConstVectorReference<ElementType, VectorOrientation::row>& u, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType& r);
 
-        /// <summary> Generalized matrix vector multiplication, u = s * M * v + t * u. </summary>
+        /// <summary> Generalized matrix column-vector multiplication, u = s * M * v + t * u. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
         /// <typeparam name="Layout"> Matrix layout. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="M"> The matrix. </param>
-        /// <param name="v"> A column vector, multiplied by t and used to store the result. </param>
-        /// <param name="t"> The scalar that multiplies u. </param>
-        /// <param name="u"> [in,out] The column vector that multiplies the matrix on the right. </param>
+        /// <param name="v"> The column vector that multiplies the matrix on the right. </param>
+        /// <param name="t"> The scalar that multiplies the left hand side vector u. </param>
+        /// <param name="u"> [in,out] A column vector, multiplied by t and used to store the result. </param>
         template<typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u);
+
+        /// <summary> Generalized matrix row-vector multiplication, u = s * v * M + t * u. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
+        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <param name="s"> The scalar that multiplies the matrix. </param>
+        /// <param name="v"> The row  vector that multiplies the matrix on the left. </param>
+        /// <param name="M"> The matrix. </param>
+        /// <param name="t"> The scalar that multiplies u. </param>
+        /// <param name="u"> [in,out] A row vector, multiplied by t and used to store the result. </param>
+        template<typename ElementType, MatrixLayout Layout>
+        static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row>& v, ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u);
+
+        // TODO v * M * u
+        // TODO rank one updates
+        // TODO GEMM
+        // TODO Add constant to matrix and scale matrix 
     };
 
 #ifdef USE_BLAS
@@ -184,17 +201,29 @@ namespace math
         template<typename ElementType>
         static void Multiply(ConstVectorReference<ElementType, VectorOrientation::row>& u, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType& r);
 
-        /// <summary> Generalized matrix vector multiplication, u = s * M * v + t * u. </summary>
+        /// <summary> Generalized matrix column-vector multiplication, u = s * M * v + t * u. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
         /// <typeparam name="Layout"> Matrix layout. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="M"> The matrix. </param>
-        /// <param name="v"> A column vector, multiplied by t and used to store the result. </param>
-        /// <param name="t"> The scalar that multiplies u. </param>
-        /// <param name="u"> [in,out] The column vector that multiplies the matrix on the right. </param>
+        /// <param name="v"> The column vector that multiplies the matrix on the right. </param>
+        /// <param name="t"> The scalar that multiplies the left hand side vector u. </param>
+        /// <param name="u"> [in,out] A column vector, multiplied by t and used to store the result. </param>
         template<typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u);
+
+        /// <summary> Generalized matrix row-vector multiplication, u = s * v * M + t * u. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
+        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <param name="s"> The scalar that multiplies the matrix. </param>
+        /// <param name="v"> The row  vector that multiplies the matrix on the left. </param>
+        /// <param name="M"> The matrix. </param>
+        /// <param name="t"> The scalar that multiplies u. </param>
+        /// <param name="u"> [in,out] A row vector, multiplied by t and used to store the result. </param>
+        template<typename ElementType, MatrixLayout Layout>
+        static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row>& v, ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u);
     };
 #else
     struct BlasOperations : public NativeOperations {};
