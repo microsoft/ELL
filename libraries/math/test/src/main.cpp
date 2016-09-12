@@ -18,8 +18,8 @@
 #include <random>
 #include <iostream>
 
-namespace emll
-{
+using namespace emll;
+
 // template structure to make it easier to test both native and blas implementations 
 enum class Implementation { native, blas };
 
@@ -340,5 +340,4 @@ int main()
     }
 
     return 0;
-}
 }
