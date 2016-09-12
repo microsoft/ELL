@@ -29,66 +29,6 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    ElementType ConstVectorReference<ElementType, Orientation>::Norm2() const
-    {
-#ifdef USE_BLAS
-        return Blas::Nrm2(static_cast<int>(_size), _pData, static_cast<int>(_increment));
-#else
-        return std::sqrt(Aggregate([](ElementType x){ return x*x; }));
-#endif
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType ConstVectorReference<ElementType, Orientation>::Norm1() const
-    {
-#ifdef USE_BLAS
-        return Blas::Asum(static_cast<int>(_size), _pData, static_cast<int>(_increment));
-#else
-        return Aggregate([](ElementType x) { return std::abs(x); });
-#endif
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType ConstVectorReference<ElementType, Orientation>::Norm0() const
-    {
-        return Aggregate([](ElementType x) { return x!=0 ? 1 : 0; });
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType ConstVectorReference<ElementType, Orientation>::Min() const
-    {
-        ElementType result = *_pData;
-        const ElementType* current = _pData+1;
-        const ElementType* end = _pData + _size * _increment ;
-        while(current < end)
-        {
-            if((*current) < result)
-            {
-                result = *current;
-            }
-            current += _increment ;
-        }
-        return result;
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType ConstVectorReference<ElementType, Orientation>::Max() const
-    {
-        ElementType result = *_pData;
-        const ElementType* current = _pData+1;
-        const ElementType* end = _pData + _size * _increment ;
-        while(current < end)
-        {
-            if((*current) > result)
-            {
-                result = *current;
-            }
-            current += _increment ;
-        }
-        return result;
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetReference() const
     {
         return ConstVectorReference<ElementType, Orientation>(_pData, _size, _increment );
@@ -142,21 +82,6 @@ namespace math
         // TODO check that pData != 0
     }
 
-    template<typename ElementType, VectorOrientation Orientation>
-    template<typename MapperType>
-    ElementType ConstVectorReference<ElementType, Orientation>::Aggregate(MapperType mapper) const
-    {
-        ElementType result = 0;
-        const ElementType* current = _pData;
-        const ElementType* end = _pData + _size * _increment ;
-        while(current < end)
-        {
-            result += mapper(*current);
-            current += _increment ;
-        }
-        return result;
-    }
-
     //
     // VectorReference
     //
@@ -200,28 +125,6 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::operator+=(ElementType scalar)
-    {
-        ForEach([scalar](ElementType x) { return x+scalar; });
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::operator-=(ElementType scalar)
-    {
-        ForEach([scalar](ElementType x) { return x-scalar; });
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::operator*=(ElementType scalar)
-    {
-#ifdef USE_BLAS
-        Blas::Scal(static_cast<int>(_size), scalar, _pData, static_cast<int>(_increment));
-#else
-        ForEach([scalar](ElementType x) { return x*scalar; });
-#endif
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetReference()
     {
         return VectorReference<ElementType, Orientation>(_pData, _size, _increment );
@@ -237,19 +140,6 @@ namespace math
     auto VectorReference<ElementType, Orientation>::Transpose() -> VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
     {
         return VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment );
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    template<typename MapperType>
-    void VectorReference<ElementType, Orientation>::ForEach(MapperType mapper)
-    {
-        ElementType* current = _pData;
-        const ElementType* end = _pData + _size * _increment ;
-        while(current < end)
-        {
-            *current = mapper(*current);
-            current += _increment ;
-        }
     }
 
     //

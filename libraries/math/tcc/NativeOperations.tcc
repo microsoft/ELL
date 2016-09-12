@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Exception.h"
+#include "..\include\Operations.h"
 
 namespace math
 {
@@ -14,14 +15,58 @@ namespace math
     // NativeOperations
     // 
 
-    template<typename ElementType, VectorOrientation Orientation>
-    void NativeOperations::AddTo(ElementType s, VectorReference<ElementType, Orientation>& v)
+    template<typename ElementType, typename MapperType>
+    ElementType Aggregate(const ElementType *pData, size_t size, size_t increment, MapperType mapper)
     {
-        v += s;
+        ElementType result = 0;
+        const ElementType* current = pData;
+        const ElementType* end = pData + size * increment;
+        while (current < end)
+        {
+            result += mapper(*current);
+            current += increment;
+        }
+        return result;
+    }
+
+    template<typename ElementType, typename MapperType>
+    void ForEach(ElementType *pData, size_t size, size_t increment, MapperType mapper)
+    {
+        ElementType* current = pData;
+        const ElementType* end = pData + size * increment;
+        while (current < end)
+        {
+            *current = mapper(*current);
+            current += increment;
+        }
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void NativeOperations::AddTo(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
+    ElementType NativeOperations::Norm0(ConstVectorReference<ElementType, Orientation>& v)
+    {
+        return Aggregate(v._pData, v._size, v._increment, [](ElementType x) { return x != 0 ? 1 : 0; });
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    ElementType NativeOperations::Norm1(ConstVectorReference<ElementType, Orientation>& v)
+    {
+        return Aggregate(v._pData, v._size, v._increment, [](ElementType x) { return std::abs(x); });
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    ElementType NativeOperations::Norm2(ConstVectorReference<ElementType, Orientation>& v)
+    {
+        return std::sqrt(Aggregate(v._pData, v._size, v._increment, [](ElementType x) { return x*x; }));
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    static void NativeOperations::Add(ElementType s, VectorReference<ElementType, Orientation>& v)
+    {
+        ForEach(v._pData, v._size, v._increment, [s](ElementType x) { return x + s; });
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void NativeOperations::Add(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
         // TODO check inputs for equal size
 
@@ -55,6 +100,12 @@ namespace math
             vData += v._increment;
         }
         return result;
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void NativeOperations::Multiply(ElementType s, VectorReference<ElementType, Orientation>& v)
+    {
+        ForEach(v._pData, v._size, v._increment, [s](ElementType x) { return x * s; });
     }
 
     template<typename ElementType>

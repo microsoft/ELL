@@ -18,107 +18,125 @@
 #include <random>
 #include <iostream>
 
-template<typename ElementType>
+
+// template structure to make it easier to test both native and blas implementations 
+enum class Implementation { native, blas };
+
+template <Implementation Implementation>
+struct ImplementedOperations;
+
+template <>
+struct ImplementedOperations<Implementation::blas> : public math::BlasOperations {};
+
+template <>
+struct ImplementedOperations<Implementation::native> : public math::NativeOperations {};
+
+template<typename ElementType, math::VectorOrientation Orientation>
 void TestVector()
 {
-    math::ColumnVector<ElementType> v(10);
+    math::Vector<ElementType, Orientation> v(10);
     v.Fill(2);
-    math::ColumnVector<ElementType> u{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
-    testing::ProcessTest("DoubleColumnVector construction and Fill", v == u);
+    math::Vector<ElementType, Orientation> r0{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+    testing::ProcessTest("Vector::Fill", v == r0);
 
     v.Reset();
-    math::ColumnVector<ElementType> z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    testing::ProcessTest("DoubleColumnVector::Reset", v == z);
+    math::Vector<ElementType, Orientation> r1{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    testing::ProcessTest("Vector::Reset", v == r1);
 
     v[3] = 7;
     v[7] = 9;
-    math::ColumnVector<ElementType> a{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
-    testing::ProcessTest("DoubleColumnVector::operator[]", v == a);
+    math::Vector<ElementType, Orientation> r2{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
+    testing::ProcessTest("Vector::operator[]", v == r2);
 
-    testing::ProcessTest("DoubleColumnVector::Norm2", testing::IsEqual(a.Norm2(), static_cast<ElementType>(std::sqrt(7*7+9*9))));
-    testing::ProcessTest("DoubleColumnVector::Norm1", a.Norm1() == 7+9);
-    testing::ProcessTest("DoubleColumnVector::Norm0", a.Norm0() == 2);
-    testing::ProcessTest("DoubleColumnVector::Min", a.Min() == 0);
-    testing::ProcessTest("DoubleColumnVector::Max", a.Max() == 9);
+    auto w = v.GetSubVector(1, 3);
+    w.Fill(3);
+    math::Vector<ElementType, Orientation> r3{ 0, 3, 3, 3, 0, 0, 0, 9, 0, 0 };
+    testing::ProcessTest("VectorReference::Fill", v == r3);
 
+    auto u = v.GetSubVector(3, 2);
+    u.Reset();
+    math::Vector<ElementType, Orientation> r4{ 0, 3, 3, 0, 0, 0, 0, 9, 0, 0 };
+    testing::ProcessTest("VectorReference::Reset", v == r4);
+
+    // just checking compilation 
     std::default_random_engine rng;
     std::normal_distribution<ElementType> normal(0, 1.0);
     auto generator = [&]() { return normal(rng); };
     v.Generate(generator);
-
-    v *= 0;
-    testing::ProcessTest("DoubleColumnVector::operator *=", v == z);
+    u.Generate(generator);
 }
 
-template<typename ElementType>
-void TestVectorReference()
+template<typename ElementType, Implementation Implementation>
+void TestVectorOperations()
 {
-    math::ColumnVector<ElementType> u(10);
-    auto v = u.GetReference();
-    auto w = v.GetSubVector(1, 3);
-    w.Fill(1);
-    math::ColumnVector<ElementType> y{ 0, 1, 1, 1, 0, 0, 0, 0, 0, 0 };
-    testing::ProcessTest("ColumnVectorReference::Fill", u == y);
+    auto implementationName = ImplementedOperations<Implementation>::GetImplementationName();
 
-    w.Reset();
-    math::ColumnVector<ElementType> z{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    testing::ProcessTest("ColumnVectorReference::Reset", u == z);
-
-    w[0] = 7;
-    w[2] = 9;
-    math::ColumnVector<ElementType> a{ 0, 7, 0, 9, 0, 0, 0, 0, 0, 0 };
-    testing::ProcessTest("ColumnVectorReference::operator[]", u == a);
-
-    auto b = w.GetSubVector(0, 2);
-    testing::ProcessTest("ColumnVectorReference::Norm2", testing::IsEqual(b.Norm2(), static_cast<ElementType>(std::sqrt(7*7))));
-    testing::ProcessTest("ColumnVectorReference::Norm1", b.Norm1() == 7);
-    testing::ProcessTest("ColumnVectorReference::Norm0", b.Norm0() == 1);
-    testing::ProcessTest("ColumnVectorReference::Min", b.Min() == 0);
-    testing::ProcessTest("ColumnVectorReference::Max", b.Max() == 7);
-
-    std::default_random_engine rng;
-    std::normal_distribution<ElementType> normal(0, 1.0);
-    auto generator = [&]() { return normal(rng); };
-    w.Generate(generator);
-
-    v.Fill(3);
-    math::RowVector<ElementType> c{ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
-    auto t = v.Transpose();
-    testing::ProcessTest("ColumnVectorReference::Transpose()", c == t);
-
-    v *= 0;
-    testing::ProcessTest("ColumnVectorReference::operator *=", v == z);
-}
-
-template<typename ElementType, math::Implementation Implementation>
-void TestVectorMultiply()
-{
-    math::RowVector<ElementType> u{ 0, 1, 0, 1, 0 };
+    math::RowVector<ElementType> u{ 0, 1, 0, 2, 0 };
     math::ColumnVector<ElementType> v{ 1, 2, 3, 4, 5 };
-    auto nativeDot = math::ImplementedOperations<Implementation>::Dot(u, v);
-    testing::ProcessTest("ImplementedOperations::Dot(Vector, Vector)", nativeDot == 6);
 
-    ElementType result;
-    math::ImplementedOperations<Implementation>::Multiply(u, v, result);
-    testing::ProcessTest("ImplementedOperations::Multiply(Vector, Vector)", result == 6);
-}
+    testing::ProcessTest(implementationName + "Operations::Norm0(Vector)", math::Operations::Norm0(u) == 2);
 
-template<typename ElementType, math::Implementation Implementation>
-void TestAddTo()
-{
-    math::RowVector<ElementType> u{ 1, 2, 3, 4, 5 };
-    math::RowVector<ElementType> v{ 0, 1, 0, 1, 0 };
-    math::ImplementedOperations<Implementation>::AddTo(static_cast<ElementType>(2.0), v, u);
+    testing::ProcessTest(implementationName + "Operations::Norm1(Vector)", math::Operations::Norm1(u) == 3);
 
-    math::RowVector<ElementType> z{ 1, 4, 3, 6, 5 };
-    testing::ProcessTest("ImplementedOperations::AddTo(scalar, Vector, Vector)", u == z);
-}
+    testing::ProcessTest(implementationName + "Operations::Norm2(Vector)", testing::IsEqual(math::Operations::Norm2(u), static_cast<ElementType>(std::sqrt(5))));
 
-void TestConstDoubleVector()
-{
-    const math::RowVector<double> u{ 0, 1, 0, 1, 0 };
-    auto v = u.GetReference();
-    //v += 3; // should not compile
+    auto dot = ImplementedOperations<Implementation>::Dot(u, v);
+    testing::ProcessTest(implementationName + "Operations::Dot(Vector, Vector)", dot == 10);
+
+    dot = ImplementedOperations<Implementation>::Dot(v.Transpose(), u);
+    testing::ProcessTest(implementationName + "Operations::Dot(VectorReference, Vector)", dot == 10);
+
+    ElementType r;
+    ImplementedOperations<Implementation>::Multiply(u, v, r);
+    testing::ProcessTest(implementationName + "Operations::Multiply(Vector, Vector, scalar)", r == 10);
+
+    ImplementedOperations<Implementation>::Multiply(v.Transpose(), u.Transpose(), r);
+    testing::ProcessTest(implementationName + "Operations::Multiply(Vector, Vector, scalar)", r == 10);
+
+    math::Operations::Add(static_cast<ElementType>(1), v);
+    math::ColumnVector<ElementType> r0{ 2, 3, 4, 5, 6 };
+    testing::ProcessTest(implementationName + "Operations::Add(scalar, Vector)", v == r0);
+
+    math::Operations::Multiply(static_cast<ElementType>(0), v);
+    math::ColumnVector<ElementType> r1{ 0, 0, 0, 0, 0 };
+    testing::ProcessTest(implementationName + "Operations::Multiply(scalar, Vector)", v == r1);
+
+    math::ColumnMatrix<ElementType> M
+    {
+        { 1, 2, 4, 0 },
+        { 0, 2, 4, 3 },
+        { 0, 8, 5, 6 }
+    };
+    auto N = M.GetBlock(1, 0, 2, 3);
+    auto w = N.GetRow(0);
+    auto z = N.GetRow(1);
+
+    dot = ImplementedOperations<Implementation>::Dot(w, z);
+    testing::ProcessTest(implementationName + "Operations::Dot(VectorReference, VectorReference)", dot == 36);
+
+    math::Operations::Add(static_cast<ElementType>(1), w);
+    math::ColumnMatrix<ElementType> R0
+    {
+        { 1, 2, 4, 0 },
+        { 1, 3, 5, 3 },
+        { 0, 8, 5, 6 }
+    };
+    testing::ProcessTest(implementationName + "Operations::Add(VectorReference, scalar)", M == R0);
+
+    math::Operations::Multiply(static_cast<ElementType>(2), z);
+    math::ColumnMatrix<ElementType> R1
+    {
+        { 1, 2, 4, 0 },
+        { 1, 3, 5, 3 },
+        { 0, 16, 10, 6 }
+    };
+    testing::ProcessTest(implementationName + "Operations::Multiply(VectorReference, scalar)", M == R1);
+
+    testing::ProcessTest(implementationName + "Operations::Norm0(VectorReference)", math::Operations::Norm0(M.GetColumn(1)) == 3);
+
+    testing::ProcessTest(implementationName + "Operations::Norm1(VectorReference)", math::Operations::Norm1(M.GetColumn(1)) == 21);
+
+    testing::ProcessTest(implementationName + "Operations::Norm2(VectorReference)", testing::IsEqual(math::Operations::Norm2(M.GetColumn(1)), static_cast<ElementType>(std::sqrt(2*2+3*3+16*16))));
 }
 
 template<typename ElementType, math::MatrixLayout Layout>
@@ -223,9 +241,11 @@ void TestMatrix2()
     testing::ProcessTest("Matrix::GetDiagonal()", M == C);
 }
 
-template<typename ElementType, math::MatrixLayout Layout, math::Implementation Implementation>
-void TestMatrixMultiply()
+template<typename ElementType, math::MatrixLayout Layout, Implementation Implementation>
+void TestMatrixOperations()
 {
+    auto implementationName = ImplementedOperations<Implementation>::GetImplementationName();
+
     math::Matrix<ElementType, Layout> M
     {
         {1, 0},
@@ -240,29 +260,35 @@ void TestMatrixMultiply()
     ElementType t = 3;
 
     // u = s * M * v + t * u
-    math::ImplementedOperations<Implementation>::Multiply(s, M, v, t, u);
+    ImplementedOperations<Implementation>::Multiply(s, M, v, t, u);
 
     math::ColumnVector<ElementType> uu{9, 11, 28};
-    testing::ProcessTest("ImplementedOperations::Multiply(Matrix, vector)", u == uu);
+    testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Vector)", u == uu);
+
+    auto A = M.GetBlock(1, 0, 2, 2);
+    auto w = M.GetRow(0).Transpose();
+    
+    // v = s * a * w + t * v;
+    ImplementedOperations<Implementation>::Multiply(s, A, w, t, v);
+
+    math::ColumnVector<ElementType> vv{ 9, 16 };
+    testing::ProcessTest("implementationName + Operations::Multiply(MatrixReference, VectorReference)", v == vv);
 }
 
 /// Runs all tests
 ///
 int main()
 {
-    TestVector<float>();
-    TestVector<double>();
-    TestVectorReference<float>();
-    TestVectorReference<double>();
-    TestVectorMultiply<float, math::Implementation::native>();
-    TestVectorMultiply<double, math::Implementation::native>();
-    TestVectorMultiply<float, math::Implementation::blas>();
-    TestVectorMultiply<double, math::Implementation::blas>();
-    TestAddTo<float, math::Implementation::native>();
-    TestAddTo<double, math::Implementation::native>();
-    TestAddTo<float, math::Implementation::blas>();
-    TestAddTo<double, math::Implementation::blas>();
-    TestConstDoubleVector();
+    // vector
+    TestVector<float, math::VectorOrientation::row>();
+    TestVector<double, math::VectorOrientation::row>();
+    TestVector<float, math::VectorOrientation::column>();
+    TestVector<double, math::VectorOrientation::column>();
+
+    TestVectorOperations<float, Implementation::native>();
+    TestVectorOperations<double, Implementation::native>();
+    TestVectorOperations<float, Implementation::blas>();
+    TestVectorOperations<double, Implementation::blas>();
 
     TestMatrix1<float, math::MatrixLayout::rowMajor>();
     TestMatrix1<float, math::MatrixLayout::columnMajor>();
@@ -274,14 +300,14 @@ int main()
     TestMatrix2<double, math::MatrixLayout::rowMajor>();
     TestMatrix2<double, math::MatrixLayout::columnMajor>();
 
-    TestMatrixMultiply<float, math::MatrixLayout::rowMajor, math::Implementation::native>();
-    TestMatrixMultiply<float, math::MatrixLayout::columnMajor, math::Implementation::native>();
-    TestMatrixMultiply<double, math::MatrixLayout::rowMajor, math::Implementation::native>();
-    TestMatrixMultiply<double, math::MatrixLayout::columnMajor, math::Implementation::native>();
-    TestMatrixMultiply<float, math::MatrixLayout::rowMajor, math::Implementation::blas>();
-    TestMatrixMultiply<float, math::MatrixLayout::columnMajor, math::Implementation::blas>();
-    TestMatrixMultiply<double, math::MatrixLayout::rowMajor, math::Implementation::blas>();
-    TestMatrixMultiply<double, math::MatrixLayout::columnMajor, math::Implementation::blas>();
+    TestMatrixOperations<float, math::MatrixLayout::rowMajor, Implementation::native>();
+    TestMatrixOperations<float, math::MatrixLayout::columnMajor, Implementation::native>();
+    TestMatrixOperations<double, math::MatrixLayout::rowMajor, Implementation::native>();
+    TestMatrixOperations<double, math::MatrixLayout::columnMajor, Implementation::native>();
+    TestMatrixOperations<float, math::MatrixLayout::rowMajor, Implementation::blas>();
+    TestMatrixOperations<float, math::MatrixLayout::columnMajor, Implementation::blas>();
+    TestMatrixOperations<double, math::MatrixLayout::rowMajor, Implementation::blas>();
+    TestMatrixOperations<double, math::MatrixLayout::columnMajor, Implementation::blas>();
 
     if(testing::DidTestFail())
     {

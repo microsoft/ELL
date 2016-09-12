@@ -11,13 +11,19 @@
 namespace math
 {
     template<typename ElementType, VectorOrientation Orientation>
-    void BlasOperations::AddTo(ElementType s, VectorReference<ElementType, Orientation>& v)
+    ElementType BlasOperations::Norm1(ConstVectorReference<ElementType, Orientation>& v) 
     {
-        v += s;
+        return Blas::Asum(static_cast<int>(v._size), v._pData, static_cast<int>(v._increment));
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void BlasOperations::AddTo(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
+    ElementType BlasOperations::Norm2(ConstVectorReference<ElementType, Orientation>& v) 
+    {
+        return Blas::Nrm2(static_cast<int>(v._size), v._pData, static_cast<int>(v._increment));
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void BlasOperations::Add(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
 
         // TODO check inputs for equal size
@@ -31,6 +37,12 @@ namespace math
         // TODO check inputs for equal size
 
         return Blas::Dot(static_cast<int>(u._size), u._pData, static_cast<int>(u._increment), v._pData, static_cast<int>(v._increment));
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void BlasOperations::Multiply(ElementType s, VectorReference<ElementType, Orientation>& v)
+    {
+        Blas::Scal(static_cast<int>(v._size), s, v._pData, static_cast<int>(v._increment));
     }
 
     template<typename ElementType>

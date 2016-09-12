@@ -11,6 +11,9 @@
 #include "Vector.h"
 #include "Matrix.h"
 
+// stl
+#include<string>
+
 namespace math
 {
     /// <summary>
@@ -19,6 +22,35 @@ namespace math
     /// </summary>
     struct NativeOperations
     {
+        /// <summary> Gets the implementation name. </summary>
+        ///
+        /// <returns> The implementation name. </returns>
+        static std::string GetImplementationName() { return "Native"; }
+
+        /// <summary> Computes the 0-norm of a vector. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <returns> The 0-norm. </returns>
+        template<typename ElementType, VectorOrientation Orientation>
+        static ElementType Norm0(ConstVectorReference<ElementType, Orientation>& v);
+
+        /// <summary> Computes the 1-norm of a vector. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <returns> The 1-norm. </returns>
+        template<typename ElementType, VectorOrientation Orientation>
+        static ElementType Norm1(ConstVectorReference<ElementType, Orientation>& v);
+
+        /// <summary> Computes the 2-norm of a vector (not the squared 2-norm). </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <returns> The 2-norm. </returns>
+        template<typename ElementType, VectorOrientation Orientation>
+        static ElementType Norm2(ConstVectorReference<ElementType, Orientation>& v);
+
         /// <summary> Adds a scalar to a vector, v += s. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
@@ -26,7 +58,7 @@ namespace math
         /// <param name="s"> The scalar being added. </param>
         /// <param name="v"> [in,out] The vector to which the scalar is added. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void AddTo(ElementType s, VectorReference<ElementType, Orientation>& v);
+        static void Add(ElementType s, VectorReference<ElementType, Orientation>& v);
 
         /// <summary> Adds a scaled vector to another vector, u += s * v. </summary>
         ///
@@ -36,7 +68,7 @@ namespace math
         /// <param name="v"> The right hand side vector. </param>
         /// <param name="u"> [in,out] The left hand side vector. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void AddTo(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
+        static void Add(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
 
         /// <summary>
         /// Calculates a vector dot Multiply (between vectors in any orientation), u * v.
@@ -51,6 +83,15 @@ namespace math
         /// <returns> The dot Multiply. </returns>
         template<typename ElementType, VectorOrientation OrientationV, VectorOrientation OrientationU>
         static ElementType Dot(ConstVectorReference<ElementType, OrientationV>& u, ConstVectorReference<ElementType, OrientationU>& v);
+
+        /// <summary> Calculates the product of a vector and a scalar, v = v * s. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <param name="s"> The scalar that multiplies the vector. </param>
+        /// <param name="v"> [in,out] The vector, in any orientation, which is multiplied by s. </param>
+        template<typename ElementType, VectorOrientation Orientation>
+        static void Multiply(ElementType s, VectorReference<ElementType, Orientation>& v);
 
         /// <summary> Calculates the product of a row vector with a column vector, r = u * v. </summary>
         ///
@@ -77,14 +118,26 @@ namespace math
 #ifdef USE_BLAS
     struct BlasOperations : public NativeOperations 
     {
-        /// <summary> Adds a scalar to a vector, v += s. </summary>
+        /// <summary> Gets the implementation name. </summary>
+        ///
+        /// <returns> The implementation name. </returns>
+        static std::string GetImplementationName() { return "Blas"; }
+
+        /// <summary> Computes the 1-norm of a vector. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
-        /// <param name="s"> The scalar being added. </param>
-        /// <param name="v"> [in,out] The vector to which the scalar is added. </param>
+        /// <returns> The 1-norm. </returns>
         template<typename ElementType, VectorOrientation Orientation>
-        static void AddTo(ElementType s, VectorReference<ElementType, Orientation>& v);
+        static ElementType Norm1(ConstVectorReference<ElementType, Orientation>& v);
+
+        /// <summary> Computes the 2-norm of a vector (not the squared 2-norm). </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <returns> The 2-norm. </returns>
+        template<typename ElementType, VectorOrientation Orientation>
+        static ElementType Norm2(ConstVectorReference<ElementType, Orientation>& v);
 
         /// <summary> Adds a scaled vector to another vector, u += s * v. </summary>
         ///
@@ -94,7 +147,8 @@ namespace math
         /// <param name="v"> The right hand side vector. </param>
         /// <param name="u"> [in,out] The left hand side vector. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void AddTo(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
+        static void Add(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
+        using NativeOperations::Add;
 
         /// <summary>
         /// Calculates a vector dot Multiply (between vectors in any orientation), u * v.
@@ -109,6 +163,15 @@ namespace math
         /// <returns> The dot Multiply. </returns>
         template<typename ElementType, VectorOrientation OrientationV, VectorOrientation OrientationU>
         static ElementType Dot(ConstVectorReference<ElementType, OrientationV>& u, ConstVectorReference<ElementType, OrientationU>& v);
+
+        /// <summary> Calculates the product of a vector and a scalar, v = v * s. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <param name="s"> The scalar that multiplies the vector. </param>
+        /// <param name="v"> [in,out] The vector, in any orientation, which is multiplied by s. </param>
+        template<typename ElementType, VectorOrientation Orientation>
+        static void Multiply(ElementType s, VectorReference<ElementType, Orientation>& v);
 
         /// <summary> Calculates the product of a row vector with a column vector, r = u * v. </summary>
         ///
@@ -134,23 +197,7 @@ namespace math
 #else
     struct BlasOperations : public NativeOperations {};
 #endif
-
-    enum class Implementation {native, blas};
-
-    template <Implementation Implementation>
-    struct ImplementedOperations;
-
-    template <>
-    struct ImplementedOperations<Implementation::blas> : public BlasOperations {};
-
-    template <>
-    struct ImplementedOperations<Implementation::native> : public NativeOperations {};
-
-#ifdef USE_BLAS
     using Operations = BlasOperations;
-#else
-    using Operations = NativeOperations;
-#endif
 }
 
 #include "../tcc/NativeOperations.tcc"

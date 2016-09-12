@@ -63,31 +63,6 @@ namespace math
         /// <returns> The vector size. </returns>
         size_t Size() const { return _size; }
 
-        /// <summary> Computes the 2-norm of the vector (not squared 2-norm). </summary>
-        ///
-        /// <returns> The 2-norm. </returns>
-        ElementType Norm2() const; 
-
-        /// <summary> Computes the 1-norm of the vector. </summary>
-        ///
-        /// <returns> The 1-norm. </returns>
-        ElementType Norm1() const;
-
-        /// <summary> Computes the 0-norm of the vector. </summary>
-        ///
-        /// <returns> The 0-norm. </returns>
-        ElementType Norm0() const;
-
-        /// <summary> Gets the minimal element in the vector. </summary>
-        ///
-        /// <returns> The minimal element. </returns>
-        ElementType Min() const;
-
-        /// <summary> Gets the maximal element in the vector. </summary>
-        ///
-        /// <returns> The maximal element. </returns>
-        ElementType Max() const;
-
         /// <summary> Gets a reference to this vector. </summary>
         ///
         /// <returns> A constant reference to this vector. </returns>
@@ -138,10 +113,6 @@ namespace math
         ElementType* _pData;
         size_t _size;
         size_t _increment;
-
-    private:
-        template<typename MapperType>
-        ElementType Aggregate(MapperType mapper) const;
     };
 
     /// <summary> A reference to a non-constant algebraic vector. </summary>
@@ -171,21 +142,6 @@ namespace math
         /// <returns> Reference to the specified element. </returns>
         ElementType& operator[] (size_t index);
         using ConstVectorReference<ElementType, Orientation>::operator[];
-
-        /// <summary> Addition assignment operator. </summary>
-        ///
-        /// <param name="scalar"> The scalar. </param>
-        void operator+=(ElementType scalar);
-
-        /// <summary> Subtraction assignment operator. </summary>
-        ///
-        /// <param name="scalar"> The scalar. </param>
-        void operator-=(ElementType scalar);
-
-        /// <summary> Multiplication assignment operator. </summary>
-        ///
-        /// <param name="scalar"> The scalar. </param>
-        void operator*=(ElementType scalar);
 
         /// <summary> Gets a reference to this vector. </summary>
         ///
