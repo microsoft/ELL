@@ -9,7 +9,11 @@ import lossfunctions_test
 import model_test
 import common_test
 
-tests = [lossfunctions_test.test, model_test.test, common_test.test]
+tests = [   
+            lossfunctions_test.test, 
+            model_test.test, 
+            common_test.test    
+        ]
 
 def interface_test():
     rc = 0
