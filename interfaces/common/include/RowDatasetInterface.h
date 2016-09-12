@@ -22,13 +22,46 @@
 
 namespace emll
 {
-namespace dataset
-{
-    typedef GenericRowDataset::Iterator GenericRowIterator;
-}
-
 namespace interfaces
 {
+    class GenericRowIterator
+    {
+    public:
+        GenericRowIterator(const dataset::GenericRowDataset::Iterator& iter)
+            : _iterator(iter) {}
+
+        bool IsValid() const
+        {
+            return _iterator.IsValid();
+        }
+
+        /// <summary> Returns true if the iterator knows its size. </summary>
+        ///
+        /// <returns> true if NumIteratesLeft returns a valid number, false if not. </returns>
+        bool HasSize() const { return _iterator.HasSize(); }
+
+        /// <summary>
+        /// Returns the number of iterates left in this iterator, including the current one.
+        /// </summary>
+        ///
+        /// <returns> The total number of iterates left. </returns>
+        uint64_t NumIteratesLeft() const
+        {
+            return _iterator.NumIteratesLeft();
+        }
+
+        /// <summary> Proceeds to the Next iterate. </summary>
+        void Next() { _iterator.Next(); }
+
+        /// <summary> Returns the value of the current iterate. </summary>
+        ///
+        /// <returns> The value of the current iterate. </returns>
+        const dataset::GenericSupervisedExample& Get() const { return _iterator.Get(); }
+
+    private:
+        dataset::GenericRowDataset::Iterator _iterator;
+    };
+
     class GenericRowDataset
     {
     public:
@@ -76,7 +109,7 @@ namespace interfaces
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        dataset::GenericRowIterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
+        GenericRowIterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///

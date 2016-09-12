@@ -10,9 +10,6 @@
 %{
 #include "LoadModel.h"
 
-#include <node.h>
-#include <v8.h>
-#include <nan.h>
 #include <string>
 #include <functional>
 #include <iostream>
@@ -38,7 +35,7 @@
 		{
 			Nan::HandleScope scope;
 			// passing out a new pointer to JS world, why cant we send a copy??
-			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_model), SWIGTYPE_p_model__Model, 0 | 0);
+			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_model),  SWIGTYPE_p_emll__model__Model, 0 | 0);
 			v8::Local<v8::Value> argv[] = { jsresult };
 			callback->Call(1, argv);
 		}

@@ -30,13 +30,29 @@
 #include "SGDIncrementalTrainer.h"
 %}
 
-template <typename IteratorType, typename ValueType> class StlIterator {};
+// SWIG can't interpret StlIterator.h, so we need to include a simpler signature of the class
+template <typename IteratorType, typename ValueType>
+class utilities::StlIterator
+{
+public:
+
+    StlIterator();
+    StlIterator(IteratorType begin, IteratorType end);
+    bool IsValid() const;
+    bool HasSize() const;
+    uint64_t NumIteratesLeft() const;
+    void Next();
+    const ValueType& Get() const;
+};
+
+template <typename IteratorType, typename ValueType> class emll::utilities::StlIterator {};
 
 %include "IArchivable.h"
 %import "Archiver.h"
 %import "ObjectArchive.h"
 %include "UniqueId.h"
 %include "Variant.h"
+
 
 %include "AnyIterator.h"
 %include "RandomEngines.h"

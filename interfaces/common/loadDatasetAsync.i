@@ -7,9 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %{
-#include <node.h>
-#include <v8.h>
-#include <nan.h>
 #include <string>
 #include <functional>
 #include <iostream>
@@ -27,22 +24,22 @@
 		virtual void Execute() override
 		{
 			// call load dataset here
-			_dataset = interfaces::GetDataset(_filename);
+			_dataset = emll::interfaces::GetDataset(_filename);
 		}
 
 		virtual void HandleOKCallback() override
 		{
 			Nan::HandleScope scope;
 			// passing out a new pointer to JS world, why cant we send a copy??
-			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_dataset), SWIGTYPE_p_interfaces__GenericRowDataset, 0 | 0);
+			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_dataset), SWIGTYPE_p_emll__interfaces__GenericRowDataset, 0 | 0);
 			v8::Local<v8::Value> argv[] = { jsresult };
 			callback->Call(1, argv);
 		}
 
 	private:
 		std::string _filename;
-		interfaces::GenericRowDataset _dataset;
-	};
+		emll::interfaces::GenericRowDataset _dataset;
+	};	
 %}
 
 %inline {
@@ -50,5 +47,5 @@
     {
        auto doneCallback = doneCb.GetFunction();
        Nan::AsyncQueueWorker(new GetDatasetWorker(doneCallback, dataFilename));
-    }
+    }	
 }

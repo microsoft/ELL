@@ -1,9 +1,6 @@
 #if defined(SWIGJAVASCRIPT)
 
 %{
-#include <node.h>
-#include <v8.h>
-#include <nan.h>
 #include <functional>
 %}
 
