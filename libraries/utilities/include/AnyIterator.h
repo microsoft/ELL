@@ -39,6 +39,10 @@ namespace utilities
     class AnyIterator
     {
     public:
+
+		/// <summary> default Constructor</summary>
+		AnyIterator() = default;
+
         /// <summary> Constructor that takes a shared pointer to an IIterator (used by MakeAnyIterator helper function) </summary>
         AnyIterator(std::shared_ptr<IIterator<ValueType>> iterator);
 

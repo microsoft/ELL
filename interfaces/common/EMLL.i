@@ -8,6 +8,15 @@
  
 %module "EMLL"
 
+// IMPORTANT: need to include these before anything else, because they include windows.h or other platform-related things
+#if defined(SWIGJAVASCRIPT)
+%{
+#include <node.h>
+#include <v8.h>
+#include <nan.h>
+%}
+#endif
+
 // Common stuff
 #ifdef SWIGPYTHON
 #pragma SWIG nowarn=325,341,362,401,503
@@ -108,20 +117,14 @@ namespace emll::dataset {};
 %template () std::vector<emll::dataset::IDataVector>;
 #endif
 
-namespace emll::dataset
+namespace utilities
 {
-    class GenericRowIterator {}; // This is necessary to prevent memory leak of datasets::GenericRowIterator
+    template <typename IteratorType, typename ValueType> class StlIndexValueIterator {};
+    %template () StlIndexValueIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
 }
 
 typedef emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample> emll::dataset::GenericRowDataset;
 typedef emll::dataset::GenericRowDataset::Iterator emll::dataset::GenericRowIterator;
-
-    // template <typename IteratorType, typename ValueType> class StlIterator {};
-    // %template () StlIterator<typename std::vector<emll::dataset::IDataVector>::const_iterator, emll::dataset::IDataVector>;
-
-    // template <typename IteratorType, typename ValueType> class StlIndexValueIterator {};
-    // %template () StlIndexValueIterator<typename std::vector<emll::dataset::IDataVector>::const_iterator, emll::dataset::IDataVector>;
-
 
 // Interface includes for lossFunctions library
 %include lossFunctions.i

@@ -18,14 +18,7 @@
 namespace emll
 {
 namespace interfaces
-{
-    /// <summary> Gets a data iterator from a data file, based on data load arguments. </summary>
-    ///
-    /// <param name="dataLoadArguments"> The data load arguments. </param>
-    ///
-    /// <returns> The data iterator. </returns>
-    utilities::AnyIterator<dataset::GenericSupervisedExample> GetDataIterator(const std::string& dataFilename);
-
+{    
     /// <summary> Gets a row dataset from data filename. </summary>
     ///
     /// <param name="dataFilename"> The data filename. </param>
