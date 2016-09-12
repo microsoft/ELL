@@ -93,11 +93,11 @@ void TestVectorOperations()
     ImplementedOperations<Implementation>::Multiply(v.Transpose(), u.Transpose(), r);
     testing::ProcessTest(implementationName + "Operations::Multiply(Vector, Vector, scalar)", r == 10);
 
-    math::Operations::Add(static_cast<ElementType>(1), v);
+    ImplementedOperations<Implementation>::Add(static_cast<ElementType>(1), v);
     math::ColumnVector<ElementType> r0{ 2, 3, 4, 5, 6 };
     testing::ProcessTest(implementationName + "Operations::Add(scalar, Vector)", v == r0);
 
-    math::Operations::Multiply(static_cast<ElementType>(0), v);
+    ImplementedOperations<Implementation>::Multiply(static_cast<ElementType>(0), v);
     math::ColumnVector<ElementType> r1{ 0, 0, 0, 0, 0 };
     testing::ProcessTest(implementationName + "Operations::Multiply(scalar, Vector)", v == r1);
 
@@ -114,29 +114,38 @@ void TestVectorOperations()
     dot = ImplementedOperations<Implementation>::Dot(w, z);
     testing::ProcessTest(implementationName + "Operations::Dot(VectorReference, VectorReference)", dot == 36);
 
-    math::Operations::Add(static_cast<ElementType>(1), w);
+    ImplementedOperations<Implementation>::Add(static_cast<ElementType>(1), w);
     math::ColumnMatrix<ElementType> R0
     {
         { 1, 2, 4, 0 },
         { 1, 3, 5, 3 },
         { 0, 8, 5, 6 }
     };
-    testing::ProcessTest(implementationName + "Operations::Add(VectorReference, scalar)", M == R0);
+    testing::ProcessTest(implementationName + "Operations::Add(scalar, VectorReference)", M == R0);
+
+    ImplementedOperations<Implementation>::Add(static_cast<ElementType>(2), r0.GetSubVector(0,3), w.Transpose());
+    math::ColumnMatrix<ElementType> R1
+    { 
+        { 1, 2, 4, 0 },
+        { 5, 9, 13, 3 },
+        { 0, 8, 5, 6 }
+    };
+    testing::ProcessTest(implementationName + "Operations::Add(scalar, VectorReference, VectorReference)", M == R1);
 
     math::Operations::Multiply(static_cast<ElementType>(2), z);
-    math::ColumnMatrix<ElementType> R1
+    math::ColumnMatrix<ElementType> R2
     {
         { 1, 2, 4, 0 },
-        { 1, 3, 5, 3 },
+        { 5, 9, 13, 3 },
         { 0, 16, 10, 6 }
     };
-    testing::ProcessTest(implementationName + "Operations::Multiply(VectorReference, scalar)", M == R1);
+    testing::ProcessTest(implementationName + "Operations::Multiply(VectorReference, scalar)", M == R2);
 
     testing::ProcessTest(implementationName + "Operations::Norm0(VectorReference)", math::Operations::Norm0(M.GetColumn(1)) == 3);
 
-    testing::ProcessTest(implementationName + "Operations::Norm1(VectorReference)", math::Operations::Norm1(M.GetColumn(1)) == 21);
+    testing::ProcessTest(implementationName + "Operations::Norm1(VectorReference)", math::Operations::Norm1(M.GetColumn(1)) == 2+9+16);
 
-    testing::ProcessTest(implementationName + "Operations::Norm2(VectorReference)", testing::IsEqual(math::Operations::Norm2(M.GetColumn(1)), static_cast<ElementType>(std::sqrt(2*2+3*3+16*16))));
+    testing::ProcessTest(implementationName + "Operations::Norm2(VectorReference)", testing::IsEqual(math::Operations::Norm2(M.GetColumn(1)), static_cast<ElementType>(std::sqrt(2*2+9*9+16*16))));
 }
 
 template<typename ElementType, math::MatrixLayout Layout>

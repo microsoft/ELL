@@ -71,7 +71,7 @@ namespace math
         static void Add(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
 
         /// <summary>
-        /// Calculates a vector dot Multiply (between vectors in any orientation), u * v.
+        /// Calculates a vector dot product (between vectors in any orientation), u * v.
         /// </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
@@ -84,7 +84,7 @@ namespace math
         template<typename ElementType, VectorOrientation OrientationV, VectorOrientation OrientationU>
         static ElementType Dot(ConstVectorReference<ElementType, OrientationV>& u, ConstVectorReference<ElementType, OrientationU>& v);
 
-        /// <summary> Calculates the product of a vector and a scalar, v = v * s. </summary>
+        /// <summary> Calculates the product of a vector and a scalar, v = s * v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
