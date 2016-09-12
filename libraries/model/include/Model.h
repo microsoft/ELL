@@ -101,6 +101,12 @@ namespace model
         template <typename ValueType>
         std::vector<ValueType> ComputeOutput(const PortElements<ValueType>& elements) const;
 
+        /// <summary> Returns part of the output computed by the model </summary>
+        ///
+        /// <param name="elements"> The output port elements to get the computed value form </param>
+        template <typename ValueType>
+        std::vector<ValueType> ComputeOutput(const PortElementsBase& elements) const;
+
         /// <summary>
         /// Visits all the nodes in the model in dependency order. No nodes will be visited until all
         /// its inputs have first been visited.

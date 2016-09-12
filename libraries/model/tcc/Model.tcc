@@ -87,6 +87,13 @@ namespace model
         return result;
     }
 
+    template <typename ValueType>
+    std::vector<ValueType> Model::ComputeOutput(const PortElementsBase& elements) const
+    {
+        auto typedElements = PortElements<ValueType>(elements);
+        return ComputeOutput(typedElements);
+    }
+
     //
     // Get nodes by type
     //

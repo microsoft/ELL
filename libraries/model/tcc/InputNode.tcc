@@ -13,11 +13,11 @@ namespace model
 {
     template <typename ValueType>
     InputNode<ValueType>::InputNode()
-        : Node({}, { &_output }), _output(this, outputPortName, 0){};
+        : InputNodeBase(_output), _output(this, outputPortName, 0){};
 
     template <typename ValueType>
     InputNode<ValueType>::InputNode(size_t dimension)
-        : Node({}, { &_output }), _output(this, outputPortName, dimension){};
+        : InputNodeBase(_output), _output(this, outputPortName, dimension){};
 
     template <typename ValueType>
     void InputNode<ValueType>::SetInput(ValueType inputValue)

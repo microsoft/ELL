@@ -10,6 +10,7 @@
 
 #include "ModelTransformer.h"
 #include "Node.h"
+#include "InputPort.h"
 #include "OutputPort.h"
 
 // utilities
@@ -25,12 +26,27 @@ namespace emll
 /// <summary> model namespace </summary>
 namespace model
 {
-    /// <summary> A node that represents an input to the system. </summary>
-    template <typename ValueType>
-    class InputNode : public Node
+    /// <summary> Base class for a node that represents an input to the system. </summary>
+    class InputNodeBase : public Node
     {
     public:
-        /// <summary> Default Constructor </summary>
+        InputNodeBase();
+
+        const OutputPortBase& GetOutputPort() const { return _outputBase; }
+
+    protected:
+        InputNodeBase(OutputPortBase& output);
+
+    private:
+        OutputPortBase& _outputBase;
+    };
+
+    /// <summary> A node that represents an input to the system. </summary>
+    template <typename ValueType>
+    class InputNode : public InputNodeBase
+    {
+    public:
+        /// <summary> Constructor </summary>
         InputNode();
 
         /// <summary> Constructor </summary>

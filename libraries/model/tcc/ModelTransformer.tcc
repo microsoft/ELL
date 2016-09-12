@@ -14,23 +14,8 @@ namespace model
     template <typename ValueType>
     PortElements<ValueType> ModelTransformer::TransformPortElements(const PortElements<ValueType>& elements)
     {
-        auto size = elements.Size();
-        PortElements<ValueType> result;
-        result.Reserve(size);
-        for (size_t index = 0; index < size; ++index)
-        {
-            auto oldElement = elements.GetElement(index);
-            assert(_elementToElementMap.find(oldElement) != _elementToElementMap.end());
-            if (_elementToElementMap.find(oldElement) == _elementToElementMap.end())
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
-            }
-            auto newElement = _elementToElementMap[oldElement];
-            auto newPort = static_cast<const OutputPort<ValueType>*>(newElement.ReferencedPort());
-            result.Append({ *newPort, newElement.GetIndex() });
-        }
-        result.Consolidate();
-        return result;
+        auto result = TransformPortElements(PortElementsBase(elements));
+        return PortElements<ValueType>(result);
     }
 
     template <typename ValueType>
@@ -46,15 +31,21 @@ namespace model
         return TransformPortElements(elements);
     }
 
+    template <typename NodeType>
+    NodeType* ModelTransformer::GetCorrespondingInputNodeAs(const NodeType* inputNode)
+    {
+        auto newNodeOutputs = GetCorrespondingOutputs(inputNode->GetOutputPort());
+        auto newNodeConst = newNodeOutputs.GetElement(0).ReferencedPort()->GetNode();
+        auto newInputNodeConst = dynamic_cast<const NodeType*>(newNodeConst);
+        assert(newInputNodeConst != nullptr);
+        auto newInputNode = const_cast<NodeType*>(newInputNodeConst);
+        return newInputNode;
+    }
+
     template <typename ValueType>
     InputNode<ValueType>* ModelTransformer::GetCorrespondingInputNode(const InputNode<ValueType>* inputNode)
     {
-        auto newNodeOutputs = GetCorrespondingOutputs(inputNode->output);
-        auto newNodeConst = newNodeOutputs.GetElement(0).ReferencedPort()->GetNode();
-        auto newInputNodeConst = dynamic_cast<const model::InputNode<ValueType>*>(newNodeConst);
-        assert(newInputNodeConst != nullptr);
-        auto newInputNode = const_cast<model::InputNode<ValueType>*>(newInputNodeConst);
-        return newInputNode;
+        return GetCorrespondingInputNodeAs(inputNode);
     }
 
     template <typename ValueType>

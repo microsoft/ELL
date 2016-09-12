@@ -25,6 +25,15 @@ namespace model
     PortElementBase::PortElementBase(const OutputPortBase& port, size_t index)
         : _referencedPort(&port), _index(index) {}
 
+    void PortElementsBase::Append(const PortElementsBase& other)
+    {
+        for (const auto& range : other.GetRanges())
+        {
+            AddRange(range);
+        }
+    }
+
+
     bool PortElementBase::operator==(const PortElementBase& other) const { return (_referencedPort == other._referencedPort) && (_index == other._index); }
 
     //

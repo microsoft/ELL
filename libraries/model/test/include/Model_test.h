@@ -11,6 +11,8 @@ namespace emll
 // Helpful stuff
 void PrintModel(const model::Model& model);
 void PrintModel(const model::Model& model, const model::Node* output);
+model::Model GetSimpleModel();
+
 
 // Tests
 void TestNodeIterator();

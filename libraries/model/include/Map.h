@@ -63,6 +63,13 @@ namespace model
     class Map
     {
     public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="model"> The model to wrap </param>
+        /// <param name="inputs"> A vector of the inputs this map uses </param>
+        /// <param name="inputNames"> A vector of names for the inputs this map uses </param>
+        /// <param name="outputs"> A vector of the outputs this map generates </param>
+        /// <param name="outputNames"> A vector of names for the outputs this map generates </param>
         Map(const Model& model,
             const InputTypesTuple& inputs,
             const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
@@ -79,6 +86,9 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
         const Model& GetModel() const { return _model; }
 
         /// <summary> Refines the model wrapped by this map </summary>

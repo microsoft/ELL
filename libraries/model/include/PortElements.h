@@ -164,12 +164,12 @@ namespace model
         /// <param name="other"> The other range </param>
         /// <returns> `true` if the other range's elements immediately follow this range's elements in the same port </returns>
         bool IsAdjacent(const PortRange& other) const;
-        
+
         /// <summary> Adds the elements from another range to the end of this range, if they're contiguous </summary>
         ///
         /// <param name="other"> The other range </param>
         void Append(const PortRange& other);
-        
+
     private:
         const OutputPortBase* _referencedPort = nullptr;
         size_t _startIndex = 0;
@@ -181,6 +181,14 @@ namespace model
     class PortElementsBase : public utilities::IArchivable
     {
     public:
+        PortElementsBase() = default;
+
+        PortElementsBase(const OutputPortBase& port);
+        PortElementsBase(const OutputPortBase& port, size_t startIndex);
+        PortElementsBase(const OutputPortBase& port, size_t startIndex, size_t numValues);
+        PortElementsBase(const PortRange& range);
+        PortElementsBase(const std::vector<PortRange>& ranges);
+
         virtual ~PortElementsBase() = default;
 
         /// <summary> The dimensionality of the output </summary>
@@ -209,6 +217,11 @@ namespace model
         /// <returns> The specified element. </returns>
         PortElementBase GetElement(size_t index) const;
 
+        /// <summary> Appends a set of elements to this set of elements. </summary>
+        ///
+        /// <param name="other"> The PortElements to append to this one. </param>
+        void Append(const PortElementsBase& other);
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -228,18 +241,11 @@ namespace model
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-        
+
         /// <summary> Consolidates adjacent ranges </summary>
         virtual void Consolidate();
 
     protected:
-        PortElementsBase(const OutputPortBase& port);
-        PortElementsBase(const OutputPortBase& port, size_t startIndex);
-        PortElementsBase(const OutputPortBase& port, size_t startIndex, size_t numValues);
-        PortElementsBase(const PortRange& range);
-        PortElementsBase(const std::vector<PortRange>& ranges);
-        PortElementsBase(){};
-
         void ComputeSize();
         void AddRange(const PortRange& range);
 
@@ -299,12 +305,20 @@ namespace model
         /// <param name="index"> The index of the value </param>
         PortElements(const PortElements<ValueType>& elements, size_t index);
 
-        /// <summary> Creates a PortElements representing a single value from a given PortElements </summary>
+        /// <summary> Creates a PortElements representing a range of values from a given PortElements </summary>
         ///
         /// <param name="elements"> The PortElements to take a value from </param>
         /// <param name="startIndex"> The index of the first value to use </param>
         /// <param name="numValues"> The number of values to take </param>
         PortElements(const PortElements<ValueType>& elements, size_t startIndex, size_t numValues);
+
+        /// <summary> Creates a typed `PortElements` from an untyped `PortElementsBase` </summary>
+        ///
+        /// <param name="elements"> The PortElements to take a value from </param>
+        /// <param name="index"> The index of the value </param>
+        /// <exception cref="utilities::InputException"> Throws an `InputException` with code `typeMismatch` if
+        ///   any of the input elements have the wrong type </exception>
+        explicit PortElements(const PortElementsBase& other);
 
         /// <summary> Gets an element in the elements. </summary>
         ///
@@ -316,12 +330,12 @@ namespace model
         ///
         /// <returns> The port this element refers to </returns>
         const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(this->PortElementBase::ReferencedPort()); }
-
+ 
         /// <summary> Appends a set of elements to this set of elements. </summary>
         ///
         /// <param name="other"> The PortElements to append to this one. </param>
         void Append(const PortElements<ValueType>& other);
-
+ 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>

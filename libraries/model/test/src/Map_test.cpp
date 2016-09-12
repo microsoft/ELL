@@ -32,20 +32,6 @@
 //
 namespace emll
 {
-
-// Returns a model with 1 3-dimensional double input and 1 2-dimensional double output
-model::Model GetSimpleModel()
-{
-    model::Model g;
-    auto in = g.AddNode<model::InputNode<double>>(3);
-    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
-    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 2);
-    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 2);
-    g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
-    return g;
-}
-
 void TestMapCreate()
 {
     auto model = GetSimpleModel();
