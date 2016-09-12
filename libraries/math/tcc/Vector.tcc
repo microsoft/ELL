@@ -25,8 +25,10 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     ElementType ConstVectorReference<ElementType, Orientation>::operator[] (size_t index) const
     {
-        // TODO check index<size
-        // 
+        if (index >= _size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size.");
+        }
         return _pData[index * _increment ];
     }
 
@@ -39,6 +41,10 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size) const
     {
+        if (offset + size > _size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size.");
+        }
         return ConstVectorReference<ElementType, Orientation>(_pData + offset * _increment , size, _increment );
     }
 
@@ -80,9 +86,7 @@ namespace math
     
     template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation>::ConstVectorReference(ElementType * pData, size_t size, size_t increment) : _pData(pData), _size(size), _increment(increment)
-    {
-        // TODO check that pData != 0
-    }
+    {}
 
     //
     // VectorReference
@@ -121,8 +125,10 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     ElementType& VectorReference<ElementType, Orientation>::operator[] (size_t index)
     {
-        // TODO check index<size
-        // 
+        if (index >= _size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size.");
+        }
         return _pData[index * _increment ];
     }
 
@@ -135,6 +141,10 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size)
     {
+        if (offset + size > _size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size.");
+        }
         return VectorReference<ElementType, Orientation>(_pData + offset * _increment , size, _increment );
     }
 
@@ -181,16 +191,20 @@ namespace math
     template <typename ElementType, VectorOrientation Orientation>
     ElementType& Vector<ElementType, Orientation>::operator[] (size_t index)
     {
-        // TODO check index<size
-        // 
+        if (index >= _size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size.");
+        }
         return _pData[index];
     }
 
     template <typename ElementType, VectorOrientation Orientation>
     ElementType Vector<ElementType, Orientation>::operator[] (size_t index) const
     {
-        // TODO check index<size
-        // 
+        if (index >= _size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size.");
+        }
         return _pData[index];
     }
 }

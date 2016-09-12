@@ -70,7 +70,10 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     void NativeOperations::Add(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
-        // TODO check inputs for equal size
+        if (v._size != u._size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors u and v are not the same size.");
+        }
 
         ElementType* uData = u._pData;
         const ElementType* vData = v._pData;
@@ -87,7 +90,10 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation1, VectorOrientation Orientation2>
     ElementType NativeOperations::Dot(ConstVectorReference<ElementType, Orientation1>& u, ConstVectorReference<ElementType, Orientation2>& v)
     {
-        // TODO check inputs for equal size
+        if (v._size != u._size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors u and v are not the same size.");
+        }
 
         const ElementType* uData = u._pData;
         const ElementType* vData = v._pData;
@@ -119,9 +125,12 @@ namespace math
     template<typename ElementType, MatrixLayout Layout>
     void NativeOperations::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u)
     {
-        // TODO check inputs for equal size
+        if (M._numRows != u._size || M._numColumns != v._size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix and vectors sizes.");
+        }
 
-        for (size_t i = 0; i < M.NumRows(); ++i)
+        for (size_t i = 0; i < M._numRows; ++i)
         {
             auto row = M.GetRow(i);
             u[i] = s * Dot(row, v) + t * u[i];

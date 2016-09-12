@@ -27,16 +27,21 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     void BlasOperations::Add(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
-
-        // TODO check inputs for equal size
+        if (v._size != u._size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors u and v are not the same size.");
+        }
 
         return Blas::Axpy(static_cast<int>(u._size), s, v._pData, static_cast<int>(v._increment), u._pData, static_cast<int>(u._increment));
     }
 
-    template<typename ElementType, VectorOrientation Orientation1, VectorOrientation Orientation2>
-    ElementType BlasOperations::Dot(ConstVectorReference<ElementType, Orientation1>& u, ConstVectorReference<ElementType, Orientation2>& v)
+    template<typename ElementType, VectorOrientation OrientationU, VectorOrientation OrientationV>
+    ElementType BlasOperations::Dot(ConstVectorReference<ElementType, OrientationU>& u, ConstVectorReference<ElementType, OrientationV>& v)
     {
-        // TODO check inputs for equal size
+        if (v._size != u._size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors u and v are not the same size.");
+        }
 
         return Blas::Dot(static_cast<int>(u._size), u._pData, static_cast<int>(u._increment), v._pData, static_cast<int>(v._increment));
     }
@@ -56,7 +61,10 @@ namespace math
     template<typename ElementType, MatrixLayout Layout>
     void BlasOperations::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u)
     {
-        // TODO check inputs for equal size
+        if (M._numRows != u._size || M._numColumns != v._size)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix and vectors sizes.");
+        }
 
         // map Layout to CBLAS_ORDER
         CBLAS_ORDER order;
@@ -72,7 +80,7 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Layout not supported");
         }
 
-        Blas::Gemv(order, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(M.NumRows()), static_cast<int>(M.NumColumns()), s, M._pData, static_cast<int>(M._increment), v._pData, static_cast<int>(v._increment), t, u._pData, static_cast<int>(u._increment));
+        Blas::Gemv(order, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(M._numRows), static_cast<int>(M._numColumns), s, M._pData, static_cast<int>(M._increment), v._pData, static_cast<int>(v._increment), t, u._pData, static_cast<int>(u._increment));
     }
 }
 }

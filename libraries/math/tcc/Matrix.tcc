@@ -56,32 +56,46 @@ namespace math
     template<typename ElementType, MatrixLayout Layout>
     ElementType ConstMatrixReference<ElementType, Layout>::operator() (size_t rowIndex, size_t columnIndex)  const
     {
+        if (rowIndex >= _numRows || columnIndex >= _numColumns)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "(rowIndex, columnIndex) exceeds matrix dimensions.");
+        }
         return _pData[rowIndex * _rowIncrement + columnIndex * _columnIncrement];
     }
 
     template<typename ElementType, MatrixLayout Layout>
     auto ConstMatrixReference<ElementType, Layout>::Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>
     {
-        // TODO check inputs
         return ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>(_pData, _numColumns, _numRows, _increment);
     }
 
     template<typename ElementType, MatrixLayout Layout>
     ConstMatrixReference<ElementType, Layout> ConstMatrixReference<ElementType, Layout>::GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns) const
     {
-        // TODO check inputs
+        if (firstRow + numRows > _numRows || columnIndex + numColumns > _numColumns)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "block exceeds matrix dimensions.");
+        }
         return ConstMatrixReference<ElementType, Layout>(_pData + firstRow * _rowIncrement + firstColumn * _columnIncrement, numRows, numColumns, _increment);
     }
 
     template<typename ElementType, MatrixLayout Layout>
     ConstVectorReference<ElementType, VectorOrientation::column> ConstMatrixReference<ElementType, Layout>::GetColumn(size_t index) const
     {
+        if (index >= _numColumns)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "column index exceeds matrix dimensions.");
+        }
         return ConstructConstVectorReference<ElementType, VectorOrientation::column>(_pData + index * _columnIncrement, _numRows, _rowIncrement);
     }
 
     template<typename ElementType, MatrixLayout Layout>
     ConstVectorReference<ElementType, VectorOrientation::row> ConstMatrixReference<ElementType, Layout>::GetRow(size_t index) const
     {
+        if (index >= _numRows)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "row index exceeds matrix dimensions.");
+        }
         return ConstructConstVectorReference<ElementType, VectorOrientation::row>(_pData + index * _rowIncrement, _numColumns, _columnIncrement);
     }
 
@@ -126,6 +140,10 @@ namespace math
     template<typename ElementType, MatrixLayout Layout>
     ElementType& MatrixReference<ElementType, Layout>::operator() (size_t rowIndex, size_t columnIndex)
     {
+        if (rowIndex >= _numRows || columnIndex >= _numColumns)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "(rowIndex, columnIndex) exceeds matrix dimensions.");
+        }
         return _pData[rowIndex * _rowIncrement + columnIndex * _columnIncrement];
     }
 
@@ -153,26 +171,36 @@ namespace math
     template<typename ElementType, MatrixLayout Layout>
     auto MatrixReference<ElementType, Layout>::Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>
     {
-        // TODO check inputs
         return MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>(_pData, _numColumns, _numRows, _increment);
     }
 
     template<typename ElementType, MatrixLayout Layout>
     MatrixReference<ElementType, Layout> MatrixReference<ElementType, Layout>::GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns)
     {
-        // TODO check inputs
+        if (firstRow + numRows > _numRows || firstColumn + numColumns > _numColumns)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "block exceeds matrix dimensions.");
+        }
         return MatrixReference<ElementType, Layout>(_pData + firstRow * _rowIncrement + firstColumn * _columnIncrement, numRows, numColumns, _increment);
     }
 
     template<typename ElementType, MatrixLayout Layout>
     VectorReference<ElementType, VectorOrientation::column> MatrixReference<ElementType, Layout>::GetColumn(size_t index)
     {
+        if (index >= _numColumns)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "column index exceeds matrix dimensions.");
+        }
         return ConstructVectorReference<ElementType, VectorOrientation::column>(_pData + index * _columnIncrement, _numRows, _rowIncrement);
     }
 
     template<typename ElementType, MatrixLayout Layout>
     VectorReference<ElementType, VectorOrientation::row> MatrixReference<ElementType, Layout>::GetRow(size_t index)
     {
+        if (index >= _numRows)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "row index exceeds matrix dimensions.");
+        }
         return ConstructVectorReference<ElementType, VectorOrientation::row>(_pData + index * _rowIncrement, _numColumns, _columnIncrement);
     }
 
