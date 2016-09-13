@@ -346,7 +346,8 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        using type = ValueType;
+        //
+        using value_type = ValueType;
     };
 
     //

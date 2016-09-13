@@ -30,6 +30,50 @@ namespace emll
 {
 namespace model
 {
+    //
+    // General "wrap tuple types" mechanism
+    //
+    template <template <typename> class WrapperType, typename... Types>
+    struct TupleOfWrappedElements
+    {
+        using type = std::tuple<WrapperType<Types>...>;
+    };
+    
+    template <typename TupleType, template <typename> class WrapperType, size_t... Sequence>
+    static auto MakeTupleOfThingsFromTypeTupleHelper(const TupleType& tuple, std::index_sequence<Sequence...>)
+    {
+        // fails if Wrapper<T> has no copy constructor
+        return typename TupleOfWrappedElements<WrapperType, typename std::tuple_element<Sequence, TupleType>::type...>::type();
+    }
+    
+    template <typename TupleType, template <typename> class WrapperType>
+    static auto MakeTupleOfThingsFromTypeTuple(const TupleType& tuple)
+    {
+        // fails if Wrapper<T> has no copy constructor
+        return MakeTupleOfThingsFromTypeTupleHelper<TupleType, WrapperType>(tuple, std::make_index_sequence<std::tuple_size<TupleType>::value>());
+    }
+    
+    template <typename TupleType, template <typename> class WrapperType>
+    struct TupleTypeWrapper
+    {
+        using type = decltype(MakeTupleOfThingsFromTypeTuple<TupleType, WrapperType>(TupleType{}));
+    };
+    
+    template <typename TupleType, template <typename> class WrapperType>
+    using WrappedTuple = typename TupleTypeWrapper<TupleType, WrapperType>::type;
+
+    //
+    // Example usage:
+    //
+    // This is just to strip the extra template parameters from std::vector
+    template <typename ValueType>
+    using MyVector = std::vector<ValueType>;
+    
+    // WrappedTuple<std::tuple<int, float, double>, MyVector> x;  // x is a tuple<vector<int>, vector<float>, vector<double>>
+    
+    // TODO: replace special-case VectorWrapper with the above
+    
+    
     // Variadic helper class to transform input types into a std::tuple<std::vector<T1>, std::vector<T2>, ...>
     template <typename... Types>
     struct ToVectorElements
@@ -39,14 +83,16 @@ namespace model
 
     // Here, TupleType is a tuple<PortElements<T1>, PortElements<T2>, ...>
     template <typename TupleType, size_t... Sequence>
-    auto MakeTupleOfVectorsFromPortElementsHelper(const TupleType& tuple, std::index_sequence<Sequence...>)
+    static auto MakeTupleOfVectorsFromPortElementsHelper(const TupleType& tuple, std::index_sequence<Sequence...>)
     {
-        using ElementType = typename std::tuple_element<Sequence..., TupleType>::type...;
-        return typename ToVectorElements<typename ElementType::type>::type{};
+        using ElementType = typename std::tuple_element<Sequence..., TupleType>::type; // Here, ElementType is PortElements<T>
+        return typename ToVectorElements<typename ElementType::value_type>::type{};
+
+//        return typename ToVectorElements<typename std::tuple_element<Sequence..., TupleType>::type::type>::type{}; // compiles on Windows, not Mac
     }
 
     template <typename TupleType>
-    auto MakeTupleOfVectorsFromPortElements(const TupleType& tuple)
+    static auto MakeTupleOfVectorsFromPortElements(const TupleType& tuple)
     {
         return MakeTupleOfVectorsFromPortElementsHelper(tuple, std::make_index_sequence<std::tuple_size<TupleType>::value>());
     }
@@ -58,6 +104,12 @@ namespace model
         using type = decltype(MakeTupleOfVectorsFromPortElements(TupleType{}));
     };
 
+    // InputTypesTuple is really a tuple<InputNode<T1>*, InputNode<T2>*, ...>
+    // OutputTypesTuple is really a tuple<PortElements<T1>, PortElements<T2>, ...>
+    
+    // TODO: make them instead just be tuple<T1, T2, ...>, and use some fancy thing to derive
+    //       the tuple<InputNode<T>*, ...>, etc.
+        
     /// <summary> Class that wraps a model and its designated outputs </summary>
     template <typename InputTypesTuple, typename OutputTypesTuple>
     class Map
@@ -125,7 +177,13 @@ namespace model
 
     private:
         Model _model;
-
+        
+        // TODO: Use the following, once we get InputTypesTuple to be a tuple oftypes, not a tuple of InputNode specializations
+        template <typename T>
+        using PointerToInputNode = InputNode<T>*;
+        WrappedTuple<std::tuple<int, float, double>, PointerToInputNode> _inputs2;
+        WrappedTuple<std::tuple<int, float, double>, PortElements> _outputs2;
+        
         InputTypesTuple _inputs; // InputTypesTuple is a std::tuple<InputNode<T1>*, InputNode<T2>*, ...>
         std::array<std::string, std::tuple_size<InputTypesTuple>::value> _inputNames;
         std::unordered_map<std::string, Node*> _inputNodeMap;
