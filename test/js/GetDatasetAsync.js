@@ -17,6 +17,7 @@ const EMLL = require("emll");
 
 console.log("Loaded EMLL");
 var dataset = EMLL.GetDataset("../data/testData.txt");
+console.log(dataset);
 if(dataset)
 {
   console.log("Sync Mode Size:" + dataset.NumExamples());
