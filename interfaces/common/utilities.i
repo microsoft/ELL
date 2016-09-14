@@ -47,9 +47,11 @@ public:
 
 template <typename IteratorType, typename ValueType> class emll::utilities::StlIterator {};
 
-%import "UniqueId.h"
-%import "ObjectArchive.h"
+%include "IArchivable.h"
 %import "Archiver.h"
+%import "ObjectArchive.h"
+%include "UniqueId.h"
+%include "Variant.h"
 
 
 %include "AnyIterator.h"
@@ -58,11 +60,7 @@ template <typename IteratorType, typename ValueType> class emll::utilities::StlI
 
 %include "SGDIncrementalTrainer_wrap.h"
 
-%include "IArchivable.h"
-%include "UniqueId.h"
-%include "Variant.h"
 
-WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
 
 // This is necessary for us to avoid leaking memory:
 #ifndef SWIGXML
@@ -78,4 +76,9 @@ WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
 %template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::HingeLoss>;
 %template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
 
-typedef emll::predictors::LinearPredictor emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::Predictor;
+typedef predictors::LinearPredictor emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::Predictor;
+
+// TODO: wrap print
+
+WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
+
