@@ -8,13 +8,14 @@
 
 #pragma once
 
+namespace emll
+{
 namespace lossFunctions
 {
     /// <summary> Implements the log-loss functions: loss(x) = log(1 + exp(-x)) </summary>
     class LogLoss
     {
     public:
-
         /// <summary> Constructs a LogLoss object. </summary>
         ///
         /// <param name="scale"> The loss scale. </param>
@@ -39,4 +40,5 @@ namespace lossFunctions
     private:
         double _scale = 1.0;
     };
+}
 }

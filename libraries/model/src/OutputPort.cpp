@@ -8,21 +8,26 @@
 
 #include "OutputPort.h"
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
-    OutputPortBase::OutputPortBase(const class Node* node, std::string name, PortType type, size_t size) : Port(node, name, type), _size(size), _isReferenced(false) 
-    {}
-
-    void OutputPortBase::Serialize(utilities::Serializer& serializer) const
+    OutputPortBase::OutputPortBase(const class Node* node, std::string name, PortType type, size_t size)
+        : Port(node, name, type), _size(size), _isReferenced(false)
     {
-        Port::Serialize(serializer);
-        serializer.Serialize("size", _size);
     }
 
-    void OutputPortBase::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void OutputPortBase::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Port::Deserialize(serializer, context);
-        serializer.Deserialize("size", _size, context);
+        Port::WriteToArchive(archiver);
+        archiver["size"] << _size;
     }
+
+    void OutputPortBase::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        Port::ReadFromArchive(archiver);
+        archiver["size"] >> _size;
+    }
+}
 }

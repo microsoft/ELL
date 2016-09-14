@@ -9,19 +9,21 @@
 #include "MakeTrainer.h"
 
 // lossFunctions
-#include "SquaredLoss.h"
-#include "LogLoss.h"
 #include "HingeLoss.h"
+#include "LogLoss.h"
+#include "SquaredLoss.h"
 
 // utilities
 #include "CommandLineParser.h"
 
 // trainers
 #include "HistogramForestTrainer.h"
+#include "LogitBooster.h"
 #include "SortingForestTrainer.h"
 #include "ThresholdFinder.h"
-#include "LogitBooster.h"
 
+namespace emll
+{
 namespace common
 {
     std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments)
@@ -48,13 +50,13 @@ namespace common
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
-        switch(lossArguments.lossFunction)
+        switch (lossArguments.lossFunction)
         {
-        case LossFunctionEnum::squared:
-            return trainers::MakeSortingForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
+            case LossFunctionEnum::squared:
+                return trainers::MakeSortingForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
 
-        default:
-            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+            default:
+                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
@@ -62,13 +64,14 @@ namespace common
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
-        switch(lossArguments.lossFunction)
+        switch (lossArguments.lossFunction)
         {
-        case LossFunctionEnum::squared:
-            return trainers::MakeHistogramForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
+            case LossFunctionEnum::squared:
+                return trainers::MakeHistogramForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
 
-        default:
-            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+            default:
+                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
+}
 }

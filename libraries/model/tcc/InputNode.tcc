@@ -6,20 +6,23 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
     template <typename ValueType>
-    InputNode<ValueType>::InputNode() : Node({}, { &_output }), _output(this, outputPortName, 0)
-    {};
+    InputNode<ValueType>::InputNode()
+        : Node({}, { &_output }), _output(this, outputPortName, 0){};
 
     template <typename ValueType>
-    InputNode<ValueType>::InputNode(size_t dimension) : Node({}, { &_output }), _output(this, outputPortName, dimension){};
+    InputNode<ValueType>::InputNode(size_t dimension)
+        : Node({}, { &_output }), _output(this, outputPortName, dimension){};
 
     template <typename ValueType>
     void InputNode<ValueType>::SetInput(ValueType inputValue)
     {
-        SetInput(std::vector<ValueType>{inputValue});
+        SetInput(std::vector<ValueType>{ inputValue });
     }
 
     template <typename ValueType>
@@ -43,17 +46,17 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::Serialize(utilities::Serializer& serializer) const
+    void InputNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void InputNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
-        Node::Deserialize(serializer, newContext);
-        serializer.Deserialize("output", _output, context);
+        Node::ReadFromArchive(archiver);
+        archiver[outputPortName] >> _output;
     }
+}
 }

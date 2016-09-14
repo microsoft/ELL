@@ -9,9 +9,11 @@
 #pragma once
 
 // stl
-#include <vector>
 #include <cstdint>
+#include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> An adapter that transforms a pair of STL iterators into a read-only forward iterator with IsValid, Next, and Get functions</summary>
@@ -21,8 +23,8 @@ namespace utilities
     public:
 
         StlIterator() = default;
-        
-        /// <summary> Constructor </summary>
+
+		/// <summary> Constructor </summary>
         ///
         /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>
         /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over. </param>
@@ -69,7 +71,7 @@ namespace utilities
     ///
     /// <returns> A StlIterator over the range specified by the begin and end iterators. </returns>
     template <typename IteratorType>
-    auto MakeStlIterator(IteratorType begin, IteratorType end)->StlIterator<IteratorType>;
+    auto MakeStlIterator(IteratorType begin, IteratorType end) -> StlIterator<IteratorType>;
 
     /// <summary> Convenience function for creating StlIterators </summary>
     ///
@@ -77,7 +79,8 @@ namespace utilities
     ///
     /// <returns> A StlIterator over the container</returns>
     template <typename ContainerType>
-    auto MakeStlIterator(ContainerType& container)->StlIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
+    auto MakeStlIterator(ContainerType& container) -> StlIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
+}
 }
 
 #include "../tcc/StlIterator.tcc"

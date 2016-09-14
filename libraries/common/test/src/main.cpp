@@ -21,25 +21,27 @@
 ///
 int main()
 {
+    using namespace emll;
+
     try
     {
         TestLoadSampleModels();
         TestLoadTreeModels();
-        
+
         TestSaveModels("xml");
         TestSaveModels("json");
     }
-    catch(const utilities::Exception& exception)
+    catch (const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
         throw;
     }
-    catch(const std::exception& exception)
+    catch (const std::exception& exception)
     {
         std::cerr << "ERROR, got std exception. Message: " << exception.what() << std::endl;
         throw;
     }
-    catch(...)
+    catch (...)
     {
         std::cerr << "ERROR, got unknown exception." << std::endl;
         throw;

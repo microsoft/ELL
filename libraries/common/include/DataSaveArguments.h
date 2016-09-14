@@ -15,6 +15,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 namespace common
 {
     /// <summary> A struct that holds command line parameters for saving data. </summary>
@@ -41,4 +43,5 @@ namespace common
         /// <returns> An utilities::CommandLineParseResult. </returns>
         virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
     };
+}
 }

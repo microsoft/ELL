@@ -11,25 +11,27 @@
 // stl
 #include <vector>
 
+namespace emll
+{
 namespace common
 {
     void ParsedDataSaveArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
             outputDataFilename,
-            "outputDataFilename", 
+            "outputDataFilename",
             "odf",
             "Path to the output data file",
             "");
     }
 
-    utilities::CommandLineParseResult ParsedDataSaveArguments::PostProcess(const utilities::CommandLineParser & parser)
+    utilities::CommandLineParseResult ParsedDataSaveArguments::PostProcess(const utilities::CommandLineParser& parser)
     {
-        if(outputDataFilename == "null")
+        if (outputDataFilename == "null")
         {
             outputDataStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
         }
-        else if(outputDataFilename == "")
+        else if (outputDataFilename == "")
         {
             outputDataStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
         }
@@ -41,4 +43,5 @@ namespace common
         std::vector<std::string> parseErrorMessages;
         return parseErrorMessages;
     }
+}
 }

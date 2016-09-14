@@ -14,6 +14,8 @@
 // stl
 #include <memory>
 
+namespace emll
+{
 namespace trainers
 {
     /// <summary>
@@ -26,7 +28,6 @@ namespace trainers
     class IIncrementalTrainer
     {
     public:
-
         virtual ~IIncrementalTrainer() = default;
 
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
@@ -39,4 +40,5 @@ namespace trainers
         /// <returns> A shared pointer to the current predictor. </returns>
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const = 0;
     };
+}
 }

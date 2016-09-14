@@ -8,31 +8,65 @@
 #pragma once
 
 // dataset
-#include "RowDataset.h"
 #include "DenseDataVector.h"
 #include "Example.h"
+#include "RowDataset.h"
 
 // utilities
-#include "StlIterator.h"
 #include "AnyIterator.h"
+#include "StlIterator.h"
 
 // stl
-#include <vector>
 #include <random>
+#include <vector>
 
-namespace dataset
+namespace emll
 {
-    typedef GenericRowDataset::Iterator GenericRowIterator;
-}
-
 namespace interfaces
 {
+    class GenericRowIterator
+    {
+    public:
+        GenericRowIterator(const dataset::GenericRowDataset::Iterator& iter)
+            : _iterator(iter) {}
+
+        bool IsValid() const
+        {
+            return _iterator.IsValid();
+        }
+
+        /// <summary> Returns true if the iterator knows its size. </summary>
+        ///
+        /// <returns> true if NumIteratesLeft returns a valid number, false if not. </returns>
+        bool HasSize() const { return _iterator.HasSize(); }
+
+        /// <summary>
+        /// Returns the number of iterates left in this iterator, including the current one.
+        /// </summary>
+        ///
+        /// <returns> The total number of iterates left. </returns>
+        uint64_t NumIteratesLeft() const
+        {
+            return _iterator.NumIteratesLeft();
+        }
+
+        /// <summary> Proceeds to the Next iterate. </summary>
+        void Next() { _iterator.Next(); }
+
+        /// <summary> Returns the value of the current iterate. </summary>
+        ///
+        /// <returns> The value of the current iterate. </returns>
+        const dataset::GenericSupervisedExample& Get() const { return _iterator.Get(); }
+
+    private:
+        dataset::GenericRowDataset::Iterator _iterator;
+    };
+
     class GenericRowDataset
     {
     public:
-        GenericRowDataset() {};
+        GenericRowDataset(){};
         GenericRowDataset(const GenericRowDataset& other);
-        GenericRowDataset(GenericRowDataset&& other) = default;
         const GenericRowDataset& operator=(GenericRowDataset&& other)
         {
             _dataset = std::move(other._dataset);
@@ -60,14 +94,14 @@ namespace interfaces
         ///
         /// <returns> Reference to the specified example. </returns>
         dataset::GenericSupervisedExample GetExample(uint64_t index) const;
-                
+
         /// <summary> Returns an example as a `DoubleDataVector`. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
         dataset::DenseSupervisedExample GetDenseSupervisedExample(uint64_t index) const;
-                
+
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
         /// <param name="firstExample"> Zero-based index of the first example to iterate over. </param>
@@ -75,7 +109,7 @@ namespace interfaces
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        dataset::GenericRowIterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
+        GenericRowIterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
@@ -99,4 +133,4 @@ namespace interfaces
         dataset::GenericRowDataset _dataset;
     };
 }
-
+}

@@ -10,34 +10,38 @@
 #include "Exception.h"
 
 // stl
-#include <stdexcept>
-#include <random>
 #include <cassert>
+#include <random>
+#include <stdexcept>
 
+namespace emll
+{
 namespace linear
 {
-    template<typename DataVectorType>
-    RowMatrix<DataVectorType>::Iterator::Iterator(const RowMatrix& table, uint64_t firstRow, uint64_t maxRow) : _table(table), _row(firstRow), _maxRow(maxRow)
-    {}
-    
-    template<typename DataVectorType>
+    template <typename DataVectorType>
+    RowMatrix<DataVectorType>::Iterator::Iterator(const RowMatrix& table, uint64_t firstRow, uint64_t maxRow)
+        : _table(table), _row(firstRow), _maxRow(maxRow)
+    {
+    }
+
+    template <typename DataVectorType>
     const DataVectorType& RowMatrix<DataVectorType>::Iterator::Get() const
     {
         assert(_row < _table.NumRows() && _row < _maxRow);
         return _table.GetRow(_row);
     }
 
-    template<typename DataVectorType>
+    template <typename DataVectorType>
     const DataVectorType& RowMatrix<DataVectorType>::GetRow(uint64_t index) const
     {
         return _rows[index];
     }
 
-    template<typename DataVectorType>
+    template <typename DataVectorType>
     typename RowMatrix<DataVectorType>::Iterator RowMatrix<DataVectorType>::GetIterator(uint64_t firstRow, uint64_t numRows) const
     {
         uint64_t maxRow = firstRow + numRows;
-        if(maxRow > NumRows() || numRows == 0)
+        if (maxRow > NumRows() || numRows == 0)
         {
             maxRow = NumRows();
         }
@@ -45,32 +49,32 @@ namespace linear
         return Iterator(*this, firstRow, maxRow);
     }
 
-    template<typename DataVectorType>
+    template <typename DataVectorType>
     void RowMatrix<DataVectorType>::AddRow(DataVectorType&& row)
     {
         uint64_t numColumns = row.Size();
         _rows.emplace_back(std::move(row));
 
-        if(_numColumns < numColumns)
+        if (_numColumns < numColumns)
         {
             _numColumns = numColumns;
         }
     }
 
-    template<typename DataVectorType>
-    template<typename... Args >
+    template <typename DataVectorType>
+    template <typename... Args>
     void RowMatrix<DataVectorType>::EmplaceBackRow(Args&&... args)
     {
         _rows.emplace_back(args...);
 
-        uint64_t numColumns = _rows[_rows.size()-1].size();
-        if(_numColumns < numColumns)
+        uint64_t numColumns = _rows[_rows.size() - 1].size();
+        if (_numColumns < numColumns)
         {
             _numColumns = numColumns;
         }
     }
 
-    template<typename DataVectorType>
+    template <typename DataVectorType>
     void RowMatrix<DataVectorType>::Gemv(const double* p_x, double* p_y, double alpha, double beta) const
     {
         int size = (int)NumRows(); // openmp doesn't like uint64_t
@@ -79,7 +83,7 @@ namespace linear
         {
             if (beta == 0.0) // alpha == 1.0 && beta == 0.0
             {
-                #pragma omp parallel for
+#pragma omp parallel for
                 for (int i = 0; i < size; ++i)
                 {
                     p_y[i] = this->GetRow(i).Dot(p_x);
@@ -87,7 +91,7 @@ namespace linear
             }
             else if (beta == 1.0) // alpha == 1.0 && beta == 1.0
             {
-                #pragma omp parallel for
+#pragma omp parallel for
                 for (int i = 0; i < size; ++i)
                 {
                     p_y[i] += this->GetRow(i).Dot(p_x);
@@ -95,18 +99,18 @@ namespace linear
             }
             else // alpha == 1.0 && beta != 0.0 && beta != 1.0
             {
-                #pragma omp parallel for
+#pragma omp parallel for
                 for (int i = 0; i < size; ++i)
                 {
                     p_y[i] = this->GetRow(i).Dot(p_x) + p_y[i] * beta;
                 }
             }
         }
-        else 
+        else
         {
             if (beta == 0.0) // alpha != 1.0 && beta == 0.0
             {
-                #pragma omp parallel for
+#pragma omp parallel for
                 for (int i = 0; i < size; ++i)
                 {
                     p_y[i] = this->GetRow(i).Dot(p_x) * alpha;
@@ -114,7 +118,7 @@ namespace linear
             }
             else if (beta == 1.0) // alpha != 1.0 && beta == 1.0
             {
-                #pragma omp parallel for
+#pragma omp parallel for
                 for (int i = 0; i < size; ++i)
                 {
                     p_y[i] += this->GetRow(i).Dot(p_x) * alpha;
@@ -122,7 +126,7 @@ namespace linear
             }
             else // alpha != 1.0 && beta != 0.0 && beta != 1.0
             {
-                #pragma omp parallel for
+#pragma omp parallel for
                 for (int i = 0; i < size; ++i)
                 {
                     p_y[i] += this->GetRow(i).Dot(p_x) * alpha + p_y[i] * beta;
@@ -131,13 +135,13 @@ namespace linear
         }
     }
 
-    template<typename DataVectorType>
+    template <typename DataVectorType>
     void RowMatrix<DataVectorType>::Gevm(const double* p_x, double* p_y, double alpha, double beta) const
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notYetImplemented);
     }
 
-    template<typename DataVectorType>
+    template <typename DataVectorType>
     void RowMatrix<DataVectorType>::Print(std::ostream& os) const
     {
         for (uint64_t i = 0; i < NumRows(); ++i)
@@ -145,6 +149,5 @@ namespace linear
             os << "Row " << i << "\t" << this->GetRow(i) << std::endl;
         }
     }
-
 }
-
+}

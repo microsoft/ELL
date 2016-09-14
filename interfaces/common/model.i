@@ -18,11 +18,12 @@
 #include "OutputNode.h"
 %}
 
-%nodefaultctor model::NodeIterator;
-%nodefaultctor model::Node;
-%nodefaultctor model::Port;
-%nodefaultctor model::OutputPortBase;
-%nodefaultctor model::InputPortBase;
+%nodefaultctor emll::model::NodeIterator;
+%nodefaultctor emll::model::Node;
+%nodefaultctor emll::model::Port;
+%nodefaultctor emll::model::OutputPortBase;
+%nodefaultctor emll::model::OutputPort<double>;
+%nodefaultctor emll::model::InputPortBase;
 
 %include "Port.h"
 %include "OutputPort.h"
@@ -33,41 +34,41 @@
 %include "InputNode.h"
 %include "OutputNode.h"
 
-%template (DoubleOutputPort) model::OutputPort<double>;
-%template (BoolOutputPort) model::OutputPort<bool>;
-%template () model::PortElements<double>;
-%template () model::PortElements<bool>;
+%template (DoubleOutputPort) emll::model::OutputPort<double>;
+%template (BoolOutputPort) emll::model::OutputPort<bool>;
+%template () emll::model::PortElements<double>;
+%template () emll::model::PortElements<bool>;
 
 #ifndef SWIGXML
-%template (NodeVector) std::vector<model::Node*>;
-%template (ConstNodeVector) std::vector<const model::Node*>;
-%template (PortVector) std::vector<model::Port*>;
-%template (InputPortVector) std::vector<model::InputPortBase*>;
-%template (OutputPortVector) std::vector<model::OutputPortBase*>;
+%template (NodeVector) std::vector<emll::model::Node*>;
+%template (ConstNodeVector) std::vector<const emll::model::Node*>;
+%template (PortVector) std::vector<emll::model::Port*>;
+%template (InputPortVector) std::vector<emll::model::InputPortBase*>;
+%template (OutputPortVector) std::vector<emll::model::OutputPortBase*>;
 
-%template (DoubleInputNode) model::InputNode<double>;
-%template (BoolInputNode) model::InputNode<bool>;
-%template (DoubleOutputNode) model::OutputNode<double>;
+%template (DoubleInputNode) emll::model::InputNode<double>;
+%template (BoolInputNode) emll::model::InputNode<bool>;
+%template (DoubleOutputNode) emll::model::OutputNode<double>;
 
-%template (DoubleInputNodeVector) std::vector<const model::InputNode<double>*>;
-%template (DoubleOutputNodeVector) std::vector<const model::OutputNode<double>*>;
+%template (DoubleInputNodeVector) std::vector<const emll::model::InputNode<double>*>;
+%template (DoubleOutputNodeVector) std::vector<const emll::model::OutputNode<double>*>;
 
 #endif
 
-%ignore model::Model::ComputeOutput;
+%ignore emll::model::Model::ComputeOutput;
 
-%extend model::Model 
+%extend emll::model::Model 
 {
     // get input nodes
-    std::vector<const model::InputNode<double>*> GetDoubleInputNodes()
+    std::vector<const emll::model::InputNode<double>*> GetDoubleInputNodes()
     {
-        return $self->GetNodesByType<model::InputNode<double>>();
+        return $self->GetNodesByType<emll::model::InputNode<double>>();
     }
 
     // get output nodes
-    std::vector<const model::OutputNode<double>*> GetDoubleOutputNodes()
+    std::vector<const emll::model::OutputNode<double>*> GetDoubleOutputNodes()
     {
-        return $self->GetNodesByType<model::OutputNode<double>>();
+        return $self->GetNodesByType<emll::model::OutputNode<double>>();
     }
 
     // compute output

@@ -8,20 +8,22 @@
 
 #pragma once
 
-#include "Node.h"
 #include "InputPort.h"
+#include "Node.h"
 #include "OutputPort.h"
 
 // utilities
+#include "IArchivable.h"
 #include "IIterator.h"
-#include "ISerializable.h"
 
 // stl
-#include <vector>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace model
 {
@@ -55,7 +57,7 @@ namespace model
     };
 
     /// <summary> Model class. Represents a graph of computation </summary>
-    class Model : public utilities::ISerializable
+    class Model : public utilities::IArchivable
     {
     public:
         /// <summary> Factory method used to create nodes and add them to the model. </summary>
@@ -153,16 +155,16 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Writes to a Serializer. </summary>
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
-        /// <param name="serializer"> The serializer. </param>
-        virtual void Serialize(utilities::Serializer& serializer) const override;
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
-        /// <summary> Reads from a Deserializer. </summary>
+        /// <summary> Reads from a Unarchiver. </summary>
         ///
-        /// <param name="deserializer"> The deserializer. </param>
+        /// <param name="archiver"> The archiver. </param>
         /// <param name="context"> The serialization context. </param>
-        virtual void Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         friend class NodeIterator;
@@ -171,12 +173,16 @@ namespace model
         std::unordered_map<Node::NodeId, std::shared_ptr<Node>> _idToNodeMap;
     };
 
-    /// <summary> A serialization context used during Model deserialization. Created by the
-    /// model during serialization --- clients shouldn't have to interact directly with this class. </summary>
-    class ModelSerializationContext: public utilities::SerializationContext
+    /// <summary> A serialization context used during model deserialization. Wraps an existing `SerializationContext`
+    /// and adds access to the model being constructed. </summary>
+    class ModelSerializationContext : public utilities::SerializationContext
     {
     public:
-        ModelSerializationContext(utilities::SerializationContext& otherContext, Model* model);
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="otherContext"> The `SerializationContext` to wrap </param>
+        /// <param name="model"> The model being constructed </param>
+        ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model);
 
         /// <summary> Gets the type factory associated with this context. </summary>
         ///
@@ -186,7 +192,7 @@ namespace model
         /// <summary> Returns the Model currently being deserialized. </summary>
         ///
         /// <returns> The Model currently being deserialized. </returns>
-        Model* GetModel() { return _model; }
+        const Model* GetModel() { return _model; }
 
         /// <summary> Returns a pointer to an already-deserialized node, given its serialized ID </summary>
         ///
@@ -198,12 +204,13 @@ namespace model
         /// <param name="id"> The serialized ID of the node. </param>
         /// <param name="node"> A pointer to the serialized node. </param>
         void MapNode(const Node::NodeId& id, Node* node);
-    
+
     private:
         utilities::SerializationContext& _originalContext;
-        Model* _model;
+        const Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };
+}
 }
 
 #include "../tcc/Model.tcc"

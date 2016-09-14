@@ -19,25 +19,25 @@
 
 // stl
 #include <cstdint>
-#include <type_traits>
 #include <iostream>
+#include <type_traits>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> Implements a sparse binary vector as an increasing list of the coordinates where the
     /// value is 1.0. </summary>
     ///
     /// <typeparam name="tegerListType"> Type of the teger list type. </typeparam>
-    template<typename IntegerListType>
+    template <typename IntegerListType>
     class SparseBinaryDataVectorBase : public IDataVector
     {
     public:
-
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
         class Iterator : public linear::IIndexValueIterator
         {
         public:
-
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;
@@ -56,7 +56,6 @@ namespace dataset
             linear::IndexValue Get() const { return linear::IndexValue{ _list_iterator.Get(), 1.0 }; }
 
         private:
-
             /// <summary> define typename to improve readability. </summary>
             using IndexIteratorType = typename IntegerListType::Iterator;
 
@@ -78,7 +77,7 @@ namespace dataset
         /// <typeparam name="IIndexValueIterator">  Type of the index value iterator. </typeparam>
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
+        template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         SparseBinaryDataVectorBase(SparseBinaryDataVectorBase<IntegerListType>&& other) = default;
@@ -151,7 +150,7 @@ namespace dataset
     };
 
     /// <summary> A sparse binary data vector. </summary>
-    class  SparseBinaryDataVector : public SparseBinaryDataVectorBase<utilities::CompressedIntegerList>
+    class SparseBinaryDataVector : public SparseBinaryDataVectorBase<utilities::CompressedIntegerList>
     {
     public:
         using SparseBinaryDataVectorBase<utilities::CompressedIntegerList>::SparseBinaryDataVectorBase;
@@ -164,7 +163,6 @@ namespace dataset
         using SparseBinaryDataVectorBase<utilities::IntegerList>::SparseBinaryDataVectorBase;
     };
 }
+}
 
 #include "../tcc/SparseBinaryDataVector.tcc"
-
-

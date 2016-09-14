@@ -8,17 +8,19 @@
 
 #pragma once
 
-#include "Node.h"
 #include "InputPort.h"
+#include "Node.h"
 #include "OutputPort.h"
 
 // utilities
 #include "TypeName.h"
 
-#include <vector>
-#include <memory>
 #include <algorithm>
+#include <memory>
+#include <vector>
 
+namespace emll
+{
 /// <summary> nodes namespace </summary>
 namespace nodes
 {
@@ -27,7 +29,7 @@ namespace nodes
     class ExtremalValueNode : public model::Node
     {
     public:
-        /// <summary> Default Constructor </summary>    
+        /// <summary> Default Constructor </summary>
         ExtremalValueNode();
 
         /// <summary> Constructor </summary>
@@ -45,6 +47,16 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
         /// <summary> Exposes the extremal value port as a read-only property </summary>
         const model::OutputPort<ValueType>& val = _val;
 
@@ -54,7 +66,7 @@ namespace nodes
         static constexpr const char* inputPortName = "input";
         static constexpr const char* valPortName = "val";
         static constexpr const char* argValPortName = "argVal";
-         
+
     protected:
         virtual void Compute() const override;
 
@@ -71,13 +83,15 @@ namespace nodes
     class ArgMinNode : public ExtremalValueNode<ValueType, false>
     {
     public:
-        /// <summary> Default Constructor </summary>    
-        ArgMinNode() : ExtremalValueNode<ValueType, false>() {}
+        /// <summary> Default Constructor </summary>
+        ArgMinNode()
+            : ExtremalValueNode<ValueType, false>() {}
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMinNode(const model::PortElements<ValueType>& input) : ExtremalValueNode<ValueType, false>(input) {}
+        ArgMinNode(const model::PortElements<ValueType>& input)
+            : ExtremalValueNode<ValueType, false>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -98,13 +112,15 @@ namespace nodes
     class ArgMaxNode : public ExtremalValueNode<ValueType, true>
     {
     public:
-        /// <summary> Default Constructor </summary>    
-        ArgMaxNode() : ExtremalValueNode<ValueType, true>() {}
+        /// <summary> Default Constructor </summary>
+        ArgMaxNode()
+            : ExtremalValueNode<ValueType, true>() {}
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The node to get the input data from </param>
-        ArgMaxNode(const model::PortElements<ValueType>& input) : ExtremalValueNode<ValueType, true>(input) {}
+        ArgMaxNode(const model::PortElements<ValueType>& input)
+            : ExtremalValueNode<ValueType, true>(input) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -118,8 +134,8 @@ namespace nodes
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-
     };
+}
 }
 
 #include "../tcc/ExtremalValueNode.tcc"

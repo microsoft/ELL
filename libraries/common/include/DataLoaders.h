@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "DataLoadArguments.h" 
+#include "DataLoadArguments.h"
 
 // dataset
 #include "RowDataset.h"
@@ -19,7 +19,8 @@
 // stl
 #include <string>
 
-
+namespace emll
+{
 namespace common
 {
     /// <summary> Gets a data iterator from a data file, based on data load arguments. </summary>
@@ -36,4 +37,4 @@ namespace common
     /// <returns> The row dataset. </returns>
     dataset::GenericRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments);
 }
-
+}

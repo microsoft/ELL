@@ -12,7 +12,7 @@
 #include "LoadModel.h"
 %}
 
-%ignore common::GetDataset;
+%ignore emll::common::GetDataset;
 
 %include "DataLoadArguments.h"
 %include "LoadModel.h"

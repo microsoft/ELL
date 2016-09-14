@@ -12,21 +12,21 @@
 #include <cstdint>
 #include <vector>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> A non-decreasing list of nonegative integers, with a forward Iterator. </summary>
     class IntegerList
     {
     public:
-
         /// <summary> Defines an alias representing the vector iterator. </summary>
         typedef std::vector<uint64_t>::const_iterator vector_iterator;
 
         /// <summary> A read-only forward iterator for the IntegerList. </summary>
-        class Iterator 
+        class Iterator
         {
         public:
-
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;
@@ -45,8 +45,7 @@ namespace utilities
             uint64_t Get() const { return *_begin; }
 
         private:
-
-            // private ctor, can only be called from IntegerList class. 
+            // private ctor, can only be called from IntegerList class.
             Iterator(const vector_iterator& begin, const vector_iterator& end);
             friend class IntegerList;
 
@@ -63,7 +62,7 @@ namespace utilities
 
         ~IntegerList() = default;
 
-        void operator= (const IntegerList&) = delete;
+        void operator=(const IntegerList&) = delete;
 
         /// <summary> Gets the number of entries in the list. </summary>
         ///
@@ -93,9 +92,9 @@ namespace utilities
         /// <returns> The iterator. </returns>
         Iterator GetIterator() const;
 
-
     private:
         // The list
         std::vector<uint64_t> _list;
     };
+}
 }

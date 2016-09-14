@@ -8,9 +8,11 @@
 
 #include "Exception.h"
 
+namespace emll
+{
 namespace predictors
 {
-    template<typename RandomAccessVectorType>
+    template <typename RandomAccessVectorType>
     bool predictors::SingleElementThresholdPredictor::Predict(const RandomAccessVectorType& inputVector) const
     {
         if (inputVector.Size() <= _index)
@@ -20,4 +22,5 @@ namespace predictors
 
         return inputVector[_index] > _threshold;
     }
+}
 }

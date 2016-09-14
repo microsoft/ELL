@@ -11,6 +11,8 @@
 // utilities
 #include "Files.h"
 
+namespace emll
+{
 namespace common
 {
     void ParsedModelLoadArguments::AddArgs(utilities::CommandLineParser& parser)
@@ -23,7 +25,7 @@ namespace common
             "");
     }
 
-    utilities::CommandLineParseResult ParsedModelLoadArguments::PostProcess(const utilities::CommandLineParser & parser)
+    utilities::CommandLineParseResult ParsedModelLoadArguments::PostProcess(const utilities::CommandLineParser& parser)
     {
         std::vector<std::string> parseErrorMessages;
 
@@ -37,4 +39,5 @@ namespace common
 
         return parseErrorMessages;
     }
+}
 }

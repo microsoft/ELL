@@ -14,6 +14,8 @@
 // stl
 #include <string>
 
+namespace emll
+{
 /// <summary> common namespace </summary>
 namespace common
 {
@@ -45,4 +47,5 @@ namespace common
         /// <returns> An utilities::CommandLineParseResult. </returns>
         virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
     };
+}
 }

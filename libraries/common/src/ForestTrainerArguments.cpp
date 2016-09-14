@@ -8,9 +8,11 @@
 
 #include "ForestTrainerArguments.h"
 
+namespace emll
+{
 namespace common
 {
-    void ParsedForestTrainerArguments::AddArgs(utilities::CommandLineParser& parser) 
+    void ParsedForestTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(minSplitGain,
                          "minSplitGain",
@@ -47,11 +49,12 @@ namespace common
                          "cpi",
                          "The number of split candidates to create per input element",
                          8);
-        
+
         parser.AddOption(sortingTrainer,
                          "sortingTrainer",
                          "st",
                          "Use the sorting trainer instead of the histogram trainer",
                          false);
     }
+}
 }

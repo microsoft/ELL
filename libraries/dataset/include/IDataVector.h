@@ -13,10 +13,12 @@
 
 // stl
 #include <cstdint>
-#include <vector>
 #include <functional>
 #include <memory>
+#include <vector>
 
+namespace emll
+{
 namespace dataset
 {
     /// <summary> Base class for infinite-dimensional vectors of double numbers. Each implementation of
@@ -39,7 +41,7 @@ namespace dataset
         ///
         /// <returns> The total number of nonzeros. </returns>
         virtual uint64_t NumNonzeros() const = 0;
-        
+
         /// <summary> Makes a deep copy of the datavector </summary>
         ///
         /// <returns> A deep copy of the datavector </summary>
@@ -50,4 +52,5 @@ namespace dataset
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const = 0;
     };
+}
 }

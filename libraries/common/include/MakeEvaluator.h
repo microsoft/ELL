@@ -20,6 +20,8 @@
 // stl
 #include <memory>
 
+namespace emll
+{
 namespace common
 {
     /// <summary> Makes an evaluator. </summary>
@@ -43,6 +45,7 @@ namespace common
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template <typename PredictorType>
     std::shared_ptr<evaluators::IIncrementalEvaluator<PredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments);
+}
 }
 
 #include "../tcc/MakeEvaluator.tcc"

@@ -1,16 +1,12 @@
 #if defined(SWIGJAVASCRIPT)
 
 %{
-#include <node.h>
-#include <v8.h>
-#include <nan.h>
 #include <functional>
 %}
 
 %{
     //
     // Callback wrapper types
-    // TODO: make them templates or something so we don't have to replicate code
     //
     class CallbackBase
     {
@@ -83,7 +79,6 @@
 
 %typemap(in) Callback
 {
-    // TODO: check for enough arguments(?)
     if($input->IsFunction())
     {
         auto func = new Nan::Callback(v8::Local<v8::Function>::Cast($input));
@@ -97,7 +92,6 @@
 
 %typemap(in) Callback2Int
 {
-    // TODO: check for enough arguments(?)
     if($input->IsFunction())
     {
         auto func = new Nan::Callback(v8::Local<v8::Function>::Cast($input));
@@ -111,7 +105,6 @@
 
 %typemap(in) Callback2Int1Double
 {
-    // TODO: check for enough arguments(?)
     if($input->IsFunction())
     {
         auto func = new Nan::Callback(v8::Local<v8::Function>::Cast($input));

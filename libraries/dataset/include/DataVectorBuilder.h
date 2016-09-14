@@ -13,17 +13,18 @@
 // stl
 #include <memory>
 
+namespace emll
+{
 /// <summary> dataset namespace </summary>
 namespace dataset
 {
     /// <summary> DataVectorBuilder Base class. </summary>
     ///
     /// <typeparam name="DefaultDataVectorType"> Type of the default data vector type. </typeparam>
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     class DataVectorBuilder
     {
     public:
-
         /// <summary> Chooses the optimal DataVector representation for a list of index-value pairs. </summary>
         ///
         /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
@@ -33,6 +34,7 @@ namespace dataset
         template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 0>
         static std::unique_ptr<IDataVector> Build(IndexValueIteratorType IndexValueIterator);
     };
+}
 }
 
 #include "../tcc/DataVectorBuilder.tcc"

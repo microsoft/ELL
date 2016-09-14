@@ -6,15 +6,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace emll
+{
 /// <summary> model namespace </summary>
 namespace nodes
 {
     template <typename ValueType, typename SelectorType>
-    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode() : Node({ &_elements, &_selector }, { &_output }), _elements(this, {}, elementsPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 1)
-    {}
-    
+    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode()
+        : Node({ &_elements, &_selector }, { &_output }), _elements(this, {}, elementsPortName), _selector(this, {}, selectorPortName), _output(this, outputPortName, 1)
+    {
+    }
+
     template <typename ValueType, typename SelectorType>
-    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector) : Node({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, 1)
+    MultiplexerNode<ValueType, SelectorType>::MultiplexerNode(const model::PortElements<ValueType>& input, const model::PortElements<SelectorType>& selector)
+        : Node({ &_elements, &_selector }, { &_output }), _elements(this, input, elementsPortName), _selector(this, selector, selectorPortName), _output(this, outputPortName, 1)
     {
         if (selector.Size() != 1)
         {
@@ -30,21 +35,21 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexerNode<ValueType, SelectorType>::Serialize(utilities::Serializer& serializer) const
+    void MultiplexerNode<ValueType, SelectorType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        Node::Serialize(serializer);
-        serializer.Serialize("elements", _elements);
-        serializer.Serialize("selector", _selector);
-        serializer.Serialize("output", _output);
+        Node::WriteToArchive(archiver);
+        archiver["elements"] << _elements;
+        archiver["selector"] << _selector;
+        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexerNode<ValueType, SelectorType>::Deserialize(utilities::Deserializer& serializer, utilities::SerializationContext& context)
+    void MultiplexerNode<ValueType, SelectorType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        Node::Deserialize(serializer, context);
-        serializer.Deserialize("elements", _elements, context);
-        serializer.Deserialize("selector", _selector, context);
-        serializer.Deserialize("output", _output, context);
+        Node::ReadFromArchive(archiver);
+        archiver["elements"] >> _elements;
+        archiver["selector"] >> _selector;
+        archiver[outputPortName] >> _output;
     }
 
     template <typename ValueType, typename SelectorType>
@@ -55,4 +60,5 @@ namespace nodes
         auto newNode = transformer.AddNode<MultiplexerNode<ValueType, SelectorType>>(newElements, newSelector);
         transformer.MapNodeOutput(output, newNode->output);
     }
+}
 }

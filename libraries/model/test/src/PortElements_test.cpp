@@ -5,8 +5,8 @@
 #include "PortElements_test.h"
 
 // model
-#include "Model.h"
 #include "InputNode.h"
+#include "Model.h"
 #include "PortElements.h"
 
 // testing
@@ -14,6 +14,9 @@
 
 // stl
 #include <iostream>
+
+namespace emll
+{
 
 void PrintRange(const model::PortRange& range)
 {
@@ -65,4 +68,5 @@ void TestAppend()
 
     testing::ProcessTest("Testing Append", testing::IsEqual(elements1.Size(), (size_t)5));
     testing::ProcessTest("Testing Append", testing::IsEqual(elements2.Size(), (size_t)7));
+}
 }

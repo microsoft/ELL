@@ -16,17 +16,19 @@
 // stl
 #include <cstdint>
 #include <iostream>
-#include <string>
 #include <random>
+#include <string>
 #include <typeinfo>
+
+using namespace emll;
 
 /// Fills a matrix with binary numbers (using a random generator with fixed seed)
 ///
-template<typename MatrixType>
+template <typename MatrixType>
 void fillMatrix(MatrixType& M, int seed, bool lowerTriangle, bool upperTriangle)
 {
     std::default_random_engine rng(seed);
-    std::normal_distribution<> dist(0,1);
+    std::normal_distribution<> dist(0, 1);
     for (uint64_t row = 0; row < M.NumRows(); ++row)
     {
         uint64_t fromColumn = lowerTriangle ? 0 : row;
@@ -52,7 +54,7 @@ linear::DoubleVector getVector(uint64_t size, int seed)
 
 /// Tests Gemv()
 ///
-template<typename MatrixType1, typename MatrixType2>
+template <typename MatrixType1, typename MatrixType2>
 void testGemv(const MatrixType1& M1, const MatrixType2& M2, double alpha, double beta)
 {
     auto v = getVector(M1.NumColumns(), 345);
@@ -127,7 +129,7 @@ int main()
 {
     testGemv();
 
-    if(testing::DidTestFail())
+    if (testing::DidTestFail())
     {
         return 1;
     }

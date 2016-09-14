@@ -8,18 +8,20 @@
 
 #include "Format.h"
 
+namespace emll
+{
 namespace utilities
 {
     void PrintFormat(std::ostream& os, const char* format)
     {
-        if(*format == '\0')
+        if (*format == '\0')
         {
             return;
         }
 
-        while(*format != '\0')
+        while (*format != '\0')
         {
-            if(*format != whitespaceSymbol)
+            if (*format != whitespaceSymbol)
             {
                 os << *format;
             }
@@ -29,24 +31,24 @@ namespace utilities
 
     MatchResult MatchToSubstitutionSymbol(const char*& content, const char*& format)
     {
-        while(*format != '\0' && *format != substitutionSymbol)
+        while (*format != '\0' && *format != substitutionSymbol)
         {
-            if(std::isspace(*format) && std::isspace(*content))
+            if (std::isspace(*format) && std::isspace(*content))
             {
                 Trim(content);
                 Trim(format);
             }
-            else if(*format == whitespaceSymbol)
+            else if (*format == whitespaceSymbol)
             {
                 Trim(content);
                 ++format;
             }
-            else if(*format == *content)
+            else if (*format == *content)
             {
                 ++format;
                 ++content;
             }
-            else if(*content == '\0')
+            else if (*content == '\0')
             {
                 return MatchResult::earlyEndOfContent;
             }
@@ -62,12 +64,12 @@ namespace utilities
     MatchResult MatchFormat(const char*& content, const char* format)
     {
         auto matchResult = MatchToSubstitutionSymbol(content, format);
-        if(matchResult != MatchResult::success)
+        if (matchResult != MatchResult::success)
         {
             return matchResult;
         }
 
-        if(*format != '\0')
+        if (*format != '\0')
         {
             return MatchResult::missingArgument;
         }
@@ -75,4 +77,4 @@ namespace utilities
         return MatchResult::success;
     }
 }
-
+}

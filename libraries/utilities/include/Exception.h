@@ -8,9 +8,11 @@
 
 #pragma once
 
-#include <string>
 #include <exception>
+#include <string>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> Base class for exceptions. </summary>
@@ -18,7 +20,7 @@ namespace utilities
     {
     public:
         virtual ~Exception() = default;
-        
+
         /// <summary> Gets the message. </summary>
         ///
         /// <returns> A message string; </returns>
@@ -90,6 +92,7 @@ namespace utilities
     typedef ErrorCodeException<SystemExceptionErrors> SystemException;
     typedef ErrorCodeException<NumericExceptionErrors> NumericException;
     typedef ErrorCodeException<InputExceptionErrors> InputException;
+}
 }
 
 #include "../tcc/Exception.tcc"

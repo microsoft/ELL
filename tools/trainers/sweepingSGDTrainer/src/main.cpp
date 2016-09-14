@@ -7,37 +7,37 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // utilities
-#include "Files.h"
-#include "OutputStreamImpostor.h" 
-#include "CommandLineParser.h" 
-#include "RandomEngines.h"
+#include "CommandLineParser.h"
 #include "Exception.h"
+#include "Files.h"
+#include "OutputStreamImpostor.h"
+#include "RandomEngines.h"
 
 // dataset
 #include "Example.h"
 
 // common
-#include "SGDIncrementalTrainerArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
-#include "TrainerArguments.h"
-#include "DataLoadArguments.h" 
-#include "ModelLoadArguments.h"
-#include "ModelSaveArguments.h"
+#include "DataLoadArguments.h"
+#include "DataLoaders.h"
 #include "EvaluatorArguments.h"
 #include "LoadModel.h"
-#include "DataLoaders.h"
-#include "MakeTrainer.h"
 #include "MakeEvaluator.h"
+#include "MakeTrainer.h"
+#include "ModelLoadArguments.h"
+#include "ModelSaveArguments.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
 #include "ParametersEnumerator.h"
+#include "SGDIncrementalTrainerArguments.h"
+#include "TrainerArguments.h"
 
 // trainers
+#include "EvaluatingIncrementalTrainer.h"
 #include "SGDIncrementalTrainer.h"
 #include "SweepingIncrementalTrainer.h"
-#include "EvaluatingIncrementalTrainer.h"
 
 // evaluators
-#include "Evaluator.h"
 #include "BinaryErrorAggregator.h"
+#include "Evaluator.h"
 #include "LossAggregator.h"
 
 // lossFunctions
@@ -45,17 +45,19 @@
 #include "LogLoss.h"
 
 // model
-#include "Model.h"
 #include "InputNode.h"
+#include "Model.h"
 
 // nodes
 #include "LinearPredictorNode.h"
 
 // stl
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <tuple>
-#include <memory>
+
+using namespace emll;
 
 int main(int argc, char* argv[])
 {
@@ -81,16 +83,16 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // manually define regularization parameters to sweep over
-        std::vector<double> regularization{1.0e-0, 1.0e-1, 1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5, 1.0e-6};
+        std::vector<double> regularization{ 1.0e-0, 1.0e-1, 1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5, 1.0e-6 };
 
-        if(trainerArguments.verbose)
+        if (trainerArguments.verbose)
         {
             std::cout << "Sweeping Stochastic Gradient Descent Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
         // load dataset
-        if(trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
+        if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments);
         size_t numColumns = dataLoadArguments.parsedDataDimension;
 
@@ -104,7 +106,7 @@ int main(int argc, char* argv[])
         auto generator = common::MakeParametersEnumerator<trainers::SGDIncrementalTrainerParameters>(regularization);
         std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
-        for(uint64_t i = 0; i < regularization.size(); ++i)
+        for (uint64_t i = 0; i < regularization.size(); ++i)
         {
             auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, generator.GenerateParameters(i));
             evaluators.push_back(common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorParameters, trainerArguments.lossArguments));
@@ -115,18 +117,18 @@ int main(int argc, char* argv[])
         auto trainer = trainers::MakeSweepingIncrementalTrainer(std::move(evaluatingTrainers), multiEpochTrainerArguments);
 
         // train
-        if(trainerArguments.verbose) std::cout << "Training ..." << std::endl;
+        if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         auto trainSetIterator = rowDataset.GetIterator();
         trainer->Update(trainSetIterator);
         auto predictor = trainer->GetPredictor();
 
         // print loss and errors
-        if(trainerArguments.verbose)
+        if (trainerArguments.verbose)
         {
             std::cout << "Finished training.\n";
 
             // print evaluation
-            for(uint64_t i = 0; i < regularization.size(); ++i)
+            for (uint64_t i = 0; i < regularization.size(); ++i)
             {
                 std::cout << "Trainer " << i << ":\n";
                 evaluators[i]->Print(std::cout);
@@ -135,11 +137,11 @@ int main(int argc, char* argv[])
         }
 
         // save predictor model
-        if(modelSaveArguments.outputModelFilename != "")
+        if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
             model::Model model;
-            auto inputNode = model.AddNode<model::InputNode<double>>(predictor->GetDimension());            
+            auto inputNode = model.AddNode<model::InputNode<double>>(predictor->GetDimension());
             model.AddNode<nodes::LinearPredictorNode>(inputNode->output, *predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }

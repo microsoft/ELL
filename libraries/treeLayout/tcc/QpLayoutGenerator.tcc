@@ -10,14 +10,16 @@
 #include "Exception.h"
 
 // stl
-#include <stdexcept>
-#include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <iostream>
+#include <stdexcept>
 
+namespace emll
+{
 namespace treeLayout
 {
-    template<typename ChildrenVectorType>
+    template <typename ChildrenVectorType>
     Layout QpLayoutGenerator::generate(const ChildrenVectorType& Children)
     {
         uint64_t num_nodes = Children.size() * 2 + 1;
@@ -60,7 +62,7 @@ namespace treeLayout
         return l;
     }
 
-    template<typename ChildrenVectorType>
+    template <typename ChildrenVectorType>
     void QpLayoutGenerator::BuildLayers(const ChildrenVectorType& Children)
     {
         std::vector<uint64_t> ancestors;
@@ -68,7 +70,7 @@ namespace treeLayout
         BuildLayers(Children, 0, ancestors, prev_layer_ancestors);
     }
 
-    template<typename ChildrenVectorType>
+    template <typename ChildrenVectorType>
     void QpLayoutGenerator::BuildLayers(const ChildrenVectorType& Children, uint64_t index, std::vector<uint64_t>& ancestors, std::vector<std::vector<uint64_t>>& prev_layer_ancestors)
     {
         uint64_t depth = (uint64_t)ancestors.size();
@@ -133,7 +135,7 @@ namespace treeLayout
         }
     }
 
-    template<typename ChildrenVectorType>
+    template <typename ChildrenVectorType>
     std::vector<std::pair<double, double>> QpLayoutGenerator::SimpleLayout(const ChildrenVectorType& Children, uint64_t node_index, uint64_t depth)
     {
         if (node_index >= Children.size()) // leaf node
@@ -145,20 +147,20 @@ namespace treeLayout
         uint64_t child0 = Children[node_index].GetChild0();
         uint64_t child1 = Children[node_index].GetChild1();
 
-        std::vector<std::pair<double, double>> x0 = SimpleLayout(Children, child0, depth + 1); 
-        std::vector<std::pair<double, double>> x1 = SimpleLayout(Children, child1, depth + 1); 
+        std::vector<std::pair<double, double>> x0 = SimpleLayout(Children, child0, depth + 1);
+        std::vector<std::pair<double, double>> x1 = SimpleLayout(Children, child1, depth + 1);
         uint64_t min_depth = std::min(x0.size(), x1.size());
         uint64_t max_depth = std::max(x0.size(), x1.size());
 
         double max_dist = _parameters.offsetSpace;
         for (uint64_t d = 0; d < min_depth; d++)
         {
-            double gap = _parameters.offsetSpace +_parameters.offsetSpaceGrowthFactor * log2(2.0+d);
+            double gap = _parameters.offsetSpace + _parameters.offsetSpaceGrowthFactor * log2(2.0 + d);
             double dist = gap + x0[d].second - x1[d].first;
             max_dist = std::max(dist, max_dist);
         }
 
-        std::vector<std::pair<double, double>> result(max_depth+1);
+        std::vector<std::pair<double, double>> result(max_depth + 1);
         result[0] = std::make_pair(-max_dist / 2, max_dist / 2);
         for (uint64_t d = 0; d < max_depth; d++)
         {
@@ -181,7 +183,7 @@ namespace treeLayout
         return result;
     }
 
-    template<typename ChildrenVectorType>
+    template <typename ChildrenVectorType>
     void QpLayoutGenerator::IncrementOffsets(const ChildrenVectorType& Children, uint64_t node_index, double displacement)
     {
         _offsets[node_index] += displacement;
@@ -195,7 +197,7 @@ namespace treeLayout
         }
     }
 
-    template<typename ChildrenVectorType>
+    template <typename ChildrenVectorType>
     void QpLayoutGenerator::Optimize(const ChildrenVectorType& Children)
     {
         for (uint64_t t = 1; t <= _parameters.gdNumSteps; ++t)
@@ -208,12 +210,12 @@ namespace treeLayout
             for (uint64_t index = 0; index < _offsets.size(); index++)
             {
                 double diff = old_offsets[index] - _offsets[index];
-                total_disp += diff*diff;
+                total_disp += diff * diff;
             }
         }
     }
 
-    template<typename ChildrenVectorType>
+    template <typename ChildrenVectorType>
     void QpLayoutGenerator::GdStep(const ChildrenVectorType& Children, double step_size)
     {
         // initialize memory
@@ -226,7 +228,7 @@ namespace treeLayout
         }
     }
 
-    template<typename ChildrenVectorType>
+    template <typename ChildrenVectorType>
     void QpLayoutGenerator::ComputeGradient(const ChildrenVectorType& Children, const std::vector<double>& offsets, const std::vector<uint64_t>& depths, double step_size, std::vector<double>& grad)
     {
         uint64_t num_nodes = Children.size() * 2 + 1;
@@ -257,7 +259,7 @@ namespace treeLayout
         }
     }
 
-    template<typename ChildrenVectorType>
+    template <typename ChildrenVectorType>
     void QpLayoutGenerator::MoveParents(const ChildrenVectorType& Children, uint64_t node_index, double step_size)
     {
         if (node_index < Children.size())
@@ -275,8 +277,9 @@ namespace treeLayout
 
             double midpt = (child0_offset + child1_offset) / 2.0;
             // move parent toward midpoint of Children
-//            _offsets[node_index] = ((1.0 - step_size) * parent_offset) + (step_size * midpt);
-            _offsets[node_index] += step_size*(midpt - parent_offset); // equivalent to above
+            //            _offsets[node_index] = ((1.0 - step_size) * parent_offset) + (step_size * midpt);
+            _offsets[node_index] += step_size * (midpt - parent_offset); // equivalent to above
         }
     }
+}
 }

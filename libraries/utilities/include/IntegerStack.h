@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <stack>
 
+namespace emll
+{
 namespace utilities
 {
     /// <summary> Implements a stack of integers, which is initialized to be 0,1,2,.... Namely, the
@@ -44,4 +46,5 @@ namespace utilities
         uint64_t _smallestUnpopped = 0;
         std::stack<uint64_t> _stack;
     };
+}
 }

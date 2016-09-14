@@ -7,20 +7,23 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SparseBinaryDataVector.h"
-#include "IntegerList.h"
 #include "CompressedIntegerList.h"
+#include "IntegerList.h"
 
 // stl
 #include <cassert>
 
+namespace emll
+{
 namespace dataset
 {
-    template<typename IntegerListType>
+    template <typename IntegerListType>
     SparseBinaryDataVectorBase<IntegerListType>::Iterator::Iterator(const IndexIteratorType& list_iterator)
         : _list_iterator(list_iterator)
-    {}
+    {
+    }
 
-    template<typename IntegerListType>
+    template <typename IntegerListType>
     void SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(uint64_t index, double value)
     {
         if (value == 0)
@@ -33,10 +36,10 @@ namespace dataset
         _indices.Append(index);
     }
 
-    template<typename IntegerListType>
+    template <typename IntegerListType>
     uint64_t SparseBinaryDataVectorBase<IntegerListType>::Size() const
     {
-        if(_indices.Size() == 0)
+        if (_indices.Size() == 0)
         {
             return 0;
         }
@@ -45,8 +48,8 @@ namespace dataset
             return _indices.Max() + 1;
         }
     }
-    
-    template<typename IntegerListType>
+
+    template <typename IntegerListType>
     void SparseBinaryDataVectorBase<IntegerListType>::AddTo(double* p_other, double scalar) const
     {
         auto iter = _indices.GetIterator();
@@ -57,26 +60,26 @@ namespace dataset
         }
     }
 
-    template<typename IntegerListType>
+    template <typename IntegerListType>
     double SparseBinaryDataVectorBase<IntegerListType>::Dot(const double* p_other) const
     {
         double value = 0.0;
-        
+
         auto iter = _indices.GetIterator();
         while (iter.IsValid())
         {
             value += (double)p_other[iter.Get()];
             iter.Next();
         }
-        
+
         return value;
     }
 
-    template<typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::Print(std::ostream & os) const
+    template <typename IntegerListType>
+    void SparseBinaryDataVectorBase<IntegerListType>::Print(std::ostream& os) const
     {
         auto iterator = GetIterator();
-        while(iterator.IsValid())
+        while (iterator.IsValid())
         {
             auto entry = iterator.Get();
             os << entry.index << ':' << entry.value << '\t';
@@ -87,4 +90,5 @@ namespace dataset
     // Explicit instantiation
     template class SparseBinaryDataVectorBase<utilities::CompressedIntegerList>;
     template class SparseBinaryDataVectorBase<utilities::IntegerList>;
+}
 }
