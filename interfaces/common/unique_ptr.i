@@ -36,8 +36,13 @@ namespace std
 
 %define wrap_unique_ptr(name, type)
   %template (name) std::unique_ptr<type>;
-  %typemap(out) unique_ptr<type> 
+  %typemap(out) std::unique_ptr<type>
   %{
-      $result = std::move($1);
+#if SWIGPYTHON
+        $result = SWIG_NewPointerObj(new $1_ltype(std::move($1)), $1_descriptor, SWIG_POINTER_OWN);
+#endif
+#if SWIGCSHARP
+        $result = new $1_ltype(std::move($1));
+#endif
   %};
 %enddef

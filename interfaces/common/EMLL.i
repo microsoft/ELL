@@ -135,8 +135,6 @@ typedef emll::dataset::GenericRowDataset::Iterator emll::dataset::GenericRowIter
 // Interface includes for dataset library
 %include dataset.i
 
-%include "SGDIncrementalTrainer_wrap.h"
-
 // Interface for the predictors library
 %include predictors.i
 

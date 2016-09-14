@@ -8,11 +8,37 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "LogLoss.h"
-#include "HingeLoss.h"
-#include "SquaredLoss.h"
+#include "ForestTrainerArguments.h"
+#include "MultiEpochIncrementalTrainer.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
+#include "SGDIncrementalTrainerArguments.h"
+#include "TrainerArguments.h"
+#include "MakeTrainer.h"
+#include "IIncrementalTrainer.h"
 #include "SGDIncrementalTrainer_wrap.h"
+
+typedef emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor> IncrementalLinearPredictorTrainer;
+typedef emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor> IncrementalForestPredictorTrainer;
 %}
+
+%include "ForestTrainerArguments.h"
+%include "MultiEpochIncrementalTrainer.h"
+%include "MultiEpochIncrementalTrainerArguments.h"
+%include "SGDIncrementalTrainerArguments.h"
+%include "TrainerArguments.h"
+%include "IIncrementalTrainer.h"
+
+%template () emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>;
+%template () emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor>;
+
+typedef emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor> IncrementalLinearPredictorTrainer;
+typedef emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor> IncrementalForestPredictorTrainer;
+
+%include "unique_ptr.i"
+wrap_unique_ptr(LinearPredictorPtr, IncrementalLinearPredictorTrainer)
+wrap_unique_ptr(SimpleForestPredictorPtr, IncrementalForestPredictorTrainer)
+
+%include "MakeTrainer.h"
 
 %include "SGDIncrementalTrainer_wrap.h"
 
