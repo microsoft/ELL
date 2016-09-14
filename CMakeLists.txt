@@ -32,13 +32,6 @@ endif()
 #      cmake -DDOXYGEN_ENABLED=OFF ..  )
 option(SWIG_ENABLED "Enable swig interfaces" ON)
 option(DOXYGEN_ENABLED "Enable Doxygen interfaces" ON)
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/llvm")
-  set(LLVM_ENABLED ON)
-  message("LLVM Compilation Enabled")
-else()
-  set(LLVM_ENABLED OFF)
-  message("LLVM Compilation Disabled")
-endif()
 
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
