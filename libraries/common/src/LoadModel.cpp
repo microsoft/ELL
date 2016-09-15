@@ -10,9 +10,11 @@
 #include "IsNodeCompilable.h"
 
 // model
+#include "DynamicMap.h"
 #include "InputNode.h"
 #include "Model.h"
 #include "OutputNode.h"
+
 
 // nodes
 #include "BinaryOperationNode.h"
@@ -202,11 +204,36 @@ namespace common
         }
     }
 
+    template <typename UnarchiverType>
+    model::DynamicMap LoadArchivedMap(std::istream& stream)
+    {
+        try
+        {
+            utilities::SerializationContext context;
+            RegisterNodeTypes(context);
+            UnarchiverType unarchiver(stream, context);
+            model::DynamicMap map;
+            unarchiver.Unarchive(map);
+            return map;
+        }
+        catch (const std::exception&)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file.");
+        }
+    }
+
     template <typename ArchiverType>
     void SaveArchivedModel(const model::Model& model, std::ostream& stream)
     {
         ArchiverType archiver(stream);
         archiver.Archive(model);
+    }
+
+    template <typename ArchiverType>
+    void SaveArchivedMap(const model::DynamicMap& map, std::ostream& stream)
+    {
+        ArchiverType archiver(stream);
+        archiver.Archive(map);
     }
 
     bool IsKnownExtension(const std::string& ext)
@@ -274,6 +301,50 @@ namespace common
         {
             auto filestream = utilities::OpenOfstream(filename);
             SaveArchivedModel<utilities::JsonArchiver>(model, filestream);
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
+        }
+    }
+
+    model::DynamicMap LoadMap(const std::string& filename)
+    {
+        auto ext = utilities::GetFileExtension(filename, true);
+        if (IsKnownExtension(ext))
+        {
+            if (!utilities::IsFileReadable(filename))
+            {
+                throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound);
+            }
+
+            auto filestream = utilities::OpenIfstream(filename);
+            if (ext == "xml")
+            {
+                return LoadArchivedMap<utilities::XmlUnarchiver>(filestream);
+            }
+            else if (ext == "json")
+            {
+                return LoadArchivedMap<utilities::JsonUnarchiver>(filestream);
+            }
+        }
+
+        model::Model emptyModel;
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
+    }
+
+    void SaveMap(const model::DynamicMap& map, const std::string& filename)
+    {
+        auto ext = utilities::GetFileExtension(filename);
+        if (ext == "xml")
+        {
+            auto filestream = utilities::OpenOfstream(filename);
+            SaveArchivedMap<utilities::XmlArchiver>(map, filestream);
+        }
+        else if (ext == "json")
+        {
+            auto filestream = utilities::OpenOfstream(filename);
+            SaveArchivedMap<utilities::JsonArchiver>(map, filestream);
         }
         else
         {

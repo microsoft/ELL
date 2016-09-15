@@ -10,6 +10,7 @@
 
 // model
 #include "Model.h"
+#include "DynamicMap.h"
 
 namespace emll
 {
@@ -31,5 +32,9 @@ namespace common
     ///
     /// <param name="context"> The `SerializationContext` </param>
     void RegisterNodeTypes(utilities::SerializationContext& context);
+
+
+    // map
+    model::DynamicMap LoadMap(const std::string& filename);
 }
 }
