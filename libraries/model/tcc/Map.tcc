@@ -12,9 +12,9 @@ namespace model
 {
     template <typename InputTypesTuple, typename OutputTypesTuple>
     Map<InputTypesTuple, OutputTypesTuple>::Map(const Model& model,
-                                                const InputTypesTuple& inputs,
+                                                const WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
                                                 const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
-                                                const OutputTypesTuple& outputs,
+                                                const WrappedTuple<OutputTypesTuple, PortElements>& outputs,
                                                 const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
         : _model(model), _inputs(inputs), _inputNames(inputNames), _outputs(outputs), _outputNames(outputNames)
     {
@@ -22,20 +22,24 @@ namespace model
         AddOutputsToNameMap(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), _outputs, _outputNames);
     }
 
-    template <typename InputTypesTuple, typename OutputTypesTuple>
+    template <typename WrappedInputTypesTuple, typename WrappedOutputTypesTuple>
     auto MakeMap(const Model& model,
-                 const InputTypesTuple& inputs,
-                 const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
-                 const OutputTypesTuple& outputs,
-                 const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
+                 const WrappedInputTypesTuple& inputs,
+                 const std::array<std::string, std::tuple_size<WrappedInputTypesTuple>::value>& inputNames,
+                 const WrappedOutputTypesTuple& outputs,
+                 const std::array<std::string, std::tuple_size<WrappedOutputTypesTuple>::value>& outputNames)
     {
+        using InputTypesTuple = typename UnwrappedTuple<WrappedInputTypesTuple>::type;
+        using OutputTypesTuple = typename UnwrappedTuple<WrappedOutputTypesTuple>::type;
+
+        // need to unwrap tuple types
         return Map<InputTypesTuple, OutputTypesTuple>(model, inputs, inputNames, outputs, outputNames);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::AddInputsToNameMap(std::index_sequence<Sequence...>,
-                                                                    InputTypesTuple& inputs,
+                                                                    WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
                                                                     const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames)
     {
         _inputNodeMap.insert({ std::get<Sequence>(inputNames)..., static_cast<Node*>(std::get<Sequence>(inputs))... });
@@ -44,7 +48,7 @@ namespace model
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::AddOutputsToNameMap(std::index_sequence<Sequence...>,
-                                                                     OutputTypesTuple& outputs,
+                                                                     WrappedTuple<OutputTypesTuple, PortElements>& outputs,
                                                                      const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
     {
         _outputElementsMap.insert({ std::get<Sequence>(outputNames)..., static_cast<PortElementsBase&>(std::get<Sequence>(outputs))... });
