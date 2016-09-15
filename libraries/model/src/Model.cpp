@@ -173,12 +173,23 @@ namespace model
     //
     // ModelSerializationContext
     //
-    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model)
-        : _originalContext(otherContext), _model(model)
+    ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& previousContext, const Model* model)
+        : _previousContext(previousContext), _model(model)
     {
+        // TODO: if the old context is a ModelSerializationContext, set it's model field
+        auto mapContext = dynamic_cast<ModelSerializationContext*>(&previousContext);
+        if (mapContext != nullptr)
+        {
+            mapContext->SetModel(model);
+        }
     }
 
-    Node* ModelSerializationContext::GetNodeFromId(const Node::NodeId& id)
+    void ModelSerializationContext::SetModel(const Model* model)
+    {
+        _model = model;
+    }
+
+    Node* ModelSerializationContext::GetNodeFromSerializedId(const Node::NodeId& id)
     {
         return _oldToNewNodeMap[id];
     }
@@ -186,6 +197,13 @@ namespace model
     void ModelSerializationContext::MapNode(const Node::NodeId& id, Node* node)
     {
         _oldToNewNodeMap[id] = node;
+
+        // if the old context is a ModelSerializationContext, forward the MapNode call to it
+        auto mapContext = dynamic_cast<ModelSerializationContext*>(&_previousContext);
+        if (mapContext != nullptr)
+        {
+            mapContext->MapNode(id, node);
+        }
     }
 }
 }

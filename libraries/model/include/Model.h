@@ -193,14 +193,19 @@ namespace model
     public:
         /// <summary> Constructor </summary>
         ///
-        /// <param name="otherContext"> The `SerializationContext` to wrap </param>
+        /// <param name="previousContext"> The `SerializationContext` to wrap </param>
         /// <param name="model"> The model being constructed </param>
-        ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model);
+        ModelSerializationContext(utilities::SerializationContext& previousContext, const Model* model);
 
         /// <summary> Gets the type factory associated with this context. </summary>
         ///
         /// <returns> The type factory associated with this context. </returns>
-        virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _originalContext.GetTypeFactory(); }
+        virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _previousContext.GetTypeFactory(); }
+
+        /// <summary> Sets the model this map is deserializing
+        ///
+        /// <param name="model"> The model this map wraps </param>
+        void SetModel(const Model* model);
 
         /// <summary> Returns the Model currently being deserialized. </summary>
         ///
@@ -210,7 +215,7 @@ namespace model
         /// <summary> Returns a pointer to an already-deserialized node, given its serialized ID </summary>
         ///
         /// <returns> A pointer to an already-deserialized node. </returns>
-        Node* GetNodeFromId(const Node::NodeId& id);
+        Node* GetNodeFromSerializedId(const Node::NodeId& id);
 
         /// <summary> Associate a newly-deserialized node with its serialized ID </summary>
         ///
@@ -219,7 +224,7 @@ namespace model
         void MapNode(const Node::NodeId& id, Node* node);
 
     private:
-        utilities::SerializationContext& _originalContext;
+        utilities::SerializationContext& _previousContext;
         const Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };

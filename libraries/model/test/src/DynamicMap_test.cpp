@@ -18,6 +18,7 @@
 
 // common
 #include "IsNodeCompilable.h"
+#include "LoadModel.h" // for RegisterNodeTypes
 
 // utilities
 #include "XmlArchiver.h"
@@ -115,11 +116,19 @@ void TestDynamicMapSerialization()
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     auto map = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
 
-    std::stringstream strstream;
-    utilities::XmlArchiver archiver(strstream);
+    std::stringstream outStream;
+    utilities::XmlArchiver archiver(outStream);
     archiver << map;
 
     std::cout << "\nArchived version of map:" << std::endl;
-    std::cout << strstream.str();
+    std::cout << outStream.str();
+
+    // Now read it back in
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    std::stringstream inStream(outStream.str());
+    utilities::XmlUnarchiver unarchiver(inStream, context);
+    model::DynamicMap map2;
+    unarchiver >> map2;
 }
 }

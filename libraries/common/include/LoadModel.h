@@ -26,5 +26,10 @@ namespace common
     /// <param name="model"> The model. </param>
     /// <param name="filename"> The filename. </param>
     void SaveModel(const model::Model& model, const std::string& filename);
+
+    /// <summary> Register known node types to a serialization context </summary>
+    ///
+    /// <param name="context"> The `SerializationContext` </param>
+    void RegisterNodeTypes(utilities::SerializationContext& context);
 }
 }

@@ -91,7 +91,7 @@ namespace model
 
         auto& context = archiver.GetContext();
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
-        Node* newNode = newContext.GetNodeFromId(newId);
+        Node* newNode = newContext.GetNodeFromSerializedId(newId);
         if (newNode == nullptr)
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find archived node.");

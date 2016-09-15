@@ -154,11 +154,14 @@ namespace common
 
     void RegisterNodeTypes(utilities::SerializationContext& context)
     {
+        // TODO: add more node types!
         context.GetTypeFactory().AddType<model::Node, utilities::UniqueId>();
         context.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ArgMaxNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ArgMinNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();

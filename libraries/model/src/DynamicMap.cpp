@@ -53,24 +53,72 @@ namespace model
     {
         archiver["model"] << _model;
 
+        // Need to do outputs, too!
         std::vector<std::string> inputNames;
         std::vector<utilities::UniqueId> inputIds;
-        for(const auto& input: _inputNodeMap)
+        for (const auto& input : _inputNodeMap)
         {
             inputNames.push_back(input.first);
             inputIds.push_back(input.second->GetId());
         }
         archiver["inputNames"] << inputNames;
         archiver["inputIds"] << inputIds;
+
+        // Need to do outputs, too!
+        std::vector<std::string> outputNames;
+        std::vector<PortElementsBase> outputElements;
+        for (const auto& output : _outputElementsMap)
+        {
+            outputNames.push_back(output.first);
+            outputElements.push_back(output.second);
+        }
+        archiver["outputNames"] << outputNames;
+        archiver["outputElements"] << outputElements;
     }
 
     void DynamicMap::ReadFromArchive(utilities::Unarchiver& archiver)
     {
+        DynamicMapSerializationContext mapContext(archiver.GetContext());
+        archiver.PushContext(mapContext);
+
         archiver["model"] >> _model;
         std::vector<std::string> inputNames;
         std::vector<utilities::UniqueId> inputIds;
         archiver["inputNames"] >> inputNames;
         archiver["inputIds"] >> inputIds;
+
+        std::vector<std::string> outputNames;
+        std::vector<PortElementsBase> outputElements;
+        archiver["outputNames"] >> outputNames;
+        archiver["outputElements"] >> outputElements;
+
+        // reconstruct _inputNodeMap
+        _inputNodeMap.clear();
+        assert(inputNames.size() == inputIds.size());
+        for (size_t index = 0; index < inputNames.size(); ++index)
+        {
+            auto node = mapContext.GetNodeFromSerializedId(inputIds[index]);
+            assert(dynamic_cast<InputNodeBase*>(node) != nullptr);
+            _inputNodeMap[inputNames[index]] = static_cast<InputNodeBase*>(node);
+        }
+
+        // reconstruct _outputElementsMap
+        _outputElementsMap.clear();
+        assert(outputNames.size() == outputElements.size());
+        for (size_t index = 0; index < outputNames.size(); ++index)
+        {
+            _outputElementsMap[outputNames[index]] = outputElements[index];
+        }
+
+        archiver.PopContext();
+    }
+
+    //
+    // DynamicMapSerializationContext
+    //
+    DynamicMapSerializationContext::DynamicMapSerializationContext(utilities::SerializationContext& previousContext)
+        : ModelSerializationContext(previousContext, nullptr)
+    {
     }
 }
 }

@@ -34,6 +34,9 @@ namespace model
     {
     public:
         /// <summary> Constructor </summary>
+        DynamicMap() = default;
+
+        /// <summary> Constructor </summary>
         ///
         /// <param name="model"> The model to wrap </param>
         /// <param name="inputs"> A vector of name/value pairs for the inputs this map uses </param>
@@ -70,7 +73,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -87,6 +90,18 @@ namespace model
         Model _model;
         std::unordered_map<std::string, InputNodeBase*> _inputNodeMap;
         std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
+    };
+
+    /// <summary> A serialization context used during model deserialization. Wraps an existing `SerializationContext`
+    /// and adds access to the model being constructed. </summary>
+    class DynamicMapSerializationContext : public ModelSerializationContext
+    {
+    public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="previousContext"> The `SerializationContext` to wrap </param>
+        /// <param name="model"> The model being constructed </param>
+        DynamicMapSerializationContext(utilities::SerializationContext& previousContext);
     };
 }
 }
