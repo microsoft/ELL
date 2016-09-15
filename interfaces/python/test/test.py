@@ -14,12 +14,14 @@ import nodes_test
 import linear_test
 import evaluators_test
 import dataset_test
+import sgd_trainer_test
 import treelayout_test
 
 tests = [   
             lossfunctions_test.test, 
             model_test.test, 
             common_test.test,
+            sgd_trainer_test.test,
             trainers_test.test,
             predictors_test.test,
             nodes_test.test,
