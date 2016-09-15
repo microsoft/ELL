@@ -14,7 +14,7 @@
 #include "SGDIncrementalTrainer.h"
 %}
 
-%include "SGDIncrementalTrainer_wrap.h"
+%include "SGDIncrementalTrainer.h"
 
 %inline 
 %{

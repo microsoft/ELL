@@ -22,4 +22,5 @@ def test():
         print "trainer.Update(...) succeeded"
     except TypeError, msg:
         print "trainer.Update(...) threw a TypeError exception", msg
-        return 0
+        return 1
+    return 0

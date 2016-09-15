@@ -22,9 +22,6 @@
 #pragma SWIG nowarn=325,341,362,401,503
 #endif
 
-
-%warnfilter(315) std::enable_if_t;
-
 // Useful defines
 %{
 #ifdef SWIGPYTHON
@@ -103,15 +100,6 @@ namespace std
 // Interface for NaN callbacks
 %include callback.i
 
-// Define some namespaces so we can refer to them later
-
-#ifndef SWIGXML
-%template () std::vector<emll::dataset::IDataVector>;
-#endif
-
-//template <typename IteratorType, typename ValueType> class emll::utilities::StlIndexValueIterator {};
-//%template () emll::utilities::StlIndexValueIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
-
 // Interface includes for lossFunctions library
 %include lossFunctions.i
 
@@ -138,18 +126,6 @@ namespace std
 
 // Interface for model library
 %include nodes.i
-
-
-#ifndef SWIGXML
-%template () std::vector<emll::dataset::GenericSupervisedExample>;
-%template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample>::const_iterator, emll::dataset::GenericSupervisedExample>;
-%template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample, std::allocator<emll::dataset::GenericSupervisedExample>>::const_iterator, emll::dataset::GenericSupervisedExample>;
-
-%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
-#endif
-
-typedef emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::PredictorType emll::predictors::LinearPredictor;
-class emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::PredictorType {};
 
 #if !defined(SWIGXML) && !defined(SWIGR) && !defined(SWIGJAVASCRIPT)
 %shared_ptr(RowDataset)

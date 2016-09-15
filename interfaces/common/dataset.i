@@ -14,7 +14,6 @@
 #include "SparseDataVector.h"
 #include "Example.h"
 #include "RowDataset.h"
-// #include "RowDatasetInterface.h"
 #include "StlIterator.h"
 %}
 
@@ -47,31 +46,11 @@
 %include "RowDataset.h"
 %include "SparseDataVector.h"
 
-
-namespace emll::dataset
-{
-//    %ignore IDataVector::Clone;
-//    %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&&);
-//    %ignore GenericSupervisedExample::GetDataVector;
-//    %ignore GenericSupervisedExample::GenericSupervisedExample;
-
-    %ignore DenseDataVector::operator[];
-    %ignore DenseDataVector<double>;
-    %ignore DenseDataVector<float>;
-
-    %ignore SparseDataVector<double, emll::utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<float, emll::utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<short, emll::utilities::CompressedIntegerList>;
-}
-
 wrap_unique_ptr(IDataVectorPtr, emll::dataset::IDataVector)
 
 %template (GenericSupervisedExample) emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>;
 %template (GenericRowDataset) emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>;
 %template (GenericRowIterator) emll::utilities::StlIterator<typename std::vector<emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>>::const_iterator, emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>>;
-// %template (GenericRowIterator2) emll::utilities::VectorIterator<emll::dataset::GenericSupervisedExample>;
-
-typedef emll::dataset::RowDataset<emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>>::Iterator GenericRowIter;
 
 // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
 %template () emll::dataset::DenseDataVector<double>;

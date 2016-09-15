@@ -8,9 +8,6 @@
 
 #pragma once
 
-// Our interface classes
-#include "RowDatasetInterface.h"
-
 #include "AnyIterator.h"
 #include "DataLoadArguments.h"
 #include "Example.h"
@@ -25,8 +22,6 @@ namespace interfaces
     /// <param name="dataFilename"> The data filename. </param>
     ///
     /// <returns> The row dataset. </returns>
-//    interfaces::GenericRowDataset2 GetDataset(const std::string& dataFilename);
-
     emll::dataset::GenericRowDataset GetDataset(const std::string& dataFilename);
 }
 }

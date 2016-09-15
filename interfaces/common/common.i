@@ -14,7 +14,6 @@
 
 %ignore emll::common::GetDataset;
 
-// %include "DataLoadArguments.h"
 %include "LoadModel.h"
 
 // Modified versions of interfaces
