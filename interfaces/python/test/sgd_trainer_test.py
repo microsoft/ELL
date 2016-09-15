@@ -11,7 +11,10 @@ def test():
     dataset = EMLL.GetDataset("../../../examples/data/testData.txt")
     print type(dataset)
 
-    iterator = dataset.GetIterator(0, dataset.NumExamples())
+    ex = dataset.GetExample(0)
+    print type(ex)
+
+    iterator = dataset.GetIterator(0, dataset.NumExamples()) 
     print type(iterator)
 
     try:

@@ -24,10 +24,10 @@ namespace emll
 {
 namespace interfaces
 {
-    class GenericRowIterator
+    class GenericRowIterator2
     {
     public:
-        GenericRowIterator(const dataset::GenericRowDataset::Iterator& iter)
+        GenericRowIterator2(const dataset::GenericRowDataset::Iterator& iter)
             : _iterator(iter) {}
 
         bool IsValid() const
@@ -62,12 +62,12 @@ namespace interfaces
         dataset::GenericRowDataset::Iterator _iterator;
     };
 
-    class GenericRowDataset
+    class GenericRowDataset2
     {
     public:
-        GenericRowDataset(){};
-        GenericRowDataset(const GenericRowDataset& other);
-        const GenericRowDataset& operator=(GenericRowDataset&& other)
+        GenericRowDataset2(){};
+        GenericRowDataset2(const GenericRowDataset2& other);
+        const GenericRowDataset2& operator=(GenericRowDataset2&& other)
         {
             _dataset = std::move(other._dataset);
             return *this;
@@ -76,7 +76,7 @@ namespace interfaces
         /// <summary> Constructor for RowDataset wrapper</summary>
         ///
         /// <param name="dataset"> The dataset::RowDataset to wrap </param>
-        GenericRowDataset(dataset::GenericRowDataset&& dataset);
+        GenericRowDataset2(dataset::GenericRowDataset&& dataset);
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -109,7 +109,7 @@ namespace interfaces
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        GenericRowIterator GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
+        GenericRowIterator2 GetIterator(uint64_t firstExample = 0, uint64_t numExamples = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///

@@ -25,6 +25,11 @@
 %nodefaultctor emll::model::OutputPort<double>;
 %nodefaultctor emll::model::InputPortBase;
 
+%ignore std::hash<emll::model::PortElementBase>;
+%ignore std::hash<emll::model::PortRange>;
+%ignore emll::model::Model::ComputeOutput;
+%ignore emll::model::InputPort::operator[];
+
 %include "Port.h"
 %include "OutputPort.h"
 %include "PortElements.h"
@@ -54,8 +59,6 @@
 %template (DoubleOutputNodeVector) std::vector<const emll::model::OutputNode<double>*>;
 
 #endif
-
-%ignore emll::model::Model::ComputeOutput;
 
 %extend emll::model::Model 
 {

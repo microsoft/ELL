@@ -11,7 +11,7 @@
 #include "LogLoss.h"
 #include "HingeLoss.h"
 #include "SquaredLoss.h"
-#include "SGDIncrementalTrainer_wrap.h"
+#include "SGDIncrementalTrainer.h"
 %}
 
 %include "SGDIncrementalTrainer_wrap.h"
@@ -22,7 +22,7 @@
     {
     public:
         LinearPredictorProxy(const std::shared_ptr<const emll::predictors::LinearPredictor>& pred) : _pred(*pred) {}
-        const emll::predictors::LinearPredictor& GetPred() { return _pred; }
+        const emll::predictors::LinearPredictor GetPred() { return _pred; }
     private:
         emll::predictors::LinearPredictor _pred;
     };

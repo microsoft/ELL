@@ -30,4 +30,12 @@ namespace trainers
 }
 }
 #else
+namespace emll
+{
+namespace trainers
+{
+template <typename LossFunctionType>
+class SGDIncrementalTrainer;    
+}
+}
 #endif

@@ -17,27 +17,27 @@ namespace interfaces
     //
     // RowDataset
     //
-    GenericRowDataset::GenericRowDataset(const GenericRowDataset& other)
+    GenericRowDataset2::GenericRowDataset2(const GenericRowDataset2& other)
         : _dataset(other._dataset)
     {
     }
 
-    GenericRowDataset::GenericRowDataset(dataset::GenericRowDataset&& dataset)
+    GenericRowDataset2::GenericRowDataset2(dataset::GenericRowDataset&& dataset)
         : _dataset(std::move(dataset))
     {
     }
 
-    uint64_t GenericRowDataset::NumExamples() const
+    uint64_t GenericRowDataset2::NumExamples() const
     {
         return _dataset.NumExamples();
     }
 
-    uint64_t GenericRowDataset::GetMaxDataVectorSize() const
+    uint64_t GenericRowDataset2::GetMaxDataVectorSize() const
     {
         return _dataset.GetMaxDataVectorSize();
     }
 
-    dataset::GenericSupervisedExample GenericRowDataset::GetExample(uint64_t index) const
+    dataset::GenericSupervisedExample GenericRowDataset2::GetExample(uint64_t index) const
     {
         if (index >= NumExamples())
         {
@@ -52,7 +52,7 @@ namespace interfaces
 		return result;
 	}
 
-    dataset::DenseSupervisedExample GenericRowDataset::GetDenseSupervisedExample(uint64_t index) const
+    dataset::DenseSupervisedExample GenericRowDataset2::GetDenseSupervisedExample(uint64_t index) const
     {
         if (index >= NumExamples())
         {
@@ -67,22 +67,22 @@ namespace interfaces
         return result;
     }
 
-    GenericRowIterator GenericRowDataset::GetIterator(uint64_t firstExample, uint64_t numExamples) const
+    GenericRowIterator2 GenericRowDataset2::GetIterator(uint64_t firstExample, uint64_t numExamples) const
     {
-        return GenericRowIterator(_dataset.GetIterator(firstExample, numExamples));
+        return GenericRowIterator2(_dataset.GetIterator(firstExample, numExamples));
     }
 
-    void GenericRowDataset::AddExample(dataset::GenericSupervisedExample&& example)
+    void GenericRowDataset2::AddExample(dataset::GenericSupervisedExample&& example)
     {
         _dataset.AddExample(std::move(example));
     }
 
-    void GenericRowDataset::RandomPermute(std::default_random_engine& rng)
+    void GenericRowDataset2::RandomPermute(std::default_random_engine& rng)
     {
         _dataset.RandomPermute(rng);
     }
 
-    void GenericRowDataset::RandomPermute(std::default_random_engine& rng, uint64_t count)
+    void GenericRowDataset2::RandomPermute(std::default_random_engine& rng, uint64_t count)
     {
         _dataset.RandomPermute(rng, count);
     }
