@@ -36,7 +36,7 @@ namespace model
         SetInput(inputName, inputValues.ToTypedArray());
     }
 
-    template <typename ValueType>
+    template <typename ValueType, utilities::IsFundamental<ValueType>>
     std::vector<ValueType> DynamicMap::ComputeOutput(const std::string& outputName)
     {
         auto iter = _outputElementsMap.find(outputName);
@@ -46,6 +46,12 @@ namespace model
         }
 
         return _model.ComputeOutput<ValueType>(iter->second);
+    }
+
+    template <typename VectorType, typename ValueType>
+    VectorType DynamicMap::ComputeOutput(const std::string& outputName)
+    {
+        return VectorType{ ComputeOutput<ValueType>(outputName) };
     }
 }
 }

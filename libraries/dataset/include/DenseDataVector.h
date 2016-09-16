@@ -34,7 +34,8 @@ namespace dataset
     {
     public:
         using Iterator = linear::VectorIndexValueIterator<ValueType>;
-
+        using value_type = ValueType;
+        
         /// <summary> Constructor. </summary>
         DenseDataVector();
 

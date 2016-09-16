@@ -94,8 +94,8 @@ int main(int argc, char* argv[])
         {
             auto row = datasetIterator.Get();
             map.SetInput<double>("input", row.GetDataVector());
-            auto output = map.ComputeOutput<double>("output");
-            auto mappedRow = dataset::DenseSupervisedExample{ dataset::DoubleDataVector{ output }, row.GetMetadata() };
+            auto output = map.ComputeOutput<dataset::DoubleDataVector>("output");
+            auto mappedRow = dataset::DenseSupervisedExample{ output, row.GetMetadata() };
             mappedRow.Print(outputStream);
             datasetIterator.Next();
         }

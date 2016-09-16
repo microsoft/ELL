@@ -20,6 +20,7 @@
 
 // utilities
 #include "TypeName.h"
+#include "TypeTraits.h"
 #include "IArchivable.h"
 
 // stl
@@ -73,8 +74,11 @@ namespace model
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
         /// <returns> A vector of output values </returns>
-        template <typename ValueType>
+        template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
         std::vector<ValueType> ComputeOutput(const std::string& outputName);
+
+        template <typename VectorType, typename ValueType = typename VectorType::value_type>
+        VectorType ComputeOutput(const std::string& outputName);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
