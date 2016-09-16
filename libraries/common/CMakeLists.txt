@@ -45,6 +45,7 @@ set (INCLUDE include/DataLoadArguments.h
 )
 
 set (TCC tcc/IsNodeCompilable.tcc
+         tcc/DataLoaders.tcc
          tcc/MakeEvaluator.tcc
          tcc/ParametersEnumerator.tcc
 )

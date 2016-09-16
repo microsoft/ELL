@@ -50,10 +50,20 @@ namespace dataset
         template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
 
+        /// <summary> Constructs an instance of DenseDataVector from an IDataVector. </summary>
+        ///
+        /// <param name="data"> The IDataVector. </param>
+        DenseDataVector(const IDataVector& dataVector);
+
         /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
         ///
         /// <param name="data"> The std::vector. </param>
-        DenseDataVector(std::vector<ValueType> data);
+//        DenseDataVector(std::vector<ValueType> data);
+
+        /// <summary> Constructs an instance of DenseDataVector from a std::vector<double>. </summary>
+        ///
+        /// <param name="data"> The std::vector<double>. </param>
+        DenseDataVector(std::vector<double> data);
 
         /// <summary> Array indexer operator. </summary>
         ///

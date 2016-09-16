@@ -24,11 +24,34 @@ namespace dataset
     }
 
     template <typename ValueType>
-    DenseDataVector<ValueType>::DenseDataVector(std::vector<ValueType> data)
-        : _numNonzeros(0), _data(std::move(data))
-    {
-        for (auto value : _data)
+    DenseDataVector<ValueType>::DenseDataVector(const IDataVector& dataVector)
+        : DenseDataVector(dataVector.ToArray())
         {
+        }
+
+    // template <typename ValueType>
+    // DenseDataVector<ValueType>::DenseDataVector(std::vector<ValueType> data)
+    //     : _numNonzeros(0), _data(std::move(data))
+    // {
+    //     for (auto value : _data)
+    //     {
+    //         if (value != 0)
+    //         {
+    //             ++_numNonzeros;
+    //         }
+    //     }
+    // }
+
+    template <typename ValueType>
+    DenseDataVector<ValueType>::DenseDataVector(std::vector<double> data)
+        : _numNonzeros(0)
+    {
+        auto size = data.size();
+        _data.resize(size);
+        for(size_t index = 0; index < size; ++index)
+        {
+            auto value = static_cast<ValueType>(data[index]);
+            _data[index++] = value;
             if (value != 0)
             {
                 ++_numNonzeros;

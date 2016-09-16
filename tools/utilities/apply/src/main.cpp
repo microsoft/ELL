@@ -53,6 +53,15 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
 
+        // TODO:
+        //
+        // apply with model + input/output PortElements-type representations
+        // apply with map + optional input name & output names (if not specified, use first input / output found)
+
+        // Also need a way to write out a map, given a model + inputs/outputs
+        // Maybe have outputMap and outputData options... if you are only outputting the map, you 
+        // don't need to specify an input dataset
+
         // parse command line
         commandLineParser.Parse();
 
@@ -64,7 +73,7 @@ int main(int argc, char* argv[])
 
         // load dataset
         if (verbose) std::cout << "Loading data ..." << std::endl;
-        auto dataset = common::GetRowDataset(dataLoadArguments);
+        auto dataset = common::GetRowDataset<dataset::DenseRowDataset>(dataLoadArguments);
         size_t numColumns = dataLoadArguments.parsedDataDimension;
 
         // load map
@@ -72,18 +81,22 @@ int main(int argc, char* argv[])
         auto mapFilename = "";
         auto map = common::LoadMap(mapFilename);
 
-        dataset::GenericRowDataset outputDataset;
+        dataset::DenseRowDataset outputDataset;
 
         // Get dataset iterator
         auto datasetIterator = dataset.GetIterator();
-        while(datasetIterator.IsValid())
+        while (datasetIterator.IsValid())
         {
             auto row = datasetIterator.Get();
-            // TODO: run it through the map
+            map.SetInput<double>("input", row.GetDataVector().ToArray()); // TODO: allow setting input of model from DataVectors
+            auto output = map.ComputeOutput<double>("output");
+            auto mappedRow = dataset::DenseSupervisedExample{ dataset::DoubleDataVector{ output }, row.GetMetadata() };
+            outputDataset.AddExample(row);
             datasetIterator.Next();
         }
 
         // TOOD: save output dataset
+//        common::SaveDataset();
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

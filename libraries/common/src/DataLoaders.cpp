@@ -40,18 +40,5 @@ namespace common
         // Create iterator
         return dataset::GetParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));
     }
-
-    dataset::GenericRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments)
-    {
-        auto dataIterator = GetDataIterator(dataLoadArguments);
-        dataset::GenericRowDataset rowDataset;
-        while (dataIterator->IsValid())
-        {
-            rowDataset.AddExample(dataIterator->Get());
-            dataIterator->Next();
-        }
-
-        return rowDataset;
-    }
 }
 }

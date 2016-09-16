@@ -27,4 +27,11 @@ add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 target_include_directories(${PROJ_NAME} PRIVATE include)
 target_link_libraries(${PROJ_NAME} utilities dataset model nodes common)
 
+# put this project in the tools/utilities folder in the IDE 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")
+
+# tests
+set (TEST_NAME ${PROJ_NAME}_test)
+add_test(NAME ${TEST_NAME}
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/tinyTestData.txt -dd auto -omf null -v)

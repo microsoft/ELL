@@ -27,7 +27,7 @@ namespace dataset
     public:
         Example() = default;
 
-        explicit Example(const Example<DataVectorType, MetadataType>& other) = default;
+        Example(const Example<DataVectorType, MetadataType>& other) = default;
 
         Example(Example<DataVectorType, MetadataType>&& other) = default;
 
@@ -36,6 +36,11 @@ namespace dataset
         /// <param name="dataVector"> The data vector. </param>
         /// <param name="metadataType"> The metadata. </param>
         Example(const std::shared_ptr<DataVectorType>& dataVector, const MetadataType& metadata);
+        
+        Example(const DataVectorType& dataVector, const MetadataType& metadata);
+
+        template <typename OtherDataVectorType>
+        Example(const Example<OtherDataVectorType, MetadataType>& other);
 
         /// <summary> Assignment operator. </summary>
         ///
