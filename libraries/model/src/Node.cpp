@@ -29,6 +29,30 @@ namespace model
         _inputs.push_back(input);
     }
 
+        InputPortBase* Node::GetInputPort(const std::string& portName)
+        {
+            for(auto port: _inputs)
+            {
+                if(port->GetName() == portName)
+                {
+                    return port;
+                }
+            }
+            return nullptr;
+        }
+
+        OutputPortBase* Node::GetOutputPort(const std::string& portName)
+        {
+            for(auto port: _outputs)
+            {
+                if(port->GetName() == portName)
+                {
+                    return port;
+                }
+            }
+            return nullptr;
+        }
+
     std::vector<const Node*> Node::GetParentNodes() const
     {
         std::unordered_set<const Node*> nodes;
