@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     main.cpp (sgdTrainer)
-//  Authors:  Ofer Dekel
+//  File:     main.cpp (apply)
+//  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -18,10 +18,11 @@
 
 // common
 #include "DataLoadArguments.h"
+#include "DataSaveArguments.h"
 #include "DataLoaders.h"
 #include "LoadModel.h"
-#include "ModelLoadArguments.h"
-#include "ModelSaveArguments.h"
+#include "MapLoadArguments.h"
+#include "MapSaveArguments.h"
 
 // model
 #include "InputNode.h"
@@ -43,15 +44,19 @@ int main(int argc, char* argv[])
         // create a command line parser
         utilities::CommandLineParser commandLineParser(argc, argv);
 
-        bool verbose = false;
-        commandLineParser.AddOption(verbose, "verbose", "v", "Verbose mode", false);
-
         // add arguments to the command line parser
         common::ParsedDataLoadArguments dataLoadArguments;
-        common::ParsedModelSaveArguments modelSaveArguments;
+        common::ParsedDataSaveArguments dataSaveArguments;
+        common::ParsedMapLoadArguments mapLoadArguments;
+        common::ParsedMapSaveArguments mapSaveArguments;
 
         commandLineParser.AddOptionSet(dataLoadArguments);
-        commandLineParser.AddOptionSet(modelSaveArguments);
+        commandLineParser.AddOptionSet(dataSaveArguments);
+        commandLineParser.AddOptionSet(mapLoadArguments);
+        commandLineParser.AddOptionSet(mapSaveArguments);
+
+        bool verbose = false;
+        commandLineParser.AddOption(verbose, "verbose", "v", "Verbose mode", false);
 
         // TODO:
         //
@@ -59,7 +64,7 @@ int main(int argc, char* argv[])
         // apply with map + optional input name & output names (if not specified, use first input / output found)
 
         // Also need a way to write out a map, given a model + inputs/outputs
-        // Maybe have outputMap and outputData options... if you are only outputting the map, you 
+        // Maybe have outputMap and outputData options... if you are only outputting the map, you
         // don't need to specify an input dataset
 
         // parse command line
@@ -81,22 +86,19 @@ int main(int argc, char* argv[])
         auto mapFilename = "";
         auto map = common::LoadMap(mapFilename);
 
-        dataset::DenseRowDataset outputDataset;
-
         // Get dataset iterator
         auto datasetIterator = dataset.GetIterator();
+        // get output stream
+        auto outputStream = dataSaveArguments.outputDataStream;
         while (datasetIterator.IsValid())
         {
             auto row = datasetIterator.Get();
             map.SetInput<double>("input", row.GetDataVector().ToArray()); // TODO: allow setting input of model from DataVectors
             auto output = map.ComputeOutput<double>("output");
             auto mappedRow = dataset::DenseSupervisedExample{ dataset::DoubleDataVector{ output }, row.GetMetadata() };
-            outputDataset.AddExample(row);
+            mappedRow.Print(outputStream);
             datasetIterator.Next();
         }
-
-        // TOOD: save output dataset
-//        common::SaveDataset();
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

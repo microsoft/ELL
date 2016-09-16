@@ -19,6 +19,8 @@ set (SRC src/DataLoadArguments.cpp
          src/IsNodeCompilable.cpp
          src/LoadModel.cpp
          src/MakeTrainer.cpp
+         src/MapLoadArguments.cpp
+         src/MapSaveArguments.cpp
          src/ModelLoadArguments.cpp
          src/ModelSaveArguments.cpp
          src/MultiEpochIncrementalTrainerArguments.cpp
@@ -35,6 +37,8 @@ set (INCLUDE include/DataLoadArguments.h
              include/LoadModel.h
              include/MakeEvaluator.h
              include/MakeTrainer.h
+             include/MapLoadArguments.h
+             include/MapSaveArguments.h
              include/ModelLoadArguments.h
              include/ModelSaveArguments.h
              include/MultiEpochIncrementalTrainerArguments.h
