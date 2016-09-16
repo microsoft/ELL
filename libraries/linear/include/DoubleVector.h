@@ -10,8 +10,6 @@
 
 #include "IVector.h"
 #include "IndexValue.h"
-
-// utilities
 #include "StlIndexValueIterator.h"
 
 // stl
@@ -28,7 +26,7 @@ namespace linear
     class DoubleVector : public IVector
     {
     public:
-        using Iterator = utilities::VectorIndexValueIterator<double>;
+        using Iterator = VectorIndexValueIterator<double>;
 
         /// <summary> Constructs an instance of DoubleVector. </summary>
         ///
@@ -102,7 +100,7 @@ namespace linear
         /// <summary> Returns an IndexValueIterator for the vector. </summary>
         ///
         /// <returns> An IndexValueIterator. </returns>
-        Iterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
+        Iterator GetIterator() const { return MakeStlIndexValueIterator(_data); }
 
         /// <summary> Returns the Size of the vector. </summary>
         ///

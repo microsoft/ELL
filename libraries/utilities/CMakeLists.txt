@@ -49,7 +49,6 @@ set (INCLUDE include/CompressedIntegerList.h
              include/Parser.h
              include/RandomEngines.h
              include/Archiver.h
-             include/StlIndexValueIterator.h
              include/StlIterator.h
              include/Tokenizer.h
              include/TransformIterator.h
@@ -71,7 +70,6 @@ set (TCC tcc/AnyIterator.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/Archiver.tcc
-         tcc/StlIndexValueIterator.tcc
          tcc/StlIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc

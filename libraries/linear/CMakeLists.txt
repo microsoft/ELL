@@ -27,11 +27,13 @@ set (INCLUDE include/Base.h
              include/IMatrix.h
              include/IndexValue.h
              include/IVector.h
-             include/RowMatrix.h)
+             include/RowMatrix.h
+             include/StlIndexValueIterator.h)
 
 set (TCC tcc/BiMatrix.tcc
          tcc/DoubleVector.tcc
-         tcc/RowMatrix.tcc)
+         tcc/RowMatrix.tcc
+         tcc/StlIndexValueIterator.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

@@ -12,8 +12,6 @@
 
 // linear
 #include "IVector.h"
-
-// utilities
 #include "StlIndexValueIterator.h"
 
 // stl
@@ -35,7 +33,7 @@ namespace dataset
     class DenseDataVector : public IDataVector
     {
     public:
-        using Iterator = utilities::VectorIndexValueIterator<ValueType>;
+        using Iterator = linear::VectorIndexValueIterator<ValueType>;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
@@ -115,7 +113,7 @@ namespace dataset
         /// <summary> Returns an Iterator that points to the beginning of the std::vector. </summary>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
+        Iterator GetIterator() const { return linear::MakeStlIndexValueIterator(_data); }
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///

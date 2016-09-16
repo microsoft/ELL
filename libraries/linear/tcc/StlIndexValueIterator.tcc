@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StlIndexValueIteratorAdapter.h (utilities)
+//  File:     StlIndexValueIteratorAdapter.h (linear)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace emll
 {
-namespace utilities
+namespace linear
 {
     //
     // StlIndexValueIterator implementation

@@ -51,7 +51,7 @@ namespace dataset
         for(size_t index = 0; index < size; ++index)
         {
             auto value = static_cast<ValueType>(data[index]);
-            _data[index++] = value;
+            _data[index] = value;
             if (value != 0)
             {
                 ++_numNonzeros;

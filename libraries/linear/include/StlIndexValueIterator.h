@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StlIndexValueIterator.h (utilities)
+//  File:     StlIndexValueIterator.h (linear)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,12 +19,12 @@
 
 namespace emll
 {
-namespace utilities
+namespace linear
 {
     /// <summary> A read-only forward index-value iterator for an STL container </summary>
 
     template <typename IteratorType, typename ValueType = decltype(*std::declval<IteratorType>())>
-    class StlIndexValueIterator : public linear::IIndexValueIterator
+    class StlIndexValueIterator : public IIndexValueIterator
     {
     public:
         /// <summary> Constructs an instance of StlIndexValueIterator. </summary>
