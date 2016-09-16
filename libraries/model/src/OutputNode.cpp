@@ -1,19 +1,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     InputNode.cpp (model)
+//  File:     OutputNode.cpp (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InputNode.h"
+#include "OutputNode.h"
 
 namespace emll
 {
 namespace model
 {
-    InputNodeBase::InputNodeBase(OutputPortBase& output)
-        : Node({}, {&output}), _outputBase(output)
+    OutputNodeBase::OutputNodeBase(InputPortBase& input, OutputPortBase& output)
+        : Node({&input}, {&output}), _inputBase(input), _outputBase(output)
     {
     }
 }

@@ -30,8 +30,6 @@ namespace model
     class InputNodeBase : public Node
     {
     public:
-        InputNodeBase();
-
         const OutputPortBase& GetOutputPort() const { return _outputBase; }
 
     protected:

@@ -17,6 +17,7 @@ set (SRC src/DynamicMap.cpp
          src/Model.cpp
          src/ModelTransformer.cpp
          src/Node.cpp
+         src/OutputNode.cpp
          src/OutputPort.cpp
          src/PortElements.cpp
          src/Port.cpp

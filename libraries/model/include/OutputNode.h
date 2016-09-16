@@ -26,8 +26,23 @@ namespace emll
 namespace model
 {
     /// <summary> A node that represents an output from the system. </summary>
+    class OutputNodeBase : public Node
+    {
+    public:
+        const InputPortBase& GetInputPort() const { return _inputBase; }
+        const OutputPortBase& GetOutputPort() const { return _outputBase; }
+
+    protected:
+        OutputNodeBase(InputPortBase& input, OutputPortBase& output);
+
+    private:
+        InputPortBase& _inputBase;
+        OutputPortBase& _outputBase;
+    };
+
+    /// <summary> A node that represents an output from the system. </summary>
     template <typename ValueType>
-    class OutputNode : public Node
+    class OutputNode : public OutputNodeBase
     {
     public:
         /// <summary> Default Constructor </summary>

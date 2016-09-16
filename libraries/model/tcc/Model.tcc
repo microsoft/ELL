@@ -102,9 +102,10 @@ namespace model
     {
         std::vector<const NodeType*> result;
         auto findNodes = [&result](const Node& node) {
-            if (typeid(node) == typeid(NodeType))
+            auto nodePtr = dynamic_cast<const NodeType*>(&node);
+            if (nodePtr != nullptr)
             {
-                result.push_back(dynamic_cast<const NodeType*>(&node));
+                result.push_back(nodePtr);
             }
         };
         Visit(findNodes);
@@ -116,9 +117,10 @@ namespace model
     {
         std::vector<NodeType*> result;
         auto findNodes = [&result](const Node& node) {
-            if (typeid(node) == typeid(NodeType))
+            auto nodePtr = dynamic_cast<const NodeType*>(&node);
+            if (nodePtr != nullptr)
             {
-                result.push_back(const_cast<NodeType*>(dynamic_cast<const NodeType*>(&node)));
+                result.push_back(const_cast<NodeType*>(nodePtr));
             }
         };
         Visit(findNodes);
