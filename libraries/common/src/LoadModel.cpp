@@ -15,7 +15,6 @@
 #include "Model.h"
 #include "OutputNode.h"
 
-
 // nodes
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
@@ -222,18 +221,11 @@ namespace common
         }
     }
 
-    template <typename ArchiverType>
-    void SaveArchivedModel(const model::Model& model, std::ostream& stream)
+    template <typename ArchiverType, typename ObjectType>
+    void SaveArchivedObject(const ObjectType& obj, std::ostream& stream)
     {
         ArchiverType archiver(stream);
-        archiver.Archive(model);
-    }
-
-    template <typename ArchiverType>
-    void SaveArchivedMap(const model::DynamicMap& map, std::ostream& stream)
-    {
-        ArchiverType archiver(stream);
-        archiver.Archive(map);
+        archiver.Archive(obj);
     }
 
     bool IsKnownExtension(const std::string& ext)
@@ -243,7 +235,11 @@ namespace common
 
     model::Model LoadModel(const std::string& filename)
     {
-        std::string treePrefix = "[tree_";
+        const std::string treePrefix = "[tree_";
+        if (filename == "")
+        {
+            return model::Model{};
+        }
         if (filename == "[1]")
         {
             return GetModel1();
@@ -292,24 +288,43 @@ namespace common
     void SaveModel(const model::Model& model, const std::string& filename)
     {
         auto ext = utilities::GetFileExtension(filename);
-        if (ext == "xml")
+        if (IsKnownExtension(ext))
         {
+            if (!utilities::IsFileWritable(filename))
+            {
+                throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotWritable);
+            }
             auto filestream = utilities::OpenOfstream(filename);
-            SaveArchivedModel<utilities::XmlArchiver>(model, filestream);
-        }
-        else if (ext == "json")
-        {
-            auto filestream = utilities::OpenOfstream(filename);
-            SaveArchivedModel<utilities::JsonArchiver>(model, filestream);
-        }
-        else
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
+            SaveModel(model, filestream, ext);
         }
     }
 
+    void SaveModel(const model::Model& model, std::ostream& outStream, std::string filetype)
+    {
+        if (filetype == "xml")
+        {
+            SaveArchivedObject<utilities::XmlArchiver>(model, outStream);
+        }
+        else if (filetype == "json")
+        {
+            SaveArchivedObject<utilities::JsonArchiver>(model, outStream);
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + filetype + "\"");
+        }
+    }
+
+    //
+    // Map
+    //
     model::DynamicMap LoadMap(const std::string& filename)
     {
+        if (filename == "")
+        {
+            return model::DynamicMap{};
+        }
+
         auto ext = utilities::GetFileExtension(filename, true);
         if (IsKnownExtension(ext))
         {
@@ -336,19 +351,30 @@ namespace common
     void SaveMap(const model::DynamicMap& map, const std::string& filename)
     {
         auto ext = utilities::GetFileExtension(filename);
-        if (ext == "xml")
+        if (IsKnownExtension(ext))
         {
+            if (!utilities::IsFileWritable(filename))
+            {
+                throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotWritable);
+            }
             auto filestream = utilities::OpenOfstream(filename);
-            SaveArchivedMap<utilities::XmlArchiver>(map, filestream);
+            SaveMap(map, filestream, ext);
         }
-        else if (ext == "json")
+    }
+
+    void SaveMap(const model::DynamicMap& map, std::ostream& outStream, std::string filetype)
+    {
+        if (filetype == "xml")
         {
-            auto filestream = utilities::OpenOfstream(filename);
-            SaveArchivedMap<utilities::JsonArchiver>(map, filestream);
+            SaveArchivedObject<utilities::XmlArchiver>(map, outStream);
+        }
+        else if (filetype == "json")
+        {
+            SaveArchivedObject<utilities::JsonArchiver>(map, outStream);
         }
         else
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + filetype + "\"");
         }
     }
 }

@@ -27,6 +27,9 @@ namespace common
  
         /// <summary> An output stream to write the output map to. </summary>
         utilities::OutputStreamImpostor outputMapStream;
+
+        /// <summary> Checks if there's a valid output stream </summary>
+        bool hasOutputStream = false;
    };
 
     /// <summary> A version of MapSaveArguments that adds its members to the command line parser. </summary>

@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// test parameters
+// bin\Release\apply -idf examples/data/testData.txt --inputModelFile examples/data/model_1.json -v -in 3128 -out 3133.output
+
 // utilities
 #include "CommandLineParser.h"
 #include "Exception.h"
@@ -18,24 +21,37 @@
 
 // common
 #include "DataLoadArguments.h"
-#include "DataSaveArguments.h"
 #include "DataLoaders.h"
+#include "DataSaveArguments.h"
 #include "LoadModel.h"
 #include "MapLoadArguments.h"
 #include "MapSaveArguments.h"
 
 // model
+#include "DynamicMap.h"
 #include "InputNode.h"
 #include "Model.h"
-#include "DynamicMap.h"
+#include "OutputNode.h"
 
 // stl
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <string>
 #include <tuple>
 
 using namespace emll;
+
+// helper function
+void SplitString(const std::string& str, char delimiter, std::vector<std::string>& elements)
+{
+    std::stringstream stream(str);
+    std::string element;
+    while (getline(stream, element, delimiter))
+    {
+        elements.push_back(element);
+    }
+}
 
 int main(int argc, char* argv[])
 {
@@ -59,7 +75,6 @@ int main(int argc, char* argv[])
         commandLineParser.AddOption(verbose, "verbose", "v", "Verbose mode", false);
 
         // mapLoadArguments:
-        
 
         // TODO:
         //
@@ -75,22 +90,94 @@ int main(int argc, char* argv[])
 
         if (verbose)
         {
-            std::cout << "Apply" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
         // load dataset
-        if (verbose) std::cout << "Loading data ..." << std::endl;
+        if (verbose) std::cout << "Loading data from file: " << dataLoadArguments.inputDataFilename << std::endl;
         auto dataset = common::GetRowDataset<dataset::DenseRowDataset>(dataLoadArguments);
         size_t numColumns = dataLoadArguments.parsedDataDimension;
 
         // load map
-        if (verbose) std::cout << "Loading map ..." << std::endl;
-        auto mapFilename = "";
-        auto map = common::LoadMap(mapFilename);
+        model::DynamicMap map;
+        if (mapLoadArguments.HasMapFile())
+        {
+            if (verbose) std::cout << "Loading map from file: " << mapLoadArguments.inputMapFile << std::endl;
+            map = common::LoadMap(mapLoadArguments.inputMapFile);
+        }
+        else
+        {
+            if (verbose) std::cout << "Loading model from file: " << mapLoadArguments.inputModelFile << std::endl;
+            auto model = common::LoadModel(mapLoadArguments.inputModelFile);
+
+            model::InputNodeBase* inputNode = nullptr;
+            model::PortElementsBase outputElements;
+            if (mapLoadArguments.modelInputsString != "")
+            {
+                // for now, modelInputString will just be the ID of an InputNode, and we'll call it 'input'
+                auto inputNodeId = utilities::UniqueId(mapLoadArguments.modelInputsString);
+                inputNode = dynamic_cast<model::InputNodeBase*>(model.GetNode(inputNodeId));
+                if (inputNode == nullptr)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find input node");
+                }
+            }
+            else // look for first input node
+            {
+                auto inputNodes = model.GetNodesByType<model::InputNodeBase>();
+                if (inputNodes.size() == 0)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find input node");
+                }
+                inputNode = inputNodes[0];
+                std::cout << "Using input Node " << inputNode->GetId() << std::endl;
+            }
+
+            if (mapLoadArguments.modelOutputsString != "")
+            {
+                // split string into "node.port"
+                std::vector<std::string> outputParts;
+                SplitString(mapLoadArguments.modelOutputsString, '.', outputParts);
+                auto outputNodeId = utilities::UniqueId(outputParts[0]);
+                auto outputPortName = outputParts[1];
+                auto outputNode = model.GetNode(outputNodeId);
+                if (outputNode == nullptr)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output node");
+                }
+
+                auto outputPort = outputNode->GetOutputPort(outputPortName); // ptr to port base
+                if (outputPort == nullptr)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output port");
+                }
+                outputElements = model::PortElementsBase(*outputPort);
+            }
+            else // look for first output node
+            {
+                auto outputNodes = model.GetNodesByType<model::OutputNodeBase>();
+                if (outputNodes.size() == 0)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output node");
+                }
+                auto outputNode = outputNodes[0];
+                auto outputPorts = outputNode->GetOutputPorts();
+                if (outputPorts.size() == 0)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output port");
+                }
+
+                auto outputPort = outputPorts[0]; // ptr to port base
+                outputElements = model::PortElementsBase(*outputPort);
+                std::cout << "Using output Node " << outputNode->GetId() << "." << outputPort->GetName() << std::endl;
+            }
+
+            map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputElements } });
+        }
 
         // Get dataset iterator
         auto datasetIterator = dataset.GetIterator();
+
         // get output stream
         auto outputStream = dataSaveArguments.outputDataStream;
         while (datasetIterator.IsValid())
@@ -100,7 +187,20 @@ int main(int argc, char* argv[])
             auto output = map.ComputeOutput<dataset::DoubleDataVector>("output");
             auto mappedRow = dataset::DenseSupervisedExample{ output, row.GetMetadata() };
             mappedRow.Print(outputStream);
+            outputStream << std::string("\n");
             datasetIterator.Next();
+        }
+
+        // write map to output if desired
+        if(mapSaveArguments.hasOutputStream)
+        {
+            if(verbose) std::cout << "Saving map to file " << mapSaveArguments.outputMapFile << std::endl;
+            auto ext = utilities::GetFileExtension(mapSaveArguments.outputMapFile, true);
+            if(ext == "")
+            {
+                ext = "json";
+            }
+            common::SaveMap(map, mapSaveArguments.outputMapStream, ext);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

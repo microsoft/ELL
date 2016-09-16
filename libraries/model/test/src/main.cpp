@@ -2,10 +2,11 @@
 // Model tests
 //
 
+#include "DynamicMap_test.h"
+#include "Map_test.h"
 #include "Model_test.h"
 #include "PortElements_test.h"
-#include "Map_test.h"
-#include "DynamicMap_test.h"
+
 
 // testing
 #include "testing.h"

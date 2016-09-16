@@ -18,7 +18,7 @@ namespace common
             outputMapFile,
             "outputMapFile",
             "omf",
-            "Path to the output map file",
+            "Path to the output map file (empty for standard out, 'null' for no output)",
             "");
     }
 
@@ -27,14 +27,17 @@ namespace common
         if (outputMapFile == "null")
         {
             outputMapStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
+            hasOutputStream = false;
         }
         else if (outputMapFile == "")
         {
             outputMapStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
+            hasOutputStream = true;
         }
         else // treat argument as filename
         {
             outputMapStream = utilities::OutputStreamImpostor(outputMapFile);
+            hasOutputStream = true;
         }
 
         std::vector<std::string> parseErrorMessages;

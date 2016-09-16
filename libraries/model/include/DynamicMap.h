@@ -47,12 +47,26 @@ namespace model
         /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
         DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
 
+        /// <summary> Add an input to the map </summary>
+        ///
+        /// <param name="inputName"> The name to assign to the input node </param>
+        /// <param name="inputNode"> The input node to add </param>
+        void AddInput(const std::string& inputName, InputNodeBase* inputNode);
+
+        /// <summary> Add an output to the map </summary>
+        ///
+        /// <param name="outputName"> The name to assign to the output elements </param>
+        /// <param name="outPutElements"> The output elements to add </param>
+        void AddOutput(const std::string& outputName, PortElementsBase outputElements);
+
         /// <summary> Gets the model wrapped by this map </summary>
         ///
         /// <returns> The `Model` </returns>
         const Model& GetModel() const { return _model; }
 
         /// <summary> Refines the model wrapped by this map </summary>
+        ///
+        /// <param name="context"> The TransformContext to use during refinement </param>
         void Refine(const TransformContext& context);
 
         /// <summary> Set a single InputNode's input </summary>

@@ -26,6 +26,7 @@ namespace utilities
         /// <summary> Constructor </summary>
         UniqueId();
         UniqueId(const UniqueId& other) = default;
+        explicit UniqueId(const std::string& idString);
         UniqueId& operator=(const UniqueId& other) = default;
 
         /// <summary> Equality comparison </summary>

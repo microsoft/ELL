@@ -7,8 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DynamicMap.h"
-#include "ModelTransformer.h"
 #include "Exception.h"
+#include "ModelTransformer.h"
+
 
 namespace emll
 {
@@ -19,13 +20,23 @@ namespace model
     {
         for (const auto& input : inputs)
         {
-            _inputNodeMap[input.first] = input.second;
+            AddInput(input.first, input.second);
         }
 
         for (const auto& output : outputs)
         {
-            _outputElementsMap[output.first] = output.second;
+            AddOutput(output.first, output.second);
         }
+    }
+
+    void DynamicMap::AddInput(const std::string& inputName, InputNodeBase* inputNode)
+    {
+        _inputNodeMap[inputName] = inputNode;
+    }
+
+    void DynamicMap::AddOutput(const std::string& outputName, PortElementsBase outputElements)
+    {
+        _outputElementsMap[outputName] = outputElements;
     }
 
     void DynamicMap::Refine(const TransformContext& context)

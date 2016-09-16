@@ -23,8 +23,11 @@ namespace common
     /// <summary> A struct that holds command line parameters for loading maps. </summary>
     struct MapLoadArguments
     {
-        /// <summary> The model load arguments. </summary>
-        ParsedModelLoadArguments modelLoadArguments;
+        /// <summary> The file to read a map from. </summary>
+        std::string inputMapFile = "";
+
+        /// <summary> The file to read a model from. </summary>
+        std::string inputModelFile = "";
 
         /// <summary> The inputs from the model to use. </summary>
         std::string modelInputsString = "";
@@ -32,8 +35,8 @@ namespace common
         /// <summary> The outputs from the model to use. </summary>
         std::string modelOutputsString = "";
 
-        /// <summary> The file to read a map from. </summary>
-        std::string inputMapFile = "";
+        bool HasMapFile() const { return inputMapFile != ""; }
+        bool HasModelFile() const { return inputModelFile != ""; }
     };
 
     /// <summary> A version of MapLoadArguments that adds its members to the command line parser. </summary>
@@ -50,7 +53,6 @@ namespace common
         ///
         /// <returns> An utilities::CommandLineParseResult. </returns>
         virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
-
     };
 }
 }

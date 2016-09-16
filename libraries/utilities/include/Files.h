@@ -30,12 +30,19 @@ namespace utilities
     /// <returns> The stream. </returns>
     std::ofstream OpenOfstream(std::string filepath);
 
-    /// <summary> Returns true if the file exists and can be opened. </summary>
+    /// <summary> Returns true if the file exists and can be for reading. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> true if the file exists and is readable. </returns>
     bool IsFileReadable(std::string filepath);
+
+    /// <summary> Returns true if the file exists and can be for writing. </summary>
+    ///
+    /// <param name="filepath"> The path. </param>
+    ///
+    /// <returns> true if the file exists and is readable. </returns>
+    bool IsFileWritable(std::string filepath);
 
     /// <summary> Returns the file extension, optionally converted to lower-case. </summary>
     ///

@@ -51,6 +51,9 @@ namespace utilities
         /// in most places where a const ostream reference would be accepted. </summary>
         operator std::ostream const&() const& { return *_outputStream; }
 
+        template <typename T>
+        OutputStreamImpostor& operator<<(const T& value) { *_outputStream << value; return *this; }
+
     private:
         std::shared_ptr<std::ofstream> _outputFileStream;
         std::shared_ptr<std::ostream> _outputStream;
