@@ -53,6 +53,16 @@ namespace math
     class ConstVectorReference : public VectorBase<Orientation>
     {
     public:
+        /// <summary> Gets a const pointer to the underlying data storage. </summary>
+        ///
+        /// <returns> Const pointer to the data. </returns>
+        const ElementType* GetDataPointer() const { return _pData; }
+
+        /// <summary> Gets the increment used in the underlying data storage. </summary>
+        ///
+        /// <returns> The increment. </returns>
+        size_t GetIncrement() const { return _increment; }
+
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
@@ -102,6 +112,15 @@ namespace math
         /// <returns> true if the vectors are not considered equivalent. </returns>
         bool operator!=(const ConstVectorReference<ElementType, Orientation>& other) const;
 
+        /// <summary> Applies a map to each vector element and sums the result. </summary>
+        ///
+        /// <typeparam name="MapperType"> A functor type of the mapper. </typeparam>
+        /// <param name="mapper"> The mapper. </param>
+        ///
+        /// <returns> The result of the operation. </returns>
+        template<typename MapperType>
+        ElementType Aggregate(MapperType mapper);
+
     protected:
         // protected ctor accessible only through derived classes and friends
         friend class VectorReferenceConstructor;
@@ -109,8 +128,7 @@ namespace math
         ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 
         // allow operations defined in the Operations struct to access raw data vector and increment
-        friend struct NativeOperations;
-        friend struct BlasOperations;
+        friend class VectorMatrixFriend;
 
         ElementType* _pData;
         size_t _size;
@@ -125,6 +143,11 @@ namespace math
     class VectorReference : public ConstVectorReference<ElementType, Orientation>
     {
     public:
+        /// <summary> Gets a pointer to the underlying data storage. </summary>
+        ///
+        /// <returns> Pointer to the data. </returns>
+        ElementType* GetDataPointer() const { return _pData; }
+
         /// <summary> Sets all vector elements to zero. </summary>
         void Reset();
 
@@ -166,15 +189,18 @@ namespace math
         auto Transpose()->VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
         using ConstVectorReference<ElementType, Orientation>::Transpose;
 
+        /// <summary> Applies an operation to all items in this collection. </summary>
+        ///
+        /// <typeparam name="MapperType"> Type of the mapper functor. </typeparam>
+        /// <param name="mapper"> The mapper. </param>
+        template<typename MapperType>
+        void ForEach(MapperType mapper);
+
     protected:
         // protected ctor accessible only through derived classes
         friend class VectorReferenceConstructor;
         friend class VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
         using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
-
-    private:
-        template<typename MapperType>
-        void ForEach(MapperType mapper);
     };
 
     /// <summary> An algebraic vector. </summary>

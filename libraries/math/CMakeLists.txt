@@ -20,10 +20,9 @@ set (INCLUDE include/BlasWrapper.h
              include/Operations.h
              include/Print.h)
 
-set (TCC tcc/BlasOperations.tcc
-         tcc/Matrix.tcc
+set (TCC tcc/Matrix.tcc
          tcc/Vector.tcc
-         tcc/NativeOperations.tcc
+         tcc/Operations.tcc
          tcc/Print.tcc)
 
 source_group("src" FILES ${SRC})

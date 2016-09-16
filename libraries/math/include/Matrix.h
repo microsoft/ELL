@@ -75,8 +75,7 @@ namespace math
         RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
 
         // allow operations defined in the Operations struct to access raw data
-        friend struct NativeOperations;
-        friend struct BlasOperations;
+        friend class VectorMatrixFriend;
 
         ElementType* _pData;
         size_t _numRows;
@@ -126,6 +125,16 @@ namespace math
     class ConstMatrixReference : public MatrixBase<ElementType, Layout>
     {
     public:
+        /// <summary> Gets a const pointer to the underlying data storage. </summary>
+        ///
+        /// <returns> Const pointer to the data. </returns>
+        const ElementType* GetDataPointer() const { return _pData; }
+
+        /// <summary> Gets the increment used in the underlying data storage. </summary>
+        ///
+        /// <returns> The increment. </returns>
+        size_t GetIncrement() const { return _increment; }
+
         /// <summary> Matrix element access operator. </summary>
         ///
         /// <returns> A copy of the element in a given position. </returns>
@@ -204,6 +213,11 @@ namespace math
     class MatrixReference : public ConstMatrixReference<ElementType, Layout>
     {
     public:
+        /// <summary> Gets a pointer to the underlying data storage. </summary>
+        ///
+        /// <returns> Pointer to the data. </returns>
+        ElementType* GetDataPointer() const { return _pData; }
+
         /// <summary> Matrix element access operator. </summary>
         ///
         /// <returns> A reference to an element in a given position. </returns>

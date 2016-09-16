@@ -88,6 +88,21 @@ namespace math
     ConstVectorReference<ElementType, Orientation>::ConstVectorReference(ElementType * pData, size_t size, size_t increment) : _pData(pData), _size(size), _increment(increment)
     {}
 
+    template<typename ElementType, VectorOrientation Orientation>
+    template<typename MapperType>
+    ElementType ConstVectorReference<ElementType, Orientation>::Aggregate(MapperType mapper)
+    {
+        ElementType result = 0;
+        const ElementType* current = _pData;
+        const ElementType* end = _pData + _size * _increment;
+        while (current < end)
+        {
+            result += mapper(*current);
+            current += _increment;
+        }
+        return result;
+    }
+
     //
     // VectorReference
     //
@@ -152,6 +167,19 @@ namespace math
     auto VectorReference<ElementType, Orientation>::Transpose() -> VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
     {
         return VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment );
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    template<typename MapperType>
+    void VectorReference<ElementType, Orientation>::ForEach(MapperType mapper)
+    {
+        ElementType* current = _pData;
+        const ElementType* end = _pData + _size * _increment;
+        while (current < end)
+        {
+            *current = mapper(*current);
+            current += _increment;
+        }
     }
 
     //
