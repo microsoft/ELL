@@ -31,6 +31,12 @@ namespace model
     }
 
     template <typename ValueType>
+    void DynamicMap::SetInput(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues)
+    {
+        SetInput(inputName, inputValues.ToTypedArray());
+    }
+
+    template <typename ValueType>
     std::vector<ValueType> DynamicMap::ComputeOutput(const std::string& outputName)
     {
         auto iter = _outputElementsMap.find(outputName);

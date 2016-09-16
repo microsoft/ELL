@@ -15,6 +15,9 @@
 #include "OutputPort.h"
 #include "PortElements.h"
 
+// dataset
+#include "DenseDataVector.h"
+
 // utilities
 #include "TypeName.h"
 #include "IArchivable.h"
@@ -58,6 +61,14 @@ namespace model
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
         void SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues);
+
+        /// <summary> Set a single InputNode's input </summary>
+        ///
+        /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
+        /// <param name="inputName"> The name assigned to the input node </param>
+        /// <param name="inputValues"> The values to set on the input node </param>
+        template <typename ValueType>
+        void SetInput(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues);
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///

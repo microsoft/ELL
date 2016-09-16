@@ -130,6 +130,8 @@ namespace dataset
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const override;
 
+        std::vector<ValueType> ToTypedArray() const { return _data; }
+
     private:
         uint64_t _numNonzeros;
         std::vector<ValueType> _data;

@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
         while (datasetIterator.IsValid())
         {
             auto row = datasetIterator.Get();
-            map.SetInput<double>("input", row.GetDataVector().ToArray()); // TODO: allow setting input of model from DataVectors
+            map.SetInput<double>("input", row.GetDataVector());
             auto output = map.ComputeOutput<double>("output");
             auto mappedRow = dataset::DenseSupervisedExample{ dataset::DoubleDataVector{ output }, row.GetMetadata() };
             mappedRow.Print(outputStream);
