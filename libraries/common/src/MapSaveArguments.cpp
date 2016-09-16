@@ -21,5 +21,24 @@ namespace common
             "Path to the output map file",
             "");
     }
+
+    utilities::CommandLineParseResult ParsedMapSaveArguments::PostProcess(const utilities::CommandLineParser& parser)
+    {
+        if (outputMapFile == "null")
+        {
+            outputMapStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
+        }
+        else if (outputMapFile == "")
+        {
+            outputMapStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
+        }
+        else // treat argument as filename
+        {
+            outputMapStream = utilities::OutputStreamImpostor(outputMapFile);
+        }
+
+        std::vector<std::string> parseErrorMessages;
+        return parseErrorMessages;
+    }
 }
 }

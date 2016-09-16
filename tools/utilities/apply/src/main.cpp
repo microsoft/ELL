@@ -58,6 +58,9 @@ int main(int argc, char* argv[])
         bool verbose = false;
         commandLineParser.AddOption(verbose, "verbose", "v", "Verbose mode", false);
 
+        // mapLoadArguments:
+        
+
         // TODO:
         //
         // apply with model + input/output PortElements-type representations

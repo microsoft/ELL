@@ -25,6 +25,7 @@ namespace common
         /// <summary> The filename for the output data file. </summary>
         std::string outputDataFilename = "";
 
+        /// <summary> An output stream for the output data file. </summary>
         utilities::OutputStreamImpostor outputDataStream;
     };
 
@@ -41,7 +42,7 @@ namespace common
         /// <param name="parser"> The parser. </param>
         ///
         /// <returns> An utilities::CommandLineParseResult. </returns>
-        virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
+        virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
     };
 }
 }

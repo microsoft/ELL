@@ -10,6 +10,7 @@
 
 // utilities
 #include "CommandLineParser.h"
+#include "OutputStreamImpostor.h"
 
 // stl
 #include <string>
@@ -23,7 +24,10 @@ namespace common
     {
         /// <summary> The filename to store the output map in. </summary>
         std::string outputMapFile = "";
-    };
+ 
+        /// <summary> An output stream to write the output map to. </summary>
+        utilities::OutputStreamImpostor outputMapStream;
+   };
 
     /// <summary> A version of MapSaveArguments that adds its members to the command line parser. </summary>
     struct ParsedMapSaveArguments : public MapSaveArguments, public utilities::ParsedArgSet
@@ -32,6 +36,13 @@ namespace common
         ///
         /// <param name="parser"> [in,out] The parser. </param>
         virtual void AddArgs(utilities::CommandLineParser& parser);
+
+        /// <summary> Check the parsed arguments. </summary>
+        ///
+        /// <param name="parser"> The parser. </param>
+        ///
+        /// <returns> An utilities::CommandLineParseResult. </returns>
+        virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
     };
 }
 }
