@@ -68,9 +68,10 @@ namespace model
 
     void DynamicMap::WriteToArchive(utilities::Archiver& archiver) const
     {
+        // Archive the model
         archiver["model"] << _model;
 
-        // Need to do outputs, too!
+        // Archive the inputs
         std::vector<std::string> inputNames;
         std::vector<utilities::UniqueId> inputIds;
         for (const auto& input : _inputNodeMap)
@@ -81,7 +82,7 @@ namespace model
         archiver["inputNames"] << inputNames;
         archiver["inputIds"] << inputIds;
 
-        // Need to do outputs, too!
+        // Archive the outputs
         std::vector<std::string> outputNames;
         std::vector<PortElementsBase> outputElements;
         for (const auto& output : _outputElementsMap)
@@ -98,18 +99,22 @@ namespace model
         DynamicMapSerializationContext mapContext(archiver.GetContext());
         archiver.PushContext(mapContext);
 
+        // Unarchive the model
         archiver["model"] >> _model;
+
+        // Unarchive the inputs
         std::vector<std::string> inputNames;
         std::vector<utilities::UniqueId> inputIds;
         archiver["inputNames"] >> inputNames;
         archiver["inputIds"] >> inputIds;
 
+        // Unarchive the outputs
         std::vector<std::string> outputNames;
         std::vector<PortElementsBase> outputElements;
         archiver["outputNames"] >> outputNames;
         archiver["outputElements"] >> outputElements;
 
-        // reconstruct _inputNodeMap
+        // Reconstruct the input node map
         _inputNodeMap.clear();
         assert(inputNames.size() == inputIds.size());
         for (size_t index = 0; index < inputNames.size(); ++index)
@@ -119,7 +124,7 @@ namespace model
             _inputNodeMap[inputNames[index]] = static_cast<InputNodeBase*>(node);
         }
 
-        // reconstruct _outputElementsMap
+        // Reconstruct the output elements map
         _outputElementsMap.clear();
         assert(outputNames.size() == outputElements.size());
         for (size_t index = 0; index < outputNames.size(); ++index)

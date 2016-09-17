@@ -13,6 +13,10 @@
 #include "Node.h"
 #include "OutputPort.h"
 #include "PortElements.h"
+#include "DynamicMap.h" // for serialization context
+
+// dataset
+#include "DenseDataVector.h"
 
 // utilities
 #include "TypeName.h"
@@ -111,9 +115,11 @@ namespace model
 
     /// <summary> Class that wraps a model and its designated outputs </summary>
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    class Map
+    class Map : public utilities::IArchivable
     {
     public:
+        Map() = default;
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="model"> The model to wrap </param>
@@ -126,16 +132,6 @@ namespace model
             const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
             const WrappedTuple<OutputTypesTuple, PortElements>& outputs,
             const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames);
-
-        /// <summary> Gets the name of this type (for serialization). </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<InputTypesTuple, OutputTypesTuple>("Map"); }
-
-        /// <summary> Gets the name of this type (for serialization). </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -174,16 +170,38 @@ namespace model
         template <typename ValueType>
         std::vector<ValueType> ComputeOutput(const std::string& outputName);
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<InputTypesTuple, OutputTypesTuple>("Map"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+    protected:
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+
+        /// <summary> Reads from a Unarchiver. </summary>
+        ///
+        /// <param name="archiver"> The archiver. </param>
+        /// <param name="context"> The serialization context. </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
     private:
         Model _model;
 
         WrappedTuple<InputTypesTuple, PointerToInputNode> _inputs;
         std::array<std::string, std::tuple_size<InputTypesTuple>::value> _inputNames;
-        std::unordered_map<std::string, Node*> _inputNodeMap;
+        std::unordered_map<std::string, InputNodeBase*> _inputNodeMap;
 
         WrappedTuple<OutputTypesTuple, PortElements> _outputs;
         std::array<std::string, std::tuple_size<OutputTypesTuple>::value> _outputNames;
-        std::unordered_map<std::string, const PortElementsBase&> _outputElementsMap;
+        std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
 
         // Adding to name->value maps
         template <size_t... Sequence>

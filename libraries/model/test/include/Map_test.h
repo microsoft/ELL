@@ -9,4 +9,5 @@ namespace emll
     void TestMapRefine();
     void TestMapCompute();
     void TestNamedInputOutput();
+    void TestMapSerialization();
 }

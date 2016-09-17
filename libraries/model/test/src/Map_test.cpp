@@ -18,6 +18,10 @@
 
 // common
 #include "IsNodeCompilable.h"
+#include "LoadModel.h" // for RegisterNodeTypes
+
+// utilities
+#include "XmlArchiver.h"
 
 // testing
 #include "testing.h"
@@ -153,5 +157,32 @@ void TestNamedInputOutput()
     for (auto x : resultValues)
         std::cout << x << "  ";
     std::cout << std::endl;
+}
+
+void TestMapSerialization()
+{
+    auto model = GetSimpleModel();
+    auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
+    auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
+    auto map = model::MakeMap(model,
+                              std::make_tuple(inputNodes[0]),
+                              { { "doubleInput" } },
+                              std::make_tuple(MakePortElements(outputNodes[0]->output)),
+                              { { "doubleOutput" } });
+
+    std::stringstream outStream;
+    utilities::XmlArchiver archiver(outStream);
+    archiver << map;
+
+    std::cout << "\nArchived version of map:" << std::endl;
+    std::cout << outStream.str();
+
+    // Now read it back in
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    std::stringstream inStream(outStream.str());
+    utilities::XmlUnarchiver unarchiver(inStream, context);
+    model::Map<std::tuple<double>, std::tuple<double>> map2;
+    unarchiver >> map2;
 }
 }

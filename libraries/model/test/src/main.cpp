@@ -7,7 +7,6 @@
 #include "Model_test.h"
 #include "PortElements_test.h"
 
-
 // testing
 #include "testing.h"
 
@@ -37,11 +36,12 @@ int main()
         TestSlice();
         TestAppend();
 
-        // Map tests
+        // Typed Map tests
         TestMapCreate();
         TestMapCompute();
         TestMapRefine();
         TestNamedInputOutput();
+        TestMapSerialization();
 
         // DynamicMap tests
         TestDynamicMapCreate();
