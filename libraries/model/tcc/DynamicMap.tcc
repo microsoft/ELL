@@ -33,7 +33,7 @@ namespace model
     template <typename ValueType>
     void DynamicMap::SetInput(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues)
     {
-        SetInput(inputName, inputValues.ToTypedArray());
+        SetInput(inputName, inputValues.ToArray());
     }
 
     template <typename ValueType, utilities::IsFundamental<ValueType>>

@@ -180,10 +180,14 @@ int main(int argc, char* argv[])
 
         // get output stream
         auto outputStream = dataSaveArguments.outputDataStream;
+        auto mapInputSize = map.GetInputSize("input");
         while (datasetIterator.IsValid())
         {
             auto row = datasetIterator.Get();
-            map.SetInput<double>("input", row.GetDataVector());
+            // truncate to size of map input
+            auto dataVec = row.GetDataVector();
+            dataVec.Resize(mapInputSize);
+            map.SetInput<double>("input", dataVec);
             auto output = map.ComputeOutput<dataset::DoubleDataVector>("output");
             auto mappedRow = dataset::DenseSupervisedExample{ output, row.GetMetadata() };
             mappedRow.Print(outputStream);

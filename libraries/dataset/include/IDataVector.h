@@ -50,7 +50,28 @@ namespace dataset
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const = 0;
+        virtual std::vector<double> ToDoubleArray() const = 0;
+    };
+
+    template <typename ValueType>
+    class IDataVectorT : public IDataVector
+    {
+    public:
+        /// <summary> Adds a value at the end of the std::vector. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the. </param>
+        /// <param name="value"> The value. </param>
+//        virtual void AppendEntry(uint64_t index, ValueType value = 1.0) = 0;
+
+        /// <summary> Makes a deep copy of the datavector </summary>
+        ///
+        /// <returns> A deep copy of the datavector </summary>
+        // virtual std::unique_ptr<IDataVectorT<ValueType>> Clone() const = 0;
+
+        /// <summary> Copies the contents of this DataVector into a std::vector. </summary>
+        ///
+        /// <returns> The array. </returns>
+        virtual std::vector<ValueType> ToArray() const = 0;
     };
 }
 }

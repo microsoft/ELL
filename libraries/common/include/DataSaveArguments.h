@@ -35,7 +35,7 @@ namespace common
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///
         /// <param name="parser"> [in,out] The parser. </param>
-        virtual void AddArgs(utilities::CommandLineParser& parser);
+        virtual void AddArgs(utilities::CommandLineParser& parser) override;
 
         /// <summary> Check the parsed arguments. </summary>
         ///

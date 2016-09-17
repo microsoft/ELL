@@ -69,7 +69,7 @@ namespace linear
     /// <param name="array"> The std::vector to copy values into </param>
     /// <param name="indexValueIterator"> The IndexValueIterator to copy values from </param>
     template <typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> = 0>
-    void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array);
+    void CopyToDoubleArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array);
 }
 }
 

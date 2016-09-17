@@ -30,7 +30,7 @@ namespace dataset
     /// <typeparam name="ValueType">     Type of the value type. </typeparam>
     /// <typeparam name="tegerListType"> Type of the teger list type. </typeparam>
     template <typename ValueType, typename IntegerListType>
-    class SparseDataVector : public IDataVector
+    class SparseDataVector : public IDataVectorT<ValueType>
     {
     public:
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
@@ -136,10 +136,15 @@ namespace dataset
         /// <returns> A deep copy of the datavector </summary>
         virtual std::unique_ptr<IDataVector> Clone() const override;
 
-        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
+        /// <summary> Copies the contents of this DataVector into a double array. </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override;
+        virtual std::vector<ValueType> ToArray() const override;
+
+        /// <summary> Copies the contents of this DataVector into a double array. </summary>
+        ///
+        /// <returns> The array. </returns>
+        virtual std::vector<double> ToDoubleArray() const override;
 
     private:
         IntegerListType _indices;

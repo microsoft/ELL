@@ -10,6 +10,7 @@
 
 // stl
 #include <cassert>
+#include <algorithm>
 
 namespace emll
 {
@@ -25,7 +26,7 @@ namespace dataset
 
     template <typename ValueType>
     DenseDataVector<ValueType>::DenseDataVector(const IDataVector& dataVector)
-        : DenseDataVector(dataVector.ToArray())
+        : DenseDataVector(dataVector.ToDoubleArray())
         {
         }
 
@@ -89,6 +90,16 @@ namespace dataset
     {
         _data.resize(0);
         _numNonzeros = 0;
+    }
+
+    template <typename ValueType>
+    void DenseDataVector<ValueType>::Resize(size_t size)
+    {
+        if(size != _data.size())
+        {
+        _data.resize(size);
+        _numNonzeros = size - std::count(_data.begin(), _data.end(), 0);
+        }
     }
 
     template <typename ValueType>

@@ -30,7 +30,7 @@ namespace dataset
     }
 
     template <typename ValueType>
-    std::vector<double> DenseDataVector<ValueType>::ToArray() const
+    std::vector<double> DenseDataVector<ValueType>::ToDoubleArray() const
     {
         auto vector = std::vector<double>(Size());
         std::copy(_data.cbegin(), _data.cend(), vector.begin());

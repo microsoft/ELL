@@ -30,12 +30,12 @@ namespace dataset
     ///
     /// <typeparam name="ValueType"> Type of the value type. </typeparam>
     template <typename ValueType>
-    class DenseDataVector : public IDataVector
+    class DenseDataVector : public IDataVectorT<ValueType>
     {
     public:
         using Iterator = linear::VectorIndexValueIterator<ValueType>;
         using value_type = ValueType;
-        
+
         /// <summary> Constructor. </summary>
         DenseDataVector();
 
@@ -86,6 +86,8 @@ namespace dataset
         /// <returns> An uint64_t. </returns>
         virtual uint64_t Size() const override { return _data.size(); }
 
+        void Resize(size_t size);
+
         /// <summary> The number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>
@@ -129,9 +131,9 @@ namespace dataset
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override;
+        virtual std::vector<double> ToDoubleArray() const override;
 
-        std::vector<ValueType> ToTypedArray() const { return _data; }
+        virtual std::vector<ValueType> ToArray() const override { return _data; }
 
     private:
         uint64_t _numNonzeros;

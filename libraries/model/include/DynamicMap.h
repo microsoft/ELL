@@ -69,6 +69,12 @@ namespace model
         /// <param name="context"> The TransformContext to use during refinement </param>
         void Refine(const TransformContext& context);
 
+        /// <summary> Returns size of a given input </summary>
+        ///
+        /// <param name="inputName"> The name of the input </param>
+        /// <returns> The dimensionality of the input </returns>
+        size_t GetInputSize(const std::string& inputName) const;
+
         /// <summary> Set a single InputNode's input </summary>
         ///
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>

@@ -39,6 +39,12 @@ namespace model
         _outputElementsMap[outputName] = outputElements;
     }
 
+    size_t DynamicMap::GetInputSize(const std::string& inputName) const
+    {
+        auto iter = _inputNodeMap.find(inputName);
+        return iter->second->GetOutputPort().Size();
+    }
+
     void DynamicMap::Refine(const TransformContext& context)
     {
         ModelTransformer transformer;

@@ -49,7 +49,7 @@ namespace linear
 
     // specialization for IndexValueIterators
     template <typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType>>
-    void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array)
+    void CopyToDoubleArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array)
     {
         std::fill(array.begin(), array.end(), 0);
         while (indexValueIterator.IsValid())
