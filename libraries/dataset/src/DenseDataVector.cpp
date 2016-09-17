@@ -27,8 +27,8 @@ namespace dataset
     template <typename ValueType>
     DenseDataVector<ValueType>::DenseDataVector(const IDataVector& dataVector)
         : DenseDataVector(dataVector.ToDoubleArray())
-        {
-        }
+    {
+    }
 
     // template <typename ValueType>
     // DenseDataVector<ValueType>::DenseDataVector(std::vector<ValueType> data)
@@ -49,7 +49,7 @@ namespace dataset
     {
         auto size = data.size();
         _data.resize(size);
-        for(size_t index = 0; index < size; ++index)
+        for (size_t index = 0; index < size; ++index)
         {
             auto value = static_cast<ValueType>(data[index]);
             _data[index] = value;
@@ -73,7 +73,7 @@ namespace dataset
     template <typename ValueType>
     void DenseDataVector<ValueType>::AppendEntry(uint64_t index, double value)
     {
-        if (value == 0)
+       if (value == 0)
         {
             return;
         }
@@ -95,10 +95,10 @@ namespace dataset
     template <typename ValueType>
     void DenseDataVector<ValueType>::Resize(size_t size)
     {
-        if(size != _data.size())
+        if (size != _data.size())
         {
-        _data.resize(size);
-        _numNonzeros = size - std::count(_data.begin(), _data.end(), 0);
+            _data.resize(size);
+            _numNonzeros = size - std::count(_data.begin(), _data.end(), 0);
         }
     }
 
@@ -144,6 +144,21 @@ namespace dataset
             os << indexValue.index << ':' << indexValue.value << '\t';
             iterator.Next();
         }
+    }
+
+    template <typename ValueType>
+    std::unique_ptr<IDataVector> DenseDataVector<ValueType>::Clone() const
+    {
+        DenseDataVector<ValueType> result = *this;
+        return std::make_unique<DenseDataVector<ValueType>>(std::move(result));
+    }
+
+    template <typename ValueType>
+    std::vector<double> DenseDataVector<ValueType>::ToDoubleArray() const
+    {
+        auto vector = std::vector<double>(Size());
+        std::copy(_data.cbegin(), _data.cend(), vector.begin());
+        return vector;
     }
 
     template class DenseDataVector<float>;
