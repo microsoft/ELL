@@ -79,7 +79,6 @@ namespace model
         : _model(model)
     {
         _currentNode = nullptr;
-        _visitFullModel = false;
         if (_model->Size() == 0)
         {
             return;
@@ -90,20 +89,11 @@ namespace model
 
         if (_stack.size() == 0) // Visit full model
         {
-            // helper function to find a terminal (output) node
-            auto IsLeaf = [](const Node* node) { return node->GetDependentNodes().size() == 0; };
-
-            // start with some arbitrary node
-            auto iter = _model->_idToNodeMap.begin();
-            const Node* anOutputNode = iter->second.get(); // !!! need private access
-
-            // follow dependency chain until we get an output node
-            while (!IsLeaf(anOutputNode))
+            // Just push everything on the stack
+            for(auto node: _model->_idToNodeMap)
             {
-                anOutputNode = anOutputNode->GetDependentNodes()[0];
+                _stack.push_back(node.second.get());
             }
-            _stack.push_back(anOutputNode);
-            _visitFullModel = true;
         }
 
         Next();
@@ -138,21 +128,6 @@ namespace model
             {
                 _stack.pop_back();
                 _visitedNodes.insert(node);
-
-                // In "visit whole model" mode, we want to add dependent nodes, so we can get to parts of the model
-                // that the original leaf node doesn't depend on
-                if (_visitFullModel)
-                {
-
-                    // now add all our children (Note: this part is the only difference between visit-all and visit-active-model
-                    const auto& dependentNodes = node->GetDependentNodes();
-                    for (const auto& child : ModelImpl::Reverse(dependentNodes)) // Visiting the children in reverse order more closely retains the order the nodes were originally created
-                    {
-                        // note: this is kind of inefficient --- we're going to push multiple copies of child on the stack. But we'll check if we've visited it already when we pop it off.
-                        _stack.push_back(child);
-                    }
-                }
-
                 _currentNode = node;
                 break;
             }
