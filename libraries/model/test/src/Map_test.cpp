@@ -132,14 +132,17 @@ void TestNamedInputOutput()
     auto model = GetSimpleModel();
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
+
+    std::cout << "num input/output nodes: " << inputNodes.size() << ", " << outputNodes.size() << std::endl;
+
+    assert(inputNodes.size() == 1);
     assert(outputNodes.size() == 1);
+
     auto map = model::MakeMap(model,
                               std::make_tuple(inputNodes[0]),
                               { { "doubleInput" } },
                               std::make_tuple(MakePortElements(outputNodes[0]->output)),
                               { { "doubleOutput" } });
-
-    assert(inputNodes.size() == 1);
 
     auto input = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
                                                    { 4.0, 5.0, 6.0 },
@@ -153,10 +156,6 @@ void TestNamedInputOutput()
     }
 
     testing::ProcessTest("Testing named input / output", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
-
-    for (auto x : resultValues)
-        std::cout << x << "  ";
-    std::cout << std::endl;
 }
 
 void TestMapSerialization()
@@ -184,5 +183,14 @@ void TestMapSerialization()
     utilities::XmlUnarchiver unarchiver(inStream, context);
     model::Map<std::tuple<double>, std::tuple<double>> map2;
     unarchiver >> map2;
+
+    // Now read it back in --- as a DynamicMap
+    context = utilities::SerializationContext{};
+    common::RegisterNodeTypes(context);
+    context.GetTypeFactory().AddType<model::DynamicMap, model::Map<std::tuple<double>, std::tuple<double>>>();
+    inStream.seekg(0);
+    utilities::XmlUnarchiver unarchiver2(inStream, context);
+    std::unique_ptr<model::DynamicMap> dmap;
+    unarchiver2 >> dmap;
 }
 }

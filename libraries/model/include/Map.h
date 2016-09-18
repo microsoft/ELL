@@ -115,7 +115,7 @@ namespace model
 
     /// <summary> Class that wraps a model and its designated outputs </summary>
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    class Map : public utilities::IArchivable
+    class Map : public DynamicMap
     {
     public:
         Map() = default;
@@ -133,13 +133,8 @@ namespace model
             const WrappedTuple<OutputTypesTuple, PortElements>& outputs,
             const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames);
 
-        /// <summary> Gets the name of this type (for serialization). </summary>
-        ///
-        /// <returns> The name of this type. </returns>
-        const Model& GetModel() const { return _model; }
-
         /// <summary> Refines the model wrapped by this map </summary>
-        void Refine(const TransformContext& context);
+        virtual ModelTransformer Refine(const TransformContext& context) override;
 
         /// <summary> Set inputs </summary>
         ///
@@ -153,8 +148,8 @@ namespace model
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
         /// <param name="inputName"> The name assigned to the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
-        template <typename ValueType>
-        void SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues);
+        // template <typename ValueType>
+        // void SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues);
 
         /// <summary> Type alias for the tuple of vectors returned by `Compute` </summary>
         using ComputeOutputType = WrappedTuple<OutputTypesTuple, StdVector>; // typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
@@ -164,11 +159,7 @@ namespace model
         /// <returns> A tuple of vectors of output values </returns>
         ComputeOutputType ComputeOutput() const;
 
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
-        ///
-        /// <returns> A vector of output values </returns>
-        template <typename ValueType>
-        std::vector<ValueType> ComputeOutput(const std::string& outputName);
+        using DynamicMap::ComputeOutput;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -193,15 +184,13 @@ namespace model
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        Model _model;
-
+        // maybe this should be a tuple<pair<string, WrappedTuple<T1>>, pair<string, WrappedTuple<T2>, ...>
+        // We'd need a helper class thing to construct the type
         WrappedTuple<InputTypesTuple, PointerToInputNode> _inputs;
         std::array<std::string, std::tuple_size<InputTypesTuple>::value> _inputNames;
-        std::unordered_map<std::string, InputNodeBase*> _inputNodeMap;
 
         WrappedTuple<OutputTypesTuple, PortElements> _outputs;
         std::array<std::string, std::tuple_size<OutputTypesTuple>::value> _outputNames;
-        std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
 
         // Adding to name->value maps
         template <size_t... Sequence>

@@ -43,10 +43,17 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="model"> The model to wrap </param>
+        DynamicMap(const Model& model);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="model"> The model to wrap </param>
         /// <param name="inputs"> A vector of name/value pairs for the inputs this map uses </param>
         /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
         DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
 
+        virtual ~DynamicMap() = default;
+        
         /// <summary> Add an input to the map </summary>
         ///
         /// <param name="inputName"> The name to assign to the input node </param>
@@ -67,7 +74,7 @@ namespace model
         /// <summary> Refines the model wrapped by this map </summary>
         ///
         /// <param name="context"> The TransformContext to use during refinement </param>
-        void Refine(const TransformContext& context);
+        virtual ModelTransformer Refine(const TransformContext& context);
 
         /// <summary> Returns size of a given input </summary>
         ///

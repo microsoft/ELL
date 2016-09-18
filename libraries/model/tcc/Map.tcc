@@ -10,18 +10,20 @@ namespace emll
 {
 namespace model
 {
+    // Constructor
     template <typename InputTypesTuple, typename OutputTypesTuple>
     Map<InputTypesTuple, OutputTypesTuple>::Map(const Model& model,
                                                 const WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
                                                 const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
                                                 const WrappedTuple<OutputTypesTuple, PortElements>& outputs,
                                                 const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
-        : _model(model), _inputs(inputs), _inputNames(inputNames), _outputs(outputs), _outputNames(outputNames)
+        : DynamicMap(model), _inputs(inputs), _inputNames(inputNames), _outputs(outputs), _outputNames(outputNames)
     {
         AddInputsToNameMap(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), _inputs, _inputNames);
         AddOutputsToNameMap(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), _outputs, _outputNames);
     }
 
+    // Helper function
     template <typename WrappedInputTypesTuple, typename WrappedOutputTypesTuple>
     auto MakeMap(const Model& model,
                  const WrappedInputTypesTuple& inputs,
@@ -42,7 +44,7 @@ namespace model
                                                                     WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
                                                                     const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames)
     {
-        _inputNodeMap.insert({ std::get<Sequence>(inputNames)..., static_cast<InputNodeBase*>(std::get<Sequence>(inputs))... });
+        AddInput(std::get<Sequence>(inputNames)..., static_cast<InputNodeBase*>(std::get<Sequence>(inputs))...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -51,7 +53,7 @@ namespace model
                                                                      WrappedTuple<OutputTypesTuple, PortElements>& outputs,
                                                                      const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
     {
-        _outputElementsMap.insert({ std::get<Sequence>(outputNames)..., static_cast<PortElementsBase>(std::get<Sequence>(outputs))... });
+        AddOutput(std::get<Sequence>(outputNames)..., static_cast<PortElementsBase>(std::get<Sequence>(outputs))...);
     }
 
     //
@@ -88,13 +90,12 @@ namespace model
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    void Map<InputTypesTuple, OutputTypesTuple>::Refine(const TransformContext& context)
+    ModelTransformer Map<InputTypesTuple, OutputTypesTuple>::Refine(const TransformContext& context)
     {
-        ModelTransformer transformer;
-        auto refinedModel = transformer.RefineModel(_model, context);
+        ModelTransformer transformer = DynamicMap::Refine(context);
         RemapInputNodes(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), transformer);
         RemapOutputElements(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), transformer);
-        _model = refinedModel;
+        return transformer;
     }
 
     //
@@ -128,27 +129,6 @@ namespace model
         SetInputTuple(std::tuple<std::vector<InputTypes>...>(inputs...));
     }
 
-    template <typename InputTypesTuple, typename OutputTypesTuple>
-    template <typename ValueType>
-    void Map<InputTypesTuple, OutputTypesTuple>::SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues)
-    {
-        auto iter = _inputNodeMap.find(inputName);
-        if (iter == _inputNodeMap.end())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
-        }
-
-        auto node = dynamic_cast<InputNode<ValueType>*>(iter->second);
-        if (node != nullptr)
-        {
-            node->SetInput(inputValues);
-        }
-        else
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
-        }
-    }
-
     //
     // Compute
     //
@@ -156,7 +136,7 @@ namespace model
     template <typename PortElementsType, typename OutputType>
     void Map<InputTypesTuple, OutputTypesTuple>::ComputeElements(PortElementsType& elements, OutputType& output) const
     {
-        output = _model.ComputeOutput(elements); // elementOutput is a vector<T>, output param is PortElements<T>&...
+        output = GetModel().ComputeOutput(elements); // elementOutput is a vector<T>, output param is PortElements<T>&...
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -174,92 +154,21 @@ namespace model
         return result;
     }
 
-    template <typename InputTypesTuple, typename OutputTypesTuple>
-    template <typename ValueType>
-    std::vector<ValueType> Map<InputTypesTuple, OutputTypesTuple>::ComputeOutput(const std::string& outputName)
-    {
-        auto iter = _outputElementsMap.find(outputName);
-        if (iter == _outputElementsMap.end())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
-        }
-
-        return _model.ComputeOutput<ValueType>(iter->second);
-    }
-
     //
     // Serialization
     //
     template <typename InputTypesTuple, typename OutputTypesTuple>
     void Map<InputTypesTuple, OutputTypesTuple>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // Archive the model
-        archiver["model"] << _model;
-
-        // Archive the inputs
-        std::vector<std::string> inputNames;
-        std::vector<utilities::UniqueId> inputIds;
-        for (const auto& input : _inputNodeMap)
-        {
-            inputNames.push_back(input.first);
-            inputIds.push_back(input.second->GetId());
-        }
-        archiver["inputNames"] << inputNames;
-        archiver["inputIds"] << inputIds;
-
-        // Archive the outputs
-        std::vector<std::string> outputNames;
-        std::vector<PortElementsBase> outputElements;
-        for (const auto& output : _outputElementsMap)
-        {
-            outputNames.push_back(output.first);
-            outputElements.push_back(output.second);
-        }
-        archiver["outputNames"] << outputNames;
-        archiver["outputElements"] << outputElements;
+        DynamicMap::WriteToArchive(archiver);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     void Map<InputTypesTuple, OutputTypesTuple>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        DynamicMapSerializationContext mapContext(archiver.GetContext());
-        archiver.PushContext(mapContext);
-
-        // Unarchive the model
-        archiver["model"] >> _model;
-
-        // Unarchive the inputs
-        std::vector<std::string> inputNames;
-        std::vector<utilities::UniqueId> inputIds;
-        archiver["inputNames"] >> inputNames;
-        archiver["inputIds"] >> inputIds;
-
-        // Unarchive the outputs
-        std::vector<std::string> outputNames;
-        std::vector<PortElementsBase> outputElements;
-        archiver["outputNames"] >> outputNames;
-        archiver["outputElements"] >> outputElements;
-
-        // Reconstruct the input node map
-        _inputNodeMap.clear();
-        assert(inputNames.size() == inputIds.size());
-        for (size_t index = 0; index < inputNames.size(); ++index)
-        {
-            auto node = mapContext.GetNodeFromSerializedId(inputIds[index]);
-            assert(dynamic_cast<InputNodeBase*>(node) != nullptr);
-            _inputNodeMap[inputNames[index]] = static_cast<InputNodeBase*>(node);
+        DynamicMap::ReadFromArchive(archiver);
+        // TODO: reconstuct _inputs and _inputNames
+        // TODO: reconstuct _outputs and _outputNames
         }
-
-        // Reconstruct the output elements map
-        _outputElementsMap.clear();
-        assert(outputNames.size() == outputElements.size());
-        for (size_t index = 0; index < outputNames.size(); ++index)
-        {
-            _outputElementsMap[outputNames[index]] = outputElements[index];
-        }
-
-        archiver.PopContext();
-    }
-
 }
 }

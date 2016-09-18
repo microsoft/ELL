@@ -15,6 +15,10 @@ namespace emll
 {
 namespace model
 {
+    DynamicMap::DynamicMap(const Model& model) : _model(model)
+    {        
+    }
+
     DynamicMap::DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
         : _model(model)
     {
@@ -31,12 +35,12 @@ namespace model
 
     void DynamicMap::AddInput(const std::string& inputName, InputNodeBase* inputNode)
     {
-        _inputNodeMap[inputName] = inputNode;
+        _inputNodeMap.insert({inputName, inputNode});
     }
 
     void DynamicMap::AddOutput(const std::string& outputName, PortElementsBase outputElements)
     {
-        _outputElementsMap[outputName] = outputElements;
+        _outputElementsMap.insert({outputName, outputElements});
     }
 
     size_t DynamicMap::GetInputSize(const std::string& inputName) const
@@ -45,7 +49,7 @@ namespace model
         return iter->second->GetOutputPort().Size();
     }
 
-    void DynamicMap::Refine(const TransformContext& context)
+    ModelTransformer DynamicMap::Refine(const TransformContext& context)
     {
         ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(_model, context);
@@ -64,6 +68,7 @@ namespace model
             outputElements.second = refinedOutput;
         }
         _model = refinedModel;
+        return transformer;
     }
 
     void DynamicMap::WriteToArchive(utilities::Archiver& archiver) const
