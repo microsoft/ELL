@@ -11,7 +11,6 @@
 // stl
 #include <vector>
 #include <iostream>
-#include <functional>
 #include <cmath>
 
 namespace emll
@@ -156,9 +155,15 @@ namespace math
         /// <param name="value"> The value. </param>
         void Fill(ElementType value);
 
-        /// <summary> Generates elements of the vector by repeatedly calling a generator function (such as a random number generator). </summary>
+        /// <summary>
+        /// Generates elements of the vector by repeatedly calling a generator function (such as a random
+        /// number generator).
+        /// </summary>
+        ///
+        /// <typeparam name="GeneratorType"> Type of lambda or functor to use as a generator. </typeparam>
         /// <param name="generator"> The generator function. </param>
-        void Generate(std::function<ElementType()> generator);
+        template<typename GeneratorType>
+        void Generate(GeneratorType generator);
 
         /// <summary> Array indexer operator. </summary>
         ///
@@ -229,9 +234,15 @@ namespace math
         /// <param name="value"> The value. </param>
         void Fill(ElementType value);
 
-        /// <summary> Generates elements of the vector by repeatedly calling a generator function (such as a random number generator). </summary>
+        /// <summary>
+        /// Generates elements of the vector by repeatedly calling a generator function (such as a random
+        /// number generator).
+        /// </summary>
+        ///
+        /// <typeparam name="GeneratorType"> Type of lambda or functor to use as a generator. </typeparam>
         /// <param name="generator"> The generator function. </param>
-        void Generate(std::function<ElementType()> generator);
+        template<typename GeneratorType>
+        void Generate(GeneratorType generator);
 
         /// <summary> Array indexer operator. </summary>
         ///

@@ -231,9 +231,15 @@ namespace math
         /// <param name="value"> The value. </param>
         void Fill(ElementType value);
 
-        /// <summary> Generates elements of the vector by repeatedly calling a generator function (such as a random number generator). </summary>
+        /// <summary>
+        /// Generates elements of the vector by repeatedly calling a generator function (such as a random
+        /// number generator).
+        /// </summary>
+        ///
+        /// <typeparam name="GeneratorType"> Type of lambda or functor to use as a generator. </typeparam>
         /// <param name="generator"> The generator function. </param>
-        void Generate(std::function<ElementType()> generator);
+        template<typename GeneratorType>
+        void Generate(GeneratorType generator);
 
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
@@ -290,24 +296,30 @@ namespace math
         ///
         /// <param name="numRows"> Number of rows in the matrix. </param>
         /// <param name="numColumns"> Number of columns in the matrix. </param>
-       Matrix(size_t numRows, size_t numColumns);
+        Matrix(size_t numRows, size_t numColumns);
 
         /// <summary> Constructs a matrix from an initialization list. </summary>
         ///
         /// <param name="list"> A list of initialization lists (row by row). </param>
-       Matrix(std::initializer_list<std::initializer_list<ElementType>> list);
+        Matrix(std::initializer_list<std::initializer_list<ElementType>> list);
 
-       /// <summary> Sets all matrix elements to zero. </summary>
-       void Reset() { Fill(0); }
+        /// <summary> Sets all matrix elements to zero. </summary>
+        void Reset() { Fill(0); }
 
-       /// <summary> Sets all matrix elements to a given value. </summary>
-       ///
-       /// <param name="value"> The value. </param>
-       void Fill(ElementType value);
+        /// <summary> Sets all matrix elements to a given value. </summary>
+        ///
+        /// <param name="value"> The value. </param>
+        void Fill(ElementType value);
 
-       /// <summary> Generates elements of the vector by repeatedly calling a generator function (such as a random number generator). </summary>
-       /// <param name="generator"> The generator function. </param>
-       void Generate(std::function<ElementType()> generator);
+        /// <summary>
+        /// Generates elements of the vector by repeatedly calling a generator function (such as a random
+        /// number generator).
+        /// </summary>
+        ///
+        /// <typeparam name="GeneratorType"> Type of lambda or functor to use as a generator. </typeparam>
+        /// <param name="generator"> The generator function. </param>
+        template<typename GeneratorType>
+        void Generate(GeneratorType generator);
 
     private:
         std::vector<ElementType> _data;

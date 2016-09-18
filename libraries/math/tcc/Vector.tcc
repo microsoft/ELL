@@ -126,7 +126,8 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::Generate(std::function<ElementType()> generator)
+    template<typename GeneratorType>
+    void VectorReference<ElementType, Orientation>::Generate(GeneratorType generator)
     {
         ElementType* current = _pData;
         ElementType* end = _pData + _size * _increment ;
@@ -211,7 +212,8 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void Vector<ElementType, Orientation>::Generate(std::function<ElementType()> generator)
+    template<typename GeneratorType>
+    void Vector<ElementType, Orientation>::Generate(GeneratorType generator)
     {
         std::generate(_data.begin(), _data.end(), generator);
     }

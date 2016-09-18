@@ -84,6 +84,10 @@ namespace math
         /// <param name="u"> [in,out] A row vector, multiplied by t and used to store the result. </param>
         template<typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row>& v, ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u);
+
+        // Add ForEachRow func
+        // Add foreachcol
+
     };
 
     enum class ImplementationType { native, openBlas };
@@ -178,7 +182,6 @@ namespace math
         template<typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u);
 
-        // TODO v * M * u
         // TODO rank one updates
         // TODO GEMM
     };

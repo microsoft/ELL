@@ -158,7 +158,8 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    void MatrixReference<ElementType, Layout>::Generate(std::function<ElementType()> generator)
+    template<typename GeneratorType>
+    void MatrixReference<ElementType, Layout>::Generate(GeneratorType generator)
     {
         for (size_t i = 0; i < _numIntervals; ++i)
         {
@@ -249,7 +250,8 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    void Matrix<ElementType, Layout>::Generate(std::function<ElementType()> generator)
+    template<typename GeneratorType>
+    void Matrix<ElementType, Layout>::Generate(GeneratorType generator)
     {
         std::generate(_data.begin(), _data.end(), generator);
     }

@@ -210,6 +210,11 @@ void TestMatrix1()
         { 0, 3, 6 }
     };
     testing::ProcessTest("Matrix::GetDiagonal()", T == S6);
+
+    std::default_random_engine rng;
+    std::normal_distribution<ElementType> normal(0, 1.0);
+    auto generator = [&]() { return normal(rng); };
+    M.Generate(generator);
 }
 
 template<typename ElementType, math::MatrixLayout Layout>
