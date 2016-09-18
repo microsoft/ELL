@@ -70,35 +70,24 @@ namespace model
     // Now, unwrapping tuples
     //
 
-    // This base case works for any wrapper that has a value_type field
     template <typename WrappedType>
-    struct UnwrappedElement
+    auto UnwrapType(model::InputNode<WrappedType>* x)
     {
-        using type = typename WrappedType::value_type;
-    };
-
-    // Specialization for InputNode<T>*
-    template <typename T>
-    struct UnwrappedElement<model::InputNode<T>*>
-    {
-        using type = T;
-    };
-
-    // Here, WrappedTupleType is a tuple<X<T1>, X<T2>, ...>, where X is some container/wrapper class
-    template <typename WrappedTupleType, size_t... Sequence>
-    static auto UnwrapTupleHelper(const WrappedTupleType& tuple, std::index_sequence<Sequence...>)
-    {
-        using ElementType = typename std::tuple_element<Sequence..., WrappedTupleType>::type; // Here, ElementType is X<T>
-        return std::tuple<typename UnwrappedElement<ElementType>::type>{};
+        return WrappedType{};
     }
 
-    template <typename WrappedTupleType>
-    static auto UnwrapTuple(const WrappedTupleType& tuple)
+    template <typename WrappedType>
+    auto UnwrapType(model::PortElements<WrappedType> x)
     {
-        return UnwrapTupleHelper(tuple, std::make_index_sequence<std::tuple_size<WrappedTupleType>::value>{});
+        return WrappedType{};
     }
 
-    // Converts from a tuple of PortElements<T>s tuple of std::vector<T>s
+    template <typename... WrappedTypes>
+    auto UnwrapTuple(const std::tuple<WrappedTypes...>& elements)
+    {
+        return std::tuple<decltype(UnwrapType(WrappedTypes{}))...>{};
+    }
+
     template <typename WrappedTupleType>
     struct UnwrappedTuple
     {
@@ -232,6 +221,13 @@ namespace model
 
         template <size_t... Sequence>
         void ComputeElementsHelper(std::index_sequence<Sequence...>, ComputeOutputType& outputValues) const;
+
+        // Serialization helpers
+        void PopulateInputs();
+        void PopulateOutputs();
+
+        template <size_t... Sequence>
+        void PopulateInputsHelper(std::index_sequence<Sequence...>);
     };
 
     template <typename WrappedInputTypesTuple, typename WrappedOutputTypesTuple>

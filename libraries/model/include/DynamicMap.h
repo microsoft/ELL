@@ -96,16 +96,51 @@ namespace model
         /// <param name="inputName"> The name assigned to the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
+        void SetInput(size_t index, const std::vector<ValueType>& inputValues);
+
+        /// <summary> Set a single InputNode's input </summary>
+        ///
+        /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
+        /// <param name="index"> The index of the input node </param>
+        /// <param name="inputValues"> The values to set on the input node </param>
+        template <typename ValueType>
         void SetInput(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues);
+
+        /// <summary> Set a single InputNode's input </summary>
+        ///
+        /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
+        /// <param name="index"> The index of the input node </param>
+        /// <param name="inputValues"> The values to set on the input node </param>
+        template <typename ValueType>
+        void SetInput(size_t index, const dataset::DenseDataVector<ValueType>& inputValues);
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
+        /// <param name="outputName"> The name of the output </param>
         /// <returns> A vector of output values </returns>
         template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
         std::vector<ValueType> ComputeOutput(const std::string& outputName);
 
+        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        ///
+        /// <param name="outputName"> The name of the output </param>
+        /// <returns> A vector of output values </returns>
         template <typename VectorType, typename ValueType = typename VectorType::value_type>
         VectorType ComputeOutput(const std::string& outputName);
+
+        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        ///
+        /// <param name="index"> The index of the output </param>
+        /// <returns> A vector of output values </returns>
+        template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
+        std::vector<ValueType> ComputeOutput(size_t index);
+
+        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        ///
+        /// <param name="index"> The index of the output </param>
+        /// <returns> A vector of output values </returns>
+        template <typename VectorType, typename ValueType = typename VectorType::value_type>
+        VectorType ComputeOutput(size_t index);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -131,7 +166,13 @@ namespace model
 
     private:
         Model _model;
+        // want the inputs and outputs indexed by name and index
+        std::vector<InputNodeBase*> _inputNodes;
+        // std::array<std::string, std::tuple_size<InputTypesTuple>::value> _inputNames;
         std::unordered_map<std::string, InputNodeBase*> _inputNodeMap;
+
+        std::vector<PortElementsBase> _outputElements;
+        // std::array<std::string, std::tuple_size<OutputTypesTuple>::value> _outputNames;
         std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
     };
 

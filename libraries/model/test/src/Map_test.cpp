@@ -173,8 +173,8 @@ void TestMapSerialization()
     utilities::XmlArchiver archiver(outStream);
     archiver << map;
 
-    std::cout << "\nArchived version of map:" << std::endl;
-    std::cout << outStream.str();
+    // std::cout << "\nArchived version of map:" << std::endl;
+    // std::cout << outStream.str();
 
     // Now read it back in
     utilities::SerializationContext context;
@@ -188,6 +188,51 @@ void TestMapSerialization()
     context = utilities::SerializationContext{};
     common::RegisterNodeTypes(context);
     context.GetTypeFactory().AddType<model::DynamicMap, model::Map<std::tuple<double>, std::tuple<double>>>();
+    inStream.seekg(0);
+    utilities::XmlUnarchiver unarchiver2(inStream, context);
+    std::unique_ptr<model::DynamicMap> dmap;
+    unarchiver2 >> dmap;
+}
+
+void TestComplexMap()
+{
+    std::cout << "\nTestComplexMap" << std::endl;
+    auto model = GetComplexModel();
+    auto doubleInputNodes = model.GetNodesByType<model::InputNode<double>>();
+    auto boolInputNodes = model.GetNodesByType<model::InputNode<bool>>();
+    auto doubleOutputNodes = model.GetNodesByType<model::OutputNode<double>>();
+    auto boolOutputNodes = model.GetNodesByType<model::OutputNode<bool>>();
+
+    assert(doubleInputNodes.size() == 1);
+    assert(boolInputNodes.size() == 1);
+    assert(doubleOutputNodes.size() == 1);
+    assert(boolOutputNodes.size() == 1);
+
+    auto map = model::MakeMap(model,
+                              std::make_tuple(doubleInputNodes[0], boolInputNodes[0]),
+                              { { "doubleInput", "boolInput" } },
+                              std::make_tuple(MakePortElements(doubleOutputNodes[0]->output), MakePortElements(boolOutputNodes[0]->output)),
+                              { { "doubleOutput", "boolOutput" } });
+
+    std::stringstream outStream;
+    utilities::XmlArchiver archiver(outStream);
+    archiver << map;
+
+    // std::cout << "\nArchived version of map:" << std::endl;
+    // std::cout << outStream.str();
+
+    // Now read it back in
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    std::stringstream inStream(outStream.str());
+    utilities::XmlUnarchiver unarchiver(inStream, context);
+    model::Map<std::tuple<double>, std::tuple<double>> map2;
+    unarchiver >> map2;
+
+    // Now read it back in --- as a DynamicMap
+    context = utilities::SerializationContext{};
+    common::RegisterNodeTypes(context);
+    context.GetTypeFactory().AddType<model::DynamicMap, model::Map<std::tuple<double, bool>, std::tuple<double, bool>>>();
     inStream.seekg(0);
     utilities::XmlUnarchiver unarchiver2(inStream, context);
     std::unique_ptr<model::DynamicMap> dmap;

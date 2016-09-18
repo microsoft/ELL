@@ -157,7 +157,9 @@ namespace common
     {
         // TODO: add more node types!
         context.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, model::InputNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, model::OutputNode<bool>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ArgMaxNode<double>>();

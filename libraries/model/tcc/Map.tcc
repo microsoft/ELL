@@ -10,6 +10,16 @@ namespace emll
 {
 namespace model
 {
+    // TODO: move this to someplace else
+    void EvalInOrder() {}
+
+    template <typename Lambda, typename... Lambdas>
+    void EvalInOrder(Lambda&& lambda, Lambdas&&... lambdas)
+    {
+        lambda();
+        EvalInOrder(std::forward<Lambdas>(lambdas)...);
+    }
+
     // Constructor
     template <typename InputTypesTuple, typename OutputTypesTuple>
     Map<InputTypesTuple, OutputTypesTuple>::Map(const Model& model,
@@ -34,7 +44,6 @@ namespace model
         using InputTypesTuple = typename UnwrappedTuple<WrappedInputTypesTuple>::type;
         using OutputTypesTuple = typename UnwrappedTuple<WrappedOutputTypesTuple>::type;
 
-        // need to unwrap tuple types
         return Map<InputTypesTuple, OutputTypesTuple>(model, inputs, inputNames, outputs, outputNames);
     }
 
@@ -44,7 +53,7 @@ namespace model
                                                                     WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
                                                                     const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames)
     {
-        AddInput(std::get<Sequence>(inputNames)..., static_cast<InputNodeBase*>(std::get<Sequence>(inputs))...);
+        EvalInOrder([&]() { AddInput(std::get<Sequence>(inputNames), static_cast<InputNodeBase*>(std::get<Sequence>(inputs))); }...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -53,7 +62,7 @@ namespace model
                                                                      WrappedTuple<OutputTypesTuple, PortElements>& outputs,
                                                                      const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
     {
-        AddOutput(std::get<Sequence>(outputNames)..., static_cast<PortElementsBase>(std::get<Sequence>(outputs))...);
+        EvalInOrder([&]() { AddOutput(std::get<Sequence>(outputNames), static_cast<PortElementsBase>(std::get<Sequence>(outputs))); }...);
     }
 
     //
@@ -71,7 +80,7 @@ namespace model
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::RemapInputNodes(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
     {
-        RemapInputNode(std::get<Sequence>(_inputs)..., modelTransformer);
+        EvalInOrder([&](){RemapInputNode(std::get<Sequence>(_inputs), modelTransformer);}...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -86,7 +95,7 @@ namespace model
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::RemapOutputElements(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
     {
-        RemapOutputElement(std::get<Sequence>(_outputs)..., modelTransformer);
+        EvalInOrder([&](){RemapOutputElement(std::get<Sequence>(_outputs), modelTransformer);}...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -136,7 +145,7 @@ namespace model
     template <typename PortElementsType, typename OutputType>
     void Map<InputTypesTuple, OutputTypesTuple>::ComputeElements(PortElementsType& elements, OutputType& output) const
     {
-        output = GetModel().ComputeOutput(elements); // elementOutput is a vector<T>, output param is PortElements<T>&...
+        output = GetModel().ComputeOutput(elements);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -166,9 +175,27 @@ namespace model
     template <typename InputTypesTuple, typename OutputTypesTuple>
     void Map<InputTypesTuple, OutputTypesTuple>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        DynamicMap::ReadFromArchive(archiver);
-        // TODO: reconstuct _inputs and _inputNames
-        // TODO: reconstuct _outputs and _outputNames
-        }
+        DynamicMap::ReadFromArchive(archiver); // Rats! we don't know the order they were serialized
+        PopulateInputs(); // reconstuct _inputs and _inputNames
+        PopulateOutputs(); // reconstuct _outputs and _outputNames
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    template <size_t... Sequence>
+    void Map<InputTypesTuple, OutputTypesTuple>::PopulateInputsHelper(std::index_sequence<Sequence...>)
+    {
+        EvalInOrder([&](){_inputNames.at(Sequence) = "";}...);
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    void Map<InputTypesTuple, OutputTypesTuple>::PopulateInputs()
+    {
+        PopulateInputsHelper(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>());
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
+    void Map<InputTypesTuple, OutputTypesTuple>::PopulateOutputs()
+    {
+    }
 }
 }

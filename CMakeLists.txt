@@ -31,7 +31,7 @@ endif()
 # (so if we're running cmake from a 'build' directory inside the main directory, do this:
 #      cmake -DDOXYGEN_ENABLED=OFF ..  )
 option(SWIG_ENABLED "Enable swig interfaces" ON)
-option(DOXYGEN_ENABLED "Enable Doxygen interfaces" ON)
+option(DOXYGEN_ENABLED "Enable Doxygen interfaces" OFF)
 
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")

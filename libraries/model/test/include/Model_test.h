@@ -12,7 +12,7 @@ namespace emll
 void PrintModel(const model::Model& model);
 void PrintModel(const model::Model& model, const model::Node* output);
 model::Model GetSimpleModel();
-
+model::Model GetComplexModel();
 
 // Tests
 void TestNodeIterator();

@@ -35,11 +35,14 @@ namespace model
 
     void DynamicMap::AddInput(const std::string& inputName, InputNodeBase* inputNode)
     {
+        std::cout << "AddInput(" << inputName << ")" << std::endl;
+        _inputNodes.push_back(inputNode);
         _inputNodeMap.insert({inputName, inputNode});
     }
 
     void DynamicMap::AddOutput(const std::string& outputName, PortElementsBase outputElements)
     {
+        _outputElements.push_back(outputElements);
         _outputElementsMap.insert({outputName, outputElements});
     }
 
