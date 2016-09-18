@@ -27,10 +27,10 @@ namespace model
                                                 const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
                                                 const WrappedTuple<OutputTypesTuple, PortElements>& outputs,
                                                 const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
-        : DynamicMap(model), _inputs(inputs), _inputNames(inputNames), _outputs(outputs), _outputNames(outputNames)
+        : DynamicMap(model), _inputs(inputs), _outputs(outputs)
     {
-        AddInputsToNameMap(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), _inputs, _inputNames);
-        AddOutputsToNameMap(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), _outputs, _outputNames);
+        AddInputsToNameMap(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), _inputs, inputNames);
+        AddOutputsToNameMap(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), _outputs, outputNames);
     }
 
     // Helper function
@@ -176,15 +176,15 @@ namespace model
     void Map<InputTypesTuple, OutputTypesTuple>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         DynamicMap::ReadFromArchive(archiver); // Rats! we don't know the order they were serialized
-        PopulateInputs(); // reconstuct _inputs and _inputNames
-        PopulateOutputs(); // reconstuct _outputs and _outputNames
+        PopulateInputs(); // reconstuct _inputs 
+        PopulateOutputs(); // reconstuct _outputs 
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::PopulateInputsHelper(std::index_sequence<Sequence...>)
     {
-        EvalInOrder([&](){_inputNames.at(Sequence) = "";}...);
+        // EvalInOrder([&](){_inputNames.at(Sequence) = "";}...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>

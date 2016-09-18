@@ -176,10 +176,7 @@ namespace model
         // maybe this should be a tuple<pair<string, WrappedTuple<T1>>, pair<string, WrappedTuple<T2>, ...>
         // We'd need a helper class thing to construct the type
         WrappedTuple<InputTypesTuple, PointerToInputNode> _inputs;
-        std::array<std::string, std::tuple_size<InputTypesTuple>::value> _inputNames;
-
         WrappedTuple<OutputTypesTuple, PortElements> _outputs;
-        std::array<std::string, std::tuple_size<OutputTypesTuple>::value> _outputNames;
 
         // Adding to name->value maps
         template <size_t... Sequence>

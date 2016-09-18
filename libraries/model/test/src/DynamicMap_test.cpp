@@ -71,10 +71,6 @@ void TestDynamicMapCompute()
     }
 
     testing::ProcessTest("Testing map compute", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
-
-    for (auto x : resultValues)
-        std::cout << x << "  ";
-    std::cout << std::endl;
 }
 
 void TestDynamicMapRefine()
@@ -119,9 +115,6 @@ void TestDynamicMapSerialization()
     std::stringstream outStream;
     utilities::XmlArchiver archiver(outStream);
     archiver << map;
-
-    std::cout << "\nArchived version of map:" << std::endl;
-    std::cout << outStream.str();
 
     // Now read it back in
     utilities::SerializationContext context;

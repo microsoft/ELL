@@ -37,12 +37,14 @@ namespace model
     {
         std::cout << "AddInput(" << inputName << ")" << std::endl;
         _inputNodes.push_back(inputNode);
+        _inputNames.push_back(inputName);
         _inputNodeMap.insert({inputName, inputNode});
     }
 
     void DynamicMap::AddOutput(const std::string& outputName, PortElementsBase outputElements)
     {
         _outputElements.push_back(outputElements);
+        _outputNames.push_back(outputName);
         _outputElementsMap.insert({outputName, outputElements});
     }
 
@@ -80,26 +82,19 @@ namespace model
         archiver["model"] << _model;
 
         // Archive the inputs
-        std::vector<std::string> inputNames;
         std::vector<utilities::UniqueId> inputIds;
-        for (const auto& input : _inputNodeMap)
+
+        // Wrong: not it the correct order
+        for (size_t index = 0; index < _inputNodes.size(); ++index)
         {
-            inputNames.push_back(input.first);
-            inputIds.push_back(input.second->GetId());
+            inputIds.push_back(_inputNodes[index]->GetId());
         }
-        archiver["inputNames"] << inputNames;
+        archiver["inputNames"] << _inputNames;
         archiver["inputIds"] << inputIds;
 
         // Archive the outputs
-        std::vector<std::string> outputNames;
-        std::vector<PortElementsBase> outputElements;
-        for (const auto& output : _outputElementsMap)
-        {
-            outputNames.push_back(output.first);
-            outputElements.push_back(output.second);
-        }
-        archiver["outputNames"] << outputNames;
-        archiver["outputElements"] << outputElements;
+        archiver["outputNames"] << _outputNames;
+        archiver["outputElements"] << _outputElements;
     }
 
     void DynamicMap::ReadFromArchive(utilities::Unarchiver& archiver)

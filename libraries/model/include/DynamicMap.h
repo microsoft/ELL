@@ -168,11 +168,11 @@ namespace model
         Model _model;
         // want the inputs and outputs indexed by name and index
         std::vector<InputNodeBase*> _inputNodes;
-        // std::array<std::string, std::tuple_size<InputTypesTuple>::value> _inputNames;
+        std::vector<std::string> _inputNames;
         std::unordered_map<std::string, InputNodeBase*> _inputNodeMap;
 
         std::vector<PortElementsBase> _outputElements;
-        // std::array<std::string, std::tuple_size<OutputTypesTuple>::value> _outputNames;
+        std::vector<std::string> _outputNames;
         std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
     };
 

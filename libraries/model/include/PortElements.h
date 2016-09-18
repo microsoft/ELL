@@ -174,7 +174,7 @@ namespace model
         const OutputPortBase* _referencedPort = nullptr;
         size_t _startIndex = 0;
         size_t _numValues = 0;
-        bool _isFixedSize = true;
+        bool _isFixedSize = false;
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>

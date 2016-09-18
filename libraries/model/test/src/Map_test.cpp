@@ -78,10 +78,6 @@ void TestMapCompute()
 
     testing::ProcessTest("Testing min value", testing::IsEqual(resultValues[0], 8.5));
     testing::ProcessTest("Testing max value", testing::IsEqual(resultValues[1], 10.5));
-
-    for (auto x : resultValues)
-        std::cout << x << "  ";
-    std::cout << std::endl;
 }
 
 void TestMapRefine()
@@ -133,8 +129,6 @@ void TestNamedInputOutput()
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
 
-    std::cout << "num input/output nodes: " << inputNodes.size() << ", " << outputNodes.size() << std::endl;
-
     assert(inputNodes.size() == 1);
     assert(outputNodes.size() == 1);
 
@@ -173,9 +167,6 @@ void TestMapSerialization()
     utilities::XmlArchiver archiver(outStream);
     archiver << map;
 
-    // std::cout << "\nArchived version of map:" << std::endl;
-    // std::cout << outStream.str();
-
     // Now read it back in
     utilities::SerializationContext context;
     common::RegisterNodeTypes(context);
@@ -196,7 +187,6 @@ void TestMapSerialization()
 
 void TestComplexMap()
 {
-    std::cout << "\nTestComplexMap" << std::endl;
     auto model = GetComplexModel();
     auto doubleInputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto boolInputNodes = model.GetNodesByType<model::InputNode<bool>>();
@@ -217,9 +207,6 @@ void TestComplexMap()
     std::stringstream outStream;
     utilities::XmlArchiver archiver(outStream);
     archiver << map;
-
-    // std::cout << "\nArchived version of map:" << std::endl;
-    // std::cout << outStream.str();
 
     // Now read it back in
     utilities::SerializationContext context;
