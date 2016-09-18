@@ -225,6 +225,9 @@ namespace model
 
         template <size_t... Sequence>
         void PopulateInputsHelper(std::index_sequence<Sequence...>);
+
+        template <size_t... Sequence>
+        void PopulateOutputsHelper(std::index_sequence<Sequence...>);
     };
 
     template <typename WrappedInputTypesTuple, typename WrappedOutputTypesTuple>

@@ -10,13 +10,13 @@
 #include "Exception.h"
 #include "ModelTransformer.h"
 
-
 namespace emll
 {
 namespace model
 {
-    DynamicMap::DynamicMap(const Model& model) : _model(model)
-    {        
+    DynamicMap::DynamicMap(const Model& model)
+        : _model(model)
+    {
     }
 
     DynamicMap::DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
@@ -38,14 +38,14 @@ namespace model
         std::cout << "AddInput(" << inputName << ")" << std::endl;
         _inputNodes.push_back(inputNode);
         _inputNames.push_back(inputName);
-        _inputNodeMap.insert({inputName, inputNode});
+        _inputNodeMap.insert({ inputName, inputNode });
     }
 
     void DynamicMap::AddOutput(const std::string& outputName, PortElementsBase outputElements)
     {
         _outputElements.push_back(outputElements);
         _outputNames.push_back(outputName);
-        _outputElementsMap.insert({outputName, outputElements});
+        _outputElementsMap.insert({ outputName, outputElements });
     }
 
     size_t DynamicMap::GetInputSize(const std::string& inputName) const
@@ -106,36 +106,45 @@ namespace model
         archiver["model"] >> _model;
 
         // Unarchive the inputs
-        std::vector<std::string> inputNames;
         std::vector<utilities::UniqueId> inputIds;
-        archiver["inputNames"] >> inputNames;
+        archiver["inputNames"] >> _inputNames;
         archiver["inputIds"] >> inputIds;
 
         // Unarchive the outputs
-        std::vector<std::string> outputNames;
-        std::vector<PortElementsBase> outputElements;
-        archiver["outputNames"] >> outputNames;
-        archiver["outputElements"] >> outputElements;
+        archiver["outputNames"] >> _outputNames;
+        archiver["outputElements"] >> _outputElements;
 
         // Reconstruct the input node map
         _inputNodeMap.clear();
-        assert(inputNames.size() == inputIds.size());
-        for (size_t index = 0; index < inputNames.size(); ++index)
+        _inputNodes.resize(inputIds.size());
+        assert(_inputNames.size() == inputIds.size());
+        for (size_t index = 0; index < _inputNames.size(); ++index)
         {
             auto node = mapContext.GetNodeFromSerializedId(inputIds[index]);
             assert(dynamic_cast<InputNodeBase*>(node) != nullptr);
-            _inputNodeMap[inputNames[index]] = static_cast<InputNodeBase*>(node);
+            _inputNodes[index] = static_cast<InputNodeBase*>(node);
+            _inputNodeMap[_inputNames[index]] = static_cast<InputNodeBase*>(node);
         }
 
         // Reconstruct the output elements map
         _outputElementsMap.clear();
-        assert(outputNames.size() == outputElements.size());
-        for (size_t index = 0; index < outputNames.size(); ++index)
+        assert(_outputNames.size() == _outputElements.size());
+        for (size_t index = 0; index < _outputNames.size(); ++index)
         {
-            _outputElementsMap[outputNames[index]] = outputElements[index];
+            _outputElementsMap[_outputNames[index]] = _outputElements[index];
         }
 
         archiver.PopContext();
+    }
+
+    InputNodeBase* DynamicMap::GetInput(size_t index)
+    {
+        return _inputNodes[index];
+    }
+
+    PortElementsBase DynamicMap::GetOutput(size_t index)
+    {
+        return _outputElements[index];
     }
 
     //

@@ -164,7 +164,10 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-    private:
+        InputNodeBase* GetInput(size_t index);
+        PortElementsBase GetOutput(size_t index);
+
+private:
         Model _model;
         // want the inputs and outputs indexed by name and index
         std::vector<InputNodeBase*> _inputNodes;
