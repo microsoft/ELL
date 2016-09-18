@@ -18,6 +18,7 @@ namespace emll
 {
 namespace math
 {
+    /// <summary> Native implementations of static vector/matrix operations that are not implemented in BLAS. </summary>
     struct CommonOperations
     {
         /// <summary> Computes the 0-norm of a vector. </summary>
@@ -54,6 +55,12 @@ namespace math
         static void Add(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M);
     };
 
+    /// <summary>
+    /// Implementations of static vector/matrix operations that are derived from other (more basic)
+    /// operations, which are implemented in a derived class.
+    /// </summary>
+    ///
+    /// <typeparam name="DerivedClass"> The derived class. </typeparam>
     template<class DerivedClass>
     struct DerivedOperations : public CommonOperations
     {
