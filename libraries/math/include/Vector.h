@@ -173,6 +173,13 @@ namespace math
         ElementType& operator[] (size_t index);
         using ConstVectorReference<ElementType, Orientation>::operator[];
 
+        /// <summary> Assignment operator. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        ///
+        /// <returns> Copies the element values from the other vector into this vector. </returns>
+        VectorReference<ElementType, Orientation>& operator=(const ConstVectorReference<ElementType, Orientation>& other);
+
         /// <summary> Gets a reference to this vector. </summary>
         ///
         /// <returns> A reference to this vector. </returns>

@@ -47,6 +47,10 @@ void TestVector()
     math::Vector<ElementType, Orientation> r4{ 0, 3, 3, 0, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("VectorReference::Reset", v == r4);
 
+    v = math::Vector<ElementType, Orientation>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
+    math::Vector<ElementType, Orientation> r5{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
+    testing::ProcessTest("VectorReference::operator=", v == r5);
+
     // just checking compilation 
     std::default_random_engine rng;
     std::normal_distribution<ElementType> normal(0, 1.0);

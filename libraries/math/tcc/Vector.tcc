@@ -149,6 +149,13 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
+    VectorReference<ElementType, Orientation>& VectorReference<ElementType, Orientation>::operator=(const ConstVectorReference<ElementType, Orientation>& other)
+    {
+        //TODO
+        return *this;
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetReference()
     {
         return VectorReference<ElementType, Orientation>(_pData, _size, _increment );

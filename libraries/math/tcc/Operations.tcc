@@ -70,6 +70,13 @@ namespace math
     // 
 
     template<typename ElementType, VectorOrientation Orientation>
+    void OperationsImplementation<ImplementationType::native>::Copy(const ConstVectorReference<ElementType, Orientation>& u, VectorReference<ElementType, Orientation>& v)
+    {
+        // check for same length
+        // TODO
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
     ElementType OperationsImplementation<ImplementationType::native>::Norm1(ConstVectorReference<ElementType, Orientation>& v)
     {
         return v.Aggregate([](ElementType x) { return std::abs(x); });
@@ -155,6 +162,13 @@ namespace math
     //
     // OpenBLAS wrappers
     //
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void OperationsImplementation<ImplementationType::openBlas>::Copy(const ConstVectorReference<ElementType, Orientation>& u, VectorReference<ElementType, Orientation>& v)
+    {
+        // check for same length
+        // TODO
+    }
 
     template<typename ElementType, VectorOrientation Orientation>
     ElementType OperationsImplementation<ImplementationType::openBlas>::Norm1(ConstVectorReference<ElementType, Orientation>& v)

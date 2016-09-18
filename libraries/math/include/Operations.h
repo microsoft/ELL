@@ -118,6 +118,15 @@ namespace math
         /// <returns> The implementation name. </returns>
         static std::string GetImplementationName() { return "Native"; }
 
+        /// <summary> Copy th values from one vector to another, v = u. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <param name="u"> A const reference to a vector whose values are being copied. </param>
+        /// <param name="v"> [in,out] Reference to a vector whose values are being overwritten. </param>
+        template<typename ElementType, VectorOrientation Orientation>
+        static void Copy(const ConstVectorReference<ElementType, Orientation>& u, VectorReference<ElementType, Orientation>& v);
+
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
@@ -203,6 +212,15 @@ namespace math
         ///
         /// <returns> The implementation name. </returns>
         static std::string GetImplementationName() { return "Blas"; }
+
+        /// <summary> Copy th values from one vector to another, v = u. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <param name="u"> A const reference to a vector whose values are being copied. </param>
+        /// <param name="v"> [in,out] Reference to a vector whose values are being overwritten. </param>
+        template<typename ElementType, VectorOrientation Orientation>
+        static void Copy(const ConstVectorReference<ElementType, Orientation>& u, VectorReference<ElementType, Orientation>& v);
 
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///
