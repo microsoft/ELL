@@ -278,6 +278,20 @@ namespace math
         template<VectorOrientation Orientation>
         VectorReference<ElementType, Orientation> GetDiagonal();
 
+        /// <summary> Applies an operation to each row of the matrix. </summary>
+        ///
+        /// <typeparam name="MapperType"> A mapper type, which is a functor that takes a row oriented VectorReference and returns void. </typeparam>
+        /// <param name="mapper"> The mapper. </param>
+        template<typename MapperType>
+        void ForEachRow(MapperType mapper);
+
+        /// <summary> Applies an operation to each column of the matrix. </summary>
+        ///
+        /// <typeparam name="MapperType"> A mapper type, which is a functor that takes a column oriented VectorReference and returns void. </typeparam>
+        /// <param name="mapper"> The mapper. </param>
+        template<typename MapperType>
+        void ForEachColumn(MapperType mapper);
+
     protected:
         friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
         using ConstMatrixReference<ElementType, Layout>::ConstMatrixReference;
@@ -291,7 +305,6 @@ namespace math
     class Matrix : public MatrixReference<ElementType, Layout>
     {
     public:
-
         /// <summary> Constructs an all-zeros matrix of a given size. </summary>
         ///
         /// <param name="numRows"> Number of rows in the matrix. </param>

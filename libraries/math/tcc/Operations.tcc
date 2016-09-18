@@ -36,40 +36,28 @@ namespace math
     template<typename ElementType>
     void DerivedOperations<DerivedClass>::Add(ElementType s, MatrixReference<ElementType, MatrixLayout::rowMajor>& M)
     {
-        for (size_t i = 0; i < M.NumRows(); ++i)
-        {
-            DerivedClass::Add(s, M.GetRow(i));
-        }
+        M.ForEachRow([s](VectorReference<ElementType, VectorOrientation::row> row) { DerivedClass::Add(s, row); });
     }
 
     template<class DerivedClass>
     template<typename ElementType>
     void DerivedOperations<DerivedClass>::Add(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M)
     {
-        for (size_t j = 0; j < M.NumColumns(); ++j)
-        {
-            DerivedClass::Add(s, M.GetColumn(j));
-        }
+        M.ForEachColumn([s](VectorReference<ElementType, VectorOrientation::column> column) { DerivedClass::Add(s, column); });
     }
 
     template<class DerivedClass>
     template<typename ElementType>
     void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, MatrixLayout::rowMajor>& M)
     {
-        for (size_t i = 0; i < M.NumRows(); ++i)
-        {
-            DerivedClass::Multiply(s, M.GetRow(i));
-        }
+        M.ForEachRow([s](VectorReference<ElementType, VectorOrientation::row> row) { DerivedClass::Multiply(s, row); });
     }
 
     template<class DerivedClass>
     template<typename ElementType>
     void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M)
     {
-        for (size_t j = 0; j < M.NumColumns(); ++j)
-        {
-            DerivedClass::Multiply(s, M.GetColumn(j));
-        }
+        M.ForEachColumn([s](VectorReference<ElementType, VectorOrientation::column> column) { DerivedClass::Multiply(s, column); });
     }
 
     template<class DerivedClass>

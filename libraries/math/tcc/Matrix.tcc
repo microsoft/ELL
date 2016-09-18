@@ -213,6 +213,28 @@ namespace math
         return ConstructVectorReference<ElementType, Orientation>(_pData, size, _increment + 1);
     }
 
+    template<typename ElementType, MatrixLayout Layout>
+    template<typename MapperType>
+    void MatrixReference<ElementType, Layout>::ForEachRow(MapperType mapper)
+    {
+        for (size_t i = 0; i < NumRows(); ++i)
+        {
+            auto row = GetRow(i);
+            mapper(row);
+        }
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    template<typename MapperType>
+    void MatrixReference<ElementType, Layout>::ForEachColumn(MapperType mapper)
+    {
+        for (size_t j = 0; j < NumColumns(); ++j)
+        {
+            auto column = GetColumn(j);
+            mapper(column);
+        }
+    }
+
     //
     // Matrix
     // 
