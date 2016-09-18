@@ -36,11 +36,7 @@ namespace math
         /// <param name="v"> [in,out] The vector to which the scalar is added. </param>
         template<typename ElementType, VectorOrientation Orientation>
         static void Add(ElementType s, VectorReference<ElementType, Orientation>& v);
-    };
 
-    template<class DerivedClass>
-    struct DerivedOperations : public CommonOperations
-    {
         /// <summary> Adds a scalar to a row major matrix, M += s. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
@@ -56,7 +52,11 @@ namespace math
         /// <param name="M"> [in,out] The column major matrix to which the scalar is added. </param>
         template<typename ElementType>
         static void Add(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M);
+    };
 
+    template<class DerivedClass>
+    struct DerivedOperations : public CommonOperations
+    {
         /// <summary> Multiplies a row major matrix by a scalar, M *= s. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
@@ -86,21 +86,24 @@ namespace math
         static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row>& v, ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u);
     };
 
+    /// <summary> An enum that represent different implementation types. </summary>
     enum class ImplementationType { native, openBlas };
-    
+
+    /// <summary> Forward declaration of OperationsImplementation, for subsequent specialization. </summary>
+    ///
+    /// <typeparam name="Implementation"> Type of implementation. </typeparam>
     template<ImplementationType Implementation>
     struct OperationsImplementation;
 
     /// <summary>
-    /// A struct that contains vector matrix operations. Function arguments follow these naming
-    /// conventions: r,s,t represent scalars; u,v,w represent vectors; M,A,B represent matrices.
+    /// Native implementation of vector and matrix operations. Function arguments follow the following 
+    /// naming conventions: r,s,t represent scalars; u,v,w represent vectors; M,A,B represent matrices.
     /// </summary>
     template<>
     struct OperationsImplementation<ImplementationType::native> : public DerivedOperations<OperationsImplementation<ImplementationType::native>>
     {
-        using CommonOperations::Add;
         using CommonOperations::Norm0;
-        using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Add;
+        using CommonOperations::Add;
         using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Multiply;
 
         /// <summary> Gets the implementation name. </summary>
@@ -177,18 +180,16 @@ namespace math
         /// <param name="u"> [in,out] A column vector, multiplied by t and used to store the result. </param>
         template<typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u);
-
-        // TODO rank one updates
-        // TODO GEMM
     };
 
 #ifdef USE_BLAS
+    /// OpenBlas implementation of vector and matrix operations. Function arguments follow the following 
+    /// naming conventions: r,s,t represent scalars; u,v,w represent vectors; M,A,B represent matrices.
     template<>
     struct OperationsImplementation<ImplementationType::openBlas> : public DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>
     {
-        using CommonOperations::Add;
         using CommonOperations::Norm0;
-        using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Add;
+        using CommonOperations::Add;
         using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Multiply;
 
         /// <summary> Gets the implementation name. </summary>
@@ -279,9 +280,12 @@ namespace math
         static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row>& v, ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u);
     };
 #else
+    /// Native implementation of vector and matrix operations. Function arguments follow the following 
+    /// naming conventions: r,s,t represent scalars; u,v,w represent vectors; M,A,B represent matrices.
     template<>
     struct OperationsImplementation<ImplementationType::openBlas> : public OperationsImplementation<ImplementationType::native> {};
 #endif
+    // friendly name
     using Operations = OperationsImplementation<ImplementationType::openBlas>;
 }
 }

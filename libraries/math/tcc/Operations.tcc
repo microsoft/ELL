@@ -27,24 +27,22 @@ namespace math
     {
         v.ForEach([s](ElementType x) { return x + s; });
     }
+    
+    template<typename ElementType>
+    void CommonOperations::Add(ElementType s, MatrixReference<ElementType, MatrixLayout::rowMajor>& M)
+    {
+        M.ForEachRow([s](VectorReference<ElementType, VectorOrientation::row> row) { Add(s, row); });
+    }
+
+    template<typename ElementType>
+    void CommonOperations::Add(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M)
+    {
+        M.ForEachColumn([s](VectorReference<ElementType, VectorOrientation::column> column) { Add(s, column); });
+    }
 
     //
     // DerivedOperations
     //
-    
-    template<class DerivedClass>
-    template<typename ElementType>
-    void DerivedOperations<DerivedClass>::Add(ElementType s, MatrixReference<ElementType, MatrixLayout::rowMajor>& M)
-    {
-        M.ForEachRow([s](VectorReference<ElementType, VectorOrientation::row> row) { DerivedClass::Add(s, row); });
-    }
-
-    template<class DerivedClass>
-    template<typename ElementType>
-    void DerivedOperations<DerivedClass>::Add(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M)
-    {
-        M.ForEachColumn([s](VectorReference<ElementType, VectorOrientation::column> column) { DerivedClass::Add(s, column); });
-    }
 
     template<class DerivedClass>
     template<typename ElementType>
