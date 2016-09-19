@@ -66,9 +66,9 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    auto ConstMatrixReference<ElementType, Layout>::Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>
+    auto ConstMatrixReference<ElementType, Layout>::Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
     {
-        return ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>(_pData, _numColumns, _numRows, _increment);
+        return ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>(_pData, _numColumns, _numRows, _increment);
     }
 
     template<typename ElementType, MatrixLayout Layout>
@@ -154,8 +154,8 @@ namespace math
     {
         for (size_t i = 0; i < _numIntervals; ++i)
         {
-            auto begin = _pData + i * _increment;
-            std::fill(begin, begin + _intervalLength, value);
+            auto begin = GetIntervalBegin(i);
+            std::fill(begin, begin + _intervalSize, value);
         }
     }
 
@@ -165,8 +165,8 @@ namespace math
     {
         for (size_t i = 0; i < _numIntervals; ++i)
         {
-            auto begin = _pData + i * _increment;
-            std::generate(begin, begin + _intervalLength, generator);
+            auto begin = GetIntervalBegin(i); 
+            std::generate(begin, begin + _intervalSize, generator);
         }
     }
 
@@ -183,9 +183,9 @@ namespace math
     //}
 
     template<typename ElementType, MatrixLayout Layout>
-    auto MatrixReference<ElementType, Layout>::Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>
+    auto MatrixReference<ElementType, Layout>::Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
     {
-        return MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>(_pData, _numColumns, _numRows, _increment);
+        return MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>(_pData, _numColumns, _numRows, _increment);
     }
 
     template<typename ElementType, MatrixLayout Layout>
@@ -224,28 +224,6 @@ namespace math
     {
         auto size = std::min(NumColumns(), NumRows());
         return ConstructVectorReference<ElementType, Orientation>(_pData, size, _increment + 1);
-    }
-
-    template<typename ElementType, MatrixLayout Layout>
-    template<typename MapperType>
-    void MatrixReference<ElementType, Layout>::ForEachRow(MapperType mapper)
-    {
-        for (size_t i = 0; i < NumRows(); ++i)
-        {
-            auto row = GetRow(i);
-            mapper(row);
-        }
-    }
-
-    template<typename ElementType, MatrixLayout Layout>
-    template<typename MapperType>
-    void MatrixReference<ElementType, Layout>::ForEachColumn(MapperType mapper)
-    {
-        for (size_t j = 0; j < NumColumns(); ++j)
-        {
-            auto column = GetColumn(j);
-            mapper(column);
-        }
     }
 
     //

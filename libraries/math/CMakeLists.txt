@@ -10,6 +10,8 @@ PROJECT(${PROJ_NAME})
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
   add_compile_options(-std=c++1y)
+else()
+  add_compile_options(-D_SCL_SECURE_NO_WARNINGS)
 endif()
 
 set (SRC src/BlasWrapper.cpp)

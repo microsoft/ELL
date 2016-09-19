@@ -278,9 +278,9 @@ void TestMatrixOperations()
 
     math::Matrix<ElementType, Layout> M
     {
-        {1, 0},
-        {0, 1},
-        {2, 2}
+        { 1, 0 },
+        { 0, 1 },
+        { 2, 2 }
     };
 
     math::ColumnVector<ElementType> u { 1, 1, 0 };
@@ -291,7 +291,7 @@ void TestMatrixOperations()
 
     // u = s * M * v + t * u
     Ops::Multiply(s, M, v, t, u);
-    math::ColumnVector<ElementType> r0{9, 11, 28};
+    math::ColumnVector<ElementType> r0{ 9, 11, 28 };
     testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Vector)", u == r0);
 
     auto A = M.GetBlock(1, 0, 2, 2);
@@ -324,6 +324,16 @@ void TestMatrixOperations()
         { 6, 6 }
     };
     testing::ProcessTest(implementationName + "Operations::Add(MatrixReference, scalar)", M == R1);
+
+    math::Matrix<ElementType, Layout> R2
+    {
+        { 0, 2 },
+        { 4, 8 },
+        { 1, 3 }
+    };
+    Ops::Copy(R2, M);
+    testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R2);
+
 }
 
 /// Runs all tests

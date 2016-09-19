@@ -43,16 +43,8 @@ namespace math
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
         /// <param name="s"> The scalar being added. </param>
         /// <param name="M"> [in,out] The row major matrix to which the scalar is added. </param>
-        template<typename ElementType>
-        static void Add(ElementType s, MatrixReference<ElementType, MatrixLayout::rowMajor>& M);
-
-        /// <summary> Adds a scalar to a column major matrix, M += s. </summary>
-        ///
-        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <param name="s"> The scalar being added. </param>
-        /// <param name="M"> [in,out] The column major matrix to which the scalar is added. </param>
-        template<typename ElementType>
-        static void Add(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M);
+        template<typename ElementType, MatrixLayout Layout>
+        static void Add(ElementType s, MatrixReference<ElementType, Layout>& M);
     };
 
     /// <summary>
@@ -64,21 +56,24 @@ namespace math
     template<class DerivedClass>
     struct DerivedOperations : public CommonOperations
     {
+
+        /// <summary> Copy values from one matrix to another, A = B. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="Orientation"> Matrix layout. </typeparam>
+        /// <param name="u"> A const reference to a matrix whose values will be copied. </param>
+        /// <param name="v"> [in,out] Reference to a matrix whose values will be overwritten. </param>
+        template<typename ElementType, MatrixLayout Layout>
+        static void Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A);
+
         /// <summary> Multiplies a row major matrix by a scalar, M *= s. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="Layout"> Matrix layout. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="M"> [in,out] The row major matrix which is multiplied by s. </param>
-        template<typename ElementType>
-        static void Multiply(ElementType s, MatrixReference<ElementType, MatrixLayout::rowMajor>& M);
-
-        /// <summary> Multiplies a column major matrix by a scalar, M *= s. </summary>
-        ///
-        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <param name="s"> The scalar that multiplies the matrix. </param>
-        /// <param name="M"> [in,out] The column matrix which is multiplied by s. </param>
-        template<typename ElementType>
-        static void Multiply(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M);
+        template<typename ElementType, MatrixLayout Layout>
+        static void Multiply(ElementType s, MatrixReference<ElementType, Layout>& M);
 
         /// <summary> Generalized (left-size) matrix row-vector multiplication, u = s * v * M + t * u. </summary>
         ///
@@ -111,6 +106,7 @@ namespace math
     {
         using CommonOperations::Norm0;
         using CommonOperations::Add;
+        using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Copy;
         using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Multiply;
 
         /// <summary> Gets the implementation name. </summary>
@@ -126,15 +122,6 @@ namespace math
         /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
         template<typename ElementType, VectorOrientation Orientation>
         static void Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
-
-        /// <summary> Copy values from one matrix to another, A = B. </summary>
-        ///
-        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="Orientation"> Matrix layout. </typeparam>
-        /// <param name="u"> A const reference to a matrix whose values will be copied. </param>
-        /// <param name="v"> [in,out] Reference to a matrix whose values will be overwritten. </param>
-        template<typename ElementType, MatrixLayout Layout>
-        static void Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A);
 
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///
@@ -215,6 +202,7 @@ namespace math
     {
         using CommonOperations::Norm0;
         using CommonOperations::Add;
+        using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Copy;
         using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Multiply;
 
         /// <summary> Gets the implementation name. </summary>
@@ -230,15 +218,6 @@ namespace math
         /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
         template<typename ElementType, VectorOrientation Orientation>
         static void Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
-
-        /// <summary> Copy values from one matrix to another, A = B. </summary>
-        ///
-        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="Orientation"> Matrix layout. </typeparam>
-        /// <param name="u"> A const reference to a matrix whose values will be copied. </param>
-        /// <param name="v"> [in,out] Reference to a matrix whose values will be overwritten. </param>
-        template<typename ElementType, MatrixLayout Layout>
-        static void Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A);
 
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///

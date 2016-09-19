@@ -90,10 +90,11 @@ namespace math
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
         MatrixBase(size_t numRows, size_t numColumns);
 
-        static constexpr MatrixLayout transposeLayout = MatrixLayout::rowMajor;
-        static constexpr size_t _rowIncrement = 1;
+        static constexpr MatrixLayout _transposeLayout = MatrixLayout::rowMajor;
+        static constexpr VectorOrientation _intervalOrientation = VectorOrientation::column;
         const size_t _numIntervals = _numColumns;
-        const size_t _intervalLength = _numRows;
+        const size_t _intervalSize = _numRows;
+        static constexpr size_t _rowIncrement = 1;
         const size_t _columnIncrement = _increment;
     };
 
@@ -107,9 +108,10 @@ namespace math
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
         MatrixBase(size_t numRows, size_t numColumns);
 
-        static constexpr MatrixLayout transposeLayout = MatrixLayout::columnMajor;
+        static constexpr MatrixLayout _transposeLayout = MatrixLayout::columnMajor;
+        static constexpr VectorOrientation _intervalOrientation = VectorOrientation::row;
         const size_t _numIntervals = _numRows;
-        const size_t _intervalLength = _numColumns;
+        const size_t _intervalSize = _numColumns;
         const size_t _rowIncrement = _increment;
         static constexpr size_t _columnIncrement = 1;
     };
@@ -142,10 +144,12 @@ namespace math
         /// <returns> The matrix layout. </returns>
         MatrixLayout GetLayout() const { return Layout; }
 
+        size_t NumIntervals() const { return _numIntervals; } // TODO
+
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
+        auto Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
 
         /// <summary> Gets a constant reference to a block-shaped sub-matrix. </summary>
         ///
@@ -179,6 +183,12 @@ namespace math
         template<VectorOrientation Orientation>
         ConstVectorReference<ElementType, Orientation> GetDiagonal() const;
 
+        auto GetInterval(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+        { 
+            return ConstructConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
+        
+        } // TODO
+
         /// <summary> Equality operator. </summary>
         ///
         /// <typeparam name="OtherLayout"> The layout of the other matrix. </typeparam>
@@ -198,8 +208,10 @@ namespace math
         bool operator !=(const ConstMatrixReference<ElementType, OtherLayout>& other);
 
     protected:
-        friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
+        friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
+
+        ElementType* GetIntervalBegin(size_t index) const { return _pData + index * _increment; } // TODO
     };
 
     /// <summary> Non-const reference to a dense matrix. </summary>
@@ -251,7 +263,7 @@ namespace math
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const->MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
+        auto Transpose() const->MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
 
         /// <summary> Gets a const reference to a block-shaped sub-matrix. </summary>
         ///
@@ -285,22 +297,15 @@ namespace math
         template<VectorOrientation Orientation>
         VectorReference<ElementType, Orientation> GetDiagonal();
 
-        /// <summary> Applies an operation to each row of the matrix. </summary>
-        ///
-        /// <typeparam name="MapperType"> A mapper type, which is a functor that takes a row oriented VectorReference and returns void. </typeparam>
-        /// <param name="mapper"> The mapper. </param>
-        template<typename MapperType>
-        void ForEachRow(MapperType mapper);
+        auto GetInterval(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+        {
+            return ConstructVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
 
-        /// <summary> Applies an operation to each column of the matrix. </summary>
-        ///
-        /// <typeparam name="MapperType"> A mapper type, which is a functor that takes a column oriented VectorReference and returns void. </typeparam>
-        /// <param name="mapper"> The mapper. </param>
-        template<typename MapperType>
-        void ForEachColumn(MapperType mapper);
+        } // TODO
+          
 
     protected:
-        friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
+        friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using ConstMatrixReference<ElementType, Layout>::ConstMatrixReference;
     };
 

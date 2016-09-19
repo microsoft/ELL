@@ -221,39 +221,7 @@ namespace math
         /// <summary> Constructs a vector from an initializer list. </summary>
         ///
         /// <param name="list"> The initalizer list. </param>
-        Vector(std::initializer_list<ElementType> list);
-
-        /// <summary> Sets all vector elements to zero. </summary>
-        void Reset();
-
-        /// <summary> Sets all vector elements to a given value. </summary>
-        ///
-        /// <param name="value"> The value. </param>
-        void Fill(ElementType value);
-
-        /// <summary>
-        /// Generates elements of the vector by repeatedly calling a generator function (such as a random
-        /// number generator).
-        /// </summary>
-        ///
-        /// <typeparam name="GeneratorType"> Type of lambda or functor to use as a generator. </typeparam>
-        /// <param name="generator"> The generator function. </param>
-        template<typename GeneratorType>
-        void Generate(GeneratorType generator);
-
-        /// <summary> Array indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        ///
-        /// <returns> Reference to the specified element. </returns>
-        ElementType& operator[] (size_t index);
-
-        /// <summary> Array indexer operator. </summary>
-        ///
-        /// <param name="index"> Zero-based index of the element. </param>
-        ///
-        /// <returns> A copy of the specified element. </returns>
-        ElementType operator[] (size_t index) const;
+        Vector(std::initializer_list<ElementType> list); // TODO - try adding Set function , which takes init list
 
     private:
         // member variables

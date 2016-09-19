@@ -28,34 +28,43 @@ namespace math
         v.ForEach([s](ElementType x) { return x + s; });
     }
     
-    template<typename ElementType>
-    void CommonOperations::Add(ElementType s, MatrixReference<ElementType, MatrixLayout::rowMajor>& M)
+    template<typename ElementType, MatrixLayout Layout>
+    void CommonOperations::Add(ElementType s, MatrixReference<ElementType, Layout>& M)
     {
-        M.ForEachRow([s](VectorReference<ElementType, VectorOrientation::row> row) { Add(s, row); });
-    }
-
-    template<typename ElementType>
-    void CommonOperations::Add(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M)
-    {
-        M.ForEachColumn([s](VectorReference<ElementType, VectorOrientation::column> column) { Add(s, column); });
+        for (size_t i = 0; i < M.NumIntervals(); ++i)
+        {
+            auto interval = M.GetInterval(i);
+            Add(s, interval);
+        }
     }
 
     //
     // DerivedOperations
     //
-
+    
     template<class DerivedClass>
-    template<typename ElementType>
-    void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, MatrixLayout::rowMajor>& M)
+    template<typename ElementType, MatrixLayout Layout>
+    void DerivedOperations<DerivedClass>::Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A)
     {
-        M.ForEachRow([s](VectorReference<ElementType, VectorOrientation::row> row) { DerivedClass::Multiply(s, row); });
+        // TODO, check sizes match
+
+        for (size_t i = 0; i < B.NumIntervals(); ++i)
+        {
+            auto intervalA = A.GetInterval(i);
+            auto intervalB = B.GetInterval(i);
+            DerivedClass::Copy(intervalB, intervalA);
+        }
     }
 
     template<class DerivedClass>
-    template<typename ElementType>
-    void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, MatrixLayout::columnMajor>& M)
+    template<typename ElementType, MatrixLayout Layout>
+    void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, Layout>& M)
     {
-        M.ForEachColumn([s](VectorReference<ElementType, VectorOrientation::column> column) { DerivedClass::Multiply(s, column); });
+        for (size_t i = 0; i < M.NumIntervals(); ++i)
+        {
+            auto interval = M.GetInterval(i);
+            DerivedClass::Multiply(s, interval);
+        }
     }
 
     template<class DerivedClass>
@@ -79,21 +88,23 @@ namespace math
 
         ElementType* uData = u.GetDataPointer();
         const ElementType* vData = v.GetDataPointer();
-        const ElementType* end = u.GetDataPointer() + u.GetIncrement() * u.Size();
 
-        while (uData < end)
+        if (u.GetIncrement() == 1 && v.GetIncrement() == 1)
         {
-            (*uData) = (*vData);
-            uData += u.GetIncrement();
-            vData += v.GetIncrement();
+            // optimized implementation for vectors with trivial increments
+            const ElementType* vEnd = v.GetDataPointer() + v.Size();
+            std::copy(vData, vEnd, uData);
         }
-    }
-
-    template<typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::native>::Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A)
-    {
-        // check for sizes
-        // TODO
+        else
+        {
+            const ElementType* vEnd = v.GetDataPointer() + v.GetIncrement() * v.Size();
+            while (vData < vEnd)
+            {
+                (*uData) = (*vData);
+                uData += u.GetIncrement();
+                vData += v.GetIncrement();
+            }
+        }
     }
 
     template<typename ElementType, VectorOrientation Orientation>
@@ -187,13 +198,6 @@ namespace math
     void OperationsImplementation<ImplementationType::openBlas>::Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
         Blas::Copy(static_cast<int>(u.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()), u.GetDataPointer(), static_cast<int>(u.GetIncrement()));
-    }
-
-    template<typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::openBlas>::Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A)
-    {
-        // check for sizes
-        // TODO
     }
 
     template<typename ElementType, VectorOrientation Orientation>

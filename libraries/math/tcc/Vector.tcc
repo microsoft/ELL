@@ -117,12 +117,20 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::Fill(ElementType value)
     {
-        ElementType* current = _pData;
-        ElementType* end = _pData + _size * _increment ;
-        while(current < end)
+        ElementType* data = _pData;
+        ElementType* end = _pData + _size * _increment;
+
+        if (_increment == 1)
         {
-            *current = value;
-            current += _increment ;
+            std::fill(data, end, value);
+        }
+        else
+        {
+            while (data < end)
+            {
+                *data = value;
+                data += _increment;
+            }
         }
     }
 
@@ -130,12 +138,20 @@ namespace math
     template<typename GeneratorType>
     void VectorReference<ElementType, Orientation>::Generate(GeneratorType generator)
     {
-        ElementType* current = _pData;
-        ElementType* end = _pData + _size * _increment ;
-        while(current < end)
+        ElementType* data = _pData;
+        ElementType* end = _pData + _size * _increment;
+
+        if (_increment == 1)
         {
-            *current = generator();
-            current += _increment ;
+            std::generate(data, end, generator);
+        }
+        else
+        {
+            while (data < end)
+            {
+                *data = generator();
+                data += _increment;
+            }
         }
     }
 
@@ -198,45 +214,6 @@ namespace math
     Vector<ElementType, Orientation>::Vector(std::initializer_list<ElementType> list) : _data(list.begin(), list.end()), VectorReference<ElementType, Orientation>(nullptr, list.size(), 1)
     {
         _pData = _data.data(); 
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    void Vector<ElementType, Orientation>::Reset()
-    {
-        std::fill(_data.begin(), _data.end(), static_cast<ElementType>(0));
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    void Vector<ElementType, Orientation>::Fill(ElementType value)
-    {
-        std::fill(_data.begin(), _data.end(), value);
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    template<typename GeneratorType>
-    void Vector<ElementType, Orientation>::Generate(GeneratorType generator)
-    {
-        std::generate(_data.begin(), _data.end(), generator);
-    }
-
-    template <typename ElementType, VectorOrientation Orientation>
-    ElementType& Vector<ElementType, Orientation>::operator[] (size_t index)
-    {
-        if (index >= _size)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size.");
-        }
-        return _pData[index];
-    }
-
-    template <typename ElementType, VectorOrientation Orientation>
-    ElementType Vector<ElementType, Orientation>::operator[] (size_t index) const
-    {
-        if (index >= _size)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size.");
-        }
-        return _pData[index];
     }
 }
 }
