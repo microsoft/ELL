@@ -158,12 +158,7 @@ typedef emll::dataset::GenericRowDataset::Iterator emll::dataset::GenericRowIter
 %template () std::vector<emll::dataset::GenericSupervisedExample>;
 %template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample>::const_iterator, emll::dataset::GenericSupervisedExample>;
 %template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample, std::allocator<emll::dataset::GenericSupervisedExample>>::const_iterator, emll::dataset::GenericSupervisedExample>;
-
-%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
 #endif
-
-typedef emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::PredictorType emll::predictors::LinearPredictor;
-class emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::PredictorType {};
 
 #if !defined(SWIGXML) && !defined(SWIGR) && !defined(SWIGJAVASCRIPT)
 %shared_ptr(RowDataset)

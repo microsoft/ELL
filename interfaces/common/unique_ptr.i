@@ -28,6 +28,7 @@ namespace std
         template<class T2, Class Del2> unique_ptr( unique_ptr<T2, Del2>&& Right );
         ~unique_ptr();
         
+		pointer get () const;
         pointer release();
         void reset(pointer ptr = pointer());
         void swap(unique_ptr& _Right);        
@@ -39,10 +40,13 @@ namespace std
   %typemap(out) std::unique_ptr<type>
   %{
 #if SWIGPYTHON
-        $result = SWIG_NewPointerObj(new $1_ltype(std::move($1)), $1_descriptor, SWIG_POINTER_OWN);
+	$result = SWIG_NewPointerObj(new $1_ltype(std::move($1)), $1_descriptor, SWIG_POINTER_OWN);
 #endif
 #if SWIGCSHARP
-        $result = new $1_ltype(std::move($1));
+    $result = new $1_ltype(std::move($1));
+#endif
+#if SWIGJAVASCRIPT
+	$result = SWIG_NewPointerObj(new $1_ltype(std::move($1)), $1_descriptor, SWIG_POINTER_OWN);
 #endif
   %};
 %enddef

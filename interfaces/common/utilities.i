@@ -70,12 +70,12 @@ WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
 %template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample>::const_iterator, emll::dataset::GenericSupervisedExample>;
 #endif
 
-%include "LogLoss.h"
-%include "HingeLoss.h"
-%include "SquaredLoss.h"
+//%include "LogLoss.h"
+//%include "HingeLoss.h"
+//%include "SquaredLoss.h"
 
-%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::LogLoss>;
-%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::HingeLoss>;
-%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
+//%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::LogLoss>;
+//%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::HingeLoss>;
+//%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
 
-typedef emll::predictors::LinearPredictor emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::Predictor;
+//typedef emll::predictors::LinearPredictor emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::Predictor;
