@@ -14,6 +14,16 @@ namespace math
 {
     namespace Blas
     {
+        void Copy(int n, const float* x, int incx, float* y, int incy)
+        {
+            cblas_scopy(n, x, incx, y, incy);
+        }
+
+        void Copy(int n, const double* x, int incx, double* y, int incy)
+        {
+            cblas_dcopy(n, x, incx, y, incy);
+        }
+        
         float Asum(int n, const float* x, int incx)
         {
             return cblas_sasum(n, x, incx);

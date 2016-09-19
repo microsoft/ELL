@@ -70,9 +70,29 @@ namespace math
     // 
 
     template<typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::native>::Copy(const ConstVectorReference<ElementType, Orientation>& u, VectorReference<ElementType, Orientation>& v)
+    void OperationsImplementation<ImplementationType::native>::Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
-        // check for same length
+        if (v.Size() != u.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors u and v are not the same size.");
+        }
+
+        ElementType* uData = u.GetDataPointer();
+        const ElementType* vData = v.GetDataPointer();
+        const ElementType* end = u.GetDataPointer() + u.GetIncrement() * u.Size();
+
+        while (uData < end)
+        {
+            (*uData) = (*vData);
+            uData += u.GetIncrement();
+            vData += v.GetIncrement();
+        }
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    void OperationsImplementation<ImplementationType::native>::Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A)
+    {
+        // check for sizes
         // TODO
     }
 
@@ -164,9 +184,15 @@ namespace math
     //
 
     template<typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::openBlas>::Copy(const ConstVectorReference<ElementType, Orientation>& u, VectorReference<ElementType, Orientation>& v)
+    void OperationsImplementation<ImplementationType::openBlas>::Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
-        // check for same length
+        Blas::Copy(static_cast<int>(u.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()), u.GetDataPointer(), static_cast<int>(u.GetIncrement()));
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    void OperationsImplementation<ImplementationType::openBlas>::Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A)
+    {
+        // check for sizes
         // TODO
     }
 

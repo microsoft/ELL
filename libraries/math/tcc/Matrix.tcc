@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Operations.h"
+
 // stl
 #include <algorithm> // for std::generate
 
@@ -168,6 +170,17 @@ namespace math
         }
     }
 
+    template<typename ElementType, MatrixLayout Layout>
+    MatrixReference<ElementType, Layout> MatrixReference<ElementType, Layout>::GetReference()
+    {
+        return MatrixReference<ElementType, Layout>(); // TODO
+    }
+
+    //template<typename ElementType, MatrixLayout Layout>
+    //ConstMatrixReference<ElementType, Layout> MatrixReference<ElementType, Layout>::GetConstReference() const
+    //{
+    //    return ConstMatrixReference<ElementType, Layout>(); // TODO
+    //}
 
     template<typename ElementType, MatrixLayout Layout>
     auto MatrixReference<ElementType, Layout>::Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>

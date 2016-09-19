@@ -23,7 +23,18 @@ namespace math
     namespace Blas
     {
         /// @{
-        /// <summary> Wraps the BLAS ASUM function, which computes the 1-norm of a vector . </summary>
+        /// <summary> Wraps the BLAS COPY function, which copies a vector. </summary>
+        /// <param name="n"> The size of each of the arrays that store the vectors. </param>
+        /// <param name="x"> Pointer to the first element of the right-hand-side array. </param>
+        /// <param name="incx"> The Increment of the right-hand-side array. </param>
+        /// <param name="y"> Pointer to the left-hand-side array, which is modified by this procedure. </param>
+        /// <param name="incy"> The Increment of the left-hand-side array. </param>
+        void Copy(int n, const float* x, int incx, float* y, int incy);
+        void Copy(int n, const double* x, int incx, double* y, int incy);
+        /// @}
+
+        /// @{
+        /// <summary> Wraps the BLAS ASUM function, which computes the 1-norm of a vector. </summary>
         ///
         /// <param name="n"> The size of the array that stores the vector. </param>
         /// <param name="x"> Pointer to the first element of the array. </param>
@@ -35,7 +46,7 @@ namespace math
         /// @}
 
         /// @{
-        /// <summary> Wraps the BLAS NRM2 function, which computes the 2-norm of a vector . </summary>
+        /// <summary> Wraps the BLAS NRM2 function, which computes the 2-norm of a vector. </summary>
         ///
         /// <param name="n"> The size of the array that stores the vector. </param>
         /// <param name="x"> Pointer to the first element of the array. </param>
@@ -64,7 +75,7 @@ namespace math
         /// <param name="alpha"> The scalar that multiplies the right-hand-side array. </param>
         /// <param name="x"> Pointer to the first element of the right-hand-side array. </param>
         /// <param name="incx"> The Increment of the right-hand-side array. </param>
-        /// <param name="y"> [in,out] The left-hand-side array, which is modified by this procedure. </param>
+        /// <param name="y"> Pointer to the left-hand-side array, which is modified by this procedure. </param>
         /// <param name="incy"> The Increment of the left-hand-side array. </param>
         void Axpy(int n, float alpha, const float* x, int incx, float* y, int incy);
         void Axpy(int n, double alpha, const double* x, int incx, double* y, int incy);
@@ -78,7 +89,7 @@ namespace math
         /// <param name="n"> The size of each of the arrays that store the vectors. </param>
         /// <param name="x"> Pointer to the first element of the first array. </param>
         /// <param name="incx"> The Increment of the first array. </param>
-        /// <param name="y"> [in,out] Pointer to the first element of the second array. </param>
+        /// <param name="y"> Pointer to the left-hand-side array, which is modified by this procedure. </param>
         /// <param name="incy"> The Increment of the second array. </param>
         ///
         /// <returns> The dot Multiply. </returns>
@@ -96,10 +107,10 @@ namespace math
         /// <param name="alpha"> The scalar alpha, which multiplies the matrix-vector Multiply. </param>
         /// <param name="M"> The matrix M. </param>
         /// <param name="lda"> The matrix increment. </param>
-        /// <param name="x"> The vector x. </param>
+        /// <param name="x"> Pointer to the first element of the vector x. </param>
         /// <param name="incx"> The increment of vector x. </param>
         /// <param name="beta"> The scalar beta, which multiplies the left-hand side vector y. </param>
-        /// <param name="y"> The vector y, multiplied by beta and used to store the result. </param>
+        /// <param name="y"> Pointer to the first element of the vector y, multiplied by beta and used to store the result. </param>
         /// <param name="incy"> The incy. </param>
         void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, float alpha, const float* M, int lda, const float* x, int incx, float beta, float* y, int incy);
         void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, double alpha, const double* M, int lda, const double* x, int incx, double beta, double* y, int incy);

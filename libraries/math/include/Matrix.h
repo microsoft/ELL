@@ -74,9 +74,6 @@ namespace math
         // protected ctor accessible only through derived classes
         RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
 
-        // allow operations defined in the Operations struct to access raw data
-        friend class VectorMatrixFriend;
-
         ElementType* _pData;
         size_t _numRows;
         size_t _numColumns;
@@ -201,7 +198,7 @@ namespace math
         bool operator !=(const ConstMatrixReference<ElementType, OtherLayout>& other);
 
     protected:
-        friend ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
+        friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
     };
 
@@ -240,6 +237,16 @@ namespace math
         /// <param name="generator"> The generator function. </param>
         template<typename GeneratorType>
         void Generate(GeneratorType generator);
+
+        /// <summary> Gets a reference to this matrix. </summary>
+        ///
+        /// <returns> A reference to this matrix. </returns>
+        MatrixReference<ElementType, Layout> GetReference();
+
+        ///// <summary> Gets a const reference to this matrix. </summary>
+        /////
+        ///// <returns> A const reference to this matrix. </returns>
+        //ConstMatrixReference<ElementType, Layout> GetConstReference() const;
 
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///

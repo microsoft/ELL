@@ -118,14 +118,23 @@ namespace math
         /// <returns> The implementation name. </returns>
         static std::string GetImplementationName() { return "Native"; }
 
-        /// <summary> Copy th values from one vector to another, v = u. </summary>
+        /// <summary> Copy values from one vector to another, u = v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
-        /// <param name="u"> A const reference to a vector whose values are being copied. </param>
-        /// <param name="v"> [in,out] Reference to a vector whose values are being overwritten. </param>
+        /// <param name="v"> A const reference to a vector whose values will be copied. </param>
+        /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void Copy(const ConstVectorReference<ElementType, Orientation>& u, VectorReference<ElementType, Orientation>& v);
+        static void Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
+
+        /// <summary> Copy values from one matrix to another, A = B. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="Orientation"> Matrix layout. </typeparam>
+        /// <param name="u"> A const reference to a matrix whose values will be copied. </param>
+        /// <param name="v"> [in,out] Reference to a matrix whose values will be overwritten. </param>
+        template<typename ElementType, MatrixLayout Layout>
+        static void Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A);
 
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///
@@ -213,14 +222,23 @@ namespace math
         /// <returns> The implementation name. </returns>
         static std::string GetImplementationName() { return "Blas"; }
 
-        /// <summary> Copy th values from one vector to another, v = u. </summary>
+        /// <summary> Copy values from one vector to another, u = v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
-        /// <param name="u"> A const reference to a vector whose values are being copied. </param>
-        /// <param name="v"> [in,out] Reference to a vector whose values are being overwritten. </param>
+        /// <param name="v"> A const reference to a vector whose values will be copied. </param>
+        /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void Copy(const ConstVectorReference<ElementType, Orientation>& u, VectorReference<ElementType, Orientation>& v);
+        static void Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
+
+        /// <summary> Copy values from one matrix to another, A = B. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="Orientation"> Matrix layout. </typeparam>
+        /// <param name="u"> A const reference to a matrix whose values will be copied. </param>
+        /// <param name="v"> [in,out] Reference to a matrix whose values will be overwritten. </param>
+        template<typename ElementType, MatrixLayout Layout>
+        static void Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A);
 
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///

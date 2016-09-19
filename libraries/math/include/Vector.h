@@ -126,9 +126,6 @@ namespace math
         friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
         ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 
-        // allow operations defined in the Operations struct to access raw data vector and increment
-        friend class VectorMatrixFriend;
-
         ElementType* _pData;
         size_t _size;
         size_t _increment;
@@ -172,13 +169,6 @@ namespace math
         /// <returns> Reference to the specified element. </returns>
         ElementType& operator[] (size_t index);
         using ConstVectorReference<ElementType, Orientation>::operator[];
-
-        /// <summary> Assignment operator. </summary>
-        ///
-        /// <param name="other"> The other vector. </param>
-        ///
-        /// <returns> Copies the element values from the other vector into this vector. </returns>
-        VectorReference<ElementType, Orientation>& operator=(const ConstVectorReference<ElementType, Orientation>& other);
 
         /// <summary> Gets a reference to this vector. </summary>
         ///

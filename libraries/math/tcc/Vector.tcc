@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BlasWrapper.h"
+#include "Operations.h"
 
 // utilities
 #include "Exception.h"
@@ -146,13 +147,6 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size.");
         }
         return _pData[index * _increment ];
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    VectorReference<ElementType, Orientation>& VectorReference<ElementType, Orientation>::operator=(const ConstVectorReference<ElementType, Orientation>& other)
-    {
-        //TODO
-        return *this;
     }
 
     template<typename ElementType, VectorOrientation Orientation>
