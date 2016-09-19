@@ -57,7 +57,7 @@ namespace nodes
         /// <summary> Gets the values contained in this node </summary>
         ///
         /// <returns> The values contained in this node </returns>
-        const std::vector<ValueType>& GetValues() { return _values; }
+        const std::vector<ValueType>& GetValues() const { return _values; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

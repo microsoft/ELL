@@ -77,6 +77,8 @@ ipch/
 *.opensdf
 *.sdf
 *.cachefile
+*.VC.db
+*.VC.opendb
 
 # Visual Studio profiler
 *.psess
@@ -229,3 +231,6 @@ browse.VC.db
 
 # CMake / CTest stuff
 /Testing/
+# EMLL External Dependencies
+external/llvm/include/
+external/llvm/lib/
