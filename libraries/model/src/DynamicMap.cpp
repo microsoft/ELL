@@ -10,6 +10,8 @@
 #include "Exception.h"
 #include "ModelTransformer.h"
 
+#include <algorithm>
+
 namespace emll
 {
 namespace model
@@ -35,7 +37,6 @@ namespace model
 
     void DynamicMap::AddInput(const std::string& inputName, InputNodeBase* inputNode)
     {
-        std::cout << "AddInput(" << inputName << ")" << std::endl;
         _inputNodes.push_back(inputNode);
         _inputNames.push_back(inputName);
         _inputNodeMap.insert({ inputName, inputNode });
@@ -54,7 +55,12 @@ namespace model
         return iter->second->GetOutputPort().Size();
     }
 
-    ModelTransformer DynamicMap::Refine(const TransformContext& context)
+    void DynamicMap::Refine(const TransformContext& context)
+    {
+        DoRefine(context);
+    }
+
+    ModelTransformer DynamicMap::DoRefine(const TransformContext& context)
     {
         ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(_model, context);
@@ -82,13 +88,8 @@ namespace model
         archiver["model"] << _model;
 
         // Archive the inputs
-        std::vector<utilities::UniqueId> inputIds;
-
-        // Wrong: not it the correct order
-        for (size_t index = 0; index < _inputNodes.size(); ++index)
-        {
-            inputIds.push_back(_inputNodes[index]->GetId());
-        }
+        std::vector<utilities::UniqueId> inputIds(_inputNodes.size());
+        std::transform(_inputNodes.begin(), _inputNodes.end(), inputIds.begin(), [](InputNodeBase* node) { return node->GetId(); });
         archiver["inputNames"] << _inputNames;
         archiver["inputIds"] << inputIds;
 

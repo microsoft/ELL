@@ -8,25 +8,22 @@
 
 #pragma once
 
-#include "InputPort.h"
 #include "InputNode.h"
 #include "ModelTransformer.h"
 #include "Node.h"
-#include "OutputPort.h"
 #include "PortElements.h"
 
 // dataset
 #include "DenseDataVector.h"
 
 // utilities
-#include "TypeName.h"
 #include "TypeTraits.h"
 #include "IArchivable.h"
+#include "Exception.h"
 
 // stl
 #include <string>
 #include <vector>
-#include <array>
 #include <unordered_map>
 
 namespace emll
@@ -37,7 +34,6 @@ namespace model
     class DynamicMap : public utilities::IArchivable
     {
     public:
-        /// <summary> Constructor </summary>
         DynamicMap() = default;
 
         /// <summary> Constructor </summary>
@@ -74,7 +70,7 @@ namespace model
         /// <summary> Refines the model wrapped by this map </summary>
         ///
         /// <param name="context"> The TransformContext to use during refinement </param>
-        virtual ModelTransformer Refine(const TransformContext& context);
+        void Refine(const TransformContext& context);
 
         /// <summary> Returns size of a given input </summary>
         ///
@@ -164,6 +160,7 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
+        virtual ModelTransformer DoRefine(const TransformContext& context);
         InputNodeBase* GetInput(size_t index);
         PortElementsBase GetOutput(size_t index);
 

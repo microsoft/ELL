@@ -52,6 +52,7 @@ set (INCLUDE include/CompressedIntegerList.h
              include/StlIterator.h
              include/Tokenizer.h
              include/TransformIterator.h
+             include/TupleWrapper.h
              include/TypeFactory.h
              include/TypeName.h
              include/TypeTraits.h

@@ -8,93 +8,34 @@
 
 #pragma once
 
-#include "InputPort.h"
+#include "DynamicMap.h"
 #include "ModelTransformer.h"
 #include "Node.h"
-#include "OutputPort.h"
 #include "PortElements.h"
-#include "DynamicMap.h" // for serialization context
 
 // dataset
 #include "DenseDataVector.h"
 
 // utilities
-#include "TypeName.h"
-#include "IArchivable.h"
 #include "Exception.h"
+#include "IArchivable.h"
+#include "TupleWrapper.h"
+#include "TypeName.h"
+
 
 // stl
-#include <string>
-#include <vector>
 #include <array>
-#include <utility> // for integer_sequence
+#include <string>
+#include <tuple>
 #include <unordered_map>
+#include <utility> // for integer_sequence
+#include <vector>
 
 namespace emll
 {
 namespace model
 {
-    //
-    // General "wrap tuple types" mechanism
-    //
-    template <template <typename> class WrapperType, typename... Types>
-    struct TupleOfWrappedElements
-    {
-        using type = std::tuple<WrapperType<Types>...>;
-    };
-
-    template <typename TupleType, template <typename> class WrapperType, size_t... Sequence>
-    static auto MakeWrappedTupleHelper(const TupleType& tuple, std::index_sequence<Sequence...>)
-    {
-        // fails if Wrapper<T> has no copy constructor
-        return typename TupleOfWrappedElements<WrapperType, typename std::tuple_element<Sequence, TupleType>::type...>::type{};
-    }
-
-    template <typename TupleType, template <typename> class WrapperType>
-    static auto MakeWrappedTuple(const TupleType& tuple)
-    {
-        // Note: fails if Wrapper<T> has no copy constructor
-        return MakeWrappedTupleHelper<TupleType, WrapperType>(tuple, std::make_index_sequence<std::tuple_size<TupleType>::value>());
-    }
-
-    template <typename TupleType, template <typename> class WrapperType>
-    struct TupleTypeWrapper
-    {
-        using type = decltype(MakeWrappedTuple<TupleType, WrapperType>(TupleType{}));
-    };
-
-    template <typename TupleType, template <typename> class WrapperType>
-    using WrappedTuple = typename TupleTypeWrapper<TupleType, WrapperType>::type;
-
-    //
-    // Now, unwrapping tuples
-    //
-
-    template <typename WrappedType>
-    auto UnwrapType(model::InputNode<WrappedType>* x)
-    {
-        return WrappedType{};
-    }
-
-    template <typename WrappedType>
-    auto UnwrapType(model::PortElements<WrappedType> x)
-    {
-        return WrappedType{};
-    }
-
-    template <typename... WrappedTypes>
-    auto UnwrapTuple(const std::tuple<WrappedTypes...>& elements)
-    {
-        return std::tuple<decltype(UnwrapType(WrappedTypes{}))...>{};
-    }
-
-    template <typename WrappedTupleType>
-    struct UnwrappedTuple
-    {
-        using type = decltype(UnwrapTuple(WrappedTupleType{}));
-    };
-
-    // This is just to strip the extra template parameters from std::vector
+    // This is just to strip the extra template parameters from std::vector so we can use the WrappedTuple<> helper
     template <typename ValueType>
     using StdVector = std::vector<ValueType>;
 
@@ -117,13 +58,10 @@ namespace model
         /// <param name="outputs"> A vector of the outputs this map generates </param>
         /// <param name="outputNames"> A vector of names for the outputs this map generates </param>
         Map(const Model& model,
-            const WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
+            const utilities::WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
             const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
-            const WrappedTuple<OutputTypesTuple, PortElements>& outputs,
+            const utilities::WrappedTuple<OutputTypesTuple, PortElements>& outputs,
             const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames);
-
-        /// <summary> Refines the model wrapped by this map </summary>
-        virtual ModelTransformer Refine(const TransformContext& context) override;
 
         /// <summary> Set inputs </summary>
         ///
@@ -141,7 +79,7 @@ namespace model
         // void SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues);
 
         /// <summary> Type alias for the tuple of vectors returned by `Compute` </summary>
-        using ComputeOutputType = WrappedTuple<OutputTypesTuple, StdVector>; // typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
+        using ComputeOutputType = utilities::WrappedTuple<OutputTypesTuple, StdVector>; // typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
 
         /// <summary> Computes the output of the map from its current input values </summary>
         ///
@@ -172,21 +110,24 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
+        /// <summary> Refines the model wrapped by this map </summary>
+        virtual ModelTransformer DoRefine(const TransformContext& context) override;
+
     private:
         // maybe this should be a tuple<pair<string, WrappedTuple<T1>>, pair<string, WrappedTuple<T2>, ...>
         // We'd need a helper class thing to construct the type
-        WrappedTuple<InputTypesTuple, PointerToInputNode> _inputs;
-        WrappedTuple<OutputTypesTuple, PortElements> _outputs;
+        utilities::WrappedTuple<InputTypesTuple, PointerToInputNode> _inputs;
+        utilities::WrappedTuple<OutputTypesTuple, PortElements> _outputs;
 
         // Adding to name->value maps
         template <size_t... Sequence>
         void AddInputsToNameMap(std::index_sequence<Sequence...>,
-                                WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
+                                utilities::WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
                                 const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames);
 
         template <size_t... Sequence>
         void AddOutputsToNameMap(std::index_sequence<Sequence...>,
-                                 WrappedTuple<OutputTypesTuple, PortElements>& outputs,
+                                 utilities::WrappedTuple<OutputTypesTuple, PortElements>& outputs,
                                  const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames);
 
         // Remap
