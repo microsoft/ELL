@@ -27,7 +27,6 @@
 #include "HingeLoss.h"
 #include "SquaredLoss.h"
 #include "LinearPredictor.h"
-#include "SGDIncrementalTrainer.h"
 %}
 
 // SWIG can't interpret StlIterator.h, so we need to include a simpler signature of the class
@@ -56,7 +55,6 @@ template <typename IteratorType, typename ValueType> class emll::utilities::StlI
 %include "RandomEngines.h"
 %include "RowDataset.h"
 
-%include "SGDIncrementalTrainer_wrap.h"
 
 %include "IArchivable.h"
 %include "UniqueId.h"
@@ -69,13 +67,3 @@ WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
 %template () std::vector<emll::dataset::GenericSupervisedExample>;
 %template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample>::const_iterator, emll::dataset::GenericSupervisedExample>;
 #endif
-
-//%include "LogLoss.h"
-//%include "HingeLoss.h"
-//%include "SquaredLoss.h"
-
-//%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::LogLoss>;
-//%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::HingeLoss>;
-//%template () emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
-
-//typedef emll::predictors::LinearPredictor emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>::Predictor;

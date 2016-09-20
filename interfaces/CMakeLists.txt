@@ -7,8 +7,7 @@ set (INTERFACE_SRC ../common/src/DataLoadersInterface.cpp
                    ../common/src/RowDatasetInterface.cpp)
 
 set (INTERFACE_INCLUDE ../common/include/DataLoadersInterface.h
-                       ../common/include/RowDatasetInterface.h
-                       ../common/include/SGDIncrementalTrainer_wrap.h)
+                       ../common/include/RowDatasetInterface.h)
 
 set (INTERFACE_MAIN ../common/EMLL.i)
 
