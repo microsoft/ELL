@@ -26,6 +26,8 @@ namespace utilities
         class Iterator
         {
         public:
+            Iterator() = default;
+            
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;

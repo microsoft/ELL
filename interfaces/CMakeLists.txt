@@ -3,11 +3,9 @@
 #
 include (CommonInterfaces)
 
-set (INTERFACE_SRC ../common/src/DataLoadersInterface.cpp
-                   ../common/src/RowDatasetInterface.cpp)
+set (INTERFACE_SRC ../common/src/DataLoadersInterface.cpp)
 
-set (INTERFACE_INCLUDE ../common/include/DataLoadersInterface.h
-                       ../common/include/RowDatasetInterface.h)
+set (INTERFACE_INCLUDE ../common/include/DataLoadersInterface.h)
 
 set (INTERFACE_MAIN ../common/EMLL.i)
 

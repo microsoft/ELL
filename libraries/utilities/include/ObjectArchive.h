@@ -27,7 +27,7 @@ namespace utilities
     class ObjectArchive
     {
     public:
-        using PropertyCollection = std::unordered_map<std::string, ObjectArchive>;
+        typedef std::unordered_map<std::string, ObjectArchive> PropertyCollection;
 
         ObjectArchive() = default;
 

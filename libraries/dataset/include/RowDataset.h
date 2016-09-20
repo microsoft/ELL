@@ -29,7 +29,7 @@ namespace dataset
     class RowDataset
     {
     public:
-        typedef utilities::VectorIterator<ExampleType> Iterator;
+        typedef utilities::StlIterator<typename std::vector<ExampleType>::const_iterator, ExampleType> Iterator;
 
         RowDataset() = default;
 
@@ -159,6 +159,7 @@ namespace dataset
     };
 
     typedef RowDataset<GenericSupervisedExample> GenericRowDataset;
+    typedef GenericRowDataset::Iterator GenericRowIterator;
 
     template <typename ExampleType>
     std::ostream& operator<<(std::ostream& os, RowDataset<ExampleType>& dataset);
