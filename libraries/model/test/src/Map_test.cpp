@@ -6,11 +6,11 @@
 #include "Model_test.h"
 
 // model
-#include "Model.h"
-#include "Map.h"
-#include "PortElements.h"
 #include "InputNode.h"
+#include "Map.h"
+#include "Model.h"
 #include "OutputNode.h"
+#include "PortElements.h"
 
 // nodes
 #include "ExtremalValueNode.h"
@@ -27,8 +27,8 @@
 #include "testing.h"
 
 // stl
-#include <iostream>
 #include <cassert>
+#include <iostream>
 #include <tuple>
 
 //
@@ -42,11 +42,10 @@ void TestMapCreate()
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     assert(outputNodes.size() == 1);
+
     auto map = model::MakeMap(model,
-                              std::make_tuple(inputNodes[0]),
-                              { { "doubleInput" } },
-                              std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                              { { "doubleOutput" } });
+                              std::make_tuple(model::MakeNamedInput("doubleInput", inputNodes[0])),
+                              std::make_tuple(model::MakeNamedOutput("doubleOutput", outputNodes[0]->output)));
 }
 
 void TestMapCompute()
@@ -56,10 +55,8 @@ void TestMapCompute()
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     assert(outputNodes.size() == 1);
     auto map = model::MakeMap(model,
-                              std::make_tuple(inputNodes[0]),
-                              { { "doubleInput" } },
-                              std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                              { { "doubleOutput" } });
+                              std::make_tuple(model::MakeNamedInput("doubleInput", inputNodes[0])),
+                              std::make_tuple(model::MakeNamedOutput("doubleOutput", outputNodes[0]->output)));
 
     assert(inputNodes.size() == 1);
 
@@ -88,16 +85,11 @@ void TestMapRefine()
     assert(outputNodes.size() == 1);
 
     auto map1 = model::MakeMap(model,
-                               std::make_tuple(inputNodes[0]),
-                               { { "doubleInput" } },
-                               std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                               { { "doubleOutput" } });
-
+                               std::make_tuple(model::MakeNamedInput("doubleInput", inputNodes[0])),
+                               std::make_tuple(model::MakeNamedOutput("doubleOutput", outputNodes[0]->output)));
     auto map2 = model::MakeMap(model,
-                               std::make_tuple(inputNodes[0]),
-                               { { "doubleInput" } },
-                               std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                               { { "doubleOutput" } });
+                               std::make_tuple(model::MakeNamedInput("doubleInput", inputNodes[0])),
+                               std::make_tuple(model::MakeNamedOutput("doubleOutput", outputNodes[0]->output)));
 
     model::TransformContext context{ common::IsNodeCompilable() };
     map2.Refine(context);
@@ -133,10 +125,8 @@ void TestNamedInputOutput()
     assert(outputNodes.size() == 1);
 
     auto map = model::MakeMap(model,
-                              std::make_tuple(inputNodes[0]),
-                              { { "doubleInput" } },
-                              std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                              { { "doubleOutput" } });
+                              std::make_tuple(model::MakeNamedInput("doubleInput", inputNodes[0])),
+                              std::make_tuple(model::MakeNamedOutput("doubleOutput", outputNodes[0]->output)));
 
     auto input = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
                                                    { 4.0, 5.0, 6.0 },
@@ -158,10 +148,8 @@ void TestMapSerialization()
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
     auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
     auto map = model::MakeMap(model,
-                              std::make_tuple(inputNodes[0]),
-                              { { "doubleInput" } },
-                              std::make_tuple(MakePortElements(outputNodes[0]->output)),
-                              { { "doubleOutput" } });
+                              std::make_tuple(model::MakeNamedInput("doubleInput", inputNodes[0])),
+                              std::make_tuple(model::MakeNamedOutput("doubleOutput", outputNodes[0]->output)));
 
     std::stringstream outStream;
     utilities::XmlArchiver archiver(outStream);
@@ -199,10 +187,10 @@ void TestComplexMap()
     assert(boolOutputNodes.size() == 1);
 
     auto map = model::MakeMap(model,
-                              std::make_tuple(doubleInputNodes[0], boolInputNodes[0]),
-                              { { "doubleInput", "boolInput" } },
-                              std::make_tuple(MakePortElements(doubleOutputNodes[0]->output), MakePortElements(boolOutputNodes[0]->output)),
-                              { { "doubleOutput", "boolOutput" } });
+                              std::make_tuple(model::MakeNamedInput("doubleInput", doubleInputNodes[0]),
+                                              model::MakeNamedInput("boolInput", boolInputNodes[0])),
+                              std::make_tuple(model::MakeNamedOutput("doubleOutput", doubleOutputNodes[0]->output),
+                                              model::MakeNamedOutput("boolOutput", boolOutputNodes[0]->output)));
 
     std::stringstream outStream;
     utilities::XmlArchiver archiver(outStream);

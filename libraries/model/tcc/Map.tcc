@@ -13,46 +13,44 @@ namespace model
     // Constructor
     template <typename InputTypesTuple, typename OutputTypesTuple>
     Map<InputTypesTuple, OutputTypesTuple>::Map(const Model& model,
-                                                const utilities::WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
-                                                const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
-                                                const utilities::WrappedTuple<OutputTypesTuple, PortElements>& outputs,
-                                                const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
-        : DynamicMap(model), _inputs(inputs), _outputs(outputs)
+                                                const utilities::WrappedTuple<InputTypesTuple, NamedInput>& inputs,
+                                                const utilities::WrappedTuple<OutputTypesTuple, NamedOutput>& outputs)
+        : DynamicMap(model)
     {
-        AddInputsToNameMap(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), _inputs, inputNames);
-        AddOutputsToNameMap(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), _outputs, outputNames);
+        AddInputs(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), inputs);
+        AddOutputs(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), outputs);
     }
 
-    // Helper function
-    template <typename WrappedInputTypesTuple, typename WrappedOutputTypesTuple>
+    template <typename NamedInputTypesTuple, typename NamedOutputTypesTuple>
     auto MakeMap(const Model& model,
-                 const WrappedInputTypesTuple& inputs,
-                 const std::array<std::string, std::tuple_size<WrappedInputTypesTuple>::value>& inputNames,
-                 const WrappedOutputTypesTuple& outputs,
-                 const std::array<std::string, std::tuple_size<WrappedOutputTypesTuple>::value>& outputNames)
+                 const NamedInputTypesTuple& inputs,
+                 const NamedOutputTypesTuple& outputs)
     {
-        using InputTypesTuple = utilities::UnwrappedTupleType<WrappedInputTypesTuple>;
-        using OutputTypesTuple = utilities::UnwrappedTupleType<WrappedOutputTypesTuple>;
+        using utilities::UnwrappedTupleType;
+        using InputTypesTuple = UnwrappedTupleType<NamedInputTypesTuple>;
+        using OutputTypesTuple = UnwrappedTupleType<NamedOutputTypesTuple>;
 
-        return Map<InputTypesTuple, OutputTypesTuple>(model, inputs, inputNames, outputs, outputNames);
+        return Map<InputTypesTuple, OutputTypesTuple>(model, inputs, outputs);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::AddInputsToNameMap(std::index_sequence<Sequence...>,
-                                                                    utilities::WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
-                                                                    const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames)
+    void Map<InputTypesTuple, OutputTypesTuple>::AddInputs(std::index_sequence<Sequence...>,
+                                                           const utilities::WrappedTuple<InputTypesTuple, NamedInput>& inputs)
     {
-        utilities::EvalInOrder([&]() { AddInput(std::get<Sequence>(inputNames), static_cast<InputNodeBase*>(std::get<Sequence>(inputs))); }...);
+        utilities::EvalInOrder([&]() { 
+            std::get<Sequence>(_inputs) = std::get<1>(std::get<Sequence>(inputs));
+            AddInput(std::get<0>(std::get<Sequence>(inputs)), static_cast<InputNodeBase*>(std::get<1>(std::get<Sequence>(inputs)))); }...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::AddOutputsToNameMap(std::index_sequence<Sequence...>,
-                                                                     utilities::WrappedTuple<OutputTypesTuple, PortElements>& outputs,
-                                                                     const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames)
+    void Map<InputTypesTuple, OutputTypesTuple>::AddOutputs(std::index_sequence<Sequence...>,
+                                                            const utilities::WrappedTuple<OutputTypesTuple, NamedOutput>& outputs)
     {
-        utilities::EvalInOrder([&]() { AddOutput(std::get<Sequence>(outputNames), static_cast<PortElementsBase>(std::get<Sequence>(outputs))); }...);
+        utilities::EvalInOrder([&]() { 
+            std::get<Sequence>(_outputs) = std::get<1>(std::get<Sequence>(outputs));
+            AddOutput(std::get<0>(std::get<Sequence>(outputs)), static_cast<PortElementsBase>(std::get<1>(std::get<Sequence>(outputs)))); }...);
     }
 
     //

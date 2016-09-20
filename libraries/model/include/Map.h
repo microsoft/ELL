@@ -11,6 +11,7 @@
 #include "DynamicMap.h"
 #include "ModelTransformer.h"
 #include "Node.h"
+#include "OutputPort.h"
 #include "PortElements.h"
 
 // dataset
@@ -21,7 +22,6 @@
 #include "IArchivable.h"
 #include "TupleWrapper.h"
 #include "TypeName.h"
-
 
 // stl
 #include <array>
@@ -43,6 +43,43 @@ namespace model
     template <typename T>
     using PointerToInputNode = InputNode<T>*;
 
+    template <typename T>
+    using NamedInput = std::tuple<std::string, InputNode<T>*>;
+
+    template <typename T>
+    NamedInput<T> MakeNamedInput(std::string name, InputNode<T>* node)
+    {
+        return NamedInput<T>(name, node);
+    }
+
+    template <typename T>
+    using NamedOutput = std::tuple<std::string, PortElements<T>>;
+
+    template <typename T>
+    NamedOutput<T> MakeNamedOutput(std::string name, PortElements<T> outputs)
+    {
+        return NamedOutput<T>(name, outputs);
+    }
+
+    template <typename T>
+    NamedOutput<T> MakeNamedOutput(std::string name, const OutputPort<T>& outputs)
+    {
+        return NamedOutput<T>(name, outputs);
+    }
+
+    // Helper functions
+    template <typename WrappedType>
+    auto UnwrapType(std::tuple<std::string, model::InputNode<WrappedType>*>)
+    {
+        return WrappedType{};
+    }
+
+    template <typename WrappedType>
+    auto UnwrapType(std::tuple<std::string, model::PortElements<WrappedType>>)
+    {
+        return WrappedType{};
+    }
+
     /// <summary> Class that wraps a model and its designated outputs </summary>
     template <typename InputTypesTuple, typename OutputTypesTuple>
     class Map : public DynamicMap
@@ -54,14 +91,10 @@ namespace model
         ///
         /// <param name="model"> The model to wrap </param>
         /// <param name="inputs"> A vector of the inputs this map uses </param>
-        /// <param name="inputNames"> A vector of names for the inputs this map uses </param>
         /// <param name="outputs"> A vector of the outputs this map generates </param>
-        /// <param name="outputNames"> A vector of names for the outputs this map generates </param>
         Map(const Model& model,
-            const utilities::WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
-            const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames,
-            const utilities::WrappedTuple<OutputTypesTuple, PortElements>& outputs,
-            const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames);
+            const utilities::WrappedTuple<InputTypesTuple, NamedInput>& inputs,
+            const utilities::WrappedTuple<OutputTypesTuple, NamedOutput>& outputs);
 
         /// <summary> Set inputs </summary>
         ///
@@ -69,14 +102,6 @@ namespace model
         /// <param name="inputs"> The inputs to be routed to the input nodes </param>
         template <typename... InputTypes>
         void SetInputs(std::vector<InputTypes>... inputs);
-
-        /// <summary> Set a single InputNode's input </summary>
-        ///
-        /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
-        /// <param name="inputName"> The name assigned to the input node </param>
-        /// <param name="inputValues"> The values to set on the input node </param>
-        // template <typename ValueType>
-        // void SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues);
 
         /// <summary> Type alias for the tuple of vectors returned by `Compute` </summary>
         using ComputeOutputType = utilities::WrappedTuple<OutputTypesTuple, StdVector>; // typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
@@ -114,21 +139,17 @@ namespace model
         virtual ModelTransformer DoRefine(const TransformContext& context) override;
 
     private:
-        // maybe this should be a tuple<pair<string, WrappedTuple<T1>>, pair<string, WrappedTuple<T2>, ...>
-        // We'd need a helper class thing to construct the type
         utilities::WrappedTuple<InputTypesTuple, PointerToInputNode> _inputs;
         utilities::WrappedTuple<OutputTypesTuple, PortElements> _outputs;
 
-        // Adding to name->value maps
+        // Adding to _inputs/_outputs and name->value maps
         template <size_t... Sequence>
-        void AddInputsToNameMap(std::index_sequence<Sequence...>,
-                                utilities::WrappedTuple<InputTypesTuple, PointerToInputNode>& inputs,
-                                const std::array<std::string, std::tuple_size<InputTypesTuple>::value>& inputNames);
+        void AddInputs(std::index_sequence<Sequence...>,
+                       const utilities::WrappedTuple<InputTypesTuple, NamedInput>& inputs);
 
         template <size_t... Sequence>
-        void AddOutputsToNameMap(std::index_sequence<Sequence...>,
-                                 utilities::WrappedTuple<OutputTypesTuple, PortElements>& outputs,
-                                 const std::array<std::string, std::tuple_size<OutputTypesTuple>::value>& outputNames);
+        void AddOutputs(std::index_sequence<Sequence...>,
+                        const utilities::WrappedTuple<OutputTypesTuple, NamedOutput>& outputs);
 
         // Remap
         template <typename InputNodeType>
@@ -171,12 +192,10 @@ namespace model
         void PopulateOutputsHelper(std::index_sequence<Sequence...>);
     };
 
-    template <typename WrappedInputTypesTuple, typename WrappedOutputTypesTuple>
+    template <typename NamedInputTypesTuple, typename NamedOutputTypesTuple>
     auto MakeMap(const Model& model,
-                 const WrappedInputTypesTuple& inputs,
-                 const std::array<std::string, std::tuple_size<WrappedInputTypesTuple>::value>& inputNames,
-                 const WrappedOutputTypesTuple& outputs,
-                 const std::array<std::string, std::tuple_size<WrappedOutputTypesTuple>::value>& outputNames);
+                 const NamedInputTypesTuple& inputs,
+                 const NamedOutputTypesTuple& outputs);
 }
 }
 
