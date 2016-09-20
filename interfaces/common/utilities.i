@@ -34,18 +34,7 @@
 %ignore emll::utilites::Variant::Variant(emll::utilities::Variant&&);
 %ignore emll::utilities::CompressedIntegerList;
 
-
-// utilities
-%include "TypeFactory.h"
-%include "CompressedIntegerList.h"
-%include "Archiver.h"
-%include "Variant.h"
-%include "ObjectArchive.h"
-%include "IArchivable.h"
-%include "JsonArchiver.h"
-%include "XmlArchiver.h"
-%include "UniqueId.h"
-%include "Variant.h"
+namespace emll { namespace utilities {} };
 
 // SWIG can't interpret StlIterator.h, so we need to include a simpler signature of the class
 template <typename IteratorType, typename ValueType>
@@ -75,23 +64,21 @@ public:
     linear::IndexValue Get() const;
 };
 
-%include "AnyIterator.h"
-%include "RandomEngines.h"
-%include "RowDataset.h"
 
-
+// utilities
+%include "TypeFactory.h"
+%include "CompressedIntegerList.h"
+%include "Archiver.h"
+%include "Variant.h"
+%include "ObjectArchive.h"
 %include "IArchivable.h"
+%include "JsonArchiver.h"
+%include "XmlArchiver.h"
 %include "UniqueId.h"
 %include "Variant.h"
+%include "AnyIterator.h"
+%include "RandomEngines.h"
 
-WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
-
-// This is necessary for us to avoid leaking memory:
-#ifndef SWIGXML
-//%template () std::vector<emll::dataset::GenericSupervisedExample>;
-%template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample>::const_iterator, emll::dataset::GenericSupervisedExample>;
-#endif
-
-// TODO: wrap print
+// wrap print
 WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
 

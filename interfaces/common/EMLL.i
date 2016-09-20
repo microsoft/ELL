@@ -100,34 +100,11 @@ namespace std
 // Interface for NaN callbacks
 %include callback.i
 
-// Define some namespaces so we can refer to them later
-namespace emll::lossFunctions {};
-namespace emll::predictors {};
-namespace emll::dataset {};
-
-// import some types early so SWIG puts them in the correct namespace or something
-%ignore emll::dataset::RowDataset::operator[];
-%import "RowDataset.h"
-%import "IDataVector.h"
-%import "ObjectArchive.h"
-%import "Variant.h"
-%import "IArchivable.h"
-
-#ifndef SWIGXML
-%template () std::vector<emll::dataset::IDataVector>;
-#endif
-
-namespace utilities
-{
-    template <typename IteratorType, typename ValueType> class StlIndexValueIterator {};
-    %template () StlIndexValueIterator<typename std::vector<dataset::IDataVector>::const_iterator, dataset::IDataVector>;
-}
-
-typedef emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample> emll::dataset::GenericRowDataset;
-typedef emll::dataset::GenericRowDataset::Iterator emll::dataset::GenericRowIterator;
-
 // Interface includes for lossFunctions library
 %include lossFunctions.i
+
+// Interface includes for utilities library
+%include utilities.i
 
 // Interface includes for linear library
 %include linear.i
@@ -137,9 +114,6 @@ typedef emll::dataset::GenericRowDataset::Iterator emll::dataset::GenericRowIter
 
 // Interface for the predictors library
 %include predictors.i
-
-// Interface includes for utilities library
-%include utilities.i
 
 // Interface includes for trainers library
 %include trainers.i
@@ -152,13 +126,6 @@ typedef emll::dataset::GenericRowDataset::Iterator emll::dataset::GenericRowIter
 
 // Interface for model library
 %include nodes.i
-
-
-#ifndef SWIGXML
-%template () std::vector<emll::dataset::GenericSupervisedExample>;
-%template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample>::const_iterator, emll::dataset::GenericSupervisedExample>;
-%template () emll::utilities::StlIterator<typename std::vector<emll::dataset::GenericSupervisedExample, std::allocator<emll::dataset::GenericSupervisedExample>>::const_iterator, emll::dataset::GenericSupervisedExample>;
-#endif
 
 #if !defined(SWIGXML) && !defined(SWIGR) && !defined(SWIGJAVASCRIPT)
 %shared_ptr(RowDataset)
