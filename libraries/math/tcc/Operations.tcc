@@ -46,7 +46,10 @@ namespace math
     template<typename ElementType, MatrixLayout Layout>
     void DerivedOperations<DerivedClass>::Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A)
     {
-        // TODO, check sizes match
+        if (A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Matrix dimensions are not the same size.");
+        }
 
         for (size_t i = 0; i < B.NumIntervals(); ++i)
         {

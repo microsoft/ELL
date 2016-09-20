@@ -134,6 +134,11 @@ namespace math
         /// <returns> The increment. </returns>
         size_t GetIncrement() const { return _increment; }
 
+        /// <summary> Gets the number of columns of a column major matrix or rows of a row major matrix. </summary>
+        ///
+        /// <returns> The number of columns. </returns>
+        size_t NumIntervals() const { return _numIntervals; }
+
         /// <summary> Matrix element access operator. </summary>
         ///
         /// <returns> A copy of the element in a given position. </returns>
@@ -143,8 +148,6 @@ namespace math
         ///
         /// <returns> The matrix layout. </returns>
         MatrixLayout GetLayout() const { return Layout; }
-
-        size_t NumIntervals() const { return _numIntervals; } // TODO
 
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
@@ -183,11 +186,12 @@ namespace math
         template<VectorOrientation Orientation>
         ConstVectorReference<ElementType, Orientation> GetDiagonal() const;
 
-        auto GetInterval(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
-        { 
-            return ConstructConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
-        
-        } // TODO
+        /// <summary> Gets a constant reference to a row of a row major matrix or to a column of a column major matrix. </summary>
+        ///
+        /// <param name="index"> The interval index. </param>
+        ///
+        /// <returns> Constant reference to the interval. </returns>
+        auto GetInterval(size_t index) const->ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
 
         /// <summary> Equality operator. </summary>
         ///
@@ -211,7 +215,7 @@ namespace math
         friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
 
-        ElementType* GetIntervalBegin(size_t index) const { return _pData + index * _increment; } // TODO
+        ElementType* GetIntervalBegin(size_t index) const;
     };
 
     /// <summary> Non-const reference to a dense matrix. </summary>
@@ -297,12 +301,12 @@ namespace math
         template<VectorOrientation Orientation>
         VectorReference<ElementType, Orientation> GetDiagonal();
 
-        auto GetInterval(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
-        {
-            return ConstructVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
-
-        } // TODO
-          
+        /// <summary> Gets a reference to a row of a row major matrix or to a column of a column major matrix. </summary>
+        ///
+        /// <param name="index"> The interval index. </param>
+        ///
+        /// <returns> Reference to the interval. </returns>
+        auto GetInterval(size_t index)->VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
 
     protected:
         friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;

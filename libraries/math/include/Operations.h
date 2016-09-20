@@ -56,7 +56,6 @@ namespace math
     template<class DerivedClass>
     struct DerivedOperations : public CommonOperations
     {
-
         /// <summary> Copy values from one matrix to another, A = B. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>

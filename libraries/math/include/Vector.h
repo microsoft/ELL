@@ -221,12 +221,11 @@ namespace math
         /// <summary> Constructs a vector from an initializer list. </summary>
         ///
         /// <param name="list"> The initalizer list. </param>
-        Vector(std::initializer_list<ElementType> list); // TODO - try adding Set function , which takes init list
+        Vector(std::initializer_list<ElementType> list);
 
     private:
         // member variables
         std::vector<ElementType> _data;
-        using ConstVectorReference<ElementType, Orientation>::_pData; // TODO
     };
 
     //

@@ -102,6 +102,12 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
+    auto ConstMatrixReference<ElementType, Layout>::GetInterval(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+    {
+        return ConstructConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
     template<VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation> ConstMatrixReference<ElementType, Layout>::GetDiagonal() const
     {
@@ -133,6 +139,12 @@ namespace math
     bool ConstMatrixReference<ElementType, Layout>::operator!=(const ConstMatrixReference<ElementType, OtherLayout>& other)
     {
         return !(*this == other);
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    ElementType* ConstMatrixReference<ElementType, Layout>::GetIntervalBegin(size_t index) const
+    {
+        return _pData + index * _increment;
     }
 
     //
@@ -173,14 +185,8 @@ namespace math
     template<typename ElementType, MatrixLayout Layout>
     MatrixReference<ElementType, Layout> MatrixReference<ElementType, Layout>::GetReference()
     {
-        return MatrixReference<ElementType, Layout>(); // TODO
+        return MatrixReference<ElementType, Layout>(_pData, _numRows, _numColumns, _increment);
     }
-
-    //template<typename ElementType, MatrixLayout Layout>
-    //ConstMatrixReference<ElementType, Layout> MatrixReference<ElementType, Layout>::GetConstReference() const
-    //{
-    //    return ConstMatrixReference<ElementType, Layout>(); // TODO
-    //}
 
     template<typename ElementType, MatrixLayout Layout>
     auto MatrixReference<ElementType, Layout>::Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
@@ -224,6 +230,12 @@ namespace math
     {
         auto size = std::min(NumColumns(), NumRows());
         return ConstructVectorReference<ElementType, Orientation>(_pData, size, _increment + 1);
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    auto MatrixReference<ElementType, Layout>::GetInterval(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+    {
+        return ConstructVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
     }
 
     //
