@@ -8,7 +8,7 @@ def test():
     trainer = EMLL.LogLossSGDTrainer(21, loss, params)
     print type(trainer)
 
-    dataset = EMLL.GetDataset("../../../examples/data/testData.txt")
+    dataset = EMLL.GetDataset("../../../../examples/data/testData.txt")
     print type(dataset)
 
     ex = dataset.GetExample(0)

@@ -60,7 +60,9 @@ def GetAdjacencyList(nodes, index):
     parentList = map(GetParents, nodes)
     dependentList = map(GetDependents, nodes)
     V = len(index)
-    # confirm parents and dependents are doubly linked 
+    # confirm parents and dependents are doubly linked
+    # If any there exists a non doubly linked edge
+    # then this part will throw an exception 
     for i in range(1, V+1):
         for j in parentList[i]:
             k = dependentList[j].index(i)
@@ -73,8 +75,11 @@ def GetAdjacencyList(nodes, index):
     CheckAdjacencyList(adj)
     return adj
 
-
 def DFS(u, baggage):
+    '''
+    Depth first search starting at vertex u where 1 <= u <= V 
+    baggage contains state
+    '''
     (adj, vertexStates, parents, processEdge, processVertex, vertices, edges) = baggage
     vertexStates[u] = 'D'
     processVertex(u, vertices)
@@ -88,14 +93,22 @@ def DFS(u, baggage):
 def processVertex(u, vertices):
     try:
         i = vertices.index(u)
+        # we should never get here
         print "already seen vertex", u
     except ValueError:
+        # mark the vertex as discovered
         vertices.append(u)
 
 def processEdge(u, v, edges):
+    '''
+    Record bi-directional edges as you encounter new ones
+    '''
     try:
         i = edges.index((u,v))
+        # if you get here then you have seen this before
+        # no need to record it
     except ValueError:
+        # never seen this edge before
         # record the edge in both directions
         edges.append((u,v))
         edges.append((v,u))
