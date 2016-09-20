@@ -17,7 +17,7 @@ namespace math
     //
 
     template<typename ElementType, VectorOrientation Orientation>
-    ElementType CommonOperations::Norm0(ConstVectorReference<ElementType, Orientation>& v)
+    ElementType CommonOperations::Norm0(const ConstVectorReference<ElementType, Orientation>& v)
     {
         return v.Aggregate([](ElementType x) { return x != 0 ? 1 : 0; });
     }
@@ -72,7 +72,7 @@ namespace math
 
     template<class DerivedClass>
     template<typename ElementType, MatrixLayout Layout>
-    void DerivedOperations<DerivedClass>::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row>& v, ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u)
+    void DerivedOperations<DerivedClass>::Multiply(ElementType s, const ConstVectorReference<ElementType, VectorOrientation::row>& v, const ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u)
     {
         DerivedClass::Multiply(s, M.Transpose(), v.Transpose(), t, u.Transpose());
     }
@@ -111,19 +111,19 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    ElementType OperationsImplementation<ImplementationType::native>::Norm1(ConstVectorReference<ElementType, Orientation>& v)
+    ElementType OperationsImplementation<ImplementationType::native>::Norm1(const ConstVectorReference<ElementType, Orientation>& v)
     {
         return v.Aggregate([](ElementType x) { return std::abs(x); });
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    ElementType OperationsImplementation<ImplementationType::native>::Norm2(ConstVectorReference<ElementType, Orientation>& v)
+    ElementType OperationsImplementation<ImplementationType::native>::Norm2(const ConstVectorReference<ElementType, Orientation>& v)
     {
         return std::sqrt(v.Aggregate([](ElementType x) { return x*x; }));
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::native>::Add(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
+    void OperationsImplementation<ImplementationType::native>::Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
         if (v.Size() != u.Size())
         {
@@ -143,7 +143,7 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation1, VectorOrientation Orientation2>
-    ElementType OperationsImplementation<ImplementationType::native>::Dot(ConstVectorReference<ElementType, Orientation1>& u, ConstVectorReference<ElementType, Orientation2>& v)
+    ElementType OperationsImplementation<ImplementationType::native>::Dot(const ConstVectorReference<ElementType, Orientation1>& u, const ConstVectorReference<ElementType, Orientation2>& v)
     {
         if (v.Size() != u.Size())
         {
@@ -172,13 +172,13 @@ namespace math
     }
 
     template<typename ElementType>
-    void OperationsImplementation<ImplementationType::native>::Multiply(ConstVectorReference<ElementType, VectorOrientation::row>& u, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType& r)
+    void OperationsImplementation<ImplementationType::native>::Multiply(const ConstVectorReference<ElementType, VectorOrientation::row>& u, const ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType& r)
     {
         r = Dot(u, v);
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u)
+    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, const ConstMatrixReference<ElementType, Layout>& M, const ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u)
     {
         if (M.NumRows() != u.Size() || M.NumColumns() != v.Size())
         {
@@ -204,19 +204,19 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm1(ConstVectorReference<ElementType, Orientation>& v)
+    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm1(const ConstVectorReference<ElementType, Orientation>& v)
     {
         return Blas::Asum(static_cast<int>(v.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm2(ConstVectorReference<ElementType, Orientation>& v)
+    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm2(const ConstVectorReference<ElementType, Orientation>& v)
     {
         return Blas::Nrm2(static_cast<int>(v.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
+    void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
     {
         if (v.Size() != u.Size())
         {
@@ -227,7 +227,7 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation OrientationU, VectorOrientation OrientationV>
-    ElementType OperationsImplementation<ImplementationType::openBlas>::Dot(ConstVectorReference<ElementType, OrientationU>& u, ConstVectorReference<ElementType, OrientationV>& v)
+    ElementType OperationsImplementation<ImplementationType::openBlas>::Dot(const ConstVectorReference<ElementType, OrientationU>& u, const ConstVectorReference<ElementType, OrientationV>& v)
     {
         if (v.Size() != u.Size())
         {
@@ -244,13 +244,13 @@ namespace math
     }
 
     template<typename ElementType>
-    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ConstVectorReference<ElementType, VectorOrientation::row>& u, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType& r)
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(const ConstVectorReference<ElementType, VectorOrientation::row>& u, const ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType& r)
     {
         r = Dot(u, v);
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout>& M, ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u)
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, const ConstMatrixReference<ElementType, Layout>& M, const ConstVectorReference<ElementType, VectorOrientation::column>& v, ElementType t, VectorReference<ElementType, VectorOrientation::column>& u)
     {
         if (M.NumRows() != u.Size() || M.NumColumns() != v.Size())
         {
@@ -275,7 +275,7 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row>& v, ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u)
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, const ConstVectorReference<ElementType, VectorOrientation::row>& v, const ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u)
     {
         Multiply(s, M.Transpose(), v.Transpose(), t, u.Transpose());
     }

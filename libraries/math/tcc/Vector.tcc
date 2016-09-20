@@ -91,7 +91,7 @@ namespace math
 
     template<typename ElementType, VectorOrientation Orientation>
     template<typename MapperType>
-    ElementType ConstVectorReference<ElementType, Orientation>::Aggregate(MapperType mapper)
+    ElementType ConstVectorReference<ElementType, Orientation>::Aggregate(MapperType mapper) const
     {
         ElementType result = 0;
         const ElementType* current = _pData;

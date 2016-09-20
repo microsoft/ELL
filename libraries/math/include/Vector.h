@@ -118,7 +118,7 @@ namespace math
         ///
         /// <returns> The result of the operation. </returns>
         template<typename MapperType>
-        ElementType Aggregate(MapperType mapper);
+        ElementType Aggregate(MapperType mapper) const;
 
     protected:
         // protected ctor accessible only through derived classes and friends
