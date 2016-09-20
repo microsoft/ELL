@@ -11,7 +11,6 @@
 // common
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
-#include "RowDatasetInterface.h"
 
 // dataset
 #include "Example.h"
@@ -92,7 +91,31 @@ namespace
 
 namespace interfaces
 {
-    interfaces::GenericRowDataset GetDataset(const std::string& dataFilename)
+    //interfaces::GenericRowDataset2 GetDataset(const std::string& dataFilename)
+    //{
+    //    dataset::GenericRowDataset rowDataset;
+    //    // load dense TSV file if filename ends in .tsv
+    //    if (EndsWith(dataFilename, ".tsv"))
+    //    {
+    //        auto inputStream = utilities::OpenIfstream(dataFilename);
+    //        ReadTsvStream(inputStream, rowDataset);
+    //    }
+    //    else
+    //    {
+    //        common::DataLoadArguments dataLoadArguments;
+    //        dataLoadArguments.inputDataFilename = dataFilename;
+    //        auto dataIterator = common::GetDataIterator(dataLoadArguments);
+    //        while (dataIterator->IsValid())
+    //        {
+    //            rowDataset.AddExample(dataIterator->Get());
+    //            dataIterator->Next();
+    //        }
+    //    }
+
+    //    return interfaces::GenericRowDataset2(std::move(rowDataset));
+    //}    
+    
+    dataset::GenericRowDataset GetDataset(const std::string& dataFilename)
     {
         dataset::GenericRowDataset rowDataset;
         // load dense TSV file if filename ends in .tsv
@@ -113,7 +136,7 @@ namespace interfaces
             }
         }
 
-        return interfaces::GenericRowDataset(std::move(rowDataset));
+        return rowDataset;
     }
 }
 }

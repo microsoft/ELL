@@ -43,6 +43,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 elseif(MSVC)
   add_definitions(-DUNICODE)
+  add_compile_options(/MP)
 endif()
 
 enable_testing()

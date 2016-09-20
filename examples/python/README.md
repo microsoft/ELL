@@ -1,6 +1,0 @@
-Python example projects
-=======================
-
-SGD
----
-
