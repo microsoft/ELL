@@ -17,6 +17,7 @@ set (SRC test.py
          linear_test.py
          evaluators_test.py
          dataset_test.py
+         sgd_trainer_test.py
          treelayout_test.py)
 add_custom_target(${PROJ_NAME} ALL DEPENDS ${SRC} SOURCES ${SRC})
 

@@ -13,49 +13,44 @@
 #include "IDataVector.h"
 #include "SparseDataVector.h"
 #include "Example.h"
-#include "RowDatasetInterface.h"
+#include "RowDataset.h"
+#include "StlIterator.h"
 %}
 
+// ignores
 %ignore emll::dataset::RowDataset::operator[];
-
-%import "CompressedIntegerList.h"
-%import "SparseDataVector.h"
-
-namespace emll::dataset
-{
-    %ignore IDataVector::Clone;
-    %ignore GenericSupervisedExample::GenericSupervisedExample(GenericSupervisedExample&&);
-    %ignore GenericSupervisedExample::GetDataVector;
-    %ignore GenericSupervisedExample::GenericSupervisedExample;
-
-    %ignore DenseDataVector::operator[];
-    %ignore DenseDataVector<double>;
-    %ignore DenseDataVector<float>;
-    %ignore SparseDataVector<double, emll::utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<float, emll::utilities::CompressedIntegerList>;
-    %ignore SparseDataVector<short, emll::utilities::CompressedIntegerList>;
-}
-
-%ignore emll::dataset::DenseSupervisedExample::DenseSupervisedExample(DenseSupervisedExample&&);
-%ignore interfaces::GenericRowDataset::GenericRowDataset(GenericRowDataset &&);
+%ignore emll::dataset::IDataVector::Clone;
+%ignore emll::dataset::GenericRowDataset::GenericRowDataset(emll::dataset::GenericRowDataset&&);
+%ignore emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>::RowDataset(emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>&&);
+%ignore emll::dataset::GenericSupervisedExample::GenericSupervisedExample(emll::dataset::GenericSupervisedExample&&);
+%ignore emll::dataset::DenseSupervisedExample::DenseSupervisedExample(emll::dataset::DenseSupervisedExample&&);
+%ignore emll::dataset::RowDataset< emll::dataset::GenericSupervisedExample >::RowDataset(emll::dataset::RowDataset< emll::dataset::GenericSupervisedExample > &&);
+%ignore emll::dataset::Example< emll::dataset::IDataVector,emll::dataset::WeightLabel >::Example(emll::dataset::Example< emll::dataset::IDataVector,emll::dataset::WeightLabel > &&);
+%ignore emll::dataset::SparseDataVector<double, emll::utilities::CompressedIntegerList>;
+%ignore emll::dataset::SparseDataVector<float, emll::utilities::CompressedIntegerList>;
+%ignore emll::dataset::SparseDataVector<short, emll::utilities::CompressedIntegerList>;
 
 %include "noncopyable.i"
+%include "unique_ptr.i"
 
+// linear stuff (should already be included)
 %include "IVector.h"
+
+// utilities stuff (should already be included)
+%include "CompressedIntegerList.h"
+
+// dataset
 %include "IDataVector.h"
 %include "DenseDataVector.h"
-%include "SparseDataVector.h"
 %include "Example.h"
 %include "RowDataset.h"
+%include "SparseDataVector.h"
 
-%include "RowDatasetInterface.h"
-%import "RowDataset.h"
-
-%include "unique_ptr.i"
 wrap_unique_ptr(IDataVectorPtr, emll::dataset::IDataVector)
 
-%template() emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>;
-%template() emll::dataset::DenseDataVector<double>;
+%template (GenericSupervisedExample) emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>;
+%template (GenericRowDataset) emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>;
+%template (GenericRowIterator) emll::utilities::StlIterator<typename std::vector<emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>>::const_iterator, emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>>;
 
 // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
 %template () emll::dataset::DenseDataVector<double>;
@@ -63,7 +58,6 @@ wrap_unique_ptr(IDataVectorPtr, emll::dataset::IDataVector)
 %template () emll::dataset::SparseDataVector<double, emll::utilities::CompressedIntegerList>;
 %template () emll::dataset::SparseDataVector<float, emll::utilities::CompressedIntegerList>;
 %template () emll::dataset::SparseDataVector<short, emll::utilities::CompressedIntegerList>;
-%template () emll::dataset::RowDataset<GenericSupervisedExample>;
 
 // wrap operator[] for python
 WRAP_OP_AT(emll::dataset::DoubleDataVector, double)
