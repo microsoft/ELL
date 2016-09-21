@@ -103,11 +103,11 @@ namespace std
 // Interface includes for lossFunctions library
 %include lossFunctions.i
 
-// Interface includes for linear library
-%include linear.i
-
 // Interface includes for utilities library
 %include utilities.i
+
+// Interface includes for linear library
+%include linear.i
 
 // Interface includes for dataset library
 %include dataset.i

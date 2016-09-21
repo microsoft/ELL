@@ -8,31 +8,98 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "LogLoss.h"
-#include "HingeLoss.h"
-#include "SquaredLoss.h"
+#include "ForestTrainerArguments.h"
+#include "MultiEpochIncrementalTrainer.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
+#include "SGDIncrementalTrainerArguments.h"
+#include "TrainerArguments.h"
+#include "IIncrementalTrainer.h"
 #include "SGDIncrementalTrainer.h"
+#include "MakeTrainer.h"
+
+typedef emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor> IncrementalLinearPredictorTrainer;
+typedef emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor> IncrementalForestPredictorTrainer;
 %}
 
 %include "SGDIncrementalTrainer.h"
+%include "ForestTrainerArguments.h"
+%include "MultiEpochIncrementalTrainer.h"
+%include "MultiEpochIncrementalTrainerArguments.h"
+%include "SGDIncrementalTrainerArguments.h"
+%include "TrainerArguments.h"
+%include "IIncrementalTrainer.h"
 
-%inline 
-%{
-    class LinearPredictorProxy
-    {
-    public:
-        LinearPredictorProxy(const std::shared_ptr<const emll::predictors::LinearPredictor>& pred) : _pred(*pred) {}
-        const emll::predictors::LinearPredictor GetPred() { return _pred; }
-    private:
-        emll::predictors::LinearPredictor _pred;
-    };
+%template () emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>;
+%template () emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor>;
+
+typedef emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor> IncrementalLinearPredictorTrainer;
+typedef emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor> IncrementalForestPredictorTrainer;
+
+%include "unique_ptr.i"
+wrap_unique_ptr(LinearPredictorPtr, IncrementalLinearPredictorTrainer)
+wrap_unique_ptr(SimpleForestPredictorPtr, IncrementalForestPredictorTrainer)
+
+
+class SGDTrainerProxy;
+%nodefaultctor SGDTrainerProxy;
+%feature("novaluewrapper") SGDTrainerProxy;
+
+class SortingForestTrainerProxy;
+%nodefaultctor SortingForestTrainerProxy;
+%feature("novaluewrapper") SortingForestTrainerProxy;
+
+%inline %{
+	class SGDTrainerProxy
+	{
+		public:
+			SGDTrainerProxy() {}
+			SGDTrainerProxy(std::unique_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>>& trainer)
+			{
+				_trainer = trainer.release();
+			}
+
+			void Update(emll::dataset::GenericRowDataset::Iterator exampleIterator) {
+				_trainer->Update(exampleIterator);
+			}
+
+			const std::shared_ptr<const emll::predictors::LinearPredictor> GetPredictor() const {
+				return _trainer->GetPredictor();
+			}
+
+		private:
+			emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>* _trainer = nullptr;
+			// std::unique_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>> _trainer;
+	};
+
+	SGDTrainerProxy GetSGDIncrementalTrainer(uint64_t dim, const emll::common::LossArguments& lossArguments, const emll::common::SGDIncrementalTrainerArguments& trainerArguments)
+	{
+		return SGDTrainerProxy(emll::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments));
+	}
+
+	class SortingForestTrainerProxy
+	{
+		public:
+			SortingForestTrainerProxy() {}
+			SortingForestTrainerProxy(std::unique_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor>>& trainer)
+			{
+				_trainer = trainer.release();
+			}
+
+			void Update(emll::dataset::GenericRowDataset::Iterator exampleIterator) {
+				_trainer->Update(exampleIterator);
+			}
+
+			const std::shared_ptr<const emll::predictors::SimpleForestPredictor> GetPredictor() const {
+				return _trainer->GetPredictor();
+			}
+
+		private:
+			emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor>* _trainer = nullptr;			
+	};
+
+	SortingForestTrainerProxy GetForestTrainer(const emll::common::LossArguments& lossArguments, const emll::common::ForestTrainerArguments& trainerArguments)
+	{
+		return SortingForestTrainerProxy(emll::common::MakeSortingForestTrainer(lossArguments, trainerArguments));
+	}
 %}
 
-%template (LogLossSGDTrainer) emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::LogLoss>;
-%template (HingeLossSGDTrainer) emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::HingeLoss>;
-%template (SquaredLossSGDTrainer) emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::SquaredLoss>;
-
-%extend emll::trainers::SGDIncrementalTrainer<emll::lossFunctions::LogLoss>
-{
-    LinearPredictorProxy GetPred() const { return LinearPredictorProxy(($self)->GetPredictor()); }
-}

@@ -18,7 +18,7 @@ namespace emll
 {
 namespace common
 {
-    using SGDIncrementalTrainerArguments = trainers::SGDIncrementalTrainerParameters;
+    typedef trainers::SGDIncrementalTrainerParameters SGDIncrementalTrainerArguments; 
 
     /// <summary> Parsed version of stochastic gradient descent parameters. </summary>
     struct ParsedSGDIncrementalTrainerArguments : public SGDIncrementalTrainerArguments, public utilities::ParsedArgSet
