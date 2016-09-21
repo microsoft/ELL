@@ -3,9 +3,9 @@ import EMLL
 def test():
     params = EMLL.SGDIncrementalTrainerParameters()
     params.regularization = 0.01
-    loss = EMLL.LogLoss()
+    loss = EMLL.LossArguments()
 
-    trainer = EMLL.LogLossSGDTrainer(21, loss, params)
+    trainer = EMLL.GetSGDIncrementalTrainer(21, loss, params)
     print type(trainer)
 
     dataset = EMLL.GetDataset("../../../examples/data/testData.txt")
