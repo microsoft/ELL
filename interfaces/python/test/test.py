@@ -34,7 +34,10 @@ tests = [
 def interface_test():
     rc = 0
     for test in tests:
-        rc = rc | test()
+        try:
+            rc |= test()
+        except:
+            rc = 1
     sys.exit(rc)
 
 interface_test()

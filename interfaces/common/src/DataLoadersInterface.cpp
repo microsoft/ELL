@@ -91,30 +91,6 @@ namespace
 
 namespace interfaces
 {
-    //interfaces::GenericRowDataset2 GetDataset(const std::string& dataFilename)
-    //{
-    //    dataset::GenericRowDataset rowDataset;
-    //    // load dense TSV file if filename ends in .tsv
-    //    if (EndsWith(dataFilename, ".tsv"))
-    //    {
-    //        auto inputStream = utilities::OpenIfstream(dataFilename);
-    //        ReadTsvStream(inputStream, rowDataset);
-    //    }
-    //    else
-    //    {
-    //        common::DataLoadArguments dataLoadArguments;
-    //        dataLoadArguments.inputDataFilename = dataFilename;
-    //        auto dataIterator = common::GetDataIterator(dataLoadArguments);
-    //        while (dataIterator->IsValid())
-    //        {
-    //            rowDataset.AddExample(dataIterator->Get());
-    //            dataIterator->Next();
-    //        }
-    //    }
-
-    //    return interfaces::GenericRowDataset2(std::move(rowDataset));
-    //}    
-    
     dataset::GenericRowDataset GetDataset(const std::string& dataFilename)
     {
         dataset::GenericRowDataset rowDataset;
