@@ -42,34 +42,64 @@ wrap_unique_ptr(SimpleForestPredictorPtr, IncrementalForestPredictorTrainer)
 
 class SGDTrainerProxy;
 %nodefaultctor SGDTrainerProxy;
-
 %feature("novaluewrapper") SGDTrainerProxy;
-%inline {
-class SGDTrainerProxy
-{
-public:
-	SGDTrainerProxy() {}
-	SGDTrainerProxy(std::unique_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>>& trainer)
+
+class SortingForestTrainerProxy;
+%nodefaultctor SortingForestTrainerProxy;
+%feature("novaluewrapper") SortingForestTrainerProxy;
+
+%inline %{
+	class SGDTrainerProxy
 	{
-		_trainer = trainer.release();
+		public:
+			SGDTrainerProxy() {}
+			SGDTrainerProxy(std::unique_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>>& trainer)
+			{
+				_trainer = trainer.release();
+			}
+
+			void Update(emll::dataset::GenericRowDataset::Iterator exampleIterator) {
+				_trainer->Update(exampleIterator);
+			}
+
+			const std::shared_ptr<const emll::predictors::LinearPredictor> GetPredictor() const {
+				return _trainer->GetPredictor();
+			}
+
+		private:
+			emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>* _trainer = nullptr;
+			// std::unique_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>> _trainer;
+	};
+
+	SGDTrainerProxy GetSGDIncrementalTrainer(uint64_t dim, const emll::common::LossArguments& lossArguments, const emll::common::SGDIncrementalTrainerArguments& trainerArguments)
+	{
+		return SGDTrainerProxy(emll::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments));
 	}
 
-	void Update(emll::dataset::GenericRowDataset::Iterator exampleIterator) {
-		_trainer->Update(exampleIterator);
+	class SortingForestTrainerProxy
+	{
+		public:
+			SortingForestTrainerProxy() {}
+			SortingForestTrainerProxy(std::unique_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor>>& trainer)
+			{
+				_trainer = trainer.release();
+			}
+
+			void Update(emll::dataset::GenericRowDataset::Iterator exampleIterator) {
+				_trainer->Update(exampleIterator);
+			}
+
+			const std::shared_ptr<const emll::predictors::SimpleForestPredictor> GetPredictor() const {
+				return _trainer->GetPredictor();
+			}
+
+		private:
+			emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor>* _trainer = nullptr;			
+	};
+
+	SortingForestTrainerProxy GetForestTrainer(const emll::common::LossArguments& lossArguments, const emll::common::ForestTrainerArguments& trainerArguments)
+	{
+		return SortingForestTrainerProxy(emll::common::MakeSortingForestTrainer(lossArguments, trainerArguments));
 	}
-
-	const std::shared_ptr<const emll::predictors::LinearPredictor> GetPredictor() const {
-		return _trainer->GetPredictor();
-	}
-
-private:
-	emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>* _trainer = nullptr;
-	// std::unique_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>> _trainer;
-};
-
-SGDTrainerProxy MakeSGDIncrementalTrainerNew(uint64_t dim, const emll::common::LossArguments& lossArguments, const emll::common::SGDIncrementalTrainerArguments& trainerArguments)
-{
-	return SGDTrainerProxy(emll::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments));
-}
-}
+%}
 
