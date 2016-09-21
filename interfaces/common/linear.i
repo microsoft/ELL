@@ -37,7 +37,7 @@
 %include "DoubleSubvector.h"
 %include "DoubleMatrix.h"
 
-%import "IndexValue.h"
+%include "IndexValue.h"
 %include "IMatrix.h"
 
 WRAP_OP_AT(emll::linear::DoubleVector, double)

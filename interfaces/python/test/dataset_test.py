@@ -20,7 +20,7 @@ def GetExampleItems(example):
     for x in example.GetDataVector().ToArray():
         yield x
 
-def slave(example):
+def exampleTest(example):
     # This is a fancy Python/Functional way getting s0 = sample count, s1 = sum of samples,
     # s2 = sum of square of samples.
     # This test the iterator
@@ -55,7 +55,7 @@ def work():
     # Compare this with what the dataset object reports
     print "NumExamples:", dataset.NumExamples()
     for example in GetItems(dataset): 
-        slave(example)
+        exampleTest(example)
 
 def test():
     try:
