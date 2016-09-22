@@ -12,7 +12,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/DenseDataVector.cpp
+set (SRC src/AutoDataVector.cpp
+         src/DenseDataVector.cpp
          src/OnesDataVector.cpp
          src/SequentialLineIterator.cpp
          src/SparseBinaryDataVector.cpp
@@ -21,7 +22,8 @@ set (SRC src/DenseDataVector.cpp
          src/Example.cpp
          src/ZeroDataVector.cpp)
 
-set (INCLUDE include/DataVectorBuilder.h
+set (INCLUDE include/AutoDataVector.h
+             include/DataVectorBuilder.h
              include/DenseDataVector.h
              include/Example.h
              include/IDataVector.h
