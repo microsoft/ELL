@@ -87,8 +87,8 @@ namespace dataset
         double label;
     };
 
-    typedef Example<IDataVector, dataset::WeightLabel> GenericSupervisedExample; // 'dataset::' prefix required due to SWIG bug
-    typedef Example<DoubleDataVector, dataset::WeightLabel> DenseSupervisedExample; // 'dataset::' prefix required due to SWIG bug
+    typedef Example<IDataVector, WeightLabel> GenericSupervisedExample;
+    typedef Example<DoubleDataVector, WeightLabel> DenseSupervisedExample; 
 
     /// <summary> Stream insertion operator. </summary>
     ///

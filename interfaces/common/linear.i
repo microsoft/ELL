@@ -6,15 +6,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+%warnfilter (315) std::enable_if_t< std::is_base_of< IIndexValueIterator,IteratorType >::value,int >;
+
 %{
 #define SWIG_FILE_WITH_INIT
 #include "DoubleVector.h"
 #include "DoubleSubvector.h"
 #include "DoubleMatrix.h"
+#include "IndexValue.h"
 #include "IVector.h"
 #include "IMatrix.h"
 %}
 
+%ignore std::enable_if_t;
+%ignore emll::linear::IsIndexValueIterator;
 %ignore emll::linear::DoubleVector::GetIterator;
 %ignore emll::linear::DoubleSubvector::GetIterator;
 %ignore emll::linear::DoubleVector::GetDataPointer;
@@ -27,12 +32,12 @@
 %rename (GetValue) emll::linear::DoubleSubvector::operator[](uint64_t) const;
 %ignore emll::linear::DoubleMatrixBase::operator()const;
 
-
+%include "IVector.h"
 %include "DoubleVector.h"
 %include "DoubleSubvector.h"
 %include "DoubleMatrix.h"
 
-//%include "IVector.h"
+%include "IndexValue.h"
 %include "IMatrix.h"
 
 WRAP_OP_AT(emll::linear::DoubleVector, double)
