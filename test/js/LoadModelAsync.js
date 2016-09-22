@@ -23,7 +23,7 @@ if(modelsync)
   tap.pass('Test LoadModel syncronously');
 }
 
-EMLL.LoadModelAsync("" ,function(model)
+EMLL.LoadModelAsync("[1]" ,function(model)
 {
   if(model)
   {
