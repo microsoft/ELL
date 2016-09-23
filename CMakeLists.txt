@@ -39,8 +39,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 # Turn on ability to create folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++1y)
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX
+  add_compile_options(-std=c++14 -Wall)  # -Werror (unsure about -Wall, -Werror on gcc)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+  add_compile_options(-std=c++14 -Wall)  # -Werror
 elseif(MSVC)
   add_definitions(-DUNICODE)
   add_compile_options(/MP)
