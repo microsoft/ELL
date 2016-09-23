@@ -12,23 +12,23 @@ namespace emll
 {
 namespace dataset
 {
-    template <typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::Iterator::Next()
+    template <typename ElementType, typename IntegerListType>
+    void SparseDataVector<ElementType, IntegerListType>::Iterator::Next()
     {
         _index_iterator.Next();
         ++_value_iterator;
     }
 
-    template <typename ValueType, typename IntegerListType>
-    SparseDataVector<ValueType, IntegerListType>::Iterator::Iterator(
+    template <typename ElementType, typename IntegerListType>
+    SparseDataVector<ElementType, IntegerListType>::Iterator::Iterator(
         const IndexIteratorType& index_iterator,
         const ValueIteratorType& value_iterator)
         : _index_iterator(index_iterator), _value_iterator(value_iterator)
     {
     }
 
-    template <typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::AppendEntry(size_t index, double value)
+    template <typename ElementType, typename IntegerListType>
+    void SparseDataVector<ElementType, IntegerListType>::AppendEntry(size_t index, double value)
     {
         if (value == 0)
         {
@@ -36,11 +36,11 @@ namespace dataset
         }
 
         _indices.Append(index);
-        _values.push_back((ValueType)value);
+        _values.push_back((ElementType)value);
     }
 
-    template <typename ValueType, typename IntegerListType>
-    size_t SparseDataVector<ValueType, IntegerListType>::Size() const
+    template <typename ElementType, typename IntegerListType>
+    size_t SparseDataVector<ElementType, IntegerListType>::Size() const
     {
         if (_indices.Size() == 0)
         {
@@ -52,8 +52,8 @@ namespace dataset
         }
     }
 
-    template <typename ValueType, typename IntegerListType>
-    double SparseDataVector<ValueType, IntegerListType>::Norm2() const
+    template <typename ElementType, typename IntegerListType>
+    double SparseDataVector<ElementType, IntegerListType>::Norm2() const
     {
         double result = 0.0;
         for (auto value : _values)
@@ -63,8 +63,8 @@ namespace dataset
         return result;
     }
 
-    template <typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::AddTo(double* p_other, double scalar) const
+    template <typename ElementType, typename IntegerListType>
+    void SparseDataVector<ElementType, IntegerListType>::AddTo(double* p_other, double scalar) const
     {
         auto iter = GetIterator();
         while (iter.IsValid())
@@ -75,8 +75,8 @@ namespace dataset
         }
     }
 
-    template <typename ValueType, typename IntegerListType>
-    double SparseDataVector<ValueType, IntegerListType>::Dot(const double* p_other) const
+    template <typename ElementType, typename IntegerListType>
+    double SparseDataVector<ElementType, IntegerListType>::Dot(const double* p_other) const
     {
         double value = 0.0;
 
@@ -91,14 +91,14 @@ namespace dataset
         return value;
     }
 
-    template <typename ValueType, typename IntegerListType>
-    typename SparseDataVector<ValueType, IntegerListType>::Iterator SparseDataVector<ValueType, IntegerListType>::GetIterator() const
+    template <typename ElementType, typename IntegerListType>
+    typename SparseDataVector<ElementType, IntegerListType>::Iterator SparseDataVector<ElementType, IntegerListType>::GetIterator() const
     {
         return Iterator(_indices.GetIterator(), _values.cbegin());
     }
 
-    template <typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::Print(std::ostream& os) const
+    template <typename ElementType, typename IntegerListType>
+    void SparseDataVector<ElementType, IntegerListType>::Print(std::ostream& os) const
     {
         auto iterator = GetIterator();
         while (iterator.IsValid())

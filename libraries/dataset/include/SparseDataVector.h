@@ -27,9 +27,9 @@ namespace dataset
 {
     /// <summary> Implements a sparse vector as an increasing list of indices and their values.
     ///
-    /// <typeparam name="ValueType">     Type of the value type. </typeparam>
+    /// <typeparam name="ElementType">     Type of the value type. </typeparam>
     /// <typeparam name="tegerListType"> Type of the teger list type. </typeparam>
-    template <typename ValueType, typename IntegerListType>
+    template <typename ElementType, typename IntegerListType>
     class SparseDataVector : public IDataVector
     {
     public:
@@ -57,11 +57,11 @@ namespace dataset
         private:
             // define typenames to improve readability
             using IndexIteratorType = typename IntegerListType::Iterator;
-            using ValueIteratorType = typename std::vector<ValueType>::const_iterator;
+            using ValueIteratorType = typename std::vector<ElementType>::const_iterator;
 
             // private ctor, can only be called from SparseDataVector class
             Iterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator);
-            friend SparseDataVector<ValueType, IntegerListType>;
+            friend SparseDataVector<ElementType, IntegerListType>;
 
             // members
             IndexIteratorType _index_iterator;
@@ -76,9 +76,9 @@ namespace dataset
         template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         SparseDataVector(IndexValueIteratorType indexValueIterator);
 
-        SparseDataVector(SparseDataVector<ValueType, IntegerListType>&& other) = default;
+        SparseDataVector(SparseDataVector<ElementType, IntegerListType>&& other) = default;
 
-        SparseDataVector(const SparseDataVector<ValueType, IntegerListType>& other) = default;
+        SparseDataVector(const SparseDataVector<ElementType, IntegerListType>& other) = default;
 
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
         /// monotonically increasing argument. The value argument must equal 1.0. </summary>
@@ -127,7 +127,7 @@ namespace dataset
 
     private:
         IntegerListType _indices;
-        std::vector<ValueType> _values;
+        std::vector<ElementType> _values;
     };
 
     /// <summary> A sparse double data vector. </summary>

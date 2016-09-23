@@ -17,7 +17,7 @@ namespace dataset
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
-            SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to SparseBinaryDataVectorBase<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
+            SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to SparseBinaryDataVectorBase<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
             indexValueIterator.Next();
         }
     }

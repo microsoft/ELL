@@ -349,7 +349,9 @@ int main()
 {
 
     IDataVectorTest<dataset::DoubleDataVector>();
+    IDataVectorTest<dataset::FloatDataVector>();
 
+    return 0;
 
     dotTest();
     addToTest();

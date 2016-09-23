@@ -31,12 +31,12 @@ namespace dataset
 {
     /// <summary> DenseDataVector Base class. </summary>
     ///
-    /// <typeparam name="ValueType"> Type of the value type. </typeparam>
-    template <typename ValueType>
-    class DenseDataVector : public DataVectorBase<DenseDataVector<ValueType>>
+    /// <typeparam name="ElementType"> Type of the value type. </typeparam>
+    template <typename ElementType>
+    class DenseDataVector : public DataVectorBase<DenseDataVector<ElementType>>
     {
     public:
-        using ConstIterator = utilities::VectorIndexValueIterator<ValueType>;
+        using ConstIterator = utilities::VectorIndexValueIterator<ElementType>;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
@@ -54,7 +54,7 @@ namespace dataset
         /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
         ///
         /// <param name="data"> The std::vector. </param>
-        DenseDataVector(std::vector<ValueType> data);
+        DenseDataVector(std::vector<ElementType> data);
 
         /// <summary> Constructs an instance of DenseDataVector from an initializer list of index value pairs. </summary>
         ///
@@ -86,22 +86,13 @@ namespace dataset
 
     private:
         size_t _numNonzeros;
-        std::vector<ValueType> _data;
+        std::vector<ElementType> _data;
     };
 
-    /// <summary> A float data vector. </summary>
-    class FloatDataVector : public DenseDataVector<float>
-    {
-    public:
-        using DenseDataVector<float>::DenseDataVector;
-    };
-
-    /// <summary> A double data vector. </summary>
-    class DoubleDataVector : public DenseDataVector<double>
-    {
-    public:
-        using DenseDataVector<double>::DenseDataVector;
-    };
+    /// friendly names
+    using FloatDataVector = DenseDataVector<float>;
+    using DoubleDataVector = DenseDataVector<double>;
+    using ShortDataVector = DenseDataVector<short>;
 }
 }
 

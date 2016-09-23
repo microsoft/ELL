@@ -10,20 +10,20 @@ namespace emll
 {
 namespace dataset
 {
-    template <typename ValueType, typename IntegerListType>
+    template <typename ElementType, typename IntegerListType>
     template <typename IndexValueIteratorType, typename concept>
-    SparseDataVector<ValueType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
-            SparseDataVector<ValueType, IntegerListType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to SparseDataVector<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
+            SparseDataVector<ElementType, IntegerListType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to SparseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
             indexValueIterator.Next();
         }
     }
 
-    template <typename ValueType, typename IntegerListType>
-    std::vector<double> SparseDataVector<ValueType, IntegerListType>::ToArray() const
+    template <typename ElementType, typename IntegerListType>
+    std::vector<double> SparseDataVector<ElementType, IntegerListType>::ToArray() const
     {
         auto vector = std::vector<double>(Size());
         auto indexValueIterator = GetIterator();

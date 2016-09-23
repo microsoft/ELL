@@ -7,34 +7,34 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Exception.h"
-#include "..\include\DenseDataVector.h"
+
+// stl
+#include <cassert>
 
 namespace emll
 {
 namespace dataset
 {
-    template <typename ValueType>
+    template <typename ElementType>
     template <typename IndexValueIteratorType, typename concept>
-    DenseDataVector<ValueType>::DenseDataVector(IndexValueIteratorType indexValueIterator)
+    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
-            DenseDataVector<ValueType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to DenseDataVector<ValueType>::AppendEntry is given to avoid virtual function call in Ctor
+            DenseDataVector<ElementType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to DenseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
             indexValueIterator.Next();
         }
     }
 
-    template <typename ValueType>
-    DenseDataVector<ValueType>::DenseDataVector()
-        : _numNonzeros(0)
+    template <typename ElementType>
+    DenseDataVector<ElementType>::DenseDataVector() : _numNonzeros(0)
     {
         _data.reserve(DEFAULT_DENSE_VECTOR_CAPACITY);
     }
 
-    template <typename ValueType>
-    DenseDataVector<ValueType>::DenseDataVector(std::vector<ValueType> data)
-        : _numNonzeros(0), _data(std::move(data))
+    template <typename ElementType>
+    DenseDataVector<ElementType>::DenseDataVector(std::vector<ElementType> data) : _numNonzeros(0), _data(std::move(data))
     {
         for (auto value : _data)
         {
@@ -45,8 +45,8 @@ namespace dataset
         }
     }
 
-    template<typename ValueType>
-    inline DenseDataVector<ValueType>::DenseDataVector(std::initializer_list<linear::IndexValue> list)
+    template<typename ElementType>
+    inline DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<linear::IndexValue> list)
     {
         auto current = list.begin();
         auto end = list.end();
@@ -58,31 +58,34 @@ namespace dataset
         }
     }
 
-    template <typename ValueType>
-    double DenseDataVector<ValueType>::operator[](size_t index) const
+    template <typename ElementType>
+    double DenseDataVector<ElementType>::operator[](size_t index) const
     {
         if (index >= _data.size())
         {
             return 0.0;
         }
-        return (double)_data[index];
+        return static_cast<double>(_data[index]);
     }
 
-    template <typename ValueType>
-    void DenseDataVector<ValueType>::AppendEntry(size_t index, double value)
+    template <typename ElementType>
+    void DenseDataVector<ElementType>::AppendEntry(size_t index, double value)
     {
         if (value == 0)
         {
             return;
         }
 
+        ElementType storedValue = static_cast<ElementType>(value);
+        assert(storedValue - value <= 1.0e-8 && value - storedValue <= 1.0e-8);
+            
         if(index < _data.size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only append values to the end of a data vector");
         }
 
         _data.resize(index + 1);
-        _data[index] = (ValueType)value;
+        _data[index] = storedValue;
         ++_numNonzeros;
     }
 }
