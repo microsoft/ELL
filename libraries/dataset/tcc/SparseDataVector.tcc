@@ -32,7 +32,7 @@ namespace dataset
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
-            SparseDataVector<ElementType, IntegerListType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to SparseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
+            SparseDataVector<ElementType, IntegerListType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendEntry is given to avoid virtual function call in Ctor
             indexValueIterator.Next();
         }
     }
@@ -44,7 +44,19 @@ namespace dataset
         auto end = list.end();
         while(current < end)
         {
-            AppendEntry(current->index, current->value);
+            SparseDataVector<ElementType, IntegerListType>::AppendEntry(current->index, current->value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendEntry is given to avoid virtual function call in Ctor
+            ++current;
+        }
+    }
+
+    template <typename ElementType, typename IntegerListType>
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<size_t> list)
+    {
+        auto current = list.begin();
+        auto end = list.end();
+        while(current < end)
+        {
+            SparseDataVector<ElementType, IntegerListType>::AppendEntry(*current, 1.0); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendEntry is given to avoid virtual function call in Ctor
             ++current;
         }
     }

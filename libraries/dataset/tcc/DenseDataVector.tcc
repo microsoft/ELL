@@ -52,7 +52,19 @@ namespace dataset
         auto end = list.end();
         while(current < end)
         {
-            AppendEntry(current->index, current->value);
+            DenseDataVector<ElementType>::AppendEntry(current->index, current->value); // explicit call to DenseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
+            ++current;
+        }
+    }
+
+    template <typename ElementType>
+    DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<size_t> list)
+    {
+        auto current = list.begin();
+        auto end = list.end();
+        while(current < end)
+        {
+            DenseDataVector<ElementType>::AppendEntry(*current, 1.0); // explicit call to DenseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
             ++current;
         }
     }

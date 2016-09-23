@@ -13,9 +13,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/AutoDataVector.cpp
-         src/OnesDataVector.cpp
          src/SequentialLineIterator.cpp
-         src/SparseBinaryDataVector.cpp
          src/SparseEntryParser.cpp
          src/Example.cpp)
 
@@ -24,7 +22,6 @@ set (INCLUDE include/AutoDataVector.h
              include/DenseDataVector.h
              include/Example.h
              include/DataVector.h
-             include/OnesDataVector.h
              include/ParsingIterator.h
              include/RowDataset.h
              include/SequentialLineIterator.h

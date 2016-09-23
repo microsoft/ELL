@@ -85,6 +85,11 @@ namespace dataset
         /// <param name="list"> The initializer list. </param>
         SparseDataVector(std::initializer_list<linear::IndexValue> list);
 
+        /// <summary> Constructs a data vector from an initializer list of indices. </summary>
+        ///
+        /// <param name="list"> The initializer list of indices where the vector equals 1. </param>
+        SparseDataVector(std::initializer_list<size_t> list);
+
         /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
         ///
         /// <returns> The iterator. </returns>

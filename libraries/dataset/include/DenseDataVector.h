@@ -61,6 +61,11 @@ namespace dataset
         /// <param name="list"> The initializer list. </param>
         DenseDataVector(std::initializer_list<linear::IndexValue> list);
 
+        /// <summary> Constructs a data vector from an initializer list of indices. </summary>
+        ///
+        /// <param name="list"> The initializer list of indices where the vector equals 1. </param>
+        DenseDataVector(std::initializer_list<size_t> list);
+
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the desired element. </param>

@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DenseDataVector.h"
-#include "OnesDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
 
@@ -69,124 +68,42 @@ template<typename DataVectorType>
 void IDataVectorTest()
 {
     DataVectorType u{{0,12}, {3,-7}, {4,1}};
-
-
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(12*12+7*7+1*1)));
 
     std::vector<double> w{1, 1, 1, 1, 1, 1};
-
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w.data()), 12.0-7+1));
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w.data()), 12.0-7.0+1.0));
 
     u.AddTo(w.data(), 2);
     std::vector<double> z{25, 1, 1, -13, 3, 1};
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w, z));
 
-
-
-
+    std::stringstream ss;
+    u.Print(ss);
+    auto sss = ss.str();
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Print()", sss == "0:12\t3:-7\t4:1");
 }
 
-
-
-
-
-
-/// Tests the Dot() member of DataVectors
-///
-template <typename DataVectorType>
-void dotTest()
+template<typename DataVectorType>
+void IDataVectorBinaryTest()
 {
-    auto a = getVector();
-    auto b = getBinaryVector();
+    DataVectorType u{0, 3, 4};
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(3)));
 
-    DataVectorType c(b.GetIterator());
+    std::vector<double> w{1, 2, 3, 4, 5, 6};
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w.data()), 1.0+4.0+5.0));
 
-    double result = c.Dot(a.GetDataPointer());
-    const double expectedResult = 2.2;
+    u.AddTo(w.data(), 2);
+    std::vector<double> z{3, 2, 3, 6, 7, 6};
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w, z));
 
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(result, expectedResult));
+    std::stringstream ss;
+    u.Print(ss);
+    auto sss = ss.str();
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Print()", sss == "0:1\t3:1\t4:1");
 }
 
 
-/// Tests the Dot() member of OnesDataVector
-///
-void dotTestOnesDataVector()
-{
-    auto a = getVector();
-    dataset::OnesDataVector o(4);
-    double result = o.Dot(a.GetDataPointer());
-    testing::ProcessTest("Testing dataset::OnesDataVector::Dot()", testing::IsEqual(result, 7.0));
-}
 
-/// Tests the Dot() member of DataVectors
-///
-void dotTest()
-{
-    dotTest<dataset::DoubleDataVector>();
-    dotTest<dataset::FloatDataVector>();
-    dotTest<dataset::SparseDoubleDataVector>();
-    dotTest<dataset::SparseFloatDataVector>();
-    dotTest<dataset::SparseShortDataVector>();
-    dotTest<dataset::SparseBinaryDataVector>();
-    dotTest<dataset::UncompressedSparseBinaryDataVector>();
-    dotTestOnesDataVector();
-}
-
-/// Adds a DataVector to a linear::DoubleVector in two different ways and checks that the result is the same
-///
-template <typename DataVectorType1, typename DataVectorType2>
-void addToTest()
-{
-    auto a1 = getVector();
-    auto a2 = getVector();
-
-    std::vector<double> b(15);
-    b[3] = 1.0;
-    b[4] = 1.0;
-    b[12] = 1.0;
-    b[13] = 1.0;
-
-    DataVectorType1 c1(utilities::MakeStlIndexValueIterator(b));
-    DataVectorType2 c2(utilities::MakeStlIndexValueIterator(b));
-
-    c1.AddTo(a1.GetDataPointer());
-    c2.AddTo(a2.GetDataPointer());
-
-    std::string name1 = typeid(DataVectorType1).name();
-    std::string name2 = typeid(DataVectorType2).name();
-
-    testing::ProcessTest("Comparing AddTo() in " + name1 + " and " + name2, testing::IsEqual(a1, a2));
-}
-
-/// Tests the AddTo() member of OnesDataVector
-///
-void addToTestOnesDataVector()
-{
-    auto a1 = getVector();
-    auto a2 = getVector();
-
-    dataset::OnesDataVector o(a1.Size());
-
-    o.AddTo(a1.GetDataPointer());
-
-    double norm1 = a1.Norm2();
-    double norm2 = a2.Norm2() + 2 * o.Dot(a2.GetDataPointer()) + a2.Size();
-
-    testing::ProcessTest("Testing dataset::OnesDataVector::AddTo()", testing::IsEqual(norm1, norm2));
-}
-
-/// Tests the AddTo() member of DataVectors
-///
-void addToTest()
-{
-    addToTest<dataset::DoubleDataVector, dataset::FloatDataVector>();
-    addToTest<dataset::DoubleDataVector, dataset::SparseDoubleDataVector>();
-    addToTest<dataset::DoubleDataVector, dataset::SparseFloatDataVector>();
-    addToTest<dataset::DoubleDataVector, dataset::SparseShortDataVector>();
-    addToTest<dataset::DoubleDataVector, dataset::SparseBinaryDataVector>();
-    addToTest<dataset::DoubleDataVector, dataset::UncompressedSparseBinaryDataVector>();
-    addToTestOnesDataVector();
-}
 
 /// Casts one DataVector type into another and checks that the result is the same
 ///
@@ -301,47 +218,6 @@ void printTest(const linear::DoubleVector& a)
     testing::ProcessTest("Comparing " + name1 + "::Print() and " + name2 + "::Print()", s1 == s2);
 }
 
-void printTestOnesDataVector()
-{
-    dataset::DoubleDataVector a;
-    for (int i = 0; i < 15; ++i)
-    {
-        a.AppendEntry(i, 1);
-    }
-
-    dataset::OnesDataVector b(15);
-
-    std::stringstream aStream;
-    std::stringstream bStream;
-
-    a.Print(aStream);
-    b.Print(bStream);
-
-    std::string aStr = aStream.str();
-    std::string bStr = bStream.str();
-
-    testing::ProcessTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::OnesDataVector::Print()", aStr == bStr);
-}
-
-void printTest()
-{
-    auto a = getVector();
-
-    printTest<dataset::DoubleDataVector, dataset::FloatDataVector>(a);
-    printTest<dataset::DoubleDataVector, dataset::SparseDoubleDataVector>(a);
-    printTest<dataset::DoubleDataVector, dataset::SparseFloatDataVector>(a);
-
-    auto b = getBinaryVector();
-
-    printTest<dataset::DoubleDataVector, dataset::FloatDataVector>(b);
-    printTest<dataset::DoubleDataVector, dataset::SparseDoubleDataVector>(b);
-    printTest<dataset::DoubleDataVector, dataset::SparseFloatDataVector>(b);
-    printTest<dataset::DoubleDataVector, dataset::SparseBinaryDataVector>(b);
-    printTest<dataset::DoubleDataVector, dataset::UncompressedSparseBinaryDataVector>(b);
-
-    printTestOnesDataVector();
-}
-
 /// Runs all tests
 ///
 int main()
@@ -351,18 +227,20 @@ int main()
     IDataVectorTest<dataset::FloatDataVector>();
     IDataVectorTest<dataset::ShortDataVector>();
     IDataVectorTest<dataset::ByteDataVector>();
-
     IDataVectorTest<dataset::SparseDoubleDataVector>();
     IDataVectorTest<dataset::SparseFloatDataVector>();
     IDataVectorTest<dataset::SparseShortDataVector>();
     IDataVectorTest<dataset::SparseByteDataVector>();
 
-    return 0;
-
-    dotTest();
-    addToTest();
-    iteratorConstructorTest();
-    printTest();
+    IDataVectorBinaryTest<dataset::DoubleDataVector>();
+    IDataVectorBinaryTest<dataset::FloatDataVector>();
+    IDataVectorBinaryTest<dataset::ShortDataVector>();
+    IDataVectorBinaryTest<dataset::ByteDataVector>();
+    IDataVectorBinaryTest<dataset::SparseDoubleDataVector>();
+    IDataVectorBinaryTest<dataset::SparseFloatDataVector>();
+    IDataVectorBinaryTest<dataset::SparseShortDataVector>();
+    IDataVectorBinaryTest<dataset::SparseByteDataVector>();
+    IDataVectorBinaryTest<dataset::SparseBinaryDataVector>();
 
     if (testing::DidTestFail())
     {

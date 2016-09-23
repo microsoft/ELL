@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DenseDataVector.h"
-#include "OnesDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
 
@@ -91,12 +90,6 @@ namespace dataset
             if (numNonZeros == 0)
             {
                 return std::make_unique<FloatDataVector>();
-            }
-
-            // all ones
-            else if (!containsNonBinary && numNonZeros == up_vec->Size())
-            {
-                return std::make_unique<OnesDataVector>(up_vec->Size());
             }
 
             // other dense

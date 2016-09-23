@@ -76,10 +76,17 @@ namespace dataset
     void DataVectorBase<DerivedType>::Print(std::ostream & os) const
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
+        if(constIter.IsValid())
+        {
+            auto indexValue = constIter.Get();
+            os << indexValue.index << ":" << indexValue.value;
+        }
+        constIter.Next();
+        
         while(constIter.IsValid())
         {
             auto indexValue = constIter.Get();
-            os << indexValue.index << ":" << indexValue.value << "\t";
+            os << '\t' << indexValue.index << ":" << indexValue.value;
             constIter.Next();
         }
     }

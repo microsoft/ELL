@@ -21,6 +21,8 @@
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
+#include <initializer_list>
+#include <cmath>
 
 namespace emll
 {
@@ -31,7 +33,7 @@ namespace dataset
     ///
     /// <typeparam name="tegerListType"> Type of the teger list type. </typeparam>
     template <typename IntegerListType>
-    class SparseBinaryDataVectorBase : public IDataVector
+    class SparseBinaryDataVectorBase : public DataVectorBase<SparseBinaryDataVectorBase<IntegerListType>>
     {
     public:
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
@@ -84,6 +86,16 @@ namespace dataset
 
         SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = default;
 
+        /// <summary> Constructs an instance of SparseBinaryDataVectorBase from an initializer list of index values. </summary>
+        ///
+        /// <param name="list"> An increasing list of indices of elements with the value 1. </param>
+        SparseBinaryDataVectorBase(std::initializer_list<size_t> list);
+
+        /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
+        ///
+        /// <returns> The iterator. </returns>
+        Iterator GetIterator() const { return Iterator(_indices.GetIterator()); }
+
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
         /// monotonically increasing argument. The value argument must equal 1.0. </summary>
         ///
@@ -99,13 +111,7 @@ namespace dataset
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
         /// <returns> A double. </returns>
-        virtual double Norm2() const override { return (double)_indices.Size(); }
-
-        /// <summary> Performs (*p_other) += scalar * (*this), where other a dense vector. </summary>
-        ///
-        /// <param name="p_other"> [in,out] If non-null, the other. </param>
-        /// <param name="scalar">  The scalar. </param>
-        virtual void AddTo(double* p_other, double scalar = 1.0) const override;
+        virtual double Norm2() const override { return std::sqrt(_indices.Size()); }
 
         /// <summary> Computes the Dot product. </summary>
         ///
@@ -114,38 +120,19 @@ namespace dataset
         /// <returns> A double. </returns>
         virtual double Dot(const double* p_other) const override;
 
-        /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
+        /// <summary> Performs (*p_other) += scalar * (*this), where other a dense vector. </summary>
         ///
-        /// <returns> The iterator. </returns>
-        Iterator GetIterator() const { return Iterator(_indices.GetIterator()); }
-
-        /// <summary> Prints the datavector to an output stream. </summary>
-        ///
-        /// <param name="os"> [in,out] Stream to write data to. </param>
-        virtual void Print(std::ostream& os) const override;
-
-        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
-        ///
-        /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override;
+        /// <param name="p_other"> [in,out] If non-null, the other. </param>
+        /// <param name="scalar">  The scalar. </param>
+        virtual void AddTo(double* p_other, double scalar = 1.0) const override;
 
     private:
         IntegerListType _indices;
     };
 
-    /// <summary> A sparse binary data vector. </summary>
-    class SparseBinaryDataVector : public SparseBinaryDataVectorBase<utilities::CompressedIntegerList>
-    {
-    public:
-        using SparseBinaryDataVectorBase<utilities::CompressedIntegerList>::SparseBinaryDataVectorBase;
-    };
-
-    /// <summary> An uncompressed sparse binary data vector. </summary>
-    class UncompressedSparseBinaryDataVector : public SparseBinaryDataVectorBase<utilities::IntegerList>
-    {
-    public:
-        using SparseBinaryDataVectorBase<utilities::IntegerList>::SparseBinaryDataVectorBase;
-    };
+    // friendly name
+    using SparseBinaryDataVector = SparseBinaryDataVectorBase<utilities::CompressedIntegerList>;
+    using UncompressedSparseBinaryDataVector = SparseBinaryDataVectorBase<utilities::IntegerList>;
 }
 }
 
