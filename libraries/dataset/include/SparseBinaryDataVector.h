@@ -89,12 +89,12 @@ namespace dataset
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void AppendEntry(uint64_t index, double value = 1.0) override;
+        virtual void AppendEntry(size_t index, double value = 1.0) override;
 
         /// <summary> Returns The largest index of a non-zero entry plus one. </summary>
         ///
-        /// <returns> An uint64_t. </returns>
-        virtual uint64_t Size() const override;
+        /// <returns> An size_t. </returns>
+        virtual size_t Size() const override;
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///

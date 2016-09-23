@@ -48,18 +48,18 @@ namespace dataset
 
         private:
             // private ctor, can only be called from SparseDataVector class
-            Iterator(uint64_t size);
+            Iterator(size_t size);
             friend OnesDataVector;
 
             // members
-            uint64_t _size = 0;
-            uint64_t _index = 0;
+            size_t _size = 0;
+            size_t _index = 0;
         };
 
         /// <summary> Constructs an instance of OnesDataVector. </summary>
         ///
         /// <param name="dim"> The dimension of the DataVector. </param>
-        OnesDataVector(uint64_t dim = 0);
+        OnesDataVector(size_t dim = 0);
 
         OnesDataVector(OnesDataVector&& other) = default;
 
@@ -69,12 +69,12 @@ namespace dataset
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void AppendEntry(uint64_t index, double value = 1.0) override;
+        virtual void AppendEntry(size_t index, double value = 1.0) override;
 
         /// <summary> Returns the size of the DataVector, which is the largest index of a non-zero entry plus one. </summary>
         ///
         /// <returns> The size of the DataVector. </returns>
-        virtual uint64_t Size() const override { return _size; }
+        virtual size_t Size() const override { return _size; }
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
@@ -110,7 +110,7 @@ namespace dataset
         virtual std::vector<double> ToArray() const override;
 
     private:
-        uint64_t _size = 0;
+        size_t _size = 0;
     };
 }
 }

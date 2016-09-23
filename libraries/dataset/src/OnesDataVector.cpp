@@ -19,17 +19,17 @@ namespace emll
 {
 namespace dataset
 {
-    OnesDataVector::Iterator::Iterator(uint64_t size)
+    OnesDataVector::Iterator::Iterator(size_t size)
         : _size(size)
     {
     }
 
-    OnesDataVector::OnesDataVector(uint64_t dim)
+    OnesDataVector::OnesDataVector(size_t dim)
         : _size(dim)
     {
     }
 
-    void OnesDataVector::AppendEntry(uint64_t index, double value)
+    void OnesDataVector::AppendEntry(size_t index, double value)
     {
         if (value != 1 || index != _size)
         {
@@ -40,7 +40,7 @@ namespace dataset
 
     void OnesDataVector::AddTo(double* p_other, double scalar) const
     {
-        for (uint64_t i = 0; i < _size; ++i)
+        for (size_t i = 0; i < _size; ++i)
         {
             p_other[i] += (double)scalar;
         }
@@ -49,7 +49,7 @@ namespace dataset
     double OnesDataVector::Dot(const double* p_other) const
     {
         double result = 0.0;
-        for (uint64_t i = 0; i < _size; ++i)
+        for (size_t i = 0; i < _size; ++i)
         {
             result += p_other[i];
         }

@@ -18,7 +18,7 @@ namespace dataset
     {
         virtual void Print(std::ostream & os) const override;
 
-        virtual uint64_t Size() const override;
+        virtual size_t Size() const override;
 
         virtual double Norm2() const override;
 
@@ -26,7 +26,7 @@ namespace dataset
 
         virtual double Dot(const double * p_other) const override;
 
-        virtual void AppendEntry(uint64_t index, double value = 1.0) override;
+        virtual void AppendEntry(size_t index, double value = 1.0) override;
 
         virtual std::vector<double> ToArray() const override;
     };

@@ -28,7 +28,7 @@ namespace dataset
     }
 
     template <typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::AppendEntry(uint64_t index, double value)
+    void SparseDataVector<ValueType, IntegerListType>::AppendEntry(size_t index, double value)
     {
         if (value == 0)
         {
@@ -40,7 +40,7 @@ namespace dataset
     }
 
     template <typename ValueType, typename IntegerListType>
-    uint64_t SparseDataVector<ValueType, IntegerListType>::Size() const
+    size_t SparseDataVector<ValueType, IntegerListType>::Size() const
     {
         if (_indices.Size() == 0)
         {

@@ -24,7 +24,7 @@ namespace dataset
     }
 
     template <typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(uint64_t index, double value)
+    void SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(size_t index, double value)
     {
         if (value == 0)
         {
@@ -37,7 +37,7 @@ namespace dataset
     }
 
     template <typename IntegerListType>
-    uint64_t SparseBinaryDataVectorBase<IntegerListType>::Size() const
+    size_t SparseBinaryDataVectorBase<IntegerListType>::Size() const
     {
         if (_indices.Size() == 0)
         {

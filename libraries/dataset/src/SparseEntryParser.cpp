@@ -35,7 +35,7 @@ namespace dataset
     void SparseEntryParser::Iterator::Next()
     {
         // parse index
-        uint64_t index;
+        size_t index;
         auto result = utilities::Parse(_currentPos, index);
 
         // handle errors

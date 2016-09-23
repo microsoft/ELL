@@ -18,9 +18,9 @@ namespace dataset
     void AutoDataVector::Print(std::ostream & os) const
     {}
 
-    uint64_t AutoDataVector::Size() const
+    size_t AutoDataVector::Size() const
     {
-        return uint64_t();
+        return size_t();
     }
 
     double AutoDataVector::Norm2() const
@@ -36,7 +36,7 @@ namespace dataset
         return 0.0;
     }
 
-    void AutoDataVector::AppendEntry(uint64_t index, double value)
+    void AutoDataVector::AppendEntry(size_t index, double value)
     {}
 
     std::vector<double> AutoDataVector::ToArray() const

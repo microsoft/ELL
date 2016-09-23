@@ -13,7 +13,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
 endif()
 
 set (SRC src/AutoDataVector.cpp
-         src/DenseDataVector.cpp
          src/OnesDataVector.cpp
          src/SequentialLineIterator.cpp
          src/SparseBinaryDataVector.cpp

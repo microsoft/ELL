@@ -49,40 +49,40 @@ namespace dataset
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
         /// <returns> The number of examples. </returns>
-        uint64_t NumExamples() const { return _examples.size(); }
+        size_t NumExamples() const { return _examples.size(); }
 
         /// <summary> Returns the maximal size of any example. </summary>
         ///
         /// <returns> The maximal size of any example. </returns>
-        uint64_t GetMaxDataVectorSize() const { return _maxExampleSize; }
+        size_t GetMaxDataVectorSize() const { return _maxExampleSize; }
 
         /// <summary> Returns a reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        ExampleType& GetExample(uint64_t index);
+        ExampleType& GetExample(size_t index);
 
         /// <summary> Returns a const reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Const reference to the specified example. </returns>
-        const ExampleType& GetExample(uint64_t index) const;
+        const ExampleType& GetExample(size_t index) const;
 
         /// <summary> Returns a reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        ExampleType& operator[](uint64_t index);
+        ExampleType& operator[](size_t index);
 
         /// <summary> Returns a const reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Const reference to the specified example. </returns>
-        const ExampleType& operator[](uint64_t index) const;
+        const ExampleType& operator[](size_t index) const;
 
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
@@ -91,7 +91,7 @@ namespace dataset
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator(uint64_t fromRowIndex = 0, uint64_t size = 0) const;
+        Iterator GetIterator(size_t fromRowIndex = 0, size_t size = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
@@ -121,7 +121,7 @@ namespace dataset
         /// <param name="targetExampleIndex"> Zero-based index of the target example. </param>
         /// <param name="rangeFirstIndex"> Index of the first example in the range from which the example is chosen. </param>
         /// <param name="rangeSize"> Number of examples in the range from which the example is chosen. </param>
-        void RandomSwap(std::default_random_engine& rng, uint64_t targetExampleIndex, uint64_t rangeFirstIndex, uint64_t rangeSize);
+        void RandomSwap(std::default_random_engine& rng, size_t targetExampleIndex, size_t rangeFirstIndex, size_t rangeSize);
 
         /// <summary> Sorts an interval of examples by a certain key. </summary>
         ///
@@ -130,7 +130,7 @@ namespace dataset
         /// <param name="fromRowIndex"> Zero-based index of the first row to sort. </param>
         /// <param name="size"> The number of examples to sort. </param>
         template <typename SortKeyType>
-        void Sort(SortKeyType sortKey, uint64_t fromRowIndex = 0, uint64_t size = 0);
+        void Sort(SortKeyType sortKey, size_t fromRowIndex = 0, size_t size = 0);
 
         /// <summary> Partitions an iterval of examples by a certain Boolean predicate (similar to sorting
         /// by the predicate, but in linear time). </summary>
@@ -141,7 +141,7 @@ namespace dataset
         /// <param name="fromRowIndex"> Zero-based index of the first row of the interval. </param>
         /// <param name="size"> The number of examples in the interval. </param>
         template <typename PartitionKeyType>
-        void Partition(PartitionKeyType partitionKey, uint64_t fromRowIndex = 0, uint64_t size = 0);
+        void Partition(PartitionKeyType partitionKey, size_t fromRowIndex = 0, size_t size = 0);
 
         /// <summary> Prints this object. </summary>
         ///
@@ -149,13 +149,13 @@ namespace dataset
         /// <param name="tabs"> The number of tabs. </param>
         /// <param name="fromRowIndex"> Zero-based index of the first row to print. </param>
         /// <param name="size"> The number of rows to print, or 0 to print until the end. </param>
-        void Print(std::ostream& os, size_t tabs = 0, uint64_t fromRowIndex = 0, uint64_t size = 0) const;
+        void Print(std::ostream& os, size_t tabs = 0, size_t fromRowIndex = 0, size_t size = 0) const;
 
     private:
-        uint64_t CorrectRangeSize(uint64_t fromRowIndex, uint64_t size) const;
+        size_t CorrectRangeSize(size_t fromRowIndex, size_t size) const;
 
         std::vector<ExampleType> _examples;
-        uint64_t _maxExampleSize = 0;
+        size_t _maxExampleSize = 0;
     };
 
     typedef RowDataset<GenericSupervisedExample> GenericRowDataset;

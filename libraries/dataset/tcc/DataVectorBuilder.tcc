@@ -28,7 +28,7 @@ namespace dataset
 
         bool containsNonBinary = false;
         bool containsNonShorts = false;
-        uint64_t numNonZeros = 0;
+        size_t numNonZeros = 0;
 
         while (IndexValueIterator.IsValid())
         {
