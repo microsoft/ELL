@@ -20,12 +20,6 @@ Types of IDataVectors:
 
 * SparseBinaryDataVector - Implemented as a list of indices, which are stored in a compressed variable-length delta-encoding (each index can occupy 1-4 bytes). The non-zero entries of this vector appear as double precision 1.0 when accessed from the outside.
 
-* UncompressedSparseBinaryDataVector - Implemented as a simple array of indices. Use SparseBinaryDataVector instead.
-
-* ZeroDataVector - Represents a vector of all zeros. This class does not occupy any memory and implements the IDataVector interface in the trivial sense.
-
-* OnesDataVector - Represents a finite prefix of all-ones, followed by an infinite sequence of zeros. Stores a single integer - the size of the prefix of ones.
-
 DataVectorBuilder
 ==================
 The user is not expected to manually choose one of the IDataVector implementations. DataVectorBuilder contains simple logic that attempts to find the best representation for each vector. To find out which vector type was chosen, use the interface function IDataVector::GetType().
