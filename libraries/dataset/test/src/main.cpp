@@ -9,6 +9,7 @@
 #include "DenseDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
+#include "AutoDataVector.h"
 
 // testing
 #include "testing.h"
@@ -86,7 +87,7 @@ void IDataVectorTest()
 template<typename DataVectorType>
 void IDataVectorBinaryTest()
 {
-    DataVectorType u{0, 3, 4};
+    DataVectorType u{1, 0, 0, 1, 1, 0};
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(3)));
 
     std::vector<double> w{1, 2, 3, 4, 5, 6};
@@ -231,6 +232,7 @@ int main()
     IDataVectorTest<dataset::SparseFloatDataVector>();
     IDataVectorTest<dataset::SparseShortDataVector>();
     IDataVectorTest<dataset::SparseByteDataVector>();
+    IDataVectorTest<dataset::AutoDataVector>();
 
     IDataVectorBinaryTest<dataset::DoubleDataVector>();
     IDataVectorBinaryTest<dataset::FloatDataVector>();
@@ -240,6 +242,7 @@ int main()
     IDataVectorBinaryTest<dataset::SparseFloatDataVector>();
     IDataVectorBinaryTest<dataset::SparseShortDataVector>();
     IDataVectorBinaryTest<dataset::SparseByteDataVector>();
+    IDataVectorBinaryTest<dataset::AutoDataVector>();
     IDataVectorBinaryTest<dataset::SparseBinaryDataVector>();
 
     if (testing::DidTestFail())

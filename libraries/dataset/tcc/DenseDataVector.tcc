@@ -58,14 +58,16 @@ namespace dataset
     }
 
     template <typename ElementType>
-    DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<size_t> list)
+    DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<double> list)
     {
         auto current = list.begin();
         auto end = list.end();
+        size_t index = 0;
         while(current < end)
         {
-            DenseDataVector<ElementType>::AppendEntry(*current, 1.0); // explicit call to DenseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
+            DenseDataVector<ElementType>::AppendEntry(index, *current); // explicit call to DenseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
             ++current;
+            ++index;
         }
     }
 

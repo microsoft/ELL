@@ -7,42 +7,42 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "AutoDataVector.h"
+#include "DenseDataVector.h"
 
 namespace emll
 {
 namespace dataset
 { 
-
-
-
-    void AutoDataVector::Print(std::ostream & os) const
-    {}
-
-    size_t AutoDataVector::Size() const
+    AutoDataVector::AutoDataVector(std::initializer_list<linear::IndexValue> list)
     {
-        return size_t();
+        DoubleDataVector v(list);
+        _pInternal = std::make_unique<FloatDataVector>(v.GetIterator());
     }
 
-    double AutoDataVector::Norm2() const
+    AutoDataVector::AutoDataVector(std::initializer_list<double> list)
     {
-        return 0.0;
+        DoubleDataVector v(list);
+        _pInternal = std::make_unique<FloatDataVector>(v.GetIterator());
+    }
+
+    void AutoDataVector::Print(std::ostream & os) const
+    {
+        _pInternal->Print(os);
     }
 
     void AutoDataVector::AddTo(double * p_other, double scalar) const
-    {}
+    {
+        _pInternal->AddTo(p_other, scalar);
+    }
 
     double AutoDataVector::Dot(const double * p_other) const
     {
-        return 0.0;
+        return _pInternal->Dot(p_other);
     }
 
     void AutoDataVector::AppendEntry(size_t index, double value)
-    {}
-
-    std::vector<double> AutoDataVector::ToArray() const
     {
-        return std::vector<double>();
+        _pInternal->AppendEntry(index, value);
     }
-
 }
 }

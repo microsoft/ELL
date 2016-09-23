@@ -50,14 +50,16 @@ namespace dataset
     }
 
     template <typename ElementType, typename IntegerListType>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<size_t> list)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<double> list)
     {
         auto current = list.begin();
         auto end = list.end();
+        size_t index = 0;
         while(current < end)
         {
-            SparseDataVector<ElementType, IntegerListType>::AppendEntry(*current, 1.0); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendEntry is given to avoid virtual function call in Ctor
+            SparseDataVector<ElementType, IntegerListType>::AppendEntry(index, *current); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendEntry is given to avoid virtual function call in Ctor
             ++current;
+            ++index;
         }
     }
 
@@ -75,8 +77,19 @@ namespace dataset
             return;
         }
 
+        ElementType storedValue = static_cast<ElementType>(value);
+        assert(storedValue - value <= 1.0e-8 && value - storedValue <= 1.0e-8);
+
+        if(_indices.Size() > 0)
+        {
+            if(index <= _indices.Max())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only append values to the end of a data vector");
+            }
+        }
+
         _indices.Append(index);
-        _values.push_back((ElementType)value);
+        _values.push_back(storedValue);
     }
 
     template <typename ElementType, typename IntegerListType>

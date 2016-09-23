@@ -32,14 +32,16 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<size_t> list)
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<double> list)
     {
         auto current = list.begin();
         auto end = list.end();
+        size_t index = 0;
         while(current < end)
         {
-            _indices.Append(*current);
+            SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(index, *current);
             ++current;
+            ++index;
         }
     }
 
