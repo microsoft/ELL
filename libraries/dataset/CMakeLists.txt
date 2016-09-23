@@ -34,7 +34,8 @@ set (INCLUDE include/AutoDataVector.h
              include/SparseEntryParser.h
              include/SupervisedExampleBuilder.h)
 
-set (TCC tcc/DataVectorBuilder.tcc
+set (TCC tcc/DataVector.tcc
+         tcc/DataVectorBuilder.tcc
          tcc/DenseDataVector.tcc
          tcc/Example.tcc
          tcc/ParsingIterator.tcc

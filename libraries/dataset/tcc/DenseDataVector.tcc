@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Exception.h"
+#include "..\include\DenseDataVector.h"
 
 namespace emll
 {
@@ -44,6 +45,19 @@ namespace dataset
         }
     }
 
+    template<typename ValueType>
+    inline DenseDataVector<ValueType>::DenseDataVector(std::initializer_list<linear::IndexValue> list)
+    {
+        auto current = list.begin();
+        auto end = list.end();
+        while(current < end)
+        {
+            _data.resize(current->index+1);
+            _data[current->index] = current->value;
+            ++current;
+        }
+    }
+
     template <typename ValueType>
     double DenseDataVector<ValueType>::operator[](size_t index) const
     {
@@ -70,58 +84,6 @@ namespace dataset
         _data.resize(index + 1);
         _data[index] = (ValueType)value;
         ++_numNonzeros;
-    }
-
-    template <typename ValueType>
-    double DenseDataVector<ValueType>::Norm2() const
-    {
-        double result = 0.0;
-        for (double element : _data)
-        {
-            result += (double)(element * element);
-        }
-        return result;
-    }
-
-    template <typename ValueType>
-    double DenseDataVector<ValueType>::Dot(const double* p_other) const
-    {
-        double result = 0.0;
-        for (size_t i = 0; i < Size(); ++i)
-        {
-            result += _data[i] * p_other[i];
-        }
-
-        return result;
-    }
-
-    template <typename ValueType>
-    void DenseDataVector<ValueType>::AddTo(double* p_other, double scalar) const
-    {
-        for (size_t i = 0; i < Size(); ++i)
-        {
-            p_other[i] += (double)(scalar * _data[i]);
-        }
-    }
-
-    template <typename ValueType>
-    std::vector<double> DenseDataVector<ValueType>::ToArray() const
-    {
-        auto vector = std::vector<double>(Size());
-        std::copy(_data.cbegin(), _data.cend(), vector.begin());
-        return vector;
-    }
-
-    template <typename ValueType>
-    void DenseDataVector<ValueType>::Print(std::ostream& os) const
-    {
-        auto iterator = GetIterator();
-        while (iterator.IsValid())
-        {
-            auto indexValue = iterator.Get();
-            os << indexValue.index << ':' << indexValue.value << '\t';
-            iterator.Next();
-        }
     }
 }
 }

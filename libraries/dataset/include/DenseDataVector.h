@@ -21,6 +21,7 @@
 #include <iostream>
 #include <type_traits>
 #include <vector>
+#include <initializer_list>
 
 #define DEFAULT_DENSE_VECTOR_CAPACITY 1000
 
@@ -32,10 +33,10 @@ namespace dataset
     ///
     /// <typeparam name="ValueType"> Type of the value type. </typeparam>
     template <typename ValueType>
-    class DenseDataVector : public IDataVector
+    class DenseDataVector : public DataVectorBase<DenseDataVector<ValueType>>
     {
     public:
-        using Iterator = utilities::VectorIndexValueIterator<ValueType>;
+        using ConstIterator = utilities::VectorIndexValueIterator<ValueType>;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
@@ -55,6 +56,11 @@ namespace dataset
         /// <param name="data"> The std::vector. </param>
         DenseDataVector(std::vector<ValueType> data);
 
+        /// <summary> Constructs an instance of DenseDataVector from an initializer list of index value pairs. </summary>
+        ///
+        /// <param name="list"> The initializer list. </param>
+        DenseDataVector(std::initializer_list<linear::IndexValue> list);
+
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the desired element. </param>
@@ -65,7 +71,7 @@ namespace dataset
         /// <summary> Returns an Iterator that points to the beginning of the std::vector. </summary>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
+        ConstIterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
 
         /// <summary> Sets an entry in the std::vector. </summary>
         ///
@@ -77,34 +83,6 @@ namespace dataset
         ///
         /// <returns> An size_t. </returns>
         virtual size_t Size() const override { return _data.size(); }
-
-        /// <summary> Computes the std::vector squared 2-norm. </summary>
-        ///
-        /// <returns> A double. </returns>
-        virtual double Norm2() const override;
-
-        /// <summary> Computes the Dot product. </summary>
-        ///
-        /// <param name="p_other"> The other. </param>
-        ///
-        /// <returns> A double. </returns>
-        virtual double Dot(const double* p_other) const override;
-
-        /// <summary> Performs (*p_other) += scalar * (*this), where other is a dense std::vector. </summary>
-        ///
-        /// <param name="p_other"> [in,out] If non-null, the other. </param>
-        /// <param name="scalar">  The scalar. </param>
-        virtual void AddTo(double* p_other, double scalar = 1.0) const override;
-
-        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
-        ///
-        /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override;
-
-        /// <summary> Prints the datavector to an output stream. </summary>
-        ///
-        /// <param name="os"> [in,out] Stream to write data to. </param>
-        virtual void Print(std::ostream& os) const override;
 
     private:
         size_t _numNonzeros;

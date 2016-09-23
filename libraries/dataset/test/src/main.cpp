@@ -24,6 +24,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cmath>
 
 using namespace emll;
 
@@ -63,6 +64,33 @@ linear::DoubleVector getBinaryVector()
 
     return a;
 }
+
+template<typename DataVectorType>
+void IDataVectorTest()
+{
+    dataset::DoubleDataVector v{{0,12}, {3,-7}, {4,1.5}};
+    DataVectorType u(v.GetIterator());
+
+
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(12*12+7*7+1.5*1.5)));
+
+    std::vector<double> w{1, 1, 1, 1, 1, 1};
+
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w.data()), 12-7+1.5));
+
+    u.AddTo(w.data(), 2);
+    std::vector<double> z{25, 1, 1, -13, 4, 1};
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w, z));
+
+
+
+
+}
+
+
+
+
+
 
 /// Tests the Dot() member of DataVectors
 ///
@@ -319,6 +347,10 @@ void printTest()
 ///
 int main()
 {
+
+    IDataVectorTest<dataset::DoubleDataVector>();
+
+
     dotTest();
     addToTest();
     iteratorConstructorTest();
