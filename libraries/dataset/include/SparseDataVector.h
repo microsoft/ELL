@@ -87,10 +87,6 @@ namespace dataset
         /// <param name="value"> The value. </param>
         virtual void AppendEntry(uint64_t index, double value) override;
 
-        /// <summary> Deletes all of the vector content and sets its Size to zero, but does not deallocate
-        /// its memory. </summary>
-        virtual void Reset() override;
-
         /// <summary> Returns The largest index of a non-zero entry plus one. </summary>
         ///
         /// <returns> An uint64_t. </returns>

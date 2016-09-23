@@ -40,13 +40,6 @@ namespace dataset
     }
 
     template <typename ValueType, typename IntegerListType>
-    void SparseDataVector<ValueType, IntegerListType>::Reset()
-    {
-        _indices.Reset();
-        _values.resize(0);
-    }
-
-    template <typename ValueType, typename IntegerListType>
     uint64_t SparseDataVector<ValueType, IntegerListType>::Size() const
     {
         if (_indices.Size() == 0)

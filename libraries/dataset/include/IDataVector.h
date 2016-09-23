@@ -30,10 +30,6 @@ namespace dataset
         /// <param name="value"> The value. </param>
         virtual void AppendEntry(uint64_t index, double value = 1.0) = 0;
 
-        /// <summary> Deletes all of the std::vector content and sets its Size to zero, but does not
-        /// deallocate its memory. </summary>
-        virtual void Reset() = 0;
-
         /// <summary> Returns the number of non-zeros. </summary>
         ///
         /// <returns> The total number of nonzeros. </returns>

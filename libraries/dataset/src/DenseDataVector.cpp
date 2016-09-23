@@ -62,13 +62,6 @@ namespace dataset
     }
 
     template <typename ValueType>
-    void DenseDataVector<ValueType>::Reset()
-    {
-        _data.resize(0);
-        _numNonzeros = 0;
-    }
-
-    template <typename ValueType>
     double DenseDataVector<ValueType>::Norm2() const
     {
         double result = 0.0;

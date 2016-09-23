@@ -39,9 +39,6 @@ namespace dataset
     void AutoDataVector::AppendEntry(uint64_t index, double value)
     {}
 
-    void AutoDataVector::Reset()
-    {}
-
     uint64_t AutoDataVector::NumNonzeros() const
     {
         return uint64_t();
