@@ -74,11 +74,11 @@ namespace trainers
 
             // Update vLast and vAvg
             double lastCoeff = -eta * beta;
-            dataVector.AddTo(vLast, lastCoeff);
+            dataVector.AddTo(vLast.GetDataPointer(), lastCoeff);
             bLast += lastCoeff;
 
             double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
-            dataVector.AddTo(vAvg, avgCoeff);
+            dataVector.AddTo(vAvg.GetDataPointer(), avgCoeff);
             bAvg += avgCoeff;
 
             exampleIterator.Next();

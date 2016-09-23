@@ -5,7 +5,7 @@
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
- 
+
 %module "EMLL"
 
 // IMPORTANT: need to include these before anything else, because they include windows.h or other platform-related things
@@ -107,7 +107,7 @@ namespace std
 %include utilities.i
 
 // Interface includes for linear library
-%include linear.i
+//%include linear.i
 
 // Interface includes for dataset library
 %include dataset.i

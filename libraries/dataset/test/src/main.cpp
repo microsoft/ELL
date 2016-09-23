@@ -75,7 +75,7 @@ void dotTest()
 
     DataVectorType c(b.GetIterator());
 
-    double result = c.Dot(a);
+    double result = c.Dot(a.GetDataPointer());
     const double expectedResult = 2.2;
 
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(result, expectedResult));
@@ -87,8 +87,8 @@ void dotTestZeroDataVector()
 {
     auto a = getVector();
     dataset::ZeroDataVector z;
-    double result = z.Dot(a);
-    testing::ProcessTest("Testing dataset::ZeroDataVector::Dot()", testing::IsEqual(result, 0.0));
+    double result = z.Dot(a.GetDataPointer());
+   testing::ProcessTest("Testing dataset::ZeroDataVector::Dot()", testing::IsEqual(result, 0.0));
 }
 
 /// Tests the Dot() member of OnesDataVector
@@ -97,7 +97,7 @@ void dotTestOnesDataVector()
 {
     auto a = getVector();
     dataset::OnesDataVector o(4);
-    double result = o.Dot(a);
+    double result = o.Dot(a.GetDataPointer());
     testing::ProcessTest("Testing dataset::OnesDataVector::Dot()", testing::IsEqual(result, 7.0));
 }
 
@@ -133,8 +133,8 @@ void addToTest()
     DataVectorType1 c1(utilities::MakeStlIndexValueIterator(b));
     DataVectorType2 c2(utilities::MakeStlIndexValueIterator(b));
 
-    c1.AddTo(a1);
-    c2.AddTo(a2);
+    c1.AddTo(a1.GetDataPointer());
+    c2.AddTo(a2.GetDataPointer());
 
     std::string name1 = typeid(DataVectorType1).name();
     std::string name2 = typeid(DataVectorType2).name();
@@ -151,7 +151,7 @@ void addToTestZeroDataVector()
 
     dataset::ZeroDataVector z;
 
-    z.AddTo(a1);
+    z.AddTo(a1.GetDataPointer());
 
     testing::ProcessTest("Testing dataset::ZeroDataVector::AddTo()", testing::IsEqual(a1, a2));
 }
@@ -165,10 +165,10 @@ void addToTestOnesDataVector()
 
     dataset::OnesDataVector o(a1.Size());
 
-    o.AddTo(a1);
+    o.AddTo(a1.GetDataPointer());
 
     double norm1 = a1.Norm2();
-    double norm2 = a2.Norm2() + 2 * o.Dot(a2) + a2.Size();
+    double norm2 = a2.Norm2() + 2 * o.Dot(a2.GetDataPointer()) + a2.Size();
 
     testing::ProcessTest("Testing dataset::OnesDataVector::AddTo()", testing::IsEqual(norm1, norm2));
 }
