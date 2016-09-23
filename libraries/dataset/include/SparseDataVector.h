@@ -125,11 +125,6 @@ namespace dataset
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const override;
 
-        /// <summary> Makes a deep copy of the datavector </summary>
-        ///
-        /// <returns> A deep copy of the datavector </summary>
-        virtual std::unique_ptr<IDataVector> Clone() const override;
-
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
         /// <returns> The array. </returns>

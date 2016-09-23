@@ -44,11 +44,6 @@ namespace dataset
         return uint64_t();
     }
 
-    std::unique_ptr<IDataVector> AutoDataVector::Clone() const
-    {
-        return std::unique_ptr<IDataVector>();
-    }
-
     std::vector<double> AutoDataVector::ToArray() const
     {
         return std::vector<double>();

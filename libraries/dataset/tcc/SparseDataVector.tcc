@@ -23,12 +23,6 @@ namespace dataset
     }
 
     template <typename ValueType, typename IntegerListType>
-    std::unique_ptr<IDataVector> SparseDataVector<ValueType, IntegerListType>::Clone() const
-    {
-        return std::make_unique<SparseDataVector<ValueType, IntegerListType>>(*this);
-    }
-
-    template <typename ValueType, typename IntegerListType>
     std::vector<double> SparseDataVector<ValueType, IntegerListType>::ToArray() const
     {
         auto vector = std::vector<double>(Size());

@@ -35,11 +35,6 @@ namespace dataset
         /// <returns> The total number of nonzeros. </returns>
         virtual uint64_t NumNonzeros() const = 0;
 
-        /// <summary> Makes a deep copy of the datavector </summary>
-        ///
-        /// <returns> A deep copy of the datavector </summary>
-        virtual std::unique_ptr<IDataVector> Clone() const = 0;
-
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
         /// <returns> The array. </returns>

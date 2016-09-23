@@ -30,8 +30,6 @@ namespace dataset
 
         virtual uint64_t NumNonzeros() const override;
 
-        virtual std::unique_ptr<IDataVector> Clone() const override;
-
         virtual std::vector<double> ToArray() const override;
     };
 }
