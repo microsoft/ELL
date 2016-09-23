@@ -87,7 +87,7 @@ void IDataVectorTest()
 template<typename DataVectorType>
 void IDataVectorBinaryTest()
 {
-    DataVectorType u{1, 0, 0, 1, 1, 0};
+    DataVectorType u{{0,1}, {3,1}, {4,1}};
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(3)));
 
     std::vector<double> w{1, 2, 3, 4, 5, 6};

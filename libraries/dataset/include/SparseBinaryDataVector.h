@@ -86,6 +86,11 @@ namespace dataset
 
         SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = default;
 
+        /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
+        ///
+        /// <param name="list"> The initializer list. </param>
+        SparseBinaryDataVectorBase(std::initializer_list<linear::IndexValue> list);
+
         /// <summary> Constructs a data vector from an initializer list of values. </summary>
         ///
         /// <param name="list"> The initializer list of values. </param>
