@@ -223,7 +223,6 @@ void printTest(const linear::DoubleVector& a)
 ///
 int main()
 {
-
     IDataVectorTest<dataset::DoubleDataVector>();
     IDataVectorTest<dataset::FloatDataVector>();
     IDataVectorTest<dataset::ShortDataVector>();

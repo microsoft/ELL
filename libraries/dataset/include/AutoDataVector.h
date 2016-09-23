@@ -21,6 +21,7 @@ namespace dataset
     {
     public:
         AutoDataVector(std::initializer_list<linear::IndexValue> list);
+
         AutoDataVector(std::initializer_list<double> list);
 
         virtual void Print(std::ostream & os) const override;
