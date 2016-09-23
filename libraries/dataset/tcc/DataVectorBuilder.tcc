@@ -10,7 +10,6 @@
 #include "OnesDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
-#include "ZeroDataVector.h"
 
 // stl
 #include <type_traits>
@@ -91,7 +90,7 @@ namespace dataset
             // all zeros (this is considered a dense vector since its Size() is zero, so the fraction of nonZeros is 0/0)
             if (numNonZeros == 0)
             {
-                return std::make_unique<ZeroDataVector>();
+                return std::make_unique<FloatDataVector>();
             }
 
             // all ones

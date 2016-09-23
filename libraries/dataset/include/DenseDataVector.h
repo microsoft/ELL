@@ -73,11 +73,6 @@ namespace dataset
         /// <returns> An uint64_t. </returns>
         virtual uint64_t Size() const override { return _data.size(); }
 
-        /// <summary> The number of non-zeros. </summary>
-        ///
-        /// <returns> The total number of nonzeros. </returns>
-        virtual uint64_t NumNonzeros() const override { return _numNonzeros; }
-
         /// <summary> Computes the std::vector squared 2-norm. </summary>
         ///
         /// <returns> A double. </returns>

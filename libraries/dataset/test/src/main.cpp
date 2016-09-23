@@ -10,7 +10,6 @@
 #include "OnesDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
-#include "ZeroDataVector.h"
 
 // testing
 #include "testing.h"
@@ -81,15 +80,6 @@ void dotTest()
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(result, expectedResult));
 }
 
-/// Tests the Dot() member of ZeroDataVector
-///
-void dotTestZeroDataVector()
-{
-    auto a = getVector();
-    dataset::ZeroDataVector z;
-    double result = z.Dot(a.GetDataPointer());
-   testing::ProcessTest("Testing dataset::ZeroDataVector::Dot()", testing::IsEqual(result, 0.0));
-}
 
 /// Tests the Dot() member of OnesDataVector
 ///
@@ -112,7 +102,6 @@ void dotTest()
     dotTest<dataset::SparseShortDataVector>();
     dotTest<dataset::SparseBinaryDataVector>();
     dotTest<dataset::UncompressedSparseBinaryDataVector>();
-    dotTestZeroDataVector();
     dotTestOnesDataVector();
 }
 
@@ -142,20 +131,6 @@ void addToTest()
     testing::ProcessTest("Comparing AddTo() in " + name1 + " and " + name2, testing::IsEqual(a1, a2));
 }
 
-/// Tests the AddTo() member of ZeroDataVector
-///
-void addToTestZeroDataVector()
-{
-    auto a1 = getVector();
-    auto a2 = getVector();
-
-    dataset::ZeroDataVector z;
-
-    z.AddTo(a1.GetDataPointer());
-
-    testing::ProcessTest("Testing dataset::ZeroDataVector::AddTo()", testing::IsEqual(a1, a2));
-}
-
 /// Tests the AddTo() member of OnesDataVector
 ///
 void addToTestOnesDataVector()
@@ -183,7 +158,6 @@ void addToTest()
     addToTest<dataset::DoubleDataVector, dataset::SparseShortDataVector>();
     addToTest<dataset::DoubleDataVector, dataset::SparseBinaryDataVector>();
     addToTest<dataset::DoubleDataVector, dataset::UncompressedSparseBinaryDataVector>();
-    addToTestZeroDataVector();
     addToTestOnesDataVector();
 }
 
@@ -322,23 +296,6 @@ void printTestOnesDataVector()
     testing::ProcessTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::OnesDataVector::Print()", aStr == bStr);
 }
 
-void printTestZeroDataVector()
-{
-    dataset::DoubleDataVector a;
-    dataset::ZeroDataVector b;
-
-    std::stringstream aStream;
-    std::stringstream bStream;
-
-    a.Print(aStream);
-    b.Print(bStream);
-
-    std::string aStr = aStream.str();
-    std::string bStr = bStream.str();
-
-    testing::ProcessTest("Comparing class dataset::DoubleDataVector::Print() and class dataset::ZeroDataVector::Print()", aStr == bStr);
-}
-
 void printTest()
 {
     auto a = getVector();
@@ -356,7 +313,6 @@ void printTest()
     printTest<dataset::DoubleDataVector, dataset::UncompressedSparseBinaryDataVector>(b);
 
     printTestOnesDataVector();
-    printTestZeroDataVector();
 }
 
 /// Runs all tests

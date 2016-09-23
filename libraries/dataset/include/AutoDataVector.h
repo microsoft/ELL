@@ -28,8 +28,6 @@ namespace dataset
 
         virtual void AppendEntry(uint64_t index, double value = 1.0) override;
 
-        virtual uint64_t NumNonzeros() const override;
-
         virtual std::vector<double> ToArray() const override;
     };
 }

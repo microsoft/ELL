@@ -96,11 +96,6 @@ namespace dataset
         /// <returns> An uint64_t. </returns>
         virtual uint64_t Size() const override;
 
-        /// <summary> Returns The number of non-zeros. </summary>
-        ///
-        /// <returns> The total number of nonzeros. </returns>
-        virtual uint64_t NumNonzeros() const override { return _indices.Size(); }
-
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
         /// <returns> A double. </returns>

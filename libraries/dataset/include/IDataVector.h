@@ -30,11 +30,6 @@ namespace dataset
         /// <param name="value"> The value. </param>
         virtual void AppendEntry(uint64_t index, double value = 1.0) = 0;
 
-        /// <summary> Returns the number of non-zeros. </summary>
-        ///
-        /// <returns> The total number of nonzeros. </returns>
-        virtual uint64_t NumNonzeros() const = 0;
-
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
         /// <returns> The array. </returns>

@@ -39,11 +39,6 @@ namespace dataset
     void AutoDataVector::AppendEntry(uint64_t index, double value)
     {}
 
-    uint64_t AutoDataVector::NumNonzeros() const
-    {
-        return uint64_t();
-    }
-
     std::vector<double> AutoDataVector::ToArray() const
     {
         return std::vector<double>();

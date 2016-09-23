@@ -19,8 +19,7 @@ set (SRC src/AutoDataVector.cpp
          src/SparseBinaryDataVector.cpp
          src/SparseDataVector.cpp
          src/SparseEntryParser.cpp
-         src/Example.cpp
-         src/ZeroDataVector.cpp)
+         src/Example.cpp)
 
 set (INCLUDE include/AutoDataVector.h
              include/DataVectorBuilder.h
@@ -34,8 +33,7 @@ set (INCLUDE include/AutoDataVector.h
              include/SparseBinaryDataVector.h
              include/SparseDataVector.h
              include/SparseEntryParser.h
-             include/SupervisedExampleBuilder.h
-             include/ZeroDataVector.h)
+             include/SupervisedExampleBuilder.h)
 
 set (TCC tcc/DataVectorBuilder.tcc
          tcc/DenseDataVector.tcc
