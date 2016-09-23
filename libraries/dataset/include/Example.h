@@ -9,7 +9,7 @@
 #pragma once
 
 #include "DenseDataVector.h"
-#include "IDataVector.h"
+#include "DataVector.h"
 
 // stl
 #include <algorithm> // for std::swap

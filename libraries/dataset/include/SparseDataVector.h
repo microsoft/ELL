@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IDataVector.h"
+#include "DataVector.h"
 
 // utilities
 #include "CompressedIntegerList.h"
@@ -25,12 +25,12 @@ namespace emll
 {
 namespace dataset
 {
-    /// <summary> Implements a sparse vector as an increasing list of indices and their values.
+    /// <summary> Implements a sparse vector as an increasing list of indices and their corresponding values.
     ///
-    /// <typeparam name="ElementType">     Type of the value type. </typeparam>
+    /// <typeparam name="ElementType"> Type of the value type. </typeparam>
     /// <typeparam name="tegerListType"> Type of the teger list type. </typeparam>
     template <typename ElementType, typename IntegerListType>
-    class SparseDataVector : public IDataVector
+    class SparseDataVector : public DataVectorBase<SparseDataVector<ElementType, IntegerListType>>
     {
     public:
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
@@ -70,21 +70,30 @@ namespace dataset
 
         SparseDataVector() = default;
 
+        SparseDataVector(SparseDataVector<ElementType, IntegerListType>&& other) = default;
+
+        SparseDataVector(const SparseDataVector<ElementType, IntegerListType>& other) = default;
+
         /// <summary> Constructs an instance of SparseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         SparseDataVector(IndexValueIteratorType indexValueIterator);
 
-        SparseDataVector(SparseDataVector<ElementType, IntegerListType>&& other) = default;
-
-        SparseDataVector(const SparseDataVector<ElementType, IntegerListType>& other) = default;
-
-        /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
-        /// monotonically increasing argument. The value argument must equal 1.0. </summary>
+        /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
-        /// <param name="index"> Zero-based index of the. </param>
-        /// <param name="value"> The value. </param>
+        /// <param name="list"> The initializer list. </param>
+        SparseDataVector(std::initializer_list<linear::IndexValue> list);
+
+        /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
+        ///
+        /// <returns> The iterator. </returns>
+        Iterator GetIterator() const;
+
+        /// <summary> Appends an entry to the end of the data vector. </summary>
+        ///
+        /// <param name="index"> Zero-based index of the entry, must be bigger than the biggest current index. </param>
+        /// <param name="value"> The entry value. </param>
         virtual void AppendEntry(size_t index, double value) override;
 
         /// <summary> Returns The largest index of a non-zero entry plus one. </summary>
@@ -92,64 +101,16 @@ namespace dataset
         /// <returns> An size_t. </returns>
         virtual size_t Size() const override;
 
-        /// <summary> Computes the vector squared 2-norm. </summary>
-        ///
-        /// <returns> A double. </returns>
-        virtual double Norm2() const override;
-
-        /// <summary> Performs (*p_other) += scalar * (*this), where other a dense vector. </summary>
-        ///
-        /// <param name="p_other"> [in,out] If non-null, the other. </param>
-        /// <param name="scalar"> The scalar. </param>
-        virtual void AddTo(double* p_other, double scalar = 1.0) const override;
-
-        /// <summary> Computes the Dot product. </summary>
-        ///
-        /// <param name="p_other"> The other. </param>
-        ///
-        /// <returns> A double. </returns>
-        virtual double Dot(const double* p_other) const override;
-
-        /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
-        ///
-        /// <returns> The iterator. </returns>
-        Iterator GetIterator() const;
-
-        /// <summary> Prints the datavector to an output stream. </summary>
-        ///
-        /// <param name="os"> [in,out] Stream to write data to. </param>
-        virtual void Print(std::ostream& os) const override;
-
-        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
-        ///
-        /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override;
-
     private:
         IntegerListType _indices;
         std::vector<ElementType> _values;
     };
 
-    /// <summary> A sparse double data vector. </summary>
-    class SparseDoubleDataVector : public SparseDataVector<double, utilities::CompressedIntegerList>
-    {
-    public:
-        using SparseDataVector<double, utilities::CompressedIntegerList>::SparseDataVector;
-    };
-
-    /// <summary> A sparse float data vector. </summary>
-    class SparseFloatDataVector : public SparseDataVector<float, utilities::CompressedIntegerList>
-    {
-    public:
-        using SparseDataVector<float, utilities::CompressedIntegerList>::SparseDataVector;
-    };
-
-    /// <summary> A sparse short data vector. </summary>
-    class SparseShortDataVector : public SparseDataVector<short, utilities::CompressedIntegerList>
-    {
-    public:
-        using SparseDataVector<short, utilities::CompressedIntegerList>::SparseDataVector;
-    };
+    // friendly names
+    using SparseDoubleDataVector = SparseDataVector<double, utilities::CompressedIntegerList>;
+    using SparseFloatDataVector = SparseDataVector<float, utilities::CompressedIntegerList>;
+    using SparseShortDataVector = SparseDataVector<short, utilities::CompressedIntegerList>;
+    using SparseByteDataVector = SparseDataVector<char, utilities::CompressedIntegerList>;
 }
 }
 

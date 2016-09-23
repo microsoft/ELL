@@ -16,7 +16,6 @@ set (SRC src/AutoDataVector.cpp
          src/OnesDataVector.cpp
          src/SequentialLineIterator.cpp
          src/SparseBinaryDataVector.cpp
-         src/SparseDataVector.cpp
          src/SparseEntryParser.cpp
          src/Example.cpp)
 
@@ -24,7 +23,7 @@ set (INCLUDE include/AutoDataVector.h
              include/DataVectorBuilder.h
              include/DenseDataVector.h
              include/Example.h
-             include/IDataVector.h
+             include/DataVector.h
              include/OnesDataVector.h
              include/ParsingIterator.h
              include/RowDataset.h

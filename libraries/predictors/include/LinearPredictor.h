@@ -14,7 +14,7 @@
 #include "DoubleVector.h"
 
 // datasets
-#include "IDataVector.h"
+#include "DataVector.h"
 
 // utilities
 #include "IArchivable.h"

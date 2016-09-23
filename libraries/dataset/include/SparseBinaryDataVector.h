@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IDataVector.h"
+#include "DataVector.h"
 
 // utilities
 #include "CompressedIntegerList.h"

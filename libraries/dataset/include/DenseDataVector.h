@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IDataVector.h"
+#include "DataVector.h"
 
 // linear
 #include "IVector.h"
@@ -56,7 +56,7 @@ namespace dataset
         /// <param name="data"> The std::vector. </param>
         DenseDataVector(std::vector<ElementType> data);
 
-        /// <summary> Constructs an instance of DenseDataVector from an initializer list of index value pairs. </summary>
+        /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
         /// <param name="list"> The initializer list. </param>
         DenseDataVector(std::initializer_list<linear::IndexValue> list);
@@ -73,10 +73,10 @@ namespace dataset
         /// <returns> The iterator. </returns>
         ConstIterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
 
-        /// <summary> Sets an entry in the std::vector. </summary>
+        /// <summary> Appends an entry to the end of the data vector. </summary>
         ///
-        /// <param name="index"> Zero-based index of the. </param>
-        /// <param name="value"> The value. </param>
+        /// <param name="index"> Zero-based index of the entry, must be bigger than the biggest current index. </param>
+        /// <param name="value"> The entry value. </param>
         virtual void AppendEntry(size_t index, double value = 1.0) override;
 
        /// <summary> The largest index of a non-zero entry plus one. </summary>
@@ -93,6 +93,7 @@ namespace dataset
     using FloatDataVector = DenseDataVector<float>;
     using DoubleDataVector = DenseDataVector<double>;
     using ShortDataVector = DenseDataVector<short>;
+    using ByteDataVector = DenseDataVector<char>;
 }
 }
 

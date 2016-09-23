@@ -45,15 +45,14 @@ namespace dataset
         }
     }
 
-    template<typename ElementType>
-    inline DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<linear::IndexValue> list)
+    template <typename ElementType>
+    DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<linear::IndexValue> list)
     {
         auto current = list.begin();
         auto end = list.end();
         while(current < end)
         {
-            _data.resize(current->index+1);
-            _data[current->index] = current->value;
+            AppendEntry(current->index, current->value);
             ++current;
         }
     }

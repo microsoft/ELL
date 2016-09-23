@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Example.h"
-#include "IDataVector.h"
+#include "DataVector.h"
 #include "RowDataset.h"
 
 // utilities

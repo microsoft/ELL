@@ -68,18 +68,17 @@ linear::DoubleVector getBinaryVector()
 template<typename DataVectorType>
 void IDataVectorTest()
 {
-    dataset::DoubleDataVector v{{0,12}, {3,-7}, {4,1.5}};
-    DataVectorType u(v.GetIterator());
+    DataVectorType u{{0,12}, {3,-7}, {4,1}};
 
 
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(12*12+7*7+1.5*1.5)));
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(12*12+7*7+1*1)));
 
     std::vector<double> w{1, 1, 1, 1, 1, 1};
 
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w.data()), 12-7+1.5));
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w.data()), 12.0-7+1));
 
     u.AddTo(w.data(), 2);
-    std::vector<double> z{25, 1, 1, -13, 4, 1};
+    std::vector<double> z{25, 1, 1, -13, 3, 1};
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w, z));
 
 
@@ -350,6 +349,13 @@ int main()
 
     IDataVectorTest<dataset::DoubleDataVector>();
     IDataVectorTest<dataset::FloatDataVector>();
+    IDataVectorTest<dataset::ShortDataVector>();
+    IDataVectorTest<dataset::ByteDataVector>();
+
+    IDataVectorTest<dataset::SparseDoubleDataVector>();
+    IDataVectorTest<dataset::SparseFloatDataVector>();
+    IDataVectorTest<dataset::SparseShortDataVector>();
+    IDataVectorTest<dataset::SparseByteDataVector>();
 
     return 0;
 
