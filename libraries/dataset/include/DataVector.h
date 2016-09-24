@@ -106,6 +106,14 @@ namespace dataset
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const override;
 
+        /// <summary> Copies the contents of a data vector to another data vector. </summary>
+        ///
+        /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam>
+        ///
+        /// <returns> A data vector of a specified type. </returns>
+        template<typename ReturnType>
+        ReturnType ToDataVector() const;
+
         /// <summary> Human readable printout to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>

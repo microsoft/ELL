@@ -103,114 +103,18 @@ void IDataVectorBinaryTest()
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Print()", sss == "0:1\t3:1\t4:1");
 }
 
-
-
-
-/// Casts one DataVector type into another and checks that the result is the same
-///
 template <typename DataVectorType1, typename DataVectorType2>
-void iteratorConstructorTest(const linear::DoubleVector& a)
+void ToDataVectorTest(std::initializer_list<double> list)
 {
-    DataVectorType1 b(a.GetIterator());
-    DataVectorType2 c(b.GetIterator());
-
-    linear::DoubleVector d(c.GetIterator());
+    const DataVectorType1 v(list);
+    auto u = v.ToDataVector<DataVectorType2>();
+    auto w = v.ToArray();
+    auto z = u.ToArray();
 
     std::string name1 = typeid(DataVectorType1).name();
     std::string name2 = typeid(DataVectorType2).name();
 
-    testing::ProcessTest("Casting " + name1 + " to " + name2, testing::IsEqual(a, d, 1.0e-6));
-}
-
-/// Tests the GetIterator() and Constructors
-///
-void iteratorConstructorTest()
-{
-    auto a = getVector();
-
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::DoubleDataVector>(a);
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::FloatDataVector>(a);
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::SparseDoubleDataVector>(a);
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::SparseFloatDataVector>(a);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::DoubleDataVector>(a);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::FloatDataVector>(a);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::SparseDoubleDataVector>(a);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::SparseFloatDataVector>(a);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::DoubleDataVector>(a);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::FloatDataVector>(a);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::SparseDoubleDataVector>(a);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::SparseFloatDataVector>(a);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::DoubleDataVector>(a);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::FloatDataVector>(a);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::SparseDoubleDataVector>(a);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::SparseFloatDataVector>(a);
-
-    auto b = getBinaryVector();
-
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::DoubleDataVector>(b);
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::FloatDataVector>(b);
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::SparseDoubleDataVector>(b);
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::SparseShortDataVector>(b);
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::SparseBinaryDataVector>(b);
-
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::DoubleDataVector>(b);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::FloatDataVector>(b);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::SparseShortDataVector>(b);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::SparseBinaryDataVector>(b);
-
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::DoubleDataVector>(b);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::FloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::SparseDoubleDataVector>(b);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::SparseShortDataVector>(b);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::SparseBinaryDataVector>(b);
-
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::DoubleDataVector>(b);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::FloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::SparseShortDataVector>(b);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::SparseBinaryDataVector>(b);
-
-    iteratorConstructorTest<dataset::SparseShortDataVector, dataset::DoubleDataVector>(b);
-    iteratorConstructorTest<dataset::SparseShortDataVector, dataset::FloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseShortDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseShortDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseShortDataVector, dataset::SparseShortDataVector>(b);
-    iteratorConstructorTest<dataset::SparseShortDataVector, dataset::SparseBinaryDataVector>(b);
-
-    iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::DoubleDataVector>(b);
-    iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::FloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::SparseFloatDataVector>(b);
-    iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::SparseShortDataVector>(b);
-    iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::SparseBinaryDataVector>(b);
-}
-
-/// Tests that two DataVector types print identically
-///
-template <typename DataVectorType1, typename DataVectorType2>
-void printTest(const linear::DoubleVector& a)
-{
-    DataVectorType1 b1(a.GetIterator());
-    DataVectorType2 b2(a.GetIterator());
-
-    std::stringstream ss1;
-    std::stringstream ss2;
-
-    b1.Print(ss1);
-    b2.Print(ss2);
-
-    std::string s1 = ss1.str();
-    std::string s2 = ss2.str();
-
-    std::string name1 = typeid(DataVectorType1).name();
-    std::string name2 = typeid(DataVectorType2).name();
-
-    testing::ProcessTest("Comparing " + name1 + "::Print() and " + name2 + "::Print()", s1 == s2);
+    testing::ProcessTest(name1 + "::ToDataVector<" + name2 + ">", testing::IsEqual(w,z, 1.0e-6));
 }
 
 /// Runs all tests
@@ -237,6 +141,17 @@ int main()
     IDataVectorBinaryTest<dataset::SparseByteDataVector>();
     IDataVectorBinaryTest<dataset::AutoDataVector>();
     IDataVectorBinaryTest<dataset::SparseBinaryDataVector>();
+
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    //ToDataVectorTest<dataset::DoubleDataVector, dataset::AutoDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
 
     if (testing::DidTestFail())
     {

@@ -78,7 +78,7 @@ namespace dataset
         }
 
         ElementType storedValue = static_cast<ElementType>(value);
-        assert(storedValue - value <= 1.0e-8 && value - storedValue <= 1.0e-8);
+        assert(storedValue - value <= 1.0e-6 && value - storedValue <= 1.0e-6);
 
         if(_indices.Size() > 0)
         {

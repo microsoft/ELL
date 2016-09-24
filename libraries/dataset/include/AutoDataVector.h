@@ -10,6 +10,9 @@
 
 #include "DataVector.h"
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <initializer_list>
 
@@ -38,10 +41,53 @@ namespace dataset
 
         virtual std::vector<double> ToArray() const override { return _pInternal->ToArray(); }
 
+        template<typename ReturnType>
+        ReturnType ToDataVector() const;
+
         virtual void Print(std::ostream & os) const override;
 
     private:
         std::unique_ptr<IDataVector> _pInternal;
     };
+
+    template<typename ReturnType>
+    inline ReturnType AutoDataVector::ToDataVector() const
+    {
+        switch (_pInternal->GetType())
+        {
+        case IDataVector::Type::DoubleDataVector:
+            return ReturnType(static_cast<DoubleDataVector*>(this)->GetIterator());
+
+        case IDataVector::Type::FloatDataVector:
+            return ReturnType(static_cast<FloatDataVector*>(this)->GetIterator());
+
+        case IDataVector::Type::ShortDataVector:
+            return ReturnType(static_cast<ShortDataVector*>(this)->GetIterator());
+
+        case IDataVector::Type::ByteDataVector:
+            return ReturnType(static_cast<ByteDataVector*>(this)->GetIterator());
+
+        case IDataVector::Type::SparseDoubleDataVector:
+            return ReturnType(static_cast<SparseDoubleDataVector*>(this)->GetIterator());
+
+        case IDataVector::Type::SparseFloatDataVector:
+            return ReturnType(static_cast<SparseFloatDataVector*>(this)->GetIterator());
+
+        case IDataVector::Type::SparseShortDataVector:
+            return ReturnType(static_cast<SparseShortDataVector*>(this)->GetIterator());
+
+        case IDataVector::Type::SparseByteDataVector:
+            return ReturnType(static_cast<SparseByteDataVector*>(this)->GetIterator());
+
+        case IDataVector::Type::SparseBinaryDataVector:
+            return ReturnType(static_cast<SparseBinaryDataVector*>(this)->GetIterator());
+
+        default:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
+        }
+
+
+        return ReturnType();
+    }
 }
 }

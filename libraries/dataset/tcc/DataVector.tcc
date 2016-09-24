@@ -73,6 +73,13 @@ namespace dataset
     }
 
     template<class DerivedType>
+    template<typename ReturnType>
+    ReturnType DataVectorBase<DerivedType>::ToDataVector() const
+    {
+        return ReturnType(static_cast<const DerivedType*>(this)->GetIterator());
+    }
+
+    template<class DerivedType>
     void DataVectorBase<DerivedType>::Print(std::ostream & os) const
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
