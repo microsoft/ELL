@@ -56,31 +56,31 @@ namespace dataset
         switch (_pInternal->GetType())
         {
         case IDataVector::Type::DoubleDataVector:
-            return ReturnType(static_cast<DoubleDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<DoubleDataVector*>(_pInternal.get())->GetIterator());
 
         case IDataVector::Type::FloatDataVector:
-            return ReturnType(static_cast<FloatDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<FloatDataVector*>(_pInternal.get())->GetIterator());
 
         case IDataVector::Type::ShortDataVector:
-            return ReturnType(static_cast<ShortDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<ShortDataVector*>(_pInternal.get())->GetIterator());
 
         case IDataVector::Type::ByteDataVector:
-            return ReturnType(static_cast<ByteDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<ByteDataVector*>(_pInternal.get())->GetIterator());
 
         case IDataVector::Type::SparseDoubleDataVector:
-            return ReturnType(static_cast<SparseDoubleDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<SparseDoubleDataVector*>(_pInternal.get())->GetIterator());
 
         case IDataVector::Type::SparseFloatDataVector:
-            return ReturnType(static_cast<SparseFloatDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<SparseFloatDataVector*>(_pInternal.get())->GetIterator());
 
         case IDataVector::Type::SparseShortDataVector:
-            return ReturnType(static_cast<SparseShortDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<SparseShortDataVector*>(_pInternal.get())->GetIterator());
 
         case IDataVector::Type::SparseByteDataVector:
-            return ReturnType(static_cast<SparseByteDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<SparseByteDataVector*>(_pInternal.get())->GetIterator());
 
         case IDataVector::Type::SparseBinaryDataVector:
-            return ReturnType(static_cast<SparseBinaryDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<SparseBinaryDataVector*>(_pInternal.get())->GetIterator());
 
         default:
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
