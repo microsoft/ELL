@@ -27,11 +27,19 @@ namespace dataset
     class IDataVector 
     {
     public:
+        /// <summary> Values that represent data vector types. </summary>
+        enum class Type { DoubleDataVector, FloatDataVector, ShortDataVector, ByteDataVector, SparseDoubleDataVector, SparseFloatDataVector, SparseShortDataVector, SparseByteDataVector, SparseBinaryDataVector, AutoDataVector };
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual Type GetType() const = 0;
+
         /// <summary> Adds a value at the end of the std::vector. </summary>
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void AppendEntry(size_t index, double value = 1.0) = 0;
+        virtual void AppendElement(size_t index, double value = 1.0) = 0;
 
         /// <summary> Returns the Size of the vector. </summary>
         ///

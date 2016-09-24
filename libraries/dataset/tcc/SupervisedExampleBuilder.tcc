@@ -18,14 +18,14 @@ namespace emll
 {
 namespace dataset
 {
-    template <typename VectorEntryParserType, typename DefaultDataVectorType>
-    SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::SupervisedExampleBuilder(VectorEntryParserType parser, bool hasWeight)
+    template <typename VectorElementParserType, typename DefaultDataVectorType>
+    SupervisedExampleBuilder<VectorElementParserType, DefaultDataVectorType>::SupervisedExampleBuilder(VectorElementParserType parser, bool hasWeight)
         : _instanceParser(parser), _hasWeight(hasWeight)
     {
     }
 
-    template <typename VectorEntryParserType, typename DefaultDataVectorType>
-    GenericSupervisedExample SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
+    template <typename VectorElementParserType, typename DefaultDataVectorType>
+    GenericSupervisedExample SupervisedExampleBuilder<VectorElementParserType, DefaultDataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
     {
         const char* pStr = spExampleString->c_str();
 
@@ -61,8 +61,8 @@ namespace dataset
         return GenericSupervisedExample(std::move(instance), WeightLabel{ weight, label });
     }
 
-    template <typename VectorEntryParserType, typename DefaultDataVectorType>
-    void dataset::SupervisedExampleBuilder<VectorEntryParserType, DefaultDataVectorType>::HandleErrors(utilities::ParseResult result, const std::string& str)
+    template <typename VectorElementParserType, typename DefaultDataVectorType>
+    void dataset::SupervisedExampleBuilder<VectorElementParserType, DefaultDataVectorType>::HandleErrors(utilities::ParseResult result, const std::string& str)
     {
         if (result == utilities::ParseResult::badFormat)
         {

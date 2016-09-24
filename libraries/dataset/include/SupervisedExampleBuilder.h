@@ -24,9 +24,9 @@ namespace dataset
 {
     /// <summary> A supervised example builder. </summary>
     ///
-    /// <typeparam name="VectorEntryParserType"> Type of the vector entry parser type. </typeparam>
+    /// <typeparam name="VectorElementParserType"> Type of the vector element parser type. </typeparam>
     /// <typeparam name="DefaultDataVectorType"> Type of the default data vector type. </typeparam>
-    template <typename VectorEntryParserType, typename DefaultDataVectorType>
+    template <typename VectorElementParserType, typename DefaultDataVectorType>
     class SupervisedExampleBuilder
     {
     public:
@@ -34,7 +34,7 @@ namespace dataset
         ///
         /// <param name="parser"> The parser. </param>
         /// <param name="hasWeight"> true if this object has weight. </param>
-        SupervisedExampleBuilder(VectorEntryParserType parser, bool hasWeight = false);
+        SupervisedExampleBuilder(VectorElementParserType parser, bool hasWeight = false);
 
         /// <summary> Takes a std::string that represents a supervised example, and returns a
         /// SupervisedExample object. </summary>
@@ -47,7 +47,7 @@ namespace dataset
     private:
         void HandleErrors(utilities::ParseResult result, const std::string& str);
 
-        VectorEntryParserType _instanceParser;
+        VectorElementParserType _instanceParser;
         bool _hasWeight;
     };
 }

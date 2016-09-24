@@ -27,8 +27,8 @@ namespace dataset
     /// each row into a dense feature std::vector of doubles, a double label, and a double weight. </summary>
     ///
     /// <typeparam name="RowIteratorType"> Type of the row iterator type. </typeparam>
-    /// <typeparam name="VectorEntryParserType"> Type of the vector entry parser type. </typeparam>
-    template <typename RowIteratorType, typename VectorEntryParserType>
+    /// <typeparam name="VectorElementParserType"> Type of the vector element parser type. </typeparam>
+    template <typename RowIteratorType, typename VectorElementParserType>
     class ParsingIterator : public IParsingIterator
     {
     public:
@@ -37,7 +37,7 @@ namespace dataset
         ///
         /// <param name="row_iter"> [in,out] The row iterator. </param>
         /// <param name="parser"> The parser. </param>
-        ParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser);
+        ParsingIterator(RowIteratorType row_iter, VectorElementParserType parser);
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
@@ -54,19 +54,19 @@ namespace dataset
 
     private:
         RowIteratorType _rowIterator;
-        VectorEntryParserType _instanceParser;
+        VectorElementParserType _instanceParser;
     };
 
     /// <summary> Returns a std::unique_ptr to a Parsing Iterator. </summary>
     ///
     /// <typeparam name="RowIteratorType"> Type of the row iterator type. </typeparam>
-    /// <typeparam name="VectorEntryParserType"> Type of the vector entry parser type. </typeparam>
+    /// <typeparam name="VectorElementParserType"> Type of the vector element parser type. </typeparam>
     /// <param name="row_iter"> The row iterator. </param>
     /// <param name="parser">   The parser. </param>
     ///
     /// <returns> The parsing iterator. </returns>
-    template <typename RowIteratorType, typename VectorEntryParserType>
-    std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType row_iter, VectorEntryParserType parser);
+    template <typename RowIteratorType, typename VectorElementParserType>
+    std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType row_iter, VectorElementParserType parser);
 }
 }
 

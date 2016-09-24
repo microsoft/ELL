@@ -78,13 +78,13 @@ namespace dataset
         /// <returns> The iterator. </returns>
         ConstIterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
 
-        /// <summary> Appends an entry to the end of the data vector. </summary>
+        /// <summary> Appends an element to the end of the data vector. </summary>
         ///
-        /// <param name="index"> Zero-based index of the entry, must be bigger than the biggest current index. </param>
-        /// <param name="value"> The entry value. </param>
-        virtual void AppendEntry(size_t index, double value = 1.0) override;
+        /// <param name="index"> Zero-based index of the element, must be bigger than the biggest current index. </param>
+        /// <param name="value"> The element value. </param>
+        virtual void AppendElement(size_t index, double value = 1.0) override;
 
-       /// <summary> The largest index of a non-zero entry plus one. </summary>
+       /// <summary> The largest index of a non-zero element plus one. </summary>
         ///
         /// <returns> An size_t. </returns>
         virtual size_t Size() const override { return _data.size(); }
@@ -94,11 +94,49 @@ namespace dataset
         std::vector<ElementType> _data;
     };
 
-    /// friendly names
-    using FloatDataVector = DenseDataVector<float>;
-    using DoubleDataVector = DenseDataVector<double>;
-    using ShortDataVector = DenseDataVector<short>;
-    using ByteDataVector = DenseDataVector<char>;
+    /// <summary> A dense data vector with double elements. </summary>
+    struct DoubleDataVector : public DenseDataVector<double>
+    {
+        using DenseDataVector<double>::DenseDataVector;
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override { return IDataVector::Type::DoubleDataVector; }
+    };
+
+    /// <summary> A dense data vector with float elements. </summary>
+    struct FloatDataVector : public DenseDataVector<float>
+    {
+        using DenseDataVector<float>::DenseDataVector;
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override { return IDataVector::Type::FloatDataVector; }
+    };
+
+    /// <summary> A dense data vector with short elements. </summary>
+    struct ShortDataVector : public DenseDataVector<short>
+    {
+        using DenseDataVector<short>::DenseDataVector;
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override { return IDataVector::Type::ShortDataVector; }
+    };
+
+    /// <summary> A dense data vector with byte elements. </summary>
+    struct ByteDataVector : public DenseDataVector<char>
+    {
+        using DenseDataVector<char>::DenseDataVector;
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override { return IDataVector::Type::ByteDataVector; }
+    };
 }
 }
 

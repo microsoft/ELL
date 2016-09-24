@@ -32,7 +32,7 @@ namespace dataset
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
-            SparseDataVector<ElementType, IntegerListType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendEntry is given to avoid virtual function call in Ctor
+            SparseDataVector<ElementType, IntegerListType>::AppendElement(indexValue.index, indexValue.value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
             indexValueIterator.Next();
         }
     }
@@ -44,7 +44,7 @@ namespace dataset
         auto end = list.end();
         while(current < end)
         {
-            SparseDataVector<ElementType, IntegerListType>::AppendEntry(current->index, current->value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendEntry is given to avoid virtual function call in Ctor
+            SparseDataVector<ElementType, IntegerListType>::AppendElement(current->index, current->value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
             ++current;
         }
     }
@@ -57,7 +57,7 @@ namespace dataset
         size_t index = 0;
         while(current < end)
         {
-            SparseDataVector<ElementType, IntegerListType>::AppendEntry(index, *current); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendEntry is given to avoid virtual function call in Ctor
+            SparseDataVector<ElementType, IntegerListType>::AppendElement(index, *current); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
             ++current;
             ++index;
         }
@@ -70,7 +70,7 @@ namespace dataset
     }
 
     template <typename ElementType, typename IntegerListType>
-    void SparseDataVector<ElementType, IntegerListType>::AppendEntry(size_t index, double value)
+    void SparseDataVector<ElementType, IntegerListType>::AppendElement(size_t index, double value)
     {
         if (value == 0)
         {

@@ -106,9 +106,9 @@ namespace dataset
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void AppendEntry(size_t index, double value = 1.0) override;
+        virtual void AppendElement(size_t index, double value = 1.0) override;
 
-        /// <summary> Returns The largest index of a non-zero entry plus one. </summary>
+        /// <summary> Returns The largest index of a non-zero element plus one. </summary>
         ///
         /// <returns> An size_t. </returns>
         virtual size_t Size() const override;
@@ -135,9 +135,16 @@ namespace dataset
         IntegerListType _indices;
     };
 
-    // friendly name
-    using SparseBinaryDataVector = SparseBinaryDataVectorBase<utilities::CompressedIntegerList>;
-    using UncompressedSparseBinaryDataVector = SparseBinaryDataVectorBase<utilities::IntegerList>;
+    /// <summary> A sparse data vector with binary elements. </summary>
+    struct SparseBinaryDataVector : public SparseBinaryDataVectorBase<utilities::CompressedIntegerList>
+    {
+        using SparseBinaryDataVectorBase<utilities::CompressedIntegerList>::SparseBinaryDataVectorBase;
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override { return IDataVector::Type::SparseBinaryDataVector; }
+    };
 }
 }
 

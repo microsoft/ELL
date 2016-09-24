@@ -95,13 +95,13 @@ namespace dataset
         /// <returns> The iterator. </returns>
         Iterator GetIterator() const;
 
-        /// <summary> Appends an entry to the end of the data vector. </summary>
+        /// <summary> Appends an element to the end of the data vector. </summary>
         ///
-        /// <param name="index"> Zero-based index of the entry, must be bigger than the biggest current index. </param>
-        /// <param name="value"> The entry value. </param>
-        virtual void AppendEntry(size_t index, double value) override;
+        /// <param name="index"> Zero-based index of the element, must be bigger than the biggest current index. </param>
+        /// <param name="value"> The element value. </param>
+        virtual void AppendElement(size_t index, double value) override;
 
-        /// <summary> Returns The largest index of a non-zero entry plus one. </summary>
+        /// <summary> Returns The largest index of a non-zero element plus one. </summary>
         ///
         /// <returns> An size_t. </returns>
         virtual size_t Size() const override;
@@ -111,11 +111,49 @@ namespace dataset
         std::vector<ElementType> _values;
     };
 
-    // friendly names
-    using SparseDoubleDataVector = SparseDataVector<double, utilities::CompressedIntegerList>;
-    using SparseFloatDataVector = SparseDataVector<float, utilities::CompressedIntegerList>;
-    using SparseShortDataVector = SparseDataVector<short, utilities::CompressedIntegerList>;
-    using SparseByteDataVector = SparseDataVector<char, utilities::CompressedIntegerList>;
+    /// <summary> A sparse data vector with double elements. </summary>
+    struct SparseDoubleDataVector : public SparseDataVector<double, utilities::CompressedIntegerList>
+    {
+        using SparseDataVector<double, utilities::CompressedIntegerList>::SparseDataVector;
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override { return IDataVector::Type::SparseDoubleDataVector; }
+    };
+
+    /// <summary> A sparse data vector with float elements. </summary>
+    struct SparseFloatDataVector : public SparseDataVector<float, utilities::CompressedIntegerList>
+    {
+        using SparseDataVector<float, utilities::CompressedIntegerList>::SparseDataVector;
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override { return IDataVector::Type::SparseFloatDataVector; }
+    };
+
+    /// <summary> A sparse data vector with short elements. </summary>
+    struct SparseShortDataVector : public SparseDataVector<short, utilities::CompressedIntegerList>
+    {
+        using SparseDataVector<short, utilities::CompressedIntegerList>::SparseDataVector;
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override { return IDataVector::Type::SparseShortDataVector; }
+    };
+
+    /// <summary> A sparse data vector with byte elements. </summary>
+    struct SparseByteDataVector : public SparseDataVector<char, utilities::CompressedIntegerList>
+    {
+        using SparseDataVector<char, utilities::CompressedIntegerList>::SparseDataVector;
+
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override { return IDataVector::Type::SparseByteDataVector; }
+    };
 }
 }
 

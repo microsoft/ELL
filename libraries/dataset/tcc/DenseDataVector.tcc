@@ -22,7 +22,7 @@ namespace dataset
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
-            DenseDataVector<ElementType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to DenseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
+            DenseDataVector<ElementType>::AppendElement(indexValue.index, indexValue.value); // explicit call to DenseDataVector<ElementType>::AppendElement is given to avoid virtual function call in Ctor
             indexValueIterator.Next();
         }
     }
@@ -52,7 +52,7 @@ namespace dataset
         auto end = list.end();
         while(current < end)
         {
-            DenseDataVector<ElementType>::AppendEntry(current->index, current->value); // explicit call to DenseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
+            DenseDataVector<ElementType>::AppendElement(current->index, current->value); // explicit call to DenseDataVector<ElementType>::AppendElement is given to avoid virtual function call in Ctor
             ++current;
         }
     }
@@ -65,7 +65,7 @@ namespace dataset
         size_t index = 0;
         while(current < end)
         {
-            DenseDataVector<ElementType>::AppendEntry(index, *current); // explicit call to DenseDataVector<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
+            DenseDataVector<ElementType>::AppendElement(index, *current); // explicit call to DenseDataVector<ElementType>::AppendElement is given to avoid virtual function call in Ctor
             ++current;
             ++index;
         }
@@ -82,7 +82,7 @@ namespace dataset
     }
 
     template <typename ElementType>
-    void DenseDataVector<ElementType>::AppendEntry(size_t index, double value)
+    void DenseDataVector<ElementType>::AppendElement(size_t index, double value)
     {
         if (value == 0)
         {

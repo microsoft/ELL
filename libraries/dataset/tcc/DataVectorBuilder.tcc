@@ -31,17 +31,17 @@ namespace dataset
 
         while (IndexValueIterator.IsValid())
         {
-            // add entry to vector
-            auto entry = IndexValueIterator.Get();
-            up_vec->AppendEntry(entry.index, entry.value);
+            // add element to vector
+            auto element = IndexValueIterator.Get();
+            up_vec->AppendElement(element.index, element.value);
 
             // Update VectorStats
-            if (entry.value != 1.0)
+            if (element.value != 1.0)
             {
                 containsNonBinary = true;
             }
 
-            if (((short)entry.value) != entry.value)
+            if (((short)element.value) != element.value)
             {
                 containsNonShorts = true;
             }

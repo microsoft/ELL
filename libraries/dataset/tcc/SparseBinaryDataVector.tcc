@@ -26,7 +26,7 @@ namespace dataset
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
-            SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(indexValue.index, indexValue.value); // explicit call to SparseBinaryDataVectorBase<ElementType>::AppendEntry is given to avoid virtual function call in Ctor
+            SparseBinaryDataVectorBase<IntegerListType>::AppendElement(indexValue.index, indexValue.value); // explicit call to SparseBinaryDataVectorBase<ElementType>::AppendElement is given to avoid virtual function call in Ctor
             indexValueIterator.Next();
         }
     }
@@ -38,7 +38,7 @@ namespace dataset
         auto end = list.end();
         while(current < end)
         {
-            SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(current->index, current->value);
+            SparseBinaryDataVectorBase<IntegerListType>::AppendElement(current->index, current->value);
             ++current;
         }
     }
@@ -51,14 +51,14 @@ namespace dataset
         size_t index = 0;
         while(current < end)
         {
-            SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(index, *current);
+            SparseBinaryDataVectorBase<IntegerListType>::AppendElement(index, *current);
             ++current;
             ++index;
         }
     }
 
     template <typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::AppendEntry(size_t index, double value)
+    void SparseBinaryDataVectorBase<IntegerListType>::AppendElement(size_t index, double value)
     {
         if (value == 0)
         {

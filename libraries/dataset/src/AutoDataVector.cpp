@@ -25,14 +25,9 @@ namespace dataset
         _pInternal = std::make_unique<FloatDataVector>(v.GetIterator());
     }
 
-    void AutoDataVector::Print(std::ostream & os) const
+    void AutoDataVector::AppendElement(size_t index, double value)
     {
-        _pInternal->Print(os);
-    }
-
-    void AutoDataVector::AddTo(double * p_other, double scalar) const
-    {
-        _pInternal->AddTo(p_other, scalar);
+        _pInternal->AppendElement(index, value);
     }
 
     double AutoDataVector::Dot(const double * p_other) const
@@ -40,9 +35,14 @@ namespace dataset
         return _pInternal->Dot(p_other);
     }
 
-    void AutoDataVector::AppendEntry(size_t index, double value)
+    void AutoDataVector::AddTo(double * p_other, double scalar) const
     {
-        _pInternal->AppendEntry(index, value);
+        _pInternal->AddTo(p_other, scalar);
+    }
+
+    void AutoDataVector::Print(std::ostream & os) const
+    {
+        _pInternal->Print(os);
     }
 }
 }

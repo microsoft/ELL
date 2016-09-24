@@ -153,7 +153,6 @@ void iteratorConstructorTest()
     iteratorConstructorTest<dataset::DoubleDataVector, dataset::SparseFloatDataVector>(b);
     iteratorConstructorTest<dataset::DoubleDataVector, dataset::SparseShortDataVector>(b);
     iteratorConstructorTest<dataset::DoubleDataVector, dataset::SparseBinaryDataVector>(b);
-    iteratorConstructorTest<dataset::DoubleDataVector, dataset::UncompressedSparseBinaryDataVector>(b);
 
     iteratorConstructorTest<dataset::FloatDataVector, dataset::DoubleDataVector>(b);
     iteratorConstructorTest<dataset::FloatDataVector, dataset::FloatDataVector>(b);
@@ -161,7 +160,6 @@ void iteratorConstructorTest()
     iteratorConstructorTest<dataset::FloatDataVector, dataset::SparseFloatDataVector>(b);
     iteratorConstructorTest<dataset::FloatDataVector, dataset::SparseShortDataVector>(b);
     iteratorConstructorTest<dataset::FloatDataVector, dataset::SparseBinaryDataVector>(b);
-    iteratorConstructorTest<dataset::FloatDataVector, dataset::UncompressedSparseBinaryDataVector>(b);
 
     iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::DoubleDataVector>(b);
     iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::FloatDataVector>(b);
@@ -169,7 +167,6 @@ void iteratorConstructorTest()
     iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::SparseFloatDataVector>(b);
     iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::SparseShortDataVector>(b);
     iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::SparseBinaryDataVector>(b);
-    iteratorConstructorTest<dataset::SparseDoubleDataVector, dataset::UncompressedSparseBinaryDataVector>(b);
 
     iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::DoubleDataVector>(b);
     iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::FloatDataVector>(b);
@@ -177,7 +174,6 @@ void iteratorConstructorTest()
     iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::SparseFloatDataVector>(b);
     iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::SparseShortDataVector>(b);
     iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::SparseBinaryDataVector>(b);
-    iteratorConstructorTest<dataset::SparseFloatDataVector, dataset::UncompressedSparseBinaryDataVector>(b);
 
     iteratorConstructorTest<dataset::SparseShortDataVector, dataset::DoubleDataVector>(b);
     iteratorConstructorTest<dataset::SparseShortDataVector, dataset::FloatDataVector>(b);
@@ -185,7 +181,6 @@ void iteratorConstructorTest()
     iteratorConstructorTest<dataset::SparseShortDataVector, dataset::SparseFloatDataVector>(b);
     iteratorConstructorTest<dataset::SparseShortDataVector, dataset::SparseShortDataVector>(b);
     iteratorConstructorTest<dataset::SparseShortDataVector, dataset::SparseBinaryDataVector>(b);
-    iteratorConstructorTest<dataset::SparseShortDataVector, dataset::UncompressedSparseBinaryDataVector>(b);
 
     iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::DoubleDataVector>(b);
     iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::FloatDataVector>(b);
@@ -193,7 +188,6 @@ void iteratorConstructorTest()
     iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::SparseFloatDataVector>(b);
     iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::SparseShortDataVector>(b);
     iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::SparseBinaryDataVector>(b);
-    iteratorConstructorTest<dataset::SparseBinaryDataVector, dataset::UncompressedSparseBinaryDataVector>(b);
 }
 
 /// Tests that two DataVector types print identically
