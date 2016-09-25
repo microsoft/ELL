@@ -16,7 +16,7 @@
 // stl
 #include <initializer_list>
 
-// finish documenting and cleaning this class
+// TODO
 // rip out the datavectorbuilder.
 // replace double* in the Dot and AddTo with math::vectors. Replace old linear vectors with new math vectors everywhere. erase linear.
 // change the way that forest trainer creates its dataset (don break encapsulation)

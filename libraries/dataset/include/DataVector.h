@@ -49,7 +49,7 @@ namespace dataset
         /// </summary>
         ///
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
-        virtual size_t GetSuffixIndex() const = 0;
+        virtual size_t Size() const = 0; // TODO rename this function, as data vectors have infinite size
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
