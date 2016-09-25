@@ -31,10 +31,9 @@ namespace dataset
     class AutoDataVectorBase : public IDataVector
     {
     public:
+        AutoDataVectorBase(AutoDataVectorBase&& vector) = default;
 
         AutoDataVectorBase(const AutoDataVectorBase& vector) = delete;
-
-        AutoDataVectorBase(AutoDataVectorBase&& vector) = default;
 
         /// <summary> Constructs an auto data vector from a vector of the default type. </summary>
         ///

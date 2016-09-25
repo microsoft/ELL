@@ -27,9 +27,9 @@ namespace dataset
         /// <param name="delim"> The delimiter. </param>
         SequentialLineIterator(const std::string& filepath, char delim = '\n');
 
-        SequentialLineIterator(const SequentialLineIterator&) = delete; // this ctor is deleted because a provate member of this class cannot be copied
-
         SequentialLineIterator(SequentialLineIterator&&) = default;
+
+        SequentialLineIterator(const SequentialLineIterator&) = delete; // this ctor is deleted because a private member of this class cannot be copied
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///

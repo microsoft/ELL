@@ -42,10 +42,14 @@ namespace dataset
         /// <param name="value"> The value. </param>
         virtual void AppendElement(size_t index, double value = 1.0) = 0;
 
-        /// <summary> Returns the size of the vector. </summary>
+        /// <summary>
+        /// A data vector has infinite dimension and ends with a suffix of zeros. This function returns
+        /// the first index in this suffix. Equivalently, the returned value is one plus the index of the
+        /// last non-zero element.
+        /// </summary>
         ///
-        /// <returns> The size of the vector. </returns>
-        virtual size_t Size() const = 0; // TODO change this to GetFirstSuffixIndex()
+        /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
+        virtual size_t GetSuffixIndex() const = 0;
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
@@ -82,6 +86,12 @@ namespace dataset
     template <typename T>
     using IsDataVector = typename std::enable_if_t<std::is_base_of<IDataVector, T>::value, bool>;
 
+    /// <summary>
+    /// Base class for some of the data vector classes. This class uses a curiously recurring
+    /// template pattern to significantly reduce code duplication in the derived classes.
+    /// </summary>
+    ///
+    /// <typeparam name="DerivedType"> The derived type, in the curiously recurring template design pattern. </typeparam>
     template<class DerivedType>
     class DataVectorBase : public IDataVector
     {

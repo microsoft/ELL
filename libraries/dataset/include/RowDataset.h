@@ -35,7 +35,7 @@ namespace dataset
 
         RowDataset(RowDataset&&) = default;
 
-        explicit RowDataset(const RowDataset&) = default;
+        explicit RowDataset(const RowDataset&) = default; // why is this allowed?
 
         /// <summary> Constructs an instance of RowDataset by making shallow copies of supervised examples. </summary>
         ///

@@ -27,8 +27,8 @@ namespace dataset
 {
     /// <summary> Implements a sparse vector as an increasing list of indices and their corresponding values.
     ///
-    /// <typeparam name="ElementType"> Type of the value type. </typeparam>
-    /// <typeparam name="tegerListType"> Type of the teger list type. </typeparam>
+    /// <typeparam name="ElementType"> Type of the vector elements. </typeparam>
+    /// <typeparam name="tegerListType"> Type of the integer list used to store indices. </typeparam>
     template <typename ElementType, typename IntegerListType>
     class SparseDataVector : public DataVectorBase<SparseDataVector<ElementType, IntegerListType>>
     {

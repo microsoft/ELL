@@ -23,7 +23,7 @@
 #include <vector>
 #include <initializer_list>
 
-#define DEFAULT_DENSE_VECTOR_CAPACITY 1000
+#define DEFAULT_DENSE_VECTOR_CAPACITY 256
 
 namespace emll
 {
@@ -41,9 +41,9 @@ namespace dataset
         /// <summary> Constructor. </summary>
         DenseDataVector();
 
-        DenseDataVector(const DenseDataVector&) = delete; // TODO look at ctors
-
         DenseDataVector(DenseDataVector&& other) = default;
+
+        DenseDataVector(const DenseDataVector&) = delete;
 
         /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
         ///
