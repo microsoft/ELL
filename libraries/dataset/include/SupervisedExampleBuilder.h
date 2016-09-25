@@ -25,8 +25,8 @@ namespace dataset
     /// <summary> A supervised example builder. </summary>
     ///
     /// <typeparam name="VectorElementParserType"> Type of the vector element parser type. </typeparam>
-    /// <typeparam name="DefaultDataVectorType"> Type of the default data vector type. </typeparam>
-    template <typename VectorElementParserType, typename DefaultDataVectorType>
+    /// <typeparam name="DataVectorType"> Type of the default data vector type. </typeparam>
+    template <typename VectorElementParserType, typename DataVectorType>
     class SupervisedExampleBuilder
     {
     public:

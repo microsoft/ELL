@@ -6,7 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DenseDataVector.h"
+#include "AutoDataVector.h"
 #include "SupervisedExampleBuilder.h"
 
 namespace emll
@@ -22,7 +22,7 @@ namespace dataset
     template <typename RowIteratorType, typename VectorElementParserType>
     GenericSupervisedExample ParsingIterator<RowIteratorType, VectorElementParserType>::Get() const
     {
-        SupervisedExampleBuilder<VectorElementParserType, FloatDataVector> exampleBuilder(_instanceParser);
+        SupervisedExampleBuilder<VectorElementParserType, AutoDataVector> exampleBuilder(_instanceParser);
         return exampleBuilder.Build(_rowIterator.Get());
     }
 

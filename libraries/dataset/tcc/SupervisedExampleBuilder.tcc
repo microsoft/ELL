@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DataVectorBuilder.h"
-
 // stl
 #include <cstdlib>
 
@@ -18,14 +16,14 @@ namespace emll
 {
 namespace dataset
 {
-    template <typename VectorElementParserType, typename DefaultDataVectorType>
-    SupervisedExampleBuilder<VectorElementParserType, DefaultDataVectorType>::SupervisedExampleBuilder(VectorElementParserType parser, bool hasWeight)
+    template <typename VectorElementParserType, typename DataVectorType>
+    SupervisedExampleBuilder<VectorElementParserType, DataVectorType>::SupervisedExampleBuilder(VectorElementParserType parser, bool hasWeight)
         : _instanceParser(parser), _hasWeight(hasWeight)
     {
     }
 
-    template <typename VectorElementParserType, typename DefaultDataVectorType>
-    GenericSupervisedExample SupervisedExampleBuilder<VectorElementParserType, DefaultDataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
+    template <typename VectorElementParserType, typename DataVectorType>
+    GenericSupervisedExample SupervisedExampleBuilder<VectorElementParserType, DataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
     {
         const char* pStr = spExampleString->c_str();
 
@@ -55,14 +53,14 @@ namespace dataset
         auto IndexValueIterator = _instanceParser.GetIterator(spExampleString, pStr);
 
         // create instance
-        auto instance = DataVectorBuilder<DefaultDataVectorType>::Build(IndexValueIterator);
+        auto dataVector = std::make_shared<DataVectorType>(IndexValueIterator);
 
         // return supervised example
-        return GenericSupervisedExample(std::move(instance), WeightLabel{ weight, label });
+        return GenericSupervisedExample(std::move(dataVector), WeightLabel{ weight, label });
     }
 
-    template <typename VectorElementParserType, typename DefaultDataVectorType>
-    void dataset::SupervisedExampleBuilder<VectorElementParserType, DefaultDataVectorType>::HandleErrors(utilities::ParseResult result, const std::string& str)
+    template <typename VectorElementParserType, typename DataVectorType>
+    void dataset::SupervisedExampleBuilder<VectorElementParserType, DataVectorType>::HandleErrors(utilities::ParseResult result, const std::string& str)
     {
         if (result == utilities::ParseResult::badFormat)
         {

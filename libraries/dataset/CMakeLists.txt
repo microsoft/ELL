@@ -17,7 +17,6 @@ set (SRC src/SequentialLineIterator.cpp
          src/Example.cpp)
 
 set (INCLUDE include/AutoDataVector.h
-             include/DataVectorBuilder.h
              include/DenseDataVector.h
              include/Example.h
              include/DataVector.h
@@ -31,7 +30,6 @@ set (INCLUDE include/AutoDataVector.h
 
 set (TCC tcc/AutoDataVector.tcc
          tcc/DataVector.tcc
-         tcc/DataVectorBuilder.tcc
          tcc/DenseDataVector.tcc
          tcc/Example.tcc
          tcc/ParsingIterator.tcc
