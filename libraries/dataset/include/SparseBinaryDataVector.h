@@ -73,18 +73,22 @@ namespace dataset
 
         SparseBinaryDataVectorBase() = default;
 
-        /// <summary> Converting constructor. </summary>
-        ///
-        /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
-        /// <typeparam name="IIndexValueIterator">  Type of the index value iterator. </typeparam>
-        /// <typeparam name="dexValueIteratorType"> Type of the dex value iterator type. </typeparam>
-        /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
-        SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
-
         SparseBinaryDataVectorBase(SparseBinaryDataVectorBase<IntegerListType>&& other) = default;
 
-        SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = default;
+        SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = delete;
+
+        /// <summary> Converting constructor. </summary>
+        ///
+        /// <param name="indexValueIterator"> The index value iterator. </param>
+        template <typename IndexValueIteratorType>
+        SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 1);
+
+        /// <summary> Constructs a SparseDataVector from another data vector. </summary>
+        ///
+        /// <typeparam name="DataVectorType"> Type of the data vector. </typeparam>
+        /// <param name="dataVector"> The data vector. </param>
+        template <typename DataVectorType>
+        SparseBinaryDataVectorBase(DataVectorType dataVector, typename IsDataVector<DataVectorType> concept = true);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///

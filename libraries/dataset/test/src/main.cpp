@@ -10,6 +10,7 @@
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
 #include "AutoDataVector.h"
+#include "DataVector.h"
 
 // testing
 #include "testing.h"
@@ -116,6 +117,37 @@ void ToDataVectorTest(std::initializer_list<double> list)
 
     testing::ProcessTest(name1 + "::ToDataVector<" + name2 + ">", testing::IsEqual(w,z, 1.0e-6));
 }
+
+void AutoDataVectorTest()
+{
+    dataset::AutoDataVector v1{ 0.123456789, 1.12345678901, 2.3456789012, 3.4567890123 };
+    testing::ProcessTest("AutoDataVector ctor", v1.GetInternalType() == dataset::IDataVector::Type::DoubleDataVector);
+
+    dataset::AutoDataVector v2{ 0.1f, 1.2f, 2.3f, 3.4f, 4.5f, 5.6f };
+    testing::ProcessTest("AutoDataVector ctor", v2.GetInternalType() == dataset::IDataVector::Type::FloatDataVector);
+
+    dataset::AutoDataVector v3{ 1234, 2345, 3456, 4567, 5678, 6789 };
+    testing::ProcessTest("AutoDataVector ctor", v3.GetInternalType() == dataset::IDataVector::Type::ShortDataVector);
+
+    dataset::AutoDataVector v4{ 10, 20, 30, 40, 50, 60, 70 };
+    testing::ProcessTest("AutoDataVector ctor", v4.GetInternalType() == dataset::IDataVector::Type::ByteDataVector);
+
+    dataset::AutoDataVector v5{ 0, 0, 0, 0, 0, 1.2345678901, 0, 0, 0 };
+    testing::ProcessTest("AutoDataVector ctor", v5.GetInternalType() == dataset::IDataVector::Type::SparseDoubleDataVector);
+
+    dataset::AutoDataVector v6{ 0, 0, 0, 0, 0, 1.2f, 0, 0, 0 };
+    testing::ProcessTest("AutoDataVector ctor", v6.GetInternalType() == dataset::IDataVector::Type::SparseFloatDataVector);
+
+    dataset::AutoDataVector v7{ 0, 0, 0, 0, 0, 1234, 0, 0, 0 };
+    testing::ProcessTest("AutoDataVector ctor", v7.GetInternalType() == dataset::IDataVector::Type::SparseShortDataVector);
+
+    dataset::AutoDataVector v8{ 0, 0, 0, 0, 0, 10, 0, 0, 0 };
+    testing::ProcessTest("AutoDataVector ctor", v8.GetInternalType() == dataset::IDataVector::Type::SparseByteDataVector);
+
+    dataset::AutoDataVector v9{ 0, 0, 0, 0, 0, 1, 0, 0, 0 };
+    testing::ProcessTest("AutoDataVector ctor", v9.GetInternalType() == dataset::IDataVector::Type::SparseBinaryDataVector);
+}
+
 
 /// Runs all tests
 ///
@@ -241,6 +273,8 @@ int main()
     ToDataVectorTest<dataset::AutoDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
     ToDataVectorTest<dataset::AutoDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
     ToDataVectorTest<dataset::AutoDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    AutoDataVectorTest();
 
     if (testing::DidTestFail())
     {

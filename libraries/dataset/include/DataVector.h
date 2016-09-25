@@ -16,6 +16,7 @@
 #include <functional>
 #include <memory>
 #include <vector>
+#include <type_traits>
 
 namespace emll
 {
@@ -76,6 +77,10 @@ namespace dataset
         /// <param name="os"> [in,out] Stream to write data to. </param>
         virtual void Print(std::ostream& os) const = 0;
     };
+
+    /// <summary> A helper definition used to define the IsDataVector SFINAE concept. </summary>
+    template <typename T>
+    using IsDataVector = typename std::enable_if_t<std::is_base_of<IDataVector, T>::value, bool>;
 
     template<class DerivedType>
     class DataVectorBase : public IDataVector

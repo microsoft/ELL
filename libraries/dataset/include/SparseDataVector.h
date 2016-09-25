@@ -72,13 +72,20 @@ namespace dataset
 
         SparseDataVector(SparseDataVector<ElementType, IntegerListType>&& other) = default;
 
-        SparseDataVector(const SparseDataVector<ElementType, IntegerListType>& other) = default;
+        SparseDataVector(const SparseDataVector<ElementType, IntegerListType>& other) = delete;
 
         /// <summary> Constructs an instance of SparseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
-        SparseDataVector(IndexValueIteratorType indexValueIterator);
+        template <typename IndexValueIteratorType>
+        SparseDataVector(IndexValueIteratorType indexValueIterator, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 1); // TODO change to ture
+
+        /// <summary> Constructs a SparseDataVector from another data vector. </summary>
+        ///
+        /// <typeparam name="DataVectorType"> Type of the data vector. </typeparam>
+        /// <param name="dataVector"> The data vector. </param>
+        template <typename DataVectorType>
+        SparseDataVector(DataVectorType dataVector, typename IsDataVector<DataVectorType> concept = true);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///

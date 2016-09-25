@@ -26,8 +26,8 @@ namespace dataset
     }
 
     template <typename ElementType, typename IntegerListType>
-    template <typename IndexValueIteratorType, typename concept>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
+    template <typename IndexValueIteratorType>
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator, linear::IsIndexValueIterator<IndexValueIteratorType>)
     {
         while (indexValueIterator.IsValid())
         {
@@ -35,6 +35,13 @@ namespace dataset
             SparseDataVector<ElementType, IntegerListType>::AppendElement(indexValue.index, indexValue.value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
             indexValueIterator.Next();
         }
+    }
+
+    template<typename ElementType, typename IntegerListType>
+    template<typename DataVectorType>
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(DataVectorType dataVector, typename IsDataVector<DataVectorType>) : SparseDataVector(dataVector.GetIterator())
+    {
+        static_assert(std::is_same<DataVectorType, SparseDataVector<ElementType, IntegerListType>>::value == false, "Move ctor should have been called instead");
     }
 
     template <typename ElementType, typename IntegerListType>

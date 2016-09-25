@@ -19,17 +19,35 @@
 namespace emll
 {
 namespace dataset
-{ 
-    class AutoDataVector : public IDataVector
+{
+    template<typename DefaultDataVectorType>
+    class AutoDataVectorBase : public IDataVector
     {
     public:
-        AutoDataVector(std::initializer_list<linear::IndexValue> list);
 
-        AutoDataVector(std::initializer_list<double> list);
+        // TODO add iter ctor
+        AutoDataVectorBase(const AutoDataVectorBase& vector) = delete;
+
+        AutoDataVectorBase(AutoDataVectorBase&& vector) = default;
+
+        AutoDataVectorBase(DefaultDataVectorType&& vector);
+        
+        /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
+        ///
+        /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
+        /// <param name="IndexValueIterator"> The index value iterator. </param>
+        template<typename IndexValueIteratorType>
+        AutoDataVectorBase(IndexValueIteratorType indexValueIterator, typename linear::IsIndexValueIterator<IndexValueIteratorType> concept = 1);
+
+        AutoDataVectorBase(std::initializer_list<linear::IndexValue> list);
+
+        AutoDataVectorBase(std::initializer_list<double> list);
 
         virtual void AppendElement(size_t index, double value = 1.0) override;
 
         virtual IDataVector::Type GetType() const override { return IDataVector::Type::AutoDataVector; }
+
+        IDataVector::Type GetInternalType() const { return _pInternal->GetType(); }
 
         virtual size_t Size() const override { return _pInternal->Size(); }
 
@@ -47,47 +65,15 @@ namespace dataset
         virtual void Print(std::ostream & os) const override;
 
     private:
+
+        void FindBestRepresentation(DefaultDataVectorType defaultDataVector);
+
+        // members
         std::unique_ptr<IDataVector> _pInternal;
     };
 
-    template<typename ReturnType>
-    inline ReturnType AutoDataVector::ToDataVector() const
-    {
-        switch (_pInternal->GetType())
-        {
-        case IDataVector::Type::DoubleDataVector:
-            return ReturnType(static_cast<DoubleDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::FloatDataVector:
-            return ReturnType(static_cast<FloatDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::ShortDataVector:
-            return ReturnType(static_cast<ShortDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::ByteDataVector:
-            return ReturnType(static_cast<ByteDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseDoubleDataVector:
-            return ReturnType(static_cast<SparseDoubleDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseFloatDataVector:
-            return ReturnType(static_cast<SparseFloatDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseShortDataVector:
-            return ReturnType(static_cast<SparseShortDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseByteDataVector:
-            return ReturnType(static_cast<SparseByteDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseBinaryDataVector:
-            return ReturnType(static_cast<SparseBinaryDataVector*>(_pInternal.get())->GetIterator());
-
-        default:
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
-        }
-
-
-        return ReturnType();
-    }
+    using AutoDataVector = AutoDataVectorBase<DoubleDataVector>;
 }
 }
+
+#include "../tcc/AutoDataVector.tcc"

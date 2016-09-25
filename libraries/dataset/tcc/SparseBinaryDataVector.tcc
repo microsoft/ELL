@@ -8,6 +8,7 @@
 
 // stl
 #include <cassert>
+#include "..\include\SparseBinaryDataVector.h"
 
 namespace emll
 {
@@ -20,8 +21,8 @@ namespace dataset
     }
 
     template <typename IntegerListType>
-    template <typename IndexValueIteratorType, typename concept>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
+    template <typename IndexValueIteratorType>
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator, linear::IsIndexValueIterator<IndexValueIteratorType>)
     {
         while (indexValueIterator.IsValid())
         {
@@ -29,6 +30,13 @@ namespace dataset
             SparseBinaryDataVectorBase<IntegerListType>::AppendElement(indexValue.index, indexValue.value); // explicit call to SparseBinaryDataVectorBase<ElementType>::AppendElement is given to avoid virtual function call in Ctor
             indexValueIterator.Next();
         }
+    }
+
+    template<typename IntegerListType>
+    template<typename DataVectorType>
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(DataVectorType dataVector, typename IsDataVector<DataVectorType>) : SparseBinaryDataVectorBase(dataVector.GetIterator())
+    {
+        static_assert(std::is_same<DataVectorType, SparseBinaryDataVectorBase<IntegerListType>>::value == false, "Move ctor should have been called instead");
     }
 
     template<typename IntegerListType>

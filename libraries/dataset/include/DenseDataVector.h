@@ -41,20 +41,28 @@ namespace dataset
         /// <summary> Constructor. </summary>
         DenseDataVector();
 
-        DenseDataVector(const DenseDataVector&) = default; // TODO look at ctors
+        DenseDataVector(const DenseDataVector&) = delete; // TODO look at ctors
 
         DenseDataVector(DenseDataVector&& other) = default;
 
-        /// <summary> Constructs an instance of DenseDataVector. </summary>
+        /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
         ///
+        /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
-        DenseDataVector(IndexValueIteratorType indexValueIterator);
+        template<typename IndexValueIteratorType>
+        DenseDataVector(IndexValueIteratorType indexValueIterator, typename linear::IsIndexValueIterator<IndexValueIteratorType> concept = 1);
+
+        /// <summary> Constructs a DenseDataVector from another data vector. </summary>
+        ///
+        /// <typeparam name="DataVectorType"> Type of the data vector. </typeparam>
+        /// <param name="dataVector"> The data vector. </param>
+        template <typename DataVectorType>
+        DenseDataVector(DataVectorType dataVector, typename IsDataVector<DataVectorType> concept = true);
 
         /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
         ///
         /// <param name="data"> The std::vector. </param>
-        DenseDataVector(std::vector<ElementType> data);
+        DenseDataVector(std::vector<ElementType> data); // TODO get rid of this
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
