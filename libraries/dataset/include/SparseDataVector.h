@@ -74,16 +74,17 @@ namespace dataset
 
         SparseDataVector(const SparseDataVector<ElementType, IntegerListType>& other) = delete;
 
-        /// <summary> Constructs an instance of SparseDataVector. </summary>
+        /// <summary> Constructs a sparse data vector from an index value iterator. </summary>
         ///
+        /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         SparseDataVector(IndexValueIteratorType indexValueIterator);
 
-        /// <summary> Constructs a SparseDataVector from another data vector. </summary>
+        /// <summary> Constructs a sparse data vector by copying the contents of another data vector. </summary>
         ///
-        /// <typeparam name="DataVectorType"> Type of the data vector. </typeparam>
-        /// <param name="dataVector"> The data vector. </param>
+        /// <typeparam name="DataVectorType"> Type of the vector being copied. </typeparam>
+        /// <param name="dataVector"> The data vector being copied. </param>
         template <typename DataVectorType, IsDataVector<DataVectorType> Concept = true>
         SparseDataVector(DataVectorType dataVector);
 

@@ -16,6 +16,13 @@
 // stl
 #include <initializer_list>
 
+// finish documenting and cleaning this class
+// rip out the datavectorbuilder.
+// replace double* in the Dot and AddTo with math::vectors. Replace old linear vectors with new math vectors everywhere. erase linear.
+// change the way that forest trainer creates its dataset (don break encapsulation)
+// change the way that predictor nodes run their internal predictors: I think input ports should expose an iterator that constructs a data vector
+// Add "using ExampleType" to predictors and have evaluators create the right kind of dataset 
+
 namespace emll
 {
 namespace dataset
@@ -25,53 +32,97 @@ namespace dataset
     {
     public:
 
-        // TODO add iter ctor
         AutoDataVectorBase(const AutoDataVectorBase& vector) = delete;
 
         AutoDataVectorBase(AutoDataVectorBase&& vector) = default;
 
+        /// <summary> Constructs an auto data vector from a vector of the default type. </summary>
+        ///
+        /// <param name="vector"> The input vector. </param>
         AutoDataVectorBase(DefaultDataVectorType&& vector);
         
-        /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
+        /// <summary> Constructs an auto data vector from an index value iterator. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
         template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         AutoDataVectorBase(IndexValueIteratorType indexValueIterator);
 
+        /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
+        ///
+        /// <param name="list"> The initializer list. </param>
         AutoDataVectorBase(std::initializer_list<linear::IndexValue> list);
 
+        /// <summary> Constructs a data vector from an initializer list of values. </summary>
+        ///
+        /// <param name="list"> The initializer list of values. </param>
         AutoDataVectorBase(std::initializer_list<double> list);
 
+        /// <summary> Not Implemented. </summary>
         virtual void AppendElement(size_t index, double value = 1.0) override;
 
+        /// <summary> Gets the data vector type. </summary>
+        ///
+        /// <returns> The data vector type. </returns>
         virtual IDataVector::Type GetType() const override { return IDataVector::Type::AutoDataVector; }
 
+        /// <summary> Gets the type of the internal data vector stored inside the auto data vector. </summary>
+        ///
+        /// <returns> The internal data vector type. </returns>
         IDataVector::Type GetInternalType() const { return _pInternal->GetType(); }
 
+        /// <summary> Returns the size of the vector. </summary>
+        ///
+        /// <returns> The size of the vector. </returns>
         virtual size_t Size() const override { return _pInternal->Size(); }
 
+        /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
+        ///
+        /// <returns> The vector 2-norm. </returns>
         virtual double Norm2() const override { return _pInternal->Norm2(); }
 
+        /// <summary> Computes the dot product with another vector. </summary>
+        ///
+        /// <param name="p_other"> The other vector. </param>
+        ///
+        /// <returns> A dot product. </returns>
         virtual double Dot(const double * p_other) const override;
 
+        /// <summary>
+        /// Performs the operation: (*p_other) += scalar * (*this), where other is an array of doubles.
+        /// </summary>
+        ///
+        /// <param name="p_other"> [in,out] The other vector. </param>
+        /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double * p_other, double scalar = 1.0) const override;
 
+        /// <summary> Copies the contents of this DataVector into a double array. </summary>
+        ///
+        /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const override { return _pInternal->ToArray(); }
 
+        /// <summary> Copies this data vector into another type of data vector. </summary>
+        ///
+        /// <typeparam name="ReturnType"> The return type. </typeparam>
+        ///
+        /// <returns> This new data vector. </returns>
         template<typename ReturnType>
         ReturnType ToDataVector() const;
 
+        /// <summary> Human readable printout to an output stream. </summary>
+        ///
+        /// <param name="os"> [in,out] Stream to write to. </param>
         virtual void Print(std::ostream & os) const override;
 
     private:
-
+        // helper function used by ctors to choose the type of data vector to use
         void FindBestRepresentation(DefaultDataVectorType defaultDataVector);
 
         // members
         std::unique_ptr<IDataVector> _pInternal;
     };
 
+    // friendly name
     using AutoDataVector = AutoDataVectorBase<DoubleDataVector>;
 }
 }

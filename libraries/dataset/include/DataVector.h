@@ -42,14 +42,14 @@ namespace dataset
         /// <param name="value"> The value. </param>
         virtual void AppendElement(size_t index, double value = 1.0) = 0;
 
-        /// <summary> Returns the Size of the vector. </summary>
+        /// <summary> Returns the size of the vector. </summary>
         ///
         /// <returns> The size of the vector. </returns>
         virtual size_t Size() const = 0; // TODO change this to GetFirstSuffixIndex()
 
-        /// <summary> Computes the squared 2-norm. </summary>
+        /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
-        /// <returns> The squared 2-norm. </returns>
+        /// <returns> The vector 2-norm. </returns>
         virtual double Norm2() const = 0;
 
         /// <summary> Computes the dot product with another vector. </summary>
@@ -67,14 +67,14 @@ namespace dataset
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const = 0;
 
-        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
+        /// <summary> Copies the contents of this DataVector into a double array. </summary>
         ///
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const = 0;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
-        /// <param name="os"> [in,out] Stream to write data to. </param>
+        /// <param name="os"> [in,out] Stream to write to. </param>
         virtual void Print(std::ostream& os) const = 0;
     };
 
@@ -86,9 +86,9 @@ namespace dataset
     class DataVectorBase : public IDataVector
     {
     public:
-        /// <summary> Computes the squared 2-norm. </summary>
+        /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
-        /// <returns> The squared 2-norm. </returns>
+        /// <returns> The vector 2-norm. </returns>
         virtual double Norm2() const override;
 
         /// <summary> Computes the dot product with another vector. </summary>
@@ -106,9 +106,11 @@ namespace dataset
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(double* p_other, double scalar = 1.0) const override;
 
-        /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
+        /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
-        /// <returns> The array. </returns>
+        /// <typeparam name="ReturnType"> The return type. </typeparam>
+        ///
+        /// <returns> This new data vector. </returns>
         virtual std::vector<double> ToArray() const override;
 
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
@@ -121,7 +123,7 @@ namespace dataset
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
-        /// <param name="os"> [in,out] Stream to write data to. </param>
+        /// <param name="os"> [in,out] Stream to write to. </param>
         virtual void Print(std::ostream& os) const override;  
     };
 }

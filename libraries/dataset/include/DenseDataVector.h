@@ -52,10 +52,10 @@ namespace dataset
         template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
 
-        /// <summary> Constructs a DenseDataVector from another data vector. </summary>
+        /// <summary> Constructs a data vector by copying the contents of another data vector. </summary>
         ///
-        /// <typeparam name="DataVectorType"> Type of the data vector. </typeparam>
-        /// <param name="dataVector"> The data vector. </param>
+        /// <typeparam name="DataVectorType"> Type of the vector being copied. </typeparam>
+        /// <param name="dataVector"> The data vector being copied. </param>
         template <typename DataVectorType, IsDataVector<DataVectorType> Concept = true>
         DenseDataVector(DataVectorType dataVector);
 
