@@ -24,8 +24,8 @@ namespace dataset
     }
 
     template<typename DefaultDataVectorType>
-    template<typename IndexValueIteratorType>
-    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(IndexValueIteratorType indexValueIterator, typename linear::IsIndexValueIterator<IndexValueIteratorType> concept)
+    template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
         DefaultDataVectorType defaultDataVector(indexValueIterator);
         FindBestRepresentation(std::move(defaultDataVector));

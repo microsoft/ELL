@@ -49,15 +49,15 @@ namespace dataset
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType>
-        DenseDataVector(IndexValueIteratorType indexValueIterator, typename linear::IsIndexValueIterator<IndexValueIteratorType> concept = 1);
+        template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        DenseDataVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a DenseDataVector from another data vector. </summary>
         ///
         /// <typeparam name="DataVectorType"> Type of the data vector. </typeparam>
         /// <param name="dataVector"> The data vector. </param>
-        template <typename DataVectorType>
-        DenseDataVector(DataVectorType dataVector, typename IsDataVector<DataVectorType> concept = true);
+        template <typename DataVectorType, IsDataVector<DataVectorType> Concept = true>
+        DenseDataVector(DataVectorType dataVector);
 
         /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
         ///

@@ -80,15 +80,15 @@ namespace dataset
         /// <summary> Converting constructor. </summary>
         ///
         /// <param name="indexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType>
-        SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 1);
+        template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a SparseDataVector from another data vector. </summary>
         ///
         /// <typeparam name="DataVectorType"> Type of the data vector. </typeparam>
         /// <param name="dataVector"> The data vector. </param>
-        template <typename DataVectorType>
-        SparseBinaryDataVectorBase(DataVectorType dataVector, typename IsDataVector<DataVectorType> concept = true);
+        template <typename DataVectorType, IsDataVector<DataVectorType> Concept = true>
+        SparseBinaryDataVectorBase(DataVectorType dataVector);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///

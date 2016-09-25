@@ -26,8 +26,8 @@ namespace dataset
     }
 
     template <typename ElementType, typename IntegerListType>
-    template <typename IndexValueIteratorType>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator, linear::IsIndexValueIterator<IndexValueIteratorType>)
+    template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
         {
@@ -38,8 +38,8 @@ namespace dataset
     }
 
     template<typename ElementType, typename IntegerListType>
-    template<typename DataVectorType>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(DataVectorType dataVector, typename IsDataVector<DataVectorType>) : SparseDataVector(dataVector.GetIterator())
+    template<typename DataVectorType, IsDataVector<DataVectorType> Concept>
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(DataVectorType dataVector) : SparseDataVector(dataVector.GetIterator())
     {
         static_assert(std::is_same<DataVectorType, SparseDataVector<ElementType, IntegerListType>>::value == false, "Move ctor should have been called instead");
     }

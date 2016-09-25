@@ -77,15 +77,15 @@ namespace dataset
         /// <summary> Constructs an instance of SparseDataVector. </summary>
         ///
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType>
-        SparseDataVector(IndexValueIteratorType indexValueIterator, linear::IsIndexValueIterator<IndexValueIteratorType> concept = 1); // TODO change to ture
+        template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        SparseDataVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a SparseDataVector from another data vector. </summary>
         ///
         /// <typeparam name="DataVectorType"> Type of the data vector. </typeparam>
         /// <param name="dataVector"> The data vector. </param>
-        template <typename DataVectorType>
-        SparseDataVector(DataVectorType dataVector, typename IsDataVector<DataVectorType> concept = true);
+        template <typename DataVectorType, IsDataVector<DataVectorType> Concept = true>
+        SparseDataVector(DataVectorType dataVector);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///

@@ -36,8 +36,8 @@ namespace dataset
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType>
-        AutoDataVectorBase(IndexValueIteratorType indexValueIterator, typename linear::IsIndexValueIterator<IndexValueIteratorType> concept = 1);
+        template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        AutoDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         AutoDataVectorBase(std::initializer_list<linear::IndexValue> list);
 

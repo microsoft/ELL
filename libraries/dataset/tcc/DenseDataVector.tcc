@@ -16,8 +16,8 @@ namespace emll
 namespace dataset
 {
     template <typename ElementType>
-    template <typename IndexValueIteratorType>
-    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator, typename linear::IsIndexValueIterator<IndexValueIteratorType>)
+    template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
         {
@@ -28,8 +28,8 @@ namespace dataset
     }
 
     template<typename ElementType>
-    template<typename DataVectorType>
-    DenseDataVector<ElementType>::DenseDataVector(DataVectorType dataVector, typename IsDataVector<DataVectorType>) : DenseDataVector(dataVector.GetIterator())
+    template<typename DataVectorType, IsDataVector<DataVectorType> Concept>
+    DenseDataVector<ElementType>::DenseDataVector(DataVectorType dataVector) : DenseDataVector(dataVector.GetIterator())
     {
         static_assert(std::is_same<DataVectorType, DenseDataVector<ElementType>>::value == false, "Move ctor should have been called instead");
     }

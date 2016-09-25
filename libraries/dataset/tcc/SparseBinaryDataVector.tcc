@@ -21,8 +21,8 @@ namespace dataset
     }
 
     template <typename IntegerListType>
-    template <typename IndexValueIteratorType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator, linear::IsIndexValueIterator<IndexValueIteratorType>)
+    template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
         {
@@ -33,8 +33,8 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    template<typename DataVectorType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(DataVectorType dataVector, typename IsDataVector<DataVectorType>) : SparseBinaryDataVectorBase(dataVector.GetIterator())
+    template<typename DataVectorType, IsDataVector<DataVectorType> Concept>
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(DataVectorType dataVector) : SparseBinaryDataVectorBase(dataVector.GetIterator())
     {
         static_assert(std::is_same<DataVectorType, SparseBinaryDataVectorBase<IntegerListType>>::value == false, "Move ctor should have been called instead");
     }
