@@ -9,7 +9,7 @@
 #pragma once
 
 #include "DenseDataVector.h"
-#include "DataVector.h"
+#include "AutoDataVector.h"
 
 // stl
 #include <algorithm> // for std::swap
@@ -87,7 +87,7 @@ namespace dataset
         double label;
     };
 
-    typedef Example<IDataVector, WeightLabel> GenericSupervisedExample;
+    typedef Example<AutoDataVector, WeightLabel> AutoSupervisedExample;
     typedef Example<DoubleDataVector, WeightLabel> DenseSupervisedExample; 
 
     /// <summary> Stream insertion operator. </summary>

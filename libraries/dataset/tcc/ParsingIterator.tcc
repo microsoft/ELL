@@ -20,7 +20,7 @@ namespace dataset
     }
 
     template <typename RowIteratorType, typename VectorElementParserType>
-    GenericSupervisedExample ParsingIterator<RowIteratorType, VectorElementParserType>::Get() const
+    AutoSupervisedExample ParsingIterator<RowIteratorType, VectorElementParserType>::Get() const
     {
         SupervisedExampleBuilder<VectorElementParserType, AutoDataVector> exampleBuilder(_instanceParser);
         return exampleBuilder.Build(_rowIterator.Get());

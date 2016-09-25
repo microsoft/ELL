@@ -35,7 +35,7 @@ namespace dataset
 
         RowDataset(RowDataset&&) = default;
 
-        explicit RowDataset(const RowDataset&) = default; // why is this allowed?
+        explicit RowDataset(const RowDataset&) = default; // TODO why is this allowed?
 
         /// <summary> Constructs an instance of RowDataset by making shallow copies of supervised examples. </summary>
         ///
@@ -158,7 +158,7 @@ namespace dataset
         size_t _maxExampleSize = 0;
     };
 
-    typedef RowDataset<GenericSupervisedExample> GenericRowDataset;
+    typedef RowDataset<AutoSupervisedExample> GenericRowDataset;
     typedef GenericRowDataset::Iterator GenericRowIterator;
 
     template <typename ExampleType>

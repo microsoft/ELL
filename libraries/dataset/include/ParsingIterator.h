@@ -21,7 +21,7 @@ namespace emll
 {
 namespace dataset
 {
-    using IParsingIterator = typename utilities::IIterator<GenericSupervisedExample>;
+    using IParsingIterator = typename utilities::IIterator<AutoSupervisedExample>;
 
     /// <summary> An input iterator that traverses a textual dataset row by row and applies a parser to
     /// each row into a dense feature std::vector of doubles, a double label, and a double weight. </summary>
@@ -50,7 +50,7 @@ namespace dataset
         /// <summary> Get the current example. </summary>
         ///
         /// <returns> A SupervisedExample. </returns>
-        virtual GenericSupervisedExample Get() const override;
+        virtual AutoSupervisedExample Get() const override;
 
     private:
         RowIteratorType _rowIterator;

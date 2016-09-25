@@ -23,7 +23,7 @@ namespace dataset
     }
 
     template <typename VectorElementParserType, typename DataVectorType>
-    GenericSupervisedExample SupervisedExampleBuilder<VectorElementParserType, DataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
+    AutoSupervisedExample SupervisedExampleBuilder<VectorElementParserType, DataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
     {
         const char* pStr = spExampleString->c_str();
 
@@ -56,7 +56,7 @@ namespace dataset
         auto dataVector = std::make_shared<DataVectorType>(IndexValueIterator);
 
         // return supervised example
-        return GenericSupervisedExample(std::move(dataVector), WeightLabel{ weight, label });
+        return AutoSupervisedExample(std::move(dataVector), WeightLabel{ weight, label });
     }
 
     template <typename VectorElementParserType, typename DataVectorType>
