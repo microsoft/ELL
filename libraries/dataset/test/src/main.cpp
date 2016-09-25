@@ -29,43 +29,6 @@
 
 using namespace emll;
 
-/// Generates a linear::DoubleVector
-///
-linear::DoubleVector getVector()
-{
-    linear::DoubleVector a(15);
-    a[0] = 0.1;
-    a[1] = 1.2;
-    a[2] = 2.3;
-    a[3] = 3.4;
-    a[4] = 4.5;
-    a[5] = 5.6;
-    a[6] = 6.7;
-    a[7] = 7.8;
-    a[8] = 8.9;
-    a[9] = 9.0;
-    a[10] = -0.1;
-    a[11] = -1.2;
-    a[12] = -2.3;
-    a[13] = -3.4;
-    a[14] = -4.5;
-
-    return a;
-}
-
-/// Generates a binary valued linear::DoubleVector
-///
-linear::DoubleVector getBinaryVector()
-{
-    linear::DoubleVector a(15);
-    a[3] = 1;
-    a[4] = 1;
-    a[12] = 1;
-    a[13] = 1;
-
-    return a;
-}
-
 template<typename DataVectorType>
 void IDataVectorTest()
 {
@@ -104,6 +67,30 @@ void IDataVectorBinaryTest()
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Print()", sss == "0:1\t3:1\t4:1");
 }
 
+void IDataVectorTests()
+{
+    IDataVectorTest<dataset::DoubleDataVector>();
+    IDataVectorTest<dataset::FloatDataVector>();
+    IDataVectorTest<dataset::ShortDataVector>();
+    IDataVectorTest<dataset::ByteDataVector>();
+    IDataVectorTest<dataset::SparseDoubleDataVector>();
+    IDataVectorTest<dataset::SparseFloatDataVector>();
+    IDataVectorTest<dataset::SparseShortDataVector>();
+    IDataVectorTest<dataset::SparseByteDataVector>();
+    IDataVectorTest<dataset::AutoDataVector>();
+
+    IDataVectorBinaryTest<dataset::DoubleDataVector>();
+    IDataVectorBinaryTest<dataset::FloatDataVector>();
+    IDataVectorBinaryTest<dataset::ShortDataVector>();
+    IDataVectorBinaryTest<dataset::ByteDataVector>();
+    IDataVectorBinaryTest<dataset::SparseDoubleDataVector>();
+    IDataVectorBinaryTest<dataset::SparseFloatDataVector>();
+    IDataVectorBinaryTest<dataset::SparseShortDataVector>();
+    IDataVectorBinaryTest<dataset::SparseByteDataVector>();
+    IDataVectorBinaryTest<dataset::AutoDataVector>();
+    IDataVectorBinaryTest<dataset::SparseBinaryDataVector>();
+}
+
 template <typename DataVectorType1, typename DataVectorType2>
 void ToDataVectorTest(std::initializer_list<double> list)
 {
@@ -116,6 +103,118 @@ void ToDataVectorTest(std::initializer_list<double> list)
     std::string name2 = typeid(DataVectorType2).name();
 
     testing::ProcessTest(name1 + "::ToDataVector<" + name2 + ">", testing::IsEqual(w,z, 1.0e-6));
+}
+
+void ToDataVectorTests()
+{
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::DoubleDataVector, dataset::AutoDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    ToDataVectorTest<dataset::FloatDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::FloatDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::FloatDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::FloatDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::FloatDataVector, dataset::AutoDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    ToDataVectorTest<dataset::ShortDataVector, dataset::DoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::ShortDataVector, dataset::FloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::ShortDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::ShortDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseFloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::ShortDataVector, dataset::AutoDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    ToDataVectorTest<dataset::ByteDataVector, dataset::DoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::ByteDataVector, dataset::FloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::ByteDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::ByteDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseFloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::ByteDataVector, dataset::AutoDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::AutoDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::AutoDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::DoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::FloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseFloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseShortDataVector, dataset::AutoDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::DoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::FloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseFloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseByteDataVector, dataset::AutoDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::DoubleDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::FloatDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::AutoDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
+
+    ToDataVectorTest<dataset::AutoDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::AutoDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::AutoDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::AutoDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
+    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
+    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
 }
 
 void AutoDataVectorTest()
@@ -148,132 +247,12 @@ void AutoDataVectorTest()
     testing::ProcessTest("AutoDataVector ctor", v9.GetInternalType() == dataset::IDataVector::Type::SparseBinaryDataVector);
 }
 
-
 /// Runs all tests
 ///
 int main()
 {
-    IDataVectorTest<dataset::DoubleDataVector>();
-    IDataVectorTest<dataset::FloatDataVector>();
-    IDataVectorTest<dataset::ShortDataVector>();
-    IDataVectorTest<dataset::ByteDataVector>();
-    IDataVectorTest<dataset::SparseDoubleDataVector>();
-    IDataVectorTest<dataset::SparseFloatDataVector>();
-    IDataVectorTest<dataset::SparseShortDataVector>();
-    IDataVectorTest<dataset::SparseByteDataVector>();
-    IDataVectorTest<dataset::AutoDataVector>();
-
-    IDataVectorBinaryTest<dataset::DoubleDataVector>();
-    IDataVectorBinaryTest<dataset::FloatDataVector>();
-    IDataVectorBinaryTest<dataset::ShortDataVector>();
-    IDataVectorBinaryTest<dataset::ByteDataVector>();
-    IDataVectorBinaryTest<dataset::SparseDoubleDataVector>();
-    IDataVectorBinaryTest<dataset::SparseFloatDataVector>();
-    IDataVectorBinaryTest<dataset::SparseShortDataVector>();
-    IDataVectorBinaryTest<dataset::SparseByteDataVector>();
-    IDataVectorBinaryTest<dataset::AutoDataVector>();
-    IDataVectorBinaryTest<dataset::SparseBinaryDataVector>();
-
-    ToDataVectorTest<dataset::DoubleDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::DoubleDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::DoubleDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::DoubleDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::DoubleDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
-    ToDataVectorTest<dataset::FloatDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::FloatDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::FloatDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::FloatDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::FloatDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
-    ToDataVectorTest<dataset::ShortDataVector, dataset::DoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::ShortDataVector, dataset::FloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::ShortDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::ShortDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseFloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::ShortDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
-    ToDataVectorTest<dataset::ByteDataVector, dataset::DoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::ByteDataVector, dataset::FloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::ByteDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::ByteDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseFloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::ByteDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
-    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseDoubleDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
-    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseFloatDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
-    ToDataVectorTest<dataset::SparseShortDataVector, dataset::DoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::SparseShortDataVector, dataset::FloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::SparseShortDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseShortDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseFloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseShortDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
-    ToDataVectorTest<dataset::SparseByteDataVector, dataset::DoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::SparseByteDataVector, dataset::FloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::SparseByteDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseByteDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseFloatDataVector>({ 1, 0, 11, 0, 0, 0, 0, 3, 0, 42 });
-    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::SparseByteDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
-    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::DoubleDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::FloatDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-    ToDataVectorTest<dataset::SparseBinaryDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
-    ToDataVectorTest<dataset::AutoDataVector, dataset::DoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::AutoDataVector, dataset::FloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::AutoDataVector, dataset::ShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::AutoDataVector, dataset::ByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseDoubleDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseFloatDataVector>({ 1, 0, 1.1, 0, 0, 0, 0, 3, 0, 4.2 });
-    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseShortDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseByteDataVector>({ 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 });
-    ToDataVectorTest<dataset::AutoDataVector, dataset::SparseBinaryDataVector>({ 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 });
-
+    IDataVectorTests();
+    ToDataVectorTests();
     AutoDataVectorTest();
 
     if (testing::DidTestFail())
