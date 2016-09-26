@@ -3,18 +3,18 @@
 <Model>
   <Array name='nodes' type='Node'>
     <InputNode(double)>
-      <string name='id' value='1026'/>
+      <string name='id' value='1022'/>
       <OutputPort(double) name='output'>
-        <string name='nodeId' value='1026'/>
+        <string name='nodeId' value='1022'/>
         <string name='name' value='output'/>
         <int name='type' value='1'/>
         <int name='size' value='3'/>
       </OutputPort(double)>
     </InputNode(double)>
     <ForestPredictorNode(SingleElementThresholdPredictor,ConstantPredictor)>
-      <string name='id' value='1027'/>
+      <string name='id' value='1023'/>
       <InputPort(double) name='input'>
-        <string name='nodeId' value='1027'/>
+        <string name='nodeId' value='1023'/>
         <string name='name' value='input'/>
         <int name='type' value='1'/>
         <PortElementsBase name='input'>
@@ -23,29 +23,29 @@
               <int name='startIndex' value='0'/>
               <int name='numValues' value='3'/>
               <bool name='isFixedSize' value='false'/>
-              <string name='referencedNodeId' value='1026'/>
+              <string name='referencedNodeId' value='1022'/>
               <string name='referencedPortName' value='output'/>
             </PortRange>
           </Array>
         </PortElementsBase>
       </InputPort(double)>
       <OutputPort(double) name='output'>
-        <string name='nodeId' value='1027'/>
+        <string name='nodeId' value='1023'/>
         <string name='name' value='output'/>
         <int name='type' value='1'/>
         <int name='size' value='1'/>
       </OutputPort(double)>
       <OutputPort(double) name='treeOutputs'>
-        <string name='nodeId' value='1027'/>
+        <string name='nodeId' value='1023'/>
         <string name='name' value='treeOutputs'/>
         <int name='type' value='1'/>
         <int name='size' value='1'/>
       </OutputPort(double)>
       <OutputPort(bool) name='edgeIndicatorVector'>
-        <string name='nodeId' value='1027'/>
+        <string name='nodeId' value='1023'/>
         <string name='name' value='edgeIndicatorVector'/>
         <int name='type' value='4'/>
-        <int name='size' value='14'/>
+        <int name='size' value='6'/>
       </OutputPort(bool)>
       <ForestPredictor(SingleElementThresholdPredictor,ConstantPredictor) name='forest'>
         <Array name='interiorNodes' type='InteriorNode'>
@@ -101,107 +101,23 @@
                 <ConstantPredictor name='predictor'>
                   <float name='value' value='-1.000000'/>
                 </ConstantPredictor>
-                <int name='targetNodeIndex' value='3'/>
+                <int name='targetNodeIndex' value='0'/>
               </Edge>
               <Edge>
                 <ConstantPredictor name='predictor'>
                   <float name='value' value='1.000000'/>
                 </ConstantPredictor>
-                <int name='targetNodeIndex' value='4'/>
+                <int name='targetNodeIndex' value='0'/>
               </Edge>
             </Array>
             <int name='firstEdgeIndex' value='4'/>
-          </InteriorNode>
-          <InteriorNode>
-            <SingleElementThresholdPredictor name='splitRule'>
-              <int name='index' value='0'/>
-              <float name='threshold' value='0.000000'/>
-            </SingleElementThresholdPredictor>
-            <Array name='outgoingEdges' type='Edge'>
-              <Edge>
-                <ConstantPredictor name='predictor'>
-                  <float name='value' value='-1.000000'/>
-                </ConstantPredictor>
-                <int name='targetNodeIndex' value='0'/>
-              </Edge>
-              <Edge>
-                <ConstantPredictor name='predictor'>
-                  <float name='value' value='1.000000'/>
-                </ConstantPredictor>
-                <int name='targetNodeIndex' value='0'/>
-              </Edge>
-            </Array>
-            <int name='firstEdgeIndex' value='6'/>
-          </InteriorNode>
-          <InteriorNode>
-            <SingleElementThresholdPredictor name='splitRule'>
-              <int name='index' value='0'/>
-              <float name='threshold' value='0.000000'/>
-            </SingleElementThresholdPredictor>
-            <Array name='outgoingEdges' type='Edge'>
-              <Edge>
-                <ConstantPredictor name='predictor'>
-                  <float name='value' value='-1.000000'/>
-                </ConstantPredictor>
-                <int name='targetNodeIndex' value='5'/>
-              </Edge>
-              <Edge>
-                <ConstantPredictor name='predictor'>
-                  <float name='value' value='1.000000'/>
-                </ConstantPredictor>
-                <int name='targetNodeIndex' value='6'/>
-              </Edge>
-            </Array>
-            <int name='firstEdgeIndex' value='8'/>
-          </InteriorNode>
-          <InteriorNode>
-            <SingleElementThresholdPredictor name='splitRule'>
-              <int name='index' value='0'/>
-              <float name='threshold' value='0.000000'/>
-            </SingleElementThresholdPredictor>
-            <Array name='outgoingEdges' type='Edge'>
-              <Edge>
-                <ConstantPredictor name='predictor'>
-                  <float name='value' value='-1.000000'/>
-                </ConstantPredictor>
-                <int name='targetNodeIndex' value='0'/>
-              </Edge>
-              <Edge>
-                <ConstantPredictor name='predictor'>
-                  <float name='value' value='1.000000'/>
-                </ConstantPredictor>
-                <int name='targetNodeIndex' value='0'/>
-              </Edge>
-            </Array>
-            <int name='firstEdgeIndex' value='10'/>
-          </InteriorNode>
-          <InteriorNode>
-            <SingleElementThresholdPredictor name='splitRule'>
-              <int name='index' value='0'/>
-              <float name='threshold' value='0.000000'/>
-            </SingleElementThresholdPredictor>
-            <Array name='outgoingEdges' type='Edge'>
-              <Edge>
-                <ConstantPredictor name='predictor'>
-                  <float name='value' value='-1.000000'/>
-                </ConstantPredictor>
-                <int name='targetNodeIndex' value='0'/>
-              </Edge>
-              <Edge>
-                <ConstantPredictor name='predictor'>
-                  <float name='value' value='1.000000'/>
-                </ConstantPredictor>
-                <int name='targetNodeIndex' value='0'/>
-              </Edge>
-            </Array>
-            <int name='firstEdgeIndex' value='12'/>
           </InteriorNode>
         </Array>
         <Array name='rootIndices' type='int'>
           <int value='0'/> 
           </Array>
         <float name='bias' value='0.000000'/>
-        <int name='numEdges' value='14'/>
+        <int name='numEdges' value='6'/>
       </ForestPredictor(SingleElementThresholdPredictor,ConstantPredictor)>
     </ForestPredictorNode(SingleElementThresholdPredictor,ConstantPredictor)>
   </Array>

@@ -3,18 +3,18 @@
 <Model>
   <Array name='nodes' type='Node'>
     <InputNode(double)>
-      <string name='id' value='1000'/>
+      <string name='id' value='1006'/>
       <OutputPort(double) name='output'>
-        <string name='nodeId' value='1000'/>
+        <string name='nodeId' value='1006'/>
         <string name='name' value='output'/>
         <int name='type' value='1'/>
         <int name='size' value='3'/>
       </OutputPort(double)>
     </InputNode(double)>
     <MovingAverageNode(double)>
-      <string name='id' value='1001'/>
+      <string name='id' value='1007'/>
       <InputPort(double) name='input'>
-        <string name='nodeId' value='1001'/>
+        <string name='nodeId' value='1007'/>
         <string name='name' value='input'/>
         <int name='type' value='1'/>
         <PortElementsBase name='input'>
@@ -23,24 +23,24 @@
               <int name='startIndex' value='0'/>
               <int name='numValues' value='3'/>
               <bool name='isFixedSize' value='false'/>
-              <string name='referencedNodeId' value='1000'/>
+              <string name='referencedNodeId' value='1006'/>
               <string name='referencedPortName' value='output'/>
             </PortRange>
           </Array>
         </PortElementsBase>
       </InputPort(double)>
       <OutputPort(double) name='output'>
-        <string name='nodeId' value='1001'/>
+        <string name='nodeId' value='1007'/>
         <string name='name' value='output'/>
         <int name='type' value='1'/>
         <int name='size' value='3'/>
       </OutputPort(double)>
       <int name='windowSize' value='8'/>
     </MovingAverageNode(double)>
-    <MovingVarianceNode(double)>
-      <string name='id' value='1004'/>
+    <L2NormNode(double)>
+      <string name='id' value='1008'/>
       <InputPort(double) name='input'>
-        <string name='nodeId' value='1004'/>
+        <string name='nodeId' value='1008'/>
         <string name='name' value='input'/>
         <int name='type' value='1'/>
         <PortElementsBase name='input'>
@@ -49,129 +49,111 @@
               <int name='startIndex' value='0'/>
               <int name='numValues' value='3'/>
               <bool name='isFixedSize' value='false'/>
-              <string name='referencedNodeId' value='1000'/>
+              <string name='referencedNodeId' value='1007'/>
               <string name='referencedPortName' value='output'/>
             </PortRange>
           </Array>
         </PortElementsBase>
       </InputPort(double)>
       <OutputPort(double) name='output'>
-        <string name='nodeId' value='1004'/>
-        <string name='name' value='output'/>
-        <int name='type' value='1'/>
-        <int name='size' value='3'/>
-      </OutputPort(double)>
-      <int name='windowSize' value='16'/>
-    </MovingVarianceNode(double)>
-    <MovingAverageNode(double)>
-      <string name='id' value='1003'/>
-      <InputPort(double) name='input'>
-        <string name='nodeId' value='1003'/>
-        <string name='name' value='input'/>
-        <int name='type' value='1'/>
-        <PortElementsBase name='input'>
-          <Array name='ranges' type='PortRange'>
-            <PortRange>
-              <int name='startIndex' value='0'/>
-              <int name='numValues' value='3'/>
-              <bool name='isFixedSize' value='false'/>
-              <string name='referencedNodeId' value='1000'/>
-              <string name='referencedPortName' value='output'/>
-            </PortRange>
-          </Array>
-        </PortElementsBase>
-      </InputPort(double)>
-      <OutputPort(double) name='output'>
-        <string name='nodeId' value='1003'/>
-        <string name='name' value='output'/>
-        <int name='type' value='1'/>
-        <int name='size' value='3'/>
-      </OutputPort(double)>
-      <int name='windowSize' value='16'/>
-    </MovingAverageNode(double)>
-    <MovingVarianceNode(double)>
-      <string name='id' value='1002'/>
-      <InputPort(double) name='input'>
-        <string name='nodeId' value='1002'/>
-        <string name='name' value='input'/>
-        <int name='type' value='1'/>
-        <PortElementsBase name='input'>
-          <Array name='ranges' type='PortRange'>
-            <PortRange>
-              <int name='startIndex' value='0'/>
-              <int name='numValues' value='3'/>
-              <bool name='isFixedSize' value='false'/>
-              <string name='referencedNodeId' value='1000'/>
-              <string name='referencedPortName' value='output'/>
-            </PortRange>
-          </Array>
-        </PortElementsBase>
-      </InputPort(double)>
-      <OutputPort(double) name='output'>
-        <string name='nodeId' value='1002'/>
-        <string name='name' value='output'/>
-        <int name='type' value='1'/>
-        <int name='size' value='3'/>
-      </OutputPort(double)>
-      <int name='windowSize' value='8'/>
-    </MovingVarianceNode(double)>
-    <LinearPredictorNode>
-      <string name='id' value='1005'/>
-      <InputPort(double) name='input'>
-        <string name='nodeId' value='1005'/>
-        <string name='name' value='input'/>
-        <int name='type' value='1'/>
-        <PortElementsBase name='input'>
-          <Array name='ranges' type='PortRange'>
-            <PortRange>
-              <int name='startIndex' value='0'/>
-              <int name='numValues' value='3'/>
-              <bool name='isFixedSize' value='false'/>
-              <string name='referencedNodeId' value='1001'/>
-              <string name='referencedPortName' value='output'/>
-            </PortRange>
-            <PortRange>
-              <int name='startIndex' value='0'/>
-              <int name='numValues' value='3'/>
-              <bool name='isFixedSize' value='false'/>
-              <string name='referencedNodeId' value='1002'/>
-              <string name='referencedPortName' value='output'/>
-            </PortRange>
-            <PortRange>
-              <int name='startIndex' value='0'/>
-              <int name='numValues' value='3'/>
-              <bool name='isFixedSize' value='false'/>
-              <string name='referencedNodeId' value='1003'/>
-              <string name='referencedPortName' value='output'/>
-            </PortRange>
-            <PortRange>
-              <int name='startIndex' value='0'/>
-              <int name='numValues' value='3'/>
-              <bool name='isFixedSize' value='false'/>
-              <string name='referencedNodeId' value='1004'/>
-              <string name='referencedPortName' value='output'/>
-            </PortRange>
-          </Array>
-        </PortElementsBase>
-      </InputPort(double)>
-      <OutputPort(double) name='output'>
-        <string name='nodeId' value='1005'/>
+        <string name='nodeId' value='1008'/>
         <string name='name' value='output'/>
         <int name='type' value='1'/>
         <int name='size' value='1'/>
       </OutputPort(double)>
-      <OutputPort(double) name='weightedElements'>
-        <string name='nodeId' value='1005'/>
-        <string name='name' value='weightedElements'/>
+    </L2NormNode(double)>
+    <L2NormNode(double)>
+      <string name='id' value='1009'/>
+      <InputPort(double) name='input'>
+        <string name='nodeId' value='1009'/>
+        <string name='name' value='input'/>
         <int name='type' value='1'/>
-        <int name='size' value='12'/>
-      </OutputPort(double)>
-      <LinearPredictor name='predictor'>
-        <Array name='w' type='float'>
-          <float value='0.000000'/> <float value='1.000000'/> <float value='2.000000'/> <float value='3.000000'/> <float value='4.000000'/> <float value='0.000000'/> <float value='1.000000'/> <float value='2.000000'/> <float value='3.000000'/> <float value='4.000000'/> <float value='0.000000'/> <float value='1.000000'/> 
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1006'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
           </Array>
-        <float name='b' value='0.000000'/>
-      </LinearPredictor>
-    </LinearPredictorNode>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1009'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='1'/>
+      </OutputPort(double)>
+    </L2NormNode(double)>
+    <MovingAverageNode(double)>
+      <string name='id' value='1010'/>
+      <InputPort(double) name='input'>
+        <string name='nodeId' value='1010'/>
+        <string name='name' value='input'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='1'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1009'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1010'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='1'/>
+      </OutputPort(double)>
+      <int name='windowSize' value='8'/>
+    </MovingAverageNode(double)>
+    <BinaryOperationNode(double)>
+      <string name='id' value='1011'/>
+      <InputPort(double) name='input1'>
+        <string name='nodeId' value='1011'/>
+        <string name='name' value='input1'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='1'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1008'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <InputPort(double) name='input2'>
+        <string name='nodeId' value='1011'/>
+        <string name='name' value='input2'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='1'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1010'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1011'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='1'/>
+      </OutputPort(double)>
+      <string name='operation' value='subtract'/>
+    </BinaryOperationNode(double)>
   </Array>
 </Model>

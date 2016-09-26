@@ -2,14 +2,27 @@
 # SWIG example projects
 #
 
-set (DATA_FILES model_1.json model_1.xml tree_3.json tree_3.xml)
+set (MODEL_FILES model_1.json 
+                 model_2.json
+                 model_3.json
+                 tree_0.json
+                 tree_1.json
+                 tree_2.json
+                 tree_3.json
+                 model_1.xml
+                 model_2.xml
+                 model_3.xml
+                 tree_0.xml
+                 tree_1.xml
+                 tree_2.xml
+                 tree_3.xml)
+set (DATA_FILES ${MODEL_FILES} testData.txt tinyTestData.txt)
 add_custom_target(datafiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
 
-
-# copy python example code
+# copy example data
 foreach(DATA_FILE ${DATA_FILES})
-    add_custom_command(TARGET datafiles POST_BUILD
+    add_custom_command(TARGET datafiles 
+                    POST_BUILD
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-                    COMMAND ${CMAKE_COMMAND}
-                    -E copy ${DATA_FILE} ${CMAKE_CURRENT_BINARY_DIR})
+                    COMMAND ${CMAKE_COMMAND} -E copy ${DATA_FILE} ${CMAKE_CURRENT_BINARY_DIR})
 endforeach()

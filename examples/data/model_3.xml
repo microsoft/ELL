@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<emll version="1.0">
+<Model>
+  <Array name='nodes' type='Node'>
+    <InputNode(double)>
+      <string name='id' value='1012'/>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1012'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='3'/>
+      </OutputPort(double)>
+    </InputNode(double)>
+    <MovingAverageNode(double)>
+      <string name='id' value='1013'/>
+      <InputPort(double) name='input'>
+        <string name='nodeId' value='1013'/>
+        <string name='name' value='input'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1012'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1013'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='3'/>
+      </OutputPort(double)>
+      <int name='windowSize' value='16'/>
+    </MovingAverageNode(double)>
+    <BinaryOperationNode(double)>
+      <string name='id' value='1014'/>
+      <InputPort(double) name='input1'>
+        <string name='nodeId' value='1014'/>
+        <string name='name' value='input1'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1012'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <InputPort(double) name='input2'>
+        <string name='nodeId' value='1014'/>
+        <string name='name' value='input2'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1013'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1014'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='3'/>
+      </OutputPort(double)>
+      <string name='operation' value='subtract'/>
+    </BinaryOperationNode(double)>
+    <DelayNode(double)>
+      <string name='id' value='1015'/>
+      <InputPort(double) name='input'>
+        <string name='nodeId' value='1015'/>
+        <string name='name' value='input'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1014'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1015'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='3'/>
+      </OutputPort(double)>
+      <int name='windowSize' value='4'/>
+    </DelayNode(double)>
+    <DotProductNode(double)>
+      <string name='id' value='1017'/>
+      <InputPort(double) name='input1'>
+        <string name='nodeId' value='1017'/>
+        <string name='name' value='input1'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1014'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <InputPort(double) name='input2'>
+        <string name='nodeId' value='1017'/>
+        <string name='name' value='input2'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1015'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1017'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='1'/>
+      </OutputPort(double)>
+    </DotProductNode(double)>
+    <DelayNode(double)>
+      <string name='id' value='1016'/>
+      <InputPort(double) name='input'>
+        <string name='nodeId' value='1016'/>
+        <string name='name' value='input'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1014'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1016'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='3'/>
+      </OutputPort(double)>
+      <int name='windowSize' value='8'/>
+    </DelayNode(double)>
+    <DotProductNode(double)>
+      <string name='id' value='1018'/>
+      <InputPort(double) name='input1'>
+        <string name='nodeId' value='1018'/>
+        <string name='name' value='input1'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1014'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <InputPort(double) name='input2'>
+        <string name='nodeId' value='1018'/>
+        <string name='name' value='input2'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='3'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1016'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1018'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='1'/>
+      </OutputPort(double)>
+    </DotProductNode(double)>
+    <BinaryOperationNode(double)>
+      <string name='id' value='1019'/>
+      <InputPort(double) name='input1'>
+        <string name='nodeId' value='1019'/>
+        <string name='name' value='input1'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='1'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1017'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <InputPort(double) name='input2'>
+        <string name='nodeId' value='1019'/>
+        <string name='name' value='input2'/>
+        <int name='type' value='1'/>
+        <PortElementsBase name='input'>
+          <Array name='ranges' type='PortRange'>
+            <PortRange>
+              <int name='startIndex' value='0'/>
+              <int name='numValues' value='1'/>
+              <bool name='isFixedSize' value='false'/>
+              <string name='referencedNodeId' value='1018'/>
+              <string name='referencedPortName' value='output'/>
+            </PortRange>
+          </Array>
+        </PortElementsBase>
+      </InputPort(double)>
+      <OutputPort(double) name='output'>
+        <string name='nodeId' value='1019'/>
+        <string name='name' value='output'/>
+        <int name='type' value='1'/>
+        <int name='size' value='1'/>
+      </OutputPort(double)>
+      <string name='operation' value='subtract'/>
+    </BinaryOperationNode(double)>
+  </Array>
+</Model>

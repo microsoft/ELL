@@ -1,0 +1,87 @@
+{
+  "_type": "Model",
+  "nodes": [{
+    "_type": "InputNode<double>",
+    "id": "1048",
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": "1048",
+      "name": "output",
+      "type": 1,
+      "size": 3
+    }
+  }, 
+{
+    "_type": "ForestPredictorNode<SingleElementThresholdPredictor,ConstantPredictor>",
+    "id": "1049",
+    "input": {
+      "_type": "InputPort<double>",
+      "nodeId": "1049",
+      "name": "input",
+      "type": 1,
+      "input": {
+        "_type": "PortElementsBase",
+        "ranges": [{
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": "1048",
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": "1049",
+      "name": "output",
+      "type": 1,
+      "size": 1
+    },
+    "treeOutputs": {
+      "_type": "OutputPort<double>",
+      "nodeId": "1049",
+      "name": "treeOutputs",
+      "type": 1,
+      "size": 1
+    },
+    "edgeIndicatorVector": {
+      "_type": "OutputPort<bool>",
+      "nodeId": "1049",
+      "name": "edgeIndicatorVector",
+      "type": 4,
+      "size": 2
+    },
+    "forest": {
+      "_type": "ForestPredictor<SingleElementThresholdPredictor,ConstantPredictor>",
+      "interiorNodes": [{
+        "_type": "InteriorNode",
+        "splitRule": {
+          "_type": "SingleElementThresholdPredictor",
+          "index": 0,
+          "threshold": 0
+        },
+        "outgoingEdges": [{
+          "_type": "Edge",
+          "predictor": {
+            "_type": "ConstantPredictor",
+            "value": -1
+          },
+          "targetNodeIndex": 0
+        }, 
+{
+          "_type": "Edge",
+          "predictor": {
+            "_type": "ConstantPredictor",
+            "value": 1
+          },
+          "targetNodeIndex": 0
+        }]
+        "firstEdgeIndex": 0
+      }]
+      "rootIndices": [      0]
+      "bias": 0,
+      "numEdges": 2
+    }
+  }]
+}
