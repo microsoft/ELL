@@ -1,6 +1,7 @@
 {
   "_type": "Model",
-  "nodes": [{
+  "nodes": [
+  {
     "_type": "InputNode<double>",
     "id": "1040",
     "output": {
@@ -11,7 +12,7 @@
       "size": 3
     }
   }, 
-{
+  {
     "_type": "MovingAverageNode<double>",
     "id": "1041",
     "input": {
@@ -21,7 +22,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -40,7 +42,7 @@
     },
     "windowSize": 16
   }, 
-{
+  {
     "_type": "BinaryOperationNode<double>",
     "id": "1042",
     "input1": {
@@ -50,7 +52,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -67,7 +70,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -86,7 +90,7 @@
     },
     "operation": "subtract"
   }, 
-{
+  {
     "_type": "DelayNode<double>",
     "id": "1043",
     "input": {
@@ -96,7 +100,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -115,7 +120,7 @@
     },
     "windowSize": 4
   }, 
-{
+  {
     "_type": "DotProductNode<double>",
     "id": "1045",
     "input1": {
@@ -125,7 +130,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -142,7 +148,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -160,7 +167,7 @@
       "size": 1
     }
   }, 
-{
+  {
     "_type": "DelayNode<double>",
     "id": "1044",
     "input": {
@@ -170,7 +177,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -189,7 +197,7 @@
     },
     "windowSize": 8
   }, 
-{
+  {
     "_type": "DotProductNode<double>",
     "id": "1046",
     "input1": {
@@ -199,7 +207,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -216,7 +225,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -234,7 +244,7 @@
       "size": 1
     }
   }, 
-{
+  {
     "_type": "BinaryOperationNode<double>",
     "id": "1047",
     "input1": {
@@ -244,7 +254,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 1,
@@ -261,7 +272,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 1,

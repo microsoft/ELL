@@ -1,6 +1,7 @@
 {
   "_type": "Model",
-  "nodes": [{
+  "nodes": [
+  {
     "_type": "InputNode<double>",
     "id": "1054",
     "output": {
@@ -11,7 +12,7 @@
       "size": 3
     }
   }, 
-{
+  {
     "_type": "ForestPredictorNode<SingleElementThresholdPredictor,ConstantPredictor>",
     "id": "1055",
     "input": {
@@ -21,7 +22,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -54,14 +56,16 @@
     },
     "forest": {
       "_type": "ForestPredictor<SingleElementThresholdPredictor,ConstantPredictor>",
-      "interiorNodes": [{
+      "interiorNodes": [
+      {
         "_type": "InteriorNode",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
           "index": 0,
           "threshold": 0
         },
-        "outgoingEdges": [{
+        "outgoingEdges": [
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
@@ -69,24 +73,25 @@
           },
           "targetNodeIndex": 1
         }, 
-{
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
             "value": 1
           },
           "targetNodeIndex": 2
-        }]
+        }],
         "firstEdgeIndex": 0
       }, 
-{
+      {
         "_type": "InteriorNode",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
           "index": 0,
           "threshold": 0
         },
-        "outgoingEdges": [{
+        "outgoingEdges": [
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
@@ -94,24 +99,25 @@
           },
           "targetNodeIndex": 0
         }, 
-{
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
             "value": 1
           },
           "targetNodeIndex": 0
-        }]
+        }],
         "firstEdgeIndex": 2
       }, 
-{
+      {
         "_type": "InteriorNode",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
           "index": 0,
           "threshold": 0
         },
-        "outgoingEdges": [{
+        "outgoingEdges": [
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
@@ -119,24 +125,25 @@
           },
           "targetNodeIndex": 3
         }, 
-{
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
             "value": 1
           },
           "targetNodeIndex": 4
-        }]
+        }],
         "firstEdgeIndex": 4
       }, 
-{
+      {
         "_type": "InteriorNode",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
           "index": 0,
           "threshold": 0
         },
-        "outgoingEdges": [{
+        "outgoingEdges": [
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
@@ -144,24 +151,25 @@
           },
           "targetNodeIndex": 0
         }, 
-{
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
             "value": 1
           },
           "targetNodeIndex": 0
-        }]
+        }],
         "firstEdgeIndex": 6
       }, 
-{
+      {
         "_type": "InteriorNode",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
           "index": 0,
           "threshold": 0
         },
-        "outgoingEdges": [{
+        "outgoingEdges": [
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
@@ -169,24 +177,25 @@
           },
           "targetNodeIndex": 5
         }, 
-{
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
             "value": 1
           },
           "targetNodeIndex": 6
-        }]
+        }],
         "firstEdgeIndex": 8
       }, 
-{
+      {
         "_type": "InteriorNode",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
           "index": 0,
           "threshold": 0
         },
-        "outgoingEdges": [{
+        "outgoingEdges": [
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
@@ -194,24 +203,25 @@
           },
           "targetNodeIndex": 0
         }, 
-{
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
             "value": 1
           },
           "targetNodeIndex": 0
-        }]
+        }],
         "firstEdgeIndex": 10
       }, 
-{
+      {
         "_type": "InteriorNode",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
           "index": 0,
           "threshold": 0
         },
-        "outgoingEdges": [{
+        "outgoingEdges": [
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
@@ -219,17 +229,17 @@
           },
           "targetNodeIndex": 0
         }, 
-{
+        {
           "_type": "Edge",
           "predictor": {
             "_type": "ConstantPredictor",
             "value": 1
           },
           "targetNodeIndex": 0
-        }]
+        }],
         "firstEdgeIndex": 12
-      }]
-      "rootIndices": [      0]
+      }],
+      "rootIndices": [0],
       "bias": 0,
       "numEdges": 14
     }

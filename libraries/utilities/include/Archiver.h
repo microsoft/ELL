@@ -356,19 +356,23 @@ namespace utilities
         void UnarchiveItem(const char* name, std::vector<const ValueType*>& value);
     };
 
-    /// <summary> Utility functions useful to archivers and unarchivers </summary>
+    //
+    // Utility functions useful to archivers and unarchivers
+    //
 
+    /// <summary> Returns type name used for serialization </summary>
+    ///
+    /// <typeparam name="T"> The type to serialize </typeparam>
+    /// <returns> The name to use when serializing type `T` </returns>
     template <typename T>
     std::string GetArchivedTypeName();
 
-    // template <typename T>
-    // std::string GetArchivedTypeName(IsIntegral<T> concept = true);
-
-    // template <typename T>
-    // std::string GetArchivedTypeName(IsFloatingPoint<T> concept = true);
-
+    /// <summary> Returns type name used for serialization of a (potentially-)polymorphic object </summary>
+    ///
+    /// <param name="value"> The value to serialize </param>
+    /// <returns> The name to use when serializing the value </returns>
     template <typename T>
-    std::string GetArchivedTypeName(const T& obj);
+    std::string GetArchivedTypeName(const T& value);
 
 /// <summary> Macros to make repetitive boilerplate code in archiver implementations easier to implement. </summary>
 #define IMPLEMENT_ARCHIVE_VALUE(base, type) \

@@ -1,6 +1,7 @@
 {
   "_type": "Model",
-  "nodes": [{
+  "nodes": [
+  {
     "_type": "InputNode<double>",
     "id": "1034",
     "output": {
@@ -11,7 +12,7 @@
       "size": 3
     }
   }, 
-{
+  {
     "_type": "MovingAverageNode<double>",
     "id": "1035",
     "input": {
@@ -21,7 +22,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -40,7 +42,7 @@
     },
     "windowSize": 8
   }, 
-{
+  {
     "_type": "L2NormNode<double>",
     "id": "1036",
     "input": {
@@ -50,7 +52,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -68,7 +71,7 @@
       "size": 1
     }
   }, 
-{
+  {
     "_type": "L2NormNode<double>",
     "id": "1037",
     "input": {
@@ -78,7 +81,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -96,7 +100,7 @@
       "size": 1
     }
   }, 
-{
+  {
     "_type": "MovingAverageNode<double>",
     "id": "1038",
     "input": {
@@ -106,7 +110,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 1,
@@ -125,7 +130,7 @@
     },
     "windowSize": 8
   }, 
-{
+  {
     "_type": "BinaryOperationNode<double>",
     "id": "1039",
     "input1": {
@@ -135,7 +140,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 1,
@@ -152,7 +158,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 1,

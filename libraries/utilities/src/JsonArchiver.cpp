@@ -53,9 +53,10 @@ namespace utilities
         bool hasName = name != std::string("");
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
+        _out << indent;
         if (hasName)
         {
-            _out << indent << "\"" << name << "\": ";
+            _out << "\"" << name << "\": ";
         }
         _out << "{\n";
         _out << indent << "  \"_type\": \"" << GetArchivedTypeName(value) << "\"";
@@ -108,7 +109,7 @@ namespace utilities
             _out << "\"" << name << "\": ";
         }
 
-        _out << "[";
+        _out << "[\n";
 
         auto numItems = array.size();
         for (size_t index = 0; index < numItems; ++index)
@@ -120,6 +121,7 @@ namespace utilities
             }
         }
         _out << "]";
+       SetEndOfLine(",\n");
     }
 
     void JsonArchiver::Indent()

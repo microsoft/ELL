@@ -265,9 +265,9 @@ namespace utilities
         return ArchiverImpl::GetTypeName<T>(true);
     }
     template <typename T>
-    std::string GetArchivedTypeName(const T& obj)
+    std::string GetArchivedTypeName(const T& value)
     {
-        return obj.GetRuntimeTypeName();
+        return value.GetRuntimeTypeName();
     }
 }
 }

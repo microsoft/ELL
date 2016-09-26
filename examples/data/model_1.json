@@ -1,6 +1,7 @@
 {
   "_type": "Model",
-  "nodes": [{
+  "nodes": [
+  {
     "_type": "InputNode<double>",
     "id": "1028",
     "output": {
@@ -11,7 +12,7 @@
       "size": 3
     }
   }, 
-{
+  {
     "_type": "MovingAverageNode<double>",
     "id": "1029",
     "input": {
@@ -21,7 +22,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -40,7 +42,7 @@
     },
     "windowSize": 8
   }, 
-{
+  {
     "_type": "MovingVarianceNode<double>",
     "id": "1032",
     "input": {
@@ -50,7 +52,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -69,7 +72,7 @@
     },
     "windowSize": 16
   }, 
-{
+  {
     "_type": "MovingAverageNode<double>",
     "id": "1031",
     "input": {
@@ -79,7 +82,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -98,7 +102,7 @@
     },
     "windowSize": 16
   }, 
-{
+  {
     "_type": "MovingVarianceNode<double>",
     "id": "1030",
     "input": {
@@ -108,7 +112,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -127,7 +132,7 @@
     },
     "windowSize": 8
   }, 
-{
+  {
     "_type": "LinearPredictorNode",
     "id": "1033",
     "input": {
@@ -137,7 +142,8 @@
       "type": 1,
       "input": {
         "_type": "PortElementsBase",
-        "ranges": [{
+        "ranges": [
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -145,7 +151,7 @@
           "referencedNodeId": "1029",
           "referencedPortName": "output"
         }, 
-{
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -153,7 +159,7 @@
           "referencedNodeId": "1030",
           "referencedPortName": "output"
         }, 
-{
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -161,7 +167,7 @@
           "referencedNodeId": "1031",
           "referencedPortName": "output"
         }, 
-{
+        {
           "_type": "PortRange",
           "startIndex": 0,
           "numValues": 3,
@@ -187,7 +193,7 @@
     },
     "predictor": {
       "_type": "LinearPredictor",
-      "w": [      0,       1,       2,       3,       4,       0,       1,       2,       3,       4,       0,       1]
+      "w": [0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1],
       "b": 0
     }
   }]
