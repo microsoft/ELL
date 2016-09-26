@@ -26,6 +26,15 @@ namespace emll
 {
 namespace nodes
 {
+    /// <summary> Types of unary operations supported by this node type. </summary>
+    enum class UnaryOperationType
+    {
+        none,
+        sqrt, // real only
+        logicalNot // bool only
+    };
+    std::string to_string(UnaryOperationType op);
+    
     /// <summary> A node that represents a unary function of its input </summary>
     template <typename ValueType>
     class UnaryOperationNode : public model::Node
@@ -38,14 +47,6 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
-        /// <summary> Types of unary operations supported by this node type. </summary>
-        enum class OperationType
-        {
-            none,
-            sqrt, // real only
-            logicalNot // bool only
-        };
-
         /// <summary> Default Constructor </summary>
         UnaryOperationNode();
 
@@ -53,7 +54,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to process. </param>
         /// <param name="operation"> The function to use to process the signal. </param>
-        UnaryOperationNode(const model::PortElements<ValueType>& input, OperationType operation);
+        UnaryOperationNode(const model::PortElements<ValueType>& input, UnaryOperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -78,8 +79,8 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-		/// <summary>Gets the operation type</summary>
-		OperationType GetOperationType() const { return _operation; }
+        /// <summary>Gets the operation type</summary>
+        UnaryOperationType GetOperationType() const { return _operation; }
 
     protected:
         virtual void Compute() const override;
@@ -95,7 +96,7 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         // Operation
-        OperationType _operation;
+        UnaryOperationType _operation;
     };
 }
 }

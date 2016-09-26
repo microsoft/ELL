@@ -82,7 +82,9 @@ namespace common
         auto mean2 = model.AddNode<nodes::MovingAverageNode<double>>(mag2->output, 8);
 
         // combine them
-        auto diff = model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
+        model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationType::subtract);
+
+        //        auto output = model.AddNode<model::OutputNode<double>>(maxVal->val);
         return model;
     }
 
@@ -92,7 +94,7 @@ namespace common
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
         auto lowpass = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 16);
-        auto highpass = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, lowpass->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
+        auto highpass = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, lowpass->output, nodes::BinaryOperationType::subtract);
 
         auto delay1 = model.AddNode<nodes::DelayNode<double>>(highpass->output, 4);
         auto delay2 = model.AddNode<nodes::DelayNode<double>>(highpass->output, 8);
@@ -100,7 +102,9 @@ namespace common
         auto dot1 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay1->output);
         auto dot2 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay2->output);
 
-        auto dotDifference = model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
+        model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationType::subtract);
+
+        //        auto output = model.AddNode<model::OutputNode<double>>(classifierNode->output);
         return model;
     }
 

@@ -12,6 +12,33 @@ namespace nodes
 {
     namespace UnaryOperations
     {
+        inline std::string to_string(UnaryOperationType op)
+        {
+            switch (op)
+            {
+                case UnaryOperationType::none:
+                    return "none";
+                case UnaryOperationType::sqrt:
+                    return "sqrt";
+                case UnaryOperationType::logicalNot:
+                    return "logicalNot";
+                default:
+                    throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
+            }
+        }
+
+        inline UnaryOperationType from_string(std::string opName)
+        {
+            if (opName == "none")
+                return UnaryOperationType::none;
+            else if (opName == "sqrt")
+                return UnaryOperationType::sqrt;
+            else if (opName == "logicalNot")
+                return UnaryOperationType::logicalNot;
+
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
+        }
+
         template <typename ValueType>
         ValueType Sqrt(ValueType a)
         {
@@ -39,12 +66,12 @@ namespace nodes
 
     template <typename ValueType>
     UnaryOperationNode<ValueType>::UnaryOperationNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _operation(OperationType::none)
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _operation(UnaryOperationType::none)
     {
     }
 
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::PortElements<ValueType>& input, OperationType operation)
+    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::PortElements<ValueType>& input, UnaryOperationType operation)
         : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _operation(operation)
     {
     }
@@ -67,12 +94,12 @@ namespace nodes
         std::vector<ValueType> output;
         switch (_operation)
         {
-            case OperationType::sqrt:
+            case UnaryOperationType::sqrt:
             {
                 output = ComputeOutput(UnaryOperations::Sqrt<ValueType>);
             }
             break;
-            case OperationType::logicalNot:
+            case UnaryOperationType::logicalNot:
             {
                 output = ComputeOutput(UnaryOperations::LogicalNot<ValueType>);
             }
@@ -98,7 +125,7 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
-        archiver["operation"] << static_cast<int>(_operation);
+        archiver["operation"] << UnaryOperations::to_string(_operation);
     }
 
     template <typename ValueType>
@@ -107,9 +134,9 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
-        int operation = 0;
+        std::string operation;
         archiver["operation"] >> operation;
-        _operation = static_cast<OperationType>(operation);
+        _operation = UnaryOperations::from_string(operation);
     }
 }
 }

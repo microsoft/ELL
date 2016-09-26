@@ -69,12 +69,12 @@ namespace model
         archiver["isFixedSize"] << _isFixedSize;
         if (_referencedPort != nullptr)
         {
-            archiver["referencedNodeId"] << _referencedPort->GetNode()->GetId();
+            archiver["referencedNodeId"] << to_string(_referencedPort->GetNode()->GetId());
             archiver["referencedPortName"] << _referencedPort->GetName();
         }
         else
         {
-            archiver["referencedNodeId"] << utilities::UniqueId();
+            archiver["referencedNodeId"] << to_string(utilities::UniqueId()); // ?
             archiver["referencedPortName"] << std::string{ "" };
         }
     }
@@ -84,8 +84,9 @@ namespace model
         archiver["startIndex"] >> _startIndex;
         archiver["numValues"] >> _numValues;
         archiver["isFixedSize"] >> _isFixedSize;
-        Node::NodeId newId;
-        archiver["referencedNodeId"] >> newId;
+        std::string newIdString;
+        archiver["referencedNodeId"] >> newIdString;
+        Node::NodeId newId(newIdString);
         std::string portName;
         archiver["referencedPortName"] >> portName;
 

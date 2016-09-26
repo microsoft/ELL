@@ -25,6 +25,21 @@ namespace emll
 {
 namespace nodes
 {
+    /// <summary> Types of coordinatewise operations supported by this node type. </summary>
+    enum class BinaryOperationType
+    {
+        none,
+        add,
+        subtract,
+        coordinatewiseMultiply, // coordinatewise multiplication
+        divide, // coordinatewise division
+        logicalAnd,
+        logicalOr,
+        logicalXor
+    };
+
+    std::string to_string(BinaryOperationType op);
+
     /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs. </summary>
     template <typename ValueType>
     class BinaryOperationNode : public model::Node
@@ -38,19 +53,6 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
-        /// <summary> Types of coordinatewise operations supported by this node type. </summary>
-        enum class OperationType
-        {
-            none,
-            add,
-            subtract,
-            coordinatewiseMultiply, // coordinatewise multiplication
-            divide, // coordinatewise division
-            logicalAnd,
-            logicalOr,
-            logicalXor
-        };
-
         /// <summary> Default Constructor </summary>
         BinaryOperationNode();
 
@@ -59,7 +61,7 @@ namespace nodes
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
         /// <param name="operation"> The type of operation to perform. </param>
-        BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, OperationType operation);
+        BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, BinaryOperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -84,8 +86,8 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-		/// <summary>Return the operation performed by this node</summary>
-		OperationType GetOperation() const { return _operation; }
+        /// <summary>Return the operation performed by this node</summary>
+        BinaryOperationType GetOperation() const { return _operation; }
 
     protected:
         virtual void Compute() const override;
@@ -102,7 +104,7 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         // Operation
-        OperationType _operation;
+        BinaryOperationType _operation;
     };
 }
 }

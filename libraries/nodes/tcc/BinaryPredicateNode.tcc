@@ -12,6 +12,48 @@ namespace nodes
 {
     namespace BinaryPredicates
     {
+        inline std::string to_string(BinaryPredicateType op)
+        {
+            switch (op)
+            {
+                case BinaryPredicateType::none:
+                    return "none";
+                case BinaryPredicateType::equal:
+                    return "equal";
+                case BinaryPredicateType::less:
+                    return "less";
+                case BinaryPredicateType::greater:
+                    return "greater";
+                case BinaryPredicateType::notEqual:
+                    return "notEqual";
+                case BinaryPredicateType::lessOrEqual:
+                    return "lessOrEqual";
+                case BinaryPredicateType::greaterOrEqual:
+                    return "greaterOrEqual";
+                default:
+                    throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
+            }
+        }
+        inline BinaryPredicateType from_string(std::string opName)
+        {
+            if (opName == "none")
+                return BinaryPredicateType::none;
+            else if (opName == "equal")
+                return BinaryPredicateType::equal;
+            else if (opName == "less")
+                return BinaryPredicateType::less;
+            else if (opName == "greater")
+                return BinaryPredicateType::greater;
+            else if (opName == "notEqual")
+                return BinaryPredicateType::notEqual;
+            else if (opName == "lessOrEqual")
+                return BinaryPredicateType::lessOrEqual;
+            else if (opName == "greaterOrEqual")
+                return BinaryPredicateType::greaterOrEqual;
+
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
+        }
+
         template <typename ValueType>
         bool Equal(ValueType a, ValueType b)
         {
@@ -51,12 +93,12 @@ namespace nodes
 
     template <typename ValueType>
     BinaryPredicateNode<ValueType>::BinaryPredicateNode()
-        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _predicate(PredicateType::none)
+        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _predicate(BinaryPredicateType::none)
     {
     }
 
     template <typename ValueType>
-    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, PredicateType predicate)
+    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, BinaryPredicateType predicate)
         : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _predicate(predicate)
     {
         if (input1.Size() != input2.Size())
@@ -84,22 +126,22 @@ namespace nodes
         std::vector<bool> output;
         switch (_predicate)
         {
-            case PredicateType::equal:
+            case BinaryPredicateType::equal:
                 output = ComputeOutput(BinaryPredicates::Equal<ValueType>);
                 break;
-            case PredicateType::less:
+            case BinaryPredicateType::less:
                 output = ComputeOutput(BinaryPredicates::Less<ValueType>);
                 break;
-            case PredicateType::greater:
+            case BinaryPredicateType::greater:
                 output = ComputeOutput(BinaryPredicates::Greater<ValueType>);
                 break;
-            case PredicateType::notEqual:
+            case BinaryPredicateType::notEqual:
                 output = ComputeOutput(BinaryPredicates::NotEqual<ValueType>);
                 break;
-            case PredicateType::lessOrEqual:
+            case BinaryPredicateType::lessOrEqual:
                 output = ComputeOutput(BinaryPredicates::LessOrEqual<ValueType>);
                 break;
-            case PredicateType::greaterOrEqual:
+            case BinaryPredicateType::greaterOrEqual:
                 output = ComputeOutput(BinaryPredicates::GreaterOrEqual<ValueType>);
                 break;
             default:
@@ -115,7 +157,7 @@ namespace nodes
         archiver[input1PortName] << _input1;
         archiver[input2PortName] << _input2;
         archiver[outputPortName] << _output;
-        archiver["predicate"] << static_cast<int>(_predicate);
+        archiver["predicate"] << BinaryPredicates::to_string(_predicate);
     }
 
     template <typename ValueType>
@@ -125,9 +167,9 @@ namespace nodes
         archiver[input1PortName] >> _input1;
         archiver[input2PortName] >> _input2;
         archiver[outputPortName] >> _output;
-        int predicate = 0;
+        std::string predicate;
         archiver["predicate"] >> predicate;
-        _predicate = static_cast<PredicateType>(predicate);
+        _predicate = BinaryPredicates::from_string(predicate);
     }
 
     template <typename ValueType>

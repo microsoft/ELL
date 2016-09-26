@@ -48,7 +48,7 @@ namespace nodes
         // Maybe... in reality, dot product will likely want to be computed as in Compute() above
         auto newInput1 = transformer.TransformPortElements(_input1.GetPortElements());
         auto newInput2 = transformer.TransformPortElements(_input2.GetPortElements());
-        auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, BinaryOperationNode<ValueType>::OperationType::coordinatewiseMultiply);
+        auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newInput1, newInput2, BinaryOperationType::coordinatewiseMultiply);
         auto sumNode = transformer.AddNode<SumNode<ValueType>>(multNode->output);
 
         transformer.MapNodeOutput(output, sumNode->output);
