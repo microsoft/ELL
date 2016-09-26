@@ -105,14 +105,14 @@ namespace model
 
     void Node::WriteToArchive(utilities::Archiver& archiver) const
     {
-        archiver["id"] << _id;
+        archiver["id"] << std::to_string(_id);
     }
 
     void Node::ReadFromArchive(utilities::Unarchiver& archiver)
     {
+        std::string oldIdString;
+        archiver["id"] >> oldIdString;
         NodeId oldId;
-        archiver["id"] >> oldId;
-        _id = oldId;
         auto& context = archiver.GetContext();
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         newContext.MapNode(oldId, this);
