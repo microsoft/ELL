@@ -33,7 +33,6 @@ namespace nodes
         sqrt, // real only
         logicalNot // bool only
     };
-    std::string to_string(UnaryOperationType op);
     
     /// <summary> A node that represents a unary function of its input </summary>
     template <typename ValueType>

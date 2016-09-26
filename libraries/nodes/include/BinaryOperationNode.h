@@ -38,8 +38,6 @@ namespace nodes
         logicalXor
     };
 
-    std::string to_string(BinaryOperationType op);
-
     /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs. </summary>
     template <typename ValueType>
     class BinaryOperationNode : public model::Node
