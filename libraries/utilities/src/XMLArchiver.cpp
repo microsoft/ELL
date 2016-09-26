@@ -67,7 +67,7 @@ namespace utilities
     void XmlArchiver::BeginArchiveObject(const char* name, const IArchivable& value)
     {
         auto indent = GetCurrentIndent();
-        auto typeName = XmlUtilities::EncodeTypeName(value.GetRuntimeTypeName());
+        auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName(value));
 
         _out << indent;
         _out << "<" << typeName;
@@ -84,7 +84,7 @@ namespace utilities
     {
         DecrementIndent();
         auto indent = GetCurrentIndent();
-        auto typeName = XmlUtilities::EncodeTypeName(value.GetRuntimeTypeName());
+        auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName(value));
         _out << indent;
         _out << "</" << typeName << ">" << std::endl;
     }

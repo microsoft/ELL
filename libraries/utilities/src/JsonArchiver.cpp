@@ -58,7 +58,7 @@ namespace utilities
             _out << indent << "\"" << name << "\": ";
         }
         _out << "{\n";
-        _out << indent << "  \"_type\": \"" << value.GetRuntimeTypeName() << "\"";
+        _out << indent << "  \"_type\": \"" << GetArchivedTypeName(value) << "\"";
         SetEndOfLine(",\n");
         FinishPreviousLine();
         IncrementIndent();

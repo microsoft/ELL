@@ -18,6 +18,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace emll
@@ -354,7 +355,20 @@ namespace utilities
         template <typename ValueType, IsArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::vector<const ValueType*>& value);
     };
-}
+
+    /// <summary> Utility functions useful to archivers and unarchivers </summary>
+
+    template <typename T>
+    std::string GetArchivedTypeName();
+
+    // template <typename T>
+    // std::string GetArchivedTypeName(IsIntegral<T> concept = true);
+
+    // template <typename T>
+    // std::string GetArchivedTypeName(IsFloatingPoint<T> concept = true);
+
+    template <typename T>
+    std::string GetArchivedTypeName(const T& obj);
 
 /// <summary> Macros to make repetitive boilerplate code in archiver implementations easier to implement. </summary>
 #define IMPLEMENT_ARCHIVE_VALUE(base, type) \
@@ -367,6 +381,7 @@ namespace utilities
     void base::UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name, value); }
 #define IMPLEMENT_UNARCHIVE_ARRAY(base, type) \
     void base::UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name, value); }
+}
 }
 
 #include "../tcc/Archiver.tcc"
