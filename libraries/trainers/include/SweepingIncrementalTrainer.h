@@ -47,7 +47,7 @@ namespace trainers
         /// <summary> Perform a sequence of training epochs. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
+        virtual void Update(dataset::AutoSupervisedDataset::Iterator exampleIterator) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

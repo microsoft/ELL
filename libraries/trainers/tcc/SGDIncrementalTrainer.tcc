@@ -24,7 +24,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::AutoSupervisedDataset::Iterator exampleIterator)
     {
         UpdateSparse(std::move(exampleIterator));
     }
@@ -36,7 +36,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(dataset::AutoSupervisedDataset::Iterator exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();
@@ -95,7 +95,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(dataset::AutoSupervisedDataset::Iterator exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();

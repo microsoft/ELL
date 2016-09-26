@@ -158,11 +158,17 @@ namespace dataset
         size_t _maxExampleSize = 0;
     };
 
-    typedef RowDataset<AutoSupervisedExample> GenericRowDataset;
-    typedef GenericRowDataset::Iterator GenericRowIterator;
+    // friendly name
+    typedef RowDataset<AutoSupervisedExample> AutoSupervisedDataset;
 
+    /// <summary> Prints a row dataset to an ostream. </summary>
+    ///
+    /// <param name="os"> [in,out] The ostream to write data to. </param>
+    /// <param name="dataset"> The dataset. </param>
+    ///
+    /// <returns> The ostream. </returns>
     template <typename ExampleType>
-    std::ostream& operator<<(std::ostream& os, RowDataset<ExampleType>& dataset);
+    std::ostream& operator<<(std::ostream& os, const RowDataset<ExampleType>& dataset);
 }
 }
 

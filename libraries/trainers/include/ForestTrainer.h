@@ -122,7 +122,7 @@ namespace trainers
         /// <summary> Grows the decision forest. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
-        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
+        virtual void Update(dataset::AutoSupervisedDataset::Iterator exampleIterator) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
@@ -163,7 +163,7 @@ namespace trainers
         //
 
         // loads a dataset and initializes the currentOutput field in the metadata
-        void LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
+        void LoadData(dataset::AutoSupervisedDataset::Iterator exampleIterator);
 
         // performs an epoch of splits
         void PerformSplits(size_t maxSplits);

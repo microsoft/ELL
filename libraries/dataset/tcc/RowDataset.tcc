@@ -156,7 +156,7 @@ namespace dataset
     }
 
     template <typename ExampleType>
-    std::ostream& operator<<(std::ostream& os, RowDataset<ExampleType>& dataset)
+    std::ostream& operator<<(std::ostream& os, const RowDataset<ExampleType>& dataset)
     {
         dataset.Print(os);
         return os;

@@ -11,7 +11,7 @@ namespace emll
 namespace evaluators
 {
     template <typename BasePredictorType, typename... AggregatorTypes>
-    IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+    IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(dataset::AutoSupervisedDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
         : Evaluator<BasePredictorType, AggregatorTypes...>(exampleIterator, evaluatorParameters, aggregators...)
     {
         _predictions.resize(BaseClassType::_rowDataset.NumExamples());
@@ -61,7 +61,7 @@ namespace evaluators
     }
 
     template <typename BasePredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::AutoSupervisedDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
     {
         return std::make_unique<IncrementalEvaluator<BasePredictorType, AggregatorTypes...>>(exampleIterator, evaluatorParameters, aggregators...);
     }

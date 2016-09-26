@@ -35,6 +35,6 @@ namespace common
     /// <param name="dataLoadArguments"> The data load arguments. </param>
     ///
     /// <returns> The row dataset. </returns>
-    dataset::GenericRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments);
+    dataset::AutoSupervisedDataset GetRowDataset(const DataLoadArguments& dataLoadArguments);
 }
 }

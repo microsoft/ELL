@@ -41,10 +41,10 @@ namespace common
         return dataset::GetParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));
     }
 
-    dataset::GenericRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments)
+    dataset::AutoSupervisedDataset GetRowDataset(const DataLoadArguments& dataLoadArguments)
     {
         auto dataIterator = GetDataIterator(dataLoadArguments);
-        dataset::GenericRowDataset rowDataset;
+        dataset::AutoSupervisedDataset rowDataset;
         while (dataIterator->IsValid())
         {
             rowDataset.AddExample(dataIterator->Get());

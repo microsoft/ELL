@@ -65,7 +65,7 @@ namespace evaluators
         /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
         /// <param name="evaluatorParameters"> The evaluation parameters. </param>
         /// <param name="aggregators"> The aggregators. </param>
-        Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+        Evaluator(dataset::AutoSupervisedDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
         ///
@@ -106,7 +106,7 @@ namespace evaluators
         std::vector<std::vector<std::string>> DispatchGetValueNames(std::index_sequence<Sequence...>) const;
 
         // member variables
-        dataset::GenericRowDataset _rowDataset;
+        dataset::AutoSupervisedDataset _rowDataset;
         EvaluatorParameters _evaluatorParameters;
         uint64_t _evaluateCounter = 0;
         typename std::tuple<AggregatorTypes...> _aggregatorTuple;
@@ -122,7 +122,7 @@ namespace evaluators
     ///
     /// <returns> A shared_ptr to an IEvaluator. </returns>
     template <typename PredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::AutoSupervisedDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 }
 
