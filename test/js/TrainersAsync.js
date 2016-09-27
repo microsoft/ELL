@@ -32,14 +32,14 @@ if(dataset)
     console.log("Done training ....");
     tap.pass('Test SGDIncrementalTrianer');
     
-    /*console.log("Start get predictor ....");
+    console.log("Start get predictor ....");
     let pred = sgdIncrementalTrainer.GetPredictor();
     if(pred)
     {
       console.log(pred);
-      console.log("Predictor bias: " + pred.GetBias());
+      console.log("Linear Predictor weights: " + pred.GetWeights());
     }
-    console.log("End get predictor ....");*/
+    console.log("End get predictor ....");
   }
 }
 
