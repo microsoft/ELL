@@ -72,7 +72,7 @@ namespace model
         /// <param name="inputName"> The name assigned to the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
-        void SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues);
+        void SetInputValue(const std::string& inputName, const std::vector<ValueType>& inputValues);
 
         /// <summary> Set a single InputNode's input </summary>
         ///
@@ -80,7 +80,7 @@ namespace model
         /// <param name="inputName"> The name assigned to the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
-        void SetInput(size_t index, const std::vector<ValueType>& inputValues);
+        void SetInputValue(size_t index, const std::vector<ValueType>& inputValues);
 
         /// <summary> Set a single InputNode's input </summary>
         ///
@@ -88,7 +88,7 @@ namespace model
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
-        void SetInput(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues);
+        void SetInputValue(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues);
 
         /// <summary> Set a single InputNode's input </summary>
         ///
@@ -96,7 +96,7 @@ namespace model
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
-        void SetInput(size_t index, const dataset::DenseDataVector<ValueType>& inputValues);
+        void SetInputValue(size_t index, const dataset::DenseDataVector<ValueType>& inputValues);
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///

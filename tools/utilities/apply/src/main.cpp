@@ -74,17 +74,6 @@ int main(int argc, char* argv[])
         bool verbose = false;
         commandLineParser.AddOption(verbose, "verbose", "v", "Verbose mode", false);
 
-        // mapLoadArguments:
-
-        // TODO:
-        //
-        // apply with model + input/output PortElements-type representations
-        // apply with map + optional input name & output names (if not specified, use first input / output found)
-
-        // Also need a way to write out a map, given a model + inputs/outputs
-        // Maybe have outputMap and outputData options... if you are only outputting the map, you
-        // don't need to specify an input dataset
-
         // parse command line
         commandLineParser.Parse();
 
@@ -187,7 +176,7 @@ int main(int argc, char* argv[])
             // truncate to size of map input
             auto dataVec = row.GetDataVector();
             dataVec.Resize(mapInputSize);
-            map.SetInput<double>("input", dataVec);
+            map.SetInputValue<double>("input", dataVec);
             auto output = map.ComputeOutput<dataset::DoubleDataVector>("output");
             auto mappedRow = dataset::DenseSupervisedExample{ output, row.GetMetadata() };
             mappedRow.Print(outputStream);

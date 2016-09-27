@@ -69,6 +69,7 @@ set (TCC tcc/AnyIterator.tcc
          tcc/JsonArchiver.tcc
          tcc/ObjectArchive.tcc
          tcc/ObjectArchiver.tcc
+         tcc/OutputStreamImpostor.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
          tcc/StlIterator.tcc

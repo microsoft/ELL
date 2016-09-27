@@ -64,7 +64,6 @@ namespace common
             predictor.GetWeights()[index] = (double)(index % 5);
         }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
-        // auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->prediction);
         return model;
     }
 
@@ -84,8 +83,6 @@ namespace common
 
         // combine them
         auto diff = model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
-
-        //        auto output = model.AddNode<model::OutputNode<double>>(maxVal->val);
         return model;
     }
 
@@ -104,8 +101,6 @@ namespace common
         auto dot2 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay2->output);
 
         auto dotDifference = model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
-
-        //        auto output = model.AddNode<model::OutputNode<double>>(classifierNode->output);
         return model;
     }
 
@@ -140,7 +135,6 @@ namespace common
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
         auto simpleForestPredictorNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
-        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestPredictorNode->output);
         return model;
     }
 

@@ -96,7 +96,7 @@ namespace model
     }
 
     //
-    // SetInputs
+    // SetInputValues
     //
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <typename InputNodeType, typename InputType>
@@ -121,7 +121,7 @@ namespace model
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <typename... InputTypes>
-    void Map<InputTypesTuple, OutputTypesTuple>::SetInputs(std::vector<InputTypes>... inputs)
+    void Map<InputTypesTuple, OutputTypesTuple>::SetInputValues(std::vector<InputTypes>... inputs)
     {
         SetInputTuple(std::tuple<std::vector<InputTypes>...>(inputs...));
     }
@@ -138,15 +138,15 @@ namespace model
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::ComputeElementsHelper(std::index_sequence<Sequence...>, ComputeOutputType& outputValues) const
+    void Map<InputTypesTuple, OutputTypesTuple>::ComputeElementsHelper(std::index_sequence<Sequence...>, ComputedOutputType& outputValues) const
     {
         ComputeElements(std::get<Sequence>(_outputs)..., std::get<Sequence>(outputValues)...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    auto Map<InputTypesTuple, OutputTypesTuple>::ComputeOutput() const -> ComputeOutputType
+    auto Map<InputTypesTuple, OutputTypesTuple>::ComputeOutput() const -> ComputedOutputType
     {
-        ComputeOutputType result;
+        ComputedOutputType result;
         ComputeElementsHelper(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), result);
         return result;
     }

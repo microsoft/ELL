@@ -40,9 +40,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  add_compile_options(-std=c++14 -Wall)  # -Werror 
+  add_compile_options(-std=c++14 -Wall) 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++14 -Wall)  # -Werror
+  add_compile_options(-std=c++14 -Wall)
 elseif(MSVC)
   add_definitions(-DUNICODE)
   add_compile_options(/MP)

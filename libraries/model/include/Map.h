@@ -101,15 +101,15 @@ namespace model
         /// <typeparam name="InputTypes"> The datatypes of the input nodes </typeparam>
         /// <param name="inputs"> The inputs to be routed to the input nodes </param>
         template <typename... InputTypes>
-        void SetInputs(std::vector<InputTypes>... inputs);
+        void SetInputValues(std::vector<InputTypes>... inputs);
 
         /// <summary> Type alias for the tuple of vectors returned by `Compute` </summary>
-        using ComputeOutputType = utilities::WrappedTuple<OutputTypesTuple, StdVector>; // typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
+        using ComputedOutputType = utilities::WrappedTuple<OutputTypesTuple, StdVector>; // typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
 
         /// <summary> Computes the output of the map from its current input values </summary>
         ///
         /// <returns> A tuple of vectors of output values </returns>
-        ComputeOutputType ComputeOutput() const;
+        ComputedOutputType ComputeOutput() const;
 
         using DynamicMap::ComputeOutput;
 
@@ -179,7 +179,7 @@ namespace model
         void ComputeElements(PortElementsType& elements, OutputType& output) const;
 
         template <size_t... Sequence>
-        void ComputeElementsHelper(std::index_sequence<Sequence...>, ComputeOutputType& outputValues) const;
+        void ComputeElementsHelper(std::index_sequence<Sequence...>, ComputedOutputType& outputValues) const;
 
         // Serialization helpers
         void PopulateInputs();

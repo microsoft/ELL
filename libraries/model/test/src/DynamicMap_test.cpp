@@ -33,7 +33,7 @@
 #include <sstream>
 
 //
-//
+// Test code for dynamic map class
 //
 namespace emll
 {
@@ -66,7 +66,7 @@ void TestDynamicMapCompute()
     std::vector<double> resultValues;
     for (const auto& inVec : input)
     {
-        map.SetInput("doubleInput", inVec);
+        map.SetInputValue("doubleInput", inVec);
         resultValues = map.ComputeOutput<double>("doubleOutput");
     }
 
@@ -94,8 +94,8 @@ void TestDynamicMapRefine()
     std::vector<double> resultValues2;
     for (const auto& inVec : input)
     {
-        map1.SetInput("doubleInput", inVec);
-        map2.SetInput("doubleInput", inVec);
+        map1.SetInputValue("doubleInput", inVec);
+        map2.SetInputValue("doubleInput", inVec);
 
         resultValues1 = map1.ComputeOutput<double>("doubleOutput");
         resultValues2 = map2.ComputeOutput<double>("doubleOutput");

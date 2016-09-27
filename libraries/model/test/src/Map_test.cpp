@@ -67,7 +67,7 @@ void TestMapCompute()
     decltype(map.ComputeOutput()) result;
     for (const auto& inVec : input)
     {
-        map.SetInputs(inVec);
+        map.SetInputValues(inVec);
         result = map.ComputeOutput();
     }
 
@@ -102,8 +102,8 @@ void TestMapRefine()
     decltype(map2.ComputeOutput()) result2;
     for (const auto& inVec : input)
     {
-        map1.SetInputs(inVec);
-        map2.SetInputs(inVec);
+        map1.SetInputValues(inVec);
+        map2.SetInputValues(inVec);
 
         result1 = map1.ComputeOutput();
         result2 = map2.ComputeOutput();
@@ -135,7 +135,7 @@ void TestNamedInputOutput()
     std::vector<double> resultValues;
     for (const auto& inVec : input)
     {
-        map.SetInput("doubleInput", inVec);
+        map.SetInputValue("doubleInput", inVec);
         resultValues = map.ComputeOutput<double>("doubleOutput");
     }
 

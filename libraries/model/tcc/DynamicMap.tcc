@@ -16,7 +16,7 @@ namespace model
 
     // By name
     template <typename ValueType>
-    void DynamicMap::SetInput(const std::string& inputName, const std::vector<ValueType>& inputValues)
+    void DynamicMap::SetInputValue(const std::string& inputName, const std::vector<ValueType>& inputValues)
     {
         auto iter = _inputNodeMap.find(inputName);
         if (iter == _inputNodeMap.end())
@@ -36,14 +36,14 @@ namespace model
     }
 
     template <typename ValueType>
-    void DynamicMap::SetInput(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues)
+    void DynamicMap::SetInputValue(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues)
     {
-        SetInput(inputName, inputValues.ToArray());
+        SetInputValue(inputName, inputValues.ToArray());
     }
 
     // By index
     template <typename ValueType>
-    void DynamicMap::SetInput(size_t index, const std::vector<ValueType>& inputValues)
+    void DynamicMap::SetInputValue(size_t index, const std::vector<ValueType>& inputValues)
     {        
         if (index >= _inputNodes.size())
         {
@@ -62,9 +62,9 @@ namespace model
     }
 
     template <typename ValueType>
-    void DynamicMap::SetInput(size_t index, const dataset::DenseDataVector<ValueType>& inputValues)
+    void DynamicMap::SetInputValue(size_t index, const dataset::DenseDataVector<ValueType>& inputValues)
     {
-        SetInput(index, inputValues.ToArray());
+        SetInputValue(index, inputValues.ToArray());
     }
 
     //
