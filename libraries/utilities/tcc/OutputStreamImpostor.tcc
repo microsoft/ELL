@@ -18,5 +18,3 @@ namespace utilities
     }
 }
 }
-
-#include "../tcc/OutputStreamImpostor.tcc"
