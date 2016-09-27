@@ -9,6 +9,7 @@
 #pragma once
 
 #include "OutputPort.h"
+#include "InputPort.h"
 #include "UniqueId.h"
 
 // utilities
@@ -25,8 +26,6 @@ namespace emll
 /// <summary> model namespace </summary>
 namespace model
 {
-    class InputPortBase;
-    class Model;
     class ModelTransformer;
 
     /// <summary> Superclass for all node types. </summary>

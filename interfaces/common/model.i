@@ -33,9 +33,9 @@
 %include "Port.h"
 %include "OutputPort.h"
 %include "PortElements.h"
+%include "InputPort.h"
 %include "Node.h"
 %include "Model.h"
-%include "InputPort.h"
 %include "InputNode.h"
 %include "OutputNode.h"
 

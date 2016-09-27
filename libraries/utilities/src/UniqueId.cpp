@@ -25,7 +25,6 @@ namespace utilities
 
     UniqueId::UniqueId(const std::string& idString)
     {
-        // ew.
         _id = std::stoi(idString);
         if(_nextId <= _id)
         {

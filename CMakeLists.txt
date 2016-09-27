@@ -31,7 +31,7 @@ endif()
 # (so if we're running cmake from a 'build' directory inside the main directory, do this:
 #      cmake -DDOXYGEN_ENABLED=OFF ..  )
 option(SWIG_ENABLED "Enable swig interfaces" ON)
-option(DOXYGEN_ENABLED "Enable Doxygen interfaces" OFF)
+option(DOXYGEN_ENABLED "Enable Doxygen interfaces" ON)
 
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
@@ -40,7 +40,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  add_compile_options(-std=c++14 -Wall)  # -Werror (unsure about -Wall, -Werror on gcc)
+  add_compile_options(-std=c++14 -Wall)  # -Werror 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
   add_compile_options(-std=c++14 -Wall)  # -Werror
 elseif(MSVC)

@@ -50,18 +50,6 @@ namespace model
 
         virtual ~DynamicMap() = default;
         
-        /// <summary> Add an input to the map </summary>
-        ///
-        /// <param name="inputName"> The name to assign to the input node </param>
-        /// <param name="inputNode"> The input node to add </param>
-        void AddInput(const std::string& inputName, InputNodeBase* inputNode);
-
-        /// <summary> Add an output to the map </summary>
-        ///
-        /// <param name="outputName"> The name to assign to the output elements </param>
-        /// <param name="outPutElements"> The output elements to add </param>
-        void AddOutput(const std::string& outputName, PortElementsBase outputElements);
-
         /// <summary> Gets the model wrapped by this map </summary>
         ///
         /// <returns> The `Model` </returns>
@@ -149,6 +137,18 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
+        /// <summary> Add an input to the map </summary>
+        ///
+        /// <param name="inputName"> The name to assign to the input node </param>
+        /// <param name="inputNode"> The input node to add </param>
+        void AddInput(const std::string& inputName, InputNodeBase* inputNode);
+
+        /// <summary> Add an output to the map </summary>
+        ///
+        /// <param name="outputName"> The name to assign to the output elements </param>
+        /// <param name="outPutElements"> The output elements to add </param>
+        void AddOutput(const std::string& outputName, PortElementsBase outputElements);
+
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>

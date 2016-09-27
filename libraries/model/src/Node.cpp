@@ -29,29 +29,29 @@ namespace model
         _inputs.push_back(input);
     }
 
-        InputPortBase* Node::GetInputPort(const std::string& portName)
+    InputPortBase* Node::GetInputPort(const std::string& portName)
+    {
+        for (auto port : _inputs)
         {
-            for(auto port: _inputs)
+            if (port->GetName() == portName)
             {
-                if(port->GetName() == portName)
-                {
-                    return port;
-                }
+                return port;
             }
-            return nullptr;
         }
+        return nullptr;
+    }
 
-        OutputPortBase* Node::GetOutputPort(const std::string& portName)
+    OutputPortBase* Node::GetOutputPort(const std::string& portName)
+    {
+        for (auto port : _outputs)
         {
-            for(auto port: _outputs)
+            if (port->GetName() == portName)
             {
-                if(port->GetName() == portName)
-                {
-                    return port;
-                }
+                return port;
             }
-            return nullptr;
         }
+        return nullptr;
+    }
 
     std::vector<const Node*> Node::GetParentNodes() const
     {
