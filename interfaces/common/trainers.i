@@ -5,6 +5,9 @@
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+%ignore emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>::GetPredictor() const;
+%ignore emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor>::GetPredictor() const;
+
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -62,13 +65,12 @@ class SortingForestTrainerProxy;
 				_trainer->Update(exampleIterator);
 			}
 
-			const std::shared_ptr<const emll::predictors::LinearPredictor> GetPredictor() const {
-				return _trainer->GetPredictor();
+			const emll::predictors::LinearPredictor& GetPredictor() const {
+				return *_trainer->GetPredictor();
 			}
 
 		private:
-			emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>* _trainer = nullptr;
-			// std::unique_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>> _trainer;
+			emll::trainers::IIncrementalTrainer<emll::predictors::LinearPredictor>* _trainer = nullptr;			
 	};
 
 	SGDTrainerProxy GetSGDIncrementalTrainer(uint64_t dim, const emll::common::LossArguments& lossArguments, const emll::common::SGDIncrementalTrainerArguments& trainerArguments)
@@ -89,8 +91,8 @@ class SortingForestTrainerProxy;
 				_trainer->Update(exampleIterator);
 			}
 
-			const std::shared_ptr<const emll::predictors::SimpleForestPredictor> GetPredictor() const {
-				return _trainer->GetPredictor();
+			const emll::predictors::SimpleForestPredictor& GetPredictor() const {
+				return *_trainer->GetPredictor();
 			}
 
 		private:
