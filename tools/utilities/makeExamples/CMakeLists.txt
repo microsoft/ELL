@@ -50,7 +50,7 @@ set (MODEL_FILES ${EXAMPLE_DIR}/model_1.json
                  ${EXAMPLE_DIR}/tree_3.xml)
 add_custom_command(TARGET ${PROJ_NAME} 
   POST_BUILD
-  COMMAND makeExamples -mf both
+  COMMAND makeExamples -mf json
   WORKING_DIRECTORY ${EXAMPLE_DIR}
   BYPRODUCTS ${MODEL_FILES}
   COMMENT "Generating example models")
