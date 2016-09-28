@@ -70,7 +70,7 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    ConstMatrixReference<ElementType, Layout> ConstMatrixReference<ElementType, Layout>::GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns) const
+    ConstMatrixReference<ElementType, Layout> ConstMatrixReference<ElementType, Layout>::GetSubMatrix(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns) const
     {
         if (firstRow + numRows > _numRows || columnIndex + numColumns > _numColumns)
         {
@@ -114,8 +114,25 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    template<MatrixLayout OtherLayout>
-    bool ConstMatrixReference<ElementType, Layout>::operator==(const ConstMatrixReference<ElementType, OtherLayout>& other) const
+    bool ConstMatrixReference<ElementType, Layout>::operator==(const ConstMatrixReference<ElementType, Layout>& other) const
+    {
+        if (NumRows() != other.NumRows() || NumColumns() != other.NumColumns())
+        {
+            return false;
+        }
+
+        for (size_t i = 0; i < NumIntervals(); ++i)
+        {
+            if (GetInterval(i) != other.GetInterval(i))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    bool ConstMatrixReference<ElementType, Layout>::operator==(const ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>& other) const 
     {
         if (NumRows() != other.NumRows() || NumColumns() != other.NumColumns())
         {
@@ -193,7 +210,7 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    MatrixReference<ElementType, Layout> MatrixReference<ElementType, Layout>::GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns)
+    MatrixReference<ElementType, Layout> MatrixReference<ElementType, Layout>::GetSubMatrix(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns)
     {
         if (firstRow + numRows > _numRows || firstColumn + numColumns > _numColumns)
         {

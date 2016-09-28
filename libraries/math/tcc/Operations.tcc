@@ -25,7 +25,7 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     static void CommonOperations::Add(ElementType s, VectorReference<ElementType, Orientation>& v)
     {
-        v.ForEach([s](ElementType x) { return x + s; });
+        v.Transform([s](ElementType x) { return x + s; });
     }
     
     template<typename ElementType, MatrixLayout Layout>
@@ -168,7 +168,7 @@ namespace math
     template<typename ElementType, VectorOrientation Orientation>
     void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, VectorReference<ElementType, Orientation>& v)
     {
-        v.ForEach([s](ElementType x) { return x * s; });
+        v.Transform([s](ElementType x) { return x * s; });
     }
 
     template<typename ElementType>

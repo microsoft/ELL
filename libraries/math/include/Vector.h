@@ -198,7 +198,7 @@ namespace math
         /// <typeparam name="MapperType"> Type of the mapper functor. </typeparam>
         /// <param name="mapper"> The mapper. </param>
         template<typename MapperType>
-        void ForEach(MapperType mapper);
+        void Transform(MapperType mapper);
 
     protected:
         using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;

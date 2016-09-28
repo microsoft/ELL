@@ -300,14 +300,16 @@ namespace math
         template<typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, const ConstVectorReference<ElementType, VectorOrientation::row>& v, const ConstMatrixReference<ElementType, Layout>& M, ElementType t, VectorReference<ElementType, VectorOrientation::row>& u);
     };
+
+    using Operations = OperationsImplementation<ImplementationType::openBlas>;
 #else
     /// Native implementation of vector and matrix operations. Function arguments follow the following 
     /// naming conventions: r,s,t represent scalars; u,v,w represent vectors; M,A,B represent matrices.
     template<>
     struct OperationsImplementation<ImplementationType::openBlas> : public OperationsImplementation<ImplementationType::native> {};
+
+    using Operations = OperationsImplementation<ImplementationType::native>;
 #endif
-    // friendly name
-    using Operations = OperationsImplementation<ImplementationType::openBlas>;
 }
 }
 #include "../tcc/Operations.tcc"

@@ -189,7 +189,7 @@ namespace math
 
     template<typename ElementType, VectorOrientation Orientation>
     template<typename MapperType>
-    void VectorReference<ElementType, Orientation>::ForEach(MapperType mapper)
+    void VectorReference<ElementType, Orientation>::Transform(MapperType mapper)
     {
         ElementType* current = _pData;
         const ElementType* end = _pData + _size * _increment;

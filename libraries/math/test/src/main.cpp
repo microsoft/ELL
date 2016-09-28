@@ -97,7 +97,7 @@ void TestVectorOperations()
         { 0, 2, 4, 3 },
         { 0, 8, 5, 6 }
     };
-    auto N = M.GetBlock(1, 0, 2, 3);
+    auto N = M.GetSubMatrix(1, 0, 2, 3);
     auto w = N.GetRow(0);
     auto z = N.GetRow(1);
 
@@ -164,7 +164,7 @@ void TestMatrix1()
     };
     testing::ProcessTest("Matrix::Operator()", M == S1);
 
-    auto N = M.GetBlock(1, 1, 2, 3);
+    auto N = M.GetSubMatrix(1, 1, 2, 3);
     N.Fill(3);
     N(0, 1) = 4;
 
@@ -174,7 +174,7 @@ void TestMatrix1()
         { 0, 3, 4, 3 },
         { 0, 3, 3, 3 }
     };
-    testing::ProcessTest("Matrix::GetBlock()", M == S2);
+    testing::ProcessTest("Matrix::GetSubMatrix()", M == S2);
 
     auto v = M.GetRow(2);
     v[2] = 5;
@@ -233,7 +233,7 @@ void TestMatrix2()
 {
     math::Matrix<ElementType, Layout> M(7, 7);
 
-    auto N = M.GetBlock(1, 1, 5, 5);
+    auto N = M.GetSubMatrix(1, 1, 5, 5);
     N.GetRow(0).Fill(1);
     N.GetRow(4).Fill(1);
     N.GetDiagonal<math::VectorOrientation::column>().Fill(1);
@@ -254,7 +254,7 @@ void TestMatrix2()
     };
     testing::ProcessTest("Matrix::GetDiagonal()", M == R1);
 
-    auto S = N.GetBlock(1, 1, 3, 3);
+    auto S = N.GetSubMatrix(1, 1, 3, 3);
     S.Fill(8);
 
     math::ColumnMatrix<ElementType> R2
@@ -294,7 +294,7 @@ void TestMatrixOperations()
     math::ColumnVector<ElementType> r0{ 9, 11, 28 };
     testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Vector)", u == r0);
 
-    auto A = M.GetBlock(1, 0, 2, 2);
+    auto A = M.GetSubMatrix(1, 0, 2, 2);
     auto w = M.GetRow(0).Transpose();
     
     // v = s * A * w + t * v;

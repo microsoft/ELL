@@ -139,7 +139,7 @@ namespace math
         /// <param name="numColumns"> Number of columns in the block. </param>
         ///
         /// <returns> The constant reference to a block. </returns>
-        ConstMatrixReference<ElementType, Layout> GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns) const;
+        ConstMatrixReference<ElementType, Layout> GetSubMatrix(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns) const;
 
         /// <summary> Gets a const reference to a column of the matrix. </summary>
         ///
@@ -160,7 +160,7 @@ namespace math
         /// <typeparam name="Orientation"> User must specify whether the return value is a column or row vector. </typeparam>
         ///
         /// <returns> A const reference to the matrix diagnoal. </returns>
-        template<VectorOrientation Orientation>
+        template<VectorOrientation Orientation = VectorOrientation::column>
         ConstVectorReference<ElementType, Orientation> GetDiagonal() const;
 
         /// <summary> Gets a constant reference to a row of a row major matrix or to a column of a column major matrix. </summary>
@@ -170,14 +170,19 @@ namespace math
         /// <returns> Constant reference to the interval. </returns>
         auto GetInterval(size_t index) const->ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
 
-        /// <summary> Equality operator. </summary>
+        /// <summary> Equality operator for matrices with the same layout. </summary>
         ///
-        /// <typeparam name="OtherLayout"> The layout of the other matrix. </typeparam>
         /// <param name="other"> The other matrix. </param>
         ///
         /// <returns> true if the two matrices are equivalent. </returns>
-        template<MatrixLayout OtherLayout>
-        bool operator==(const ConstMatrixReference<ElementType, OtherLayout>& other) const;
+        bool operator==(const ConstMatrixReference<ElementType, Layout>& other) const;
+
+        /// <summary> Equality operator for matrices with opposite layout. </summary>
+        ///
+        /// <param name="other"> The other matrix. </param>
+        ///
+        /// <returns> true if the two matrices are equivalent. </returns>
+        bool operator==(const ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>& other) const;
 
         /// <summary> Inequality operator. </summary>
         ///
@@ -254,7 +259,7 @@ namespace math
         /// <param name="numColumns"> Number of columns in the block. </param>
         ///
         /// <returns> The constant reference to a block. </returns>
-        MatrixReference<ElementType, Layout> GetBlock(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns);
+        MatrixReference<ElementType, Layout> GetSubMatrix(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns);
 
         /// <summary> Gets a reference to a column of the matrix. </summary>
         ///
@@ -275,7 +280,7 @@ namespace math
         /// <typeparam name="Orientation"> User must specify whether the return value is a column or row vector. </typeparam>
         ///
         /// <returns> A const reference to the matrix diagnoal. </returns>
-        template<VectorOrientation Orientation>
+        template<VectorOrientation Orientation = VectorOrientation::column>
         VectorReference<ElementType, Orientation> GetDiagonal();
 
         /// <summary> Gets a reference to a row of a row major matrix or to a column of a column major matrix. </summary>
