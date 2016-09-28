@@ -86,7 +86,7 @@ namespace math
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "column index exceeds matrix dimensions.");
         }
-        return ConstructConstVectorReference<ElementType, VectorOrientation::column>(_pData + index * _columnIncrement, _numRows, _rowIncrement);
+        return ConstructConstVectorReference<VectorOrientation::column>(_pData + index * _columnIncrement, _numRows, _rowIncrement);
     }
 
     template<typename ElementType, MatrixLayout Layout>
@@ -96,13 +96,13 @@ namespace math
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "row index exceeds matrix dimensions.");
         }
-        return ConstructConstVectorReference<ElementType, VectorOrientation::row>(_pData + index * _rowIncrement, _numColumns, _columnIncrement);
+        return ConstructConstVectorReference<VectorOrientation::row>(_pData + index * _rowIncrement, _numColumns, _columnIncrement);
     }
 
     template<typename ElementType, MatrixLayout Layout>
     auto ConstMatrixReference<ElementType, Layout>::GetInterval(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
     {
-        return ConstructConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
+        return ConstructConstVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
     }
 
     template<typename ElementType, MatrixLayout Layout>
@@ -110,7 +110,7 @@ namespace math
     ConstVectorReference<ElementType, Orientation> ConstMatrixReference<ElementType, Layout>::GetDiagonal() const
     {
         auto size = std::min(NumColumns(), NumRows());
-        return ConstructConstVectorReference<ElementType, Orientation>(_pData, size, _increment + 1);
+        return ConstructConstVectorReference<Orientation>(_pData, size, _increment + 1);
     }
 
     template<typename ElementType, MatrixLayout Layout>

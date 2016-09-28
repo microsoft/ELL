@@ -121,14 +121,12 @@ namespace math
         ElementType Aggregate(MapperType mapper) const;
 
     protected:
-        // protected ctor accessible only through derived classes and friends
-        friend class VectorReferenceConstructor;
-        
+        ConstVectorReference(ElementType* pData, size_t size, size_t increment);
+
         template<typename T>
         friend class RectangularMatrixBase;
         
         friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
-        ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 
         ElementType* _pData;
         size_t _size;
@@ -203,10 +201,12 @@ namespace math
         void ForEach(MapperType mapper);
 
     protected:
-        // protected ctor accessible only through derived classes
-        friend class VectorReferenceConstructor;
-        friend class VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
         using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
+
+        template<typename T>
+        friend class RectangularMatrixBase;
+
+        friend class VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
     };
 
     /// <summary> An algebraic vector. </summary>
