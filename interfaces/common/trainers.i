@@ -43,16 +43,14 @@ wrap_unique_ptr(LinearPredictorPtr, IncrementalLinearPredictorTrainer)
 wrap_unique_ptr(SimpleForestPredictorPtr, IncrementalForestPredictorTrainer)
 
 %include "noncopyable.i"
-wrap_noncopyable(SGDTrainerProxy);
-wrap_noncopyable(SortingForestTrainerProxy);
 
 class SGDTrainerProxy;
 %nodefaultctor SGDTrainerProxy;
-%feature("novaluewrapper") SGDTrainerProxy;
+wrap_noncopyable(SGDTrainerProxy);
 
 class SortingForestTrainerProxy;
 %nodefaultctor SortingForestTrainerProxy;
-%feature("novaluewrapper") SortingForestTrainerProxy;
+wrap_noncopyable(SortingForestTrainerProxy);
 
 %inline %{
 	class SGDTrainerProxy
