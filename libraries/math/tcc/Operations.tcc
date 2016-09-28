@@ -33,7 +33,7 @@ namespace math
     {
         for (size_t i = 0; i < M.NumIntervals(); ++i)
         {
-            auto interval = M.GetInterval(i);
+            auto interval = M.GetMajorVector(i);
             Add(s, interval);
         }
     }
@@ -53,8 +53,8 @@ namespace math
 
         for (size_t i = 0; i < B.NumIntervals(); ++i)
         {
-            auto intervalA = A.GetInterval(i);
-            auto intervalB = B.GetInterval(i);
+            auto intervalA = A.GetMajorVector(i);
+            auto intervalB = B.GetMajorVector(i);
             DerivedClass::Copy(intervalB, intervalA);
         }
     }
@@ -65,7 +65,7 @@ namespace math
     {
         for (size_t i = 0; i < M.NumIntervals(); ++i)
         {
-            auto interval = M.GetInterval(i);
+            auto interval = M.GetMajorVector(i);
             DerivedClass::Multiply(s, interval);
         }
     }

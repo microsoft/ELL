@@ -100,9 +100,9 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    auto ConstMatrixReference<ElementType, Layout>::GetInterval(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+    auto ConstMatrixReference<ElementType, Layout>::GetMajorVector(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
     {
-        return ConstructConstVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
+        return ConstructConstVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
     }
 
     template<typename ElementType, MatrixLayout Layout>
@@ -123,7 +123,7 @@ namespace math
 
         for (size_t i = 0; i < NumIntervals(); ++i)
         {
-            if (GetInterval(i) != other.GetInterval(i))
+            if (GetMajorVector(i) != other.GetMajorVector(i))
             {
                 return false;
             }
@@ -157,7 +157,7 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    ElementType* ConstMatrixReference<ElementType, Layout>::GetIntervalBegin(size_t index) const
+    ElementType* ConstMatrixReference<ElementType, Layout>::GetMajorVectorBegin(size_t index) const
     {
         return _pData + index * _increment;
     }
@@ -181,7 +181,7 @@ namespace math
     {
         for (size_t i = 0; i < _numIntervals; ++i)
         {
-            auto begin = GetIntervalBegin(i);
+            auto begin = GetMajorVectorBegin(i);
             std::fill(begin, begin + _intervalSize, value);
         }
     }
@@ -192,7 +192,7 @@ namespace math
     {
         for (size_t i = 0; i < _numIntervals; ++i)
         {
-            auto begin = GetIntervalBegin(i); 
+            auto begin = GetMajorVectorBegin(i); 
             std::generate(begin, begin + _intervalSize, generator);
         }
     }
@@ -248,9 +248,9 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    auto MatrixReference<ElementType, Layout>::GetInterval(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+    auto MatrixReference<ElementType, Layout>::GetMajorVector(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
     {
-        return ConstructVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
+        return ConstructVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
     }
 
     //

@@ -168,7 +168,7 @@ namespace math
         /// <param name="index"> The interval index. </param>
         ///
         /// <returns> Constant reference to the interval. </returns>
-        auto GetInterval(size_t index) const->ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
+        auto GetMajorVector(size_t index) const->ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
 
         /// <summary> Equality operator for matrices with the same layout. </summary>
         ///
@@ -197,7 +197,7 @@ namespace math
         friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
 
-        ElementType* GetIntervalBegin(size_t index) const;
+        ElementType* GetMajorVectorBegin(size_t index) const;
     };
 
     /// <summary> Non-const reference to a dense matrix. </summary>
@@ -288,7 +288,7 @@ namespace math
         /// <param name="index"> The interval index. </param>
         ///
         /// <returns> Reference to the interval. </returns>
-        auto GetInterval(size_t index)->VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
+        auto GetMajorVector(size_t index)->VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
 
     protected:
         friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
