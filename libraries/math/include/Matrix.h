@@ -24,40 +24,11 @@ namespace math
     template<typename ElementType, MatrixLayout Layout>
     class MatrixBase;
 
-    /// <summary> A helper class that constructs vector reference objects. </summary>
-    class VectorReferenceConstructor
-    {
-    protected:
-        /// <summary> Constructs a vector reference. </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
-        /// <param name="pData"> Pointer to the first element in the vector. </param>
-        /// <param name="size"> The vector size. </param>
-        /// <param name="increment"> The vector increment. </param>
-        ///
-        /// <returns> A vector reference; </returns>
-        template<typename ElementType, VectorOrientation Orientation>
-        VectorReference<ElementType, Orientation> ConstructVectorReference(ElementType* pData, size_t size, size_t increment);
-
-        /// <summary> Constructs a const vector reference. </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
-        /// <param name="pData"> Pointer to the first element in the vector. </param>
-        /// <param name="size"> The vector size. </param>
-        /// <param name="increment"> The vector increment. </param>
-        ///
-        /// <returns> A const vector reference. </returns>
-        template<typename ElementType, VectorOrientation Orientation>
-        ConstVectorReference<ElementType, Orientation> ConstructConstVectorReference(ElementType* pData, size_t size, size_t increment) const;
-    };
-
     /// <summary> Base class for rectangular dense matrices. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
     template <typename ElementType>
-    class RectangularMatrixBase : public VectorReferenceConstructor
+    class RectangularMatrixBase 
     {
     public:
         /// <summary> Gets the number of rows. </summary>
@@ -73,6 +44,12 @@ namespace math
     protected:
         // protected ctor accessible only through derived classes
         RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
+
+        template<VectorOrientation Orientation>
+        VectorReference<ElementType, Orientation> ConstructVectorReference(ElementType* pData, size_t size, size_t increment);
+
+        template<VectorOrientation Orientation>
+        ConstVectorReference<ElementType, Orientation> ConstructConstVectorReference(ElementType* pData, size_t size, size_t increment) const;
 
         ElementType* _pData;
         size_t _numRows;

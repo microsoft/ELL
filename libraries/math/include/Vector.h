@@ -123,6 +123,10 @@ namespace math
     protected:
         // protected ctor accessible only through derived classes and friends
         friend class VectorReferenceConstructor;
+        
+        template<typename T>
+        friend class RectangularMatrixBase;
+        
         friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
         ConstVectorReference(ElementType* pData, size_t size, size_t increment);
 

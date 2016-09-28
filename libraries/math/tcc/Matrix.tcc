@@ -16,28 +16,26 @@ namespace emll
 namespace math
 {
     //
-    // VectorReferenceConstructor
-    // 
-
-    template<typename ElementType, VectorOrientation Orientation>
-    VectorReference<ElementType, Orientation> VectorReferenceConstructor::ConstructVectorReference(ElementType * pData, size_t size, size_t increment)
-    {
-        return VectorReference<ElementType, Orientation>(pData, size, increment);
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    ConstVectorReference<ElementType, Orientation> VectorReferenceConstructor::ConstructConstVectorReference(ElementType * pData, size_t size, size_t increment) const
-    {
-        return ConstVectorReference<ElementType, Orientation>(pData, size, increment);
-    }
-
-    //
     // RectangularMatrixBase
     // 
 
     template<typename ElementType>
     RectangularMatrixBase<ElementType>::RectangularMatrixBase(ElementType * pData, size_t numRows, size_t numColumns, size_t increment) : _pData(pData), _numRows(numRows), _numColumns(numColumns), _increment(increment)
     {}
+
+    template<typename ElementType>
+    template<VectorOrientation Orientation>
+    VectorReference<ElementType, Orientation> RectangularMatrixBase<ElementType>::ConstructVectorReference(ElementType * pData, size_t size, size_t increment)
+    {
+        return VectorReference<ElementType, Orientation>(pData, size, increment);
+    }
+
+    template<typename ElementType>
+    template<VectorOrientation Orientation>
+    ConstVectorReference<ElementType, Orientation> RectangularMatrixBase<ElementType>::ConstructConstVectorReference(ElementType * pData, size_t size, size_t increment) const
+    {
+        return ConstVectorReference<ElementType, Orientation>(pData, size, increment);
+    }
 
     //
     // MatrixBase
@@ -211,7 +209,7 @@ namespace math
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "column index exceeds matrix dimensions.");
         }
-        return ConstructVectorReference<ElementType, VectorOrientation::column>(_pData + index * _columnIncrement, _numRows, _rowIncrement);
+        return ConstructVectorReference<VectorOrientation::column>(_pData + index * _columnIncrement, _numRows, _rowIncrement);
     }
 
     template<typename ElementType, MatrixLayout Layout>
@@ -221,7 +219,7 @@ namespace math
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "row index exceeds matrix dimensions.");
         }
-        return ConstructVectorReference<ElementType, VectorOrientation::row>(_pData + index * _rowIncrement, _numColumns, _columnIncrement);
+        return ConstructVectorReference<VectorOrientation::row>(_pData + index * _rowIncrement, _numColumns, _columnIncrement);
     }
 
     template<typename ElementType, MatrixLayout Layout>
@@ -229,13 +227,13 @@ namespace math
     VectorReference<ElementType, Orientation> MatrixReference<ElementType, Layout>::GetDiagonal()
     {
         auto size = std::min(NumColumns(), NumRows());
-        return ConstructVectorReference<ElementType, Orientation>(_pData, size, _increment + 1);
+        return ConstructVectorReference<Orientation>(_pData, size, _increment + 1);
     }
 
     template<typename ElementType, MatrixLayout Layout>
     auto MatrixReference<ElementType, Layout>::GetInterval(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
     {
-        return ConstructVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
+        return ConstructVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetIntervalBegin(index), _intervalSize, 1);
     }
 
     //
