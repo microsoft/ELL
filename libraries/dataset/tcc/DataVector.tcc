@@ -13,6 +13,43 @@ namespace emll
 {
 namespace dataset
 {
+    template<typename ReturnType>
+    ReturnType IDataVector::ToDataVector() const
+    {
+        switch (GetType())
+        {
+        case Type::DoubleDataVector:
+            return ReturnType(static_cast<const DoubleDataVector*>(this)->GetIterator());
+
+        case Type::FloatDataVector:
+            return ReturnType(static_cast<const FloatDataVector*>(this)->GetIterator());
+
+        case Type::ShortDataVector:
+            return ReturnType(static_cast<const ShortDataVector*>(this)->GetIterator());
+
+        case Type::ByteDataVector:
+            return ReturnType(static_cast<const ByteDataVector*>(this)->GetIterator());
+
+        case Type::SparseDoubleDataVector:
+            return ReturnType(static_cast<const SparseDoubleDataVector*>(this)->GetIterator());
+
+        case Type::SparseFloatDataVector:
+            return ReturnType(static_cast<const SparseFloatDataVector*>(this)->GetIterator());
+
+        case Type::SparseShortDataVector:
+            return ReturnType(static_cast<const SparseShortDataVector*>(this)->GetIterator());
+
+        case Type::SparseByteDataVector:
+            return ReturnType(static_cast<const SparseByteDataVector*>(this)->GetIterator());
+
+        case Type::SparseBinaryDataVector:
+            return ReturnType(static_cast<const SparseBinaryDataVector*>(this)->GetIterator());
+
+        default:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
+        }
+    }
+
     template<class DerivedType>
     double DataVectorBase<DerivedType>::Norm2() const
     {

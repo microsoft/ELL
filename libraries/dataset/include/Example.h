@@ -66,6 +66,9 @@ namespace dataset
         /// <returns> The metadata. </returns>
         const MetadataType& GetMetadata() const { return _metadata; }
 
+
+        //template<typename 
+
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>

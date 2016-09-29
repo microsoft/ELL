@@ -71,42 +71,9 @@ namespace dataset
 
     template<typename DefaultDataVectorType>
     template<typename ReturnType>
-    ReturnType AutoDataVectorBase<DefaultDataVectorType>::ToDataVector() const
+    ReturnType AutoDataVectorBase<DefaultDataVectorType>::ToDataVector() const 
     {
-        switch (_pInternal->GetType())
-        {
-        case IDataVector::Type::DoubleDataVector:
-            return ReturnType(static_cast<DoubleDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::FloatDataVector:
-            return ReturnType(static_cast<FloatDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::ShortDataVector:
-            return ReturnType(static_cast<ShortDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::ByteDataVector:
-            return ReturnType(static_cast<ByteDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseDoubleDataVector:
-            return ReturnType(static_cast<SparseDoubleDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseFloatDataVector:
-            return ReturnType(static_cast<SparseFloatDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseShortDataVector:
-            return ReturnType(static_cast<SparseShortDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseByteDataVector:
-            return ReturnType(static_cast<SparseByteDataVector*>(_pInternal.get())->GetIterator());
-
-        case IDataVector::Type::SparseBinaryDataVector:
-            return ReturnType(static_cast<SparseBinaryDataVector*>(_pInternal.get())->GetIterator());
-
-        default:
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
-        }
-
-        return ReturnType();
+        return _pInternal->ToDataVector<ReturnType>();
     }
 
     template<typename TargetType>
@@ -144,19 +111,19 @@ namespace dataset
         {
             if (includesNonFloats)
             {
-                _pInternal = std::make_unique<DoubleDataVector>(std::move(defaultDataVector));
+                SetInternal<DoubleDataVector>(std::move(defaultDataVector));
             }
             else if (includesNonShorts)
             {
-                _pInternal = std::make_unique<FloatDataVector>(std::move(defaultDataVector));
+                SetInternal<FloatDataVector>(std::move(defaultDataVector));
             }
             else if (includesNonBytes)
             {
-                _pInternal = std::make_unique<ShortDataVector>(std::move(defaultDataVector));
+                SetInternal<ShortDataVector>(std::move(defaultDataVector));
             }
             else
             {
-                _pInternal = std::make_unique<ByteDataVector>(std::move(defaultDataVector));
+                SetInternal<ByteDataVector>(std::move(defaultDataVector));
             }
         }
 
@@ -165,23 +132,23 @@ namespace dataset
         {
             if (includesNonFloats)
             {
-                _pInternal = std::make_unique<SparseDoubleDataVector>(std::move(defaultDataVector));
+                SetInternal<SparseDoubleDataVector>(std::move(defaultDataVector));
             }
             else if (includesNonShorts)
             {
-                _pInternal = std::make_unique<SparseFloatDataVector>(std::move(defaultDataVector));
+                SetInternal<SparseFloatDataVector>(std::move(defaultDataVector));
             }
             else if (includesNonBytes)
             {
-                _pInternal = std::make_unique<SparseShortDataVector>(std::move(defaultDataVector));
+                SetInternal<SparseShortDataVector>(std::move(defaultDataVector));
             }
             else if(includesNonBinary)
             {
-                _pInternal = std::make_unique<SparseByteDataVector>(std::move(defaultDataVector));
+                SetInternal<SparseByteDataVector>(std::move(defaultDataVector));
             }
             else
             {
-                _pInternal = std::make_unique<SparseBinaryDataVector>(std::move(defaultDataVector));
+                SetInternal<SparseBinaryDataVector>(std::move(defaultDataVector));
             }
         }
     }

@@ -81,13 +81,6 @@ namespace dataset
         template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         SparseDataVector(IndexValueIteratorType indexValueIterator);
 
-        /// <summary> Constructs a sparse data vector by copying the contents of another data vector. </summary>
-        ///
-        /// <typeparam name="DataVectorType"> Type of the vector being copied. </typeparam>
-        /// <param name="dataVector"> The data vector being copied. </param>
-        template <typename DataVectorType, IsDataVector<DataVectorType> Concept = true>
-        SparseDataVector(DataVectorType dataVector);
-
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
         /// <param name="list"> The initializer list. </param>

@@ -27,13 +27,6 @@ namespace dataset
         }
     }
 
-    template<typename ElementType>
-    template<typename DataVectorType, IsDataVector<DataVectorType> Concept>
-    DenseDataVector<ElementType>::DenseDataVector(DataVectorType dataVector) : DenseDataVector(dataVector.GetIterator())
-    {
-        static_assert(std::is_same<DataVectorType, DenseDataVector<ElementType>>::value == false, "Move ctor should have been called instead");
-    }
-
     template <typename ElementType>
     DenseDataVector<ElementType>::DenseDataVector() : _numNonzeros(0)
     {

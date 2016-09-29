@@ -37,13 +37,6 @@ namespace dataset
         }
     }
 
-    template<typename ElementType, typename IntegerListType>
-    template<typename DataVectorType, IsDataVector<DataVectorType> Concept>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(DataVectorType dataVector) : SparseDataVector(dataVector.GetIterator())
-    {
-        static_assert(std::is_same<DataVectorType, SparseDataVector<ElementType, IntegerListType>>::value == false, "Move ctor should have been called instead");
-    }
-
     template <typename ElementType, typename IntegerListType>
     SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<linear::IndexValue> list)
     {

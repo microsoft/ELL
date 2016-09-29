@@ -116,6 +116,24 @@ namespace dataset
         // helper function used by ctors to choose the type of data vector to use
         void FindBestRepresentation(DefaultDataVectorType defaultDataVector);
 
+        template <typename T, typename S>
+        using IsSame = typename std::enable_if_t<std::is_same<T,S>::value, bool>;
+
+        template <typename T, typename S>
+        using IsDifferent = typename std::enable_if_t<!std::is_same<T,S>::value, bool>;
+
+        template<typename DataVectorType, IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
+        void SetInternal(DefaultDataVectorType defaultDataVector)
+        {
+            _pInternal = std::make_unique<DefaultDataVectorType>(std::move(defaultDataVector));
+        }
+
+        template<typename DataVectorType, IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
+        void SetInternal(DefaultDataVectorType defaultDataVector)
+        {
+            _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator());
+        }
+
         // members
         std::unique_ptr<IDataVector> _pInternal;
     };

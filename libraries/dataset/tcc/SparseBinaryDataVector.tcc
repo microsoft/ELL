@@ -33,13 +33,6 @@ namespace dataset
     }
 
     template<typename IntegerListType>
-    template<typename DataVectorType, IsDataVector<DataVectorType> Concept>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(DataVectorType dataVector) : SparseBinaryDataVectorBase(dataVector.GetIterator())
-    {
-        static_assert(std::is_same<DataVectorType, SparseBinaryDataVectorBase<IntegerListType>>::value == false, "Move ctor should have been called instead");
-    }
-
-    template<typename IntegerListType>
     SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<linear::IndexValue> list)
     {
         auto current = list.begin();
