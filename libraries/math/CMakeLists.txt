@@ -42,17 +42,14 @@ source_group("tcc" FILES ${TCC})
 #  message(WARNING "BLAS NOT Found!")
 #endif()
 
-set (BLAS_LIB_NAMES ${BLAS_LIB_NAMES} cblas openblas)
+set (BLAS_LIB_NAMES ${BLAS_LIB_NAMES} cblas openblas libopenblas.dll.a)
 
 ## libopenblas install on ubuntu in /usr/lib and /usr/include
 ## TODO: Add private/dependencies/OpenBlas/linux/...
 
-find_library(BLAS_LIBRARY
-  NAMES ${BLAS_LIB_NAMES}
-  PATHS /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
-      ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/lib/
-      ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/
-  )
+if(${WIN32})
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".dll.a" ".a")
+endif()
 
 find_path(BLAS_INCLUDE_DIR cblas.h
   /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/
@@ -61,6 +58,15 @@ find_path(BLAS_INCLUDE_DIR cblas.h
   /usr/local/include
   ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include/
   ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include/)
+message(STATUS "Using BLAS include path: ${BLAS_INCLUDE_DIR}")
+
+find_library(BLAS_LIBRARY
+  NAMES ${BLAS_LIB_NAMES}
+  PATHS /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
+      ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/lib/
+      ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/
+  )
+message(STATUS "Using BLAS library: ${BLAS_LIBRARY}")
 
 if(${APPLE})
   # To install commandline tools (which seems to also install headers in /System/Library/Frameworks/...), do this:
@@ -75,16 +81,18 @@ else ()
     set(CBLAS_FOUND "NO")
 endif ()
 
-message(WARNING "BLAS library: ${BLAS_LIBRARY}")
-message(WARNING "BLAS includes: ${BLAS_INCLUDE_DIR}")
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include ${BLAS_INCLUDE_DIR})
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+
+if(CBLAS_FOUND)
+target_compile_definitions(${PROJ_NAME} PRIVATE USE_BLAS=1)
 endif()
 
-target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBRARY})
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+  target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBRARY})
+endif()
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
