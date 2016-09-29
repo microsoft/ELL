@@ -38,6 +38,7 @@ set (INCLUDE include/AnyIterator.h
              include/Exception.h
              include/Files.h
              include/Format.h
+             include/FunctionUtils.h
              include/IArchivable.h
              include/IIterator.h
              include/IntegerList.h
@@ -65,6 +66,7 @@ set (TCC tcc/AnyIterator.tcc
          tcc/CommandLineParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
+         tcc/FunctionUtils.tcc
          tcc/IArchivable.tcc
          tcc/JsonArchiver.tcc
          tcc/ObjectArchive.tcc
