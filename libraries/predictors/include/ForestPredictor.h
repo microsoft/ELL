@@ -209,6 +209,9 @@ namespace predictors
             size_t _firstEdgeIndex = 0;
         };
 
+        /// <summary> Type of the data vector expected by this predictor type. </summary>
+        using DataVectorType = dataset::DoubleDataVector;
+
         /// <summary> Query if this forest has no trees and a zero bias. </summary>
         ///
         /// <returns> true if the forest is trivial. </returns>

@@ -31,6 +31,9 @@ namespace predictors
     class LinearPredictor : public IPredictor<double>, public utilities::IArchivable
     {
     public:
+        /// <summary> Type of the data vector expected by this predictor type. </summary>
+        using DataVectorType = dataset::IDataVector;
+
         /// <summary> Default Constructor. </summary>
         LinearPredictor();
 
