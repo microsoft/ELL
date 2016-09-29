@@ -57,6 +57,11 @@ namespace model
         /// <returns> The `Model` </returns>
         const Model& GetModel() const { return _model; }
 
+        /// <summary> Gets the model wrapped by this map </summary>
+        ///
+        /// <returns> The `Model` </returns>
+        Model& GetModel() { return _model; }
+
         /// <summary> Refines the model wrapped by this map </summary>
         ///
         /// <param name="context"> The TransformContext to use during refinement </param>
@@ -193,6 +198,15 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        size_t NumInputs() const { return _inputNodes.size(); }
+        size_t NumOutputs() const { return _outputElements.size(); }
+
+
+        std::vector<InputNodeBase*> GetInputs() { return _inputNodes; }
+        std::vector<PortElementsBase> GetOutputs() { return _outputElements; }
+        InputNodeBase* GetInput(size_t index);
+        PortElementsBase GetOutput(size_t index);
 
     protected:
         // helper
