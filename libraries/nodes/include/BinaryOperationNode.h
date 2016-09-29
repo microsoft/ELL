@@ -32,7 +32,7 @@ namespace nodes
         add,
         subtract,
         coordinatewiseMultiply, // coordinatewise multiplication
-        divide, // coordinatewise division
+        coordinatewiseDivide, // coordinatewise division
         logicalAnd,
         logicalOr,
         logicalXor

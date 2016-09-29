@@ -15,8 +15,6 @@
 #include <string>
 #include <vector>
 
-using namespace std::string_literals;
-
 namespace emll
 {
 namespace utilities

@@ -24,7 +24,7 @@ namespace nodes
                     return "subtract";
                 case BinaryOperationType::coordinatewiseMultiply:
                     return "multiply";
-                case BinaryOperationType::divide:
+                case BinaryOperationType::coordinatewiseDivide:
                     return "divide";
                 case BinaryOperationType::logicalAnd:
                     return "logicalAnd";
@@ -48,7 +48,7 @@ namespace nodes
             else if (opName == "multiply")
                 return BinaryOperationType::coordinatewiseMultiply;
             else if (opName == "divide")
-                return BinaryOperationType::divide;
+                return BinaryOperationType::coordinatewiseDivide;
             else if (opName == "logicalAnd")
                 return BinaryOperationType::logicalAnd;
             else if (opName == "logicalOr")
