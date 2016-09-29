@@ -3,10 +3,16 @@
   "nodes": [
   {
     "_type": "InputNode<double>",
-    "id": "1040",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1012"
+    },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1040",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1012"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -14,10 +20,16 @@
   }, 
   {
     "_type": "MovingAverageNode<double>",
-    "id": "1041",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1013"
+    },
     "input": {
       "_type": "InputPort<double>",
-      "nodeId": "1041",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1013"
+      },
       "name": "input",
       "type": 1,
       "input": {
@@ -28,14 +40,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1040",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1012"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1041",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1013"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -44,10 +62,16 @@
   }, 
   {
     "_type": "BinaryOperationNode<double>",
-    "id": "1042",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1014"
+    },
     "input1": {
       "_type": "InputPort<double>",
-      "nodeId": "1042",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1014"
+      },
       "name": "input1",
       "type": 1,
       "input": {
@@ -58,14 +82,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1040",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1012"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "input2": {
       "_type": "InputPort<double>",
-      "nodeId": "1042",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1014"
+      },
       "name": "input2",
       "type": 1,
       "input": {
@@ -76,14 +106,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1041",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1013"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1042",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1014"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -92,10 +128,16 @@
   }, 
   {
     "_type": "DelayNode<double>",
-    "id": "1043",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1015"
+    },
     "input": {
       "_type": "InputPort<double>",
-      "nodeId": "1043",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1015"
+      },
       "name": "input",
       "type": 1,
       "input": {
@@ -106,14 +148,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1042",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1014"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1043",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1015"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -122,10 +170,16 @@
   }, 
   {
     "_type": "DotProductNode<double>",
-    "id": "1045",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1017"
+    },
     "input1": {
       "_type": "InputPort<double>",
-      "nodeId": "1045",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1017"
+      },
       "name": "input1",
       "type": 1,
       "input": {
@@ -136,14 +190,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1042",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1014"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "input2": {
       "_type": "InputPort<double>",
-      "nodeId": "1045",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1017"
+      },
       "name": "input2",
       "type": 1,
       "input": {
@@ -154,14 +214,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1043",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1015"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1045",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1017"
+      },
       "name": "output",
       "type": 1,
       "size": 1
@@ -169,10 +235,16 @@
   }, 
   {
     "_type": "DelayNode<double>",
-    "id": "1044",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1016"
+    },
     "input": {
       "_type": "InputPort<double>",
-      "nodeId": "1044",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1016"
+      },
       "name": "input",
       "type": 1,
       "input": {
@@ -183,14 +255,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1042",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1014"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1044",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1016"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -199,10 +277,16 @@
   }, 
   {
     "_type": "DotProductNode<double>",
-    "id": "1046",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1018"
+    },
     "input1": {
       "_type": "InputPort<double>",
-      "nodeId": "1046",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1018"
+      },
       "name": "input1",
       "type": 1,
       "input": {
@@ -213,14 +297,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1042",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1014"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "input2": {
       "_type": "InputPort<double>",
-      "nodeId": "1046",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1018"
+      },
       "name": "input2",
       "type": 1,
       "input": {
@@ -231,14 +321,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1044",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1016"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1046",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1018"
+      },
       "name": "output",
       "type": 1,
       "size": 1
@@ -246,10 +342,16 @@
   }, 
   {
     "_type": "BinaryOperationNode<double>",
-    "id": "1047",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1019"
+    },
     "input1": {
       "_type": "InputPort<double>",
-      "nodeId": "1047",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1019"
+      },
       "name": "input1",
       "type": 1,
       "input": {
@@ -260,14 +362,20 @@
           "startIndex": 0,
           "numValues": 1,
           "isFixedSize": false,
-          "referencedNodeId": "1045",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1017"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "input2": {
       "_type": "InputPort<double>",
-      "nodeId": "1047",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1019"
+      },
       "name": "input2",
       "type": 1,
       "input": {
@@ -278,14 +386,20 @@
           "startIndex": 0,
           "numValues": 1,
           "isFixedSize": false,
-          "referencedNodeId": "1046",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1018"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1047",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1019"
+      },
       "name": "output",
       "type": 1,
       "size": 1

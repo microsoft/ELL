@@ -3,10 +3,16 @@
   "nodes": [
   {
     "_type": "InputNode<double>",
-    "id": "1028",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1000"
+    },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1028",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1000"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -14,10 +20,16 @@
   }, 
   {
     "_type": "MovingAverageNode<double>",
-    "id": "1029",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1001"
+    },
     "input": {
       "_type": "InputPort<double>",
-      "nodeId": "1029",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1001"
+      },
       "name": "input",
       "type": 1,
       "input": {
@@ -28,14 +40,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1028",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1000"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1029",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1001"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -44,10 +62,16 @@
   }, 
   {
     "_type": "MovingVarianceNode<double>",
-    "id": "1032",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1004"
+    },
     "input": {
       "_type": "InputPort<double>",
-      "nodeId": "1032",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1004"
+      },
       "name": "input",
       "type": 1,
       "input": {
@@ -58,14 +82,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1028",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1000"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1032",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1004"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -74,10 +104,16 @@
   }, 
   {
     "_type": "MovingAverageNode<double>",
-    "id": "1031",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1003"
+    },
     "input": {
       "_type": "InputPort<double>",
-      "nodeId": "1031",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1003"
+      },
       "name": "input",
       "type": 1,
       "input": {
@@ -88,14 +124,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1028",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1000"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1031",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1003"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -104,10 +146,16 @@
   }, 
   {
     "_type": "MovingVarianceNode<double>",
-    "id": "1030",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1002"
+    },
     "input": {
       "_type": "InputPort<double>",
-      "nodeId": "1030",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1002"
+      },
       "name": "input",
       "type": 1,
       "input": {
@@ -118,14 +166,20 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1028",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1000"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1030",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1002"
+      },
       "name": "output",
       "type": 1,
       "size": 3
@@ -134,10 +188,16 @@
   }, 
   {
     "_type": "LinearPredictorNode",
-    "id": "1033",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1005"
+    },
     "input": {
       "_type": "InputPort<double>",
-      "nodeId": "1033",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1005"
+      },
       "name": "input",
       "type": 1,
       "input": {
@@ -148,7 +208,10 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1029",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1001"
+          },
           "referencedPortName": "output"
         }, 
         {
@@ -156,7 +219,10 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1030",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1002"
+          },
           "referencedPortName": "output"
         }, 
         {
@@ -164,7 +230,10 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1031",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1003"
+          },
           "referencedPortName": "output"
         }, 
         {
@@ -172,21 +241,30 @@
           "startIndex": 0,
           "numValues": 3,
           "isFixedSize": false,
-          "referencedNodeId": "1032",
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1004"
+          },
           "referencedPortName": "output"
         }]
       }
     },
     "output": {
       "_type": "OutputPort<double>",
-      "nodeId": "1033",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1005"
+      },
       "name": "output",
       "type": 1,
       "size": 1
     },
     "weightedElements": {
       "_type": "OutputPort<double>",
-      "nodeId": "1033",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1005"
+      },
       "name": "weightedElements",
       "type": 1,
       "size": 12

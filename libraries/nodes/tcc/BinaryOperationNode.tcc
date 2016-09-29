@@ -191,7 +191,7 @@ namespace nodes
             case BinaryOperationType::coordinatewiseMultiply:
                 output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
                 break;
-            case BinaryOperationType::divide:
+            case BinaryOperationType::coordinatewiseDivide:
                 output = ComputeOutput(BinaryOperations::Divide<ValueType>);
                 break;
             case BinaryOperationType::logicalAnd:

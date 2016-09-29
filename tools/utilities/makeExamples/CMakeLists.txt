@@ -40,14 +40,7 @@ set (MODEL_FILES ${EXAMPLE_DIR}/model_1.json
                  ${EXAMPLE_DIR}/tree_0.json
                  ${EXAMPLE_DIR}/tree_1.json
                  ${EXAMPLE_DIR}/tree_2.json
-                 ${EXAMPLE_DIR}/tree_3.json
-                 ${EXAMPLE_DIR}/model_1.xml
-                 ${EXAMPLE_DIR}/model_2.xml
-                 ${EXAMPLE_DIR}/model_3.xml
-                 ${EXAMPLE_DIR}/tree_0.xml
-                 ${EXAMPLE_DIR}/tree_1.xml
-                 ${EXAMPLE_DIR}/tree_2.xml
-                 ${EXAMPLE_DIR}/tree_3.xml)
+                 ${EXAMPLE_DIR}/tree_3.json)
 add_custom_command(TARGET ${PROJ_NAME} 
   POST_BUILD
   COMMAND makeExamples -mf json

@@ -8,14 +8,7 @@ set (MODEL_FILES model_1.json
                  tree_0.json
                  tree_1.json
                  tree_2.json
-                 tree_3.json
-                 model_1.xml
-                 model_2.xml
-                 model_3.xml
-                 tree_0.xml
-                 tree_1.xml
-                 tree_2.xml
-                 tree_3.xml)
+                 tree_3.json)
 set (DATA_FILES ${MODEL_FILES} testData.txt tinyTestData.txt)
 add_custom_target(datafiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
 

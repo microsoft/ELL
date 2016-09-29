@@ -62,7 +62,7 @@ namespace nodes
         auto accumNode = transformer.AddNode<AccumulatorNode<ValueType>>(subtractNode->output);
         std::vector<ValueType> literalN(newPortElements.Size(), (ValueType)_windowSize);
         auto constNode = transformer.AddNode<ConstantNode<ValueType>>(literalN);
-        auto divideNode = transformer.AddNode<BinaryOperationNode<ValueType>>(accumNode->output, constNode->output, BinaryOperationType::divide);
+        auto divideNode = transformer.AddNode<BinaryOperationNode<ValueType>>(accumNode->output, constNode->output, BinaryOperationType::coordinatewiseDivide);
         transformer.MapNodeOutput(output, divideNode->output);
         return true;
     }

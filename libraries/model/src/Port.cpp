@@ -37,16 +37,15 @@ namespace model
 
     void Port::WriteToArchive(utilities::Archiver& archiver) const
     {
-        archiver["nodeId"] << to_string(_node->GetId());
+        archiver["nodeId"] << _node->GetId();
         archiver["name"] << _name;
         archiver["type"] << static_cast<int>(_type);
     }
 
     void Port::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        std::string nodeIdString;
-        archiver["nodeId"] >> nodeIdString; // ignore it
-        Node::NodeId id(nodeIdString);
+        Node::NodeId id;
+        archiver["nodeId"] >> id; 
         archiver["name"] >> _name;
         int typeCode;
         archiver["type"] >> typeCode;
