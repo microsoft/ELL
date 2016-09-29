@@ -6,11 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define ADD_TO_STRING_ENTRY(namespc, op)   \
-    case namespc::op: \
-        return #op;
+#define ADD_TO_STRING_ENTRY(NAMESPACE, OPERATOR) \
+    case NAMESPACE::OPERATOR:                    \
+        return #OPERATOR;
 #define BEGIN_FROM_STRING if (false)
-#define ADD_FROM_STRING_ENTRY(namespc, op) else if (name == #op) return namespc::op
+#define ADD_FROM_STRING_ENTRY(NAMESPACE, OPERATOR) else if (name == #OPERATOR) return NAMESPACE::OPERATOR
 
 namespace emll
 {
@@ -18,7 +18,6 @@ namespace nodes
 {
     namespace BinaryOperations
     {
-
         inline std::string to_string(BinaryOperationType op)
         {
             switch (op)
