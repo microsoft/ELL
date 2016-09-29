@@ -91,9 +91,9 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
-  target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBRARY})
 endif()
 
+target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBRARY})
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #
