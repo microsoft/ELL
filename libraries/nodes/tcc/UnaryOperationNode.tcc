@@ -6,6 +6,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define ADD_TO_STRING_ENTRY(namespc, op)   \
+    case namespc::op: \
+        return #op;
+#define BEGIN_FROM_STRING if (false)
+#define ADD_FROM_STRING_ENTRY(namespc, op) else if (name == #op) return namespc::op
+
 namespace emll
 {
 namespace nodes
@@ -16,25 +22,20 @@ namespace nodes
         {
             switch (op)
             {
-                case UnaryOperationType::none:
-                    return "none";
-                case UnaryOperationType::sqrt:
-                    return "sqrt";
-                case UnaryOperationType::logicalNot:
-                    return "logicalNot";
-                default:
-                    throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
+                ADD_TO_STRING_ENTRY(UnaryOperationType, none);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, sqrt);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, logicalNot);
+
+                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
             }
         }
 
-        inline UnaryOperationType from_string(std::string opName)
+        inline UnaryOperationType from_string(std::string name)
         {
-            if (opName == "none")
-                return UnaryOperationType::none;
-            else if (opName == "sqrt")
-                return UnaryOperationType::sqrt;
-            else if (opName == "logicalNot")
-                return UnaryOperationType::logicalNot;
+            BEGIN_FROM_STRING;
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, none);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, sqrt);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, logicalNot);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
         }

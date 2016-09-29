@@ -6,6 +6,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define ADD_TO_STRING_ENTRY(namespc, op)   \
+    case namespc::op: \
+        return #op;
+#define BEGIN_FROM_STRING if (false)
+#define ADD_FROM_STRING_ENTRY(namespc, op) else if (name == #op) return namespc::op
+
 namespace emll
 {
 namespace nodes
@@ -16,40 +22,28 @@ namespace nodes
         {
             switch (op)
             {
-                case BinaryPredicateType::none:
-                    return "none";
-                case BinaryPredicateType::equal:
-                    return "equal";
-                case BinaryPredicateType::less:
-                    return "less";
-                case BinaryPredicateType::greater:
-                    return "greater";
-                case BinaryPredicateType::notEqual:
-                    return "notEqual";
-                case BinaryPredicateType::lessOrEqual:
-                    return "lessOrEqual";
-                case BinaryPredicateType::greaterOrEqual:
-                    return "greaterOrEqual";
+                ADD_TO_STRING_ENTRY(BinaryPredicateType, none);
+                ADD_TO_STRING_ENTRY(BinaryPredicateType, equal);
+                ADD_TO_STRING_ENTRY(BinaryPredicateType, less);
+                ADD_TO_STRING_ENTRY(BinaryPredicateType, greater);
+                ADD_TO_STRING_ENTRY(BinaryPredicateType, notEqual);
+                ADD_TO_STRING_ENTRY(BinaryPredicateType, lessOrEqual);
+                ADD_TO_STRING_ENTRY(BinaryPredicateType, greaterOrEqual);
                 default:
                     throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
             }
         }
-        inline BinaryPredicateType from_string(std::string opName)
+
+        inline BinaryPredicateType from_string(std::string name)
         {
-            if (opName == "none")
-                return BinaryPredicateType::none;
-            else if (opName == "equal")
-                return BinaryPredicateType::equal;
-            else if (opName == "less")
-                return BinaryPredicateType::less;
-            else if (opName == "greater")
-                return BinaryPredicateType::greater;
-            else if (opName == "notEqual")
-                return BinaryPredicateType::notEqual;
-            else if (opName == "lessOrEqual")
-                return BinaryPredicateType::lessOrEqual;
-            else if (opName == "greaterOrEqual")
-                return BinaryPredicateType::greaterOrEqual;
+            BEGIN_FROM_STRING;
+            ADD_FROM_STRING_ENTRY(BinaryPredicateType, none);
+            ADD_FROM_STRING_ENTRY(BinaryPredicateType, equal);
+            ADD_FROM_STRING_ENTRY(BinaryPredicateType, less);
+            ADD_FROM_STRING_ENTRY(BinaryPredicateType, greater);
+            ADD_FROM_STRING_ENTRY(BinaryPredicateType, notEqual);
+            ADD_FROM_STRING_ENTRY(BinaryPredicateType, lessOrEqual);
+            ADD_FROM_STRING_ENTRY(BinaryPredicateType, greaterOrEqual);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
         }

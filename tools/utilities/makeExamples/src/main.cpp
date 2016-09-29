@@ -28,22 +28,24 @@ void SaveModels(std::string ext)
     auto tree1 = GenerateTreeModel(1);
     auto tree2 = GenerateTreeModel(2);
     auto tree3 = GenerateTreeModel(3);
+    auto refinedTree0 = GenerateRefinedTreeModel(0);
+    auto refinedTree1 = GenerateRefinedTreeModel(1);
+    auto refinedTree2 = GenerateRefinedTreeModel(2);
+    auto refinedTree3 = GenerateRefinedTreeModel(3);
 
     common::SaveModel(model1, "model_1." + ext);
     common::SaveModel(model2, "model_2." + ext);
     common::SaveModel(model3, "model_3." + ext);
+
     common::SaveModel(tree0, "tree_0." + ext);
     common::SaveModel(tree1, "tree_1." + ext);
     common::SaveModel(tree2, "tree_2." + ext);
     common::SaveModel(tree3, "tree_3." + ext);
 
-    // auto newModel1 = common::LoadModel("model_1." + ext);
-    // auto newModel2 = common::LoadModel("model_2." + ext);
-    // auto newModel3 = common::LoadModel("model_3." + ext);
-    // auto newTree0 = common::LoadModel("tree_0." + ext);
-    // auto newTree1 = common::LoadModel("tree_1." + ext);
-    // auto newTree2 = common::LoadModel("tree_2." + ext);
-    // auto newTree3 = common::LoadModel("tree_3." + ext);
+    common::SaveModel(refinedTree0, "refined_tree_0." + ext);
+    common::SaveModel(refinedTree1, "refined_tree_1." + ext);
+    common::SaveModel(refinedTree2, "refined_tree_2." + ext);
+    common::SaveModel(refinedTree3, "refined_tree_3." + ext);
 }
 }
 

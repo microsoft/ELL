@@ -6,55 +6,47 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define ADD_TO_STRING_ENTRY(namespc, op)   \
+    case namespc::op: \
+        return #op;
+#define BEGIN_FROM_STRING if (false)
+#define ADD_FROM_STRING_ENTRY(namespc, op) else if (name == #op) return namespc::op
+
 namespace emll
 {
 namespace nodes
 {
     namespace BinaryOperations
     {
+
         inline std::string to_string(BinaryOperationType op)
         {
             switch (op)
             {
-                case BinaryOperationType::none:
-                    return "none";
-                case BinaryOperationType::add:
-                    return "add";
-                case BinaryOperationType::subtract:
-                    return "subtract";
-                case BinaryOperationType::coordinatewiseMultiply:
-                    return "multiply";
-                case BinaryOperationType::coordinatewiseDivide:
-                    return "divide";
-                case BinaryOperationType::logicalAnd:
-                    return "logicalAnd";
-                case BinaryOperationType::logicalOr:
-                    return "logicalOr";
-                case BinaryOperationType::logicalXor:
-                    return "logicalXor";
+                ADD_TO_STRING_ENTRY(BinaryOperationType, none);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, add);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, subtract);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalAnd);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalOr);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalXor);
                 default:
                     throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
             }
         }
 
-        inline BinaryOperationType from_string(std::string opName)
+        inline BinaryOperationType from_string(std::string name)
         {
-            if (opName == "none")
-                return BinaryOperationType::none;
-            else if (opName == "add")
-                return BinaryOperationType::add;
-            else if (opName == "subtract")
-                return BinaryOperationType::subtract;
-            else if (opName == "multiply")
-                return BinaryOperationType::coordinatewiseMultiply;
-            else if (opName == "divide")
-                return BinaryOperationType::coordinatewiseDivide;
-            else if (opName == "logicalAnd")
-                return BinaryOperationType::logicalAnd;
-            else if (opName == "logicalOr")
-                return BinaryOperationType::logicalOr;
-            else if (opName == "logicalXor")
-                return BinaryOperationType::logicalXor;
+            BEGIN_FROM_STRING;
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, none);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, add);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, subtract);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalAnd);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalOr);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalXor);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
         }
