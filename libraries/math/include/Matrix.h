@@ -67,6 +67,10 @@ namespace math
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
         MatrixBase(size_t numRows, size_t numColumns);
 
+        using RectangularMatrixBase<ElementType>::_pData;
+        using RectangularMatrixBase<ElementType>::_numRows;
+        using RectangularMatrixBase<ElementType>::_numColumns;
+        using RectangularMatrixBase<ElementType>::_increment;
         static constexpr MatrixLayout _transposeLayout = MatrixLayout::rowMajor;
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::column;
         const size_t _numIntervals = _numColumns;
@@ -85,6 +89,10 @@ namespace math
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
         MatrixBase(size_t numRows, size_t numColumns);
 
+        using RectangularMatrixBase<ElementType>::_pData;
+        using RectangularMatrixBase<ElementType>::_numRows;
+        using RectangularMatrixBase<ElementType>::_numColumns;
+        using RectangularMatrixBase<ElementType>::_increment;
         static constexpr MatrixLayout _transposeLayout = MatrixLayout::columnMajor;
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::row;
         const size_t _numIntervals = _numRows;
@@ -196,8 +204,21 @@ namespace math
     protected:
         friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
+        using RectangularMatrixBase<ElementType>::NumRows;
+        using RectangularMatrixBase<ElementType>::NumColumns;
 
         ElementType* GetMajorVectorBegin(size_t index) const;
+
+
+        using RectangularMatrixBase<ElementType>::_pData;
+        using RectangularMatrixBase<ElementType>::_numRows;
+        using RectangularMatrixBase<ElementType>::_numColumns;
+        using RectangularMatrixBase<ElementType>::_increment;
+
+        using MatrixBase<ElementType, Layout>::_numIntervals;
+        using MatrixBase<ElementType, Layout>::_intervalSize;
+        using MatrixBase<ElementType, Layout>::_rowIncrement;
+        using MatrixBase<ElementType, Layout>::_columnIncrement;
     };
 
     /// <summary> Non-const reference to a dense matrix. </summary>
@@ -292,7 +313,21 @@ namespace math
 
     protected:
         friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
+        using RectangularMatrixBase<ElementType>::NumRows;
+        using RectangularMatrixBase<ElementType>::NumColumns;
         using ConstMatrixReference<ElementType, Layout>::ConstMatrixReference;
+
+        using RectangularMatrixBase<ElementType>::_pData;
+        using RectangularMatrixBase<ElementType>::_numRows;
+        using RectangularMatrixBase<ElementType>::_numColumns;
+        using RectangularMatrixBase<ElementType>::_increment;
+
+        using MatrixBase<ElementType, Layout>::_numIntervals;
+        using MatrixBase<ElementType, Layout>::_intervalSize;
+        using MatrixBase<ElementType, Layout>::_rowIncrement;
+        using MatrixBase<ElementType, Layout>::_columnIncrement;
+
+        using ConstMatrixReference<ElementType, Layout>::GetMajorVectorBegin;
     };
 
     /// <summary> A dense matrix. </summary>
@@ -332,7 +367,12 @@ namespace math
         template<typename GeneratorType>
         void Generate(GeneratorType generator);
 
+        // using MatrixReference<ElementType, Layout>::GetDiagonal;
     private:
+        using RectangularMatrixBase<ElementType>::_pData;
+        using RectangularMatrixBase<ElementType>::_numRows;
+        using RectangularMatrixBase<ElementType>::_numColumns;
+        using RectangularMatrixBase<ElementType>::_increment;
         std::vector<ElementType> _data;
     };
 

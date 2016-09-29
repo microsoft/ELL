@@ -201,7 +201,7 @@ void TestMatrix1()
     };
     testing::ProcessTest("Matrix::GetColumn()", M == S4);
 
-    auto w = M.GetDiagonal<math::VectorOrientation::column>();
+   auto w = M.template GetDiagonal<math::VectorOrientation::column>();
     w.Fill(9);
 
     math::ColumnMatrix<ElementType> S5
@@ -236,7 +236,7 @@ void TestMatrix2()
     auto N = M.GetSubMatrix(1, 1, 5, 5);
     N.GetRow(0).Fill(1);
     N.GetRow(4).Fill(1);
-    N.GetDiagonal<math::VectorOrientation::column>().Fill(1);
+    N.template GetDiagonal<math::VectorOrientation::column>().Fill(1);
 
     auto T = N.Transpose();
     T.GetRow(0).Fill(1);

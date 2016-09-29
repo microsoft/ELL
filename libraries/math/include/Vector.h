@@ -202,6 +202,9 @@ namespace math
 
     protected:
         using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
+        using ConstVectorReference<ElementType, Orientation>::_pData;
+        using ConstVectorReference<ElementType, Orientation>::_size;
+        using ConstVectorReference<ElementType, Orientation>::_increment;
 
         template<typename T>
         friend class RectangularMatrixBase;
@@ -228,6 +231,7 @@ namespace math
         Vector(std::initializer_list<ElementType> list);
 
     private:
+        using ConstVectorReference<ElementType, Orientation>::_pData;
         // member variables
         std::vector<ElementType> _data;
     };
