@@ -42,24 +42,33 @@ source_group("tcc" FILES ${TCC})
 #  message(WARNING "BLAS NOT Found!")
 #endif()
 
-set (CBLAS_NAMES ${CBLAS_NAMES} cblas openblas)
+set (BLAS_LIB_NAMES ${BLAS_LIB_NAMES} cblas openblas)
+
+## libopenblas install on ubuntu in /usr/lib and /usr/include
+## TODO: Add private/dependencies/OpenBlas/linux/...
+
+find_library(BLAS_LIBRARY
+  NAMES ${BLAS_LIB_NAMES}
+  PATHS /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
+      ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/lib/
+      ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/
+  )
+
+find_path(BLAS_INCLUDE_DIR cblas.h
+  /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers/
+  /usr/include
+  /usr/local/include
+  ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include/
+  ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include/)
+  )
 
 if(${APPLE})
   # To install commandline tools (which seems to also install headers in /System/Library/Frameworks/...), do this:
   # xcode-select --install
+elseif(${WIN32})
 
-# Add private/dependencies/OpenBlas/linux/...
-  find_library(BLAS_LIBRARY
-    NAMES ${CBLAS_NAMES}
-    PATHS /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
-    )
-
-  find_path(BLAS_INCLUDE_DIR cblas.h
-    /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/
-    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers/
-    )
-
-
+endif()
 
 if (BLAS_LIBRARY AND BLAS_INCLUDE_DIR)
     set(CBLAS_FOUND "YES")
@@ -67,28 +76,8 @@ else ()
     set(CBLAS_FOUND "NO")
 endif ()
 
-
-elseif(${WIN32})
-
-  find_library(BLAS_LIBRARY
-    NAMES ${CBLAS_NAMES}
-    PATHS 
-      ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/lib/
-      ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/
-      /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
-    )
-
-#  set (BLAS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include)
-  find_path(BLAS_INCLUDE_DIR cblas.h
-    ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include/
-    ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include/)
-
-#  set (BLASLibrary ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/lib/libopenblas.dll.a)
-endif()
-
 message(WARNING "BLAS library: ${BLAS_LIBRARY}")
 message(WARNING "BLAS includes: ${BLAS_INCLUDE_DIR}")
-
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include ${BLAS_INCLUDE_DIR})
