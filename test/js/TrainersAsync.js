@@ -24,6 +24,8 @@ console.log(dataset);
 if(dataset)
 {  
   var sgdIncrementalTrainer = EMLL.GetSGDIncrementalTrainer(21, lossarg, sgdtrainarg);
+  console.log(sgdIncrementalTrainer);
+  
   var trainSetIterator = dataset.GetIterator();
   if(trainSetIterator)
   {
@@ -40,6 +42,25 @@ if(dataset)
       console.log("Linear Predictor weights: " + pred.GetWeights());
     }
     console.log("End get predictor ....");
+    
+    console.log(sgdIncrementalTrainer)
+    
+    console.log("Start training async....");    
+    sgdIncrementalTrainer.UpdateAsync(trainSetIterator, function(result)
+    {
+      if(result)
+      {
+        console.log("Start get predictor ....");
+        let pred = sgdIncrementalTrainer.GetPredictor();
+        if(pred)
+        {
+          console.log(pred);
+          console.log("Linear Predictor weights: " + pred.GetWeights());
+        }
+        console.log("End get predictor ....");           
+      }
+    });
+    console.log("Done training async ....");
   }
 }
 
