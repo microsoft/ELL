@@ -21,6 +21,7 @@
 #include "Exception.h"
 #include "IArchivable.h"
 #include "TupleWrapper.h"
+#include "FunctionUtils.h"
 #include "TypeName.h"
 
 // stl

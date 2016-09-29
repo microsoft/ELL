@@ -77,16 +77,5 @@ namespace utilities
 
     template <typename WrappedTupleType>
     using UnwrappedTupleType = typename UnwrappedTuple<WrappedTupleType>::type;
-
-
-    // TODO: move this to someplace else
-    void EvalInOrder() {}
-
-    template <typename Lambda, typename... Lambdas>
-    void EvalInOrder(Lambda&& lambda, Lambdas&&... lambdas)
-    {
-        lambda();
-        EvalInOrder(std::forward<Lambdas>(lambdas)...);
-    }
 }
 }

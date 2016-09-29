@@ -27,6 +27,8 @@ namespace emll
 /// <summary> model namespace </summary>
 namespace model
 {
+    class Model;
+    
     /// <summary> An iterator over the nodes in a Model </summary>
     class NodeIterator : public utilities::IIterator<const Node*>
     {
