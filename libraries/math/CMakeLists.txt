@@ -61,7 +61,6 @@ find_path(BLAS_INCLUDE_DIR cblas.h
   /usr/local/include
   ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include/
   ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include/)
-  )
 
 if(${APPLE})
   # To install commandline tools (which seems to also install headers in /System/Library/Frameworks/...), do this:
