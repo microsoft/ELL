@@ -201,11 +201,12 @@ namespace math
         template<MatrixLayout OtherLayout>
         bool operator !=(const ConstMatrixReference<ElementType, OtherLayout>& other);
 
+        using RectangularMatrixBase<ElementType>::NumRows;
+        using RectangularMatrixBase<ElementType>::NumColumns;
+
     protected:
         friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
-        using RectangularMatrixBase<ElementType>::NumRows;
-        using RectangularMatrixBase<ElementType>::NumColumns;
 
         ElementType* GetMajorVectorBegin(size_t index) const;
 
@@ -311,10 +312,11 @@ namespace math
         /// <returns> Reference to the interval. </returns>
         auto GetMajorVector(size_t index)->VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
 
-    protected:
-        friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using RectangularMatrixBase<ElementType>::NumRows;
         using RectangularMatrixBase<ElementType>::NumColumns;
+
+    protected:
+        friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using ConstMatrixReference<ElementType, Layout>::ConstMatrixReference;
 
         using RectangularMatrixBase<ElementType>::_pData;

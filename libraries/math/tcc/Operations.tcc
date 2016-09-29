@@ -23,13 +23,13 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    static void CommonOperations::Add(ElementType s, VectorReference<ElementType, Orientation>& v)
+    void CommonOperations::Add(ElementType s, VectorReference<ElementType, Orientation> v)
     {
         v.Transform([s](ElementType x) { return x + s; });
     }
     
     template<typename ElementType, MatrixLayout Layout>
-    void CommonOperations::Add(ElementType s, MatrixReference<ElementType, Layout>& M)
+    void CommonOperations::Add(ElementType s, MatrixReference<ElementType, Layout> M)
     {
         for (size_t i = 0; i < M.NumIntervals(); ++i)
         {
@@ -44,7 +44,7 @@ namespace math
     
     template<class DerivedClass>
     template<typename ElementType, MatrixLayout Layout>
-    void DerivedOperations<DerivedClass>::Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A)
+    void DerivedOperations<DerivedClass>::Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout> A)
     {
         if (A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns())
         {
@@ -82,7 +82,7 @@ namespace math
     // 
 
     template<typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::native>::Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
+    void OperationsImplementation<ImplementationType::native>::Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation> u)
     {
         if (v.Size() != u.Size())
         {
@@ -123,7 +123,7 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::native>::Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
+    void OperationsImplementation<ImplementationType::native>::Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation> u)
     {
         if (v.Size() != u.Size())
         {
@@ -198,7 +198,7 @@ namespace math
     //
 
     template<typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::openBlas>::Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
+    void OperationsImplementation<ImplementationType::openBlas>::Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation> u)
     {
         Blas::Copy(static_cast<int>(u.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()), u.GetDataPointer(), static_cast<int>(u.GetIncrement()));
     }
@@ -216,7 +216,7 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u)
+    void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation> u)
     {
         if (v.Size() != u.Size())
         {

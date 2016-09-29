@@ -36,7 +36,7 @@ namespace math
         /// <param name="s"> The scalar being added. </param>
         /// <param name="v"> [in,out] The vector to which the scalar is added. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void Add(ElementType s, VectorReference<ElementType, Orientation>& v);
+        static void Add(ElementType s, VectorReference<ElementType, Orientation> v);
 
         /// <summary> Adds a scalar to a row major matrix, M += s. </summary>
         ///
@@ -44,7 +44,7 @@ namespace math
         /// <param name="s"> The scalar being added. </param>
         /// <param name="M"> [in,out] The row major matrix to which the scalar is added. </param>
         template<typename ElementType, MatrixLayout Layout>
-        static void Add(ElementType s, MatrixReference<ElementType, Layout>& M);
+        static void Add(ElementType s, MatrixReference<ElementType, Layout> M);
     };
 
     /// <summary>
@@ -63,7 +63,7 @@ namespace math
         /// <param name="u"> A const reference to a matrix whose values will be copied. </param>
         /// <param name="v"> [in,out] Reference to a matrix whose values will be overwritten. </param>
         template<typename ElementType, MatrixLayout Layout>
-        static void Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout>& A);
+        static void Copy(const ConstMatrixReference<ElementType, Layout>& B, MatrixReference<ElementType, Layout> A);
 
         /// <summary> Multiplies a row major matrix by a scalar, M *= s. </summary>
         ///
@@ -120,7 +120,7 @@ namespace math
         /// <param name="v"> A const reference to a vector whose values will be copied. </param>
         /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
+        static void Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation> u);
 
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///
@@ -146,7 +146,7 @@ namespace math
         /// <param name="v"> The right hand side vector. </param>
         /// <param name="u"> [in,out] The left hand side vector. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
+        static void Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation> u);
 
         /// <summary>
         /// Calculates a vector dot product (between vectors in any orientation), u * v.
@@ -216,7 +216,7 @@ namespace math
         /// <param name="v"> A const reference to a vector whose values will be copied. </param>
         /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
+        static void Copy(const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation> u);
 
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///
@@ -242,7 +242,7 @@ namespace math
         /// <param name="v"> The right hand side vector. </param>
         /// <param name="u"> [in,out] The left hand side vector. </param>
         template<typename ElementType, VectorOrientation Orientation>
-        static void Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation>& u);
+        static void Add(ElementType s, const ConstVectorReference<ElementType, Orientation>& v, VectorReference<ElementType, Orientation> u);
 
         /// <summary>
         /// Calculates a vector dot Multiply (between vectors in any orientation), u * v.
