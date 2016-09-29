@@ -217,6 +217,15 @@ namespace utilities
             }
         }
         _tokenizer.MatchToken("]");
+
+        // eat a comma if it exists
+        if (hasName)
+        {
+            if (_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
     }
 
     inline void JsonUnarchiver::ReadArray(const char* name, std::vector<std::string>& array)
@@ -246,6 +255,15 @@ namespace utilities
             }
         }
         _tokenizer.MatchToken("]");
+
+        // eat a comma if it exists
+        if (hasName)
+        {
+            if (_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
     }
 }
 }
