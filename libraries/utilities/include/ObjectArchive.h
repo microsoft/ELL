@@ -27,9 +27,12 @@ namespace utilities
     class ObjectArchive
     {
     public:
-        typedef std::unordered_map<std::string, ObjectArchive> PropertyCollection;
+        typedef std::unordered_map<std::string, std::shared_ptr<ObjectArchive>> PropertyCollection;
 
         ObjectArchive() = default;
+
+        // ObjectArchive(const ObjectArchive&);
+        // ObjectArchive(ObjectArchive&&) = default;
 
         /// <summary> Gets the string representing the type name of this object </summary>
         ///
@@ -122,7 +125,7 @@ namespace utilities
     private:
         std::string _typeName;
         Variant _value;
-        mutable std::unordered_map<std::string, ObjectArchive> _properties;
+        mutable PropertyCollection _properties;
 
         // friends
         friend class IArchivable;
