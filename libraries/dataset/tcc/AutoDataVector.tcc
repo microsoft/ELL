@@ -71,9 +71,9 @@ namespace dataset
 
     template<typename DefaultDataVectorType>
     template<typename ReturnType>
-    ReturnType AutoDataVectorBase<DefaultDataVectorType>::ToDataVector() const 
+    ReturnType AutoDataVectorBase<DefaultDataVectorType>::Duplicate() const 
     {
-        return _pInternal->ToDataVector<ReturnType>();
+        return _pInternal->Duplicate<ReturnType>();
     }
 
     template<typename TargetType>

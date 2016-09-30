@@ -48,6 +48,15 @@ namespace utilities
     /// <summary> Enabled if ValueType is not a specialization of std::vector. </summary>
     template <typename ValueType>
     using IsNotVector = typename std::enable_if_t<!IsVectorType<typename std::decay<ValueType>::type>::value, int>;
+
+    /// <summary> Enabled if the two classes are the same. </summary>
+    template <typename T, typename S>
+    using IsSame = typename std::enable_if_t<std::is_same<T, S>::value, bool>;
+
+    /// <summary> Enabled if the two classes are different. </summary>
+    template <typename T, typename S>
+    using IsDifferent = typename std::enable_if_t<!std::is_same<T, S>::value, bool>;
+
 }
 }
 

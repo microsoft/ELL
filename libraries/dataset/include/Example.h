@@ -11,6 +11,9 @@
 #include "DenseDataVector.h"
 #include "AutoDataVector.h"
 
+// utilities
+#include "TypeTraits.h"
+
 // stl
 #include <algorithm> // for std::swap
 #include <cstdint>
@@ -66,9 +69,31 @@ namespace dataset
         /// <returns> The metadata. </returns>
         const MetadataType& GetMetadata() const { return _metadata; }
 
+        /// <summary>
+        /// Creates a new example that contains the same data as this example, in a specified data vector
+        /// type and meta data type. This overload creates a shallow copy of the data vector, because the
+        /// requested data vector type matches the one already stored in this example.
+        /// </summary>
+        ///
+        /// <typeparam name="NewDataVectorType"> Requested data vector type. </typeparam>
+        /// <typeparam name="NewMetadataType"> Requested metadata type (must have a ctor whose argument is the old
+        /// MetadataType). </typeparam>
+        /// <returns> An example. </returns>
+        template<typename NewDataVectorType, typename NewMetadataType, utilities::IsSame<NewDataVectorType, DataVectorType> Concept = true>
+        Example<NewDataVectorType, NewMetadataType> ToExample() const;
 
-        template<typename NewDataVectorType, typename NewMetadataType>
-        Example<NewDataVectorType, NewMetadataType> ToExample() const; // TODO implement this
+        /// <summary>
+        /// Creates a new example that contains the same data as this example, in a specified data vector
+        /// type and meta data type. This overload creates a deep copy of the data vector, because the
+        /// requested data vector is different from the one stored in this example.
+        /// </summary>
+        ///
+        /// <typeparam name="NewDataVectorType"> Requested data vector type. </typeparam>
+        /// <typeparam name="NewMetadataType"> Requested metadata type (must have a ctor whose argument is the old
+        /// MetadataType). </typeparam>
+        /// <returns> An example. </returns>
+        template<typename NewDataVectorType, typename NewMetadataType, utilities::IsDifferent<NewDataVectorType, DataVectorType> Concept = true>
+        Example<NewDataVectorType, NewMetadataType> ToExample() const;
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///

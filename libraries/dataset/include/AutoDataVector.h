@@ -12,6 +12,7 @@
 
 // utilities
 #include "Exception.h"
+#include "TypeTraits.h"
 
 // stl
 #include <initializer_list>
@@ -105,7 +106,7 @@ namespace dataset
         ///
         /// <returns> This new data vector. </returns>
         template<typename ReturnType>
-        ReturnType ToDataVector() const;
+        ReturnType Duplicate() const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
@@ -116,20 +117,14 @@ namespace dataset
         // helper function used by ctors to choose the type of data vector to use
         void FindBestRepresentation(DefaultDataVectorType defaultDataVector);
 
-        template <typename T, typename S>
-        using IsSame = typename std::enable_if_t<std::is_same<T,S>::value, bool>;
-
-        template <typename T, typename S>
-        using IsDifferent = typename std::enable_if_t<!std::is_same<T,S>::value, bool>;
-
-        template<typename DataVectorType, IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
-        void SetInternal(DefaultDataVectorType defaultDataVector)
+        template<typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
+        void SetInternal(DefaultDataVectorType defaultDataVector) // TODO move definition
         {
             _pInternal = std::make_unique<DefaultDataVectorType>(std::move(defaultDataVector));
         }
 
-        template<typename DataVectorType, IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
-        void SetInternal(DefaultDataVectorType defaultDataVector)
+        template<typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
+        void SetInternal(DefaultDataVectorType defaultDataVector) // TODO move def
         {
             _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator());
         }

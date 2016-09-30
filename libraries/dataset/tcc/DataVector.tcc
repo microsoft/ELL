@@ -14,7 +14,7 @@ namespace emll
 namespace dataset
 {
     template<typename ReturnType>
-    ReturnType IDataVector::ToDataVector() const
+    ReturnType IDataVector::Duplicate() const
     {
         switch (GetType())
         {
@@ -111,7 +111,7 @@ namespace dataset
 
     template<class DerivedType>
     template<typename ReturnType>
-    ReturnType DataVectorBase<DerivedType>::ToDataVector() const
+    ReturnType DataVectorBase<DerivedType>::Duplicate() const
     {
         return ReturnType(static_cast<const DerivedType*>(this)->GetIterator());
     }
