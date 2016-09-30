@@ -13,7 +13,7 @@
 #include "IArchivable.h"
 #include "JsonArchiver.h"
 #include "UniqueId.h"
-#include "XMLArchiver.h"
+#include "XmlArchiver.h"
 
 // model
 #include "InputNode.h"
