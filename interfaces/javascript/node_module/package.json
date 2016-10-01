@@ -23,7 +23,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://intelligentdevices.visualstudio.com/_git/UX"
+    "url": "https://intelligentdevices.visualstudio.com/_git/EMLL"
   },
   "gypfile": true,
   "dependencies": {

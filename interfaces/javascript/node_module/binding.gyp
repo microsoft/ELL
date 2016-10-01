@@ -8,9 +8,9 @@
             'OS=="win"', 
             {
                 'variables': {
-                    'swig_include_path_prefix%': '../..',
-                    'include_path_prefix%': '..',
-                    'library_path_prefix%': '..',
+                    'swig_include_path_prefix%': '../../../..',
+                    'include_path_prefix%': '../../..',
+                    'library_path_prefix%': '../../..',
                     'library_path_suffix%': '/Release'
                 },
             }
@@ -19,9 +19,9 @@
             'OS=="mac"', 
             {
                 'variables': {
-                    'swig_include_path_prefix%':'..',
-                    'include_path_prefix%':'..',
-                    'library_path_prefix%':'../..',
+                    'swig_include_path_prefix%':'../../..',
+                    'include_path_prefix%':'../../..',
+                    'library_path_prefix%':'../../../..',
                     'library_path_suffix%': ''
                 },
             }
@@ -30,9 +30,9 @@
             'OS=="linux"', 
             {
                 'variables': {
-                    'swig_include_path_prefix%':'..',
-                    'include_path_prefix%':'..',
-                    'library_path_prefix%':'../..',
+                    'swig_include_path_prefix%':'../../..',
+                    'include_path_prefix%':'../../..',
+                    'library_path_prefix%':'../../../..',
                     'library_path_suffix%': ''
                 },
             }
@@ -45,45 +45,45 @@
                 {
                     'destination': 'build',
                     'files': [
-                        '<(include_path_prefix)/EMLL/build/interfaces/xml/EMLLXML_wrap.xml'
+                        '<(include_path_prefix)/build/interfaces/xml/EMLLXML_wrap.xml'
                     ]    
                 }                
             ],
             'dependencies': [],
             'include_dirs': [
                 "<!(node -e \"require('nan')\")",
-                '<(include_path_prefix)/EMLL/libraries/common/include',
-                '<(include_path_prefix)/EMLL/libraries/dataset/include',
-                '<(include_path_prefix)/EMLL/libraries/evaluators/include',
-                '<(include_path_prefix)/EMLL/libraries/features/include',
-                '<(include_path_prefix)/EMLL/libraries/layers/include',
-                '<(include_path_prefix)/EMLL/libraries/linear/include',
-                '<(include_path_prefix)/EMLL/libraries/model/include',
-                '<(include_path_prefix)/EMLL/libraries/nodes/include',
-                '<(include_path_prefix)/EMLL/libraries/lossFunctions/include',
-                '<(include_path_prefix)/EMLL/libraries/predictors/include',
-                '<(include_path_prefix)/EMLL/libraries/trainers/include',
-                '<(include_path_prefix)/EMLL/libraries/utilities/include',
-                '<(include_path_prefix)/EMLL/interfaces/common/include'
+                '<(include_path_prefix)/libraries/common/include',
+                '<(include_path_prefix)/libraries/dataset/include',
+                '<(include_path_prefix)/libraries/evaluators/include',
+                '<(include_path_prefix)/libraries/features/include',
+                '<(include_path_prefix)/libraries/layers/include',
+                '<(include_path_prefix)/libraries/linear/include',
+                '<(include_path_prefix)/libraries/model/include',
+                '<(include_path_prefix)/libraries/nodes/include',
+                '<(include_path_prefix)/libraries/lossFunctions/include',
+                '<(include_path_prefix)/libraries/predictors/include',
+                '<(include_path_prefix)/libraries/trainers/include',
+                '<(include_path_prefix)/libraries/utilities/include',
+                '<(include_path_prefix)/interfaces/common/include'
             ],
             'sources': [
-                '<(include_path_prefix)/EMLL/interfaces/common/src/DataLoadersInterface.cpp',                
-                '<(include_path_prefix)/EMLL/build/interfaces/javascript/EMLLJAVASCRIPT_wrap.cxx'
+                '<(include_path_prefix)/interfaces/common/src/DataLoadersInterface.cpp',                
+                '<(include_path_prefix)/build/interfaces/javascript/EMLLJAVASCRIPT_wrap.cxx'
             ],
             'link_settings': {
                 'library_dirs': [
-                    '<(library_path_prefix)/EMLL/build/libraries/common<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/dataset<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/evaluators<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/features<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/layers<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/linear<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/model<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/nodes<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/lossFunctions<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/predictors<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/trainers<(library_path_suffix)',
-                    '<(library_path_prefix)/EMLL/build/libraries/utilities<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/common<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/dataset<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/evaluators<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/features<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/layers<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/linear<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/model<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/nodes<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/lossFunctions<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/predictors<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/trainers<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/utilities<(library_path_suffix)',
                 ]
             },
             'conditions': [
