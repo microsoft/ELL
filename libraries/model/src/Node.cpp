@@ -112,6 +112,7 @@ namespace model
     {
         NodeId oldId;
         archiver["id"] >> oldId;
+        _id = oldId;
         auto& context = archiver.GetContext();
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         newContext.MapNode(oldId, this);

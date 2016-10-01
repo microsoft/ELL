@@ -33,7 +33,7 @@
       "name": "input",
       "type": 1,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<double>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -75,7 +75,7 @@
       "name": "input",
       "type": 1,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<double>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -116,7 +116,7 @@
       "name": "input",
       "type": 1,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<double>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -157,7 +157,7 @@
       "name": "input",
       "type": 1,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<double>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -199,7 +199,7 @@
       "name": "input1",
       "type": 1,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<double>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -223,7 +223,7 @@
       "name": "input2",
       "type": 1,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<double>",
         "ranges": [
         {
           "_type": "PortRange",

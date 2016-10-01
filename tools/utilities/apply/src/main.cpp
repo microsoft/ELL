@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
                 auto outputNode = model.GetNode(outputNodeId);
                 if (outputNode == nullptr)
                 {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output node");
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Can't find output node ") + to_string(outputNodeId));
                 }
 
                 auto outputPort = outputNode->GetOutputPort(outputPortName); // ptr to port base

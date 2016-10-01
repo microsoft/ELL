@@ -33,7 +33,7 @@
       "name": "input",
       "type": 1,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<double>",
         "ranges": [
         {
           "_type": "PortRange",

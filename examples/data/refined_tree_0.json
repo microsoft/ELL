@@ -2,159 +2,22 @@
   "_type": "Model",
   "nodes": [
   {
-    "_type": "ConstantNode<bool>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1047"
-    },
-    "output": {
-      "_type": "OutputPort<bool>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1047"
-      },
-      "name": "output",
-      "type": 4,
-      "size": 1
-    },
-    "values": [true]
-  }, 
-  {
-    "_type": "ConstantNode<bool>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1049"
-    },
-    "output": {
-      "_type": "OutputPort<bool>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1049"
-      },
-      "name": "output",
-      "type": 4,
-      "size": 1
-    },
-    "values": [false]
-  }, 
-  {
-    "_type": "InputNode<double>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1042"
-    },
-    "output": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1042"
-      },
-      "name": "output",
-      "type": 1,
-      "size": 3
-    }
-  }, 
-  {
     "_type": "ConstantNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1043"
+      "id": "1054"
     },
     "output": {
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1043"
+        "id": "1054"
       },
       "name": "output",
       "type": 1,
       "size": 1
     },
     "values": [0]
-  }, 
-  {
-    "_type": "BinaryPredicateNode<double>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1044"
-    },
-    "input1": {
-      "_type": "InputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1044"
-      },
-      "name": "input1",
-      "type": 1,
-      "input": {
-        "_type": "PortElementsBase",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": true,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1042"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "input2": {
-      "_type": "InputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1044"
-      },
-      "name": "input2",
-      "type": 1,
-      "input": {
-        "_type": "PortElementsBase",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1043"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "output": {
-      "_type": "OutputPort<bool>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1044"
-      },
-      "name": "output",
-      "type": 4,
-      "size": 1
-    },
-    "predicate": "greater"
-  }, 
-  {
-    "_type": "ConstantNode<double>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1040"
-    },
-    "output": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1040"
-      },
-      "name": "output",
-      "type": 1,
-      "size": 1
-    },
-    "values": [1]
   }, 
   {
     "_type": "ConstantNode<double>",
@@ -172,86 +35,28 @@
       "type": 1,
       "size": 1
     },
-    "values": [-1]
+    "values": [1]
   }, 
   {
-    "_type": "MultiplexerNode<double,bool>",
+    "_type": "ConstantNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1045"
-    },
-    "elements": {
-      "_type": "InputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1045"
-      },
-      "name": "elements",
-      "type": 1,
-      "input": {
-        "_type": "PortElementsBase",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": true,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1041"
-          },
-          "referencedPortName": "output"
-        }, 
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": true,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1040"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "selector": {
-      "_type": "InputPort<bool>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1045"
-      },
-      "name": "selector",
-      "type": 4,
-      "input": {
-        "_type": "PortElementsBase",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": true,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1044"
-          },
-          "referencedPortName": "output"
-        }]
-      }
+      "id": "1040"
     },
     "output": {
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1045"
+        "id": "1040"
       },
       "name": "output",
       "type": 1,
       "size": 1
-    }
+    },
+    "values": [-1]
   }, 
   {
-    "_type": "ConstantNode<double>",
+    "_type": "InputNode<double>",
     "id": {
       "_type": "UniqueId",
       "id": "1039"
@@ -264,38 +69,44 @@
       },
       "name": "output",
       "type": 1,
+      "size": 3
+    }
+  }, 
+  {
+    "_type": "ConstantNode<double>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1042"
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1042"
+      },
+      "name": "output",
+      "type": 1,
       "size": 1
     },
     "values": [0]
   }, 
   {
-    "_type": "SumNode<double>",
+    "_type": "BinaryPredicateNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1046"
+      "id": "1043"
     },
-    "input": {
+    "input1": {
       "_type": "InputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1046"
+        "id": "1043"
       },
-      "name": "input",
+      "name": "input1",
       "type": 1,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<double>",
         "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": true,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1045"
-          },
-          "referencedPortName": "output"
-        }, 
         {
           "_type": "PortRange",
           "startIndex": 0,
@@ -309,11 +120,112 @@
         }]
       }
     },
+    "input2": {
+      "_type": "InputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1043"
+      },
+      "name": "input2",
+      "type": 1,
+      "input": {
+        "_type": "PortElements<double>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1042"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<bool>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1043"
+      },
+      "name": "output",
+      "type": 4,
+      "size": 1
+    },
+    "predicate": "greater"
+  }, 
+  {
+    "_type": "MultiplexerNode<double,bool>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1044"
+    },
+    "elements": {
+      "_type": "InputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1044"
+      },
+      "name": "elements",
+      "type": 1,
+      "input": {
+        "_type": "PortElements<double>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": true,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1040"
+          },
+          "referencedPortName": "output"
+        }, 
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": true,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1041"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "selector": {
+      "_type": "InputPort<bool>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1044"
+      },
+      "name": "selector",
+      "type": 4,
+      "input": {
+        "_type": "PortElements<bool>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": true,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1043"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
     "output": {
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1046"
+        "id": "1044"
       },
       "name": "output",
       "type": 1,
@@ -321,21 +233,21 @@
     }
   }, 
   {
-    "_type": "TypeCastNode<bool,int32>",
+    "_type": "SumNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1048"
+      "id": "1055"
     },
     "input": {
-      "_type": "InputPort<bool>",
+      "_type": "InputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1048"
+        "id": "1055"
       },
       "name": "input",
-      "type": 4,
+      "type": 1,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<double>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -347,6 +259,94 @@
             "id": "1044"
           },
           "referencedPortName": "output"
+        }, 
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": true,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1054"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1055"
+      },
+      "name": "output",
+      "type": 1,
+      "size": 1
+    }
+  }, 
+  {
+    "_type": "ConstantNode<bool>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1045"
+    },
+    "output": {
+      "_type": "OutputPort<bool>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1045"
+      },
+      "name": "output",
+      "type": 4,
+      "size": 1
+    },
+    "values": [true]
+  }, 
+  {
+    "_type": "ConstantNode<bool>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1047"
+    },
+    "output": {
+      "_type": "OutputPort<bool>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1047"
+      },
+      "name": "output",
+      "type": 4,
+      "size": 1
+    },
+    "values": [false]
+  }, 
+  {
+    "_type": "TypeCastNode<bool,int32>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1046"
+    },
+    "input": {
+      "_type": "InputPort<bool>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1046"
+      },
+      "name": "input",
+      "type": 4,
+      "input": {
+        "_type": "PortElements<bool>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": true,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1043"
+          },
+          "referencedPortName": "output"
         }]
       }
     },
@@ -354,7 +354,7 @@
       "_type": "OutputPort<int32>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1048"
+        "id": "1046"
       },
       "name": "output",
       "type": 2,
@@ -365,36 +365,36 @@
     "_type": "ConstantNode<int32>",
     "id": {
       "_type": "UniqueId",
-      "id": "1050"
+      "id": "1051"
     },
     "output": {
       "_type": "OutputPort<int32>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1050"
+        "id": "1051"
       },
       "name": "output",
       "type": 2,
       "size": 1
     },
-    "values": [0]
+    "values": [1]
   }, 
   {
     "_type": "BinaryPredicateNode<int32>",
     "id": {
       "_type": "UniqueId",
-      "id": "1051"
+      "id": "1052"
     },
     "input1": {
       "_type": "InputPort<int32>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1051"
+        "id": "1052"
       },
       "name": "input1",
       "type": 2,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<int32>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -403,7 +403,7 @@
           "isFixedSize": false,
           "referencedNodeId": {
             "_type": "UniqueId",
-            "id": "1048"
+            "id": "1046"
           },
           "referencedPortName": "output"
         }]
@@ -413,89 +413,12 @@
       "_type": "InputPort<int32>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1051"
+        "id": "1052"
       },
       "name": "input2",
       "type": 2,
       "input": {
-        "_type": "PortElementsBase",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1050"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "output": {
-      "_type": "OutputPort<bool>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1051"
-      },
-      "name": "output",
-      "type": 4,
-      "size": 1
-    },
-    "predicate": "equal"
-  }, 
-  {
-    "_type": "MultiplexerNode<bool,bool>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1052"
-    },
-    "elements": {
-      "_type": "InputPort<bool>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1052"
-      },
-      "name": "elements",
-      "type": 4,
-      "input": {
-        "_type": "PortElementsBase",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1049"
-          },
-          "referencedPortName": "output"
-        }, 
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": true,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1047"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "selector": {
-      "_type": "InputPort<bool>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1052"
-      },
-      "name": "selector",
-      "type": 4,
-      "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<int32>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -519,42 +442,143 @@
       "name": "output",
       "type": 4,
       "size": 1
+    },
+    "predicate": "equal"
+  }, 
+  {
+    "_type": "MultiplexerNode<bool,bool>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1053"
+    },
+    "elements": {
+      "_type": "InputPort<bool>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1053"
+      },
+      "name": "elements",
+      "type": 4,
+      "input": {
+        "_type": "PortElements<bool>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1047"
+          },
+          "referencedPortName": "output"
+        }, 
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": true,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1045"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "selector": {
+      "_type": "InputPort<bool>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1053"
+      },
+      "name": "selector",
+      "type": 4,
+      "input": {
+        "_type": "PortElements<bool>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1052"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<bool>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1053"
+      },
+      "name": "output",
+      "type": 4,
+      "size": 1
     }
   }, 
   {
     "_type": "ConstantNode<int32>",
     "id": {
       "_type": "UniqueId",
-      "id": "1053"
+      "id": "1048"
     },
     "output": {
       "_type": "OutputPort<int32>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1053"
+        "id": "1048"
       },
       "name": "output",
       "type": 2,
       "size": 1
     },
-    "values": [1]
+    "values": [0]
   }, 
   {
     "_type": "BinaryPredicateNode<int32>",
     "id": {
       "_type": "UniqueId",
-      "id": "1054"
+      "id": "1049"
     },
     "input1": {
       "_type": "InputPort<int32>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1054"
+        "id": "1049"
       },
       "name": "input1",
       "type": 2,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<int32>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1046"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "input2": {
+      "_type": "InputPort<int32>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1049"
+      },
+      "name": "input2",
+      "type": 2,
+      "input": {
+        "_type": "PortElements<int32>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -569,35 +593,11 @@
         }]
       }
     },
-    "input2": {
-      "_type": "InputPort<int32>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1054"
-      },
-      "name": "input2",
-      "type": 2,
-      "input": {
-        "_type": "PortElementsBase",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1053"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
     "output": {
       "_type": "OutputPort<bool>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1054"
+        "id": "1049"
       },
       "name": "output",
       "type": 4,
@@ -609,18 +609,53 @@
     "_type": "MultiplexerNode<bool,bool>",
     "id": {
       "_type": "UniqueId",
-      "id": "1055"
+      "id": "1050"
     },
     "elements": {
       "_type": "InputPort<bool>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1055"
+        "id": "1050"
       },
       "name": "elements",
       "type": 4,
       "input": {
-        "_type": "PortElementsBase",
+        "_type": "PortElements<bool>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1047"
+          },
+          "referencedPortName": "output"
+        }, 
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": true,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1045"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "selector": {
+      "_type": "InputPort<bool>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1050"
+      },
+      "name": "selector",
+      "type": 4,
+      "input": {
+        "_type": "PortElements<bool>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -632,41 +667,6 @@
             "id": "1049"
           },
           "referencedPortName": "output"
-        }, 
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": true,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1047"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "selector": {
-      "_type": "InputPort<bool>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1055"
-      },
-      "name": "selector",
-      "type": 4,
-      "input": {
-        "_type": "PortElementsBase",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 1,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1054"
-          },
-          "referencedPortName": "output"
         }]
       }
     },
@@ -674,7 +674,7 @@
       "_type": "OutputPort<bool>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1055"
+        "id": "1050"
       },
       "name": "output",
       "type": 4,
