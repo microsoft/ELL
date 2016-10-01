@@ -29,7 +29,23 @@ namespace dataset
     }
 
     template <typename ValueType, typename IntegerListType>
-    std::vector<double> SparseDataVector<ValueType, IntegerListType>::ToArray() const
+    std::vector<ValueType> SparseDataVector<ValueType, IntegerListType>::ToArray() const
+    {
+        auto vector = std::vector<ValueType>(Size());
+        auto indexValueIterator = GetIterator();
+
+        while (indexValueIterator.IsValid())
+        {
+            auto indexValue = indexValueIterator.Get();
+            vector[indexValue.index] = indexValue.value;
+            indexValueIterator.Next();
+        }
+
+        return vector;
+    }
+
+    template <typename ValueType, typename IntegerListType>
+    std::vector<double> SparseDataVector<ValueType, IntegerListType>::ToDoubleArray() const
     {
         auto vector = std::vector<double>(Size());
         auto indexValueIterator = GetIterator();
@@ -37,7 +53,7 @@ namespace dataset
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
-            vector[indexValue.index] = indexValue.value;
+            vector[indexValue.index] = static_cast<double>(indexValue.value);
             indexValueIterator.Next();
         }
 

@@ -1,13 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StlIndexValueIterator.h (utilities)
+//  File:     StlIndexValueIterator.h (linear)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
+// linear
 #include "IndexValue.h"
 
 // stl
@@ -18,12 +19,12 @@
 
 namespace emll
 {
-namespace utilities
+namespace linear
 {
     /// <summary> A read-only forward index-value iterator for an STL container </summary>
 
     template <typename IteratorType, typename ValueType = decltype(*std::declval<IteratorType>())>
-    class StlIndexValueIterator : public linear::IIndexValueIterator
+    class StlIndexValueIterator : public IIndexValueIterator
     {
     public:
         /// <summary> Constructs an instance of StlIndexValueIterator. </summary>
@@ -68,7 +69,7 @@ namespace utilities
     /// <param name="array"> The std::vector to copy values into </param>
     /// <param name="indexValueIterator"> The IndexValueIterator to copy values from </param>
     template <typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> = 0>
-    void CopyToArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array);
+    void CopyToDoubleArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array);
 }
 }
 

@@ -78,7 +78,7 @@ namespace trainers
         {
             const auto& example = exampleIterator.Get();
 
-            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
+            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToDoubleArray());
 
             ExampleMetadata metadata;
             metadata.strong = example.GetMetadata();

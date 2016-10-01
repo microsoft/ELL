@@ -50,7 +50,17 @@ namespace dataset
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const = 0;
+        virtual std::vector<double> ToDoubleArray() const = 0;
+    };
+
+    template <typename ValueType>
+    class IDataVectorT : public IDataVector
+    {
+    public:
+        /// <summary> Copies the contents of this DataVector into a std::vector. </summary>
+        ///
+        /// <returns> The array. </returns>
+        virtual std::vector<ValueType> ToArray() const = 0;
     };
 }
 }

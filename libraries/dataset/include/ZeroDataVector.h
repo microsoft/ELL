@@ -115,7 +115,7 @@ namespace dataset
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override { return std::vector<double>(0); }
+        virtual std::vector<double> ToDoubleArray() const override { return std::vector<double>(0); }
     };
 }
 }

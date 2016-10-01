@@ -8,6 +8,7 @@
 
 #include "ModelTransformer.h"
 #include "Node.h"
+#include "InputNode.h"
 
 // utilities
 #include "Exception.h"
@@ -108,6 +109,42 @@ namespace model
         // clear out the context
         _context = TransformContext();
         return _model;
+    }
+
+    PortElementsBase ModelTransformer::TransformPortElements(const PortElementsBase& elements)
+    {
+        auto size = elements.Size();
+        PortElementsBase result;
+        result.Reserve(size);
+        for (size_t index = 0; index < size; ++index)
+        {
+            auto oldElement = elements.GetElement(index);
+            assert(_elementToElementMap.find(oldElement) != _elementToElementMap.end());
+            if (_elementToElementMap.find(oldElement) == _elementToElementMap.end())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
+            }
+            auto newElement = _elementToElementMap[oldElement];
+            auto newPort = newElement.ReferencedPort();
+            result.Append({ *newPort, newElement.GetIndex() });
+        }
+        result.Consolidate();
+        return result;
+    }
+
+    PortElementsBase ModelTransformer::GetCorrespondingOutputs(const OutputPortBase& port)
+    {
+        return GetCorrespondingOutputs(PortElementsBase(port));
+    }
+
+    PortElementsBase ModelTransformer::GetCorrespondingOutputs(const PortElementsBase& elements)
+    {
+        return TransformPortElements(elements);
+    }
+
+    InputNodeBase* ModelTransformer::GetCorrespondingInputNode(const InputNodeBase* inputNode)
+    {
+        return GetCorrespondingInputNodeAs(inputNode);
     }
 
     std::vector<const Node*> ModelTransformer::FindUncompilableNodes(const Model& model, const TransformContext& context) const

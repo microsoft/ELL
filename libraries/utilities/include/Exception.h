@@ -66,6 +66,7 @@ namespace utilities
     enum class SystemExceptionErrors
     {
         fileNotFound,
+        fileNotWritable,
         serialPortUnavailable
     };
 

@@ -23,9 +23,16 @@ namespace utilities
     class UniqueId : public IArchivable
     {
     public:
-        /// <summary> Constructor </summary>
+        /// <summary> Default constructor </summary>
         UniqueId();
+
         UniqueId(const UniqueId& other) = default;
+
+        /// <summary> Constructor from string representation </summary>
+        ///
+        /// <param name="idString"> A string representation of a `UniqueId` </param>
+        explicit UniqueId(const std::string& idString);
+
         UniqueId& operator=(const UniqueId& other) = default;
 
         /// <summary> Equality comparison </summary>

@@ -27,6 +27,8 @@ namespace emll
 /// <summary> model namespace </summary>
 namespace model
 {
+    class Model;
+    
     /// <summary> An iterator over the nodes in a Model </summary>
     class NodeIterator : public utilities::IIterator<const Node*>
     {
@@ -52,7 +54,6 @@ namespace model
         std::unordered_set<const Node*> _visitedNodes;
         std::vector<const Node*> _stack;
 
-        bool _visitFullModel = false;
         const Node* _currentNode = nullptr;
     };
 
@@ -80,7 +81,14 @@ namespace model
         /// <typeparam name="NodeType"> The type of the node </typeparam>
         /// <returns> A vector of nodes of the requested type </returns>
         template <typename NodeType>
-        std::vector<const NodeType*> GetNodesByType();
+        std::vector<const NodeType*> GetNodesByType() const;
+
+        /// <summary> Retrieves a set of nodes by type </summary>
+        ///
+        /// <typeparam name="NodeType"> The type of the node </typeparam>
+        /// <returns> A vector of nodes of the requested type </returns>
+        template <typename NodeType>
+        std::vector<NodeType*> GetNodesByType();
 
         /// <summary> Returns part of the output computed by the model </summary>
         ///
@@ -93,6 +101,12 @@ namespace model
         /// <param name="elements"> The output port elements to get the computed value form </param>
         template <typename ValueType>
         std::vector<ValueType> ComputeOutput(const PortElements<ValueType>& elements) const;
+
+        /// <summary> Returns part of the output computed by the model </summary>
+        ///
+        /// <param name="elements"> The output port elements to get the computed value form </param>
+        template <typename ValueType>
+        std::vector<ValueType> ComputeOutput(const PortElementsBase& elements) const;
 
         /// <summary>
         /// Visits all the nodes in the model in dependency order. No nodes will be visited until all
@@ -180,14 +194,19 @@ namespace model
     public:
         /// <summary> Constructor </summary>
         ///
-        /// <param name="otherContext"> The `SerializationContext` to wrap </param>
+        /// <param name="previousContext"> The `SerializationContext` to wrap </param>
         /// <param name="model"> The model being constructed </param>
-        ModelSerializationContext(utilities::SerializationContext& otherContext, const Model* model);
+        ModelSerializationContext(utilities::SerializationContext& previousContext, const Model* model);
 
         /// <summary> Gets the type factory associated with this context. </summary>
         ///
         /// <returns> The type factory associated with this context. </returns>
-        virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _originalContext.GetTypeFactory(); }
+        virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _previousContext.GetTypeFactory(); }
+
+        /// <summary> Sets the model this map is deserializing
+        ///
+        /// <param name="model"> The model this map wraps </param>
+        void SetModel(const Model* model);
 
         /// <summary> Returns the Model currently being deserialized. </summary>
         ///
@@ -197,7 +216,7 @@ namespace model
         /// <summary> Returns a pointer to an already-deserialized node, given its serialized ID </summary>
         ///
         /// <returns> A pointer to an already-deserialized node. </returns>
-        Node* GetNodeFromId(const Node::NodeId& id);
+        Node* GetNodeFromSerializedId(const Node::NodeId& id);
 
         /// <summary> Associate a newly-deserialized node with its serialized ID </summary>
         ///
@@ -206,7 +225,7 @@ namespace model
         void MapNode(const Node::NodeId& id, Node* node);
 
     private:
-        utilities::SerializationContext& _originalContext;
+        utilities::SerializationContext& _previousContext;
         const Model* _model;
         std::unordered_map<Node::NodeId, Node*> _oldToNewNodeMap;
     };

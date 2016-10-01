@@ -159,7 +159,7 @@ namespace dataset
     };
 
     typedef RowDataset<GenericSupervisedExample> GenericRowDataset;
-    typedef GenericRowDataset::Iterator GenericRowIterator;
+    typedef RowDataset<DenseSupervisedExample> DenseRowDataset;
 
     template <typename ExampleType>
     std::ostream& operator<<(std::ostream& os, RowDataset<ExampleType>& dataset);

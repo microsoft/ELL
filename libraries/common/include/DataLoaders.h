@@ -12,8 +12,6 @@
 
 // dataset
 #include "RowDataset.h"
-
-// dataset
 #include "ParsingIterator.h"
 
 // stl
@@ -35,6 +33,9 @@ namespace common
     /// <param name="dataLoadArguments"> The data load arguments. </param>
     ///
     /// <returns> The row dataset. </returns>
-    dataset::GenericRowDataset GetRowDataset(const DataLoadArguments& dataLoadArguments);
+    template <typename DatasetType = dataset::GenericRowDataset>
+    DatasetType GetRowDataset(const DataLoadArguments& dataLoadArguments);
 }
 }
+
+#include "../tcc/DataLoaders.tcc"

@@ -23,6 +23,15 @@ namespace utilities
         ++_nextId;
     }
 
+    UniqueId::UniqueId(const std::string& idString)
+    {
+        _id = std::stoi(idString);
+        if(_nextId <= _id)
+        {
+            _nextId = _id+1;
+        }
+    }
+
     bool UniqueId::operator==(const UniqueId& other) const
     {
         return _id == other._id;

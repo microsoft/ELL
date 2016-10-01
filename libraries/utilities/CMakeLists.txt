@@ -12,7 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/CompressedIntegerList.cpp
+set (SRC src/Archiver.cpp
          src/CommandLineParser.cpp
          src/CompressedIntegerList.cpp
          src/Files.cpp
@@ -20,27 +20,29 @@ set (SRC src/CompressedIntegerList.cpp
          src/IArchivable.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
+         src/JsonArchiver.cpp
          src/ObjectArchive.cpp
          src/ObjectArchiver.cpp
          src/OutputStreamImpostor.cpp
          src/RandomEngines.cpp
-         src/Archiver.cpp
-         src/JsonArchiver.cpp
          src/Tokenizer.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
          src/Variant.cpp
          src/XMLArchiver.cpp)
 
-set (INCLUDE include/CompressedIntegerList.h
+set (INCLUDE include/AnyIterator.h
+             include/Archiver.h
              include/CommandLineParser.h
+             include/CompressedIntegerList.h
              include/Exception.h
              include/Files.h
              include/Format.h
+             include/FunctionUtils.h
+             include/IArchivable.h
              include/IIterator.h
              include/IntegerList.h
              include/IntegerStack.h
-             include/IArchivable.h
              include/JsonArchiver.h
              include/ObjectArchive.h
              include/ObjectArchiver.h
@@ -48,11 +50,10 @@ set (INCLUDE include/CompressedIntegerList.h
              include/ParallelTransformIterator.h
              include/Parser.h
              include/RandomEngines.h
-             include/Archiver.h
-             include/StlIndexValueIterator.h
              include/StlIterator.h
              include/Tokenizer.h
              include/TransformIterator.h
+             include/TupleWrapper.h
              include/TypeFactory.h
              include/TypeName.h
              include/TypeTraits.h
@@ -61,17 +62,18 @@ set (INCLUDE include/CompressedIntegerList.h
              include/XMLArchiver.h)
 
 set (TCC tcc/AnyIterator.tcc
+         tcc/Archiver.tcc
          tcc/CommandLineParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
+         tcc/FunctionUtils.tcc
          tcc/IArchivable.tcc
          tcc/JsonArchiver.tcc
          tcc/ObjectArchive.tcc
          tcc/ObjectArchiver.tcc
+         tcc/OutputStreamImpostor.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
-         tcc/Archiver.tcc
-         tcc/StlIndexValueIterator.tcc
          tcc/StlIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc

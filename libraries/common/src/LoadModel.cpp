@@ -10,6 +10,7 @@
 #include "IsNodeCompilable.h"
 
 // model
+#include "DynamicMap.h"
 #include "InputNode.h"
 #include "Model.h"
 #include "OutputNode.h"
@@ -63,7 +64,6 @@ namespace common
             predictor.GetWeights()[index] = (double)(index % 5);
         }
         auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
-        // auto outputNode = model.AddNode<model::OutputNode<double>>(classifierNode->prediction);
         return model;
     }
 
@@ -83,8 +83,6 @@ namespace common
 
         // combine them
         auto diff = model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
-
-        //        auto output = model.AddNode<model::OutputNode<double>>(maxVal->val);
         return model;
     }
 
@@ -103,8 +101,6 @@ namespace common
         auto dot2 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay2->output);
 
         auto dotDifference = model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationNode<double>::OperationType::subtract);
-
-        //        auto output = model.AddNode<model::OutputNode<double>>(classifierNode->output);
         return model;
     }
 
@@ -114,7 +110,6 @@ namespace common
         using SplitAction = predictors::SimpleForestPredictor::SplitAction;
         using SplitRule = predictors::SingleElementThresholdPredictor;
         using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
-        using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
         // build a forest
         predictors::SimpleForestPredictor forest;
@@ -140,7 +135,6 @@ namespace common
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
         auto simpleForestPredictorNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
-        auto outputNode = model.AddNode<model::OutputNode<double>>(simpleForestPredictorNode->output);
         return model;
     }
 
@@ -155,11 +149,15 @@ namespace common
 
     void RegisterNodeTypes(utilities::SerializationContext& context)
     {
-        context.GetTypeFactory().AddType<model::Node, utilities::UniqueId>();
+        // TODO: add more node types!
         context.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, model::InputNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, model::OutputNode<bool>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::AccumulatorNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ArgMaxNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ArgMinNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();
@@ -200,11 +198,29 @@ namespace common
         }
     }
 
-    template <typename ArchiverType>
-    void SaveArchivedModel(const model::Model& model, std::ostream& stream)
+    template <typename UnarchiverType>
+    model::DynamicMap LoadArchivedMap(std::istream& stream)
+    {
+        try
+        {
+            utilities::SerializationContext context;
+            RegisterNodeTypes(context);
+            UnarchiverType unarchiver(stream, context);
+            model::DynamicMap map;
+            unarchiver.Unarchive(map);
+            return map;
+        }
+        catch (const std::exception&)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file.");
+        }
+    }
+
+    template <typename ArchiverType, typename ObjectType>
+    void SaveArchivedObject(const ObjectType& obj, std::ostream& stream)
     {
         ArchiverType archiver(stream);
-        archiver.Archive(model);
+        archiver.Archive(obj);
     }
 
     bool IsKnownExtension(const std::string& ext)
@@ -214,7 +230,11 @@ namespace common
 
     model::Model LoadModel(const std::string& filename)
     {
-        std::string treePrefix = "[tree_";
+        const std::string treePrefix = "[tree_";
+        if (filename == "")
+        {
+            return model::Model{};
+        }
         if (filename == "[1]")
         {
             return GetModel1();
@@ -263,19 +283,93 @@ namespace common
     void SaveModel(const model::Model& model, const std::string& filename)
     {
         auto ext = utilities::GetFileExtension(filename);
-        if (ext == "xml")
+        if (IsKnownExtension(ext))
         {
+            if (!utilities::IsFileWritable(filename))
+            {
+                throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotWritable);
+            }
             auto filestream = utilities::OpenOfstream(filename);
-            SaveArchivedModel<utilities::XmlArchiver>(model, filestream);
+            SaveModel(model, filestream, ext);
         }
-        else if (ext == "json")
+    }
+
+    void SaveModel(const model::Model& model, std::ostream& outStream, std::string filetype)
+    {
+        if (filetype == "xml")
         {
-            auto filestream = utilities::OpenOfstream(filename);
-            SaveArchivedModel<utilities::JsonArchiver>(model, filestream);
+            SaveArchivedObject<utilities::XmlArchiver>(model, outStream);
+        }
+        else if (filetype == "json")
+        {
+            SaveArchivedObject<utilities::JsonArchiver>(model, outStream);
         }
         else
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + filetype + "\"");
+        }
+    }
+
+    //
+    // Map
+    //
+    model::DynamicMap LoadMap(const std::string& filename)
+    {
+        if (filename == "")
+        {
+            return model::DynamicMap{};
+        }
+
+        auto ext = utilities::GetFileExtension(filename, true);
+        if (IsKnownExtension(ext))
+        {
+            if (!utilities::IsFileReadable(filename))
+            {
+                throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound);
+            }
+
+            auto filestream = utilities::OpenIfstream(filename);
+            if (ext == "xml")
+            {
+                return LoadArchivedMap<utilities::XmlUnarchiver>(filestream);
+            }
+            else if (ext == "json")
+            {
+                return LoadArchivedMap<utilities::JsonUnarchiver>(filestream);
+            }
+        }
+
+        model::Model emptyModel;
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
+    }
+
+    void SaveMap(const model::DynamicMap& map, const std::string& filename)
+    {
+        auto ext = utilities::GetFileExtension(filename);
+        if (IsKnownExtension(ext))
+        {
+            if (!utilities::IsFileWritable(filename))
+            {
+                throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotWritable);
+            }
+            auto filestream = utilities::OpenOfstream(filename);
+            SaveMap(map, filestream, ext);
+        }
+    }
+
+    void SaveMap(const model::DynamicMap& map, std::ostream& outStream, std::string filetype)
+    {
+        if (filetype == "xml")
+        {
+            SaveArchivedObject<utilities::XmlArchiver>(map, outStream);
+        }
+        else if (filetype == "json")
+        {
+            SaveArchivedObject<utilities::JsonArchiver>(map, outStream);
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + filetype + "\"");
         }
     }
 }

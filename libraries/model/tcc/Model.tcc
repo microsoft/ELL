@@ -87,17 +87,40 @@ namespace model
         return result;
     }
 
+    template <typename ValueType>
+    std::vector<ValueType> Model::ComputeOutput(const PortElementsBase& elements) const
+    {
+        auto typedElements = PortElements<ValueType>(elements);
+        return ComputeOutput(typedElements);
+    }
+
     //
     // Get nodes by type
     //
     template <typename NodeType>
-    std::vector<const NodeType*> Model::GetNodesByType()
+    std::vector<const NodeType*> Model::GetNodesByType() const
     {
         std::vector<const NodeType*> result;
         auto findNodes = [&result](const Node& node) {
-            if (typeid(node) == typeid(NodeType))
+            auto nodePtr = dynamic_cast<const NodeType*>(&node);
+            if (nodePtr != nullptr)
             {
-                result.push_back(dynamic_cast<const NodeType*>(&node));
+                result.push_back(nodePtr);
+            }
+        };
+        Visit(findNodes);
+        return result;
+    }
+
+    template <typename NodeType>
+    std::vector<NodeType*> Model::GetNodesByType()
+    {
+        std::vector<NodeType*> result;
+        auto findNodes = [&result](const Node& node) {
+            auto nodePtr = dynamic_cast<const NodeType*>(&node);
+            if (nodePtr != nullptr)
+            {
+                result.push_back(const_cast<NodeType*>(nodePtr));
             }
         };
         Visit(findNodes);

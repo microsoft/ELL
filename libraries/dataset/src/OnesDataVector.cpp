@@ -65,7 +65,7 @@ namespace dataset
         }
     }
 
-    std::vector<double> OnesDataVector::ToArray() const
+    std::vector<double> OnesDataVector::ToDoubleArray() const
     {
         auto vector = std::vector<double>(Size());
         std::fill(vector.begin(), vector.end(), 1.0);

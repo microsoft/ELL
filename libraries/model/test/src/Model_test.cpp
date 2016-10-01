@@ -80,6 +80,32 @@ void PrintModel(const model::Model& model, const model::Node* output)
     model.Visit(NodePrinter, output);
 }
 
+model::Model GetSimpleModel()
+{
+    model::Model g;
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
+    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
+    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 2);
+    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 2);
+    g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
+    return g;
+}
+
+model::Model GetComplexModel()
+{
+    model::Model g;
+    auto in = g.AddNode<model::InputNode<double>>(3);
+    auto in2 = g.AddNode<model::InputNode<bool>>(3);
+    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
+    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
+    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 2);
+    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 2);
+    g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
+    g.AddNode<model::OutputNode<bool>>(model::PortElements<bool>({in2->output }));
+    return g;
+}
+
 void TestStaticModel()
 {
     // Create a simple computation model

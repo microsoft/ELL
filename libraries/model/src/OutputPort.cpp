@@ -10,7 +10,6 @@
 
 namespace emll
 {
-/// <summary> model namespace </summary>
 namespace model
 {
     OutputPortBase::OutputPortBase(const class Node* node, std::string name, PortType type, size_t size)

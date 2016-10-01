@@ -12,8 +12,6 @@
 
 // linear
 #include "IVector.h"
-
-// utilities
 #include "StlIndexValueIterator.h"
 
 // stl
@@ -32,10 +30,11 @@ namespace dataset
     ///
     /// <typeparam name="ValueType"> Type of the value type. </typeparam>
     template <typename ValueType>
-    class DenseDataVector : public IDataVector
+    class DenseDataVector : public IDataVectorT<ValueType>
     {
     public:
-        using Iterator = utilities::VectorIndexValueIterator<ValueType>;
+        using Iterator = linear::VectorIndexValueIterator<ValueType>;
+        using value_type = ValueType;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
@@ -50,10 +49,20 @@ namespace dataset
         template <typename IndexValueIteratorType, typename concept = linear::IsIndexValueIterator<IndexValueIteratorType>>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
 
+        /// <summary> Constructs an instance of DenseDataVector from an IDataVector. </summary>
+        ///
+        /// <param name="data"> The IDataVector. </param>
+        DenseDataVector(const IDataVector& dataVector);
+
         /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
         ///
         /// <param name="data"> The std::vector. </param>
-        DenseDataVector(std::vector<ValueType> data);
+//        DenseDataVector(std::vector<ValueType> data);
+
+        /// <summary> Constructs an instance of DenseDataVector from a std::vector<double>. </summary>
+        ///
+        /// <param name="data"> The std::vector<double>. </param>
+        DenseDataVector(std::vector<double> data);
 
         /// <summary> Array indexer operator. </summary>
         ///
@@ -76,6 +85,8 @@ namespace dataset
         ///
         /// <returns> An uint64_t. </returns>
         virtual uint64_t Size() const override { return _data.size(); }
+
+        void Resize(size_t size);
 
         /// <summary> The number of non-zeros. </summary>
         ///
@@ -105,7 +116,7 @@ namespace dataset
         /// <summary> Returns an Iterator that points to the beginning of the std::vector. </summary>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
+        Iterator GetIterator() const { return linear::MakeStlIndexValueIterator(_data); }
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
@@ -120,7 +131,9 @@ namespace dataset
         /// <summary> Copies the contents of this DataVector into a double array of given size. </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override;
+        virtual std::vector<double> ToDoubleArray() const override;
+
+        virtual std::vector<ValueType> ToArray() const override { return _data; }
 
     private:
         uint64_t _numNonzeros;
