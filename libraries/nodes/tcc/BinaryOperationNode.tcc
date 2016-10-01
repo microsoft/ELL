@@ -6,12 +6,50 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define ADD_TO_STRING_ENTRY(NAMESPACE, OPERATOR) \
+    case NAMESPACE::OPERATOR:                    \
+        return #OPERATOR;
+#define BEGIN_FROM_STRING if (false)
+#define ADD_FROM_STRING_ENTRY(NAMESPACE, OPERATOR) else if (name == #OPERATOR) return NAMESPACE::OPERATOR
+
 namespace emll
 {
 namespace nodes
 {
     namespace BinaryOperations
     {
+        inline std::string to_string(BinaryOperationType op)
+        {
+            switch (op)
+            {
+                ADD_TO_STRING_ENTRY(BinaryOperationType, none);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, add);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, subtract);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalAnd);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalOr);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalXor);
+                default:
+                    throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
+            }
+        }
+
+        inline BinaryOperationType from_string(std::string name)
+        {
+            BEGIN_FROM_STRING;
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, none);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, add);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, subtract);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalAnd);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalOr);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalXor);
+
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
+        }
+
         template <typename ValueType>
         ValueType Add(ValueType a, ValueType b)
         {
@@ -102,12 +140,12 @@ namespace nodes
 
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode()
-        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(OperationType::none)
+        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(BinaryOperationType::none)
     {
     }
 
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, OperationType operation)
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, BinaryOperationType operation)
         : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
     {
         if (input1.Size() != input2.Size())
@@ -135,25 +173,25 @@ namespace nodes
         std::vector<ValueType> output;
         switch (_operation)
         {
-            case OperationType::add:
+            case BinaryOperationType::add:
                 output = ComputeOutput(BinaryOperations::Add<ValueType>);
                 break;
-            case OperationType::subtract:
+            case BinaryOperationType::subtract:
                 output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
                 break;
-            case OperationType::coordinatewiseMultiply:
+            case BinaryOperationType::coordinatewiseMultiply:
                 output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
                 break;
-            case OperationType::divide:
+            case BinaryOperationType::coordinatewiseDivide:
                 output = ComputeOutput(BinaryOperations::Divide<ValueType>);
                 break;
-            case OperationType::logicalAnd:
+            case BinaryOperationType::logicalAnd:
                 output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
                 break;
-            case OperationType::logicalOr:
+            case BinaryOperationType::logicalOr:
                 output = ComputeOutput(BinaryOperations::LogicalOr<ValueType>);
                 break;
-            case OperationType::logicalXor:
+            case BinaryOperationType::logicalXor:
                 output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
                 break;
             default:
@@ -178,7 +216,7 @@ namespace nodes
         archiver[input1PortName] << _input1;
         archiver[input2PortName] << _input2;
         archiver[outputPortName] << _output;
-        archiver["operation"] << static_cast<int>(_operation);
+        archiver["operation"] << BinaryOperations::to_string(_operation);
     }
 
     template <typename ValueType>
@@ -188,9 +226,9 @@ namespace nodes
         archiver[input1PortName] >> _input1;
         archiver[input2PortName] >> _input2;
         archiver[outputPortName] >> _output;
-        int operation = 0;
+        std::string operation;
         archiver["operation"] >> operation;
-        _operation = static_cast<OperationType>(operation);
+        _operation = BinaryOperations::from_string(operation);
     }
 }
 }

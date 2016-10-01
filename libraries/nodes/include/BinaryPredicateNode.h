@@ -25,6 +25,18 @@ namespace emll
 {
 namespace nodes
 {
+    /// <summary> Types of coordinatewise operations supported by this node type. </summary>
+    enum class BinaryPredicateType
+    {
+        none,
+        equal,
+        less,
+        greater,
+        notEqual,
+        lessOrEqual,
+        greaterOrEqual
+    };
+
     /// <summary> A node that performs a coordinatewise binary boolean-valued operation on its inputs. </summary>
     template <typename ValueType>
     class BinaryPredicateNode : public model::Node
@@ -38,18 +50,6 @@ namespace nodes
         const model::OutputPort<bool>& output = _output;
         /// @}
 
-        /// <summary> Types of coordinatewise operations supported by this node type. </summary>
-        enum class PredicateType
-        {
-            none,
-            equal,
-            less,
-            greater,
-            notEqual,
-            lessOrEqual,
-            greaterOrEqual
-        };
-
         /// <summary> Default Constructor </summary>
         BinaryPredicateNode();
 
@@ -58,7 +58,7 @@ namespace nodes
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
         /// <param name="predicate"> The type of predicate to apply. </param>
-        BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, PredicateType predicate);
+        BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, BinaryPredicateType predicate);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -83,8 +83,8 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-		/// <summary>Get the predicate type</summary>
-		PredicateType GetPredicateType() const { return _predicate; }
+        /// <summary>Get the predicate type</summary>
+        BinaryPredicateType GetPredicateType() const { return _predicate; }
 
     protected:
         virtual void Compute() const override;
@@ -101,7 +101,7 @@ namespace nodes
         model::OutputPort<bool> _output;
 
         // Operation
-        PredicateType _predicate;
+        BinaryPredicateType _predicate;
     };
 }
 }

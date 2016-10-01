@@ -45,7 +45,7 @@ namespace model
     void Port::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::NodeId id;
-        archiver["nodeId"] >> id; // ignore it
+        archiver["nodeId"] >> id; 
         archiver["name"] >> _name;
         int typeCode;
         archiver["type"] >> typeCode;

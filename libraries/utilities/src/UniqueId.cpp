@@ -50,12 +50,14 @@ namespace utilities
 
     void UniqueId::WriteToArchive(Archiver& archiver) const
     {
-        archiver["id"] << _id;
+        archiver["id"] << to_string(*this);
     }
 
     void UniqueId::ReadFromArchive(Unarchiver& archiver)
     {
-        archiver["id"] >> _id;
+        std::string idString;
+        archiver["id"] >> idString;
+        *this = UniqueId(idString);
     }
 
     std::string to_string(const UniqueId& id)

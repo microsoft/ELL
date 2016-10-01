@@ -79,7 +79,7 @@ namespace utilities
 
     void Unarchiver::UnarchiveValue(const char* name, IArchivable& value)
     {
-        auto typeName = BeginUnarchiveObject(name, value.GetRuntimeTypeName());
+        auto typeName = BeginUnarchiveObject(name, GetArchivedTypeName(value));
         UnarchiveObject(name, value);
         EndUnarchiveObject(name, typeName);
     }

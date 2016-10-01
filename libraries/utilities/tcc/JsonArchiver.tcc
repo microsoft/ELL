@@ -86,7 +86,7 @@ namespace utilities
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
-        auto endOfLine = "\n";
+        auto endOfLine = ",\n";
 
         FinishPreviousLine();
         _out << indent;
@@ -98,6 +98,8 @@ namespace utilities
         _out << "[";
 
         // reset indent
+        auto prevIndent = _indent;
+        _indent = 0;
         auto numItems = array.size();
         for (size_t index = 0; index < numItems; ++index)
         {
@@ -108,6 +110,7 @@ namespace utilities
             }
         }
         // reset indent
+        _indent = prevIndent;
         _out << "]";
         SetEndOfLine(endOfLine);
     }
@@ -214,6 +217,15 @@ namespace utilities
             }
         }
         _tokenizer.MatchToken("]");
+
+        // eat a comma if it exists
+        if (hasName)
+        {
+            if (_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
     }
 
     inline void JsonUnarchiver::ReadArray(const char* name, std::vector<std::string>& array)
@@ -243,6 +255,15 @@ namespace utilities
             }
         }
         _tokenizer.MatchToken("]");
+
+        // eat a comma if it exists
+        if (hasName)
+        {
+            if (_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
     }
 }
 }
