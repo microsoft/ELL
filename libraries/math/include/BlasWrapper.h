@@ -8,8 +8,6 @@
 
 #pragma once
 
-#define USE_BLAS
-
 // OpenBlas
 #include "cblas.h"
 

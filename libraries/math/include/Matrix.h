@@ -163,13 +163,10 @@ namespace math
         /// <returns> A const reference to the matrix row. </returns>
         ConstVectorReference<ElementType, VectorOrientation::row> GetRow(size_t index) const;
 
-        /// <summary> Gets a const reference to the matrix diagonal. </summary>
-        ///
-        /// <typeparam name="Orientation"> User must specify whether the return value is a column or row vector. </typeparam>
+        /// <summary> Gets a const reference to the matrix diagonal as a column vector. </summary>
         ///
         /// <returns> A const reference to the matrix diagnoal. </returns>
-        template<VectorOrientation Orientation = VectorOrientation::column>
-        ConstVectorReference<ElementType, Orientation> GetDiagonal() const;
+        ConstVectorReference<ElementType, VectorOrientation::column> GetDiagonal() const;
 
         /// <summary> Gets a constant reference to a row of a row major matrix or to a column of a column major matrix. </summary>
         ///
@@ -297,13 +294,10 @@ namespace math
         /// <returns> A reference to the matrix row. </returns>
         VectorReference<ElementType, VectorOrientation::row> GetRow(size_t index);
 
-        /// <summary> Gets a reference to the matrix diagonal. </summary>
-        ///
-        /// <typeparam name="Orientation"> User must specify whether the return value is a column or row vector. </typeparam>
+        /// <summary> Gets a reference to the matrix diagonal as a column vector. </summary>
         ///
         /// <returns> A const reference to the matrix diagnoal. </returns>
-        template<VectorOrientation Orientation = VectorOrientation::column>
-        VectorReference<ElementType, Orientation> GetDiagonal();
+        VectorReference<ElementType, VectorOrientation::column> GetDiagonal();
 
         /// <summary> Gets a reference to a row of a row major matrix or to a column of a column major matrix. </summary>
         ///
@@ -369,7 +363,6 @@ namespace math
         template<typename GeneratorType>
         void Generate(GeneratorType generator);
 
-        // using MatrixReference<ElementType, Layout>::GetDiagonal;
     private:
         using RectangularMatrixBase<ElementType>::_pData;
         using RectangularMatrixBase<ElementType>::_numRows;

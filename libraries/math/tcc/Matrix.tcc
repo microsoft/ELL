@@ -106,11 +106,10 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    template<VectorOrientation Orientation>
-    ConstVectorReference<ElementType, Orientation> ConstMatrixReference<ElementType, Layout>::GetDiagonal() const
+    ConstVectorReference<ElementType, VectorOrientation::column> ConstMatrixReference<ElementType, Layout>::GetDiagonal() const
     {
         auto size = std::min(NumColumns(), NumRows());
-        return RectangularMatrixBase<ElementType>::template ConstructConstVectorReference<Orientation>(_pData, size, _increment + 1);
+        return RectangularMatrixBase<ElementType>::template ConstructConstVectorReference<VectorOrientation::column>(_pData, size, _increment + 1);
     }
 
     template<typename ElementType, MatrixLayout Layout>
@@ -240,11 +239,10 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    template<VectorOrientation Orientation>
-    VectorReference<ElementType, Orientation> MatrixReference<ElementType, Layout>::GetDiagonal()
+    VectorReference<ElementType, VectorOrientation::column> MatrixReference<ElementType, Layout>::GetDiagonal()
     {
         auto size = std::min(NumColumns(), NumRows());
-        return RectangularMatrixBase<ElementType>::template ConstructVectorReference<Orientation>(_pData, size, _increment + 1);
+        return RectangularMatrixBase<ElementType>::template ConstructVectorReference<VectorOrientation::column>(_pData, size, _increment + 1);
     }
 
     template<typename ElementType, MatrixLayout Layout>
