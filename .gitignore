@@ -236,3 +236,4 @@ browse.VC.db
 external/llvm/include/
 external/llvm/lib/
 swig/
+dist/
