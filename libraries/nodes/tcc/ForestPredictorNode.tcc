@@ -172,19 +172,19 @@ namespace nodes
     void ForestPredictorNode<SplitRuleType, EdgePredictorType>::Compute() const
     {
         // forest output
-        auto dataVector = ForestPredictor::DataVectorType(_input.GetIterator());
-        _output.SetOutput({ _forest.Predict(dataVector) });
+        auto inputDataVector = ForestPredictor::DataVectorType(_input.GetIterator());
+        _output.SetOutput({ _forest.Predict(inputDataVector) });
 
         // individual tree outputs
         std::vector<double> treeOutputs(_forest.NumTrees());
         for (size_t i = 0; i < _forest.NumTrees(); ++i)
         {
-            treeOutputs[i] = _forest.Predict(dataVector, _forest.GetRootIndex(i));
+            treeOutputs[i] = _forest.Predict(inputDataVector, _forest.GetRootIndex(i));
         }
         _treeOutputs.SetOutput(std::move(treeOutputs));
 
         // path indicator
-        auto edgeIndicator = _forest.GetEdgeIndicatorVector(_input);
+        auto edgeIndicator = _forest.GetEdgeIndicatorVector(inputDataVector);
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
     }
 }

@@ -266,25 +266,19 @@ namespace predictors
 
         /// <summary> Generates the edge path indicator vector of the entire forest. </summary>
         ///
-        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
-        ///  input. </typeparam>
         /// <param name="input"> The input vector. </param>
         ///
         /// <returns> The edge indicator vector. </returns>
-        template <typename RandomAccessVectorType>
-        std::vector<bool> GetEdgeIndicatorVector(const RandomAccessVectorType& input) const;
+        std::vector<bool> GetEdgeIndicatorVector(const DataVectorType& input) const;
 
         /// <summary> Generates the edge path indicator vector of a given subtree for a given input. The
         /// dimension of this vector is NumEdges() (regardless of the subtree chosen). </summary>
         ///
-        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
-        ///  input. </typeparam>
         /// <param name="input"> The input vector. </param>
         /// <param name="interiorNodeIndex"> Zero-based index of the interior node. </param>
         ///
         /// <returns> The edge indicator vector. </returns>
-        template <typename RandomAccessVectorType>
-        std::vector<bool> GetEdgeIndicatorVector(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
+        std::vector<bool> GetEdgeIndicatorVector(const DataVectorType& input, size_t interiorNodeIndex) const;
 
         /// <summary> Gets a SplittableNodeId that represents the root of a new tree. </summary>
         ///

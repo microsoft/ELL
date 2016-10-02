@@ -66,7 +66,7 @@ void ForestPredictorTest()
     testing::ProcessTest("Testing Compute()", testing::IsEqual(output, 4.0, 1.0e-8));
 
     // test path generation
-    auto edgeIndicator = forest.GetEdgeIndicatorVector(linear::DoubleVector({ 0.25, 0.7, 0.0 }));
+    auto edgeIndicator = forest.GetEdgeIndicatorVector(dataset::DoubleDataVector{ 0.25, 0.7, 0.0 });
     testing::ProcessTest("Testing SetEdgeIndicatorVector()", testing::IsEqual(edgeIndicator, std::vector<bool>{ 1, 0, 0, 1, 0, 0, 0, 1 }));
 }
 
