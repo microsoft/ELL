@@ -76,7 +76,7 @@ namespace trainers
     template <typename LossFunctionType, typename BoosterType>
     void SortingForestTrainer<LossFunctionType, BoosterType>::SortNodeDataset(Range range, size_t inputIndex)
     {
-        _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
+        _dataset.Sort([inputIndex](const dataset::Example<dataset::DoubleDataVector, ExampleMetadata>& example) { return example.GetDataVector()[inputIndex]; },
                       range.firstIndex,
                       range.size);
     }

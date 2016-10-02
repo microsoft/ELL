@@ -29,8 +29,7 @@ namespace dataset
     Example<NewDataVectorType, NewMetadataType> Example<DataVectorType, MetadataType>::ToExample() const
     {
         // deep copy of data vector
-        auto newDataVector = _dataVector->Duplicate<NewDataVectorType>()
-        return Example<NewDataVectorType, NewMetadataType>(std::make_shared<NewDataVectorType>(std::move(newDataVector)), NewMetadataType(_metadata));
+        return Example<NewDataVectorType, NewMetadataType>(std::make_shared<NewDataVectorType>(_dataVector->Duplicate<NewDataVectorType>()), NewMetadataType(_metadata));
     }
 
     template <typename DataVectorType, typename MetadataType>

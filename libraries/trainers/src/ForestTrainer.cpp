@@ -106,6 +106,10 @@ namespace trainers
         return _childSums[position];
     }
 
+    ForestTrainerBase::ExampleMetadata::ExampleMetadata(const dataset::WeightLabel& metaData) : strong(metaData)
+    {
+    }
+
     //
     // debugging code
     //

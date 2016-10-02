@@ -77,6 +77,7 @@ namespace trainers
         // metadata that the forest trainer keeps with each example
         struct ExampleMetadata
         {
+            ExampleMetadata(const dataset::WeightLabel& metaData);  
             void Print(std::ostream& os) const;
 
             // strong weight and label
@@ -200,8 +201,7 @@ namespace trainers
         SplitCandidatePriorityQueue _queue;
 
         // the dataset
-        using ForestTrainerExample = dataset::Example<dataset::DoubleDataVector, ExampleMetadata>;
-        dataset::RowDataset<ForestTrainerExample> _dataset;
+        dataset::RowDataset<dataset::Example<dataset::DoubleDataVector, ExampleMetadata>> _dataset;
     };
 }
 }

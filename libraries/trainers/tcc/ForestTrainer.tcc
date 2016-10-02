@@ -71,20 +71,17 @@ namespace trainers
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(dataset::AutoSupervisedDataset::Iterator exampleIterator)
     {
         // reset the dataset
-        _dataset = dataset::RowDataset<ForestTrainerExample>();
+        _dataset.Reset();
 
         // create the dataset from the example iterator
         while (exampleIterator.IsValid())
         {
-            const auto& example = exampleIterator.Get();
+            const auto& oldExample = exampleIterator.Get();
 
-            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToArray());
+            auto newExample = oldExample.ToExample<dataset::DoubleDataVector, ExampleMetadata>();
+            newExample.GetMetadata().currentOutput = _forest->Predict(newExample.GetDataVector());
 
-            ExampleMetadata metadata;
-            metadata.strong = example.GetMetadata();
-            metadata.currentOutput = _forest->Predict(*denseDataVector);
-
-            _dataset.AddExample(ForestTrainerExample(std::move(denseDataVector), metadata));
+            _dataset.AddExample(std::move(newExample));
 
             exampleIterator.Next();
         }
@@ -190,13 +187,13 @@ namespace trainers
     {
         if (splitRule.NumOutputs() == 2)
         {
-            _dataset.Partition([splitRule](const ForestTrainerExample& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
+            _dataset.Partition([splitRule](const dataset::Example<dataset::DoubleDataVector, ExampleMetadata>& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
                                range.firstIndex,
                                range.size);
         }
         else
         {
-            _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Predict(example.GetDataVector()); },
+            _dataset.Sort([splitRule](const dataset::Example<dataset::DoubleDataVector, ExampleMetadata>& example) { return splitRule.Predict(example.GetDataVector()); },
                           range.firstIndex,
                           range.size);
         }
