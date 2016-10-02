@@ -276,12 +276,14 @@ namespace utilities
     {
         if (_options.find(info.name) != _options.end())
         {
-            throw CommandLineParserInvalidOptionsException("Error: adding same option more than once");
+            auto messageStr = std::string{"Error: adding same option more than once ("} + info.name + ")";
+            throw CommandLineParserInvalidOptionsException(messageStr.c_str());
         }
 
         if (_shortToLongNameMap.find(info.shortName) != _shortToLongNameMap.end())
         {
-            throw CommandLineParserInvalidOptionsException("Error: adding same short name more than once");
+            auto messageStr = std::string{"Error: adding same short name more than once ("} + info.shortName + ")";
+            throw CommandLineParserInvalidOptionsException(messageStr.c_str());
         }
 
         _options[info.name] = info;

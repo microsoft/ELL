@@ -19,8 +19,18 @@ namespace emll
 {
 namespace utilities
 {
-    const char typeNameLeftBracket = '(';
-    const char typeNameRightBracket = ')';
+    /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
+    ///
+    /// <param name="baseType"> The base type (e.g., 'Vector') </param>
+    /// <typeparam name="Types"> The templated type (e.g., 'double') </typeparam>
+    template <typename... Types>
+    std::string GetCompositeTypeName(std::string baseType);
+
+    /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
+    ///
+    /// <param name="baseType"> The base type (e.g., 'Vector') </param>
+    /// <param name="subtypes"> The list of templated types (e.g., 'double') </param>
+    std::string GetCompositeTypeName(std::string baseType, const std::vector<std::string>& subtypes);
 
     /// <summary> Class used to get information about class types. </summary>
     ///
@@ -68,6 +78,21 @@ namespace utilities
         ///
         /// <returns> The serialization name. </returns>
         static std::string GetName();
+    };
+
+    /// <summary> Class used to get information about tuple types. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template <typename... T>
+    struct TypeName<std::tuple<T...>>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName()
+        {
+            return GetCompositeTypeName<typename std::decay<T>::type...>("tuple");
+        }
     };
 
     /// <summary> Class used to get information about the bool type. </summary>
@@ -259,19 +284,6 @@ namespace utilities
         /// <returns> The serialization name. </returns>
         static std::string GetName() { return "std::false_type"; }
     };
-
-    /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
-    ///
-    /// <param name="baseType"> The base type (e.g., 'Vector') </param>
-    /// <typeparam name="Types"> The templated type (e.g., 'double') </typeparam>
-    template <typename... Types>
-    std::string GetCompositeTypeName(std::string baseType);
-
-    /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
-    ///
-    /// <param name="baseType"> The base type (e.g., 'Vector') </param>
-    /// <param name="subtypes"> The list of templated types (e.g., 'double') </param>
-    std::string GetCompositeTypeName(std::string baseType, const std::vector<std::string>& subtypes);
 }
 }
 

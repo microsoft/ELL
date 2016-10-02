@@ -92,7 +92,7 @@ namespace nodes
                 {
                     model::PortElements<double> elements = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
 
-                    auto sumNode = transformer.AddNode<BinaryOperationNode<double>>(edgePredictorNode->output, elements, BinaryOperationNode<double>::OperationType::add);
+                    auto sumNode = transformer.AddNode<BinaryOperationNode<double>>(edgePredictorNode->output, elements, BinaryOperationType::add);
                     edgeOutputs.Append(sumNode->output);
                 }
                 else // target node is a leaf

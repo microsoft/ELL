@@ -12,7 +12,6 @@
 
 // utilities
 #include "IArchivable.h"
-#include "IArchivable.h"
 
 // stl
 #include <unordered_set>
@@ -28,6 +27,30 @@ namespace model
     void Node::AddInputPort(InputPortBase* input)
     {
         _inputs.push_back(input);
+    }
+
+    InputPortBase* Node::GetInputPort(const std::string& portName)
+    {
+        for (auto port : _inputs)
+        {
+            if (port->GetName() == portName)
+            {
+                return port;
+            }
+        }
+        return nullptr;
+    }
+
+    OutputPortBase* Node::GetOutputPort(const std::string& portName)
+    {
+        for (auto port : _outputs)
+        {
+            if (port->GetName() == portName)
+            {
+                return port;
+            }
+        }
+        return nullptr;
     }
 
     std::vector<const Node*> Node::GetParentNodes() const
@@ -89,6 +112,7 @@ namespace model
     {
         NodeId oldId;
         archiver["id"] >> oldId;
+        _id = oldId;
         auto& context = archiver.GetContext();
         ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
         newContext.MapNode(oldId, this);

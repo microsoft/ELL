@@ -22,6 +22,7 @@
 %ignore emll::dataset::IDataVector::Clone;
 %ignore emll::dataset::GenericRowDataset::GenericRowDataset(emll::dataset::GenericRowDataset&&);
 %ignore emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>::RowDataset(emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>&&);
+%ignore emll::dataset::GenericSupervisedExample::GenericSupervisedExample;
 %ignore emll::dataset::GenericSupervisedExample::GenericSupervisedExample(emll::dataset::GenericSupervisedExample&&);
 %ignore emll::dataset::DenseSupervisedExample::DenseSupervisedExample(emll::dataset::DenseSupervisedExample&&);
 %ignore emll::dataset::RowDataset< emll::dataset::GenericSupervisedExample >::RowDataset(emll::dataset::RowDataset< emll::dataset::GenericSupervisedExample > &&);
@@ -29,6 +30,7 @@
 %ignore emll::dataset::SparseDataVector<double, emll::utilities::CompressedIntegerList>;
 %ignore emll::dataset::SparseDataVector<float, emll::utilities::CompressedIntegerList>;
 %ignore emll::dataset::SparseDataVector<short, emll::utilities::CompressedIntegerList>;
+%ignore emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>::Example;
 
 %include "noncopyable.i"
 %include "unique_ptr.i"

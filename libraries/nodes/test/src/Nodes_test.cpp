@@ -210,7 +210,7 @@ void TestUnaryOperationNodeCompute()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, nodes::UnaryOperationNode<double>::OperationType::sqrt);
+    auto outputNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, nodes::UnaryOperationType::sqrt);
 
     for (int index = 0; index < data.size(); ++index)
     {
@@ -233,7 +233,7 @@ void TestBinaryOperationNodeCompute()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, inputNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
+    auto outputNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, inputNode->output, nodes::BinaryOperationType::add);
 
     for (int index = 0; index < data.size(); ++index)
     {

@@ -12,16 +12,21 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/Model.cpp
+set (SRC src/DynamicMap.cpp
+         src/InputNode.cpp
+         src/Model.cpp
          src/ModelTransformer.cpp
          src/Node.cpp
+         src/OutputNode.cpp
          src/OutputPort.cpp
          src/PortElements.cpp
          src/Port.cpp
 )
 
-set (INCLUDE include/InputNode.h
+set (INCLUDE include/DynamicMap.h
+             include/InputNode.h
              include/InputPort.h
+             include/Map.h
              include/Model.h
              include/ModelTransformer.h
              include/Node.h
@@ -31,8 +36,10 @@ set (INCLUDE include/InputNode.h
              include/Port.h
 )
 
-set (TCC tcc/InputNode.tcc
+set (TCC tcc/DynamicMap.tcc
+         tcc/InputNode.tcc
          tcc/InputPort.tcc
+         tcc/Map.tcc
          tcc/Model.tcc
          tcc/ModelTransformer.tcc
          tcc/OutputNode.tcc
@@ -50,7 +57,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
 
-target_link_libraries(${PROJ_NAME} utilities linear)
+target_link_libraries(${PROJ_NAME} utilities dataset linear) // TODO check this
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -63,9 +70,13 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp
+              test/src/DynamicMap_test.cpp
+              test/src/Map_test.cpp
               test/src/Model_test.cpp
               test/src/PortElements_test.cpp)
 set (TEST_INCLUDE test/include/PortElements_test.h
+                  test/include/DynamicMap_test.h
+                  test/include/Map_test.h
                   test/include/Model_test.h)
 
 source_group("src" FILES ${TEST_SRC})

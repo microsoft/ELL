@@ -62,6 +62,20 @@ namespace utilities
         return false;
     }
 
+    bool IsFileWritable(std::string filepath)
+    {
+        // open file
+        std::ofstream fs(filepath);
+
+        // check that it opened
+        if (fs.is_open())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     std::string GetFileExtension(std::string filepath, bool toLowercase)
     {
         auto dotPos = filepath.find_last_of('.');

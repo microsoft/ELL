@@ -58,11 +58,11 @@ namespace nodes
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto delayNode = transformer.AddNode<DelayNode<ValueType>>(newPortElements, _windowSize);
-        auto subtractNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newPortElements, delayNode->output, BinaryOperationNode<ValueType>::OperationType::subtract);
+        auto subtractNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newPortElements, delayNode->output, BinaryOperationType::subtract);
         auto accumNode = transformer.AddNode<AccumulatorNode<ValueType>>(subtractNode->output);
         std::vector<ValueType> literalN(newPortElements.Size(), (ValueType)_windowSize);
         auto constNode = transformer.AddNode<ConstantNode<ValueType>>(literalN);
-        auto divideNode = transformer.AddNode<BinaryOperationNode<ValueType>>(accumNode->output, constNode->output, BinaryOperationNode<ValueType>::OperationType::divide);
+        auto divideNode = transformer.AddNode<BinaryOperationNode<ValueType>>(accumNode->output, constNode->output, BinaryOperationType::coordinatewiseDivide);
         transformer.MapNodeOutput(output, divideNode->output);
         return true;
     }

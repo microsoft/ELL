@@ -108,6 +108,19 @@ namespace model
     }
 
     template <typename ValueType>
+    PortElements<ValueType>::PortElements(const PortElementsBase& other)
+    {
+        for(const auto& range: other.GetRanges())
+        {
+            if(range.GetType() != Port::GetPortType<ValueType>())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+            }
+            AddRange(range);
+        }
+    }
+
+    template <typename ValueType>
     PortElement<ValueType> PortElements<ValueType>::GetElement(size_t index) const
     {
         auto baseElement = PortElementsBase::GetElement(index);
@@ -118,10 +131,7 @@ namespace model
     template <typename ValueType>
     void PortElements<ValueType>::Append(const PortElements<ValueType>& other)
     {
-        for (const auto& range : other.GetRanges())
-        {
-            AddRange(range);
-        }
+        PortElementsBase::Append(other);
     }
 
     //

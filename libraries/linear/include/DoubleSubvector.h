@@ -11,8 +11,6 @@
 #include "DoubleVector.h"
 #include "IVector.h"
 #include "IndexValue.h"
-
-// utilities
 #include "StlIndexValueIterator.h"
 
 // stl
@@ -29,7 +27,7 @@ namespace linear
     class DoubleSubvector : public IVector
     {
     public:
-        using Iterator = utilities::StlIndexValueIterator<const double*, double>;
+        using Iterator = StlIndexValueIterator<const double*, double>;
         /// <summary> Constructs a DoubleSubvector. </summary>
         ///
         /// <param name="vec"> The vector to reference. </param>

@@ -2,6 +2,8 @@
 // Model tests
 //
 
+#include "DynamicMap_test.h"
+#include "Map_test.h"
 #include "Model_test.h"
 #include "PortElements_test.h"
 
@@ -18,8 +20,9 @@ using namespace emll;
 
 int main()
 {
-    try
+   try
     {
+        // Model tests
         TestStaticModel();
         TestNodeIterator();
         TestExampleModel();
@@ -32,12 +35,26 @@ int main()
         // PortElements tests
         TestSlice();
         TestAppend();
+
+        // DynamicMap tests
+        TestDynamicMapCreate();
+        TestDynamicMapCompute();
+        TestDynamicMapRefine();
+        TestDynamicMapSerialization();
+
+        // Typed Map tests
+        TestMapCreate();
+        TestMapCompute();
+        TestMapRefine();
+        TestNamedInputOutput();
+        TestMapSerialization();
+        TestComplexMap();
     }
-    catch (const utilities::Exception& exception)
-    {
-        std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
-        throw;
-    }
+   catch (const utilities::Exception& exception)
+   {
+       std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
+       throw;
+   }
 
     if (testing::DidTestFail())
     {

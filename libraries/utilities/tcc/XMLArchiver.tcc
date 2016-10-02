@@ -20,7 +20,7 @@ namespace utilities
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
-        auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName<ValueType>());
 
         _out << indent;
         _out << "<" << typeName;
@@ -40,7 +40,7 @@ namespace utilities
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
         auto endOfLine = hasName ? "\n" : "";
-        auto typeName = XmlUtilities::EncodeTypeName(TypeName<bool>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName<bool>());
 
         _out << indent;
         _out << "<" << typeName;
@@ -98,7 +98,7 @@ namespace utilities
     {
         bool hasName = name != std::string("");
         auto indent = GetCurrentIndent();
-        auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName<ValueType>());
 
         _out << indent;
         _out << "<Array";
@@ -133,7 +133,7 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void XmlUnarchiver::ReadScalar(const char* name, ValueType& value)
     {
-        auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName<ValueType>());
         bool hasName = name != std::string("");
 
         _tokenizer.MatchTokens({ "<", typeName });
@@ -194,7 +194,7 @@ namespace utilities
     template <typename ValueType, IsFundamental<ValueType> concept>
     void XmlUnarchiver::ReadArray(const char* name, std::vector<ValueType>& array)
     {
-        auto typeName = XmlUtilities::EncodeTypeName(TypeName<ValueType>::GetName());
+        auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName<ValueType>());
         bool hasName = name != std::string("");
 
         _tokenizer.MatchTokens({ "<", "Array" });

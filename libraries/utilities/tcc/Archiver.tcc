@@ -77,7 +77,7 @@ namespace utilities
     template <typename ValueType, IsArchivable<ValueType> concept>
     void Archiver::ArchiveItem(const char* name, const std::vector<ValueType>& array)
     {
-        auto baseTypeName = ValueType::GetTypeName();
+        auto baseTypeName = GetArchivedTypeName<ValueType>();
         std::vector<const utilities::IArchivable*> tmpArray;
         for (const auto& item : array)
         {
@@ -90,7 +90,7 @@ namespace utilities
     template <typename ValueType, IsArchivable<ValueType> concept>
     void Archiver::ArchiveItem(const char* name, const std::vector<const ValueType*>& array)
     {
-        auto baseTypeName = ValueType::GetTypeName();
+        auto baseTypeName = GetArchivedTypeName<ValueType>();
         std::vector<const utilities::IArchivable*> tmpArray;
         for (const auto& item : array)
         {
@@ -148,7 +148,7 @@ namespace utilities
     template <typename ValueType, IsArchivable<ValueType> concept>
     void Unarchiver::UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value)
     {
-        auto baseTypeName = ValueType::GetTypeName();
+        auto baseTypeName = GetArchivedTypeName<ValueType>();
         auto encodedTypeName = BeginUnarchiveObject(name, baseTypeName);
 
         std::unique_ptr<ValueType> newPtr = GetContext().GetTypeFactory().Construct<ValueType>(encodedTypeName);
@@ -177,7 +177,7 @@ namespace utilities
     void Unarchiver::UnarchiveItem(const char* name, std::vector<ValueType>& arr)
     {
         arr.clear();
-        auto typeName = ValueType::GetTypeName();
+        auto typeName = GetArchivedTypeName<ValueType>();
         BeginUnarchiveArray(name, typeName);
         while (true)
         {
@@ -199,7 +199,7 @@ namespace utilities
     void Unarchiver::UnarchiveItem(const char* name, std::vector<std::unique_ptr<ValueType>>& arr)
     {
         arr.clear();
-        auto typeName = ValueType::GetTypeName();
+        auto typeName = GetArchivedTypeName<ValueType>();
         BeginUnarchiveArray(name, typeName);
         while (true)
         {
@@ -221,7 +221,7 @@ namespace utilities
     void Unarchiver::UnarchiveItem(const char* name, std::vector<const ValueType*>& arr)
     {
         arr.clear();
-        auto typeName = ValueType::GetTypeName();
+        auto typeName = GetArchivedTypeName<ValueType>();
         BeginUnarchiveArray(name, typeName);
         while (true)
         {
@@ -236,6 +236,38 @@ namespace utilities
             EndUnarchiveArrayItem(typeName);
         }
         EndUnarchiveArray(name, typeName);
+    }
+
+    //
+    // Utility functions
+    //
+    namespace ArchiverImpl
+    {
+        template <typename T>
+        static std::string GetTypeName(...) { return TypeName<T>::GetName(); }
+
+        template <typename T, IsIntegral<T> concept = true>
+        static std::string GetTypeName(bool)
+        {
+            return "int";
+        }
+
+        template <typename T, IsFloatingPoint<T> concept = true>
+        static std::string GetTypeName(bool)
+        {
+            return "float";
+        }
+    }
+
+    template <typename T>
+    std::string GetArchivedTypeName()
+    {
+        return ArchiverImpl::GetTypeName<T>(true);
+    }
+    template <typename T>
+    std::string GetArchivedTypeName(const T& value)
+    {
+        return value.GetRuntimeTypeName();
     }
 }
 }

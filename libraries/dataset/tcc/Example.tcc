@@ -11,6 +11,12 @@ namespace emll
 namespace dataset
 {
     template <typename DataVectorType, typename MetadataType>
+    Example<DataVectorType, MetadataType>::Example(const DataVectorType& dataVector, const MetadataType& metadata)
+        : _dataVector(std::make_shared<DataVectorType>(dataVector)), _metadata(metadata)
+    {
+    }
+
+    template <typename DataVectorType, typename MetadataType>
     Example<DataVectorType, MetadataType>::Example(const std::shared_ptr<DataVectorType>& dataVector, const MetadataType& metadata)
         : _dataVector(dataVector), _metadata(metadata)
     {
@@ -30,6 +36,12 @@ namespace dataset
     {
         // deep copy of data vector
         return Example<NewDataVectorType, NewMetadataType>(std::make_shared<NewDataVectorType>(_dataVector->Duplicate<NewDataVectorType>()), NewMetadataType(_metadata));
+    }
+
+    template <typename DataVectorType, typename MetadataType>
+    template <typename OtherDataVectorType>
+    Example<DataVectorType, MetadataType>::Example(const Example<OtherDataVectorType, MetadataType>& other) : _dataVector(std::make_shared<DataVectorType>(other.GetDataVector())), _metadata(other.GetMetadata())
+    {
     }
 
     template <typename DataVectorType, typename MetadataType>

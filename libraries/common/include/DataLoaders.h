@@ -12,8 +12,6 @@
 
 // dataset
 #include "RowDataset.h"
-
-// dataset
 #include "ParsingIterator.h"
 
 // stl
@@ -32,9 +30,12 @@ namespace common
 
     /// <summary> Gets a row dataset from data load arguments. </summary>
     ///
-    /// <param name="dataLoadArguments"> The data load arguments. </param>
+    /// <param name="dataLoadArguments"> The data load arguments. </param> // TODO add template type documentation
     ///
     /// <returns> The row dataset. </returns>
-    dataset::AutoSupervisedDataset GetRowDataset(const DataLoadArguments& dataLoadArguments);
+    template <typename DatasetType = dataset::AutoSupervisedDataset>
+    DatasetType GetRowDataset(const DataLoadArguments& dataLoadArguments);
 }
 }
+
+#include "../tcc/DataLoaders.tcc"

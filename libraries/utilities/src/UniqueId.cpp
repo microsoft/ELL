@@ -23,6 +23,15 @@ namespace utilities
         ++_nextId;
     }
 
+    UniqueId::UniqueId(const std::string& idString)
+    {
+        _id = std::stoi(idString);
+        if(_nextId <= _id)
+        {
+            _nextId = _id+1;
+        }
+    }
+
     bool UniqueId::operator==(const UniqueId& other) const
     {
         return _id == other._id;
@@ -41,12 +50,14 @@ namespace utilities
 
     void UniqueId::WriteToArchive(Archiver& archiver) const
     {
-        archiver["id"] << _id;
+        archiver["id"] << to_string(*this);
     }
 
     void UniqueId::ReadFromArchive(Unarchiver& archiver)
     {
-        archiver["id"] >> _id;
+        std::string idString;
+        archiver["id"] >> idString;
+        *this = UniqueId(idString);
     }
 
     std::string to_string(const UniqueId& id)

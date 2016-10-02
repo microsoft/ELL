@@ -75,7 +75,7 @@ void TestArchiver()
     model::Model g;
     auto in = g.AddNode<model::InputNode<double>>(3);
     auto constNode = g.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
-    auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
+    auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationType::add);
     auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
     std::stringstream strstream;
@@ -209,7 +209,7 @@ void TestUnarchiver()
             ArchiverType archiver(strstream);
             auto in = g.AddNode<model::InputNode<double>>(3);
             auto constNode = g.AddNode<nodes::ConstantNode<double>>(constVector);
-            auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
+            auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationType::add);
             auto out = g.AddNode<model::OutputNode<double>>(in->output);
 
             archiver.Archive("node1", *constNode);
@@ -278,8 +278,8 @@ void TestUnarchiver()
         auto in = g.AddNode<model::InputNode<double>>(3);
         auto doubleVector = std::vector<double>{ 1.0, 2.0, 3.0 };
         auto constNode = g.AddNode<nodes::ConstantNode<double>>(doubleVector);
-        auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationNode<double>::OperationType::add);
-        auto out = g.AddNode<model::OutputNode<double>>(in->output);
+        g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationType::add);
+        g.AddNode<model::OutputNode<double>>(in->output);
 
         std::stringstream strstream;
         {

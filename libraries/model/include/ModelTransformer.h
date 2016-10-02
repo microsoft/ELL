@@ -30,6 +30,7 @@ namespace emll
 /// <summary> model namespace </summary>
 namespace model
 {
+    class InputNodeBase;
     template <typename ValueType>
     class InputNode;
 
@@ -89,15 +90,27 @@ namespace model
         template <typename ValueType>
         PortElements<ValueType> GetCorrespondingOutputs(const OutputPort<ValueType>& port);
 
+        /// <summary> Returns the port elements from the new model corresponding to the given port on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        PortElementsBase GetCorrespondingOutputs(const OutputPortBase& port);
+
         /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         PortElements<ValueType> GetCorrespondingOutputs(const PortElements<ValueType>& elements);
 
+        /// <summary> Returns the port elements from the new model corresponding to the given elements on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        PortElementsBase GetCorrespondingOutputs(const PortElementsBase& elements);
+
         /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node);
+
+        /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
+        /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
+        InputNodeBase* GetCorrespondingInputNode(const InputNodeBase* node);
 
         ///
         /// Functions used by node implementors
@@ -106,9 +119,15 @@ namespace model
         /// <summary> Transforms a set of output port references from the input model space to the output model space. Called by node implementors. </summary>
         ///
         /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
-        /// <returns> An PortElements object representing the transformed elements in the space of the new model. </returns>
+        /// <returns> A `PortElements` object representing the transformed elements in the space of the new model. </returns>
         template <typename ValueType>
         PortElements<ValueType> TransformPortElements(const PortElements<ValueType>& elements);
+
+        /// <summary> Transforms a set of output port references from the input model space to the output model space. Called by node implementors. </summary>
+        ///
+        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
+        /// <returns> A `PortElementsBase` object representing the transformed elements in the space of the new model. </returns>
+        PortElementsBase TransformPortElements(const PortElementsBase& elements);
 
         /// <summary> Creates a new node in the transformed model. Called by node implementors. </summary>
         ///
@@ -149,6 +168,9 @@ namespace model
 
     private:
         friend class Node;
+
+        template <typename NodeType>
+        NodeType* GetCorrespondingInputNodeAs(const NodeType* node);
 
         // Find a node that isn't compilable (if there are several, it just finds one)
         std::vector<const Node*> FindUncompilableNodes(const Model& model, const TransformContext& context) const;
