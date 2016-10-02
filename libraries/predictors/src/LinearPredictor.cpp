@@ -31,12 +31,12 @@ namespace predictors
         _b = 0;
     }
 
-    double LinearPredictor::Predict(const dataset::IDataVector& dataVector) const
+    double LinearPredictor::Predict(const DataVectorType& dataVector) const
     {
         return dataVector.Dot(_w.GetDataPointer()) + _b;
     }
 
-    std::vector<double> LinearPredictor::GetWeightedElements(const dataset::IDataVector& dataVector) const
+    std::vector<double> LinearPredictor::GetWeightedElements(const DataVectorType& dataVector) const
     {
         std::vector<double> weightedElements(_w.Size());
         dataVector.AddTo(weightedElements.data());

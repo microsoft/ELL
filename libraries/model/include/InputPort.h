@@ -16,6 +16,9 @@
 #include "Exception.h"
 #include "IArchivable.h"
 
+// linear
+#include "IndexValue.h"
+
 // stl
 #include <cassert>
 #include <vector>
@@ -64,13 +67,13 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-		/// <summary>Gets the port element at the specified index</summary>
-		///
-		/// <returns>The element at the specified index</returns>
-		model::PortElementBase GetInputElement(size_t index) const 
-		{ 
-			return _inputElements.GetElement(index); 
-		}
+        /// <summary>Gets the port element at the specified index</summary>
+        ///
+        /// <returns>The element at the specified index</returns>
+        model::PortElementBase GetInputElement(size_t index) const 
+        { 
+            return _inputElements.GetElement(index); 
+        }
 
     protected:
         /// Subclasses _must_ call this method in their constructor
@@ -85,6 +88,35 @@ namespace model
     class InputPort : public InputPortBase
     {
     public:
+        /// <summary> A read-only forward iterator for values of an input port. </summary>
+        class Iterator : public linear::IIndexValueIterator
+        {
+        public:
+            Iterator(const Iterator&) = default;
+
+            Iterator(Iterator&&) = default;
+
+            /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+            ///
+            /// <returns> true if it succeeds, false if it fails. </returns>
+            bool IsValid() const { return _currentIndex < _size; }
+
+            /// <summary> Proceeds to the Next iterate. </summary>
+            void Next() { ++_currentIndex; }
+
+            /// <summary> Returns The current index-value pair. </summary>
+            ///
+            /// <returns> An IndexValue. </returns>
+            linear::IndexValue Get() const { return linear::IndexValue{ 0, 1.0 }; } // TODO replace with actual implementation
+
+        private:
+            friend InputPort<ValueType>;
+            Iterator(size_t size) : _size(size) {}
+
+            size_t _size;
+            size_t _currentIndex;
+        };
+
         /// <summary> Default Constructor </summary>
         InputPort();
 
@@ -121,6 +153,11 @@ namespace model
         /// <param name="index"> The index of the element to return </param>
         /// <returns> The output value at the corresponding index </returns>
         ValueType operator[](size_t index) const;
+
+        /// <summary> Gets a forward read-only index-value iterator that iterates over nonzeros. </summary>
+        ///
+        /// <returns> The iterator. </returns>
+        Iterator GetIterator() const { return Iterator(Size()); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

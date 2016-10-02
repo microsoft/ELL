@@ -97,8 +97,7 @@ namespace predictors
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    template <typename RandomAccessVectorType>
-    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const RandomAccessVectorType& input) const
+    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const DataVectorType& input) const
     {
         double output = _bias;
         for (auto treeRootIndex : _rootIndices)
@@ -109,8 +108,7 @@ namespace predictors
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    template <typename RandomAccessVectorType>
-    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const RandomAccessVectorType& input, size_t interiorNodeIndex) const
+    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const DataVectorType& input, size_t interiorNodeIndex) const
     {
         if (interiorNodeIndex >= _interiorNodes.size())
         {

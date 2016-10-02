@@ -251,23 +251,18 @@ namespace predictors
 
         /// <summary> Returns the output of the forest (including all trees and the bias term) for a given input. </summary>
         ///
-        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the input. </typeparam>
         /// <param name="input"> The input vector. </param>
         ///
         /// <returns> The prediction. </returns>
-        template <typename RandomAccessVectorType>
-        double Predict(const RandomAccessVectorType& input) const;
+        double Predict(const DataVectorType& input) const;
 
         /// <summary> Returns the output of a given subtree for a given input. </summary>
         ///
-        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
-        /// input. </typeparam>
         /// <param name="input"> The input vector. </param>
         /// <param name="treeIndex"> The index of the subtree root. </param>
         ///
         /// <returns> The prediction. </returns>
-        template <typename RandomAccessVectorType>
-        double Predict(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
+        double Predict(const DataVectorType& input, size_t interiorNodeIndex) const;
 
         /// <summary> Generates the edge path indicator vector of the entire forest. </summary>
         ///
