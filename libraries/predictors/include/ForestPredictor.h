@@ -357,13 +357,11 @@ namespace predictors
         //
         // protected member functions
         //
-        template <typename RandomAccessVectorType>
-        void SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& edgeIndicator, size_t interiorNodeIndex) const;
+        void SetEdgeIndicatorVector(const DataVectorType& input, std::vector<bool>& edgeIndicator, size_t interiorNodeIndex) const;
 
         size_t AddInteriorNode(const SplitAction& splitAction);
 
-        template <typename RandomAccessVectorType>
-        void VisitEdgePathToLeaf(const RandomAccessVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const;
+        void VisitEdgePathToLeaf(const DataVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const;
 
         //
         //  member variables
