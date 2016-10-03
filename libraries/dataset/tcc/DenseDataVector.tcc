@@ -34,18 +34,6 @@ namespace dataset
     }
 
     template <typename ElementType>
-    DenseDataVector<ElementType>::DenseDataVector(std::vector<ElementType> data) : _numNonzeros(0), _data(std::move(data))
-    {
-        for (auto value : _data)
-        {
-            if (value != 0)
-            {
-                ++_numNonzeros;
-            }
-        }
-    }
-
-    template <typename ElementType>
     DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<linear::IndexValue> list)
     {
         auto current = list.begin();

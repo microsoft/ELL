@@ -70,11 +70,8 @@ namespace nodes
 
     void SingleElementThresholdNode::Compute() const
     {
-        // create an IDataVector
-        dataset::DoubleDataVector dataVector(_input.GetValue());
-
-        // predict
-        _output.SetOutput({ _predictor.Predict(dataVector) });
+        auto inputDataVector = SingleElementThresholdPredictor::DataVectorType(_input.GetIterator());
+        _output.SetOutput({ _predictor.Predict(inputDataVector) });
     }
 
     SingleElementThresholdNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor, model::ModelTransformer& transformer)

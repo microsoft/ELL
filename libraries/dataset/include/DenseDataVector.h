@@ -52,11 +52,6 @@ namespace dataset
         template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
 
-        /// <summary> Constructs an instance of DenseDataVector from a std::vector. </summary>
-        ///
-        /// <param name="data"> The std::vector. </param>
-        DenseDataVector(std::vector<ElementType> data); // TODO get rid of this
-
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
         /// <param name="list"> The initializer list. </param>
