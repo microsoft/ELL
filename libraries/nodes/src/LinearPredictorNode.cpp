@@ -80,12 +80,9 @@ namespace nodes
 
     void LinearPredictorNode::Compute() const
     {
-        // create an IDataVector
-        dataset::DoubleDataVector dataVector(_input.GetValue());
-
-        // predict
-        _output.SetOutput({ _predictor.Predict(dataVector) });
-        _weightedElements.SetOutput(_predictor.GetWeightedElements(dataVector));
+        auto inputDataVector = LinearPredictor::DataVectorType(_input.GetIterator());
+        _output.SetOutput({ _predictor.Predict(inputDataVector) });
+        _weightedElements.SetOutput(_predictor.GetWeightedElements(inputDataVector));
     }
 
     LinearPredictorNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer)

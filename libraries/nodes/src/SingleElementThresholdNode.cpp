@@ -22,7 +22,7 @@ namespace nodes
     {
     }
 
-    SingleElementThresholdNode::SingleElementThresholdNode(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor)
+    SingleElementThresholdNode::SingleElementThresholdNode(const model::PortElements<double>& input, const SingleElementThresholdPredictor& predictor)
         : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
     {
         assert(input.Size() > predictor.GetElementIndex());

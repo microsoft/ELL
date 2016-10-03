@@ -14,7 +14,7 @@
 #include "DoubleVector.h"
 
 // datasets
-#include "DataVector.h"
+#include "AutoDataVector.h"
 
 // utilities
 #include "IArchivable.h"
@@ -32,7 +32,7 @@ namespace predictors
     {
     public:
         /// <summary> Type of the data vector expected by this predictor type. </summary>
-        using DataVectorType = dataset::IDataVector;
+        using DataVectorType = dataset::AutoDataVector;
 
         /// <summary> Default Constructor. </summary>
         LinearPredictor();

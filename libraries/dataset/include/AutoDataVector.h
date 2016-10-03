@@ -9,6 +9,7 @@
 #pragma once
 
 #include "DataVector.h"
+#include "DenseDataVector.h"
 
 // utilities
 #include "Exception.h"
@@ -18,7 +19,6 @@
 #include <initializer_list>
 
 // TODO
-// change the way that predictor nodes run their internal predictors: I think input ports should expose an iterator that constructs a data vector
 // replace double* in the Dot and AddTo with math::vectors. Replace old linear vectors with new math vectors everywhere. erase linear.
 // Add "using ExampleType" to predictors and have evaluators create the right kind of dataset 
 
