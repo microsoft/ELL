@@ -2,6 +2,8 @@
 @echo off
  
 Echo "%1"
+call npm install
+
 IF "%1"=="" (
   Echo building EMLL for Electron
   call node-gyp rebuild
