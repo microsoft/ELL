@@ -47,7 +47,7 @@ namespace common
     model::Model GetModel1()
     {
         // For now, just create a model and return it
-        const int dimension = 3;
+        const size_t dimension = 3;
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
         auto mean8 = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 8);
@@ -59,7 +59,7 @@ namespace common
         auto inputs = model::Concat(model::MakePortElements(mean8->output), model::MakePortElements(var8->output), model::MakePortElements(mean16->output), model::MakePortElements(var16->output));
         predictors::LinearPredictor predictor(inputs.Size());
         // Set some values into the predictor's vector
-        for (int index = 0; index < inputs.Size(); ++index)
+        for (size_t index = 0; index < inputs.Size(); ++index)
         {
             predictor.GetWeights()[index] = (double)(index % 5);
         }
@@ -69,7 +69,7 @@ namespace common
 
     model::Model GetModel2()
     {
-        const int dimension = 3;
+        const size_t dimension = 3;
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
 
@@ -90,7 +90,7 @@ namespace common
 
     model::Model GetModel3()
     {
-        const int dimension = 3;
+        const size_t dimension = 3;
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
         auto lowpass = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 16);
@@ -108,7 +108,7 @@ namespace common
         return model;
     }
 
-    predictors::SimpleForestPredictor CreateForest(int numSplits)
+    predictors::SimpleForestPredictor CreateForest(size_t numSplits)
     {
         // define some abbreviations
         using SplitAction = predictors::SimpleForestPredictor::SplitAction;
@@ -123,7 +123,7 @@ namespace common
         std::vector<size_t> interiorNodeVector;
         interiorNodeVector.push_back(root);
 
-        for (int index = 0; index < numSplits; ++index)
+        for (size_t index = 0; index < numSplits; ++index)
         {
             auto node = interiorNodeVector.back();
             interiorNodeVector.pop_back();
@@ -133,7 +133,7 @@ namespace common
         return forest;
     }
 
-    model::Model GetTreeModel(int numSplits)
+    model::Model GetTreeModel(size_t numSplits)
     {
         auto forest = CreateForest(numSplits);
         model::Model model;
@@ -142,7 +142,7 @@ namespace common
         return model;
     }
 
-    model::Model GetRefinedTreeModel(int numSplits)
+    model::Model GetRefinedTreeModel(size_t numSplits)
     {
         auto model = GetTreeModel(numSplits);
         model::TransformContext context{ common::IsNodeCompilable() };

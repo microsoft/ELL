@@ -30,7 +30,7 @@ namespace dataset
     public:
         Example() = default;
 
-        explicit Example(const Example<DataVectorType, MetadataType>& other) = default;
+        Example(const Example<DataVectorType, MetadataType>& other) = default;
 
         Example(Example<DataVectorType, MetadataType>&& other) = default;
 

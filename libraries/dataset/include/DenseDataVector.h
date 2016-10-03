@@ -36,7 +36,7 @@ namespace dataset
     class DenseDataVector : public DataVectorBase<DenseDataVector<ElementType>>
     {
     public:
-        using ConstIterator = utilities::VectorIndexValueIterator<ElementType>;
+        using Iterator = linear::VectorIndexValueIterator<ElementType>; // TODO should be double
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
@@ -77,7 +77,7 @@ namespace dataset
         /// <summary> Returns an Iterator that points to the beginning of the std::vector. </summary>
         ///
         /// <returns> The iterator. </returns>
-        ConstIterator GetIterator() const { return utilities::MakeStlIndexValueIterator(_data); }
+        Iterator GetIterator() const { return Iterator(_data.begin(), _data.end()); }
 
         /// <summary> Appends an element to the end of the data vector. </summary>
         ///

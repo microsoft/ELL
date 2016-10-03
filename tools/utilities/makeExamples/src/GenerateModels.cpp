@@ -93,7 +93,7 @@ model::Model GenerateModel3()
     return model;
 }
 
-predictors::SimpleForestPredictor CreateForest(int numSplits)
+predictors::SimpleForestPredictor CreateForest(size_t numSplits)
 {
     // define some abbreviations
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
