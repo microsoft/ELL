@@ -100,7 +100,7 @@ namespace linear
         /// <summary> Returns an IndexValueIterator for the vector. </summary>
         ///
         /// <returns> An IndexValueIterator. </returns>
-        Iterator GetIterator() const { return MakeStlIndexValueIterator(_data); }
+        Iterator GetIterator() const { return MakeVectorIndexValueIterator(_data); }
 
         /// <summary> Returns the Size of the vector. </summary>
         ///

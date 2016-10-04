@@ -42,7 +42,7 @@ namespace linear
     // Convenience function to create iterator
     //
     template <typename ValueType>
-    VectorIndexValueIterator<ValueType> inline MakeStlIndexValueIterator(const std::vector<ValueType>& arr)
+    VectorIndexValueIterator<ValueType> MakeVectorIndexValueIterator(const std::vector<ValueType>& arr)
     {
         return VectorIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
     }
