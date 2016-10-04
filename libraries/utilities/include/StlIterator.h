@@ -24,7 +24,7 @@ namespace utilities
 
         StlIterator() = default;
 
-		/// <summary> Constructor </summary>
+        /// <summary> Constructor </summary>
         ///
         /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>
         /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over. </param>
@@ -53,9 +53,9 @@ namespace utilities
         /// <summary> Returns the value of the current iterate. </summary>
         ///
         /// <returns> The value of the current iterate. </returns>
-        const ValueType& Get() const { return *_current; }
+        ValueType Get() const { return *_current; }
 
-    private:
+    protected:
         IteratorType _current;
         IteratorType _end;
     };

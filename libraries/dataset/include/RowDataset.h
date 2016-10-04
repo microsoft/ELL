@@ -29,7 +29,13 @@ namespace dataset
     class RowDataset
     {
     public:
-        typedef utilities::StlIterator<typename std::vector<ExampleType>::const_iterator, ExampleType> Iterator;
+        
+        class Iterator : public utilities::StlIterator<typename std::vector<ExampleType>::const_iterator, ExampleType>
+        {
+        public:
+            using utilities::StlIterator<typename std::vector<ExampleType>::const_iterator, ExampleType>::StlIterator;
+            ExampleType Get() const { return _current->ToExample<ExampleType::DataVectorType, ExampleType::MetadataType>(); }
+        };
 
         RowDataset() = default;
 

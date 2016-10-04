@@ -21,7 +21,10 @@ namespace dataset
     Example<NewDataVectorType, NewMetadataType> Example<DataVectorType, MetadataType>::ToExample() const
     {
         // shallow copy of data vector
-        return Example<NewDataVectorType, NewMetadataType>(_dataVector, NewMetadataType(_metadata));
+        return Example<NewDataVectorType, NewMetadataType>(std::make_shared<NewDataVectorType>(_dataVector->Duplicate<NewDataVectorType>()), NewMetadataType(_metadata));
+        //auto newMetadata = NewMetadataType(_metadata);
+        //std::shared_ptr<const NewDataVectorType> newDataVectorPtr(_dataVector);
+        //return Example<NewDataVectorType, NewMetadataType>(newDataVectorPtr,newMetadata); // TODO - why does this not work?
     }
 
     template<typename DataVectorType, typename MetadataType>

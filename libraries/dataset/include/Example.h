@@ -24,10 +24,13 @@ namespace emll
 namespace dataset
 {
     /// <summary> A supervised example. </summary>
-    template <typename DataVectorType, typename MetadataType>
+    template <typename DataVectorT, typename MetadataT>
     class Example
     {
     public:
+        using DataVectorType = DataVectorT;
+        using MetadataType = MetadataT;
+
         Example() = default;
 
         Example(const Example<DataVectorType, MetadataType>& other) = default;

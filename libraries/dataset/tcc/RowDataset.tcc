@@ -57,7 +57,7 @@ namespace dataset
     typename RowDataset<ExampleType>::Iterator RowDataset<ExampleType>::GetIterator(size_t fromRowIndex, size_t size) const
     {
         size = CorrectRangeSize(fromRowIndex, size);
-        return utilities::MakeStlIterator(_examples.cbegin() + fromRowIndex, _examples.cbegin() + fromRowIndex + size);
+        return Iterator(_examples.cbegin() + fromRowIndex, _examples.cbegin() + fromRowIndex + size);
     }
 
     template <typename ExampleType>
