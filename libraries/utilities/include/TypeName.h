@@ -137,83 +137,93 @@ namespace utilities
 
     /// <summary> Class used to get information about the 16-bit integer type. </summary>
     template <>
-    struct TypeName<int16_t>
+    struct TypeName<short>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "int16"; }
+        static std::string GetName() { return "short"; }
     };
 
     /// <summary> Class used to get information about the unsigned 16-bit integer type. </summary>
     template <>
-    struct TypeName<uint16_t>
+    struct TypeName<unsigned short>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "uint16"; }
+        static std::string GetName() { return "ushort"; }
     };
 
     /// <summary> Class used to get information about the 32-bit integer type. </summary>
     template <>
-    struct TypeName<int32_t>
+    struct TypeName<int>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "int32"; }
+        static std::string GetName() { return "int"; }
     };
 
     /// <summary> Class used to get information about the unsigned 32-bit integer type. </summary>
     template <>
-    struct TypeName<uint32_t>
+    struct TypeName<unsigned int>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "uint32"; }
+        static std::string GetName() { return "uint"; }
     };
 
     /// <summary> Class used to get information about the 64-bit integer type. </summary>
     template <>
-    struct TypeName<int64_t>
+    struct TypeName<long>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "int64"; }
+        static std::string GetName() { return "long"; }
     };
 
     /// <summary> Class used to get information about the unsigned 64-bit integer type. </summary>
-    template <>
-    struct TypeName<uint64_t>
-    {
-        /// <summary> Gets the serialization name of the type. </summary>
-        ///
-        /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "uint64"; }
-    };
-
-    /// <summary> Class used to get information about the unsigned 64-bit integer type. </summary>
-    template <>
-    struct TypeName<const uint64_t&>
-    {
-        /// <summary> Gets the serialization name of the type. </summary>
-        ///
-        /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "uint64"; }
-    };
-
-    /// <summary> Class used to get information about the unsigned long integer type. </summary>
     template <>
     struct TypeName<unsigned long>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetName() { return "unsigned_long"; }
+        static std::string GetName() { return "ulong"; }
     };
+
+    /// <summary> Class used to get information about the 64-bit integer type. </summary>
+    template <>
+    struct TypeName<long long>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "longlong"; }
+    };
+
+    /// <summary> Class used to get information about the unsigned 64-bit integer type. </summary>
+    template <>
+    struct TypeName<unsigned long long>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "ulonglong"; }
+    };
+
+    // /// <summary> Class used to get information about the unsigned 64-bit integer type. </summary>
+    // template <>
+    // struct TypeName<const uint64_t&>
+    // {
+    //     /// <summary> Gets the serialization name of the type. </summary>
+    //     ///
+    //     /// <returns> The serialization name. </returns>
+    //     static std::string GetName() { return "uint64"; }
+    // };
 
     /// <summary> Class used to get information about the float type. </summary>
     template <>
