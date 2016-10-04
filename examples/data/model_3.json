@@ -169,48 +169,6 @@
     "windowSize": 4
   }, 
   {
-    "_type": "DelayNode<double>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1016"
-    },
-    "input": {
-      "_type": "InputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1016"
-      },
-      "name": "input",
-      "type": 1,
-      "input": {
-        "_type": "PortElements<double>",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 3,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1014"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "output": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1016"
-      },
-      "name": "output",
-      "type": 1,
-      "size": 3
-    },
-    "windowSize": 8
-  }, 
-  {
     "_type": "DotProductNode<double>",
     "id": {
       "_type": "UniqueId",
@@ -274,6 +232,48 @@
       "type": 1,
       "size": 1
     }
+  }, 
+  {
+    "_type": "DelayNode<double>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1016"
+    },
+    "input": {
+      "_type": "InputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1016"
+      },
+      "name": "input",
+      "type": 1,
+      "input": {
+        "_type": "PortElements<double>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1014"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1016"
+      },
+      "name": "output",
+      "type": 1,
+      "size": 3
+    },
+    "windowSize": 8
   }, 
   {
     "_type": "DotProductNode<double>",

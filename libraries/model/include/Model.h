@@ -186,7 +186,7 @@ namespace model
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.
         // We keep it sorted by id to make visiting all nodes deterministically ordered
-        std::map<Node::NodeId, std::shared_ptr<Node>, std::greater<Node::NodeId>> _idToNodeMap;
+        std::map<Node::NodeId, std::shared_ptr<Node>, std::less<Node::NodeId>> _idToNodeMap;
     };
 
     /// <summary> A serialization context used during model deserialization. Wraps an existing `SerializationContext`
