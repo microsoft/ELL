@@ -16,5 +16,3 @@ IF /I "%1"=="node" (
   Echo building EMLL for Node.JS
   call node-gyp rebuild
 )
-
-call copyWindowsLib

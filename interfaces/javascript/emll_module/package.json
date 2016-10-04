@@ -6,9 +6,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "echo ",
     "build": "buildme",
-    "buildmac": "./buildme && ./copyMacLib.sh",
-    "buildwin": "buildme node",
-    "buildlinux": "./buildme && ./copyLinuxLib.sh",
+    "buildmac": "npm install && node-gyp rebuild && ./copyMacLib.sh",
+    "buildwin": "npm install && node-gyp rebuild --target=0.36.7 --arch-x64 --dist-url=https://atom.io/download/atom-shell && copyWindowsLib",
+    "buildlinux": "npm install && node-gyp rebuild && ./copyLinuxLib.sh",
+    "buildwintest": "npm install && node-gyp rebuild && copyWindowsLib",
     "preinstall": "",
     "preuninstall": "rm -rf build/*"
   },

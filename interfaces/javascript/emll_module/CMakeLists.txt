@@ -21,10 +21,18 @@ if(NPM_EXECUTABLE)
         set (MODULE_COPY_COMMAND copyLinuxLib)
     endif()
 
-    add_custom_target(${PROJ_NAME} ALL
-        COMMAND ${NPM_EXECUTABLE} run ${MODULE_BUILD_COMMAND}
-        DEPENDS EMLL_javascript
-        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+    if(WIN32)
+        add_custom_target(${PROJ_NAME} ALL
+            COMMAND ${NPM_EXECUTABLE} run buildwintest
+#            COMMAND ${NPM_EXECUTABLE} run ${MODULE_BUILD_COMMAND}
+            DEPENDS EMLL_javascript ${PROJ_NAME}_copy
+            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+    else()
+        add_custom_target(${PROJ_NAME} ALL
+            COMMAND ${NPM_EXECUTABLE} run ${MODULE_BUILD_COMMAND}
+            DEPENDS EMLL_javascript
+            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+    endif()
 
     add_custom_command(TARGET ${PROJ_NAME} PRE_BUILD
                     COMMAND ${NPM_EXECUTABLE} install
@@ -32,28 +40,24 @@ if(NPM_EXECUTABLE)
                     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
                     COMMENT "Installing prerequisites"
                     VERBATIM)
-
-    add_custom_command(TARGET ${PROJ_NAME} POST_BUILD
-                    COMMAND ${MODULE_COPY_COMMAND}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-                    COMMENT "Copying module"
-                    VERBATIM)
 endif()
+
 
 #
 # add tests
 #
 find_program(NODE_EXECUTABLE node)
 if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
-
     # set up environment for test
     add_custom_command(TARGET ${PROJ_NAME} POST_BUILD
-                    COMMAND ${NPM_EXECUTABLE} install && ${NPM_EXECUTABLE} install emll
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js)
+                    COMMAND ${NPM_EXECUTABLE} install 
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js
+                    VERBATIM)
 
-    # add_custom_command(TARGET ${PROJ_NAME} POST_BUILD
-    #                 COMMAND ${NPM_EXECUTABLE} install emll
-    #                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js)
+    add_custom_command(TARGET ${PROJ_NAME} POST_BUILD
+                    COMMAND ${NPM_EXECUTABLE} install emll
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js
+                    VERBATIM)
 
     # add test
     set (TEST_NAME ${PROJ_NAME}_test)
