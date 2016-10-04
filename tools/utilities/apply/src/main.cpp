@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
         // load dataset
         if (verbose) std::cout << "Loading data from file: " << dataLoadArguments.inputDataFilename << std::endl;
 //TODO        auto dataset = common::GetRowDataset<dataset::DenseRowDataset>(dataLoadArguments);
-        size_t numColumns = dataLoadArguments.parsedDataDimension;
+// TODO - consider removing        size_t numColumns = dataLoadArguments.parsedDataDimension;
 
         // load map
         model::DynamicMap map;
