@@ -42,6 +42,16 @@ namespace utilities
         return !(other == *this);
     }
 
+    bool UniqueId::operator<(const UniqueId& other) const
+    {
+        return _id < other._id;
+    }
+
+    bool UniqueId::operator>(const UniqueId& other) const
+    {
+        return _id > other._id;
+    }
+
     std::ostream& operator<<(std::ostream& stream, const UniqueId& id)
     {
         stream << id._id;

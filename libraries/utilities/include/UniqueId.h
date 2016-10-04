@@ -41,6 +41,12 @@ namespace utilities
         /// <summary> Inequality comparison </summary>
         bool operator!=(const UniqueId& other) const;
 
+        /// <summary> Less-than comparison </summary>
+        bool operator<(const UniqueId& other) const;
+
+        /// <summary> Greater-than comparison </summary>
+        bool operator>(const UniqueId& other) const;
+
         /// <summary> Stream output </summary>
         friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id);
         friend std::string to_string(const UniqueId& id);
