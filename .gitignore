@@ -235,3 +235,8 @@ browse.VC.db
 # EMLL External Dependencies
 external/llvm/include/
 external/llvm/lib/
+swig/
+dist/
+
+interfaces/javascript/emll_module/CMakeFiles/
+interfaces/javascript/emll_module/test/js/Testing/
