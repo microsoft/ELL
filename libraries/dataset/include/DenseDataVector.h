@@ -36,7 +36,7 @@ namespace dataset
     class DenseDataVector : public DataVectorBase<DenseDataVector<ElementType>>
     {
     public:
-        using Iterator = linear::VectorIndexValueIterator<ElementType>; // TODO should be double
+        using Iterator = linear::VectorIndexValueIterator<ElementType>; 
 
         /// <summary> Constructor. </summary>
         DenseDataVector();

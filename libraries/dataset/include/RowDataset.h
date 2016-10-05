@@ -30,10 +30,17 @@ namespace dataset
     {
     public:
         
-        class Iterator : public utilities::StlIterator<typename std::vector<ExampleType>::const_iterator, ExampleType>
+        using StlIterator = utilities::StlIterator<typename std::vector<ExampleType>::const_iterator, ExampleType>;
+
+        /// <summary> Iterator class. </summary>
+        class Iterator : public StlIterator
         {
         public:
-            using utilities::StlIterator<typename std::vector<ExampleType>::const_iterator, ExampleType>::StlIterator;
+            using StlIterator::StlIterator;
+
+            /// <summary> Gets the current example pointer to by the iterator. </summary>
+            ///
+            /// <returns> The example. </returns>
             ExampleType Get() const { return _current->ToExample<ExampleType::DataVectorType, ExampleType::MetadataType>(); }
         };
 
