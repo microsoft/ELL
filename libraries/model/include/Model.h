@@ -178,8 +178,7 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    private:
-        friend class NodeIterator;
+    protected:
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -191,6 +190,9 @@ namespace model
         /// <param name="archiver"> The archiver. </param>
         /// <param name="context"> The serialization context. </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+    private:
+        friend class NodeIterator;
 
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.

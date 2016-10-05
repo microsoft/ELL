@@ -103,7 +103,7 @@ namespace model
         if (_stack.size() == 0) // Visit full model
         {
             // Just push everything on the stack
-            for(auto node: _model->_idToNodeMap)
+            for (auto node : _model->_idToNodeMap)
             {
                 _stack.push_back(node.second.get());
             }
