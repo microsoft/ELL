@@ -102,11 +102,23 @@ namespace model
         ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(_model, context);
 
+        for (auto& inputNode : _inputNodes)
+        {
+            auto refinedInput = transformer.GetCorrespondingInputNode(inputNode);
+            inputNode = refinedInput;
+        }
+
         for (auto& inputNode : _inputNodeMap)
         {
             auto input = inputNode.second;
             auto refinedInput = transformer.GetCorrespondingInputNode(input);
             inputNode.second = refinedInput;
+        }
+
+        for (auto& outputElements : _outputElements)
+        {
+            auto refinedOutput = transformer.GetCorrespondingOutputs(outputElements);
+            outputElements = refinedOutput;
         }
 
         for (auto& outputElements : _outputElementsMap)
@@ -115,6 +127,7 @@ namespace model
             auto refinedOutput = transformer.GetCorrespondingOutputs(output);
             outputElements.second = refinedOutput;
         }
+
         _model = refinedModel;
         return transformer;
     }
