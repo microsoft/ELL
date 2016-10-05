@@ -41,7 +41,7 @@ namespace dataset
         ///
         /// <param name="dataVector"> The data vector. </param>
         /// <param name="metadataType"> The metadata. </param>
-        Example(const std::shared_ptr<DataVectorType>& dataVector, const MetadataType& metadata); // TODO replace this with a converting ctor, or make it private
+        Example(const std::shared_ptr<const DataVectorType>& dataVector, const MetadataType& metadata); // TODO replace this with a converting ctor, or make it private
 
         /// <summary> Assignment operator. </summary>
         ///
