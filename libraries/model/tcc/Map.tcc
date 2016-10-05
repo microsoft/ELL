@@ -112,20 +112,6 @@ namespace model
         SetNodeInput(std::get<Sequence>(_inputs)..., std::get<Sequence>(inputValues)...);
     }
 
-    template <typename InputTypesTuple, typename OutputTypesTuple>
-    template <typename... InputNodeTypes>
-    void Map<InputTypesTuple, OutputTypesTuple>::SetInputTuple(const std::tuple<std::vector<InputNodeTypes>...>& inputTuple)
-    {
-        SetInputElementsHelper(std::index_sequence_for<InputNodeTypes...>(), inputTuple);
-    }
-
-    template <typename InputTypesTuple, typename OutputTypesTuple>
-    template <typename... InputTypes>
-    void Map<InputTypesTuple, OutputTypesTuple>::SetInputValues(std::vector<InputTypes>... inputs)
-    {
-        SetInputTuple(std::tuple<std::vector<InputTypes>...>(inputs...));
-    }
-
     //
     // Compute
     //
