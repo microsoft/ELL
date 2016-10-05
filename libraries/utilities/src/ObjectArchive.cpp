@@ -23,15 +23,6 @@ namespace utilities
     //
     // ObjectArchive
     //
-    // ObjectArchive::ObjectArchive(const ObjectArchive& other)
-    // {
-    //     _typeName = other._typeName;
-    //     _value = other._value;
-    //     for(const auto& key_value: other._properties)
-    //     {
-    //         _properties.emplace(key_value.first, std::make_unique(*(key_value.second)));
-    //     }
-    // }
 
     const ObjectArchive::PropertyCollection& ObjectArchive::GetProperties() const
     {

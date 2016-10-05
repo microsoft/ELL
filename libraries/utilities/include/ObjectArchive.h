@@ -31,9 +31,6 @@ namespace utilities
 
         ObjectArchive() = default;
 
-        // ObjectArchive(const ObjectArchive&);
-        // ObjectArchive(ObjectArchive&&) = default;
-
         /// <summary> Gets the string representing the type name of this object </summary>
         ///
         /// <returns> The string representing the type name of this object </returns>
