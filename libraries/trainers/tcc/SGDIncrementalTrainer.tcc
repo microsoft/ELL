@@ -24,9 +24,9 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::AutoSupervisedDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
     {
-        UpdateSparse(std::move(exampleIterator));
+        UpdateSparse(exampleIterator);
     }
 
     template <typename LossFunctionType>
@@ -36,7 +36,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(dataset::AutoSupervisedDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();
@@ -47,7 +47,7 @@ namespace trainers
 
         // define some constants
         const double T_prev = double(_total_iterations);
-        const double T_next = T_prev + exampleIterator.NumIteratesLeft();
+        const double T_next = T_prev; // TODO IMPORTANT!!!!  +exampleIterator.NumIteratesLeft();
         const double eta = 1.0 / _parameters.regularization / T_prev;
         const double sigma = std::log(T_next) + 0.5 / T_next;
 
@@ -95,7 +95,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(dataset::AutoSupervisedDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();

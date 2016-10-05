@@ -59,7 +59,7 @@ namespace evaluators
         /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
         /// <param name="evaluatorParameters"> The evaluation parameters. </param>
         /// <param name="aggregators"> The aggregators. </param>
-        IncrementalEvaluator(dataset::AutoSupervisedDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+        IncrementalEvaluator(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
         /// <summary>
         /// Runs the given predictor on the evaluation set, increments cached outputs, invokes each of
@@ -94,7 +94,7 @@ namespace evaluators
     ///
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template <typename BasePredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::AutoSupervisedDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 }
 

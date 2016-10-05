@@ -89,8 +89,7 @@ int main(int argc, char* argv[])
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        auto dataIterator = rowDataset.GetIterator(0, 1000);
-        trainer->Update(dataIterator);
+        trainer->Update(rowDataset.GetIterator(0, 1000));
 
         // print loss and errors
         if (trainerArguments.verbose)

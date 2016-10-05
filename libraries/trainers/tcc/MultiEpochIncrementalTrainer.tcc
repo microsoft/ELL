@@ -21,7 +21,7 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    void MultiEpochIncrementalTrainer<PredictorType>::Update(dataset::AutoSupervisedDataset::Iterator exampleIterator)
+    void MultiEpochIncrementalTrainer<PredictorType>::Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
     {
         dataset::AutoSupervisedDataset rowDataset(exampleIterator);
 

@@ -40,7 +40,7 @@ namespace trainers
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(dataset::AutoSupervisedDataset::Iterator exampleIterator) override;
+        virtual void Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

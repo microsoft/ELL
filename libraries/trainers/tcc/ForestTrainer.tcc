@@ -20,7 +20,7 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(dataset::AutoSupervisedDataset::Iterator exampleIterator)
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
     {
         // convert data from iterator to dense dataset with metadata (weak weight / weak label) associated with each example
         LoadData(exampleIterator);
@@ -68,7 +68,7 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(dataset::AutoSupervisedDataset::Iterator exampleIterator)
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
     {
         // reset the dataset
         _dataset.Reset();

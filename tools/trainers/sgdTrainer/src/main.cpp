@@ -112,8 +112,7 @@ int main(int argc, char* argv[])
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        auto trainSetIterator = rowDataset.GetIterator();
-        trainer->Update(trainSetIterator);
+        trainer->Update(rowDataset.GetIterator());
         auto predictor = trainer->GetPredictor();
 
         // print loss and errors

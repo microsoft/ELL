@@ -20,11 +20,11 @@ namespace emll
 namespace dataset
 {
     template <typename ExampleType>
-    RowDataset<ExampleType>::RowDataset(Iterator exampleIterator)
+    RowDataset<ExampleType>::RowDataset(ExampleIterator<ExampleType> exampleIterator)
     {
         while (exampleIterator.IsValid())
         {
-            AddExample(ExampleType(exampleIterator.Get()));
+            AddExample(ExampleType(exampleIterator.Get())); // TODO fix this 
             exampleIterator.Next();
         }
     }
@@ -54,10 +54,10 @@ namespace dataset
     }
 
     template <typename ExampleType>
-    typename RowDataset<ExampleType>::Iterator RowDataset<ExampleType>::GetIterator(size_t fromRowIndex, size_t size) const // TODO typename needed?
+    ExampleIterator<ExampleType> RowDataset<ExampleType>::GetIterator(size_t fromRowIndex, size_t size) const
     {
         size = CorrectRangeSize(fromRowIndex, size);
-        return Iterator(_examples.cbegin() + fromRowIndex, _examples.cbegin() + fromRowIndex + size);
+        return ExampleIterator<ExampleType>(std::make_shared<DatasetExampleIterator<ExampleType>>(_examples.cbegin() + fromRowIndex, _examples.cbegin() + fromRowIndex + size)); // TODO unique or shared?
     }
 
     template <typename ExampleType>

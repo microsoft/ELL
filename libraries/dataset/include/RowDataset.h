@@ -24,24 +24,77 @@ namespace emll
 {
 namespace dataset
 {
+    template<typename ExampleType> // TODO document
+    struct IExampleIterator
+    {
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        ///
+        /// <returns> true if the iterator is currently pointing to a valid iterate. </returns>
+        virtual bool IsValid() const = 0;
+
+        /// <summary> Proceeds to the Next iterate. </summary>
+        virtual void Next() = 0;
+
+        /// <summary> Returns the current example. </summary>
+        ///
+        /// <returns> An example. </returns>
+        virtual ExampleType Get() const = 0;
+    };
+
+    template<typename ExampleType> // TODO document
+    struct ExampleIterator
+    {
+        ExampleIterator(std::shared_ptr<IExampleIterator<ExampleType>>&& iterator) : _iterator(std::move(iterator)) {} // TODO move to tcc, document
+
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        ///
+        /// <returns> true if the iterator is currently pointing to a valid iterate. </returns>
+        bool IsValid() const { return _iterator->IsValid();  }
+
+        /// <summary> Proceeds to the Next iterate. </summary>
+        void Next() { _iterator->Next(); }
+
+        /// <summary> Returns the current example. </summary>
+        ///
+        /// <returns> An example. </returns>
+        ExampleType Get() const { return _iterator->Get(); }
+
+    private:
+        std::shared_ptr<IExampleIterator<ExampleType>> _iterator;
+    };
+
     /// <summary> A row-major dataset of examples. </summary>
     template <typename ExampleType>
     class RowDataset
     {
     public:
-        
-        using StlIterator = utilities::StlIterator<typename std::vector<ExampleType>::const_iterator, ExampleType>;
 
         /// <summary> Iterator class. </summary>
-        class Iterator : public StlIterator
+        template<typename IteratorExampleType> 
+        class DatasetExampleIterator : public IExampleIterator<IteratorExampleType>
         {
         public:
-            using StlIterator::StlIterator;
+            using IteratorType = typename std::vector<ExampleType>::const_iterator;
+            DatasetExampleIterator(IteratorType begin, IteratorType end) : _current(begin), _end(end) {} // TODO move this private, move implementation to tcc file
+
+            /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+            ///
+            /// <returns> true if it succeeds, false if it fails. </returns>
+            virtual bool IsValid() const override { return _current < _end; }
+
+            /// <summary> Proceeds to the Next iterate. </summary>
+            virtual void Next() override { ++_current; }
 
             /// <summary> Gets the current example pointer to by the iterator. </summary>
             ///
             /// <returns> The example. </returns>
-            ExampleType Get() const { return _current->ToExample<ExampleType::DataVectorType, ExampleType::MetadataType>(); }
+            virtual IteratorExampleType Get() const override { return _current->ToExample<IteratorExampleType::DataVectorType, IteratorExampleType::MetadataType>(); } // TODO change ToExample to take one template  param, which is the example type
+
+        private:
+            friend RowDataset<ExampleType>;
+
+            IteratorType _current;
+            IteratorType _end;
         };
 
         RowDataset() = default;
@@ -53,7 +106,7 @@ namespace dataset
         /// <summary> Constructs an instance of RowDataset by making shallow copies of supervised examples. </summary>
         ///
         /// <param name="exampleIterator"> The example iterator. </param>
-        RowDataset(Iterator exampleIterator);
+        RowDataset(ExampleIterator<ExampleType> exampleIterator);
 
         RowDataset<ExampleType>& operator=(RowDataset&&) = default;
 
@@ -104,7 +157,7 @@ namespace dataset
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator(size_t fromRowIndex = 0, size_t size = 0) const;
+        ExampleIterator<ExampleType> GetIterator(size_t fromRowIndex = 0, size_t size = 0) const;
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
