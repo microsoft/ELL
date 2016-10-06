@@ -31,7 +31,8 @@ set (SRC src/Archiver.cpp
          src/Variant.cpp
          src/XMLArchiver.cpp)
 
-set (INCLUDE include/AnyIterator.h
+set (INCLUDE include/AbstractInvoker.h
+             include/AnyIterator.h
              include/Archiver.h
              include/CommandLineParser.h
              include/CompressedIntegerList.h
@@ -61,7 +62,8 @@ set (INCLUDE include/AnyIterator.h
              include/Variant.h
              include/XMLArchiver.h)
 
-set (TCC tcc/AnyIterator.tcc
+set (TCC tcc/AbstractInvoker.tcc
+         tcc/AnyIterator.tcc
          tcc/Archiver.tcc
          tcc/CommandLineParser.tcc
          tcc/Exception.tcc

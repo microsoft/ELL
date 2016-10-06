@@ -14,11 +14,13 @@
 
 // utilities
 #include "StlIterator.h"
+#include "AbstractInvoker.h"
 
 // stl
 #include <ostream>
 #include <random>
 #include <vector>
+#include <functional>
 
 namespace emll
 {
@@ -42,8 +44,9 @@ namespace dataset
     };
 
     template<typename ExampleType> // TODO document
-    struct ExampleIterator
+    class ExampleIterator
     {
+    public:
         ExampleIterator(std::shared_ptr<IExampleIterator<ExampleType>>&& iterator) : _iterator(std::move(iterator)) {} // TODO move to tcc, document
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -63,12 +66,43 @@ namespace dataset
         std::shared_ptr<IExampleIterator<ExampleType>> _iterator;
     };
 
-    /// <summary> A row-major dataset of examples. </summary>
-    template <typename ExampleType>
-    class RowDataset
+    template<typename ExampleType>
+    struct GetIteratorAbstractor
+    {
+        using ReturnType = ExampleIterator<ExampleType>;
+
+        template<typename RowDatasetType>
+        ReturnType operator()(const RowDatasetType& dataset)
+        {
+            return dataset.GetIterator();
+        }
+    };
+
+    struct IRowDataset 
+    {
+        virtual ~IRowDataset() {}
+    };
+
+    class AnyDataSet
     {
     public:
+        AnyDataSet(const IRowDataset* pDataset) : _pDataset(pDataset) {}
 
+        template<typename ExampleType>
+        ExampleIterator<ExampleType> GetIterator()
+        {
+            return utilities::AbstractInvoker<IRowDataset, RowDataset<dataset::AutoSupervisedExample>, RowDataset<dataset::DoubleDataVector>>::Invoke(GetIteratorAbstractor, *_pDataset);
+        }
+
+    private:
+        const IRowDataset* _pDataset;
+    };
+
+    /// <summary> A row-major dataset of examples. </summary>
+    template <typename ExampleType>
+    class RowDataset : public IRowDataset
+    {
+    public:
         /// <summary> Iterator class. </summary>
         template<typename IteratorExampleType> 
         class DatasetExampleIterator : public IExampleIterator<IteratorExampleType>
@@ -158,6 +192,8 @@ namespace dataset
         ///
         /// <returns> The iterator. </returns>
         ExampleIterator<ExampleType> GetIterator(size_t fromRowIndex = 0, size_t size = 0) const;
+
+        AnyDataSet GetDataSet() const { return AnyDataSet(this); }
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
