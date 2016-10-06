@@ -20,8 +20,8 @@
 // stl
 #include <iostream>
 
-namespace emll
-{
+using namespace emll;
+
 void SaveModels(std::string ext)
 {
     auto model1 = GenerateModel1();
@@ -35,6 +35,8 @@ void SaveModels(std::string ext)
     auto refinedTree1 = GenerateRefinedTreeModel(1);
     auto refinedTree2 = GenerateRefinedTreeModel(2);
     auto refinedTree3 = GenerateRefinedTreeModel(3);
+    auto identity = GenerateIdentityModel();
+    auto timesTwo = GenerateTimesTwoModel();
 
     common::SaveModel(model1, "model_1." + ext);
     common::SaveModel(model2, "model_2." + ext);
@@ -49,10 +51,10 @@ void SaveModels(std::string ext)
     common::SaveModel(refinedTree1, "refined_tree_1." + ext);
     common::SaveModel(refinedTree2, "refined_tree_2." + ext);
     common::SaveModel(refinedTree3, "refined_tree_3." + ext);
-}
-}
 
-using namespace emll;
+    common::SaveModel(identity, "identity." + ext);
+    common::SaveModel(timesTwo, "timesTwo." + ext);
+}
 
 int main(int argc, char* argv[])
 {

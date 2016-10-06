@@ -13,6 +13,8 @@
 
 namespace emll
 {
+model::Model GenerateIdentityModel();
+model::Model GenerateTimesTwoModel();
 model::Model GenerateModel1();
 model::Model GenerateModel2();
 model::Model GenerateModel3();

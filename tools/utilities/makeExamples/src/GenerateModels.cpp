@@ -12,9 +12,11 @@
 // model
 #include "InputNode.h"
 #include "Model.h"
+#include "OutputNode.h"
 
 // nodes
 #include "BinaryOperationNode.h"
+#include "ConstantNode.h"
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "ForestPredictorNode.h"
@@ -33,6 +35,26 @@
 
 namespace emll
 {
+model::Model GenerateIdentityModel()
+{
+    const int dimension = 3;
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
+    model.AddNode<model::OutputNode<double>>(inputNode->output);
+    return model;
+}
+
+model::Model GenerateTimesTwoModel()
+{
+    const int dimension = 3;
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
+    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{2.0, 2.0, 2.0});
+    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantNode->output, nodes::BinaryOperationType::coordinatewiseMultiply);
+    model.AddNode<model::OutputNode<double>>(timesNode->output);
+    return model;
+}
+
 model::Model GenerateModel1()
 {
     // For now, just create a model and return it

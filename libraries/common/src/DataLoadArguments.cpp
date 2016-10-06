@@ -44,22 +44,21 @@ namespace common
         std::vector<std::string> parseErrorMessages;
 
         // inputDataFilename
-        if (inputDataFilename == "")
+        if (inputDataFilename != "")
         {
-            parseErrorMessages.push_back("-inputDataFilename (or -idf) is required");
-        }
-        else
-        {
-            if (!utilities::IsFileReadable(inputDataFilename))
-            {
-                parseErrorMessages.push_back("cannot read from specified input data file: " + inputDataFilename);
-            }
+            isFileReadable = utilities::IsFileReadable(inputDataFilename);
         }
 
         // dataDimension
         const char* ptr = dataDimension.c_str();
         if (dataDimension == "auto")
         {
+            if (!isFileReadable)
+            {
+                "Couldn't read data file";
+                return parseErrorMessages;
+            }
+
             auto dataIterator = GetDataIterator(*this);
             while (dataIterator->IsValid())
             {

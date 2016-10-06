@@ -1,0 +1,62 @@
+{
+  "_type": "Model",
+  "nodes": [
+  {
+    "_type": "InputNode<double>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1380"
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1380"
+      },
+      "name": "output",
+      "type": 1,
+      "size": 3
+    }
+  }, 
+  {
+    "_type": "OutputNode<double>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1381"
+    },
+    "input": {
+      "_type": "InputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1381"
+      },
+      "name": "input",
+      "type": 1,
+      "input": {
+        "_type": "PortElements<double>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1380"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1381"
+      },
+      "name": "output",
+      "type": 1,
+      "size": 3
+    }
+  }]
+}

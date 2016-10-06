@@ -91,6 +91,12 @@ namespace model
         /// <returns> The size of the input </returns>
         size_t GetInputSize(const std::string& inputName) const;
 
+        /// <summary> Returns size of a given input </summary>
+        ///
+        /// <param name="inputIndex"> The index of the input </param>
+        /// <returns> The dimensionality of the input </returns>
+        size_t GetInputSize(size_t inputIndex) const;
+
         /// <summary> Set a single InputNode's input </summary>
         ///
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
@@ -122,6 +128,18 @@ namespace model
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         void SetInputValue(const std::string& inputName, const DataVectorType& inputValues) const;
+
+        /// <summary> Returns size of a given output </summary>
+        ///
+        /// <param name="outputName"> The name of the output </param>
+        /// <returns> The dimensionality of the output </returns>
+        size_t GetOutputSize(const std::string& outputName) const;
+
+        /// <summary> Returns size of a given output </summary>
+        ///
+        /// <param name="outputIndex"> The index of the output </param>
+        /// <returns> The dimensionality of the output </returns>
+        size_t GetOutputSize(size_t outputIndex) const;
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
