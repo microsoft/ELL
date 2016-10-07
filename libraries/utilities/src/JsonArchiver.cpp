@@ -254,8 +254,17 @@ namespace utilities
 
     void JsonUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
+        bool hasName = name != std::string("");
         _tokenizer.MatchToken("]");
-    }
+        // eat a comma if it exists
+        if (hasName)
+        {
+            if (_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
+}
 
     void JsonUnarchiver::MatchFieldName(const char* key)
     {
