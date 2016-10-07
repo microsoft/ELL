@@ -97,6 +97,14 @@ int main(int argc, char* argv[])
         // predictor type
         using PredictorType = predictors::LinearPredictor;
 
+
+        // TODO
+        // XXX
+        trainers::SGDIncrementalTrainer<lossFunctions::HingeLoss> tmpSGD (numColumns, lossFunctions::HingeLoss(), sgdIncrementalTrainerArguments);
+        auto dataSet = rowDataset.GetDataSet(0, 10);
+        tmpSGD.Update(dataSet);
+
+
         // create sgd trainer
         auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
 

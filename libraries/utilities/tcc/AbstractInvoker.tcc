@@ -31,7 +31,7 @@ namespace utilities
     template<typename FunctorType>
     auto AbstractInvoker<BaseType>::Invoke(const FunctorType& functor, const BaseType& abstractArgument) -> typename FunctorType::ReturnType
     {
-        throw LogicException(LogicExceptionErrors::illegalState, "base type reference could not be matched with a derived type")
+        throw LogicException(LogicExceptionErrors::illegalState, "base type reference could not be matched with a derived type");
     }
 }
 }

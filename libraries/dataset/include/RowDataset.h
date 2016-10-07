@@ -75,7 +75,7 @@ namespace dataset
         GetIteratorAbstractor(size_t fromIndex, size_t size) : _fromIndex(fromIndex), _size(size) {}
 
         template<typename RowDatasetType>
-        ReturnType operator()(const RowDatasetType& dataset)
+        ReturnType operator()(const RowDatasetType& dataset) const
         {
             return dataset.GetIterator<ExampleType>(_fromIndex, _size);
         }

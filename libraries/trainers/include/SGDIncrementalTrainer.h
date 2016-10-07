@@ -58,6 +58,12 @@ namespace trainers
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
         virtual void Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator) override;
 
+        void Update(dataset::DataSet dataSet)  // TODO make this the real thing!
+        {
+            auto exampleIterator = dataSet.GetIterator<dataset::AutoSupervisedExample>();
+            Update(exampleIterator);
+        }
+
         /// <summary> Returns The averaged predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
