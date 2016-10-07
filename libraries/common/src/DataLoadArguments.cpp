@@ -55,7 +55,7 @@ namespace common
         {
             if (!isFileReadable)
             {
-                "Couldn't read data file";
+                parseErrorMessages.push_back("Couldn't read data file");
                 return parseErrorMessages;
             }
 
