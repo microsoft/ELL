@@ -38,7 +38,7 @@
 #include "Archiver.h"
 #include "Files.h"
 #include "JsonArchiver.h"
-#include "XMLArchiver.h"
+#include "XmlArchiver.h"
 
 namespace emll
 {
