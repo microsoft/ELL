@@ -83,10 +83,10 @@ namespace dataset
         virtual ~IRowDataset() {}
     };
 
-    class AnyDataSet
+    class DataSet
     {
     public:
-        AnyDataSet(const IRowDataset* pDataset) : _pDataset(pDataset) {}
+        DataSet(const IRowDataset* pDataset) : _pDataset(pDataset) {}
 
         template<typename ExampleType>
         ExampleIterator<ExampleType> GetIterator()
@@ -99,7 +99,7 @@ namespace dataset
     };
 
     /// <summary> A row-major dataset of examples. </summary>
-    template <typename ExampleType>
+    template <typename DataSetExampleType>
     class RowDataset : public IRowDataset
     {
     public:
@@ -108,7 +108,7 @@ namespace dataset
         class DatasetExampleIterator : public IExampleIterator<IteratorExampleType>
         {
         public:
-            using IteratorType = typename std::vector<ExampleType>::const_iterator;
+            using IteratorType = typename std::vector<DataSetExampleType>::const_iterator;
             DatasetExampleIterator(IteratorType begin, IteratorType end) : _current(begin), _end(end) {} // TODO move this private, move implementation to tcc file
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
@@ -125,7 +125,7 @@ namespace dataset
             virtual IteratorExampleType Get() const override { return _current->ToExample<IteratorExampleType::DataVectorType, IteratorExampleType::MetadataType>(); } // TODO change ToExample to take one template  param, which is the example type
 
         private:
-            friend RowDataset<ExampleType>;
+            friend RowDataset<DataSetExampleType>;
 
             IteratorType _current;
             IteratorType _end;
@@ -140,11 +140,11 @@ namespace dataset
         /// <summary> Constructs an instance of RowDataset by making shallow copies of supervised examples. </summary>
         ///
         /// <param name="exampleIterator"> The example iterator. </param>
-        RowDataset(ExampleIterator<ExampleType> exampleIterator);
+        RowDataset(ExampleIterator<DataSetExampleType> exampleIterator);
 
-        RowDataset<ExampleType>& operator=(RowDataset&&) = default;
+        RowDataset<DataSetExampleType>& operator=(RowDataset&&) = default;
 
-        RowDataset<ExampleType>& operator=(const RowDataset&) = delete;
+        RowDataset<DataSetExampleType>& operator=(const RowDataset&) = delete;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -161,28 +161,28 @@ namespace dataset
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        ExampleType& GetExample(size_t index);
+        DataSetExampleType& GetExample(size_t index);
 
         /// <summary> Returns a const reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Const reference to the specified example. </returns>
-        const ExampleType& GetExample(size_t index) const;
+        const DataSetExampleType& GetExample(size_t index) const;
 
         /// <summary> Returns a reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Reference to the specified example. </returns>
-        ExampleType& operator[](size_t index);
+        DataSetExampleType& operator[](size_t index);
 
         /// <summary> Returns a const reference to an example. </summary>
         ///
         /// <param name="index"> Zero-based index of the row. </param>
         ///
         /// <returns> Const reference to the specified example. </returns>
-        const ExampleType& operator[](size_t index) const;
+        const DataSetExampleType& operator[](size_t index) const;
 
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
@@ -191,14 +191,15 @@ namespace dataset
         /// examples. </param>
         ///
         /// <returns> The iterator. </returns>
-        ExampleIterator<ExampleType> GetIterator(size_t fromRowIndex = 0, size_t size = 0) const;
+        template<typename IteratorExampleType = DataSetExampleType>
+        ExampleIterator<IteratorExampleType> GetIterator(size_t fromRowIndex = 0, size_t size = 0) const;
 
-        AnyDataSet GetDataSet() const { return AnyDataSet(this); }
+        DataSet GetDataSet() const { return DataSet(this); }
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
         /// <param name="example"> The example. </param>
-        void AddExample(ExampleType example);
+        void AddExample(DataSetExampleType example);
 
         /// <summary> Erases all of the examples in the RowDataset. </summary>
         void Reset();
@@ -228,7 +229,7 @@ namespace dataset
         /// <summary> Sorts an interval of examples by a certain key. </summary>
         ///
         /// <typeparam name="SortKeyType"> Type of the sort key. </typeparam>
-        /// <param name="sortKey"> A function that takes const reference to ExampleType and returns a sort key. </param>
+        /// <param name="sortKey"> A function that takes const reference to DataSetExampleType and returns a sort key. </param>
         /// <param name="fromRowIndex"> Zero-based index of the first row to sort. </param>
         /// <param name="size"> The number of examples to sort. </param>
         template <typename SortKeyType>
@@ -238,7 +239,7 @@ namespace dataset
         /// by the predicate, but in linear time). </summary>
         ///
         /// <typeparam name="PartitionKeyType"> Type of predicate. </typeparam>
-        /// <param name="sortKey"> A function that takes const reference to ExampleType and returns a
+        /// <param name="sortKey"> A function that takes const reference to DataSetExampleType and returns a
         ///  bool. </param>
         /// <param name="fromRowIndex"> Zero-based index of the first row of the interval. </param>
         /// <param name="size"> The number of examples in the interval. </param>
@@ -256,7 +257,7 @@ namespace dataset
     private:
         size_t CorrectRangeSize(size_t fromRowIndex, size_t size) const;
 
-        std::vector<ExampleType> _examples;
+        std::vector<DataSetExampleType> _examples;
         size_t _maxExampleSize = 0;
     };
 
@@ -269,8 +270,8 @@ namespace dataset
     /// <param name="dataset"> The dataset. </param>
     ///
     /// <returns> The ostream. </returns>
-    template <typename ExampleType>
-    std::ostream& operator<<(std::ostream& os, const RowDataset<ExampleType>& dataset);
+    template <typename DataSetExampleType>
+    std::ostream& operator<<(std::ostream& os, const RowDataset<DataSetExampleType>& dataset);
 }
 }
 

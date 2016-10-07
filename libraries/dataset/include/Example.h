@@ -82,7 +82,7 @@ namespace dataset
         /// <typeparam name="NewMetadataType"> Requested metadata type (must have a ctor whose argument is the old
         /// MetadataType). </typeparam>
         /// <returns> An example. </returns>
-        template<typename NewDataVectorType, typename NewMetadataType, utilities::IsSame<NewDataVectorType, DataVectorType> Concept = true>
+        template<typename NewDataVectorType, typename NewMetadataType = MetadataType, utilities::IsSame<NewDataVectorType, DataVectorType> Concept = true>
         Example<NewDataVectorType, NewMetadataType> ToExample() const;
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace dataset
         /// <typeparam name="NewMetadataType"> Requested metadata type (must have a ctor whose argument is the old
         /// MetadataType). </typeparam>
         /// <returns> An example. </returns>
-        template<typename NewDataVectorType, typename NewMetadataType, utilities::IsDifferent<NewDataVectorType, DataVectorType> Concept = true>
+        template<typename NewDataVectorType, typename NewMetadataType = MetadataType, utilities::IsDifferent<NewDataVectorType, DataVectorType> Concept = true>
         Example<NewDataVectorType, NewMetadataType> ToExample() const;
 
         /// <summary> Prints the datavector to an output stream. </summary>
