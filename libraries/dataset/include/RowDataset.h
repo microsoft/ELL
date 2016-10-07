@@ -15,6 +15,7 @@
 // utilities
 #include "StlIterator.h"
 #include "AbstractInvoker.h"
+#include "TypeTraits.h"
 
 // stl
 #include <ostream>
@@ -71,11 +72,16 @@ namespace dataset
     {
         using ReturnType = ExampleIterator<ExampleType>;
 
+        GetIteratorAbstractor(size_t fromIndex, size_t size) : _fromIndex(fromIndex), _size(size) {}
+
         template<typename RowDatasetType>
         ReturnType operator()(const RowDatasetType& dataset)
         {
-            return dataset.GetIterator();
+            return dataset.GetIterator<ExampleType>(_fromIndex, _size);
         }
+
+        size_t _fromIndex;
+        size_t _size;
     };
 
     struct IRowDataset 
@@ -86,16 +92,21 @@ namespace dataset
     class DataSet
     {
     public:
-        DataSet(const IRowDataset* pDataset) : _pDataset(pDataset) {}
+        DataSet(const IRowDataset* pDataset, size_t fromIndex, size_t size) : _pDataset(pDataset), _fromIndex(fromIndex), _size(size) {}
 
-        template<typename ExampleType>
+        template<typename ExampleType, utilities::IsSame<typename ExampleType::MetadataType, WeightLabel> Concept = true>
         ExampleIterator<ExampleType> GetIterator()
         {
-            return utilities::AbstractInvoker<IRowDataset, RowDataset<dataset::AutoSupervisedExample>, RowDataset<dataset::DoubleDataVector>>::Invoke(GetIteratorAbstractor, *_pDataset);
+            GetIteratorAbstractor<ExampleType> abstractor(_fromIndex, _size);
+            return utilities::AbstractInvoker<IRowDataset, RowDataset<dataset::AutoSupervisedExample>, RowDataset<dataset::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
         }
+
+        size_t Size() const { return _size; }
 
     private:
         const IRowDataset* _pDataset;
+        size_t _fromIndex;
+        size_t _size;
     };
 
     /// <summary> A row-major dataset of examples. </summary>
@@ -194,7 +205,7 @@ namespace dataset
         template<typename IteratorExampleType = DataSetExampleType>
         ExampleIterator<IteratorExampleType> GetIterator(size_t fromRowIndex = 0, size_t size = 0) const;
 
-        DataSet GetDataSet() const { return DataSet(this); }
+        DataSet GetDataSet(size_t fromIndex = 0, size_t size = 0) const { return DataSet(this, fromIndex, size); }
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
