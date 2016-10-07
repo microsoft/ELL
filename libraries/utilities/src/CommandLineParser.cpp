@@ -159,8 +159,8 @@ namespace utilities
             }
 
             needsReparse = false;
-            uint64_t argc = _originalArgs.size();
-            for (int index = 1; index < argc; index++)
+            size_t argc = _originalArgs.size();
+            for (size_t index = 1; index < argc; index++)
             {
                 std::string arg = _originalArgs[index];
                 if (arg[0] == '-') // it's an option
@@ -403,7 +403,7 @@ namespace utilities
                         out << "  {";
                         std::string sep = "";
                         out << info.enumValues[0];
-                        for (int index = 1; index < info.enumValues.size(); ++index)
+                        for (size_t index = 1; index < info.enumValues.size(); ++index)
                         {
                             out << " | " << info.enumValues[index];
                         }
