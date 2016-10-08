@@ -36,7 +36,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void DynamicMap::SetInputValue(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues)
+    void DynamicMap::SetInputValue(const std::string& inputName, const data::DenseDataVector<ValueType>& inputValues)
     {
         SetInputValue(inputName, inputValues.ToArray());
     }
@@ -62,7 +62,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void DynamicMap::SetInputValue(size_t index, const dataset::DenseDataVector<ValueType>& inputValues)
+    void DynamicMap::SetInputValue(size_t index, const data::DenseDataVector<ValueType>& inputValues)
     {
         SetInputValue(index, inputValues.ToArray());
     }

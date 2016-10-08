@@ -13,7 +13,7 @@
 #include "OutputStreamImpostor.h"
 #include "RandomEngines.h"
 
-// dataset
+// data
 #include "Example.h"
 
 // common

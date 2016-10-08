@@ -1,0 +1,20 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     Example.cpp (data)
+//  Authors:  Ofer Dekel
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "Example.h"
+
+namespace emll
+{
+namespace data
+{
+    void data::WeightLabel::Print(std::ostream& os) const
+    {
+        os << "(" << weight << ", " << label << ")";
+    }
+}
+}

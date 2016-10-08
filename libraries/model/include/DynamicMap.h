@@ -13,7 +13,7 @@
 #include "Node.h"
 #include "PortElements.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
 
 // utilities
@@ -88,7 +88,7 @@ namespace model
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
-        void SetInputValue(const std::string& inputName, const dataset::DenseDataVector<ValueType>& inputValues);
+        void SetInputValue(const std::string& inputName, const data::DenseDataVector<ValueType>& inputValues);
 
         /// <summary> Set a single InputNode's input </summary>
         ///
@@ -96,7 +96,7 @@ namespace model
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
-        void SetInputValue(size_t index, const dataset::DenseDataVector<ValueType>& inputValues);
+        void SetInputValue(size_t index, const data::DenseDataVector<ValueType>& inputValues);
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///

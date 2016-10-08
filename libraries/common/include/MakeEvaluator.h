@@ -10,7 +10,7 @@
 
 #include "TrainerArguments.h"
 
-// dataset
+// data
 #include "RowDataset.h"
 
 // utilities
@@ -33,7 +33,7 @@ namespace common
     ///
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template <typename PredictorType>
-    std::shared_ptr<evaluators::IEvaluator<PredictorType>> MakeEvaluator(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments);
+    std::shared_ptr<evaluators::IEvaluator<PredictorType>> MakeEvaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments);
 
     /// <summary> Makes an incremental evaluator (used to evaluate ensembles). </summary>
     ///
@@ -44,7 +44,7 @@ namespace common
     ///
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template <typename PredictorType>
-    std::shared_ptr<evaluators::IIncrementalEvaluator<PredictorType>> MakeIncrementalEvaluator(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments);
+    std::shared_ptr<evaluators::IIncrementalEvaluator<PredictorType>> MakeIncrementalEvaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments);
 }
 }
 

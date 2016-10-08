@@ -14,7 +14,7 @@
 #include "OutputPort.h"
 #include "PortElements.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
 
 // utilities

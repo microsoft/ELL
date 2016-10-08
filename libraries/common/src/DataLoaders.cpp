@@ -11,7 +11,7 @@
 // utilities
 #include "Files.h"
 
-// dataset
+// data
 #include "ParsingIterator.h"
 #include "RowDataset.h"
 #include "SequentialLineIterator.h"
@@ -29,22 +29,22 @@ namespace common
     //
     // Public functions
     //
-    std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
+    std::unique_ptr<data::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
         // create parser for sparse vectors (SVMLight format)
-        dataset::SparseEntryParser sparseEntryParser;
+        data::SparseEntryParser sparseEntryParser;
 
         // create line iterator - read line by line sequentially
-        dataset::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
+        data::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
 
         // Create iterator
-        return dataset::GetParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));
+        return data::GetParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));
     }
 
-    dataset::AutoSupervisedDataset GetRowDataset(const DataLoadArguments& dataLoadArguments)
+    data::AutoSupervisedDataset GetRowDataset(const DataLoadArguments& dataLoadArguments)
     {
         auto dataIterator = GetDataIterator(dataLoadArguments);
-        dataset::AutoSupervisedDataset rowDataset;
+        data::AutoSupervisedDataset rowDataset;
         while (dataIterator->IsValid())
         {
             rowDataset.AddExample(dataIterator->Get());

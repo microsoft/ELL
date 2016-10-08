@@ -10,7 +10,7 @@
 #include <cassert>
 #include <cmath>
 
-// dataset
+// data
 #include "RowDataset.h"
 
 namespace emll
@@ -24,7 +24,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
     {
         UpdateSparse(exampleIterator);
     }
@@ -36,7 +36,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();
@@ -95,7 +95,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();

@@ -8,7 +8,7 @@
 
 #pragma once
 
-// dataset
+// data
 #include "RowDataset.h"
 
 // stl
@@ -33,7 +33,7 @@ namespace trainers
         /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator) = 0;
+        virtual void Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) = 0;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

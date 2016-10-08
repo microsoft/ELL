@@ -10,7 +10,7 @@
 #include "BinaryPredicateNode.h"
 #include "ConstantNode.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
 
 namespace emll

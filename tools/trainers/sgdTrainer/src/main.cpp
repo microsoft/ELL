@@ -13,7 +13,7 @@
 #include "OutputStreamImpostor.h"
 #include "RandomEngines.h"
 
-// dataset
+// data
 #include "Example.h"
 
 // common
@@ -101,8 +101,8 @@ int main(int argc, char* argv[])
         // TODO
         // XXX
         trainers::SGDIncrementalTrainer<lossFunctions::HingeLoss> tmpSGD (numColumns, lossFunctions::HingeLoss(), sgdIncrementalTrainerArguments);
-        auto dataSet = rowDataset.GetDataSet(0, 10);
-        tmpSGD.Update(dataSet);
+        auto dataset = rowDataset.GetDataset(0, 10);
+        tmpSGD.Update(dataset);
 
 
         // create sgd trainer

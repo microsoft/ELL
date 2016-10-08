@@ -14,7 +14,7 @@
 // utilities
 #include "Exception.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
 
 // stl

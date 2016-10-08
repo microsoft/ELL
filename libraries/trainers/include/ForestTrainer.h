@@ -10,7 +10,7 @@
 
 #include "IIncrementalTrainer.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
 #include "RowDataset.h"
 
@@ -48,7 +48,7 @@ namespace trainers
             double sumWeights = 0;
             double sumWeightedLabels = 0;
 
-            void Increment(const dataset::WeightLabel& weightLabel);
+            void Increment(const data::WeightLabel& weightLabel);
             Sums operator-(const Sums& other) const;
             double GetMeanLabel() const;
             void Print(std::ostream& os) const;
@@ -77,14 +77,14 @@ namespace trainers
         // metadata that the forest trainer keeps with each example
         struct TrainerMetadata
         {
-            TrainerMetadata(const dataset::WeightLabel& metaData);  
+            TrainerMetadata(const data::WeightLabel& metaData);  
             void Print(std::ostream& os) const;
 
             // strong weight and label
-            dataset::WeightLabel strong;
+            data::WeightLabel strong;
 
             // weak weight and label
-            dataset::WeightLabel weak;
+            data::WeightLabel weak;
 
             // the output of the forest on this example
             double currentOutput = 0;
@@ -114,7 +114,7 @@ namespace trainers
     class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>>
     {
     public:
-        using TrainerExampleType = dataset::Example<dataset::DoubleDataVector, TrainerMetadata>;
+        using TrainerExampleType = data::Example<data::DoubleDataVector, TrainerMetadata>;
 
         /// <summary> Constructs an instance of ForestTrainer. </summary>
         ///
@@ -125,15 +125,15 @@ namespace trainers
         /// <summary> Grows the decision forest. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
-        virtual void Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator) override {}
+        virtual void Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) override {}
 
-        void Update(dataset::ExampleIterator<TrainerExampleType> exampleIterator);
+        void Update(data::ExampleIterator<TrainerExampleType> exampleIterator);
 
 
         // TODO
-        void Update(dataset::DataSet dataSet)
+        void Update(data::Dataset dataset)
         {
-            auto exampleIterator = dataSet.GetIterator<TrainerExampleType>();
+            auto exampleIterator = dataset.GetIterator<TrainerExampleType>();
             Update(exampleIterator);
         }
 
@@ -177,7 +177,7 @@ namespace trainers
         //
 
         // loads a dataset and initializes the currentOutput field in the metadata
-        void LoadData(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator);
+        void LoadData(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator);
 
         // performs an epoch of splits
         void PerformSplits(size_t maxSplits);
@@ -214,7 +214,7 @@ namespace trainers
         SplitCandidatePriorityQueue _queue;
 
         // the dataset
-        dataset::RowDataset<TrainerExampleType> _dataset;
+        data::RowDataset<TrainerExampleType> _dataset;
     };
 }
 }

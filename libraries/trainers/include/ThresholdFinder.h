@@ -8,7 +8,7 @@
 
 #pragma once
 
-// dataset
+// data
 #include "RowDataset.h"
 
 // predictor

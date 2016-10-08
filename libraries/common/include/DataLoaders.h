@@ -10,7 +10,7 @@
 
 #include "DataLoadArguments.h"
 
-// dataset
+// data
 #include "RowDataset.h"
 #include "ParsingIterator.h"
 
@@ -26,14 +26,14 @@ namespace common
     /// <param name="dataLoadArguments"> The data load arguments. </param>
     ///
     /// <returns> The data iterator. </returns>
-    std::unique_ptr<dataset::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments);
+    std::unique_ptr<data::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments);
 
     /// <summary> Gets a row dataset from data load arguments. </summary>
     ///
     /// <param name="dataLoadArguments"> The data load arguments. </param> // TODO add template type documentation
     ///
     /// <returns> The row dataset. </returns>
-    template <typename DatasetType = dataset::AutoSupervisedDataset>
+    template <typename DatasetType = data::AutoSupervisedDataset>
     DatasetType GetRowDataset(const DataLoadArguments& dataLoadArguments);
 }
 }

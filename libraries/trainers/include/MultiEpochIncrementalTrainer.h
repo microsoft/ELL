@@ -10,7 +10,7 @@
 
 #include "IIncrementalTrainer.h"
 
-// dataset
+// data
 #include "RowDataset.h"
 
 // evaluators
@@ -52,7 +52,7 @@ namespace trainers
         /// <summary> Perform a set of training epochs. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator) override;
+        virtual void Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

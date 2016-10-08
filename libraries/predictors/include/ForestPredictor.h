@@ -12,7 +12,7 @@
 #include "IPredictor.h"
 #include "SingleElementThresholdPredictor.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
 
 // utilities
@@ -210,7 +210,7 @@ namespace predictors
         };
 
         /// <summary> Type of the data vector expected by this predictor type. </summary>
-        using DataVectorType = dataset::DoubleDataVector;
+        using DataVectorType = data::DoubleDataVector;
 
         /// <summary> Query if this forest has no trees and a zero bias. </summary>
         ///

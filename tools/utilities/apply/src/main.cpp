@@ -15,7 +15,7 @@
 #include "Files.h"
 #include "OutputStreamImpostor.h"
 
-// dataset
+// data
 #include "Example.h"
 #include "RowDataset.h"
 
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
 
         // load dataset
         if (verbose) std::cout << "Loading data from file: " << dataLoadArguments.inputDataFilename << std::endl;
-//TODO        auto dataset = common::GetRowDataset<dataset::DenseRowDataset>(dataLoadArguments);
+//TODO        auto dataset = common::GetRowDataset<data::DenseRowDataset>(dataLoadArguments);
 // TODO - consider removing        size_t numColumns = dataLoadArguments.parsedDataDimension;
 
         // load map
@@ -177,8 +177,8 @@ int main(int argc, char* argv[])
         //    auto dataVec = row.GetDataVector();
         //    dataVec.Resize(mapInputSize);
         //    map.SetInputValue<double>("input", dataVec);
-        //    auto output = map.ComputeOutput<dataset::DoubleDataVector>("output");
-        //    auto mappedRow = dataset::DenseSupervisedExample{ output, row.GetMetadata() };
+        //    auto output = map.ComputeOutput<data::DoubleDataVector>("output");
+        //    auto mappedRow = data::DenseSupervisedExample{ output, row.GetMetadata() };
         //    mappedRow.Print(outputStream);
         //    outputStream << std::string("\n");
         //    datasetIterator.Next();

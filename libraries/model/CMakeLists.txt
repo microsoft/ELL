@@ -57,7 +57,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
 
-target_link_libraries(${PROJ_NAME} utilities dataset linear) ## TODO look at this
+target_link_libraries(${PROJ_NAME} utilities data linear) ## TODO look at this
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 

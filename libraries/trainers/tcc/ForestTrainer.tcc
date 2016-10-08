@@ -20,9 +20,9 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(dataset::ExampleIterator<TrainerExampleType> exampleIterator)
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(data::ExampleIterator<TrainerExampleType> exampleIterator)
     {
-        _dataset = dataset::RowDataset<TrainerExampleType>(exampleIterator);
+        _dataset = data::RowDataset<TrainerExampleType>(exampleIterator);
 
         // convert data from iterator to dense dataset with metadata (weak weight / weak label) associated with each example
 //        LoadData(exampleIterator);
@@ -70,7 +70,7 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
     {
         // reset the dataset
         _dataset.Reset();
@@ -80,7 +80,7 @@ namespace trainers
         {
             const auto& oldExample = exampleIterator.Get();
 
-            auto newExample = oldExample.ToExample<dataset::DoubleDataVector, TrainerMetadata>();
+            auto newExample = oldExample.ToExample<data::DoubleDataVector, TrainerMetadata>();
             newExample.GetMetadata().currentOutput = _forest->Predict(newExample.GetDataVector());
 
             _dataset.AddExample(std::move(newExample));
@@ -189,13 +189,13 @@ namespace trainers
     {
         if (splitRule.NumOutputs() == 2)
         {
-            _dataset.Partition([splitRule](const dataset::Example<dataset::DoubleDataVector, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
+            _dataset.Partition([splitRule](const data::Example<data::DoubleDataVector, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
                                range.firstIndex,
                                range.size);
         }
         else
         {
-            _dataset.Sort([splitRule](const dataset::Example<dataset::DoubleDataVector, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()); },
+            _dataset.Sort([splitRule](const data::Example<data::DoubleDataVector, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()); },
                           range.firstIndex,
                           range.size);
         }

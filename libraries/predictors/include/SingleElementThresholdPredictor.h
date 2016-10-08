@@ -10,7 +10,7 @@
 
 #include "IPredictor.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
 
 // utilities
@@ -27,7 +27,7 @@ namespace predictors
     class SingleElementThresholdPredictor : public IPredictor<bool>, public utilities::IArchivable
     {
     public:
-        using DataVectorType = dataset::DoubleDataVector;
+        using DataVectorType = data::DoubleDataVector;
 
         /// <summary> Constructs a single-element threshold rule. </summary>
         ///

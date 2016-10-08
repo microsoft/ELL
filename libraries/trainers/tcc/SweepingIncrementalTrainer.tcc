@@ -21,9 +21,9 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    void SweepingIncrementalTrainer<PredictorType>::Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator)
+    void SweepingIncrementalTrainer<PredictorType>::Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
     {
-        dataset::AutoSupervisedDataset rowDataset(exampleIterator);
+        data::AutoSupervisedDataset rowDataset(exampleIterator);
 
         // calculate epoch size
         uint64_t epochSize = _parameters.epochSize;

@@ -32,7 +32,7 @@ namespace predictors
     {
     public:
         /// <summary> Type of the data vector expected by this predictor type. </summary>
-        using DataVectorType = dataset::AutoDataVector;
+        using DataVectorType = data::AutoDataVector;
 
         /// <summary> Default Constructor. </summary>
         LinearPredictor();

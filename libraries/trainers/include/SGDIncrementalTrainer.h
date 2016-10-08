@@ -17,7 +17,7 @@
 // linear
 #include "DoubleVector.h"
 
-// dataset
+// data
 #include "Example.h"
 #include "RowDataset.h"
 
@@ -56,11 +56,11 @@ namespace trainers
         /// <summary> Performs an epoch of SGD iterations. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator) override;
+        virtual void Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) override;
 
-        void Update(dataset::DataSet dataSet)  // TODO make this the real thing!
+        void Update(data::Dataset dataset)  // TODO make this the real thing!
         {
-            auto exampleIterator = dataSet.GetIterator<dataset::AutoSupervisedExample>();
+            auto exampleIterator = dataset.GetIterator<data::AutoSupervisedExample>();
             Update(exampleIterator);
         }
 
@@ -70,8 +70,8 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
     private:
-        void UpdateSparse(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator);
-        void UpdateDense(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator);
+        void UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator);
+        void UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator);
 
         LossFunctionType _lossFunction;
         SGDIncrementalTrainerParameters _parameters;

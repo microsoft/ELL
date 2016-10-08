@@ -13,7 +13,7 @@
 #include "OutputStreamImpostor.h"
 #include "RandomEngines.h"
 
-// dataset
+// data
 #include "Example.h"
 
 // common
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
         // TODO
         
         auto tmpTrainer = trainers::HistogramForestTrainer<lossFunctions::SquaredLoss, trainers::LogitBooster, trainers::ExhaustiveThresholdFinder>(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), forestTrainerArguments);
-        tmpTrainer.Update(rowDataset.GetDataSet());
+        tmpTrainer.Update(rowDataset.GetDataset());
 
         // create trainer
         std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> trainer;
