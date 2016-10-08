@@ -90,6 +90,13 @@ namespace model
         return iter->second;
     }
 
+   void DynamicMap::ResetOutput(size_t index, PortElementsBase outputElements)
+    {
+        assert(index > 0 && index <= _outputElements.size() && "Error: Resetting unset output");
+        _outputElements[index] = outputElements;
+        _outputElementsMap[_outputNames[index]] = outputElements;
+    }
+
     size_t DynamicMap::GetInputSize(int inputIndex) const
     {
         return _inputNodes[inputIndex]->GetOutputPort().Size();

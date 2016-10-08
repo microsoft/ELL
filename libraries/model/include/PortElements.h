@@ -243,6 +243,8 @@ namespace model
         /// <returns> The number of ranges in this list </returns>
         size_t NumRanges() const { return _ranges.size(); }
 
+        bool IsFullPortOutput() const { return _ranges.size() == 1 && _ranges[0].IsFullPortRange(); }
+
         /// <summary> Gets a vector of range objects </summary>
         ///
         /// <returns> A std::vector of PortRange objects </returns>

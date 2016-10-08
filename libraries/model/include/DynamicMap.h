@@ -249,6 +249,7 @@ namespace model
         /// <param name="inputNode"> The input node to add </param>
         void AddInput(const std::string& inputName, InputNodeBase* inputNode);
         void AddOutput(const std::string& outputName, PortElementsBase outputElements);
+        void ResetOutput(size_t index, PortElementsBase outputElements);
 
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
