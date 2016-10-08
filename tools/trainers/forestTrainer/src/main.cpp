@@ -29,6 +29,8 @@
 #include "HistogramForestTrainer.h"
 #include "SortingForestTrainer.h"
 
+#include "ThresholdFinder.h" // TODO remove this
+
 // lossFunctions
 #include "LogLoss.h"
 #include "SquaredLoss.h"
@@ -69,6 +71,12 @@ int main(int argc, char* argv[])
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto rowDataset = common::GetRowDataset(dataLoadArguments);
+
+        // XX
+        // TODO
+        
+        auto tmpTrainer = trainers::HistogramForestTrainer<lossFunctions::SquaredLoss, trainers::LogitBooster, trainers::ExhaustiveThresholdFinder>(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), forestTrainerArguments);
+        tmpTrainer.Update(rowDataset.GetDataSet());
 
         // create trainer
         std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> trainer;

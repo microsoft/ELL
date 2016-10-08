@@ -75,9 +75,9 @@ namespace trainers
         };
 
         // metadata that the forest trainer keeps with each example
-        struct ExampleMetadata
+        struct TrainerMetadata
         {
-            ExampleMetadata(const dataset::WeightLabel& metaData);  
+            TrainerMetadata(const dataset::WeightLabel& metaData);  
             void Print(std::ostream& os) const;
 
             // strong weight and label
@@ -114,6 +114,8 @@ namespace trainers
     class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>>
     {
     public:
+        using TrainerExampleType = dataset::Example<dataset::DoubleDataVector, TrainerMetadata>;
+
         /// <summary> Constructs an instance of ForestTrainer. </summary>
         ///
         /// <param name="booster"> The booster. </param>
@@ -123,7 +125,18 @@ namespace trainers
         /// <summary> Grows the decision forest. </summary>
         ///
         /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
-        virtual void Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator) override;
+        virtual void Update(dataset::ExampleIterator<dataset::AutoSupervisedExample> exampleIterator) override {}
+
+        void Update(dataset::ExampleIterator<TrainerExampleType> exampleIterator);
+
+
+        // TODO
+        void Update(dataset::DataSet dataSet)
+        {
+            auto exampleIterator = dataSet.GetIterator<TrainerExampleType>();
+            Update(exampleIterator);
+        }
+
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
@@ -201,7 +214,7 @@ namespace trainers
         SplitCandidatePriorityQueue _queue;
 
         // the dataset
-        dataset::RowDataset<dataset::Example<dataset::DoubleDataVector, ExampleMetadata>> _dataset;
+        dataset::RowDataset<TrainerExampleType> _dataset;
     };
 }
 }

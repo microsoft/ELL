@@ -47,7 +47,7 @@ namespace trainers
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::NodeStats;
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Range;
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Sums;
-        using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ExampleMetadata;
+        using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::TrainerMetadata;
 
     protected:
         using ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::_dataset;

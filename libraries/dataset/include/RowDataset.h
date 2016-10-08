@@ -94,7 +94,7 @@ namespace dataset
     public:
         DataSet(const IRowDataset* pDataset, size_t fromIndex, size_t size) : _pDataset(pDataset), _fromIndex(fromIndex), _size(size) {}
 
-        template<typename ExampleType, utilities::IsSame<typename ExampleType::MetadataType, WeightLabel> Concept = true>
+        template<typename ExampleType>
         ExampleIterator<ExampleType> GetIterator()
         {
             GetIteratorAbstractor<ExampleType> abstractor(_fromIndex, _size);

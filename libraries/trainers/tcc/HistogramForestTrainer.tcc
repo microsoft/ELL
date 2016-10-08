@@ -87,7 +87,7 @@ namespace trainers
         Sums sums0;
         size_t size0 = 0;
 
-        auto exampleIterator = _dataset.GetIterator<>(range.firstIndex, range.size);
+        auto exampleIterator = _dataset.GetIterator(range.firstIndex, range.size);
         while (exampleIterator.IsValid())
         {
             const auto& example = exampleIterator.Get();
