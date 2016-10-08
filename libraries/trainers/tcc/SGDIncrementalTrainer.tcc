@@ -24,9 +24,9 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(data::Dataset dataset)
     {
-        UpdateSparse(exampleIterator);
+        UpdateSparse(dataset.GetIterator<data::AutoSupervisedExample>(), dataset.NumExamples());
     }
 
     template <typename LossFunctionType>
@@ -36,7 +36,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();
@@ -47,7 +47,7 @@ namespace trainers
 
         // define some constants
         const double T_prev = double(_total_iterations);
-        const double T_next = T_prev; // TODO IMPORTANT!!!!  +exampleIterator.NumIteratesLeft();
+        const double T_next = T_prev + numExamples;
         const double eta = 1.0 / _parameters.regularization / T_prev;
         const double sigma = std::log(T_next) + 0.5 / T_next;
 

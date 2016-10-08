@@ -21,9 +21,9 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    void MultiEpochIncrementalTrainer<PredictorType>::Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
+    void MultiEpochIncrementalTrainer<PredictorType>::Update(data::Dataset dataset)
     {
-        data::AutoSupervisedDataset rowDataset(exampleIterator);
+        auto rowDataset = data::MakeRowDataset(dataset.GetIterator<data::AutoSupervisedExample>()); // TODO match internal trainer example type
 
         // calculate epoch size
         uint64_t epochSize = _parameters.epochSize;
@@ -38,8 +38,7 @@ namespace trainers
             rowDataset.RandomPermute(_random, epochSize);
 
             // update the incremental trainer
-            auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            _internalTrainer->Update(trainSetIterator);
+            _internalTrainer->Update(rowDataset.GetDataset(0, epochSize));
         }
     }
 

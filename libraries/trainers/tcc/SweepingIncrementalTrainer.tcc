@@ -21,9 +21,9 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    void SweepingIncrementalTrainer<PredictorType>::Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
+    void SweepingIncrementalTrainer<PredictorType>::Update(data::Dataset dataset)
     {
-        data::AutoSupervisedDataset rowDataset(exampleIterator);
+        auto rowDataset = data::MakeRowDataset(dataset.GetIterator<data::AutoSupervisedExample>()); // TODO match internal trainer example type
 
         // calculate epoch size
         uint64_t epochSize = _parameters.epochSize;
@@ -40,8 +40,7 @@ namespace trainers
             for (int i = 0; i < _evaluatingTrainers.size(); ++i)
             {
                 // update the incremental trainer
-                auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-                _evaluatingTrainers[i].Update(trainSetIterator);
+                _evaluatingTrainers[i].Update(rowDataset.GetDataset(0, epochSize));
             }
         }
     }

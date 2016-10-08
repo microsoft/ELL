@@ -97,14 +97,6 @@ int main(int argc, char* argv[])
         // predictor type
         using PredictorType = predictors::LinearPredictor;
 
-
-        // TODO
-        // XXX
-        trainers::SGDIncrementalTrainer<lossFunctions::HingeLoss> tmpSGD (numColumns, lossFunctions::HingeLoss(), sgdIncrementalTrainerArguments);
-        auto dataset = rowDataset.GetDataset(0, 10);
-        tmpSGD.Update(dataset);
-
-
         // create sgd trainer
         auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
 
@@ -120,7 +112,7 @@ int main(int argc, char* argv[])
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(rowDataset.GetIterator());
+        trainer->Update(rowDataset.GetDataset()); // TODO epoch size?
         auto predictor = trainer->GetPredictor();
 
         // print loss and errors

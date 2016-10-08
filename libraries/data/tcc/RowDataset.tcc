@@ -156,6 +156,12 @@ namespace data
         }
     }
 
+    template<typename ExampleType>
+    RowDataset<ExampleType> MakeRowDataset(ExampleIterator<ExampleType> iterator)
+    {
+        return RowDataset<ExampleType>(iterator);
+    }
+
     template <typename DatasetExampleType>
     std::ostream& operator<<(std::ostream& os, const RowDataset<DatasetExampleType>& rowDataset)
     {

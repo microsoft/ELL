@@ -20,9 +20,9 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(data::ExampleIterator<TrainerExampleType> exampleIterator)
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(data::Dataset dataset)
     {
-        _dataset = data::RowDataset<TrainerExampleType>(exampleIterator);
+        _dataset = data::MakeRowDataset(dataset.GetIterator<TrainerExampleType>());
 
         // convert data from iterator to dense dataset with metadata (weak weight / weak label) associated with each example
 //        LoadData(exampleIterator);

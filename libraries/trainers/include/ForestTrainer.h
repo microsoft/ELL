@@ -122,21 +122,10 @@ namespace trainers
         /// <param name="parameters"> Training Parameters. </param>
         ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters);
 
-        /// <summary> Grows the decision forest. </summary>
+        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
-        virtual void Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) override {}
-
-        void Update(data::ExampleIterator<TrainerExampleType> exampleIterator);
-
-
-        // TODO
-        void Update(data::Dataset dataset)
-        {
-            auto exampleIterator = dataset.GetIterator<TrainerExampleType>();
-            Update(exampleIterator);
-        }
-
+        /// <param name="dataset"> A dataset. </param>
+        virtual void Update(data::Dataset dataset) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

@@ -30,10 +30,10 @@ namespace trainers
     public:
         virtual ~IIncrementalTrainer() = default;
 
-        /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
+        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) = 0;
+        /// <param name="dataset"> A dataset. </param>
+        virtual void Update(data::Dataset dataset) = 0;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

@@ -37,10 +37,10 @@ namespace trainers
         /// <param name="evaluator"> An evaluator. </param>
         EvaluatingIncrementalTrainer(std::unique_ptr<InternalTrainerType>&& internalTrainer, std::shared_ptr<EvaluatorType> evaluator);
 
-        /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
+        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) override;
+        /// <param name="dataset"> A dataset. </param>
+        virtual void Update(data::Dataset dataset) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

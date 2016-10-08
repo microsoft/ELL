@@ -101,7 +101,7 @@ namespace data
             return utilities::AbstractInvoker<IRowDataset, RowDataset<data::AutoSupervisedExample>, RowDataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
         }
 
-        size_t Size() const { return _size; }
+        size_t NumExamples() const { return _size; }
 
     private:
         const IRowDataset* _pDataset;
@@ -272,6 +272,15 @@ namespace data
         size_t _maxExampleSize = 0;
     };
 
+    /// <summary> Helper function that makes a row dataset out of an example iterator. </summary>
+    ///
+    /// <typeparam name="ExampleType"> Example type. </typeparam>
+    /// <param name="iterator"> The example iterator. </param>
+    ///
+    /// <returns> A RowDataset. </returns>
+    template<typename ExampleType>
+    RowDataset<ExampleType> MakeRowDataset(ExampleIterator<ExampleType> iterator);
+
     // friendly name
     typedef RowDataset<AutoSupervisedExample> AutoSupervisedDataset;
 
@@ -281,8 +290,8 @@ namespace data
     /// <param name="dataset"> The dataset. </param>
     ///
     /// <returns> The ostream. </returns>
-    template <typename DatasetExampleType>
-    std::ostream& operator<<(std::ostream& os, const RowDataset<DatasetExampleType>& rowDataset);
+    template <typename ExampleType>
+    std::ostream& operator<<(std::ostream& os, const RowDataset<ExampleType>& rowDataset);
 }
 }
 

@@ -24,9 +24,9 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    void EvaluatingIncrementalTrainer<PredictorType>::Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
+    void EvaluatingIncrementalTrainer<PredictorType>::Update(data::Dataset dataset)
     {
-        _internalTrainer->Update(exampleIterator);
+        _internalTrainer->Update(dataset);
         _evaluator->Evaluate(*_internalTrainer->GetPredictor());
     }
 

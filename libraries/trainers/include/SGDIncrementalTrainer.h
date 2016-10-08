@@ -53,16 +53,10 @@ namespace trainers
         /// <param name="parameters"> The training parameters. </param>
         SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
 
-        /// <summary> Performs an epoch of SGD iterations. </summary>
+        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) override;
-
-        void Update(data::Dataset dataset)  // TODO make this the real thing!
-        {
-            auto exampleIterator = dataset.GetIterator<data::AutoSupervisedExample>();
-            Update(exampleIterator);
-        }
+        /// <param name="dataset"> A dataset. </param>
+        virtual void Update(data::Dataset dataset) override;
 
         /// <summary> Returns The averaged predictor. </summary>
         ///
@@ -70,7 +64,7 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
     private:
-        void UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator);
+        void UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples);
         void UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator);
 
         LossFunctionType _lossFunction;
