@@ -276,6 +276,15 @@ namespace model
         }
     }
 
+    Port::PortType PortElementsBase::GetPortType()
+    {
+        if(_ranges.size() == 0)
+        {
+            return Port::PortType::none;
+        }
+        return _ranges[0].ReferencedPort()->GetType();
+    }
+    
     void PortElementsBase::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["ranges"] << _ranges;

@@ -207,6 +207,8 @@ namespace model
         /// <returns> The `PortElementsBase` object representing the indicated outputs </returns>
         PortElementsBase GetOutputElementsBase(const std::string& outputName);
 
+        // TODO: add ComputeOutput(index, outvec) and ComputeOutput(name, outvec)
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -217,14 +219,12 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        // TODO: document
         size_t NumInputs() const { return _inputNodes.size(); }
         size_t NumOutputs() const { return _outputElements.size(); }
 
-
-        std::vector<InputNodeBase*> GetInputs() { return _inputNodes; }
-        std::vector<PortElementsBase> GetOutputs() { return _outputElements; }
-        InputNodeBase* GetInput(size_t index);
-        PortElementsBase GetOutput(size_t index);
+        const std::vector<InputNodeBase*>& GetInputs() { return _inputNodes; }
+        const std::vector<PortElementsBase>& GetOutputs() { return _outputElements; }
 
     protected:
         // helper
@@ -248,22 +248,9 @@ namespace model
         /// <param name="inputName"> The name to assign to the input node </param>
         /// <param name="inputNode"> The input node to add </param>
         void AddInput(const std::string& inputName, InputNodeBase* inputNode);
-
-        /// <summary> Add an output to the map </summary>
-        ///
-        /// <param name="outputName"> The name to assign to the output elements </param>
-        /// <param name="outPutElements"> The output elements to add </param>
         void AddOutput(const std::string& outputName, PortElementsBase outputElements);
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Reads from a Unarchiver. </summary>
-        ///
-        /// <param name="archiver"> The archiver. </param>
-        /// <param name="context"> The serialization context. </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         virtual ModelTransformer DoRefine(const TransformContext& context);
@@ -273,10 +260,17 @@ namespace model
         PortElementsBase GetOutput(size_t index) const;
         PortElementsBase GetOutput(const std::string& name) const;
 
+        virtual void SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues);
+        virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues);
+        virtual void SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues);
+
+        virtual std::vector<bool> ComputeBoolOutput(const PortElementsBase& outputs);
+        virtual std::vector<int> ComputeIntOutput(const PortElementsBase& outputs);
+        virtual std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs);
+
     private:
         Model _model;
 
-        // want the inputs and outputs indexed by name and index
         std::vector<InputNodeBase*> _inputNodes;
         std::vector<std::string> _inputNames;
         std::unordered_map<std::string, InputNodeBase*> _inputNodeMap;

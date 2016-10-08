@@ -264,6 +264,11 @@ namespace model
         /// <param name="other"> The PortElements to append to this one. </param>
         void Append(const PortElementsBase& other);
 
+        /// <summary> Consolidates adjacent ranges </summary>
+        virtual void Consolidate();
+
+        Port::PortType GetPortType();
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -283,9 +288,6 @@ namespace model
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
-        /// <summary> Consolidates adjacent ranges </summary>
-        virtual void Consolidate();
 
     protected:
         void ComputeSize();

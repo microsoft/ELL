@@ -35,6 +35,36 @@ namespace model
         }
     }
 
+    void DynamicMap::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues)
+    {
+        node->SetInput(inputValues);
+    }
+
+    void DynamicMap::SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues)
+    {
+        node->SetInput(inputValues);
+    }
+
+    void DynamicMap::SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues)
+    {
+        node->SetInput(inputValues);
+    }
+
+    std::vector<bool> DynamicMap::ComputeBoolOutput(const PortElementsBase& outputs)
+    {
+        return _model.ComputeOutput<bool>(outputs);
+    }
+
+    std::vector<int> DynamicMap::ComputeIntOutput(const PortElementsBase& outputs)
+    {
+        return _model.ComputeOutput<int>(outputs);
+    }
+
+    std::vector<double> DynamicMap::ComputeDoubleOutput(const PortElementsBase& outputs)
+    {
+        return _model.ComputeOutput<double>(outputs);
+    }
+
     void DynamicMap::AddInput(const std::string& inputName, InputNodeBase* inputNode)
     {
         _inputNodes.push_back(inputNode);
