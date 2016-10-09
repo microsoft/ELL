@@ -3,6 +3,11 @@
 #
 
 set (MODEL_FILES 
+    identity.json
+    times_two.json
+    is_equal.json
+    arg_max.json
+    multi_out.json
     model_1.json 
     model_2.json
     model_3.json
@@ -14,10 +19,6 @@ set (MODEL_FILES
     refined_tree_1.json
     refined_tree_2.json
     refined_tree_3.json
-    identity.json
-    times_two.json
-    is_equal.json
-    arg_max.json
 )
 
 set_source_files_properties(${MODEL_FILES} PROPERTIES GENERATED TRUE)

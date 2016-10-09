@@ -42,6 +42,8 @@ void SaveModels(std::string ext)
     common::SaveModel(GenerateRefinedTreeModel(1), "refined_tree_1." + ext);
     common::SaveModel(GenerateRefinedTreeModel(2), "refined_tree_2." + ext);
     common::SaveModel(GenerateRefinedTreeModel(3), "refined_tree_3." + ext);
+
+    common::SaveModel(GenerateMultiOutModel(3), "multi_out." + ext);
 }
 
 int main(int argc, char* argv[])
