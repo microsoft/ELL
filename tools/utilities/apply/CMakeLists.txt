@@ -34,4 +34,4 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")
 set (TEST_NAME ${PROJ_NAME}_test)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFile ${CMAKE_SOURCE_DIR}/examples/data/model_1.json -in 1000 -out 1005.output -dd auto -odf null -omf null -v)
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFile ${CMAKE_SOURCE_DIR}/examples/data/model_1.json -in 1012 -out 1017.output -dd auto -odf null -omf null -v)

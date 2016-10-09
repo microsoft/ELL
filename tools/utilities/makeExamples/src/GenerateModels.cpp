@@ -54,6 +54,15 @@ model::Model GenerateTimesTwoModel(size_t dimension)
     return model;
 }
 
+model::Model GenerateIsEqualModel()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(2);
+    auto predicateNode = model.AddNode<nodes::BinaryPredicateNode<double>>(model::PortElements<double>{ inputNode->output, 0 }, model::PortElements<double>{ inputNode->output, 1 }, nodes::BinaryPredicateType::equal);
+    model.AddNode<model::OutputNode<bool>>(predicateNode->output);
+    return model;
+}
+
 model::Model GenerateArgMaxModel(size_t dimension)
 {
     model::Model model;
@@ -82,7 +91,7 @@ model::Model GenerateModel1()
     {
         predictor.GetWeights()[index] = (double)(index % 5);
     }
-    auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
+    model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
     return model;
 }
 
@@ -101,7 +110,7 @@ model::Model GenerateModel2()
     auto mean2 = model.AddNode<nodes::MovingAverageNode<double>>(mag2->output, 8);
 
     // combine them
-    auto diff = model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationType::subtract);
+    model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationType::subtract);
     return model;
 }
 
@@ -119,7 +128,7 @@ model::Model GenerateModel3()
     auto dot1 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay1->output);
     auto dot2 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay2->output);
 
-    auto dotDifference = model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationType::subtract);
+    model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationType::subtract);
     return model;
 }
 
@@ -129,7 +138,6 @@ predictors::SimpleForestPredictor CreateForest(size_t numSplits)
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
     using SplitRule = predictors::SingleElementThresholdPredictor;
     using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
-    using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
     // build a forest
     predictors::SimpleForestPredictor forest;
@@ -154,7 +162,7 @@ model::Model GenerateTreeModel(size_t numSplits)
     auto forest = CreateForest(numSplits);
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto simpleForestPredictorNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
+    model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
     return model;
 }
 

@@ -5,13 +5,13 @@
     "_type": "InputNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1009"
+      "id": "1012"
     },
     "output": {
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1009"
+        "id": "1012"
       },
       "name": "output",
       "type": 1,
@@ -22,13 +22,13 @@
     "_type": "MovingVarianceNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1013"
+      "id": "1016"
     },
     "input": {
       "_type": "InputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1013"
+        "id": "1016"
       },
       "name": "input",
       "type": 1,
@@ -42,7 +42,7 @@
           "isFixedSize": false,
           "referencedNodeId": {
             "_type": "UniqueId",
-            "id": "1009"
+            "id": "1012"
           },
           "referencedPortName": "output"
         }]
@@ -52,7 +52,7 @@
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1013"
+        "id": "1016"
       },
       "name": "output",
       "type": 1,
@@ -64,13 +64,13 @@
     "_type": "MovingAverageNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1012"
+      "id": "1015"
     },
     "input": {
       "_type": "InputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1012"
+        "id": "1015"
       },
       "name": "input",
       "type": 1,
@@ -84,7 +84,7 @@
           "isFixedSize": false,
           "referencedNodeId": {
             "_type": "UniqueId",
-            "id": "1009"
+            "id": "1012"
           },
           "referencedPortName": "output"
         }]
@@ -94,7 +94,7 @@
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1012"
+        "id": "1015"
       },
       "name": "output",
       "type": 1,
@@ -104,90 +104,6 @@
   }, 
   {
     "_type": "MovingVarianceNode<double>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1011"
-    },
-    "input": {
-      "_type": "InputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1011"
-      },
-      "name": "input",
-      "type": 1,
-      "input": {
-        "_type": "PortElements<double>",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 3,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1009"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "output": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1011"
-      },
-      "name": "output",
-      "type": 1,
-      "size": 3
-    },
-    "windowSize": 8
-  }, 
-  {
-    "_type": "MovingAverageNode<double>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1010"
-    },
-    "input": {
-      "_type": "InputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1010"
-      },
-      "name": "input",
-      "type": 1,
-      "input": {
-        "_type": "PortElements<double>",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 3,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1009"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "output": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1010"
-      },
-      "name": "output",
-      "type": 1,
-      "size": 3
-    },
-    "windowSize": 8
-  }, 
-  {
-    "_type": "LinearPredictorNode",
     "id": {
       "_type": "UniqueId",
       "id": "1014"
@@ -210,40 +126,7 @@
           "isFixedSize": false,
           "referencedNodeId": {
             "_type": "UniqueId",
-            "id": "1010"
-          },
-          "referencedPortName": "output"
-        }, 
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 3,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1011"
-          },
-          "referencedPortName": "output"
-        }, 
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 3,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
             "id": "1012"
-          },
-          "referencedPortName": "output"
-        }, 
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 3,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1013"
           },
           "referencedPortName": "output"
         }]
@@ -257,13 +140,130 @@
       },
       "name": "output",
       "type": 1,
+      "size": 3
+    },
+    "windowSize": 8
+  }, 
+  {
+    "_type": "MovingAverageNode<double>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1013"
+    },
+    "input": {
+      "_type": "InputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1013"
+      },
+      "name": "input",
+      "type": 1,
+      "input": {
+        "_type": "PortElements<double>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1012"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1013"
+      },
+      "name": "output",
+      "type": 1,
+      "size": 3
+    },
+    "windowSize": 8
+  }, 
+  {
+    "_type": "LinearPredictorNode",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1017"
+    },
+    "input": {
+      "_type": "InputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1017"
+      },
+      "name": "input",
+      "type": 1,
+      "input": {
+        "_type": "PortElements<double>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1013"
+          },
+          "referencedPortName": "output"
+        }, 
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1014"
+          },
+          "referencedPortName": "output"
+        }, 
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1015"
+          },
+          "referencedPortName": "output"
+        }, 
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1016"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1017"
+      },
+      "name": "output",
+      "type": 1,
       "size": 1
     },
     "weightedElements": {
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1014"
+        "id": "1017"
       },
       "name": "weightedElements",
       "type": 1,

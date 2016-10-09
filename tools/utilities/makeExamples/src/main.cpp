@@ -25,8 +25,9 @@ using namespace emll;
 void SaveModels(std::string ext)
 {
     common::SaveModel(GenerateIdentityModel(3), "identity." + ext);
-    common::SaveModel(GenerateTimesTwoModel(3), "timesTwo." + ext);
-    common::SaveModel(GenerateArgMaxModel(3), "argMax." + ext);
+    common::SaveModel(GenerateTimesTwoModel(3), "times_two." + ext);
+    common::SaveModel(GenerateIsEqualModel(), "is_equal." + ext);
+    common::SaveModel(GenerateArgMaxModel(3), "arg_max." + ext);
 
     common::SaveModel(GenerateModel1(), "model_1." + ext);
     common::SaveModel(GenerateModel2(), "model_2." + ext);

@@ -1,22 +1,30 @@
 #
-# SWIG example projects
+# example data
 #
 
-set (MODEL_FILES model_1.json 
-                 model_2.json
-                 model_3.json
-                 tree_0.json
-                 tree_1.json
-                 tree_2.json
-                 tree_3.json
-                 refined_tree_0.json
-                 refined_tree_1.json
-                 refined_tree_2.json
-                 refined_tree_3.json
-                 identity.json
-                 timesTwo.json)
+set (MODEL_FILES 
+    model_1.json 
+    model_2.json
+    model_3.json
+    tree_0.json
+    tree_1.json
+    tree_2.json
+    tree_3.json
+    refined_tree_0.json
+    refined_tree_1.json
+    refined_tree_2.json
+    refined_tree_3.json
+    identity.json
+    times_two.json
+    is_equal.json
+    arg_max.json
+)
+
+set_source_files_properties(${MODEL_FILES} PROPERTIES GENERATED TRUE)
+
 set (DATA_FILES ${MODEL_FILES} testData.txt tinyTestData.txt)
 add_custom_target(datafiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
+add_dependencies(datafiles makeExamples)
 
 # copy example data
 foreach(DATA_FILE ${DATA_FILES})
