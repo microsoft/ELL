@@ -62,7 +62,7 @@ namespace linear
     /// <param name="container"> A std::vector to iterate over </param>
     /// <returns> An StlIndexValueIteratorAdapter that iterates over the given vector </returns>
     template <typename ValueType>
-    VectorIndexValueIterator<ValueType> MakeVectorIndexValueIterator(const std::vector<ValueType>& container); // TODO rename or delete, make sure its used uniformly ?
+    VectorIndexValueIterator<ValueType> MakeVectorIndexValueIterator(const std::vector<ValueType>& container);
 }
 }
 

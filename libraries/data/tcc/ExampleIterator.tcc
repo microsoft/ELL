@@ -11,7 +11,7 @@ namespace emll
 namespace data
 {
     template<typename ExampleType>
-    ExampleIterator<ExampleType>::ExampleIterator(std::shared_ptr<IExampleIterator<ExampleType>>&& iterator) : _iterator(std::move(iterator)) 
+    ExampleIterator<ExampleType>::ExampleIterator(std::unique_ptr<IExampleIterator<ExampleType>>&& iterator) : _iterator(std::move(iterator)) 
     {}
 }
 }

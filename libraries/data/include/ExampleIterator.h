@@ -39,11 +39,15 @@ namespace data
     class ExampleIterator
     {
     public:
-
         /// <summary> Constructs an instance of ExampleIterator. </summary>
         ///
         /// <param name="iterator"> Shared pointer to an IExampleIterator. </param>
-        ExampleIterator(std::shared_ptr<IExampleIterator<ExampleType>>&& iterator); 
+        ExampleIterator(std::unique_ptr<IExampleIterator<ExampleType>>&& iterator); 
+
+        ExampleIterator(ExampleIterator<ExampleType>&&) = default;
+
+        // Copy ctor deleted because this class contains a unique_ptr
+        ExampleIterator(const ExampleIterator<ExampleType>&) = delete;
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
@@ -59,7 +63,7 @@ namespace data
         ExampleType Get() const { return _iterator->Get(); }
 
     private:
-        std::shared_ptr<IExampleIterator<ExampleType>> _iterator;
+        std::unique_ptr<IExampleIterator<ExampleType>> _iterator;
     };
 }
 }

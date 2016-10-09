@@ -84,7 +84,7 @@ namespace data
     ExampleIterator<IteratorExampleType> Dataset<DatasetExampleType>::GetExampleIterator(size_t fromIndex, size_t size) const
     {
         size = CorrectRangeSize(fromIndex, size);
-        return ExampleIterator<IteratorExampleType>(std::make_shared<DatasetExampleIterator<IteratorExampleType>>(_examples.cbegin() + fromIndex, _examples.cbegin() + fromIndex + size)); // TODO unique or shared?
+        return ExampleIterator<IteratorExampleType>(std::make_unique<DatasetExampleIterator<IteratorExampleType>>(_examples.cbegin() + fromIndex, _examples.cbegin() + fromIndex + size));
     }
 
     template <typename DatasetExampleType>
@@ -185,7 +185,7 @@ namespace data
     template<typename ExampleType>
     Dataset<ExampleType> MakeDataset(ExampleIterator<ExampleType> iterator)
     {
-        return Dataset<ExampleType>(iterator);
+        return Dataset<ExampleType>(std::move(iterator));
     }
 
     template <typename DatasetExampleType>

@@ -56,7 +56,7 @@ namespace trainers
     template <typename ExampleIteratorType>
     std::vector<predictors::SingleElementThresholdPredictor> trainers::ExhaustiveThresholdFinder::GetThresholds(ExampleIteratorType exampleIterator) const
     {
-        auto uniqueValuesResult = UniqueValues(exampleIterator);
+        auto uniqueValuesResult = UniqueValues(std::move(exampleIterator));
         std::vector<predictors::SingleElementThresholdPredictor> thresholdPredictors;
 
         for (size_t j = 0; j < uniqueValuesResult.weightedValues.size(); ++j)
