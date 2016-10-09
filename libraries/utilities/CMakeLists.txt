@@ -51,7 +51,7 @@ set (INCLUDE include/AbstractInvoker.h
              include/ParallelTransformIterator.h
              include/Parser.h
              include/RandomEngines.h
-             include/StlIterator.h
+             include/StlReferenceIterator.h
              include/Tokenizer.h
              include/TransformIterator.h
              include/TupleWrapper.h
@@ -76,7 +76,7 @@ set (TCC tcc/AbstractInvoker.tcc
          tcc/OutputStreamImpostor.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
-         tcc/StlIterator.tcc
+         tcc/StlReferenceIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc

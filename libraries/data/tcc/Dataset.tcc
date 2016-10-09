@@ -93,6 +93,12 @@ namespace data
     }
 
     template <typename DatasetExampleType>
+    auto Dataset<DatasetExampleType>::GetExampleReferenceIterator(size_t fromIndex = 0, size_t size = 0) const -> ExampleReferenceIterator
+    {
+        return ExampleReferenceIterator(_examples.cbegin() + fromIndex, _examples.cbegin() + fromIndex + size);
+    }
+
+    template <typename DatasetExampleType>
     void Dataset<DatasetExampleType>::AddExample(DatasetExampleType example)
     {
         size_t numFeatures = example.GetDataVector().ZeroSuffixFirstIndex();

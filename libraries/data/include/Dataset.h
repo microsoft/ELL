@@ -14,7 +14,7 @@
 #include "ExampleIterator.h"
 
 // utilities
-#include "StlIterator.h"
+#include "StlReferenceIterator.h"
 #include "AbstractInvoker.h"
 #include "TypeTraits.h"
 
@@ -103,6 +103,8 @@ namespace data
     class Dataset : public IDataset
     {
     public:
+        using ExampleReferenceIterator = utilities::VectorReferenceIterator<DatasetExampleType>;
+
         /// <summary> Iterator class. </summary>
         template<typename IteratorExampleType> 
         class DatasetExampleIterator : public IExampleIterator<IteratorExampleType>
@@ -197,6 +199,15 @@ namespace data
         /// <returns> The iterator. </returns>
         template<typename IteratorExampleType = DatasetExampleType>
         ExampleIterator<IteratorExampleType> GetExampleIterator(size_t fromIndex = 0, size_t size = 0) const;
+
+        /// <summary> Gets an example reference iterator. </summary>
+        ///
+        /// <param name="firstExample"> Zero-based index of the first example to iterate over. </param>
+        /// <param name="size"> The number of examples to iterate over, a value of zero means all
+        /// the way to the end. </param>
+        ///
+        /// <returns> The example reference iterator. </returns>
+        ExampleReferenceIterator GetExampleReferenceIterator(size_t fromIndex = 0, size_t size = 0) const;
 
         /// <summary> Returns an AnyDataset that represents an interval of examples from this dataset. </summary>
         ///

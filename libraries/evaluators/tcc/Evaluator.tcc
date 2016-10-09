@@ -33,7 +33,7 @@ namespace evaluators
             return;
         }
 
-        auto iterator = _dataset.GetExampleIterator();
+        auto iterator = _dataset.GetExampleReferenceIterator();
 
         while (iterator.IsValid())
         {

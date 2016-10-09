@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StlIterator.h (utilities)
+//  File:     StlReferenceIterator.h (utilities)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,17 +18,17 @@ namespace utilities
 {
     /// <summary> An adapter that transforms a pair of STL iterators into a read-only forward iterator with IsValid, Next, and Get functions</summary>
     template <typename IteratorType, typename ValueType = typename std::decay<decltype(*std::declval<IteratorType>())>::type>
-    class StlIterator
+    class StlReferenceIterator
     {
     public:
 
-        StlIterator() = default;
+        StlReferenceIterator() = default;
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>
         /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over. </param>
-        StlIterator(IteratorType begin, IteratorType end);
+        StlReferenceIterator(IteratorType begin, IteratorType end);
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
@@ -53,34 +53,34 @@ namespace utilities
         /// <summary> Returns the value of the current iterate. </summary>
         ///
         /// <returns> The value of the current iterate. </returns>
-        ValueType Get() const { return *_current; }
+        const ValueType& Get() const { return *_current; }
 
     protected:
         IteratorType _current;
         IteratorType _end;
     };
 
-    /// <summary> Handy type alias for a StlIterator over a std::vector </summary>
+    /// <summary> Handy type alias for a StlReferenceIterator over a std::vector </summary>
     template <typename ValueType>
-    using VectorIterator = StlIterator<typename std::vector<ValueType>::const_iterator>;
+    using VectorReferenceIterator = StlReferenceIterator<typename std::vector<ValueType>::const_iterator>;
 
-    /// <summary> Convenience function for creating StlIterators </summary>
+    /// <summary> Convenience function for creating StlReferenceIterators </summary>
     ///
     /// <param name="begin"> The STL iterator pointing to the beginning of the range to iterate over. </param>
     /// <param name="end"> The STL iterator pointing just past the end of the range to iterate over. </param>
     ///
-    /// <returns> A StlIterator over the range specified by the begin and end iterators. </returns>
+    /// <returns> A StlReferenceIterator over the range specified by the begin and end iterators. </returns>
     template <typename IteratorType>
-    auto MakeStlIterator(IteratorType begin, IteratorType end) -> StlIterator<IteratorType>;
+    auto MakeStlReferenceIterator(IteratorType begin, IteratorType end) -> StlReferenceIterator<IteratorType>;
 
-    /// <summary> Convenience function for creating StlIterators </summary>
+    /// <summary> Convenience function for creating StlReferenceIterators </summary>
     ///
     /// <param name="container"> The C++-conforming iterable container to iterate over. </param>
     ///
-    /// <returns> A StlIterator over the container</returns>
+    /// <returns> A StlReferenceIterator over the container</returns>
     template <typename ContainerType>
-    auto MakeStlIterator(ContainerType& container) -> StlIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
+    auto MakeStlReferenceIterator(ContainerType& container) -> StlReferenceIterator<typename ContainerType::iterator, typename ContainerType::value_type>;
 }
 }
 
-#include "../tcc/StlIterator.tcc"
+#include "../tcc/StlReferenceIterator.tcc"
