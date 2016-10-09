@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     RowDataset.h (data)
+//  File:     Dataset.h (data)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,7 +10,7 @@
 
 #include "Example.h"
 #include "DataVector.h"
-#include "RowDataset.h"
+#include "Dataset.h"
 
 // utilities
 #include "StlIterator.h"
@@ -74,8 +74,8 @@ namespace data
 
         GetIteratorAbstractor(size_t fromIndex, size_t size) : _fromIndex(fromIndex), _size(size) {}
 
-        template<typename RowDatasetType>
-        ReturnType operator()(const RowDatasetType& dataset) const
+        template<typename DatasetType>
+        ReturnType operator()(const DatasetType& dataset) const
         {
             return dataset.GetIterator<ExampleType>(_fromIndex, _size);
         }
@@ -84,34 +84,34 @@ namespace data
         size_t _size;
     };
 
-    struct IRowDataset 
+    struct IDataset 
     {
-        virtual ~IRowDataset() {}
+        virtual ~IDataset() {}
     };
 
-    class Dataset
+    class AnyDataset
     {
     public:
-        Dataset(const IRowDataset* pDataset, size_t fromIndex, size_t size) : _pDataset(pDataset), _fromIndex(fromIndex), _size(size) {}
+        AnyDataset(const IDataset* pDataset, size_t fromIndex, size_t size) : _pDataset(pDataset), _fromIndex(fromIndex), _size(size) {}
 
         template<typename ExampleType>
         ExampleIterator<ExampleType> GetIterator()
         {
             GetIteratorAbstractor<ExampleType> abstractor(_fromIndex, _size);
-            return utilities::AbstractInvoker<IRowDataset, RowDataset<data::AutoSupervisedExample>, RowDataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
+            return utilities::AbstractInvoker<IDataset, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
         }
 
         size_t NumExamples() const { return _size; }
 
     private:
-        const IRowDataset* _pDataset;
+        const IDataset* _pDataset;
         size_t _fromIndex;
         size_t _size;
     };
 
-    /// <summary> A row-major dataset of examples. </summary>
+    /// <summary> A row-major data set of examples. </summary>
     template <typename DatasetExampleType>
-    class RowDataset : public IRowDataset
+    class Dataset : public IDataset
     {
     public:
         /// <summary> Iterator class. </summary>
@@ -136,28 +136,28 @@ namespace data
             virtual IteratorExampleType Get() const override { return _current->ToExample<IteratorExampleType::DataVectorType, IteratorExampleType::MetadataType>(); } // TODO change ToExample to take one template  param, which is the example type
 
         private:
-            friend RowDataset<DatasetExampleType>;
+            friend Dataset<DatasetExampleType>;
 
             IteratorType _current;
             IteratorType _end;
         };
 
-        RowDataset() = default;
+        Dataset() = default;
 
-        RowDataset(RowDataset&&) = default;
+        Dataset(Dataset&&) = default;
 
-        explicit RowDataset(const RowDataset&) = default; // TODO why is this allowed?
+        explicit Dataset(const Dataset&) = default; // TODO why is this allowed?
 
-        /// <summary> Constructs an instance of RowDataset by making shallow copies of supervised examples. </summary>
+        /// <summary> Constructs an instance of Dataset by making shallow copies of supervised examples. </summary>
         ///
         /// <param name="exampleIterator"> The example iterator. </param>
-        RowDataset(ExampleIterator<DatasetExampleType> exampleIterator);
+        Dataset(ExampleIterator<DatasetExampleType> exampleIterator);
 
-        RowDataset<DatasetExampleType>& operator=(RowDataset&&) = default;
+        Dataset<DatasetExampleType>& operator=(Dataset&&) = default;
 
-        RowDataset<DatasetExampleType>& operator=(const RowDataset&) = delete;
+        Dataset<DatasetExampleType>& operator=(const Dataset&) = delete;
 
-        /// <summary> Returns the number of examples in the dataset. </summary>
+        /// <summary> Returns the number of examples in the data set. </summary>
         ///
         /// <returns> The number of examples. </returns>
         size_t NumExamples() const { return _examples.size(); }
@@ -205,23 +205,23 @@ namespace data
         template<typename IteratorExampleType = DatasetExampleType>
         ExampleIterator<IteratorExampleType> GetIterator(size_t fromRowIndex = 0, size_t size = 0) const;
 
-        Dataset GetDataset(size_t fromIndex = 0, size_t size = 0) const { return Dataset(this, fromIndex, size); }
+        AnyDataset GetAnyDataset(size_t fromIndex = 0, size_t size = 0) const { return AnyDataset(this, fromIndex, size); }
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
         ///
         /// <param name="example"> The example. </param>
         void AddExample(DatasetExampleType example);
 
-        /// <summary> Erases all of the examples in the RowDataset. </summary>
+        /// <summary> Erases all of the examples in the Dataset. </summary>
         void Reset();
 
         /// <summary> Permutes the rows of the matrix so that a prefix of them is uniformly distributed. </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
-        /// <param name="prefixSize"> Size of the prefix that should be uniformly distributed, zero to permute the entire dataset. </param>
+        /// <param name="prefixSize"> Size of the prefix that should be uniformly distributed, zero to permute the entire data set. </param>
         void RandomPermute(std::default_random_engine& rng, size_t prefixSize = 0);
 
-        /// <summary> Randomly permutes a range of rows in the dataset so that a prefix of them is uniformly distributed. </summary>
+        /// <summary> Randomly permutes a range of rows in the data set so that a prefix of them is uniformly distributed. </summary>
         ///
         /// <param name="rng"> [in,out] The random number generator. </param>
         /// <param name="rangeFirstIndex"> Zero-based index of the firest example in the range. </param>
@@ -272,27 +272,27 @@ namespace data
         size_t _maxExampleSize = 0;
     };
 
-    /// <summary> Helper function that makes a row dataset out of an example iterator. </summary>
+    /// <summary> Helper function that makes a data set out of an example iterator. </summary>
     ///
     /// <typeparam name="ExampleType"> Example type. </typeparam>
     /// <param name="iterator"> The example iterator. </param>
     ///
-    /// <returns> A RowDataset. </returns>
+    /// <returns> A Dataset. </returns>
     template<typename ExampleType>
-    RowDataset<ExampleType> MakeRowDataset(ExampleIterator<ExampleType> iterator);
+    Dataset<ExampleType> MakeDataset(ExampleIterator<ExampleType> iterator);
 
     // friendly name
-    typedef RowDataset<AutoSupervisedExample> AutoSupervisedDataset;
+    typedef Dataset<AutoSupervisedExample> AutoSupervisedDataset;
 
-    /// <summary> Prints a row dataset to an ostream. </summary>
+    /// <summary> Prints a data set to an ostream. </summary>
     ///
     /// <param name="os"> [in,out] The ostream to write data to. </param>
     /// <param name="dataset"> The dataset. </param>
     ///
     /// <returns> The ostream. </returns>
     template <typename ExampleType>
-    std::ostream& operator<<(std::ostream& os, const RowDataset<ExampleType>& rowDataset);
+    std::ostream& operator<<(std::ostream& os, const Dataset<ExampleType>& dataset);
 }
 }
 
-#include "../tcc/RowDataset.tcc"
+#include "../tcc/Dataset.tcc"

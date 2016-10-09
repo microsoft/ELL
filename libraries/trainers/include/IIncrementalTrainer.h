@@ -9,7 +9,7 @@
 #pragma once
 
 // data
-#include "RowDataset.h"
+#include "Dataset.h"
 
 // stl
 #include <memory>
@@ -32,8 +32,8 @@ namespace trainers
 
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="dataset"> A dataset. </param>
-        virtual void Update(data::Dataset dataset) = 0;
+        /// <param name="anyDataset"> A dataset. </param>
+        virtual void Update(data::AnyDataset anyDataset) = 0;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

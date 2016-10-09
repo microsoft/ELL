@@ -68,15 +68,15 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // load dataset
+        // load data set
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments);
+        auto dataset = common::GetDataset(dataLoadArguments);
 
         // XX
         // TODO
         
         auto tmpTrainer = trainers::HistogramForestTrainer<lossFunctions::SquaredLoss, trainers::LogitBooster, trainers::ExhaustiveThresholdFinder>(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), forestTrainerArguments);
-        tmpTrainer.Update(rowDataset.GetDataset());
+        tmpTrainer.Update(dataset.GetAnyDataset());
 
         // create trainer
         std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> trainer;
@@ -93,11 +93,11 @@ int main(int argc, char* argv[])
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
 
         // randomly permute the data
-        rowDataset.RandomPermute(rng);
+        dataset.RandomPermute(rng);
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(rowDataset.GetDataset(0, 1000));
+        trainer->Update(dataset.GetAnyDataset(0, 1000));
 
         // print loss and errors
         if (trainerArguments.verbose)
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
             std::cout << "Finished training forest with " << predictor->NumTrees() << " trees." << std::endl;
 
             // evaluate // TODO fix this
-            // auto evaluator = common::MakeEvaluator<predictors::SimpleForestPredictor>(rowDataset.GetDataset(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
+            // auto evaluator = common::MakeEvaluator<predictors::SimpleForestPredictor>(dataset.GetAnyDataset(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
             //evaluator->Evaluate(tree);
             //std::cout << "Training error\n";
             //evaluator->Print(std::cout);

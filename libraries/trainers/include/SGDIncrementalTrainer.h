@@ -19,7 +19,7 @@
 
 // data
 #include "Example.h"
-#include "RowDataset.h"
+#include "Dataset.h"
 
 // stl
 #include <cstdint>
@@ -55,8 +55,8 @@ namespace trainers
 
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="dataset"> A dataset. </param>
-        virtual void Update(data::Dataset dataset) override;
+        /// <param name="anyDataset"> A dataset. </param>
+        virtual void Update(data::AnyDataset anyDataset) override;
 
         /// <summary> Returns The averaged predictor. </summary>
         ///

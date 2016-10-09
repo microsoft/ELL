@@ -89,9 +89,9 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // load dataset
+        // load data set
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments);
+        auto dataset = common::GetDataset(dataLoadArguments);
         size_t numColumns = dataLoadArguments.parsedDataDimension;
 
         // predictor type
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
         if (trainerArguments.verbose)
         {
-            evaluator = common::MakeEvaluator<PredictorType>(rowDataset.GetDataset(), evaluatorArguments, trainerArguments.lossArguments);
+            evaluator = common::MakeEvaluator<PredictorType>(dataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossArguments);
             sgdIncrementalTrainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator));
         }
 
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(rowDataset.GetDataset()); // TODO epoch size?
+        trainer->Update(dataset.GetAnyDataset()); // TODO epoch size?
         auto predictor = trainer->GetPredictor();
 
         // print loss and errors

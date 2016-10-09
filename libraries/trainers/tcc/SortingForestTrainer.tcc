@@ -25,7 +25,7 @@ namespace trainers
 
         for (uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
         {
-            // sort the relevant rows of dataset in ascending order by inputIndex
+            // sort the relevant rows of data set in ascending order by inputIndex
             SortNodeDataset(range, inputIndex);
 
             Sums sums0;

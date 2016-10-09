@@ -12,7 +12,7 @@
 
 // data
 #include "DenseDataVector.h"
-#include "RowDataset.h"
+#include "Dataset.h"
 
 // predictors
 #include "ForestPredictor.h"
@@ -124,8 +124,8 @@ namespace trainers
 
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="dataset"> A dataset. </param>
-        virtual void Update(data::Dataset dataset) override;
+        /// <param name="anyDataset"> A dataset. </param>
+        virtual void Update(data::AnyDataset anyDataset) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
@@ -166,7 +166,7 @@ namespace trainers
         //
 
         // loads a dataset and initializes the currentOutput field in the metadata
-        void LoadData(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator);
+        void LoadData(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator); // TODO remove this ?
 
         // performs an epoch of splits
         void PerformSplits(size_t maxSplits);
@@ -178,7 +178,7 @@ namespace trainers
         void UpdateCurrentOutputs(double value);
         void UpdateCurrentOutputs(Range range, const EdgePredictorType& edgePredictor);
 
-        // after performing a split, we rearrange the dataset to ensure that each node's examples occupy contiguous rows in the dataset
+        // after performing a split, we rearrange the data set to ensure that each node's examples occupy contiguous rows in the dataset
         void SortNodeDataset(Range range, const SplitRuleType& splitRule);
 
         //
@@ -202,8 +202,8 @@ namespace trainers
         // the priority queue that holds the split candidates
         SplitCandidatePriorityQueue _queue;
 
-        // the dataset
-        data::RowDataset<TrainerExampleType> _dataset;
+        // the data set
+        data::Dataset<TrainerExampleType> _dataset;
     };
 }
 }

@@ -23,7 +23,7 @@ namespace data
 {
     using IParsingIterator = typename utilities::IIterator<AutoSupervisedExample>;
 
-    /// <summary> An input iterator that traverses a textual dataset row by row and applies a parser to
+    /// <summary> An input iterator that traverses a textual data set row by row and applies a parser to
     /// each row into a dense feature std::vector of doubles, a double label, and a double weight. </summary>
     ///
     /// <typeparam name="RowIteratorType"> Type of the row iterator type. </typeparam>
@@ -33,7 +33,7 @@ namespace data
     {
     public:
         /// <summary> Constructs a parsing iterator \param row_iter An input iterator of strings, that
-        /// traverses the textual dataset row by row. </summary>
+        /// traverses the textual data set row by row. </summary>
         ///
         /// <param name="row_iter"> [in,out] The row iterator. </param>
         /// <param name="parser"> The parser. </param>

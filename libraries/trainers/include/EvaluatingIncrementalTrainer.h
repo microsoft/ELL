@@ -39,8 +39,8 @@ namespace trainers
 
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="dataset"> A dataset. </param>
-        virtual void Update(data::Dataset dataset) override;
+        /// <param name="anyDataset"> A dataset. </param>
+        virtual void Update(data::AnyDataset anyDataset) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

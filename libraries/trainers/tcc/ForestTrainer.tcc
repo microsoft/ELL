@@ -20,20 +20,20 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(data::Dataset dataset)
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(data::AnyDataset anyDataset)
     {
-        _dataset = data::MakeRowDataset(dataset.GetIterator<TrainerExampleType>());
+        _dataset = data::MakeDataset(anyDataset.GetIterator<TrainerExampleType>());
 
-        // convert data from iterator to dense dataset with metadata (weak weight / weak label) associated with each example
+        // convert data from iterator to dense data set with metadata (weak weight / weak label) associated with each example
 //        LoadData(exampleIterator);
 
         // boosting loop (outer loop)
         for (size_t round = 0; round < _parameters.numRounds; ++round)
         {
-            // call the booster and compute sums for the entire dataset
+            // call the booster and compute sums for the entire data set
             Sums sums = SetWeakWeightsLabels();
 
-            // use the computed sums to calaculate the bias term, set it in the forest and the dataset
+            // use the computed sums to calaculate the bias term, set it in the forest and the data set
             double bias = sums.GetMeanLabel();
             _forest->AddToBias(bias);
             UpdateCurrentOutputs(bias);
@@ -70,12 +70,12 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) // TODO remove
     {
-        // reset the dataset
+        // reset the data set
         _dataset.Reset();
 
-        // create the dataset from the example iterator
+        // create the data set from the example iterator
         while (exampleIterator.IsValid())
         {
             const auto& oldExample = exampleIterator.Get();

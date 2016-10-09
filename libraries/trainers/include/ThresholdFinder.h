@@ -9,7 +9,7 @@
 #pragma once
 
 // data
-#include "RowDataset.h"
+#include "Dataset.h"
 
 // predictor
 #include "SingleElementThresholdPredictor.h"

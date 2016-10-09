@@ -91,9 +91,9 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // load dataset
+        // load data set
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments);
+        auto dataset = common::GetDataset(dataLoadArguments);
         size_t numColumns = dataLoadArguments.parsedDataDimension;
 
         // get predictor type
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
         for (uint64_t i = 0; i < regularization.size(); ++i)
         {
             auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, generator.GenerateParameters(i));
-            evaluators.push_back(common::MakeEvaluator<PredictorType>(rowDataset.GetDataset(), evaluatorParameters, trainerArguments.lossArguments));
+            evaluators.push_back(common::MakeEvaluator<PredictorType>(dataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossArguments));
             evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluators.back()));
         }
 
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(rowDataset.GetDataset());
+        trainer->Update(dataset.GetAnyDataset());
         auto predictor = trainer->GetPredictor();
 
         // print loss and errors

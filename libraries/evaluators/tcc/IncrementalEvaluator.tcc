@@ -11,10 +11,10 @@ namespace emll
 namespace evaluators
 {
     template <typename BasePredictorType, typename... AggregatorTypes>
-    IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(data::Dataset dataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
-        : Evaluator<BasePredictorType, AggregatorTypes...>(dataset, evaluatorParameters, aggregators...)
+    IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(data::AnyDataset anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+        : Evaluator<BasePredictorType, AggregatorTypes...>(anyDataset, evaluatorParameters, aggregators...)
     {
-        _predictions.resize(BaseClassType::_rowDataset.NumExamples());
+        _predictions.resize(BaseClassType::_dataset.NumExamples());
     }
 
     template <typename BasePredictorType, typename... AggregatorTypes>
@@ -23,7 +23,7 @@ namespace evaluators
         ++BaseClassType::_evaluateCounter;
         bool evaluate = BaseClassType::_evaluateCounter % BaseClassType::_evaluatorParameters.evaluationFrequency == 0 ? true : false;
 
-        auto iterator = BaseClassType::_rowDataset.GetIterator();
+        auto iterator = BaseClassType::_dataset.GetIterator();
         uint64_t index = 0;
 
         while (iterator.IsValid())

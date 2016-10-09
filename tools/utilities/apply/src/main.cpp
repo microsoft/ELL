@@ -17,7 +17,7 @@
 
 // data
 #include "Example.h"
-#include "RowDataset.h"
+#include "Dataset.h"
 
 // common
 #include "DataLoadArguments.h"
@@ -82,9 +82,9 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // load dataset
+        // load data set
         if (verbose) std::cout << "Loading data from file: " << dataLoadArguments.inputDataFilename << std::endl;
-//TODO        auto dataset = common::GetRowDataset<data::DenseRowDataset>(dataLoadArguments);
+//TODO        auto dataset = common::GetDataset<data::DenseDataset>(dataLoadArguments);
 // TODO - consider removing        size_t numColumns = dataLoadArguments.parsedDataDimension;
 
         // load map
@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
             map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputElements } });
         }
 
-        // Get dataset iterator
+        // Get data set iterator
 // TODO        auto datasetIterator = dataset.GetIterator();
 
         // get output stream

@@ -11,7 +11,7 @@
 #include <cmath>
 
 // data
-#include "RowDataset.h"
+#include "Dataset.h"
 
 namespace emll
 {
@@ -24,9 +24,9 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::Update(data::Dataset dataset)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(data::AnyDataset anyDataset)
     {
-        UpdateSparse(dataset.GetIterator<data::AutoSupervisedExample>(), dataset.NumExamples());
+        UpdateSparse(anyDataset.GetIterator<data::AutoSupervisedExample>(), anyDataset.NumExamples());
     }
 
     template <typename LossFunctionType>

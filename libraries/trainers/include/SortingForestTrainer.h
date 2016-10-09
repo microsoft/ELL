@@ -25,7 +25,7 @@ namespace trainers
     };
 
     /// <summary> A trainer for binary decision forests with threshold split rules and constant outputs
-    /// that operates by sorting the dataset by each feature. </summary>
+    /// that operates by sorting the data set by each feature. </summary>
     ///
     /// <typeparam name="LossFunctionType"> Loss function type. </typeparam>
     /// <typeparam name="BoosterType"> Booster type. </typeparam>
