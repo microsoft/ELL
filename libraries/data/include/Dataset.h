@@ -144,7 +144,7 @@ namespace data
         /// <summary> Constructs an instance of Dataset from an AnyDataset. </summary>
         ///
         /// <param name="anyDataset"> the AnyDataset. </param>
-        Dataset(AnyDataset anyDataset);
+        Dataset(const AnyDataset& anyDataset);
 
         Dataset<DatasetExampleType>& operator=(Dataset&&) = default;
 

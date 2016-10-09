@@ -24,7 +24,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::Update(data::AnyDataset anyDataset)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
     {
         UpdateSparse(anyDataset.GetExampleIterator<data::AutoSupervisedExample>(), anyDataset.NumExamples());
     }

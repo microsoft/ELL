@@ -56,7 +56,7 @@ namespace trainers
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
         /// <param name="anyDataset"> A dataset. </param>
-        virtual void Update(data::AnyDataset anyDataset) override;
+        virtual void Update(const data::AnyDataset& anyDataset) override;
 
         /// <summary> Returns The averaged predictor. </summary>
         ///

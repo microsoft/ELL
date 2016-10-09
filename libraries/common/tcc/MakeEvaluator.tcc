@@ -21,7 +21,7 @@ namespace emll
 namespace common
 {
     template <typename PredictorType>
-    std::shared_ptr<evaluators::IEvaluator<PredictorType>> MakeEvaluator(data::AnyDataset anyDataset, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments)
+    std::shared_ptr<evaluators::IEvaluator<PredictorType>> MakeEvaluator(const data::AnyDataset& anyDataset, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 

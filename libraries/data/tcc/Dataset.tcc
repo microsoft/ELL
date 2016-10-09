@@ -56,7 +56,7 @@ namespace data
     }
 
     template<typename DatasetExampleType>
-    Dataset<DatasetExampleType>::Dataset(AnyDataset anyDataset) : Dataset(anyDataset.GetExampleIterator<DatasetExampleType>())
+    Dataset<DatasetExampleType>::Dataset(const AnyDataset& anyDataset) : Dataset(anyDataset.GetExampleIterator<DatasetExampleType>())
     {
     }
 

@@ -21,7 +21,7 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    void MultiEpochIncrementalTrainer<PredictorType>::Update(data::AnyDataset anyDataset)
+    void MultiEpochIncrementalTrainer<PredictorType>::Update(const data::AnyDataset& anyDataset)
     {
         auto dataset = data::Dataset<data::AutoSupervisedExample>(anyDataset); // TODO match internal trainer example type
 

@@ -59,7 +59,7 @@ namespace evaluators
         /// <param name="anyDataset"> An dataset. </param>
         /// <param name="evaluatorParameters"> The evaluation parameters. </param>
         /// <param name="aggregators"> The aggregators. </param>
-        IncrementalEvaluator(data::AnyDataset anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+        IncrementalEvaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
         /// <summary>
         /// Runs the given predictor on the evaluation set, increments cached outputs, invokes each of

@@ -20,7 +20,7 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(data::AnyDataset anyDataset)
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(const data::AnyDataset& anyDataset)
     {
         // materialize a dataset of dense DataVectors with metadata that contains both strong and weak weight and lables for each example
         _dataset = data::Dataset<TrainerExampleType>(anyDataset);

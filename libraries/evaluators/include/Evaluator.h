@@ -71,7 +71,7 @@ namespace evaluators
         /// <param name="anyDataset"> A dataset. </param>
         /// <param name="evaluatorParameters"> The evaluation parameters. </param>
         /// <param name="aggregators"> The aggregators. </param>
-        Evaluator(data::AnyDataset anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+        Evaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
         ///
@@ -128,7 +128,7 @@ namespace evaluators
     ///
     /// <returns> A shared_ptr to an IEvaluator. </returns>
     template <typename PredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(data::AnyDataset anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 }
 

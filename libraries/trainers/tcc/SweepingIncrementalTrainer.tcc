@@ -21,7 +21,7 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    void SweepingIncrementalTrainer<PredictorType>::Update(data::AnyDataset anyDataset)
+    void SweepingIncrementalTrainer<PredictorType>::Update(const data::AnyDataset& anyDataset)
     {
         auto dataset = data::Dataset<data::AutoSupervisedExample>(anyDataset); // TODO match internal trainer example type
 

@@ -11,7 +11,7 @@ namespace emll
 namespace evaluators
 {
     template <typename BasePredictorType, typename... AggregatorTypes>
-    IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(data::AnyDataset anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+    IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
         : Evaluator<BasePredictorType, AggregatorTypes...>(anyDataset, evaluatorParameters, aggregators...)
     {
         _predictions.resize(BaseClassType::_dataset.NumExamples());
