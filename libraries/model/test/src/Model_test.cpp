@@ -77,7 +77,7 @@ void PrintModel(const model::Model& model)
 
 void PrintModel(const model::Model& model, const model::Node* output)
 {
-    model.Visit(NodePrinter, output);
+    model.Visit(output, NodePrinter);
 }
 
 model::Model GetSimpleModel()

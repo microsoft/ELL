@@ -10,7 +10,9 @@
 #include "Exception.h"
 #include "ModelTransformer.h"
 
+// stl
 #include <algorithm>
+#include <unordered_set>
 
 namespace emll
 {
@@ -137,7 +139,24 @@ namespace model
     ModelTransformer DynamicMap::DoRefine(const TransformContext& context)
     {
         ModelTransformer transformer;
-        auto refinedModel = transformer.RefineModel(_model, context);
+
+        // gather output nodes
+        std::unordered_set<const Node*> outputNodes;
+        for(const auto& output: GetOutputs())
+        {
+            for(const auto& range: output.GetRanges())
+            {
+                outputNodes.insert(range.ReferencedPort()->GetNode());
+            }
+        }
+		std::cout << "# output nodes: " << outputNodes.size() << std::endl;
+ 		std::vector<const Node*> outputNodeVec(outputNodes.begin(), outputNodes.end());
+		auto minimalModel = transformer.CopyModel(_model, outputNodeVec, context);
+		std::cout << "Original model size: " << _model.Size() << std::endl;
+		std::cout << "Minimal model size: " << minimalModel.Size() << std::endl;
+		auto refinedModel = transformer.RefineModel(minimalModel, context);
+		_model = refinedModel;
+
 
         for (auto& inputNode : _inputNodes)
         {
@@ -165,7 +184,6 @@ namespace model
             outputElements.second = refinedOutput;
         }
 
-        _model = refinedModel;
         return transformer;
     }
 

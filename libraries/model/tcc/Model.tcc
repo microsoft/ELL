@@ -56,7 +56,7 @@ namespace model
     std::vector<ValueType> Model::ComputeOutput(const OutputPort<ValueType>& outputPort) const
     {
         auto compute = [](const Node& node) { node.Compute(); };
-        Visit(compute, { outputPort.GetNode() });
+        Visit({ outputPort.GetNode() }, compute);
         return outputPort.GetOutput();
     }
 
@@ -72,7 +72,7 @@ namespace model
 
         auto compute = [](const Node& node) { node.Compute(); };
         auto nodes = std::vector<const Node*>(usedNodes.begin(), usedNodes.end());
-        Visit(compute, nodes);
+        Visit(nodes, compute);
 
         // Now construct the output
         auto numElements = elements.Size();
@@ -136,19 +136,19 @@ namespace model
     void Model::Visit(Visitor&& visitor) const
     {
         std::vector<const Node*> emptyVec;
-        Visit(visitor, emptyVec);
+        Visit(emptyVec, visitor);
     }
 
     // Visits just the parts necessary to compute output node
     template <typename Visitor>
-    void Model::Visit(Visitor&& visitor, const Node* outputNode) const
+    void Model::Visit(const Node* outputNode, Visitor&& visitor) const
     {
-        Visit(visitor, std::vector<const Node*>{ outputNode });
+        Visit(std::vector<const Node*>{ outputNode }, visitor);
     }
 
     // Real implementation function for `Visit()`
     template <typename Visitor>
-    void Model::Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const
+    void Model::Visit(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const
     {
         auto iter = GetNodeIterator(outputNodes);
         while (iter.IsValid())

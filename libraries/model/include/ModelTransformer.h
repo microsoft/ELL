@@ -68,6 +68,22 @@ namespace model
         /// <returns> The copied Model. </returns>
         Model CopyModel(const Model& model, const TransformContext& context);
 
+        /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
+        ///
+        /// <param name="model"> The model. </param>
+        /// <param name="context"> The context. </param>
+        ///
+        /// <returns> The copied Model. </returns>
+        Model CopyModel(const Model& model, const Node* outputNode, const TransformContext& context);
+
+        /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
+        ///
+        /// <param name="model"> The model. </param>
+        /// <param name="context"> The context. </param>
+        ///
+        /// <returns> The copied Model. </returns>
+        Model CopyModel(const Model& model, const std::vector<const Node*>& outputNodes, const TransformContext& context);
+
         /// <summary> Performs one or more refinement iterations on a given model and returns the result.
         /// If context.IsNodeCompilable is not set, this call performs one refinement iteration. If
         /// context.IsNodeCompilable is set, this call refines the model until all its nodes are
