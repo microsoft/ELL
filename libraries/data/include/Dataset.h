@@ -28,11 +28,11 @@ namespace emll
 {
 namespace data
 {
-    /// <summary> A functor class that abstracts the GetIterator member of Datasets. </summary>
+    /// <summary> A functor class that calls the GetExampleIterator member of a Dataset. </summary>
     ///
-    /// <typeparam name="IteratorExampleType"> Type of the example type. </typeparam>
+    /// <typeparam name="IteratorExampleType"> Example type. </typeparam>
     template<typename IteratorExampleType>
-    class GetIteratorAbstractor
+    class GetExampleIteratorFunctor
     {
     public:
         /// <summary> Functor return type. </summary>
@@ -42,14 +42,14 @@ namespace data
         ///
         /// <param name="fromIndex"> Zero-based index of the first example referenced by the iterator. </param>
         /// <param name="size"> The number of examples referenced by the iterator. </param>
-        GetIteratorAbstractor(size_t fromIndex, size_t size);
+        GetExampleIteratorFunctor(size_t fromIndex, size_t size); // TODO rename to GetExampleI...
 
-        /// <summary> Function call operator. Calls a dataset's GetIterator member. </summary>
+        /// <summary> Function call operator. Calls a dataset's GetExampleIterator member. </summary>
         ///
         /// <typeparam name="DatasetType"> Dataset type. </typeparam>
         /// <param name="dataset"> The dataset. </param>
         ///
-        /// <returns> The example iterator returned by the call to GetIterator. </returns>
+        /// <returns> The example iterator returned by the call to GetExampleIterator. </returns>
         template<typename DatasetType>
         ReturnType operator()(const DatasetType& dataset) const;
     
@@ -82,7 +82,7 @@ namespace data
         ///
         /// <returns> The example iterator. </returns>
         template<typename ExampleType>
-        ExampleIterator<ExampleType> GetIterator(); // TODO rename to GetExampleIterator
+        ExampleIterator<ExampleType> GetExampleIterator(); // TODO rename to GetExampleIterator
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -183,13 +183,20 @@ namespace data
         /// <summary> Returns an iterator that traverses the examples. </summary>
         ///
         /// <param name="firstExample"> Zero-based index of the first example to iterate over. </param>
-        /// <param name="numExamples"> The number of examples to iterate over, a value of zero means all
-        /// examples. </param>
+        /// <param name="size"> The number of examples to iterate over, a value of zero means all
+        /// the way to the end. </param>
         ///
         /// <returns> The iterator. </returns>
         template<typename IteratorExampleType = DatasetExampleType>
-        ExampleIterator<IteratorExampleType> GetIterator(size_t fromRowIndex = 0, size_t size = 0) const;
+        ExampleIterator<IteratorExampleType> GetExampleIterator(size_t fromIndex = 0, size_t size = 0) const;
 
+        /// <summary> Returns an AnyDataset that represents an interval of examples from this dataset. </summary>
+        ///
+        /// <param name="firstExample"> Zero-based index of the first example in the AnyDataset. </param>
+        /// <param name="size"> The number of examples to include, a value of zero means all
+        /// the way to the end. </param>
+        ///
+        /// <returns> The iterator. </returns>
         AnyDataset GetAnyDataset(size_t fromIndex = 0, size_t size = 0) const { return AnyDataset(this, fromIndex, size); }
 
         /// <summary> Adds an example at the bottom of the matrix. </summary>
@@ -226,10 +233,10 @@ namespace data
         ///
         /// <typeparam name="SortKeyType"> Type of the sort key. </typeparam>
         /// <param name="sortKey"> A function that takes const reference to DatasetExampleType and returns a sort key. </param>
-        /// <param name="fromRowIndex"> Zero-based index of the first row to sort. </param>
+        /// <param name="fromIndex"> Zero-based index of the first row to sort. </param>
         /// <param name="size"> The number of examples to sort. </param>
         template <typename SortKeyType>
-        void Sort(SortKeyType sortKey, size_t fromRowIndex = 0, size_t size = 0);
+        void Sort(SortKeyType sortKey, size_t fromIndex = 0, size_t size = 0);
 
         /// <summary> Partitions an iterval of examples by a certain Boolean predicate (similar to sorting
         /// by the predicate, but in linear time). </summary>
@@ -237,21 +244,21 @@ namespace data
         /// <typeparam name="PartitionKeyType"> Type of predicate. </typeparam>
         /// <param name="sortKey"> A function that takes const reference to DatasetExampleType and returns a
         ///  bool. </param>
-        /// <param name="fromRowIndex"> Zero-based index of the first row of the interval. </param>
+        /// <param name="fromIndex"> Zero-based index of the first row of the interval. </param>
         /// <param name="size"> The number of examples in the interval. </param>
         template <typename PartitionKeyType>
-        void Partition(PartitionKeyType partitionKey, size_t fromRowIndex = 0, size_t size = 0);
+        void Partition(PartitionKeyType partitionKey, size_t fromIndex = 0, size_t size = 0);
 
         /// <summary> Prints this object. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
         /// <param name="tabs"> The number of tabs. </param>
-        /// <param name="fromRowIndex"> Zero-based index of the first row to print. </param>
+        /// <param name="fromIndex"> Zero-based index of the first row to print. </param>
         /// <param name="size"> The number of rows to print, or 0 to print until the end. </param>
-        void Print(std::ostream& os, size_t tabs = 0, size_t fromRowIndex = 0, size_t size = 0) const;
+        void Print(std::ostream& os, size_t tabs = 0, size_t fromIndex = 0, size_t size = 0) const;
 
     private:
-        size_t CorrectRangeSize(size_t fromRowIndex, size_t size) const;
+        size_t CorrectRangeSize(size_t fromIndex, size_t size) const;
 
         std::vector<DatasetExampleType> _examples;
         size_t _maxExampleSize = 0;

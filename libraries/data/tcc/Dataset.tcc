@@ -21,20 +21,22 @@ namespace data
 {
 
     template<typename IteratorExampleType>
-    GetIteratorAbstractor<IteratorExampleType>::GetIteratorAbstractor(size_t fromIndex, size_t size) : _fromIndex(fromIndex), _size(size) 
+    GetExampleIteratorFunctor<IteratorExampleType>::GetExampleIteratorFunctor(size_t fromIndex, size_t size) : _fromIndex(fromIndex), _size(size) 
     {}
 
     template<typename IteratorExampleType>
     template<typename DatasetType>
-    auto GetIteratorAbstractor<IteratorExampleType>::operator()(const DatasetType& dataset) const -> ReturnType
+    auto GetExampleIteratorFunctor<IteratorExampleType>::operator()(const DatasetType& dataset) const -> ReturnType
     {
-        return dataset.GetIterator<IteratorExampleType>(_fromIndex, _size);
+        return dataset.GetExampleIterator<IteratorExampleType>(_fromIndex, _size);
     }
 
     template<typename ExampleType>
-    ExampleIterator<ExampleType> AnyDataset::GetIterator()
+    ExampleIterator<ExampleType> AnyDataset::GetExampleIterator()
     {
-        GetIteratorAbstractor<ExampleType> abstractor(_fromIndex, _size);
+        GetExampleIteratorFunctor<ExampleType> abstractor(_fromIndex, _size);
+
+        // all Dataset types for which GetAnyDataset() is called must be listed below, in the variadic template argument.
         return utilities::AbstractInvoker<IDataset, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
     }
 
@@ -79,10 +81,10 @@ namespace data
 
     template <typename DatasetExampleType>
     template <typename IteratorExampleType>
-    ExampleIterator<IteratorExampleType> Dataset<DatasetExampleType>::GetIterator(size_t fromRowIndex, size_t size) const
+    ExampleIterator<IteratorExampleType> Dataset<DatasetExampleType>::GetExampleIterator(size_t fromIndex, size_t size) const
     {
-        size = CorrectRangeSize(fromRowIndex, size);
-        return ExampleIterator<IteratorExampleType>(std::make_shared<DatasetExampleIterator<IteratorExampleType>>(_examples.cbegin() + fromRowIndex, _examples.cbegin() + fromRowIndex + size)); // TODO unique or shared?
+        size = CorrectRangeSize(fromIndex, size);
+        return ExampleIterator<IteratorExampleType>(std::make_shared<DatasetExampleIterator<IteratorExampleType>>(_examples.cbegin() + fromIndex, _examples.cbegin() + fromIndex + size)); // TODO unique or shared?
     }
 
     template <typename DatasetExampleType>
@@ -148,12 +150,12 @@ namespace data
 
     template <typename DatasetExampleType>
     template <typename SortKeyType>
-    void Dataset<DatasetExampleType>::Sort(SortKeyType sortKey, size_t fromRowIndex, size_t size)
+    void Dataset<DatasetExampleType>::Sort(SortKeyType sortKey, size_t fromIndex, size_t size)
     {
-        size = CorrectRangeSize(fromRowIndex, size);
+        size = CorrectRangeSize(fromIndex, size);
 
-        std::sort(_examples.begin() + fromRowIndex,
-                  _examples.begin() + fromRowIndex + size,
+        std::sort(_examples.begin() + fromIndex,
+                  _examples.begin() + fromIndex + size,
                   [&](const DatasetExampleType& a, const DatasetExampleType& b) -> bool {
                       return sortKey(a) < sortKey(b);
                   });
@@ -161,18 +163,18 @@ namespace data
 
     template <typename DatasetExampleType>
     template <typename PartitionKeyType>
-    void Dataset<DatasetExampleType>::Partition(PartitionKeyType partitionKey, size_t fromRowIndex, size_t size)
+    void Dataset<DatasetExampleType>::Partition(PartitionKeyType partitionKey, size_t fromIndex, size_t size)
     {
-        size = CorrectRangeSize(fromRowIndex, size);
-        std::partition(_examples.begin() + fromRowIndex, _examples.begin() + fromRowIndex + size, partitionKey);
+        size = CorrectRangeSize(fromIndex, size);
+        std::partition(_examples.begin() + fromIndex, _examples.begin() + fromIndex + size, partitionKey);
     }
 
     template <typename DatasetExampleType>
-    void Dataset<DatasetExampleType>::Print(std::ostream& os, size_t tabs, size_t fromRowIndex, size_t size) const
+    void Dataset<DatasetExampleType>::Print(std::ostream& os, size_t tabs, size_t fromIndex, size_t size) const
     {
-        size = CorrectRangeSize(fromRowIndex, size);
+        size = CorrectRangeSize(fromIndex, size);
 
-        for (size_t index = fromRowIndex; index < fromRowIndex + size; ++index)
+        for (size_t index = fromIndex; index < fromIndex + size; ++index)
         {
             os << std::string(tabs * 4, ' ');
             _examples[index].Print(os);
@@ -194,11 +196,11 @@ namespace data
     }
 
     template <typename DatasetExampleType>
-    size_t Dataset<DatasetExampleType>::CorrectRangeSize(size_t fromRowIndex, size_t size) const
+    size_t Dataset<DatasetExampleType>::CorrectRangeSize(size_t fromIndex, size_t size) const
     {
-        if (size == 0 || fromRowIndex + size > _examples.size())
+        if (size == 0 || fromIndex + size > _examples.size())
         {
-            return _examples.size() - fromRowIndex;
+            return _examples.size() - fromIndex;
         }
         return size;
     }

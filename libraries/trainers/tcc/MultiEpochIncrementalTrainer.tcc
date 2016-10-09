@@ -23,7 +23,7 @@ namespace trainers
     template <typename PredictorType>
     void MultiEpochIncrementalTrainer<PredictorType>::Update(data::AnyDataset anyDataset)
     {
-        auto dataset = data::MakeDataset(anyDataset.GetIterator<data::AutoSupervisedExample>()); // TODO match internal trainer example type
+        auto dataset = data::MakeDataset(anyDataset.GetExampleIterator<data::AutoSupervisedExample>()); // TODO match internal trainer example type
 
         // calculate epoch size
         uint64_t epochSize = _parameters.epochSize;

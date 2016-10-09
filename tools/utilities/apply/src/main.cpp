@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
         }
 
         // Get data set iterator
-// TODO        auto datasetIterator = dataset.GetIterator();
+// TODO        auto datasetIterator = dataset.GetExampleIterator();
 
         // get output stream
         auto outputStream = dataSaveArguments.outputDataStream;

@@ -23,7 +23,7 @@ namespace evaluators
         ++BaseClassType::_evaluateCounter;
         bool evaluate = BaseClassType::_evaluateCounter % BaseClassType::_evaluatorParameters.evaluationFrequency == 0 ? true : false;
 
-        auto iterator = BaseClassType::_dataset.GetIterator();
+        auto iterator = BaseClassType::_dataset.GetExampleIterator();
         uint64_t index = 0;
 
         while (iterator.IsValid())
