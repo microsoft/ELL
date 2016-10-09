@@ -61,9 +61,6 @@ namespace evaluators
     class Evaluator : public IEvaluator<PredictorType>
     {
     public:
-        // the type of example used by this evaluator
-        using ExampleType = data::Example<typename PredictorType::DataVectorType, data::WeightLabel>;
-
         /// <summary>
         /// Constructs an instance of Evaluator with a given data set and given aggregators.
         /// </summary>
@@ -111,8 +108,11 @@ namespace evaluators
         template <std::size_t... Sequence>
         std::vector<std::vector<std::string>> DispatchGetValueNames(std::index_sequence<Sequence...>) const;
 
+        // the type of example used by this evaluator
+        using ExampleType = data::Example<typename PredictorType::DataVectorType, data::WeightLabel>;
+
         // member variables
-        data::AutoSupervisedDataset _dataset;
+        data::Dataset<ExampleType> _dataset;
         EvaluatorParameters _evaluatorParameters;
         uint64_t _evaluateCounter = 0;
         typename std::tuple<AggregatorTypes...> _aggregatorTuple;
