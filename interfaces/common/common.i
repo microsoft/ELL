@@ -21,6 +21,7 @@
 
 %ignore emll::common::GetDataset;
 
+%include "ModelLoadArguments.h"
 %include "MapLoadArguments.h"
 %include "LoadModel.h"
 
