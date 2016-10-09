@@ -11,6 +11,7 @@
 #include "Example.h"
 #include "DataVector.h"
 #include "Dataset.h"
+#include "ExampleIterator.h"
 
 // utilities
 #include "StlIterator.h"
@@ -27,80 +28,65 @@ namespace emll
 {
 namespace data
 {
-    template<typename ExampleType> // TODO document
-    struct IExampleIterator
-    {
-        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
-        ///
-        /// <returns> true if the iterator is currently pointing to a valid iterate. </returns>
-        virtual bool IsValid() const = 0;
-
-        /// <summary> Proceeds to the Next iterate. </summary>
-        virtual void Next() = 0;
-
-        /// <summary> Returns the current example. </summary>
-        ///
-        /// <returns> An example. </returns>
-        virtual ExampleType Get() const = 0;
-    };
-
-    template<typename ExampleType> // TODO document
-    class ExampleIterator
+    /// <summary> A functor class that abstracts the GetIterator member of Datasets. </summary>
+    ///
+    /// <typeparam name="IteratorExampleType"> Type of the example type. </typeparam>
+    template<typename IteratorExampleType>
+    class GetIteratorAbstractor
     {
     public:
-        ExampleIterator(std::shared_ptr<IExampleIterator<ExampleType>>&& iterator) : _iterator(std::move(iterator)) {} // TODO move to tcc, document
+        /// <summary> Functor return type. </summary>
+        using ReturnType = ExampleIterator<IteratorExampleType>;
 
-        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        /// <summary> Constructor. </summary>
         ///
-        /// <returns> true if the iterator is currently pointing to a valid iterate. </returns>
-        bool IsValid() const { return _iterator->IsValid();  }
+        /// <param name="fromIndex"> Zero-based index of the first example referenced by the iterator. </param>
+        /// <param name="size"> The number of examples referenced by the iterator. </param>
+        GetIteratorAbstractor(size_t fromIndex, size_t size);
 
-        /// <summary> Proceeds to the Next iterate. </summary>
-        void Next() { _iterator->Next(); }
-
-        /// <summary> Returns the current example. </summary>
+        /// <summary> Function call operator. Calls a dataset's GetIterator member. </summary>
         ///
-        /// <returns> An example. </returns>
-        ExampleType Get() const { return _iterator->Get(); }
-
-    private:
-        std::shared_ptr<IExampleIterator<ExampleType>> _iterator;
-    };
-
-    template<typename ExampleType>
-    struct GetIteratorAbstractor
-    {
-        using ReturnType = ExampleIterator<ExampleType>;
-
-        GetIteratorAbstractor(size_t fromIndex, size_t size) : _fromIndex(fromIndex), _size(size) {}
-
+        /// <typeparam name="DatasetType"> Dataset type. </typeparam>
+        /// <param name="dataset"> The dataset. </param>
+        ///
+        /// <returns> The example iterator returned by the call to GetIterator. </returns>
         template<typename DatasetType>
-        ReturnType operator()(const DatasetType& dataset) const
-        {
-            return dataset.GetIterator<ExampleType>(_fromIndex, _size);
-        }
-
+        ReturnType operator()(const DatasetType& dataset) const;
+    
+    private:
         size_t _fromIndex;
         size_t _size;
     };
 
+    /// <summary> Polymorphic interface for datasets, enables dynamic_cast operations. </summary>
     struct IDataset 
     {
-        virtual ~IDataset() {}
+        virtual ~IDataset() = default;
     };
 
+    /// <summary> Implements an untyped data set. This class is used to send data to trainers and evaluators </summary>
     class AnyDataset
     {
     public:
-        AnyDataset(const IDataset* pDataset, size_t fromIndex, size_t size) : _pDataset(pDataset), _fromIndex(fromIndex), _size(size) {}
 
+        /// <summary> Constructs an instance of AnyDataset. </summary>
+        ///
+        /// <param name="pDataset"> Pointer to an IDataset. </param>
+        /// <param name="fromIndex"> Zero-based index of the first example referenced by the iterator. </param>
+        /// <param name="size"> The number of examples referenced by the iterator. </param>
+        AnyDataset(const IDataset* pDataset, size_t fromIndex, size_t size);
+
+        /// <summary> Gets an example iterator of a given example type. </summary>
+        ///
+        /// <typeparam name="ExampleType"> Example type. </typeparam>
+        ///
+        /// <returns> The example iterator. </returns>
         template<typename ExampleType>
-        ExampleIterator<ExampleType> GetIterator()
-        {
-            GetIteratorAbstractor<ExampleType> abstractor(_fromIndex, _size);
-            return utilities::AbstractInvoker<IDataset, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
-        }
+        ExampleIterator<ExampleType> GetIterator(); // TODO rename to GetExampleIterator
 
+        /// <summary> Returns the number of examples in the dataset. </summary>
+        ///
+        /// <returns> Number of examples. </returns>
         size_t NumExamples() const { return _size; }
 
     private:
@@ -109,7 +95,7 @@ namespace data
         size_t _size;
     };
 
-    /// <summary> A row-major data set of examples. </summary>
+    /// <summary> A data set of a specific example type. </summary>
     template <typename DatasetExampleType>
     class Dataset : public IDataset
     {
@@ -119,9 +105,6 @@ namespace data
         class DatasetExampleIterator : public IExampleIterator<IteratorExampleType>
         {
         public:
-            using IteratorType = typename std::vector<DatasetExampleType>::const_iterator;
-            DatasetExampleIterator(IteratorType begin, IteratorType end) : _current(begin), _end(end) {} // TODO move this private, move implementation to tcc file
-
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
@@ -135,11 +118,13 @@ namespace data
             /// <returns> The example. </returns>
             virtual IteratorExampleType Get() const override { return _current->ToExample<IteratorExampleType::DataVectorType, IteratorExampleType::MetadataType>(); } // TODO change ToExample to take one template  param, which is the example type
 
-        private:
-            friend Dataset<DatasetExampleType>;
+            // TODO: move this to private and make the dataset a friend
+            using InternalIteratorType = typename std::vector<DatasetExampleType>::const_iterator;
+            DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end);
 
-            IteratorType _current;
-            IteratorType _end;
+        private:
+            InternalIteratorType _current;
+            InternalIteratorType _end;
         };
 
         Dataset() = default;

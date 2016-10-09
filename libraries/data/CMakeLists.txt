@@ -12,13 +12,15 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/SequentialLineIterator.cpp
+set (SRC src/Dataset.cpp
+         src/SequentialLineIterator.cpp
          src/SparseEntryParser.cpp
          src/Example.cpp)
 
 set (INCLUDE include/AutoDataVector.h
              include/DenseDataVector.h
              include/Example.h
+             include/ExampleIterator.h
              include/DataVector.h
              include/ParsingIterator.h
              include/Dataset.h
@@ -32,6 +34,7 @@ set (TCC tcc/AutoDataVector.tcc
          tcc/DataVector.tcc
          tcc/DenseDataVector.tcc
          tcc/Example.tcc
+         tcc/ExampleIterator.tcc
          tcc/ParsingIterator.tcc
          tcc/Dataset.tcc
          tcc/SparseBinaryDataVector.tcc

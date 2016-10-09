@@ -19,6 +19,30 @@ namespace emll
 {
 namespace data
 {
+
+    template<typename IteratorExampleType>
+    GetIteratorAbstractor<IteratorExampleType>::GetIteratorAbstractor(size_t fromIndex, size_t size) : _fromIndex(fromIndex), _size(size) 
+    {}
+
+    template<typename IteratorExampleType>
+    template<typename DatasetType>
+    auto GetIteratorAbstractor<IteratorExampleType>::operator()(const DatasetType& dataset) const -> ReturnType
+    {
+        return dataset.GetIterator<IteratorExampleType>(_fromIndex, _size);
+    }
+
+    template<typename ExampleType>
+    ExampleIterator<ExampleType> AnyDataset::GetIterator()
+    {
+        GetIteratorAbstractor<ExampleType> abstractor(_fromIndex, _size);
+        return utilities::AbstractInvoker<IDataset, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
+    }
+
+    template<typename DatasetExampleType>
+    template<typename IteratorExampleType>
+    Dataset<DatasetExampleType>::DatasetExampleIterator<IteratorExampleType>::DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end) : _current(begin), _end(end) 
+    {}
+
     template <typename DatasetExampleType>
     Dataset<DatasetExampleType>::Dataset(ExampleIterator<DatasetExampleType> exampleIterator)
     {
