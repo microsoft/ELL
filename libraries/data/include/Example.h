@@ -78,12 +78,11 @@ namespace data
         /// requested data vector type matches the one already stored in this example.
         /// </summary>
         ///
-        /// <typeparam name="NewDataVectorType"> Requested data vector type. </typeparam>
-        /// <typeparam name="NewMetadataType"> Requested metadata type (must have a ctor whose argument is the old
+        /// <typeparam name="TargetExampleType"> Requested target example type (metadata ctor must take old
         /// MetadataType). </typeparam>
-        /// <returns> An example. </returns>
-        template<typename NewDataVectorType, typename NewMetadataType = MetadataType, utilities::IsSame<NewDataVectorType, DataVectorType> Concept = true>
-        Example<NewDataVectorType, NewMetadataType> ToExample() const;
+        /// <returns> An example of the desired type. </returns>
+        template<typename TargetExampleType, utilities::IsSame<typename TargetExampleType::DataVectorType, DataVectorType> Concept = true>
+        TargetExampleType ToExample() const;
 
         /// <summary>
         /// Creates a new example that contains the same data as this example, in a specified data vector
@@ -91,12 +90,11 @@ namespace data
         /// requested data vector is different from the one stored in this example.
         /// </summary>
         ///
-        /// <typeparam name="NewDataVectorType"> Requested data vector type. </typeparam>
-        /// <typeparam name="NewMetadataType"> Requested metadata type (must have a ctor whose argument is the old
+        /// <typeparam name="TargetExampleType"> Requested target example type (metadata ctor must take old
         /// MetadataType). </typeparam>
-        /// <returns> An example. </returns>
-        template<typename NewDataVectorType, typename NewMetadataType = MetadataType, utilities::IsDifferent<NewDataVectorType, DataVectorType> Concept = true>
-        Example<NewDataVectorType, NewMetadataType> ToExample() const;
+        /// <returns> An example of the desired type. </returns>
+        template<typename TargetExampleType, utilities::IsDifferent<typename TargetExampleType::DataVectorType, DataVectorType> Concept = true>
+        TargetExampleType ToExample() const;
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///

@@ -80,7 +80,7 @@ namespace trainers
         {
             const auto& oldExample = exampleIterator.Get();
 
-            auto newExample = oldExample.ToExample<data::DoubleDataVector, TrainerMetadata>();
+            auto newExample = oldExample.ToExample<TrainerExampleType>();
             newExample.GetMetadata().currentOutput = _forest->Predict(newExample.GetDataVector());
 
             _dataset.AddExample(std::move(newExample));
