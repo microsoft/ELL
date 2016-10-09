@@ -23,7 +23,7 @@ namespace trainers
     template <typename PredictorType>
     void SweepingIncrementalTrainer<PredictorType>::Update(data::AnyDataset anyDataset)
     {
-        auto dataset = anyDataset.ToDataset<data::AutoSupervisedExample>(); // TODO match internal trainer example type
+        auto dataset = data::Dataset<data::AutoSupervisedExample>(anyDataset); // TODO match internal trainer example type
 
         // calculate epoch size
         uint64_t epochSize = _parameters.epochSize;

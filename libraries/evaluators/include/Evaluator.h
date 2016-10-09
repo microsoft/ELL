@@ -10,6 +10,7 @@
 
 // data
 #include "Dataset.h"
+#include "Example.h"
 
 // stl
 #include <memory>
@@ -60,8 +61,8 @@ namespace evaluators
     class Evaluator : public IEvaluator<PredictorType>
     {
     public:
-        /// <summary> the type of data vector prefered by the evaluated predictor. </summary>
-        using DataVectorType = typename PredictorType::DataVectorType;
+        // the type of example used by this evaluator
+        using ExampleType = data::Example<typename PredictorType::DataVectorType, data::WeightLabel>;
 
         /// <summary>
         /// Constructs an instance of Evaluator with a given data set and given aggregators.

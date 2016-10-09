@@ -23,7 +23,7 @@ namespace trainers
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(data::AnyDataset anyDataset)
     {
         // materialize a dataset of dense DataVectors with metadata that contains both strong and weak weight and lables for each example
-        _dataset = anyDataset.ToDataset<TrainerExampleType>();
+        _dataset = data::Dataset<TrainerExampleType>(anyDataset);
 
         // boosting loop (outer loop)
         for (size_t round = 0; round < _parameters.numRounds; ++round)

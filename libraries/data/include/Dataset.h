@@ -87,14 +87,6 @@ namespace data
         template<typename ExampleType>
         ExampleIterator<ExampleType> GetExampleIterator() const;
 
-        /// <summary> Converts this AnyDataset to a concrete Dataset. </summary>
-        ///
-        /// <typeparam name="ExampleType"> Example type used by the Dataset. </typeparam>
-        ///
-        /// <returns> The Dataset. </returns>
-        template<typename ExampleType>
-        Dataset<ExampleType> ToDataset() const;
-
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
         /// <returns> Number of examples. </returns>
@@ -148,6 +140,11 @@ namespace data
         ///
         /// <param name="exampleIterator"> The example iterator. </param>
         Dataset(ExampleIterator<DatasetExampleType> exampleIterator);
+
+        /// <summary> Constructs an instance of Dataset from an AnyDataset. </summary>
+        ///
+        /// <param name="anyDataset"> the AnyDataset. </param>
+        Dataset(AnyDataset anyDataset);
 
         Dataset<DatasetExampleType>& operator=(Dataset&&) = default;
 

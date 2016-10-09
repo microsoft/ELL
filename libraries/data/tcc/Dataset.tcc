@@ -40,12 +40,6 @@ namespace data
         return utilities::AbstractInvoker<IDataset, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
     }
 
-    template<typename ExampleType>
-    Dataset<ExampleType> AnyDataset::ToDataset() const
-    {
-        return Dataset<ExampleType>(GetExampleIterator<ExampleType>());
-    }
-
     template<typename DatasetExampleType>
     template<typename IteratorExampleType>
     Dataset<DatasetExampleType>::DatasetExampleIterator<IteratorExampleType>::DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end) : _current(begin), _end(end) 
@@ -59,6 +53,11 @@ namespace data
             AddExample(exampleIterator.Get());
             exampleIterator.Next();
         }
+    }
+
+    template<typename DatasetExampleType>
+    Dataset<DatasetExampleType>::Dataset(AnyDataset anyDataset) : Dataset(anyDataset.GetExampleIterator<DatasetExampleType>())
+    {
     }
 
     template <typename DatasetExampleType>
