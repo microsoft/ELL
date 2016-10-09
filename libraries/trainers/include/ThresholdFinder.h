@@ -42,7 +42,7 @@ namespace trainers
 
         // Gets a vector of sorted unique values from each feature, with counts
         template <typename ExampleIteratorType>
-        UniqueValuesResult UniqueValues(ExampleIteratorType exampleIterator) const;
+        UniqueValuesResult UniqueValues(ExampleIteratorType exampleIterator) const; // TODO change to ReferenceIterator of Dataset<Dense...>
 
     private:
         size_t SortReduceDuplicates(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const;
@@ -59,7 +59,7 @@ namespace trainers
         ///
         /// <returns> The thresholds. </returns>
         template <typename ExampleIteratorType>
-        std::vector<predictors::SingleElementThresholdPredictor> GetThresholds(ExampleIteratorType exampleIterator) const;
+        std::vector<predictors::SingleElementThresholdPredictor> GetThresholds(ExampleIteratorType exampleIterator) const; // TODO change to ReferenceIterator of Dataset<Dense...>
     };
 }
 }

@@ -77,7 +77,7 @@ namespace trainers
         // uniformly choose _candidatesPerInput from the range, without replacement
         _dataset.RandomPermute(_random, range.firstIndex, range.size, _thresholdFinderSampleSize);
 
-        auto thresholds = _thresholdFinder.GetThresholds(_dataset.GetExampleIterator(range.firstIndex, _thresholdFinderSampleSize));
+        auto thresholds = _thresholdFinder.GetThresholds(_dataset.GetExampleReferenceIterator(range.firstIndex, _thresholdFinderSampleSize));
         return thresholds;
     }
 
