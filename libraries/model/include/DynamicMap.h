@@ -79,6 +79,13 @@ namespace model
         /// <returns> The specified input node </returns>
         InputNodeBase* GetInputNode(const std::string& inputName) const;
 
+        //
+        // Routines for getting information about inputs / outputs of the map
+        //
+
+        /// <returns> The number of input nodes </returns>
+        size_t NumInputs() const { return _inputNodes.size(); }
+
         /// <summary> Returns size of a given input </summary>
         ///
         /// <param name="inputIndex"> The index of the input </param>
@@ -91,11 +98,60 @@ namespace model
         /// <returns> The size of the input </returns>
         size_t GetInputSize(const std::string& inputName) const;
 
-        /// <summary> Returns size of a given input </summary>
+        /// <summary> Returns the input nodes </summary>
         ///
-        /// <param name="inputIndex"> The index of the input </param>
-        /// <returns> The dimensionality of the input </returns>
-        size_t GetInputSize(size_t inputIndex) const;
+        /// <returns> The input nodes </returns>
+        const std::vector<InputNodeBase*>& GetInputs() { return _inputNodes; }
+
+        /// <summary> Returns an input node </summary>
+        ///
+        /// <param name="index"> The index of the input </param>
+        /// <returns> The input node </returns>
+        InputNodeBase* GetInput(size_t index);
+
+        /// <summary> Returns an input node </summary>
+        ///
+        /// <param name="index"> The name of the input </param>
+        /// <returns> The input node </returns>
+        InputNodeBase* GetInput(const std::string& inputName);
+
+        /// <summary> Get the number of outputs </summary>
+        ///
+        /// <returns> The number of outputs </returns>
+        size_t NumOutputs() const { return _outputElements.size(); }
+
+        /// <summary> Returns size of a given output </summary>
+        ///
+        /// <param name="outputName"> The name of the output </param>
+        /// <returns> The dimensionality of the output </returns>
+        size_t GetOutputSize(const std::string& outputName) const;
+
+        /// <summary> Returns size of a given output </summary>
+        ///
+        /// <param name="outputIndex"> The index of the output </param>
+        /// <returns> The dimensionality of the output </returns>
+        size_t GetOutputSize(int outputIndex) const;
+
+        /// <summary> Returns the outputs </summary>
+        ///
+        /// <returns> The outputs </returns>
+        const std::vector<PortElementsBase>& GetOutputs() { return _outputElements; }
+
+        /// <summary> Returns an outputs </summary>
+        ///
+        /// <param name="index"> The index of the output </param>
+        /// <returns> The output </returns>
+        PortElementsBase GetOutput(size_t index);
+
+        /// <summary> Returns an outputs </summary>
+        ///
+        /// <param name="outputName"> The name of the output </param>
+        /// <returns> The output </returns>
+        PortElementsBase GetOutput(const std::string& outputName);
+
+        //
+        // Routines for computing output (processing data)
+        //
 
         /// <summary> Set a single InputNode's input </summary>
         ///
@@ -129,18 +185,6 @@ namespace model
         template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         void SetInputValue(const std::string& inputName, const DataVectorType& inputValues) const;
 
-        /// <summary> Returns size of a given output </summary>
-        ///
-        /// <param name="outputName"> The name of the output </param>
-        /// <returns> The dimensionality of the output </returns>
-        size_t GetOutputSize(const std::string& outputName) const;
-
-        /// <summary> Returns size of a given output </summary>
-        ///
-        /// <param name="outputIndex"> The index of the output </param>
-        /// <returns> The dimensionality of the output </returns>
-        size_t GetOutputSize(size_t outputIndex) const;
-
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
         /// <param name="index"> The index of the output </param>
@@ -168,18 +212,6 @@ namespace model
         /// <returns> A vector of output values </returns>
         template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         DataVectorType ComputeOutput(const std::string& outputName) const;
-
-        /// <summary> Returns size of a given output </summary>
-        ///
-        /// <param name="outputIndex"> The index of the output </param>
-        /// <returns> The size of the output </returns>
-        size_t GetOutputSize(int outputIndex) const;
-
-        /// <summary> Returns size of a given output </summary>
-        ///
-        /// <param name="outputName"> The name of the output </param>
-        /// <returns> The size of the output </returns>
-        size_t GetOutputSize(const std::string& outputName) const;
 
         /// <summary> Returns a `PortElements` object representing the indicated map output </summary>
         ///
@@ -218,10 +250,6 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        // TODO: document
-        size_t NumInputs() const { return _inputNodes.size(); }
-        size_t NumOutputs() const { return _outputElements.size(); }
 
         const std::vector<InputNodeBase*>& GetInputs() { return _inputNodes; }
         const std::vector<PortElementsBase>& GetOutputs() { return _outputElements; }

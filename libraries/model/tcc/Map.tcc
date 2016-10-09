@@ -10,6 +10,31 @@ namespace emll
 {
 namespace model
 {
+    //
+    // Helper classes
+    //
+    template <typename T>
+    NamedInput<T> MakeNamedInput(std::string name, InputNode<T>* node)
+    {
+        return NamedInput<T>(name, node);
+    }
+
+    template <typename T>
+    NamedOutput<T> MakeNamedOutput(std::string name, PortElements<T> outputs)
+    {
+        return NamedOutput<T>(name, outputs);
+    }
+
+    template <typename T>
+    NamedOutput<T> MakeNamedOutput(std::string name, const OutputPort<T>& outputs)
+    {
+        return NamedOutput<T>(name, outputs);
+    }
+
+    //
+    // Map class
+    //
+
     // Constructor
     template <typename InputTypesTuple, typename OutputTypesTuple>
     Map<InputTypesTuple, OutputTypesTuple>::Map(const Model& model,
@@ -38,9 +63,13 @@ namespace model
     void Map<InputTypesTuple, OutputTypesTuple>::AddInputs(std::index_sequence<Sequence...>,
                                                            const utilities::WrappedTuple<InputTypesTuple, NamedInput>& inputs)
     {
-        utilities::InOrderFunctionEvaluator([&]() { 
-            std::get<Sequence>(_inputs) = std::get<1>(std::get<Sequence>(inputs));
-            AddInput(std::get<0>(std::get<Sequence>(inputs)), static_cast<InputNodeBase*>(std::get<1>(std::get<Sequence>(inputs)))); }...);
+        utilities::ApplyToEach(
+            [&](auto indexTag) {
+                constexpr size_t index = decltype(indexTag)::index;
+                std::get<index>(_inputs) = std::get<1>(std::get<index>(inputs));
+                this->AddInput(std::get<0>(std::get<index>(inputs)), static_cast<InputNodeBase*>(std::get<1>(std::get<index>(inputs))));
+            },
+            utilities::IndexTag<Sequence>{}...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -48,9 +77,13 @@ namespace model
     void Map<InputTypesTuple, OutputTypesTuple>::AddOutputs(std::index_sequence<Sequence...>,
                                                             const utilities::WrappedTuple<OutputTypesTuple, NamedOutput>& outputs)
     {
-        utilities::InOrderFunctionEvaluator([&]() { 
-            std::get<Sequence>(_outputs) = std::get<1>(std::get<Sequence>(outputs));
-            AddOutput(std::get<0>(std::get<Sequence>(outputs)), static_cast<PortElementsBase>(std::get<1>(std::get<Sequence>(outputs)))); }...);
+        utilities::ApplyToEach(
+            [&](auto indexTag) {
+                constexpr auto index = decltype(indexTag)::index;
+                std::get<index>(_outputs) = std::get<1>(std::get<index>(outputs));
+                this->AddOutput(std::get<0>(std::get<index>(outputs)), static_cast<PortElementsBase>(std::get<1>(std::get<index>(outputs))));
+            },
+            utilities::IndexTag<Sequence>{}...);
     }
 
     //
@@ -68,7 +101,12 @@ namespace model
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::RemapInputNodes(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
     {
-        utilities::InOrderFunctionEvaluator([&]() { RemapInputNode(std::get<Sequence>(_inputs), modelTransformer); }...);
+        utilities::ApplyToEach(
+            [&](auto indexTag) {
+                constexpr auto index = decltype(indexTag)::index;
+                this->RemapInputNode(std::get<index>(this->_inputs), modelTransformer);
+            },
+            utilities::IndexTag<Sequence>{}...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -83,7 +121,12 @@ namespace model
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::RemapOutputElements(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
     {
-        utilities::InOrderFunctionEvaluator([&]() { RemapOutputElement(std::get<Sequence>(_outputs), modelTransformer); }...);
+        utilities::ApplyToEach(
+            [&](auto indexTag) {
+                constexpr auto index = decltype(indexTag)::index;
+                this->RemapOutputElement(std::get<index>(this->_outputs), modelTransformer);
+            },
+            utilities::IndexTag<Sequence>{}...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -158,7 +201,12 @@ namespace model
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::PopulateInputsHelper(std::index_sequence<Sequence...>)
     {
-        utilities::InOrderFunctionEvaluator([&]() { std::get<Sequence>(_inputs) = dynamic_cast<InputNode<typename std::tuple_element<Sequence, InputTypesTuple>::type>*>(GetInput(Sequence)); }...);
+        utilities::ApplyToEach(
+            [&](auto indexTag) {
+                constexpr auto index = decltype(indexTag)::index;
+                std::get<index>(this->_inputs) = dynamic_cast<InputNode<typename std::tuple_element<index, InputTypesTuple>::type>*>(this->GetInput(index));
+            },
+            utilities::IndexTag<Sequence>{}...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -171,7 +219,12 @@ namespace model
     template <size_t... Sequence>
     void Map<InputTypesTuple, OutputTypesTuple>::PopulateOutputsHelper(std::index_sequence<Sequence...>)
     {
-        utilities::InOrderFunctionEvaluator([&]() { std::get<Sequence>(_outputs) = static_cast<PortElements<typename std::tuple_element<Sequence, InputTypesTuple>::type>>(GetOutput(Sequence)); }...);
+        utilities::ApplyToEach(
+            [&](auto indexTag) {
+                constexpr auto index = decltype(indexTag)::index;
+                std::get<index>(this->_outputs) = static_cast<PortElements<typename std::tuple_element<index, InputTypesTuple>::type>>(this->GetOutput(index));
+            },
+            utilities::IndexTag<Sequence>{}...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>

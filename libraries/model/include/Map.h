@@ -36,6 +36,10 @@ namespace emll
 {
 namespace model
 {
+    //
+    // Utility types and helper functions
+    //
+
     // This is just to strip the extra template parameters from std::vector so we can use the WrappedTuple<> helper
     template <typename ValueType>
     using StdVector = std::vector<ValueType>;
@@ -48,26 +52,16 @@ namespace model
     using NamedInput = std::tuple<std::string, InputNode<T>*>;
 
     template <typename T>
-    NamedInput<T> MakeNamedInput(std::string name, InputNode<T>* node)
-    {
-        return NamedInput<T>(name, node);
-    }
+    NamedInput<T> MakeNamedInput(std::string name, InputNode<T>* node);
 
     template <typename T>
     using NamedOutput = std::tuple<std::string, PortElements<T>>;
 
     template <typename T>
-    NamedOutput<T> MakeNamedOutput(std::string name, PortElements<T> outputs)
-    {
-        return NamedOutput<T>(name, outputs);
-    }
+    NamedOutput<T> MakeNamedOutput(std::string name, PortElements<T> outputs);
 
     template <typename T>
-    NamedOutput<T> MakeNamedOutput(std::string name, const OutputPort<T>& outputs)
-    {
-        return NamedOutput<T>(name, outputs);
-    }
-
+    NamedOutput<T> MakeNamedOutput(std::string name, const OutputPort<T>& outputs);
     // Helper functions
     template <typename WrappedType>
     auto UnwrapType(std::tuple<std::string, model::InputNode<WrappedType>*>)
@@ -80,6 +74,10 @@ namespace model
     {
         return WrappedType{};
     }
+
+    //
+    // Map class
+    //
 
     /// <summary> Class that wraps a model and its designated outputs </summary>
     template <typename InputTypesTuple, typename OutputTypesTuple>
@@ -108,7 +106,7 @@ namespace model
         }
 
         /// <summary> Type alias for the tuple of vectors returned by `Compute` </summary>
-        using ComputedOutputType = utilities::WrappedTuple<OutputTypesTuple, StdVector>; // typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
+        using ComputedOutputType = utilities::WrappedTuple<OutputTypesTuple, StdVector>;
 
         /// <summary> Computes the output of the map from its current input values </summary>
         ///
@@ -199,6 +197,7 @@ namespace model
         void PopulateOutputsHelper(std::index_sequence<Sequence...>);
     };
 
+    // Helper function
     template <typename NamedInputTypesTuple, typename NamedOutputTypesTuple>
     auto MakeMap(const Model& model,
                  const NamedInputTypesTuple& inputs,

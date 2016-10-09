@@ -256,11 +256,6 @@ namespace model
     InputNodeBase* DynamicMap::GetInput(const std::string& inputName) const
     {
         auto iter = _inputNodeMap.find(inputName);
-        if (iter == _inputNodeMap.end())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
-        }
-
         return iter->second;
     }
 

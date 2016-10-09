@@ -19,6 +19,13 @@ namespace utilities
 
     template <typename Function, typename... Functions>
     void InOrderFunctionEvaluator(Function&& function, Functions&&... functions);
+
+    template <typename FunctionType>
+    inline void ApplyToEach(FunctionType&& function)
+    {}
+    
+    template <typename FunctionType, typename Arg, typename... Args>
+    void ApplyToEach(FunctionType&& function, Arg&& arg, Args&&... args);
 }
 }
 
