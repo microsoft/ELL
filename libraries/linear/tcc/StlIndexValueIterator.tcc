@@ -41,27 +41,11 @@ namespace linear
     //
     // Convenience function to create iterator
     //
+
     template <typename ValueType>
     VectorIndexValueIterator<ValueType> MakeVectorIndexValueIterator(const std::vector<ValueType>& arr)
     {
         return VectorIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
-    }
-
-    // specialization for IndexValueIterators
-    template <typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType>>
-    void CopyToDoubleArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array)
-    {
-        std::fill(array.begin(), array.end(), 0);
-        while (indexValueIterator.IsValid())
-        {
-            auto entry = indexValueIterator.Get();
-            if (entry.index >= array.size())
-            {
-                array.resize(entry.index + 1);
-            }
-            array[entry.index] = entry.value;
-            indexValueIterator.Next();
-        }
     }
 }
 }

@@ -152,5 +152,19 @@ namespace data
             }
         }
     }
+
+    template<typename DefaultDataVectorType>
+    template<typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept>
+    void AutoDataVectorBase<DefaultDataVectorType>::SetInternal(DefaultDataVectorType defaultDataVector)
+    {
+        _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator());
+    }
+
+    template<typename DefaultDataVectorType>
+    template<typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept>
+    void AutoDataVectorBase<DefaultDataVectorType>::SetInternal(DefaultDataVectorType defaultDataVector)
+    {
+        _pInternal = std::make_unique<DefaultDataVectorType>(std::move(defaultDataVector));
+    }
 }
 }

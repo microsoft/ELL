@@ -117,16 +117,10 @@ namespace data
         void FindBestRepresentation(DefaultDataVectorType defaultDataVector);
 
         template<typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
-        void SetInternal(DefaultDataVectorType defaultDataVector) // TODO move definition
-        {
-            _pInternal = std::make_unique<DefaultDataVectorType>(std::move(defaultDataVector));
-        }
+        void SetInternal(DefaultDataVectorType defaultDataVector);
 
         template<typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
-        void SetInternal(DefaultDataVectorType defaultDataVector) // TODO move def
-        {
-            _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator());
-        }
+        void SetInternal(DefaultDataVectorType defaultDataVector);
 
         // members
         std::unique_ptr<IDataVector> _pInternal;
