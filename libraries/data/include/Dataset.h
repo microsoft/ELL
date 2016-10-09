@@ -42,7 +42,7 @@ namespace data
         ///
         /// <param name="fromIndex"> Zero-based index of the first example referenced by the iterator. </param>
         /// <param name="size"> The number of examples referenced by the iterator. </param>
-        GetExampleIteratorFunctor(size_t fromIndex, size_t size); // TODO rename to GetExampleI...
+        GetExampleIteratorFunctor(size_t fromIndex, size_t size);
 
         /// <summary> Function call operator. Calls a dataset's GetExampleIterator member. </summary>
         ///
@@ -82,7 +82,7 @@ namespace data
         ///
         /// <returns> The example iterator. </returns>
         template<typename ExampleType>
-        ExampleIterator<ExampleType> GetExampleIterator(); // TODO rename to GetExampleIterator
+        ExampleIterator<ExampleType> GetExampleIterator();
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -131,7 +131,7 @@ namespace data
 
         Dataset(Dataset&&) = default;
 
-        explicit Dataset(const Dataset&) = default; // TODO why is this allowed?
+        Dataset(const Dataset&) = delete; 
 
         /// <summary> Constructs an instance of Dataset by making shallow copies of supervised examples. </summary>
         ///

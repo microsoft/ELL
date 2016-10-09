@@ -22,10 +22,8 @@ namespace trainers
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(data::AnyDataset anyDataset)
     {
-        _dataset = data::MakeDataset(anyDataset.GetExampleIterator<TrainerExampleType>());
-
         // convert data from iterator to dense data set with metadata (weak weight / weak label) associated with each example
-//        LoadData(exampleIterator);
+        _dataset = data::MakeDataset(anyDataset.GetExampleIterator<TrainerExampleType>());
 
         // boosting loop (outer loop)
         for (size_t round = 0; round < _parameters.numRounds; ++round)
@@ -67,26 +65,6 @@ namespace trainers
     ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums)
         : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
     {
-    }
-
-    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator) // TODO remove
-    {
-        // reset the data set
-        _dataset.Reset();
-
-        // create the data set from the example iterator
-        while (exampleIterator.IsValid())
-        {
-            const auto& oldExample = exampleIterator.Get();
-
-            auto newExample = oldExample.ToExample<TrainerExampleType>();
-            newExample.GetMetadata().currentOutput = _forest->Predict(newExample.GetDataVector());
-
-            _dataset.AddExample(std::move(newExample));
-
-            exampleIterator.Next();
-        }
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>

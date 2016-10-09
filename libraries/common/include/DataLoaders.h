@@ -30,7 +30,8 @@ namespace common
 
     /// <summary> Gets a dataset from data load arguments. </summary>
     ///
-    /// <param name="dataLoadArguments"> The data load arguments. </param> // TODO add template type documentation
+    /// <typeparam name="DatasetType"> Dataset type. </typeparam>
+    /// <param name="dataLoadArguments"> The data load arguments. </param>
     ///
     /// <returns> The dataset. </returns>
     template <typename DatasetType = data::AutoSupervisedDataset>

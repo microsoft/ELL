@@ -50,7 +50,7 @@ namespace data
     {
         while (exampleIterator.IsValid())
         {
-            AddExample(DatasetExampleType(exampleIterator.Get())); // TODO fix this 
+            AddExample(exampleIterator.Get());
             exampleIterator.Next();
         }
     }

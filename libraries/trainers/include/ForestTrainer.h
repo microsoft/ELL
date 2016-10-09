@@ -165,9 +165,6 @@ namespace trainers
         // private member functions
         //
 
-        // loads a dataset and initializes the currentOutput field in the metadata
-        void LoadData(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator); // TODO remove this ?
-
         // performs an epoch of splits
         void PerformSplits(size_t maxSplits);
 

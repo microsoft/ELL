@@ -40,18 +40,5 @@ namespace common
         // Create iterator
         return data::GetParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));
     }
-
-    data::AutoSupervisedDataset GetDataset(const DataLoadArguments& dataLoadArguments) // TODO there's a similar func in the tcc file ...
-    {
-        auto dataIterator = GetDataIterator(dataLoadArguments);
-        data::AutoSupervisedDataset dataset;
-        while (dataIterator->IsValid())
-        {
-            dataset.AddExample(dataIterator->Get());
-            dataIterator->Next();
-        }
-
-        return dataset;
-    }
 }
 }
