@@ -25,19 +25,25 @@ namespace data
     {}
 
     template<typename IteratorExampleType>
-    template<typename DatasetType>
-    auto GetExampleIteratorFunctor<IteratorExampleType>::operator()(const DatasetType& dataset) const -> ReturnType
+    template<typename ExampleType>
+    auto GetExampleIteratorFunctor<IteratorExampleType>::operator()(const Dataset<ExampleType>& dataset) const -> ReturnType
     {
         return dataset.GetExampleIterator<IteratorExampleType>(_fromIndex, _size);
     }
 
     template<typename ExampleType>
-    ExampleIterator<ExampleType> AnyDataset::GetExampleIterator()
+    ExampleIterator<ExampleType> AnyDataset::GetExampleIterator() const
     {
         GetExampleIteratorFunctor<ExampleType> abstractor(_fromIndex, _size);
 
         // all Dataset types for which GetAnyDataset() is called must be listed below, in the variadic template argument.
         return utilities::AbstractInvoker<IDataset, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
+    }
+
+    template<typename ExampleType>
+    Dataset<ExampleType> AnyDataset::ToDataset() const
+    {
+        return Dataset<ExampleType>(GetExampleIterator<ExampleType>());
     }
 
     template<typename DatasetExampleType>
@@ -180,12 +186,6 @@ namespace data
             _examples[index].Print(os);
             os << "\n";
         }
-    }
-
-    template<typename ExampleType>
-    Dataset<ExampleType> MakeDataset(ExampleIterator<ExampleType> iterator)
-    {
-        return Dataset<ExampleType>(std::move(iterator));
     }
 
     template <typename DatasetExampleType>

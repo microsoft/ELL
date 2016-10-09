@@ -60,6 +60,9 @@ namespace evaluators
     class Evaluator : public IEvaluator<PredictorType>
     {
     public:
+        /// <summary> the type of data vector prefered by the evaluated predictor. </summary>
+        using DataVectorType = typename PredictorType::DataVectorType;
+
         /// <summary>
         /// Constructs an instance of Evaluator with a given data set and given aggregators.
         /// </summary>

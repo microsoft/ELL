@@ -28,6 +28,10 @@ namespace emll
 {
 namespace data
 {
+    // forward declaratin of Dataset, since AnyDataset and Dataset have a cyclical dependence
+    template<typename ExampleType>
+    class Dataset;
+
     /// <summary> A functor class that calls the GetExampleIterator member of a Dataset. </summary>
     ///
     /// <typeparam name="IteratorExampleType"> Example type. </typeparam>
@@ -46,12 +50,12 @@ namespace data
 
         /// <summary> Function call operator. Calls a dataset's GetExampleIterator member. </summary>
         ///
-        /// <typeparam name="DatasetType"> Dataset type. </typeparam>
+        /// <typeparam name="ExampleType"> Type of example kept by the Dataset. </typeparam>
         /// <param name="dataset"> The dataset. </param>
         ///
         /// <returns> The example iterator returned by the call to GetExampleIterator. </returns>
-        template<typename DatasetType>
-        ReturnType operator()(const DatasetType& dataset) const;
+        template<typename ExampleType>
+        ReturnType operator()(const Dataset<ExampleType>& dataset) const;
     
     private:
         size_t _fromIndex;
@@ -68,7 +72,6 @@ namespace data
     class AnyDataset
     {
     public:
-
         /// <summary> Constructs an instance of AnyDataset. </summary>
         ///
         /// <param name="pDataset"> Pointer to an IDataset. </param>
@@ -82,7 +85,15 @@ namespace data
         ///
         /// <returns> The example iterator. </returns>
         template<typename ExampleType>
-        ExampleIterator<ExampleType> GetExampleIterator();
+        ExampleIterator<ExampleType> GetExampleIterator() const;
+
+        /// <summary> Converts this AnyDataset to a concrete Dataset. </summary>
+        ///
+        /// <typeparam name="ExampleType"> Example type used by the Dataset. </typeparam>
+        ///
+        /// <returns> The Dataset. </returns>
+        template<typename ExampleType>
+        Dataset<ExampleType> ToDataset() const;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
         ///
@@ -263,15 +274,6 @@ namespace data
         std::vector<DatasetExampleType> _examples;
         size_t _numFeatures = 0;
     };
-
-    /// <summary> Helper function that makes a data set out of an example iterator. </summary>
-    ///
-    /// <typeparam name="ExampleType"> Example type. </typeparam>
-    /// <param name="iterator"> The example iterator. </param>
-    ///
-    /// <returns> A Dataset. </returns>
-    template<typename ExampleType>
-    Dataset<ExampleType> MakeDataset(ExampleIterator<ExampleType> iterator);
 
     // friendly name
     typedef Dataset<AutoSupervisedExample> AutoSupervisedDataset;
