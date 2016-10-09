@@ -105,8 +105,8 @@ int main(int argc, char* argv[])
             const auto& predictor = trainer->GetPredictor();
             std::cout << "Finished training forest with " << predictor->NumTrees() << " trees." << std::endl;
 
-            // evaluate
-            // auto evaluator = common::MakeEvaluator<predictors::SimpleForestPredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
+            // evaluate // TODO fix this
+            // auto evaluator = common::MakeEvaluator<predictors::SimpleForestPredictor>(rowDataset.GetDataset(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
             //evaluator->Evaluate(tree);
             //std::cout << "Training error\n";
             //evaluator->Print(std::cout);

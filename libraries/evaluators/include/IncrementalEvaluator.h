@@ -56,10 +56,10 @@ namespace evaluators
 
         /// <summary> Constructs an instance of IncrementalEvaluator with a given dataset and given aggregators. </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
+        /// <param name="dataset"> An dataset. </param>
         /// <param name="evaluatorParameters"> The evaluation parameters. </param>
         /// <param name="aggregators"> The aggregators. </param>
-        IncrementalEvaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+        IncrementalEvaluator(data::Dataset dataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
         /// <summary>
         /// Runs the given predictor on the evaluation set, increments cached outputs, invokes each of

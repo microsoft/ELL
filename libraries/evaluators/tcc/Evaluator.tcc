@@ -13,8 +13,8 @@ namespace emll
 namespace evaluators
 {
     template <typename PredictorType, typename... AggregatorTypes>
-    Evaluator<PredictorType, AggregatorTypes...>::Evaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
-        : _rowDataset(exampleIterator), _evaluatorParameters(evaluatorParameters), _aggregatorTuple(std::make_tuple(aggregators...))
+    Evaluator<PredictorType, AggregatorTypes...>::Evaluator(data::Dataset dataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+        : _rowDataset(dataset.GetIterator<data::AutoSupervisedExample>()), _evaluatorParameters(evaluatorParameters), _aggregatorTuple(std::make_tuple(aggregators...))
     {
         static_assert(sizeof...(AggregatorTypes) > 0, "Evaluator must contains at least one aggregator");
 
@@ -155,9 +155,9 @@ namespace evaluators
     }
 
     template <typename PredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(data::Dataset dataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
     {
-        return std::make_unique<Evaluator<PredictorType, AggregatorTypes...>>(exampleIterator, evaluatorParameters, aggregators...);
+        return std::make_unique<Evaluator<PredictorType, AggregatorTypes...>>(dataset, evaluatorParameters, aggregators...);
     }
 }
 }

@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
         for (uint64_t i = 0; i < regularization.size(); ++i)
         {
             auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, generator.GenerateParameters(i));
-            evaluators.push_back(common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorParameters, trainerArguments.lossArguments));
+            evaluators.push_back(common::MakeEvaluator<PredictorType>(rowDataset.GetDataset(), evaluatorParameters, trainerArguments.lossArguments));
             evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluators.back()));
         }
 

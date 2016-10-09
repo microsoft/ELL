@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
         if (trainerArguments.verbose)
         {
-            evaluator = common::MakeEvaluator<PredictorType>(rowDataset.GetIterator(), evaluatorArguments, trainerArguments.lossArguments);
+            evaluator = common::MakeEvaluator<PredictorType>(rowDataset.GetDataset(), evaluatorArguments, trainerArguments.lossArguments);
             sgdIncrementalTrainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator));
         }
 

@@ -60,12 +60,14 @@ namespace evaluators
     class Evaluator : public IEvaluator<PredictorType>
     {
     public:
-        /// <summary> Constructs an instance of Evaluator with a given dataset and given aggregators. </summary>
+        /// <summary>
+        /// Constructs an instance of Evaluator with a given dataset and given aggregators.
+        /// </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
+        /// <param name="dataset"> A dataset. </param>
         /// <param name="evaluatorParameters"> The evaluation parameters. </param>
         /// <param name="aggregators"> The aggregators. </param>
-        Evaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+        Evaluator(data::Dataset dataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
         ///
@@ -122,7 +124,7 @@ namespace evaluators
     ///
     /// <returns> A shared_ptr to an IEvaluator. </returns>
     template <typename PredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(data::Dataset dataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 }
 
