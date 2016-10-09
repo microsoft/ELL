@@ -90,12 +90,12 @@ namespace data
     template <typename DatasetExampleType>
     void Dataset<DatasetExampleType>::AddExample(DatasetExampleType example)
     {
-        size_t size = example.GetDataVector().Size();
+        size_t numFeatures = example.GetDataVector().ZeroSuffixFirstIndex();
         _examples.push_back(std::move(example));
 
-        if (_maxExampleSize < size)
+        if (_numFeatures < numFeatures)
         {
-            _maxExampleSize = size;
+            _numFeatures = numFeatures;
         }
     }
 
@@ -103,7 +103,7 @@ namespace data
     void Dataset<DatasetExampleType>::Reset()
     {
         _examples.clear();
-        _maxExampleSize = 0;
+        _numFeatures = 0;
     }
 
     template <typename DatasetExampleType>

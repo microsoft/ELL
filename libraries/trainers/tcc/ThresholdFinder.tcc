@@ -30,12 +30,12 @@ namespace trainers
 
             totalWeight += weight;
 
-            if (result.size() < denseDataVector.Size())
+            if (result.size() < denseDataVector.ZeroSuffixFirstIndex())
             {
-                result.resize(denseDataVector.Size());
+                result.resize(denseDataVector.ZeroSuffixFirstIndex());
             }
 
-            for (size_t j = 0; j < denseDataVector.Size(); ++j)
+            for (size_t j = 0; j < denseDataVector.ZeroSuffixFirstIndex(); ++j)
             {
                 result[j].push_back({ denseDataVector[j], weight });
             }

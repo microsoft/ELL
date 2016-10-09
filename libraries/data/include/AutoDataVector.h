@@ -69,10 +69,14 @@ namespace data
         /// <returns> The internal data vector type. </returns>
         IDataVector::Type GetInternalType() const { return _pInternal->GetType(); }
 
-        /// <summary> Returns the size of the vector. </summary>
+        /// <summary>
+        /// A data vector has infinite dimension and ends with a suffix of zeros. This function returns
+        /// the first index in this suffix. Equivalently, the returned value is one plus the index of the
+        /// last non-zero element.
+        /// </summary>
         ///
-        /// <returns> The size of the vector. </returns>
-        virtual size_t Size() const override { return _pInternal->Size(); }
+        /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
+        virtual size_t ZeroSuffixFirstIndex() const override { return _pInternal->ZeroSuffixFirstIndex(); }
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///

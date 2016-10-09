@@ -93,7 +93,7 @@ namespace data
     }
 
     template <typename ElementType, typename IntegerListType>
-    size_t SparseDataVector<ElementType, IntegerListType>::Size() const
+    size_t SparseDataVector<ElementType, IntegerListType>::ZeroSuffixFirstIndex() const
     {
         if (_indices.Size() == 0)
         {

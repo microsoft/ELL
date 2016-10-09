@@ -106,10 +106,14 @@ namespace data
         /// <param name="value"> The value. </param>
         virtual void AppendElement(size_t index, double value = 1.0) override;
 
-        /// <summary> Returns The largest index of a non-zero element plus one. </summary>
+        /// <summary>
+        /// A data vector has infinite dimension and ends with a suffix of zeros. This function returns
+        /// the first index in this suffix. Equivalently, the returned value is one plus the index of the
+        /// last non-zero element.
+        /// </summary>
         ///
-        /// <returns> An size_t. </returns>
-        virtual size_t Size() const override;
+        /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
+        virtual size_t ZeroSuffixFirstIndex() const override;
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///

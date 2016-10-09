@@ -72,7 +72,7 @@ namespace data
     }
 
     template <typename IntegerListType>
-    size_t SparseBinaryDataVectorBase<IntegerListType>::Size() const
+    size_t SparseBinaryDataVectorBase<IntegerListType>::ZeroSuffixFirstIndex() const
     {
         if (_indices.Size() == 0)
         {

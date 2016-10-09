@@ -62,7 +62,7 @@ namespace common
             auto dataIterator = GetDataIterator(*this);
             while (dataIterator->IsValid())
             {
-                auto size = dataIterator->Get().GetDataVector().Size();
+                auto size = dataIterator->Get().GetDataVector().ZeroSuffixFirstIndex();
                 parsedDataDimension = std::max(parsedDataDimension, size);
                 dataIterator->Next();
             }

@@ -150,7 +150,7 @@ namespace data
         /// <summary> Returns the maximal size of any example. </summary>
         ///
         /// <returns> The maximal size of any example. </returns>
-        size_t GetMaxDataVectorSize() const { return _maxExampleSize; }
+        size_t NumFeatures() const { return _numFeatures; }
 
         /// <summary> Returns a reference to an example. </summary>
         ///
@@ -261,7 +261,7 @@ namespace data
         size_t CorrectRangeSize(size_t fromIndex, size_t size) const;
 
         std::vector<DatasetExampleType> _examples;
-        size_t _maxExampleSize = 0;
+        size_t _numFeatures = 0;
     };
 
     /// <summary> Helper function that makes a data set out of an example iterator. </summary>
