@@ -19,6 +19,7 @@
 #include "ConstantNode.h"
 #include "DelayNode.h"
 #include "DotProductNode.h"
+#include "ExtremalValueNode.h"
 #include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
@@ -35,23 +36,30 @@
 
 namespace emll
 {
-model::Model GenerateIdentityModel()
+model::Model GenerateIdentityModel(size_t dimension)
 {
-    const int dimension = 3;
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
     model.AddNode<model::OutputNode<double>>(inputNode->output);
     return model;
 }
 
-model::Model GenerateTimesTwoModel()
+model::Model GenerateTimesTwoModel(size_t dimension)
 {
-    const int dimension = 3;
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
-    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{2.0, 2.0, 2.0});
+    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 2.0, 2.0, 2.0 });
     auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantNode->output, nodes::BinaryOperationType::coordinatewiseMultiply);
     model.AddNode<model::OutputNode<double>>(timesNode->output);
+    return model;
+}
+
+model::Model GenerateArgMaxModel(size_t dimension)
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
+    auto argMaxNode = model.AddNode<nodes::ArgMaxNode<double>>(inputNode->output);
+    model.AddNode<model::OutputNode<int>>(argMaxNode->argVal);
     return model;
 }
 

@@ -13,8 +13,9 @@
 
 namespace emll
 {
-model::Model GenerateIdentityModel();
-model::Model GenerateTimesTwoModel();
+model::Model GenerateIdentityModel(size_t dimension);
+model::Model GenerateTimesTwoModel(size_t dimension);
+model::Model GenerateArgMaxModel(size_t dimension);
 model::Model GenerateModel1();
 model::Model GenerateModel2();
 model::Model GenerateModel3();
