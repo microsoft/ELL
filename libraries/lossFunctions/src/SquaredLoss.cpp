@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SquaredLoss.h"
+#include "ELL_SquaredLoss.h"
 
 // stl
 #include <cmath>
@@ -33,3 +34,16 @@ namespace lossFunctions
     }
 }
 }
+
+double ELL_SquaredLoss::Evaluate(double prediction, double label)
+{
+    emll::lossFunctions::SquaredLoss X;
+    return X.Evaluate(prediction, label);
+}
+
+double ELL_SquaredLoss::GetDerivative(double prediction, double label)
+{
+    emll::lossFunctions::SquaredLoss X;
+    return X.GetDerivative(prediction, label);
+}
+

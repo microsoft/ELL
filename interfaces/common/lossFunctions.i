@@ -11,8 +11,14 @@
 #include "HingeLoss.h"
 #include "LogLoss.h"
 #include "SquaredLoss.h"
+#include "ELL_HingeLoss.h"
+#include "ELL_LogLoss.h"
+#include "ELL_SquaredLoss.h"
 %}
 
-%include "HingeLoss.h"
-%include "LogLoss.h"
-%include "SquaredLoss.h"
+// %include "HingeLoss.h"
+// %include "LogLoss.h"
+// %include "SquaredLoss.h"
+%include "ELL_HingeLoss.h"
+%include "ELL_LogLoss.h"
+%include "ELL_SquaredLoss.h"
