@@ -14,7 +14,7 @@
 #include "RandomEngines.h"
 
 // data
-#include "Example.h"
+#include "Dataset.h"
 
 // common
 #include "DataLoadArguments.h"
@@ -98,21 +98,22 @@ int main(int argc, char* argv[])
         using PredictorType = predictors::LinearPredictor;
 
         // create sgd trainer
-        auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
+        auto trainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
 
-        // in verbose mode, create evaluator
+        // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
         if (trainerArguments.verbose)
         {
             evaluator = common::MakeEvaluator<PredictorType>(dataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossArguments);
-            sgdIncrementalTrainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluator));
+            trainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(trainer), evaluator));
         }
 
-        auto trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(sgdIncrementalTrainer), multiEpochTrainerArguments);
+        // create multi epoch trainer
+        trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(trainer), multiEpochTrainerArguments);
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(dataset.GetAnyDataset()); // TODO epoch size?
+        trainer->Update(dataset.GetAnyDataset()); 
         auto predictor = trainer->GetPredictor();
 
         // print loss and errors
@@ -155,6 +156,5 @@ int main(int argc, char* argv[])
         std::cerr << "exception: " << exception.GetMessage() << std::endl;
         return 1;
     }
-
     return 0;
 }

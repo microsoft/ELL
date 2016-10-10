@@ -46,31 +46,25 @@ namespace common
         }
     }
 
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeSortingForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments)
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
         switch (lossArguments.lossFunction)
         {
-            case LossFunctionEnum::squared:
+        case LossFunctionEnum::squared:
+
+            if(trainerArguments.sortingTrainer)
+            {
                 return trainers::MakeSortingForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
-
-            default:
-                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
-        }
-    }
-
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments)
-    {
-        using LossFunctionEnum = common::LossArguments::LossFunction;
-
-        switch (lossArguments.lossFunction)
-        {
-            case LossFunctionEnum::squared:
+            }
+            else
+            {
                 return trainers::MakeHistogramForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
+            }
 
-            default:
-                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+        default:
+            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 }
