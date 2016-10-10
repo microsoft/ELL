@@ -167,6 +167,9 @@ namespace trainers
         // private member functions
         //
 
+        // initializes weak weights and labels, as well as currentOutput
+        void InitializeMetadata(); 
+
         // performs an epoch of splits
         void PerformSplits(size_t maxSplits);
 

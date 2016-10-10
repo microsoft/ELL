@@ -25,6 +25,9 @@ namespace trainers
         // materialize a dataset of dense DataVectors with metadata that contains both strong and weak weight and lables for each example
         _dataset = data::Dataset<TrainerExampleType>(anyDataset);
 
+        // initalizes the speical fields in the dataset metadata: weak weight and label, currentOutput
+        InitializeMetadata();
+
         // boosting loop (outer loop)
         for (size_t round = 0; round < _parameters.numRounds; ++round)
         {
@@ -104,6 +107,19 @@ namespace trainers
         {
             auto& example = _dataset[rowIndex];
             example.GetMetadata().currentOutput += edgePredictor.Predict(example.GetDataVector());
+        }
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::InitializeMetadata()
+    {
+        for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
+        {
+            auto& example = _dataset[rowIndex];
+            auto prediction = _forest->Predict(example.GetDataVector());
+            auto& metadata = example.GetMetadata();
+            metadata.currentOutput = prediction;
+            metadata.weak = _booster.GetWeakWeightLabel(metadata.strong, prediction);
         }
     }
 

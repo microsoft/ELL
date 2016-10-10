@@ -90,7 +90,7 @@ namespace data
         virtual size_t ZeroSuffixFirstIndex() const override { return _data.size(); }
 
     private:
-        size_t _numNonzeros;
+        size_t _numNonzeros = 0;
         std::vector<ElementType> _data;
     };
 

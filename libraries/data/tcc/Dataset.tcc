@@ -95,6 +95,7 @@ namespace data
     template <typename DatasetExampleType>
     auto Dataset<DatasetExampleType>::GetExampleReferenceIterator(size_t fromIndex = 0, size_t size = 0) const -> ExampleReferenceIterator
     {
+        size = CorrectRangeSize(fromIndex, size);
         return ExampleReferenceIterator(_examples.cbegin() + fromIndex, _examples.cbegin() + fromIndex + size);
     }
 
