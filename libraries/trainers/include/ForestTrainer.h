@@ -114,7 +114,9 @@ namespace trainers
     class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>>
     {
     public:
-        using TrainerExampleType = data::Example<data::DoubleDataVector, TrainerMetadata>;
+        using PredictorType = typename predictors::ForestPredictor<SplitRuleType, EdgePredictorType>;
+        using DataVectorType = typename PredictorType::DataVectorType;
+        using TrainerExampleType = data::Example<DataVectorType, TrainerMetadata>;
 
         /// <summary> Constructs an instance of ForestTrainer. </summary>
         ///
@@ -130,7 +132,7 @@ namespace trainers
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const override { return _forest; };
+        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _forest; };
 
     protected:
         //
@@ -194,7 +196,7 @@ namespace trainers
         ForestTrainerParameters _parameters;
 
         // the forest being grown
-        std::shared_ptr<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> _forest;
+        std::shared_ptr<PredictorType> _forest;
 
         // the priority queue that holds the split candidates
         SplitCandidatePriorityQueue _queue;

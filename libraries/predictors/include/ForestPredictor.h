@@ -210,7 +210,7 @@ namespace predictors
         };
 
         /// <summary> Type of the data vector expected by this predictor type. </summary>
-        using DataVectorType = data::DoubleDataVector;
+        using DataVectorType = data::FloatDataVector;
 
         /// <summary> Query if this forest has no trees and a zero bias. </summary>
         ///

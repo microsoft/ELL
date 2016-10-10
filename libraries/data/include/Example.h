@@ -118,7 +118,7 @@ namespace data
     };
 
     typedef Example<AutoDataVector, WeightLabel> AutoSupervisedExample;
-    typedef Example<DoubleDataVector, WeightLabel> DenseSupervisedExample; 
+    typedef Example<FloatDataVector, WeightLabel> DenseSupervisedExample; 
 
     /// <summary> Stream insertion operator. </summary>
     ///

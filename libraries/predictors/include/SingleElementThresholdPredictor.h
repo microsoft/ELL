@@ -27,7 +27,7 @@ namespace predictors
     class SingleElementThresholdPredictor : public IPredictor<bool>, public utilities::IArchivable
     {
     public:
-        using DataVectorType = data::DoubleDataVector;
+        using DataVectorType = data::FloatDataVector;
 
         /// <summary> Constructs a single-element threshold rule. </summary>
         ///

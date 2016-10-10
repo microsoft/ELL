@@ -25,6 +25,8 @@ namespace trainers
     class ThresholdFinder
     {
     protected:
+        using DataVectorType = predictors::SingleElementThresholdPredictor::DataVectorType;
+
         struct ValueWeight
         {
             double value;

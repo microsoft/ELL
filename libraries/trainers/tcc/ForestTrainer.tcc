@@ -167,13 +167,13 @@ namespace trainers
     {
         if (splitRule.NumOutputs() == 2)
         {
-            _dataset.Partition([splitRule](const data::Example<data::DoubleDataVector, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
+            _dataset.Partition([splitRule](const data::Example<DataVectorType, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
                                range.firstIndex,
                                range.size);
         }
         else
         {
-            _dataset.Sort([splitRule](const data::Example<data::DoubleDataVector, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()); },
+            _dataset.Sort([splitRule](const data::Example<DataVectorType, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()); },
                           range.firstIndex,
                           range.size);
         }
