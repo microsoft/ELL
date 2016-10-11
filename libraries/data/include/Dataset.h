@@ -285,6 +285,7 @@ namespace data
 
     // friendly name
     typedef Dataset<AutoSupervisedExample> AutoSupervisedDataset;
+    typedef Dataset<DenseSupervisedExample> DenseSupervisedDataset;
 
     /// <summary> Prints a data set to an ostream. </summary>
     ///

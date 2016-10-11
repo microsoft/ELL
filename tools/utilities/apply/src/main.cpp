@@ -84,8 +84,7 @@ int main(int argc, char* argv[])
 
         // load data set
         if (verbose) std::cout << "Loading data from file: " << dataLoadArguments.inputDataFilename << std::endl;
-//TODO        auto dataset = common::GetDataset<data::DenseDataset>(dataLoadArguments);
-// TODO - consider removing        size_t numColumns = dataLoadArguments.parsedDataDimension;
+        auto dataset = common::GetDataset(dataLoadArguments);
 
         // load map
         model::DynamicMap map;
@@ -164,37 +163,26 @@ int main(int argc, char* argv[])
             map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputElements } });
         }
 
-        // Get data set iterator
-// TODO        auto datasetIterator = dataset.GetExampleIterator();
-
-        // get output stream
         auto outputStream = dataSaveArguments.outputDataStream;
         auto mapInputSize = map.GetInputSize("input");
-// TODO        //while (datasetIterator.IsValid())
-        //{
-        //    auto row = datasetIterator.Get();
-        //    // truncate to size of map input
-        //    auto dataVec = row.GetDataVector();
-        //    dataVec.Resize(mapInputSize);
-        //    map.SetInputValue<double>("input", dataVec);
-        //    auto output = map.ComputeOutput<data::DoubleDataVector>("output");
-        //    auto mappedRow = data::DenseSupervisedExample{ output, row.GetMetadata() };
-        //    mappedRow.Print(outputStream);
-        //    outputStream << std::string("\n");
-        //    datasetIterator.Next();
-        //}
 
-        //// write map to output if desired
-        //if(mapSaveArguments.hasOutputStream)
-        //{
-        //    if(verbose) std::cout << "Saving map to file " << mapSaveArguments.outputMapFile << std::endl;
-        //    auto ext = utilities::GetFileExtension(mapSaveArguments.outputMapFile, true);
-        //    if(ext == "")
-        //    {
-        //        ext = "json";
-        //    }
-        //    common::SaveMap(map, mapSaveArguments.outputMapStream, ext);
-        //}
+        auto datasetIterator = dataset.GetExampleReferenceIterator();
+        while (datasetIterator.IsValid())
+        {
+            const auto& example = datasetIterator.Get();
+            auto featureArray = example.GetDataVector().ToArray();
+
+            featureArray.resize(mapInputSize);
+            map.SetInputValue<double>("input", featureArray);
+
+            // TODO: create data vector via Iterator.
+//            auto output = map.ComputeOutput<data::FloatDataVector, double>("output");
+//            auto mappedExample = data::DenseSupervisedExample{ std::make_shared<data::FloatDataVector>(std::move(output)), example.GetMetadata() };
+
+//            mappedExample.Print(outputStream);
+            outputStream << std::string("\n");
+            datasetIterator.Next();
+        }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

@@ -18,10 +18,6 @@
 // stl
 #include <initializer_list>
 
-// TODO
-// replace double* in the Dot and AddTo with math::vectors. Replace old linear vectors with new math vectors everywhere. erase linear.
-// Add "using ExampleType" to predictors and have evaluators create the right kind of dataset 
-
 namespace emll
 {
 namespace data
