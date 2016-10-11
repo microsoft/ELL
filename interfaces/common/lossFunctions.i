@@ -11,14 +11,31 @@
 #include "HingeLoss.h"
 #include "LogLoss.h"
 #include "SquaredLoss.h"
-#include "ELL_HingeLoss.h"
-#include "ELL_LogLoss.h"
-#include "ELL_SquaredLoss.h"
 %}
 
-// %include "HingeLoss.h"
-// %include "LogLoss.h"
-// %include "SquaredLoss.h"
-%include "ELL_HingeLoss.h"
-%include "ELL_LogLoss.h"
-%include "ELL_SquaredLoss.h"
+%inline %{
+
+class ELL_LogLoss {
+public:
+    double Evaluate(double p, double l) { return _loss.Evaluate(p,l); }
+    double GetDerivative(double p, double l) { return _loss.GetDerivative(p, l); }
+private:
+    emll::lossFunctions::LogLoss _loss;
+};
+
+class ELL_HingeLoss {
+public:
+    double Evaluate(double p, double l) { return _loss.Evaluate(p,l); }
+    double GetDerivative(double p, double l) { return _loss.GetDerivative(p, l); }
+private:
+    emll::lossFunctions::HingeLoss _loss;
+};
+
+class ELL_SquaredLoss {
+public:
+    double Evaluate(double p, double l) { return _loss.Evaluate(p,l); }
+    double GetDerivative(double p, double l) { return _loss.GetDerivative(p, l); }
+private:
+    emll::lossFunctions::SquaredLoss _loss;
+};
+%}

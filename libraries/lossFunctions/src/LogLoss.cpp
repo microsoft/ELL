@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LogLoss.h"
-#include "ELL_LogLoss.h"
 
 // stl
 #include <cmath>
@@ -52,16 +51,4 @@ namespace lossFunctions
         }
     }
 }
-}
-
-double ELL_LogLoss::Evaluate(double prediction, double label)
-{
-    emll::lossFunctions::LogLoss X;
-    return X.Evaluate(prediction, label);
-}
-
-double ELL_LogLoss::GetDerivative(double prediction, double label)
-{
-    emll::lossFunctions::LogLoss X;
-    return X.GetDerivative(prediction, label);
 }
