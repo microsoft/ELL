@@ -18,6 +18,13 @@
 
 namespace emll
 {
+    template<typename ExampleType>
+    ExampleType GetExample()
+    {
+        using DataVectorType = ExampleType::DataVectorType;
+        DataVectorType dataVector{ 1,0,1,0,1,0,1 };
+        return ExampleType(std::make_shared<DataVectorType>(std::move(dataVector)), data::WeightLabel{ 1,1 });
+    }
 
     template<typename DataVectorType1, typename DataVectorType2>
     void ToExampleTest(size_t expectedReferenceCount)
@@ -25,8 +32,7 @@ namespace emll
         using ExampleType1 = data::Example<DataVectorType1, data::WeightLabel>;
         using ExampleType2 = data::Example<DataVectorType2, data::WeightLabel>;
 
-        DataVectorType1 dataVector { 1,0,1,0,1,0,1 };
-        auto example1 = ExampleType1(std::make_shared<DataVectorType1>(std::move(dataVector)), data::WeightLabel{ 1,1 });
+        auto example1 = GetExample<ExampleType1>();
         auto example2 = example1.ToExample<ExampleType2>();
         bool isExpected = (example2.GetDataVectorReferenceCount() == expectedReferenceCount);        
 

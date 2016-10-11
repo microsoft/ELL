@@ -8,6 +8,7 @@
 
 #include "DataVector_test.h"
 #include "Example_test.h"
+#include "Dataset_test.h"
 
 // testing
 #include "testing.h"
@@ -22,6 +23,7 @@ int main()
     ToDataVectorTests();
     AutoDataVectorTest();
     ToExampleTests();
+    DatasetCastingTests();
 
     if (testing::DidTestFail())
     {
