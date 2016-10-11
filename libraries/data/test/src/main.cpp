@@ -21,7 +21,7 @@ int main()
     IDataVectorTests();
     ToDataVectorTests();
     AutoDataVectorTest();
-    ToExampleTest();
+    ToExampleTests();
 
     if (testing::DidTestFail())
     {

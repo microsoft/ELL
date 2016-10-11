@@ -72,6 +72,11 @@ namespace data
         /// <returns> The metadata. </returns>
         const MetadataType& GetMetadata() const { return _metadata; }
 
+        /// <summary> Gets the value of the reference counter of the shared pointer that holds the data vector. </summary>
+        ///
+        /// <returns> The data vector reference count. </returns>
+        size_t GetDataVectorReferenceCount() const { return _dataVector.use_count(); }
+
         /// <summary>
         /// Creates a new example that contains the same data as this example, in a specified data vector
         /// type and meta data type. This overload creates a shallow copy of the data vector, because the

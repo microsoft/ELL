@@ -10,5 +10,5 @@
 
 namespace emll
 {
-    void ToExampleTest();
+    void ToExampleTests();
 }
