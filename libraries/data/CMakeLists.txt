@@ -62,8 +62,12 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 PROJECT(${TEST_NAME})
 
-set (TEST_SRC test/src/main.cpp)
-set (TEST_INCLUDE )
+set (TEST_SRC test/src/main.cpp
+              test/src/DataVector_test.cpp
+              test/src/Example_test.cpp)
+
+set (TEST_INCLUDE test/include/DataVector_test.h
+                  test/include/Example_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})

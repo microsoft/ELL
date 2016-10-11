@@ -74,6 +74,7 @@ set (TEST_SRC test/src/main.cpp
               test/src/Map_test.cpp
               test/src/Model_test.cpp
               test/src/PortElements_test.cpp)
+
 set (TEST_INCLUDE test/include/PortElements_test.h
                   test/include/DynamicMap_test.h
                   test/include/Map_test.h
