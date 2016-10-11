@@ -12,6 +12,9 @@
 // testing
 #include "testing.h"
 
+// stl
+#include <sstream>
+
 namespace emll
 {
     template<typename ExampleType>
@@ -35,7 +38,12 @@ namespace emll
         std::string name1 = typeid(ExampleType1).name();
         std::string name2 = typeid(ExampleType2).name();
 
-        testing::ProcessTest(name1 + "::ctor(" + name2 + ")", dataset2.NumExamples() == 3);
+        std::stringstream ss1, ss2;
+        dataset1.Print(ss1);
+        dataset2.Print(ss2);
+        bool isSame = (ss1.str() == ss2.str());
+
+        testing::ProcessTest(name1 + "::ctor(" + name2 + ")", isSame);
     }
 
     template<typename ExampleType>
@@ -52,7 +60,6 @@ namespace emll
         DatasetCastingTest<ExampleType, data::Example<data::SparseByteDataVector, data::WeightLabel>>();
         DatasetCastingTest<ExampleType, data::Example<data::SparseBinaryDataVector, data::WeightLabel>>();
     }
-
 
     void DatasetCastingTests()
     {
