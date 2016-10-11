@@ -18,18 +18,18 @@ import sgd_trainer_test
 import treelayout_test
 
 tests = [   
-            (lossfunctions_test.test, "lossfunctions_test"),
-            (model_test.test, "model_test"),
-            (common_test.test, "common_test"),
-            (sgd_trainer_test.test, "sgd_trainer_test"),
-            (trainers_test.test, "trainers_test"),
-            (predictors_test.test, "predictors_test"),
-            (nodes_test.test, "nodes_test"),
-            (linear_test.test, "linear_test"),
-            (evaluators_test.test, "evaluators_test"),
-            (dataset_test.test, "dataset_test"),
-            (treelayout_test.test, "treelayout_test")
-        ]
+    (lossfunctions_test.test, "lossfunctions_test"),
+    (model_test.test,         "model_test"        ),
+    (common_test.test,        "common_test"       ),
+    (sgd_trainer_test.test,   "sgd_trainer_test"  ),
+    (trainers_test.test,      "trainers_test"     ),
+    (predictors_test.test,    "predictors_test"   ),
+    (nodes_test.test,         "nodes_test"        ),
+    (linear_test.test,        "linear_test"       ),
+    (evaluators_test.test,    "evaluators_test"   ),
+    (dataset_test.test,       "dataset_test"      ),
+    (treelayout_test.test,    "treelayout_test"   )
+    ]
 
 def interface_test():
     rc = 0
@@ -43,7 +43,7 @@ def interface_test():
             rc |= ans
         except Exception, e:
             print name, "failed"
-            print e
+            print "exception:", e
             rc = 1
     sys.exit(rc)
 
