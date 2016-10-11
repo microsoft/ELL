@@ -18,6 +18,8 @@ namespace data
     template<typename ExampleType>
     struct IExampleIterator
     {
+        virtual ~IExampleIterator() = default;
+
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if the iterator is currently pointing to a valid iterate. </returns>

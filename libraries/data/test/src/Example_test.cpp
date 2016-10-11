@@ -135,6 +135,5 @@ namespace emll
         ToExampleTest<data::SparseBinaryDataVector, data::SparseShortDataVector>(1);
         ToExampleTest<data::SparseBinaryDataVector, data::SparseByteDataVector>(1);
         ToExampleTest<data::SparseBinaryDataVector, data::SparseBinaryDataVector>(2);
-
     }
 }

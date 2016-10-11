@@ -31,6 +31,8 @@ namespace data
         /// <summary> Values that represent data vector types. </summary>
         enum class Type { DoubleDataVector, FloatDataVector, ShortDataVector, ByteDataVector, SparseDoubleDataVector, SparseFloatDataVector, SparseShortDataVector, SparseByteDataVector, SparseBinaryDataVector, AutoDataVector };
 
+        virtual ~IDataVector() = default;
+
         /// <summary> Gets the data vector type. </summary>
         ///
         /// <returns> The data vector type. </returns>

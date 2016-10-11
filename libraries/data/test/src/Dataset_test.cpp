@@ -7,8 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Dataset_test.h"
-
 #include "Dataset.h"
+
+// testing
+#include "testing.h"
 
 namespace emll
 {
@@ -20,23 +22,41 @@ namespace emll
         return ExampleType(std::make_shared<DataVectorType>(std::move(dataVector)), data::WeightLabel{ 1,1 });
     }
 
-    template<typename DataVectorType1, typename DataVectorType2>
+    template<typename ExampleType1, typename ExampleType2>
     void DatasetCastingTest()
     {
-        using ExampleType1 = data::Example<DataVectorType1, data::WeightLabel>;
-        using ExampleType2 = data::Example<DataVectorType2, data::WeightLabel>;
-        
         data::Dataset<ExampleType1> dataset1;
         dataset1.AddExample(GetExample<ExampleType1>());
         dataset1.AddExample(GetExample<ExampleType1>());
         dataset1.AddExample(GetExample<ExampleType1>());
 
-//        data::Dataset<ExampleType2> dataset2(dataset1.GetExampleIterator<ExampleType2>());
+        data::Dataset<ExampleType2> dataset2(dataset1.GetAnyDataset());
+
+        std::string name1 = typeid(ExampleType1).name();
+        std::string name2 = typeid(ExampleType2).name();
+
+        testing::ProcessTest(name1 + "::ctor(" + name2 + ")", dataset2.NumExamples() == 3);
     }
+
+    template<typename ExampleType>
+    void DatasetCastingTestDispatch()
+    {
+        DatasetCastingTest<ExampleType, data::Example<data::AutoDataVector, data::WeightLabel>>();
+        DatasetCastingTest<ExampleType, data::Example<data::DoubleDataVector, data::WeightLabel>>();
+        DatasetCastingTest<ExampleType, data::Example<data::FloatDataVector, data::WeightLabel>>();
+        DatasetCastingTest<ExampleType, data::Example<data::ShortDataVector, data::WeightLabel>>();
+        DatasetCastingTest<ExampleType, data::Example<data::ByteDataVector, data::WeightLabel>>();
+        DatasetCastingTest<ExampleType, data::Example<data::SparseDoubleDataVector, data::WeightLabel>>();
+        DatasetCastingTest<ExampleType, data::Example<data::SparseFloatDataVector, data::WeightLabel>>();
+        DatasetCastingTest<ExampleType, data::Example<data::SparseShortDataVector, data::WeightLabel>>();
+        DatasetCastingTest<ExampleType, data::Example<data::SparseByteDataVector, data::WeightLabel>>();
+        DatasetCastingTest<ExampleType, data::Example<data::SparseBinaryDataVector, data::WeightLabel>>();
+    }
+
 
     void DatasetCastingTests()
     {
-        DatasetCastingTest<data::DoubleDataVector, data::DoubleDataVector>();
-        DatasetCastingTest<data::DoubleDataVector, data::FloatDataVector>();
+        DatasetCastingTestDispatch<data::AutoSupervisedExample>();
+        DatasetCastingTestDispatch<data::DenseSupervisedExample>();
     }
 }
