@@ -94,9 +94,9 @@ namespace model
     {
         // gather output nodes
         std::unordered_set<const Node*> outputNodes;
-        for(const auto& output: GetOutputs())
+        for (const auto& output : GetOutputs())
         {
-            for(const auto& range: output.GetRanges())
+            for (const auto& range : output.GetRanges())
             {
                 outputNodes.insert(range.ReferencedPort()->GetNode());
             }
