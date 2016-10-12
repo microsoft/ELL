@@ -82,7 +82,7 @@ namespace data
             }
         }
 
-        _currentIndexValue = linear::IndexValue{ index, value };
+        _currentIndexValue = IndexValue{ index, value };
     }
 
     SparseEntryParser::Iterator::Iterator(std::shared_ptr<const std::string> spExampleString, const char* pStr)

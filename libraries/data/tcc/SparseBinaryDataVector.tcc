@@ -21,7 +21,7 @@ namespace data
     }
 
     template <typename IntegerListType>
-    template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
     SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
@@ -33,7 +33,7 @@ namespace data
     }
 
     template<typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<linear::IndexValue> list)
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<IndexValue> list)
     {
         auto current = list.begin();
         auto end = list.end();

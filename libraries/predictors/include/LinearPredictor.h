@@ -10,9 +10,6 @@
 
 #include "IPredictor.h"
 
-// linear
-#include "DoubleVector.h"
-
 // math
 #include "Vector.h"
 

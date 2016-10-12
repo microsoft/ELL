@@ -10,9 +10,6 @@
 
 #include "DataVector.h"
 
-// linear
-#include "IVector.h"
-
 // utilities
 #include "StlIndexValueIterator.h"
 
@@ -36,7 +33,7 @@ namespace data
     class DenseDataVector : public DataVectorBase<DenseDataVector<ElementType>>
     {
     public:
-        using Iterator = linear::VectorIndexValueIterator<ElementType>; 
+        using Iterator = VectorIndexValueIterator<ElementType>; 
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
@@ -49,13 +46,13 @@ namespace data
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
         /// <param name="list"> The initializer list. </param>
-        DenseDataVector(std::initializer_list<linear::IndexValue> list);
+        DenseDataVector(std::initializer_list<IndexValue> list);
 
         /// <summary> Constructs a data vector from an initializer list of values. </summary>
         ///

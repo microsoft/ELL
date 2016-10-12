@@ -8,7 +8,6 @@
 
 #pragma once
 
-// linear
 #include "IndexValue.h"
 
 // stl
@@ -44,7 +43,7 @@ namespace data
         /// <summary> Returns The current index-value pair </summary>
         ///
         /// <returns> The current index-value pair </returns>
-        linear::IndexValue Get() const { return linear::IndexValue{ _index, (double)*_begin }; }
+        IndexValue Get() const { return IndexValue{ _index, (double)*_begin }; }
 
     protected:
         IteratorType _begin;

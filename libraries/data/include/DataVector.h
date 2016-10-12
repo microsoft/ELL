@@ -8,7 +8,6 @@
 
 #pragma once
 
-// linear
 #include "IndexValue.h"
 
 // math

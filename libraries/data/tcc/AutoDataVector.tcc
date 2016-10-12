@@ -24,7 +24,7 @@ namespace data
     }
 
     template<typename DefaultDataVectorType>
-    template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
     AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
         DefaultDataVectorType defaultDataVector(indexValueIterator);
@@ -32,7 +32,7 @@ namespace data
     }
 
     template<typename DefaultDataVectorType>
-    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(std::initializer_list<linear::IndexValue> list)
+    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(std::initializer_list<IndexValue> list)
     {
         DefaultDataVectorType defaultDataVector(list);
         FindBestRepresentation(std::move(defaultDataVector));

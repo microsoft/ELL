@@ -8,7 +8,6 @@
 
 #pragma once
 
-// linear
 #include "IndexValue.h"
 
 // stl
@@ -24,7 +23,7 @@ namespace data
     class SparseEntryParser
     {
     public:
-        class Iterator : public linear::IIndexValueIterator
+        class Iterator : public IIndexValueIterator
         {
         public:
             Iterator(Iterator&) = default;
@@ -42,12 +41,12 @@ namespace data
             /// <summary> Returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const { return _currentIndexValue; }
+            IndexValue Get() const { return _currentIndexValue; }
 
         private:
             std::shared_ptr<const std::string> _spExampleString; // hold on to the shared ptr to make sure that std::string is not deleted
             const char* _currentPos = 0;
-            linear::IndexValue _currentIndexValue;
+            IndexValue _currentIndexValue;
             bool _isValid = true;
 
             // Private constructor that can only be called from SparseEntryParser

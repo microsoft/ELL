@@ -26,7 +26,7 @@ namespace data
     }
 
     template <typename ElementType, typename IntegerListType>
-    template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
     SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
@@ -38,7 +38,7 @@ namespace data
     }
 
     template <typename ElementType, typename IntegerListType>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<linear::IndexValue> list)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<IndexValue> list)
     {
         auto current = list.begin();
         auto end = list.end();

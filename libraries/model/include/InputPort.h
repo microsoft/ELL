@@ -16,7 +16,7 @@
 #include "Exception.h"
 #include "IArchivable.h"
 
-// linear
+// data
 #include "IndexValue.h"
 
 // stl
@@ -89,7 +89,7 @@ namespace model
     {
     public:
         /// <summary> A read-only forward iterator for values of an input port. </summary>
-        class Iterator : public linear::IIndexValueIterator
+        class Iterator : public data::IIndexValueIterator
         {
         public:
             Iterator(const Iterator&) = default;
@@ -107,7 +107,7 @@ namespace model
             /// <summary> Returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const { return linear::IndexValue{ 0, 1.0 }; } // TODO replace with actual implementation
+            data::IndexValue Get() const { return data::IndexValue{ 0, 1.0 }; } // TODO replace with actual implementation
 
         private:
             friend InputPort<ValueType>;

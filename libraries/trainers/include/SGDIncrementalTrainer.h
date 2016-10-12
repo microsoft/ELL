@@ -14,9 +14,6 @@
 // predictors
 #include "LinearPredictor.h"
 
-// linear
-#include "DoubleVector.h"
-
 // data
 #include "Example.h"
 #include "Dataset.h"

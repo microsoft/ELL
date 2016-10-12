@@ -14,7 +14,7 @@
 
 namespace emll
 {
-namespace linear
+namespace data
 {
     /// <summary> An entry in a vector </summary>
     struct IndexValue

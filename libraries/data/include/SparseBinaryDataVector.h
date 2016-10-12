@@ -9,13 +9,11 @@
 #pragma once
 
 #include "DataVector.h"
+#include "IndexValue.h"
 
 // utilities
 #include "CompressedIntegerList.h"
 #include "IntegerList.h"
-
-// linear
-#include "IndexValue.h"
 
 // stl
 #include <cstdint>
@@ -37,7 +35,7 @@ namespace data
     {
     public:
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
-        class Iterator : public linear::IIndexValueIterator
+        class Iterator : public IIndexValueIterator
         {
         public:
             Iterator(const Iterator&) = default;
@@ -55,7 +53,7 @@ namespace data
             /// <summary> Returns The current value. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const { return linear::IndexValue{ _list_iterator.Get(), 1.0 }; }
+            IndexValue Get() const { return IndexValue{ _list_iterator.Get(), 1.0 }; }
 
         private:
             /// <summary> define typename to improve readability. </summary>
@@ -81,13 +79,13 @@ namespace data
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
         /// <param name="list"> The initializer list. </param>
-        SparseBinaryDataVectorBase(std::initializer_list<linear::IndexValue> list);
+        SparseBinaryDataVectorBase(std::initializer_list<IndexValue> list);
 
         /// <summary> Constructs a data vector from an initializer list of values. </summary>
         ///
