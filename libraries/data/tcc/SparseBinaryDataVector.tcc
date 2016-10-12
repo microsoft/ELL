@@ -85,14 +85,14 @@ namespace data
     }
 
     template <typename IntegerListType>
-    double SparseBinaryDataVectorBase<IntegerListType>::Dot(const double* p_other) const
+    double SparseBinaryDataVectorBase<IntegerListType>::Dot(const math::UnorientedConstVectorReference<double>& vector) const
     {
         double value = 0.0;
 
         auto iter = _indices.GetIterator();
         while (iter.IsValid())
         {
-            value += (double)p_other[iter.Get()];
+            value += vector[iter.Get()];
             iter.Next();
         }
 

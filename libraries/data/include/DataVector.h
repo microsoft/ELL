@@ -11,6 +11,9 @@
 // linear
 #include "IndexValue.h"
 
+// math
+#include "Vector.h"
+
 // stl
 #include <cstdint>
 #include <functional>
@@ -60,10 +63,10 @@ namespace data
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
-        /// <param name="p_other"> The other vector. </param>
+        /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        virtual double Dot(const double* p_other) const = 0;
+        virtual double Dot(const math::UnorientedConstVectorReference<double>& vector) const = 0;
 
         /// <summary>
         /// Performs the operation: (*p_other) += scalar * (*this), where other is an array of doubles.
@@ -113,10 +116,10 @@ namespace data
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
-        /// <param name="p_other"> The other vector. </param>
+        /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        virtual double Dot(const double* p_other) const override;
+        virtual double Dot(const math::UnorientedConstVectorReference<double>& vector) const override;
 
         /// <summary>
         /// Performs the operation: (*p_other) += scalar * (*this), where other is an array of doubles.

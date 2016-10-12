@@ -53,7 +53,7 @@ namespace trainers
 
         // calulate the contribution of the old lastPredictor to the new avergedPredictor
         const double historyWeight = sigma - std::log(T_prev) - 0.5 / T_prev;
-        vLast.AddTo(vAvg, historyWeight);
+        // vLast.AddTo(vAvg, historyWeight); // TODO call Operation
         bAvg += bLast * historyWeight;
         while (exampleIterator.IsValid())
         {
@@ -74,11 +74,11 @@ namespace trainers
 
             // Update vLast and vAvg
             double lastCoeff = -eta * beta;
-            dataVector.AddTo(vLast.GetDataPointer(), lastCoeff);
+            // TODO Operation dataVector.AddTo(vLast.GetDataPointer(), lastCoeff);
             bLast += lastCoeff;
 
             double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
-            dataVector.AddTo(vAvg.GetDataPointer(), avgCoeff);
+            // TODO Operation dataVector.AddTo(vAvg.GetDataPointer(), avgCoeff);
             bAvg += avgCoeff;
 
             exampleIterator.Next();
@@ -88,9 +88,9 @@ namespace trainers
 
         // calculate w and w_avg
         double scale = T_prev / T_next;
-        vLast.Scale(scale);
+        // vLast.Scale(scale); // TODO
         bLast *= scale;
-        vAvg.Scale(scale);
+        // vAvg.Scale(scale); // TODO -> Operation
         bAvg *= scale;
     }
 

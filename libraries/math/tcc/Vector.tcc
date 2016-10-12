@@ -20,11 +20,11 @@ namespace emll
 namespace math
 {
     //
-    // ConstVectorReference
+    // UnorientedConstVectorReference
     //  
 
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType ConstVectorReference<ElementType, Orientation>::operator[] (size_t index) const
+    template<typename ElementType>
+    ElementType UnorientedConstVectorReference<ElementType>::operator[] (size_t index) const
     {
         if (index >= _size)
         {
@@ -32,6 +32,29 @@ namespace math
         }
         return _pData[index * _increment ];
     }
+
+    template<typename ElementType>
+    UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference(ElementType * pData, size_t size, size_t increment) : _pData(pData), _size(size), _increment(increment)
+    {}
+
+    template<typename ElementType>
+    template<typename MapperType>
+    ElementType UnorientedConstVectorReference<ElementType>::Aggregate(MapperType mapper) const
+    {
+        ElementType result = 0;
+        const ElementType* current = _pData;
+        const ElementType* end = _pData + _size * _increment;
+        while (current < end)
+        {
+            result += mapper(*current);
+            current += _increment;
+        }
+        return result;
+    }
+
+    //
+    // ConstVectorReference
+    //  
 
     template<typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetReference() const
@@ -85,25 +108,6 @@ namespace math
         return !(*this == other);
     }
     
-    template<typename ElementType, VectorOrientation Orientation>
-    ConstVectorReference<ElementType, Orientation>::ConstVectorReference(ElementType * pData, size_t size, size_t increment) : _pData(pData), _size(size), _increment(increment)
-    {}
-
-    template<typename ElementType, VectorOrientation Orientation>
-    template<typename MapperType>
-    ElementType ConstVectorReference<ElementType, Orientation>::Aggregate(MapperType mapper) const
-    {
-        ElementType result = 0;
-        const ElementType* current = _pData;
-        const ElementType* end = _pData + _size * _increment;
-        while (current < end)
-        {
-            result += mapper(*current);
-            current += _increment;
-        }
-        return result;
-    }
-
     //
     // VectorReference
     //

@@ -16,7 +16,7 @@ namespace emll
 namespace predictors
 {
     LinearPredictor::LinearPredictor()
-        : _b(0)
+        : _w(0), _b(0)
     {
     }
 
@@ -33,7 +33,7 @@ namespace predictors
 
     double LinearPredictor::Predict(const DataVectorType& dataVector) const
     {
-        return dataVector.Dot(_w.GetDataPointer()) + _b;
+        return dataVector.Dot(_w) + _b;
     }
 
     std::vector<double> LinearPredictor::GetWeightedElements(const DataVectorType& dataVector) const
@@ -49,13 +49,13 @@ namespace predictors
 
     void LinearPredictor::Scale(double scalar)
     {
-        _w.Scale(scalar);
+        // _w.Scale(scalar); // TODO call Operation
         _b *= scalar;
     }
 
     void LinearPredictor::WriteToArchive(utilities::Archiver& archiver) const
     {
-        archiver["w"] << static_cast<std::vector<double>>(_w);
+        // archiver["w"] << static_cast<std::vector<double>>(_w); TODO Vector serialization
         archiver["b"] << _b;
     }
 
@@ -63,7 +63,7 @@ namespace predictors
     {
         std::vector<double> w;
         archiver["w"] >> w;
-        _w = w;
+        // _w = w; TODO Serialization
         archiver["b"] >> _b;
     }
 }

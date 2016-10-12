@@ -52,9 +52,9 @@ namespace data
     }
 
     template<typename DefaultDataVectorType>
-    double AutoDataVectorBase<DefaultDataVectorType>::Dot(const double * p_other) const
+    double AutoDataVectorBase<DefaultDataVectorType>::Dot(const math::UnorientedConstVectorReference<double>& vector) const
     {
-        return _pInternal->Dot(p_other);
+        return _pInternal->Dot(vector);
     }
 
     template<typename DefaultDataVectorType>

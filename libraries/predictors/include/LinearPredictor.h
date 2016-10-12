@@ -13,6 +13,9 @@
 // linear
 #include "DoubleVector.h"
 
+// math
+#include "Vector.h"
+
 // datasets
 #include "AutoDataVector.h"
 
@@ -45,12 +48,12 @@ namespace predictors
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        linear::DoubleVector& GetWeights() { return _w; }
+        math::ColumnVector<double>& GetWeights() { return _w; }
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        const linear::DoubleVector& GetWeights() const { return _w; }
+        const math::ColumnVector<double>& GetWeights() const { return _w; } // TODO return ConstVectorReference?
 
         /// <summary> Returns the underlying bias. </summary>
         ///
@@ -110,7 +113,7 @@ namespace predictors
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        linear::DoubleVector _w;
+        math::ColumnVector<double> _w;
         double _b;
     };
 }

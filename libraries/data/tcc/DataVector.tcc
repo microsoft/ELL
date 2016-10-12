@@ -66,7 +66,7 @@ namespace data
     }
 
     template<class DerivedType>
-    double DataVectorBase<DerivedType>::Dot(const double * p_other) const
+    double DataVectorBase<DerivedType>::Dot(const math::UnorientedConstVectorReference<double>& vector) const
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
 
@@ -74,7 +74,7 @@ namespace data
         while(constIter.IsValid())
         {
             auto indexValue = constIter.Get();
-            result += indexValue.value * p_other[indexValue.index];
+            result += indexValue.value * vector[indexValue.index];
             constIter.Next();
         }
         return result;

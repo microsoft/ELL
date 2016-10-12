@@ -125,7 +125,7 @@ namespace data
         /// <param name="p_other"> The other. </param>
         ///
         /// <returns> A double. </returns>
-        virtual double Dot(const double* p_other) const override;
+        virtual double Dot(const math::UnorientedConstVectorReference<double>& vector) const override;
 
         /// <summary> Performs (*p_other) += scalar * (*this), where other a dense vector. </summary>
         ///

@@ -44,12 +44,8 @@ namespace math
         static constexpr VectorOrientation transposeOrientation = VectorOrientation::row;
     };
 
-    /// <summary> A reference to a constant algebraic vector. </summary>
-    ///
-    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
-    /// <typeparam name="Orientation"> The orientation. </typeparam>
-    template <typename ElementType, VectorOrientation Orientation>
-    class ConstVectorReference : public VectorBase<Orientation>
+    template<typename ElementType>
+    class UnorientedConstVectorReference
     {
     public:
         /// <summary> Gets a const pointer to the underlying data storage. </summary>
@@ -74,6 +70,31 @@ namespace math
         /// <returns> The vector size. </returns>
         size_t Size() const { return _size; }
 
+        /// <summary> Applies a map to each vector element and sums the result. </summary>
+        ///
+        /// <typeparam name="MapperType"> A functor type of the mapper. </typeparam>
+        /// <param name="mapper"> The mapper. </param>
+        ///
+        /// <returns> The result of the operation. </returns>
+        template<typename MapperType>
+        ElementType Aggregate(MapperType mapper) const;
+
+    protected:
+        UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
+
+        ElementType* _pData;
+        size_t _size;
+        size_t _increment;
+    };
+
+    /// <summary> A reference to a constant algebraic vector. </summary>
+    ///
+    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="Orientation"> The orientation. </typeparam>
+    template <typename ElementType, VectorOrientation Orientation>
+    class ConstVectorReference : public VectorBase<Orientation>, public UnorientedConstVectorReference<ElementType>
+    {
+    public:
         /// <summary> Gets a reference to this vector. </summary>
         ///
         /// <returns> A constant reference to this vector. </returns>
@@ -111,26 +132,13 @@ namespace math
         /// <returns> true if the vectors are not considered equivalent. </returns>
         bool operator!=(const ConstVectorReference<ElementType, Orientation>& other) const;
 
-        /// <summary> Applies a map to each vector element and sums the result. </summary>
-        ///
-        /// <typeparam name="MapperType"> A functor type of the mapper. </typeparam>
-        /// <param name="mapper"> The mapper. </param>
-        ///
-        /// <returns> The result of the operation. </returns>
-        template<typename MapperType>
-        ElementType Aggregate(MapperType mapper) const;
-
     protected:
-        ConstVectorReference(ElementType* pData, size_t size, size_t increment);
+        using UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference;
 
         template<typename T>
         friend class RectangularMatrixBase;
         
         friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
-
-        ElementType* _pData;
-        size_t _size;
-        size_t _increment;
     };
 
     /// <summary> A reference to a non-constant algebraic vector. </summary>
