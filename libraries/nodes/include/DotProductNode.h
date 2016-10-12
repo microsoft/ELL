@@ -73,12 +73,12 @@ namespace nodes
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
-        virtual bool Refine(model::ModelTransformer& transformer) const override;
+        // virtual bool Refine(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
 
-    private:
+    // private:
         // Inputs
         model::InputPort<ValueType> _input1;
         model::InputPort<ValueType> _input2;
