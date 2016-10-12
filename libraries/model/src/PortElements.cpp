@@ -20,6 +20,44 @@ namespace emll
 namespace model
 {
     //
+    // PortElementBase::Iterator
+    //
+    void PortElementsBase::Iterator::Next()
+    {
+        if (_ranges.size() == 0)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
+        }
+
+        if (_ranges[0].Size() == 1)
+        {
+            _ranges.erase(_ranges.begin());
+        }
+        else
+        {
+            auto oldRange = _ranges[0];
+            _ranges[0] = { *oldRange.ReferencedPort(), oldRange.GetStartIndex() + 1, oldRange.Size() - 1 };
+        }
+
+        ++_index;
+    }
+
+    linear::IndexValue PortElementsBase::Iterator::Get()
+    {
+        if(!IsValid())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
+        }
+
+        return { _index, _ranges[0].ReferencedPort()->GetDoubleOutput(_ranges[0].GetStartIndex()) };
+    }
+
+    PortElementsBase::Iterator::Iterator(const std::vector<PortRange>& ranges)
+        : _ranges(ranges.begin(), ranges.end())
+    {
+    }
+
+    //
     // PortElementBase
     //
     PortElementBase::PortElementBase(const OutputPortBase& port, size_t index)
@@ -32,7 +70,6 @@ namespace model
             AddRange(range);
         }
     }
-
 
     bool PortElementBase::operator==(const PortElementBase& other) const { return (_referencedPort == other._referencedPort) && (_index == other._index); }
 
@@ -122,15 +159,15 @@ namespace model
     {
         return (ReferencedPort() == other.ReferencedPort()) && (GetStartIndex() + Size() == other.GetStartIndex());
     }
-    
+
     void PortRange::Append(const PortRange& other)
     {
-        if(IsAdjacent(other) && _isFixedSize)
+        if (IsAdjacent(other) && _isFixedSize)
         {
             _numValues += other.Size();
         }
     }
-    
+
     bool PortRange::operator==(const PortRange& other) const
     {
         return (_referencedPort == other._referencedPort) && (_startIndex == other._startIndex) && (_numValues == other._numValues);
@@ -202,18 +239,18 @@ namespace model
 
     void PortElementsBase::Consolidate()
     {
-        if(_ranges.size() > 1)
+        if (_ranges.size() > 1)
         {
             auto oldSize = Size();
-            
+
             // For each range, check if it's adjacent to the next one. If so, combine them
             std::vector<PortRange> newRanges;
             newRanges.push_back(_ranges[0]);
             auto numRanges = _ranges.size();
-            for(size_t index = 1; index < numRanges; ++index)
+            for (size_t index = 1; index < numRanges; ++index)
             {
                 const auto r = _ranges[index];
-                if(newRanges.back().IsAdjacent(r))
+                if (newRanges.back().IsAdjacent(r))
                 {
                     newRanges.back().Append(r);
                 }
@@ -223,12 +260,12 @@ namespace model
                 }
             }
             _ranges = newRanges;
-            
+
             ComputeSize();
             assert(oldSize == Size());
         }
     }
-    
+
     void PortElementsBase::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["ranges"] << _ranges;
