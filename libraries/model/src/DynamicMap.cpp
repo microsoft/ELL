@@ -149,11 +149,9 @@ namespace model
                 outputNodes.insert(range.ReferencedPort()->GetNode());
             }
         }
-		std::cout << "# output nodes: " << outputNodes.size() << std::endl;
+
  		std::vector<const Node*> outputNodeVec(outputNodes.begin(), outputNodes.end());
 		auto minimalModel = transformer.CopyModel(_model, outputNodeVec, context);
-		std::cout << "Original model size: " << _model.Size() << std::endl;
-		std::cout << "Minimal model size: " << minimalModel.Size() << std::endl;
 		auto refinedModel = transformer.RefineModel(minimalModel, context);
 
         for (auto& inputNode : _inputNodes)
