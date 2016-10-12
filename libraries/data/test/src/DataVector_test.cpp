@@ -92,7 +92,7 @@ namespace emll
     void ToDataVectorTest(std::initializer_list<double> list)
     {
         const DataVectorType1 v(list);
-        auto u = v.Duplicate<DataVectorType2>();
+        auto u = v.template Duplicate<DataVectorType2>();
         auto w = v.ToArray();
         auto z = u.ToArray();
 

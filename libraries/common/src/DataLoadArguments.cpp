@@ -16,6 +16,7 @@
 // stl
 #include <string>
 #include <vector>
+#include <algorithm>
 
 namespace emll
 {

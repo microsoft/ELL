@@ -8,7 +8,6 @@
 
 // stl
 #include <cassert>
-#include "..\include\SparseBinaryDataVector.h"
 
 namespace emll
 {

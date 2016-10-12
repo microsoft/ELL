@@ -21,7 +21,7 @@ namespace data
     TargetExampleType Example<DataVectorType, MetadataType>::ToExample() const
     {
         // shallow copy of data vector
-        return TargetExampleType(_dataVector, TargetExampleType::MetadataType(_metadata));
+        return TargetExampleType(_dataVector, typename TargetExampleType::MetadataType(_metadata));
     }
 
     template<typename DataVectorType, typename MetadataType>
@@ -29,7 +29,9 @@ namespace data
     TargetExampleType Example<DataVectorType, MetadataType>::ToExample() const
     {
         // deep copy of data vector
-        return TargetExampleType(std::make_shared<TargetExampleType::DataVectorType>(_dataVector->Duplicate<TargetExampleType::DataVectorType>()), TargetExampleType::MetadataType(_metadata));
+        using DataType = typename TargetExampleType::DataVectorType;
+        using MetadataType = typename TargetExampleType::MetadataType;
+        return TargetExampleType(std::make_shared<DataType>(_dataVector->template Duplicate<DataType>()), MetadataType(_metadata));
     }
 
     template <typename DataVectorType, typename MetadataType>

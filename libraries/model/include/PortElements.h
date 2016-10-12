@@ -361,12 +361,12 @@ namespace model
         ///
         /// <returns> The port this element refers to </returns>
         const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(this->PortElementBase::ReferencedPort()); }
- 
+
         /// <summary> Appends a set of elements to this set of elements. </summary>
         ///
         /// <param name="other"> The PortElements to append to this one. </param>
         void Append(const PortElements<ValueType>& other);
- 
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
