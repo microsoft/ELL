@@ -155,8 +155,6 @@ namespace model
 		std::cout << "Original model size: " << _model.Size() << std::endl;
 		std::cout << "Minimal model size: " << minimalModel.Size() << std::endl;
 		auto refinedModel = transformer.RefineModel(minimalModel, context);
-		_model = refinedModel;
-
 
         for (auto& inputNode : _inputNodes)
         {
@@ -184,6 +182,7 @@ namespace model
             outputElements.second = refinedOutput;
         }
 
+		_model = refinedModel;
         return transformer;
     }
 
