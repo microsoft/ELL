@@ -58,9 +58,9 @@ namespace data
     }
 
     template<typename DefaultDataVectorType>
-    void AutoDataVectorBase<DefaultDataVectorType>::AddTo(double * p_other, double scalar) const
+    void AutoDataVectorBase<DefaultDataVectorType>::AddTo(math::RowVectorReference<double>& vector, double scalar) const
     {
-        _pInternal->AddTo(p_other, scalar);
+        _pInternal->AddTo(vector, scalar);
     }
 
     template<typename DefaultDataVectorType>

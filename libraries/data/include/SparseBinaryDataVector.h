@@ -127,11 +127,11 @@ namespace data
         /// <returns> A double. </returns>
         virtual double Dot(const math::UnorientedConstVectorReference<double>& vector) const override;
 
-        /// <summary> Performs (*p_other) += scalar * (*this), where other a dense vector. </summary>
+        /// <summary> Performs vector += scalar * (*this), where other a dense vector. </summary>
         ///
-        /// <param name="p_other"> [in,out] If non-null, the other. </param>
+        /// <param name="vector"> [in,out] The vector that this DataVector is added to. </param>
         /// <param name="scalar">  The scalar. </param>
-        virtual void AddTo(double* p_other, double scalar = 1.0) const override;
+        virtual void AddTo(math::RowVectorReference<double>& vector, double scalar = 1.0) const override;
 
     private:
         IntegerListType _indices;

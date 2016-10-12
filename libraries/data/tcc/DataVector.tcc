@@ -81,14 +81,14 @@ namespace data
     }
 
     template<class DerivedType>
-    void DataVectorBase<DerivedType>::AddTo(double * p_other, double scalar) const
+    void DataVectorBase<DerivedType>::AddTo(math::RowVectorReference<double>& vector, double scalar) const
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
 
         while(constIter.IsValid())
         {
             auto indexValue = constIter.Get();
-            p_other[indexValue.index] += scalar * indexValue.value;
+            vector[indexValue.index] += scalar * indexValue.value;
             constIter.Next();
         }
     }

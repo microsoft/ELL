@@ -100,12 +100,12 @@ namespace data
     }
 
     template <typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::AddTo(double* p_other, double scalar) const
+    void SparseBinaryDataVectorBase<IntegerListType>::AddTo(math::RowVectorReference<double>& vector, double scalar) const
     {
         auto iter = _indices.GetIterator();
         while (iter.IsValid())
         {
-            p_other[iter.Get()] += scalar;
+            vector[iter.Get()] += scalar;
             iter.Next();
         }
     }

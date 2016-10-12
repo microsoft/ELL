@@ -44,6 +44,9 @@ namespace math
         static constexpr VectorOrientation transposeOrientation = VectorOrientation::row;
     };
 
+    /// <summary> Represents a constant reference to a vector, without a specified row or column orientation. </summary>
+    ///
+    /// <typeparam name="ElementType"> ElementType. </typeparam>
     template<typename ElementType>
     class UnorientedConstVectorReference
     {
@@ -247,12 +250,23 @@ namespace math
     //
     // friendly names
     //
-
     template<typename ElementType>
     using ColumnVector = Vector<ElementType, VectorOrientation::column>;
 
     template<typename ElementType>
     using RowVector = Vector<ElementType, VectorOrientation::row>;
+
+    template<typename ElementType>
+    using ColumnVectorReference = VectorReference<ElementType, VectorOrientation::column>;
+
+    template<typename ElementType>
+    using RowVectorReference = VectorReference<ElementType, VectorOrientation::row>;
+
+    template<typename ElementType>
+    using ColumnConstVectorReference = ConstVectorReference<ElementType, VectorOrientation::column>;
+
+    template<typename ElementType>
+    using RowConstVectorReference = ConstVectorReference<ElementType, VectorOrientation::row>;
 }
 }
 #include "../tcc/Vector.tcc"

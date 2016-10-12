@@ -27,7 +27,7 @@ namespace math
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
         /// <returns> The 0-norm. </returns>
         template<typename ElementType, VectorOrientation Orientation>
-        static ElementType Norm0(const ConstVectorReference<ElementType, Orientation>& v);
+        static ElementType Norm0(const ConstVectorReference<ElementType, Orientation>& v); // TODO change to Unoriented
 
         /// <summary> Adds a scalar to a vector, v += s. </summary>
         ///
@@ -128,7 +128,7 @@ namespace math
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
         /// <returns> The 1-norm. </returns>
         template<typename ElementType, VectorOrientation Orientation>
-        static ElementType Norm1(const ConstVectorReference<ElementType, Orientation>& v);
+        static ElementType Norm1(const ConstVectorReference<ElementType, Orientation>& v);  // TODO change to Unoriented
 
         /// <summary> Computes the 2-norm of a vector (not the squared 2-norm). </summary>
         ///
@@ -136,7 +136,7 @@ namespace math
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
         /// <returns> The 2-norm. </returns>
         template<typename ElementType, VectorOrientation Orientation>
-        static ElementType Norm2(const ConstVectorReference<ElementType, Orientation>& v);
+        static ElementType Norm2(const ConstVectorReference<ElementType, Orientation>& v); // TODO change to Unoriented
 
         /// <summary> Adds a scaled vector to another vector, u += s * v. </summary>
         ///
@@ -160,7 +160,7 @@ namespace math
         ///
         /// <returns> The dot Multiply. </returns>
         template<typename ElementType, VectorOrientation OrientationV, VectorOrientation OrientationU>
-        static ElementType Dot(const ConstVectorReference<ElementType, OrientationV>& u, const ConstVectorReference<ElementType, OrientationU>& v);
+        static ElementType Dot(const ConstVectorReference<ElementType, OrientationV>& u, const ConstVectorReference<ElementType, OrientationU>& v); // TODO change to Unoriented
 
         /// <summary> Multiplies a vector by a scalar, v *= s. </summary>
         ///
@@ -224,7 +224,7 @@ namespace math
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
         /// <returns> The 1-norm. </returns>
         template<typename ElementType, VectorOrientation Orientation>
-        static ElementType Norm1(const ConstVectorReference<ElementType, Orientation>& v);
+        static ElementType Norm1(const ConstVectorReference<ElementType, Orientation>& v); // TODO change to Unoriented
 
         /// <summary> Computes the 2-norm of a vector (not the squared 2-norm). </summary>
         ///
@@ -232,7 +232,7 @@ namespace math
         /// <typeparam name="Orientation"> Vector orientation. </typeparam>
         /// <returns> The 2-norm. </returns>
         template<typename ElementType, VectorOrientation Orientation>
-        static ElementType Norm2(const ConstVectorReference<ElementType, Orientation>& v);
+        static ElementType Norm2(const ConstVectorReference<ElementType, Orientation>& v); // TODO change to Unoriented
 
         /// <summary> Adds a scaled vector to another vector, u += s * v. </summary>
         ///
@@ -256,7 +256,7 @@ namespace math
         ///
         /// <returns> The dot Multiply. </returns>
         template<typename ElementType, VectorOrientation OrientationV, VectorOrientation OrientationU>
-        static ElementType Dot(const ConstVectorReference<ElementType, OrientationV>& u, const ConstVectorReference<ElementType, OrientationU>& v);
+        static ElementType Dot(const ConstVectorReference<ElementType, OrientationV>& u, const ConstVectorReference<ElementType, OrientationU>& v); // TODO change to Unoriented
 
         /// <summary> Calculates the product of a vector and a scalar, v = v * s. </summary>
         ///

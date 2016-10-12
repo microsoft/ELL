@@ -36,15 +36,14 @@ namespace predictors
         return dataVector.Dot(_w) + _b;
     }
 
-    std::vector<double> LinearPredictor::GetWeightedElements(const DataVectorType& dataVector) const
+    auto LinearPredictor::GetWeightedElements(const DataVectorType& dataVector) const -> DataVectorType
     {
-        std::vector<double> weightedElements(_w.Size());
-        dataVector.AddTo(weightedElements.data());
-        for (size_t i = 0; i < _w.Size(); ++i)
-        {
-            weightedElements[i] *= _w[i];
-        }
-        return weightedElements;
+        auto scaledDataVector = dataVector.Duplicate<DataVectorType>();
+        //for (size_t i = 0; i < _w.Size(); ++i) // TODO make a visitor that changes stuff
+        //{
+        //    weightedElements[i] *= _w[i];
+        //}
+        return scaledDataVector;
     }
 
     void LinearPredictor::Scale(double scalar)

@@ -82,7 +82,7 @@ namespace nodes
     {
         auto inputDataVector = LinearPredictor::DataVectorType(_input.GetIterator());
         _output.SetOutput({ _predictor.Predict(inputDataVector) });
-        _weightedElements.SetOutput(_predictor.GetWeightedElements(inputDataVector));
+        _weightedElements.SetOutput(_predictor.GetWeightedElements(inputDataVector).ToArray()); // TODO is this really the best way to set an output port
     }
 
     LinearPredictorNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer)

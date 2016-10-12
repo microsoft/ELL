@@ -82,7 +82,7 @@ namespace predictors
         /// <param name="example"> The data vector. </param>
         ///
         /// <returns> The weighted elements vector. </returns>
-        std::vector<double> GetWeightedElements(const DataVectorType& dataVector) const;
+        DataVectorType GetWeightedElements(const DataVectorType& dataVector) const;
 
         /// <summary> Scales the linear predictor by a scalar </summary>
         ///
