@@ -31,27 +31,13 @@ namespace data
     template <typename ElementType>
     DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<IndexValue> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        while(current < end)
-        {
-            DenseDataVector<ElementType>::AppendElement(current->index, current->value); // explicit call to DenseDataVector<ElementType>::AppendElement is given to avoid virtual function call in Ctor
-            ++current;
-        }
+        AppendElements(std::move(list));
     }
 
     template <typename ElementType>
     DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<double> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        size_t index = 0;
-        while(current < end)
-        {
-            DenseDataVector<ElementType>::AppendElement(index, *current); // explicit call to DenseDataVector<ElementType>::AppendElement is given to avoid virtual function call in Ctor
-            ++current;
-            ++index;
-        }
+        AppendElements(std::move(list));
     }
 
     template <typename ElementType>

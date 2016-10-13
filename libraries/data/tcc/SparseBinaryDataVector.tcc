@@ -30,27 +30,13 @@ namespace data
     template<typename IntegerListType>
     SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<IndexValue> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        while(current < end)
-        {
-            SparseBinaryDataVectorBase<IntegerListType>::AppendElement(current->index, current->value);
-            ++current;
-        }
+        AppendElements(std::move(list));
     }
 
     template<typename IntegerListType>
     SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<double> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        size_t index = 0;
-        while(current < end)
-        {
-            SparseBinaryDataVectorBase<IntegerListType>::AppendElement(index, *current);
-            ++current;
-            ++index;
-        }
+        AppendElements(std::move(list));
     }
 
     template <typename IntegerListType>

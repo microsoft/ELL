@@ -33,29 +33,15 @@ namespace data
     }
 
     template <typename ElementType, typename IntegerListType>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<IndexValue> list) // TODO change this as above, to use AppendElements (also in denseDV)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<IndexValue> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        while(current < end)
-        {
-            SparseDataVector<ElementType, IntegerListType>::AppendElement(current->index, current->value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
-            ++current;
-        }
+        AppendElements(std::move(list));
     }
 
     template <typename ElementType, typename IntegerListType>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<double> list) // TODO change this to use AppendElements (also in denseDV)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<double> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        size_t index = 0;
-        while(current < end)
-        {
-            SparseDataVector<ElementType, IntegerListType>::AppendElement(index, *current); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
-            ++current;
-            ++index;
-        }
+        AppendElements(std::move(list));
     }
 
     template <typename ElementType, typename IntegerListType>

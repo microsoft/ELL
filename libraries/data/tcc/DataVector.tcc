@@ -8,6 +8,7 @@
 
 //stl 
 #include <cmath>
+#include "..\include\DataVector.h"
 
 namespace emll
 {
@@ -60,6 +61,32 @@ namespace data
             double value = nonZeroMapper ? nonZeroMapper(indexValue) : indexValue.value;
             static_cast<DerivedType*>(this)->AppendElement(indexValue.index, value);
             indexValueIterator.Next();
+        }
+    }
+
+    template<class DerivedType>
+    void DataVectorBase<DerivedType>::AppendElements(std::initializer_list<IndexValue> list)
+    {
+        auto current = list.begin();
+        auto end = list.end();
+        while (current < end)
+        {
+            static_cast<DerivedType*>(this)->AppendElement(current->index, current->value);
+            ++current;
+        }
+    }
+
+    template<class DerivedType>
+    void DataVectorBase<DerivedType>::AppendElements(std::initializer_list<double> list)
+    {
+        auto current = list.begin();
+        auto end = list.end();
+        size_t index = 0;
+        while (current < end)
+        {
+            static_cast<DerivedType*>(this)->AppendElement(index, *current);
+            ++current;
+            ++index;
         }
     }
 

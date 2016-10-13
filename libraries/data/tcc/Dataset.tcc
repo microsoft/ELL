@@ -19,7 +19,6 @@ namespace emll
 {
 namespace data
 {
-
     template<typename IteratorExampleType>
     GetExampleIteratorFunctor<IteratorExampleType>::GetExampleIteratorFunctor(size_t fromIndex, size_t size) : _fromIndex(fromIndex), _size(size) 
     {}

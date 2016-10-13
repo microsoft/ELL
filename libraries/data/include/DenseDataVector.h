@@ -12,7 +12,6 @@
 
 // utilities
 #include "StlIndexValueIterator.h"
-#include "NoopFunction.h"
 
 // stl
 #include <cstdint>

@@ -117,6 +117,13 @@ namespace data
         template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         void AppendElements(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper = {});
 
+        // TODO
+        void AppendElements(std::initializer_list<IndexValue> list);
+
+        void AppendElements(std::initializer_list<double> list);
+
+
+
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
         /// <returns> The vector 2-norm. </returns>
