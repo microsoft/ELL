@@ -49,6 +49,15 @@ namespace data
         template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
 
+        /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
+        ///
+        /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
+        /// <typeparam name="NonZeroMapperType"> Functor type that takes (size_t, double&) and is applied non-zero elements. </typeparam>
+        /// <param name="IndexValueIterator"> The index value iterator. </param>
+        /// <param name="nonZeroMapper"> The mapper that is applies to all non-zero elements. </param>
+        template<typename IndexValueIteratorType, typename NonZeroMapperType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        DenseDataVector(IndexValueIteratorType indexValueIterator, const NonZeroMapperType& nonZeroMapper);
+
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
         /// <param name="list"> The initializer list. </param>

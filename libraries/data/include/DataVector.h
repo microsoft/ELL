@@ -108,6 +108,19 @@ namespace data
     class DataVectorBase : public IDataVector
     {
     public:
+
+        // TODO document and move implementation
+        template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        void AppendElements(IndexValueIteratorType indexValueIterator)
+        {
+            while (indexValueIterator.IsValid())
+            {
+                auto indexValue = indexValueIterator.Get();
+                static_cast<DerivedType*>(this)->AppendElement(indexValue.index, indexValue.value);
+                indexValueIterator.Next();
+            }
+        }
+
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
         /// <returns> The vector 2-norm. </returns>

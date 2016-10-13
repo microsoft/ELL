@@ -29,16 +29,11 @@ namespace data
     template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
     SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
     {
-        while (indexValueIterator.IsValid())
-        {
-            auto indexValue = indexValueIterator.Get();
-            SparseDataVector<ElementType, IntegerListType>::AppendElement(indexValue.index, indexValue.value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
-            indexValueIterator.Next();
-        }
+        AppendElements(std::move(indexValueIterator));
     }
 
     template <typename ElementType, typename IntegerListType>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<IndexValue> list)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<IndexValue> list) // TODO change this as above, to use AppendElements (also in denseDV)
     {
         auto current = list.begin();
         auto end = list.end();
@@ -50,7 +45,7 @@ namespace data
     }
 
     template <typename ElementType, typename IntegerListType>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<double> list)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<double> list) // TODO change this to use AppendElements (also in denseDV)
     {
         auto current = list.begin();
         auto end = list.end();
