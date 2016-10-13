@@ -133,6 +133,16 @@ namespace model
         return _model;
     }
 
+    Model ModelTransformer::TransformModel(const Model& model, const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
+    {
+        _context = context;
+        _model = Model();
+        _elementToElementMap.clear();
+        model.Visit([this, transformFunction](const Node& node) { transformFunction(node, *this); });
+        _context = TransformContext();
+        return _model;
+    }
+
     PortElementsBase ModelTransformer::TransformPortElements(const PortElementsBase& elements)
     {
         auto size = elements.Size();

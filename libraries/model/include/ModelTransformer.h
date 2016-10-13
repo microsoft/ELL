@@ -74,6 +74,7 @@ namespace model
         /// </summary>
         ///
         /// <param name="model"> The model. </param>
+        /// <param name="outputNode"> The output node we are interested in </param>
         /// <param name="context"> The context. </param>
         /// <param name="outputNode"> The output that must be computable in the result model </param>
         ///
@@ -86,6 +87,7 @@ namespace model
         /// </summary>
         ///
         /// <param name="model"> The model. </param>
+        /// <param name="outputNodes"> The output nodes we are interested in </param>
         /// <param name="context"> The context. </param>
         /// <param name="outputNodes"> The outputs that must be computable in the result model </param>
         ///
@@ -102,6 +104,15 @@ namespace model
         ///
         /// <returns> The refined Model. </returns>
         Model RefineModel(const Model& model, const TransformContext& context);
+
+        /// <summary> Performs an arbitrary transformation on a given model. </summary>
+        ///
+        /// <param name="model"> The model. </param>
+        /// <param name="transformFunction"> The function to apply to each node. </param>
+        /// <param name="context"> The context. </param>
+        ///
+        /// <returns> The refined Model. </returns>
+        Model TransformModel(const Model& model, const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
 
         /// <summary> Indicates if the last call to RefineModel produced a model that is compilable. </summary>
         ///
