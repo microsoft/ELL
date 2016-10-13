@@ -117,12 +117,15 @@ namespace data
         template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         void AppendElements(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper = {});
 
-        // TODO
+        /// <summary> Takes an initializer list of index value pairs and appends them to the data vector. </summary>
+        ///
+        /// <param name="list"> The initializer list of index value paris. </param>
         void AppendElements(std::initializer_list<IndexValue> list);
 
+        /// <summary> Takes an initializer list of values and appends them to the data vector. </summary>
+        ///
+        /// <param name="list"> The initializer list. </param>
         void AppendElements(std::initializer_list<double> list);
-
-
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
