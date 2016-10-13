@@ -34,6 +34,12 @@ namespace math
     }
 
     template<typename ElementType>
+    std::vector<double> UnorientedConstVectorReference<ElementType>::ToArray() const
+    {
+        return std::vector<double>(_pData, _pData+_size);
+    }
+
+    template<typename ElementType>
     UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference(ElementType * pData, size_t size, size_t increment) : _pData(pData), _size(size), _increment(increment)
     {}
 

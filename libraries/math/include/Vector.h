@@ -73,6 +73,11 @@ namespace math
         /// <returns> The vector size. </returns>
         size_t Size() const { return _size; }
 
+        /// <summary> Convert this vector into an array. </summary>
+        ///
+        /// <returns> An array that represents the data in this object. </returns>
+        std::vector<double> ToArray() const;
+
         /// <summary> Applies a map to each vector element and sums the result. </summary>
         ///
         /// <typeparam name="MapperType"> A functor type of the mapper. </typeparam>
