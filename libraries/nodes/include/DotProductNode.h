@@ -70,9 +70,13 @@ namespace nodes
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` currently copying the model </param>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` currently refining the model </param>
         // virtual bool Refine(model::ModelTransformer& transformer) const override;
 
     protected:

@@ -17,6 +17,7 @@
 #include "BinaryPredicateNode.h"
 #include "ConstantNode.h"
 #include "DemultiplexerNode.h"
+#include "DotProductNode.h"
 #include "MultiplexerNode.h"
 #include "SumNode.h"
 #include "UnaryOperationNode.h"
@@ -40,6 +41,7 @@ namespace common
         AddNodeType<nodes::BinaryPredicateNode<double>>();
         AddNodeType<nodes::DemultiplexerNode<bool, bool>>();
         AddNodeType<nodes::DemultiplexerNode<double, bool>>();
+        AddNodeType<nodes::DotProductNode<double>>();
         AddNodeType<nodes::SumNode<double>>();
         AddNodeType<nodes::TypeCastNode<bool, int>>();
         AddNodeType<nodes::UnaryOperationNode<bool>>();
