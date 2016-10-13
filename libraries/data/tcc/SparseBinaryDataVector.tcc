@@ -22,14 +22,9 @@ namespace data
 
     template <typename IntegerListType>
     template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper)
     {
-        while (indexValueIterator.IsValid())
-        {
-            auto indexValue = indexValueIterator.Get();
-            SparseBinaryDataVectorBase<IntegerListType>::AppendElement(indexValue.index, indexValue.value); // explicit call to SparseBinaryDataVectorBase<ElementType>::AppendElement is given to avoid virtual function call in Ctor
-            indexValueIterator.Next();
-        }
+        AppendElements(std::move(indexValueIterator), std::move(nonZeroMapper));
     }
 
     template<typename IntegerListType>

@@ -27,9 +27,9 @@ namespace data
 
     template <typename ElementType, typename IntegerListType>
     template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper)
     {
-        AppendElements(std::move(indexValueIterator));
+        AppendElements(std::move(indexValueIterator), std::move(nonZeroMapper));
     }
 
     template <typename ElementType, typename IntegerListType>

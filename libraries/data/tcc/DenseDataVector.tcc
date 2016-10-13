@@ -17,22 +17,9 @@ namespace data
 {
     template <typename ElementType>
     template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator)
+    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper)
     {
-        AppendElements(std::move(indexValueIterator));
-    }
-
-    template <typename ElementType>
-    template<typename IndexValueIteratorType, typename NonZeroMapperType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator, const NonZeroMapperType& nonZeroMapper) // TODO move this to something similar to AppendElements in the RCTP
-    {
-        while (indexValueIterator.IsValid())
-        {
-            auto indexValue = indexValueIterator.Get();
-            double mappedValue = nonZeroMapper(indexValue.index, indexValue.value);
-            DenseDataVector<ElementType>::AppendElement(indexValue.index, mappedValue); // explicit call to DenseDataVector<ElementType>::AppendElement is given to avoid virtual function call in Ctor
-            indexValueIterator.Next();
-        }
+        AppendElements(std::move(indexValueIterator), std::move(nonZeroMapper));
     }
 
     template <typename ElementType>

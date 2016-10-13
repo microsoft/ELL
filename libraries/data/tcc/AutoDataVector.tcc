@@ -25,23 +25,23 @@ namespace data
 
     template<typename DefaultDataVectorType>
     template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(IndexValueIteratorType indexValueIterator)
+    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper)
     {
-        DefaultDataVectorType defaultDataVector(indexValueIterator);
+        DefaultDataVectorType defaultDataVector(std::move(indexValueIterator), std::move(nonZeroMapper));
         FindBestRepresentation(std::move(defaultDataVector));
     }
 
     template<typename DefaultDataVectorType>
     AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(std::initializer_list<IndexValue> list)
     {
-        DefaultDataVectorType defaultDataVector(list);
+        DefaultDataVectorType defaultDataVector(std::move(list));
         FindBestRepresentation(std::move(defaultDataVector));
     }
 
     template<typename DefaultDataVectorType>
     AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(std::initializer_list<double> list)
     {
-        DefaultDataVectorType defaultDataVector(list);
+        DefaultDataVectorType defaultDataVector(std::move(list));
         FindBestRepresentation(std::move(defaultDataVector));
     }
 
@@ -71,9 +71,9 @@ namespace data
 
     template<typename DefaultDataVectorType>
     template<typename ReturnType>
-    ReturnType AutoDataVectorBase<DefaultDataVectorType>::Duplicate() const 
+    ReturnType AutoDataVectorBase<DefaultDataVectorType>::Duplicate(std::function<double(IndexValue)> nonZeroMapper) const
     {
-        return _pInternal->Duplicate<ReturnType>();
+        return _pInternal->Duplicate<ReturnType>(std::move(nonZeroMapper));
     }
 
     template<typename TargetType>

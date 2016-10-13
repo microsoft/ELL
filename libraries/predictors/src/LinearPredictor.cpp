@@ -38,12 +38,8 @@ namespace predictors
 
     auto LinearPredictor::GetWeightedElements(const DataVectorType& dataVector) const -> DataVectorType
     {
-        auto scaledDataVector = dataVector.Duplicate<DataVectorType>();
-        //for (size_t i = 0; i < _w.Size(); ++i) // TODO make a visitor that changes stuff
-        //{
-        //    weightedElements[i] *= _w[i];
-        //}
-        return scaledDataVector;
+        auto mapper = [&](data::IndexValue indexValue)->double { return indexValue.value * _w[indexValue.index]; };
+        return dataVector.Duplicate<DataVectorType>(mapper);
     }
 
     void LinearPredictor::Scale(double scalar)

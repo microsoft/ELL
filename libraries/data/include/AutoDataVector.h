@@ -34,13 +34,14 @@ namespace data
         ///
         /// <param name="vector"> The input vector. </param>
         AutoDataVectorBase(DefaultDataVectorType&& vector);
-        
-        /// <summary> Constructs an auto data vector from an index value iterator. </summary>
+
+        /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
+        /// <param name="nonZeroMapper"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
-        AutoDataVectorBase(IndexValueIteratorType indexValueIterator);
+        AutoDataVectorBase(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper = {});
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
@@ -102,10 +103,11 @@ namespace data
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> The return type. </typeparam>
+        /// <param name="nonZeroMapper"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> This new data vector. </returns>
         template<typename ReturnType>
-        ReturnType Duplicate() const;
+        ReturnType Duplicate(std::function<double(IndexValue)> nonZeroMapper = {}) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///

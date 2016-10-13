@@ -14,39 +14,52 @@ namespace emll
 namespace data
 {
     template<typename ReturnType>
-    ReturnType IDataVector::Duplicate() const
+    ReturnType IDataVector::Duplicate(std::function<double(IndexValue)> nonZeroMapper) const
     {
         switch (GetType())
         {
         case Type::DoubleDataVector:
-            return ReturnType(static_cast<const DoubleDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<const DoubleDataVector*>(this)->GetIterator(), nonZeroMapper);
 
         case Type::FloatDataVector:
-            return ReturnType(static_cast<const FloatDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<const FloatDataVector*>(this)->GetIterator(), nonZeroMapper);
 
         case Type::ShortDataVector:
-            return ReturnType(static_cast<const ShortDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<const ShortDataVector*>(this)->GetIterator(), nonZeroMapper);
 
         case Type::ByteDataVector:
-            return ReturnType(static_cast<const ByteDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<const ByteDataVector*>(this)->GetIterator(), nonZeroMapper);
 
         case Type::SparseDoubleDataVector:
-            return ReturnType(static_cast<const SparseDoubleDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<const SparseDoubleDataVector*>(this)->GetIterator(), nonZeroMapper);
 
         case Type::SparseFloatDataVector:
-            return ReturnType(static_cast<const SparseFloatDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<const SparseFloatDataVector*>(this)->GetIterator(), nonZeroMapper);
 
         case Type::SparseShortDataVector:
-            return ReturnType(static_cast<const SparseShortDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<const SparseShortDataVector*>(this)->GetIterator(), nonZeroMapper);
 
         case Type::SparseByteDataVector:
-            return ReturnType(static_cast<const SparseByteDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<const SparseByteDataVector*>(this)->GetIterator(), nonZeroMapper);
 
         case Type::SparseBinaryDataVector:
-            return ReturnType(static_cast<const SparseBinaryDataVector*>(this)->GetIterator());
+            return ReturnType(static_cast<const SparseBinaryDataVector*>(this)->GetIterator(), nonZeroMapper);
 
         default:
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
+        }
+    }
+
+    template<class DerivedType>
+    template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
+    void DataVectorBase<DerivedType>::AppendElements(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper)
+    {
+        while (indexValueIterator.IsValid())
+        {
+            auto indexValue = indexValueIterator.Get();
+            double value = nonZeroMapper ? nonZeroMapper(indexValue) : indexValue.value;
+            static_cast<DerivedType*>(this)->AppendElement(indexValue.index, value);
+            indexValueIterator.Next();
         }
     }
 
@@ -111,9 +124,9 @@ namespace data
 
     template<class DerivedType>
     template<typename ReturnType>
-    ReturnType DataVectorBase<DerivedType>::Duplicate() const
+    ReturnType DataVectorBase<DerivedType>::Duplicate(std::function<double(IndexValue)> nonZeroMapper) const
     {
-        return ReturnType(static_cast<const DerivedType*>(this)->GetIterator());
+        return ReturnType(static_cast<const DerivedType*>(this)->GetIterator(), std::move(nonZeroMapper));
     }
 
     template<class DerivedType>

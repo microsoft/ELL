@@ -72,12 +72,13 @@ namespace data
 
         SparseDataVector(const SparseDataVector<ElementType, IntegerListType>& other) = delete;
 
-        /// <summary> Constructs a sparse data vector from an index value iterator. </summary>
+        /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
-        SparseDataVector(IndexValueIteratorType indexValueIterator);
+        /// <param name="nonZeroMapper"> The mapper that is applied to all non-zero elements. </param>
+        template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        SparseDataVector(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper = {});
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///

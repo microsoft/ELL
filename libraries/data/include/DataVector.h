@@ -83,10 +83,11 @@ namespace data
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> The return type. </typeparam>
+        /// <param name="nonZeroMapper"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> The new data vector. </returns>
         template<typename ReturnType>
-        ReturnType Duplicate() const;
+        ReturnType Duplicate(std::function<double(IndexValue)> nonZeroMapper = {}) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
@@ -108,18 +109,13 @@ namespace data
     class DataVectorBase : public IDataVector
     {
     public:
-
-        // TODO document and move implementation
+        /// <summary> Takes an iterator and appends its entries to the data vector, possibly applying a mapping along the way. </summary>
+        ///
+        /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
+        /// <param name="IndexValueIterator"> The index value iterator. </param>
+        /// <param name="nonZeroMapper"> The mapper that is applied to all non-zero elements. </param>
         template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
-        void AppendElements(IndexValueIteratorType indexValueIterator)
-        {
-            while (indexValueIterator.IsValid())
-            {
-                auto indexValue = indexValueIterator.Get();
-                static_cast<DerivedType*>(this)->AppendElement(indexValue.index, indexValue.value);
-                indexValueIterator.Next();
-            }
-        }
+        void AppendElements(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper = {});
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
@@ -150,11 +146,12 @@ namespace data
 
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
         ///
-        /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam>
+        /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam> 
+        /// <param name="nonZeroMapper"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> A data vector of a specified type. </returns>
         template<typename ReturnType>
-        ReturnType Duplicate() const;
+        ReturnType Duplicate(std::function<double(IndexValue)> nonZeroMapper = {}) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
