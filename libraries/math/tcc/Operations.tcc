@@ -16,8 +16,8 @@ namespace math
     // CommonOperations
     //
 
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType CommonOperations::Norm0(const ConstVectorReference<ElementType, Orientation>& v)
+    template<typename ElementType>
+    ElementType CommonOperations::Norm0(const UnorientedConstVectorReference<ElementType>& v)
     {
         return v.Aggregate([](ElementType x) { return x != 0 ? 1 : 0; });
     }
@@ -110,14 +110,14 @@ namespace math
         }
     }
 
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType OperationsImplementation<ImplementationType::native>::Norm1(const ConstVectorReference<ElementType, Orientation>& v)
+    template<typename ElementType>
+    ElementType OperationsImplementation<ImplementationType::native>::Norm1(const UnorientedConstVectorReference<ElementType>& v)
     {
         return v.Aggregate([](ElementType x) { return std::abs(x); });
     }
 
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType OperationsImplementation<ImplementationType::native>::Norm2(const ConstVectorReference<ElementType, Orientation>& v)
+    template<typename ElementType>
+    ElementType OperationsImplementation<ImplementationType::native>::Norm2(const UnorientedConstVectorReference<ElementType>& v)
     {
         return std::sqrt(v.Aggregate([](ElementType x) { return x*x; }));
     }
@@ -142,8 +142,8 @@ namespace math
         }
     }
 
-    template<typename ElementType, VectorOrientation Orientation1, VectorOrientation Orientation2>
-    ElementType OperationsImplementation<ImplementationType::native>::Dot(const ConstVectorReference<ElementType, Orientation1>& u, const ConstVectorReference<ElementType, Orientation2>& v)
+    template<typename ElementType>
+    ElementType OperationsImplementation<ImplementationType::native>::Dot(const UnorientedConstVectorReference<ElementType>& u, const UnorientedConstVectorReference<ElementType>& v)
     {
         if (v.Size() != u.Size())
         {
@@ -203,14 +203,14 @@ namespace math
         Blas::Copy(static_cast<int>(u.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()), u.GetDataPointer(), static_cast<int>(u.GetIncrement()));
     }
 
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm1(const ConstVectorReference<ElementType, Orientation>& v)
+    template<typename ElementType>
+    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm1(const UnorientedConstVectorReference<ElementType>& v)
     {
         return Blas::Asum(static_cast<int>(v.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
     }
 
-    template<typename ElementType, VectorOrientation Orientation>
-    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm2(const ConstVectorReference<ElementType, Orientation>& v)
+    template<typename ElementType>
+    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm2(const UnorientedConstVectorReference<ElementType>& v)
     {
         return Blas::Nrm2(static_cast<int>(v.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
     }
@@ -226,8 +226,8 @@ namespace math
         return Blas::Axpy(static_cast<int>(u.Size()), s, v.GetDataPointer(), static_cast<int>(v.GetIncrement()), u.GetDataPointer(), static_cast<int>(u.GetIncrement()));
     }
 
-    template<typename ElementType, VectorOrientation OrientationU, VectorOrientation OrientationV>
-    ElementType OperationsImplementation<ImplementationType::openBlas>::Dot(const ConstVectorReference<ElementType, OrientationU>& u, const ConstVectorReference<ElementType, OrientationV>& v)
+    template<typename ElementType>
+    ElementType OperationsImplementation<ImplementationType::openBlas>::Dot(const UnorientedConstVectorReference<ElementType>& u, const UnorientedConstVectorReference<ElementType>& v)
     {
         if (v.Size() != u.Size())
         {

@@ -54,9 +54,9 @@ namespace emll
         math::RowVector<double> w{ 1, 2, 3, 4, 5, 6 };
         testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w), 1.0 + 4.0 + 5.0));
 
-        // TODO u.AddTo(w.data(), 2);
-        std::vector<double> z{ 3, 2, 3, 6, 7, 6 };
-        // TODO testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w, z));
+        u.AddTo(w, 2);
+        math::RowVector<double> z{ 3, 2, 3, 6, 7, 6 };
+        testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w.ToArray(), z.ToArray()));
 
         std::stringstream ss;
         u.Print(ss);
