@@ -21,7 +21,7 @@ namespace emll
     template<typename ExampleType>
     ExampleType GetExample()
     {
-        using DataVectorType = ExampleType::DataVectorType;
+        using DataVectorType = typename ExampleType::DataVectorType;
         DataVectorType dataVector{ 1,0,1,0,1,0,1 };
         return ExampleType(std::make_shared<DataVectorType>(std::move(dataVector)), data::WeightLabel{ 1,1 });
     }
@@ -37,7 +37,7 @@ namespace emll
 
         size_t expectedReferenceCount = (typeName1 == typeName2) ? 2 : 1;
         auto example1 = GetExample<ExampleType1>();
-        auto example2 = example1.CopyAs<ExampleType2>();
+        auto example2 = example1.template CopyAs<ExampleType2>();
         bool isExpectedReferenceCount = (example2.GetDataVectorReferenceCount() == expectedReferenceCount);
 
         std::stringstream ss1, ss2;

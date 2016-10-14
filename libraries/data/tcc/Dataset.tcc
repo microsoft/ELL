@@ -28,7 +28,7 @@ namespace data
     template<typename ExampleType>
     auto GetExampleIteratorFunctor<IteratorExampleType>::operator()(const Dataset<ExampleType>& dataset) const -> ReturnType
     {
-        return dataset.GetExampleIterator<IteratorExampleType>(_fromIndex, _size);
+        return dataset.template GetExampleIterator<IteratorExampleType>(_fromIndex, _size);
     }
 
     template<typename ExampleType>
@@ -93,7 +93,7 @@ namespace data
     }
 
     template <typename DatasetExampleType>
-    auto Dataset<DatasetExampleType>::GetExampleReferenceIterator(size_t fromIndex = 0, size_t size = 0) const -> ExampleReferenceIterator
+    auto Dataset<DatasetExampleType>::GetExampleReferenceIterator(size_t fromIndex, size_t size) const -> ExampleReferenceIterator
     {
         size = CorrectRangeSize(fromIndex, size);
         return ExampleReferenceIterator(_examples.cbegin() + fromIndex, _examples.cbegin() + fromIndex + size);

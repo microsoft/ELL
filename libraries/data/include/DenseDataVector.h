@@ -6,9 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
 #include "DataVector.h"
+
+#ifndef DENSEDATAVECTOR_H
+#define DENSEDATAVECTOR_H
 
 // linear
 #include "IVector.h"
@@ -141,3 +142,5 @@ namespace data
 }
 
 #include "../tcc/DenseDataVector.tcc"
+
+#endif // DENSEDATAVECTOR_H

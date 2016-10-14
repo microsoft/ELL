@@ -6,9 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
 #include "DataVector.h"
+
+#ifndef SPARSEDATAVECTOR_H
+#define SPARSEDATAVECTOR_H
 
 // utilities
 #include "CompressedIntegerList.h"
@@ -163,3 +164,5 @@ namespace data
 }
 
 #include "../tcc/SparseDataVector.tcc"
+
+#endif // SPARSEDATAVECTOR_H
