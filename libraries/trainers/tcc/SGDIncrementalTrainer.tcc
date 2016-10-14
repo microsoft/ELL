@@ -10,8 +10,8 @@
 #include <cassert>
 #include <cmath>
 
-// dataset
-#include "RowDataset.h"
+// data
+#include "Dataset.h"
 
 namespace emll
 {
@@ -24,9 +24,9 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
     {
-        UpdateSparse(std::move(exampleIterator));
+        UpdateSparse(anyDataset.GetExampleIterator<data::AutoSupervisedExample>(), anyDataset.NumExamples());
     }
 
     template <typename LossFunctionType>
@@ -36,7 +36,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();
@@ -47,7 +47,7 @@ namespace trainers
 
         // define some constants
         const double T_prev = double(_total_iterations);
-        const double T_next = T_prev + exampleIterator.NumIteratesLeft();
+        const double T_next = T_prev + numExamples;
         const double eta = 1.0 / _parameters.regularization / T_prev;
         const double sigma = std::log(T_next) + 0.5 / T_next;
 
@@ -74,11 +74,11 @@ namespace trainers
 
             // Update vLast and vAvg
             double lastCoeff = -eta * beta;
-            dataVector.AddTo(vLast, lastCoeff);
+            dataVector.AddTo(vLast.GetDataPointer(), lastCoeff);
             bLast += lastCoeff;
 
             double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
-            dataVector.AddTo(vAvg, avgCoeff);
+            dataVector.AddTo(vAvg.GetDataPointer(), avgCoeff);
             bAvg += avgCoeff;
 
             exampleIterator.Next();
@@ -95,7 +95,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator)
+    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();

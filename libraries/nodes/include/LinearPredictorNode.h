@@ -36,6 +36,8 @@ namespace nodes
         const model::OutputPort<double>& weightedElements = _weightedElements;
         /// @}
 
+        using LinearPredictor = predictors::LinearPredictor;
+
         /// <summary> Default Constructor </summary>
         LinearPredictorNode();
 
@@ -43,7 +45,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to predict from </param>
         /// <param name="predictor"> The linear predictor to use when making the prediction. </param>
-        LinearPredictorNode(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor);
+        LinearPredictorNode(const model::PortElements<double>& input, const LinearPredictor& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -83,7 +85,7 @@ namespace nodes
         model::OutputPort<double> _weightedElements;
 
         // Linear predictor
-        predictors::LinearPredictor _predictor;
+        LinearPredictor _predictor;
     };
 
     /// <summary> Adds a linear predictor node to a model transformer. </summary>

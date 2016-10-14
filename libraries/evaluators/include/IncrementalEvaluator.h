@@ -54,12 +54,12 @@ namespace evaluators
     public:
         using BaseClassType = Evaluator<BasePredictorType, AggregatorTypes...>;
 
-        /// <summary> Constructs an instance of IncrementalEvaluator with a given dataset and given aggregators. </summary>
+        /// <summary> Constructs an instance of IncrementalEvaluator with a given data set and given aggregators. </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
+        /// <param name="anyDataset"> An dataset. </param>
         /// <param name="evaluatorParameters"> The evaluation parameters. </param>
         /// <param name="aggregators"> The aggregators. </param>
-        IncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+        IncrementalEvaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
         /// <summary>
         /// Runs the given predictor on the evaluation set, increments cached outputs, invokes each of
@@ -94,7 +94,7 @@ namespace evaluators
     ///
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template <typename BasePredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 }
 

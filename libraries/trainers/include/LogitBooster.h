@@ -8,7 +8,7 @@
 
 #pragma once
 
-// dataset
+// data
 #include "Example.h"
 
 namespace emll
@@ -29,7 +29,7 @@ namespace trainers
         /// <param name="prediction"> The prediction. </param>
         ///
         /// <returns> The weak weight and label. </returns>
-        dataset::WeightLabel GetWeakWeightLabel(const dataset::WeightLabel& strongWeightLabel, double prediction) const;
+        data::WeightLabel GetWeakWeightLabel(const data::WeightLabel& strongWeightLabel, double prediction) const;
 
     private:
         double _scale;

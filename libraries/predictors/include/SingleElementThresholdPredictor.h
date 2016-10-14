@@ -10,6 +10,9 @@
 
 #include "IPredictor.h"
 
+// data
+#include "DenseDataVector.h"
+
 // utilities
 #include "IArchivable.h"
 
@@ -24,6 +27,8 @@ namespace predictors
     class SingleElementThresholdPredictor : public IPredictor<bool>, public utilities::IArchivable
     {
     public:
+        using DataVectorType = data::FloatDataVector;
+
         /// <summary> Constructs a single-element threshold rule. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
@@ -62,12 +67,10 @@ namespace predictors
 
         /// <summary> Evaluates the split rule. </summary>
         ///
-        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the input. </typeparam>
         /// <param name="dataVector"> The input vector. </param>
         ///
         /// <returns> The result of the split rule. </returns>
-        template <typename RandomAccessVectorType>
-        bool Predict(const RandomAccessVectorType& inputVector) const;
+        bool Predict(const DataVectorType& inputVector) const;
 
         /// <summary> Returns the number of outputs (the max output value plus one). </summary>
         ///
@@ -86,5 +89,3 @@ namespace predictors
     };
 }
 }
-
-#include "../tcc/SingleElementThresholdPredictor.tcc"

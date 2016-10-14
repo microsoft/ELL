@@ -62,14 +62,7 @@ namespace linear
     /// <param name="container"> A std::vector to iterate over </param>
     /// <returns> An StlIndexValueIteratorAdapter that iterates over the given vector </returns>
     template <typename ValueType>
-    VectorIndexValueIterator<ValueType> MakeStlIndexValueIterator(const std::vector<ValueType>& container);
-
-    /// <summary> Copies values from an IndexValueIterator into a std::vector, resizing the vector if necessary </summary>
-    ///
-    /// <param name="array"> The std::vector to copy values into </param>
-    /// <param name="indexValueIterator"> The IndexValueIterator to copy values from </param>
-    template <typename ValueType, typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> = 0>
-    void CopyToDoubleArray(IndexValueIteratorType& indexValueIterator, std::vector<ValueType>& array);
+    VectorIndexValueIterator<ValueType> MakeVectorIndexValueIterator(const std::vector<ValueType>& container);
 }
 }
 

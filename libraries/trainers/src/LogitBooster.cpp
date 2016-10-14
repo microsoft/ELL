@@ -19,7 +19,7 @@ namespace trainers
     {
     }
 
-    dataset::WeightLabel LogitBooster::GetWeakWeightLabel(const dataset::WeightLabel& strongWeightLabel, double prediction) const
+    data::WeightLabel LogitBooster::GetWeakWeightLabel(const data::WeightLabel& strongWeightLabel, double prediction) const
     {
         double scaledMargin = _scale * strongWeightLabel.label * prediction;
         if (scaledMargin > 0)

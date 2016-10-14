@@ -23,7 +23,7 @@ namespace linear
     };
 #ifndef SWIG
     template <typename IteratorType>
-    using IsIndexValueIterator = typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IteratorType>::value, int>;
+    using IsIndexValueIterator = typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IteratorType>::value, bool>;
 #endif
 }
 }

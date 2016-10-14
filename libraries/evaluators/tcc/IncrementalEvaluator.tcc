@@ -11,10 +11,10 @@ namespace emll
 namespace evaluators
 {
     template <typename BasePredictorType, typename... AggregatorTypes>
-    IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
-        : Evaluator<BasePredictorType, AggregatorTypes...>(exampleIterator, evaluatorParameters, aggregators...)
+    IncrementalEvaluator<BasePredictorType, AggregatorTypes...>::IncrementalEvaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+        : Evaluator<BasePredictorType, AggregatorTypes...>(anyDataset, evaluatorParameters, aggregators...)
     {
-        _predictions.resize(BaseClassType::_rowDataset.NumExamples());
+        _predictions.resize(BaseClassType::_dataset.NumExamples());
     }
 
     template <typename BasePredictorType, typename... AggregatorTypes>
@@ -23,7 +23,7 @@ namespace evaluators
         ++BaseClassType::_evaluateCounter;
         bool evaluate = BaseClassType::_evaluateCounter % BaseClassType::_evaluatorParameters.evaluationFrequency == 0 ? true : false;
 
-        auto iterator = BaseClassType::_rowDataset.GetIterator();
+        auto iterator = BaseClassType::_dataset.GetExampleIterator();
         uint64_t index = 0;
 
         while (iterator.IsValid())
@@ -61,7 +61,7 @@ namespace evaluators
     }
 
     template <typename BasePredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+    std::shared_ptr<IIncrementalEvaluator<BasePredictorType>> MakeIncrementalEvaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
     {
         return std::make_unique<IncrementalEvaluator<BasePredictorType, AggregatorTypes...>>(exampleIterator, evaluatorParameters, aggregators...);
     }

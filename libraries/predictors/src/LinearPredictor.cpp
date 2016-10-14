@@ -31,15 +31,15 @@ namespace predictors
         _b = 0;
     }
 
-    double LinearPredictor::Predict(const dataset::IDataVector& dataVector) const
+    double LinearPredictor::Predict(const DataVectorType& dataVector) const
     {
-        return dataVector.Dot(_w) + _b;
+        return dataVector.Dot(_w.GetDataPointer()) + _b;
     }
 
-    std::vector<double> LinearPredictor::GetWeightedElements(const dataset::IDataVector& dataVector) const
+    std::vector<double> LinearPredictor::GetWeightedElements(const DataVectorType& dataVector) const
     {
         std::vector<double> weightedElements(_w.Size());
-        dataVector.AddTo(weightedElements);
+        dataVector.AddTo(weightedElements.data());
         for (size_t i = 0; i < _w.Size(); ++i)
         {
             weightedElements[i] *= _w[i];

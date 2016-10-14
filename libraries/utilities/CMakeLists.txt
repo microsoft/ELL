@@ -31,7 +31,8 @@ set (SRC src/Archiver.cpp
          src/Variant.cpp
          src/XMLArchiver.cpp)
 
-set (INCLUDE include/AnyIterator.h
+set (INCLUDE include/AbstractInvoker.h
+             include/AnyIterator.h
              include/Archiver.h
              include/CommandLineParser.h
              include/CompressedIntegerList.h
@@ -50,7 +51,7 @@ set (INCLUDE include/AnyIterator.h
              include/ParallelTransformIterator.h
              include/Parser.h
              include/RandomEngines.h
-             include/StlIterator.h
+             include/StlReferenceIterator.h
              include/Tokenizer.h
              include/TransformIterator.h
              include/TupleWrapper.h
@@ -61,7 +62,8 @@ set (INCLUDE include/AnyIterator.h
              include/Variant.h
              include/XMLArchiver.h)
 
-set (TCC tcc/AnyIterator.tcc
+set (TCC tcc/AbstractInvoker.tcc
+         tcc/AnyIterator.tcc
          tcc/Archiver.tcc
          tcc/CommandLineParser.tcc
          tcc/Exception.tcc
@@ -74,7 +76,7 @@ set (TCC tcc/AnyIterator.tcc
          tcc/OutputStreamImpostor.tcc
          tcc/ParallelTransformIterator.tcc
          tcc/Parser.tcc
-         tcc/StlIterator.tcc
+         tcc/StlReferenceIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc
          tcc/TypeName.tcc
@@ -128,9 +130,9 @@ add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(utilities_test utilities dataset linear model nodes testing -pthread)
+target_link_libraries(utilities_test utilities data linear model nodes testing -pthread)
 else()
-target_link_libraries(utilities_test utilities dataset linear model nodes testing)
+target_link_libraries(utilities_test utilities data linear model nodes testing)
 endif()
 set_property(TARGET utilities_test PROPERTY FOLDER "tests")
 add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})

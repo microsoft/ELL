@@ -18,7 +18,7 @@ namespace trainers
     //
     // Sums
     //
-    void ForestTrainerBase::Sums::Increment(const dataset::WeightLabel& weightLabel)
+    void ForestTrainerBase::Sums::Increment(const data::WeightLabel& weightLabel)
     {
         sumWeights += weightLabel.weight;
         sumWeightedLabels += weightLabel.weight * weightLabel.label;
@@ -106,10 +106,14 @@ namespace trainers
         return _childSums[position];
     }
 
+    ForestTrainerBase::TrainerMetadata::TrainerMetadata(const data::WeightLabel& metaData) : strong(metaData)
+    {
+    }
+
     //
     // debugging code
     //
-    void ForestTrainerBase::ExampleMetadata::Print(std::ostream& os) const
+    void ForestTrainerBase::TrainerMetadata::Print(std::ostream& os) const
     {
         os << "(" << strong.weight << ", " << strong.label << ", " << weak.weight << ", " << weak.label << ", " << currentOutput << ")";
     }

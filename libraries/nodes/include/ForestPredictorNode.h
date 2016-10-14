@@ -44,6 +44,8 @@ namespace nodes
         const model::OutputPort<bool>& edgeIndicatorVector = _edgeIndicatorVector;
         /// @}
 
+        using ForestPredictor = predictors::ForestPredictor<SplitRuleType, EdgePredictorType>;
+
         /// <summary> Default Constructor </summary>
         ForestPredictorNode();
 
@@ -51,7 +53,7 @@ namespace nodes
         ///
         /// <param name="input"> The predictor's input. </param>
         /// <param name="forest"> The forest predictor. </param>
-        ForestPredictorNode(const model::PortElements<double>& input, const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest);
+        ForestPredictorNode(const model::PortElements<double>& input, const ForestPredictor& forest);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -94,7 +96,7 @@ namespace nodes
         model::OutputPort<bool> _edgeIndicatorVector;
 
         // Forest
-        predictors::ForestPredictor<SplitRuleType, EdgePredictorType> _forest;
+        ForestPredictor _forest;
     };
 
     /// <summary> Defines an alias representing a simple forest node, which holds a forest with a SingleElementThresholdPredictor as the split rule and ConstantPredictors on the edges. </summary>

@@ -17,9 +17,9 @@
 // linear
 #include "DoubleVector.h"
 
-// dataset
+// data
 #include "Example.h"
-#include "RowDataset.h"
+#include "Dataset.h"
 
 // stl
 #include <cstdint>
@@ -53,10 +53,10 @@ namespace trainers
         /// <param name="parameters"> The training parameters. </param>
         SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
 
-        /// <summary> Performs an epoch of SGD iterations. </summary>
+        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
+        /// <param name="anyDataset"> A dataset. </param>
+        virtual void Update(const data::AnyDataset& anyDataset) override;
 
         /// <summary> Returns The averaged predictor. </summary>
         ///
@@ -64,8 +64,8 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
     private:
-        void UpdateSparse(dataset::GenericRowDataset::Iterator exampleIterator);
-        void UpdateDense(dataset::GenericRowDataset::Iterator exampleIterator);
+        void UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples);
+        void UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator);
 
         LossFunctionType _lossFunction;
         SGDIncrementalTrainerParameters _parameters;

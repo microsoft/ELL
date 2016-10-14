@@ -30,6 +30,8 @@ namespace nodes
         static constexpr const char* outputPortName = "output";
         const model::OutputPort<bool>& output = _output;
         /// @}
+        
+        using SingleElementThresholdPredictor = predictors::SingleElementThresholdPredictor;
 
         /// <summary> Default Constructor </summary>
         SingleElementThresholdNode();
@@ -38,7 +40,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to predict from </param>
         /// <param name="predictor"> The linear predictor to use when making the prediction. </param>
-        SingleElementThresholdNode(const model::PortElements<double>& input, const predictors::SingleElementThresholdPredictor& predictor);
+        SingleElementThresholdNode(const model::PortElements<double>& input, const SingleElementThresholdPredictor& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -77,7 +79,7 @@ namespace nodes
         model::OutputPort<bool> _output;
 
         // Linear predictor
-        predictors::SingleElementThresholdPredictor _predictor;
+        SingleElementThresholdPredictor _predictor;
     };
 
     /// <summary> Adds a SingleElementThreshold predictor node to a model transformer. </summary>

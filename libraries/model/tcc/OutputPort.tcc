@@ -27,6 +27,20 @@ namespace model
     }
 
     template <typename ValueType>
+    std::vector<double> OutputPort<ValueType>::GetDoubleOutput() const
+    {
+        std::vector<double> result;
+        std::copy(_cachedOutput.begin(), _cachedOutput.end(), result.begin());
+        return result;
+    }
+
+    template <typename ValueType>
+    double OutputPort<ValueType>::GetDoubleOutput(size_t index) const
+    {
+        return static_cast<double>(_cachedOutput[index]);
+    }
+
+    template <typename ValueType>
     void OutputPort<ValueType>::SetOutput(std::vector<ValueType> values) const
     {
         _cachedOutput = values;

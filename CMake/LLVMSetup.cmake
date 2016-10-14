@@ -13,9 +13,14 @@ endif()
 
 if(MSVC)
 # Required to compile against LLVM libraries. See LLVM documentation
-add_compile_options(-w14062 /Zc:inline /Zc:rvalueCast /Zc:sizedDealloc- /D_SCL_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_WARNINGS)
+if(${CMAKE_GENERATOR_TOOLSET} MATCHES "clang")
+    message(STATUS "Using clang toolset")
+else()
+    add_compile_options(-w14062 /Zc:inline /Zc:rvalueCast /Zc:sizedDealloc-)
+endif()
 
 # Warnings that must be disabled. See LLVM documentation. 
+add_compile_options(/D_SCL_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_WARNINGS)
 add_compile_options( /wd4141 /wd4146 /wd4180 /wd4244 /wd4258 /wd4267 /wd4291 /wd4345 /wd4351 /wd4355 /wd4456 /wd4457 /wd4458 /wd4459 /wd4503 /wd4624 /wd4722 /wd4800 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702 /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4805 /wd4204 /wd4577 /wd4091 /wd4592 /wd4319 /wd4324 /wd4996)
 endif()
 

@@ -11,6 +11,9 @@
 #include "OutputPort.h"
 #include "Port.h"
 
+// linear
+#include "IndexValue.h"
+
 // utilities
 #include "Exception.h"
 #include "IArchivable.h"
@@ -18,6 +21,7 @@
 // stl
 #include <algorithm>
 #include <cassert>
+#include <deque>
 #include <vector>
 
 namespace emll
@@ -181,6 +185,34 @@ namespace model
     class PortElementsBase : public utilities::IArchivable
     {
     public:
+        /// <summary> A read-only forward iterator for the output values of a `PortElementsBase`. </summary>
+        class Iterator : public linear::IIndexValueIterator
+        {
+        public:
+            Iterator(const Iterator&) = default;
+            Iterator(Iterator&&) = default;
+
+            /// <summary> Returns true if the iterator is currently pointing to a valid item. </summary>
+            ///
+            /// <returns> true if it succeeds, false if it fails. </returns>
+            bool IsValid() { return _ranges.size() > 0; }
+
+            /// <summary> Proceeds to the Next item. </summary>
+            void Next();
+
+            /// <summary> Gets the item the iterator is pointing to. </summary>
+            ///
+            /// <returns> The item. </returns>
+            linear::IndexValue Get();
+
+        private:
+            friend class PortElementsBase;
+            Iterator(const std::vector<PortRange>& ranges);
+
+            std::deque<PortRange> _ranges;
+            size_t _index = 0;
+        };
+
         PortElementsBase() = default;
 
         PortElementsBase(const OutputPortBase& port);
@@ -195,6 +227,11 @@ namespace model
         ///
         /// <returns> The dimensionality of the output </returns>
         size_t Size() const { return _size; }
+
+        /// <summary> Gets a forward read-only index-value iterator that iterates over the `PortElementsBase` output values. </summary>
+        ///
+        /// <returns> The iterator. </returns>
+        Iterator GetIterator() const { return Iterator(GetRanges()); }
 
         /// <summary> The number of ranges in this list </summary>
         ///
@@ -330,12 +367,12 @@ namespace model
         ///
         /// <returns> The port this element refers to </returns>
         const OutputPort<ValueType>* ReferencedPort() const { return static_cast<const OutputPort<ValueType>*>(this->PortElementBase::ReferencedPort()); }
- 
+
         /// <summary> Appends a set of elements to this set of elements. </summary>
         ///
         /// <param name="other"> The PortElements to append to this one. </param>
         void Append(const PortElements<ValueType>& other);
- 
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>

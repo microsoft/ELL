@@ -29,6 +29,16 @@ namespace predictors
         archiver["threshold"] >> _threshold;
     }
 
+    bool SingleElementThresholdPredictor::Predict(const DataVectorType& inputVector) const
+    {
+        if (inputVector.PrefixLength() <= _index)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
+        }
+
+        return inputVector[_index] > _threshold;
+    }
+
     void SingleElementThresholdPredictor::PrintLine(std::ostream& os, size_t tabs) const
     {
         os << std::string(tabs * 4, ' ') << "index = " << _index << ", threshold = " << _threshold << "\n";

@@ -1,0 +1,52 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (EMLL)
+//  File:     Example.tcc (data)
+//  Authors:  Ofer Dekel
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace emll
+{
+namespace data
+{
+    template <typename DataVectorType, typename MetadataType>
+    Example<DataVectorType, MetadataType>::Example(const std::shared_ptr<const DataVectorType>& dataVector, const MetadataType& metadata)
+        : _dataVector(dataVector), _metadata(metadata)
+    {
+    }
+
+    template<typename DataVectorType, typename MetadataType>
+    template<typename TargetExampleType, utilities::IsSame<typename TargetExampleType::DataVectorType, DataVectorType> Concept>
+    TargetExampleType Example<DataVectorType, MetadataType>::CopyAs() const
+    {
+        // shallow copy of data vector
+        return TargetExampleType(_dataVector, typename TargetExampleType::MetadataType(_metadata));
+    }
+
+    template<typename DataVectorType, typename MetadataType>
+    template<typename TargetExampleType, utilities::IsDifferent<typename TargetExampleType::DataVectorType, DataVectorType> Concept>
+    TargetExampleType Example<DataVectorType, MetadataType>::CopyAs() const
+    {
+        // deep copy of data vector
+        using DataType = typename TargetExampleType::DataVectorType;
+        using MetadataType = typename TargetExampleType::MetadataType;
+        return TargetExampleType(std::make_shared<DataType>(_dataVector->template DeepCopyAs<DataType>()), MetadataType(_metadata));
+    }
+
+    template <typename DataVectorType, typename MetadataType>
+    void Example<DataVectorType, MetadataType>::Print(std::ostream& os) const
+    {
+        _metadata.Print(os);
+        os << "\t";
+        _dataVector->Print(os);
+    }
+
+    template <typename DataVectorType, typename MetadataType>
+    std::ostream& operator<<(std::ostream& ostream, const Example<DataVectorType, MetadataType>& example)
+    {
+        example.Print(ostream);
+        return ostream;
+    }
+}
+}

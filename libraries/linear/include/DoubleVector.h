@@ -100,7 +100,7 @@ namespace linear
         /// <summary> Returns an IndexValueIterator for the vector. </summary>
         ///
         /// <returns> An IndexValueIterator. </returns>
-        Iterator GetIterator() const { return MakeStlIndexValueIterator(_data); }
+        Iterator GetIterator() const { return MakeVectorIndexValueIterator(_data); }
 
         /// <summary> Returns the Size of the vector. </summary>
         ///
@@ -134,7 +134,7 @@ namespace linear
         /// <summary> Prints the vector to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write data to. </param>
-        virtual void Print(std::ostream& os) const override;
+        //virtual void Print(std::ostream& os) const override;
 
         /// <summary> Appends a value to the end of the the vector. </summary>
         ///

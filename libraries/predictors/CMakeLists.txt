@@ -24,7 +24,6 @@ set (INCLUDE include/ConstantPredictor.h
              include/ForestPredictor.h)
 
 set (TCC tcc/SignPredictor.tcc
-         tcc/SingleElementThresholdPredictor.tcc
          tcc/ForestPredictor.tcc)
 
 source_group("src" FILES ${SRC})
@@ -36,7 +35,7 @@ target_include_directories(${PROJ_NAME} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
-target_link_libraries(${PROJ_NAME} dataset utilities)
+target_link_libraries(${PROJ_NAME} data utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -57,7 +56,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE} ${TCC})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
 
-target_link_libraries(${TEST_NAME} testing predictors dataset linear)
+target_link_libraries(${TEST_NAME} testing predictors data linear)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

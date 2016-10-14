@@ -6,23 +6,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 namespace emll
 {
 namespace common
 {
     template <typename DatasetType>
-    DatasetType GetRowDataset(const DataLoadArguments& dataLoadArguments)
+    DatasetType GetDataset(const DataLoadArguments& dataLoadArguments)
     {
         auto dataIterator = GetDataIterator(dataLoadArguments);
-        DatasetType rowDataset;
+        DatasetType dataset;
         while (dataIterator->IsValid())
         {
-            rowDataset.AddExample(dataIterator->Get());
+            dataset.AddExample(dataIterator->Get());
             dataIterator->Next();
         }
 
-        return rowDataset;
+        return dataset;
     }
 }
 }

@@ -21,25 +21,25 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    void MultiEpochIncrementalTrainer<PredictorType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
+    void MultiEpochIncrementalTrainer<PredictorType>::Update(const data::AnyDataset& anyDataset)
     {
-        dataset::GenericRowDataset rowDataset(exampleIterator);
+        using ExampleType = data::Example<typename PredictorType::DataVectorType, data::WeightLabel>;
+        auto dataset = data::Dataset<ExampleType>(anyDataset); 
 
         // calculate epoch size
         uint64_t epochSize = _parameters.epochSize;
-        if (epochSize == 0 || epochSize > rowDataset.NumExamples())
+        if (epochSize == 0 || epochSize > dataset.NumExamples())
         {
-            epochSize = rowDataset.NumExamples();
+            epochSize = dataset.NumExamples();
         }
 
         for (int epoch = 0; epoch < _parameters.numEpochs; ++epoch)
         {
             // randomly permute the data
-            rowDataset.RandomPermute(_random, epochSize);
+            dataset.RandomPermute(_random, epochSize);
 
             // update the incremental trainer
-            auto trainSetIterator = rowDataset.GetIterator(0, epochSize);
-            _internalTrainer->Update(trainSetIterator);
+            _internalTrainer->Update(dataset.GetAnyDataset(0, epochSize));
         }
     }
 

@@ -19,13 +19,13 @@ namespace trainers
     template <typename LossFunctionType, typename BoosterType>
     auto SortingForestTrainer<LossFunctionType, BoosterType>::GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) -> SplitCandidate
     {
-        auto numFeatures = _dataset.GetMaxDataVectorSize();
+        auto numFeatures = _dataset.NumFeatures();
 
         SplitCandidate bestSplitCandidate(nodeId, range, sums);
 
         for (uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
         {
-            // sort the relevant rows of dataset in ascending order by inputIndex
+            // sort the relevant rows of data set in ascending order by inputIndex
             SortNodeDataset(range, inputIndex);
 
             Sums sums0;
@@ -76,7 +76,7 @@ namespace trainers
     template <typename LossFunctionType, typename BoosterType>
     void SortingForestTrainer<LossFunctionType, BoosterType>::SortNodeDataset(Range range, size_t inputIndex)
     {
-        _dataset.Sort([inputIndex](const ForestTrainerExample& example) { return example.GetDataVector()[inputIndex]; },
+        _dataset.Sort([inputIndex](const data::Example<DataVectorType, TrainerMetadata>& example) { return example.GetDataVector()[inputIndex]; },
                       range.firstIndex,
                       range.size);
     }

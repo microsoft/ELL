@@ -23,7 +23,7 @@ namespace linear
     /// <summary>
     /// Base class for double precision algebraic vectors.
     /// </summary>
-    class IVector : public Base
+    class IVector 
     {
     public:
         /// <summary> Returns the Size of the vector. </summary>

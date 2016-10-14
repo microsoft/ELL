@@ -45,6 +45,10 @@ The library currently can only be built in 64-bit mode on Windows. To create a 6
     > cmake -G "Visual Studio 14 2015 Win64" ..
 
 **Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `EMLL.sln`, along with other files. 
+Alternatively, you can create a solution that doesn't build Doxygen documentation or SWIG interfaces, by typing:
+
+    > cmake -G "Visual Studio 14 2015 Win64" -DSWIG_ENABLED=false -DDOXYGEN_ENABLED=false ..
+
 There are two ways to build the library. One option is to open the solution file in Visual Studio and build it there. To do this, type:
 
     > EMLL.sln

@@ -8,8 +8,8 @@
 
 #pragma once
 
-// dataset
-#include "RowDataset.h"
+// data
+#include "Dataset.h"
 
 // stl
 #include <memory>
@@ -30,10 +30,10 @@ namespace trainers
     public:
         virtual ~IIncrementalTrainer() = default;
 
-        /// <summary> Updates the state of the trainer by performing a learning iteration. </summary>
+        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the training set. </param>
-        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) = 0;
+        /// <param name="anyDataset"> A dataset. </param>
+        virtual void Update(const data::AnyDataset& anyDataset) = 0;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///

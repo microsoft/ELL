@@ -14,7 +14,7 @@ PROJECT(EMLL)
 # Define custom configuration types for VS
 if(CMAKE_CONFIGURATION_TYPES)
 #  list(APPEND CMAKE_CONFIGURATION_TYPES Documentation)
-#  list(REMOVE_DUPLICATES CMAKE_CONFIGURATION_TYPES)
+#  list(REMOVE_DeepCopyAsS CMAKE_CONFIGURATION_TYPES)
 
   # Copy important configuration info from Release config to new Documentation config  
   set(CMAKE_CXX_FLAGS_DOCUMENTATION ${CMAKE_CXX_FLAGS_RELEASE})

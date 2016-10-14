@@ -12,7 +12,7 @@
 #include "IPredictor.h"
 #include "SingleElementThresholdPredictor.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
 
 // utilities
@@ -210,7 +210,7 @@ namespace predictors
         };
 
         /// <summary> Type of the data vector expected by this predictor type. </summary>
-        using DataVectorType = dataset::DoubleDataVector;
+        using DataVectorType = data::FloatDataVector;
 
         /// <summary> Query if this forest has no trees and a zero bias. </summary>
         ///
@@ -251,45 +251,34 @@ namespace predictors
 
         /// <summary> Returns the output of the forest (including all trees and the bias term) for a given input. </summary>
         ///
-        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the input. </typeparam>
         /// <param name="input"> The input vector. </param>
         ///
         /// <returns> The prediction. </returns>
-        template <typename RandomAccessVectorType>
-        double Predict(const RandomAccessVectorType& input) const;
+        double Predict(const DataVectorType& input) const;
 
         /// <summary> Returns the output of a given subtree for a given input. </summary>
         ///
-        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
-        /// input. </typeparam>
         /// <param name="input"> The input vector. </param>
         /// <param name="treeIndex"> The index of the subtree root. </param>
         ///
         /// <returns> The prediction. </returns>
-        template <typename RandomAccessVectorType>
-        double Predict(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
+        double Predict(const DataVectorType& input, size_t interiorNodeIndex) const;
 
         /// <summary> Generates the edge path indicator vector of the entire forest. </summary>
         ///
-        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
-        ///  input. </typeparam>
         /// <param name="input"> The input vector. </param>
         ///
         /// <returns> The edge indicator vector. </returns>
-        template <typename RandomAccessVectorType>
-        std::vector<bool> GetEdgeIndicatorVector(const RandomAccessVectorType& input) const;
+        std::vector<bool> GetEdgeIndicatorVector(const DataVectorType& input) const;
 
         /// <summary> Generates the edge path indicator vector of a given subtree for a given input. The
         /// dimension of this vector is NumEdges() (regardless of the subtree chosen). </summary>
         ///
-        /// <typeparam name="RandomAccessVectorType"> The random access vector type used to represent the
-        ///  input. </typeparam>
         /// <param name="input"> The input vector. </param>
         /// <param name="interiorNodeIndex"> Zero-based index of the interior node. </param>
         ///
         /// <returns> The edge indicator vector. </returns>
-        template <typename RandomAccessVectorType>
-        std::vector<bool> GetEdgeIndicatorVector(const RandomAccessVectorType& input, size_t interiorNodeIndex) const;
+        std::vector<bool> GetEdgeIndicatorVector(const DataVectorType& input, size_t interiorNodeIndex) const;
 
         /// <summary> Gets a SplittableNodeId that represents the root of a new tree. </summary>
         ///
@@ -368,13 +357,11 @@ namespace predictors
         //
         // protected member functions
         //
-        template <typename RandomAccessVectorType>
-        void SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& edgeIndicator, size_t interiorNodeIndex) const;
+        void SetEdgeIndicatorVector(const DataVectorType& input, std::vector<bool>& edgeIndicator, size_t interiorNodeIndex) const;
 
         size_t AddInteriorNode(const SplitAction& splitAction);
 
-        template <typename RandomAccessVectorType>
-        void VisitEdgePathToLeaf(const RandomAccessVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const;
+        void VisitEdgePathToLeaf(const DataVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const;
 
         //
         //  member variables

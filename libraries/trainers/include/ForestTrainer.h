@@ -10,9 +10,9 @@
 
 #include "IIncrementalTrainer.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
-#include "RowDataset.h"
+#include "Dataset.h"
 
 // predictors
 #include "ForestPredictor.h"
@@ -48,7 +48,7 @@ namespace trainers
             double sumWeights = 0;
             double sumWeightedLabels = 0;
 
-            void Increment(const dataset::WeightLabel& weightLabel);
+            void Increment(const data::WeightLabel& weightLabel);
             Sums operator-(const Sums& other) const;
             double GetMeanLabel() const;
             void Print(std::ostream& os) const;
@@ -75,15 +75,16 @@ namespace trainers
         };
 
         // metadata that the forest trainer keeps with each example
-        struct ExampleMetadata
+        struct TrainerMetadata
         {
+            TrainerMetadata(const data::WeightLabel& metaData);  
             void Print(std::ostream& os) const;
 
             // strong weight and label
-            dataset::WeightLabel strong;
+            data::WeightLabel strong;
 
             // weak weight and label
-            dataset::WeightLabel weak;
+            data::WeightLabel weak;
 
             // the output of the forest on this example
             double currentOutput = 0;
@@ -113,21 +114,25 @@ namespace trainers
     class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>>
     {
     public:
+        using PredictorType = typename predictors::ForestPredictor<SplitRuleType, EdgePredictorType>;
+        using DataVectorType = typename PredictorType::DataVectorType;
+        using TrainerExampleType = data::Example<DataVectorType, TrainerMetadata>;
+
         /// <summary> Constructs an instance of ForestTrainer. </summary>
         ///
         /// <param name="booster"> The booster. </param>
         /// <param name="parameters"> Training Parameters. </param>
         ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters);
 
-        /// <summary> Grows the decision forest. </summary>
+        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the training set.  </param>
-        virtual void Update(dataset::GenericRowDataset::Iterator exampleIterator) override;
+        /// <param name="anyDataset"> A dataset. </param>
+        virtual void Update(const data::AnyDataset& anyDataset) override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> GetPredictor() const override { return _forest; };
+        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _forest; };
 
     protected:
         //
@@ -162,8 +167,8 @@ namespace trainers
         // private member functions
         //
 
-        // loads a dataset and initializes the currentOutput field in the metadata
-        void LoadData(dataset::GenericRowDataset::Iterator exampleIterator);
+        // initializes weak weights and labels, as well as currentOutput
+        void InitializeMetadata(); 
 
         // performs an epoch of splits
         void PerformSplits(size_t maxSplits);
@@ -175,7 +180,7 @@ namespace trainers
         void UpdateCurrentOutputs(double value);
         void UpdateCurrentOutputs(Range range, const EdgePredictorType& edgePredictor);
 
-        // after performing a split, we rearrange the dataset to ensure that each node's examples occupy contiguous rows in the dataset
+        // after performing a split, we rearrange the data set to ensure that each node's examples occupy contiguous rows in the dataset
         void SortNodeDataset(Range range, const SplitRuleType& splitRule);
 
         //
@@ -194,14 +199,13 @@ namespace trainers
         ForestTrainerParameters _parameters;
 
         // the forest being grown
-        std::shared_ptr<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>> _forest;
+        std::shared_ptr<PredictorType> _forest;
 
         // the priority queue that holds the split candidates
         SplitCandidatePriorityQueue _queue;
 
-        // the dataset
-        using ForestTrainerExample = dataset::Example<dataset::DoubleDataVector, ExampleMetadata>;
-        dataset::RowDataset<ForestTrainerExample> _dataset;
+        // the data set
+        data::Dataset<TrainerExampleType> _dataset;
     };
 }
 }

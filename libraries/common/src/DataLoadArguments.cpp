@@ -16,6 +16,7 @@
 // stl
 #include <string>
 #include <vector>
+#include <algorithm>
 
 namespace emll
 {
@@ -62,7 +63,7 @@ namespace common
             auto dataIterator = GetDataIterator(*this);
             while (dataIterator->IsValid())
             {
-                auto size = dataIterator->Get().GetDataVector().Size();
+                auto size = dataIterator->Get().GetDataVector().PrefixLength();
                 parsedDataDimension = std::max(parsedDataDimension, size);
                 dataIterator->Next();
             }

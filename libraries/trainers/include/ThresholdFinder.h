@@ -8,8 +8,8 @@
 
 #pragma once
 
-// dataset
-#include "RowDataset.h"
+// data
+#include "Dataset.h"
 
 // predictor
 #include "SingleElementThresholdPredictor.h"
@@ -25,6 +25,8 @@ namespace trainers
     class ThresholdFinder
     {
     protected:
+        using DataVectorType = predictors::SingleElementThresholdPredictor::DataVectorType;
+
         struct ValueWeight
         {
             double value;
@@ -45,7 +47,7 @@ namespace trainers
         UniqueValuesResult UniqueValues(ExampleIteratorType exampleIterator) const;
 
     private:
-        size_t SortReduceDuplicates(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const;
+        size_t SortReduceDeepCopyAss(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const;
     };
 
     /// <summary> A threshold finder that finds all possible thresholds. </summary>

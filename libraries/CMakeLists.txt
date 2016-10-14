@@ -5,7 +5,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 add_subdirectory(common)
-add_subdirectory(dataset)
+add_subdirectory(data)
 add_subdirectory(evaluators)
 add_subdirectory(linear)
 add_subdirectory(lossFunctions)

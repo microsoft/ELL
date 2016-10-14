@@ -57,7 +57,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
 
-target_link_libraries(${PROJ_NAME} utilities dataset)
+target_link_libraries(${PROJ_NAME} utilities data linear) ## TODO look at this
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -74,6 +74,7 @@ set (TEST_SRC test/src/main.cpp
               test/src/Map_test.cpp
               test/src/Model_test.cpp
               test/src/PortElements_test.cpp)
+
 set (TEST_INCLUDE test/include/PortElements_test.h
                   test/include/DynamicMap_test.h
                   test/include/Map_test.h

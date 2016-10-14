@@ -97,8 +97,7 @@ namespace predictors
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    template <typename RandomAccessVectorType>
-    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const RandomAccessVectorType& input) const
+    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const DataVectorType& input) const
     {
         double output = _bias;
         for (auto treeRootIndex : _rootIndices)
@@ -109,8 +108,7 @@ namespace predictors
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    template <typename RandomAccessVectorType>
-    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const RandomAccessVectorType& input, size_t interiorNodeIndex) const
+    double ForestPredictor<SplitRuleType, EdgePredictorType>::Predict(const DataVectorType& input, size_t interiorNodeIndex) const
     {
         if (interiorNodeIndex >= _interiorNodes.size())
         {
@@ -126,8 +124,7 @@ namespace predictors
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    template <typename RandomAccessVectorType>
-    std::vector<bool> ForestPredictor<SplitRuleType, EdgePredictorType>::GetEdgeIndicatorVector(const RandomAccessVectorType& input) const
+    std::vector<bool> ForestPredictor<SplitRuleType, EdgePredictorType>::GetEdgeIndicatorVector(const DataVectorType& input) const
     {
         std::vector<bool> edgeIndicator(_numEdges);
         for (auto treeRootIndex : _rootIndices)
@@ -138,8 +135,7 @@ namespace predictors
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    template <typename RandomAccessVectorType>
-    std::vector<bool> ForestPredictor<SplitRuleType, EdgePredictorType>::GetEdgeIndicatorVector(const RandomAccessVectorType& input, size_t interiorNodeIndex) const
+    std::vector<bool> ForestPredictor<SplitRuleType, EdgePredictorType>::GetEdgeIndicatorVector(const DataVectorType& input, size_t interiorNodeIndex) const
     {
         std::vector<bool> edgeIndicator(_numEdges);
         SetEdgeIndicatorVector(input, edgeIndicator, interiorNodeIndex);
@@ -233,8 +229,7 @@ namespace predictors
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    template <typename RandomAccessVectorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::SetEdgeIndicatorVector(const RandomAccessVectorType& input, std::vector<bool>& output, size_t interiorNodeIndex) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::SetEdgeIndicatorVector(const DataVectorType& input, std::vector<bool>& output, size_t interiorNodeIndex) const
     {
         if (interiorNodeIndex >= _interiorNodes.size())
         {
@@ -268,8 +263,7 @@ namespace predictors
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>
-    template <typename RandomAccessVectorType>
-    void ForestPredictor<SplitRuleType, EdgePredictorType>::VisitEdgePathToLeaf(const RandomAccessVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const
+    void ForestPredictor<SplitRuleType, EdgePredictorType>::VisitEdgePathToLeaf(const DataVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const
     {
         size_t nodeIndex = interiorNodeIndex;
 

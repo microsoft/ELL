@@ -14,7 +14,7 @@
 #include "DoubleVector.h"
 
 // datasets
-#include "IDataVector.h"
+#include "AutoDataVector.h"
 
 // utilities
 #include "IArchivable.h"
@@ -32,7 +32,7 @@ namespace predictors
     {
     public:
         /// <summary> Type of the data vector expected by this predictor type. </summary>
-        using DataVectorType = dataset::IDataVector;
+        using DataVectorType = data::AutoDataVector;
 
         /// <summary> Default Constructor. </summary>
         LinearPredictor();
@@ -72,14 +72,14 @@ namespace predictors
         /// <param name="example"> The data vector. </param>
         ///
         /// <returns> The prediction. </returns>
-        double Predict(const dataset::IDataVector& dataVector) const;
+        double Predict(const DataVectorType& dataVector) const;
 
         /// <summary> Returns a vector of dataVector elements weighted by the predictor weights. </summary>
         ///
         /// <param name="example"> The data vector. </param>
         ///
         /// <returns> The weighted elements vector. </returns>
-        std::vector<double> GetWeightedElements(const dataset::IDataVector& dataVector) const;
+        std::vector<double> GetWeightedElements(const DataVectorType& dataVector) const;
 
         /// <summary> Scales the linear predictor by a scalar </summary>
         ///

@@ -14,7 +14,7 @@
 #include "OutputPort.h"
 #include "PortElements.h"
 
-// dataset
+// data
 #include "DenseDataVector.h"
 
 // utilities
@@ -103,9 +103,9 @@ namespace model
         /// <param name="inputs"> The inputs to be routed to the input nodes </param>
         template <typename... InputTypes>
         void SetInputValues(std::vector<InputTypes>... inputs)
-		{
-			SetInputTuple(std::tuple<std::vector<InputTypes>...>(inputs...));
-		}
+        {
+            SetInputTuple(std::tuple<std::vector<InputTypes>...>(inputs...));
+        }
 
         /// <summary> Type alias for the tuple of vectors returned by `Compute` </summary>
         using ComputedOutputType = utilities::WrappedTuple<OutputTypesTuple, StdVector>; // typename TupleOfVectorsFromPortElements<OutputTypesTuple>::type;
@@ -171,9 +171,9 @@ namespace model
         // SetInput
         template <typename... InputNodeTypes>
         void SetInputTuple(const std::tuple<std::vector<InputNodeTypes>...>& inputTuple)
-		{
-			SetInputElementsHelper(std::index_sequence_for<InputNodeTypes...>(), inputTuple);
-		}
+        {
+            SetInputElementsHelper(std::index_sequence_for<InputNodeTypes...>(), inputTuple);
+        }
 
         template <typename InputNodeType, typename InputType>
         void SetNodeInput(InputNode<InputNodeType>* inputNode, const InputType& inputValues);

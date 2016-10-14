@@ -20,18 +20,21 @@ namespace trainers
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(dataset::GenericRowDataset::Iterator exampleIterator)
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::Update(const data::AnyDataset& anyDataset)
     {
-        // convert data from iterator to dense dataset with metadata (weak weight / weak label) associated with each example
-        LoadData(exampleIterator);
+        // materialize a dataset of dense DataVectors with metadata that contains both strong and weak weight and lables for each example
+        _dataset = data::Dataset<TrainerExampleType>(anyDataset);
+
+        // initalizes the speical fields in the dataset metadata: weak weight and label, currentOutput
+        InitializeMetadata();
 
         // boosting loop (outer loop)
         for (size_t round = 0; round < _parameters.numRounds; ++round)
         {
-            // call the booster and compute sums for the entire dataset
+            // call the booster and compute sums for the entire data set
             Sums sums = SetWeakWeightsLabels();
 
-            // use the computed sums to calaculate the bias term, set it in the forest and the dataset
+            // use the computed sums to calaculate the bias term, set it in the forest and the data set
             double bias = sums.GetMeanLabel();
             _forest->AddToBias(bias);
             UpdateCurrentOutputs(bias);
@@ -65,29 +68,6 @@ namespace trainers
     ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums)
         : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
     {
-    }
-
-    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::LoadData(dataset::GenericRowDataset::Iterator exampleIterator)
-    {
-        // reset the dataset
-        _dataset = dataset::RowDataset<ForestTrainerExample>();
-
-        // create the dataset from the example iterator
-        while (exampleIterator.IsValid())
-        {
-            const auto& example = exampleIterator.Get();
-
-            auto denseDataVector = std::make_unique<dataset::DoubleDataVector>(example.GetDataVector().ToDoubleArray());
-
-            ExampleMetadata metadata;
-            metadata.strong = example.GetMetadata();
-            metadata.currentOutput = _forest->Predict(*denseDataVector);
-
-            _dataset.AddExample(ForestTrainerExample(std::move(denseDataVector), metadata));
-
-            exampleIterator.Next();
-        }
     }
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
@@ -127,6 +107,19 @@ namespace trainers
         {
             auto& example = _dataset[rowIndex];
             example.GetMetadata().currentOutput += edgePredictor.Predict(example.GetDataVector());
+        }
+    }
+
+    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::InitializeMetadata()
+    {
+        for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
+        {
+            auto& example = _dataset[rowIndex];
+            auto prediction = _forest->Predict(example.GetDataVector());
+            auto& metadata = example.GetMetadata();
+            metadata.currentOutput = prediction;
+            metadata.weak = _booster.GetWeakWeightLabel(metadata.strong, prediction);
         }
     }
 
@@ -190,13 +183,13 @@ namespace trainers
     {
         if (splitRule.NumOutputs() == 2)
         {
-            _dataset.Partition([splitRule](const ForestTrainerExample& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
+            _dataset.Partition([splitRule](const data::Example<DataVectorType, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()) == 0; },
                                range.firstIndex,
                                range.size);
         }
         else
         {
-            _dataset.Sort([splitRule](const ForestTrainerExample& example) { return splitRule.Predict(example.GetDataVector()); },
+            _dataset.Sort([splitRule](const data::Example<DataVectorType, TrainerMetadata>& example) { return splitRule.Predict(example.GetDataVector()); },
                           range.firstIndex,
                           range.size);
         }

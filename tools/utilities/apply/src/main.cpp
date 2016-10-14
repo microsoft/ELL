@@ -15,9 +15,9 @@
 #include "Files.h"
 #include "OutputStreamImpostor.h"
 
-// dataset
+// data
 #include "Example.h"
-#include "RowDataset.h"
+#include "Dataset.h"
 
 // common
 #include "DataLoadArguments.h"
@@ -82,9 +82,9 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // load dataset
+        // load data set
         if (verbose) std::cout << "Loading data from file: " << dataLoadArguments.inputDataFilename << std::endl;
-        auto dataset = common::GetRowDataset<dataset::DenseRowDataset>(dataLoadArguments);
+        auto dataset = common::GetDataset(dataLoadArguments);
 
         // load map
         model::DynamicMap map;
@@ -163,36 +163,25 @@ int main(int argc, char* argv[])
             map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputElements } });
         }
 
-        // Get dataset iterator
-        auto datasetIterator = dataset.GetIterator();
-
-        // get output stream
         auto outputStream = dataSaveArguments.outputDataStream;
         auto mapInputSize = map.GetInputSize("input");
+
+        auto datasetIterator = dataset.GetExampleReferenceIterator();
         while (datasetIterator.IsValid())
         {
-            auto row = datasetIterator.Get();
-            // truncate to size of map input
-            auto dataVec = row.GetDataVector();
-            dataVec.Resize(mapInputSize);
-            map.SetInputValue<double>("input", dataVec);
-            auto output = map.ComputeOutput<dataset::DoubleDataVector>("output");
-            auto mappedRow = dataset::DenseSupervisedExample{ output, row.GetMetadata() };
-            mappedRow.Print(outputStream);
+            const auto& example = datasetIterator.Get();
+            auto featureArray = example.GetDataVector().ToArray();
+
+            featureArray.resize(mapInputSize);
+            map.SetInputValue<double>("input", featureArray);
+
+            // TODO: create data vector via Iterator.
+//            auto output = map.ComputeOutput<data::FloatDataVector, double>("output");
+//            auto mappedExample = data::DenseSupervisedExample{ std::make_shared<data::FloatDataVector>(std::move(output)), example.GetMetadata() };
+
+//            mappedExample.Print(outputStream);
             outputStream << std::string("\n");
             datasetIterator.Next();
-        }
-
-        // write map to output if desired
-        if(mapSaveArguments.hasOutputStream)
-        {
-            if(verbose) std::cout << "Saving map to file " << mapSaveArguments.outputMapFile << std::endl;
-            auto ext = utilities::GetFileExtension(mapSaveArguments.outputMapFile, true);
-            if(ext == "")
-            {
-                ext = "json";
-            }
-            common::SaveMap(map, mapSaveArguments.outputMapStream, ext);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

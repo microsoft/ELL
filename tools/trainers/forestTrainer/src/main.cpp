@@ -13,21 +13,25 @@
 #include "OutputStreamImpostor.h"
 #include "RandomEngines.h"
 
-// dataset
-#include "Example.h"
+// data
+#include "Dataset.h"
 
 // common
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
+#include "EvaluatorArguments.h"
 #include "ForestTrainerArguments.h"
 #include "MakeEvaluator.h"
 #include "MakeTrainer.h"
 #include "ModelSaveArguments.h"
 #include "TrainerArguments.h"
+#include "MultiEpochIncrementalTrainerArguments.h"
 
 // trainers
 #include "HistogramForestTrainer.h"
 #include "SortingForestTrainer.h"
+#include "EvaluatingIncrementalTrainer.h"
+#include "MultiEpochIncrementalTrainer.h"
 
 // lossFunctions
 #include "LogLoss.h"
@@ -51,11 +55,15 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedForestTrainerArguments forestTrainerArguments;
+        common::ParsedEvaluatorArguments evaluatorArguments;
+        common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
+        commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(forestTrainerArguments);
+        commandLineParser.AddOptionSet(evaluatorArguments);
 
         // parse command line
         commandLineParser.Parse();
@@ -66,44 +74,47 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // load dataset
+        // load data set
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto rowDataset = common::GetRowDataset(dataLoadArguments);
+        auto dataset = common::GetDataset(dataLoadArguments);
+
+        // predictor type
+        using PredictorType = predictors::SimpleForestPredictor;
 
         // create trainer
-        std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> trainer;
-        if (true)
+        auto trainer = common::MakeForestTrainer(trainerArguments.lossArguments, forestTrainerArguments);
+
+        // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer
+        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
+        if (trainerArguments.verbose)
         {
-            trainer = common::MakeSortingForestTrainer(trainerArguments.lossArguments, forestTrainerArguments);
+            evaluator = common::MakeEvaluator<PredictorType>(dataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossArguments);
+            trainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(trainer), evaluator));
         }
-        else
-        {
-            trainer = common::MakeHistogramForestTrainer(trainerArguments.lossArguments, forestTrainerArguments);
-        }
+
+        // create multi epoch trainer
+        trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(trainer), multiEpochTrainerArguments);
 
         // create random number generator
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
 
         // randomly permute the data
-        rowDataset.RandomPermute(rng);
+        dataset.RandomPermute(rng);
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        auto dataIterator = rowDataset.GetIterator(0, 1000);
-        trainer->Update(dataIterator);
+        trainer->Update(dataset.GetAnyDataset());
+        auto predictor = trainer->GetPredictor();
 
         // print loss and errors
         if (trainerArguments.verbose)
         {
-            const auto& predictor = trainer->GetPredictor();
             std::cout << "Finished training forest with " << predictor->NumTrees() << " trees." << std::endl;
 
-            // evaluate
-            // auto evaluator = common::MakeEvaluator<predictors::SimpleForestPredictor>(rowDataset.GetIterator(), evaluators::EvaluatorParameters{1, false}, trainerArguments.lossArguments);
-            //evaluator->Evaluate(tree);
-            //std::cout << "Training error\n";
-            //evaluator->Print(std::cout);
-            //std::cout << std::endl;
+            // print evaluation
+            std::cout << "Training error\n";
+            evaluator->Print(std::cout);
+            std::cout << std::endl;
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
@@ -125,6 +136,5 @@ int main(int argc, char* argv[])
         std::cerr << "exception: " << exception.GetMessage() << std::endl;
         return 1;
     }
-
     return 0;
 }

@@ -8,8 +8,9 @@
 
 #pragma once
 
-// dataset
-#include "RowDataset.h"
+// data
+#include "Dataset.h"
+#include "Example.h"
 
 // stl
 #include <memory>
@@ -52,7 +53,7 @@ namespace evaluators
         bool addZeroEvaluation;
     };
 
-    /// <summary> Implements an evaluator that holds a dataset and a set of evaluation aggregators. </summary>
+    /// <summary> Implements an evaluator that holds a data set and a set of evaluation aggregators. </summary>
     ///
     /// <typeparam name="PredictorType"> The predictor type. </typeparam>
     /// <typeparam name="AggregatorTypes"> The aggregator types. </typeparam>
@@ -60,12 +61,14 @@ namespace evaluators
     class Evaluator : public IEvaluator<PredictorType>
     {
     public:
-        /// <summary> Constructs an instance of Evaluator with a given dataset and given aggregators. </summary>
+        /// <summary>
+        /// Constructs an instance of Evaluator with a given data set and given aggregators.
+        /// </summary>
         ///
-        /// <param name="exampleIterator"> An example iterator that represents the evaluation set. </param>
+        /// <param name="anyDataset"> A dataset. </param>
         /// <param name="evaluatorParameters"> The evaluation parameters. </param>
         /// <param name="aggregators"> The aggregators. </param>
-        Evaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+        Evaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
         ///
@@ -105,8 +108,11 @@ namespace evaluators
         template <std::size_t... Sequence>
         std::vector<std::vector<std::string>> DispatchGetValueNames(std::index_sequence<Sequence...>) const;
 
+        // the type of example used by this evaluator
+        using ExampleType = data::Example<typename PredictorType::DataVectorType, data::WeightLabel>;
+
         // member variables
-        dataset::GenericRowDataset _rowDataset;
+        data::Dataset<ExampleType> _dataset;
         EvaluatorParameters _evaluatorParameters;
         uint64_t _evaluateCounter = 0;
         typename std::tuple<AggregatorTypes...> _aggregatorTuple;
@@ -117,12 +123,12 @@ namespace evaluators
     ///
     /// <typeparam name="PredictorType"> The predictor type. </typeparam>
     /// <typeparam name="AggregatorTypes"> The Aggregator types. </typeparam>
-    /// <param name="exampleIterator"> An example iterator that represents the evaluation data. </param>
+    /// <param name="dataset"> A dataset. </param>
     /// <param name="aggregators"> The aggregators. </param>
     ///
     /// <returns> A shared_ptr to an IEvaluator. </returns>
     template <typename PredictorType, typename... AggregatorTypes>
-    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(dataset::GenericRowDataset::Iterator exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
+    std::shared_ptr<IEvaluator<PredictorType>> MakeEvaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 }
 }
 

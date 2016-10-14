@@ -56,15 +56,15 @@ namespace linear
         return result;
     }
 
-    void DoubleSubvector::Print(std::ostream& os) const
-    {
-        auto iterator = GetIterator();
-        while (iterator.IsValid())
-        {
-            auto indexValue = iterator.Get();
-            os << indexValue.index << ':' << indexValue.value << '\t';
-            iterator.Next();
-        }
-    }
+    //void DoubleSubvector::Print(std::ostream& os) const
+    //{
+    //    auto iterator = GetIterator();
+    //    while (iterator.IsValid())
+    //    {
+    //        auto indexValue = iterator.Get();
+    //        os << indexValue.index << ':' << indexValue.value << '\t';
+    //        iterator.Next();
+    //    }
+    //}
 }
 }
