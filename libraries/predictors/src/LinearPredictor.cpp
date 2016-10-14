@@ -50,7 +50,8 @@ namespace predictors
 
     void LinearPredictor::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // archiver["w"] << static_cast<std::vector<double>>(_w); TODO Vector serialization
+        auto w = _w.ToArray();
+        archiver["w"] << w;
         archiver["b"] << _b;
     }
 
@@ -58,7 +59,7 @@ namespace predictors
     {
         std::vector<double> w;
         archiver["w"] >> w;
-        // _w = w; TODO Serialization
+        _w = math::ColumnVector<double>(std::move(w));
         archiver["b"] >> _b;
     }
 }

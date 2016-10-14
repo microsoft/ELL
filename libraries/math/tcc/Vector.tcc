@@ -203,13 +203,19 @@ namespace math
     //
 
     template<typename ElementType, VectorOrientation Orientation>
-    Vector<ElementType, Orientation>::Vector(size_t size) : _data(size), VectorReference<ElementType, Orientation>(nullptr, size, 1)
+    Vector<ElementType, Orientation>::Vector(size_t size) : VectorReference<ElementType, Orientation>(nullptr, size, 1), _data(size)
     {
         _pData = _data.data();
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    Vector<ElementType, Orientation>::Vector(std::initializer_list<ElementType> list) : _data(list.begin(), list.end()), VectorReference<ElementType, Orientation>(nullptr, list.size(), 1)
+    Vector<ElementType, Orientation>::Vector(std::vector<ElementType> data) : VectorReference<ElementType, Orientation>(nullptr, data.size(), 1), _data(std::move(data))
+    {
+        _pData = _data.data();
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    Vector<ElementType, Orientation>::Vector(std::initializer_list<ElementType> list) : VectorReference<ElementType, Orientation>(nullptr, list.size(), 1), _data(list.begin(), list.end())
     {
         _pData = _data.data(); 
     }

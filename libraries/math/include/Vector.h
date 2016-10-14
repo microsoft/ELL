@@ -251,6 +251,8 @@ namespace math
         /// <param name="size"> The vector size. </param>
         Vector(size_t size);
 
+        Vector(std::vector<ElementType> data);
+
         /// <summary> Constructs a vector from an initializer list. </summary>
         ///
         /// <param name="list"> The initalizer list. </param>
