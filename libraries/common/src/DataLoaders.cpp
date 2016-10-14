@@ -12,7 +12,7 @@
 #include "Files.h"
 
 // data
-#include "ParsingIterator.h"
+#include "ParsingExampleIterator.h"
 #include "Dataset.h"
 #include "SequentialLineIterator.h"
 #include "SparseEntryParser.h"
@@ -29,7 +29,7 @@ namespace common
     //
     // Public functions
     //
-    std::unique_ptr<data::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
+    std::unique_ptr<data::IParsingExampleIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
     {
         // create parser for sparse vectors (SVMLight format)
         data::SparseEntryParser sparseEntryParser;
@@ -38,7 +38,7 @@ namespace common
         data::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
 
         // Create iterator
-        return data::GetParsingIterator(std::move(lineIterator), std::move(sparseEntryParser));
+        return data::GetParsingExampleIterator(std::move(lineIterator), std::move(sparseEntryParser));
     }
 }
 }

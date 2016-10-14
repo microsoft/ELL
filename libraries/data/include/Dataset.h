@@ -63,9 +63,9 @@ namespace data
     };
 
     /// <summary> Polymorphic interface for datasets, enables dynamic_cast operations. </summary>
-    struct IDataset 
+    struct DatasetBase
     {
-        virtual ~IDataset() = default;
+        virtual ~DatasetBase() = default;
     };
 
     /// <summary> Implements an untyped data set. This class is used to send data to trainers and evaluators </summary>
@@ -74,10 +74,10 @@ namespace data
     public:
         /// <summary> Constructs an instance of AnyDataset. </summary>
         ///
-        /// <param name="pDataset"> Pointer to an IDataset. </param>
+        /// <param name="pDataset"> Pointer to an DatasetBase. </param>
         /// <param name="fromIndex"> Zero-based index of the first example referenced by the iterator. </param>
         /// <param name="size"> The number of examples referenced by the iterator. </param>
-        AnyDataset(const IDataset* pDataset, size_t fromIndex, size_t size);
+        AnyDataset(const DatasetBase* pDataset, size_t fromIndex, size_t size);
 
         /// <summary> Gets an example iterator of a given example type. </summary>
         ///
@@ -93,14 +93,14 @@ namespace data
         size_t NumExamples() const { return _size; }
 
     private:
-        const IDataset* _pDataset;
+        const DatasetBase* _pDataset;
         size_t _fromIndex;
         size_t _size;
     };
 
     /// <summary> A data set of a specific example type. </summary>
     template <typename DatasetExampleType>
-    class Dataset : public IDataset
+    class Dataset : public DatasetBase
     {
     public:
         using ExampleReferenceIterator = utilities::VectorReferenceIterator<DatasetExampleType>;

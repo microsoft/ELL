@@ -22,7 +22,7 @@ set (INCLUDE include/AutoDataVector.h
              include/Example.h
              include/ExampleIterator.h
              include/DataVector.h
-             include/ParsingIterator.h
+             include/ParsingExampleIterator.h
              include/Dataset.h
              include/SequentialLineIterator.h
              include/SparseBinaryDataVector.h
@@ -35,7 +35,7 @@ set (TCC tcc/AutoDataVector.tcc
          tcc/DenseDataVector.tcc
          tcc/Example.tcc
          tcc/ExampleIterator.tcc
-         tcc/ParsingIterator.tcc
+         tcc/ParsingExampleIterator.tcc
          tcc/Dataset.tcc
          tcc/SparseBinaryDataVector.tcc
          tcc/SparseDataVector.tcc

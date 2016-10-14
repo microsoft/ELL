@@ -37,7 +37,7 @@ namespace data
         GetExampleIteratorFunctor<ExampleType> abstractor(_fromIndex, _size);
 
         // all Dataset types for which GetAnyDataset() is called must be listed below, in the variadic template argument.
-        return utilities::AbstractInvoker<IDataset, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
+        return utilities::AbstractInvoker<DatasetBase, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
     }
 
     template<typename DatasetExampleType>
