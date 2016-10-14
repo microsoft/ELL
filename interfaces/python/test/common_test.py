@@ -17,7 +17,7 @@ data = [
 extensions = ["xml", "json"]
 
 def TestModelSize(key, label):
-    model = EMLL.LoadModel(key)
+    model = EMLL.ELL_Model(key)
     print "%s size: %d" % (label, model.Size())
 
 def TestModelSizes():
@@ -26,8 +26,7 @@ def TestModelSizes():
  
 def TestSaveModel(ext, key, prefix):
     fileName = prefix + "." + ext
-    model = EMLL.LoadModel(key)
-    EMLL.SaveModel(model, fileName)
+    EMLL.ELL_Model(key).Save(fileName)
 
 def TestSaveModelsExt(ext):
     for (key, label, prefix) in data:

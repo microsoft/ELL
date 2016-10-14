@@ -31,9 +31,9 @@ class ELL_HingeLoss {
 public:
     double Evaluate(double p, double l) { return _loss.Evaluate(p,l); }
     double GetDerivative(double p, double l) { return _loss.GetDerivative(p, l); }
+    ELL_HingeLoss() {}
 #ifndef SWIG
     ELL_HingeLoss(const emll::lossFunctions::HingeLoss& other) { _loss = other; }
-    ELL_HingeLoss() {}
 #endif
 private:
     emll::lossFunctions::HingeLoss _loss;
@@ -44,9 +44,9 @@ public:
     double Evaluate(double p, double l) { return _loss.Evaluate(p,l); }
     double GetDerivative(double p, double l) { return _loss.GetDerivative(p, l); }
     double BregmanGenerator(double v) { return _loss.BregmanGenerator(v); }
+    ELL_SquaredLoss() {}
 #ifndef SWIG
     ELL_SquaredLoss(const emll::lossFunctions::SquaredLoss& other) { _loss = other; }
-    ELL_SquaredLoss() {}
 #endif
 private:
     emll::lossFunctions::SquaredLoss _loss;

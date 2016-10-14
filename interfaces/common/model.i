@@ -16,6 +16,7 @@
 #include "PortElements.h"
 #include "InputNode.h"
 #include "OutputNode.h"
+#include "LoadModel.h"
 %}
 
 %nodefaultctor emll::model::NodeIterator;
@@ -80,3 +81,25 @@
         return $self->ComputeOutput(outputPort);
     }
 }
+
+%inline %{
+
+class ELL_Model {
+public:
+    ELL_Model() {}
+    ELL_Model(const std::string& filename) : _model(emll::common::LoadModel(filename)) {}
+    void Save(const std::string& filename)
+    {
+        emll::common::SaveModel(_model, filename);
+    }
+    size_t Size() { return _model.Size(); }
+#ifndef SWIG
+    ELL_Model(const emll::model::Model& other) { _model = other; }
+#endif
+
+private:
+    emll::model::Model _model;
+};
+
+%}
+
