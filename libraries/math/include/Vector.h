@@ -18,16 +18,20 @@ namespace emll
 namespace math
 {
     /// <summary> Enum of possible vector orientations. </summary>
-    enum class VectorOrientation { column, row };
+    enum class VectorOrientation
+    {
+        column,
+        row
+    };
 
     /// <summary> Base class for vectors. </summary>
     ///
     /// <typeparam name="Orientation"> The vector orientation. </typeparam>
-    template<VectorOrientation Orientation>
+    template <VectorOrientation Orientation>
     class VectorBase;
 
     /// <summary> Base class for row vectors. </summary>
-    template<>
+    template <>
     class VectorBase<VectorOrientation::row>
     {
     protected:
@@ -36,7 +40,7 @@ namespace math
     };
 
     /// <summary> Base class for column vectors. </summary>
-    template<>
+    template <>
     class VectorBase<VectorOrientation::column>
     {
     protected:
@@ -66,7 +70,7 @@ namespace math
         /// <param name="index"> Zero-based index of the element. </param>
         ///
         /// <returns> A copy of the specified element. </returns>
-        ElementType operator[] (size_t index) const;
+        ElementType operator[](size_t index) const;
 
         /// <summary> Gets the vector size. </summary>
         ///
@@ -124,7 +128,10 @@ namespace math
         /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
         /// <returns> A reference to the transpose of this vector. </returns>
-        auto Transpose() const->ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
+        auto Transpose() const -> ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
+        {
+            return ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
+        }
 
         /// <summary> Equality operator. </summary>
         ///
@@ -143,9 +150,9 @@ namespace math
     protected:
         using UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference;
 
-        template<typename T>
+        template <typename T>
         friend class RectangularMatrixBase;
-        
+
         friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
     };
 
@@ -177,7 +184,7 @@ namespace math
         ///
         /// <typeparam name="GeneratorType"> Type of lambda or functor to use as a generator. </typeparam>
         /// <param name="generator"> The generator function. </param>
-        template<typename GeneratorType>
+        template <typename GeneratorType>
         void Generate(GeneratorType generator);
 
         /// <summary> Array indexer operator. </summary>
@@ -185,7 +192,7 @@ namespace math
         /// <param name="index"> Zero-based index of the element. </param>
         ///
         /// <returns> Reference to the specified element. </returns>
-        ElementType& operator[] (size_t index);
+        ElementType& operator[](size_t index);
         using ConstVectorReference<ElementType, Orientation>::operator[];
 
         /// <summary> Gets a reference to this vector. </summary>
@@ -206,14 +213,17 @@ namespace math
         /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
         /// <returns> A reference to the transpose of this vector. </returns>
-        auto Transpose()->VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
+        auto Transpose() -> VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
+        {
+            return VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
+        }
         using ConstVectorReference<ElementType, Orientation>::Transpose;
 
         /// <summary> Applies an operation to all items in this collection. </summary>
         ///
         /// <typeparam name="MapperType"> Type of the mapper functor. </typeparam>
         /// <param name="mapper"> The mapper. </param>
-        template<typename MapperType>
+        template <typename MapperType>
         void Transform(MapperType mapper);
 
     protected:
@@ -222,7 +232,7 @@ namespace math
         using ConstVectorReference<ElementType, Orientation>::_size;
         using ConstVectorReference<ElementType, Orientation>::_increment;
 
-        template<typename T>
+        template <typename T>
         friend class RectangularMatrixBase;
 
         friend class VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
@@ -255,22 +265,23 @@ namespace math
     //
     // friendly names
     //
-    template<typename ElementType>
+
+    template <typename ElementType>
     using ColumnVector = Vector<ElementType, VectorOrientation::column>;
 
-    template<typename ElementType>
+    template <typename ElementType>
     using RowVector = Vector<ElementType, VectorOrientation::row>;
 
-    template<typename ElementType>
+    template <typename ElementType>
     using ColumnVectorReference = VectorReference<ElementType, VectorOrientation::column>;
 
-    template<typename ElementType>
+    template <typename ElementType>
     using RowVectorReference = VectorReference<ElementType, VectorOrientation::row>;
 
-    template<typename ElementType>
+    template <typename ElementType>
     using ColumnConstVectorReference = ConstVectorReference<ElementType, VectorOrientation::column>;
 
-    template<typename ElementType>
+    template <typename ElementType>
     using RowConstVectorReference = ConstVectorReference<ElementType, VectorOrientation::row>;
 }
 }

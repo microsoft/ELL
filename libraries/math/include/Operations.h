@@ -6,9 +6,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
 
 #include "Vector.h"
+
+#ifndef MATH_OPERATIONS_H
+#define MATH_OPERATIONS_H
+
 #include "Matrix.h"
 
 // stl
@@ -304,3 +307,5 @@ namespace math
 }
 }
 #include "../tcc/Operations.tcc"
+
+#endif

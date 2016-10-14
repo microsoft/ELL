@@ -79,12 +79,6 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    auto ConstVectorReference<ElementType, Orientation>::Transpose() const -> ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
-    {
-        return ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment );
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
     bool ConstVectorReference<ElementType, Orientation>::operator==(const ConstVectorReference<ElementType, Orientation>& other) const
     {
         if (_size != other._size)
@@ -189,12 +183,6 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size.");
         }
         return VectorReference<ElementType, Orientation>(_pData + offset * _increment , size, _increment );
-    }
-
-    template<typename ElementType, VectorOrientation Orientation>
-    auto VectorReference<ElementType, Orientation>::Transpose() -> VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
-    {
-        return VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment );
     }
 
     template<typename ElementType, VectorOrientation Orientation>

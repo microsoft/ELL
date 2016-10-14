@@ -64,12 +64,6 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    auto ConstMatrixReference<ElementType, Layout>::Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
-    {
-        return ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>(_pData, _numColumns, _numRows, _increment);
-    }
-
-    template<typename ElementType, MatrixLayout Layout>
     ConstMatrixReference<ElementType, Layout> ConstMatrixReference<ElementType, Layout>::GetSubMatrix(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns) const
     {
         if (firstRow + numRows > _numRows || firstColumn + numColumns > _numColumns)
@@ -100,12 +94,6 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    auto ConstMatrixReference<ElementType, Layout>::GetMajorVector(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
-    {
-        return RectangularMatrixBase<ElementType>::template ConstructConstVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
-    }
-
-    template<typename ElementType, MatrixLayout Layout>
     ConstVectorReference<ElementType, VectorOrientation::column> ConstMatrixReference<ElementType, Layout>::GetDiagonal() const
     {
         auto size = std::min(NumColumns(), NumRows());
@@ -123,24 +111,6 @@ namespace math
         for (size_t i = 0; i < NumIntervals(); ++i)
         {
             if (GetMajorVector(i) != other.GetMajorVector(i))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    template<typename ElementType, MatrixLayout Layout>
-    bool ConstMatrixReference<ElementType, Layout>::operator==(const ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>& other) const 
-    {
-        if (NumRows() != other.NumRows() || NumColumns() != other.NumColumns())
-        {
-            return false;
-        }
-
-        for (size_t i = 0; i < NumRows(); ++i)
-        {
-            if (GetRow(i) != other.GetRow(i))
             {
                 return false;
             }
@@ -203,12 +173,6 @@ namespace math
     }
 
     template<typename ElementType, MatrixLayout Layout>
-    auto MatrixReference<ElementType, Layout>::Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
-    {
-        return MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>(_pData, _numColumns, _numRows, _increment);
-    }
-
-    template<typename ElementType, MatrixLayout Layout>
     MatrixReference<ElementType, Layout> MatrixReference<ElementType, Layout>::GetSubMatrix(size_t firstRow, size_t firstColumn, size_t numRows, size_t numColumns)
     {
         if (firstRow + numRows > _numRows || firstColumn + numColumns > _numColumns)
@@ -243,12 +207,6 @@ namespace math
     {
         auto size = std::min(NumColumns(), NumRows());
         return RectangularMatrixBase<ElementType>::template ConstructVectorReference<VectorOrientation::column>(_pData, size, _increment + 1);
-    }
-
-    template<typename ElementType, MatrixLayout Layout>
-    auto MatrixReference<ElementType, Layout>::GetMajorVector(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
-    {
-        return RectangularMatrixBase<ElementType>::template ConstructVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
     }
 
     //
