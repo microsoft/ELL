@@ -96,7 +96,7 @@ namespace data
     template<class DerivedType>
     std::vector<double> DataVectorBase<DerivedType>::ToArray() const
     {
-        std::vector<double> result(static_cast<const DerivedType*>(this)->ZeroSuffixFirstIndex());
+        std::vector<double> result(static_cast<const DerivedType*>(this)->PrefixLength());
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
 
         while(constIter.IsValid())

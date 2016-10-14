@@ -31,7 +31,7 @@ namespace predictors
 
     bool SingleElementThresholdPredictor::Predict(const DataVectorType& inputVector) const
     {
-        if (inputVector.ZeroSuffixFirstIndex() <= _index)
+        if (inputVector.PrefixLength() <= _index)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }

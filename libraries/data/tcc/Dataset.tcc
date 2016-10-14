@@ -102,7 +102,7 @@ namespace data
     template <typename DatasetExampleType>
     void Dataset<DatasetExampleType>::AddExample(DatasetExampleType example)
     {
-        size_t numFeatures = example.GetDataVector().ZeroSuffixFirstIndex();
+        size_t numFeatures = example.GetDataVector().PrefixLength();
         _examples.push_back(std::move(example));
 
         if (_numFeatures < numFeatures)

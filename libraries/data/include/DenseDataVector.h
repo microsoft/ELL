@@ -87,7 +87,7 @@ namespace data
         /// </summary>
         ///
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
-        virtual size_t ZeroSuffixFirstIndex() const override { return _data.size(); }
+        virtual size_t PrefixLength() const override { return _data.size(); }
 
     private:
         size_t _numNonzeros = 0;

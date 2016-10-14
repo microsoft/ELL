@@ -18,6 +18,7 @@
 #include <algorithm> // for std::swap
 #include <cstdint>
 #include <memory>
+#include <type_traits>
 
 namespace emll
 {
@@ -111,6 +112,7 @@ namespace data
         MetadataType _metadata;
     };
 
+    /// <summary> A metadata class that contains a weight and a real valued label. </summary>
     struct WeightLabel
     {
         /// <summary> Prints the weight label pair. </summary>

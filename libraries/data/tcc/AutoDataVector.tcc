@@ -107,7 +107,7 @@ namespace data
         }
 
         // dense 
-        if (numNonZeros > SPARSE_THRESHOLD * defaultDataVector.ZeroSuffixFirstIndex())
+        if (numNonZeros > SPARSE_THRESHOLD * defaultDataVector.PrefixLength())
         {
             if (includesNonFloats)
             {

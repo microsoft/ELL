@@ -113,7 +113,7 @@ namespace data
         /// </summary>
         ///
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
-        virtual size_t ZeroSuffixFirstIndex() const override;
+        virtual size_t PrefixLength() const override;
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
