@@ -48,7 +48,7 @@ namespace predictors
 
     void LinearPredictor::Scale(double scalar)
     {
-        // _w.Scale(scalar); // TODO call Operation
+        math::Operations::Multiply(scalar, _w);
         _b *= scalar;
     }
 
