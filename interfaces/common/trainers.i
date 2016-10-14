@@ -116,4 +116,3 @@ class SortingForestTrainerProxy;
 			std::shared_ptr<emll::trainers::IIncrementalTrainer<emll::predictors::SimpleForestPredictor>> _trainer = nullptr;			
 	};	
 %}
-

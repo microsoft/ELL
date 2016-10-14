@@ -6,6 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "DenseDataVector.h"
+#include "SparseDataVector.h"
+#include "SparseBinaryDataVector.h"
+
 //stl 
 #include <cmath>
 #include "..\include\DataVector.h"
@@ -15,7 +19,7 @@ namespace emll
 namespace data
 {
     template<typename ReturnType>
-    ReturnType IDataVector::Duplicate(std::function<double(IndexValue)> nonZeroMapper) const
+    ReturnType IDataVector::DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper) const
     {
         switch (GetType())
         {
@@ -136,7 +140,7 @@ namespace data
     template<class DerivedType>
     std::vector<double> DataVectorBase<DerivedType>::ToArray() const
     {
-        std::vector<double> result(static_cast<const DerivedType*>(this)->ZeroSuffixFirstIndex());
+        std::vector<double> result(static_cast<const DerivedType*>(this)->PrefixLength());
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
 
         while(constIter.IsValid())
@@ -151,7 +155,7 @@ namespace data
 
     template<class DerivedType>
     template<typename ReturnType>
-    ReturnType DataVectorBase<DerivedType>::Duplicate(std::function<double(IndexValue)> nonZeroMapper) const
+    ReturnType DataVectorBase<DerivedType>::DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper) const
     {
         return ReturnType(static_cast<const DerivedType*>(this)->GetIterator(), std::move(nonZeroMapper));
     }

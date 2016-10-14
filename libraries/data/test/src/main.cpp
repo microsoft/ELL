@@ -22,7 +22,7 @@ int main()
     IDataVectorTests();
     ToDataVectorTests();
     AutoDataVectorTest();
-    ToExampleTests();
+    CopyAsTests();
     DatasetCastingTests();
 
     if (testing::DidTestFail())

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     ParsingIterator.h (data)
+//  File:     ParsingExampleIterator.h (data)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ namespace emll
 {
 namespace data
 {
-    using IParsingIterator = typename utilities::IIterator<AutoSupervisedExample>;
+    using IParsingExampleIterator = typename utilities::IIterator<AutoSupervisedExample>;
 
     /// <summary> An input iterator that traverses a textual data set row by row and applies a parser to
     /// each row into a dense feature std::vector of doubles, a double label, and a double weight. </summary>
@@ -29,7 +29,7 @@ namespace data
     /// <typeparam name="RowIteratorType"> Type of the row iterator type. </typeparam>
     /// <typeparam name="VectorElementParserType"> Type of the vector element parser type. </typeparam>
     template <typename RowIteratorType, typename VectorElementParserType>
-    class ParsingIterator : public IParsingIterator
+    class ParsingExampleIterator : public IParsingExampleIterator
     {
     public:
         /// <summary> Constructs a parsing iterator \param row_iter An input iterator of strings, that
@@ -37,7 +37,7 @@ namespace data
         ///
         /// <param name="row_iter"> [in,out] The row iterator. </param>
         /// <param name="parser"> The parser. </param>
-        ParsingIterator(RowIteratorType row_iter, VectorElementParserType parser);
+        ParsingExampleIterator(RowIteratorType row_iter, VectorElementParserType parser);
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
@@ -66,8 +66,8 @@ namespace data
     ///
     /// <returns> The parsing iterator. </returns>
     template <typename RowIteratorType, typename VectorElementParserType>
-    std::unique_ptr<IParsingIterator> GetParsingIterator(RowIteratorType row_iter, VectorElementParserType parser);
+    std::unique_ptr<IParsingExampleIterator> GetParsingExampleIterator(RowIteratorType row_iter, VectorElementParserType parser);
 }
 }
 
-#include "../tcc/ParsingIterator.tcc"
+#include "../tcc/ParsingExampleIterator.tcc"

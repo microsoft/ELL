@@ -172,7 +172,7 @@ namespace nodes
     void ForestPredictorNode<SplitRuleType, EdgePredictorType>::Compute() const
     {
         // forest output
-        auto inputDataVector = ForestPredictor::DataVectorType(_input.GetIterator());
+        auto inputDataVector = typename ForestPredictor::DataVectorType(_input.GetIterator());
         _output.SetOutput({ _forest.Predict(inputDataVector) });
 
         // individual tree outputs

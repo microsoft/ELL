@@ -53,7 +53,7 @@ namespace data
         /// </summary>
         ///
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
-        virtual size_t ZeroSuffixFirstIndex() const = 0;
+        virtual size_t PrefixLength() const = 0;
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
@@ -87,7 +87,7 @@ namespace data
         ///
         /// <returns> The new data vector. </returns>
         template<typename ReturnType>
-        ReturnType Duplicate(std::function<double(IndexValue)> nonZeroMapper = {}) const;
+        ReturnType DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper = {}) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
@@ -161,7 +161,7 @@ namespace data
         ///
         /// <returns> A data vector of a specified type. </returns>
         template<typename ReturnType>
-        ReturnType Duplicate(std::function<double(IndexValue)> nonZeroMapper = {}) const;
+        ReturnType DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper = {}) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///

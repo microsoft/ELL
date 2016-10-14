@@ -39,11 +39,13 @@
 %inline %{
 	SGDTrainerProxy GetSGDIncrementalTrainer(uint64_t dim, const emll::common::LossArguments& lossArguments, const emll::common::SGDIncrementalTrainerArguments& trainerArguments)
 	{
-		return SGDTrainerProxy(emll::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments));
+		auto trainer = emll::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments);
+		return SGDTrainerProxy(trainer);
 	}
 
 	SortingForestTrainerProxy GetForestTrainer(const emll::common::LossArguments& lossArguments, const emll::common::ForestTrainerArguments& trainerArguments)
 	{
-		return SortingForestTrainerProxy(emll::common::MakeSortingForestTrainer(lossArguments, trainerArguments));
+		auto trainer = emll::common::MakeSortingForestTrainer(lossArguments, trainerArguments);
+		return SortingForestTrainerProxy(trainer);
 	}
 %}

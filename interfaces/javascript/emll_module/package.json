@@ -1,0 +1,33 @@
+{
+  "name": "emll",
+  "version": "0.1.0",
+  "description": "A native node module with interfaces to the Embedded Machine Learning Library (EMLL)",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "echo ",
+    "build": "buildme",
+    "buildmac": "npm install && node-gyp rebuild && ./copyMacLib.sh",
+    "buildwin": "npm install && node-gyp rebuild --target=0.36.7 --arch-x64 --dist-url=https://atom.io/download/atom-shell && copyWindowsLib",
+    "buildlinux": "npm install && node-gyp rebuild && ./copyLinuxLib.sh",
+    "buildwintest": "npm install && node-gyp rebuild && copyWindowsLib",
+    "preinstall": "",
+    "preuninstall": "rm -rf build/*"
+  },
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "homepage": "",
+  "author": {
+    "name": "Charles Jacobs",
+    "email": "cjacobs@microsoft.com",
+    "url": "http://www.microsoft.com/"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://intelligentdevices.visualstudio.com/_git/EMLL"
+  },
+  "gypfile": true,
+  "dependencies": {
+    "nan": "^2.4.0"
+  }
+}

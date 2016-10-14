@@ -20,7 +20,7 @@ namespace emll
     template<typename ExampleType>
     ExampleType GetExample()
     {
-        using DataVectorType = ExampleType::DataVectorType;
+        using DataVectorType = typename ExampleType::DataVectorType;
         DataVectorType dataVector{ 1,0,1,0,1,0,1 };
         return ExampleType(std::make_shared<DataVectorType>(std::move(dataVector)), data::WeightLabel{ 1,1 });
     }

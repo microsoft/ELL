@@ -6,10 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
 #include "DataVector.h"
 #include "IndexValue.h"
+
+#ifndef SPARSEDATAVECTOR_H
+#define SPARSEDATAVECTOR_H
 
 // utilities
 #include "CompressedIntegerList.h"
@@ -108,7 +109,7 @@ namespace data
         /// </summary>
         ///
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
-        virtual size_t ZeroSuffixFirstIndex() const override;
+        virtual size_t PrefixLength() const override;
 
     private:
         IntegerListType _indices;
@@ -162,3 +163,5 @@ namespace data
 }
 
 #include "../tcc/SparseDataVector.tcc"
+
+#endif // SPARSEDATAVECTOR_H

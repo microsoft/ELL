@@ -6,9 +6,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Exception.h"
+
 // stl
 #include <cassert>
-#include "..\include\SparseBinaryDataVector.h"
 
 namespace emll
 {
@@ -53,7 +55,7 @@ namespace data
     }
 
     template <typename IntegerListType>
-    size_t SparseBinaryDataVectorBase<IntegerListType>::ZeroSuffixFirstIndex() const
+    size_t SparseBinaryDataVectorBase<IntegerListType>::PrefixLength() const
     {
         if (_indices.Size() == 0)
         {

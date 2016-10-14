@@ -27,7 +27,7 @@ namespace data
     template<typename ExampleType>
     auto GetExampleIteratorFunctor<IteratorExampleType>::operator()(const Dataset<ExampleType>& dataset) const -> ReturnType
     {
-        return dataset.GetExampleIterator<IteratorExampleType>(_fromIndex, _size);
+        return dataset.template GetExampleIterator<IteratorExampleType>(_fromIndex, _size);
     }
 
     template<typename ExampleType>
@@ -36,7 +36,7 @@ namespace data
         GetExampleIteratorFunctor<ExampleType> abstractor(_fromIndex, _size);
 
         // all Dataset types for which GetAnyDataset() is called must be listed below, in the variadic template argument.
-        return utilities::AbstractInvoker<IDataset, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
+        return utilities::AbstractInvoker<DatasetBase, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
     }
 
     template<typename DatasetExampleType>
@@ -92,7 +92,7 @@ namespace data
     }
 
     template <typename DatasetExampleType>
-    auto Dataset<DatasetExampleType>::GetExampleReferenceIterator(size_t fromIndex = 0, size_t size = 0) const -> ExampleReferenceIterator
+    auto Dataset<DatasetExampleType>::GetExampleReferenceIterator(size_t fromIndex, size_t size) const -> ExampleReferenceIterator
     {
         size = CorrectRangeSize(fromIndex, size);
         return ExampleReferenceIterator(_examples.cbegin() + fromIndex, _examples.cbegin() + fromIndex + size);
@@ -101,7 +101,7 @@ namespace data
     template <typename DatasetExampleType>
     void Dataset<DatasetExampleType>::AddExample(DatasetExampleType example)
     {
-        size_t numFeatures = example.GetDataVector().ZeroSuffixFirstIndex();
+        size_t numFeatures = example.GetDataVector().PrefixLength();
         _examples.push_back(std::move(example));
 
         if (_numFeatures < numFeatures)

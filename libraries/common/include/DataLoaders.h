@@ -12,7 +12,7 @@
 
 // data
 #include "Dataset.h"
-#include "ParsingIterator.h"
+#include "ParsingExampleIterator.h"
 
 // stl
 #include <string>
@@ -26,7 +26,7 @@ namespace common
     /// <param name="dataLoadArguments"> The data load arguments. </param>
     ///
     /// <returns> The data iterator. </returns>
-    std::unique_ptr<data::IParsingIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments);
+    std::unique_ptr<data::IParsingExampleIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments);
 
     /// <summary> Gets a dataset from data load arguments. </summary>
     ///

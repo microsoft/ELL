@@ -18,18 +18,20 @@ namespace data
 
     template<typename DataVectorType, typename MetadataType>
     template<typename TargetExampleType, utilities::IsSame<typename TargetExampleType::DataVectorType, DataVectorType> Concept>
-    TargetExampleType Example<DataVectorType, MetadataType>::ToExample() const
+    TargetExampleType Example<DataVectorType, MetadataType>::CopyAs() const
     {
         // shallow copy of data vector
-        return TargetExampleType(_dataVector, TargetExampleType::MetadataType(_metadata));
+        return TargetExampleType(_dataVector, typename TargetExampleType::MetadataType(_metadata));
     }
 
     template<typename DataVectorType, typename MetadataType>
     template<typename TargetExampleType, utilities::IsDifferent<typename TargetExampleType::DataVectorType, DataVectorType> Concept>
-    TargetExampleType Example<DataVectorType, MetadataType>::ToExample() const
+    TargetExampleType Example<DataVectorType, MetadataType>::CopyAs() const
     {
         // deep copy of data vector
-        return TargetExampleType(std::make_shared<TargetExampleType::DataVectorType>(_dataVector->Duplicate<TargetExampleType::DataVectorType>()), TargetExampleType::MetadataType(_metadata));
+        using DataType = typename TargetExampleType::DataVectorType;
+        using MetadataType = typename TargetExampleType::MetadataType;
+        return TargetExampleType(std::make_shared<DataType>(_dataVector->template DeepCopyAs<DataType>()), MetadataType(_metadata));
     }
 
     template <typename DataVectorType, typename MetadataType>

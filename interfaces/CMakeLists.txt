@@ -15,7 +15,6 @@ set (INTERFACE_FILES ../common/common.i
 					 ../common/loadDatasetAsync.i
                      ../common/dataset.i
                      ../common/evaluators.i
-                     ../common/linear.i
                      ../common/lossFunctions.i
                      ../common/model.i
                      ../common/nodes.i

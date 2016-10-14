@@ -71,7 +71,7 @@ namespace data
 
     template<typename DefaultDataVectorType>
     template<typename ReturnType>
-    ReturnType AutoDataVectorBase<DefaultDataVectorType>::Duplicate(std::function<double(IndexValue)> nonZeroMapper) const
+    ReturnType AutoDataVectorBase<DefaultDataVectorType>::DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper) const
     {
         return _pInternal->Duplicate<ReturnType>(std::move(nonZeroMapper));
     }
@@ -107,7 +107,7 @@ namespace data
         }
 
         // dense 
-        if (numNonZeros > SPARSE_THRESHOLD * defaultDataVector.ZeroSuffixFirstIndex())
+        if (numNonZeros > SPARSE_THRESHOLD * defaultDataVector.PrefixLength())
         {
             if (includesNonFloats)
             {

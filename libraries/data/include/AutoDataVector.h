@@ -22,6 +22,11 @@ namespace emll
 {
 namespace data
 {
+    /// <summary> Base class for DataVectors that automatically determine their internal
+    /// representation. </summary>
+    ///
+    /// <typeparam name="DefaultDataVectorType"> The default internal representation. Datavectors are
+    ///  created in this type and then possibly changed if a different type is more appropriate. </typeparam>
     template<typename DefaultDataVectorType>
     class AutoDataVectorBase : public IDataVector
     {
@@ -73,7 +78,7 @@ namespace data
         /// </summary>
         ///
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
-        virtual size_t ZeroSuffixFirstIndex() const override { return _pInternal->ZeroSuffixFirstIndex(); }
+        virtual size_t PrefixLength() const override { return _pInternal->PrefixLength(); }
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
@@ -103,11 +108,10 @@ namespace data
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> The return type. </typeparam>
-        /// <param name="nonZeroMapper"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> This new data vector. </returns>
         template<typename ReturnType>
-        ReturnType Duplicate(std::function<double(IndexValue)> nonZeroMapper = {}) const;
+        ReturnType DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper = {}) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///

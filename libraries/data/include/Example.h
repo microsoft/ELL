@@ -18,6 +18,7 @@
 #include <algorithm> // for std::swap
 #include <cstdint>
 #include <memory>
+#include <type_traits>
 
 namespace emll
 {
@@ -87,7 +88,7 @@ namespace data
         /// MetadataType). </typeparam>
         /// <returns> An example of the desired type. </returns>
         template<typename TargetExampleType, utilities::IsSame<typename TargetExampleType::DataVectorType, DataVectorType> Concept = true>
-        TargetExampleType ToExample() const;
+        TargetExampleType CopyAs() const;
 
         /// <summary>
         /// Creates a new example that contains the same data as this example, in a specified data vector
@@ -99,7 +100,7 @@ namespace data
         /// MetadataType). </typeparam>
         /// <returns> An example of the desired type. </returns>
         template<typename TargetExampleType, utilities::IsDifferent<typename TargetExampleType::DataVectorType, DataVectorType> Concept = true>
-        TargetExampleType ToExample() const;
+        TargetExampleType CopyAs() const;
 
         /// <summary> Prints the datavector to an output stream. </summary>
         ///
@@ -111,6 +112,7 @@ namespace data
         MetadataType _metadata;
     };
 
+    /// <summary> A metadata class that contains a weight and a real valued label. </summary>
     struct WeightLabel
     {
         /// <summary> Prints the weight label pair. </summary>

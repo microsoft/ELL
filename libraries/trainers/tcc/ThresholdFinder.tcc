@@ -30,12 +30,12 @@ namespace trainers
 
             totalWeight += weight;
 
-            if (result.size() < denseDataVector.ZeroSuffixFirstIndex())
+            if (result.size() < denseDataVector.PrefixLength())
             {
-                result.resize(denseDataVector.ZeroSuffixFirstIndex());
+                result.resize(denseDataVector.PrefixLength());
             }
 
-            for (size_t j = 0; j < denseDataVector.ZeroSuffixFirstIndex(); ++j)
+            for (size_t j = 0; j < denseDataVector.PrefixLength(); ++j)
             {
                 result[j].push_back({ denseDataVector[j], weight });
             }
@@ -46,7 +46,7 @@ namespace trainers
         // sort and unique each feature
         for (size_t j = 0; j < result.size(); ++j)
         {
-            auto newSize = SortReduceDuplicates(result[j].begin(), result[j].end());
+            auto newSize = SortReduceDeepCopyAss(result[j].begin(), result[j].end());
             result[j].resize(newSize);
         }
 
