@@ -185,10 +185,13 @@ namespace model
     class PortElementsBase : public utilities::IArchivable
     {
     public:
-        /// <summary> Iterator class </summary>
-        class Iterator
+        /// <summary> A read-only forward iterator for the output values of a `PortElementsBase`. </summary>
+        class Iterator : public linear::IIndexValueIterator
         {
         public:
+            Iterator(const Iterator&) = default;
+            Iterator(Iterator&&) = default;
+
             /// <summary> Returns true if the iterator is currently pointing to a valid item. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
@@ -225,6 +228,9 @@ namespace model
         /// <returns> The dimensionality of the output </returns>
         size_t Size() const { return _size; }
 
+        /// <summary> Gets a forward read-only index-value iterator that iterates over the `PortElementsBase` output values. </summary>
+        ///
+        /// <returns> The iterator. </returns>
         Iterator GetIterator() const { return Iterator(GetRanges()); }
 
         /// <summary> The number of ranges in this list </summary>

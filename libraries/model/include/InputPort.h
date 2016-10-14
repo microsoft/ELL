@@ -88,35 +88,6 @@ namespace model
     class InputPort : public InputPortBase
     {
     public:
-        /// <summary> A read-only forward iterator for values of an input port. </summary>
-        class Iterator : public linear::IIndexValueIterator
-        {
-        public:
-            Iterator(const Iterator&) = default;
-
-            Iterator(Iterator&&) = default;
-
-            /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
-            ///
-            /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const { return _currentIndex < _size; }
-
-            /// <summary> Proceeds to the Next iterate. </summary>
-            void Next() { ++_currentIndex; }
-
-            /// <summary> Returns The current index-value pair. </summary>
-            ///
-            /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const { return linear::IndexValue{ 0, 1.0 }; } // TODO replace with actual implementation
-
-        private:
-            friend InputPort<ValueType>;
-            Iterator(size_t size) : _size(size) {}
-
-            size_t _size;
-            size_t _currentIndex;
-        };
-
         /// <summary> Default Constructor </summary>
         InputPort();
 
@@ -157,7 +128,7 @@ namespace model
         /// <summary> Gets a forward read-only index-value iterator that iterates over nonzeros. </summary>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const { return Iterator(Size()); }
+        PortElementsBase::Iterator GetIterator() const { return _input.GetIterator(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

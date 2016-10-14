@@ -241,8 +241,6 @@ namespace model
     {
         if (_ranges.size() > 1)
         {
-            auto oldSize = Size();
-
             // For each range, check if it's adjacent to the next one. If so, combine them
             std::vector<PortRange> newRanges;
             newRanges.push_back(_ranges[0]);
@@ -262,7 +260,6 @@ namespace model
             _ranges = newRanges;
 
             ComputeSize();
-            assert(oldSize == Size());
         }
     }
 
