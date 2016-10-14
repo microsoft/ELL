@@ -88,9 +88,9 @@ namespace trainers
 
         // calculate w and w_avg
         double scale = T_prev / T_next;
-        // vLast.Scale(scale); // TODO
+        math::Operations::Multiply(scale, vLast);
         bLast *= scale;
-        // vAvg.Scale(scale); // TODO -> Operation
+        math::Operations::Multiply(scale, vAvg);
         bAvg *= scale;
     }
 
