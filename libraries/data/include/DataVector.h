@@ -11,9 +11,6 @@
 // linear
 #include "IndexValue.h"
 
-// utilities
-#include "Exception.h"
-
 // stl
 #include <cstdint>
 #include <functional>
@@ -151,9 +148,5 @@ namespace data
     };
 }
 }
-
-#include "DenseDataVectorDecl.h"
-#include "SparseDataVectorDecl.h"
-#include "SparseBinaryDataVectorDecl.h"
 
 #include "../tcc/DataVector.tcc"
