@@ -343,8 +343,8 @@ void TestSimpleForestPredictorNodeRefine()
     testing::ProcessTest("Testing SimpleForestPredictorNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     // check equivalence
-    inputNode->SetInput({ 0.2, 0.5, 0.0 });
-    refinedInputNode->SetInput({ 0.2, 0.5, 0.0 });
+    inputNode->SetInput({ 0.18, 0.5, 0.0 });
+    refinedInputNode->SetInput({ 0.18, 0.5, 0.0 });
     auto outputValue = model.ComputeOutput(simpleForestPredictorNode->output)[0];
     auto treeOutputsValue = model.ComputeOutput(simpleForestPredictorNode->treeOutputs);
     auto edgeIndicatorVectorValue = model.ComputeOutput(simpleForestPredictorNode->edgeIndicatorVector);
