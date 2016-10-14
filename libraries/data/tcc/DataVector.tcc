@@ -14,7 +14,7 @@ namespace emll
 namespace data
 {
     template<typename ReturnType>
-    ReturnType IDataVector::Duplicate() const
+    ReturnType IDataVector::DeepCopyAs() const
     {
         switch (GetType())
         {
@@ -111,7 +111,7 @@ namespace data
 
     template<class DerivedType>
     template<typename ReturnType>
-    ReturnType DataVectorBase<DerivedType>::Duplicate() const
+    ReturnType DataVectorBase<DerivedType>::DeepCopyAs() const
     {
         return ReturnType(static_cast<const DerivedType*>(this)->GetIterator());
     }

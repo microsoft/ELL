@@ -16,7 +16,7 @@ namespace emll
 {
 namespace trainers
 {
-    size_t ThresholdFinder::SortReduceDuplicates(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const
+    size_t ThresholdFinder::SortReduceDeepCopyAss(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const
     {
         // sort the values
         std::sort(begin, end, std::less<double>());
@@ -24,7 +24,7 @@ namespace trainers
         auto iter = begin;
         auto current = begin;
 
-        // remove duplicates while incrementing counts
+        // remove DeepCopyAss while incrementing counts
         while (++iter != end)
         {
             if (iter->value == current->value)

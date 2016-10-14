@@ -110,7 +110,7 @@ namespace data
         ///
         /// <returns> This new data vector. </returns>
         template<typename ReturnType>
-        ReturnType Duplicate() const;
+        ReturnType DeepCopyAs() const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///

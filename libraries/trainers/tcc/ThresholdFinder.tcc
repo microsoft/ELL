@@ -46,7 +46,7 @@ namespace trainers
         // sort and unique each feature
         for (size_t j = 0; j < result.size(); ++j)
         {
-            auto newSize = SortReduceDuplicates(result[j].begin(), result[j].end());
+            auto newSize = SortReduceDeepCopyAss(result[j].begin(), result[j].end());
             result[j].resize(newSize);
         }
 

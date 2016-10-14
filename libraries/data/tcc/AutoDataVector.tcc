@@ -71,9 +71,9 @@ namespace data
 
     template<typename DefaultDataVectorType>
     template<typename ReturnType>
-    ReturnType AutoDataVectorBase<DefaultDataVectorType>::Duplicate() const 
+    ReturnType AutoDataVectorBase<DefaultDataVectorType>::DeepCopyAs() const 
     {
-        return _pInternal->Duplicate<ReturnType>();
+        return _pInternal->DeepCopyAs<ReturnType>();
     }
 
     template<typename TargetType>

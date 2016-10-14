@@ -84,7 +84,7 @@ namespace data
         ///
         /// <returns> The new data vector. </returns>
         template<typename ReturnType>
-        ReturnType Duplicate() const;
+        ReturnType DeepCopyAs() const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
@@ -139,7 +139,7 @@ namespace data
         ///
         /// <returns> A data vector of a specified type. </returns>
         template<typename ReturnType>
-        ReturnType Duplicate() const;
+        ReturnType DeepCopyAs() const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///

@@ -92,14 +92,14 @@ namespace emll
     void ToDataVectorTest(std::initializer_list<double> list)
     {
         const DataVectorType1 v(list);
-        auto u = v.Duplicate<DataVectorType2>();
+        auto u = v.DeepCopyAs<DataVectorType2>();
         auto w = v.ToArray();
         auto z = u.ToArray();
 
         std::string name1 = typeid(DataVectorType1).name();
         std::string name2 = typeid(DataVectorType2).name();
 
-        testing::ProcessTest(name1 + "::Duplicate<" + name2 + ">", testing::IsEqual(w, z, 1.0e-6));
+        testing::ProcessTest(name1 + "::DeepCopyAs<" + name2 + ">", testing::IsEqual(w, z, 1.0e-6));
     }
 
     enum class InitType { fractional, integral, binary };

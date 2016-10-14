@@ -121,7 +121,7 @@ namespace data
             /// <summary> Gets the current example pointer to by the iterator. </summary>
             ///
             /// <returns> The example. </returns>
-            virtual IteratorExampleType Get() const override { return _current->ToExample<IteratorExampleType>(); } 
+            virtual IteratorExampleType Get() const override { return _current->CopyAs<IteratorExampleType>(); } 
 
             // TODO: move this to private and make the dataset a friend
             using InternalIteratorType = typename std::vector<DatasetExampleType>::const_iterator;

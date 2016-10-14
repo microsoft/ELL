@@ -27,7 +27,7 @@ namespace emll
     }
 
     template<typename DataVectorType1, typename DataVectorType2>
-    void ToExampleTest()
+    void CopyAsTest()
     {
         using ExampleType1 = data::Example<DataVectorType1, data::WeightLabel>;
         using ExampleType2 = data::Example<DataVectorType2, data::WeightLabel>;
@@ -37,7 +37,7 @@ namespace emll
 
         size_t expectedReferenceCount = (typeName1 == typeName2) ? 2 : 1;
         auto example1 = GetExample<ExampleType1>();
-        auto example2 = example1.ToExample<ExampleType2>();
+        auto example2 = example1.CopyAs<ExampleType2>();
         bool isExpectedReferenceCount = (example2.GetDataVectorReferenceCount() == expectedReferenceCount);
 
         std::stringstream ss1, ss2;
@@ -45,35 +45,35 @@ namespace emll
         example2.Print(ss2);
         bool isSame = (ss1.str() == ss2.str());
 
-        testing::ProcessTest("Testing " + typeName1 + "::ToExample<" + typeName2 + ">", isSame && isExpectedReferenceCount);
+        testing::ProcessTest("Testing " + typeName1 + "::CopyAs<" + typeName2 + ">", isSame && isExpectedReferenceCount);
     }
 
     template<typename DataVectorType>
-    void ToExampleTestDispatch()
+    void CopyAsTestDispatch()
     {
-        ToExampleTest<DataVectorType, data::AutoDataVector>();
-        ToExampleTest<DataVectorType, data::DoubleDataVector>();
-        ToExampleTest<DataVectorType, data::FloatDataVector>();
-        ToExampleTest<DataVectorType, data::ShortDataVector>();
-        ToExampleTest<DataVectorType, data::ByteDataVector>();
-        ToExampleTest<DataVectorType, data::SparseDoubleDataVector>();
-        ToExampleTest<DataVectorType, data::SparseFloatDataVector>();
-        ToExampleTest<DataVectorType, data::SparseShortDataVector>();
-        ToExampleTest<DataVectorType, data::SparseByteDataVector>();
-        ToExampleTest<DataVectorType, data::SparseBinaryDataVector>();
+        CopyAsTest<DataVectorType, data::AutoDataVector>();
+        CopyAsTest<DataVectorType, data::DoubleDataVector>();
+        CopyAsTest<DataVectorType, data::FloatDataVector>();
+        CopyAsTest<DataVectorType, data::ShortDataVector>();
+        CopyAsTest<DataVectorType, data::ByteDataVector>();
+        CopyAsTest<DataVectorType, data::SparseDoubleDataVector>();
+        CopyAsTest<DataVectorType, data::SparseFloatDataVector>();
+        CopyAsTest<DataVectorType, data::SparseShortDataVector>();
+        CopyAsTest<DataVectorType, data::SparseByteDataVector>();
+        CopyAsTest<DataVectorType, data::SparseBinaryDataVector>();
     }
 
-    void ToExampleTests()
+    void CopyAsTests()
     {
-        ToExampleTestDispatch<data::AutoDataVector>();
-        ToExampleTestDispatch<data::DoubleDataVector>();
-        ToExampleTestDispatch<data::FloatDataVector>();
-        ToExampleTestDispatch<data::ShortDataVector>();
-        ToExampleTestDispatch<data::ByteDataVector>();
-        ToExampleTestDispatch<data::SparseDoubleDataVector>();
-        ToExampleTestDispatch<data::SparseFloatDataVector>();
-        ToExampleTestDispatch<data::SparseShortDataVector>();
-        ToExampleTestDispatch<data::SparseByteDataVector>();
-        ToExampleTestDispatch<data::SparseBinaryDataVector>();
+        CopyAsTestDispatch<data::AutoDataVector>();
+        CopyAsTestDispatch<data::DoubleDataVector>();
+        CopyAsTestDispatch<data::FloatDataVector>();
+        CopyAsTestDispatch<data::ShortDataVector>();
+        CopyAsTestDispatch<data::ByteDataVector>();
+        CopyAsTestDispatch<data::SparseDoubleDataVector>();
+        CopyAsTestDispatch<data::SparseFloatDataVector>();
+        CopyAsTestDispatch<data::SparseShortDataVector>();
+        CopyAsTestDispatch<data::SparseByteDataVector>();
+        CopyAsTestDispatch<data::SparseBinaryDataVector>();
     }
 }
