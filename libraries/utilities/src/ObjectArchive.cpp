@@ -65,17 +65,5 @@ namespace utilities
         auto& prop = _properties[propertyName];
         return prop;
     }
-
-    //
-    // IArchivable
-    //
-
-    ObjectArchive IArchivable::GetDescription() const
-    {
-        utilities::SerializationContext context;
-        utilities::ObjectArchiver archiver(context);
-        archiver.Archive(*this);
-        return archiver.GetObjectArchive();
-    }
 }
 }

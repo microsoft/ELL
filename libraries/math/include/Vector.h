@@ -95,7 +95,10 @@ namespace math
         /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
         /// <returns> A reference to the transpose of this vector. </returns>
-        auto Transpose() const->ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
+        auto Transpose() const->ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
+		{
+			return VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
+		}
 
         /// <summary> Equality operator. </summary>
         ///
@@ -190,7 +193,10 @@ namespace math
         /// <summary> Gets a reference to the transpose of this vector. </summary>
         ///
         /// <returns> A reference to the transpose of this vector. </returns>
-        auto Transpose()->VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
+		auto Transpose()->VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
+		{
+			return VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
+		}
         using ConstVectorReference<ElementType, Orientation>::Transpose;
 
         /// <summary> Applies an operation to all items in this collection. </summary>

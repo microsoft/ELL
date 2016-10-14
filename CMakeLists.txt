@@ -54,7 +54,10 @@ enable_testing()
 add_subdirectory(libraries)
 add_subdirectory(tools)
 add_subdirectory(scripts)
+
+if(EXISTS ${CMAKE_SOURCE_DIR}/private)
 add_subdirectory(private)
+endif()
 
 # Add SWIG-generated interfaces
 

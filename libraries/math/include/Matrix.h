@@ -137,7 +137,10 @@ namespace math
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
+        auto Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
+		{
+			return ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>(_pData, _numColumns, _numRows, _increment);
+		}
 
         /// <summary> Gets a constant reference to a block-shaped sub-matrix. </summary>
         ///
@@ -173,7 +176,10 @@ namespace math
         /// <param name="index"> The interval index. </param>
         ///
         /// <returns> Constant reference to the interval. </returns>
-        auto GetMajorVector(size_t index) const->ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
+        auto GetMajorVector(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+		{
+			return RectangularMatrixBase<ElementType>::template ConstructConstVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
+		}
 
         /// <summary> Equality operator for matrices with the same layout. </summary>
         ///
@@ -187,7 +193,22 @@ namespace math
         /// <param name="other"> The other matrix. </param>
         ///
         /// <returns> true if the two matrices are equivalent. </returns>
-        bool operator==(const ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>& other) const;
+        bool operator==(const ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>& other) const
+		{
+			if (NumRows() != other.NumRows() || NumColumns() != other.NumColumns())
+			{
+				return false;
+			}
+
+			for (size_t i = 0; i < NumRows(); ++i)
+			{
+				if (GetRow(i) != other.GetRow(i))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 
         /// <summary> Inequality operator. </summary>
         ///
@@ -268,7 +289,10 @@ namespace math
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const->MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
+        auto Transpose() const->MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
+		{
+			return MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>(_pData, _numColumns, _numRows, _increment);
+		}
 
         /// <summary> Gets a const reference to a block-shaped sub-matrix. </summary>
         ///
@@ -304,7 +328,10 @@ namespace math
         /// <param name="index"> The interval index. </param>
         ///
         /// <returns> Reference to the interval. </returns>
-        auto GetMajorVector(size_t index)->VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>;
+        auto GetMajorVector(size_t index)->VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+		{
+			return RectangularMatrixBase<ElementType>::template ConstructVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
+		}
 
         using RectangularMatrixBase<ElementType>::NumRows;
         using RectangularMatrixBase<ElementType>::NumColumns;
