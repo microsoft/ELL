@@ -76,12 +76,12 @@ set (TEST_NAME ${PROJ_NAME}_test)
 PROJECT(${TEST_NAME})
 
 set (TEST_SRC test/src/main.cpp
+              test/src/LoadMap_test.cpp
               test/src/LoadModel_test.cpp)
-set (TEST_INCLUDE test/include/LoadModel_test.h)
-
+set (TEST_INCLUDE test/include/LoadMap_test.h
+                  test/include/LoadModel_test.h)
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
-
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)

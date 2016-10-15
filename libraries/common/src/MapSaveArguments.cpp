@@ -16,7 +16,7 @@ namespace common
     {
         parser.AddOption(
             outputMapFile,
-            "outputMapFile",
+            "outputMapFilename",
             "omf",
             "Path to the output map file (empty for standard out, 'null' for no output)",
             "");

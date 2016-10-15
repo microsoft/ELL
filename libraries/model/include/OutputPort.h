@@ -39,6 +39,11 @@ namespace model
         /// <returns> The dimensionality of the output </returns>
         virtual size_t Size() const override { return _size; }
 
+        /// <summary> Returns the dimensionality of the output </summary>
+        ///
+        /// <param name="size> The dimensionality of the output </param>
+        void SetSize(size_t size);
+
         /// <summary> Indicate if this port is referenced. </summary>
         ///
         /// <returns> Returns true if the port is referenced by another node. </returns>

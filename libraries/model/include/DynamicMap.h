@@ -60,6 +60,24 @@ namespace model
         /// <param name="context"> The TransformContext to use during refinement </param>
         void Refine(const TransformContext& context);
 
+        /// <summary> Returns the requested input node </summary>
+        ///
+        /// <param name="inputName"> The name of the input </param>
+        /// <returns> The specified input node </returns>
+        InputNodeBase* GetInputNode(size_t inputIndex) const;
+
+        /// <summary> Returns the requested input node </summary>
+        ///
+        /// <param name="inputName"> The name of the input </param>
+        /// <returns> The specified input node </returns>
+        InputNodeBase* GetInputNode(const std::string& inputName) const;
+
+        /// <summary> Returns size of a given input </summary>
+        ///
+        /// <param name="inputIndex"> The index of the input </param>
+        /// <returns> The dimensionality of the input </returns>
+        size_t GetInputSize(size_t inputIndex) const;
+
         /// <summary> Returns size of a given input </summary>
         ///
         /// <param name="inputName"> The name of the input </param>
@@ -72,7 +90,7 @@ namespace model
         /// <param name="inputName"> The name assigned to the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
-        void SetInputValue(const std::string& inputName, const std::vector<ValueType>& inputValues);
+        void SetInputValue(size_t index, const std::vector<ValueType>& inputValues) const;
 
         /// <summary> Set a single InputNode's input </summary>
         ///
@@ -80,51 +98,89 @@ namespace model
         /// <param name="inputName"> The name assigned to the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
-        void SetInputValue(size_t index, const std::vector<ValueType>& inputValues);
+        void SetInputValue(const std::string& inputName, const std::vector<ValueType>& inputValues) const;
 
         /// <summary> Set a single InputNode's input </summary>
         ///
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
-        template <typename ValueType>
-        void SetInputValue(const std::string& inputName, const data::DenseDataVector<ValueType>& inputValues);
+        // template <typename ValueType>
+        // void SetInputValue(size_t index, const data::DenseDataVector<ValueType>& inputValues) const;
 
         /// <summary> Set a single InputNode's input </summary>
         ///
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
+        // template <typename ValueType>
+        // void SetInputValue(const std::string& inputName, const data::DenseDataVector<ValueType>& inputValues) const;
+
+        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        ///
+        /// <param name="index"> The index of the output </param>
+        /// <returns> A vector of output values </returns>
+        template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
+        std::vector<ValueType> ComputeOutput(size_t index) const;
+
+        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        ///
+        /// <param name="index"> The index of the output </param>
+        /// <returns> A vector of output values </returns>
+        // template <typename VectorType, typename ValueType> // = typename VectorType::value_type>
+        // VectorType ComputeOutput(size_t index) const;
+
+        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        ///
+        /// <param name="outputName"> The name of the output </param>
+        /// <returns> A vector of output values </returns>
+        template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
+        std::vector<ValueType> ComputeOutput(const std::string& outputName) const;
+
+        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        ///
+        /// <param name="outputName"> The name of the output </param>
+        /// <returns> A vector of output values </returns>
+        // template <typename VectorType, typename ValueType> // = typename VectorType::value_type>
+        // VectorType ComputeOutput(const std::string& outputName) const;
+
+        /// <summary> Returns size of a given output </summary>
+        ///
+        /// <param name="outputIndex"> The index of the output </param>
+        /// <returns> The dimensionality of the output </returns>
+        size_t GetOutputSize(size_t outputIndex) const;
+
+        /// <summary> Returns size of a given output </summary>
+        ///
+        /// <param name="outputName"> The name of the output </param>
+        /// <returns> The dimensionality of the output </returns>
+        size_t GetOutputSize(const std::string& outputName) const;
+
+        /// <summary> Returns a `PortElements` object representing the indicated map output </summary>
+        ///
+        /// <param name="outputIndex"> The zero-based index of the map output </param>
+        /// <returns> The `PortElements` object representing the indicated outputs </returns> 
         template <typename ValueType>
-        void SetInputValue(size_t index, const data::DenseDataVector<ValueType>& inputValues);
+        PortElements<ValueType> GetOutputElements(size_t outputIndex);
 
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        /// <summary> Returns a `PortElements` object representing the indicated map output </summary>
         ///
-        /// <param name="outputName"> The name of the output </param>
-        /// <returns> A vector of output values </returns>
-        template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
-        std::vector<ValueType> ComputeOutput(const std::string& outputName);
+        /// <param name="outputName"> The name of the map output </param>
+        /// <returns> The `PortElements` object representing the indicated outputs </returns> 
+        template <typename ValueType>
+        PortElements<ValueType> GetOutputElements(std::string outputName);
 
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        /// <summary> Returns a `PortElementsBase` object representing the indicated map output </summary>
         ///
-        /// <param name="outputName"> The name of the output </param>
-        /// <returns> A vector of output values </returns>
-        template <typename VectorType, typename ValueType = typename VectorType::value_type>
-        VectorType ComputeOutput(const std::string& outputName);
+        /// <param name="outputIndex"> The zero-based index of the map output </param>
+        /// <returns> The `PortElementsBase` object representing the indicated outputs </returns> 
+        PortElementsBase GetOutputElementsBase(size_t outputIndex);
 
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        /// <summary> Returns a `PortElementsBase` object representing the indicated map output </summary>
         ///
-        /// <param name="index"> The index of the output </param>
-        /// <returns> A vector of output values </returns>
-        template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
-        std::vector<ValueType> ComputeOutput(size_t index);
-
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
-        ///
-        /// <param name="index"> The index of the output </param>
-        /// <returns> A vector of output values </returns>
-        template <typename VectorType, typename ValueType = typename VectorType::value_type>
-        VectorType ComputeOutput(size_t index);
+        /// <param name="outputName"> The name of the map output </param>
+        /// <returns> The `PortElementsBase` object representing the indicated outputs </returns> 
+        PortElementsBase GetOutputElementsBase(const std::string& outputName);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -166,6 +222,7 @@ namespace model
 
 private:
         Model _model;
+
         // want the inputs and outputs indexed by name and index
         std::vector<InputNodeBase*> _inputNodes;
         std::vector<std::string> _inputNames;

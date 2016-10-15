@@ -10,6 +10,11 @@
 
 #include "ModelLoadArguments.h"
 
+// model
+#include "PortElements.h"
+#include "Model.h"
+#include "InputNode.h"
+
 // utilities
 #include "CommandLineParser.h"
 
@@ -37,6 +42,9 @@ namespace common
 
         bool HasMapFile() const { return inputMapFile != ""; }
         bool HasModelFile() const { return inputModelFile != ""; }
+        bool HasInputFile() const { return HasMapFile() || HasModelFile(); }
+        model::InputNodeBase* GetInput(model::Model& model) const;
+        model::PortElementsBase GetOutput(model::Model& model) const;
     };
 
     /// <summary> A version of MapLoadArguments that adds its members to the command line parser. </summary>

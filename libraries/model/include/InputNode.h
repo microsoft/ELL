@@ -30,7 +30,15 @@ namespace model
     class InputNodeBase : public Node
     {
     public:
+        /// <summary> Gets the output port. </summary>
+        ///
+        /// <returns> The output port. </returns>
         const OutputPortBase& GetOutputPort() const { return _outputBase; }
+
+        /// <summary> Sets the dimension </summary>
+        ///
+        /// <param name="size"> The input dimension </param>
+        void SetSize(size_t size);
 
     protected:
         InputNodeBase(OutputPortBase& output);
@@ -52,7 +60,7 @@ namespace model
         /// <param name="dimension"> The input dimension </param>
         InputNode(size_t dimension);
 
-        /// <summary> Sets the value output by this scalar node </summary>
+        /// <summary> Sets the value output by this node </summary>
         ///
         /// <param name="inputValues"> The value for this node to output </param>
         void SetInput(ValueType inputValue);

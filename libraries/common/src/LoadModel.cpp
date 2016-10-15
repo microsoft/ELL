@@ -44,6 +44,19 @@ namespace emll
 {
 namespace common
 {
+    namespace
+    {
+        void SplitString(const std::string& str, char delimiter, std::vector<std::string>& elements)
+        {
+            std::stringstream stream(str);
+            std::string element;
+            while (getline(stream, element, delimiter))
+            {
+                elements.push_back(element);
+            }
+        }
+    }
+
     model::Model GetModel1()
     {
         // For now, just create a model and return it
@@ -63,7 +76,7 @@ namespace common
         {
             predictor.GetWeights()[index] = (double)(index % 5);
         }
-        auto classifierNode = model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
+        model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
         return model;
     }
 
@@ -83,8 +96,6 @@ namespace common
 
         // combine them
         model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationType::subtract);
-
-        //        auto output = model.AddNode<model::OutputNode<double>>(maxVal->val);
         return model;
     }
 
@@ -103,8 +114,6 @@ namespace common
         auto dot2 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay2->output);
 
         model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationType::subtract);
-
-        //        auto output = model.AddNode<model::OutputNode<double>>(classifierNode->output);
         return model;
     }
 
@@ -138,7 +147,7 @@ namespace common
         auto forest = CreateForest(numSplits);
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
-        auto simpleForestPredictorNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
+        model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
         return model;
     }
 
@@ -345,6 +354,75 @@ namespace common
 
         model::Model emptyModel;
         throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
+    }
+
+    model::DynamicMap LoadMap(const MapLoadArguments& mapLoadArguments)
+    {
+        if (mapLoadArguments.HasMapFile())
+        {
+            return common::LoadMap(mapLoadArguments.inputMapFile);
+        }
+        else if (mapLoadArguments.HasModelFile())
+        {
+            auto model = common::LoadModel(mapLoadArguments.inputModelFile);
+
+            model::InputNodeBase* inputNode = nullptr;
+            model::PortElementsBase outputElements;
+            if (mapLoadArguments.modelInputsString != "")
+            {
+                inputNode = mapLoadArguments.GetInput(model);
+                if (inputNode == nullptr)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find input node");
+                }
+            }
+            else // look for first input node
+            {
+                auto inputNodes = model.GetNodesByType<model::InputNodeBase>();
+                if (inputNodes.size() == 0)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find input node");
+                }
+                inputNode = inputNodes[0];
+                std::cout << "Using input Node " << inputNode->GetId() << std::endl;
+            }
+
+            if (mapLoadArguments.modelOutputsString != "")
+            {
+                outputElements = mapLoadArguments.GetOutput(model);
+                // if (outputPort == nullptr)
+                // {
+                //     throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output port");
+                // }
+            }
+            else // look for first output node
+            {
+                auto outputNodes = model.GetNodesByType<model::OutputNodeBase>();
+                if (outputNodes.size() == 0)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output node");
+                }
+                auto outputNode = outputNodes[0];
+                auto outputPorts = outputNode->GetOutputPorts();
+                if (outputPorts.size() == 0)
+                {
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output port");
+                }
+
+                auto outputPort = outputPorts[0]; // ptr to port base
+                outputElements = model::PortElementsBase(*outputPort);
+                std::cout << "Using output Node " << outputNode->GetId() << "." << outputPort->GetName() << std::endl;
+            }
+
+            return { model, { { "input", inputNode } }, { { "output", outputElements } } };
+        }
+        else // No model / map file specified -- return an identity map
+        {
+            model::Model model;
+            auto inputNode = model.AddNode<model::InputNode<double>>(0);
+            model::PortElements<double> outputElements(inputNode->output);
+            return { model, { { "input", inputNode } }, { { "output", outputElements } } };
+        }
     }
 
     void SaveMap(const model::DynamicMap& map, const std::string& filename)

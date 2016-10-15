@@ -14,6 +14,9 @@
 #include "Dataset.h"
 #include "ParsingExampleIterator.h"
 
+// model
+#include "DynamicMap.h"
+
 // stl
 #include <string>
 
@@ -36,6 +39,30 @@ namespace common
     /// <returns> The dataset. </returns>
     template <typename DatasetType = data::AutoSupervisedDataset>
     DatasetType GetDataset(const DataLoadArguments& dataLoadArguments);
+
+    // ####
+    // #### TODO: make this work:
+    template <typename DatasetType = data::AutoSupervisedDataset>
+    DatasetType GetMappedDataset(const DataLoadArguments& dataLoadArguments, const model::DynamicMap& map)
+    {
+        auto dataIterator = GetDataIterator(dataLoadArguments);
+        DatasetType dataset;
+        using OutDataVectorType = DatasetType::ExampleType::DataVectorType;
+
+        // generate mapped dataset
+        while (dataIterator->IsValid())
+        {
+            auto row = dataIterator->Get(); // AutoSupervisedExample
+            auto dataVec = row.GetDataVector();
+            map.SetInputValue(0, dataVec);
+            auto output = map.ComputeOutput<OutDataVectorType>(0);
+            auto mappedRow = typename DatasetType::ExampleType( output, row.GetMetadata() );
+            dataset.AddExample(mappedRow);
+            dataIterator->Next();
+        }
+        return dataset;
+    }
+
 }
 }
 

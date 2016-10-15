@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LoadModel_test.h"
+#include "LoadMap_test.h"
 
 // testing
 #include "testing.h"
@@ -30,6 +31,9 @@ int main()
 
         TestSaveModels("xml");
         TestSaveModels("json");
+
+        TestLoadMapWithDefaultArgs();
+        TestLoadMapWithPorts();
     }
     catch (const utilities::Exception& exception)
     {

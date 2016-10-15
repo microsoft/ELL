@@ -49,10 +49,47 @@ namespace model
         _outputElementsMap.insert({ outputName, outputElements });
     }
 
+    InputNodeBase* DynamicMap::GetInputNode(size_t inputIndex) const
+    {
+        return _inputNodes[inputIndex];
+    }
+
+    InputNodeBase* DynamicMap::GetInputNode(const std::string& inputName) const
+    {
+        auto iter = _inputNodeMap.find(inputName);
+        return iter->second;
+    }
+
+    size_t DynamicMap::GetInputSize(size_t inputIndex) const
+    {
+        return _inputNodes[inputIndex]->GetOutputPort().Size();
+    }
+
     size_t DynamicMap::GetInputSize(const std::string& inputName) const
     {
         auto iter = _inputNodeMap.find(inputName);
         return iter->second->GetOutputPort().Size();
+    }
+
+    size_t DynamicMap::GetOutputSize(size_t outputIndex) const
+    {
+        return _outputElements[outputIndex].Size();
+    }
+
+    size_t DynamicMap::GetOutputSize(const std::string& outputName) const
+    {
+        auto iter = _outputElementsMap.find(outputName);
+        return iter->second.Size();
+    }
+
+    PortElementsBase DynamicMap::GetOutputElementsBase(size_t outputIndex)
+    {
+        return _outputElements[outputIndex];
+    }
+
+    PortElementsBase DynamicMap::GetOutputElementsBase(const std::string& outputName)
+    {
+        return _outputElementsMap[outputName];
     }
 
     void DynamicMap::Refine(const TransformContext& context)
