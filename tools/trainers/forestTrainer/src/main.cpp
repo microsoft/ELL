@@ -115,8 +115,6 @@ int main(int argc, char* argv[])
             map = { model, { { "input", inputNode } }, { { "output", outputElements } } };
         }
 
-        auto plainDataset = common::GetDataset(dataLoadArguments);
-
         auto mappedDataset = common::GetMappedDataset(dataLoadArguments, map);
         auto mappedDatasetDimension = map.GetOutputSize(0);
 

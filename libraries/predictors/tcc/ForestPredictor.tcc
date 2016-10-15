@@ -115,7 +115,6 @@ namespace predictors
             return 0.0;
         }
 
-        size_t nodeIndex = interiorNodeIndex;
         double output = 0.0;
 
         VisitEdgePathToLeaf(input, interiorNodeIndex, [&](const InteriorNode& interiorNode, size_t edgePosition) { output += interiorNode._outgoingEdges[edgePosition]._predictor.Predict(input); });
