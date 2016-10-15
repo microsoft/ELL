@@ -20,7 +20,6 @@ namespace emll
 {
 namespace utilities
 {
-
     void CompressedIntegerList::Iterator::Next()
     {
         uint64_t delta;
@@ -51,7 +50,10 @@ namespace utilities
     CompressedIntegerList::Iterator::Iterator(const uint8_t* iter, const uint8_t* end)
         : _iter(iter), _end(end), _value(0), _iter_increment(0)
     {
-        Next();
+        if (IsValid())
+        {
+            Next();
+        }
     }
 
     CompressedIntegerList::CompressedIntegerList()
