@@ -104,7 +104,8 @@ namespace data
     {
     public:
         using ExampleReferenceIterator = utilities::VectorReferenceIterator<DatasetExampleType>;
-
+        using ExampleType = DatasetExampleType;
+        
         /// <summary> Iterator class. </summary>
         template<typename IteratorExampleType> 
         class DatasetExampleIterator : public IExampleIterator<IteratorExampleType>

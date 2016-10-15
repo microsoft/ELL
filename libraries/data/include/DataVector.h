@@ -133,6 +133,9 @@ namespace data
         /// <returns> This new data vector. </returns>
         virtual std::vector<double> ToArray() const override;
 
+        template <typename ValueType>
+        std::vector<ValueType> ToArrayT() const;
+
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam>

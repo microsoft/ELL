@@ -31,6 +31,7 @@ namespace data
     class AutoDataVectorBase : public IDataVector
     {
     public:
+        using ValueType = typename DefaultDataVectorType::ValueType;
         AutoDataVectorBase(AutoDataVectorBase&& vector) = default;
 
         AutoDataVectorBase(const AutoDataVectorBase& vector) = delete;

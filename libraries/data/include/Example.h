@@ -42,7 +42,28 @@ namespace data
         ///
         /// <param name="dataVector"> The data vector. </param>
         /// <param name="metadataType"> The metadata. </param>
+        Example(DataVectorType dataVector, const MetadataType& metadata);
+
+        template <typename InputDataVectorType, typename InputMetadataType, utilities::IsDifferent<InputDataVectorType, DataVectorType> Concept = true>
+        Example(const InputDataVectorType& dataVector, const InputMetadataType& metadata);
+
+        /// <summary> Constructs a supervised example. </summary>
+        ///
+        /// <param name="dataVector"> The data vector. </param>
+        /// <param name="metadataType"> The metadata. </param>
         Example(const std::shared_ptr<const DataVectorType>& dataVector, const MetadataType& metadata);
+
+        /// <summary> Constructs a supervised example. </summary>
+        ///
+        /// <param name="dataVector"> The data vector. </param>
+        /// <param name="metadataType"> The metadata. </param>
+        Example(const std::shared_ptr<DataVectorType>& dataVector, const MetadataType& metadata);
+
+        /// <summary> Constructs a supervised example. </summary>
+        ///
+        /// <param name="dataVector"> The data vector. </param>
+        /// <param name="metadataType"> The metadata. </param>
+        Example(const std::vector<double>& dataVector, const MetadataType& metadata);
 
         /// <summary> Assignment operator. </summary>
         ///

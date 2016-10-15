@@ -49,7 +49,7 @@ namespace model
         DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
 
         virtual ~DynamicMap() = default;
-        
+
         /// <summary> Gets the model wrapped by this map </summary>
         ///
         /// <returns> The `Model` </returns>
@@ -105,16 +105,16 @@ namespace model
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
-        // template <typename ValueType>
-        // void SetInputValue(size_t index, const data::DenseDataVector<ValueType>& inputValues) const;
+        template <typename ValueType>
+        void SetInputValue(size_t index, const data::DenseDataVector<ValueType>& inputValues) const;
 
         /// <summary> Set a single InputNode's input </summary>
         ///
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
-        // template <typename ValueType>
-        // void SetInputValue(const std::string& inputName, const data::DenseDataVector<ValueType>& inputValues) const;
+        template <typename ValueType>
+        void SetInputValue(const std::string& inputName, const data::DenseDataVector<ValueType>& inputValues) const;
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
@@ -127,8 +127,8 @@ namespace model
         ///
         /// <param name="index"> The index of the output </param>
         /// <returns> A vector of output values </returns>
-        // template <typename VectorType, typename ValueType> // = typename VectorType::value_type>
-        // VectorType ComputeOutput(size_t index) const;
+        template <typename VectorType, typename ValueType = typename VectorType::ValueType> // = typename VectorType::value_type>
+        VectorType ComputeOutput(size_t index) const;
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
@@ -141,8 +141,8 @@ namespace model
         ///
         /// <param name="outputName"> The name of the output </param>
         /// <returns> A vector of output values </returns>
-        // template <typename VectorType, typename ValueType> // = typename VectorType::value_type>
-        // VectorType ComputeOutput(const std::string& outputName) const;
+        template <typename VectorType, typename ValueType> // = typename VectorType::value_type>
+        VectorType ComputeOutput(const std::string& outputName) const;
 
         /// <summary> Returns size of a given output </summary>
         ///
@@ -159,27 +159,27 @@ namespace model
         /// <summary> Returns a `PortElements` object representing the indicated map output </summary>
         ///
         /// <param name="outputIndex"> The zero-based index of the map output </param>
-        /// <returns> The `PortElements` object representing the indicated outputs </returns> 
+        /// <returns> The `PortElements` object representing the indicated outputs </returns>
         template <typename ValueType>
         PortElements<ValueType> GetOutputElements(size_t outputIndex);
 
         /// <summary> Returns a `PortElements` object representing the indicated map output </summary>
         ///
         /// <param name="outputName"> The name of the map output </param>
-        /// <returns> The `PortElements` object representing the indicated outputs </returns> 
+        /// <returns> The `PortElements` object representing the indicated outputs </returns>
         template <typename ValueType>
         PortElements<ValueType> GetOutputElements(std::string outputName);
 
         /// <summary> Returns a `PortElementsBase` object representing the indicated map output </summary>
         ///
         /// <param name="outputIndex"> The zero-based index of the map output </param>
-        /// <returns> The `PortElementsBase` object representing the indicated outputs </returns> 
+        /// <returns> The `PortElementsBase` object representing the indicated outputs </returns>
         PortElementsBase GetOutputElementsBase(size_t outputIndex);
 
         /// <summary> Returns a `PortElementsBase` object representing the indicated map output </summary>
         ///
         /// <param name="outputName"> The name of the map output </param>
-        /// <returns> The `PortElementsBase` object representing the indicated outputs </returns> 
+        /// <returns> The `PortElementsBase` object representing the indicated outputs </returns>
         PortElementsBase GetOutputElementsBase(const std::string& outputName);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -220,7 +220,7 @@ namespace model
         InputNodeBase* GetInput(size_t index);
         PortElementsBase GetOutput(size_t index);
 
-private:
+    private:
         Model _model;
 
         // want the inputs and outputs indexed by name and index

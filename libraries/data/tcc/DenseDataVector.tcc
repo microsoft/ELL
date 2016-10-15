@@ -60,6 +60,17 @@ namespace data
     }
 
     template <typename ElementType>
+    DenseDataVector<ElementType>::DenseDataVector(std::vector<ElementType> vec)
+    {
+        size_t index = 0;
+        for(auto value: vec)
+        {
+            DenseDataVector<ElementType>::AppendElement(index, value); // explicit call to DenseDataVector<ElementType>::AppendElement is given to avoid virtual function call in Ctor
+            ++index;
+        }
+    }
+
+    template <typename ElementType>
     double DenseDataVector<ElementType>::operator[](size_t index) const
     {
         if (index >= _data.size())

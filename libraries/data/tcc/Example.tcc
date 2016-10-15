@@ -11,21 +11,40 @@ namespace emll
 namespace data
 {
     template <typename DataVectorType, typename MetadataType>
+    Example<DataVectorType, MetadataType>::Example(DataVectorType dataVector, const MetadataType& metadata)
+        : _dataVector(std::make_shared<DataVectorType>(std::move(dataVector))), _metadata(metadata)
+    {
+    }
+
+    template <typename DataVectorType, typename MetadataType>
+    template <typename InputDataVectorType, typename InputMetadataType, utilities::IsDifferent<InputDataVectorType, DataVectorType> Concept>
+    Example<DataVectorType, MetadataType>::Example(const InputDataVectorType& dataVector, const InputMetadataType& metadata)
+        : _dataVector(std::make_shared<DataVectorType>(dataVector.template ToArrayT<typename DataVectorType::ValueType>())), _metadata(MetadataType(metadata))
+    {
+    }
+
+    template <typename DataVectorType, typename MetadataType>
     Example<DataVectorType, MetadataType>::Example(const std::shared_ptr<const DataVectorType>& dataVector, const MetadataType& metadata)
         : _dataVector(dataVector), _metadata(metadata)
     {
     }
 
-    template<typename DataVectorType, typename MetadataType>
-    template<typename TargetExampleType, utilities::IsSame<typename TargetExampleType::DataVectorType, DataVectorType> Concept>
+    template <typename DataVectorType, typename MetadataType>
+    Example<DataVectorType, MetadataType>::Example(const std::shared_ptr<DataVectorType>& dataVector, const MetadataType& metadata)
+        : _dataVector(dataVector), _metadata(metadata)
+    {
+    }
+
+    template <typename DataVectorType, typename MetadataType>
+    template <typename TargetExampleType, utilities::IsSame<typename TargetExampleType::DataVectorType, DataVectorType> Concept>
     TargetExampleType Example<DataVectorType, MetadataType>::CopyAs() const
     {
         // shallow copy of data vector
         return TargetExampleType(_dataVector, typename TargetExampleType::MetadataType(_metadata));
     }
 
-    template<typename DataVectorType, typename MetadataType>
-    template<typename TargetExampleType, utilities::IsDifferent<typename TargetExampleType::DataVectorType, DataVectorType> Concept>
+    template <typename DataVectorType, typename MetadataType>
+    template <typename TargetExampleType, utilities::IsDifferent<typename TargetExampleType::DataVectorType, DataVectorType> Concept>
     TargetExampleType Example<DataVectorType, MetadataType>::CopyAs() const
     {
         // deep copy of data vector
