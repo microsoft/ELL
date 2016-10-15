@@ -42,7 +42,7 @@ namespace common
             auto output = map.ComputeOutput<data::DoubleDataVector>(0);
             // convert output vector to OutDataVectorType
             auto mappedRow = typename DatasetType::ExampleType(output, row.GetMetadata());
-            // dataset.AddExample(mappedRow);
+            dataset.AddExample(mappedRow);
             dataIterator->Next();
         }
         return dataset;
