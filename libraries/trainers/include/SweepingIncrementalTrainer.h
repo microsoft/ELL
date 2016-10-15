@@ -55,6 +55,9 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override;
 
     private:
+        template <typename DatasetType, typename IteratorType>
+        void DoUpdate(IteratorType examleIterator);
+
         std::vector<EvaluatingTrainerType> _evaluatingTrainers;
         MultiEpochIncrementalTrainerParameters _parameters;
         mutable std::default_random_engine _random;

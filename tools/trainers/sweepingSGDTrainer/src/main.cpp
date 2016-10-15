@@ -25,6 +25,8 @@
 #include "MakeTrainer.h"
 #include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
+#include "MapLoadArguments.h"
+#include "MapSaveArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "ParametersEnumerator.h"
 #include "SGDIncrementalTrainerArguments.h"
@@ -69,12 +71,14 @@ int main(int argc, char* argv[])
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
+        common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
+        commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
@@ -91,10 +95,28 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // load data set
+        // load map
+        model::DynamicMap map = common::LoadMap(mapLoadArguments);
+
+        // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto dataset = common::GetDataset(dataLoadArguments);
         size_t numColumns = dataLoadArguments.parsedDataDimension;
+
+        if (!mapLoadArguments.HasInputFile())
+        {
+            if (numColumns == 0)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error, must specify a data dimension if not specifying an input map");
+            }
+
+            model::Model model;
+            auto inputNode = model.AddNode<model::InputNode<double>>(numColumns);
+            model::PortElements<double> outputElements(inputNode->output);
+            map = { model, { { "input", inputNode } }, { { "output", outputElements } } };
+        }
+
+        auto mappedDataset = common::GetMappedDataset(dataLoadArguments, map);
+        auto mappedDatasetDimension = map.GetOutputSize(0);
 
         // get predictor type
         using PredictorType = predictors::LinearPredictor;
@@ -108,8 +130,8 @@ int main(int argc, char* argv[])
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
         for (size_t i = 0; i < regularization.size(); ++i)
         {
-            auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, generator.GenerateParameters(i));
-            evaluators.push_back(common::MakeEvaluator<PredictorType>(dataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossArguments));
+            auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(mappedDatasetDimension, trainerArguments.lossArguments, generator.GenerateParameters(i));
+            evaluators.push_back(common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossArguments));
             evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluators.back()));
         }
 
@@ -118,7 +140,7 @@ int main(int argc, char* argv[])
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(dataset.GetAnyDataset());
+        trainer->Update(mappedDataset.GetAnyDataset());
         auto predictor = trainer->GetPredictor();
 
         // print loss and errors
@@ -139,10 +161,11 @@ int main(int argc, char* argv[])
         if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
-            model::Model model;
-            auto inputNode = model.AddNode<model::InputNode<double>>(predictor->GetDimension());
-            model.AddNode<nodes::LinearPredictorNode>(inputNode->output, *predictor);
+            model::Model model = map.GetModel();
+            auto mapOutput = model::PortElements<double>(map.GetOutputElementsBase(0));
+            model.AddNode<nodes::LinearPredictorNode>(mapOutput, *predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
+
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

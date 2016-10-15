@@ -24,6 +24,20 @@ namespace evaluators
         }
     }
 
+    // template <typename PredictorType, typename... AggregatorTypes>
+    // template <typename IteratorType>
+    // Evaluator<PredictorType, AggregatorTypes...>::Evaluator(IteratorType exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators)
+    //     : dataset(exampleIterator), _evaluatorParameters(evaluatorParameters), _aggregatorTuple(std::make_tuple(aggregators...))
+    // {
+        
+    //     static_assert(sizeof...(AggregatorTypes) > 0, "Evaluator must contains at least one aggregator");
+
+    //     if (_evaluatorParameters.addZeroEvaluation)
+    //     {
+    //         EvaluateZero();
+    //     }
+    // }
+
     template <typename PredictorType, typename... AggregatorTypes>
     void Evaluator<PredictorType, AggregatorTypes...>::Evaluate(const PredictorType& predictor)
     {

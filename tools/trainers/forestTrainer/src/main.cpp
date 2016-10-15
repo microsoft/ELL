@@ -24,9 +24,20 @@
 #include "LoadModel.h"
 #include "MakeEvaluator.h"
 #include "MakeTrainer.h"
+#include "MapLoadArguments.h"
+#include "MapSaveArguments.h"
+#include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
 #include "TrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
+
+// model
+#include "InputNode.h"
+#include "Model.h"
+#include "DynamicMap.h"
+
+// nodes
+#include "ForestPredictorNode.h"
 
 // trainers
 #include "HistogramForestTrainer.h"
@@ -61,6 +72,7 @@ int main(int argc, char* argv[])
         // add arguments to the command line parser
         common::ParsedTrainerArguments trainerArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
+        common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedForestTrainerArguments forestTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
@@ -68,6 +80,7 @@ int main(int argc, char* argv[])
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
+        commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(forestTrainerArguments);
@@ -82,9 +95,30 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // load data set
+        // load map
+        model::DynamicMap map = common::LoadMap(mapLoadArguments);
+
+        // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto dataset = common::GetDataset(dataLoadArguments);
+        size_t numColumns = dataLoadArguments.parsedDataDimension;
+
+        if (!mapLoadArguments.HasInputFile())
+        {
+            if (numColumns == 0)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error, must specify a data dimension if not specifying an input map");
+            }
+
+            model::Model model;
+            auto inputNode = model.AddNode<model::InputNode<double>>(numColumns);
+            model::PortElements<double> outputElements(inputNode->output);
+            map = { model, { { "input", inputNode } }, { { "output", outputElements } } };
+        }
+
+        auto plainDataset = common::GetDataset(dataLoadArguments);
+
+        auto mappedDataset = common::GetMappedDataset(dataLoadArguments, map);
+        auto mappedDatasetDimension = map.GetOutputSize(0);
 
         // predictor type
         using PredictorType = predictors::SimpleForestPredictor;
@@ -96,7 +130,7 @@ int main(int argc, char* argv[])
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
         if (trainerArguments.verbose)
         {
-            evaluator = common::MakeEvaluator<PredictorType>(dataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossArguments);
+            evaluator = common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossArguments);
             trainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(trainer), evaluator));
         }
 
@@ -107,13 +141,13 @@ int main(int argc, char* argv[])
         auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
 
         // randomly permute the data
-        dataset.RandomPermute(rng);
+        mappedDataset.RandomPermute(rng);
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(dataset.GetAnyDataset());
-        auto predictor = trainer->GetPredictor();
+        trainer->Update(mappedDataset.GetAnyDataset());
 
+        auto predictor = trainer->GetPredictor();
         // print loss and errors
         if (trainerArguments.verbose)
         {
@@ -124,14 +158,16 @@ int main(int argc, char* argv[])
             evaluator->Print(std::cout);
             std::cout << std::endl;
         }
-
-        // save predictor model
+        
+        // Save predictor model
         if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
-            model::Model model;
-            auto inputNode = model.AddNode<model::InputNode<double>>(1);
-            model.AddNode<nodes::ForestPredictorNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor>>(inputNode->output, *predictor);
+            model::Model model = map.GetModel();
+
+            // input to predictor node is output of map
+            auto mapOutput = model::PortElements<double>(map.GetOutputElementsBase(0));
+            model.AddNode<nodes::SimpleForestPredictorNode>(mapOutput, *predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }

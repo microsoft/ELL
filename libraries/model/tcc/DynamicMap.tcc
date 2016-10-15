@@ -173,5 +173,12 @@ namespace model
     {
         return ComputeOutput<DataVectorType>(GetOutput(outputName));
     }
+
+    template <typename ValueType>
+    PortElements<ValueType> DynamicMap::GetOutputElements(std::string outputName)
+    {
+        PortElements<ValueType> result = dynamic_cast<const PortElements<ValueType>&>(_outputElementsMap[outputName]);
+        return result;
+    }
 }
 }
