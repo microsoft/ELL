@@ -215,16 +215,6 @@ namespace utilities
         static std::string GetName() { return "ulonglong"; }
     };
 
-    // /// <summary> Class used to get information about the unsigned 64-bit integer type. </summary>
-    // template <>
-    // struct TypeName<const uint64_t&>
-    // {
-    //     /// <summary> Gets the serialization name of the type. </summary>
-    //     ///
-    //     /// <returns> The serialization name. </returns>
-    //     static std::string GetName() { return "uint64"; }
-    // };
-
     /// <summary> Class used to get information about the float type. </summary>
     template <>
     struct TypeName<float>
