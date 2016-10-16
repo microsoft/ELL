@@ -37,17 +37,17 @@ namespace model
         }
     }
 
-    void DynamicMap::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues)
+    void DynamicMap::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const
     {
         node->SetInput(inputValues);
     }
 
-    void DynamicMap::SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues)
+    void DynamicMap::SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const
     {
         node->SetInput(inputValues);
     }
 
-    void DynamicMap::SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues)
+    void DynamicMap::SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues) const
     {
         node->SetInput(inputValues);
     }

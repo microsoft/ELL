@@ -107,13 +107,13 @@ namespace model
         ///
         /// <param name="index"> The index of the input </param>
         /// <returns> The input node </returns>
-        InputNodeBase* GetInput(size_t index);
+        InputNodeBase* GetInput(size_t index) const;
 
         /// <summary> Returns an input node </summary>
         ///
         /// <param name="index"> The name of the input </param>
         /// <returns> The input node </returns>
-        InputNodeBase* GetInput(const std::string& inputName);
+        InputNodeBase* GetInput(const std::string& inputName) const;
 
         /// <summary> Get the number of outputs </summary>
         ///
@@ -284,14 +284,9 @@ namespace model
 
         virtual ModelTransformer DoRefine(const TransformContext& context);
 
-        InputNodeBase* GetInput(size_t index) const;
-        InputNodeBase* GetInput(const std::string& name) const;
-        PortElementsBase GetOutput(size_t index) const;
-        PortElementsBase GetOutput(const std::string& name) const;
-
-        virtual void SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues);
-        virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues);
-        virtual void SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues);
+        virtual void SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const;
+        virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const;
+        virtual void SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues) const;
 
         virtual std::vector<bool> ComputeBoolOutput(const PortElementsBase& outputs);
         virtual std::vector<int> ComputeIntOutput(const PortElementsBase& outputs);
