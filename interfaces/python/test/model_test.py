@@ -144,7 +144,7 @@ def GetGraphStats(adj):
     return stats
 
 def work(key):
-    model = EMLL.LoadModel(key)
+    model = EMLL.ELL_Model(key)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
     print key,
