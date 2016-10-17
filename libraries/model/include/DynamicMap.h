@@ -141,13 +141,13 @@ namespace model
         ///
         /// <param name="index"> The index of the output </param>
         /// <returns> The output </returns>
-        PortElementsBase GetOutput(size_t index);
+        PortElementsBase GetOutput(size_t index) const;
 
         /// <summary> Returns an outputs </summary>
         ///
         /// <param name="outputName"> The name of the output </param>
         /// <returns> The output </returns>
-        PortElementsBase GetOutput(const std::string& outputName);
+        PortElementsBase GetOutput(const std::string& outputName) const;
 
         //
         // Routines for computing output (processing data)
@@ -250,9 +250,6 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        const std::vector<InputNodeBase*>& GetInputs() { return _inputNodes; }
-        const std::vector<PortElementsBase>& GetOutputs() { return _outputElements; }
 
     protected:
         // helper
