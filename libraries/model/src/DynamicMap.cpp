@@ -54,6 +54,11 @@ namespace model
         return _inputNodes[inputIndex];
     }
 
+    InputNodeBase* DynamicMap::GetInputNode(int inputIndex) const
+    {
+        return GetInputNode(static_cast<size_t>(inputIndex));
+    }
+
     InputNodeBase* DynamicMap::GetInputNode(const std::string& inputName) const
     {
         auto iter = _inputNodeMap.find(inputName);
@@ -63,6 +68,11 @@ namespace model
     size_t DynamicMap::GetInputSize(size_t inputIndex) const
     {
         return _inputNodes[inputIndex]->GetOutputPort().Size();
+    }
+
+    size_t DynamicMap::GetInputSize(int inputIndex) const
+    {
+        return GetInputSize(static_cast<size_t>(inputIndex));
     }
 
     size_t DynamicMap::GetInputSize(const std::string& inputName) const
@@ -175,14 +185,46 @@ namespace model
         archiver.PopContext();
     }
 
-    InputNodeBase* DynamicMap::GetInput(size_t index)
+    InputNodeBase* DynamicMap::GetInput(size_t index) const
     {
+        if (index >= _inputNodes.size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+
         return _inputNodes[index];
     }
 
-    PortElementsBase DynamicMap::GetOutput(size_t index)
+    InputNodeBase* DynamicMap::GetInput(const std::string& inputName) const
     {
+        auto iter = _inputNodeMap.find(inputName);
+        if (iter == _inputNodeMap.end())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+
+        return iter->second;
+    }
+
+    PortElementsBase DynamicMap::GetOutput(size_t index) const
+    {
+        if (index >= _outputElements.size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+
         return _outputElements[index];
+    }
+
+    PortElementsBase DynamicMap::GetOutput(const std::string& outputName) const
+    {
+        auto iter = _outputElementsMap.find(outputName);
+        if (iter == _outputElementsMap.end())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+
+        return iter->second;
     }
 
     //

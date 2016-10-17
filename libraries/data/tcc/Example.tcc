@@ -19,7 +19,7 @@ namespace data
     template <typename DataVectorType, typename MetadataType>
     template <typename InputDataVectorType, typename InputMetadataType, utilities::IsDifferent<InputDataVectorType, DataVectorType> Concept>
     Example<DataVectorType, MetadataType>::Example(const InputDataVectorType& dataVector, const InputMetadataType& metadata)
-        : _dataVector(std::make_shared<DataVectorType>(dataVector.template ToArrayT<typename DataVectorType::ValueType>())), _metadata(MetadataType(metadata))
+        : _dataVector(std::make_shared<DataVectorType>(dataVector.GetIterator())), _metadata(MetadataType(metadata))
     {
     }
 

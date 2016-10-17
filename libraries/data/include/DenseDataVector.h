@@ -38,7 +38,6 @@ namespace data
     {
     public:
         using Iterator = linear::VectorIndexValueIterator<ElementType>; 
-        using ValueType = ElementType;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();

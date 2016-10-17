@@ -14,12 +14,13 @@
 #include "PortElements.h"
 
 // data
-#include "DenseDataVector.h"
+#include "DataVector.h"
 
 // utilities
 #include "TypeTraits.h"
 #include "IArchivable.h"
 #include "Exception.h"
+#include "StlIndexValueIterator.h"
 
 // stl
 #include <string>
@@ -65,6 +66,7 @@ namespace model
         /// <param name="inputName"> The name of the input </param>
         /// <returns> The specified input node </returns>
         InputNodeBase* GetInputNode(size_t inputIndex) const;
+        InputNodeBase* GetInputNode(int inputIndex) const;
 
         /// <summary> Returns the requested input node </summary>
         ///
@@ -77,6 +79,7 @@ namespace model
         /// <param name="inputIndex"> The index of the input </param>
         /// <returns> The dimensionality of the input </returns>
         size_t GetInputSize(size_t inputIndex) const;
+        size_t GetInputSize(int inputIndex) const;
 
         /// <summary> Returns size of a given input </summary>
         ///
@@ -91,6 +94,8 @@ namespace model
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
         void SetInputValue(size_t index, const std::vector<ValueType>& inputValues) const;
+        template <typename ValueType>
+        void SetInputValue(int index, const std::vector<ValueType>& inputValues) const;
 
         /// <summary> Set a single InputNode's input </summary>
         ///
@@ -105,16 +110,18 @@ namespace model
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
-        template <typename ValueType>
-        void SetInputValue(size_t index, const data::DenseDataVector<ValueType>& inputValues) const;
+        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
+        void SetInputValue(size_t index, const DataVectorType& inputValues) const;
+        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
+        void SetInputValue(int index, const DataVectorType& inputValues) const;
 
         /// <summary> Set a single InputNode's input </summary>
         ///
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
-        template <typename ValueType>
-        void SetInputValue(const std::string& inputName, const data::DenseDataVector<ValueType>& inputValues) const;
+        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
+        void SetInputValue(const std::string& inputName, const DataVectorType& inputValues) const;
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
@@ -122,13 +129,17 @@ namespace model
         /// <returns> A vector of output values </returns>
         template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
         std::vector<ValueType> ComputeOutput(size_t index) const;
+        template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
+        std::vector<ValueType> ComputeOutput(int index) const;
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
         /// <param name="index"> The index of the output </param>
         /// <returns> A vector of output values </returns>
-        template <typename DataVectorType, typename ValueType = typename DataVectorType::ValueType>
+        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         DataVectorType ComputeOutput(size_t index) const;
+        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
+        DataVectorType ComputeOutput(int index) const;
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
@@ -141,7 +152,7 @@ namespace model
         ///
         /// <param name="outputName"> The name of the output </param>
         /// <returns> A vector of output values </returns>
-        template <typename DataVectorType, typename ValueType = typename DataVectorType::ValueType>
+        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         DataVectorType ComputeOutput(const std::string& outputName) const;
 
         /// <summary> Returns size of a given output </summary>
@@ -149,6 +160,7 @@ namespace model
         /// <param name="outputIndex"> The index of the output </param>
         /// <returns> The dimensionality of the output </returns>
         size_t GetOutputSize(size_t outputIndex) const;
+        size_t GetOutputSize(int outputIndex) const;
 
         /// <summary> Returns size of a given output </summary>
         ///
@@ -193,11 +205,21 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        template <typename ValueType>
+        // helper
+        template <typename DataVectorType, typename ElementsType, data::IsDataVector<DataVectorType> Concept = true>
+        void SetInputValue(InputNodeBase* node, const DataVectorType& inputValues) const;
+
+        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
+        void SetInputValue(InputNodeBase* node, const DataVectorType& inputValues) const;
+
+        template <typename DataVectorType, typename ElementsType, data::IsDataVector<DataVectorType> Concept = true>
+        DataVectorType ComputeOutput(const PortElementsBase& elements) const;
+
+        template <typename ValueType, utilities::IsFundamental<ValueType> = 1>
         std::vector<ValueType> ComputeOutput(const PortElementsBase& elements) const;
 
-        template <typename OutputValueType, typename ElementsValueType>
-        std::vector<OutputValueType> ComputeOutput(const PortElementsBase& elements) const;
+        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
+        DataVectorType ComputeOutput(const PortElementsBase& elements) const;
 
         /// <summary> Add an input to the map </summary>
         ///
@@ -223,8 +245,11 @@ namespace model
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         virtual ModelTransformer DoRefine(const TransformContext& context);
-        InputNodeBase* GetInput(size_t index);
-        PortElementsBase GetOutput(size_t index);
+
+        InputNodeBase* GetInput(size_t index) const;
+        InputNodeBase* GetInput(const std::string& name) const;
+        PortElementsBase GetOutput(size_t index) const;
+        PortElementsBase GetOutput(const std::string& name) const;
 
     private:
         Model _model;

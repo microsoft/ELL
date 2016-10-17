@@ -13,138 +13,183 @@ namespace model
     //
     // SetInput
     //
-
-    // By name
-    template <typename ValueType>
-    void DynamicMap::SetInputValue(const std::string& inputName, const std::vector<ValueType>& inputValues) const
+    template <typename DataVectorType, typename ElementsType, data::IsDataVector<DataVectorType>>
+    void DynamicMap::SetInputValue(InputNodeBase* node, const DataVectorType& inputValues) const
     {
-        auto iter = _inputNodeMap.find(inputName);
-        if (iter == _inputNodeMap.end())
+        auto inputSize = node->GetOutputPort().Size();
+        std::vector<ElementsType> arr(inputSize);
+        auto iter = inputValues.GetIterator();
+        while (iter.IsValid())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+            auto indexValue = iter.Get();
+            if (indexValue.index >= inputSize)
+            {
+                break;
+            }
+            arr[indexValue.index] = static_cast<ElementsType>(indexValue.value);
+            iter.Next();
         }
 
-        auto node = dynamic_cast<InputNode<ValueType>*>(iter->second);
-        if (node != nullptr)
-        {
-            node->SetInput(inputValues);
-        }
-        else
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
-        }
+        auto typedNode = static_cast<InputNode<ElementsType>*>(node);
+        typedNode->SetInput(arr);
     }
 
-    template <typename ValueType>
-    void DynamicMap::SetInputValue(const std::string& inputName, const data::DenseDataVector<ValueType>& inputValues) const
+    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
+    void DynamicMap::SetInputValue(InputNodeBase* inputNode, const DataVectorType& inputValues) const
     {
-        auto arr = inputValues.template ToArrayT<ValueType>();
-        arr.resize(GetInputSize(inputName));
-        SetInputValue(inputName, arr);
-    }
-
-    // By index
-    template <typename ValueType>
-    void DynamicMap::SetInputValue(size_t index, const std::vector<ValueType>& inputValues) const
-    {
-        if (index >= _inputNodes.size())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
-        }
-
-        auto node = dynamic_cast<InputNode<ValueType>*>(_inputNodes[index]);
-        if (node != nullptr)
-        {
-            node->SetInput(inputValues);
-        }
-        else
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
-        }
-    }
-
-    template <typename ValueType>
-    void DynamicMap::SetInputValue(size_t index, const data::DenseDataVector<ValueType>& inputValues) const
-    {
-        auto arr = inputValues.template ToArrayT<ValueType>();
-        arr.resize(GetInputSize(index));
-        SetInputValue(index, arr);
-    }
-
-    //
-    // ComputeOutput
-    //
-
-    template <typename OutputValueType, typename ElementsValueType>
-    std::vector<OutputValueType> DynamicMap::ComputeOutput(const PortElementsBase& elements) const
-    {
-        auto computedValue = _model.ComputeOutput<ElementsValueType>(elements);
-        std::vector<OutputValueType> result(computedValue.size());
-        std::copy(computedValue.begin(), computedValue.end(), result.begin());
-        return result;
-    }
-
-    // By name
-    template <typename ValueType>
-    std::vector<ValueType> DynamicMap::ComputeOutput(const PortElementsBase& elements) const
-    {
-        std::vector<ValueType> result;
-        switch (elements.GetType())
+        switch (inputNode->GetOutputPort().GetType())
         {
             case Port::PortType::none:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
                 break;
             case Port::PortType::real:
-                return ComputeOutput<ValueType, double>(elements);
+                SetInputValue<DataVectorType, double>(inputNode, inputValues);
                 break;
             case Port::PortType::integer:
-                return ComputeOutput<ValueType, int>(elements);
+                SetInputValue<DataVectorType, int>(inputNode, inputValues);
                 break;
             case Port::PortType::categorical:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
                 break;
             case Port::PortType::boolean:
-                return ComputeOutput<ValueType, bool>(elements);
+                SetInputValue<DataVectorType, bool>(inputNode, inputValues);
                 break;
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
         }
     }
 
-    template <typename ValueType, utilities::IsFundamental<ValueType>>
-    std::vector<ValueType> DynamicMap::ComputeOutput(const std::string& outputName) const
+    // By name
+    template <typename ValueType>
+    void DynamicMap::SetInputValue(const std::string& inputName, const std::vector<ValueType>& inputValues) const
     {
-        auto iter = _outputElementsMap.find(outputName);
-        if (iter == _outputElementsMap.end())
+        auto node = dynamic_cast<InputNode<ValueType>*>(GetInput(inputName));
+        if (node == nullptr)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        return ComputeOutput<ValueType>(iter->second);
+        node->SetInput(inputValues);
     }
 
-    template <typename DataVectorType, typename ValueType>
-    DataVectorType DynamicMap::ComputeOutput(const std::string& outputName) const
+    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
+    void DynamicMap::SetInputValue(const std::string& inputName, const DataVectorType& inputValues) const
     {
-        return DataVectorType{ ComputeOutput<ValueType>(outputName) };
+        auto node = GetInput(inputName);
+        SetInputValue(node, inputValues);
+    }
+
+    // By index
+    template <typename ValueType>
+    void DynamicMap::SetInputValue(size_t index, const std::vector<ValueType>& inputValues) const
+    {
+        auto node = dynamic_cast<InputNode<ValueType>*>(GetInput(index));
+        if (node == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        node->SetInput(inputValues);
+    }
+
+    template <typename ValueType>
+    void DynamicMap::SetInputValue(int index, const std::vector<ValueType>& inputValues) const
+    {
+        SetInputValue(static_cast<size_t>(index), inputValues);
+    }
+
+    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
+    void DynamicMap::SetInputValue(size_t index, const DataVectorType& inputValues) const
+    {
+        auto node = GetInput(index);
+        SetInputValue(node, inputValues);
+    }
+
+    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
+    void DynamicMap::SetInputValue(int index, const DataVectorType& inputValues) const
+    {
+        SetInputValue(static_cast<size_t>(index), inputValues);
+    }
+
+    //
+    // ComputeOutput
+    //
+
+    template <typename OutputDataVectorType, typename ElementsValueType, data::IsDataVector<OutputDataVectorType>>
+    OutputDataVectorType DynamicMap::ComputeOutput(const PortElementsBase& elements) const
+    {
+        auto resultVector = ComputeOutput<ElementsValueType>(elements);
+        auto resultVectorIterator = linear::MakeVectorIndexValueIterator(resultVector);
+        return { resultVectorIterator };
+    }
+
+    template <typename ValueType, utilities::IsFundamental<ValueType>>
+    std::vector<ValueType> DynamicMap::ComputeOutput(const PortElementsBase& elements) const
+    {
+        return _model.ComputeOutput<ValueType>(elements);
+    }
+
+    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
+    DataVectorType DynamicMap::ComputeOutput(const PortElementsBase& elements) const
+    {
+        switch (elements.GetType())
+        {
+            case Port::PortType::none:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+                break;
+            case Port::PortType::real:
+                return ComputeOutput<DataVectorType, double>(elements);
+                break;
+            case Port::PortType::integer:
+                return ComputeOutput<DataVectorType, int>(elements);
+                break;
+            case Port::PortType::categorical:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+                break;
+            case Port::PortType::boolean:
+                return ComputeOutput<DataVectorType, bool>(elements);
+                break;
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
     }
 
     // By index
     template <typename ValueType, utilities::IsFundamental<ValueType>>
     std::vector<ValueType> DynamicMap::ComputeOutput(size_t index) const
     {
-        if (index >= _outputElements.size())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
-        }
-
-        return ComputeOutput<ValueType>(_outputElements[index]);
+        return ComputeOutput<ValueType>(GetOutput(index));
     }
 
-    template <typename DataVectorType, typename ValueType>
+    template <typename ValueType, utilities::IsFundamental<ValueType>>
+    std::vector<ValueType> DynamicMap::ComputeOutput(int index) const
+    {
+        return ComputeOutput<ValueType>(static_cast<size_t>(index));
+    }
+
+    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     DataVectorType DynamicMap::ComputeOutput(size_t index) const
     {
-        return DataVectorType{ ComputeOutput<ValueType>(index) };
+        return ComputeOutput<DataVectorType>(GetOutput(index));
+    }
+
+    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
+    DataVectorType DynamicMap::ComputeOutput(int index) const
+    {
+        return ComputeOutput<DataVectorType>(static_cast<size_t>(index));
+    }
+
+    // By name
+    template <typename ValueType, utilities::IsFundamental<ValueType>>
+    std::vector<ValueType> DynamicMap::ComputeOutput(const std::string& outputName) const
+    {
+        return ComputeOutput<ValueType>(GetOutput(outputName));
+    }
+
+    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
+    DataVectorType DynamicMap::ComputeOutput(const std::string& outputName) const
+    {
+        return ComputeOutput<DataVectorType>(GetOutput(outputName));
     }
 }
 }

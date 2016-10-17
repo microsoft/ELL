@@ -91,7 +91,6 @@ int main(int argc, char* argv[])
             featureArray.resize(mapInputSize);
             map.SetInputValue<double>("input", featureArray);
 
-            // TODO: create data vector via Iterator.
             auto output = map.ComputeOutput<data::FloatDataVector>("output");
             auto mappedExample = data::DenseSupervisedExample{ std::move(output), example.GetMetadata() };
 

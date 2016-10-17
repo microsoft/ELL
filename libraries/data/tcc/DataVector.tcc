@@ -114,23 +114,6 @@ namespace data
     }
 
     template <class DerivedType>
-    template <class ValueType>
-    std::vector<ValueType> DataVectorBase<DerivedType>::ToArrayT() const
-    {
-        std::vector<ValueType> result(static_cast<const DerivedType*>(this)->PrefixLength());
-        auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
-
-        while (constIter.IsValid())
-        {
-            auto indexValue = constIter.Get();
-            result[indexValue.index] = indexValue.value;
-            constIter.Next();
-        }
-
-        return result;
-    }
-
-    template <class DerivedType>
     template <typename ReturnType>
     ReturnType DataVectorBase<DerivedType>::DeepCopyAs() const
     {
