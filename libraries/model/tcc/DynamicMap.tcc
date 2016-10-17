@@ -10,6 +10,21 @@ namespace emll
 {
 namespace model
 {
+    namespace DynamicMapImpl
+    {
+        template <typename T>
+        T FromDouble(double x)
+        {
+            return static_cast<T>(x);
+        }
+
+        template <>
+        inline bool FromDouble<bool>(double x)
+        {
+            return x != 0;
+        }
+    }
+ 
     //
     // SetInput
     //
@@ -20,7 +35,7 @@ namespace model
         auto inputArray = inputValues.ToArray();
         inputArray.resize(inputSize);
         std::vector<ElementsType> array(inputSize);
-        std::transform(inputArray.begin(), inputArray.end(), array.begin(), [](auto x) { return static_cast<ElementsType>(x); });
+        std::transform(inputArray.begin(), inputArray.end(), array.begin(), [](auto x) { return DynamicMapImpl::FromDouble<ElementsType>(x); });
         auto typedNode = static_cast<InputNode<ElementsType>*>(node);
         typedNode->SetInput(array);
     }
