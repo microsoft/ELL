@@ -80,18 +80,15 @@ int main(int argc, char* argv[])
 
         // get output stream
         auto outputStream = dataSaveArguments.outputDataStream;
-        auto mapInputSize = map.GetInputSize("input");
+        auto mapInputSize = map.GetInputSize(0);
 
         auto datasetIterator = dataset.GetExampleReferenceIterator();
         while (datasetIterator.IsValid())
         {
             const auto& example = datasetIterator.Get();
-            auto featureArray = example.GetDataVector().ToArray();
+            map.SetInputValue(0, example.GetDataVector());
 
-            featureArray.resize(mapInputSize);
-            map.SetInputValue<double>("input", featureArray);
-
-            auto output = map.ComputeOutput<data::FloatDataVector>("output");
+            auto output = map.ComputeOutput<data::FloatDataVector>(0);
             auto mappedExample = data::DenseSupervisedExample{ std::move(output), example.GetMetadata() };
 
             mappedExample.Print(outputStream);

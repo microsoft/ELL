@@ -17,21 +17,13 @@ namespace model
     void DynamicMap::SetInputValue(InputNodeBase* node, const DataVectorType& inputValues) const
     {
         auto inputSize = node->GetOutputPort().Size();
-        std::vector<ElementsType> arr(inputSize);
-        auto iter = inputValues.GetIterator();
-        while (iter.IsValid())
-        {
-            auto indexValue = iter.Get();
-            if (indexValue.index >= inputSize)
-            {
-                break;
-            }
-            arr[indexValue.index] = static_cast<ElementsType>(indexValue.value);
-            iter.Next();
-        }
+        std::vector<ElementsType> array(inputSize);
+        auto inputArray = inputValues.ToArray();
+        inputArray.resize(inputSize);
+        std::copy(inputArray.begin(), inputArray.end(), array.begin());
 
         auto typedNode = static_cast<InputNode<ElementsType>*>(node);
-        typedNode->SetInput(arr);
+        typedNode->SetInput(array);
     }
 
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>

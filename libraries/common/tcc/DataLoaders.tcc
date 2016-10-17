@@ -30,13 +30,11 @@ namespace common
     {
         auto dataIterator = GetDataIterator(dataLoadArguments);
         DatasetType dataset;
-        // using OutDataVectorType = typename DatasetType::ExampleType::DataVectorType;
 
         // generate mapped dataset
         while (dataIterator->IsValid())
         {
             auto row = dataIterator->Get(); // this is an AutoSupervisedExample
-            // auto dataVec = row.GetDataVector();  // Error: missing copy c'tor for AutoDataVector
             auto dataVec = row.GetDataVector().DeepCopyAs<data::DoubleDataVector>();
             map.SetInputValue(0, dataVec);
             auto output = map.ComputeOutput<data::DoubleDataVector>(0);
