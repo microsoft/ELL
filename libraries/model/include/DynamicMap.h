@@ -127,8 +127,8 @@ namespace model
         ///
         /// <param name="index"> The index of the output </param>
         /// <returns> A vector of output values </returns>
-        template <typename VectorType, typename ValueType = typename VectorType::ValueType> // = typename VectorType::value_type>
-        VectorType ComputeOutput(size_t index) const;
+        template <typename DataVectorType, typename ValueType = typename DataVectorType::ValueType>
+        DataVectorType ComputeOutput(size_t index) const;
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
@@ -141,8 +141,8 @@ namespace model
         ///
         /// <param name="outputName"> The name of the output </param>
         /// <returns> A vector of output values </returns>
-        template <typename VectorType, typename ValueType> // = typename VectorType::value_type>
-        VectorType ComputeOutput(const std::string& outputName) const;
+        template <typename DataVectorType, typename ValueType = typename DataVectorType::ValueType>
+        DataVectorType ComputeOutput(const std::string& outputName) const;
 
         /// <summary> Returns size of a given output </summary>
         ///
@@ -193,6 +193,12 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
+        template <typename ValueType>
+        std::vector<ValueType> ComputeOutput(const PortElementsBase& elements) const;
+
+        template <typename OutputValueType, typename ElementsValueType>
+        std::vector<OutputValueType> ComputeOutput(const PortElementsBase& elements) const;
+
         /// <summary> Add an input to the map </summary>
         ///
         /// <param name="inputName"> The name to assign to the input node </param>

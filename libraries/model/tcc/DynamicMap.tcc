@@ -46,7 +46,7 @@ namespace model
     // By index
     template <typename ValueType>
     void DynamicMap::SetInputValue(size_t index, const std::vector<ValueType>& inputValues) const
-    {        
+    {
         if (index >= _inputNodes.size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
@@ -75,7 +75,42 @@ namespace model
     // ComputeOutput
     //
 
+    template <typename OutputValueType, typename ElementsValueType>
+    std::vector<OutputValueType> DynamicMap::ComputeOutput(const PortElementsBase& elements) const
+    {
+        auto computedValue = _model.ComputeOutput<ElementsValueType>(elements);
+        std::vector<OutputValueType> result(computedValue.size());
+        std::copy(computedValue.begin(), computedValue.end(), result.begin());
+        return result;
+    }
+
     // By name
+    template <typename ValueType>
+    std::vector<ValueType> DynamicMap::ComputeOutput(const PortElementsBase& elements) const
+    {
+        std::vector<ValueType> result;
+        switch (elements.GetType())
+        {
+            case Port::PortType::none:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+                break;
+            case Port::PortType::real:
+                return ComputeOutput<ValueType, double>(elements);
+                break;
+            case Port::PortType::integer:
+                return ComputeOutput<ValueType, int>(elements);
+                break;
+            case Port::PortType::categorical:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+                break;
+            case Port::PortType::boolean:
+                return ComputeOutput<ValueType, bool>(elements);
+                break;
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+    }
+
     template <typename ValueType, utilities::IsFundamental<ValueType>>
     std::vector<ValueType> DynamicMap::ComputeOutput(const std::string& outputName) const
     {
@@ -85,13 +120,13 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
         }
 
-        return _model.ComputeOutput<ValueType>(iter->second);
+        return ComputeOutput<ValueType>(iter->second);
     }
 
-    template <typename VectorType, typename ValueType>
-    VectorType DynamicMap::ComputeOutput(const std::string& outputName) const
+    template <typename DataVectorType, typename ValueType>
+    DataVectorType DynamicMap::ComputeOutput(const std::string& outputName) const
     {
-        return VectorType{ ComputeOutput<ValueType>(outputName) };
+        return DataVectorType{ ComputeOutput<ValueType>(outputName) };
     }
 
     // By index
@@ -103,13 +138,13 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
         }
 
-        return _model.ComputeOutput<ValueType>(_outputElements[index]);
+        return ComputeOutput<ValueType>(_outputElements[index]);
     }
 
-    template <typename VectorType, typename ValueType>
-    VectorType DynamicMap::ComputeOutput(size_t index) const
+    template <typename DataVectorType, typename ValueType>
+    DataVectorType DynamicMap::ComputeOutput(size_t index) const
     {
-        return VectorType{ ComputeOutput<ValueType>(index) };
+        return DataVectorType{ ComputeOutput<ValueType>(index) };
     }
 }
 }

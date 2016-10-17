@@ -44,7 +44,7 @@ namespace model
 
     linear::IndexValue PortElementsBase::Iterator::Get()
     {
-        if(!IsValid())
+        if (!IsValid())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange);
         }
@@ -206,7 +206,20 @@ namespace model
         ComputeSize();
     }
 
-    void PortElementsBase::Reserve(size_t numRanges) { _ranges.reserve(numRanges); }
+    Port::PortType PortElementsBase::GetType() const
+    {
+        if(Size() == 0)
+        {
+            return Port::PortType::none;
+        }
+
+        return _ranges[0].GetType();
+    }
+    
+    void PortElementsBase::Reserve(size_t numRanges)
+    {
+        _ranges.reserve(numRanges);
+    }
 
     void PortElementsBase::AddRange(const PortRange& range)
     {

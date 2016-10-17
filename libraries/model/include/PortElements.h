@@ -223,6 +223,11 @@ namespace model
 
         virtual ~PortElementsBase() = default;
 
+        /// <summary> Returns the type of the values referenced </summary>
+        ///
+        /// <returns> The type of the values referenced </returns>
+        Port::PortType GetType() const;
+
         /// <summary> The dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
