@@ -139,7 +139,7 @@
     "predicate": "greater"
   }, 
   {
-    "_type": "TypeCastNode<bool,int32>",
+    "_type": "TypeCastNode<bool,int>",
     "id": {
       "_type": "UniqueId",
       "id": "1048"
@@ -169,7 +169,7 @@
       }
     },
     "output": {
-      "_type": "OutputPort<int32>",
+      "_type": "OutputPort<int>",
       "nodeId": {
         "_type": "UniqueId",
         "id": "1048"
@@ -180,13 +180,13 @@
     }
   }, 
   {
-    "_type": "ConstantNode<int32>",
+    "_type": "ConstantNode<int>",
     "id": {
       "_type": "UniqueId",
       "id": "1053"
     },
     "output": {
-      "_type": "OutputPort<int32>",
+      "_type": "OutputPort<int>",
       "nodeId": {
         "_type": "UniqueId",
         "id": "1053"
@@ -198,13 +198,13 @@
     "values": [1]
   }, 
   {
-    "_type": "BinaryPredicateNode<int32>",
+    "_type": "BinaryPredicateNode<int>",
     "id": {
       "_type": "UniqueId",
       "id": "1054"
     },
     "input1": {
-      "_type": "InputPort<int32>",
+      "_type": "InputPort<int>",
       "nodeId": {
         "_type": "UniqueId",
         "id": "1054"
@@ -212,7 +212,7 @@
       "name": "input1",
       "type": 2,
       "input": {
-        "_type": "PortElements<int32>",
+        "_type": "PortElements<int>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -228,7 +228,7 @@
       }
     },
     "input2": {
-      "_type": "InputPort<int32>",
+      "_type": "InputPort<int>",
       "nodeId": {
         "_type": "UniqueId",
         "id": "1054"
@@ -236,7 +236,7 @@
       "name": "input2",
       "type": 2,
       "input": {
-        "_type": "PortElements<int32>",
+        "_type": "PortElements<int>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -340,13 +340,13 @@
     }
   }, 
   {
-    "_type": "ConstantNode<int32>",
+    "_type": "ConstantNode<int>",
     "id": {
       "_type": "UniqueId",
       "id": "1050"
     },
     "output": {
-      "_type": "OutputPort<int32>",
+      "_type": "OutputPort<int>",
       "nodeId": {
         "_type": "UniqueId",
         "id": "1050"
@@ -358,13 +358,13 @@
     "values": [0]
   }, 
   {
-    "_type": "BinaryPredicateNode<int32>",
+    "_type": "BinaryPredicateNode<int>",
     "id": {
       "_type": "UniqueId",
       "id": "1051"
     },
     "input1": {
-      "_type": "InputPort<int32>",
+      "_type": "InputPort<int>",
       "nodeId": {
         "_type": "UniqueId",
         "id": "1051"
@@ -372,7 +372,7 @@
       "name": "input1",
       "type": 2,
       "input": {
-        "_type": "PortElements<int32>",
+        "_type": "PortElements<int>",
         "ranges": [
         {
           "_type": "PortRange",
@@ -388,7 +388,7 @@
       }
     },
     "input2": {
-      "_type": "InputPort<int32>",
+      "_type": "InputPort<int>",
       "nodeId": {
         "_type": "UniqueId",
         "id": "1051"
@@ -396,7 +396,7 @@
       "name": "input2",
       "type": 2,
       "input": {
-        "_type": "PortElements<int32>",
+        "_type": "PortElements<int>",
         "ranges": [
         {
           "_type": "PortRange",
