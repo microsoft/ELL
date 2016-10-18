@@ -66,12 +66,6 @@ namespace model
         ///
         /// <param name="inputName"> The name of the input </param>
         /// <returns> The specified input node </returns>
-        InputNodeBase* GetInputNode(size_t inputIndex) const;
-
-        /// <summary> Returns the requested input node </summary>
-        ///
-        /// <param name="inputName"> The name of the input </param>
-        /// <returns> The specified input node </returns>
         InputNodeBase* GetInputNode(int inputIndex) const;
 
         /// <summary> Returns the requested input node </summary>
@@ -84,12 +78,6 @@ namespace model
         ///
         /// <param name="inputIndex"> The index of the input </param>
         /// <returns> The size of the input </returns>
-        size_t GetInputSize(size_t inputIndex) const;
-
-        /// <summary> Returns size of a given input </summary>
-        ///
-        /// <param name="inputIndex"> The index of the input </param>
-        /// <returns> The size of the input </returns>
         size_t GetInputSize(int inputIndex) const;
 
         /// <summary> Returns size of a given input </summary>
@@ -97,14 +85,6 @@ namespace model
         /// <param name="inputName"> The name of the input </param>
         /// <returns> The size of the input </returns>
         size_t GetInputSize(const std::string& inputName) const;
-
-        /// <summary> Set a single InputNode's input </summary>
-        ///
-        /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
-        /// <param name="inputName"> The name assigned to the input node </param>
-        /// <param name="inputValues"> The values to set on the input node </param>
-        template <typename ValueType>
-        void SetInputValue(size_t index, const std::vector<ValueType>& inputValues) const;
 
         /// <summary> Set a single InputNode's input </summary>
         ///
@@ -128,14 +108,6 @@ namespace model
         /// <param name="index"> The index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
-        void SetInputValue(size_t index, const DataVectorType& inputValues) const;
-
-        /// <summary> Set a single InputNode's input </summary>
-        ///
-        /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
-        /// <param name="index"> The index of the input node </param>
-        /// <param name="inputValues"> The values to set on the input node </param>
-        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         void SetInputValue(int index, const DataVectorType& inputValues) const;
 
         /// <summary> Set a single InputNode's input </summary>
@@ -151,21 +123,7 @@ namespace model
         /// <param name="index"> The index of the output </param>
         /// <returns> A vector of output values </returns>
         template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
-        std::vector<ValueType> ComputeOutput(size_t index) const;
-
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
-        ///
-        /// <param name="index"> The index of the output </param>
-        /// <returns> A vector of output values </returns>
-        template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
         std::vector<ValueType> ComputeOutput(int index) const;
-
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
-        ///
-        /// <param name="index"> The index of the output </param>
-        /// <returns> A vector of output values </returns>
-        template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
-        DataVectorType ComputeOutput(size_t index) const;
 
         /// <summary> Computes of one of the map's outputs from its current input values </summary>
         ///
@@ -192,7 +150,6 @@ namespace model
         ///
         /// <param name="outputIndex"> The index of the output </param>
         /// <returns> The size of the output </returns>
-        size_t GetOutputSize(size_t outputIndex) const;
         size_t GetOutputSize(int outputIndex) const;
 
         /// <summary> Returns size of a given output </summary>

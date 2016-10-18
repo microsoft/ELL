@@ -87,7 +87,7 @@ namespace model
 
     // By index
     template <typename ValueType>
-    void DynamicMap::SetInputValue(size_t index, const std::vector<ValueType>& inputValues) const
+    void DynamicMap::SetInputValue(int index, const std::vector<ValueType>& inputValues) const
     {
         auto node = dynamic_cast<InputNode<ValueType>*>(GetInput(index));
         if (node == nullptr)
@@ -98,23 +98,11 @@ namespace model
         node->SetInput(inputValues);
     }
 
-    template <typename ValueType>
-    void DynamicMap::SetInputValue(int index, const std::vector<ValueType>& inputValues) const
-    {
-        SetInputValue(static_cast<size_t>(index), inputValues);
-    }
-
-    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
-    void DynamicMap::SetInputValue(size_t index, const DataVectorType& inputValues) const
-    {
-        auto node = GetInput(index);
-        SetInputValue(node, inputValues);
-    }
-
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     void DynamicMap::SetInputValue(int index, const DataVectorType& inputValues) const
     {
-        SetInputValue(static_cast<size_t>(index), inputValues);
+        auto node = GetInput(index);
+        SetInputValue(node, inputValues);
     }
 
     //
@@ -162,27 +150,15 @@ namespace model
 
     // By index
     template <typename ValueType, utilities::IsFundamental<ValueType>>
-    std::vector<ValueType> DynamicMap::ComputeOutput(size_t index) const
-    {
-        return ComputeOutput<ValueType>(GetOutput(index));
-    }
-
-    template <typename ValueType, utilities::IsFundamental<ValueType>>
     std::vector<ValueType> DynamicMap::ComputeOutput(int index) const
     {
-        return ComputeOutput<ValueType>(static_cast<size_t>(index));
-    }
-
-    template <typename DataVectorType, data::IsDataVector<DataVectorType>>
-    DataVectorType DynamicMap::ComputeOutput(size_t index) const
-    {
-        return ComputeOutput<DataVectorType>(GetOutput(index));
+        return ComputeOutput<ValueType>(GetOutput(index));
     }
 
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     DataVectorType DynamicMap::ComputeOutput(int index) const
     {
-        return ComputeOutput<DataVectorType>(static_cast<size_t>(index));
+        return ComputeOutput<DataVectorType>(GetOutput(index));
     }
 
     // By name
