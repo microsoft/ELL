@@ -44,19 +44,6 @@ namespace emll
 {
 namespace common
 {
-    namespace
-    {
-        void SplitString(const std::string& str, char delimiter, std::vector<std::string>& elements)
-        {
-            std::stringstream stream(str);
-            std::string element;
-            while (getline(stream, element, delimiter))
-            {
-                elements.push_back(element);
-            }
-        }
-    }
-
     model::Model GetModel1()
     {
         // For now, just create a model and return it
@@ -390,10 +377,6 @@ namespace common
             if (mapLoadArguments.modelOutputsString != "")
             {
                 outputElements = mapLoadArguments.GetOutput(model);
-                // if (outputPort == nullptr)
-                // {
-                //     throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output port");
-                // }
             }
             else // look for first output node
             {

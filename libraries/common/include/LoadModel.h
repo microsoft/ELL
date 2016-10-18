@@ -14,7 +14,6 @@
 #include "Model.h"
 #include "DynamicMap.h"
 
-
 namespace emll
 {
 namespace common
