@@ -59,15 +59,15 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/private)
 add_subdirectory(private)
 endif()
 
-# Add SWIG-generated interfaces
+# Add examples
+add_subdirectory(examples)
 
+# Add SWIG-generated interfaces
 if(SWIG_ENABLED)
   find_package(SWIG 3.0)
   if(SWIG_FOUND)
     add_subdirectory(interfaces)
 
-    # Add examples
-    add_subdirectory(examples)
   
   else()
     message(WARNING "Couldn't find SWIG, skipping interface generation.")
