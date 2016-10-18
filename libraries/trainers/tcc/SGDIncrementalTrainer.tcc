@@ -127,14 +127,14 @@ namespace trainers
             bLast *= scaleCoefficient;
 
             double updateCoefficient = -beta / t / _parameters.regularization;
-            dataVector.AddTo(vLast, updateCoefficient);
+            dataVector.AddTo(vLast.GetDataPointer(), updateCoefficient);
             bLast += updateCoefficient;
 
             // update average
             double averageingCoefficient = (t - 1) / t;
             vAvg.Scale(averageingCoefficient); // dense operation
             bAvg *= averageingCoefficient;
-            vLast.AddTo(vAvg, 1 / t); // dense operation
+            vLast.AddTo(vAvg.GetDataPointer(), 1 / t); // dense operation
             bAvg += bLast / t;
 
             exampleIterator.Next();
