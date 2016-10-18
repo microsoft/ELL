@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <utility>
 
 namespace emll
 {
@@ -77,14 +78,14 @@ namespace model
         /// <summary> Returns size of a given input </summary>
         ///
         /// <param name="inputIndex"> The index of the input </param>
-        /// <returns> The dimensionality of the input </returns>
+        /// <returns> The size of the input </returns>
         size_t GetInputSize(size_t inputIndex) const;
         size_t GetInputSize(int inputIndex) const;
 
         /// <summary> Returns size of a given input </summary>
         ///
         /// <param name="inputName"> The name of the input </param>
-        /// <returns> The dimensionality of the input </returns>
+        /// <returns> The size of the input </returns>
         size_t GetInputSize(const std::string& inputName) const;
 
         /// <summary> Set a single InputNode's input </summary>
@@ -158,14 +159,14 @@ namespace model
         /// <summary> Returns size of a given output </summary>
         ///
         /// <param name="outputIndex"> The index of the output </param>
-        /// <returns> The dimensionality of the output </returns>
+        /// <returns> The size of the output </returns>
         size_t GetOutputSize(size_t outputIndex) const;
         size_t GetOutputSize(int outputIndex) const;
 
         /// <summary> Returns size of a given output </summary>
         ///
         /// <param name="outputName"> The name of the output </param>
-        /// <returns> The dimensionality of the output </returns>
+        /// <returns> The size of the output </returns>
         size_t GetOutputSize(const std::string& outputName) const;
 
         /// <summary> Returns a `PortElements` object representing the indicated map output </summary>

@@ -48,22 +48,8 @@ namespace data
     template <typename ElementType>
     DenseDataVector<ElementType>::DenseDataVector(std::initializer_list<double> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
         size_t index = 0;
-        while(current < end)
-        {
-            DenseDataVector<ElementType>::AppendElement(index, *current); // explicit call to DenseDataVector<ElementType>::AppendElement is given to avoid virtual function call in Ctor
-            ++current;
-            ++index;
-        }
-    }
-
-    template <typename ElementType>
-    DenseDataVector<ElementType>::DenseDataVector(std::vector<ElementType> vec)
-    {
-        size_t index = 0;
-        for(auto value: vec)
+        for(auto value: list)
         {
             DenseDataVector<ElementType>::AppendElement(index, value); // explicit call to DenseDataVector<ElementType>::AppendElement is given to avoid virtual function call in Ctor
             ++index;

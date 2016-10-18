@@ -42,7 +42,7 @@ namespace data
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void AppendElement(size_t index, double value = 1.0) = 0;
+        virtual void AppendElement(size_t index, double value) = 0;
 
         /// <summary>
         /// A data vector has infinite dimension and ends with a suffix of zeros. This function returns

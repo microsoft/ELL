@@ -63,11 +63,6 @@ namespace data
         /// <param name="list"> The initializer list of values. </param>
         DenseDataVector(std::initializer_list<double> list);
 
-        /// <summary> Constructs a data vector from an STL vector. </summary>
-        ///
-        /// <param name="list"> The vector of values. </param>
-        DenseDataVector(std::vector<ElementType> vec);
-
         /// <summary> Array indexer operator. </summary>
         ///
         /// <param name="index"> Zero-based index of the desired element. </param>

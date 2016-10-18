@@ -52,9 +52,9 @@ namespace model
         /// <returns> The list nodes this input port gets values from </returns>
         const PortElementsBase& GetInputElements() const { return _inputElements; }
 
-        /// <summary> The dimensionality of the output </summary>
+        /// <summary> The size of the output </summary>
         ///
-        /// <returns> The dimensionality of the output </returns>
+        /// <returns> The size of the output </returns>
         virtual size_t Size() const override { return _inputElements.Size(); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>

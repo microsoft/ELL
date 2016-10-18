@@ -105,7 +105,7 @@ namespace data
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void AppendElement(size_t index, double value = 1.0) override;
+        virtual void AppendElement(size_t index, double value) override;
 
         /// <summary>
         /// A data vector has infinite dimension and ends with a suffix of zeros. This function returns

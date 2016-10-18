@@ -16,11 +16,5 @@ namespace model
         : Node({}, {&output}), _outputBase(output)
     {
     }
-
-    void InputNodeBase::SetSize(size_t size)
-    {
-        _outputBase.SetSize(size);
-    }
-
 }
 }

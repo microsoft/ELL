@@ -35,11 +35,6 @@ namespace model
         /// <returns> The output port. </returns>
         const OutputPortBase& GetOutputPort() const { return _outputBase; }
 
-        /// <summary> Sets the dimension </summary>
-        ///
-        /// <param name="size"> The input dimension </param>
-        void SetSize(size_t size);
-
     protected:
         InputNodeBase(OutputPortBase& output);
 
@@ -57,8 +52,8 @@ namespace model
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="dimension"> The input dimension </param>
-        InputNode(size_t dimension);
+        /// <param name="size"> The input size </param>
+        InputNode(size_t size);
 
         /// <summary> Sets the value output by this node </summary>
         ///

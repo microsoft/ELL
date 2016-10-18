@@ -34,15 +34,10 @@ namespace model
         /// <summary> Notify this port that it is being referenced </summary>
         void ReferencePort() const { _isReferenced = true; }
 
-        /// <summary> Returns the dimensionality of the output </summary>
+        /// <summary> Returns the size of the output </summary>
         ///
-        /// <returns> The dimensionality of the output </returns>
+        /// <returns> The size of the output </returns>
         virtual size_t Size() const override { return _size; }
-
-        /// <summary> Returns the dimensionality of the output </summary>
-        ///
-        /// <param name="size> The dimensionality of the output </param>
-        void SetSize(size_t size);
 
         /// <summary> Indicate if this port is referenced. </summary>
         ///
@@ -91,7 +86,7 @@ namespace model
         ///
         /// <param name="node"> The node this output port is part of </param>
         /// <param name="name"> The name of this port </param>
-        /// <param name="size"> The dimensionality of this port </param>
+        /// <param name="size"> The size of this port </param>
         OutputPort(const class Node* node, std::string name, size_t size);
 
         /// <summary> Returns the cached output from this port </summary>

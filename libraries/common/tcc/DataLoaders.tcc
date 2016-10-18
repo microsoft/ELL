@@ -39,7 +39,7 @@ namespace common
             map.SetInputValue(0, dataVec);
             auto output = map.ComputeOutput<data::DoubleDataVector>(0);
             // convert output vector to OutDataVectorType
-            auto mappedRow = typename DatasetType::ExampleType(output, row.GetMetadata());
+            auto mappedRow = typename DatasetType::DatasetExampleType(output, row.GetMetadata());
             dataset.AddExample(mappedRow);
             dataIterator->Next();
         }

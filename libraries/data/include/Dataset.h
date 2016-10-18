@@ -99,12 +99,12 @@ namespace data
     };
 
     /// <summary> A data set of a specific example type. </summary>
-    template <typename DatasetExampleType>
+    template <typename DatasetExampleT>
     class Dataset : public DatasetBase
     {
     public:
+        using DatasetExampleType = DatasetExampleT;
         using ExampleReferenceIterator = utilities::VectorReferenceIterator<DatasetExampleType>;
-        using ExampleType = DatasetExampleType;
         
         /// <summary> Iterator class. </summary>
         template<typename IteratorExampleType> 

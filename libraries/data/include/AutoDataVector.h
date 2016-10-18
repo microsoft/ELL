@@ -58,7 +58,7 @@ namespace data
         AutoDataVectorBase(std::initializer_list<double> list);
 
         /// <summary> Not Implemented. </summary>
-        virtual void AppendElement(size_t index, double value = 1.0) override;
+        virtual void AppendElement(size_t index, double value) override;
 
         /// <summary> Gets the data vector type. </summary>
         ///
