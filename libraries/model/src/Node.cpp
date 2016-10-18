@@ -84,10 +84,19 @@ namespace model
         {
             return inputPort;
         }
-        else
+
+        return GetOutputPort(portName);
+    }
+
+    const Port* Node::GetPort(const std::string& portName) const
+    {
+        auto inputPort = GetInputPort(portName);
+        if(inputPort != nullptr)
         {
-            return GetOutputPort(portName);
+            return inputPort;
         }
+
+        return GetOutputPort(portName);
     }
 
     std::vector<const Node*> Node::GetParentNodes() const

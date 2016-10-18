@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "DataVector.h"
 #include "DenseDataVector.h"
 #include "AutoDataVector.h"
 
@@ -44,7 +45,7 @@ namespace data
         /// <param name="metadataType"> The metadata. </param>
         Example(DataVectorType dataVector, const MetadataType& metadata);
 
-        template <typename InputDataVectorType, typename InputMetadataType, utilities::IsDifferent<InputDataVectorType, DataVectorType> Concept = true>
+        template <typename InputDataVectorType, typename InputMetadataType, utilities::IsDifferent<InputDataVectorType, DataVectorType> IsDifferentConcept = true, IsDataVector<InputDataVectorType> IsDataConcept = true>
         Example(const InputDataVectorType& dataVector, const InputMetadataType& metadata);
 
         /// <summary> Constructs a supervised example. </summary>
