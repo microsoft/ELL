@@ -224,6 +224,7 @@ ModelManifest.xml
 # Mac stuff
 .DS_Store
 build_xcode/
+build_clang/
 
 # VS Code stuff
 .vs/
