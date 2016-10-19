@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %module "EMLL"
-
+#if 0
 // IMPORTANT: need to include these before anything else, because they include windows.h or other platform-related things
 #if defined(SWIGJAVASCRIPT)
 %{
@@ -129,4 +129,5 @@ namespace std
 
 #if !defined(SWIGXML) && !defined(SWIGR) && !defined(SWIGJAVASCRIPT)
 %shared_ptr(RowDataset)
+#endif
 #endif
