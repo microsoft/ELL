@@ -18,6 +18,7 @@ set (INCLUDE include/AccumulatorNode.h
              include/ConstantNode.h
              include/DelayNode.h
              include/DotProductNode.h
+             include/DTWNode.h
              include/ExtremalValueNode.h
              include/MultiplexerNode.h
              include/ForestPredictorNode.h
@@ -42,6 +43,7 @@ set (TCC tcc/AccumulatorNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/DotProductNode.tcc
+         tcc/DTWNode.tcc
          tcc/ExtremalValueNode.tcc
          tcc/MultiplexerNode.tcc
          tcc/ForestPredictorNode.tcc
