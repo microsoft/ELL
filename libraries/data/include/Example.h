@@ -54,12 +54,6 @@ namespace data
         /// <param name="metadataType"> The metadata. </param>
         Example(const std::shared_ptr<const DataVectorType>& dataVector, const MetadataType& metadata);
 
-        /// <summary> Constructs a supervised example. </summary>
-        ///
-        /// <param name="dataVector"> The data vector. </param>
-        /// <param name="metadataType"> The metadata. </param>
-        Example(const std::shared_ptr<DataVectorType>& dataVector, const MetadataType& metadata);
-
         /// <summary> Assignment operator. </summary>
         ///
         /// <param name="other"> The other. </param>

@@ -30,12 +30,6 @@ namespace data
     }
 
     template <typename DataVectorType, typename MetadataType>
-    Example<DataVectorType, MetadataType>::Example(const std::shared_ptr<DataVectorType>& dataVector, const MetadataType& metadata)
-        : _dataVector(dataVector), _metadata(metadata)
-    {
-    }
-
-    template <typename DataVectorType, typename MetadataType>
     template <typename TargetExampleType, utilities::IsSame<typename TargetExampleType::DataVectorType, DataVectorType> Concept>
     TargetExampleType Example<DataVectorType, MetadataType>::CopyAs() const
     {
