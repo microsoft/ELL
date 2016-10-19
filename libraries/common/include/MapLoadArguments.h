@@ -40,9 +40,21 @@ namespace common
         /// <summary> The outputs from the model to use. </summary>
         std::string modelOutputsString = "";
 
+        /// <summary> Query if the arguments specify a map file. </summary>
+        ///
+        /// <returns> true if the arguments specify a map file. </returns>
         bool HasMapFile() const { return inputMapFile != ""; }
+        
+        /// <summary> Query if the arguments specify a model file. </summary>
+        ///
+        /// <returns> true if the arguments specify a model file. </returns>
         bool HasModelFile() const { return inputModelFile != ""; }
+        
+        /// <summary> Query if the arguments specify either a map file or a model file. </summary>
+        ///
+        /// <returns> true if the arguments specify a map file or a model file. </returns>
         bool HasInputFile() const { return HasMapFile() || HasModelFile(); }
+        
         model::InputNodeBase* GetInput(model::Model& model) const;
         model::PortElementsBase GetOutput(model::Model& model) const;
     };
