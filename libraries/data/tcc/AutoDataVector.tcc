@@ -73,7 +73,7 @@ namespace data
     template<typename ReturnType>
     ReturnType AutoDataVectorBase<DefaultDataVectorType>::DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper) const
     {
-        return _pInternal->Duplicate<ReturnType>(std::move(nonZeroMapper));
+        return _pInternal->DeepCopyAs<ReturnType>(std::move(nonZeroMapper));
     }
 
     template<typename TargetType>

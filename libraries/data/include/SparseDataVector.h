@@ -112,6 +112,7 @@ namespace data
         virtual size_t PrefixLength() const override;
 
     private:
+        using DataVectorBase<SparseDataVector<ElementType, IntegerListType>>::AppendElements;
         IntegerListType _indices;
         std::vector<ElementType> _values;
     };

@@ -11,7 +11,7 @@
 #include "OutputPort.h"
 #include "Port.h"
 
-// linear
+// data
 #include "IndexValue.h"
 
 // utilities
@@ -186,7 +186,7 @@ namespace model
     {
     public:
         /// <summary> A read-only forward iterator for the output values of a `PortElementsBase`. </summary>
-        class Iterator : public linear::IIndexValueIterator
+        class Iterator : public data::IIndexValueIterator
         {
         public:
             Iterator(const Iterator&) = default;
@@ -203,7 +203,7 @@ namespace model
             /// <summary> Gets the item the iterator is pointing to. </summary>
             ///
             /// <returns> The item. </returns>
-            linear::IndexValue Get();
+            data::IndexValue Get();
 
         private:
             friend class PortElementsBase;

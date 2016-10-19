@@ -134,6 +134,7 @@ namespace data
         virtual void AddTo(math::RowVectorReference<double>& vector, double scalar = 1.0) const override;
 
     private:
+        using DataVectorBase<SparseBinaryDataVectorBase<IntegerListType>>::AppendElements;
         IntegerListType _indices;
     };
 

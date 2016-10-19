@@ -89,6 +89,7 @@ namespace data
         virtual size_t PrefixLength() const override { return _data.size(); }
 
     private:
+        using DataVectorBase<DenseDataVector<ElementType>>::AppendElements;
         size_t _numNonzeros = 0;
         std::vector<ElementType> _data;
     };

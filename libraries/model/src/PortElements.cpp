@@ -42,7 +42,7 @@ namespace model
         ++_index;
     }
 
-    linear::IndexValue PortElementsBase::Iterator::Get()
+    data::IndexValue PortElementsBase::Iterator::Get()
     {
         if(!IsValid())
         {
