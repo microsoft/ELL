@@ -55,7 +55,16 @@ namespace common
         /// <returns> true if the arguments specify a map file or a model file. </returns>
         bool HasInputFile() const { return HasMapFile() || HasModelFile(); }
         
+        /// <summary> Get the input node for the loaded model, given the input definition string. </summary>
+        ///
+        /// <param name="model"> The model as specified by the input model filename </param>
+        /// <returns> The specified input node to use for the map. </returns>
         model::InputNodeBase* GetInput(model::Model& model) const;
+
+        /// <summary> Get the output PortElements for the loaded model, given the output definition string. </summary>
+        ///
+        /// <param name="model"> The model as specified by the input model filename </param>
+        /// <returns> The specified output to use for the map. </returns>
         model::PortElementsBase GetOutput(model::Model& model) const;
     };
 
