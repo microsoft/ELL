@@ -28,7 +28,7 @@ namespace emll
 {
 namespace nodes
 {
-    /// <summary> A node that takes two vector inputs and returns their dot product </summary>
+    /// <summary> A node that performs DTW between its inputs </summary>
     template <typename ValueType>
     class DTWNode : public model::Node
     {
@@ -36,7 +36,6 @@ namespace nodes
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* inputPortName = "input";
-        static constexpr const char* samplePortName = "sample";
         static constexpr const char* outputPortName = "output";
         const model::OutputPort<ValueType>& output = _output;
         /// @}
@@ -47,7 +46,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         /// <param name="input1"> One of the signals to take the dot product of </param>
         /// <param name="input2"> The other signal to take the dot product of </param>
-        DTWNode(const model::PortElements<ValueType>& input, const model::PortElements<ValueType>& sample);
+        DTWNode(const model::PortElements<ValueType>& input, const model::PortElements<ValueType>& sample, double confidenceThreshold);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -82,13 +81,18 @@ namespace nodes
     protected:
         virtual void Compute() const override;
 
-    // private:
+        // private:
         // Inputs
         model::InputPort<ValueType> _input;
-        model::InputPort<ValueType> _sample;
 
         // Output
         model::OutputPort<ValueType> _output;
+
+        double _threshold;
+        std::vector<ValueType> _dPrev;
+        std::vector<ValueType> _d;
+        size_t _sampleDimension;
+        size_t _sampleLength;
     };
 }
 }
