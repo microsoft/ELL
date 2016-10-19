@@ -12,33 +12,49 @@ namespace nodes
 {
     template <typename ValueType>
     DTWNode<ValueType>::DTWNode()
-        : Node({ &_input, &_sample }, { &_output }), _input(this, {}, inputPortName), _sample(this, {}, samplePortName), _output(this, outputPortName, 1), _sampleDimension(0), _sampleLength(0)
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _sampleDimension(0), _prototypeLength(0), _threshold(0)
     {
     }
 
     template <typename ValueType>
-    DTWNode<ValueType>::DTWNode(const model::PortElements<ValueType>& input, const model::PortElements<ValueType>& sample, double confidenceThreshold)
-        : Node({ &_input, &_sample }, { &_output }), _input(this, input, inputPortName), _sample(this, sample, samplePortName), _output(this, outputPortName, 1)
+    DTWNode<ValueType>::DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype, double confidenceThreshold)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName),  _output(this, outputPortName, 1), _prototype(prototype)
     {
         _sampleDimension = input.Size();
-        _sampleLength = sample.Size() / input.Size();
-        _dPrev.resize(_sampleLength + 1);
-        _d.resize(_sampleLength + 1);
+        _prototypeLength = prototype.size();
+        _dPrev.resize(_prototypeLength + 1);
+        _d.resize(_prototypeLength + 1);
 
-        _threshold = threshold;
+        auto threshold = confidenceThreshold;
         // TODO: compute threshold from confidenceThreshold and variance of sample
         // float confidenceThreshold = 0.2; //this can be within the range (0,1)
         // float variance = 392.0529540761332; //this is the variance of the nextSlidePrototype
         // float _threshold = sqrt(-2 * log(confidenceThreshold)) * variance;
+        _threshold = threshold;
+    }
+
+    template <typename ValueType>
+    DTWNode<ValueType>::DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype, double threshold, UseRawThreshold)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName),  _output(this, outputPortName, 1), _prototype(prototype)
+    {
+        _sampleDimension = input.Size();
+        _prototypeLength = prototype.size();
+        _dPrev.resize(_prototypeLength + 1);
+        _d.resize(_prototypeLength + 1);
+
+        std::fill(_dPrev.begin()+1, _dPrev.end(), 99999.0);
+        _dPrev[0] = 0.0;
+
+        _threshold = threshold;
     }
 
     template <typename T>
     float euclideanDistanceFunction(const std::vector<T>& a, const std::vector<T>& b)
     {
         int s = 0;
-        for (int i = 0; i < a.size(); i++)
+        for (int index = 0; index < a.size(); index++)
         {
-            s += (a[i] - b[i]) * (a[i] - b[i]);
+            s += (a[index] - b[index]) * (a[index] - b[index]);
         }
         return std::sqrt(s);
     }
@@ -48,24 +64,24 @@ namespace nodes
     {
         std::vector<ValueType> input = _input.GetValue();
         _d[0] = 0;
-        for(size_t index = 1; index < _sampleLength+1; ++index)
+        for(size_t index = 1; index < _prototypeLength+1; ++index)
         {
-            auto dist = euclideanDistanceFunction(GetSample(index-1), input);
-            if(_d[i-1] <= _dPrev[i] && _d[i-1] < _dPrev[i-1])
+            auto dist = euclideanDistanceFunction(_prototype[index-1], input);
+            if(_d[index-1] <= _dPrev[index] && _d[index-1] < _dPrev[index-1])
             {
-                _d[i] = dist + _d[i-1]
+                _d[index] = dist + _d[index-1];
             }
-            else if(_dPrev[i] <= _d[i-1] && _dPrev[i] <= _dPrev[i-1])
+            else if(_dPrev[index] <= _d[index-1] && _dPrev[index] <= _dPrev[index-1])
             {
-                _d[i] = dist + _dPrev[i];
+                _d[index] = dist + _dPrev[index];
             }
             else
             {
-                _d[i] = dist + _dPrev[i-1];
+                _d[index] = dist + _dPrev[index-1];
             }
         }
 
-        auto result = _d[_sampleLength] / _threshold;
+        auto result = _d[_prototypeLength] / _threshold;
         std::swap(_dPrev, _d);
         _output.SetOutput({ result });
     };
@@ -74,31 +90,19 @@ namespace nodes
     void DTWNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newinput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newsample = transformer.TransformPortElements(_sample.GetPortElements());
-        auto newNode = transformer.AddNode<DTWNode<ValueType>>(newinput, newsample);
+        auto newNode = transformer.AddNode<DTWNode<ValueType>>(newinput, _prototype, _threshold, UseRawThreshold());
         transformer.MapNodeOutput(output, newNode->output);
     }
-
-    // template <typename ValueType>
-    // bool DTWNode<ValueType>::Refine(model::ModelTransformer& transformer) const
-    // {
-    //     // Maybe... in reality, dot product will likely want to be computed as in Compute() above
-    //     auto newinput = transformer.TransformPortElements(_input.GetPortElements());
-    //     auto newsample = transformer.TransformPortElements(_sample.GetPortElements());
-    //     auto multNode = transformer.AddNode<BinaryOperationNode<ValueType>>(newinput, newsample, BinaryOperationType::coordinatewiseMultiply);
-    //     auto sumNode = transformer.AddNode<SumNode<ValueType>>(multNode->output);
-
-    //     transformer.MapNodeOutput(output, sumNode->output);
-    //     return true;
-    // }
 
     template <typename ValueType>
     void DTWNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver[samplePortName] << _sample;
         archiver[outputPortName] << _output;
+        // archiver["prototype"] << _prototype;
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        archiver["threshold"] << _threshold;
     }
 
     template <typename ValueType>
@@ -106,8 +110,10 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver[samplePortName] >> _sample;
         archiver[outputPortName] >> _output;
+        // archiver["prototype"] >> _prototype;
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        archiver["threshold"] >> _threshold;
     }
 }
 }

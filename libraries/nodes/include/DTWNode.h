@@ -19,6 +19,7 @@
 #include "PortElements.h"
 
 // utilities
+#include "Exception.h"
 #include "TypeName.h"
 
 // stl
@@ -46,7 +47,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         /// <param name="input1"> One of the signals to take the dot product of </param>
         /// <param name="input2"> The other signal to take the dot product of </param>
-        DTWNode(const model::PortElements<ValueType>& input, const model::PortElements<ValueType>& sample, double confidenceThreshold);
+        DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype, double confidenceThreshold);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -80,6 +81,13 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
+        struct UseRawThreshold {};
+
+    public:
+        /// <summary> Constructor for internal use only </summary>
+        DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype, double threshold, UseRawThreshold);
+
+    protected:
 
         // private:
         // Inputs
@@ -88,11 +96,13 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
 
+        std::vector<std::vector<ValueType>> _prototype;
+
         double _threshold;
-        std::vector<ValueType> _dPrev;
-        std::vector<ValueType> _d;
+        mutable std::vector<ValueType> _dPrev;
+        mutable std::vector<ValueType> _d;
         size_t _sampleDimension;
-        size_t _sampleLength;
+        size_t _prototypeLength;
     };
 }
 }

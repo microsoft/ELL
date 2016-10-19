@@ -7,10 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Nodes_test.h"
+#include "DTWPrototype.h"
+
+// nodes
 #include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
 #include "DelayNode.h"
 #include "DemultiplexerNode.h"
+#include "DTWNode.h"
 #include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
@@ -258,6 +262,8 @@ void TestLinearPredictorNodeCompute()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dim);
     auto predNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
+
+    // TODO: test
 }
 
 void TestDemultiplexerNodeCompute()
@@ -424,5 +430,27 @@ void TestDemultiplexerNodeRefine()
     outputVec = model.ComputeOutput(muxNode->output);
     newOutputVec = refinedModel.ComputeOutput(newMuxNodeElements);
     testing::ProcessTest("Testing DemultiplexerNode refine", testing::IsEqual(outputVec, newOutputVec));
+}
+
+void TestDTWNodeCompute()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto prototype = GetNextSlidePrototype();
+    auto dtwNode = model.AddNode<nodes::DTWNode<double>>(inputNode->output, prototype, 0.2);
+
+    //
+    auto prototypeLength = prototype.size();
+    size_t numSamples = 200;
+    size_t increment = 3;
+    for(int index = 0; index < numSamples; ++index)
+    {        
+        auto sampleIndex = (index*increment)%prototypeLength;
+        auto inputValue = prototype[sampleIndex];
+        inputNode->SetInput(inputValue);
+        std::vector<double> outputVec = model.ComputeOutput(dtwNode->output);
+        std::cout << "[" << sampleIndex << "]: \t" << outputVec[0] << std::endl; 
+        if(sampleIndex+increment >= prototypeLength) std::cout << std::endl;
+    }
 }
 }
