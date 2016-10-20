@@ -30,7 +30,8 @@ set (INCLUDE include/AutoDataVector.h
              include/SparseDataVector.h
              include/SparseEntryParser.h
              include/StlIndexValueIterator.h
-             include/SupervisedExampleBuilder.h)
+             include/SupervisedExampleBuilder.h
+             include/TransformingIndexValueIterator.h)
 
 set (TCC tcc/AutoDataVector.tcc
          tcc/DataVector.tcc
@@ -42,7 +43,8 @@ set (TCC tcc/AutoDataVector.tcc
          tcc/SparseBinaryDataVector.tcc
          tcc/SparseDataVector.tcc
          tcc/StlIndexValueIterator.tcc
-         tcc/SupervisedExampleBuilder.tcc)
+         tcc/SupervisedExampleBuilder.tcc
+         tcc/TransformingIndexValueIterator.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
