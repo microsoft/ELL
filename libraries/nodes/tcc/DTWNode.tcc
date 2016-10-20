@@ -25,12 +25,9 @@ namespace nodes
         _dPrev.resize(_prototypeLength + 1);
         _d.resize(_prototypeLength + 1);
 
-        auto threshold = confidenceThreshold;
         // TODO: compute threshold from confidenceThreshold and variance of sample
-        // float confidenceThreshold = 0.2; //this can be within the range (0,1)
-        // float variance = 392.0529540761332; //this is the variance of the nextSlidePrototype
-        // float _threshold = sqrt(-2 * log(confidenceThreshold)) * variance;
-        _threshold = threshold;
+        double variance = 392.0529540761332; //this is the variance of the nextSlidePrototype
+        _threshold = std::sqrt(-2 * std::log(confidenceThreshold)) * variance;
     }
 
     template <typename ValueType>
