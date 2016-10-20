@@ -77,7 +77,6 @@ namespace nodes
     protected:
         virtual void Compute() const override;
 
-    private:
         // Inputs
         model::InputPort<ValueType> _input;
 
