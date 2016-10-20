@@ -39,7 +39,7 @@ namespace predictors
     auto LinearPredictor::GetWeightedElements(const DataVectorType& dataVector) const -> DataVectorType
     {
         auto mapper = [&](data::IndexValue indexValue)->double { return indexValue.value * _w[indexValue.index]; };
-        return dataVector.Duplicate<DataVectorType>(mapper);
+        return dataVector.DeepCopyAs<DataVectorType>(mapper);
     }
 
     void LinearPredictor::Scale(double scalar)

@@ -74,11 +74,13 @@ namespace trainers
 
             // Update vLast and vAvg
             double lastCoeff = -eta * beta;
-            dataVector.AddTo(vLast.Transpose(), lastCoeff);
+            auto vLastTranspose = vLast.Transpose();
+            dataVector.AddTo(vLastTranspose, lastCoeff);
             bLast += lastCoeff;
 
             double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
-            dataVector.AddTo(vAvg.Transpose(), avgCoeff);
+            auto vAvgTranspose = vAvg.Transpose(); 
+            dataVector.AddTo(vAvgTranspose, avgCoeff);
             bAvg += avgCoeff;
 
             exampleIterator.Next();
@@ -123,7 +125,7 @@ namespace trainers
 
             // update last
             double scaleCoefficient = 1.0 - 1.0 / t;
-            vLast.Scale(scaleCoefficient); // dense operation
+            math::Operations::Multiply(scaleCoefficient, vLast);
             bLast *= scaleCoefficient;
 
             double updateCoefficient = -beta / t / _parameters.regularization;
@@ -132,7 +134,7 @@ namespace trainers
 
             // update average
             double averageingCoefficient = (t - 1) / t;
-            vAvg.Scale(averageingCoefficient); // dense operation
+            math::Operations::Multiply(averageingCoefficient, vAvg);
             bAvg *= averageingCoefficient;
             vLast.AddTo(vAvg, 1 / t); // dense operation
             bAvg += bLast / t;

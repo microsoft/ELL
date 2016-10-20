@@ -149,6 +149,9 @@ namespace math
 
     protected:
         using UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference;
+        using UnorientedConstVectorReference<ElementType>::_pData;
+        using UnorientedConstVectorReference<ElementType>::_size;
+        using UnorientedConstVectorReference<ElementType>::_increment;
 
         template <typename T>
         friend class RectangularMatrixBase;

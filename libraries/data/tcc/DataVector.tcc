@@ -12,7 +12,6 @@
 
 //stl 
 #include <cmath>
-#include "..\include\DataVector.h"
 
 namespace emll
 {
