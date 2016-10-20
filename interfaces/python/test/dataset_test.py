@@ -17,7 +17,7 @@ def GetExampleItems(example):
     '''
     Returns a Python generator for a list of IDataVector types
     '''
-    for x in example.GetDataVector().ToArray():
+    for x in example.GetDataVector().ToDoubleArray():
         yield x
 
 def exampleTest(example):
