@@ -70,26 +70,19 @@ namespace data
     template<class DerivedType>
     void DataVectorBase<DerivedType>::AppendElements(std::initializer_list<IndexValue> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        while (current < end)
+        for (const auto& current : list)
         {
-            static_cast<DerivedType*>(this)->AppendElement(current->index, current->value);
-            ++current;
+            static_cast<DerivedType*>(this)->AppendElement(current.index, current.value);
         }
     }
 
     template<class DerivedType>
     void DataVectorBase<DerivedType>::AppendElements(std::initializer_list<double> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
         size_t index = 0;
-        while (current < end)
+        for (double current : list)
         {
-            static_cast<DerivedType*>(this)->AppendElement(index, *current);
-            ++current;
-            ++index;
+            static_cast<DerivedType*>(this)->AppendElement(index++, current);
         }
     }
 

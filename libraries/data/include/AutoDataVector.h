@@ -40,7 +40,7 @@ namespace data
         /// <param name="vector"> The input vector. </param>
         AutoDataVectorBase(DefaultDataVectorType&& vector);
 
-        /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
+        /// <summary> Constructs an auto data vector from an index value iterator. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
@@ -59,7 +59,7 @@ namespace data
         AutoDataVectorBase(std::initializer_list<double> list);
 
         /// <summary> Not Implemented. </summary>
-        virtual void AppendElement(size_t index, double value = 1.0) override;
+        virtual void AppendElement(size_t index, double value) override;
 
         /// <summary> Gets the data vector type. </summary>
         ///

@@ -80,7 +80,7 @@ namespace math
         /// <summary> Convert this vector into an array. </summary>
         ///
         /// <returns> An array that represents the data in this object. </returns>
-        std::vector<double> ToArray() const;
+        std::vector<ElementType> ToArray() const;
 
         /// <summary> Applies a map to each vector element and sums the result. </summary>
         ///

@@ -77,7 +77,7 @@ namespace data
         ///
         /// <param name="index"> Zero-based index of the element, must be bigger than the biggest current index. </param>
         /// <param name="value"> The element value. </param>
-        virtual void AppendElement(size_t index, double value = 1.0) override;
+        virtual void AppendElement(size_t index, double value) override;
 
         /// <summary>
         /// A data vector has infinite dimension and ends with a suffix of zeros. This function returns
