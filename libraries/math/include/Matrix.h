@@ -6,9 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
 #include "Vector.h"
+
+#ifndef MATRIX_H
+#define MATRIX_H
 
 namespace emll
 {
@@ -436,3 +437,4 @@ namespace math
 }
 }
 #include "../tcc/Matrix.tcc"
+#endif MATRIX_H

@@ -7,11 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Vector.h"
+#include "Matrix.h"
 
 #ifndef MATH_OPERATIONS_H
 #define MATH_OPERATIONS_H
-
-#include "Matrix.h"
 
 // stl
 #include <string>
