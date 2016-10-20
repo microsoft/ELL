@@ -21,6 +21,7 @@
 #include "DataLoaders.h"
 #include "EvaluatorArguments.h"
 #include "ForestTrainerArguments.h"
+#include "LoadModel.h"
 #include "MakeEvaluator.h"
 #include "MakeTrainer.h"
 #include "ModelSaveArguments.h"
@@ -36,6 +37,13 @@
 // lossFunctions
 #include "LogLoss.h"
 #include "SquaredLoss.h"
+
+// model
+#include "InputNode.h"
+#include "Model.h"
+
+// nodes
+#include "ForestPredictorNode.h"
 
 // stl
 #include <iostream>
@@ -115,6 +123,16 @@ int main(int argc, char* argv[])
             std::cout << "Training error\n";
             evaluator->Print(std::cout);
             std::cout << std::endl;
+        }
+
+        // save predictor model
+        if (modelSaveArguments.outputModelFilename != "")
+        {
+            // Create a model
+            model::Model model;
+            auto inputNode = model.AddNode<model::InputNode<double>>(1);
+            model.AddNode<nodes::ForestPredictorNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor>>(inputNode->output, *predictor);
+            common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

@@ -1,10 +1,11 @@
 # Building the Embedded Machine Learning Libraries (EMLL) using CMake
 
-## Prerequisites
+Prerequisites
+=============
 If you don't have cmake installed, download and install it from <https://cmake.org/download/>
 
-### Python interfaces
-
+Python interfaces
+-----------------
 If you intend to build the python interfaces, you will need [Python 2.7](https://www.python.org/downloads/). 
 
 You will also need [SWIG](http://www.swig.org/download.html) version 3.0 or above. On Windows, download the `swigwin.zip` file, 
@@ -13,7 +14,8 @@ to update your PATH environment variable to include this directory.
 On Ubuntu, note that `apt-get install swig` currently gets an outdated version of swig. On UNIX systems,
 download the SWIG tarball, unpack it, and follow the instructions in swig's `INSTALL` file.  
   
-## Creating a build environment
+Building EMLL
+=============
 CMake can create a variety of build environments for different compilers and target platforms. 
 Open a console (a.k.a. command prompt) and navigate to the main solution directory (the directory that this file, `INSTALL.md`, is in). 
 Create a subdirectory named `build`, and change to that directory:
@@ -36,8 +38,8 @@ Next, run the makefile to build the project:
 
 A directory named `bin` will appear inside `build`, with all of the executables in it.
 
-Building with Visual Studio 2015 on Windows
--------------------------------------------
+Building with Visual Studio 2015 (Update 3) on Windows
+------------------------------------------------------
 If you don't have Visual Studio installed, you can download the free [Visual Studio Express for Desktop](http://www.microsoft.com/express/). 
 
 The library currently can only be built in 64-bit mode on Windows. To create a 64-bit solution for Visual Studio 2015, invoke cmake as follows:
@@ -45,7 +47,7 @@ The library currently can only be built in 64-bit mode on Windows. To create a 6
     > cmake -G "Visual Studio 14 2015 Win64" ..
 
 **Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `EMLL.sln`, along with other files. 
-Alternatively, you can create a solution that doesn't build Doxygen documentation or SWIG interfaces, by typing:
+By default, the solution file also builds interfaces using SWIG and code documentation using Doxygen. Alternatively, you can turn these options of by typing:
 
     > cmake -G "Visual Studio 14 2015 Win64" -DSWIG_ENABLED=false -DDOXYGEN_ENABLED=false ..
 
@@ -64,3 +66,14 @@ If you are able to run MSBuild, invoke the following command:
     > "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" /m EMLL.sln /p:Configuration=Release 
 
 Both build methods create a directory named `bin` inside `build`, with all of executables in it.
+
+Building with Visual Studio 2015 (Update 3) using Clang on Windows
+------------------------------------------------------------------
+Visual Studio 2015 supports compilation using the Clang compiler. To create the appropriate 64-bit Visual Studio solution, invoke cmake as follows:
+
+    > cmake -G "Visual Studio 14 2015 Win64" -T v140_clang_c2 ..
+
+As above, open Visual Studio by typing:
+ 
+    > EMLL.sln
+

@@ -14,6 +14,9 @@
 #include "Dataset.h"
 #include "ParsingExampleIterator.h"
 
+// model
+#include "DynamicMap.h"
+
 // stl
 #include <string>
 
@@ -36,6 +39,9 @@ namespace common
     /// <returns> The dataset. </returns>
     template <typename DatasetType = data::AutoSupervisedDataset>
     DatasetType GetDataset(const DataLoadArguments& dataLoadArguments);
+
+    template <typename DatasetType = data::AutoSupervisedDataset>
+    DatasetType GetMappedDataset(const DataLoadArguments& dataLoadArguments, const model::DynamicMap& map);
 }
 }
 

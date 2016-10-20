@@ -16,6 +16,7 @@
 #include "PortElements.h"
 #include "InputNode.h"
 #include "OutputNode.h"
+#include "LoadModel.h"
 %}
 
 %nodefaultctor emll::model::NodeIterator;
@@ -80,3 +81,55 @@
         return $self->ComputeOutput(outputPort);
     }
 }
+
+%inline %{
+
+class ELL_NodeIterator {
+public:
+    ELL_NodeIterator() : _iterator() {}
+    bool IsValid() { return _iterator.IsValid(); }
+    void Next() { _iterator.Next(); }
+    const emll::model::Node* Get() { return _iterator.Get(); }
+#ifndef SWIG
+    ELL_NodeIterator(emll::model::NodeIterator& other) { _iterator = other; }
+#endif
+private:
+    emll::model::NodeIterator _iterator;
+};
+
+class ELL_Model {
+public:
+    ELL_Model() {}
+    ELL_Model(const std::string& filename) : _model(emll::common::LoadModel(filename)) {}
+    void Save(const std::string& filename)
+    {
+        emll::common::SaveModel(_model, filename);
+    }
+    size_t Size() { return _model.Size(); }
+    std::vector<const emll::model::InputNode<double>*> GetDoubleInputNodes() const
+    {
+        return _model.GetNodesByType<emll::model::InputNode<double>>();
+    }
+    std::vector<const emll::model::OutputNode<double>*> GetDoubleOutputNodes() const
+    {
+        return _model.GetNodesByType<emll::model::OutputNode<double>>();
+    }
+    std::vector<double> ComputeDoubleOutput(const emll::model::OutputPort<double>& outputPort) const
+    {
+        return _model.ComputeOutput(outputPort);
+    }
+    ELL_NodeIterator GetNodeIterator()
+    {
+        emll::model::NodeIterator iter = _model.GetNodeIterator();
+        return ELL_NodeIterator(iter);
+    }
+#ifndef SWIG
+    ELL_Model(const emll::model::Model& other) { _model = other; }
+#endif
+
+private:
+    emll::model::Model _model;
+};
+
+%}
+

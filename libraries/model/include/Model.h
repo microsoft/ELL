@@ -34,6 +34,8 @@ namespace model
     class NodeIterator : public utilities::IIterator<const Node*>
     {
     public:
+        NodeIterator() {}
+
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if valid, false if not. </returns>
@@ -71,6 +73,12 @@ namespace model
         /// <param name="id"> The id of the node </param>
         /// <returns> a weak_ptr to the node </param>
         Node* GetNode(Node::NodeId id);
+
+        /// <summary> Looks up a node by id </summary>
+        ///
+        /// <param name="id"> The id of the node </param>
+        /// <returns> a weak_ptr to the node </param>
+        const Node* GetNode(Node::NodeId id) const;
 
         /// <summary> Get number of nodes </summary>
         ///
@@ -170,6 +178,9 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+    private:
+        friend class NodeIterator;
+
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
@@ -181,8 +192,6 @@ namespace model
         /// <param name="context"> The serialization context. </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-    private:
-        friend class NodeIterator;
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.
         // We keep it sorted by id to make visiting all nodes deterministically ordered

@@ -16,8 +16,8 @@ namespace model
         : InputNodeBase(_output), _output(this, outputPortName, 0){};
 
     template <typename ValueType>
-    InputNode<ValueType>::InputNode(size_t dimension)
-        : InputNodeBase(_output), _output(this, outputPortName, dimension){};
+    InputNode<ValueType>::InputNode(size_t size)
+        : InputNodeBase(_output), _output(this, outputPortName, size){};
 
     template <typename ValueType>
     void InputNode<ValueType>::SetInput(ValueType inputValue)

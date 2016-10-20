@@ -10,7 +10,7 @@
 #include "SparseDataVector.h"
 #include "SparseBinaryDataVector.h"
 
-//stl 
+//stl
 #include <cmath>
 
 namespace emll
@@ -49,8 +49,8 @@ namespace data
         case Type::SparseBinaryDataVector:
             return ReturnType(static_cast<const SparseBinaryDataVector*>(this)->GetIterator(), nonZeroMapper);
 
-        default:
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
+            default:
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
         }
     }
 
@@ -92,7 +92,7 @@ namespace data
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
 
         double result = 0.0;
-        while(constIter.IsValid())
+        while (constIter.IsValid())
         {
             double value = constIter.Get().value;
             result += value * value;
@@ -107,7 +107,7 @@ namespace data
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
 
         double result = 0.0;
-        while(constIter.IsValid())
+        while (constIter.IsValid())
         {
             auto indexValue = constIter.Get();
             result += indexValue.value * vector[indexValue.index];
@@ -121,7 +121,7 @@ namespace data
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
 
-        while(constIter.IsValid())
+        while (constIter.IsValid())
         {
             auto indexValue = constIter.Get();
             vector[indexValue.index] += scalar * indexValue.value;
@@ -129,13 +129,13 @@ namespace data
         }
     }
 
-    template<class DerivedType>
+    template <class DerivedType>
     std::vector<double> DataVectorBase<DerivedType>::ToArray() const
     {
         std::vector<double> result(static_cast<const DerivedType*>(this)->PrefixLength());
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
 
-        while(constIter.IsValid())
+        while (constIter.IsValid())
         {
             auto indexValue = constIter.Get();
             result[indexValue.index] = indexValue.value;
@@ -152,18 +152,18 @@ namespace data
         return ReturnType(static_cast<const DerivedType*>(this)->GetIterator(), std::move(nonZeroMapper));
     }
 
-    template<class DerivedType>
-    void DataVectorBase<DerivedType>::Print(std::ostream & os) const
+    template <class DerivedType>
+    void DataVectorBase<DerivedType>::Print(std::ostream& os) const
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
-        if(constIter.IsValid())
+        if (constIter.IsValid())
         {
             auto indexValue = constIter.Get();
             os << indexValue.index << ":" << indexValue.value;
         }
         constIter.Next();
-        
-        while(constIter.IsValid())
+
+        while (constIter.IsValid())
         {
             auto indexValue = constIter.Get();
             os << '\t' << indexValue.index << ":" << indexValue.value;
