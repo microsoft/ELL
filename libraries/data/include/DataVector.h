@@ -83,13 +83,18 @@ namespace data
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> The return type. </typeparam>
-        /// <param name="nonZeroTransform"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> The new data vector. </returns>
-        template<typename ReturnType> // TODO doc
+        template<typename ReturnType>
         ReturnType DeepCopyAs() const;
 
-        template<typename ReturnType, typename TransformType> // TODO doc
+        /// <summary> Copies this data vector into another type of data vector. </summary>
+        ///
+        /// <typeparam name="ReturnType"> The return type. </typeparam>
+        /// <param name="nonZeroTransform"> A functor that takes an IndexValue and returns a double, which is applied to each non-zero elements during the copy. </param>
+        ///
+        /// <returns> The new data vector. </returns>
+        template<typename ReturnType, typename TransformType> 
         ReturnType DeepCopyAs(TransformType nonZeroTransform) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
@@ -159,14 +164,19 @@ namespace data
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam> 
-        /// <param name="nonZeroTransform"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> A data vector of a specified type. </returns>
         template<typename ReturnType>
         ReturnType DeepCopyAs() const;
 
+        /// <summary> Copies the contents of a data vector to another data vector. </summary>
+        ///
+        /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam> 
+        /// <param name="nonZeroTransform"> A functor that takes an IndexValue and returns a double, which is applied to each non-zero elements during the copy. </param>
+        ///
+        /// <returns> A data vector of a specified type. </returns>
         template<typename ReturnType, typename TransformType>
-        ReturnType DeepCopyAs(TransformType nonZeroTransform) const; // TODO
+        ReturnType DeepCopyAs(TransformType nonZeroTransform) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///

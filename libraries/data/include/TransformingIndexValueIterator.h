@@ -30,7 +30,7 @@ namespace data
         ///
         /// <param name="wrappedIterator"> The index value iterator whose non-zero values are to be transformed. </param>
         /// <param name="transform"> A transform that takes an IndexValue and returns the transformed double value. </param>
-        TransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformType transform) : _wrappedIterator(std::move(wrappedIterator)), _transform(std::move(transform)) {}
+        TransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformType transform);
 
         /// <summary> Returns True if the iterator is currently pointing to a valid iterate. </summary>
         ///
@@ -43,11 +43,7 @@ namespace data
         /// <summary> Returns The current index-value pair </summary>
         ///
         /// <returns> The current index-value pair </returns>
-        IndexValue Get() const 
-        {
-            auto indexValue = _wrappedIterator.Get();
-            return{ indexValue.index, _transform(indexValue) };
-        }
+        IndexValue Get() const;
 
     protected:
         WrappedIndexValueIteratorType _wrappedIterator;
@@ -65,3 +61,5 @@ namespace data
     }
 }
 }
+
+#include "../tcc/TransformingIndexValueIterator.tcc"

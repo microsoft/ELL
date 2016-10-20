@@ -107,8 +107,10 @@ namespace data
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> The return type. </typeparam>
+        /// <typeparam name="ArgTypes"> Type of the argument. </typeparam>
+        /// <param name="args"> Variable number of arguments, forwarded as is to the underlying datavector. </param>
         ///
-        /// <returns> This new data vector. </returns>
+        /// <returns> The new data vector. </returns>
         template<typename ReturnType, typename ... ArgTypes>
         ReturnType DeepCopyAs(ArgTypes ... args) const;
 
