@@ -47,9 +47,8 @@ namespace data
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        /// <param name="nonZeroTransform"> The mapper that is applied to all non-zero elements. </param>
         template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
-        DenseDataVector(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroTransform = {});
+        DenseDataVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///

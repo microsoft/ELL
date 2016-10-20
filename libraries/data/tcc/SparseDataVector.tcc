@@ -30,9 +30,9 @@ namespace data
 
     template <typename ElementType, typename IntegerListType>
     template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroTransform)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
     {
-        AppendElements(std::move(indexValueIterator), std::move(nonZeroTransform));
+        AppendElements(std::move(indexValueIterator));
     }
 
     template <typename ElementType, typename IntegerListType>

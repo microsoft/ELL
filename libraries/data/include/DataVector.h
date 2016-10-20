@@ -112,13 +112,12 @@ namespace data
     class DataVectorBase : public IDataVector
     {
     public:
-        /// <summary> Takes an iterator and appends its entries to the data vector, possibly applying a mapping along the way. </summary>
+        /// <summary> Takes an iterator and appends its entries to the data vector. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        /// <param name="nonZeroTransform"> The mapper that is applied to all non-zero elements. </param>
         template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
-        void AppendElements(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroTransform = {});
+        void AppendElements(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Takes an initializer list of index value pairs and appends them to the data vector. </summary>
         ///

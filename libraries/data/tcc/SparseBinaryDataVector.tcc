@@ -24,9 +24,9 @@ namespace data
 
     template <typename IntegerListType>
     template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroTransform)
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
-        AppendElements(std::move(indexValueIterator), std::move(nonZeroTransform));
+        AppendElements(std::move(indexValueIterator));
     }
 
     template<typename IntegerListType>

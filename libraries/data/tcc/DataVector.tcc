@@ -94,13 +94,12 @@ namespace data
 
     template<class DerivedType>
     template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    void DataVectorBase<DerivedType>::AppendElements(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroTransform)
+    void DataVectorBase<DerivedType>::AppendElements(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
         {
-            auto indexValue = indexValueIterator.Get();
-            double value = nonZeroTransform ? nonZeroTransform(indexValue) : indexValue.value;
-            static_cast<DerivedType*>(this)->AppendElement(indexValue.index, value);
+            auto current = indexValueIterator.Get();
+            static_cast<DerivedType*>(this)->AppendElement(current.index, current.value);
             indexValueIterator.Next();
         }
     }
