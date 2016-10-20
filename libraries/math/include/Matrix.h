@@ -45,6 +45,8 @@ namespace math
         // protected ctor accessible only through derived classes
         RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
 
+        void Swap(RectangularMatrixBase<ElementType>& other);
+
         template<VectorOrientation Orientation>
         VectorReference<ElementType, Orientation> ConstructVectorReference(ElementType* pData, size_t size, size_t increment);
 
@@ -371,6 +373,28 @@ namespace math
         ///
         /// <param name="list"> A list of initialization lists (row by row). </param>
         Matrix(std::initializer_list<std::initializer_list<ElementType>> list);
+
+        /// <summary> Move Constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The matrix being moved. </param>
+        Matrix(Matrix<ElementType, Layout>&& other);
+
+        /// <summary> Copy Constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The matrix being copied. </param>
+        Matrix(const Matrix<ElementType, Layout>& other);
+
+        /// <summary> Assignment operator. </summary>
+        ///
+        /// <param name="other"> The other matrix. </param>
+        ///
+        /// <returns> A reference to this matrix. </returns>
+        Matrix<ElementType, Layout>& operator=(Matrix<ElementType, Layout> other);
+
+        /// <summary> Swaps the contents of this matrix with the contents of another matrix. </summary>
+        ///
+        /// <param name="other"> [in,out] The other matrix. </param>
+        void Swap(Matrix<ElementType, Layout>& other);
 
         /// <summary> Sets all matrix elements to zero. </summary>
         void Reset() { Fill(0); }

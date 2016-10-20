@@ -25,6 +25,15 @@ namespace math
     {}
 
     template<typename ElementType>
+    void RectangularMatrixBase<ElementType>::Swap(RectangularMatrixBase<ElementType>& other)
+    {
+        std::swap(_pData, other._pData);
+        std::swap(_numRows, other._numRows);
+        std::swap(_numColumns, other._numColumns);
+        std::swap(_increment, other._increment);
+    }
+
+    template<typename ElementType>
     template<VectorOrientation Orientation>
     VectorReference<ElementType, Orientation> RectangularMatrixBase<ElementType>::ConstructVectorReference(ElementType * pData, size_t size, size_t increment)
     {
@@ -238,6 +247,32 @@ namespace math
             }
             ++i;
         }
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    Matrix<ElementType, Layout>::Matrix(Matrix<ElementType, Layout>&& other) : MatrixReference<ElementType, Layout>(other.NumRows(), other.NumColumns()), _data(std::move(other._data))
+    {
+        _pData = _data.data();
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    Matrix<ElementType, Layout>::Matrix(const Matrix<ElementType, Layout>& other) : MatrixReference<ElementType, Layout>(other.NumRows(), other.NumColumns()), _data(other._data)
+    {
+        _pData = _data.data();
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    Matrix<ElementType, Layout>& Matrix<ElementType, Layout>::operator=(Matrix<ElementType, Layout> other)
+    {
+        Swap(other);
+        return *this;
+    }
+
+    template<typename ElementType, MatrixLayout Layout>
+    void Matrix<ElementType, Layout>::Swap(Matrix<ElementType, Layout>& other)
+    {
+        RectangularMatrixBase<ElementType>::Swap(other);
+        std::swap(_data, other._data);
     }
 
     template<typename ElementType, MatrixLayout Layout>

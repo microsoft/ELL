@@ -93,6 +93,7 @@ namespace math
 
     protected:
         UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
+        void Swap(UnorientedConstVectorReference<ElementType>& other);
 
         ElementType* _pData;
         size_t _size;
@@ -260,6 +261,28 @@ namespace math
         ///
         /// <param name="list"> The initalizer list. </param>
         Vector(std::initializer_list<ElementType> list);
+
+        /// <summary> Move Constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The vector being moved. </param>
+        Vector(Vector<ElementType, Orientation>&& other);
+
+        /// <summary> Copy Constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The vector being copied. </param>
+        Vector(const Vector<ElementType, Orientation>& other);
+
+        /// <summary> Assignment operator. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        ///
+        /// <returns> A reference to this vector. </returns>
+        Vector<ElementType, Orientation>& operator=(Vector<ElementType, Orientation> other);
+
+        /// <summary> Swaps the contents of this vector with the contents of another vector. </summary>
+        ///
+        /// <param name="other"> [in,out] The other vector. </param>
+        void Swap(Vector<ElementType, Orientation>& other);
 
     private:
         using ConstVectorReference<ElementType, Orientation>::_pData;

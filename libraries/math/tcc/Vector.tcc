@@ -44,6 +44,14 @@ namespace math
     {}
 
     template<typename ElementType>
+    void UnorientedConstVectorReference<ElementType>::Swap(UnorientedConstVectorReference<ElementType>& other)
+    {
+        std::swap(_pData, other._pData);
+        std::swap(_size, other._size);
+        std::swap(_increment, other._increment);
+    }
+
+    template<typename ElementType>
     template<typename MapperType>
     ElementType UnorientedConstVectorReference<ElementType>::Aggregate(MapperType mapper) const
     {
@@ -218,6 +226,32 @@ namespace math
     Vector<ElementType, Orientation>::Vector(std::initializer_list<ElementType> list) : VectorReference<ElementType, Orientation>(nullptr, list.size(), 1), _data(list.begin(), list.end())
     {
         _pData = _data.data(); 
+    }
+    
+    template<typename ElementType, VectorOrientation Orientation>
+    Vector<ElementType, Orientation>::Vector(Vector<ElementType, Orientation>&& other) : VectorReference<ElementType, Orientation>(nullptr, other._size, other._increment), _data(std::move(other._data))
+    {
+        _pData = _data.data();
+    }
+    
+    template<typename ElementType, VectorOrientation Orientation>
+    Vector<ElementType, Orientation>::Vector(const Vector<ElementType, Orientation>& other) : VectorReference<ElementType, Orientation>(nullptr, other._size, other._increment), _data(other._data)
+    {
+        _pData = _data.data();
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    Vector<ElementType, Orientation>& Vector<ElementType, Orientation>::operator=(Vector<ElementType, Orientation> other)
+    {
+        Swap(other);
+        return *this;
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void Vector<ElementType, Orientation>::Swap(Vector<ElementType, Orientation>& other)
+    {
+        UnorientedConstVectorReference<ElementType>::Swap(other);
+        std::swap(_data, other._data);
     }
 }
 }
