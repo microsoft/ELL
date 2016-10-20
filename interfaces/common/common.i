@@ -9,6 +9,7 @@
 %{
 #include "DataLoadArguments.h"
 #include "DataLoadersInterface.h"
+#include "MapLoadArguments.h"
 #include "LoadModel.h"
 
 #include "TrainerArguments.h"
@@ -20,6 +21,7 @@
 
 %ignore emll::common::GetDataset;
 
+%include "MapLoadArguments.h"
 %include "LoadModel.h"
 
 // Modified versions of interfaces

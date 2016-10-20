@@ -54,6 +54,12 @@ namespace model
         /// <returns> A pointer to the port </returns>
         InputPortBase* GetInputPort(const std::string& portName);
 
+        /// <summary> Returns the named input port </summary>
+        ///
+        /// <param name="portName"> The name of the port </param>
+        /// <returns> A pointer to the port </returns>
+        const InputPortBase* GetInputPort(const std::string& portName) const;
+
         /// <summary> Returns the output "ports" for this node </summary>
         ///
         /// <returns> The output "ports" for this node </returns>
@@ -64,6 +70,24 @@ namespace model
         /// <param name="portName"> The name of the port </param>
         /// <returns> A pointer to the port </returns>
         OutputPortBase* GetOutputPort(const std::string& portName);
+
+        /// <summary> Returns the named output port </summary>
+        ///
+        /// <param name="portName"> The name of the port </param>
+        /// <returns> A pointer to the port </returns>
+        const OutputPortBase* GetOutputPort(const std::string& portName) const;
+
+        /// <summary> Returns the named port </summary>
+        ///
+        /// <param name="portName"> The name of the port </param>
+        /// <returns> A pointer to the port </returns>
+        Port* GetPort(const std::string& portName);
+
+        /// <summary> Returns the named port </summary>
+        ///
+        /// <param name="portName"> The name of the port </param>
+        /// <returns> A const pointer to the port </returns>
+        const Port* GetPort(const std::string& portName) const;
 
         /// <summary> Get all nodes that this nodes uses for input (and therefore depends on) </summary>
         ///

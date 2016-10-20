@@ -7,6 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LoadModel_test.h"
+#include "LoadMap_test.h"
+#include "LoadDataset_test.h"
 
 // testing
 #include "testing.h"
@@ -30,6 +32,12 @@ int main()
 
         TestSaveModels("xml");
         TestSaveModels("json");
+
+        TestLoadMapWithDefaultArgs();
+        TestLoadMapWithPorts();
+
+        TestLoadDataset();
+        TestLoadMappedDataset();
     }
     catch (const utilities::Exception& exception)
     {

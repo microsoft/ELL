@@ -42,17 +42,6 @@
 
 using namespace emll;
 
-// helper function
-void SplitString(const std::string& str, char delimiter, std::vector<std::string>& elements)
-{
-    std::stringstream stream(str);
-    std::string element;
-    while (getline(stream, element, delimiter))
-    {
-        elements.push_back(element);
-    }
-}
-
 int main(int argc, char* argv[])
 {
     try
@@ -82,104 +71,27 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
-        // load data set
+        // load map
+        model::DynamicMap map = common::LoadMap(mapLoadArguments);
+
+        // load dataset
         if (verbose) std::cout << "Loading data from file: " << dataLoadArguments.inputDataFilename << std::endl;
         auto dataset = common::GetDataset(dataLoadArguments);
 
-        // load map
-        model::DynamicMap map;
-        if (mapLoadArguments.HasMapFile())
-        {
-            if (verbose) std::cout << "Loading map from file: " << mapLoadArguments.inputMapFile << std::endl;
-            map = common::LoadMap(mapLoadArguments.inputMapFile);
-        }
-        else
-        {
-            if (verbose) std::cout << "Loading model from file: " << mapLoadArguments.inputModelFile << std::endl;
-            auto model = common::LoadModel(mapLoadArguments.inputModelFile);
-
-            model::InputNodeBase* inputNode = nullptr;
-            model::PortElementsBase outputElements;
-            if (mapLoadArguments.modelInputsString != "")
-            {
-                // for now, modelInputString will just be the ID of an InputNode, and we'll call it 'input'
-                auto inputNodeId = utilities::UniqueId(mapLoadArguments.modelInputsString);
-                inputNode = dynamic_cast<model::InputNodeBase*>(model.GetNode(inputNodeId));
-                if (inputNode == nullptr)
-                {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find input node");
-                }
-            }
-            else // look for first input node
-            {
-                auto inputNodes = model.GetNodesByType<model::InputNodeBase>();
-                if (inputNodes.size() == 0)
-                {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find input node");
-                }
-                inputNode = inputNodes[0];
-                std::cout << "Using input Node " << inputNode->GetId() << std::endl;
-            }
-
-            if (mapLoadArguments.modelOutputsString != "")
-            {
-                // split string into "node.port"
-                std::vector<std::string> outputParts;
-                SplitString(mapLoadArguments.modelOutputsString, '.', outputParts);
-                auto outputNodeId = utilities::UniqueId(outputParts[0]);
-                auto outputPortName = outputParts[1];
-                auto outputNode = model.GetNode(outputNodeId);
-                if (outputNode == nullptr)
-                {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, std::string("Can't find output node ") + to_string(outputNodeId));
-                }
-
-                auto outputPort = outputNode->GetOutputPort(outputPortName); // ptr to port base
-                if (outputPort == nullptr)
-                {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output port");
-                }
-                outputElements = model::PortElementsBase(*outputPort);
-            }
-            else // look for first output node
-            {
-                auto outputNodes = model.GetNodesByType<model::OutputNodeBase>();
-                if (outputNodes.size() == 0)
-                {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output node");
-                }
-                auto outputNode = outputNodes[0];
-                auto outputPorts = outputNode->GetOutputPorts();
-                if (outputPorts.size() == 0)
-                {
-                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find output port");
-                }
-
-                auto outputPort = outputPorts[0]; // ptr to port base
-                outputElements = model::PortElementsBase(*outputPort);
-                std::cout << "Using output Node " << outputNode->GetId() << "." << outputPort->GetName() << std::endl;
-            }
-
-            map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputElements } });
-        }
-
+        // get output stream
         auto outputStream = dataSaveArguments.outputDataStream;
-        auto mapInputSize = map.GetInputSize("input");
+        auto mapInputSize = map.GetInputSize(0);
 
         auto datasetIterator = dataset.GetExampleReferenceIterator();
         while (datasetIterator.IsValid())
         {
             const auto& example = datasetIterator.Get();
-            auto featureArray = example.GetDataVector().ToArray();
+            map.SetInputValue(0, example.GetDataVector());
 
-            featureArray.resize(mapInputSize);
-            map.SetInputValue<double>("input", featureArray);
+            auto output = map.ComputeOutput<data::FloatDataVector>(0);
+            auto mappedExample = data::DenseSupervisedExample{ std::move(output), example.GetMetadata() };
 
-            // TODO: create data vector via Iterator.
-//            auto output = map.ComputeOutput<data::FloatDataVector, double>("output");
-//            auto mappedExample = data::DenseSupervisedExample{ std::make_shared<data::FloatDataVector>(std::move(output)), example.GetMetadata() };
-
-//            mappedExample.Print(outputStream);
+            mappedExample.Print(outputStream);
             outputStream << std::string("\n");
             datasetIterator.Next();
         }

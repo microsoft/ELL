@@ -10,6 +10,11 @@
 
 #include "ModelLoadArguments.h"
 
+// model
+#include "PortElements.h"
+#include "Model.h"
+#include "InputNode.h"
+
 // utilities
 #include "CommandLineParser.h"
 
@@ -35,8 +40,32 @@ namespace common
         /// <summary> The outputs from the model to use. </summary>
         std::string modelOutputsString = "";
 
+        /// <summary> Query if the arguments specify a map file. </summary>
+        ///
+        /// <returns> true if the arguments specify a map file. </returns>
         bool HasMapFile() const { return inputMapFile != ""; }
+        
+        /// <summary> Query if the arguments specify a model file. </summary>
+        ///
+        /// <returns> true if the arguments specify a model file. </returns>
         bool HasModelFile() const { return inputModelFile != ""; }
+        
+        /// <summary> Query if the arguments specify either a map file or a model file. </summary>
+        ///
+        /// <returns> true if the arguments specify a map file or a model file. </returns>
+        bool HasInputFile() const { return HasMapFile() || HasModelFile(); }
+        
+        /// <summary> Get the input node for the loaded model, given the input definition string. </summary>
+        ///
+        /// <param name="model"> The model as specified by the input model filename </param>
+        /// <returns> The specified input node to use for the map. </returns>
+        model::InputNodeBase* GetInput(model::Model& model) const;
+
+        /// <summary> Get the output PortElements for the loaded model, given the output definition string. </summary>
+        ///
+        /// <param name="model"> The model as specified by the input model filename </param>
+        /// <returns> The specified output to use for the map. </returns>
+        model::PortElementsBase GetOutput(model::Model& model) const;
     };
 
     /// <summary> A version of MapLoadArguments that adds its members to the command line parser. </summary>

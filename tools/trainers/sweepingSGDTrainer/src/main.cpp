@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
         auto generator = common::MakeParametersEnumerator<trainers::SGDIncrementalTrainerParameters>(regularization);
         std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
-        for (uint64_t i = 0; i < regularization.size(); ++i)
+        for (size_t i = 0; i < regularization.size(); ++i)
         {
             auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(numColumns, trainerArguments.lossArguments, generator.GenerateParameters(i));
             evaluators.push_back(common::MakeEvaluator<PredictorType>(dataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossArguments));
@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
             std::cout << "Finished training.\n";
 
             // print evaluation
-            for (uint64_t i = 0; i < regularization.size(); ++i)
+            for (size_t i = 0; i < regularization.size(); ++i)
             {
                 std::cout << "Trainer " << i << ":\n";
                 evaluators[i]->Print(std::cout);

@@ -41,6 +41,18 @@ namespace model
         return nullptr;
     }
 
+    const InputPortBase* Node::GetInputPort(const std::string& portName) const
+    {
+        for (auto port : _inputs)
+        {
+            if (port->GetName() == portName)
+            {
+                return port;
+            }
+        }
+        return nullptr;
+    }
+
     OutputPortBase* Node::GetOutputPort(const std::string& portName)
     {
         for (auto port : _outputs)
@@ -51,6 +63,40 @@ namespace model
             }
         }
         return nullptr;
+    }
+
+    const OutputPortBase* Node::GetOutputPort(const std::string& portName) const
+    {
+        for (auto port : _outputs)
+        {
+            if (port->GetName() == portName)
+            {
+                return port;
+            }
+        }
+        return nullptr;
+    }
+
+    Port* Node::GetPort(const std::string& portName)
+    {
+        auto inputPort = GetInputPort(portName);
+        if(inputPort != nullptr)
+        {
+            return inputPort;
+        }
+
+        return GetOutputPort(portName);
+    }
+
+    const Port* Node::GetPort(const std::string& portName) const
+    {
+        auto inputPort = GetInputPort(portName);
+        if(inputPort != nullptr)
+        {
+            return inputPort;
+        }
+
+        return GetOutputPort(portName);
     }
 
     std::vector<const Node*> Node::GetParentNodes() const

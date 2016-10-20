@@ -10,6 +10,7 @@ namespace emll
 {
 namespace common
 {
+
     template <typename DatasetType>
     DatasetType GetDataset(const DataLoadArguments& dataLoadArguments)
     {
@@ -21,6 +22,27 @@ namespace common
             dataIterator->Next();
         }
 
+        return dataset;
+    }
+
+    template <typename DatasetType>
+    DatasetType GetMappedDataset(const DataLoadArguments& dataLoadArguments, const model::DynamicMap& map)
+    {
+        auto dataIterator = GetDataIterator(dataLoadArguments);
+        DatasetType dataset;
+
+        // generate mapped dataset
+        while (dataIterator->IsValid())
+        {
+            auto row = dataIterator->Get(); // this is an AutoSupervisedExample
+            auto dataVec = row.GetDataVector().DeepCopyAs<data::DoubleDataVector>();
+            map.SetInputValue(0, dataVec);
+            auto output = map.ComputeOutput<data::DoubleDataVector>(0);
+            // convert output vector to OutDataVectorType
+            auto mappedRow = typename DatasetType::DatasetExampleType(output, row.GetMetadata());
+            dataset.AddExample(mappedRow);
+            dataIterator->Next();
+        }
         return dataset;
     }
 }

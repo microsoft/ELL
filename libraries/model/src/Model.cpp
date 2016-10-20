@@ -34,6 +34,19 @@ namespace model
         }
     }
 
+    const Node* Model::GetNode(Node::NodeId id) const
+    {
+        auto it = _idToNodeMap.find(id);
+        if (it == _idToNodeMap.end())
+        {
+            return nullptr; // weak_ptr equivalent of nullptr
+        }
+        else
+        {
+            return it->second.get();
+        }
+    }
+
     NodeIterator Model::GetNodeIterator(const std::vector<const Node*>& outputNodes) const
     {
         return NodeIterator(this, outputNodes);

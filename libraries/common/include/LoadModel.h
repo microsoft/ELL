@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "MapLoadArguments.h"
+
 // model
 #include "Model.h"
 #include "DynamicMap.h"
@@ -40,12 +42,17 @@ namespace common
     /// <param name="context"> The `SerializationContext` </param>
     void RegisterNodeTypes(utilities::SerializationContext& context);
 
-
     /// <summary> Loads a map from a file, or creates a new one if given an empty filename. </summary>
     ///
     /// <param name="filename"> The filename. </param>
     /// <returns> The loaded map. </returns>
     model::DynamicMap LoadMap(const std::string& filename);
+
+    /// <summary> Loads a map from a `MapLoadArguments` struct. </summary>
+    ///
+    /// <param name="mapLoadArguments"> The `MapLoadArguments` struct. </param>
+    /// <returns> The loaded map. </returns>
+    model::DynamicMap LoadMap(const MapLoadArguments& mapLoadArguments);
 
     /// <summary> Saves a map to a file. </summary>
     ///

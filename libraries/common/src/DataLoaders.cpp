@@ -17,6 +17,9 @@
 #include "SequentialLineIterator.h"
 #include "SparseEntryParser.h"
 
+// model
+#include "DynamicMap.h"
+
 // stl
 #include <cstdint>
 #include <memory>
