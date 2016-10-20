@@ -16,17 +16,17 @@ namespace emll
 namespace data
 {
     template <typename ElementType>
-    template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator)
-    {
-        AppendElements(std::move(indexValueIterator));
-    }
-
-    template <typename ElementType>
     DenseDataVector<ElementType>::DenseDataVector()
         : _numNonzeros(0)
     {
         _data.reserve(DEFAULT_DENSE_VECTOR_CAPACITY);
+    }
+
+    template <typename ElementType>
+    template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
+    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator)
+    {
+        AppendElements(std::move(indexValueIterator));
     }
 
     template <typename ElementType>
