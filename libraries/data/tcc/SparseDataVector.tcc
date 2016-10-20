@@ -64,9 +64,9 @@ namespace data
         ElementType storedValue = static_cast<ElementType>(value);
         assert(storedValue - value <= 1.0e-6 && value - storedValue <= 1.0e-6);
 
-        if(_indices.Size() > 0)
+        if (_indices.Size() > 0)
         {
-            if(index <= _indices.Max())
+            if (index <= _indices.Max())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only append values to the end of a data vector");
             }

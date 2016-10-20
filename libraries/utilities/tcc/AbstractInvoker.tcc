@@ -12,8 +12,8 @@ namespace emll
 {
 namespace utilities
 {
-    template<typename BaseType, typename DerivedType, typename ...DerivedTypes>
-    template<typename FunctorType>
+    template <typename BaseType, typename DerivedType, typename... DerivedTypes>
+    template <typename FunctorType>
     auto AbstractInvoker<BaseType, DerivedType, DerivedTypes...>::Invoke(const FunctorType& functor, const BaseType& abstractArgument) -> typename FunctorType::ReturnType
     {
         const DerivedType* ptr = dynamic_cast<const DerivedType*>(&abstractArgument);
@@ -27,8 +27,8 @@ namespace utilities
         }
     }
 
-    template<typename BaseType>
-    template<typename FunctorType>
+    template <typename BaseType>
+    template <typename FunctorType>
     auto AbstractInvoker<BaseType>::Invoke(const FunctorType& functor, const BaseType& abstractArgument) -> typename FunctorType::ReturnType
     {
         throw LogicException(LogicExceptionErrors::illegalState, "base type reference could not be matched with a derived type");

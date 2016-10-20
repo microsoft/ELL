@@ -10,7 +10,7 @@
 
 namespace emll
 {
-    void IDataVectorTests();
-    void ToDataVectorTests();
-    void AutoDataVectorTest();
+void IDataVectorTests();
+void ToDataVectorTests();
+void AutoDataVectorTest();
 }

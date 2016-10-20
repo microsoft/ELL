@@ -27,7 +27,7 @@ namespace utilities
         {
         public:
             Iterator() = default;
-            
+
             Iterator(const Iterator&) = default;
 
             Iterator(Iterator&&) = default;

@@ -30,7 +30,7 @@ namespace nodes
         static constexpr const char* outputPortName = "output";
         const model::OutputPort<bool>& output = _output;
         /// @}
-        
+
         using SingleElementThresholdPredictor = predictors::SingleElementThresholdPredictor;
 
         /// <summary> Default Constructor </summary>

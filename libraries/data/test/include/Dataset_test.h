@@ -10,5 +10,5 @@
 
 namespace emll
 {
-    void DatasetCastingTests();
+void DatasetCastingTests();
 }

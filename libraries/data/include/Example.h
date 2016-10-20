@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include "AutoDataVector.h"
 #include "DataVector.h"
 #include "DenseDataVector.h"
-#include "AutoDataVector.h"
 
 // utilities
 #include "TypeTraits.h"
@@ -97,7 +97,7 @@ namespace data
         /// <typeparam name="TargetExampleType"> Requested target example type (metadata ctor must take old
         /// MetadataType). </typeparam>
         /// <returns> An example of the desired type. </returns>
-        template<typename TargetExampleType, utilities::IsSame<typename TargetExampleType::DataVectorType, DataVectorType> Concept = true>
+        template <typename TargetExampleType, utilities::IsSame<typename TargetExampleType::DataVectorType, DataVectorType> Concept = true>
         TargetExampleType CopyAs() const;
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace data
         /// <typeparam name="TargetExampleType"> Requested target example type (metadata ctor must take old
         /// MetadataType). </typeparam>
         /// <returns> An example of the desired type. </returns>
-        template<typename TargetExampleType, utilities::IsDifferent<typename TargetExampleType::DataVectorType, DataVectorType> Concept = true>
+        template <typename TargetExampleType, utilities::IsDifferent<typename TargetExampleType::DataVectorType, DataVectorType> Concept = true>
         TargetExampleType CopyAs() const;
 
         /// <summary> Prints the datavector to an output stream. </summary>
@@ -135,7 +135,7 @@ namespace data
     };
 
     typedef Example<AutoDataVector, WeightLabel> AutoSupervisedExample;
-    typedef Example<FloatDataVector, WeightLabel> DenseSupervisedExample; 
+    typedef Example<FloatDataVector, WeightLabel> DenseSupervisedExample;
 
     /// <summary> Stream insertion operator. </summary>
     ///

@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DenseDataVector.h"
-#include "SparseDataVector.h"
 #include "SparseBinaryDataVector.h"
+#include "SparseDataVector.h"
 #include "TransformingIndexValueIterator.h"
 
 //stl
@@ -18,82 +18,82 @@ namespace emll
 {
 namespace data
 {
-    template<typename ReturnType>
+    template <typename ReturnType>
     ReturnType IDataVector::DeepCopyAs() const
     {
         switch (GetType())
         {
-        case Type::DoubleDataVector:
-            return ReturnType(static_cast<const DoubleDataVector*>(this)->GetIterator());
+            case Type::DoubleDataVector:
+                return ReturnType(static_cast<const DoubleDataVector*>(this)->GetIterator());
 
-        case Type::FloatDataVector:
-            return ReturnType(static_cast<const FloatDataVector*>(this)->GetIterator());
+            case Type::FloatDataVector:
+                return ReturnType(static_cast<const FloatDataVector*>(this)->GetIterator());
 
-        case Type::ShortDataVector:
-            return ReturnType(static_cast<const ShortDataVector*>(this)->GetIterator());
+            case Type::ShortDataVector:
+                return ReturnType(static_cast<const ShortDataVector*>(this)->GetIterator());
 
-        case Type::ByteDataVector:
-            return ReturnType(static_cast<const ByteDataVector*>(this)->GetIterator());
+            case Type::ByteDataVector:
+                return ReturnType(static_cast<const ByteDataVector*>(this)->GetIterator());
 
-        case Type::SparseDoubleDataVector:
-            return ReturnType(static_cast<const SparseDoubleDataVector*>(this)->GetIterator());
+            case Type::SparseDoubleDataVector:
+                return ReturnType(static_cast<const SparseDoubleDataVector*>(this)->GetIterator());
 
-        case Type::SparseFloatDataVector:
-            return ReturnType(static_cast<const SparseFloatDataVector*>(this)->GetIterator());
+            case Type::SparseFloatDataVector:
+                return ReturnType(static_cast<const SparseFloatDataVector*>(this)->GetIterator());
 
-        case Type::SparseShortDataVector:
-            return ReturnType(static_cast<const SparseShortDataVector*>(this)->GetIterator());
+            case Type::SparseShortDataVector:
+                return ReturnType(static_cast<const SparseShortDataVector*>(this)->GetIterator());
 
-        case Type::SparseByteDataVector:
-            return ReturnType(static_cast<const SparseByteDataVector*>(this)->GetIterator());
+            case Type::SparseByteDataVector:
+                return ReturnType(static_cast<const SparseByteDataVector*>(this)->GetIterator());
 
-        case Type::SparseBinaryDataVector:
-            return ReturnType(static_cast<const SparseBinaryDataVector*>(this)->GetIterator());
-
-        default:
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
-        }
-    }
-
-    template<typename ReturnType, typename TransformType>
-    ReturnType IDataVector::DeepCopyAs(TransformType nonZeroTransform) const
-    {
-        switch (GetType())
-        {
-        case Type::DoubleDataVector:
-            return ReturnType(MakeTransformingIndexValueIterator(static_cast<const DoubleDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-        case Type::FloatDataVector:
-            return ReturnType(MakeTransformingIndexValueIterator(static_cast<const FloatDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-        case Type::ShortDataVector:
-            return ReturnType(MakeTransformingIndexValueIterator(static_cast<const ShortDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-        case Type::ByteDataVector:
-            return ReturnType(MakeTransformingIndexValueIterator(static_cast<const ByteDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-        case Type::SparseDoubleDataVector:
-            return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseDoubleDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-        case Type::SparseFloatDataVector:
-            return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseFloatDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-        case Type::SparseShortDataVector:
-            return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseShortDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-        case Type::SparseByteDataVector:
-            return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseByteDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-        case Type::SparseBinaryDataVector:
-            return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseBinaryDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+            case Type::SparseBinaryDataVector:
+                return ReturnType(static_cast<const SparseBinaryDataVector*>(this)->GetIterator());
 
             default:
                 throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
         }
     }
 
-    template<class DerivedType>
-    template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
+    template <typename ReturnType, typename TransformType>
+    ReturnType IDataVector::DeepCopyAs(TransformType nonZeroTransform) const
+    {
+        switch (GetType())
+        {
+            case Type::DoubleDataVector:
+                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const DoubleDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+
+            case Type::FloatDataVector:
+                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const FloatDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+
+            case Type::ShortDataVector:
+                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const ShortDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+
+            case Type::ByteDataVector:
+                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const ByteDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+
+            case Type::SparseDoubleDataVector:
+                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseDoubleDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+
+            case Type::SparseFloatDataVector:
+                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseFloatDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+
+            case Type::SparseShortDataVector:
+                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseShortDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+
+            case Type::SparseByteDataVector:
+                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseByteDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+
+            case Type::SparseBinaryDataVector:
+                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseBinaryDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+
+            default:
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
+        }
+    }
+
+    template <class DerivedType>
+    template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
     void DataVectorBase<DerivedType>::AppendElements(IndexValueIteratorType indexValueIterator)
     {
         while (indexValueIterator.IsValid())
@@ -104,7 +104,7 @@ namespace data
         }
     }
 
-    template<class DerivedType>
+    template <class DerivedType>
     void DataVectorBase<DerivedType>::AppendElements(std::initializer_list<IndexValue> list)
     {
         for (const auto& current : list)
@@ -113,7 +113,7 @@ namespace data
         }
     }
 
-    template<class DerivedType>
+    template <class DerivedType>
     void DataVectorBase<DerivedType>::AppendElements(std::initializer_list<double> list)
     {
         size_t index = 0;
@@ -123,7 +123,7 @@ namespace data
         }
     }
 
-    template<class DerivedType>
+    template <class DerivedType>
     double DataVectorBase<DerivedType>::Norm2() const
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
@@ -138,7 +138,7 @@ namespace data
         return std::sqrt(result);
     }
 
-    template<class DerivedType>
+    template <class DerivedType>
     double DataVectorBase<DerivedType>::Dot(const math::UnorientedConstVectorReference<double>& vector) const
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
@@ -153,7 +153,7 @@ namespace data
         return result;
     }
 
-    template<class DerivedType>
+    template <class DerivedType>
     void DataVectorBase<DerivedType>::AddTo(math::RowVectorReference<double>& vector, double scalar) const
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
@@ -182,15 +182,15 @@ namespace data
         return result;
     }
 
-    template<class DerivedType>
-    template<typename ReturnType>
+    template <class DerivedType>
+    template <typename ReturnType>
     ReturnType DataVectorBase<DerivedType>::DeepCopyAs() const
     {
         return ReturnType(static_cast<const DerivedType*>(this)->GetIterator());
     }
 
-    template<class DerivedType>
-    template<typename ReturnType, typename TransformType>
+    template <class DerivedType>
+    template <typename ReturnType, typename TransformType>
     ReturnType DataVectorBase<DerivedType>::DeepCopyAs(TransformType nonZeroTransform) const
     {
         return ReturnType(MakeTransformingIndexValueIterator(static_cast<const DerivedType*>(this)->GetIterator(), std::move(nonZeroTransform)));

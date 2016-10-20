@@ -27,7 +27,7 @@ namespace data
     ///
     /// <typeparam name="DefaultDataVectorType"> The default internal representation. Datavectors are
     ///  created in this type and then possibly changed if a different type is more appropriate. </typeparam>
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     class AutoDataVectorBase : public IDataVector
     {
     public:
@@ -44,7 +44,7 @@ namespace data
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         AutoDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
@@ -111,22 +111,22 @@ namespace data
         /// <param name="args"> Variable number of arguments, forwarded as is to the underlying datavector. </param>
         ///
         /// <returns> The new data vector. </returns>
-        template<typename ReturnType, typename ... ArgTypes>
-        ReturnType DeepCopyAs(ArgTypes ... args) const;
+        template <typename ReturnType, typename... ArgTypes>
+        ReturnType DeepCopyAs(ArgTypes... args) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write to. </param>
-        virtual void Print(std::ostream & os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     private:
         // helper function used by ctors to choose the type of data vector to use
         void FindBestRepresentation(DefaultDataVectorType defaultDataVector);
 
-        template<typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
+        template <typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
         void SetInternal(DefaultDataVectorType defaultDataVector);
 
-        template<typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
+        template <typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
         void SetInternal(DefaultDataVectorType defaultDataVector);
 
         // members

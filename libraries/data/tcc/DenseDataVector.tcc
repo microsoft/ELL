@@ -23,7 +23,8 @@ namespace data
     }
 
     template <typename ElementType>
-    DenseDataVector<ElementType>::DenseDataVector() : _numNonzeros(0)
+    DenseDataVector<ElementType>::DenseDataVector()
+        : _numNonzeros(0)
     {
         _data.reserve(DEFAULT_DENSE_VECTOR_CAPACITY);
     }
@@ -60,8 +61,8 @@ namespace data
 
         ElementType storedValue = static_cast<ElementType>(value);
         assert(storedValue - value <= 1.0e-6 && value - storedValue <= 1.0e-6);
-            
-        if(index < _data.size())
+
+        if (index < _data.size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only append values to the end of a data vector");
         }

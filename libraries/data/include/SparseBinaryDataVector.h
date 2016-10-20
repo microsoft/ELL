@@ -17,11 +17,11 @@
 #include "IntegerList.h"
 
 // stl
+#include <cmath>
 #include <cstdint>
+#include <initializer_list>
 #include <iostream>
 #include <type_traits>
-#include <initializer_list>
-#include <cmath>
 
 namespace emll
 {
@@ -80,7 +80,7 @@ namespace data
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>

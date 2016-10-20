@@ -8,34 +8,34 @@
 
 #pragma once
 
-#include "Example.h"
 #include "DataVector.h"
 #include "Dataset.h"
+#include "Example.h"
 #include "ExampleIterator.h"
 
 // utilities
-#include "StlReferenceIterator.h"
 #include "AbstractInvoker.h"
+#include "StlReferenceIterator.h"
 #include "TypeTraits.h"
 
 // stl
+#include <functional>
 #include <ostream>
 #include <random>
 #include <vector>
-#include <functional>
 
 namespace emll
 {
 namespace data
 {
     // forward declaratin of Dataset, since AnyDataset and Dataset have a cyclical dependence
-    template<typename ExampleType>
+    template <typename ExampleType>
     class Dataset;
 
     /// <summary> A functor class that calls the GetExampleIterator member of a Dataset. </summary>
     ///
     /// <typeparam name="IteratorExampleType"> Example type. </typeparam>
-    template<typename IteratorExampleType>
+    template <typename IteratorExampleType>
     class GetExampleIteratorFunctor
     {
     public:
@@ -54,9 +54,9 @@ namespace data
         /// <param name="dataset"> The dataset. </param>
         ///
         /// <returns> The example iterator returned by the call to GetExampleIterator. </returns>
-        template<typename ExampleType>
+        template <typename ExampleType>
         ReturnType operator()(const Dataset<ExampleType>& dataset) const;
-    
+
     private:
         size_t _fromIndex;
         size_t _size;
@@ -84,7 +84,7 @@ namespace data
         /// <typeparam name="ExampleType"> Example type. </typeparam>
         ///
         /// <returns> The example iterator. </returns>
-        template<typename ExampleType>
+        template <typename ExampleType>
         ExampleIterator<ExampleType> GetExampleIterator() const;
 
         /// <summary> Returns the number of examples in the dataset. </summary>
@@ -105,9 +105,9 @@ namespace data
     public:
         using DatasetExampleType = DatasetExampleT;
         using ExampleReferenceIterator = utilities::VectorReferenceIterator<DatasetExampleType>;
-        
+
         /// <summary> Iterator class. </summary>
-        template<typename IteratorExampleType> 
+        template <typename IteratorExampleType>
         class DatasetExampleIterator : public IExampleIterator<IteratorExampleType>
         {
         public:
@@ -122,7 +122,7 @@ namespace data
             /// <summary> Gets the current example pointer to by the iterator. </summary>
             ///
             /// <returns> The example. </returns>
-            virtual IteratorExampleType Get() const override { return _current->template CopyAs<IteratorExampleType>(); } 
+            virtual IteratorExampleType Get() const override { return _current->template CopyAs<IteratorExampleType>(); }
 
             // TODO: move this to private and make the dataset a friend
             using InternalIteratorType = typename std::vector<DatasetExampleType>::const_iterator;
@@ -137,7 +137,7 @@ namespace data
 
         Dataset(Dataset&&) = default;
 
-        Dataset(const Dataset&) = delete; 
+        Dataset(const Dataset&) = delete;
 
         /// <summary> Constructs an instance of Dataset by making shallow copies of supervised examples. </summary>
         ///
@@ -198,7 +198,7 @@ namespace data
         /// the way to the end. </param>
         ///
         /// <returns> The iterator. </returns>
-        template<typename IteratorExampleType = DatasetExampleType>
+        template <typename IteratorExampleType = DatasetExampleType>
         ExampleIterator<IteratorExampleType> GetExampleIterator(size_t fromIndex = 0, size_t size = 0) const;
 
         /// <summary> Gets an example reference iterator. </summary>

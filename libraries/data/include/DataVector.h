@@ -17,8 +17,8 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 namespace emll
 {
@@ -27,11 +27,23 @@ namespace data
     /// <summary> Interface for infinite-dimensional vectors of double numbers. Each implementation of
     /// this interface has a mathematical dimension of infinity and is made up of an explicitly specified
     /// prefix followed by an implicit suffix of zeros. </summary>
-    class IDataVector 
+    class IDataVector
     {
     public:
         /// <summary> Values that represent data vector types. </summary>
-        enum class Type { DoubleDataVector, FloatDataVector, ShortDataVector, ByteDataVector, SparseDoubleDataVector, SparseFloatDataVector, SparseShortDataVector, SparseByteDataVector, SparseBinaryDataVector, AutoDataVector };
+        enum class Type
+        {
+            DoubleDataVector,
+            FloatDataVector,
+            ShortDataVector,
+            ByteDataVector,
+            SparseDoubleDataVector,
+            SparseFloatDataVector,
+            SparseShortDataVector,
+            SparseByteDataVector,
+            SparseBinaryDataVector,
+            AutoDataVector
+        };
 
         virtual ~IDataVector() = default;
 
@@ -85,7 +97,7 @@ namespace data
         /// <typeparam name="ReturnType"> The return type. </typeparam>
         ///
         /// <returns> The new data vector. </returns>
-        template<typename ReturnType>
+        template <typename ReturnType>
         ReturnType DeepCopyAs() const;
 
         /// <summary> Copies this data vector into another type of data vector. </summary>
@@ -94,7 +106,7 @@ namespace data
         /// <param name="nonZeroTransform"> A functor that takes an IndexValue and returns a double, which is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> The new data vector. </returns>
-        template<typename ReturnType, typename TransformType> 
+        template <typename ReturnType, typename TransformType>
         ReturnType DeepCopyAs(TransformType nonZeroTransform) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
@@ -113,7 +125,7 @@ namespace data
     /// </summary>
     ///
     /// <typeparam name="DerivedType"> The derived type, in the curiously recurring template design pattern. </typeparam>
-    template<class DerivedType>
+    template <class DerivedType>
     class DataVectorBase : public IDataVector
     {
     public:
@@ -121,7 +133,7 @@ namespace data
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         void AppendElements(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Takes an initializer list of index value pairs and appends them to the data vector. </summary>
@@ -163,25 +175,25 @@ namespace data
 
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
         ///
-        /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam> 
+        /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam>
         ///
         /// <returns> A data vector of a specified type. </returns>
-        template<typename ReturnType>
+        template <typename ReturnType>
         ReturnType DeepCopyAs() const;
 
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
         ///
-        /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam> 
+        /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam>
         /// <param name="nonZeroTransform"> A functor that takes an IndexValue and returns a double, which is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> A data vector of a specified type. </returns>
-        template<typename ReturnType, typename TransformType>
+        template <typename ReturnType, typename TransformType>
         ReturnType DeepCopyAs(TransformType nonZeroTransform) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write to. </param>
-        virtual void Print(std::ostream& os) const override;  
+        virtual void Print(std::ostream& os) const override;
     };
 }
 }

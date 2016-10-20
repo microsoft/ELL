@@ -29,13 +29,13 @@ namespace data
         AppendElements(std::move(indexValueIterator));
     }
 
-    template<typename IntegerListType>
+    template <typename IntegerListType>
     SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<IndexValue> list)
     {
         AppendElements(std::move(list));
     }
 
-    template<typename IntegerListType>
+    template <typename IntegerListType>
     SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<double> list)
     {
         AppendElements(std::move(list));

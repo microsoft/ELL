@@ -16,10 +16,10 @@
 
 // stl
 #include <cstdint>
+#include <initializer_list>
 #include <iostream>
 #include <type_traits>
 #include <vector>
-#include <initializer_list>
 
 #define DEFAULT_DENSE_VECTOR_CAPACITY 256
 
@@ -34,7 +34,7 @@ namespace data
     class DenseDataVector : public DataVectorBase<DenseDataVector<ElementType>>
     {
     public:
-        using Iterator = VectorIndexValueIterator<ElementType>; 
+        using Iterator = VectorIndexValueIterator<ElementType>;
 
         /// <summary> Constructor. </summary>
         DenseDataVector();
@@ -47,7 +47,7 @@ namespace data
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         DenseDataVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>

@@ -9,9 +9,9 @@
 #pragma once
 
 // stl
-#include <vector>
-#include <iostream>
 #include <cmath>
+#include <iostream>
+#include <vector>
 
 namespace emll
 {
@@ -51,7 +51,7 @@ namespace math
     /// <summary> Represents a constant reference to a vector, without a specified row or column orientation. </summary>
     ///
     /// <typeparam name="ElementType"> ElementType. </typeparam>
-    template<typename ElementType>
+    template <typename ElementType>
     class UnorientedConstVectorReference
     {
     public:
@@ -88,7 +88,7 @@ namespace math
         /// <param name="mapper"> The mapper. </param>
         ///
         /// <returns> The result of the operation. </returns>
-        template<typename MapperType>
+        template <typename MapperType>
         ElementType Aggregate(MapperType mapper) const;
 
     protected:
