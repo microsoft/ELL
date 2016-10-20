@@ -17,9 +17,9 @@ namespace data
 {
     template <typename ElementType>
     template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper)
+    DenseDataVector<ElementType>::DenseDataVector(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroTransform)
     {
-        AppendElements(std::move(indexValueIterator), std::move(nonZeroMapper));
+        AppendElements(std::move(indexValueIterator), std::move(nonZeroTransform));
     }
 
     template <typename ElementType>

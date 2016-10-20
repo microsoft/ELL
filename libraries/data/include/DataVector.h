@@ -83,11 +83,14 @@ namespace data
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> The return type. </typeparam>
-        /// <param name="nonZeroMapper"> An optional mapper that is applied to each non-zero elements during the copy. </param>
+        /// <param name="nonZeroTransform"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> The new data vector. </returns>
-        template<typename ReturnType>
-        ReturnType DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper = {}) const;
+        template<typename ReturnType> // TODO doc
+        ReturnType DeepCopyAs() const;
+
+        template<typename ReturnType, typename TransformType> // TODO doc
+        ReturnType DeepCopyAs(TransformType nonZeroTransform) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
@@ -113,9 +116,9 @@ namespace data
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        /// <param name="nonZeroMapper"> The mapper that is applied to all non-zero elements. </param>
+        /// <param name="nonZeroTransform"> The mapper that is applied to all non-zero elements. </param>
         template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
-        void AppendElements(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper = {});
+        void AppendElements(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroTransform = {});
 
         /// <summary> Takes an initializer list of index value pairs and appends them to the data vector. </summary>
         ///
@@ -157,11 +160,14 @@ namespace data
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam> 
-        /// <param name="nonZeroMapper"> An optional mapper that is applied to each non-zero elements during the copy. </param>
+        /// <param name="nonZeroTransform"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         ///
         /// <returns> A data vector of a specified type. </returns>
         template<typename ReturnType>
-        ReturnType DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper = {}) const;
+        ReturnType DeepCopyAs() const;
+
+        template<typename ReturnType, typename TransformType>
+        ReturnType DeepCopyAs(TransformType nonZeroTransform) const; // TODO
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///

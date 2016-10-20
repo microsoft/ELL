@@ -21,7 +21,6 @@ namespace emll
 namespace data
 {
     /// <summary> A read-only forward index-value iterator for an STL container </summary>
-
     template <typename IteratorType>
     class StlIndexValueIterator : public IIndexValueIterator
     {

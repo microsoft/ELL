@@ -11,58 +11,57 @@
 #include "IndexValue.h"
 
 // stl
-#include <cstdint>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include <memory>
 
 namespace emll
 {
 namespace data
 {
-    /// <summary> A read-only forward index-value iterator for an STL container </summary>
-
-    template <typename IteratorType, typename ValueType = decltype(*std::declval<IteratorType>())>
+    /// <summary> An index-value iterator that wraps another index-value iterator and applies a
+    /// transformation to each of its non-zero elements. </summary>
+    ///
+    /// <typeparam name="WrappedIndexValueIteratorType"> Type of the wrapped index value iterator. </typeparam>
+    /// <typeparam name="TransformType"> A functor type that takes an IndexValue and returns a double. </typeparam>
+    template <typename WrappedIndexValueIteratorType, typename TransformType>
     class TransformingIndexValueIterator : public IIndexValueIterator
     {
     public:
         /// <summary> Constructs an instance of TransformingIndexValueIterator. </summary>
         ///
-        /// <param name="begin"> STL iterator pointing at beginning of range to iterate over </param>
-        /// <param name="end"> STL iterator pointing at end of range to iterate over </param>
-        TransformingIndexValueIterator(const IteratorType& begin, const IteratorType& end);
+        /// <param name="wrappedIterator"> The index value iterator whose non-zero values are to be transformed. </param>
+        /// <param name="transform"> A transform that takes an IndexValue and returns the transformed double value. </param>
+        TransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformType transform) : _wrappedIterator(std::move(wrappedIterator)), _transform(std::move(transform)) {}
 
         /// <summary> Returns True if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> True if the iterator is currently pointing to a valid iterate. </returns>
-        bool IsValid() const { return _begin != _end; }
+        bool IsValid() const { return _wrappedIterator.IsValid(); }
 
         /// <summary> Proceeds to the Next iterate </summary>
-        void Next();
+        void Next() { _wrappedIterator.Next(); }
 
         /// <summary> Returns The current index-value pair </summary>
         ///
         /// <returns> The current index-value pair </returns>
-        IndexValue Get() const { return IndexValue{ _index, (double)*_begin }; }
+        IndexValue Get() const 
+        {
+            auto indexValue = _wrappedIterator.Get();
+            return{ indexValue.index, _transform(indexValue) };
+        }
 
     protected:
-        IteratorType _begin;
-        IteratorType _end;
-        uint64_t _index = 0;
-        void SkipZeros();
+        WrappedIndexValueIteratorType _wrappedIterator;
+        TransformType _transform;
     };
 
-    /// <summary> Handy type alias for a TransformingIndexValueIterator over a std::vector </summary>
-    template <typename ValueType>
-    using VectorIndexValueIterator = TransformingIndexValueIterator<typename std::vector<ValueType>::const_iterator>;
-
-    /// <summary> Creates an StlIndexValueIteratorAdapter for a std::vector </summary>
+    /// <summary> Creates an TransformingIndexValueIterator.</summary>
     ///
-    /// <param name="container"> A std::vector to iterate over </param>
-    /// <returns> An StlIndexValueIteratorAdapter that iterates over the given vector </returns>
-    template <typename ValueType>
-    VectorIndexValueIterator<ValueType> MakeVectorIndexValueIterator(const std::vector<ValueType>& container);
+    /// <param name="wrappedIterator"> STL iterator pointing at beginning of range to iterate over. </param>
+    /// <param name="transform"> STL iterator pointing at end of range to iterate over. </param>
+    template <typename WrappedIndexValueIteratorType, typename TransformType>
+    TransformingIndexValueIterator<WrappedIndexValueIteratorType, TransformType> MakeTransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformType transform)
+    {
+        return TransformingIndexValueIterator<WrappedIndexValueIteratorType, TransformType>(std::move(wrappedIterator), std::move(transform));
+    }
 }
 }
-
-#include "../tcc/TransformingIndexValueIterator.tcc"

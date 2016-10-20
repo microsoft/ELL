@@ -25,9 +25,9 @@ namespace data
 
     template<typename DefaultDataVectorType>
     template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper)
+    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroTransform)
     {
-        DefaultDataVectorType defaultDataVector(std::move(indexValueIterator), std::move(nonZeroMapper));
+        DefaultDataVectorType defaultDataVector(std::move(indexValueIterator), std::move(nonZeroTransform));
         FindBestRepresentation(std::move(defaultDataVector));
     }
 
@@ -71,9 +71,9 @@ namespace data
 
     template<typename DefaultDataVectorType>
     template<typename ReturnType>
-    ReturnType AutoDataVectorBase<DefaultDataVectorType>::DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper) const
+    ReturnType AutoDataVectorBase<DefaultDataVectorType>::DeepCopyAs(std::function<double(IndexValue)> nonZeroTransform) const
     {
-        return _pInternal->DeepCopyAs<ReturnType>(std::move(nonZeroMapper));
+        return _pInternal->DeepCopyAs<ReturnType>(std::move(nonZeroTransform));
     }
 
     template<typename TargetType>

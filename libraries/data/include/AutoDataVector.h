@@ -44,9 +44,9 @@ namespace data
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        /// <param name="nonZeroMapper"> An optional mapper that is applied to each non-zero elements during the copy. </param>
+        /// <param name="nonZeroTransform"> An optional mapper that is applied to each non-zero elements during the copy. </param>
         template<typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
-        AutoDataVectorBase(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroMapper = {});
+        AutoDataVectorBase(IndexValueIteratorType indexValueIterator, std::function<double(IndexValue)> nonZeroTransform = {});
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
@@ -111,7 +111,7 @@ namespace data
         ///
         /// <returns> This new data vector. </returns>
         template<typename ReturnType>
-        ReturnType DeepCopyAs(std::function<double(IndexValue)> nonZeroMapper = {}) const;
+        ReturnType DeepCopyAs(std::function<double(IndexValue)> nonZeroTransform = {}) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
