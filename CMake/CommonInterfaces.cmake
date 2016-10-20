@@ -97,7 +97,7 @@ if( ((${language} STREQUAL "xml") OR (${language} STREQUAL "javascript")))
 else()
     swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC}) # ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
 
-    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common dataset evaluators lossFunctions model nodes predictors trainers utilities)
+    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common evaluators lossFunctions model nodes predictors trainers utilities)
     set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
     add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} EMLL_common)
 endif()
