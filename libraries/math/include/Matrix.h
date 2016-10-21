@@ -6,29 +6,34 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
 #include "Vector.h"
+
+#ifndef MATRIX_H
+#define MATRIX_H
 
 namespace emll
 {
 namespace math
 {
     /// <summary> Enum of possible matrix layouts. </summary>
-    enum class MatrixLayout { columnMajor, rowMajor };
+    enum class MatrixLayout
+    {
+        columnMajor,
+        rowMajor
+    };
 
     /// <summary> Forward declaration of a base class for matrices, for subsequent specialization according to layout. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
     /// <typeparam name="Layout"> Type of the layout. </typeparam>
-    template<typename ElementType, MatrixLayout Layout>
+    template <typename ElementType, MatrixLayout Layout>
     class MatrixBase;
 
     /// <summary> Base class for rectangular dense matrices. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
     template <typename ElementType>
-    class RectangularMatrixBase 
+    class RectangularMatrixBase
     {
     public:
         /// <summary> Gets the number of rows. </summary>
@@ -45,10 +50,12 @@ namespace math
         // protected ctor accessible only through derived classes
         RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
 
-        template<VectorOrientation Orientation>
+        void Swap(RectangularMatrixBase<ElementType>& other);
+
+        template <VectorOrientation Orientation>
         VectorReference<ElementType, Orientation> ConstructVectorReference(ElementType* pData, size_t size, size_t increment);
 
-        template<VectorOrientation Orientation>
+        template <VectorOrientation Orientation>
         ConstVectorReference<ElementType, Orientation> ConstructConstVectorReference(ElementType* pData, size_t size, size_t increment) const;
 
         ElementType* _pData;
@@ -60,7 +67,7 @@ namespace math
     /// <summary> Base class for column major rectangular dense matrices. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
-    template<typename ElementType>
+    template <typename ElementType>
     class MatrixBase<ElementType, MatrixLayout::columnMajor> : public RectangularMatrixBase<ElementType>
     {
     protected:
@@ -82,7 +89,7 @@ namespace math
     /// <summary> Base class for row major rectangular dense matrices. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
-    template<typename ElementType>
+    template <typename ElementType>
     class MatrixBase<ElementType, MatrixLayout::rowMajor> : public RectangularMatrixBase<ElementType>
     {
     protected:
@@ -127,7 +134,7 @@ namespace math
         /// <summary> Matrix element access operator. </summary>
         ///
         /// <returns> A copy of the element in a given position. </returns>
-        ElementType operator() (size_t rowIndex, size_t columnIndex)  const;
+        ElementType operator()(size_t rowIndex, size_t columnIndex) const;
 
         /// <summary> Gets the matrix layout. </summary>
         ///
@@ -176,7 +183,7 @@ namespace math
         /// <param name="index"> The interval index. </param>
         ///
         /// <returns> Constant reference to the interval. </returns>
-        auto GetMajorVector(size_t index) const->ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+        auto GetMajorVector(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
         {
             return RectangularMatrixBase<ElementType>::template ConstructConstVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
         }
@@ -216,8 +223,8 @@ namespace math
         /// <param name="other"> The other matrix. </param>
         ///
         /// <returns> true if the two matrices are not equivalent. </returns>
-        template<MatrixLayout OtherLayout>
-        bool operator !=(const ConstMatrixReference<ElementType, OtherLayout>& other);
+        template <MatrixLayout OtherLayout>
+        bool operator!=(const ConstMatrixReference<ElementType, OtherLayout>& other);
 
         using RectangularMatrixBase<ElementType>::NumRows;
         using RectangularMatrixBase<ElementType>::NumColumns;
@@ -227,7 +234,6 @@ namespace math
         using MatrixBase<ElementType, Layout>::MatrixBase;
 
         ElementType* GetMajorVectorBegin(size_t index) const;
-
 
         using RectangularMatrixBase<ElementType>::_pData;
         using RectangularMatrixBase<ElementType>::_numRows;
@@ -256,7 +262,7 @@ namespace math
         /// <summary> Matrix element access operator. </summary>
         ///
         /// <returns> A reference to an element in a given position. </returns>
-        ElementType& operator() (size_t rowIndex, size_t columnIndex);
+        ElementType& operator()(size_t rowIndex, size_t columnIndex);
 
         /// <summary> Sets all matrix elements to zero. </summary>
         void Reset() { Fill(0); }
@@ -273,7 +279,7 @@ namespace math
         ///
         /// <typeparam name="GeneratorType"> Type of lambda or functor to use as a generator. </typeparam>
         /// <param name="generator"> The generator function. </param>
-        template<typename GeneratorType>
+        template <typename GeneratorType>
         void Generate(GeneratorType generator);
 
         /// <summary> Gets a reference to this matrix. </summary>
@@ -289,7 +295,7 @@ namespace math
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const->MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
+        auto Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
         {
             return MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>(_pData, _numColumns, _numRows, _increment);
         }
@@ -328,7 +334,7 @@ namespace math
         /// <param name="index"> The interval index. </param>
         ///
         /// <returns> Reference to the interval. </returns>
-        auto GetMajorVector(size_t index)->VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+        auto GetMajorVector(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
         {
             return RectangularMatrixBase<ElementType>::template ConstructVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
         }
@@ -372,6 +378,28 @@ namespace math
         /// <param name="list"> A list of initialization lists (row by row). </param>
         Matrix(std::initializer_list<std::initializer_list<ElementType>> list);
 
+        /// <summary> Move Constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The matrix being moved. </param>
+        Matrix(Matrix<ElementType, Layout>&& other);
+
+        /// <summary> Copy Constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The matrix being copied. </param>
+        Matrix(const Matrix<ElementType, Layout>& other);
+
+        /// <summary> Assignment operator. </summary>
+        ///
+        /// <param name="other"> The other matrix. </param>
+        ///
+        /// <returns> A reference to this matrix. </returns>
+        Matrix<ElementType, Layout>& operator=(Matrix<ElementType, Layout> other);
+
+        /// <summary> Swaps the contents of this matrix with the contents of another matrix. </summary>
+        ///
+        /// <param name="other"> [in,out] The other matrix. </param>
+        void Swap(Matrix<ElementType, Layout>& other);
+
         /// <summary> Sets all matrix elements to zero. </summary>
         void Reset() { Fill(0); }
 
@@ -387,7 +415,7 @@ namespace math
         ///
         /// <typeparam name="GeneratorType"> Type of lambda or functor to use as a generator. </typeparam>
         /// <param name="generator"> The generator function. </param>
-        template<typename GeneratorType>
+        template <typename GeneratorType>
         void Generate(GeneratorType generator);
 
     private:
@@ -400,12 +428,13 @@ namespace math
 
     //
     // friendly names
-    // 
-    template<typename ElementType>
+    //
+    template <typename ElementType>
     using ColumnMatrix = Matrix<ElementType, MatrixLayout::columnMajor>;
 
-    template<typename ElementType>
+    template <typename ElementType>
     using RowMatrix = Matrix<ElementType, MatrixLayout::rowMajor>;
 }
 }
 #include "../tcc/Matrix.tcc"
+#endif MATRIX_H

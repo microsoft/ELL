@@ -6,21 +6,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Operations.h"
-#include "Vector.h"
 #include "Matrix.h"
+#include "Operations.h"
 #include "Print.h"
+#include "Vector.h"
 
 // testing
 #include "testing.h"
 
 // stl
-#include <random>
 #include <iostream>
+#include <random>
 
 using namespace emll;
 
-template<typename ElementType, math::VectorOrientation Orientation>
+template <typename ElementType, math::VectorOrientation Orientation>
 void TestVector()
 {
     math::Vector<ElementType, Orientation> v(10);
@@ -47,7 +47,7 @@ void TestVector()
     math::Vector<ElementType, Orientation> r4{ 0, 3, 3, 0, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("VectorReference::Reset", v == r4);
 
-    // just checking compilation 
+    // just checking compilation
     std::default_random_engine rng;
     std::normal_distribution<ElementType> normal(0, 1.0);
     auto generator = [&]() { return normal(rng); };
@@ -55,7 +55,7 @@ void TestVector()
     u.Generate(generator);
 }
 
-template<typename ElementType, math::ImplementationType Implementation>
+template <typename ElementType, math::ImplementationType Implementation>
 void TestVectorOperations()
 {
     auto implementationName = math::OperationsImplementation<Implementation>::GetImplementationName();
@@ -91,8 +91,7 @@ void TestVectorOperations()
     math::ColumnVector<ElementType> r1{ 0, 0, 0, 0, 0 };
     testing::ProcessTest(implementationName + "Operations::Multiply(scalar, Vector)", v == r1);
 
-    math::ColumnMatrix<ElementType> M
-    {
+    math::ColumnMatrix<ElementType> M{
         { 1, 2, 4, 0 },
         { 0, 2, 4, 3 },
         { 0, 8, 5, 6 }
@@ -105,17 +104,15 @@ void TestVectorOperations()
     testing::ProcessTest(implementationName + "Operations::Dot(VectorReference, VectorReference)", dot == 36);
 
     Ops::Add(static_cast<ElementType>(1), w);
-    math::ColumnMatrix<ElementType> R0
-    {
+    math::ColumnMatrix<ElementType> R0{
         { 1, 2, 4, 0 },
         { 1, 3, 5, 3 },
         { 0, 8, 5, 6 }
     };
     testing::ProcessTest(implementationName + "Operations::Add(scalar, VectorReference)", M == R0);
 
-    Ops::Add(static_cast<ElementType>(2), r0.GetSubVector(0,3), w.Transpose());
-    math::ColumnMatrix<ElementType> R1
-    { 
+    Ops::Add(static_cast<ElementType>(2), r0.GetSubVector(0, 3), w.Transpose());
+    math::ColumnMatrix<ElementType> R1{
         { 1, 2, 4, 0 },
         { 5, 9, 13, 3 },
         { 0, 8, 5, 6 }
@@ -123,8 +120,7 @@ void TestVectorOperations()
     testing::ProcessTest(implementationName + "Operations::Add(scalar, VectorReference, VectorReference)", M == R1);
 
     math::Operations::Multiply(static_cast<ElementType>(2), z);
-    math::ColumnMatrix<ElementType> R2
-    {
+    math::ColumnMatrix<ElementType> R2{
         { 1, 2, 4, 0 },
         { 5, 9, 13, 3 },
         { 0, 16, 10, 6 }
@@ -133,14 +129,13 @@ void TestVectorOperations()
 
     testing::ProcessTest(implementationName + "Operations::Norm0(VectorReference)", math::Operations::Norm0(M.GetColumn(1)) == 3);
 
-    testing::ProcessTest(implementationName + "Operations::Norm1(VectorReference)", math::Operations::Norm1(M.GetColumn(1)) == 2+9+16);
+    testing::ProcessTest(implementationName + "Operations::Norm1(VectorReference)", math::Operations::Norm1(M.GetColumn(1)) == 2 + 9 + 16);
 
-    testing::ProcessTest(implementationName + "Operations::Norm2(VectorReference)", testing::IsEqual(math::Operations::Norm2(M.GetColumn(1)), static_cast<ElementType>(std::sqrt(2*2+9*9+16*16))));
+    testing::ProcessTest(implementationName + "Operations::Norm2(VectorReference)", testing::IsEqual(math::Operations::Norm2(M.GetColumn(1)), static_cast<ElementType>(std::sqrt(2 * 2 + 9 * 9 + 16 * 16))));
 
-    Ops::Copy(math::RowVector<ElementType> { 1, 1, 1, 1 }, M.GetRow(1));
-    Ops::Copy(math::ColumnVector<ElementType> { 1, 1, 1 }, M.GetColumn(2));
-    math::ColumnMatrix<ElementType> R3
-    {
+    Ops::Copy(math::RowVector<ElementType>{ 1, 1, 1, 1 }, M.GetRow(1));
+    Ops::Copy(math::ColumnVector<ElementType>{ 1, 1, 1 }, M.GetColumn(2));
+    math::ColumnMatrix<ElementType> R3{
         { 1, 2, 1, 0 },
         { 1, 1, 1, 1 },
         { 0, 16, 1, 6 }
@@ -148,7 +143,7 @@ void TestVectorOperations()
     testing::ProcessTest(implementationName + "Operations::Copy(VectorReference, VectorReference)", M == R3);
 }
 
-template<typename ElementType, math::MatrixLayout Layout>
+template <typename ElementType, math::MatrixLayout Layout>
 void TestMatrix1()
 {
     math::Matrix<ElementType, Layout> M(3, 4);
@@ -156,11 +151,10 @@ void TestMatrix1()
     M(0, 2) = 4;
     M(2, 3) = 7;
 
-    math::ColumnMatrix<ElementType> S1
-    { 
+    math::ColumnMatrix<ElementType> S1{
         { 1, 0, 4, 0 },
         { 0, 0, 0, 0 },
-        { 0, 0, 0, 7 } 
+        { 0, 0, 0, 7 }
     };
     testing::ProcessTest("Matrix::Operator()", M == S1);
 
@@ -168,8 +162,7 @@ void TestMatrix1()
     N.Fill(3);
     N(0, 1) = 4;
 
-    math::ColumnMatrix<ElementType> S2
-    {
+    math::ColumnMatrix<ElementType> S2{
         { 1, 0, 4, 0 },
         { 0, 3, 4, 3 },
         { 0, 3, 3, 3 }
@@ -180,8 +173,7 @@ void TestMatrix1()
     v[2] = 5;
     v[3] = 6;
 
-    math::ColumnMatrix<ElementType> S3
-    {
+    math::ColumnMatrix<ElementType> S3{
         { 1, 0, 4, 0 },
         { 0, 3, 4, 3 },
         { 0, 3, 5, 6 }
@@ -193,19 +185,17 @@ void TestMatrix1()
     u[1] = 2;
     u[2] = 8;
 
-    math::ColumnMatrix<ElementType> S4
-    {
+    math::ColumnMatrix<ElementType> S4{
         { 1, 2, 4, 0 },
         { 0, 2, 4, 3 },
         { 0, 8, 5, 6 }
     };
     testing::ProcessTest("Matrix::GetColumn()", M == S4);
 
-   auto w = M.GetDiagonal();
+    auto w = M.GetDiagonal();
     w.Fill(9);
 
-    math::ColumnMatrix<ElementType> S5
-    {
+    math::ColumnMatrix<ElementType> S5{
         { 9, 2, 4, 0 },
         { 0, 9, 4, 3 },
         { 0, 8, 9, 6 }
@@ -213,8 +203,7 @@ void TestMatrix1()
     testing::ProcessTest("Matrix::GetDiagonal()", M == S5);
 
     auto T = M.Transpose();
-    math::ColumnMatrix<ElementType> S6
-    {
+    math::ColumnMatrix<ElementType> S6{
         { 9, 0, 0 },
         { 2, 9, 8 },
         { 4, 4, 9 },
@@ -228,7 +217,7 @@ void TestMatrix1()
     M.Generate(generator);
 }
 
-template<typename ElementType, math::MatrixLayout Layout>
+template <typename ElementType, math::MatrixLayout Layout>
 void TestMatrix2()
 {
     math::Matrix<ElementType, Layout> M(7, 7);
@@ -242,8 +231,7 @@ void TestMatrix2()
     T.GetRow(0).Fill(1);
     T.GetRow(4).Fill(1);
 
-    math::ColumnMatrix<ElementType> R1
-    {
+    math::ColumnMatrix<ElementType> R1{
         { 0, 0, 0, 0, 0, 0, 0 },
         { 0, 1, 1, 1, 1, 1, 0 },
         { 0, 1, 1, 0, 0, 1, 0 },
@@ -257,8 +245,7 @@ void TestMatrix2()
     auto S = N.GetSubMatrix(1, 1, 3, 3);
     S.Fill(8);
 
-    math::ColumnMatrix<ElementType> R2
-    {
+    math::ColumnMatrix<ElementType> R2{
         { 0, 0, 0, 0, 0, 0, 0 },
         { 0, 1, 1, 1, 1, 1, 0 },
         { 0, 1, 8, 8, 8, 1, 0 },
@@ -270,22 +257,21 @@ void TestMatrix2()
     testing::ProcessTest("Matrix::Fill()", M == R2);
 }
 
-template<typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
+template <typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
 void TestMatrixOperations()
 {
     auto implementationName = math::OperationsImplementation<Implementation>::GetImplementationName();
     using Ops = math::OperationsImplementation<Implementation>;
 
-    math::Matrix<ElementType, Layout> M
-    {
+    math::Matrix<ElementType, Layout> M{
         { 1, 0 },
         { 0, 1 },
         { 2, 2 }
     };
 
-    math::ColumnVector<ElementType> u { 1, 1, 0 };
-    math::ColumnVector<ElementType> v { 3, 4 };
-    
+    math::ColumnVector<ElementType> u{ 1, 1, 0 };
+    math::ColumnVector<ElementType> v{ 3, 4 };
+
     ElementType s = 2;
     ElementType t = 3;
 
@@ -296,7 +282,7 @@ void TestMatrixOperations()
 
     auto A = M.GetSubMatrix(1, 0, 2, 2);
     auto w = M.GetRow(0).Transpose();
-    
+
     // v = s * A * w + t * v;
     Ops::Multiply(s, A, w, t, v);
     math::ColumnVector<ElementType> r1{ 9, 16 };
@@ -308,8 +294,7 @@ void TestMatrixOperations()
     testing::ProcessTest(implementationName + "Operations::Multiply(Matrix.Transpose, Vector)", v == r2);
 
     Ops::Add(static_cast<ElementType>(1), M);
-    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R0
-    {
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R0{
         { 2, 1 },
         { 1, 2 },
         { 3, 3 }
@@ -317,23 +302,20 @@ void TestMatrixOperations()
     testing::ProcessTest(implementationName + "Operations::Add(MatrixReference, scalar)", M == R0);
 
     Ops::Multiply(static_cast<ElementType>(2), M);
-    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R1
-    {
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R1{
         { 4, 2 },
         { 2, 4 },
         { 6, 6 }
     };
     testing::ProcessTest(implementationName + "Operations::Add(MatrixReference, scalar)", M == R1);
 
-    math::Matrix<ElementType, Layout> R2
-    {
+    math::Matrix<ElementType, Layout> R2{
         { 0, 2 },
         { 4, 8 },
         { 1, 3 }
     };
     Ops::Copy(R2, M);
     testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R2);
-
 }
 
 /// Runs all tests
@@ -370,7 +352,7 @@ int main()
     TestMatrixOperations<double, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
     TestMatrixOperations<double, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
 
-    if(testing::DidTestFail())
+    if (testing::DidTestFail())
     {
         return 1;
     }

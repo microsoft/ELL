@@ -10,8 +10,8 @@
 
 #include "IPredictor.h"
 
-// linear
-#include "DoubleVector.h"
+// math
+#include "Vector.h"
 
 // datasets
 #include "AutoDataVector.h"
@@ -45,12 +45,12 @@ namespace predictors
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        linear::DoubleVector& GetWeights() { return _w; }
+        math::ColumnVector<double>& GetWeights() { return _w; }
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        const linear::DoubleVector& GetWeights() const { return _w; }
+        const math::ColumnConstVectorReference<double>& GetWeights() const { return _w; }
 
         /// <summary> Returns the underlying bias. </summary>
         ///
@@ -79,7 +79,7 @@ namespace predictors
         /// <param name="example"> The data vector. </param>
         ///
         /// <returns> The weighted elements vector. </returns>
-        std::vector<double> GetWeightedElements(const DataVectorType& dataVector) const;
+        DataVectorType GetWeightedElements(const DataVectorType& dataVector) const;
 
         /// <summary> Scales the linear predictor by a scalar </summary>
         ///
@@ -110,7 +110,7 @@ namespace predictors
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        linear::DoubleVector _w;
+        math::ColumnVector<double> _w;
         double _b;
     };
 }

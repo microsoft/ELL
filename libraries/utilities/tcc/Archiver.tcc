@@ -244,7 +244,10 @@ namespace utilities
     namespace ArchiverImpl
     {
         template <typename T>
-        static std::string GetTypeName(...) { return TypeName<T>::GetName(); }
+        static std::string GetTypeName(...)
+        {
+            return TypeName<T>::GetName();
+        }
 
         template <typename T, IsIntegral<T> concept = true>
         static std::string GetTypeName(bool)

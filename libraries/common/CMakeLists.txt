@@ -66,7 +66,7 @@ target_include_directories(${PROJ_NAME} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
-target_link_libraries(${PROJ_NAME} data linear utilities lossFunctions model nodes predictors evaluators trainers)
+target_link_libraries(${PROJ_NAME} data utilities lossFunctions model nodes predictors evaluators trainers)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -96,7 +96,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} common data linear testing utilities lossFunctions predictors trainers model nodes)
+target_link_libraries(${TEST_NAME} common data testing utilities lossFunctions predictors trainers model nodes)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

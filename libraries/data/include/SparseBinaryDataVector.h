@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DataVector.h"
+#include "IndexValue.h"
 
 #ifndef SPARSEBINARYDATAVECTOR_H
 #define SPARSEBINARYDATAVECTOR_H
@@ -15,15 +16,12 @@
 #include "CompressedIntegerList.h"
 #include "IntegerList.h"
 
-// linear
-#include "IndexValue.h"
-
 // stl
+#include <cmath>
 #include <cstdint>
+#include <initializer_list>
 #include <iostream>
 #include <type_traits>
-#include <initializer_list>
-#include <cmath>
 
 namespace emll
 {
@@ -38,7 +36,7 @@ namespace data
     {
     public:
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
-        class Iterator : public linear::IIndexValueIterator
+        class Iterator : public IIndexValueIterator
         {
         public:
             Iterator(const Iterator&) = default;
@@ -56,7 +54,7 @@ namespace data
             /// <summary> Returns The current value. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const { return linear::IndexValue{ _list_iterator.Get(), 1.0 }; }
+            IndexValue Get() const { return IndexValue{ _list_iterator.Get(), 1.0 }; }
 
         private:
             /// <summary> define typename to improve readability. </summary>
@@ -78,17 +76,17 @@ namespace data
 
         SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = delete;
 
-        /// <summary> Constructs a sparse binary data vector from an index value iterator. </summary>
+        /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
         /// <param name="list"> The initializer list. </param>
-        SparseBinaryDataVectorBase(std::initializer_list<linear::IndexValue> list);
+        SparseBinaryDataVectorBase(std::initializer_list<IndexValue> list);
 
         /// <summary> Constructs a data vector from an initializer list of values. </summary>
         ///
@@ -126,15 +124,16 @@ namespace data
         /// <param name="p_other"> The other. </param>
         ///
         /// <returns> A double. </returns>
-        virtual double Dot(const double* p_other) const override;
+        virtual double Dot(const math::UnorientedConstVectorReference<double>& vector) const override;
 
-        /// <summary> Performs (*p_other) += scalar * (*this), where other a dense vector. </summary>
+        /// <summary> Performs vector += scalar * (*this), where other a dense vector. </summary>
         ///
-        /// <param name="p_other"> [in,out] If non-null, the other. </param>
+        /// <param name="vector"> [in,out] The vector that this DataVector is added to. </param>
         /// <param name="scalar">  The scalar. </param>
-        virtual void AddTo(double* p_other, double scalar = 1.0) const override;
+        virtual void AddTo(math::RowVectorReference<double>& vector, double scalar = 1.0) const override;
 
     private:
+        using DataVectorBase<SparseBinaryDataVectorBase<IntegerListType>>::AppendElements;
         IntegerListType _indices;
     };
 

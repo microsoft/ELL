@@ -19,19 +19,20 @@ namespace emll
 {
 namespace data
 {
+    template <typename IteratorExampleType>
+    GetExampleIteratorFunctor<IteratorExampleType>::GetExampleIteratorFunctor(size_t fromIndex, size_t size)
+        : _fromIndex(fromIndex), _size(size)
+    {
+    }
 
-    template<typename IteratorExampleType>
-    GetExampleIteratorFunctor<IteratorExampleType>::GetExampleIteratorFunctor(size_t fromIndex, size_t size) : _fromIndex(fromIndex), _size(size) 
-    {}
-
-    template<typename IteratorExampleType>
-    template<typename ExampleType>
+    template <typename IteratorExampleType>
+    template <typename ExampleType>
     auto GetExampleIteratorFunctor<IteratorExampleType>::operator()(const Dataset<ExampleType>& dataset) const -> ReturnType
     {
         return dataset.template GetExampleIterator<IteratorExampleType>(_fromIndex, _size);
     }
 
-    template<typename ExampleType>
+    template <typename ExampleType>
     ExampleIterator<ExampleType> AnyDataset::GetExampleIterator() const
     {
         GetExampleIteratorFunctor<ExampleType> abstractor(_fromIndex, _size);
@@ -40,10 +41,12 @@ namespace data
         return utilities::AbstractInvoker<DatasetBase, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
     }
 
-    template<typename DatasetExampleType>
-    template<typename IteratorExampleType>
-    Dataset<DatasetExampleType>::DatasetExampleIterator<IteratorExampleType>::DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end) : _current(begin), _end(end) 
-    {}
+    template <typename DatasetExampleType>
+    template <typename IteratorExampleType>
+    Dataset<DatasetExampleType>::DatasetExampleIterator<IteratorExampleType>::DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end)
+        : _current(begin), _end(end)
+    {
+    }
 
     template <typename DatasetExampleType>
     Dataset<DatasetExampleType>::Dataset(ExampleIterator<DatasetExampleType> exampleIterator)
@@ -55,8 +58,9 @@ namespace data
         }
     }
 
-    template<typename DatasetExampleType>
-    Dataset<DatasetExampleType>::Dataset(const AnyDataset& anyDataset) : Dataset(anyDataset.GetExampleIterator<DatasetExampleType>())
+    template <typename DatasetExampleType>
+    Dataset<DatasetExampleType>::Dataset(const AnyDataset& anyDataset)
+        : Dataset(anyDataset.GetExampleIterator<DatasetExampleType>())
     {
     }
 

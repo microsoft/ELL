@@ -53,7 +53,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} evaluators data linear testing)
+target_link_libraries(${TEST_NAME} evaluators data testing)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

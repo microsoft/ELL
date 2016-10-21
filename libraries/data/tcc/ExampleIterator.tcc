@@ -10,8 +10,10 @@ namespace emll
 {
 namespace data
 {
-    template<typename ExampleType>
-    ExampleIterator<ExampleType>::ExampleIterator(std::unique_ptr<IExampleIterator<ExampleType>>&& iterator) : _iterator(std::move(iterator)) 
-    {}
+    template <typename ExampleType>
+    ExampleIterator<ExampleType>::ExampleIterator(std::unique_ptr<IExampleIterator<ExampleType>>&& iterator)
+        : _iterator(std::move(iterator))
+    {
+    }
 }
 }

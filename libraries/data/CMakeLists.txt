@@ -24,11 +24,14 @@ set (INCLUDE include/AutoDataVector.h
              include/DataVector.h
              include/ParsingExampleIterator.h
              include/Dataset.h
+             include/IndexValue.h
              include/SequentialLineIterator.h
              include/SparseBinaryDataVector.h
              include/SparseDataVector.h
              include/SparseEntryParser.h
-             include/SupervisedExampleBuilder.h)
+             include/StlIndexValueIterator.h
+             include/SupervisedExampleBuilder.h
+             include/TransformingIndexValueIterator.h)
 
 set (TCC tcc/AutoDataVector.tcc
          tcc/DataVector.tcc
@@ -39,7 +42,9 @@ set (TCC tcc/AutoDataVector.tcc
          tcc/Dataset.tcc
          tcc/SparseBinaryDataVector.tcc
          tcc/SparseDataVector.tcc
-         tcc/SupervisedExampleBuilder.tcc)
+         tcc/StlIndexValueIterator.tcc
+         tcc/SupervisedExampleBuilder.tcc
+         tcc/TransformingIndexValueIterator.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -50,7 +55,7 @@ target_include_directories(${PROJ_NAME} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
-target_link_libraries(${PROJ_NAME} linear utilities)
+target_link_libraries(${PROJ_NAME} math utilities)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
@@ -77,7 +82,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} data linear testing utilities)
+target_link_libraries(${TEST_NAME} data testing utilities)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

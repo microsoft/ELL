@@ -27,7 +27,7 @@ namespace data
     ///
     /// <typeparam name="DefaultDataVectorType"> The default internal representation. Datavectors are
     ///  created in this type and then possibly changed if a different type is more appropriate. </typeparam>
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     class AutoDataVectorBase : public IDataVector
     {
     public:
@@ -39,18 +39,18 @@ namespace data
         ///
         /// <param name="vector"> The input vector. </param>
         AutoDataVectorBase(DefaultDataVectorType&& vector);
-        
+
         /// <summary> Constructs an auto data vector from an index value iterator. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         AutoDataVectorBase(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
         /// <param name="list"> The initializer list. </param>
-        AutoDataVectorBase(std::initializer_list<linear::IndexValue> list);
+        AutoDataVectorBase(std::initializer_list<IndexValue> list);
 
         /// <summary> Constructs a data vector from an initializer list of values. </summary>
         ///
@@ -86,18 +86,18 @@ namespace data
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
-        /// <param name="p_other"> The other vector. </param>
+        /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        virtual double Dot(const double * p_other) const override;
+        virtual double Dot(const math::UnorientedConstVectorReference<double>& vector) const override;
 
         /// <summary>
-        /// Performs the operation: (*p_other) += scalar * (*this), where other is an array of doubles.
+        /// Performs the operation: vector += scalar * (*this), where other is an array of doubles.
         /// </summary>
         ///
-        /// <param name="p_other"> [in,out] The other vector. </param>
+        /// <param name="vector"> [in,out] The vector that this DataVector is added to. </param>
         /// <param name="scalar"> The scalar. </param>
-        virtual void AddTo(double * p_other, double scalar = 1.0) const override;
+        virtual void AddTo(math::RowVectorReference<double>& vector, double scalar = 1.0) const override;
 
         /// <summary> Copies the contents of this DataVector into a double array. </summary>
         ///
@@ -107,24 +107,26 @@ namespace data
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
         /// <typeparam name="ReturnType"> The return type. </typeparam>
+        /// <typeparam name="ArgTypes"> Type of the argument. </typeparam>
+        /// <param name="args"> Variable number of arguments, forwarded as is to the underlying datavector. </param>
         ///
-        /// <returns> This new data vector. </returns>
-        template<typename ReturnType>
-        ReturnType DeepCopyAs() const;
+        /// <returns> The new data vector. </returns>
+        template <typename ReturnType, typename... ArgTypes>
+        ReturnType DeepCopyAs(ArgTypes... args) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write to. </param>
-        virtual void Print(std::ostream & os) const override;
+        virtual void Print(std::ostream& os) const override;
 
     private:
         // helper function used by ctors to choose the type of data vector to use
         void FindBestRepresentation(DefaultDataVectorType defaultDataVector);
 
-        template<typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
+        template <typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
         void SetInternal(DefaultDataVectorType defaultDataVector);
 
-        template<typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
+        template <typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
         void SetInternal(DefaultDataVectorType defaultDataVector);
 
         // members

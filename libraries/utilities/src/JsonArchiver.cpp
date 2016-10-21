@@ -121,7 +121,7 @@ namespace utilities
             }
         }
         _out << "]";
-       SetEndOfLine(",\n");
+        SetEndOfLine(",\n");
     }
 
     void JsonArchiver::Indent()

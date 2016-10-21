@@ -16,7 +16,7 @@
 #include "Exception.h"
 #include "IArchivable.h"
 
-// linear
+// data
 #include "IndexValue.h"
 
 // stl

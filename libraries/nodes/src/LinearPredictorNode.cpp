@@ -67,7 +67,7 @@ namespace nodes
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
 
-        auto weightsNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetWeights());
+        auto weightsNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetWeights().ToArray());
         auto dotProductNode = transformer.AddNode<DotProductNode<double>>(weightsNode->output, newPortElements);
         auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<double>>(weightsNode->output, newPortElements, BinaryOperationType::coordinatewiseMultiply);
         auto biasNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetBias());
@@ -82,7 +82,7 @@ namespace nodes
     {
         auto inputDataVector = LinearPredictor::DataVectorType(_input.GetIterator());
         _output.SetOutput({ _predictor.Predict(inputDataVector) });
-        _weightedElements.SetOutput(_predictor.GetWeightedElements(inputDataVector));
+        _weightedElements.SetOutput(_predictor.GetWeightedElements(inputDataVector).ToArray());
     }
 
     LinearPredictorNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer)

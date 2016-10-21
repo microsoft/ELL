@@ -29,41 +29,22 @@ namespace data
     }
 
     template <typename ElementType, typename IntegerListType>
-    template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
     SparseDataVector<ElementType, IntegerListType>::SparseDataVector(IndexValueIteratorType indexValueIterator)
     {
-        while (indexValueIterator.IsValid())
-        {
-            auto indexValue = indexValueIterator.Get();
-            SparseDataVector<ElementType, IntegerListType>::AppendElement(indexValue.index, indexValue.value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
-            indexValueIterator.Next();
-        }
+        AppendElements(std::move(indexValueIterator));
     }
 
     template <typename ElementType, typename IntegerListType>
-    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<linear::IndexValue> list)
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<IndexValue> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        while(current < end)
-        {
-            SparseDataVector<ElementType, IntegerListType>::AppendElement(current->index, current->value); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
-            ++current;
-        }
+        AppendElements(std::move(list));
     }
 
     template <typename ElementType, typename IntegerListType>
     SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::initializer_list<double> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        size_t index = 0;
-        while(current < end)
-        {
-            SparseDataVector<ElementType, IntegerListType>::AppendElement(index, *current); // explicit call to SparseDataVector<ElementType, IntegerListType>::AppendElement is given to avoid virtual function call in Ctor
-            ++current;
-            ++index;
-        }
+        AppendElements(std::move(list));
     }
 
     template <typename ElementType, typename IntegerListType>
@@ -83,9 +64,9 @@ namespace data
         ElementType storedValue = static_cast<ElementType>(value);
         assert(storedValue - value <= 1.0e-6 && value - storedValue <= 1.0e-6);
 
-        if(_indices.Size() > 0)
+        if (_indices.Size() > 0)
         {
-            if(index <= _indices.Max())
+            if (index <= _indices.Max())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only append values to the end of a data vector");
             }

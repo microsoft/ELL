@@ -11,9 +11,6 @@
 // testing
 #include "testing.h"
 
-// linear
-#include "DoubleVector.h"
-
 using namespace emll;
 
 void ForestPredictorTest()

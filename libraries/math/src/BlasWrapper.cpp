@@ -23,7 +23,7 @@ namespace math
         {
             cblas_dcopy(n, x, incx, y, incy);
         }
-        
+
         float Asum(int n, const float* x, int incx)
         {
             return cblas_sasum(n, x, incx);

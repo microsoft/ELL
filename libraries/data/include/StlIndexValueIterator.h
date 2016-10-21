@@ -1,14 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StlIndexValueIterator.h (linear)
+//  File:     StlIndexValueIterator.h (data)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-// linear
 #include "IndexValue.h"
 
 // stl
@@ -19,11 +18,10 @@
 
 namespace emll
 {
-namespace linear
+namespace data
 {
     /// <summary> A read-only forward index-value iterator for an STL container </summary>
-
-    template <typename IteratorType, typename ValueType = decltype(*std::declval<IteratorType>())>
+    template <typename IteratorType>
     class StlIndexValueIterator : public IIndexValueIterator
     {
     public:
@@ -44,7 +42,7 @@ namespace linear
         /// <summary> Returns The current index-value pair </summary>
         ///
         /// <returns> The current index-value pair </returns>
-        linear::IndexValue Get() const { return linear::IndexValue{ _index, (double)*_begin }; }
+        IndexValue Get() const { return IndexValue{ _index, (double)*_begin }; }
 
     protected:
         IteratorType _begin;

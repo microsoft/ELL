@@ -9,9 +9,9 @@
 #pragma once
 
 // stl
-#include <vector>
-#include <iostream>
 #include <cmath>
+#include <iostream>
+#include <vector>
 
 namespace emll
 {
@@ -48,12 +48,11 @@ namespace math
         static constexpr VectorOrientation transposeOrientation = VectorOrientation::row;
     };
 
-    /// <summary> A reference to a constant algebraic vector. </summary>
+    /// <summary> Represents a constant reference to a vector, without a specified row or column orientation. </summary>
     ///
-    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
-    /// <typeparam name="Orientation"> The orientation. </typeparam>
-    template <typename ElementType, VectorOrientation Orientation>
-    class ConstVectorReference : public VectorBase<Orientation>
+    /// <typeparam name="ElementType"> ElementType. </typeparam>
+    template <typename ElementType>
+    class UnorientedConstVectorReference
     {
     public:
         /// <summary> Gets a const pointer to the underlying data storage. </summary>
@@ -78,6 +77,37 @@ namespace math
         /// <returns> The vector size. </returns>
         size_t Size() const { return _size; }
 
+        /// <summary> Convert this vector into an array. </summary>
+        ///
+        /// <returns> An array that represents the data in this object. </returns>
+        std::vector<ElementType> ToArray() const;
+
+        /// <summary> Applies a map to each vector element and sums the result. </summary>
+        ///
+        /// <typeparam name="MapperType"> A functor type of the mapper. </typeparam>
+        /// <param name="mapper"> The mapper. </param>
+        ///
+        /// <returns> The result of the operation. </returns>
+        template <typename MapperType>
+        ElementType Aggregate(MapperType mapper) const;
+
+    protected:
+        UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
+        void Swap(UnorientedConstVectorReference<ElementType>& other);
+
+        ElementType* _pData;
+        size_t _size;
+        size_t _increment;
+    };
+
+    /// <summary> A reference to a constant algebraic vector. </summary>
+    ///
+    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="Orientation"> The orientation. </typeparam>
+    template <typename ElementType, VectorOrientation Orientation>
+    class ConstVectorReference : public VectorBase<Orientation>, public UnorientedConstVectorReference<ElementType>
+    {
+    public:
         /// <summary> Gets a reference to this vector. </summary>
         ///
         /// <returns> A constant reference to this vector. </returns>
@@ -118,26 +148,16 @@ namespace math
         /// <returns> true if the vectors are not considered equivalent. </returns>
         bool operator!=(const ConstVectorReference<ElementType, Orientation>& other) const;
 
-        /// <summary> Applies a map to each vector element and sums the result. </summary>
-        ///
-        /// <typeparam name="MapperType"> A functor type of the mapper. </typeparam>
-        /// <param name="mapper"> The mapper. </param>
-        ///
-        /// <returns> The result of the operation. </returns>
-        template <typename MapperType>
-        ElementType Aggregate(MapperType mapper) const;
-
     protected:
-        ConstVectorReference(ElementType* pData, size_t size, size_t increment);
+        using UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference;
+        using UnorientedConstVectorReference<ElementType>::_pData;
+        using UnorientedConstVectorReference<ElementType>::_size;
+        using UnorientedConstVectorReference<ElementType>::_increment;
 
         template <typename T>
         friend class RectangularMatrixBase;
 
         friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
-
-        ElementType* _pData;
-        size_t _size;
-        size_t _increment;
     };
 
     /// <summary> A reference to a non-constant algebraic vector. </summary>
@@ -235,10 +255,34 @@ namespace math
         /// <param name="size"> The vector size. </param>
         Vector(size_t size);
 
+        Vector(std::vector<ElementType> data);
+
         /// <summary> Constructs a vector from an initializer list. </summary>
         ///
         /// <param name="list"> The initalizer list. </param>
         Vector(std::initializer_list<ElementType> list);
+
+        /// <summary> Move Constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The vector being moved. </param>
+        Vector(Vector<ElementType, Orientation>&& other);
+
+        /// <summary> Copy Constructor. </summary>
+        ///
+        /// <param name="other"> [in,out] The vector being copied. </param>
+        Vector(const Vector<ElementType, Orientation>& other);
+
+        /// <summary> Assignment operator. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        ///
+        /// <returns> A reference to this vector. </returns>
+        Vector<ElementType, Orientation>& operator=(Vector<ElementType, Orientation> other);
+
+        /// <summary> Swaps the contents of this vector with the contents of another vector. </summary>
+        ///
+        /// <param name="other"> [in,out] The other vector. </param>
+        void Swap(Vector<ElementType, Orientation>& other);
 
     private:
         using ConstVectorReference<ElementType, Orientation>::_pData;
@@ -255,6 +299,18 @@ namespace math
 
     template <typename ElementType>
     using RowVector = Vector<ElementType, VectorOrientation::row>;
+
+    template <typename ElementType>
+    using ColumnVectorReference = VectorReference<ElementType, VectorOrientation::column>;
+
+    template <typename ElementType>
+    using RowVectorReference = VectorReference<ElementType, VectorOrientation::row>;
+
+    template <typename ElementType>
+    using ColumnConstVectorReference = ConstVectorReference<ElementType, VectorOrientation::column>;
+
+    template <typename ElementType>
+    using RowConstVectorReference = ConstVectorReference<ElementType, VectorOrientation::row>;
 }
 }
 #include "../tcc/Vector.tcc"

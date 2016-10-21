@@ -23,41 +23,22 @@ namespace data
     }
 
     template <typename IntegerListType>
-    template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
     SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
-        while (indexValueIterator.IsValid())
-        {
-            auto indexValue = indexValueIterator.Get();
-            SparseBinaryDataVectorBase<IntegerListType>::AppendElement(indexValue.index, indexValue.value); // explicit call to SparseBinaryDataVectorBase<ElementType>::AppendElement is given to avoid virtual function call in Ctor
-            indexValueIterator.Next();
-        }
+        AppendElements(std::move(indexValueIterator));
     }
 
-    template<typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<linear::IndexValue> list)
+    template <typename IntegerListType>
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<IndexValue> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        while(current < end)
-        {
-            SparseBinaryDataVectorBase<IntegerListType>::AppendElement(current->index, current->value);
-            ++current;
-        }
+        AppendElements(std::move(list));
     }
 
-    template<typename IntegerListType>
+    template <typename IntegerListType>
     SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<double> list)
     {
-        auto current = list.begin();
-        auto end = list.end();
-        size_t index = 0;
-        while(current < end)
-        {
-            SparseBinaryDataVectorBase<IntegerListType>::AppendElement(index, *current);
-            ++current;
-            ++index;
-        }
+        AppendElements(std::move(list));
     }
 
     template <typename IntegerListType>
@@ -87,14 +68,14 @@ namespace data
     }
 
     template <typename IntegerListType>
-    double SparseBinaryDataVectorBase<IntegerListType>::Dot(const double* p_other) const
+    double SparseBinaryDataVectorBase<IntegerListType>::Dot(const math::UnorientedConstVectorReference<double>& vector) const
     {
         double value = 0.0;
 
         auto iter = _indices.GetIterator();
         while (iter.IsValid())
         {
-            value += (double)p_other[iter.Get()];
+            value += vector[iter.Get()];
             iter.Next();
         }
 
@@ -102,12 +83,12 @@ namespace data
     }
 
     template <typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::AddTo(double* p_other, double scalar) const
+    void SparseBinaryDataVectorBase<IntegerListType>::AddTo(math::RowVectorReference<double>& vector, double scalar) const
     {
         auto iter = _indices.GetIterator();
         while (iter.IsValid())
         {
-            p_other[iter.Get()] += scalar;
+            vector[iter.Get()] += scalar;
             iter.Next();
         }
     }

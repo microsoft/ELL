@@ -71,8 +71,8 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-		/// <summary>Return the window size</summary>
-		size_t GetWindowSize() const { return _windowSize; }
+        /// <summary>Return the window size</summary>
+        size_t GetWindowSize() const { return _windowSize; }
 
     protected:
         virtual void Compute() const override;

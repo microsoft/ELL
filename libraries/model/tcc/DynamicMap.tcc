@@ -113,7 +113,7 @@ namespace model
     OutputDataVectorType DynamicMap::ComputeOutput(const PortElementsBase& elements) const
     {
         auto resultVector = ComputeOutput<ElementsValueType>(elements);
-        auto resultVectorIterator = linear::MakeVectorIndexValueIterator(resultVector);
+        auto resultVectorIterator = data::MakeVectorIndexValueIterator(resultVector);
         return { resultVectorIterator };
     }
 

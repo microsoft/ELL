@@ -15,7 +15,7 @@ namespace data
     /// <summary> Interface for example iterators. </summary>
     ///
     /// <typeparam name="ExampleType"> Example type. </typeparam>
-    template<typename ExampleType>
+    template <typename ExampleType>
     struct IExampleIterator
     {
         virtual ~IExampleIterator() = default;
@@ -37,14 +37,14 @@ namespace data
     /// <summary> An example iterator that wraps an IExampleIterator. </summary>
     ///
     /// <typeparam name="ExampleType"> Example type. </typeparam>
-    template<typename ExampleType>
+    template <typename ExampleType>
     class ExampleIterator
     {
     public:
         /// <summary> Constructs an instance of ExampleIterator. </summary>
         ///
         /// <param name="iterator"> Shared pointer to an IExampleIterator. </param>
-        ExampleIterator(std::unique_ptr<IExampleIterator<ExampleType>>&& iterator); 
+        ExampleIterator(std::unique_ptr<IExampleIterator<ExampleType>>&& iterator);
 
         ExampleIterator(ExampleIterator<ExampleType>&&) = default;
 
@@ -54,7 +54,7 @@ namespace data
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if the iterator is currently pointing to a valid iterate. </returns>
-        bool IsValid() const { return _iterator->IsValid();  }
+        bool IsValid() const { return _iterator->IsValid(); }
 
         /// <summary> Proceeds to the Next iterate. </summary>
         void Next() { _iterator->Next(); }

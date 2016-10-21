@@ -365,7 +365,7 @@ void TestLinearPredictorNodeRefine()
     size_t dim = 3;
     predictors::LinearPredictor predictor(dim);
     predictor.GetBias() = 2.0;
-    predictor.GetWeights() = std::vector<double>{ 3.0, 4.0, 5.0 };
+    predictor.GetWeights() = math::ColumnVector<double>{ 3.0, 4.0, 5.0 };
 
     // make a model
     model::Model model;

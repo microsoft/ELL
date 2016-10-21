@@ -1,35 +1,35 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     StlIndexValueIteratorAdapter.h (linear)
+//  File:     StlIndexValueIteratorAdapter.h (data)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace emll
 {
-namespace linear
+namespace data
 {
     //
     // StlIndexValueIterator implementation
     //
-    template <typename IteratorType, typename ValueType>
-    StlIndexValueIterator<IteratorType, ValueType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end)
+    template <typename IteratorType>
+    StlIndexValueIterator<IteratorType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end)
         : _begin(begin), _end(end), _index(0)
     {
         SkipZeros();
     }
 
-    template <typename IteratorType, typename ValueType>
-    void StlIndexValueIterator<IteratorType, ValueType>::Next()
+    template <typename IteratorType>
+    void StlIndexValueIterator<IteratorType>::Next()
     {
         ++_begin;
         ++_index;
         SkipZeros();
     }
 
-    template <typename IteratorType, typename ValueType>
-    void StlIndexValueIterator<IteratorType, ValueType>::SkipZeros()
+    template <typename IteratorType>
+    void StlIndexValueIterator<IteratorType>::SkipZeros()
     {
         while (_begin < _end && *_begin == 0)
         {

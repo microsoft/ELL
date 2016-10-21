@@ -22,7 +22,7 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC})
 target_include_directories(${PROJ_NAME} PRIVATE include)
-target_link_libraries(${PROJ_NAME} common data linear lossFunctions model predictors trainers evaluators utilities)
+target_link_libraries(${PROJ_NAME} common data lossFunctions model predictors trainers evaluators utilities)
 
 # put this project in the trainers folder in the IDE 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")

@@ -7,15 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DataVector.h"
+#include "IndexValue.h"
 
 #ifndef SPARSEDATAVECTOR_H
 #define SPARSEDATAVECTOR_H
 
 // utilities
 #include "CompressedIntegerList.h"
-
-// linear
-#include "IndexValue.h"
 
 // stl
 #include <cstdint>
@@ -35,7 +33,7 @@ namespace data
     {
     public:
         /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
-        class Iterator : public linear::IIndexValueIterator
+        class Iterator : public IIndexValueIterator
         {
         public:
             Iterator(const Iterator&) = default;
@@ -53,7 +51,7 @@ namespace data
             /// <summary> Returns The current index-value pair. </summary>
             ///
             /// <returns> An IndexValue. </returns>
-            linear::IndexValue Get() const { return linear::IndexValue{ _index_iterator.Get(), (double)*_value_iterator }; }
+            IndexValue Get() const { return IndexValue{ _index_iterator.Get(), (double)*_value_iterator }; }
 
         private:
             // define typenames to improve readability
@@ -75,17 +73,17 @@ namespace data
 
         SparseDataVector(const SparseDataVector<ElementType, IntegerListType>& other) = delete;
 
-        /// <summary> Constructs a sparse data vector from an index value iterator. </summary>
+        /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
         /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept = true>
+        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         SparseDataVector(IndexValueIteratorType indexValueIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
         /// <param name="list"> The initializer list. </param>
-        SparseDataVector(std::initializer_list<linear::IndexValue> list);
+        SparseDataVector(std::initializer_list<IndexValue> list);
 
         /// <summary> Constructs a data vector from an initializer list of values. </summary>
         ///
@@ -113,6 +111,7 @@ namespace data
         virtual size_t PrefixLength() const override;
 
     private:
+        using DataVectorBase<SparseDataVector<ElementType, IntegerListType>>::AppendElements;
         IntegerListType _indices;
         std::vector<ElementType> _values;
     };

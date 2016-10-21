@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DataVector_test.h"
-#include "Example_test.h"
 #include "Dataset_test.h"
+#include "Example_test.h"
 
 // testing
 #include "testing.h"

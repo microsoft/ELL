@@ -21,7 +21,6 @@ namespace utilities
     class StlReferenceIterator
     {
     public:
-
         StlReferenceIterator() = default;
 
         /// <summary> Constructor </summary>

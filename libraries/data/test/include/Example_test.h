@@ -10,5 +10,5 @@
 
 namespace emll
 {
-    void CopyAsTests();
+void CopyAsTests();
 }

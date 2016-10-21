@@ -10,80 +10,80 @@
 #define SPARSE_THRESHOLD 0.2
 
 #include "DenseDataVector.h"
-#include "SparseDataVector.h"
 #include "SparseBinaryDataVector.h"
+#include "SparseDataVector.h"
 
 namespace emll
 {
 namespace data
 {
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(DefaultDataVectorType&& vector)
     {
         FindBestRepresentation(std::move(vector));
     }
 
-    template<typename DefaultDataVectorType>
-    template<typename IndexValueIteratorType, linear::IsIndexValueIterator<IndexValueIteratorType> Concept>
+    template <typename DefaultDataVectorType>
+    template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
     AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
-        DefaultDataVectorType defaultDataVector(indexValueIterator);
+        DefaultDataVectorType defaultDataVector(std::move(indexValueIterator));
         FindBestRepresentation(std::move(defaultDataVector));
     }
 
-    template<typename DefaultDataVectorType>
-    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(std::initializer_list<linear::IndexValue> list)
+    template <typename DefaultDataVectorType>
+    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(std::initializer_list<IndexValue> list)
     {
-        DefaultDataVectorType defaultDataVector(list);
+        DefaultDataVectorType defaultDataVector(std::move(list));
         FindBestRepresentation(std::move(defaultDataVector));
     }
 
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(std::initializer_list<double> list)
     {
-        DefaultDataVectorType defaultDataVector(list);
+        DefaultDataVectorType defaultDataVector(std::move(list));
         FindBestRepresentation(std::move(defaultDataVector));
     }
 
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     void AutoDataVectorBase<DefaultDataVectorType>::AppendElement(size_t index, double value)
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Append element not supported for AutoDataVector");
     }
 
-    template<typename DefaultDataVectorType>
-    double AutoDataVectorBase<DefaultDataVectorType>::Dot(const double * p_other) const
+    template <typename DefaultDataVectorType>
+    double AutoDataVectorBase<DefaultDataVectorType>::Dot(const math::UnorientedConstVectorReference<double>& vector) const
     {
-        return _pInternal->Dot(p_other);
+        return _pInternal->Dot(vector);
     }
 
-    template<typename DefaultDataVectorType>
-    void AutoDataVectorBase<DefaultDataVectorType>::AddTo(double * p_other, double scalar) const
+    template <typename DefaultDataVectorType>
+    void AutoDataVectorBase<DefaultDataVectorType>::AddTo(math::RowVectorReference<double>& vector, double scalar) const
     {
-        _pInternal->AddTo(p_other, scalar);
+        _pInternal->AddTo(vector, scalar);
     }
 
-    template<typename DefaultDataVectorType>
-    void AutoDataVectorBase<DefaultDataVectorType>::Print(std::ostream & os) const
+    template <typename DefaultDataVectorType>
+    void AutoDataVectorBase<DefaultDataVectorType>::Print(std::ostream& os) const
     {
         _pInternal->Print(os);
     }
 
-    template<typename DefaultDataVectorType>
-    template<typename ReturnType>
-    ReturnType AutoDataVectorBase<DefaultDataVectorType>::DeepCopyAs() const 
+    template <typename DefaultDataVectorType>
+    template <typename ReturnType, typename... ArgTypes>
+    ReturnType AutoDataVectorBase<DefaultDataVectorType>::DeepCopyAs(ArgTypes... args) const
     {
-        return _pInternal->DeepCopyAs<ReturnType>();
+        return _pInternal->DeepCopyAs<ReturnType>(args...);
     }
 
-    template<typename TargetType>
+    template <typename TargetType>
     bool DoesCastModifyValue(double value)
     {
         double target = static_cast<double>(static_cast<TargetType>(value));
         return (target - value > APPROXIMATION_TOLERANCE) || (value - target > APPROXIMATION_TOLERANCE);
     }
 
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     void AutoDataVectorBase<DefaultDataVectorType>::FindBestRepresentation(DefaultDataVectorType defaultDataVector)
     {
         size_t numNonZeros = 0;
@@ -106,7 +106,7 @@ namespace data
             iter.Next();
         }
 
-        // dense 
+        // dense
         if (numNonZeros > SPARSE_THRESHOLD * defaultDataVector.PrefixLength())
         {
             if (includesNonFloats)
@@ -142,7 +142,7 @@ namespace data
             {
                 SetInternal<SparseShortDataVector>(std::move(defaultDataVector));
             }
-            else if(includesNonBinary)
+            else if (includesNonBinary)
             {
                 SetInternal<SparseByteDataVector>(std::move(defaultDataVector));
             }
@@ -153,15 +153,15 @@ namespace data
         }
     }
 
-    template<typename DefaultDataVectorType>
-    template<typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept>
+    template <typename DefaultDataVectorType>
+    template <typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept>
     void AutoDataVectorBase<DefaultDataVectorType>::SetInternal(DefaultDataVectorType defaultDataVector)
     {
         _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator());
     }
 
-    template<typename DefaultDataVectorType>
-    template<typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept>
+    template <typename DefaultDataVectorType>
+    template <typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept>
     void AutoDataVectorBase<DefaultDataVectorType>::SetInternal(DefaultDataVectorType defaultDataVector)
     {
         _pInternal = std::make_unique<DefaultDataVectorType>(std::move(defaultDataVector));

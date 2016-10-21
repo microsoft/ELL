@@ -53,7 +53,7 @@ namespace trainers
 
         // calulate the contribution of the old lastPredictor to the new avergedPredictor
         const double historyWeight = sigma - std::log(T_prev) - 0.5 / T_prev;
-        vLast.AddTo(vAvg, historyWeight);
+        math::Operations::Add(historyWeight, vLast, vAvg);
         bAvg += bLast * historyWeight;
         while (exampleIterator.IsValid())
         {
@@ -74,11 +74,13 @@ namespace trainers
 
             // Update vLast and vAvg
             double lastCoeff = -eta * beta;
-            dataVector.AddTo(vLast.GetDataPointer(), lastCoeff);
+            auto vLastTranspose = vLast.Transpose();
+            dataVector.AddTo(vLastTranspose, lastCoeff);
             bLast += lastCoeff;
 
             double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
-            dataVector.AddTo(vAvg.GetDataPointer(), avgCoeff);
+            auto vAvgTranspose = vAvg.Transpose(); 
+            dataVector.AddTo(vAvgTranspose, avgCoeff);
             bAvg += avgCoeff;
 
             exampleIterator.Next();
@@ -88,9 +90,9 @@ namespace trainers
 
         // calculate w and w_avg
         double scale = T_prev / T_next;
-        vLast.Scale(scale);
+        math::Operations::Multiply(scale, vLast);
         bLast *= scale;
-        vAvg.Scale(scale);
+        math::Operations::Multiply(scale, vAvg);
         bAvg *= scale;
     }
 
@@ -123,7 +125,7 @@ namespace trainers
 
             // update last
             double scaleCoefficient = 1.0 - 1.0 / t;
-            vLast.Scale(scaleCoefficient); // dense operation
+            math::Operations::Multiply(scaleCoefficient, vLast);
             bLast *= scaleCoefficient;
 
             double updateCoefficient = -beta / t / _parameters.regularization;
@@ -132,7 +134,7 @@ namespace trainers
 
             // update average
             double averageingCoefficient = (t - 1) / t;
-            vAvg.Scale(averageingCoefficient); // dense operation
+            math::Operations::Multiply(averageingCoefficient, vAvg);
             bAvg *= averageingCoefficient;
             vLast.AddTo(vAvg.GetDataPointer(), 1 / t); // dense operation
             bAvg += bLast / t;

@@ -38,7 +38,7 @@ namespace utilities
     using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
 
     template <typename ValueType>
-    using IsIntegral = typename std::enable_if_t<std::is_integral<typename std::decay<ValueType>::type>::value && !std::is_same<typename std::decay<ValueType>::type , bool>::value && !std::is_same<typename std::decay<ValueType>::type , char>::value, bool>;
+    using IsIntegral = typename std::enable_if_t<std::is_integral<typename std::decay<ValueType>::type>::value && !std::is_same<typename std::decay<ValueType>::type, bool>::value && !std::is_same<typename std::decay<ValueType>::type, char>::value, bool>;
 
     template <typename ValueType>
     using IsFloatingPoint = typename std::enable_if_t<std::is_floating_point<typename std::decay<ValueType>::type>::value, bool>;
@@ -62,7 +62,6 @@ namespace utilities
     /// <summary> Enabled if the two classes are different. </summary>
     template <typename T, typename S>
     using IsDifferent = typename std::enable_if_t<!std::is_same<T, S>::value, bool>;
-
 }
 }
 

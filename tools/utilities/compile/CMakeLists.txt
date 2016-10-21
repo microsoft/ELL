@@ -28,6 +28,6 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PRIVATE include)
-target_link_libraries(${PROJ_NAME} utilities model linear common)
+target_link_libraries(${PROJ_NAME} utilities model common)
 
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")

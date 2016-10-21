@@ -33,7 +33,7 @@ namespace nodes
         sqrt, // real only
         logicalNot // bool only
     };
-    
+
     /// <summary> A node that represents a unary function of its input </summary>
     template <typename ValueType>
     class UnaryOperationNode : public model::Node
