@@ -81,6 +81,8 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
+        void Reset() const;
+
         struct UseRawThreshold {};
 
     public:
@@ -88,21 +90,19 @@ namespace nodes
         DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype, double threshold, UseRawThreshold);
 
     protected:
-
         // private:
-        // Inputs
         model::InputPort<ValueType> _input;
-
-        // Output
         model::OutputPort<ValueType> _output;
 
-        std::vector<std::vector<ValueType>> _prototype;
-
-        double _threshold;
-        mutable std::vector<ValueType> _dPrev;
-        mutable std::vector<ValueType> _d;
         size_t _sampleDimension;
         size_t _prototypeLength;
+        std::vector<std::vector<ValueType>> _prototype;
+        double _threshold;
+        double _prototypeVariance;
+
+        mutable std::vector<ValueType> _d;
+        mutable std::vector<int> _s;
+        mutable int _currentT;
     };
 }
 }
