@@ -102,7 +102,7 @@ namespace nodes
 
         mutable std::vector<ValueType> _d;
         mutable std::vector<int> _s;
-        mutable int _currentT;
+        mutable int _currentTime;
     };
 }
 }

@@ -30,7 +30,7 @@ namespace nodes
 
         // TODO: compute threshold from confidenceThreshold and variance of sample
         _prototypeVariance = 392.0529540761332; //this is the variance of the nextSlidePrototype
-        _threshold = std::sqrt(-2 * std::log(confidenceThreshold)) * variance;
+        _threshold = std::sqrt(-2 * std::log(confidenceThreshold)) * _prototypeVariance;
         Reset();
     }
 
@@ -54,7 +54,7 @@ namespace nodes
         std::fill(_d.begin() + 1, _d.end(), 1e10);
         _d[0] = 0.0;
         std::fill(_s.begin(), _s.end(), 0);
-        _currentT = 0;
+        _currentTime = 0;
     }
 
     template <typename T>
@@ -100,14 +100,17 @@ namespace nodes
                 bestStart = sPrev_iMinus1;
             }
             bestDist += distance(_prototype[index - 1], input);
+            
+            _d[index] = bestDist;
+            _s[index] = bestStart;
         }
         assert(bestDist == _d[_prototypeLength]);
         assert(bestStart == _s[_prototypeLength]);
-        auto result = bestDist / _variance;
+        auto result = bestDist / _prototypeVariance;
 
         // Ensure best match is between 80% and 120% of prototype length
         auto timeDiff = _currentTime - bestStart;
-        if (timeDiff < DTW->prototypeSize * 0.8 || timeDiff > DTW->prototypeSize * 1.2)
+        if (timeDiff < _prototypeLength * 0.8 || timeDiff > _prototypeLength * 1.2)
         {
             bestDist = 1e10;
         }
