@@ -76,11 +76,6 @@ namespace model
         return _outputElements[outputIndex].Size();
     }
 
-    size_t DynamicMap::GetOutputSize(int outputIndex) const
-    {
-        return GetOutputSize(static_cast<size_t>(outputIndex));
-    }
-
     size_t DynamicMap::GetOutputSize(const std::string& outputName) const
     {
         auto iter = _outputElementsMap.find(outputName);

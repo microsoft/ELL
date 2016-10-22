@@ -437,4 +437,4 @@ namespace math
 }
 }
 #include "../tcc/Matrix.tcc"
-#endif MATRIX_H
+#endif
