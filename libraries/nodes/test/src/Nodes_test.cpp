@@ -437,7 +437,7 @@ void TestDTWNodeCompute()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto prototype = GetNextSlidePrototype();
-    auto dtwNode = model.AddNode<nodes::DTWNode<double>>(inputNode->output, prototype, 0.2);
+    auto dtwNode = model.AddNode<nodes::DTWNode<double>>(inputNode->output, prototype);
 
     //
     auto prototypeLength = prototype.size();

@@ -47,7 +47,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         /// <param name="input1"> One of the signals to take the dot product of </param>
         /// <param name="input2"> The other signal to take the dot product of </param>
-        DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype, double confidenceThreshold);
+        DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -83,13 +83,6 @@ namespace nodes
         virtual void Compute() const override;
         void Reset() const;
 
-        struct UseRawThreshold {};
-
-    public:
-        /// <summary> Constructor for internal use only </summary>
-        DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype, double threshold, UseRawThreshold);
-
-    protected:
         // private:
         model::InputPort<ValueType> _input;
         model::OutputPort<ValueType> _output;
@@ -97,7 +90,7 @@ namespace nodes
         size_t _sampleDimension;
         size_t _prototypeLength;
         std::vector<std::vector<ValueType>> _prototype;
-        double _threshold;
+        // double _threshold;
         double _prototypeVariance;
 
         mutable std::vector<ValueType> _d;

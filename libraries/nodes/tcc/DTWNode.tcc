@@ -10,34 +10,35 @@ namespace emll
 {
 namespace nodes
 {
-    template <typename ValueType>
-    ValueType Variance(const std::vector<std::vector<ValueType>>& prototype)
+    namespace DTWNodeImpl
     {
-        ValueType sum = 0; // sum(x)
-        ValueType sumSquares = 0; // sum(x^2)
-        size_t size = 0;
-        for(const auto& vec: prototype)
+        template <typename ValueType>
+        double Variance(const std::vector<std::vector<ValueType>>& prototype)
         {
-            size += vec.size();
-            for(auto x: vec)
+            double sum = 0; // sum(x)
+            double sumSquares = 0; // sum(x^2)
+            size_t size = 0;
+            for(const auto& vec: prototype)
             {
-                sum += x;
-                sumSquares += (x*x);
+                size += vec.size();
+                for(auto x: vec)
+                {
+                    sum += x;
+                    sumSquares += (x*x);
+                }
             }
-        }
-        return (sumSquares - ((sum*sum) / size)) / size;
-    }    
-
-
+            return (sumSquares - ((sum*sum) / size)) / size;
+        }    
+    }
 
     template <typename ValueType>
     DTWNode<ValueType>::DTWNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _sampleDimension(0), _prototypeLength(0), _threshold(0)
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _sampleDimension(0), _prototypeLength(0), _prototypeVariance(0)
     {
     }
 
     template <typename ValueType>
-    DTWNode<ValueType>::DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype, double confidenceThreshold)
+    DTWNode<ValueType>::DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype)
         : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _prototype(prototype)
     {
         _sampleDimension = input.Size();
@@ -48,27 +49,8 @@ namespace nodes
         std::fill(_d.begin() + 1, _d.end(), 99999.0);
         _d[0] = 0.0;
 
-        // TODO: compute threshold from confidenceThreshold and variance of sample
-        // _prototypeVariance = 392.0529540761332; //this is the variance of the nextSlidePrototype
-        _prototypeVariance = Variance(_prototype);
-        std::cout << "Prototype variance: " << _prototypeVariance << std::endl;
-        _threshold = std::sqrt(-2 * std::log(confidenceThreshold)) * _prototypeVariance;
-        Reset();
-    }
-
-    template <typename ValueType>
-    DTWNode<ValueType>::DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype, double threshold, UseRawThreshold)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _prototype(prototype)
-    {
-        _sampleDimension = input.Size();
-        _prototypeLength = prototype.size();
-        _d.resize(_prototypeLength + 1);
-        _s.resize(_prototypeLength + 1);
-
-        // _prototypeVariance = 392.0529540761332; //this is the variance of the nextSlidePrototype
-        _prototypeVariance = Variance(_prototype);
-        std::cout << "Prototype variance: " << _prototypeVariance << std::endl;
-        _threshold = threshold;
+        _prototypeVariance = DTWNodeImpl::Variance(_prototype);
+        // _threshold = std::sqrt(-2 * std::log(confidenceThreshold)) * _prototypeVariance;
         Reset();
     }
 
@@ -146,7 +128,7 @@ namespace nodes
     void DTWNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newinput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<DTWNode<ValueType>>(newinput, _prototype, _threshold, UseRawThreshold());
+        auto newNode = transformer.AddNode<DTWNode<ValueType>>(newinput, _prototype);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -158,7 +140,6 @@ namespace nodes
         archiver[outputPortName] << _output;
         // archiver["prototype"] << _prototype;
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        archiver["threshold"] << _threshold;
     }
 
     template <typename ValueType>
@@ -169,7 +150,6 @@ namespace nodes
         archiver[outputPortName] >> _output;
         // archiver["prototype"] >> _prototype;
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        archiver["threshold"] >> _threshold;
     }
 }
 }
