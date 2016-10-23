@@ -11,6 +11,26 @@ namespace emll
 namespace nodes
 {
     template <typename ValueType>
+    ValueType Variance(const std::vector<std::vector<ValueType>>& prototype)
+    {
+        ValueType sum = 0; // sum(x)
+        ValueType sumSquares = 0; // sum(x^2)
+        size_t size = 0;
+        for(const auto& vec: prototype)
+        {
+            size += vec.size();
+            for(auto x: vec)
+            {
+                sum += x;
+                sumSquares += (x*x);
+            }
+        }
+        return (sumSquares - ((sum*sum) / size)) / size;
+    }    
+
+
+
+    template <typename ValueType>
     DTWNode<ValueType>::DTWNode()
         : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _sampleDimension(0), _prototypeLength(0), _threshold(0)
     {
@@ -29,7 +49,9 @@ namespace nodes
         _d[0] = 0.0;
 
         // TODO: compute threshold from confidenceThreshold and variance of sample
-        _prototypeVariance = 392.0529540761332; //this is the variance of the nextSlidePrototype
+        // _prototypeVariance = 392.0529540761332; //this is the variance of the nextSlidePrototype
+        _prototypeVariance = Variance(_prototype);
+        std::cout << "Prototype variance: " << _prototypeVariance << std::endl;
         _threshold = std::sqrt(-2 * std::log(confidenceThreshold)) * _prototypeVariance;
         Reset();
     }
@@ -43,7 +65,9 @@ namespace nodes
         _d.resize(_prototypeLength + 1);
         _s.resize(_prototypeLength + 1);
 
-        _prototypeVariance = 392.0529540761332; //this is the variance of the nextSlidePrototype
+        // _prototypeVariance = 392.0529540761332; //this is the variance of the nextSlidePrototype
+        _prototypeVariance = Variance(_prototype);
+        std::cout << "Prototype variance: " << _prototypeVariance << std::endl;
         _threshold = threshold;
         Reset();
     }

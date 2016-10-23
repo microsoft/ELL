@@ -12,7 +12,6 @@
 
 std::vector<std::vector<double>> GetNextSlidePrototype()
 {
-
     return
     {
     {
