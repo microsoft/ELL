@@ -69,6 +69,24 @@ namespace model
         return _model.ComputeOutput<double>(outputs);
     }
 
+    template <>
+    std::vector<bool> DynamicMap::ComputeOutput<bool>(const PortElementsBase& elements) const
+    {
+        return ComputeBoolOutput(elements);
+    }
+
+    template <>
+    std::vector<int> DynamicMap::ComputeOutput<int>(const PortElementsBase& elements) const
+    {
+        return ComputeIntOutput(elements);
+    }
+
+    template <>
+    std::vector<double> DynamicMap::ComputeOutput<double>(const PortElementsBase& elements) const
+    {
+        return ComputeDoubleOutput(elements);
+    }
+
     void DynamicMap::AddInput(const std::string& inputName, InputNodeBase* inputNode)
     {
         _inputNodes.push_back(inputNode);
