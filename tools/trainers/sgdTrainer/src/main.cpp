@@ -94,25 +94,12 @@ int main(int argc, char* argv[])
         }
 
         // load map
+        size_t numColumns = dataLoadArguments.parsedDataDimension;
+        mapLoadArguments.defaultInputSize = dataLoadArguments.parsedDataDimension;
         model::DynamicMap map = common::LoadMap(mapLoadArguments);
 
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        size_t numColumns = dataLoadArguments.parsedDataDimension;
-
-        if (!mapLoadArguments.HasInputFile())
-        {
-            if (numColumns == 0)
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error, must specify a data dimension if not specifying an input map");
-            }
-
-            model::Model model;
-            auto inputNode = model.AddNode<model::InputNode<double>>(numColumns);
-            model::PortElements<double> outputElements(inputNode->output);
-            map = { model, { { "input", inputNode } }, { { "output", outputElements } } };
-        }
-
         auto mappedDataset = common::GetMappedDataset(dataLoadArguments, map);
         auto mappedDatasetDimension = map.GetOutputSize(0);
 

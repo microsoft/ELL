@@ -60,9 +60,6 @@ namespace trainers
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _internalTrainer->GetPredictor(); }
 
     private:
-        template <typename DatasetType, typename IteratorType>
-        void DoUpdate(IteratorType examleIterator);
-
         std::unique_ptr<InternalTrainerType> _internalTrainer;
         MultiEpochIncrementalTrainerParameters _parameters;
         mutable std::default_random_engine _random;

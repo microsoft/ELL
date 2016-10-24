@@ -56,6 +56,13 @@ namespace common
             "out",
             "Model outputs to use",
             "");
+
+        parser.AddOption(
+            defaultInputSize,
+            "defaultInputSize",
+            "d",
+            "Default size of input node",
+            1);
     }
 
     namespace

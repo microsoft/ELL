@@ -70,9 +70,6 @@ namespace evaluators
         /// <param name="aggregators"> The aggregators. </param>
         Evaluator(const data::AnyDataset& anyDataset, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
 
-        // template <typename IteratorType>
-        // Evaluator(IteratorType exampleIterator, const EvaluatorParameters& evaluatorParameters, AggregatorTypes... aggregators);
-
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
         ///
         /// <param name="predictor"> The predictor. </param>

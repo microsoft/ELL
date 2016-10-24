@@ -40,6 +40,9 @@ namespace common
         /// <summary> The outputs from the model to use. </summary>
         std::string modelOutputsString = "";
 
+        /// <summary> The default size for the input of a newly-generated map (e.g., if no model/map file is specified) </summary>
+        size_t defaultInputSize;
+        
         /// <summary> Query if the arguments specify a map file. </summary>
         ///
         /// <returns> true if the arguments specify a map file. </returns>
