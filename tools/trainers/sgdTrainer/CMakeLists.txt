@@ -34,7 +34,7 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (TEST_NAME ${PROJ_NAME}_test_1)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFile ${CMAKE_SOURCE_DIR}/examples/data/model_3.json --modelInputs 1012 --modelOutputs 1019.output -dd 3 --outputModelFilename sgdTrainer_model_3.json -v -ne 20)
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFile ${CMAKE_SOURCE_DIR}/examples/data/model_3.json --modelInputs 1024 --modelOutputs 1031.output -dd 3 --outputModelFilename sgdTrainer_model_3.json -v -ne 20)
 
 set (TEST_NAME ${PROJ_NAME}_test_2)
 add_test(NAME ${TEST_NAME}

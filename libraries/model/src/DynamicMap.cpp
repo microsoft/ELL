@@ -208,54 +208,6 @@ namespace model
         return transformer;
     }
 
-<<<<<<< HEAD
-=======
-    void DynamicMap::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
-    {
-        ModelTransformer transformer;
-
-        // gather output nodes
-        std::unordered_set<const Node*> outputNodes;
-        for (const auto& output : GetOutputs())
-        {
-            for (const auto& range : output.GetRanges())
-            {
-                outputNodes.insert(range.ReferencedPort()->GetNode());
-            }
-        }
-
-        auto refinedModel = transformer.TransformModel(_model, transformFunction, context);
-
-        for (auto& inputNode : _inputNodes)
-        {
-            auto refinedInput = transformer.GetCorrespondingInputNode(inputNode);
-            inputNode = refinedInput;
-        }
-
-        for (auto& inputNode : _inputNodeMap)
-        {
-            auto input = inputNode.second;
-            auto refinedInput = transformer.GetCorrespondingInputNode(input);
-            inputNode.second = refinedInput;
-        }
-
-        for (auto& outputElements : _outputElements)
-        {
-            auto refinedOutput = transformer.GetCorrespondingOutputs(outputElements);
-            outputElements = refinedOutput;
-        }
-
-        for (auto& outputElements : _outputElementsMap)
-        {
-            auto output = outputElements.second;
-            auto refinedOutput = transformer.GetCorrespondingOutputs(output);
-            outputElements.second = refinedOutput;
-        }
-
-        _model = refinedModel;
-    }
-
->>>>>>> 2050610... Added Prune function to maps
     void DynamicMap::WriteToArchive(utilities::Archiver& archiver) const
     {
         // Archive the model
