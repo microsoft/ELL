@@ -138,6 +138,7 @@ namespace model
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Refines the model wrapped by this map </summary>
+        virtual ModelTransformer DoPrune() override;
         virtual ModelTransformer DoRefine(const TransformContext& context) override;
 
     private:

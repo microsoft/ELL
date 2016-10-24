@@ -44,6 +44,7 @@ namespace model
     {
         AddInputs(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), inputs);
         AddOutputs(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), outputs);
+        this->Prune();
     }
 
     template <typename NamedInputTypesTuple, typename NamedOutputTypesTuple>
@@ -130,8 +131,19 @@ namespace model
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
+    ModelTransformer Map<InputTypesTuple, OutputTypesTuple>::DoPrune()
+    {
+        auto model = GetModel(); // IMPORTANT: keep this line here, it prevents memory from being freed too soon
+        ModelTransformer transformer = DynamicMap::DoPrune();
+        RemapInputNodes(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), transformer);
+        RemapOutputElements(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), transformer);
+        return transformer;
+    }
+
+    template <typename InputTypesTuple, typename OutputTypesTuple>
     ModelTransformer Map<InputTypesTuple, OutputTypesTuple>::DoRefine(const TransformContext& context)
     {
+        auto model = GetModel(); // IMPORTANT: keep this line here, it prevents memory from being freed too soon
         ModelTransformer transformer = DynamicMap::DoRefine(context);
         RemapInputNodes(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>(), transformer);
         RemapOutputElements(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), transformer);

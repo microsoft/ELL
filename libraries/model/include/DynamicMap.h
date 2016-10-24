@@ -275,11 +275,13 @@ namespace model
         void AddInput(const std::string& inputName, InputNodeBase* inputNode);
         void AddOutput(const std::string& outputName, PortElementsBase outputElements);
         void ResetOutput(size_t index, PortElementsBase outputElements);
+        void Prune(); // prune away unused parts of internal model
 
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        virtual ModelTransformer DoRefine(const TransformContext& context);
+        virtual ModelTransformer DoPrune(); // overridable prune implementation
+        virtual ModelTransformer DoRefine(const TransformContext& context); // overridable refine implementation
 
         virtual void SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const;
         virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const;
@@ -299,6 +301,9 @@ namespace model
         std::vector<PortElementsBase> _outputElements;
         std::vector<std::string> _outputNames;
         std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
+    
+        std::vector<const Node*> GetOutputNodes();
+        void FixTransformedIO(ModelTransformer& transformer);
     };
 
     /// <summary> A serialization context used during model deserialization. Wraps an existing `SerializationContext`

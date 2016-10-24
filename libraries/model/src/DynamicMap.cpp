@@ -35,6 +35,8 @@ namespace model
         {
             AddOutput(output.first, output.second);
         }
+
+        Prune();
     }
 
     void DynamicMap::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const
@@ -92,7 +94,7 @@ namespace model
         return iter->second;
     }
 
-   void DynamicMap::ResetOutput(size_t index, PortElementsBase outputElements)
+    void DynamicMap::ResetOutput(size_t index, PortElementsBase outputElements)
     {
         assert(index > 0 && index <= _outputElements.size() && "Error: Resetting unset output");
         _outputElements[index] = outputElements;
@@ -131,15 +133,8 @@ namespace model
         return _outputElementsMap[outputName];
     }
 
-    void DynamicMap::Refine(const TransformContext& context)
+    std::vector<const Node*> DynamicMap::GetOutputNodes()
     {
-        DoRefine(context);
-    }
-
-    ModelTransformer DynamicMap::DoRefine(const TransformContext& context)
-    {
-        ModelTransformer transformer;
-
         // gather output nodes
         std::unordered_set<const Node*> outputNodes;
         for(const auto& output: GetOutputs())
@@ -150,9 +145,86 @@ namespace model
             }
         }
 
- 		std::vector<const Node*> outputNodeVec(outputNodes.begin(), outputNodes.end());
-		auto minimalModel = transformer.CopyModel(_model, outputNodeVec, context);
-		auto refinedModel = transformer.RefineModel(minimalModel, context);
+        return { outputNodes.begin(), outputNodes.end() };
+    }
+
+    void DynamicMap::FixTransformedIO(ModelTransformer& transformer)
+    {
+        for (auto& inputNode : _inputNodes)
+        {
+            auto refinedInput = transformer.GetCorrespondingInputNode(inputNode);
+            inputNode = refinedInput;
+        }
+
+        for (auto& inputNode : _inputNodeMap)
+        {
+            auto input = inputNode.second;
+            auto refinedInput = transformer.GetCorrespondingInputNode(input);
+            inputNode.second = refinedInput;
+        }
+
+        for (auto& outputElements : _outputElements)
+        {
+            auto refinedOutput = transformer.GetCorrespondingOutputs(outputElements);
+            outputElements = refinedOutput;
+        }
+
+        for (auto& outputElements : _outputElementsMap)
+        {
+            auto output = outputElements.second;
+            auto refinedOutput = transformer.GetCorrespondingOutputs(output);
+            outputElements.second = refinedOutput;
+        }
+    }
+
+    void DynamicMap::Prune()
+    {
+        DoPrune();
+    }
+
+    ModelTransformer DynamicMap::DoPrune()
+    {        
+        TransformContext context;
+        ModelTransformer transformer;
+
+        auto outputNodeVec = GetOutputNodes();
+        auto minimalModel = transformer.CopyModel(_model, outputNodeVec, context);
+        FixTransformedIO(transformer);
+        _model = minimalModel;
+        return transformer;
+    }
+
+    void DynamicMap::Refine(const TransformContext& context)
+    {
+        DoRefine(context);
+    }
+
+    ModelTransformer DynamicMap::DoRefine(const TransformContext& context)
+    {
+        ModelTransformer transformer;
+        auto refinedModel = transformer.RefineModel(_model, context);
+        FixTransformedIO(transformer);
+        _model = refinedModel;
+        return transformer;
+    }
+
+<<<<<<< HEAD
+=======
+    void DynamicMap::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
+    {
+        ModelTransformer transformer;
+
+        // gather output nodes
+        std::unordered_set<const Node*> outputNodes;
+        for (const auto& output : GetOutputs())
+        {
+            for (const auto& range : output.GetRanges())
+            {
+                outputNodes.insert(range.ReferencedPort()->GetNode());
+            }
+        }
+
+        auto refinedModel = transformer.TransformModel(_model, transformFunction, context);
 
         for (auto& inputNode : _inputNodes)
         {
@@ -180,10 +252,10 @@ namespace model
             outputElements.second = refinedOutput;
         }
 
-		_model = refinedModel;
-        return transformer;
+        _model = refinedModel;
     }
 
+>>>>>>> 2050610... Added Prune function to maps
     void DynamicMap::WriteToArchive(utilities::Archiver& archiver) const
     {
         // Archive the model
