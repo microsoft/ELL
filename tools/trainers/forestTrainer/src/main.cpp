@@ -148,12 +148,7 @@ int main(int argc, char* argv[])
         // Save predictor model
         if (modelSaveArguments.outputModelFilename != "")
         {
-            // Create a model
-            model::Model model = map.GetModel();
-
-            // input to predictor node is output of map
-            auto mapOutput = model::PortElements<double>(map.GetOutputElementsBase(0));
-            model.AddNode<nodes::SimpleForestPredictorNode>(mapOutput, *predictor);
+            auto model = common::AppendNodeToModel<nodes::SimpleForestPredictorNode, PredictorType>(map, *predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }
