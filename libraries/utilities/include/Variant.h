@@ -62,6 +62,9 @@ namespace utilities
     class VariantDerived : public VariantBase
     {
     public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="val"> Value to wrap in a variant </param>
         VariantDerived(const ValueType& val);
 
     protected:
