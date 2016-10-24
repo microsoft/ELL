@@ -67,6 +67,12 @@ namespace model
         /// <param name="context"> The TransformContext to use during refinement </param>
         void Refine(const TransformContext& context);
 
+        /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
+        ///
+        /// <param name="transformFunction"> The function to apply on each node </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
+
         /// <summary> Computes the map's output from input values </summary>
         ///
         /// <param name="inputValues"> The input to the map </param>

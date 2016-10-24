@@ -79,6 +79,8 @@ namespace nodes
         /// <param name="transformer"> The `ModelTransformer` currently refining the model </param>
         // virtual bool Refine(model::ModelTransformer& transformer) const override;
 
+        std::vector<std::vector<ValueType>> GetPrototype() const { return _prototype; }
+
     protected:
         virtual void Compute() const override;
         void Reset() const;

@@ -116,13 +116,14 @@ namespace model
 
         virtual bool IsCompilable() const { return false; }
 
+        virtual void Copy(ModelTransformer& transformer) const = 0;
+
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer. </summary>
         ///
         /// <param name="transformer"> [in,out] The transformer. </param>
-        virtual void Copy(ModelTransformer& transformer) const = 0;
 
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(ModelTransformer& transformer) const;
