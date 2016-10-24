@@ -17,6 +17,7 @@
 #include "Dataset.h"
 
 // common
+#include "AppendNodeToModel.h"
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
 #include "EvaluatorArguments.h"
