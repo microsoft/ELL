@@ -66,7 +66,7 @@ namespace trainers
 
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::SplitCandidate::SplitCandidate(SplittableNodeId nodeId, Range totalRange, Sums totalSums)
-        : gain(0), nodeId(nodeId), ranges(totalRange), stats(totalSums)
+        : gain(0), nodeId(nodeId), stats(totalSums), ranges(totalRange)
     {
     }
 

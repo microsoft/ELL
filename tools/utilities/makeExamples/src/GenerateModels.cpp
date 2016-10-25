@@ -48,7 +48,7 @@ model::Model GenerateModel1()
     auto inputs = model::Concat(model::MakePortElements(mean8->output), model::MakePortElements(var8->output), model::MakePortElements(mean16->output), model::MakePortElements(var16->output));
     predictors::LinearPredictor predictor(inputs.Size());
     // Set some values into the predictor's vector
-    for (int index = 0; index < inputs.Size(); ++index)
+    for (size_t index = 0; index < inputs.Size(); ++index)
     {
         predictor.GetWeights()[index] = (double)(index % 5);
     }
@@ -109,7 +109,7 @@ predictors::SimpleForestPredictor CreateForest(size_t numSplits)
     std::vector<size_t> interiorNodeVector;
     interiorNodeVector.push_back(root);
 
-    for (int index = 0; index < numSplits; ++index)
+    for (size_t index = 0; index < numSplits; ++index)
     {
         auto node = interiorNodeVector.back();
         interiorNodeVector.pop_back();

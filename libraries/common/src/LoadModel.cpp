@@ -402,7 +402,7 @@ namespace common
         else // No model / map file specified -- return an identity map
         {
             model::Model model;
-            auto inputNode = model.AddNode<model::InputNode<double>>(0);
+            auto inputNode = model.AddNode<model::InputNode<double>>(mapLoadArguments.defaultInputSize);
             model::PortElements<double> outputElements(inputNode->output);
             return { model, { { "input", inputNode } }, { { "output", outputElements } } };
         }

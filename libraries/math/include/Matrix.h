@@ -436,5 +436,7 @@ namespace math
     using RowMatrix = Matrix<ElementType, MatrixLayout::rowMajor>;
 }
 }
+
 #include "../tcc/Matrix.tcc"
-#endif MATRIX_H
+
+#endif // MATRIX_H

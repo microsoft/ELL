@@ -79,6 +79,16 @@ Next, indicate all `#include` statements. First, include files from the local pr
     #include <vector>
     #include <string>
 
+In certain cases, normal `#ifndef`-style include guards are required instead of using `#pragma once`. In this case, add the guard name
+in a comment after the `#endif`:
+
+    #ifndef MATRIX_H
+    #define MATRIX_H
+
+    ...
+
+    #endif // MATRIX_H
+
 ## Function implementations
 Almost all function implementations belong in .cpp and .tcc files. The exception is short single-instruction implementations of parameterless functions, which should appear in the .h file on the same line as the function declaration. For example:
 

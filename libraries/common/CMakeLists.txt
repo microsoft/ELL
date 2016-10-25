@@ -31,6 +31,7 @@ set (SRC
 )
 
 set (INCLUDE 
+  include/AppendNodeToModel.h
   include/DataLoadArguments.h
   include/DataSaveArguments.h
   include/DataLoaders.h
@@ -51,6 +52,7 @@ set (INCLUDE
 )
 
 set (TCC 
+  tcc/AppendNodeToModel.tcc
   tcc/IsNodeCompilable.tcc
   tcc/DataLoaders.tcc
   tcc/MakeEvaluator.tcc

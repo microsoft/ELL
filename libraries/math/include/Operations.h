@@ -307,9 +307,10 @@ namespace math
     };
 
     using Operations = OperationsImplementation<ImplementationType::native>;
-#endif
+#endif // USE_BLAS
 }
 }
+
 #include "../tcc/Operations.tcc"
 
-#endif
+#endif // MATH_OPERATIONS_H

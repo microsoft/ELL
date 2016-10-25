@@ -62,11 +62,14 @@ namespace utilities
     class VariantDerived : public VariantBase
     {
     public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="val"> Value to wrap in a variant </param>
         VariantDerived(const ValueType& val);
 
     protected:
         const ValueType& GetValue() const { return _value; }
-        virtual std::unique_ptr<VariantBase> Clone() const;
+        virtual std::unique_ptr<VariantBase> Clone() const override;
         virtual std::string ToString() const override;
         virtual std::string GetStoredTypeName() const override;
         virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
