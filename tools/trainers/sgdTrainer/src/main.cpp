@@ -17,6 +17,7 @@
 #include "Dataset.h"
 
 // common
+#include "AppendNodeToModel.h"
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
 #include "EvaluatorArguments.h"
@@ -140,9 +141,7 @@ int main(int argc, char* argv[])
         if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
-            model::Model model = map.GetModel();
-            auto mapOutput = model::PortElements<double>(map.GetOutputElementsBase(0));
-            model.AddNode<nodes::LinearPredictorNode>(mapOutput, *predictor);
+            auto model = common::AppendNodeToModel<nodes::LinearPredictorNode, PredictorType>(map, *predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }
