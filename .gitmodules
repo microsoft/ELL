@@ -1,3 +1,0 @@
-[submodule "private/binaries/llvm-mac"]
-	path = private/binaries/llvm-mac
-	url = https://intelligentdevices.visualstudio.com/EMLL/_git/LLVM-Mac
