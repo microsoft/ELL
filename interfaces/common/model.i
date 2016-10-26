@@ -17,8 +17,14 @@
 #include "InputNode.h"
 #include "OutputNode.h"
 #include "LoadModel.h"
+#include "DTWNode.h"
+#include "CompiledMap.h"
+#include <string>
+#include <sstream>
+#include <vector>
 %}
 
+#if 0
 %nodefaultctor emll::model::NodeIterator;
 %nodefaultctor emll::model::Node;
 %nodefaultctor emll::model::Port;
@@ -82,6 +88,9 @@
     }
 }
 
+#endif // kirko
+
+
 %inline %{
 
 class ELL_NodeIterator {
@@ -130,6 +139,50 @@ public:
 private:
     emll::model::Model _model;
 };
+
+std::vector<double> Function1(const std::vector<double>& x)
+{
+    return x;
+}
+
+std::vector<std::vector<double>> Funtion2(const std::vector<std::vector<double>>& x)
+{
+    return x;
+}
+
+class ELL_CompiledMap {
+public:
+    ELL_CompiledMap() {}
+    ELL_CompiledMap(const ELL_CompiledMap&) = default;
+    std::string CompileToString()
+    {
+        std::stringstream s;
+        _map.WriteCode(s, "asm");
+        return s.str();
+    }
+#ifndef SWIG
+    ELL_CompiledMap(const emll::compiler::CompiledMap& other) : _map(other) {}
+#endif
+private:
+    emll::compiler::CompiledMap _map;
+};
+
+ELL_CompiledMap GenerateDTWClassifier(const std::vector<std::vector<double>>& prototype)
+{
+    auto dim = prototype[0].size();
+
+    emll::model::Model model;
+    auto inputNode = model.AddNode<emll::model::InputNode<double>>(dim);
+    auto dtwNode = model.AddNode<emll::nodes::DTWNode<double>>(inputNode->output, prototype);
+    emll::compiler::CompiledMap result(model, {{"input", inputNode}}, {{"output", dtwNode->output}});
+    return ELL_CompiledMap(result);
+}
+
+std::string GetClassifierCode(const std::vector<std::vector<double>>& prototype)
+{
+    auto map = GenerateDTWClassifier(prototype);
+    return map.CompileToString();
+}
 
 %}
 
