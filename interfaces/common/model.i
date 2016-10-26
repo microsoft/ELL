@@ -554,7 +554,9 @@ ELL_InputPortBaseIterator::ELL_InputPortBaseIterator(std::vector<emll::model::In
 class ELL_CompiledMap {
 public:
     ELL_CompiledMap() {}
+
     ELL_CompiledMap(const ELL_CompiledMap&) = default;
+
     std::string CompileToString()
     {
         std::stringstream s;
@@ -564,6 +566,13 @@ public:
         }
         return s.str();
     }
+
+    std::vector<double> Compute(const std::vector<double>& inputData)
+    {
+        _map->SetInputValue(0, inputData);
+        return _map->ComputeOutput<double>(0);
+    }
+
 #ifndef SWIG
     ELL_CompiledMap(const emll::compiler::CompiledMap& other) : _map(std::make_shared<emll::compiler::CompiledMap>(other)) {}
 #endif
