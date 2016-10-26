@@ -66,7 +66,6 @@ namespace nodes
     protected:
         virtual void Compute() const override;
 
-    private:
         model::InputPort<InputValueType> _input;
         model::OutputPort<OutputValueType> _output;
     };
