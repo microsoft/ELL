@@ -19,9 +19,11 @@
 #include "LoadModel.h"
 #include "DTWNode.h"
 #include "CompiledMap.h"
+
 #include <string>
 #include <sstream>
 #include <vector>
+#include <memory>
 %}
 
 #if 0
@@ -548,6 +550,26 @@ ELL_InputPortBaseIterator::ELL_InputPortBaseIterator(std::vector<emll::model::In
 {
 }
 #endif
+
+class ELL_CompiledMap {
+public:
+    ELL_CompiledMap() {}
+    ELL_CompiledMap(const ELL_CompiledMap&) = default;
+    std::string CompileToString()
+    {
+        std::stringstream s;
+        if(_map != nullptr)
+        {
+            _map->WriteCode(s, "asm");
+        }
+        return s.str();
+    }
+#ifndef SWIG
+    ELL_CompiledMap(const emll::compiler::CompiledMap& other) : _map(std::make_shared<emll::compiler::CompiledMap>(other)) {}
+#endif
+private:
+    std::shared_ptr<emll::compiler::CompiledMap> _map;
+};
 
 //
 // ELL_OutputPortBaseIterator Methods
