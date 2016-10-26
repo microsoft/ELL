@@ -31,6 +31,8 @@ namespace model
     public:
         const InputPortBase& GetInputPort() const { return _inputBase; }
         const OutputPortBase& GetOutputPort() const { return _outputBase; }
+        using Node::GetInputPort;
+        using Node::GetOutputPort;
 
     protected:
         OutputNodeBase(InputPortBase& input, OutputPortBase& output);
@@ -85,7 +87,6 @@ namespace model
     protected:
         virtual void Compute() const override;
 
-    private:
         InputPort<ValueType> _input;
         OutputPort<ValueType> _output;
     };

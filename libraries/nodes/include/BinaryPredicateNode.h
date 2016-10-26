@@ -83,13 +83,14 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-        /// <summary>Get the predicate type</summary>
-        BinaryPredicateType GetPredicateType() const { return _predicate; }
+        /// <summary> Gets the predicate performed by this node </summary>
+        ///
+        /// <returns> The predicate </returns>
+        BinaryPredicateType GetPredicate() const { return _predicate; }
 
     protected:
         virtual void Compute() const override;
 
-    private:
         template <typename Operation>
         std::vector<bool> ComputeOutput(Operation&& fn) const;
 
