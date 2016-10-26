@@ -17,11 +17,20 @@
 #include "InputNode.h"
 #include "OutputNode.h"
 #include "LoadModel.h"
+#include "DTWNode.h"
+#include "CompiledMap.h"
 #include <string>
 #include <sstream>
 #include <vector>
 %}
 
+#if 0
+%nodefaultctor emll::model::NodeIterator;
+%nodefaultctor emll::model::Node;
+%nodefaultctor emll::model::Port;
+%nodefaultctor emll::model::OutputPortBase;
+%nodefaultctor emll::model::OutputPort<double>;
+%nodefaultctor emll::model::InputPortBase;
 
 %inline %{
 
@@ -175,6 +184,11 @@ public:
 private:
     const emll::model::Port* _port;
 };
+
+#endif // kirko
+
+
+%inline %{
 
 //
 // ELL_PortElementBase Class Declaration
