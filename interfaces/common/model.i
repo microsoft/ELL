@@ -557,7 +557,7 @@ public:
 
     ELL_CompiledMap(const ELL_CompiledMap&) = default;
 
-    std::string CompileToString()
+    std::string GetCodeString()
     {
         std::stringstream s;
         if(_map != nullptr)
