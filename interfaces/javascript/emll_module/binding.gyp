@@ -62,7 +62,11 @@
                 '<(include_path_prefix)/libraries/predictors/include',
                 '<(include_path_prefix)/libraries/trainers/include',
                 '<(include_path_prefix)/libraries/utilities/include',
-                '<(include_path_prefix)/interfaces/common/include'
+                '<(include_path_prefix)/interfaces/common/include',
+                '<(include_path_prefix)/private/libraries/compiler/include',
+                '<(include_path_prefix)/private/libraries/emitters/include',
+                '<(include_path_prefix)/private/binaries/llvm/include',
+                '<(include_path_prefix)/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include'
             ],
             'sources': [
                 '<(include_path_prefix)/build/interfaces/javascript/EMLLJAVASCRIPT_wrap.cxx'
@@ -79,6 +83,8 @@
                     '<(library_path_prefix)/build/libraries/predictors<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/trainers<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/utilities<(library_path_suffix)',
+                    '<(library_path_prefix)/build/private/libraries/compiler<(library_path_suffix)',
+                    '<(library_path_prefix)/build/private/libraries/emitters<(library_path_suffix)',
                 ]
             },
             'conditions': [
