@@ -27,7 +27,7 @@ function ToEMLLVector(array) {
 }
 
 function PrintResults(map, data) {
-  for (var rowIndex = 0; rowIndex < testData.size(); rowIndex++) {
+  for (var rowIndex = 0; rowIndex < data.size(); rowIndex++) {
     var result = map.Compute(data.get(rowIndex));
     let resultStr = '';
     for (var colIndex = 0; colIndex < result.size(); colIndex++) {
