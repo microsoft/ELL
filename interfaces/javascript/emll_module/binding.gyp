@@ -65,6 +65,7 @@
                 '<(include_path_prefix)/interfaces/common/include',
                 '<(include_path_prefix)/private/libraries/compiler/include',
                 '<(include_path_prefix)/private/libraries/emitters/include',
+
                 '<(include_path_prefix)/private/binaries/llvm/include',
                 '<(include_path_prefix)/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include'
             ],
@@ -85,6 +86,8 @@
                     '<(library_path_prefix)/build/libraries/utilities<(library_path_suffix)',
                     '<(library_path_prefix)/build/private/libraries/compiler<(library_path_suffix)',
                     '<(library_path_prefix)/build/private/libraries/emitters<(library_path_suffix)',
+
+                    '<(library_path_prefix)/private/binaries/llvm/Rel/lib',
                 ]
             },
             'conditions': [
@@ -102,7 +105,36 @@
                                 '-lnodes.lib',
                                 '-lpredictors.lib',
                                 '-ltrainers.lib',
-                                '-lutilities.lib'
+                                '-lutilities.lib',
+                                '-lcompiler.lib',
+                                '-lemitters.lib',
+
+                                '-lLLVMAnalysis.lib',
+                                '-lLLVMAsmParser.lib',
+                                '-lLLVMAsmPrinter.lib',
+                                '-lLLVMBitReader.lib',
+                                '-lLLVMBitWriter.lib',
+                                '-lLLVMCodeGen.lib',
+                                '-lLLVMCore.lib',
+                                '-lLLVMDebugInfoCodeView.lib',
+                                '-lLLVMExecutionEngine.lib',
+                                '-lLLVMInstCombine.lib',
+                                '-lLLVMMC.lib',
+                                '-lLLVMMCDisassembler.lib',
+                                '-lLLVMMCJIT.lib',
+                                '-lLLVMMCParser.lib',
+                                '-lLLVMObject.lib',
+                                '-lLLVMRuntimeDyld.lib',
+                                '-lLLVMScalarOpts.lib',
+                                '-lLLVMSelectionDag.lib',
+                                '-lLLVMSupport.lib',
+                                '-lLLVMTarget.lib',
+                                '-lLLVMTransformUtils.lib',
+                                '-lLLVMX86AsmPrinter.lib',
+                                '-lLLVMX86CodeGen.lib',
+                                '-lLLVMX86Desc.lib',
+                                '-lLLVMX86Info.lib',
+                                '-lLLVMX86Utils.lib'                                
                             ]
                         },
                         'msvs_settings': {
