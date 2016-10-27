@@ -53,30 +53,28 @@
             'include_dirs': [
                 "<!(node -e \"require('nan')\")",
                 '<(include_path_prefix)/libraries/common/include',
-                '<(include_path_prefix)/libraries/dataset/include',
+                '<(include_path_prefix)/libraries/data/include',
                 '<(include_path_prefix)/libraries/evaluators/include',
-                '<(include_path_prefix)/libraries/linear/include',
+                '<(include_path_prefix)/libraries/lossFunctions/include',
+                '<(include_path_prefix)/libraries/math/include',
                 '<(include_path_prefix)/libraries/model/include',
                 '<(include_path_prefix)/libraries/nodes/include',
-                '<(include_path_prefix)/libraries/lossFunctions/include',
                 '<(include_path_prefix)/libraries/predictors/include',
                 '<(include_path_prefix)/libraries/trainers/include',
                 '<(include_path_prefix)/libraries/utilities/include',
                 '<(include_path_prefix)/interfaces/common/include'
             ],
             'sources': [
-                '<(include_path_prefix)/interfaces/common/src/DataLoadersInterface.cpp',                
                 '<(include_path_prefix)/build/interfaces/javascript/EMLLJAVASCRIPT_wrap.cxx'
             ],
             'link_settings': {
                 'library_dirs': [
                     '<(library_path_prefix)/build/libraries/common<(library_path_suffix)',
-                    '<(library_path_prefix)/build/libraries/dataset<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/data<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/evaluators<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/linear<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/model<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/nodes<(library_path_suffix)',
-                    '<(library_path_prefix)/build/libraries/lossFunctions<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/predictors<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/trainers<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/utilities<(library_path_suffix)',
@@ -89,12 +87,12 @@
                         'link_settings': {
                             'libraries': [
                                 '-lcommon.lib',
-                                '-ldataset.lib',
+                                '-ldata.lib',
                                 '-levaluators.lib',                                                                
-                                '-llinear.lib',
+                                '-llossFunctions.lib',
+                                '-lmath.lib',
                                 '-lmodel.lib',
                                 '-lnodes.lib',
-                                '-llossFunctions.lib',
                                 '-lpredictors.lib',
                                 '-ltrainers.lib',
                                 '-lutilities.lib'
@@ -117,12 +115,12 @@
                         'link_settings': {
                             'libraries': [
                                 'libcommon.a',
-                                'libdataset.a',
+                                'libdata.a',
                                 'libevaluators.a',
-                                'liblinear.a',
+                                'liblossFunctions.a',
+                                'libmath.a',
                                 'libmodel.a',
                                 'libnodes.a',
-                                'liblossFunctions.a',
                                 'libpredictors.a',
                                 'libtrainers.a',
                                 'libutilities.a',
@@ -164,12 +162,12 @@
                         'link_settings': {
                             'libraries': [
                                 'libcommon.a',
-                                'libdataset.a',
+                                'libdata.a',
                                 'libevaluators.a',
-                                'liblinear.a',
+                                'liblossFunctions.a',
+                                'libmath.a',
                                 'libmodel.a',
                                 'libnodes.a',
-                                'liblossFunctions.a',
                                 'libpredictors.a',
                                 'libtrainers.a',
                                 'libutilities.a',
