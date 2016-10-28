@@ -14,9 +14,6 @@ else()
   endif()
 endif()
 
-# set (INTERFACE_SRC ../common/src/DataLoadersInterface.cpp)
-# set (INTERFACE_INCLUDE ../common/include/DataLoadersInterface.h)
-
 set (INTERFACE_MAIN ../common/EMLL.i)
 
 set (INTERFACE_FILES ../common/common.i

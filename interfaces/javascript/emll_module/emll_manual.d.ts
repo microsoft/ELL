@@ -73,10 +73,15 @@ export class OutputPortElement {
 }
 
 // template collections
-// export class DoubleVector {
-//   size(): number;
-//   get(index: number): number;
-// }
+export class DoubleVector {
+  size(): number;
+  get(index: number): number;
+}
+
+export class DoubleVectorVector {
+  size(): number;
+  get(index: number): DoubleVector;
+}
 
 export class NodeVector {
   size(): number;
@@ -114,3 +119,12 @@ export class MeanNode extends Node { constructor(); }
 export function LoadModelGraph(filename: string): ModelGraph;
 export class UniqueId {}
 export class Variant {}
+
+export function GetFive(): number;
+export class ELL_CompiledMap {
+    GetCodeString(): string;
+    Compute(inputData: DoubleVector) : DoubleVector;
+}
+
+export function GenerateDTWClassifier(prototype: DoubleVectorVector):ELL_CompiledMap;
+export function GetDTWClassifierCode(prototype: DoubleVectorVector): string;
