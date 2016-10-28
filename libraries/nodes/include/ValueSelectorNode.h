@@ -30,6 +30,18 @@ namespace nodes
     class ValueSelectorNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* conditionPortName = "condition";
+        static constexpr const char* input1PortName = "input1";
+        static constexpr const char* input2PortName = "input2";
+        static constexpr const char* outputPortName = "output";
+        const model::InputPort<bool>& condition = _condition;
+        const model::InputPort<ValueType>& input1 = _input1;
+        const model::InputPort<ValueType>& input2 = _input2;
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
         /// <summary> Default Constructor </summary>
         ValueSelectorNode();
 
@@ -60,16 +72,8 @@ namespace nodes
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<ValueType>& output = _output;
-
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        static constexpr const char* conditionPortName = "condition";
-        static constexpr const char* input1PortName = "input1";
-        static constexpr const char* input2PortName = "input2";
-        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

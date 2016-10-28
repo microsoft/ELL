@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <limits>
+
 namespace emll
 {
 namespace nodes
@@ -28,7 +30,7 @@ namespace nodes
                 }
             }
             return (sumSquares - ((sum*sum) / size)) / size;
-        }    
+        }
     }
 
     template <typename ValueType>
@@ -46,9 +48,6 @@ namespace nodes
         _d.resize(_prototypeLength + 1);
         _s.resize(_prototypeLength + 1);
 
-        std::fill(_d.begin() + 1, _d.end(), 99999.0);
-        _d[0] = 0.0;
-
         _prototypeVariance = DTWNodeImpl::Variance(_prototype);
         // _threshold = std::sqrt(-2 * std::log(confidenceThreshold)) * _prototypeVariance;
         Reset();
@@ -57,7 +56,7 @@ namespace nodes
     template <typename ValueType>
     void DTWNode<ValueType>::Reset() const
     {
-        std::fill(_d.begin() + 1, _d.end(), 1e10);
+        std::fill(_d.begin() + 1, _d.end(), std::numeric_limits<ValueType>::max());
         _d[0] = 0.0;
         std::fill(_s.begin(), _s.end(), 0);
         _currentTime = 0;
@@ -118,7 +117,7 @@ namespace nodes
         auto timeDiff = _currentTime - bestStart;
         if (timeDiff < _prototypeLength * 0.8 || timeDiff > _prototypeLength * 1.2)
         {
-            bestDist = 1e10;
+            bestDist = std::numeric_limits<ValueType>::max();
         }
 
         _output.SetOutput({ static_cast<ValueType>(result) });

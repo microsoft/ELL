@@ -26,6 +26,14 @@ namespace nodes
     class TypeCastNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* inputPortName = "input";
+        static constexpr const char* outputPortName = "output";
+        const model::InputPort<InputValueType>& input = _input;
+        const model::OutputPort<OutputValueType>& output = _output;
+        /// @}
+
         /// <summary> Default Constructor </summary>
         TypeCastNode();
 
@@ -54,14 +62,8 @@ namespace nodes
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const model::OutputPort<OutputValueType>& output = _output;
-
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
-
-        static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

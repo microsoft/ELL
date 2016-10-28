@@ -33,6 +33,7 @@ namespace nodes
         /// @{
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
+        const model::InputPort<ValueType>& input = _input;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
