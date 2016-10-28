@@ -174,8 +174,8 @@ model::Model GetCompoundModel()
     auto in = g.AddNode<model::InputNode<double>>(3);
     auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
     auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 8);
-    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 8);
+    g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 8);
+    g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 8);
     return g;
 }
 
@@ -249,8 +249,8 @@ void TestInputRouting2()
     auto minAndArgMin3 = model.AddNode<nodes::ArgMinNode<double>>(ranges); // a node that takes its input from a "group" --- an arbitrary set of outputs from other ports
 
     auto minAndArgMin4 = model.AddNode<nodes::ArgMinNode<double>>(model::PortElements<double>(in->output, 0, 2));
-    auto minAndArgMin5 = model.AddNode<nodes::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 } });
-    auto minAndArgMin6 = model.AddNode<nodes::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 }, { minAndArgMin1->val, 0, 1 } });
+    model.AddNode<nodes::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 } });
+    model.AddNode<nodes::ArgMinNode<double>>(model::PortElements<double>{ { in->output, 0 }, { in->output, 0, 2 }, { minAndArgMin1->val, 0, 1 } });
 
     //// set some example input and read the output
     std::vector<double> inputValues = { 0.5, 0.25, 0.75 };
@@ -260,9 +260,6 @@ void TestInputRouting2()
     auto output2 = model.ComputeOutput(minAndArgMin2->val);
     auto output3 = model.ComputeOutput(minAndArgMin3->val);
     auto output4 = model.ComputeOutput(minAndArgMin4->val);
-    //    auto output5 = model.ComputeOutput(minAndArgMin5->val);
-
-    std::cout << "output1: " << output1[0] << ", output2: " << output2[0] << ", output3: " << output3[0] << ", output4: " << output4[0] << std::endl; // ", output5: " << output5[0] << std::endl;
 
     testing::ProcessTest("testing combine node", testing::IsEqual(output1[0], 0.25));
     testing::ProcessTest("testing combine node", testing::IsEqual(output2[0], 0.25));
@@ -282,8 +279,8 @@ void TestCopyModel()
     auto maxAndArgMax = model.AddNode<nodes::ArgMaxNode<double>>(in->output);
     auto minAndArgMin = model.AddNode<nodes::ArgMinNode<double>>(in->output);
     auto condition = model.AddNode<nodes::ConstantNode<bool>>(true);
-    auto valSelector = model.AddNode<nodes::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
-    auto indexSelector = model.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
+    model.AddNode<nodes::ValueSelectorNode<double>>(condition->output, maxAndArgMax->val, minAndArgMin->val);
+    model.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
     // Now make a copy
     model::TransformContext context;
