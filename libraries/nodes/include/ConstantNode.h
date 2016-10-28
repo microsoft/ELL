@@ -22,7 +22,6 @@
 #include "TypeName.h"
 
 // stl
-#include <initializer_list>
 #include <memory>
 #include <vector>
 
