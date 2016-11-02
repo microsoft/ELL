@@ -11,7 +11,6 @@ export class DoubleVectorVector {
   add(vec: DoubleVector);
 }
 
-
 //
 // misc
 //
@@ -20,5 +19,16 @@ export class ELL_CompiledMap {
     Compute(inputData: DoubleVector) : DoubleVector;
 }
 
+export class ELL_LabeledPrototype {
+  constructor(label:number, prototype: DoubleVectorVector);
+}
+
+export class PrototypeList {
+  size(): number;
+  get(index: number): ELL_LabeledPrototype;
+  add(vec: ELL_LabeledPrototype);
+}
+
 export function GenerateDTWClassifier(prototype: DoubleVectorVector):ELL_CompiledMap;
+export function GenerateMulticlassDTWClassifier(prototype: PrototypeList):ELL_CompiledMap;
 export function GetDTWClassifierCode(prototype: DoubleVectorVector): string;
