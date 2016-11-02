@@ -76,11 +76,13 @@ export class OutputPortElement {
 export class DoubleVector {
   size(): number;
   get(index: number): number;
+  add(value: number);
 }
 
 export class DoubleVectorVector {
   size(): number;
   get(index: number): DoubleVector;
+  add(vec: DoubleVector);
 }
 
 export class NodeVector {

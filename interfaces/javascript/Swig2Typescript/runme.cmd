@@ -1,0 +1,1 @@
+LaunchXslt\bin\debug\LaunchXslt.exe ..\..\EMLLModule\dist\EMLLXML_wrap.xml generate-d-ts.xlst emll.d.ts

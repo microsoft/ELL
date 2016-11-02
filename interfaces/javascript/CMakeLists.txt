@@ -10,3 +10,4 @@ generate_interface(javascript ${CMAKE_CURRENT_SOURCE_DIR} "" "")
 add_dependencies(EMLL_javascript EMLL_common)
 
 add_subdirectory(emll_module)
+add_subdirectory(Swig2Typescript)
