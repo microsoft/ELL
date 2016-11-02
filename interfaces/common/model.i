@@ -8,22 +8,31 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "Node.h"
-#include "Model.h"
-#include "Port.h"
-#include "InputPort.h"
-#include "OutputPort.h"
-#include "PortElements.h"
-#include "InputNode.h"
-#include "OutputNode.h"
-#include "LoadModel.h"
-#include "DTWNode.h"
-#include "CompiledMap.h"
 
+// common
+#include "LoadModel.h"
+
+// model
+#include "CompiledMap.h"
+#include "InputNode.h"
+#include "InputPort.h"
+#include "Model.h"
+#include "Node.h"
+#include "OutputNode.h"
+#include "OutputPort.h"
+#include "Port.h"
+#include "PortElements.h"
+
+// nodes
+#include "ConstantNode.h"
+#include "DTWNode.h"
+#include "ExtremalValueNode.h"
+#include "MultiplexerNode.h"
+
+#include <memory>
 #include <string>
 #include <sstream>
 #include <vector>
-#include <memory>
 %}
 
 #if 0
@@ -551,7 +560,8 @@ ELL_InputPortBaseIterator::ELL_InputPortBaseIterator(std::vector<emll::model::In
 }
 #endif
 
-class ELL_CompiledMap {
+class ELL_CompiledMap 
+{
 public:
     ELL_CompiledMap() {}
 

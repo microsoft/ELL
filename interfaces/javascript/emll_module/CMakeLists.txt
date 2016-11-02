@@ -55,6 +55,12 @@ if(NPM_EXECUTABLE)
 
     add_dependencies(${PROJ_NAME} ${PROJ_NAME}_files ${PROJ_NAME}_install EMLL_xml)
 
+    add_custom_command(TARGET ${PROJ_NAME} 
+                    POST_BUILD
+                    COMMAND ${MODULE_COPY_COMMAND}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                    VERBATIM)
+
     foreach(MODULE_FILE ${MODULE_FILES})
         add_custom_command(OUTPUT ${MODULE_FILE} 
                         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FILE} ${CMAKE_CURRENT_BINARY_DIR}
@@ -72,12 +78,14 @@ endif()
 find_program(NODE_EXECUTABLE node)
 if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
     # set up environment for test
-    add_custom_command(TARGET ${PROJ_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJ_NAME} 
+                    POST_BUILD
                     COMMAND ${NPM_EXECUTABLE} install 
                     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js
                     VERBATIM)
 
-    add_custom_command(TARGET ${PROJ_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJ_NAME} 
+                    POST_BUILD
                     COMMAND ${NPM_EXECUTABLE} install emll
                     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js
                     VERBATIM)
