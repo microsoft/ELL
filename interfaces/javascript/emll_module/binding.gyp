@@ -18,7 +18,7 @@
             'OS=="mac"', 
             {
                 'variables': {
-                    'include_path_prefix%':'../../..',
+                    'include_path_prefix%':'../../../..',
                     'library_path_prefix%':'../../../..',
                     'library_path_suffix%': ''
                 },
@@ -28,7 +28,7 @@
             'OS=="linux"', 
             {
                 'variables': {
-                    'include_path_prefix%':'../../..',
+                    'include_path_prefix%':'../../../..',
                     'library_path_prefix%':'../../../..',
                     'library_path_suffix%': ''
                 },
@@ -42,7 +42,7 @@
                 {
                     'destination': 'build',
                     'files': [
-                        '<(include_path_prefix)/build/interfaces/xml/EMLLXML_wrap.xml'
+                        '../../xml/EMLLXML_wrap.xml'
                     ]    
                 }                
             ],
@@ -68,7 +68,7 @@
                 '<(include_path_prefix)/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include'
             ],
             'sources': [
-                '<(include_path_prefix)/build/interfaces/javascript/EMLLJAVASCRIPT_wrap.cxx'
+                '../EMLLJAVASCRIPT_wrap.cxx'
             ],
             'link_settings': {
                 'library_dirs': [

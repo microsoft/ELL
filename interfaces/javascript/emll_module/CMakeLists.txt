@@ -36,32 +36,34 @@ if(NPM_EXECUTABLE)
         set (MODULE_COPY_COMMAND copyLinuxLib)
     endif()
 
-    if(WIN32)
-        add_custom_target(${PROJ_NAME} ALL
-            COMMAND ${NPM_EXECUTABLE} run ${MODULE_BUILD_COMMAND}
-            DEPENDS EMLL_javascript ${PROJ_NAME}_copy
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    else()
-        add_custom_target(${PROJ_NAME} ALL
-            COMMAND ${NPM_EXECUTABLE} run ${MODULE_BUILD_COMMAND}
-            DEPENDS EMLL_javascript
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    endif()
+    add_custom_target(${PROJ_NAME}_files ALL
+        DEPENDS ${MODULE_FILES} 
+        COMMENT "Copying module files"
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-    foreach(MODULE_FILE ${MODULE_FILES})
-        add_custom_command(TARGET ${PROJ_NAME} 
-                        PRE_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E copy ${MODULE_FILE} ${CMAKE_CURRENT_BINARY_DIR}
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    endforeach()
-
-    add_custom_command(TARGET ${PROJ_NAME} 
-                    PRE_BUILD
+    add_custom_target(${PROJ_NAME}_install ALL
                     COMMAND ${NPM_EXECUTABLE} install
                     DEPENDS EMLL_javascript common data evaluators lossFunctions math model nodes predictors trainers utilities compiler emitters
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Installing prerequisites"
                     VERBATIM)
+
+    add_custom_target(${PROJ_NAME} ALL
+        COMMAND ${NPM_EXECUTABLE} run ${MODULE_BUILD_COMMAND}
+        COMMENT "Building module"
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+    add_dependencies(${PROJ_NAME} ${PROJ_NAME}_files ${PROJ_NAME}_install EMLL_xml)
+
+    foreach(MODULE_FILE ${MODULE_FILES})
+        add_custom_command(OUTPUT ${MODULE_FILE} 
+                        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FILE} ${CMAKE_CURRENT_BINARY_DIR}
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                        COMMENT "Copying ${MODULE_FILE}"
+                        VERBATIM)
+        set_property(TARGET ${PROJ_NAME}_files APPEND PROPERTY OBJECT_DEPENDS ${MODULE_FILE})
+    endforeach()
+
 endif()
 
 #
