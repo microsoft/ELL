@@ -66,7 +66,7 @@ namespace nodes
     float distance(const std::vector<T>& a, const std::vector<T>& b)
     {
         int s = 0;
-        for (int index = 0; index < a.size(); index++)
+        for (size_t index = 0; index < a.size(); index++)
         {
             s += std::abs(a[index] - b[index]);
         }
