@@ -5,11 +5,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "echo ",
-    "build": "buildme",
-    "buildmac": "npm install && node-gyp rebuild && ./copyMacLib.sh",
-    "buildwin": "npm install && node-gyp rebuild --runtime=electron --target=1.4.4 --arch-x64 --dist-url=https://atom.io/download/atom-shell && copyWindowsLib",
-    "buildlinux": "npm install && node-gyp rebuild && ./copyLinuxLib.sh",
-    "buildwintest": "npm install && node-gyp rebuild && copyWindowsLib",
+    "build": "node-gyp rebuild --runtime=electron --target=1.4.4 --arch-x64 --dist-url=https://atom.io/download/atom-shell",
+    "build:test": "node-gyp rebuild",
+    "buildmac": "npm run build && ./copyMacLib.sh",
+    "buildwin": "npm run build && copyWindowsLib",
+    "buildlinux": "npm run build && ./copyLinuxLib.sh",
     "preinstall": "",
     "preuninstall": "rm -rf build/*"
   },

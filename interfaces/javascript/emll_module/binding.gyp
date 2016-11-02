@@ -8,7 +8,6 @@
             'OS=="win"', 
             {
                 'variables': {
-                    'swig_include_path_prefix%': '../../../..',
                     'include_path_prefix%': '../../../..',
                     'library_path_prefix%': '../../../..',
                     'library_path_suffix%': '/Release'
@@ -19,7 +18,6 @@
             'OS=="mac"', 
             {
                 'variables': {
-                    'swig_include_path_prefix%':'../../..',
                     'include_path_prefix%':'../../..',
                     'library_path_prefix%':'../../../..',
                     'library_path_suffix%': ''
@@ -30,7 +28,6 @@
             'OS=="linux"', 
             {
                 'variables': {
-                    'swig_include_path_prefix%':'../../..',
                     'include_path_prefix%':'../../..',
                     'library_path_prefix%':'../../../..',
                     'library_path_suffix%': ''
