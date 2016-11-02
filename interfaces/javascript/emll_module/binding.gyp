@@ -2,7 +2,16 @@
 # https://github.com/nodejs/node-gyp/wiki/%22binding.gyp%22-files-out-in-the-wild
 # Very helpful discussion showing how to enable RTTI on OS X:
 # https://github.com/nodejs/node-gyp/issues/26
+
+# TODO: fill in llvm and blas paths from CMake via configure_file 
+# TODO: have CMake generate the .d.ts file from XML
 {
+    'variables': {
+        'llvm_include_path': '../../../../private/binaries/llvm/include',
+        'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
+        'llvm_library_path': '../../../../private/binaries/llvm/Rel/lib',
+        'llvm_compiler_definitions': '',
+    },
     'conditions': [
         [
             'OS=="win"', 
@@ -10,7 +19,7 @@
                 'variables': {
                     'include_path_prefix%': '../../../..',
                     'library_path_prefix%': '../../../..',
-                    'library_path_suffix%': '/Release'
+                    'library_path_suffix%': '/Release',
                 },
             }
         ],
@@ -64,8 +73,8 @@
                 '<(include_path_prefix)/private/libraries/compiler/include',
                 '<(include_path_prefix)/private/libraries/emitters/include',
 
-                '<(include_path_prefix)/private/binaries/llvm/include',
-                '<(include_path_prefix)/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include'
+                '<(llvm_include_path)',
+                '<(blas_include_path)'
             ],
             'sources': [
                 '../EMLLJAVASCRIPT_wrap.cxx'
@@ -84,7 +93,7 @@
                     '<(library_path_prefix)/build/libraries/utilities<(library_path_suffix)',
                     '<(library_path_prefix)/build/private/libraries/compiler<(library_path_suffix)',
                     '<(library_path_prefix)/build/private/libraries/emitters<(library_path_suffix)',
-                    '<(library_path_prefix)/private/binaries/llvm/Rel/lib',
+                    '<(llvm_library_path)',
                 ]
             },
             'conditions': [
@@ -162,6 +171,10 @@
                                 'libutilities.a',
                             ]
                         },
+                        'defines': [
+                            '__STDC_LIMIT_MACROS=1', 
+                            '__STDC_CONSTANT_MACROS=1'
+                        ],
                         'cflags_cc!': [
                             '-fno-rtti',
                             '-fno-exceptions'
@@ -173,7 +186,8 @@
                             'OTHER_CPLUSPLUSFLAGS': [
                                 '-std=c++14',
                                 '-stdlib=libc++',
-                                '-v'
+                                '-v',
+
                             ],
                             'OTHER_LDFLAGS': [
                                 '-stdlib=libc++'
