@@ -27,13 +27,12 @@ find_program(NPM_EXECUTABLE npm)
 if(NPM_EXECUTABLE)
     message(STATUS "Found npm at ${NPM_EXECUTABLE}")
 
-    set (MODULE_BUILD_COMMAND build)
     if(WIN32)
-        set (MODULE_COPY_COMMAND copyWindowsLib)
+        set (MODULE_BUILD_COMMAND build:win)
     elseif(APPLE)
-        set (MODULE_COPY_COMMAND copyMacLib)
+        set (MODULE_BUILD_COMMAND build:mac)
     elseif(UNIX)
-        set (MODULE_COPY_COMMAND copyLinuxLib)
+        set (MODULE_BUILD_COMMAND build:linux)
     endif()
 
     add_custom_target(${PROJ_NAME}_files ALL
@@ -54,12 +53,6 @@ if(NPM_EXECUTABLE)
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
     add_dependencies(${PROJ_NAME} ${PROJ_NAME}_files ${PROJ_NAME}_install EMLL_xml)
-
-    add_custom_command(TARGET ${PROJ_NAME} 
-                    POST_BUILD
-                    COMMAND ${MODULE_COPY_COMMAND}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    VERBATIM)
 
     foreach(MODULE_FILE ${MODULE_FILES})
         add_custom_command(OUTPUT ${MODULE_FILE} 

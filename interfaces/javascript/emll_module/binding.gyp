@@ -7,10 +7,6 @@
 # TODO: have CMake generate the .d.ts file from XML
 {
     'variables': {
-        'llvm_include_path': '../../../../private/binaries/llvm/include',
-        'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
-        'llvm_library_path': '../../../../private/binaries/llvm/Rel/lib',
-        'llvm_compiler_definitions': '',
     },
     'conditions': [
         [
@@ -20,6 +16,9 @@
                     'include_path_prefix%': '../../../..',
                     'library_path_prefix%': '../../../..',
                     'library_path_suffix%': '/Release',
+                    'llvm_include_path': '../../../../private/binaries/llvm/include',
+                    'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
+                    'llvm_library_path': '../../../../private/binaries/llvm/Rel/lib',
                 },
             }
         ],
@@ -28,8 +27,11 @@
             {
                 'variables': {
                     'include_path_prefix%':'../../../..',
-                    'library_path_prefix%':'../../../..',
-                    'library_path_suffix%': ''
+                    'library_path_prefix%':'../../../../..',
+                    'library_path_suffix%': '',
+                    'llvm_include_path': '/usr/local/include/llvm/include',
+                    'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
+                    'llvm_library_path': '/usr/local/lib',
                 },
             }
         ],
@@ -39,7 +41,10 @@
                 'variables': {
                     'include_path_prefix%':'../../../..',
                     'library_path_prefix%':'../../../..',
-                    'library_path_suffix%': ''
+                    'library_path_suffix%': '',
+                    'llvm_include_path': '/usr/local/include/llvm/include',
+                    'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
+                    'llvm_library_path': '/usr/local/lib',
                 },
             }
         ]
@@ -51,11 +56,13 @@
                 {
                     'destination': 'build',
                     'files': [
-                        '../../xml/EMLLXML_wrap.xml'
                     ]    
                 }                
             ],
-            'defines': [],
+            'defines': [
+                '__STDC_LIMIT_MACROS=1', 
+                '__STDC_CONSTANT_MACROS=1'
+            ],
             'dependencies': [],
             'include_dirs': [
                 "<!(node -e \"require('nan')\")",
@@ -159,16 +166,44 @@
                     {
                         'link_settings': {
                             'libraries': [
-                                'libcommon.a',
-                                'libdata.a',
-                                'libevaluators.a',
-                                'liblossFunctions.a',
-                                'libmath.a',
-                                'libmodel.a',
-                                'libnodes.a',
-                                'libpredictors.a',
-                                'libtrainers.a',
-                                'libutilities.a',
+                                '-lcommon',
+                                '-ldata',
+                                '-levaluators',                                                                
+                                '-llossFunctions',
+                                '-lmath',
+                                '-lmodel',
+                                '-lnodes',
+                                '-lpredictors',
+                                '-ltrainers',
+                                '-lutilities',
+                                '-lcompiler',
+                                '-lemitters',
+                                '-lLLVMAnalysis',
+                                '-lLLVMAsmParser',
+                                '-lLLVMAsmPrinter',
+                                '-lLLVMBitReader',
+                                '-lLLVMBitWriter',
+                                '-lLLVMCodeGen',
+                                '-lLLVMCore',
+                                '-lLLVMDebugInfoCodeView',
+                                '-lLLVMExecutionEngine',
+                                '-lLLVMInstCombine',
+                                '-lLLVMMC',
+                                '-lLLVMMCDisassembler',
+                                '-lLLVMMCJIT',
+                                '-lLLVMMCParser',
+                                '-lLLVMObject',
+                                '-lLLVMRuntimeDyld',
+                                '-lLLVMScalarOpts',
+                                '-lLLVMSelectionDag',
+                                '-lLLVMSupport',
+                                '-lLLVMTarget',
+                                '-lLLVMTransformUtils',
+                                '-lLLVMX86AsmPrinter',
+                                '-lLLVMX86CodeGen',
+                                '-lLLVMX86Desc',
+                                '-lLLVMX86Info',
+                                '-lLLVMX86Utils'                                
                             ]
                         },
                         'defines': [
@@ -192,7 +227,7 @@
                             'OTHER_LDFLAGS': [
                                 '-stdlib=libc++'
                             ],
-                            'MACOSX_DEPLOYMENT_TARGET': '10.11',
+                            'MACOSX_DEPLOYMENT_TARGET': '10.12',
                             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
                             'GCC_ENABLE_CPP_RTTI': 'YES'
                         }
