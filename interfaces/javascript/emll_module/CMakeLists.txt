@@ -23,7 +23,6 @@ set (NODE_ABI_VERSION 50)
 set (ELECTRON_VERSION 1.4.4)
 
 find_program(NPM_EXECUTABLE npm)
-
 if(NPM_EXECUTABLE)
     message(STATUS "Found npm at ${NPM_EXECUTABLE}")
 

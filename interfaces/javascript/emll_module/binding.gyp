@@ -206,10 +206,6 @@
                                 '-lLLVMX86Utils'                                
                             ]
                         },
-                        'defines': [
-                            '__STDC_LIMIT_MACROS=1', 
-                            '__STDC_CONSTANT_MACROS=1'
-                        ],
                         'cflags_cc!': [
                             '-fno-rtti',
                             '-fno-exceptions'
@@ -246,16 +242,44 @@
                         ],
                         'link_settings': {
                             'libraries': [
-                                'libcommon.a',
-                                'libdata.a',
-                                'libevaluators.a',
-                                'liblossFunctions.a',
-                                'libmath.a',
-                                'libmodel.a',
-                                'libnodes.a',
-                                'libpredictors.a',
-                                'libtrainers.a',
-                                'libutilities.a',
+                                '-lcommon',
+                                '-ldata',
+                                '-levaluators',                                                                
+                                '-llossFunctions',
+                                '-lmath',
+                                '-lmodel',
+                                '-lnodes',
+                                '-lpredictors',
+                                '-ltrainers',
+                                '-lutilities',
+                                '-lcompiler',
+                                '-lemitters',
+                                '-lLLVMAnalysis',
+                                '-lLLVMAsmParser',
+                                '-lLLVMAsmPrinter',
+                                '-lLLVMBitReader',
+                                '-lLLVMBitWriter',
+                                '-lLLVMCodeGen',
+                                '-lLLVMCore',
+                                '-lLLVMDebugInfoCodeView',
+                                '-lLLVMExecutionEngine',
+                                '-lLLVMInstCombine',
+                                '-lLLVMMC',
+                                '-lLLVMMCDisassembler',
+                                '-lLLVMMCJIT',
+                                '-lLLVMMCParser',
+                                '-lLLVMObject',
+                                '-lLLVMRuntimeDyld',
+                                '-lLLVMScalarOpts',
+                                '-lLLVMSelectionDag',
+                                '-lLLVMSupport',
+                                '-lLLVMTarget',
+                                '-lLLVMTransformUtils',
+                                '-lLLVMX86AsmPrinter',
+                                '-lLLVMX86CodeGen',
+                                '-lLLVMX86Desc',
+                                '-lLLVMX86Info',
+                                '-lLLVMX86Utils'                                
                             ]
                         }
                     }
