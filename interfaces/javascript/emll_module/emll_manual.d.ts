@@ -21,6 +21,9 @@ export class ELL_CompiledMap {
 
 export class ELL_LabeledPrototype {
   constructor(label:number, prototype: DoubleVectorVector);
+  Label(): number;
+  Dimension(): number;
+  Prototype(): DoubleVectorVector;
 }
 
 export class PrototypeList {

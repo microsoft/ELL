@@ -54,6 +54,7 @@ if(NPM_EXECUTABLE)
     add_dependencies(${PROJ_NAME} ${PROJ_NAME}_files ${PROJ_NAME}_install EMLL_xml)
 
     foreach(MODULE_FILE ${MODULE_FILES})
+        configure_file(${MODULE_FILE} ${MODULE_FILE} COPYONLY)
         add_custom_command(OUTPUT ${MODULE_FILE} 
                         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FILE} ${CMAKE_CURRENT_BINARY_DIR}
                         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
