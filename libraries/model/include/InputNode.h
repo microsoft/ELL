@@ -40,6 +40,11 @@ namespace model
         /// <returns> The dimensionality of the output </returns>
         size_t Size() { return _outputBase.Size(); }
 
+        /// <summary> Gets the output type of this node </summary>
+        ///
+        /// <returns> The output type of this node </returns>
+        Port::PortType GetType() const { return _outputBase.GetType(); }
+
     protected:
         InputNodeBase(OutputPortBase& output);
 
