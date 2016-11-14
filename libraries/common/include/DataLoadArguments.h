@@ -28,8 +28,6 @@ namespace common
         /// <summary> The number of elements in an input data vector. </summary>
         std::string dataDimension = "";
 
-        bool isFileReadable = false;
-
         // not exposed on the command line
         size_t parsedDataDimension = 0;
     };

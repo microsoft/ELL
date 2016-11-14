@@ -11,7 +11,7 @@
 // model
 #include "Node.h"
 #include "Model.h"
-#include "Map.h"
+#include "DynamicMap.h"
 
 // utilities
 #include "Files.h"

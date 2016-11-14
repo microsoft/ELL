@@ -2,15 +2,16 @@
 // Model tests
 //
 
-#include "Map_test.h"
+#include "TypedMap_test.h"
 #include "Model_test.h"
 
 // model
 #include "InputNode.h"
-#include "Map.h"
 #include "Model.h"
 #include "OutputNode.h"
 #include "PortElements.h"
+#include "TypedMap.h"
+
 
 // nodes
 #include "ExtremalValueNode.h"
@@ -36,7 +37,7 @@
 //
 namespace emll
 {
-void TestMapCreate()
+void TestTypedMapCreate()
 {
     auto model = GetSimpleModel();
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
@@ -48,7 +49,7 @@ void TestMapCreate()
                               std::make_tuple(model::MakeNamedOutput("doubleOutput", outputNodes[0]->output)));
 }
 
-void TestMapCompute()
+void TestTypedMapCompute()
 {
     auto model = GetSimpleModel();
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
@@ -77,7 +78,7 @@ void TestMapCompute()
     testing::ProcessTest("Testing max value", testing::IsEqual(resultValues[1], 10.5));
 }
 
-void TestMapRefine()
+void TestTypedMapRefine()
 {
     auto model = GetSimpleModel();
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
@@ -142,7 +143,7 @@ void TestNamedInputOutput()
     testing::ProcessTest("Testing named input / output", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
 }
 
-void TestMapSerialization()
+void TestTypedMapSerialization()
 {
     auto model = GetSimpleModel();
     auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
@@ -160,13 +161,13 @@ void TestMapSerialization()
     common::RegisterNodeTypes(context);
     std::stringstream inStream(outStream.str());
     utilities::XmlUnarchiver unarchiver(inStream, context);
-    model::Map<std::tuple<double>, std::tuple<double>> map2;
+    model::TypedMap<std::tuple<double>, std::tuple<double>> map2;
     unarchiver >> map2;
 
     // Now read it back in --- as a DynamicMap
     context = utilities::SerializationContext{};
     common::RegisterNodeTypes(context);
-    context.GetTypeFactory().AddType<model::DynamicMap, model::Map<std::tuple<double>, std::tuple<double>>>();
+    context.GetTypeFactory().AddType<model::DynamicMap, model::TypedMap<std::tuple<double>, std::tuple<double>>>();
     inStream.seekg(0);
     utilities::XmlUnarchiver unarchiver2(inStream, context);
     std::unique_ptr<model::DynamicMap> dmap;
@@ -201,13 +202,13 @@ void TestComplexMap()
     common::RegisterNodeTypes(context);
     std::stringstream inStream(outStream.str());
     utilities::XmlUnarchiver unarchiver(inStream, context);
-    model::Map<std::tuple<double>, std::tuple<double>> map2;
+    model::TypedMap<std::tuple<double>, std::tuple<double>> map2;
     unarchiver >> map2;
 
     // Now read it back in --- as a DynamicMap
     context = utilities::SerializationContext{};
     common::RegisterNodeTypes(context);
-    context.GetTypeFactory().AddType<model::DynamicMap, model::Map<std::tuple<double, bool>, std::tuple<double, bool>>>();
+    context.GetTypeFactory().AddType<model::DynamicMap, model::TypedMap<std::tuple<double, bool>, std::tuple<double, bool>>>();
     inStream.seekg(0);
     utilities::XmlUnarchiver unarchiver2(inStream, context);
     std::unique_ptr<model::DynamicMap> dmap;

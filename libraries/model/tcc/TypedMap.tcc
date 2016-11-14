@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Map.tcc (nodes)
+//  File:     TypedMap.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,12 +32,12 @@ namespace model
     }
 
     //
-    // Map class
+    // TypedMap class
     //
 
     // Constructor
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    Map<InputTypesTuple, OutputTypesTuple>::Map(const Model& model,
+    TypedMap<InputTypesTuple, OutputTypesTuple>::TypedMap(const Model& model,
                                                 const utilities::WrappedTuple<InputTypesTuple, NamedInput>& inputs,
                                                 const utilities::WrappedTuple<OutputTypesTuple, NamedOutput>& outputs)
         : DynamicMap(model)
@@ -56,12 +56,12 @@ namespace model
         using InputTypesTuple = UnwrappedTupleType<NamedInputTypesTuple>;
         using OutputTypesTuple = UnwrappedTupleType<NamedOutputTypesTuple>;
 
-        return Map<InputTypesTuple, OutputTypesTuple>(model, inputs, outputs);
+        return TypedMap<InputTypesTuple, OutputTypesTuple>(model, inputs, outputs);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::AddInputs(std::index_sequence<Sequence...>,
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::AddInputs(std::index_sequence<Sequence...>,
                                                            const utilities::WrappedTuple<InputTypesTuple, NamedInput>& inputs)
     {
         utilities::ApplyToEach(
@@ -75,7 +75,7 @@ namespace model
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::AddOutputs(std::index_sequence<Sequence...>,
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::AddOutputs(std::index_sequence<Sequence...>,
                                                             const utilities::WrappedTuple<OutputTypesTuple, NamedOutput>& outputs)
     {
         utilities::ApplyToEach(
@@ -92,7 +92,7 @@ namespace model
     //
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <typename InputNodeType>
-    void Map<InputTypesTuple, OutputTypesTuple>::RemapInputNode(InputNodeType& input, ModelTransformer& modelTransformer)
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::RemapInputNode(InputNodeType& input, ModelTransformer& modelTransformer)
     {
         auto refinedInput = modelTransformer.GetCorrespondingInputNode(input);
         input = refinedInput;
@@ -100,7 +100,7 @@ namespace model
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::RemapInputNodes(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::RemapInputNodes(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
     {
         utilities::ApplyToEach(
             [&](auto indexTag) {
@@ -112,7 +112,7 @@ namespace model
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <typename OutputElementsType>
-    void Map<InputTypesTuple, OutputTypesTuple>::RemapOutputElement(OutputElementsType& output, ModelTransformer& modelTransformer)
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::RemapOutputElement(OutputElementsType& output, ModelTransformer& modelTransformer)
     {
         auto refinedOutputElements = modelTransformer.GetCorrespondingOutputs(output);
         output = refinedOutputElements;
@@ -120,7 +120,7 @@ namespace model
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::RemapOutputElements(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::RemapOutputElements(std::index_sequence<Sequence...>, ModelTransformer& modelTransformer)
     {
         utilities::ApplyToEach(
             [&](auto indexTag) {
@@ -131,7 +131,7 @@ namespace model
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    ModelTransformer Map<InputTypesTuple, OutputTypesTuple>::DoPrune()
+    ModelTransformer TypedMap<InputTypesTuple, OutputTypesTuple>::DoPrune()
     {
         auto model = GetModel(); // IMPORTANT: keep this line here, it prevents memory from being freed too soon
         ModelTransformer transformer = DynamicMap::DoPrune();
@@ -141,7 +141,7 @@ namespace model
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    ModelTransformer Map<InputTypesTuple, OutputTypesTuple>::DoRefine(const TransformContext& context)
+    ModelTransformer TypedMap<InputTypesTuple, OutputTypesTuple>::DoRefine(const TransformContext& context)
     {
         auto model = GetModel(); // IMPORTANT: keep this line here, it prevents memory from being freed too soon
         ModelTransformer transformer = DynamicMap::DoRefine(context);
@@ -155,14 +155,14 @@ namespace model
     //
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <typename InputNodeType, typename InputType>
-    void Map<InputTypesTuple, OutputTypesTuple>::SetNodeInput(InputNode<InputNodeType>* inputNode, const InputType& inputValues)
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::SetNodeInput(InputNode<InputNodeType>* inputNode, const InputType& inputValues)
     {
         inputNode->SetInput(inputValues);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <typename InputNodesTupleType, size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::SetInputElementsHelper(std::index_sequence<Sequence...> seq, const InputNodesTupleType& inputValues)
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::SetInputElementsHelper(std::index_sequence<Sequence...> seq, const InputNodesTupleType& inputValues)
     {
         SetNodeInput(std::get<Sequence>(_inputs)..., std::get<Sequence>(inputValues)...);
     }
@@ -172,20 +172,20 @@ namespace model
     //
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <typename PortElementsType, typename OutputType>
-    void Map<InputTypesTuple, OutputTypesTuple>::ComputeElements(PortElementsType& elements, OutputType& output) const
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::ComputeElements(PortElementsType& elements, OutputType& output) const
     {
         output = GetModel().ComputeOutput(elements);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::ComputeElementsHelper(std::index_sequence<Sequence...>, ComputedOutputType& outputValues) const
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::ComputeElementsHelper(std::index_sequence<Sequence...>, ComputedOutputType& outputValues) const
     {
         ComputeElements(std::get<Sequence>(_outputs)..., std::get<Sequence>(outputValues)...);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    auto Map<InputTypesTuple, OutputTypesTuple>::ComputeOutput() const -> ComputedOutputType
+    auto TypedMap<InputTypesTuple, OutputTypesTuple>::ComputeOutput() const -> ComputedOutputType
     {
         ComputedOutputType result;
         ComputeElementsHelper(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>(), result);
@@ -196,13 +196,13 @@ namespace model
     // Serialization
     //
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    void Map<InputTypesTuple, OutputTypesTuple>::WriteToArchive(utilities::Archiver& archiver) const
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::WriteToArchive(utilities::Archiver& archiver) const
     {
         DynamicMap::WriteToArchive(archiver);
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    void Map<InputTypesTuple, OutputTypesTuple>::ReadFromArchive(utilities::Unarchiver& archiver)
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         DynamicMap::ReadFromArchive(archiver); // Rats! we don't know the order they were serialized
         PopulateInputs(); // reconstuct _inputs
@@ -211,7 +211,7 @@ namespace model
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::PopulateInputsHelper(std::index_sequence<Sequence...>)
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::PopulateInputsHelper(std::index_sequence<Sequence...>)
     {
         utilities::ApplyToEach(
             [&](auto indexTag) {
@@ -222,14 +222,14 @@ namespace model
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    void Map<InputTypesTuple, OutputTypesTuple>::PopulateInputs()
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::PopulateInputs()
     {
         PopulateInputsHelper(std::make_index_sequence<std::tuple_size<InputTypesTuple>::value>());
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
     template <size_t... Sequence>
-    void Map<InputTypesTuple, OutputTypesTuple>::PopulateOutputsHelper(std::index_sequence<Sequence...>)
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::PopulateOutputsHelper(std::index_sequence<Sequence...>)
     {
         utilities::ApplyToEach(
             [&](auto indexTag) {
@@ -240,7 +240,7 @@ namespace model
     }
 
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    void Map<InputTypesTuple, OutputTypesTuple>::PopulateOutputs()
+    void TypedMap<InputTypesTuple, OutputTypesTuple>::PopulateOutputs()
     {
         PopulateOutputsHelper(std::make_index_sequence<std::tuple_size<OutputTypesTuple>::value>());
     }

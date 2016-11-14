@@ -9,7 +9,6 @@
 #pragma once
 
 #include <tuple>
-#include <utility> // for integer_sequence
 
 namespace emll
 {
@@ -23,7 +22,12 @@ namespace utilities
     template <typename FunctionType>
     inline void ApplyToEach(FunctionType&& function)
     {}
-    
+
+    /// <summary> Applies a single-argument function to each of a number of arguments. </summary>
+    ///
+    /// <param name="function"> The function to apply </param>
+    /// <param name="arg"> The first argument to apply the function to </param>
+    /// <param name="args"> The rest of the arguments to apply the function to </param>
     template <typename FunctionType, typename Arg, typename... Args>
     void ApplyToEach(FunctionType&& function, Arg&& arg, Args&&... args);
 }

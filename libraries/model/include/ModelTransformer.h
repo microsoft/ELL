@@ -68,18 +68,26 @@ namespace model
         /// <returns> The copied Model. </returns>
         Model CopyModel(const Model& model, const TransformContext& context);
 
-        /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
+        /// <summary>
+        /// Returns a copy of a subset of the input model, by calling Copy() on each of the model's nodes. The
+        /// model returned contains the nodes sufficient to compute the given output.
+        /// </summary>
         ///
         /// <param name="model"> The model. </param>
         /// <param name="context"> The context. </param>
+        /// <param name="outputNode"> The output that must be computable in the result model </param>
         ///
-        /// <returns> The copied Model. </returns>
+        /// <returns> The copied model. </returns>
         Model CopyModel(const Model& model, const Node* outputNode, const TransformContext& context);
 
-        /// <summary> Returns a copy of the input model, by calling Copy() on each of the model's nodes </summary>
+        /// <summary>
+        /// Returns a copy of a subset of the input model, by calling Copy() on each of the model's nodes. The
+        /// model returned contains the nodes sufficient to compute the given output.
+        /// </summary>
         ///
         /// <param name="model"> The model. </param>
         /// <param name="context"> The context. </param>
+        /// <param name="outputNodes"> The outputs that must be computable in the result model </param>
         ///
         /// <returns> The copied Model. </returns>
         Model CopyModel(const Model& model, const std::vector<const Node*>& outputNodes, const TransformContext& context);

@@ -42,7 +42,7 @@ namespace common
     utilities::CommandLineParseResult ParsedDataLoadArguments::PostProcess(const utilities::CommandLineParser& parser)
     {
         std::vector<std::string> parseErrorMessages;
-
+        bool isFileReadable = false;
         // inputDataFilename
         if (inputDataFilename != "")
         {
@@ -55,7 +55,7 @@ namespace common
         {
             if (!isFileReadable)
             {
-                parseErrorMessages.push_back("Couldn't read data file");
+                parseErrorMessages.push_back("Couldn't read data file");    
                 return parseErrorMessages;
             }
 

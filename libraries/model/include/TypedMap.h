@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     Map.h (model)
+//  File:     TypedMap.h (model)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,22 +76,22 @@ namespace model
     }
 
     //
-    // Map class
+    // TypedMap class
     //
 
     /// <summary> Class that wraps a model and its designated outputs </summary>
     template <typename InputTypesTuple, typename OutputTypesTuple>
-    class Map : public DynamicMap
+    class TypedMap : public DynamicMap
     {
     public:
-        Map() = default;
+        TypedMap() = default;
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="model"> The model to wrap </param>
         /// <param name="inputs"> A vector of the inputs this map uses </param>
         /// <param name="outputs"> A vector of the outputs this map generates </param>
-        Map(const Model& model,
+        TypedMap(const Model& model,
             const utilities::WrappedTuple<InputTypesTuple, NamedInput>& inputs,
             const utilities::WrappedTuple<OutputTypesTuple, NamedOutput>& outputs);
 
@@ -118,7 +118,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<InputTypesTuple, OutputTypesTuple>("Map"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<InputTypesTuple, OutputTypesTuple>("TypedMap"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -206,4 +206,4 @@ namespace model
 }
 }
 
-#include "../tcc/Map.tcc"
+#include "../tcc/TypedMap.tcc"
