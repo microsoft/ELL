@@ -17,16 +17,18 @@
 #include "DataVector.h"
 
 // utilities
-#include "TypeTraits.h"
-#include "IArchivable.h"
 #include "Exception.h"
+#include "IArchivable.h"
 #include "StlIndexValueIterator.h"
+#include "TypeTraits.h"
+
 
 // stl
 #include <string>
-#include <vector>
 #include <unordered_map>
 #include <utility>
+#include <vector>
+
 
 namespace emll
 {
@@ -67,6 +69,13 @@ namespace model
         /// <param name="context"> The TransformContext to use during refinement </param>
         void Refine(const TransformContext& context);
 
+        template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
+        OutputVectorType Compute(const InputVectorType& inputValues) const;
+
+        //
+        // Routines for getting information about inputs / outputs of the map
+        //
+
         /// <summary> Returns the requested input node </summary>
         ///
         /// <param name="inputName"> The name of the input </param>
@@ -78,10 +87,6 @@ namespace model
         /// <param name="inputName"> The name of the input </param>
         /// <returns> The specified input node </returns>
         InputNodeBase* GetInputNode(const std::string& inputName) const;
-
-        //
-        // Routines for getting information about inputs / outputs of the map
-        //
 
         /// <returns> The number of input nodes </returns>
         size_t NumInputs() const { return _inputNodes.size(); }
@@ -218,26 +223,14 @@ namespace model
         /// <param name="outputIndex"> The zero-based index of the map output </param>
         /// <returns> The `PortElements` object representing the indicated outputs </returns>
         template <typename ValueType>
-        PortElements<ValueType> GetOutputElements(size_t outputIndex);
+        PortElements<ValueType> GetOutputElements(size_t outputIndex) const;
 
         /// <summary> Returns a `PortElements` object representing the indicated map output </summary>
         ///
         /// <param name="outputName"> The name of the map output </param>
         /// <returns> The `PortElements` object representing the indicated outputs </returns>
         template <typename ValueType>
-        PortElements<ValueType> GetOutputElements(std::string outputName);
-
-        /// <summary> Returns a `PortElementsBase` object representing the indicated map output </summary>
-        ///
-        /// <param name="outputIndex"> The zero-based index of the map output </param>
-        /// <returns> The `PortElementsBase` object representing the indicated outputs </returns>
-        PortElementsBase GetOutputElementsBase(size_t outputIndex);
-
-        /// <summary> Returns a `PortElementsBase` object representing the indicated map output </summary>
-        ///
-        /// <param name="outputName"> The name of the map output </param>
-        /// <returns> The `PortElementsBase` object representing the indicated outputs </returns>
-        PortElementsBase GetOutputElementsBase(const std::string& outputName);
+        PortElements<ValueType> GetOutputElements(std::string outputName) const;
 
         // TODO: add ComputeOutput(index, outvec) and ComputeOutput(name, outvec)
 
@@ -268,10 +261,6 @@ namespace model
         template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         DataVectorType ComputeOutput(const PortElementsBase& elements) const;
 
-        /// <summary> Add an input to the map </summary>
-        ///
-        /// <param name="inputName"> The name to assign to the input node </param>
-        /// <param name="inputNode"> The input node to add </param>
         void AddInput(const std::string& inputName, InputNodeBase* inputNode);
         void AddOutput(const std::string& outputName, PortElementsBase outputElements);
         void ResetOutput(size_t index, PortElementsBase outputElements);
@@ -301,7 +290,7 @@ namespace model
         std::vector<PortElementsBase> _outputElements;
         std::vector<std::string> _outputNames;
         std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
-    
+
         std::vector<const Node*> GetOutputNodes();
         void FixTransformedIO(ModelTransformer& transformer);
     };

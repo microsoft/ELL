@@ -14,7 +14,7 @@ namespace common
     model::Model AppendNodeToModel(model::DynamicMap& map, const PredictorType& predictor)
     {
         model::Model model = map.GetModel();
-        auto mapOutput = model::PortElements<double>(map.GetOutputElementsBase(0));
+        auto mapOutput = map.GetOutputElements<double>(0);
         model.AddNode<PredictorNodeType>(mapOutput, predictor);
         return model;
     }

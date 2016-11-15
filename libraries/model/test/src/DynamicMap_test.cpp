@@ -5,6 +5,9 @@
 #include "DynamicMap_test.h"
 #include "Model_test.h"
 
+// data
+#include "DenseDataVector.h"
+
 // model
 #include "Model.h"
 #include "DynamicMap.h"
@@ -67,6 +70,31 @@ void TestDynamicMapCompute()
     for (const auto& inVec : input)
     {
         map.SetInputValue("doubleInput", inVec);
+        resultValues = map.ComputeOutput<double>("doubleOutput");
+    }
+
+    testing::ProcessTest("Testing map compute", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
+}
+
+void TestDynamicMapComputeDataVector()
+{
+    auto model = GetSimpleModel();
+    auto inputNodes = model.GetNodesByType<model::InputNode<double>>();
+    auto outputNodes = model.GetNodesByType<model::OutputNode<double>>();
+    assert(outputNodes.size() == 1);
+    auto map = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
+
+    assert(inputNodes.size() == 1);
+
+    auto signal = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
+                                                   { 4.0, 5.0, 6.0 },
+                                                   { 7.0, 8.0, 9.0 },
+                                                   { 10.0, 11.0, 12.0 } };
+    std::vector<double> resultValues;
+    for (const auto& sample : signal)
+    {
+        data::DoubleDataVector sampleVec(sample);
+        map.SetInputValue("doubleInput", sampleVec);
         resultValues = map.ComputeOutput<double>("doubleOutput");
     }
 

@@ -123,16 +123,6 @@ namespace model
         return iter->second.Size();
     }
 
-    PortElementsBase DynamicMap::GetOutputElementsBase(size_t outputIndex)
-    {
-        return _outputElements[outputIndex];
-    }
-
-    PortElementsBase DynamicMap::GetOutputElementsBase(const std::string& outputName)
-    {
-        return _outputElementsMap[outputName];
-    }
-
     std::vector<const Node*> DynamicMap::GetOutputNodes()
     {
         // gather output nodes

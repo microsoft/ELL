@@ -38,6 +38,7 @@ int main()
         // DynamicMap tests
         TestDynamicMapCreate();
         TestDynamicMapCompute();
+        TestDynamicMapComputeDataVector();
         TestDynamicMapRefine();
         TestDynamicMapSerialization();
     }
