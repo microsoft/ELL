@@ -25,6 +25,13 @@ namespace model
         }
     }
 
+    template <typename OutputType, typename InputType, utilities::IsFundamental<OutputType>, utilities::IsFundamental<InputType>>
+    std::vector<OutputType> DynamicMap::Compute(const std::vector<InputType>& inputValues) const
+    {
+        SetInputValue(0, inputValues);
+        return ComputeOutput<OutputType>(GetOutput(0));
+    }
+
     template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType>, data::IsDataVector<InputVectorType>>
     OutputVectorType DynamicMap::Compute(const InputVectorType& inputValues) const
     {

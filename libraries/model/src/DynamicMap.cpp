@@ -54,17 +54,17 @@ namespace model
         node->SetInput(inputValues);
     }
 
-    std::vector<bool> DynamicMap::ComputeBoolOutput(const PortElementsBase& outputs)
+    std::vector<bool> DynamicMap::ComputeBoolOutput(const PortElementsBase& outputs) const
     {
         return _model.ComputeOutput<bool>(outputs);
     }
 
-    std::vector<int> DynamicMap::ComputeIntOutput(const PortElementsBase& outputs)
+    std::vector<int> DynamicMap::ComputeIntOutput(const PortElementsBase& outputs) const
     {
         return _model.ComputeOutput<int>(outputs);
     }
 
-    std::vector<double> DynamicMap::ComputeDoubleOutput(const PortElementsBase& outputs)
+    std::vector<double> DynamicMap::ComputeDoubleOutput(const PortElementsBase& outputs) const
     {
         return _model.ComputeOutput<double>(outputs);
     }
@@ -83,44 +83,11 @@ namespace model
         _outputElementsMap.insert({ outputName, outputElements });
     }
 
-    InputNodeBase* DynamicMap::GetInputNode(int inputIndex) const
-    {
-        return _inputNodes[inputIndex];
-    }
-
-    InputNodeBase* DynamicMap::GetInputNode(const std::string& inputName) const
-    {
-        auto iter = _inputNodeMap.find(inputName);
-        return iter->second;
-    }
-
     void DynamicMap::ResetOutput(size_t index, PortElementsBase outputElements)
     {
         assert(index > 0 && index <= _outputElements.size() && "Error: Resetting unset output");
         _outputElements[index] = outputElements;
         _outputElementsMap[_outputNames[index]] = outputElements;
-    }
-
-    size_t DynamicMap::GetInputSize(int inputIndex) const
-    {
-        return _inputNodes[inputIndex]->GetOutputPort().Size();
-    }
-
-    size_t DynamicMap::GetInputSize(const std::string& inputName) const
-    {
-        auto iter = _inputNodeMap.find(inputName);
-        return iter->second->GetOutputPort().Size();
-    }
-
-    size_t DynamicMap::GetOutputSize(int outputIndex) const
-    {
-        return _outputElements[outputIndex].Size();
-    }
-
-    size_t DynamicMap::GetOutputSize(const std::string& outputName) const
-    {
-        auto iter = _outputElementsMap.find(outputName);
-        return iter->second.Size();
     }
 
     std::vector<const Node*> DynamicMap::GetOutputNodes()
@@ -267,6 +234,11 @@ namespace model
     InputNodeBase* DynamicMap::GetInput(const std::string& inputName) const
     {
         auto iter = _inputNodeMap.find(inputName);
+        if (iter == _inputNodeMap.end())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+        
         return iter->second;
     }
 

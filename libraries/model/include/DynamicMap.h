@@ -69,44 +69,19 @@ namespace model
         /// <param name="context"> The TransformContext to use during refinement </param>
         void Refine(const TransformContext& context);
 
+        template <typename OutputType, typename InputType, utilities::IsFundamental<OutputType> OutputConcept = 1, utilities::IsFundamental<InputType> InputConcept = 1>
+        std::vector<OutputType> Compute(const std::vector<InputType>& inputValues) const;
+
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
 
         //
-        // Routines for getting information about inputs / outputs of the map
+        // Internal routines for getting information about inputs / outputs of the map
+        // and doing type-safe operations.
         //
-
-        /// <summary> Returns the requested input node </summary>
-        ///
-        /// <param name="inputName"> The name of the input </param>
-        /// <returns> The specified input node </returns>
-        InputNodeBase* GetInputNode(int inputIndex) const;
-
-        /// <summary> Returns the requested input node </summary>
-        ///
-        /// <param name="inputName"> The name of the input </param>
-        /// <returns> The specified input node </returns>
-        InputNodeBase* GetInputNode(const std::string& inputName) const;
 
         /// <returns> The number of input nodes </returns>
         size_t NumInputs() const { return _inputNodes.size(); }
-
-        /// <summary> Returns size of a given input </summary>
-        ///
-        /// <param name="inputIndex"> The index of the input </param>
-        /// <returns> The size of the input </returns>
-        size_t GetInputSize(int inputIndex) const;
-
-        /// <summary> Returns size of a given input </summary>
-        ///
-        /// <param name="inputName"> The name of the input </param>
-        /// <returns> The size of the input </returns>
-        size_t GetInputSize(const std::string& inputName) const;
-
-        /// <summary> Returns the input nodes </summary>
-        ///
-        /// <returns> The input nodes </returns>
-        const std::vector<InputNodeBase*>& GetInputs() { return _inputNodes; }
 
         /// <summary> Returns an input node </summary>
         ///
@@ -120,27 +95,15 @@ namespace model
         /// <returns> The input node </returns>
         InputNodeBase* GetInput(const std::string& inputName) const;
 
+        /// <summary> Returns the input nodes </summary>
+        ///
+        /// <returns> The input nodes </returns>
+        const std::vector<InputNodeBase*>& GetInputs() { return _inputNodes; }
+
         /// <summary> Get the number of outputs </summary>
         ///
         /// <returns> The number of outputs </returns>
         size_t NumOutputs() const { return _outputElements.size(); }
-
-        /// <summary> Returns size of a given output </summary>
-        ///
-        /// <param name="outputName"> The name of the output </param>
-        /// <returns> The dimensionality of the output </returns>
-        size_t GetOutputSize(const std::string& outputName) const;
-
-        /// <summary> Returns size of a given output </summary>
-        ///
-        /// <param name="outputIndex"> The index of the output </param>
-        /// <returns> The dimensionality of the output </returns>
-        size_t GetOutputSize(int outputIndex) const;
-
-        /// <summary> Returns the outputs </summary>
-        ///
-        /// <returns> The outputs </returns>
-        const std::vector<PortElementsBase>& GetOutputs() { return _outputElements; }
 
         /// <summary> Returns an outputs </summary>
         ///
@@ -153,6 +116,11 @@ namespace model
         /// <param name="outputName"> The name of the output </param>
         /// <returns> The output </returns>
         PortElementsBase GetOutput(const std::string& outputName) const;
+
+        /// <summary> Returns the outputs </summary>
+        ///
+        /// <returns> The outputs </returns>
+        const std::vector<PortElementsBase>& GetOutputs() { return _outputElements; }
 
         //
         // Routines for computing output (processing data)
@@ -245,7 +213,6 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        // helper
         template <typename DataVectorType, typename ElementsType, data::IsDataVector<DataVectorType> Concept = true>
         void SetInputValue(InputNodeBase* node, const DataVectorType& inputValues) const;
 
@@ -276,9 +243,9 @@ namespace model
         virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const;
         virtual void SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues) const;
 
-        virtual std::vector<bool> ComputeBoolOutput(const PortElementsBase& outputs);
-        virtual std::vector<int> ComputeIntOutput(const PortElementsBase& outputs);
-        virtual std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs);
+        virtual std::vector<bool> ComputeBoolOutput(const PortElementsBase& outputs) const;
+        virtual std::vector<int> ComputeIntOutput(const PortElementsBase& outputs) const;
+        virtual std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs) const;
 
     private:
         Model _model;

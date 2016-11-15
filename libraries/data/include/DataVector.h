@@ -138,13 +138,23 @@ namespace data
 
         /// <summary> Takes an initializer list of index value pairs and appends them to the data vector. </summary>
         ///
-        /// <param name="list"> The initializer list of index value paris. </param>
+        /// <param name="list"> The initializer list of index value pairs. </param>
         void AppendElements(std::initializer_list<IndexValue> list);
 
         /// <summary> Takes an initializer list of values and appends them to the data vector. </summary>
         ///
         /// <param name="list"> The initializer list. </param>
         void AppendElements(std::initializer_list<double> list);
+
+        /// <summary> Takes a vector of index value pairs and appends them to the data vector. </summary>
+        ///
+        /// <param name="list"> The vector of index value pairs. </param>
+        void AppendElements(std::vector<IndexValue> list);
+
+        /// <summary> Takes vector of values and appends them to the data vector. </summary>
+        ///
+        /// <param name="list"> The vector. </param>
+        void AppendElements(std::vector<double> list);
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///

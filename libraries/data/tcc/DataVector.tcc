@@ -124,6 +124,25 @@ namespace data
     }
 
     template <class DerivedType>
+    void DataVectorBase<DerivedType>::AppendElements(std::vector<IndexValue> list)
+    {
+        for (const auto& current : list)
+        {
+            static_cast<DerivedType*>(this)->AppendElement(current.index, current.value);
+        }
+    }
+
+    template <class DerivedType>
+    void DataVectorBase<DerivedType>::AppendElements(std::vector<double> list)
+    {
+        size_t index = 0;
+        for (double current : list)
+        {
+            static_cast<DerivedType*>(this)->AppendElement(index++, current);
+        }
+    }
+
+    template <class DerivedType>
     double DataVectorBase<DerivedType>::Norm2() const
     {
         auto constIter = static_cast<const DerivedType*>(this)->GetIterator();

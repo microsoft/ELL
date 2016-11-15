@@ -36,9 +36,7 @@ namespace common
         {
             auto row = dataIterator->Get(); // this is an AutoSupervisedExample
             auto dataVec = row.GetDataVector().DeepCopyAs<data::DoubleDataVector>();
-            map.SetInputValue(0, dataVec);
-            auto output = map.ComputeOutput<data::DoubleDataVector>(0);
-            // convert output vector to OutDataVectorType
+            auto output = map.Compute<data::DoubleDataVector>(dataVec);
             auto mappedRow = typename DatasetType::DatasetExampleType(output, row.GetMetadata());
             dataset.AddExample(mappedRow);
             dataIterator->Next();
