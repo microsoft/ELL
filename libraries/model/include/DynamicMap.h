@@ -69,9 +69,17 @@ namespace model
         /// <param name="context"> The TransformContext to use during refinement </param>
         void Refine(const TransformContext& context);
 
+        /// <summary> Computes the map's output from input values </summary>
+        ///
+        /// <param name="inputValues"> The input to the map </param>
+        /// <returns> A vector of output values </returns>
         template <typename OutputType, typename InputType, utilities::IsFundamental<OutputType> OutputConcept = 1, utilities::IsFundamental<InputType> InputConcept = 1>
         std::vector<OutputType> Compute(const std::vector<InputType>& inputValues) const;
 
+        /// <summary> Computes the map's output from input values </summary>
+        ///
+        /// <param name="inputValues"> The input to the map </param>
+        /// <returns> A vector of output values </returns>
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
 
