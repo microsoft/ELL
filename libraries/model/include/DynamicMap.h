@@ -22,13 +22,11 @@
 #include "StlIndexValueIterator.h"
 #include "TypeTraits.h"
 
-
 // stl
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
 
 namespace emll
 {
