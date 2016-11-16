@@ -22,6 +22,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <type_traits>
+#include <vector>
 
 namespace emll
 {
@@ -92,6 +93,16 @@ namespace data
         ///
         /// <param name="list"> The initializer list of values. </param>
         SparseBinaryDataVectorBase(std::initializer_list<double> list);
+
+        /// <summary> Constructs a data vector from a vector of index value pairs. </summary>
+        ///
+        /// <param name="list"> The initializer list. </param>
+        SparseBinaryDataVectorBase(std::vector<IndexValue> vec);
+
+        /// <summary> Constructs a data vector from a vector of values. </summary>
+        ///
+        /// <param name="list"> The initializer list of values. </param>
+        SparseBinaryDataVectorBase(std::vector<double> vec);
 
         /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
         ///

@@ -17,6 +17,7 @@
 
 // stl
 #include <cstdint>
+#include <initializer_list>
 #include <type_traits>
 #include <vector>
 
@@ -89,6 +90,16 @@ namespace data
         ///
         /// <param name="list"> The initializer list of values. </param>
         SparseDataVector(std::initializer_list<double> list);
+
+        /// <summary> Constructs a data vector from a vector of index value pairs. </summary>
+        ///
+        /// <param name="list"> The initializer list. </param>
+        SparseDataVector(std::vector<IndexValue> vec);
+
+        /// <summary> Constructs a data vector from a vector of values. </summary>
+        ///
+        /// <param name="list"> The initializer list of values. </param>
+        SparseDataVector(std::vector<double> vec);
 
         /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
         ///

@@ -42,6 +42,18 @@ namespace data
     }
 
     template <typename IntegerListType>
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::vector<IndexValue> vec)
+    {
+        AppendElements(std::move(vec));
+    }
+
+    template <typename IntegerListType>
+    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::vector<double> vec)
+    {
+        AppendElements(std::move(vec));
+    }
+
+    template <typename IntegerListType>
     void SparseBinaryDataVectorBase<IntegerListType>::AppendElement(size_t index, double value)
     {
         if (value == 0)

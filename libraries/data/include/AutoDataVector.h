@@ -57,6 +57,16 @@ namespace data
         /// <param name="list"> The initializer list of values. </param>
         AutoDataVectorBase(std::initializer_list<double> list);
 
+        /// <summary> Constructs a data vector from a vector of index value pairs. </summary>
+        ///
+        /// <param name="list"> The initializer list. </param>
+        AutoDataVectorBase(std::vector<IndexValue> vec);
+
+        /// <summary> Constructs a data vector from a vector of values. </summary>
+        ///
+        /// <param name="list"> The vector of values. </param>
+        AutoDataVectorBase(std::vector<double> vec);
+
         /// <summary> Not Implemented. </summary>
         virtual void AppendElement(size_t index, double value) override;
 

@@ -164,7 +164,6 @@ namespace model
     ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& previousContext, const Model* model)
         : _previousContext(previousContext), _model(model)
     {
-        // TODO: if the old context is a ModelSerializationContext, set its model field
         auto mapContext = dynamic_cast<ModelSerializationContext*>(&previousContext);
         if (mapContext != nullptr)
         {

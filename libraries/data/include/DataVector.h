@@ -16,6 +16,7 @@
 // stl
 #include <cstdint>
 #include <functional>
+#include <initializer_list>
 #include <memory>
 #include <type_traits>
 #include <vector>
@@ -149,12 +150,16 @@ namespace data
         /// <summary> Takes a vector of index value pairs and appends them to the data vector. </summary>
         ///
         /// <param name="list"> The vector of index value pairs. </param>
-        void AppendElements(std::vector<IndexValue> list);
+        void AppendElements(std::vector<IndexValue> vec);
 
-        /// <summary> Takes vector of values and appends them to the data vector. </summary>
+        /// <summary> Takes a vector of values and appends them to the data vector. </summary>
         ///
-        /// <param name="list"> The vector. </param>
-        void AppendElements(std::vector<double> list);
+        /// <param name="list"> The vectpr. </param>
+        void AppendElements(std::vector<double> vec);
+
+        template <typename ContainerType, IsContainer<ContainerType> Concept = true>
+        void AppendElements(ContainerType<double> vec);
+
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///

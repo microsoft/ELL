@@ -124,19 +124,19 @@ namespace data
     }
 
     template <class DerivedType>
-    void DataVectorBase<DerivedType>::AppendElements(std::vector<IndexValue> list)
+    void DataVectorBase<DerivedType>::AppendElements(std::vector<IndexValue> vec)
     {
-        for (const auto& current : list)
+        for (const auto& current : vec)
         {
             static_cast<DerivedType*>(this)->AppendElement(current.index, current.value);
         }
     }
 
     template <class DerivedType>
-    void DataVectorBase<DerivedType>::AppendElements(std::vector<double> list)
+    void DataVectorBase<DerivedType>::AppendElements(std::vector<double> vec)
     {
         size_t index = 0;
-        for (double current : list)
+        for (double current : vec)
         {
             static_cast<DerivedType*>(this)->AppendElement(index++, current);
         }

@@ -48,6 +48,18 @@ namespace data
     }
 
     template <typename ElementType, typename IntegerListType>
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::vector<IndexValue> vec)
+    {
+        AppendElements(std::move(vec));
+    }
+
+    template <typename ElementType, typename IntegerListType>
+    SparseDataVector<ElementType, IntegerListType>::SparseDataVector(std::vector<double> vec)
+    {
+        AppendElements(std::move(vec));
+    }
+
+    template <typename ElementType, typename IntegerListType>
     typename SparseDataVector<ElementType, IntegerListType>::Iterator SparseDataVector<ElementType, IntegerListType>::GetIterator() const
     {
         return Iterator(_indices.GetIterator(), _values.cbegin());
