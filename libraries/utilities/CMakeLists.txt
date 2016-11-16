@@ -15,6 +15,7 @@ endif()
 set (SRC src/Archiver.cpp
          src/CommandLineParser.cpp
          src/CompressedIntegerList.cpp
+         src/ConformingVector.cpp
          src/Files.cpp
          src/Format.cpp
          src/IArchivable.cpp
@@ -36,6 +37,7 @@ set (INCLUDE include/AbstractInvoker.h
              include/Archiver.h
              include/CommandLineParser.h
              include/CompressedIntegerList.h
+             include/ConformingVector.h
              include/Exception.h
              include/Files.h
              include/Format.h
