@@ -42,7 +42,7 @@ namespace model
         /// <summary> Indicate if this port is referenced. </summary>
         ///
         /// <returns> Returns true if the port is referenced by another node. </returns>
-        bool IsReferenced() { return _isReferenced; }
+        bool IsReferenced() const { return _isReferenced; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

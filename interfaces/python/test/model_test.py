@@ -1,18 +1,12 @@
 import EMLL
 
-def GetName(node): return str(node.GetId())
-
+def GetName(node): return node.GetId()
 def GetNodeIndex(index, node): return index[GetName(node)]
 
 def GetNodes(model):
     '''Return an array holding all the Node objects of the model.
 The output will we of the form [node_1, node_2, ..., node_v]'''
-    ans = []
-    nodes = model.GetNodeIterator()
-    while nodes.IsValid():
-        ans.append(nodes.Get())
-        nodes.Next()
-    return ans
+    return [n for n in GetNodeGenerator(model.GetNodes())]
 
 def GetNodeDictionary(nodes):
     '''Return a dictionary mapping Node names to indices. The range
@@ -49,14 +43,25 @@ def CheckAdjacencyList(adj):
         for j in js:
             k = adj[j].index(i)
 
+def GetNodeGenerator(iter):
+    while iter.IsValid():
+        yield iter.Get()
+        iter.Next()
+
 def GetAdjacencyList(nodes, index):
     def GetIndex(node): return GetNodeIndex(index, node)
     def GetParents(node):
-        if node == None: return []
-        else: return map(GetIndex, node.GetParentNodes())
+        if node == None: 
+            return []
+        else: 
+            parents = GetNodeGenerator(node.GetParents())
+            return map(GetIndex, parents)
     def GetDependents(node):
-        if node == None: return []
-        else: return map(GetIndex, node.GetDependentNodes())
+        if node == None: 
+            return []
+        else: 
+            children = GetNodeGenerator(node.GetDependents())
+            return map(GetIndex, children)
     parentList = map(GetParents, nodes)
     dependentList = map(GetDependents, nodes)
     V = len(index)
@@ -165,9 +170,9 @@ def work(key):
 
 def test():
     keys = ['[1]','[2]','[3]','[tree_0]','[tree_1]','[tree_2]','[tree_3]']
-    try:
-        for key in keys: 
-            work(key)
-        return 0
-    except:
-        return 1
+    for key in keys: 
+        work(key)
+    return 0
+
+if __name__ == '__main__':
+    test()

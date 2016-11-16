@@ -18,7 +18,8 @@ set (SRC test.py
          evaluators_test.py
          dataset_test.py
          sgd_trainer_test.py
-         treelayout_test.py)
+         treelayout_test.py
+         )
 add_custom_target(${PROJ_NAME} ALL DEPENDS ${SRC} SOURCES ${SRC})
 
 # copy the contents of the test directory to build/interfaces/python
