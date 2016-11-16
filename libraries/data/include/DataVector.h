@@ -154,12 +154,8 @@ namespace data
 
         /// <summary> Takes a vector of values and appends them to the data vector. </summary>
         ///
-        /// <param name="list"> The vectpr. </param>
+        /// <param name="list"> The vector. </param>
         void AppendElements(std::vector<double> vec);
-
-        template <typename ContainerType, IsContainer<ContainerType> Concept = true>
-        void AppendElements(ContainerType<double> vec);
-
 
         /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
         ///
