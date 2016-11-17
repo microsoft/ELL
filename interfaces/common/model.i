@@ -42,6 +42,7 @@
 %nodefaultctor emll::model::OutputPortBase;
 %nodefaultctor emll::model::OutputPort<double>;
 %nodefaultctor emll::model::InputPortBase;
+#endif
 
 %inline %{
 
@@ -195,11 +196,6 @@ public:
 private:
     const emll::model::Port* _port;
 };
-
-#endif // kirko
-
-
-%inline %{
 
 //
 // ELL_PortElementBase Class Declaration
