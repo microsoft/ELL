@@ -1,0 +1,113 @@
+{
+  "_type": "Model",
+  "nodes": [
+  {
+    "_type": "InputNode<double>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1009"
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1009"
+      },
+      "name": "output",
+      "type": 1,
+      "size": 3
+    }
+  }, 
+  {
+    "_type": "ArgMaxNode<double>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1010"
+    },
+    "input": {
+      "_type": "InputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1010"
+      },
+      "name": "input",
+      "type": 1,
+      "input": {
+        "_type": "PortElements<double>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1009"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "val": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1010"
+      },
+      "name": "val",
+      "type": 1,
+      "size": 1
+    },
+    "argVal": {
+      "_type": "OutputPort<int>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1010"
+      },
+      "name": "argVal",
+      "type": 2,
+      "size": 1
+    }
+  }, 
+  {
+    "_type": "OutputNode<int>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1011"
+    },
+    "input": {
+      "_type": "InputPort<int>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1011"
+      },
+      "name": "input",
+      "type": 2,
+      "input": {
+        "_type": "PortElements<int>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 1,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1010"
+          },
+          "referencedPortName": "argVal"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<int>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1011"
+      },
+      "name": "output",
+      "type": 2,
+      "size": 1
+    }
+  }]
+}

@@ -134,7 +134,7 @@ namespace model
         /// <param name="visitor"> The visitor functor to use </param>
         /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
         template <typename Visitor>
-        void Visit(Visitor&& visitor, const Node* outputNode) const;
+        void Visit(const Node* outputNode, Visitor&& visitor) const;
 
         /// <summary>
         /// Visits the nodes in the model necessary to compute the outputs of the given nodes. Visits the nodes
@@ -144,7 +144,7 @@ namespace model
         /// <param name="visitor"> The visitor functor to use </param>
         /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
         template <typename Visitor>
-        void Visit(Visitor&& visitor, const std::vector<const Node*>& outputNodes) const;
+        void Visit(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const;
 
         /// <summary>
         /// Gets an iterator over all the nodes in the model in dependency order. No nodes will be visited until all
@@ -178,8 +178,7 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    private:
-        friend class NodeIterator;
+    protected:
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -191,6 +190,9 @@ namespace model
         /// <param name="archiver"> The archiver. </param>
         /// <param name="context"> The serialization context. </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+    private:
+        friend class NodeIterator;
 
         // The id->node map acts both as the main container that holds the shared pointers to nodes, and as the index
         // to look nodes up by id.

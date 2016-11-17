@@ -31,8 +31,8 @@ void TestLoadMapWithDefaultArgs()
     auto map = common::LoadMap(args);
 
     // check stuff out
-    std::cout << "Input[0] size: " << map.GetInputSize(0) << std::endl;
-    std::cout << "Input[0] node id: " << map.GetInputNode(0)->GetId() << std::endl;
+    std::cout << "Input[0] size: " << map.GetInput(0)->Size() << std::endl;
+    std::cout << "Input[0] node id: " << map.GetInput(0)->GetId() << std::endl;
 }
 
 void TestLoadMapWithPorts()

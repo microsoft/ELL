@@ -46,6 +46,20 @@ namespace data
     }
 
     template <typename DefaultDataVectorType>
+    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(std::vector<IndexValue> vec)
+    {
+        DefaultDataVectorType defaultDataVector(std::move(vec));
+        FindBestRepresentation(std::move(defaultDataVector));
+    }
+
+    template <typename DefaultDataVectorType>
+    AutoDataVectorBase<DefaultDataVectorType>::AutoDataVectorBase(std::vector<double> vec)
+    {
+        DefaultDataVectorType defaultDataVector(std::move(vec));
+        FindBestRepresentation(std::move(defaultDataVector));
+    }
+
+    template <typename DefaultDataVectorType>
     void AutoDataVectorBase<DefaultDataVectorType>::AppendElement(size_t index, double value)
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Append element not supported for AutoDataVector");

@@ -50,6 +50,28 @@ namespace model
         return _model;
     }
 
+    Model ModelTransformer::CopyModel(const Model& oldModel, const Node* outputNode, const TransformContext& context)
+    {
+        _context = context;
+        _model = Model();
+        _elementToElementMap.clear();
+        oldModel.Visit(outputNode, [this](const Node& node) { node.InvokeCopy(*this); });
+        _context = TransformContext();
+
+        return _model;
+    }
+
+    Model ModelTransformer::CopyModel(const Model& oldModel, const std::vector<const Node*>& outputNodes, const TransformContext& context)
+    {
+        _context = context;
+        _model = Model();
+        _elementToElementMap.clear();
+        oldModel.Visit(outputNodes, [this](const Node& node) { node.InvokeCopy(*this); });
+        _context = TransformContext();
+
+        return _model;
+    }
+
     Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context)
     {
         _context = context;

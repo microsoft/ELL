@@ -20,39 +20,31 @@
 // stl
 #include <iostream>
 
-namespace emll
-{
+using namespace emll;
+
 void SaveModels(std::string ext)
 {
-    auto model1 = GenerateModel1();
-    auto model2 = GenerateModel2();
-    auto model3 = GenerateModel3();
-    auto tree0 = GenerateTreeModel(0);
-    auto tree1 = GenerateTreeModel(1);
-    auto tree2 = GenerateTreeModel(2);
-    auto tree3 = GenerateTreeModel(3);
-    auto refinedTree0 = GenerateRefinedTreeModel(0);
-    auto refinedTree1 = GenerateRefinedTreeModel(1);
-    auto refinedTree2 = GenerateRefinedTreeModel(2);
-    auto refinedTree3 = GenerateRefinedTreeModel(3);
+    common::SaveModel(GenerateIdentityModel(3), "identity." + ext);
+    common::SaveModel(GenerateTimesTwoModel(3), "times_two." + ext);
+    common::SaveModel(GenerateIsEqualModel(), "is_equal." + ext);
+    common::SaveModel(GenerateArgMaxModel(3), "arg_max." + ext);
 
-    common::SaveModel(model1, "model_1." + ext);
-    common::SaveModel(model2, "model_2." + ext);
-    common::SaveModel(model3, "model_3." + ext);
+    common::SaveModel(GenerateModel1(), "model_1." + ext);
+    common::SaveModel(GenerateModel2(), "model_2." + ext);
+    common::SaveModel(GenerateModel3(), "model_3." + ext);
 
-    common::SaveModel(tree0, "tree_0." + ext);
-    common::SaveModel(tree1, "tree_1." + ext);
-    common::SaveModel(tree2, "tree_2." + ext);
-    common::SaveModel(tree3, "tree_3." + ext);
+    common::SaveModel(GenerateTreeModel(0), "tree_0." + ext);
+    common::SaveModel(GenerateTreeModel(1), "tree_1." + ext);
+    common::SaveModel(GenerateTreeModel(2), "tree_2." + ext);
+    common::SaveModel(GenerateTreeModel(3), "tree_3." + ext);
 
-    common::SaveModel(refinedTree0, "refined_tree_0." + ext);
-    common::SaveModel(refinedTree1, "refined_tree_1." + ext);
-    common::SaveModel(refinedTree2, "refined_tree_2." + ext);
-    common::SaveModel(refinedTree3, "refined_tree_3." + ext);
+    common::SaveModel(GenerateRefinedTreeModel(0), "refined_tree_0." + ext);
+    common::SaveModel(GenerateRefinedTreeModel(1), "refined_tree_1." + ext);
+    common::SaveModel(GenerateRefinedTreeModel(2), "refined_tree_2." + ext);
+    common::SaveModel(GenerateRefinedTreeModel(3), "refined_tree_3." + ext);
+
+    common::SaveModel(GenerateMultiOutModel(3), "multi_out." + ext);
 }
-}
-
-using namespace emll;
 
 int main(int argc, char* argv[])
 {

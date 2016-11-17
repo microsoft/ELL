@@ -103,7 +103,7 @@ namespace model
         if (_stack.size() == 0) // Visit full model
         {
             // Just push everything on the stack
-            for(auto node: _model->_idToNodeMap)
+            for (auto node : _model->_idToNodeMap)
             {
                 _stack.push_back(node.second.get());
             }
@@ -164,7 +164,6 @@ namespace model
     ModelSerializationContext::ModelSerializationContext(utilities::SerializationContext& previousContext, const Model* model)
         : _previousContext(previousContext), _model(model)
     {
-        // TODO: if the old context is a ModelSerializationContext, set it's model field
         auto mapContext = dynamic_cast<ModelSerializationContext*>(&previousContext);
         if (mapContext != nullptr)
         {

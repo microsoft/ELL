@@ -243,6 +243,11 @@ namespace model
         /// <returns> The number of ranges in this list </returns>
         size_t NumRanges() const { return _ranges.size(); }
 
+        /// <summary> Indicates if this PortElements consists of the entire port's output </summary>
+        ///
+        /// <returns> true if this PortElements spans a single port's entire range </returns>
+        bool IsFullPortOutput() const { return _ranges.size() == 1 && _ranges[0].IsFullPortRange(); }
+
         /// <summary> Gets a vector of range objects </summary>
         ///
         /// <returns> A std::vector of PortRange objects </returns>
@@ -264,6 +269,14 @@ namespace model
         /// <param name="other"> The PortElements to append to this one. </param>
         void Append(const PortElementsBase& other);
 
+        /// <summary> Consolidates adjacent ranges </summary>
+        virtual void Consolidate();
+
+        /// <summary> Gets the type of this port. </summary>
+        ///
+        /// <returns> The type of the port. </returns>
+        Port::PortType GetPortType();
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -283,9 +296,6 @@ namespace model
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
-        /// <summary> Consolidates adjacent ranges </summary>
-        virtual void Consolidate();
 
     protected:
         void ComputeSize();

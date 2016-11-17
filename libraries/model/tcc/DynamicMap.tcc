@@ -24,7 +24,21 @@ namespace model
             return x != 0;
         }
     }
- 
+
+    template <typename OutputType, typename InputType, utilities::IsFundamental<OutputType>, utilities::IsFundamental<InputType>>
+    std::vector<OutputType> DynamicMap::Compute(const std::vector<InputType>& inputValues) const
+    {
+        SetInputValue(0, inputValues);
+        return ComputeOutput<OutputType>(GetOutput(0));
+    }
+
+    template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType>, data::IsDataVector<InputVectorType>>
+    OutputVectorType DynamicMap::Compute(const InputVectorType& inputValues) const
+    {
+        SetInputValue(GetInput(0), inputValues);
+        return ComputeOutput<OutputVectorType>(GetOutput(0));
+    }
+
     //
     // SetInput
     //
@@ -175,10 +189,15 @@ namespace model
     }
 
     template <typename ValueType>
-    PortElements<ValueType> DynamicMap::GetOutputElements(std::string outputName)
+    PortElements<ValueType> DynamicMap::GetOutputElements(size_t outputIndex) const
     {
-        PortElements<ValueType> result = dynamic_cast<const PortElements<ValueType>&>(_outputElementsMap[outputName]);
-        return result;
+        return PortElements<ValueType>(GetOutput(outputIndex));
+    }
+
+    template <typename ValueType>
+    PortElements<ValueType> DynamicMap::GetOutputElements(std::string outputName) const
+    {
+        return PortElements<ValueType>(GetOutput(outputName));
     }
 }
 }

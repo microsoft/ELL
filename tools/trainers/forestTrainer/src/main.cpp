@@ -104,7 +104,6 @@ int main(int argc, char* argv[])
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
         auto mappedDataset = common::GetMappedDataset(dataLoadArguments, map);
-        auto mappedDatasetDimension = map.GetOutputSize(0);
 
         // predictor type
         using PredictorType = predictors::SimpleForestPredictor;

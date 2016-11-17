@@ -29,6 +29,16 @@ namespace nodes
     class ExtremalValueNode : public model::Node
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* inputPortName = "input";
+        static constexpr const char* valPortName = "val";
+        static constexpr const char* argValPortName = "argVal";
+
+        const model::OutputPort<ValueType>& val = _val;
+        const model::OutputPort<int>& argVal = _argVal;
+        /// @}
+
         /// <summary> Default Constructor </summary>
         ExtremalValueNode();
 
@@ -56,16 +66,6 @@ namespace nodes
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
-        /// <summary> Exposes the extremal value port as a read-only property </summary>
-        const model::OutputPort<ValueType>& val = _val;
-
-        /// <summary> Exposes the extremal value index port as a read-only property </summary>
-        const model::OutputPort<int>& argVal = _argVal;
-
-        static constexpr const char* inputPortName = "input";
-        static constexpr const char* valPortName = "val";
-        static constexpr const char* argValPortName = "argVal";
 
     protected:
         virtual void Compute() const override;

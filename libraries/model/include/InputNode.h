@@ -35,6 +35,11 @@ namespace model
         /// <returns> The output port. </returns>
         const OutputPortBase& GetOutputPort() const { return _outputBase; }
 
+        /// <summary> Returns the dimensionality of the output </summary>
+        ///
+        /// <returns> The dimensionality of the output </returns>
+        size_t Size() { return _outputBase.Size(); }
+
     protected:
         InputNodeBase(OutputPortBase& output);
 

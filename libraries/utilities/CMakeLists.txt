@@ -15,6 +15,7 @@ endif()
 set (SRC src/Archiver.cpp
          src/CommandLineParser.cpp
          src/CompressedIntegerList.cpp
+         src/ConformingVector.cpp
          src/Files.cpp
          src/Format.cpp
          src/IArchivable.cpp
@@ -29,13 +30,14 @@ set (SRC src/Archiver.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
          src/Variant.cpp
-         src/XMLArchiver.cpp)
+         src/XmlArchiver.cpp)
 
 set (INCLUDE include/AbstractInvoker.h
              include/AnyIterator.h
              include/Archiver.h
              include/CommandLineParser.h
              include/CompressedIntegerList.h
+             include/ConformingVector.h
              include/Exception.h
              include/Files.h
              include/Format.h
@@ -60,7 +62,7 @@ set (INCLUDE include/AbstractInvoker.h
              include/TypeTraits.h
              include/UniqueId.h
              include/Variant.h
-             include/XMLArchiver.h)
+             include/XmlArchiver.h)
 
 set (TCC tcc/AbstractInvoker.tcc
          tcc/AnyIterator.tcc
@@ -82,7 +84,7 @@ set (TCC tcc/AbstractInvoker.tcc
          tcc/TypeName.tcc
          tcc/TypeTraits.tcc
          tcc/Variant.tcc
-         tcc/XMLArchiver.tcc)
+         tcc/XmlArchiver.tcc)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})

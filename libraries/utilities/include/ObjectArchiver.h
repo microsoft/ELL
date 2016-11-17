@@ -44,7 +44,7 @@ namespace utilities
         /// <summary> Gets the `ObjectArchive` containing the information for the archived object </summary>
         ///
         /// <returns> The `ObjectArchive` containing the information  for the archived object </returns>
-        ObjectArchive GetObjectArchive() { return _objectDescription; }
+        const ObjectArchive& GetObjectArchive() { return _objectDescription; }
 
     protected:
         // Serialization

@@ -38,7 +38,7 @@
 #include "Archiver.h"
 #include "Files.h"
 #include "JsonArchiver.h"
-#include "XMLArchiver.h"
+#include "XmlArchiver.h"
 
 namespace emll
 {
@@ -371,7 +371,6 @@ namespace common
                     throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't find input node");
                 }
                 inputNode = inputNodes[0];
-                std::cout << "Using input Node " << inputNode->GetId() << std::endl;
             }
 
             if (mapLoadArguments.modelOutputsString != "")
@@ -394,7 +393,6 @@ namespace common
 
                 auto outputPort = outputPorts[0]; // ptr to port base
                 outputElements = model::PortElementsBase(*outputPort);
-                std::cout << "Using output Node " << outputNode->GetId() << "." << outputPort->GetName() << std::endl;
             }
 
             return { model, { { "input", inputNode } }, { { "output", outputElements } } };

@@ -3,7 +3,6 @@
 //
 
 #include "DynamicMap_test.h"
-#include "Map_test.h"
 #include "Model_test.h"
 #include "PortElements_test.h"
 
@@ -39,16 +38,9 @@ int main()
         // DynamicMap tests
         TestDynamicMapCreate();
         TestDynamicMapCompute();
+        TestDynamicMapComputeDataVector();
         TestDynamicMapRefine();
         TestDynamicMapSerialization();
-
-        // Typed Map tests
-        TestMapCreate();
-        TestMapCompute();
-        TestMapRefine();
-        TestNamedInputOutput();
-        TestMapSerialization();
-        TestComplexMap();
     }
    catch (const utilities::Exception& exception)
    {

@@ -23,6 +23,7 @@ namespace utilities
     //
     // ObjectArchive
     //
+
     const ObjectArchive::PropertyCollection& ObjectArchive::GetProperties() const
     {
         return _properties;
@@ -57,13 +58,19 @@ namespace utilities
         {
             throw InputException(InputExceptionErrors::badData);
         }
-        return iter->second;
+        return *(iter->second);
     }
 
     ObjectArchive& ObjectArchive::operator[](const std::string& propertyName)
     {
-        auto& prop = _properties[propertyName];
-        return prop;
+        auto iter = _properties.find(propertyName);
+        if (iter == _properties.end())
+        {
+            auto prop = std::make_shared<ObjectArchive>();
+            _properties[propertyName] = prop;
+            return *prop;
+        }
+        return *(iter->second);
     }
 }
 }

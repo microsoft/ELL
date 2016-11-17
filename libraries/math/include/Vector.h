@@ -132,7 +132,7 @@ namespace math
         auto Transpose() const -> ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
         {
             return ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
-        }
+		}
 
         /// <summary> Equality operator. </summary>
         ///
