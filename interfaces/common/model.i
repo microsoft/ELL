@@ -25,29 +25,27 @@
 
 %inline %{
 
-//---------------------
+//
 // Forward declartions
-//---------------------
+//
 
-class ELL_Node;
 class ELL_InputPortBaseIterator;
 class ELL_OutputPortBaseIterator;
 class ELL_NodeIterator;
-class ELL_Model;
 class ELL_Port;
-class ELL_PortElementBase;
 class ELL_InputPortBase;
 class ELL_OutputPortBase;
 
-//----------------------------------------------------------------------------/
-//                             Class Declarations
-//----------------------------------------------------------------------------/
+//
+// Class Declarations
+//
 
-//----------------------------
+//
 // ELL_Node Class Declaration
-//----------------------------
+//
 
-class ELL_Node {
+class ELL_Node 
+{
 public:
     ELL_Node();
     ~ELL_Node();
@@ -67,11 +65,12 @@ private:
     const emll::model::Node* _node;
 };
 
-//---------------------------------------------
+//
 // ELL_InputPortBaseIterator Class Declaration
-//---------------------------------------------
+//
 
-class ELL_InputPortBaseIterator {
+class ELL_InputPortBaseIterator 
+{
 public:
     ELL_InputPortBaseIterator();
     ~ELL_InputPortBaseIterator();
@@ -86,11 +85,12 @@ private:
     std::vector<emll::model::InputPortBase*> _ports;
 };
 
-//----------------------------------------------
+//
 // ELL_OutputPortBaseIterator Class Declaration
-//----------------------------------------------
+//
 
-class ELL_OutputPortBaseIterator {
+class ELL_OutputPortBaseIterator 
+{
 public:
     ELL_OutputPortBaseIterator();
     ~ELL_OutputPortBaseIterator();
@@ -105,11 +105,12 @@ private:
     std::vector<emll::model::OutputPortBase*> _ports;
 };
 
-//------------------------------------
+//
 // ELL_NodeIterator Class Declaration
-//------------------------------------
+//
 
-class ELL_NodeIterator {
+class ELL_NodeIterator 
+{
 public:
     ELL_NodeIterator();
     ~ELL_NodeIterator();
@@ -127,11 +128,12 @@ private:
     emll::model::NodeIterator _iterator;
 };
 
-//-----------------------------
+//
 // ELL_Model Class Declaration
-//-----------------------------
+//
 
-class ELL_Model {
+class ELL_Model 
+{
 public:
     ELL_Model();
     ELL_Model(const std::string& filename);
@@ -145,11 +147,12 @@ private:
     emll::model::Model _model;
 };
 
-//----------------------------
+//
 // ELL_Port Class Declaration
-//----------------------------
+//
 
-class ELL_Port {
+class ELL_Port 
+{
 public:
     enum class Type
     {
@@ -173,11 +176,12 @@ private:
     const emll::model::Port* _port;
 };
 
-//---------------------------------------
+//
 // ELL_PortElementBase Class Declaration
-//---------------------------------------
+//
 
-class ELL_PortElementBase {
+class ELL_PortElementBase 
+{
 public:
     ELL_PortElementBase();
     ~ELL_PortElementBase();
@@ -192,11 +196,12 @@ private:
     const emll::model::PortElementBase _port;
 };
 
-//-------------------------------------
+//
 // ELL_InputPortBase Class Declaration
-//-------------------------------------
+//
 
-class ELL_InputPortBase {
+class ELL_InputPortBase 
+{
 public:
     ELL_InputPortBase();
     ~ELL_InputPortBase();
@@ -211,11 +216,12 @@ private:
     const emll::model::InputPortBase* _port;
 };
 
-//--------------------------------------
+//
 // ELL_OutputPortBase Class Declaration
-//--------------------------------------
+//
 
-class ELL_OutputPortBase {
+class ELL_OutputPortBase 
+{
 public:
     ELL_OutputPortBase();
     ~ELL_OutputPortBase();
@@ -233,7 +239,8 @@ private:
     const emll::model::OutputPortBase* _port;
 };
 
-class ELL_TransformContext{
+class ELL_TransformContext
+{
 public:
     ELL_TransformContext();
     ~ELL_TransformContext();
@@ -259,13 +266,13 @@ ELL_TransformContext::~ELL_TransformContext()
 
 
 
-//----------------------------------------------------------------------------/
-//                              Class Methods
-//----------------------------------------------------------------------------/
+//
+// Class Methods
+//
 
-//-----------------------------
+//
 // ELL_PortElementBase Methods
-//-----------------------------
+//
 
 #ifndef SWIG
 ELL_PortElementBase::ELL_PortElementBase(const emll::model::PortElementBase& other) : 
@@ -292,9 +299,9 @@ ELL_OutputPortBase ELL_PortElementBase::ReferencedPort()
     return ELL_OutputPortBase(_port.ReferencedPort());
 }
 
-//----------------------------
+//
 // ELL_OutputPortBase Methods 
-//----------------------------
+//
 
 #ifndef SWIG
 ELL_OutputPortBase::ELL_OutputPortBase(const emll::model::OutputPortBase* other) : 
@@ -337,9 +344,9 @@ std::string ELL_OutputPortBase::GetTypeName()
     return _port->GetTypeName();
 }
 
-//---------------------------
+//
 // ELL_InputPortBase Methods
-//---------------------------
+//
 
 #ifndef SWIG
 ELL_InputPortBase::ELL_InputPortBase(const emll::model::InputPortBase* other) : 
@@ -369,9 +376,9 @@ ELL_NodeIterator ELL_InputPortBase::GetParentNodes()
     return ELL_NodeIterator(_port->GetParentNodes());
 }
 
-//------------------
+//
 // ELL_Port Methods 
-//------------------
+//
 
 ELL_Port::ELL_Port() : _port(nullptr) 
 {
@@ -405,9 +412,9 @@ int ELL_Port::Size()
 }
 #endif
 
-//--------------------------
+//
 // ELL_NodeIterator Methods 
-//--------------------------
+//
 
 ELL_NodeIterator::ELL_NodeIterator() : 
     _i(0), _isVector(false), _nodes(), _iterator() 
@@ -419,23 +426,35 @@ ELL_NodeIterator::~ELL_NodeIterator()
 bool ELL_NodeIterator::IsValid() 
 {
     if (_isVector)
+    {
         return _i < _nodes.size();
+    }
     else
+    {
         return _iterator.IsValid();
+    }
 }
 void ELL_NodeIterator::Next() 
 {
-    if (_isVector) 
+    if (_isVector)
+    { 
         _i = _i + 1;
+    }
     else
+    {
         _iterator.Next();
+    }
 }
 ELL_Node ELL_NodeIterator::Get() 
 {
     if (_isVector)
+    {
         return ELL_Node(_nodes[_i]);
+    }
     else
+    {
         return ELL_Node(_iterator.Get());
+    }
 }
 #ifndef SWIG
 ELL_NodeIterator::ELL_NodeIterator(std::vector<const emll::model::Node*> nodes) : 
@@ -448,9 +467,9 @@ ELL_NodeIterator::ELL_NodeIterator(emll::model::NodeIterator& other) :
 }
 #endif
 
-//-------------------------------
+//
 // ELL_InputPortBaseIterator Methods
-//-------------------------------
+//
 
 ELL_InputPortBaseIterator::ELL_InputPortBaseIterator() : 
     _i(0), _ports() 
@@ -478,9 +497,9 @@ ELL_InputPortBaseIterator::ELL_InputPortBaseIterator(std::vector<emll::model::In
 }
 #endif
 
-//--------------------------------
+//
 // ELL_OutputPortBaseIterator Methods
-//--------------------------------
+//
 
 ELL_OutputPortBaseIterator::ELL_OutputPortBaseIterator() : _i(0), _ports() 
 {
@@ -507,9 +526,9 @@ ELL_OutputPortBaseIterator::ELL_OutputPortBaseIterator(std::vector<emll::model::
 }
 #endif
 
-//------------------
+//
 // ELL_Node Methods
-//------------------
+//
 
 ELL_Node::ELL_Node() 
 {
@@ -556,9 +575,9 @@ ELL_InputPortBaseIterator ELL_Node::GetInputPorts()
     return ELL_InputPortBaseIterator(_node->GetInputPorts());
 }
 
-//-------------------
+//
 // ELL_Model Methods
-//-------------------
+//
 
 ELL_Model::ELL_Model() 
 {
@@ -587,9 +606,10 @@ ELL_Model::ELL_Model(const emll::model::Model& other) :
 }
 #endif
 
-
-//-----------
+//
 // Functions
-//-----------
+//
+
+// TBD
 
 %}
