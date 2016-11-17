@@ -62,17 +62,6 @@ namespace model
         /// <returns> The `Model` </returns>
         Model& GetModel() { return _model; }
 
-        /// <summary> Refines the model wrapped by this map </summary>
-        ///
-        /// <param name="context"> The TransformContext to use during refinement </param>
-        void Refine(const TransformContext& context);
-
-        /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
-        ///
-        /// <param name="transformFunction"> The function to apply on each node </param>
-        /// <param name="context"> The TransformContext to use during the transformation </param>
-        void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
-
         /// <summary> Computes the map's output from input values </summary>
         ///
         /// <param name="inputValues"> The input to the map </param>
@@ -86,6 +75,17 @@ namespace model
         /// <returns> A vector of output values </returns>
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
+
+        /// <summary> Refines the model wrapped by this map </summary>
+        ///
+        /// <param name="context"> The TransformContext to use during refinement </param>
+        void Refine(const TransformContext& context);
+
+        /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
+        ///
+        /// <param name="transformFunction"> The function to apply on each node </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
 
         //
         // Internal routines for getting information about inputs / outputs of the map
