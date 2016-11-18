@@ -43,7 +43,17 @@ namespace model
         /// <returns> The unique ID for this node </returns>
         const NodeId GetId() const { return _id; }
 
-        /// <summary> Returns the input "ports" for this node </summary>
+        /// <summary> Returns the number of input ports for this node </summary>
+        ///
+        /// <returns> The number of input ports </returns>
+        size_t NumInputs() const { return _inputs.size(); }
+
+        /// <summary> Returns the number of output ports for this node </summary>
+        ///
+        /// <returns> The number of output ports </returns>
+        size_t NumOutputs() const { return _outputs.size(); }
+
+        /// <summary> Returns the input ports for this node </summary>
         ///
         /// <returns> The input "ports" for this node </returns>
         const std::vector<InputPortBase*>& GetInputPorts() const { return _inputs; }
