@@ -52,6 +52,12 @@ namespace model
     class InputNode : public InputNodeBase
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
         /// <summary> Constructor </summary>
         InputNode();
 
@@ -94,11 +100,6 @@ namespace model
         virtual void Copy(ModelTransformer& transformer) const override;
 
         size_t Size() const { return _output.Size(); }
-
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const OutputPort<ValueType>& output = _output;
-
-        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;

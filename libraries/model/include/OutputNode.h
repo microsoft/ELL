@@ -47,6 +47,14 @@ namespace model
     class OutputNode : public OutputNodeBase
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* inputPortName = "input";
+        static constexpr const char* outputPortName = "output";
+        const model::InputPort<ValueType>& input = _input;
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
         /// <summary> Default Constructor </summary>
         OutputNode();
 
@@ -75,14 +83,8 @@ namespace model
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const OutputPort<ValueType>& output = _output;
-
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const override;
-
-        static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputPortName = "output";
 
     protected:
         virtual void Compute() const override;
