@@ -145,14 +145,14 @@ namespace data
     template <class DerivedType>
     double DataVectorBase<DerivedType>::Norm2() const
     {
-        auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
+        auto iter = static_cast<const DerivedType*>(this)->GetIterator();
 
         double result = 0.0;
-        while (constIter.IsValid())
+        while (iter.IsValid())
         {
-            double value = constIter.Get().value;
+            double value = iter.Get().value;
             result += value * value;
-            constIter.Next();
+            iter.Next();
         }
         return std::sqrt(result);
     }
@@ -160,14 +160,14 @@ namespace data
     template <class DerivedType>
     double DataVectorBase<DerivedType>::Dot(const math::UnorientedConstVectorReference<double>& vector) const
     {
-        auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
 
         double result = 0.0;
-        while (constIter.IsValid())
+        while (indexValueIterator.IsValid())
         {
-            auto indexValue = constIter.Get();
+            auto indexValue = indexValueIterator.Get();
             result += indexValue.value * vector[indexValue.index];
-            constIter.Next();
+            indexValueIterator.Next();
         }
         return result;
     }
@@ -175,13 +175,13 @@ namespace data
     template <class DerivedType>
     void DataVectorBase<DerivedType>::AddTo(math::RowVectorReference<double>& vector, double scalar) const
     {
-        auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
 
-        while (constIter.IsValid())
+        while (indexValueIterator.IsValid())
         {
-            auto indexValue = constIter.Get();
+            auto indexValue = indexValueIterator.Get();
             vector[indexValue.index] += scalar * indexValue.value;
-            constIter.Next();
+            indexValueIterator.Next();
         }
     }
 
@@ -194,13 +194,17 @@ namespace data
         }
 
         std::vector<double> result(size);
-        auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
 
-        while (constIter.IsValid())
+        while (indexValueIterator.IsValid())
         {
-            auto indexValue = constIter.Get();
+            auto indexValue = indexValueIterator.Get();
+            if (indexValue.index >= size)
+            {
+                break;
+            }
             result[indexValue.index] = indexValue.value;
-            constIter.Next();
+            indexValueIterator.Next();
         }
 
         return result;
@@ -223,19 +227,19 @@ namespace data
     template <class DerivedType>
     void DataVectorBase<DerivedType>::Print(std::ostream& os) const
     {
-        auto constIter = static_cast<const DerivedType*>(this)->GetIterator();
-        if (constIter.IsValid())
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
+        if (indexValueIterator.IsValid())
         {
-            auto indexValue = constIter.Get();
+            auto indexValue = indexValueIterator.Get();
             os << indexValue.index << ":" << indexValue.value;
+            indexValueIterator.Next();
         }
-        constIter.Next();
 
-        while (constIter.IsValid())
+        while (indexValueIterator.IsValid())
         {
-            auto indexValue = constIter.Get();
+            auto indexValue = indexValueIterator.Get();
             os << '\t' << indexValue.index << ":" << indexValue.value;
-            constIter.Next();
+            indexValueIterator.Next();
         }
     }
 }

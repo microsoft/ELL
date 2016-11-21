@@ -15,7 +15,7 @@ namespace common
     void ParsedMapSaveArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            outputMapFile,
+            outputMapFilename,
             "outputMapFilename",
             "omf",
             "Path to the output map file (empty for standard out, 'null' for no output)",
@@ -24,19 +24,19 @@ namespace common
 
     utilities::CommandLineParseResult ParsedMapSaveArguments::PostProcess(const utilities::CommandLineParser& parser)
     {
-        if (outputMapFile == "null")
+        if (outputMapFilename == "null")
         {
             outputMapStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
             hasOutputStream = false;
         }
-        else if (outputMapFile == "")
+        else if (outputMapFilename == "")
         {
             outputMapStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
             hasOutputStream = true;
         }
         else // treat argument as filename
         {
-            outputMapStream = utilities::OutputStreamImpostor(outputMapFile);
+            outputMapStream = utilities::OutputStreamImpostor(outputMapFilename);
             hasOutputStream = true;
         }
 

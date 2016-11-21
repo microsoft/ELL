@@ -24,7 +24,7 @@ void TestLoadMapWithDefaultArgs()
 {
     std::cout << "Testing map loading" << std::endl;
     common::MapLoadArguments args;
-    args.inputModelFile = "model_1.xml";
+    args.inputModelFilename = "model_1.xml";
     args.modelInputsString = "";
     args.modelOutputsString = "1377.output";
 
@@ -39,7 +39,7 @@ void TestLoadMapWithPorts()
 {
     std::cout << "Testing map loading" << std::endl;
     common::MapLoadArguments args;
-    args.inputModelFile = "model_1.xml";
+    args.inputModelFilename = "model_1.xml";
     args.modelInputsString = "";
     args.modelOutputsString = "1377.weightedElements[0:2]";
 

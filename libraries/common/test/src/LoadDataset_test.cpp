@@ -35,7 +35,7 @@ void TestLoadDataset()
 void TestLoadMappedDataset()
 {
     common::MapLoadArguments args;
-    args.inputModelFile = "model_1.xml";
+    args.inputModelFilename = "model_1.xml";
     args.modelInputsString = "";
     args.modelOutputsString = "1377.output";
 
