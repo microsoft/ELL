@@ -90,8 +90,10 @@ namespace data
 
         /// <summary> Copies the contents of this DataVector into a double array. </summary>
         ///
+        /// <param name="size"> The desired array size, or zero to set the size to its default value of PrefixLength(). </param>
+        ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const = 0;
+        virtual std::vector<double> ToArray(size_t size = 0) const = 0;
 
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
@@ -177,12 +179,12 @@ namespace data
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(math::RowVectorReference<double>& vector, double scalar = 1.0) const override;
 
-        /// <summary> Copies this data vector into another type of data vector. </summary>
+        /// <summary> Copies the contents of this DataVector into a double array. </summary>
         ///
-        /// <typeparam name="ReturnType"> The return type. </typeparam>
+        /// <param name="size"> The desired array size, or zero to set the size to its default value of PrefixLength(). </param>
         ///
-        /// <returns> This new data vector. </returns>
-        virtual std::vector<double> ToArray() const override;
+        /// <returns> The array. </returns>
+        virtual std::vector<double> ToArray(size_t size = 0) const override;
 
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
         ///

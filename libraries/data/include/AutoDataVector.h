@@ -111,8 +111,10 @@ namespace data
 
         /// <summary> Copies the contents of this DataVector into a double array. </summary>
         ///
+        ///  <param name="size"> The desired array size, or zero to set the size to its default value of PrefixLength(). </param>
+        ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override { return _pInternal->ToArray(); }
+        virtual std::vector<double> ToArray(size_t size = 0) const override { return _pInternal->ToArray(size); }
 
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///

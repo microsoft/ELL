@@ -53,29 +53,18 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedDataSaveArguments dataSaveArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
-        common::ParsedMapSaveArguments mapSaveArguments;
 
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(dataSaveArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
-        commandLineParser.AddOptionSet(mapSaveArguments);
-
-        bool verbose = false;
-        commandLineParser.AddOption(verbose, "verbose", "v", "Verbose mode", false);
 
         // parse command line
         commandLineParser.Parse();
-
-        if (verbose)
-        {
-            std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
-        }
 
         // load map
         model::DynamicMap map = common::LoadMap(mapLoadArguments);
 
         // load dataset
-        if (verbose) std::cout << "Loading data from file: " << dataLoadArguments.inputDataFilename << std::endl;
         auto dataset = common::GetDataset(dataLoadArguments);
 
         // get output stream
@@ -84,12 +73,12 @@ int main(int argc, char* argv[])
         auto datasetIterator = dataset.GetExampleReferenceIterator();
         while (datasetIterator.IsValid())
         {
-            const auto& example = datasetIterator.Get();    
-            auto output = map.Compute<data::FloatDataVector>(example.GetDataVector());
-            auto mappedExample = data::DenseSupervisedExample{ std::move(output), example.GetMetadata() };
+            const auto& example = datasetIterator.Get();
+            auto mappedDataVector = map.Compute<data::FloatDataVector>(example.GetDataVector());
+            auto mappedExample = data::DenseSupervisedExample{ std::move(mappedDataVector), example.GetMetadata() };
 
             mappedExample.Print(outputStream);
-            outputStream << std::string("\n");
+            outputStream << '\n';
             datasetIterator.Next();
         }
     }
