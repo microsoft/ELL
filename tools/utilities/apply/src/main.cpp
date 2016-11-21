@@ -64,22 +64,23 @@ int main(int argc, char* argv[])
         // load map
         model::DynamicMap map = common::LoadMap(mapLoadArguments);
 
-        // load dataset
-        auto dataset = common::GetDataset(dataLoadArguments);
+        // get data iterator
+        auto dataIterator = GetDataIterator(dataLoadArguments);
 
         // get output stream
-        auto outputStream = dataSaveArguments.outputDataStream;
+        auto& outputStream = dataSaveArguments.outputDataStream;
 
-        auto datasetIterator = dataset.GetExampleReferenceIterator();
-        while (datasetIterator.IsValid())
+        // iterate over data
+        while (dataIterator->IsValid())
         {
-            const auto& example = datasetIterator.Get();
+            auto example = dataIterator->Get();
             auto mappedDataVector = map.Compute<data::FloatDataVector>(example.GetDataVector());
-            auto mappedExample = data::DenseSupervisedExample{ std::move(mappedDataVector), example.GetMetadata() };
+            auto mappedExample = data::DenseSupervisedExample(std::move(mappedDataVector), example.GetMetadata());
 
             mappedExample.Print(outputStream);
             outputStream << '\n';
-            datasetIterator.Next();
+
+            dataIterator->Next();
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
