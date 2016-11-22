@@ -2,16 +2,23 @@
 # https://github.com/nodejs/node-gyp/wiki/%22binding.gyp%22-files-out-in-the-wild
 # Very helpful discussion showing how to enable RTTI on OS X:
 # https://github.com/nodejs/node-gyp/issues/26
+
+# TODO: fill in llvm and blas paths from CMake via configure_file 
+# TODO: have CMake generate the .d.ts file from XML
 {
+    'variables': {
+    },
     'conditions': [
         [
             'OS=="win"', 
             {
                 'variables': {
-                    'swig_include_path_prefix%': '../../../..',
-                    'include_path_prefix%': '../../..',
-                    'library_path_prefix%': '../../..',
-                    'library_path_suffix%': '/Release'
+                    'include_path_prefix%': '../../../..',
+                    'library_path_prefix%': '../../../..',
+                    'library_path_suffix%': '/Release',
+                    'llvm_include_path': '../../../../private/binaries/llvm/include',
+                    'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
+                    'llvm_library_path': '../../../../private/binaries/llvm/Rel/lib',
                 },
             }
         ],
@@ -19,10 +26,12 @@
             'OS=="mac"', 
             {
                 'variables': {
-                    'swig_include_path_prefix%':'../../..',
-                    'include_path_prefix%':'../../..',
-                    'library_path_prefix%':'../../../..',
-                    'library_path_suffix%': ''
+                    'include_path_prefix%':'../../../..',
+                    'library_path_prefix%':'../../../../..',
+                    'library_path_suffix%': '',
+                    'llvm_include_path': '/usr/local/include/llvm/include',
+                    'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
+                    'llvm_library_path': '/usr/local/lib',
                 },
             }
         ],
@@ -30,10 +39,12 @@
             'OS=="linux"', 
             {
                 'variables': {
-                    'swig_include_path_prefix%':'../../..',
-                    'include_path_prefix%':'../../..',
+                    'include_path_prefix%':'../../../..',
                     'library_path_prefix%':'../../../..',
-                    'library_path_suffix%': ''
+                    'library_path_suffix%': '',
+                    'llvm_include_path': '/usr/local/include/llvm/include',
+                    'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
+                    'llvm_library_path': '/usr/local/lib',
                 },
             }
         ]
@@ -45,13 +56,17 @@
                 {
                     'destination': 'build',
                     'files': [
-                        '<(include_path_prefix)/build/interfaces/xml/EMLLXML_wrap.xml'
                     ]    
                 }                
+            ],
+            'defines': [
+                '__STDC_LIMIT_MACROS=1', 
+                '__STDC_CONSTANT_MACROS=1'
             ],
             'dependencies': [],
             'include_dirs': [
                 "<!(node -e \"require('nan')\")",
+                '<(include_path_prefix)/interfaces/common/include',
                 '<(include_path_prefix)/libraries/common/include',
                 '<(include_path_prefix)/libraries/data/include',
                 '<(include_path_prefix)/libraries/evaluators/include',
@@ -62,10 +77,14 @@
                 '<(include_path_prefix)/libraries/predictors/include',
                 '<(include_path_prefix)/libraries/trainers/include',
                 '<(include_path_prefix)/libraries/utilities/include',
-                '<(include_path_prefix)/interfaces/common/include'
+                '<(include_path_prefix)/private/libraries/compiler/include',
+                '<(include_path_prefix)/private/libraries/emitters/include',
+
+                '<(llvm_include_path)',
+                '<(blas_include_path)'
             ],
             'sources': [
-                '<(include_path_prefix)/build/interfaces/javascript/EMLLJAVASCRIPT_wrap.cxx'
+                '../EMLLJAVASCRIPT_wrap.cxx'
             ],
             'link_settings': {
                 'library_dirs': [
@@ -79,6 +98,9 @@
                     '<(library_path_prefix)/build/libraries/predictors<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/trainers<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/utilities<(library_path_suffix)',
+                    '<(library_path_prefix)/build/private/libraries/compiler<(library_path_suffix)',
+                    '<(library_path_prefix)/build/private/libraries/emitters<(library_path_suffix)',
+                    '<(llvm_library_path)',
                 ]
             },
             'conditions': [
@@ -87,16 +109,45 @@
                     {
                         'link_settings': {
                             'libraries': [
-                                '-lcommon.lib',
-                                '-ldata.lib',
-                                '-levaluators.lib',                                                                
-                                '-llossFunctions.lib',
-                                '-lmath.lib',
-                                '-lmodel.lib',
-                                '-lnodes.lib',
-                                '-lpredictors.lib',
-                                '-ltrainers.lib',
-                                '-lutilities.lib'
+                                '-lcommon',
+                                '-ldata',
+                                '-levaluators',                                                                
+                                '-llossFunctions',
+                                '-lmath',
+                                '-lmodel',
+                                '-lnodes',
+                                '-lpredictors',
+                                '-ltrainers',
+                                '-lutilities',
+                                '-lcompiler',
+                                '-lemitters',
+
+                                '-lLLVMAnalysis',
+                                '-lLLVMAsmParser',
+                                '-lLLVMAsmPrinter',
+                                '-lLLVMBitReader',
+                                '-lLLVMBitWriter',
+                                '-lLLVMCodeGen',
+                                '-lLLVMCore',
+                                '-lLLVMDebugInfoCodeView',
+                                '-lLLVMExecutionEngine',
+                                '-lLLVMInstCombine',
+                                '-lLLVMMC',
+                                '-lLLVMMCDisassembler',
+                                '-lLLVMMCJIT',
+                                '-lLLVMMCParser',
+                                '-lLLVMObject',
+                                '-lLLVMRuntimeDyld',
+                                '-lLLVMScalarOpts',
+                                '-lLLVMSelectionDag',
+                                '-lLLVMSupport',
+                                '-lLLVMTarget',
+                                '-lLLVMTransformUtils',
+                                '-lLLVMX86AsmPrinter',
+                                '-lLLVMX86CodeGen',
+                                '-lLLVMX86Desc',
+                                '-lLLVMX86Info',
+                                '-lLLVMX86Utils'                                
                             ]
                         },
                         'msvs_settings': {
@@ -115,16 +166,44 @@
                     {
                         'link_settings': {
                             'libraries': [
-                                'libcommon.a',
-                                'libdata.a',
-                                'libevaluators.a',
-                                'liblossFunctions.a',
-                                'libmath.a',
-                                'libmodel.a',
-                                'libnodes.a',
-                                'libpredictors.a',
-                                'libtrainers.a',
-                                'libutilities.a',
+                                '-lcommon',
+                                '-ldata',
+                                '-levaluators',                                                                
+                                '-llossFunctions',
+                                '-lmath',
+                                '-lmodel',
+                                '-lnodes',
+                                '-lpredictors',
+                                '-ltrainers',
+                                '-lutilities',
+                                '-lcompiler',
+                                '-lemitters',
+                                '-lLLVMAnalysis',
+                                '-lLLVMAsmParser',
+                                '-lLLVMAsmPrinter',
+                                '-lLLVMBitReader',
+                                '-lLLVMBitWriter',
+                                '-lLLVMCodeGen',
+                                '-lLLVMCore',
+                                '-lLLVMDebugInfoCodeView',
+                                '-lLLVMExecutionEngine',
+                                '-lLLVMInstCombine',
+                                '-lLLVMMC',
+                                '-lLLVMMCDisassembler',
+                                '-lLLVMMCJIT',
+                                '-lLLVMMCParser',
+                                '-lLLVMObject',
+                                '-lLLVMRuntimeDyld',
+                                '-lLLVMScalarOpts',
+                                '-lLLVMSelectionDag',
+                                '-lLLVMSupport',
+                                '-lLLVMTarget',
+                                '-lLLVMTransformUtils',
+                                '-lLLVMX86AsmPrinter',
+                                '-lLLVMX86CodeGen',
+                                '-lLLVMX86Desc',
+                                '-lLLVMX86Info',
+                                '-lLLVMX86Utils'                                
                             ]
                         },
                         'cflags_cc!': [
@@ -138,12 +217,13 @@
                             'OTHER_CPLUSPLUSFLAGS': [
                                 '-std=c++14',
                                 '-stdlib=libc++',
-                                '-v'
+                                '-v',
+
                             ],
                             'OTHER_LDFLAGS': [
                                 '-stdlib=libc++'
                             ],
-                            'MACOSX_DEPLOYMENT_TARGET': '10.11',
+                            'MACOSX_DEPLOYMENT_TARGET': '10.12',
                             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
                             'GCC_ENABLE_CPP_RTTI': 'YES'
                         }
@@ -162,16 +242,44 @@
                         ],
                         'link_settings': {
                             'libraries': [
-                                'libcommon.a',
-                                'libdata.a',
-                                'libevaluators.a',
-                                'liblossFunctions.a',
-                                'libmath.a',
-                                'libmodel.a',
-                                'libnodes.a',
-                                'libpredictors.a',
-                                'libtrainers.a',
-                                'libutilities.a',
+                                '-lcommon',
+                                '-ldata',
+                                '-levaluators',                                                                
+                                '-llossFunctions',
+                                '-lmath',
+                                '-lmodel',
+                                '-lnodes',
+                                '-lpredictors',
+                                '-ltrainers',
+                                '-lutilities',
+                                '-lcompiler',
+                                '-lemitters',
+                                '-lLLVMAnalysis',
+                                '-lLLVMAsmParser',
+                                '-lLLVMAsmPrinter',
+                                '-lLLVMBitReader',
+                                '-lLLVMBitWriter',
+                                '-lLLVMCodeGen',
+                                '-lLLVMCore',
+                                '-lLLVMDebugInfoCodeView',
+                                '-lLLVMExecutionEngine',
+                                '-lLLVMInstCombine',
+                                '-lLLVMMC',
+                                '-lLLVMMCDisassembler',
+                                '-lLLVMMCJIT',
+                                '-lLLVMMCParser',
+                                '-lLLVMObject',
+                                '-lLLVMRuntimeDyld',
+                                '-lLLVMScalarOpts',
+                                '-lLLVMSelectionDag',
+                                '-lLLVMSupport',
+                                '-lLLVMTarget',
+                                '-lLLVMTransformUtils',
+                                '-lLLVMX86AsmPrinter',
+                                '-lLLVMX86CodeGen',
+                                '-lLLVMX86Desc',
+                                '-lLLVMX86Info',
+                                '-lLLVMX86Utils'                                
                             ]
                         }
                     }
