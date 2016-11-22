@@ -72,8 +72,14 @@ namespace model
         return _model;
     }
 
-    Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context)
+    Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context, int maxIterations)
     {
+        if (maxIterations <= 0)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "maxIterations must be positive");
+            return oldModel;
+        }
+
         _context = context;
         _model = oldModel;
 
@@ -116,7 +122,7 @@ namespace model
             }
 
             // die after too many iterations
-            if (++iterationCount >= maxRefinementIterations)
+            if (++iterationCount >= maxIterations)
             {
                 std::string firstUncompilableNodeName;
                 auto uncompilableNodes = FindUncompilableNodes(currentModel, context);
@@ -124,7 +130,7 @@ namespace model
                 {
                     firstUncompilableNodeName = uncompilableNodes[0]->GetRuntimeTypeName();
                 }
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxRefinementIterations) + " refinement iterations, first uncompilable node: " + firstUncompilableNodeName);
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxIterations) + " refinement iterations, first uncompilable node: " + firstUncompilableNodeName);
             }
         } while (!_isModelCompilable);
 

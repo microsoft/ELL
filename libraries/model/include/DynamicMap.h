@@ -62,10 +62,11 @@ namespace model
         /// <returns> The `Model` </returns>
         Model& GetModel() { return _model; }
 
-        /// <summary> Refines the model wrapped by this map </summary>
+        /// <summary> Refines the model wrapped by this map. </summary>
         ///
-        /// <param name="context"> The TransformContext to use during refinement </param>
-        void Refine(const TransformContext& context);
+        /// <param name="context"> The TransformContext to use during refinement. </param>
+        /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
+        void Refine(const TransformContext& context, int maxIterations = 10);
 
         /// <summary> Computes the map's output from input values </summary>
         ///
@@ -241,7 +242,7 @@ namespace model
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         virtual ModelTransformer DoPrune(); // overridable prune implementation
-        virtual ModelTransformer DoRefine(const TransformContext& context); // overridable refine implementation
+        virtual ModelTransformer DoRefine(const TransformContext& context, int maxIterations); // overridable refine implementation
 
         virtual void SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const;
         virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const;

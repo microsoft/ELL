@@ -151,15 +151,21 @@ namespace model
         return transformer;
     }
 
-    void DynamicMap::Refine(const TransformContext& context)
+    void DynamicMap::Refine(const TransformContext& context, int maxIterations)
     {
-        DoRefine(context);
+        DoRefine(context, maxIterations);
     }
 
-    ModelTransformer DynamicMap::DoRefine(const TransformContext& context)
+    ModelTransformer DynamicMap::DoRefine(const TransformContext& context, int maxIterations)
     {
         ModelTransformer transformer;
-        auto refinedModel = transformer.RefineModel(_model, context);
+
+        if (maxIterations == 0)
+        {
+            return transformer;
+        }
+
+        auto refinedModel = transformer.RefineModel(_model, context, maxIterations);
         FixTransformedIO(transformer);
         _model = refinedModel;
         return transformer;
