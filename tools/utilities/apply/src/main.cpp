@@ -6,8 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// test parameters
-// bin\Release\apply -idf examples/data/testData.txt --inputModelFile examples/data/model_1.json -v -in 3128 -out 3133.output
+#include "ApplyArguments.h"
 
 // utilities
 #include "CommandLineParser.h"
@@ -53,10 +52,12 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedDataSaveArguments dataSaveArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
+        ParsedApplyArguments applyArguments;
 
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(dataSaveArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
+        commandLineParser.AddOptionSet(applyArguments);
 
         // parse command line
         commandLineParser.Parse();
