@@ -18,9 +18,9 @@
 %template(DoubleVector) std::vector<double>;
 %template(DoubleVectorVector) std::vector<std::vector<double>>;
 #endif 
+
 %include "lossFunctions.i"
 %include "model.i"
-
 
 #if 0
 // IMPORTANT: need to include these before anything else, because they include windows.h or other platform-related things
