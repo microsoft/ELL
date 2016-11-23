@@ -71,75 +71,54 @@ int main(int argc, char* argv[])
         // get output stream
         auto& outputStream = dataSaveArguments.outputDataStream;
 
-        // apply map to dataset
-        if (applyArguments.inputMapFilename2 != "")
+        // output summarization mode
+        if (applyArguments.summarize)
         {
-            auto map2 = common::LoadMap(applyArguments.inputMapFilename2);
-            math::RowVector<double> mean(map.ComputeSize());
-            math::RowVector<double> meanSquared(map.ComputeSize());
+            std::unique_ptr<model::DynamicMap> map2 = nullptr;
+            if (applyArguments.inputMapFilename2 != "")
+            {
+                map2 = std::make_unique<model::DynamicMap>(common::LoadMap(applyArguments.inputMapFilename2));
+            }
+
+            math::RowVector<double> u(map.ComputeSize());
+            math::RowVector<double> v(map.ComputeSize());
             size_t count = 0;
 
             while (dataIterator->IsValid())
             {
                 auto example = dataIterator->Get();
                 auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
-                auto mappedDataVector2 = map2.Compute<data::DoubleDataVector>(example.GetDataVector());
+                math::RowVector<double> w(map.ComputeSize());
+                mappedDataVector.AddTo(w);
 
-                math::RowVector<double> v(map.ComputeSize());
-                mappedDataVector.AddTo(v);
-                mappedDataVector2.AddTo(v, -1.0);
+                if (map2 != nullptr)
+                {
+                    auto mappedDataVector2 = map2->Compute<data::DoubleDataVector>(example.GetDataVector());
+                    mappedDataVector2.AddTo(w, -1.0);
+                }
 
-                math::Operations::Add(1.0, v, mean);
-                v.Transform([](double x) {return x*x; });
-                math::Operations::Add(1.0, v, meanSquared);
-
-                dataIterator->Next();
-                ++count;
-            }
-
-            math::Operations::Multiply(1.0 / count, mean);
-            meanSquared.Transform([count](double x) {return std::sqrt(x / count); });
-
-            outputStream << "mean:\t";
-            mean.Print(outputStream);
-            outputStream << '\n';
-            outputStream << "std:\t";
-            meanSquared.Print(outputStream);
-            outputStream << '\n';
-        }
-
-        else if (applyArguments.summarize)
-        {
-            math::RowVector<double> mean(map.ComputeSize());
-            math::RowVector<double> meanSquared(map.ComputeSize());
-            size_t count = 0;
-
-            while (dataIterator->IsValid())
-            {
-                auto example = dataIterator->Get();
-                auto mappedDataVector = map.Compute<data::FloatDataVector>(example.GetDataVector());
-                
-                math::RowVector<double> v(map.ComputeSize());
-                mappedDataVector.AddTo(v);
-                math::Operations::Add(1.0, v, mean);
-                v.Transform([](double x) {return x*x; });
-                math::Operations::Add(1.0, v, meanSquared);
+                // accumulate vectors for mean and standard deviation computation
+                u += w;
+                w.CoordinatewiseSquare();
+                v += w;
 
                 dataIterator->Next();
                 ++count;
             }
 
-            math::Operations::Multiply(1.0 / count, mean);
-            meanSquared.Transform([count](double x) {return std::sqrt(x / count); });
+            // calculate and print mean and standard deviation
+            double denominator = static_cast<double>(count);
+            u /= denominator;
+            outputStream << "mean:\t" << u << '\n';
 
-            outputStream << "mean:\t";
-            mean.Print(outputStream);
-            outputStream << '\n';
-            outputStream << "std:\t";
-            meanSquared.Print(outputStream);
-            outputStream << '\n';
+            u.CoordinatewiseSquare();
+            v /= denominator;
+            v -= u;
+            v.CoordinatewiseSquareRoot();
+            outputStream << "std:\t" << v << '\n';
         }
-        
+
+        // output new dataset mode
         else 
         {
             while (dataIterator->IsValid())

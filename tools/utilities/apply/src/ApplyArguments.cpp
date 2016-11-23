@@ -16,14 +16,14 @@ namespace emll
             inputMapFilename2,
             "inputMapFilename2",
             "imap2",
-            "Path to the second input map file. If provided, the second map is subtracted from the first.",
+            "Path to the second input map file (used only in summarization mode). If provided, the second map is subtracted from the first.",
             "");
 
         parser.AddOption(
             summarize,
             "summarize",
             "s",
-            "Instead of raw output, report a summary.",
+            "Aggregate and summarize map output.",
             false);
     }
 

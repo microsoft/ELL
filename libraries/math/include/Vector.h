@@ -91,27 +91,23 @@ namespace math
         template <typename MapperType>
         ElementType Aggregate(MapperType mapper) const;
 
-        void Print(std::ostream& ostream) const
-        {
-            if (_size > 0)
-            {
-                ostream << *_pData;
-            }
-
-            for (size_t i = 1; i < _size; ++i)
-            {
-                ostream << '\t' << _pData[i*_increment];
-            }
-        }
+        /// <summary> Prints a tab separated representation of this vector to an output stream, independent of orientation. </summary>
+        ///
+        /// <param name="ostream"> [in,out] The output stream. </param>
+        void Print(std::ostream& ostream) const;
 
     protected:
         UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
         void Swap(UnorientedConstVectorReference<ElementType>& other);
+        void CheckSize(const UnorientedConstVectorReference<ElementType>& other) const;
 
         ElementType* _pData;
         size_t _size;
         size_t _increment;
     };
+
+    template <typename ElementType>
+    std::ostream& operator<<(std::ostream& ostream, UnorientedConstVectorReference<ElementType> vector);
 
     /// <summary> A reference to a constant algebraic vector. </summary>
     ///
@@ -242,6 +238,42 @@ namespace math
         /// <param name="mapper"> The mapper. </param>
         template <typename MapperType>
         void Transform(MapperType mapper);
+
+        /// <summary> Adds another vector to this vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        void operator+= (ConstVectorReference<ElementType, Orientation> other);
+
+        /// <summary> Subtracts another vector from this vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        void operator-= (ConstVectorReference<ElementType, Orientation> other);
+
+        /// <summary> Adds a constant value to this vector. </summary>
+        ///
+        /// <param name="other"> The constant value. </param>
+        void operator+= (ElementType value);
+
+        /// <summary> Subtracts a constant value from this vector. </summary>
+        ///
+        /// <param name="other"> The constant value. </param>
+        void operator-= (ElementType value);
+
+        /// <summary> Multiplies this vector by a constant value. </summary>
+        ///
+        /// <param name="other"> The constant value. </param>
+        void operator*= (ElementType value);
+
+        /// <summary> Divides each element of this vector by a constant value. </summary>
+        ///
+        /// <param name="other"> The constant value. </param>
+        void operator/= (ElementType value);
+
+        /// <summary> Replaces each element of this vector with its square. </summary>
+        void CoordinatewiseSquare();
+
+        /// <summary> Replaces each element of this vector with its square root. </summary>
+        void CoordinatewiseSquareRoot();
 
     protected:
         using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
