@@ -82,6 +82,11 @@ namespace model
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
 
+        size_t ComputeSize() const // TODO
+        {
+            return GetOutput(0).Size();
+        }
+
         //
         // Internal routines for getting information about inputs / outputs of the map
         // and doing type-safe operations.

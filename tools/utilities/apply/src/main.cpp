@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // load map
-        model::DynamicMap map = common::LoadMap(mapLoadArguments);
+        auto map = common::LoadMap(mapLoadArguments);
 
         // get data iterator
         auto dataIterator = GetDataIterator(dataLoadArguments);
@@ -71,17 +71,86 @@ int main(int argc, char* argv[])
         // get output stream
         auto& outputStream = dataSaveArguments.outputDataStream;
 
-        // iterate over data
-        while (dataIterator->IsValid())
+        // apply map to dataset
+        if (applyArguments.inputMapFilename2 != "")
         {
-            auto example = dataIterator->Get();
-            auto mappedDataVector = map.Compute<data::FloatDataVector>(example.GetDataVector());
-            auto mappedExample = data::DenseSupervisedExample(std::move(mappedDataVector), example.GetMetadata());
+            auto map2 = common::LoadMap(applyArguments.inputMapFilename2);
+            math::RowVector<double> mean(map.ComputeSize());
+            math::RowVector<double> meanSquared(map.ComputeSize());
+            size_t count = 0;
 
-            mappedExample.Print(outputStream);
+            while (dataIterator->IsValid())
+            {
+                auto example = dataIterator->Get();
+                auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
+                auto mappedDataVector2 = map2.Compute<data::DoubleDataVector>(example.GetDataVector());
+
+                math::RowVector<double> v(map.ComputeSize());
+                mappedDataVector.AddTo(v);
+                mappedDataVector2.AddTo(v, -1.0);
+
+                math::Operations::Add(1.0, v, mean);
+                v.Transform([](double x) {return x*x; });
+                math::Operations::Add(1.0, v, meanSquared);
+
+                dataIterator->Next();
+                ++count;
+            }
+
+            math::Operations::Multiply(1.0 / count, mean);
+            meanSquared.Transform([count](double x) {return std::sqrt(x / count); });
+
+            outputStream << "mean:\t";
+            mean.Print(outputStream);
             outputStream << '\n';
+            outputStream << "std:\t";
+            meanSquared.Print(outputStream);
+            outputStream << '\n';
+        }
 
-            dataIterator->Next();
+        else if (applyArguments.summarize)
+        {
+            math::RowVector<double> mean(map.ComputeSize());
+            math::RowVector<double> meanSquared(map.ComputeSize());
+            size_t count = 0;
+
+            while (dataIterator->IsValid())
+            {
+                auto example = dataIterator->Get();
+                auto mappedDataVector = map.Compute<data::FloatDataVector>(example.GetDataVector());
+                
+                math::RowVector<double> v(map.ComputeSize());
+                mappedDataVector.AddTo(v);
+                math::Operations::Add(1.0, v, mean);
+                v.Transform([](double x) {return x*x; });
+                math::Operations::Add(1.0, v, meanSquared);
+
+                dataIterator->Next();
+                ++count;
+            }
+
+            math::Operations::Multiply(1.0 / count, mean);
+            meanSquared.Transform([count](double x) {return std::sqrt(x / count); });
+
+            outputStream << "mean:\t";
+            mean.Print(outputStream);
+            outputStream << '\n';
+            outputStream << "std:\t";
+            meanSquared.Print(outputStream);
+            outputStream << '\n';
+        }
+        
+        else 
+        {
+            while (dataIterator->IsValid())
+            {
+                auto example = dataIterator->Get();
+                auto mappedDataVector = map.Compute<data::FloatDataVector>(example.GetDataVector());
+                auto mappedExample = data::DenseSupervisedExample(std::move(mappedDataVector), example.GetMetadata());
+                mappedExample.Print(outputStream);
+                outputStream << '\n';
+                dataIterator->Next();
+            }
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

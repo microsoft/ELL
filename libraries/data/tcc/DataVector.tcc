@@ -163,9 +163,14 @@ namespace data
         auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
 
         double result = 0.0;
+        auto size = vector.Size();
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
+            if (indexValue.index >= size)
+            {
+                break;
+            }
             result += indexValue.value * vector[indexValue.index];
             indexValueIterator.Next();
         }
@@ -177,9 +182,14 @@ namespace data
     {
         auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
 
+        auto originalSize = vector.Size();
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
+            if (indexValue.index >= originalSize)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "vector size is smaller than data vector prefix length");
+            }
             vector[indexValue.index] += scalar * indexValue.value;
             indexValueIterator.Next();
         }

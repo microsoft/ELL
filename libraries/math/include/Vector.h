@@ -91,6 +91,19 @@ namespace math
         template <typename MapperType>
         ElementType Aggregate(MapperType mapper) const;
 
+        void Print(std::ostream& ostream) const
+        {
+            if (_size > 0)
+            {
+                ostream << *_pData;
+            }
+
+            for (size_t i = 1; i < _size; ++i)
+            {
+                ostream << '\t' << _pData[i*_increment];
+            }
+        }
+
     protected:
         UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
         void Swap(UnorientedConstVectorReference<ElementType>& other);
@@ -132,7 +145,7 @@ namespace math
         auto Transpose() const -> ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
         {
             return ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
-		}
+        }
 
         /// <summary> Equality operator. </summary>
         ///

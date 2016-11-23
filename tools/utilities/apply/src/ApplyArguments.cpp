@@ -15,8 +15,8 @@ namespace emll
         parser.AddOption(
             inputMapFilename2,
             "inputMapFilename2",
-            "imf2",
-            "Path to the second input map file. The second map is subtracted from the first.",
+            "imap2",
+            "Path to the second input map file. If provided, the second map is subtracted from the first.",
             "");
 
         parser.AddOption(
