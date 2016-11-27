@@ -87,7 +87,7 @@ namespace model
 
         // refine until all nodes are compilable according to context.IsNodeCompilable(), until
         // the model is fully refined, or until the maximum number of iterations is reached.
-        do
+        for(int i=0; i<maxIterations; ++i)
         {
             Model currentModel = std::move(_model);
             _model = Model();
@@ -115,24 +115,18 @@ namespace model
                 _elementToElementMap = newElementToElementMap;
             }
 
-            // return if we didn't make any progress
-            if (!didRefineAny)
+            // check for unrefinable graphs
+            if (!didRefineAny && !_isModelCompilable)
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "unrefinable model: some nodes are uncompilable, yet cannot refine");
+            }
+
+            // stop if we are finished
+            if (_isModelCompilable)
             {
                 break;
             }
-
-            // die after too many iterations
-            if (++iterationCount >= maxIterations)
-            {
-                std::string firstUncompilableNodeName;
-                auto uncompilableNodes = FindUncompilableNodes(currentModel, context);
-                if (uncompilableNodes.size() > 0)
-                {
-                    firstUncompilableNodeName = uncompilableNodes[0]->GetRuntimeTypeName();
-                }
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxIterations) + " refinement iterations, first uncompilable node: " + firstUncompilableNodeName);
-            }
-        } while (!_isModelCompilable);
+        }
 
         // clear out the context
         _context = TransformContext();

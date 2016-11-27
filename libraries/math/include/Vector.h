@@ -106,6 +106,14 @@ namespace math
         size_t _increment;
     };
 
+    /// <summary>
+    /// Streaming operator. Prints vectors to ostreams
+    /// </summary>
+    ///
+    /// <param name="ostream"> [in,out] Stream to write data to. </param>
+    /// <param name="vector"> The vector. </param>
+    ///
+    /// <returns> Reference to the stream. </returns>
     template <typename ElementType>
     std::ostream& operator<<(std::ostream& ostream, UnorientedConstVectorReference<ElementType> vector);
 
