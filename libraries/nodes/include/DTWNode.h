@@ -46,8 +46,9 @@ namespace nodes
         DTWNode();
 
         /// <summary> Constructor </summary>
-        /// <param name="input1"> One of the signals to take the dot product of </param>
-        /// <param name="input2"> The other signal to take the dot product of </param>
+        ///
+        /// <param name="input"> The signals to compare to the prototype </param>
+        /// <param name="prototype"> The prototype </param>
         DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype);
 
         /// <summary> Gets the name of this type (for serialization). </summary>

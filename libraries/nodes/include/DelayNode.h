@@ -45,6 +45,7 @@ namespace nodes
         DelayNode();
 
         /// <summary> Constructor </summary>
+        ///
         /// <param name="input"> The signal to delay </param>
         /// <param name="windowSize"> The number of samples to delay the signal </param>
         DelayNode(const model::PortElements<ValueType>& input, size_t windowSize);

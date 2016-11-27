@@ -47,6 +47,7 @@ namespace nodes
         DotProductNode();
 
         /// <summary> Constructor </summary>
+        ///
         /// <param name="input1"> One of the signals to take the dot product of </param>
         /// <param name="input2"> The other signal to take the dot product of </param>
         DotProductNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2);

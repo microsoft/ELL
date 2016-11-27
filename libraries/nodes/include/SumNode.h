@@ -41,6 +41,7 @@ namespace nodes
         SumNode();
 
         /// <summary> Constructor </summary>
+        ///
         /// <param name="input"> The signal to take the sum of </param>
         SumNode(const model::PortElements<ValueType>& input);
 

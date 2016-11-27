@@ -55,7 +55,7 @@ namespace nodes
         /// <summary> Default Constructor </summary>
         BinaryPredicateNode();
 
-        /// <summary> Constructor. </summary>
+        /// <summary> Constructor </summary>
         ///
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
