@@ -719,6 +719,4 @@ ELL_Model::ELL_Model(const emll::model::Model& other) :
 // Functions
 //
 
-// TBD
-
 %}

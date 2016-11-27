@@ -59,10 +59,12 @@ foreach(file ${INTERFACE_FILES})
     configure_file(${file} ${file} COPYONLY)
 endforeach()
 
-# -debug-classes -debug-typedef 
-set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-typedef  -debug-template)
+set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-classes -debug-typedef  -debug-template)
 if(${language} STREQUAL "javascript")
-    set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node) # -DV8_VERSION=0x032530)
+    # Note: if compiling against older version of node, we may have to specify the 
+    # V8 version explicitly. For instance, when building against electron 0.36.7,
+    # add this flag to the CMAKE_SWIG_FLAGS: -DV8_VERSION=0x032530
+    set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node)
 endif()
 
 set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
