@@ -12,7 +12,7 @@ var tap = require('tap');
 const EMLL = require('emll');
 console.log('Loaded EMLL');
 
-// v is a list of lists (a javascript jagged array)
+// array is a list of lists (a javascript jagged array)
 function ToEMLLVector(array) {
   let result = new EMLL.DoubleVectorVector();
   for (var rowIndex = 0; rowIndex < array.length; rowIndex++) {
@@ -52,12 +52,3 @@ let testData = ToEMLLVector([
 
 console.log('Compute:');
 PrintResults(map, testData);
-
-/*EMLL.GetDatasetAsync("../data/testData.txt", function(datasetasync)
-{
-  if(datasetasync)
-  {
-    console.log("Async Mode Size:" + datasetasync.NumExamples());
-    tap.pass('Test GetDatasetAsync');
-  }
-});*/
