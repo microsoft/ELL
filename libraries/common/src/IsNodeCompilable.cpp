@@ -41,7 +41,7 @@ namespace common
         AddNodeType<nodes::BinaryPredicateNode<double>>();
         AddNodeType<nodes::DemultiplexerNode<bool, bool>>();
         AddNodeType<nodes::DemultiplexerNode<double, bool>>();
-        // AddNodeType<nodes::DotProductNode<double>>();
+        AddNodeType<nodes::DotProductNode<double>>();
         AddNodeType<nodes::TypeCastNode<bool, int>>();
         AddNodeType<nodes::UnaryOperationNode<bool>>();
         AddNodeType<nodes::UnaryOperationNode<double>>();

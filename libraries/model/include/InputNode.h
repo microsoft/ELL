@@ -43,7 +43,7 @@ namespace model
         /// <summary> Gets the output type of this node </summary>
         ///
         /// <returns> The output type of this node </returns>
-        Port::PortType GetType() const { return _outputBase.GetType(); }
+        Port::PortType GetOutputType() const { return _outputBase.GetType(); }
 
     protected:
         InputNodeBase(OutputPortBase& output);

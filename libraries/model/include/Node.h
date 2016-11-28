@@ -46,12 +46,12 @@ namespace model
         /// <summary> Returns the number of input ports for this node </summary>
         ///
         /// <returns> The number of input ports </returns>
-        size_t NumInputs() const { return _inputs.size(); }
+        size_t NumInputPorts() const { return _inputs.size(); }
 
         /// <summary> Returns the number of output ports for this node </summary>
         ///
         /// <returns> The number of output ports </returns>
-        size_t NumOutputs() const { return _outputs.size(); }
+        size_t NumOutputPorts() const { return _outputs.size(); }
 
         /// <summary> Returns the input ports for this node </summary>
         ///

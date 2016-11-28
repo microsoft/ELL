@@ -240,3 +240,5 @@ interfaces/javascript/emll_module/CMakeFiles/
 interfaces/javascript/emll_module/test/js/Testing/
 yotta_modules/
 yotta_targets/
+LaunchXslt/bin/**
+LaunchXslt/obj/**

@@ -105,11 +105,11 @@ namespace model
         /// <returns> The refined Model. </returns>
         Model RefineModel(const Model& model, const TransformContext& context);
 
-        /// <summary> Performs an arbitrary transformation on a given model. </summary>
+        /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
         ///
         /// <param name="model"> The model. </param>
-        /// <param name="transformFunction"> The function to apply to each node. </param>
-        /// <param name="context"> The context. </param>
+        /// <param name="transformFunction"> The function to apply on each node </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
         ///
         /// <returns> The refined Model. </returns>
         Model TransformModel(const Model& model, const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
