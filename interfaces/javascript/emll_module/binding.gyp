@@ -1,10 +1,3 @@
-# Examples of binding.gyp files for real projects:
-# https://github.com/nodejs/node-gyp/wiki/%22binding.gyp%22-files-out-in-the-wild
-# Very helpful discussion showing how to enable RTTI on OS X:
-# https://github.com/nodejs/node-gyp/issues/26
-
-# TODO: fill in llvm and blas paths from CMake via configure_file 
-# TODO: have CMake generate the .d.ts file from XML
 {
     'variables': {
     },
