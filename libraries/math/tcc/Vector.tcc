@@ -78,7 +78,7 @@ namespace math
 
         for (size_t i = 1; i < _size; ++i)
         {
-            ostream << '\t' << _pData[i*_increment];
+            ostream << '\t' << _pData[i * _increment];
         }
     }
 
@@ -239,39 +239,39 @@ namespace math
     }
 
     template <typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::operator+= (ConstVectorReference<ElementType, Orientation> other)
+    void VectorReference<ElementType, Orientation>::operator+=(ConstVectorReference<ElementType, Orientation> other)
     {
         CheckSize(other);
         Operations::Add(1.0, other, *this);
     }
 
     template <typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::operator-= (ConstVectorReference<ElementType, Orientation> other)
+    void VectorReference<ElementType, Orientation>::operator-=(ConstVectorReference<ElementType, Orientation> other)
     {
         CheckSize(other);
         Operations::Add(-1.0, other, *this);
     }
 
     template <typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::operator+= (ElementType value)
+    void VectorReference<ElementType, Orientation>::operator+=(ElementType value)
     {
         Operations::Add(value, *this);
     }
 
     template <typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::operator-= (ElementType value)
+    void VectorReference<ElementType, Orientation>::operator-=(ElementType value)
     {
         Operations::Add(-value, *this);
     }
 
     template <typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::operator*= (ElementType value)
+    void VectorReference<ElementType, Orientation>::operator*=(ElementType value)
     {
         Operations::Multiply(value, *this);
     }
 
     template <typename ElementType, VectorOrientation Orientation>
-    void VectorReference<ElementType, Orientation>::operator/= (ElementType value)
+    void VectorReference<ElementType, Orientation>::operator/=(ElementType value)
     {
         if (value == 0)
         {
@@ -283,7 +283,7 @@ namespace math
     template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::CoordinatewiseSquare()
     {
-        Transform([](ElementType x) { return x*x; });
+        Transform([](ElementType x) { return x * x; });
     }
 
     template <typename ElementType, VectorOrientation Orientation>

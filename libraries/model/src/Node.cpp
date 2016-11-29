@@ -80,7 +80,7 @@ namespace model
     Port* Node::GetPort(const std::string& portName)
     {
         auto inputPort = GetInputPort(portName);
-        if(inputPort != nullptr)
+        if (inputPort != nullptr)
         {
             return inputPort;
         }
@@ -91,7 +91,7 @@ namespace model
     const Port* Node::GetPort(const std::string& portName) const
     {
         auto inputPort = GetInputPort(portName);
-        if(inputPort != nullptr)
+        if (inputPort != nullptr)
         {
             return inputPort;
         }

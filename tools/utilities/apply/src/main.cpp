@@ -15,8 +15,8 @@
 #include "OutputStreamImpostor.h"
 
 // data
-#include "Example.h"
 #include "Dataset.h"
+#include "Example.h"
 
 // common
 #include "DataLoadArguments.h"
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
         }
 
         // output new dataset mode
-        else 
+        else
         {
             while (dataIterator->IsValid())
             {

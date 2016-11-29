@@ -12,7 +12,6 @@
 #include "DenseDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
-#include "..\include\AutoDataVector.h"
 
 namespace emll
 {
@@ -78,7 +77,7 @@ namespace data
         _pInternal->AddTo(vector, scalar);
     }
 
-    template<typename DefaultDataVectorType>
+    template <typename DefaultDataVectorType>
     std::vector<double> AutoDataVectorBase<DefaultDataVectorType>::ToArray(size_t size) const
     {
         return _pInternal->ToArray(size);

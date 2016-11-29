@@ -199,7 +199,7 @@ namespace data
     std::vector<double> DataVectorBase<DerivedType>::ToArray() const
     {
         auto size = static_cast<const DerivedType*>(this)->PrefixLength();
- 
+
         std::vector<double> result(size);
         auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
 
@@ -236,7 +236,6 @@ namespace data
 
         return result;
     }
-
 
     template <class DerivedType>
     template <typename ReturnType>

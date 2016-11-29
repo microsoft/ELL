@@ -250,32 +250,32 @@ namespace math
         /// <summary> Adds another vector to this vector. </summary>
         ///
         /// <param name="other"> The other vector. </param>
-        void operator+= (ConstVectorReference<ElementType, Orientation> other);
+        void operator+=(ConstVectorReference<ElementType, Orientation> other);
 
         /// <summary> Subtracts another vector from this vector. </summary>
         ///
         /// <param name="other"> The other vector. </param>
-        void operator-= (ConstVectorReference<ElementType, Orientation> other);
+        void operator-=(ConstVectorReference<ElementType, Orientation> other);
 
         /// <summary> Adds a constant value to this vector. </summary>
         ///
         /// <param name="other"> The constant value. </param>
-        void operator+= (ElementType value);
+        void operator+=(ElementType value);
 
         /// <summary> Subtracts a constant value from this vector. </summary>
         ///
         /// <param name="other"> The constant value. </param>
-        void operator-= (ElementType value);
+        void operator-=(ElementType value);
 
         /// <summary> Multiplies this vector by a constant value. </summary>
         ///
         /// <param name="other"> The constant value. </param>
-        void operator*= (ElementType value);
+        void operator*=(ElementType value);
 
         /// <summary> Divides each element of this vector by a constant value. </summary>
         ///
         /// <param name="other"> The constant value. </param>
-        void operator/= (ElementType value);
+        void operator/=(ElementType value);
 
         /// <summary> Replaces each element of this vector with its square. </summary>
         void CoordinatewiseSquare();

@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ModelTransformer.h"
-#include "Node.h"
 #include "InputNode.h"
+#include "Node.h"
 
 // utilities
 #include "Exception.h"
@@ -87,7 +87,7 @@ namespace model
 
         // refine until all nodes are compilable according to context.IsNodeCompilable(), until
         // the model is fully refined, or until the maximum number of iterations is reached.
-        for(int i=0; i<maxIterations; ++i)
+        for (int i = 0; i < maxIterations; ++i)
         {
             Model currentModel = std::move(_model);
             _model = Model();

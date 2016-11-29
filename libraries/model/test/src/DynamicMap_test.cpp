@@ -9,11 +9,11 @@
 #include "DenseDataVector.h"
 
 // model
-#include "Model.h"
 #include "DynamicMap.h"
-#include "PortElements.h"
 #include "InputNode.h"
+#include "Model.h"
 #include "OutputNode.h"
+#include "PortElements.h"
 
 // nodes
 #include "ExtremalValueNode.h"
@@ -30,10 +30,10 @@
 #include "testing.h"
 
 // stl
-#include <iostream>
 #include <cassert>
-#include <tuple>
+#include <iostream>
 #include <sstream>
+#include <tuple>
 
 //
 // Test code for dynamic map class
@@ -87,9 +87,9 @@ void TestDynamicMapComputeDataVector()
     assert(inputNodes.size() == 1);
 
     auto signal = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },
-                                                   { 4.0, 5.0, 6.0 },
-                                                   { 7.0, 8.0, 9.0 },
-                                                   { 10.0, 11.0, 12.0 } };
+                                                    { 4.0, 5.0, 6.0 },
+                                                    { 7.0, 8.0, 9.0 },
+                                                    { 10.0, 11.0, 12.0 } };
     std::vector<double> resultValues;
     for (const auto& sample : signal)
     {
