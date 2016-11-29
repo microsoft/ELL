@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ModelTransformer.h"
-#include "Node.h"
 #include "InputNode.h"
+#include "Node.h"
 
 // utilities
 #include "Exception.h"
@@ -72,8 +72,14 @@ namespace model
         return _model;
     }
 
-    Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context)
+    Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context, int maxIterations)
     {
+        if (maxIterations <= 0)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "maxIterations must be positive");
+            return oldModel;
+        }
+
         _context = context;
         _model = oldModel;
 
@@ -81,7 +87,7 @@ namespace model
 
         // refine until all nodes are compilable according to context.IsNodeCompilable(), until
         // the model is fully refined, or until the maximum number of iterations is reached.
-        do
+        for (int i = 0; i < maxIterations; ++i)
         {
             Model currentModel = std::move(_model);
             _model = Model();
@@ -109,24 +115,12 @@ namespace model
                 _elementToElementMap = newElementToElementMap;
             }
 
-            // return if we didn't make any progress
-            if (!didRefineAny)
+            // check for early end condition
+            if (!didRefineAny || _isModelCompilable)
             {
                 break;
             }
-
-            // die after too many iterations
-            if (++iterationCount >= maxRefinementIterations)
-            {
-                std::string firstUncompilableNodeName;
-                auto uncompilableNodes = FindUncompilableNodes(currentModel, context);
-                if (uncompilableNodes.size() > 0)
-                {
-                    firstUncompilableNodeName = uncompilableNodes[0]->GetRuntimeTypeName();
-                }
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "More than " + std::to_string(maxRefinementIterations) + " refinement iterations, first uncompilable node: " + firstUncompilableNodeName);
-            }
-        } while (!_isModelCompilable);
+        }
 
         // clear out the context
         _context = TransformContext();

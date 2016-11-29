@@ -40,6 +40,16 @@ namespace common
     template <typename DatasetType = data::AutoSupervisedDataset>
     DatasetType GetDataset(const DataLoadArguments& dataLoadArguments);
 
+    /// <summary>
+    /// Gets a dataset by loading it according to data load arguments and then running it through a
+    /// map.
+    /// </summary>
+    ///
+    /// <typeparam name="DatasetType"> The Dataset type. </typeparam>
+    /// <param name="dataLoadArguments"> The data load arguments. </param>
+    /// <param name="map"> The map. </param>
+    ///
+    /// <returns> The dataset. </returns>
     template <typename DatasetType = data::AutoSupervisedDataset>
     DatasetType GetMappedDataset(const DataLoadArguments& dataLoadArguments, const model::DynamicMap& map);
 }

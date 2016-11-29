@@ -70,9 +70,9 @@ namespace model
         /// <summary>Gets the port element at the specified index</summary>
         ///
         /// <returns>The element at the specified index</returns>
-        model::PortElementBase GetInputElement(size_t index) const 
-        { 
-            return _inputElements.GetElement(index); 
+        model::PortElementBase GetInputElement(size_t index) const
+        {
+            return _inputElements.GetElement(index);
         }
 
     protected:

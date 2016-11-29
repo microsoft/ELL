@@ -34,11 +34,11 @@ namespace common
         // generate mapped dataset
         while (dataIterator->IsValid())
         {
-            auto row = dataIterator->Get(); // this is an AutoSupervisedExample
-            const auto& dataVec = row.GetDataVector();
-            auto output = map.Compute<data::DoubleDataVector>(dataVec);
-            auto mappedRow = typename DatasetType::DatasetExampleType(output, row.GetMetadata());
-            dataset.AddExample(mappedRow);
+            auto example = dataIterator->Get();
+            auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
+            auto mappedExample = typename DatasetType::DatasetExampleType(std::move(mappedDataVector), example.GetMetadata());
+            dataset.AddExample(mappedExample);
+
             dataIterator->Next();
         }
         return dataset;

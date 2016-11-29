@@ -23,7 +23,7 @@ namespace common
     struct MapSaveArguments
     {
         /// <summary> The filename to store the output map in. </summary>
-        std::string outputMapFile = "";
+        std::string outputMapFilename = "";
  
         /// <summary> An output stream to write the output map to. </summary>
         utilities::OutputStreamImpostor outputMapStream;

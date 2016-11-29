@@ -5,9 +5,9 @@
 
 namespace emll
 {
-    void TestDynamicMapCreate();
-    void TestDynamicMapCompute();
-    void TestDynamicMapComputeDataVector();
-    void TestDynamicMapRefine();
-    void TestDynamicMapSerialization();
+void TestDynamicMapCreate();
+void TestDynamicMapCompute();
+void TestDynamicMapComputeDataVector();
+void TestDynamicMapRefine();
+void TestDynamicMapSerialization();
 }

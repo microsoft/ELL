@@ -345,13 +345,13 @@ namespace common
 
     model::DynamicMap LoadMap(const MapLoadArguments& mapLoadArguments)
     {
-        if (mapLoadArguments.HasMapFile())
+        if (mapLoadArguments.HasMapFilename())
         {
-            return common::LoadMap(mapLoadArguments.inputMapFile);
+            return common::LoadMap(mapLoadArguments.inputMapFilename);
         }
-        else if (mapLoadArguments.HasModelFile())
+        else if (mapLoadArguments.HasModelFilename())
         {
-            auto model = common::LoadModel(mapLoadArguments.inputModelFile);
+            auto model = common::LoadModel(mapLoadArguments.inputModelFilename);
 
             model::InputNodeBase* inputNode = nullptr;
             model::PortElementsBase outputElements;

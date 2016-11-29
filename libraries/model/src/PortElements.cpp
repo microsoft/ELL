@@ -208,14 +208,14 @@ namespace model
 
     Port::PortType PortElementsBase::GetType() const
     {
-        if(Size() == 0)
+        if (Size() == 0)
         {
             return Port::PortType::none;
         }
 
         return _ranges[0].GetType();
     }
-    
+
     void PortElementsBase::Reserve(size_t numRanges)
     {
         _ranges.reserve(numRanges);
@@ -278,13 +278,13 @@ namespace model
 
     Port::PortType PortElementsBase::GetPortType()
     {
-        if(_ranges.size() == 0)
+        if (_ranges.size() == 0)
         {
             return Port::PortType::none;
         }
         return _ranges[0].ReferencedPort()->GetType();
     }
-    
+
     void PortElementsBase::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["ranges"] << _ranges;

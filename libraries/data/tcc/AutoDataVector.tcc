@@ -78,6 +78,12 @@ namespace data
     }
 
     template <typename DefaultDataVectorType>
+    std::vector<double> AutoDataVectorBase<DefaultDataVectorType>::ToArray(size_t size) const
+    {
+        return _pInternal->ToArray(size);
+    }
+
+    template <typename DefaultDataVectorType>
     void AutoDataVectorBase<DefaultDataVectorType>::Print(std::ostream& os) const
     {
         _pInternal->Print(os);

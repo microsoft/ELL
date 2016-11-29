@@ -104,7 +104,9 @@ namespace model
         typedef int value_type; // PortTypeToValueType
     };
 
-    struct unknown_t {};
+    struct unknown_t
+    {
+    };
 
     template <>
     struct PortTypeToValueType<Port::PortType::none>
