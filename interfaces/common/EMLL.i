@@ -7,6 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %module "EMLL"
+#if defined(SWIGJAVASCRIPT)
+%{
+#include <node.h>
+#include <v8.h>
+#include <nan.h>
+%}
+#endif
+
 %{
 #include <vector>
 %}
@@ -17,9 +25,19 @@
 %include "std_vector.i"
 %template(DoubleVector) std::vector<double>;
 %template(DoubleVectorVector) std::vector<std::vector<double>>;
-#endif 
+#endif
+
+// ELL APIs 
 %include "lossFunctions.i"
 %include "model.i"
+
+#if defined(SWIGJAVASCRIPT)
+// Interface for NaN callbacks
+%include callback.i
+
+// Interface ELL Load Model Async
+%include loadModelAsync.i
+#endif
 
 
 #if 0
