@@ -19,7 +19,7 @@ namespace emll
 /// <summary> Command line arguments for the apply executable. </summary>
 struct ApplyArguments
 {
-    /// <summary> Path to a second map, whose output values are subtracted fromthe The output code file. </summary>
+    /// <summary> Path to a second map, whose output values are subtracted from the The output code file. </summary>
     std::string inputMapFilename2;
 
     /// <summary> Instead of raw output, report a summary. </summary>
