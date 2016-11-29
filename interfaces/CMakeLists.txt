@@ -77,6 +77,6 @@ add_subdirectory(common)
 add_subdirectory(python)
 # add_subdirectory(R) # currently doesn't compile
 # add_subdirectory(csharp)
-# add_subdirectory(javascript)
+add_subdirectory(javascript)
 add_subdirectory(xml) 
 
