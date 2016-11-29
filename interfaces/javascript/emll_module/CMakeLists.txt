@@ -86,7 +86,7 @@ if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
     # add test
     set (TEST_NAME ${PROJ_NAME}_test)
     add_test(NAME ${TEST_NAME}
-            COMMAND ${NODE_EXECUTABLE} TrainersAsync.js
+            COMMAND ${NODE_EXECUTABLE} TestCompiler.js
             WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js )
 
 endif()

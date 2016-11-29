@@ -2,12 +2,17 @@
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
 //  File:     model.i (interfaces)
-//  Authors:  Chuck Jacobs
+//  Authors:  Chuck Jacobs, Kirk Olynyk
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %{
 #define SWIG_FILE_WITH_INIT
+
+// common
+#include "LoadModel.h"
+
+// model
 #include "Node.h"
 #include "Model.h"
 #include "Port.h"
@@ -16,7 +21,11 @@
 #include "PortElements.h"
 #include "InputNode.h"
 #include "OutputNode.h"
-#include "LoadModel.h"
+
+// utilities
+#include "JsonArchiver.h"
+
+// stl
 #include <string>
 #include <sstream>
 #include <vector>
@@ -58,6 +67,7 @@ public:
     ELL_Port GetPort(const std::string& portName);
     ELL_OutputPortBaseIterator GetOutputPorts();
     ELL_InputPortBaseIterator GetInputPorts();
+    std::string GetRuntimeTypeName();
 #ifndef SWIG
     ELL_Node(const emll::model::Node* other);
 #endif
@@ -140,6 +150,8 @@ public:
     void Save(const std::string& filename);
     size_t Size(); 
     ELL_NodeIterator GetNodes();
+    std::string GetJson() const;
+    std::string GetRuntimeTypeName() const;
 #ifndef SWIG
     ELL_Model(const emll::model::Model& other);
 #endif
@@ -166,8 +178,8 @@ public:
     ~ELL_Port();
     ELL_Node GetNode();
     std::string GetName();
-    std::string GetTypeName();
     std::string GetRuntimeTypeName();
+    int GetOutputType();
     int Size();
 #ifndef SWIG
     ELL_Port(const emll::model::Port* other);
@@ -193,7 +205,27 @@ public:
     ELL_PortElementBase(const emll::model::PortElementBase& other);
 #endif
 private:
-    const emll::model::PortElementBase _port;
+    emll::model::PortElementBase _port;
+};
+
+//
+// ELL_PortElementsBase Class Declaration
+//
+
+class ELL_PortElementsBase 
+{
+public:
+    ELL_PortElementsBase() = default;
+    ~ELL_PortElementsBase() = default;
+    int Size() const;
+    int GetType() const;
+    ELL_PortElementBase GetElement(int index) const;
+
+#ifndef SWIG
+    ELL_PortElementsBase(const emll::model::PortElementsBase& other);
+#endif
+private:
+    emll::model::PortElementsBase _elements;
 };
 
 //
@@ -206,9 +238,10 @@ public:
     ELL_InputPortBase();
     ~ELL_InputPortBase();
     int Size();
+    int GetOutputType();
     std::string GetRuntimeTypeName();
-    std::string GetTypeName();
     ELL_NodeIterator GetParentNodes();
+    ELL_PortElementsBase GetInputElements();
 #ifndef SWIG
     ELL_InputPortBase(const emll::model::InputPortBase* other);
 #endif
@@ -229,8 +262,8 @@ public:
     std::vector<double> GetDoubleOutput();
     double GetDoubleOutput(int index);
     int Size();
+    int GetOutputType();
     void ReferencePort();
-    std::string GetTypeName();
     std::string GetRuntimeTypeName();
 #ifndef SWIG
     ELL_OutputPortBase(const emll::model::OutputPortBase* other);
@@ -263,8 +296,6 @@ ELL_TransformContext::~ELL_TransformContext()
 //{
 //}
 #endif
-
-
 
 //
 // Class Methods
@@ -305,6 +336,33 @@ ELL_OutputPortBase ELL_PortElementBase::ReferencedPort()
 }
 
 //
+// ELL_PortElementsBase Methods
+//
+
+#ifndef SWIG
+ELL_PortElementsBase::ELL_PortElementsBase(const emll::model::PortElementsBase& other) : 
+    _elements(other) 
+{
+} 
+#endif
+
+int ELL_PortElementsBase::Size() const
+{
+    return _elements.Size();
+}
+
+int ELL_PortElementsBase::GetType() const
+{
+    return static_cast<int>(_elements.GetType());
+}
+
+ELL_PortElementBase ELL_PortElementsBase::GetElement(int index) const
+{
+    return ELL_PortElementBase(_elements.GetElement(index));
+}
+
+
+//
 // ELL_OutputPortBase Methods 
 //
 
@@ -326,6 +384,11 @@ ELL_OutputPortBase::~ELL_OutputPortBase()
 bool ELL_OutputPortBase::IsReferenced() const
 {
     return _port->IsReferenced();
+}
+
+int ELL_OutputPortBase::GetOutputType()
+{
+    return (int) (_port->GetType());
 }
 
 std::vector<double> ELL_OutputPortBase::GetDoubleOutput() 
@@ -353,11 +416,6 @@ std::string ELL_OutputPortBase::GetRuntimeTypeName()
     return _port->GetRuntimeTypeName();
 }
 
-std::string ELL_OutputPortBase::GetTypeName() 
-{
-    return _port->GetTypeName();
-}
-
 //
 // ELL_InputPortBase Methods
 //
@@ -376,6 +434,11 @@ ELL_InputPortBase::~ELL_InputPortBase()
 {
 }
 
+int ELL_InputPortBase::GetOutputType()
+{
+    return (int)(_port->GetType());
+}
+
 int ELL_InputPortBase::Size() 
 {
     return  (int) _port->Size();
@@ -386,14 +449,14 @@ std::string ELL_InputPortBase::GetRuntimeTypeName()
     return _port->GetRuntimeTypeName();
 }
 
-std::string ELL_InputPortBase::GetTypeName() 
-{
-    return _port->GetTypeName();
-}
-
 ELL_NodeIterator ELL_InputPortBase::GetParentNodes() 
 {
     return ELL_NodeIterator(_port->GetParentNodes());
+}
+
+ELL_PortElementsBase ELL_InputPortBase::GetInputElements()
+{
+    return ELL_PortElementsBase(_port->GetInputElements());
 }
 
 //
@@ -406,6 +469,11 @@ ELL_Port::ELL_Port() : _port(nullptr)
 
 ELL_Port::~ELL_Port() 
 {
+}
+
+int ELL_Port::GetOutputType()
+{
+    return (int) (_port->GetType());
 }
 
 #ifndef SWIG
@@ -422,11 +490,6 @@ ELL_Node ELL_Port::GetNode()
 std::string ELL_Port::GetName() 
 {
     return _port->GetName();
-}
-
-std::string ELL_Port::GetTypeName() 
-{
-    return _port->GetTypeName();
 }
 
 std::string ELL_Port::GetRuntimeTypeName() 
@@ -628,6 +691,11 @@ ELL_InputPortBaseIterator ELL_Node::GetInputPorts()
     return ELL_InputPortBaseIterator(_node->GetInputPorts());
 }
 
+std::string ELL_Node::GetRuntimeTypeName() 
+{ 
+    return _node->GetRuntimeTypeName(); 
+}
+
 //
 // ELL_Model Methods
 //
@@ -657,6 +725,11 @@ ELL_NodeIterator ELL_Model::GetNodes()
     return ELL_NodeIterator(iter);
 }
 
+std::string ELL_Model::GetRuntimeTypeName() const
+{
+    return _model.GetRuntimeTypeName();
+}
+
 #ifndef SWIG
 ELL_Model::ELL_Model(const emll::model::Model& other) : 
     _model(other) 
@@ -664,10 +737,35 @@ ELL_Model::ELL_Model(const emll::model::Model& other) :
 }
 #endif
 
+std::string ELL_Model::GetJson() const
+{
+    std::stringstream stream;
+    emll::utilities::JsonArchiver ar(stream);
+    ar << _model;
+    return stream.str();
+    // create stringstream
+    // archive to stream
+    
+    return "";
+}
 //
 // Functions
 //
 
-// TBD
+ELL_Model LoadModel(std::string filename)
+{
+    return ELL_Model(filename);
+}
+
+
+ELL_Model LoadModelFromString(std::string str)
+{
+    std::stringstream stream(str);
+    emll::utilities::SerializationContext context;
+    emll::utilities::JsonUnarchiver ar(stream, context);
+    emll::model::Model model;
+    ar >> model;
+    return ELL_Model(model);
+}
 
 %}
