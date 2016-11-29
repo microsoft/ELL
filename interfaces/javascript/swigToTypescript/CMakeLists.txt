@@ -1,7 +1,7 @@
 #
-# SWIG javascript-on-node interfaces
+# swigToTypescript project
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
-add_subdirectory(LaunchXslt)
+add_subdirectory(transformXml)

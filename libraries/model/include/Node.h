@@ -124,16 +124,17 @@ namespace model
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) = 0;
 
+        /// <summary> Indicates if the current node should stop refining itself </summary>
         virtual bool IsCompilable() const { return false; }
 
+        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
         virtual void Copy(ModelTransformer& transformer) const = 0;
 
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer. </summary>
-        ///
-        /// <param name="transformer"> [in,out] The transformer. </param>
 
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(ModelTransformer& transformer) const;

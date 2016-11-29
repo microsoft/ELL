@@ -93,7 +93,7 @@ namespace model
         //
 
         /// <returns> The number of input nodes </returns>
-        size_t NumInputs() const { return _inputNodes.size(); }
+        size_t NumInputPorts() const { return _inputNodes.size(); }
 
         /// <summary> Returns an input node </summary>
         ///
@@ -115,7 +115,7 @@ namespace model
         /// <summary> Get the number of outputs </summary>
         ///
         /// <returns> The number of outputs </returns>
-        size_t NumOutputs() const { return _outputElements.size(); }
+        size_t NumOutputPorts() const { return _outputElements.size(); }
 
         /// <summary> Returns an outputs </summary>
         ///

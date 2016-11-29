@@ -133,7 +133,6 @@ namespace model
         return _model;
     }
 
-    // General transformation
     Model ModelTransformer::TransformModel(const Model& model, const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
     {
         _context = context;

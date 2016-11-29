@@ -7,8 +7,8 @@
     <ProjectGuid>{5BAF164E-6BD3-42A4-BE85-E3C98EE94B8D}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LaunchXslt</RootNamespace>
-    <AssemblyName>LaunchXslt</AssemblyName>
+    <RootNamespace>TransformXml</RootNamespace>
+    <AssemblyName>transformXml</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

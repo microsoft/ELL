@@ -4,12 +4,13 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
-public class Sample
+public class Program
 {
+    /// <summary>
+    /// Transforms an XML file via an XSLT script
+    /// </summary>
     public static void Main(string[] args)
     {
-        LaunchXslt.XsltScripts.TestMe();
-
         if (args.Length != 3)
         {
             Console.WriteLine("usage: {0} [xml file] [xsl file] [output file]", System.AppDomain.CurrentDomain.FriendlyName);
