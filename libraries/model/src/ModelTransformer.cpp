@@ -115,14 +115,8 @@ namespace model
                 _elementToElementMap = newElementToElementMap;
             }
 
-            // check for unrefinable graphs
-            if (!didRefineAny && !_isModelCompilable)
-            {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "unrefinable model: some nodes are uncompilable, yet cannot refine");
-            }
-
-            // stop if we are finished
-            if (_isModelCompilable)
+            // check for early end condition
+            if (!didRefineAny || _isModelCompilable)
             {
                 break;
             }
