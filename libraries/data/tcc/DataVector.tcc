@@ -196,13 +196,10 @@ namespace data
     }
 
     template <class DerivedType>
-    std::vector<double> DataVectorBase<DerivedType>::ToArray(size_t size) const
+    std::vector<double> DataVectorBase<DerivedType>::ToArray() const
     {
-        if (size == 0)
-        {
-            size = static_cast<const DerivedType*>(this)->PrefixLength();
-        }
-
+        auto size = static_cast<const DerivedType*>(this)->PrefixLength();
+ 
         std::vector<double> result(size);
         auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
 
@@ -219,6 +216,27 @@ namespace data
 
         return result;
     }
+
+    template <class DerivedType>
+    std::vector<double> DataVectorBase<DerivedType>::ToArray(size_t size) const
+    {
+        std::vector<double> result(size);
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
+
+        while (indexValueIterator.IsValid())
+        {
+            auto indexValue = indexValueIterator.Get();
+            if (indexValue.index >= size)
+            {
+                break;
+            }
+            result[indexValue.index] = indexValue.value;
+            indexValueIterator.Next();
+        }
+
+        return result;
+    }
+
 
     template <class DerivedType>
     template <typename ReturnType>
