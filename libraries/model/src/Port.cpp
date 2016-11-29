@@ -51,5 +51,25 @@ namespace model
         archiver["type"] >> typeCode;
         _type = static_cast<PortType>(typeCode);
     }
+
+    std::string GetPortCTypeName(emll::model::Port::PortType type)
+    {
+        switch (type)
+        {
+            case emll::model::Port::PortType::none:
+                return "void";
+            case emll::model::Port::PortType::real:
+                return "double";
+            case emll::model::Port::PortType::integer:
+                return "int";
+            case emll::model::Port::PortType::categorical:
+                return "int";
+            case emll::model::Port::PortType::boolean:
+                return "bool"; // ???
+            default:
+                return "Unknown";
+        };
+    }
+
 }
 }
