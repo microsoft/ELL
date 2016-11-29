@@ -297,8 +297,6 @@ ELL_TransformContext::~ELL_TransformContext()
 //}
 #endif
 
-
-
 //
 // Class Methods
 //

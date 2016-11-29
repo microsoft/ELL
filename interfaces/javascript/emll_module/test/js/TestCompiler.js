@@ -52,12 +52,3 @@ let testData = ToEMLLVector([
 
 console.log('Compute:');
 PrintResults(map, testData);
-
-/*EMLL.GetDatasetAsync("../data/testData.txt", function(datasetasync)
-{
-  if(datasetasync)
-  {
-    console.log("Async Mode Size:" + datasetasync.NumExamples());
-    tap.pass('Test GetDatasetAsync');
-  }
-});*/
