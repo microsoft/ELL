@@ -288,6 +288,7 @@ namespace math
         using ConstVectorReference<ElementType, Orientation>::_pData;
         using ConstVectorReference<ElementType, Orientation>::_size;
         using ConstVectorReference<ElementType, Orientation>::_increment;
+        using UnorientedConstVectorReference<ElementType>::CheckSize;
 
         template <typename T>
         friend class RectangularMatrixBase;
