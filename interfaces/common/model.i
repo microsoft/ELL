@@ -238,6 +238,8 @@ public:
     ELL_InputPortBase();
     ~ELL_InputPortBase();
     int Size();
+    ELL_Node GetNode();
+    std::string GetName();
     int GetOutputType();
     std::string GetRuntimeTypeName();
     ELL_NodeIterator GetParentNodes();
@@ -262,6 +264,8 @@ public:
     std::vector<double> GetDoubleOutput();
     double GetDoubleOutput(int index);
     int Size();
+    ELL_Node GetNode();
+    std::string GetName();
     int GetOutputType();
     void ReferencePort();
     std::string GetRuntimeTypeName();
@@ -287,9 +291,12 @@ private:
 ELL_TransformContext::ELL_TransformContext() : _context()
 {
 }
+
 ELL_TransformContext::~ELL_TransformContext()
 {
 }
+
+
 #ifndef SWIG
 //ELL_TransformContext(const std::function<bool(const Node&)>& isNodeCompilable) :
 //    _context(isNodeCompilable)
@@ -361,7 +368,6 @@ ELL_PortElementBase ELL_PortElementsBase::GetElement(int index) const
     return ELL_PortElementBase(_elements.GetElement(index));
 }
 
-
 //
 // ELL_OutputPortBase Methods 
 //
@@ -401,9 +407,19 @@ double ELL_OutputPortBase::GetDoubleOutput(int index)
     return _port->GetDoubleOutput((size_t) index);
 }
 
+ELL_Node ELL_OutputPortBase::GetNode() 
+{
+    return ELL_Node(_port->GetNode());
+}
+
 int ELL_OutputPortBase::Size() 
 {
     return (int) _port->Size();
+}
+
+std::string ELL_OutputPortBase::GetName() 
+{
+    return _port->GetName();
 }
 
 void ELL_OutputPortBase::ReferencePort() 
@@ -439,9 +455,19 @@ int ELL_InputPortBase::GetOutputType()
     return (int)(_port->GetType());
 }
 
+ELL_Node ELL_InputPortBase::GetNode() 
+{
+    return ELL_Node(_port->GetNode());
+}
+
 int ELL_InputPortBase::Size() 
 {
     return  (int) _port->Size();
+}
+
+std::string ELL_InputPortBase::GetName() 
+{
+    return _port->GetName();
 }
 
 std::string ELL_InputPortBase::GetRuntimeTypeName() 
@@ -743,22 +769,17 @@ std::string ELL_Model::GetJson() const
     emll::utilities::JsonArchiver ar(stream);
     ar << _model;
     return stream.str();
-    // create stringstream
-    // archive to stream
-    
-    return "";
 }
 //
 // Functions
 //
 
-ELL_Model LoadModel(std::string filename)
+ELL_Model ELL_LoadModel(std::string filename)
 {
     return ELL_Model(filename);
 }
 
-
-ELL_Model LoadModelFromString(std::string str)
+ELL_Model ELL_LoadModelFromString(std::string str)
 {
     std::stringstream stream(str);
     emll::utilities::SerializationContext context;

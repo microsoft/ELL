@@ -9,5 +9,6 @@ namespace emll
 {
 void TestLoadSampleModels();
 void TestLoadTreeModels();
+void TestLoadSavedModels();
 void TestSaveModels(std::string ext);
 }

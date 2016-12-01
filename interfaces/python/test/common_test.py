@@ -23,7 +23,18 @@ def TestModelSize(key, label):
 def TestModelSizes():
     for (key, label, prefix) in data: 
         TestModelSize(key, label)
- 
+
+def TestLoadModel(fileName):
+    print "Loading file %s" % fileName
+    m = EMLL.ELL_LoadModel(fileName)
+
+def TestLoadModels():
+#    prefix = "../../examples/data/"
+    prefix = "D:/GitProj/ID/EMLL/examples/data/"
+    fileNames = ["model_1.json", "model_2.json"]
+    for fileName in fileNames:
+        TestLoadModel(prefix + fileName)
+
 def TestSaveModel(ext, key, prefix):
     fileName = prefix + "." + ext
     EMLL.ELL_Model(key).Save(fileName)
@@ -39,6 +50,7 @@ def TestSaveModels():
 def test():
     try:
         TestModelSizes()
+        TestLoadModels()
         TestSaveModels()
         return  0
     except:
