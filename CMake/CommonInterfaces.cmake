@@ -62,7 +62,8 @@ endforeach()
 # -debug-classes -debug-typedef 
 set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-typedef  -debug-template)
 if(${language} STREQUAL "javascript")
-    set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node -DV8_VERSION=0x032530)
+    #set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node -DV8_VERSION=0x032530)
+	set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node)
 endif()
 
 set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
