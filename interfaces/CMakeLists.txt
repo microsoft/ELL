@@ -63,7 +63,7 @@ set (INTERFACE_DEPENDENCIES common evaluators lossFunctions trainers predictors 
 
 # Add EMLL library include directories
 include_directories(../libraries/common/include)
-#include_directories(../libraries/dataset/include)
+include_directories(../libraries/data/include)
 include_directories(../libraries/evaluators/include)
 include_directories(../libraries/lossFunctions/include)
 include_directories(../libraries/model/include)

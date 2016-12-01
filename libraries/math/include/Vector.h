@@ -91,14 +91,31 @@ namespace math
         template <typename MapperType>
         ElementType Aggregate(MapperType mapper) const;
 
+        /// <summary> Prints a tab separated representation of this vector to an output stream, independent of orientation. </summary>
+        ///
+        /// <param name="ostream"> [in,out] The output stream. </param>
+        void Print(std::ostream& ostream) const;
+
     protected:
         UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
         void Swap(UnorientedConstVectorReference<ElementType>& other);
+        void CheckSize(const UnorientedConstVectorReference<ElementType>& other) const;
 
         ElementType* _pData;
         size_t _size;
         size_t _increment;
     };
+
+    /// <summary>
+    /// Streaming operator. Prints vectors to ostreams
+    /// </summary>
+    ///
+    /// <param name="ostream"> [in,out] Stream to write data to. </param>
+    /// <param name="vector"> The vector. </param>
+    ///
+    /// <returns> Reference to the stream. </returns>
+    template <typename ElementType>
+    std::ostream& operator<<(std::ostream& ostream, UnorientedConstVectorReference<ElementType> vector);
 
     /// <summary> A reference to a constant algebraic vector. </summary>
     ///
@@ -132,7 +149,7 @@ namespace math
         auto Transpose() const -> ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>
         {
             return ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
-		}
+        }
 
         /// <summary> Equality operator. </summary>
         ///
@@ -230,11 +247,48 @@ namespace math
         template <typename MapperType>
         void Transform(MapperType mapper);
 
+        /// <summary> Adds another vector to this vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        void operator+=(ConstVectorReference<ElementType, Orientation> other);
+
+        /// <summary> Subtracts another vector from this vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        void operator-=(ConstVectorReference<ElementType, Orientation> other);
+
+        /// <summary> Adds a constant value to this vector. </summary>
+        ///
+        /// <param name="other"> The constant value. </param>
+        void operator+=(ElementType value);
+
+        /// <summary> Subtracts a constant value from this vector. </summary>
+        ///
+        /// <param name="other"> The constant value. </param>
+        void operator-=(ElementType value);
+
+        /// <summary> Multiplies this vector by a constant value. </summary>
+        ///
+        /// <param name="other"> The constant value. </param>
+        void operator*=(ElementType value);
+
+        /// <summary> Divides each element of this vector by a constant value. </summary>
+        ///
+        /// <param name="other"> The constant value. </param>
+        void operator/=(ElementType value);
+
+        /// <summary> Replaces each element of this vector with its square. </summary>
+        void CoordinatewiseSquare();
+
+        /// <summary> Replaces each element of this vector with its square root. </summary>
+        void CoordinatewiseSquareRoot();
+
     protected:
         using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
         using ConstVectorReference<ElementType, Orientation>::_pData;
         using ConstVectorReference<ElementType, Orientation>::_size;
         using ConstVectorReference<ElementType, Orientation>::_increment;
+        using UnorientedConstVectorReference<ElementType>::CheckSize;
 
         template <typename T>
         friend class RectangularMatrixBase;

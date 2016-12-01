@@ -94,9 +94,9 @@ namespace model
     {
         // gather output nodes
         std::unordered_set<const Node*> outputNodes;
-        for(const auto& output: GetOutputs())
+        for (const auto& output : GetOutputs())
         {
-            for(const auto& range: output.GetRanges())
+            for (const auto& range : output.GetRanges())
             {
                 outputNodes.insert(range.ReferencedPort()->GetNode());
             }
@@ -140,7 +140,7 @@ namespace model
     }
 
     ModelTransformer DynamicMap::DoPrune()
-    {        
+    {
         TransformContext context;
         ModelTransformer transformer;
 
@@ -151,15 +151,21 @@ namespace model
         return transformer;
     }
 
-    void DynamicMap::Refine(const TransformContext& context)
+    void DynamicMap::Refine(const TransformContext& context, int maxIterations)
     {
-        DoRefine(context);
+        DoRefine(context, maxIterations);
     }
 
-    ModelTransformer DynamicMap::DoRefine(const TransformContext& context)
+    ModelTransformer DynamicMap::DoRefine(const TransformContext& context, int maxIterations)
     {
         ModelTransformer transformer;
-        auto refinedModel = transformer.RefineModel(_model, context);
+
+        if (maxIterations == 0)
+        {
+            return transformer;
+        }
+
+        auto refinedModel = transformer.RefineModel(_model, context, maxIterations);
         FixTransformedIO(transformer);
         _model = refinedModel;
         return transformer;
@@ -238,7 +244,7 @@ namespace model
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
         }
-        
+
         return iter->second;
     }
 

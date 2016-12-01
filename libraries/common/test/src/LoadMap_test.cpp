@@ -24,9 +24,9 @@ void TestLoadMapWithDefaultArgs()
 {
     std::cout << "Testing map loading" << std::endl;
     common::MapLoadArguments args;
-    args.inputModelFile = "model_1.xml";
+    args.inputModelFilename = "../../examples/data/model_1.json";
     args.modelInputsString = "";
-    args.modelOutputsString = "1377.output";
+    args.modelOutputsString = "1017.output";
 
     auto map = common::LoadMap(args);
 
@@ -39,9 +39,9 @@ void TestLoadMapWithPorts()
 {
     std::cout << "Testing map loading" << std::endl;
     common::MapLoadArguments args;
-    args.inputModelFile = "model_1.xml";
+    args.inputModelFilename = "../../examples/data/model_1.json";
     args.modelInputsString = "";
-    args.modelOutputsString = "1377.weightedElements[0:2]";
+    args.modelOutputsString = "1017.weightedElements[0:2]";
 
     auto map = common::LoadMap(args);
 

@@ -29,6 +29,7 @@ int main()
     {
         TestLoadSampleModels();
         TestLoadTreeModels();
+        TestLoadSavedModels();
 
         TestSaveModels("xml");
         TestSaveModels("json");

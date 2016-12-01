@@ -17,8 +17,8 @@
 #include "IIterator.h"
 
 // stl
-#include <memory>
 #include <map>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -29,7 +29,7 @@ namespace emll
 namespace model
 {
     class Model;
-    
+
     /// <summary> An iterator over the nodes in a Model </summary>
     class NodeIterator : public utilities::IIterator<const Node*>
     {
@@ -179,7 +179,6 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
