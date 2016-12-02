@@ -29,8 +29,7 @@ def TestLoadModel(fileName):
     m = EMLL.ELL_LoadModel(fileName)
 
 def TestLoadModels():
-#    prefix = "../../examples/data/"
-    prefix = "D:/GitProj/ID/EMLL/examples/data/"
+    prefix = "../../../examples/data/"
     fileNames = ["model_1.json", "model_2.json"]
     for fileName in fileNames:
         TestLoadModel(prefix + fileName)
