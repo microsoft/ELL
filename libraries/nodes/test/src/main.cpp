@@ -37,7 +37,7 @@ int main()
         TestBinaryOperationNodeCompute();
         TestLinearPredictorNodeCompute();
         TestDemultiplexerNodeCompute();
-        TestDTWNodeCompute();
+        TestDTWDistanceNodeCompute();
 
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();

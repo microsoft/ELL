@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     DTWNode.tcc (nodes)
+//  File:     DTWDistanceNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,7 +12,7 @@ namespace emll
 {
 namespace nodes
 {
-    namespace DTWNodeImpl
+    namespace DTWDistanceNodeImpl
     {
         template <typename ValueType>
         double Variance(const std::vector<std::vector<ValueType>>& prototype)
@@ -34,13 +34,13 @@ namespace nodes
     }
 
     template <typename ValueType>
-    DTWNode<ValueType>::DTWNode()
+    DTWDistanceNode<ValueType>::DTWDistanceNode()
         : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _sampleDimension(0), _prototypeLength(0), _prototypeVariance(0)
     {
     }
 
     template <typename ValueType>
-    DTWNode<ValueType>::DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype)
+    DTWDistanceNode<ValueType>::DTWDistanceNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype)
         : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _prototype(prototype)
     {
         _sampleDimension = input.Size();
@@ -48,13 +48,13 @@ namespace nodes
         _d.resize(_prototypeLength + 1);
         _s.resize(_prototypeLength + 1);
 
-        _prototypeVariance = DTWNodeImpl::Variance(_prototype);
+        _prototypeVariance = DTWDistanceNodeImpl::Variance(_prototype);
         // _threshold = std::sqrt(-2 * std::log(confidenceThreshold)) * _prototypeVariance;
         Reset();
     }
 
     template <typename ValueType>
-    void DTWNode<ValueType>::Reset() const
+    void DTWDistanceNode<ValueType>::Reset() const
     {
         std::fill(_d.begin() + 1, _d.end(), std::numeric_limits<ValueType>::max());
         _d[0] = 0.0;
@@ -74,7 +74,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DTWNode<ValueType>::Compute() const
+    void DTWDistanceNode<ValueType>::Compute() const
     {
         std::vector<ValueType> input = _input.GetValue();
         auto t = ++_currentTime;
@@ -124,15 +124,15 @@ namespace nodes
     };
 
     template <typename ValueType>
-    void DTWNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    void DTWDistanceNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newinput = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<DTWNode<ValueType>>(newinput, _prototype);
+        auto newNode = transformer.AddNode<DTWDistanceNode<ValueType>>(newinput, _prototype);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
-    void DTWNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    void DTWDistanceNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
@@ -142,7 +142,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DTWNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    void DTWDistanceNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
