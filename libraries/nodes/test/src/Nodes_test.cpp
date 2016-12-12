@@ -14,7 +14,7 @@
 #include "BinaryOperationNode.h"
 #include "DelayNode.h"
 #include "DemultiplexerNode.h"
-#include "DTWNode.h"
+#include "DTWDistanceNode.h"
 #include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
@@ -432,12 +432,12 @@ void TestDemultiplexerNodeRefine()
     testing::ProcessTest("Testing DemultiplexerNode refine", testing::IsEqual(outputVec, newOutputVec));
 }
 
-void TestDTWNodeCompute()
+void TestDTWDistanceNodeCompute()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto prototype = GetNextSlidePrototype();
-    auto dtwNode = model.AddNode<nodes::DTWNode<double>>(inputNode->output, prototype);
+    auto dtwNode = model.AddNode<nodes::DTWDistanceNode<double>>(inputNode->output, prototype);
 
     //
     auto prototypeLength = prototype.size();

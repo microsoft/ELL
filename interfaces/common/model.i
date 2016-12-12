@@ -25,7 +25,7 @@
 
 // nodes
 #include "ConstantNode.h"
-#include "DTWNode.h"
+#include "DTWDistanceNode.h"
 #include "ExtremalValueNode.h"
 #include "MultiplexerNode.h"
 

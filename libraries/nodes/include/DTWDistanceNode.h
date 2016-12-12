@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     DTWNode.h (nodes)
+//  File:     DTWDistanceNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,9 +29,9 @@ namespace emll
 {
 namespace nodes
 {
-    /// <summary> A node that performs DTW between its inputs </summary>
+    /// <summary> A node that computes the dynamic time-warping distance between its inputs </summary>
     template <typename ValueType>
-    class DTWNode : public model::Node
+    class DTWDistanceNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
@@ -43,18 +43,18 @@ namespace nodes
         /// @}
 
         /// <summary> Default Constructor </summary>
-        DTWNode();
+        DTWDistanceNode();
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The signals to compare to the prototype </param>
         /// <param name="prototype"> The prototype </param>
-        DTWNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype);
+        DTWDistanceNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("DTWNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("DTWDistanceNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -104,4 +104,4 @@ namespace nodes
 }
 }
 
-#include "../tcc/DTWNode.tcc"
+#include "../tcc/DTWDistanceNode.tcc"
