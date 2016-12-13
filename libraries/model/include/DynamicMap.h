@@ -76,16 +76,23 @@ namespace model
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
 
-        /// <summary> Refines the model wrapped by this map </summary>
+        /// <summary> Refines the model wrapped by this map. </summary>
         ///
-        /// <param name="context"> The TransformContext to use during refinement </param>
-        void Refine(const TransformContext& context);
+        /// <param name="context"> The TransformContext to use during refinement. </param>
+        /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
+        void Refine(const TransformContext& context, int maxIterations = 10);
 
         /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
         ///
         /// <param name="transformFunction"> The function to apply on each node </param>
         /// <param name="context"> The TransformContext to use during the transformation </param>
         void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
+
+        size_t ComputeSize() const // TODO
+        {
+            return GetOutput(0).Size();
+        }
+
 
         //
         // Internal routines for getting information about inputs / outputs of the map
@@ -247,7 +254,7 @@ namespace model
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         virtual ModelTransformer DoPrune(); // overridable prune implementation
-        virtual ModelTransformer DoRefine(const TransformContext& context); // overridable refine implementation
+        virtual ModelTransformer DoRefine(const TransformContext& context, int maxIterations); // overridable refine implementation
 
         virtual void SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const;
         virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const;

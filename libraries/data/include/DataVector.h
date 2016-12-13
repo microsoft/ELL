@@ -88,10 +88,17 @@ namespace data
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(math::RowVectorReference<double>& vector, double scalar = 1.0) const = 0;
 
-        /// <summary> Copies the contents of this DataVector into a double array. </summary>
+        /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
         ///
         /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const = 0;
+
+        /// <summary> Copies the contents of this DataVector into a double array of a given size. </summary>
+        ///
+        /// <param name="size"> The desired array size. </param>
+        ///
+        /// <returns> The array. </returns>
+        virtual std::vector<double> ToArray(size_t size) const = 0;
 
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
@@ -177,12 +184,17 @@ namespace data
         /// <param name="scalar"> The scalar. </param>
         virtual void AddTo(math::RowVectorReference<double>& vector, double scalar = 1.0) const override;
 
-        /// <summary> Copies this data vector into another type of data vector. </summary>
+        /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
         ///
-        /// <typeparam name="ReturnType"> The return type. </typeparam>
-        ///
-        /// <returns> This new data vector. </returns>
+        /// <returns> The array. </returns>
         virtual std::vector<double> ToArray() const override;
+
+        /// <summary> Copies the contents of this DataVector into a double array of a given size. </summary>
+        ///
+        /// <param name="size"> The desired array size. </param>
+        ///
+        /// <returns> The array. </returns>
+        virtual std::vector<double> ToArray(size_t size) const override;
 
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
         ///

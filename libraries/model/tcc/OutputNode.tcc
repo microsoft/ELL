@@ -12,7 +12,7 @@ namespace emll
 namespace model
 {
     template <typename ValueType>
-    OutputNode<ValueType>::OutputNode() 
+    OutputNode<ValueType>::OutputNode()
         : OutputNodeBase(_input, _output), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
 
     template <typename ValueType>

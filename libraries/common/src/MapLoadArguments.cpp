@@ -30,15 +30,15 @@ namespace common
     void ParsedMapLoadArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            inputMapFile,
-            "inputMapFile",
+            inputMapFilename,
+            "inputMapFilename",
             "imap",
             "Path to the input map file",
             "");
 
         parser.AddOption(
-            inputModelFile,
-            "inputModelFile",
+            inputModelFilename,
+            "inputModelFilename",
             "imf",
             "Path to the input model file",
             "");
@@ -169,22 +169,22 @@ namespace common
     {
         std::vector<std::string> parseErrorMessages;
 
-        if (inputModelFile != "" && inputMapFile != "")
+        if (inputModelFilename != "" && inputMapFilename != "")
         {
             parseErrorMessages.push_back("Can only specify an input map or model file, not both.");
         }
-        else if (inputMapFile != "")
+        else if (inputMapFilename != "")
         {
-            if (!utilities::IsFileReadable(inputMapFile))
+            if (!utilities::IsFileReadable(inputMapFilename))
             {
-                parseErrorMessages.push_back("Cannot read from specified input map file: " + inputMapFile);
+                parseErrorMessages.push_back("Cannot read from specified input map file: " + inputMapFilename);
             }
         }
-        else if (inputModelFile != "")
+        else if (inputModelFilename != "")
         {
-            if (!utilities::IsFileReadable(inputModelFile))
+            if (!utilities::IsFileReadable(inputModelFilename))
             {
-                parseErrorMessages.push_back("Cannot read from specified input model file: " + inputModelFile);
+                parseErrorMessages.push_back("Cannot read from specified input model file: " + inputModelFilename);
             }
         }
 

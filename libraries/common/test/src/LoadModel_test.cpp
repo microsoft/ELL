@@ -43,6 +43,13 @@ void TestLoadTreeModels()
     std::cout << "Tree 3 size: " << model3.Size() << std::endl;
 }
 
+void TestLoadSavedModels()
+{
+    std::cout << "Testing loading of saved model" << std::endl;
+    auto model1 = common::LoadModel("../../examples/data/model_1.json");
+    std::cout << "Model 1 size: " << model1.Size() << std::endl;
+}
+
 void TestSaveModels(std::string ext)
 {
     auto model1 = common::LoadModel("[1]");

@@ -36,6 +36,8 @@ namespace model
     {
     public:
         PortElementBase() = default;
+        PortElementBase(const PortElementBase& other) = default;
+        PortElementBase& operator=(const PortElementBase& other) = default;
         virtual ~PortElementBase() = default;
 
         /// <summary> Creates a PortElementBase representing a single value from a given port </summary>
@@ -275,7 +277,7 @@ namespace model
         /// <summary> Gets the type of this port. </summary>
         ///
         /// <returns> The type of the port. </returns>
-        Port::PortType GetPortType();
+        Port::PortType GetPortType(); // ## redundant with GetType
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -19,7 +19,7 @@ using namespace emll;
 
 int main()
 {
-   try
+    try
     {
         // Model tests
         TestStaticModel();
@@ -42,11 +42,11 @@ int main()
         TestDynamicMapRefine();
         TestDynamicMapSerialization();
     }
-   catch (const utilities::Exception& exception)
-   {
-       std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
-       throw;
-   }
+    catch (const utilities::Exception& exception)
+    {
+        std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
+        throw;
+    }
 
     if (testing::DidTestFail())
     {

@@ -102,7 +102,7 @@ model::Model GetComplexModel()
     auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 2);
     auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 2);
     g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
-    g.AddNode<model::OutputNode<bool>>(model::PortElements<bool>({in2->output }));
+    g.AddNode<model::OutputNode<bool>>(model::PortElements<bool>({ in2->output }));
     return g;
 }
 

@@ -6,8 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// test parameters
-// bin\Release\apply -idf examples/data/testData.txt --inputModelFile examples/data/model_1.json -v -in 3128 -out 3133.output
+#include "ApplyArguments.h"
 
 // utilities
 #include "CommandLineParser.h"
@@ -16,8 +15,8 @@
 #include "OutputStreamImpostor.h"
 
 // data
-#include "Example.h"
 #include "Dataset.h"
+#include "Example.h"
 
 // common
 #include "DataLoadArguments.h"
@@ -53,44 +52,84 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedDataSaveArguments dataSaveArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
-        common::ParsedMapSaveArguments mapSaveArguments;
+        ParsedApplyArguments applyArguments;
 
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(dataSaveArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
-        commandLineParser.AddOptionSet(mapSaveArguments);
-
-        bool verbose = false;
-        commandLineParser.AddOption(verbose, "verbose", "v", "Verbose mode", false);
+        commandLineParser.AddOptionSet(applyArguments);
 
         // parse command line
         commandLineParser.Parse();
 
-        if (verbose)
-        {
-            std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
-        }
-
         // load map
-        model::DynamicMap map = common::LoadMap(mapLoadArguments);
+        auto map = common::LoadMap(mapLoadArguments);
 
-        // load dataset
-        if (verbose) std::cout << "Loading data from file: " << dataLoadArguments.inputDataFilename << std::endl;
-        auto dataset = common::GetDataset(dataLoadArguments);
+        // get data iterator
+        auto dataIterator = GetDataIterator(dataLoadArguments);
 
         // get output stream
-        auto outputStream = dataSaveArguments.outputDataStream;
+        auto& outputStream = dataSaveArguments.outputDataStream;
 
-        auto datasetIterator = dataset.GetExampleReferenceIterator();
-        while (datasetIterator.IsValid())
+        // output summarization mode
+        if (applyArguments.summarize)
         {
-            const auto& example = datasetIterator.Get();    
-            auto output = map.Compute<data::FloatDataVector>(example.GetDataVector());
-            auto mappedExample = data::DenseSupervisedExample{ std::move(output), example.GetMetadata() };
+            std::unique_ptr<model::DynamicMap> map2 = nullptr;
+            if (applyArguments.inputMapFilename2 != "")
+            {
+                map2 = std::make_unique<model::DynamicMap>(common::LoadMap(applyArguments.inputMapFilename2));
+            }
 
-            mappedExample.Print(outputStream);
-            outputStream << std::string("\n");
-            datasetIterator.Next();
+            math::RowVector<double> u(map.ComputeSize());
+            math::RowVector<double> v(map.ComputeSize());
+            size_t count = 0;
+
+            while (dataIterator->IsValid())
+            {
+                auto example = dataIterator->Get();
+                auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
+                math::RowVector<double> w(map.ComputeSize());
+                mappedDataVector.AddTo(w);
+
+                if (map2 != nullptr)
+                {
+                    auto mappedDataVector2 = map2->Compute<data::DoubleDataVector>(example.GetDataVector());
+                    mappedDataVector2.AddTo(w, -1.0);
+                }
+
+                // accumulate vectors for mean and standard deviation computation
+                u += w;
+                w.CoordinatewiseSquare();
+                v += w;
+
+                dataIterator->Next();
+                ++count;
+            }
+
+            // calculate and print mean and standard deviation
+            double denominator = static_cast<double>(count);
+            u /= denominator;
+            outputStream << "mean:\t" << u << '\n';
+
+            u.CoordinatewiseSquare();
+            v /= denominator;
+            v -= u;
+            v.CoordinatewiseSquareRoot();
+            outputStream << "std:\t" << v << '\n';
+        }
+
+        // output new dataset mode
+        else
+        {
+            while (dataIterator->IsValid())
+            {
+                auto example = dataIterator->Get();
+                auto mappedDataVector = map.Compute<data::FloatDataVector>(example.GetDataVector());
+                auto mappedExample = data::DenseSupervisedExample(std::move(mappedDataVector), example.GetMetadata());
+                mappedExample.Print(outputStream);
+                outputStream << '\n';
+                dataIterator->Next();
+            }
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

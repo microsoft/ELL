@@ -13,7 +13,7 @@ namespace emll
 namespace model
 {
     InputNodeBase::InputNodeBase(OutputPortBase& output)
-        : Node({}, {&output}), _outputBase(output)
+        : Node({}, { &output }), _outputBase(output)
     {
     }
 }

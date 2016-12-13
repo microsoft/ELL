@@ -110,9 +110,9 @@ namespace model
     template <typename ValueType>
     PortElements<ValueType>::PortElements(const PortElementsBase& other)
     {
-        for(const auto& range: other.GetRanges())
+        for (const auto& range : other.GetRanges())
         {
-            if(range.GetType() != Port::GetPortType<ValueType>())
+            if (range.GetType() != Port::GetPortType<ValueType>())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
             }

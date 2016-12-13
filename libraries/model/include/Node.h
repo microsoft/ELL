@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "OutputPort.h"
 #include "InputPort.h"
+#include "OutputPort.h"
 #include "UniqueId.h"
 
 // utilities

@@ -29,10 +29,10 @@ namespace common
     struct MapLoadArguments
     {
         /// <summary> The file to read a map from. </summary>
-        std::string inputMapFile = "";
+        std::string inputMapFilename = "";
 
         /// <summary> The file to read a model from. </summary>
-        std::string inputModelFile = "";
+        std::string inputModelFilename = "";
 
         /// <summary> The inputs from the model to use. </summary>
         std::string modelInputsString = "";
@@ -46,17 +46,17 @@ namespace common
         /// <summary> Query if the arguments specify a map file. </summary>
         ///
         /// <returns> true if the arguments specify a map file. </returns>
-        bool HasMapFile() const { return inputMapFile != ""; }
+        bool HasMapFilename() const { return inputMapFilename != ""; }
         
         /// <summary> Query if the arguments specify a model file. </summary>
         ///
         /// <returns> true if the arguments specify a model file. </returns>
-        bool HasModelFile() const { return inputModelFile != ""; }
+        bool HasModelFilename() const { return inputModelFilename != ""; }
         
         /// <summary> Query if the arguments specify either a map file or a model file. </summary>
         ///
         /// <returns> true if the arguments specify a map file or a model file. </returns>
-        bool HasInputFile() const { return HasMapFile() || HasModelFile(); }
+        bool HasInputFilename() const { return HasMapFilename() || HasModelFilename(); }
         
         /// <summary> Get the input node for the loaded model, given the input definition string. </summary>
         ///

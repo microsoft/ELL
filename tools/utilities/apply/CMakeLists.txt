@@ -13,9 +13,10 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/main.cpp)
+set (SRC src/ApplyArguments.cpp 
+         src/main.cpp)
 
-set (INCLUDE )
+set (INCLUDE include/ApplyArguments.h)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
@@ -34,4 +35,4 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")
 set (TEST_NAME ${PROJ_NAME}_test)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFile ${CMAKE_SOURCE_DIR}/examples/data/model_1.json -in 1012 -out 1017.output -dd auto -odf null -omf null -v)
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -imf ${CMAKE_SOURCE_DIR}/examples/data/times_two.json -odf null)

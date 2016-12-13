@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include "InputPort.h"
 #include "ModelTransformer.h"
 #include "Node.h"
-#include "InputPort.h"
 #include "OutputPort.h"
 
 // utilities

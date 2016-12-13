@@ -68,6 +68,36 @@ namespace math
         return result;
     }
 
+    template <typename ElementType>
+    void UnorientedConstVectorReference<ElementType>::Print(std::ostream& ostream) const
+    {
+        if (_size > 0)
+        {
+            ostream << *_pData;
+        }
+
+        for (size_t i = 1; i < _size; ++i)
+        {
+            ostream << '\t' << _pData[i * _increment];
+        }
+    }
+
+    template <typename ElementType>
+    void UnorientedConstVectorReference<ElementType>::CheckSize(const UnorientedConstVectorReference<ElementType>& other) const
+    {
+        if (_size != other.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors must have the same size");
+        }
+    }
+
+    template <typename ElementType>
+    std::ostream& operator<<(std::ostream& ostream, UnorientedConstVectorReference<ElementType> vector)
+    {
+        vector.Print(ostream);
+        return ostream;
+    }
+
     //
     // ConstVectorReference
     //
@@ -206,6 +236,60 @@ namespace math
             *current = mapper(*current);
             current += _increment;
         }
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::operator+=(ConstVectorReference<ElementType, Orientation> other)
+    {
+        CheckSize(other);
+        Operations::Add(1.0, other, *this);
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::operator-=(ConstVectorReference<ElementType, Orientation> other)
+    {
+        CheckSize(other);
+        Operations::Add(-1.0, other, *this);
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::operator+=(ElementType value)
+    {
+        Operations::Add(value, *this);
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::operator-=(ElementType value)
+    {
+        Operations::Add(-value, *this);
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::operator*=(ElementType value)
+    {
+        Operations::Multiply(value, *this);
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::operator/=(ElementType value)
+    {
+        if (value == 0)
+        {
+            throw utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "divide by zero");
+        }
+        Operations::Multiply(1.0 / value, *this);
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::CoordinatewiseSquare()
+    {
+        Transform([](ElementType x) { return x * x; });
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::CoordinatewiseSquareRoot()
+    {
+        Transform([](ElementType x) { return static_cast<ElementType>(std::sqrt(x)); });
     }
 
     //

@@ -103,9 +103,10 @@ namespace model
         ///
         /// <param name="model"> The model. </param>
         /// <param name="context"> The context. </param>
+        /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
         ///
         /// <returns> The refined Model. </returns>
-        Model RefineModel(const Model& model, const TransformContext& context);
+        Model RefineModel(const Model& model, const TransformContext& context, int maxIterations = 10);
 
         /// <summary> Transforms the model by applying a transformation function to each node </summary>
         ///
@@ -216,9 +217,6 @@ namespace model
         TransformContext _context;
         std::unordered_map<PortElementBase, PortElementBase> _elementToElementMap;
         bool _isModelCompilable;
-
-        // the maximal number of refinement iterations to allow
-        const int maxRefinementIterations = 10;
     };
 }
 }
