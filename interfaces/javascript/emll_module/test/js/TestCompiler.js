@@ -12,7 +12,7 @@ var tap = require('tap');
 const EMLL = require('emll');
 console.log('Loaded EMLL');
 
-// array is a list of lists (a javascript jagged array)
+// `array` is a list of lists (a javascript jagged array)
 function ToEMLLVector(array) {
   let result = new EMLL.DoubleVectorVector();
   for (var rowIndex = 0; rowIndex < array.length; rowIndex++) {

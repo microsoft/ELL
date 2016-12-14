@@ -28,6 +28,7 @@ namespace nodes
         /// @{
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
+        const model::InputPort<double>& input = _input;
         const model::OutputPort<bool>& output = _output;
         /// @}
 

@@ -47,13 +47,15 @@ namespace nodes
         static constexpr const char* input1PortName = "input1";
         static constexpr const char* input2PortName = "input2";
         static constexpr const char* outputPortName = "output";
+        const model::InputPort<ValueType>& input1 = _input1;
+        const model::InputPort<ValueType>& input2 = _input2;
         const model::OutputPort<bool>& output = _output;
         /// @}
 
         /// <summary> Default Constructor </summary>
         BinaryPredicateNode();
 
-        /// <summary> Constructor. </summary>
+        /// <summary> Constructor </summary>
         ///
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
@@ -83,13 +85,14 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-        /// <summary>Get the predicate type</summary>
-        BinaryPredicateType GetPredicateType() const { return _predicate; }
+        /// <summary> Gets the predicate performed by this node </summary>
+        ///
+        /// <returns> The predicate </returns>
+        BinaryPredicateType GetPredicate() const { return _predicate; }
 
     protected:
         virtual void Compute() const override;
 
-    private:
         template <typename Operation>
         std::vector<bool> ComputeOutput(Operation&& fn) const;
 

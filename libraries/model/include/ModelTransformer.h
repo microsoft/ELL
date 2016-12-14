@@ -74,6 +74,7 @@ namespace model
         /// </summary>
         ///
         /// <param name="model"> The model. </param>
+        /// <param name="outputNode"> The output node we are interested in </param>
         /// <param name="context"> The context. </param>
         /// <param name="outputNode"> The output that must be computable in the result model </param>
         ///
@@ -86,16 +87,19 @@ namespace model
         /// </summary>
         ///
         /// <param name="model"> The model. </param>
+        /// <param name="outputNodes"> The output nodes we are interested in </param>
         /// <param name="context"> The context. </param>
         /// <param name="outputNodes"> The outputs that must be computable in the result model </param>
         ///
         /// <returns> The copied Model. </returns>
         Model CopyModel(const Model& model, const std::vector<const Node*>& outputNodes, const TransformContext& context);
 
-        /// <summary> Performs one or more refinement iterations on a given model and returns the result.
+        /// <summary> 
+        /// Performs one or more refinement iterations on a given model and returns the result.
         /// If context.IsNodeCompilable is not set, this call performs one refinement iteration. If
         /// context.IsNodeCompilable is set, this call refines the model until all its nodes are
-        /// compilable or until none of the nodes refine themselves. </summary>
+        /// compilable or until none of the nodes refine themselves. 
+        /// </summary>
         ///
         /// <param name="model"> The model. </param>
         /// <param name="context"> The context. </param>
@@ -103,6 +107,15 @@ namespace model
         ///
         /// <returns> The refined Model. </returns>
         Model RefineModel(const Model& model, const TransformContext& context, int maxIterations = 10);
+
+        /// <summary> Transforms the model by applying a transformation function to each node </summary>
+        ///
+        /// <param name="model"> The model to transform. </param>
+        /// <param name="transformFunction"> The function to apply on each node </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        ///
+        /// <returns> The refined Model. </returns>
+        Model TransformModel(const Model& model, const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
 
         /// <summary> Indicates if the last call to RefineModel produced a model that is compilable. </summary>
         ///

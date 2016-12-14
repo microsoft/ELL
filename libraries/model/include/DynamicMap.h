@@ -62,12 +62,6 @@ namespace model
         /// <returns> The `Model` </returns>
         Model& GetModel() { return _model; }
 
-        /// <summary> Refines the model wrapped by this map. </summary>
-        ///
-        /// <param name="context"> The TransformContext to use during refinement. </param>
-        /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
-        void Refine(const TransformContext& context, int maxIterations = 10);
-
         /// <summary> Computes the map's output from input values </summary>
         ///
         /// <param name="inputValues"> The input to the map </param>
@@ -82,10 +76,23 @@ namespace model
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
 
+        /// <summary> Refines the model wrapped by this map. </summary>
+        ///
+        /// <param name="context"> The TransformContext to use during refinement. </param>
+        /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
+        void Refine(const TransformContext& context, int maxIterations = 10);
+
+        /// <summary> Transforms the model wrapped by this map by applying a transformation function to each node </summary>
+        ///
+        /// <param name="transformFunction"> The function to apply on each node </param>
+        /// <param name="context"> The TransformContext to use during the transformation </param>
+        void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
+
         size_t ComputeSize() const // TODO
         {
             return GetOutput(0).Size();
         }
+
 
         //
         // Internal routines for getting information about inputs / outputs of the map
@@ -93,7 +100,7 @@ namespace model
         //
 
         /// <returns> The number of input nodes </returns>
-        size_t NumInputs() const { return _inputNodes.size(); }
+        size_t NumInputPorts() const { return _inputNodes.size(); }
 
         /// <summary> Returns an input node </summary>
         ///
@@ -115,7 +122,7 @@ namespace model
         /// <summary> Get the number of outputs </summary>
         ///
         /// <returns> The number of outputs </returns>
-        size_t NumOutputs() const { return _outputElements.size(); }
+        size_t NumOutputPorts() const { return _outputElements.size(); }
 
         /// <summary> Returns an outputs </summary>
         ///

@@ -12,25 +12,43 @@
 // common
 #include "LoadModel.h"
 
+// comiler
+#include "CompiledMap.h"
+
 // model
-#include "Node.h"
-#include "Model.h"
-#include "Port.h"
-#include "InputPort.h"
-#include "OutputPort.h"
-#include "PortElements.h"
 #include "InputNode.h"
+#include "InputPort.h"
+#include "Model.h"
+#include "Node.h"
 #include "OutputNode.h"
+#include "OutputPort.h"
+#include "Port.h"
+#include "PortElements.h"
+
+// nodes
+#include "ConstantNode.h"
+#include "DTWDistanceNode.h"
+#include "ExtremalValueNode.h"
+#include "MultiplexerNode.h"
 
 // utilities
 #include "JsonArchiver.h"
 
 // stl
+#include <memory>
 #include <string>
 #include <sstream>
 #include <vector>
 %}
 
+#if 0
+%nodefaultctor emll::model::NodeIterator;
+%nodefaultctor emll::model::Node;
+%nodefaultctor emll::model::Port;
+%nodefaultctor emll::model::OutputPortBase;
+%nodefaultctor emll::model::OutputPort<double>;
+%nodefaultctor emll::model::InputPortBase;
+#endif
 
 %inline %{
 
@@ -623,6 +641,36 @@ ELL_InputPortBaseIterator::ELL_InputPortBaseIterator(std::vector<emll::model::In
 {
 }
 #endif
+
+class ELL_CompiledMap 
+{
+public:
+    ELL_CompiledMap() {}
+
+    ELL_CompiledMap(const ELL_CompiledMap&) = default;
+
+    std::string GetCodeString()
+    {
+        std::stringstream s;
+        if(_map != nullptr)
+        {
+            _map->WriteCode(s, "asm");
+        }
+        return s.str();
+    }
+
+    std::vector<double> Compute(const std::vector<double>& inputData)
+    {
+        _map->SetInputValue(0, inputData);
+        return _map->ComputeOutput<double>(0);
+    }
+
+#ifndef SWIG
+    ELL_CompiledMap(const emll::compiler::CompiledMap& other) : _map(std::make_shared<emll::compiler::CompiledMap>(other)) {}
+#endif
+private:
+    std::shared_ptr<emll::compiler::CompiledMap> _map;
+};
 
 //
 // ELL_OutputPortBaseIterator Methods

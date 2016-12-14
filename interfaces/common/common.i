@@ -8,7 +8,6 @@
 
 %{
 #include "DataLoadArguments.h"
-#include "DataLoadersInterface.h"
 #include "MapLoadArguments.h"
 #include "LoadModel.h"
 
@@ -24,9 +23,6 @@
 %include "ModelLoadArguments.h"
 %include "MapLoadArguments.h"
 %include "LoadModel.h"
-
-// Modified versions of interfaces
-%include "DataLoadersInterface.h"
 
 // Trainer arguments
 %include "TrainerArguments.h"

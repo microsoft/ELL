@@ -3,44 +3,16 @@
 #
 include (CommonInterfaces)
 
-
-###
+# Get include directories for LLVM
 if(WIN32)
   include (LLVMSetup)
-
-  if(LLVM_LIBROOT)
-    set(LLVM_ENABLED ON)
-  else()
-    set(LLVM_ENABLED OFF)
-    message("LLVM Unavailable. Compilers disabled.")
-  endif()
-
 else()
-  find_package(LLVM REQUIRED CONFIG)
+  find_package(LLVM CONFIG)
   if(LLVM_FOUND)
-    message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-    message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-    message(STATUS "LLVM definitions: ${LLVM_DEFINITIONS}")
     include_directories(${LLVM_INCLUDE_DIRS})
     add_definitions(${LLVM_DEFINITIONS})
-    # Find the libraries that correspond to the LLVM components
-    # that we wish to use
-    llvm_map_components_to_libnames(LLVM_LIBS all) #support core irreader)
-#    set(LLVM_LIBS LLVMCore LLVMAnalysis LLVMAsmParser LLVMSupport LLVMBitWriter LLVMInstCombine LLVMTransformUtils LLVMScalarOpts LLVMExecutionEngine LLVMRuntimeDyld LLVMObject LLVMMC LLVMTarget LLVMMCParser LLVMBitReader LLVMCodeGen LLVMSelectionDAG LLVMAsmPrinter LLVMX86CodeGen LLVMX86Info LLVMX86Desc LLVMX86Utils LLVMX86AsmPrinter LLVMMCDisassembler LLVMDebugInfoCodeView LLVMMCJIT)
-
-    message(STATUS "Libs: ${LLVM_LIBS}")
-    set(LLVM_ENABLED ON)
-  else()
-    set(LLVM_ENABLED OFF)
   endif()
-
 endif()
-
-###
-
-# set (INTERFACE_SRC ../common/src/DataLoadersInterface.cpp)
-
-# set (INTERFACE_INCLUDE ../common/include/DataLoadersInterface.h)
 
 set (INTERFACE_MAIN ../common/EMLL.i)
 

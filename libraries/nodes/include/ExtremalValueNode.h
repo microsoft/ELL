@@ -35,6 +35,7 @@ namespace nodes
         static constexpr const char* valPortName = "val";
         static constexpr const char* argValPortName = "argVal";
 
+        const model::InputPort<ValueType>& input = _input;
         const model::OutputPort<ValueType>& val = _val;
         const model::OutputPort<int>& argVal = _argVal;
         /// @}
@@ -66,6 +67,8 @@ namespace nodes
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+        bool IsMaxNode() const { return max; }
 
     protected:
         virtual void Compute() const override;

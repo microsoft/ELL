@@ -43,6 +43,7 @@ namespace nodes
         /// @{
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
+        const model::InputPort<ValueType>& input = _input;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
@@ -78,13 +79,14 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-        /// <summary>Gets the operation type</summary>
-        UnaryOperationType GetOperationType() const { return _operation; }
+        /// <summary> Gets the operation performed by this node </summary>
+        ///
+        /// <returns> The operation </returns>
+        UnaryOperationType GetOperation() const { return _operation; }
 
     protected:
         virtual void Compute() const override;
 
-    private:
         template <typename Operation>
         std::vector<ValueType> ComputeOutput(Operation&& function) const;
 

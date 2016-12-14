@@ -39,6 +39,7 @@ namespace nodes
         static constexpr const char* outputPortName = "output";
         static constexpr const char* treeOutputsPortName = "treeOutputs";
         static constexpr const char* edgeIndicatorVectorPortName = "edgeIndicatorVector";
+        const model::InputPort<double>& input = _input;
         const model::OutputPort<double>& output = _output;
         const model::OutputPort<double>& treeOutputs = _treeOutputs;
         const model::OutputPort<bool>& edgeIndicatorVector = _edgeIndicatorVector;

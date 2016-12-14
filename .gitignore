@@ -208,23 +208,22 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
-# Mac stuff
-.DS_Store
-build_xcode/
-
 # Emacs autosaves
 \#*\#
 .#*
 
 # Mac stuff
 .DS_Store
-build_xcode/
-build_clang/
 
 # VS Code stuff
 .vs/
 .vscode/
 browse.VC.db
+
+# mbed development
+.yotta.json
+yotta_modules/
+yotta_targets/
 
 # CMake / CTest stuff
 /Testing/
@@ -233,11 +232,13 @@ external/llvm/include/
 external/llvm/lib/
 swig/
 dist/
+build/
+build_clang/
+build_xcode/
 
 interfaces/javascript/emll_module/CMakeFiles/
 interfaces/javascript/emll_module/test/js/Testing/
 yotta_modules/
 yotta_targets/
-
 LaunchXslt/bin/**
 LaunchXslt/obj/**

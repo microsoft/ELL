@@ -40,6 +40,11 @@ namespace model
         /// <returns> The dimensionality of the output </returns>
         size_t Size() { return _outputBase.Size(); }
 
+        /// <summary> Gets the output type of this node </summary>
+        ///
+        /// <returns> The output type of this node </returns>
+        Port::PortType GetOutputType() const { return _outputBase.GetType(); }
+
     protected:
         InputNodeBase(OutputPortBase& output);
 
@@ -52,6 +57,12 @@ namespace model
     class InputNode : public InputNodeBase
     {
     public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* outputPortName = "output";
+        const model::OutputPort<ValueType>& output = _output;
+        /// @}
+
         /// <summary> Constructor </summary>
         InputNode();
 
@@ -93,10 +104,7 @@ namespace model
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const override;
 
-        /// <summary> Exposes the output port as a read-only property </summary>
-        const OutputPort<ValueType>& output = _output;
-
-        static constexpr const char* outputPortName = "output";
+        size_t Size() const { return _output.Size(); }
 
     protected:
         virtual void Compute() const override;

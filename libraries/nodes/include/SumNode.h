@@ -33,6 +33,7 @@ namespace nodes
         /// @{
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
+        const model::InputPort<ValueType>& input = _input;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
@@ -40,6 +41,7 @@ namespace nodes
         SumNode();
 
         /// <summary> Constructor </summary>
+        ///
         /// <param name="input"> The signal to take the sum of </param>
         SumNode(const model::PortElements<ValueType>& input);
 
@@ -69,7 +71,6 @@ namespace nodes
     protected:
         virtual void Compute() const override;
 
-    private:
         // Inputs
         model::InputPort<ValueType> _input;
 

@@ -69,6 +69,24 @@ namespace model
         return _model.ComputeOutput<double>(outputs);
     }
 
+    template <>
+    std::vector<bool> DynamicMap::ComputeOutput<bool>(const PortElementsBase& elements) const
+    {
+        return ComputeBoolOutput(elements);
+    }
+
+    template <>
+    std::vector<int> DynamicMap::ComputeOutput<int>(const PortElementsBase& elements) const
+    {
+        return ComputeIntOutput(elements);
+    }
+
+    template <>
+    std::vector<double> DynamicMap::ComputeOutput<double>(const PortElementsBase& elements) const
+    {
+        return ComputeDoubleOutput(elements);
+    }
+
     void DynamicMap::AddInput(const std::string& inputName, InputNodeBase* inputNode)
     {
         _inputNodes.push_back(inputNode);
@@ -85,7 +103,7 @@ namespace model
 
     void DynamicMap::ResetOutput(size_t index, PortElementsBase outputElements)
     {
-        assert(index > 0 && index <= _outputElements.size() && "Error: Resetting unset output");
+        assert(index >= 0 && index <= _outputElements.size() && "Error: Resetting unset output");
         _outputElements[index] = outputElements;
         _outputElementsMap[_outputNames[index]] = outputElements;
     }
@@ -169,6 +187,14 @@ namespace model
         FixTransformedIO(transformer);
         _model = refinedModel;
         return transformer;
+    }
+
+    void DynamicMap::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
+    {
+        ModelTransformer transformer;
+        auto refinedModel = transformer.TransformModel(_model, transformFunction, context);
+        FixTransformedIO(transformer);
+        _model = refinedModel;
     }
 
     void DynamicMap::WriteToArchive(utilities::Archiver& archiver) const

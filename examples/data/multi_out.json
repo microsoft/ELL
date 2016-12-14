@@ -5,13 +5,13 @@
     "_type": "InputNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1392"
+      "id": "1628"
     },
     "output": {
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1392"
+        "id": "1628"
       },
       "name": "output",
       "type": 1,
@@ -22,13 +22,13 @@
     "_type": "ConstantNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1394"
+      "id": "1630"
     },
     "output": {
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1394"
+        "id": "1630"
       },
       "name": "output",
       "type": 1,
@@ -40,13 +40,13 @@
     "_type": "BinaryOperationNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1396"
+      "id": "1632"
     },
     "input1": {
       "_type": "InputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1396"
+        "id": "1632"
       },
       "name": "input1",
       "type": 1,
@@ -60,7 +60,7 @@
           "isFixedSize": false,
           "referencedNodeId": {
             "_type": "UniqueId",
-            "id": "1392"
+            "id": "1628"
           },
           "referencedPortName": "output"
         }]
@@ -70,7 +70,7 @@
       "_type": "InputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1396"
+        "id": "1632"
       },
       "name": "input2",
       "type": 1,
@@ -84,7 +84,7 @@
           "isFixedSize": false,
           "referencedNodeId": {
             "_type": "UniqueId",
-            "id": "1394"
+            "id": "1630"
           },
           "referencedPortName": "output"
         }]
@@ -94,7 +94,7 @@
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1396"
+        "id": "1632"
       },
       "name": "output",
       "type": 1,
@@ -103,16 +103,100 @@
     "operation": "add"
   }, 
   {
+    "_type": "ConstantNode<double>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1629"
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1629"
+      },
+      "name": "output",
+      "type": 1,
+      "size": 3
+    },
+    "values": [2, 2, 2]
+  }, 
+  {
+    "_type": "BinaryOperationNode<double>",
+    "id": {
+      "_type": "UniqueId",
+      "id": "1631"
+    },
+    "input1": {
+      "_type": "InputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1631"
+      },
+      "name": "input1",
+      "type": 1,
+      "input": {
+        "_type": "PortElements<double>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1628"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "input2": {
+      "_type": "InputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1631"
+      },
+      "name": "input2",
+      "type": 1,
+      "input": {
+        "_type": "PortElements<double>",
+        "ranges": [
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1629"
+          },
+          "referencedPortName": "output"
+        }]
+      }
+    },
+    "output": {
+      "_type": "OutputPort<double>",
+      "nodeId": {
+        "_type": "UniqueId",
+        "id": "1631"
+      },
+      "name": "output",
+      "type": 1,
+      "size": 3
+    },
+    "operation": "coordinatewiseMultiply"
+  }, 
+  {
     "_type": "OutputNode<double>",
     "id": {
       "_type": "UniqueId",
-      "id": "1397"
+      "id": "1633"
     },
     "input": {
       "_type": "InputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1397"
+        "id": "1633"
       },
       "name": "input",
       "type": 1,
@@ -126,7 +210,18 @@
           "isFixedSize": false,
           "referencedNodeId": {
             "_type": "UniqueId",
-            "id": "1396"
+            "id": "1631"
+          },
+          "referencedPortName": "output"
+        }, 
+        {
+          "_type": "PortRange",
+          "startIndex": 0,
+          "numValues": 3,
+          "isFixedSize": false,
+          "referencedNodeId": {
+            "_type": "UniqueId",
+            "id": "1632"
           },
           "referencedPortName": "output"
         }]
@@ -136,95 +231,11 @@
       "_type": "OutputPort<double>",
       "nodeId": {
         "_type": "UniqueId",
-        "id": "1397"
+        "id": "1633"
       },
       "name": "output",
       "type": 1,
-      "size": 3
+      "size": 6
     }
-  }, 
-  {
-    "_type": "ConstantNode<double>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1393"
-    },
-    "output": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1393"
-      },
-      "name": "output",
-      "type": 1,
-      "size": 3
-    },
-    "values": [2, 2, 2]
-  }, 
-  {
-    "_type": "BinaryOperationNode<double>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1395"
-    },
-    "input1": {
-      "_type": "InputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1395"
-      },
-      "name": "input1",
-      "type": 1,
-      "input": {
-        "_type": "PortElements<double>",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 3,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1392"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "input2": {
-      "_type": "InputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1395"
-      },
-      "name": "input2",
-      "type": 1,
-      "input": {
-        "_type": "PortElements<double>",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 3,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1393"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "output": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1395"
-      },
-      "name": "output",
-      "type": 1,
-      "size": 3
-    },
-    "operation": "coordinatewiseMultiply"
   }]
 }

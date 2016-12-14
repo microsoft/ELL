@@ -98,6 +98,12 @@ namespace model
         PortType _type = PortType::none;
     };
 
+    /// <summary> Returns a string with the 'C' type name to use for the given `PortType` </summary>
+    ///
+    /// <param name="type"> The type of the port </param>
+    /// <returns> A string representation of the C type to use </returns>
+    std::string GetPortCTypeName(emll::model::Port::PortType type);
+
     template <Port::PortType portType>
     struct PortTypeToValueType
     {

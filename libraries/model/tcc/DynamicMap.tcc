@@ -50,7 +50,8 @@ namespace model
         std::vector<ElementsType> array(inputSize);
         std::transform(inputArray.begin(), inputArray.end(), array.begin(), [](auto x) { return DynamicMapImpl::FromDouble<ElementsType>(x); });
         auto typedNode = static_cast<InputNode<ElementsType>*>(node);
-        typedNode->SetInput(array);
+
+        SetNodeInput(typedNode, array);
     }
 
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
@@ -88,7 +89,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        node->SetInput(inputValues);
+        SetNodeInput(node, inputValues);
     }
 
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
@@ -108,7 +109,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        node->SetInput(inputValues);
+        SetNodeInput(node, inputValues);
     }
 
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
@@ -128,12 +129,6 @@ namespace model
         auto resultVector = ComputeOutput<ElementsValueType>(elements);
         auto resultVectorIterator = data::MakeVectorIndexValueIterator(resultVector);
         return { resultVectorIterator };
-    }
-
-    template <typename ValueType, utilities::IsFundamental<ValueType>>
-    std::vector<ValueType> DynamicMap::ComputeOutput(const PortElementsBase& elements) const
-    {
-        return _model.ComputeOutput<ValueType>(elements);
     }
 
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>

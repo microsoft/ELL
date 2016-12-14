@@ -1,13 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     L2NormNode.h (nodes)
+//  File:     DTWDistanceNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
+#include "SumNode.h"
+
+// model
+#include "BinaryOperationNode.h"
 #include "InputPort.h"
 #include "ModelTransformer.h"
 #include "Node.h"
@@ -15,19 +19,19 @@
 #include "PortElements.h"
 
 // utilities
+#include "Exception.h"
 #include "TypeName.h"
 
 // stl
-#include <cmath>
 #include <string>
 
 namespace emll
 {
 namespace nodes
 {
-    /// <summary> A node that takes a vector input and returns its magnitude </summary>
+    /// <summary> A node that computes the dynamic time-warping distance between its inputs </summary>
     template <typename ValueType>
-    class L2NormNode : public model::Node
+    class DTWDistanceNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
@@ -39,16 +43,18 @@ namespace nodes
         /// @}
 
         /// <summary> Default Constructor </summary>
-        L2NormNode();
+        DTWDistanceNode();
 
         /// <summary> Constructor </summary>
-        /// <param name="input"> The signal to take the magnitude of </param>
-        L2NormNode(const model::PortElements<ValueType>& input);
+        ///
+        /// <param name="input"> The signals to compare to the prototype </param>
+        /// <param name="prototype"> The prototype </param>
+        DTWDistanceNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("L2NormNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("DTWDistanceNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -66,19 +72,36 @@ namespace nodes
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` currently copying the model </param>
         virtual void Copy(model::ModelTransformer& transformer) const override;
+
+        /// <summary> Refines this node in the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` currently refining the model </param>
+        // virtual bool Refine(model::ModelTransformer& transformer) const override;
+
+        std::vector<std::vector<ValueType>> GetPrototype() const { return _prototype; }
 
     protected:
         virtual void Compute() const override;
+        void Reset() const;
 
-    private:
-        // Inputs
+        // private:
         model::InputPort<ValueType> _input;
-
-        // Output
         model::OutputPort<ValueType> _output;
+
+        size_t _sampleDimension;
+        size_t _prototypeLength;
+        std::vector<std::vector<ValueType>> _prototype;
+        // double _threshold;
+        double _prototypeVariance;
+
+        mutable std::vector<ValueType> _d;
+        mutable std::vector<int> _s;
+        mutable int _currentTime;
     };
 }
 }
 
-#include "../tcc/L2NormNode.tcc"
+#include "../tcc/DTWDistanceNode.tcc"

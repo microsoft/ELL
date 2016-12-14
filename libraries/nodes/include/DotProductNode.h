@@ -38,6 +38,8 @@ namespace nodes
         static constexpr const char* input1PortName = "input1";
         static constexpr const char* input2PortName = "input2";
         static constexpr const char* outputPortName = "output";
+        const model::InputPort<ValueType>& input1 = _input1;
+        const model::InputPort<ValueType>& input2 = _input2;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
@@ -45,6 +47,7 @@ namespace nodes
         DotProductNode();
 
         /// <summary> Constructor </summary>
+        ///
         /// <param name="input1"> One of the signals to take the dot product of </param>
         /// <param name="input2"> The other signal to take the dot product of </param>
         DotProductNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2);
@@ -70,15 +73,18 @@ namespace nodes
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` currently copying the model </param>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` currently refining the model </param>
         virtual bool Refine(model::ModelTransformer& transformer) const override;
 
     protected:
         virtual void Compute() const override;
 
-    private:
         // Inputs
         model::InputPort<ValueType> _input1;
         model::InputPort<ValueType> _input2;

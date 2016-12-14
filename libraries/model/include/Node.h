@@ -43,7 +43,17 @@ namespace model
         /// <returns> The unique ID for this node </returns>
         const NodeId GetId() const { return _id; }
 
-        /// <summary> Returns the input "ports" for this node </summary>
+        /// <summary> Returns the number of input ports for this node </summary>
+        ///
+        /// <returns> The number of input ports </returns>
+        size_t NumInputPorts() const { return _inputs.size(); }
+
+        /// <summary> Returns the number of output ports for this node </summary>
+        ///
+        /// <returns> The number of output ports </returns>
+        size_t NumOutputPorts() const { return _outputs.size(); }
+
+        /// <summary> Returns the input ports for this node </summary>
         ///
         /// <returns> The input "ports" for this node </returns>
         const std::vector<InputPortBase*>& GetInputPorts() const { return _inputs; }
@@ -114,13 +124,17 @@ namespace model
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) = 0;
 
+        /// <summary> Indicates if this node is able to compile itself to code. </summary>
+        virtual bool IsCompilable() const { return false; }
+
+        /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
+        virtual void Copy(ModelTransformer& transformer) const = 0;
+
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer. </summary>
-        ///
-        /// <param name="transformer"> [in,out] The transformer. </param>
-        virtual void Copy(ModelTransformer& transformer) const = 0;
 
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(ModelTransformer& transformer) const;

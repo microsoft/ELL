@@ -37,6 +37,7 @@ namespace nodes
         /// @{
         static constexpr const char* outputPortName = "output";
         static constexpr const char* inputPortName = "input";
+        const model::InputPort<ValueType>& input = _input;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
@@ -44,6 +45,7 @@ namespace nodes
         DelayNode();
 
         /// <summary> Constructor </summary>
+        ///
         /// <param name="input"> The signal to delay </param>
         /// <param name="windowSize"> The number of samples to delay the signal </param>
         DelayNode(const model::PortElements<ValueType>& input, size_t windowSize);
@@ -77,7 +79,6 @@ namespace nodes
     protected:
         virtual void Compute() const override;
 
-    private:
         // Inputs
         model::InputPort<ValueType> _input;
 

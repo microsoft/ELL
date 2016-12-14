@@ -17,6 +17,7 @@
 #include "BinaryPredicateNode.h"
 #include "ConstantNode.h"
 #include "DemultiplexerNode.h"
+#include "DotProductNode.h"
 #include "MultiplexerNode.h"
 #include "SumNode.h"
 #include "UnaryOperationNode.h"
@@ -40,7 +41,7 @@ namespace common
         AddNodeType<nodes::BinaryPredicateNode<double>>();
         AddNodeType<nodes::DemultiplexerNode<bool, bool>>();
         AddNodeType<nodes::DemultiplexerNode<double, bool>>();
-        AddNodeType<nodes::SumNode<double>>();
+        AddNodeType<nodes::DotProductNode<double>>();
         AddNodeType<nodes::TypeCastNode<bool, int>>();
         AddNodeType<nodes::UnaryOperationNode<bool>>();
         AddNodeType<nodes::UnaryOperationNode<double>>();
@@ -50,15 +51,13 @@ namespace common
 
     bool IsNodeCompilable::operator()(const model::Node& node)
     {
+
         const auto& nodeName = node.GetRuntimeTypeName();
         if (_nodeNames.find(nodeName) != _nodeNames.end())
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 }
 }
