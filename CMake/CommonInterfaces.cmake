@@ -64,7 +64,8 @@ if(${language} STREQUAL "javascript")
     # Note: if compiling against older version of node, we may have to specify the 
     # V8 version explicitly. For instance, when building against electron 0.36.7,
     # add this flag to the CMAKE_SWIG_FLAGS: -DV8_VERSION=0x032530
-    set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node)
+    #set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node -DV8_VERSION=0x032530)
+	set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node)
 endif()
 
 set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
