@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "echo ",
-    "build": "node-gyp rebuild --runtime=electron --target=1.4.4 --arch-x64 --dist-url=https://atom.io/download/atom-shell",
+    "build": "node-gyp rebuild --runtime=electron --target=@ELECTRON_VERSION@ --arch-x64 --dist-url=https://atom.io/download/atom-shell",
     "build:mac": "npm run build && npm run copy:mac",
     "build:win": "npm run build && npm run copy:win",
     "build:linux": "npm run build && npm run copy:linux",
