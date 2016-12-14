@@ -23,7 +23,7 @@ namespace emll
 common::DataLoadArguments GetDataLoadArguments()
 {
     common::DataLoadArguments args;
-    args.inputDataFilename = "../../examples/data/testData.txt";
+    args.inputDataFilename = "../../../examples/data/testData.txt";
     return args;
 }
 void TestLoadDataset()
@@ -35,7 +35,7 @@ void TestLoadDataset()
 void TestLoadMappedDataset()
 {
     common::MapLoadArguments args;
-    args.inputModelFilename = "../../examples/data/model_1.json";
+    args.inputModelFilename = "../../../examples/data/model_1.json";
     args.modelInputsString = "";
     args.modelOutputsString = "1017.output";
 
