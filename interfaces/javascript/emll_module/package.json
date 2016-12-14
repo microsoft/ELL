@@ -11,7 +11,7 @@
     "build:linux": "npm run build && npm run copy:linux",
     "build:test": "node-gyp rebuild",
     "copy:mac": "source copyMacLib.sh",
-    "copy:linux":"source copyLinuxLib.sh",
+    "copy:linux":". ./copyLinuxLib.sh",
     "copy:win":"copyWindowsLib",
     "preinstall": "",
     "preuninstall": "rm -rf build/*"
