@@ -124,7 +124,7 @@ namespace model
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) = 0;
 
-        /// <summary> Indicates if the current node should stop refining itself </summary>
+        /// <summary> Indicates if this node is able to compile itself to code. </summary>
         virtual bool IsCompilable() const { return false; }
 
         /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
