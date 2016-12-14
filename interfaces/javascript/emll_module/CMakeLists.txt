@@ -55,11 +55,6 @@ if(NPM_EXECUTABLE)
 
     foreach(MODULE_FILE ${MODULE_FILES})
         configure_file(${MODULE_FILE} ${MODULE_FILE} @ONLY)
-        add_custom_command(OUTPUT ${MODULE_FILE} 
-                        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FILE} ${CMAKE_CURRENT_BINARY_DIR}
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                        COMMENT "Copying ${MODULE_FILE}"
-                        VERBATIM)
         set_property(TARGET ${PROJ_NAME}_files APPEND PROPERTY OBJECT_DEPENDS ${MODULE_FILE})
     endforeach()
 
