@@ -9,6 +9,9 @@
 %module "EMLL"
 #if defined(SWIGJAVASCRIPT)
 %{
+#include "LLVMInclude.h" // LLVM headers must be included before Windows headers (which are included by node.h)
+
+// 
 #include <node.h>
 #include <v8.h>
 #include <nan.h>
