@@ -11,7 +11,7 @@
                     'library_path_suffix%': '/Release',
                     'llvm_include_path': '../../../../private/binaries/llvm/include',
                     'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
-                    'llvm_library_path': '../../../../private/binaries/llvm/Rel/lib',
+                    'llvm_library_path': '../../../../private/binaries/llvm/Rel/lib'
                 },
             }
         ],
@@ -22,9 +22,9 @@
                     'include_path_prefix%':'../../../..',
                     'library_path_prefix%':'../../../../..',
                     'library_path_suffix%': '',
-                    'llvm_include_path': '/usr/local/include/llvm/include',
+                    'llvm_include_path': '@LLVM_INCLUDE_DIRS@',
                     'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
-                    'llvm_library_path': '/usr/local/lib',
+                    'llvm_library_path': '@LLVM_LIBRARY_DIRS@'
                 },
             }
         ],
@@ -33,11 +33,11 @@
             {
                 'variables': {
                     'include_path_prefix%':'../../../..',
-                    'library_path_prefix%':'../../../..',
+                    'library_path_prefix%':'../../../../..',
                     'library_path_suffix%': '',
-                    'llvm_include_path': '/usr/local/include/llvm/include',
+                    'llvm_include_path': '@LLVM_INCLUDE_DIRS@',
                     'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
-                    'llvm_library_path': '/usr/local/lib',
+                    'llvm_library_path': '@LLVM_LIBRARY_DIRS@'
                 },
             }
         ]
@@ -132,7 +132,7 @@
                                 '-lLLVMObject',
                                 '-lLLVMRuntimeDyld',
                                 '-lLLVMScalarOpts',
-                                '-lLLVMSelectionDag',
+                                '-lLLVMSelectionDAG',
                                 '-lLLVMSupport',
                                 '-lLLVMTarget',
                                 '-lLLVMTransformUtils',
@@ -188,7 +188,7 @@
                                 '-lLLVMObject',
                                 '-lLLVMRuntimeDyld',
                                 '-lLLVMScalarOpts',
-                                '-lLLVMSelectionDag',
+                                '-lLLVMSelectionDAG',
                                 '-lLLVMSupport',
                                 '-lLLVMTarget',
                                 '-lLLVMTransformUtils',
@@ -264,7 +264,7 @@
                                 '-lLLVMObject',
                                 '-lLLVMRuntimeDyld',
                                 '-lLLVMScalarOpts',
-                                '-lLLVMSelectionDag',
+                                '-lLLVMSelectionDAG',
                                 '-lLLVMSupport',
                                 '-lLLVMTarget',
                                 '-lLLVMTransformUtils',

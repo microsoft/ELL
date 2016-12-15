@@ -1,3 +1,5 @@
+#!/bin/bash
+
 mkdir -p ./dist/linux/build/Release
 
 cp -f build/Release/emll.node ./dist/linux/build/Release
