@@ -235,6 +235,7 @@ dist/
 build/
 build_clang/
 build_xcode/
+build_linux/
 
 interfaces/javascript/emll_module/CMakeFiles/
 interfaces/javascript/emll_module/test/js/Testing/
