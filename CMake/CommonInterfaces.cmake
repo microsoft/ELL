@@ -1,5 +1,5 @@
 #
-# CMake macro to create swig-generated language wrapper for Embedded Machine Learning Library
+# CMake macro to create swig-generated language wrapper for Embedded Learning Library
 #
 
 # Variables assumed to have been set in parent scope:
