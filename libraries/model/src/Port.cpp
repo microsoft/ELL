@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Port.cpp (model)
 //  Authors:  Chuck Jacobs
 //
@@ -9,7 +9,7 @@
 #include "Port.h"
 #include "Node.h"
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model
@@ -52,19 +52,19 @@ namespace model
         _type = static_cast<PortType>(typeCode);
     }
 
-    std::string GetPortCTypeName(emll::model::Port::PortType type)
+    std::string GetPortCTypeName(ell::model::Port::PortType type)
     {
         switch (type)
         {
-            case emll::model::Port::PortType::none:
+            case ell::model::Port::PortType::none:
                 return "void";
-            case emll::model::Port::PortType::real:
+            case ell::model::Port::PortType::real:
                 return "double";
-            case emll::model::Port::PortType::integer:
+            case ell::model::Port::PortType::integer:
                 return "int";
-            case emll::model::Port::PortType::categorical:
+            case ell::model::Port::PortType::categorical:
                 return "int";
-            case emll::model::Port::PortType::boolean:
+            case ell::model::Port::PortType::boolean:
                 return "bool"; // ???
             default:
                 return "Unknown";

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (forestTrainer)
 //  Authors:  Ofer Dekel
 //
@@ -61,7 +61,7 @@
 #include <iostream>
 #include <stdexcept>
 
-using namespace emll;
+using namespace ell;
 
 int main(int argc, char* argv[])
 {

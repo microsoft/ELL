@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     AnyIterator.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -15,7 +15,7 @@
 #include <memory>
 #include <utility>
 
-namespace emll
+namespace ell
 {
 /// <summary> utilities namespace </summary>
 namespace utilities

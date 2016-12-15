@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Layout.h (treeLayout)
 //  Authors:  Ofer Dekel
 //
@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> %treeLayout namespace </summary>
 namespace treeLayout

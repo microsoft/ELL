@@ -1,4 +1,4 @@
-import EMLL
+import ELL
 
 data = [ 
     #     key    label       file
@@ -17,7 +17,7 @@ data = [
 extensions = ["xml", "json"]
 
 def TestModelSize(key, label):
-    model = EMLL.ELL_Model(key)
+    model = ELL.ELL_Model(key)
     print "%s size: %d" % (label, model.Size())
 
 def TestModelSizes():
@@ -26,7 +26,7 @@ def TestModelSizes():
 
 def TestLoadModel(fileName):
     print "Loading file %s" % fileName
-    m = EMLL.ELL_LoadModel(fileName)
+    m = ELL.ELL_LoadModel(fileName)
 
 def TestLoadModels():
     prefix = "../../../examples/data/"
@@ -36,7 +36,7 @@ def TestLoadModels():
 
 def TestSaveModel(ext, key, prefix):
     fileName = prefix + "." + ext
-    EMLL.ELL_Model(key).Save(fileName)
+    ELL.ELL_Model(key).Save(fileName)
 
 def TestSaveModelsExt(ext):
     for (key, label, prefix) in data:

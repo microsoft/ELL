@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (common_test)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
@@ -23,7 +23,7 @@
 ///
 int main()
 {
-    using namespace emll;
+    using namespace ell;
 
     try
     {
@@ -42,7 +42,7 @@ int main()
     }
     catch (const utilities::Exception& exception)
     {
-        std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
+        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
         throw;
     }
     catch (const std::exception& exception)

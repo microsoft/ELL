@@ -6,7 +6,7 @@
 // Model tests
 //
 
-namespace emll
+namespace ell
 {
 // Helpful stuff
 void PrintModel(const model::Model& model);

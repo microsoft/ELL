@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Vector.tcc (math)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 // stl
 #include <algorithm> // for std::generate
 
-namespace emll
+namespace ell
 {
 namespace math
 {

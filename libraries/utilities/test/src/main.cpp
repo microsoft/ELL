@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (utilities_test)
 //  Authors:  Ofer Dekel
 //
@@ -25,7 +25,7 @@
 #include <thread>
 #include <vector>
 
-using namespace emll;
+using namespace ell;
 
 template <typename... Args>
 void testMatchFormat(utilities::MatchResult expectedResult, const char* content, const char* format, Args... args)
@@ -122,7 +122,7 @@ int main()
     }
     catch (const utilities::Exception& exception)
     {
-        std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
+        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
         throw;
     }
 

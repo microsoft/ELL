@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ParsingExampleIterator.tcc (data)
 //  Authors:  Ofer Dekel
 //
@@ -9,7 +9,7 @@
 #include "AutoDataVector.h"
 #include "SupervisedExampleBuilder.h"
 
-namespace emll
+namespace ell
 {
 namespace data
 {

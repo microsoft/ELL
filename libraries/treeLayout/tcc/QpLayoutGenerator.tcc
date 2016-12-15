@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     QpLayoutGenerator.tcc (treeLayout)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace emll
+namespace ell
 {
 namespace treeLayout
 {

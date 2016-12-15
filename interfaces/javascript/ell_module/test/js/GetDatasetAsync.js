@@ -11,12 +11,10 @@ var tap = require('tap');
 
 console.log("#" + path.relative('.', __dirname));
 
-//const EMLL = require("emll");
-const EMLL = require("emll");
+const ELL = require("ell");
 
-
-console.log("Loaded EMLL");
-var dataset = EMLL.GetDataset("../data/testData.txt");
+console.log("Loaded ELL");
+var dataset = ELL.GetDataset("../data/testData.txt");
 console.log(dataset);
 if(dataset)
 {
@@ -28,7 +26,7 @@ if(dataset)
   console.log("Sync Itearator no. of iterations left:" + dataiter.NumIteratesLeft());
 }
 
-EMLL.GetDatasetAsync("../data/testData.txt", function(datasetasync)
+ELL.GetDatasetAsync("../data/testData.txt", function(datasetasync)
 {
   if(datasetasync)
   {

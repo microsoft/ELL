@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     TypeCastNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> nodes namespace </summary>
 namespace nodes

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Node.h (model)
 //  Authors:  Chuck Jacobs
 //
@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model

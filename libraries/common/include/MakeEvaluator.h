@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     MakeEvaluator.h (common)
 //  Authors:  Ofer Dekel
 //
@@ -20,7 +20,7 @@
 // stl
 #include <memory>
 
-namespace emll
+namespace ell
 {
 namespace common
 {

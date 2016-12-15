@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SweepingIncrementalTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

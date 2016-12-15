@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IncrementalEvaluator.h (evaluators)
 //  Authors:  Ofer Dekel
 //
@@ -14,7 +14,7 @@
 #include <memory>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace evaluators
 {

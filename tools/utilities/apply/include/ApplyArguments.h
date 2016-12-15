@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ApplyArguments.h (apply)
 //  Authors:  Ofer Dekel
 //
@@ -14,7 +14,7 @@
 // stl
 #include <string>
 
-namespace emll
+namespace ell
 {
 /// <summary> Command line arguments for the apply executable. </summary>
 struct ApplyArguments

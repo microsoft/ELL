@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     MakeTrainer.cpp (common)
 //  Authors:  Ofer Dekel
 //
@@ -22,7 +22,7 @@
 #include "SortingForestTrainer.h"
 #include "ThresholdFinder.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {

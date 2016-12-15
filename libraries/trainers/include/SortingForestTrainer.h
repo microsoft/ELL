@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SortingForestTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 #include "ConstantPredictor.h"
 #include "SingleElementThresholdPredictor.h"
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     GenerateModels.cpp (makeExamples)
 //  Authors:  Chuck Jacobs
 //
@@ -34,7 +34,7 @@
 // stl
 #include <string>
 
-namespace emll
+namespace ell
 {
 model::Model GenerateIdentityModel(size_t dimension)
 {

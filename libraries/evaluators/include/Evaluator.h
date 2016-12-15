@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Evaluator.h (evaluators)
 //  Authors:  Ofer Dekel
 //
@@ -17,7 +17,7 @@
 #include <tuple>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace evaluators
 {

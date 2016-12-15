@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SparseBinaryDataVector.tcc (data)
 //  Authors:  Ofer Dekel
 //
@@ -12,7 +12,7 @@
 // stl
 #include <cassert>
 
-namespace emll
+namespace ell
 {
 namespace data
 {

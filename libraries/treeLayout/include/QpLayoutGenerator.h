@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     QpLayoutGenerator.h (treeLayout)
 //  Authors:  Ofer Dekel
 //
@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace treeLayout
 {

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Tokenizer.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -15,7 +15,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

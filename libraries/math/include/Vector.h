@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Vector.h (math)
 //  Authors:  Ofer Dekel
 //
@@ -13,7 +13,7 @@
 #include <iostream>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace math
 {

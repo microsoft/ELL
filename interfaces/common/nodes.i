@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     nodes.i (interfaces)
 //  Authors:  Chuck Jacobs
 //
@@ -21,8 +21,8 @@
 #include "MovingVarianceNode.h"
 %}
 
-%ignore emll::nodes::LinearPredictorSubModelOutputs;
-%ignore emll::nodes::BuildSubModel;
+%ignore ell::nodes::LinearPredictorSubModelOutputs;
+%ignore ell::nodes::BuildSubModel;
 
 %include "AccumulatorNode.h"
 %include "BinaryOperationNode.h"

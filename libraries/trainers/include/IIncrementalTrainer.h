@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IIncrementalTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -14,7 +14,7 @@
 // stl
 #include <memory>
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

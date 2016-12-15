@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (lossFunctions_test)
 //  Authors:  Ofer Dekel
 //
@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-using namespace emll;
+using namespace ell;
 
 void hingeLossTest()
 {

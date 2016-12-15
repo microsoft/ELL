@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ModelTransformer.cpp (model)
 //  Authors:  Chuck Jacobs
 //
@@ -13,7 +13,7 @@
 // utilities
 #include "Exception.h"
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model

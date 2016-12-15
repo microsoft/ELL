@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     PrintModel.cpp (print)
 //  Authors:  Chuck Jacobs
 //
@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-namespace emll
+namespace ell
 {
 void PrintNode(const model::Node& node, std::ostream& out)
 {

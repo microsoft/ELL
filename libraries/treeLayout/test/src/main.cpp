@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (treeLayout_test)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "Layout.h"
 
-using namespace emll;
+using namespace ell;
 
 /// Runs all tests
 ///

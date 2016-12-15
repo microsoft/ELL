@@ -1,4 +1,4 @@
-# Building the Embedded Machine Learning Libraries (EMLL) using CMake
+# Building the Embedded Learning Libraries (ELL) using CMake
 
 Prerequisites
 =============
@@ -14,7 +14,7 @@ to update your PATH environment variable to include this directory.
 On Ubuntu, note that `apt-get install swig` currently gets an outdated version of swig. On UNIX systems,
 download the SWIG tarball, unpack it, and follow the instructions in swig's `INSTALL` file.  
   
-Building EMLL
+Building ELL
 =============
 CMake can create a variety of build environments for different compilers and target platforms. 
 Open a console (a.k.a. command prompt) and navigate to the main solution directory (the directory that this file, `INSTALL.md`, is in). 
@@ -27,7 +27,7 @@ The next step depends on which build system you would like to use to build the l
 
 Building with makefiles on UNIX
 -------------------------------
-On unix systems, the easiest way to build EMLL is to use cmake to create a makefile, and then run the makefile to build the libraries. Invoke cmake as follows:
+On unix systems, the easiest way to build ELL is to use cmake to create a makefile, and then run the makefile to build the libraries. Invoke cmake as follows:
 
     > cmake -G "Unix Makefiles" ..
 
@@ -46,14 +46,14 @@ The library currently can only be built in 64-bit mode on Windows. To create a 6
 
     > cmake -G "Visual Studio 14 2015 Win64" ..
 
-**Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `EMLL.sln`, along with other files. 
+**Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, along with other files. 
 By default, the solution file also builds interfaces using SWIG and code documentation using Doxygen. Alternatively, you can turn these options of by typing:
 
     > cmake -G "Visual Studio 14 2015 Win64" -DSWIG_ENABLED=false -DDOXYGEN_ENABLED=false ..
 
 There are two ways to build the library. One option is to open the solution file in Visual Studio and build it there. To do this, type:
 
-    > EMLL.sln
+    > ELL.sln
 
 Visual studio will open the solution. Chose either the "Debug" configuration or the "Release" configuration, and use the shortcut Ctrl+Shift+B to build the solution. 
 
@@ -63,7 +63,7 @@ The second option is to build directly in the command prompt using the visual st
 
 If you are able to run MSBuild, invoke the following command:
 
-    > "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" /m EMLL.sln /p:Configuration=Release 
+    > "\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" /m ELL.sln /p:Configuration=Release 
 
 Both build methods create a directory named `bin` inside `build`, with all of executables in it.
 
@@ -75,5 +75,5 @@ Visual Studio 2015 supports compilation using the Clang compiler. To create the 
 
 As above, open Visual Studio by typing:
  
-    > EMLL.sln
+    > ELL.sln
 

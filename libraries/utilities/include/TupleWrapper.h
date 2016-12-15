@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     TupleWrapper.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -11,7 +11,7 @@
 #include <tuple>
 #include <utility> // for integer_sequence
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

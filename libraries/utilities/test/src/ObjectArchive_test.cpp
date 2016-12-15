@@ -1,7 +1,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ObjectArchive_test.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -23,7 +23,7 @@
 #include <sstream>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 class InnerObject : public utilities::IArchivable
 {

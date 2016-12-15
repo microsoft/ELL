@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SGDIncrementalTrainerArguments.cpp (common)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "SGDIncrementalTrainerArguments.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {

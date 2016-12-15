@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     PortElements.h (model)
 //  Authors:  Chuck Jacobs
 //
@@ -24,7 +24,7 @@
 #include <deque>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model
@@ -446,10 +446,10 @@ namespace std
 {
 /// <summary> Implements a hash function for the PortRange class, so that it can be used with associative containers (maps, sets, and the like). </summary>
 template <>
-class hash<emll::model::PortElementBase>
+class hash<ell::model::PortElementBase>
 {
 public:
-    typedef emll::model::PortElementBase argument_type;
+    typedef ell::model::PortElementBase argument_type;
     typedef std::size_t result_type;
 
     /// <summary> Computes a hash of the input value. </summary>
@@ -459,10 +459,10 @@ public:
 };
 
 template <>
-class hash<emll::model::PortRange>
+class hash<ell::model::PortRange>
 {
 public:
-    typedef emll::model::PortRange argument_type;
+    typedef ell::model::PortRange argument_type;
     typedef std::size_t result_type;
 
     /// <summary> Computes a hash of the input value. </summary>

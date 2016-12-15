@@ -1,7 +1,7 @@
 {
-  "name": "emll",
+  "name": "ell",
   "version": "0.1.0",
-  "description": "A native node module with interfaces to the Embedded Machine Learning Library (EMLL)",
+  "description": "A native node module with interfaces to the Embedded Learning Library (ELL)",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "echo ",

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IArchivable_test.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -32,7 +32,7 @@
 #include <sstream>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 struct TestStruct : public utilities::IArchivable
 {

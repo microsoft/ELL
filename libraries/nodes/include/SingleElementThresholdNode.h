@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SingleElementThresholdNode.h (nodes)
 //  Authors:  Ofer Dekel
 //
@@ -16,7 +16,7 @@
 // predictors
 #include "SingleElementThresholdPredictor.h"
 
-namespace emll
+namespace ell
 {
 namespace nodes
 {

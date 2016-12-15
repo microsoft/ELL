@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     MultiplexerNode.h (node)
 //  Authors:  Ofer Dekel
 //
@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace nodes

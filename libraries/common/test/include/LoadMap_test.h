@@ -3,7 +3,7 @@
 // LoadMap tests
 //
 
-namespace emll
+namespace ell
 {
 void TestLoadMapWithDefaultArgs();
 void TestLoadMapWithPorts();

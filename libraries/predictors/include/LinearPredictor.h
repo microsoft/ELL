@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     LinearPredictor.h (predictors)
 //  Authors:  Ofer Dekel
 //
@@ -23,7 +23,7 @@
 #include <cstdint>
 #include <memory>
 
-namespace emll
+namespace ell
 {
 namespace predictors
 {

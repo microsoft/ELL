@@ -44,7 +44,7 @@
     ],
     'targets': [
         {
-            'target_name': 'emll',
+            'target_name': 'ell',
             'copies' : [
                 {
                     'destination': 'build',
@@ -77,7 +77,7 @@
                 '<(blas_include_path)'
             ],
             'sources': [
-                '../EMLLJAVASCRIPT_wrap.cxx'
+                '../ELLJAVASCRIPT_wrap.cxx'
             ],
             'link_settings': {
                 'library_dirs': [

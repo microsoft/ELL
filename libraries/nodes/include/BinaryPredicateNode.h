@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     BinaryPredicateNode.h (nodes)
 //  Authors:  Ofer Dekel
 //
@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace nodes
 {

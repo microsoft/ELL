@@ -1,11 +1,11 @@
-:: Build the EMLL module
+:: Build the ELL module
 @echo off
  
 Echo "%1"
 call npm install
 
 IF "%1"=="" (
-  Echo building EMLL for Electron
+  Echo building ELL for Electron
   REM call node-gyp rebuild
   
   :: TODO: see if this step is really necessary. It isn't on OS X
@@ -13,6 +13,6 @@ IF "%1"=="" (
 )
 
 IF /I "%1"=="node" (
-  Echo building EMLL for Node.JS
+  Echo building ELL for Node.JS
   call node-gyp rebuild
 )

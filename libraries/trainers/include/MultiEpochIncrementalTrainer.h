@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     MultiEpochIncrementalTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -22,7 +22,7 @@
 #include <string>
 #include <utility>
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

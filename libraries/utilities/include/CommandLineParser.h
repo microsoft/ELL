@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     CommandLineParser.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

@@ -15,7 +15,7 @@
 // stl
 #include <iostream>
 
-namespace emll
+namespace ell
 {
 
 void PrintRange(const model::PortRange& range)

@@ -1,7 +1,7 @@
 {
-  "name": "emll_tests",
+  "name": "ell_tests",
   "version": "0.0.1",
-  "description": "Suite of tests for EMLL Core",
+  "description": "Suite of tests for ELL Core",
   "main": "LoadModelAsync.js",
   "devDependencies": {
     "tap": "^6.2.0"
@@ -9,7 +9,7 @@
   "dependencies": {
     "requirejs": "^2.2.0",
     "nan": "^2.4.0",
-    "emll": "file:../../"
+    "ell": "file:../../"
   },  
   "scripts": {
     "test": "tap *.js"

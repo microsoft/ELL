@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DataLoadArguments.h (common)
 //  Authors:  Ofer Dekel
 //
@@ -14,7 +14,7 @@
 // stl
 #include <string>
 
-namespace emll
+namespace ell
 {
 /// <summary> common namespace </summary>
 namespace common

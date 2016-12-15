@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ApplyArguments.cpp (apply)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "ApplyArguments.h"
 
-namespace emll
+namespace ell
 {
 void ParsedApplyArguments::AddArgs(utilities::CommandLineParser& parser)
 {

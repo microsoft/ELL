@@ -227,7 +227,8 @@ yotta_targets/
 
 # CMake / CTest stuff
 /Testing/
-# EMLL External Dependencies
+
+# ELL External Dependencies
 external/llvm/include/
 external/llvm/lib/
 swig/
@@ -236,8 +237,8 @@ build/
 build_clang/
 build_xcode/
 
-interfaces/javascript/emll_module/CMakeFiles/
-interfaces/javascript/emll_module/test/js/Testing/
+interfaces/javascript/ell_module/CMakeFiles/
+interfaces/javascript/ell_module/test/js/Testing/
 yotta_modules/
 yotta_targets/
 LaunchXslt/bin/**

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (apply)
 //  Authors:  Chuck Jacobs
 //
@@ -39,7 +39,7 @@
 #include <string>
 #include <tuple>
 
-using namespace emll;
+using namespace ell;
 
 int main(int argc, char* argv[])
 {

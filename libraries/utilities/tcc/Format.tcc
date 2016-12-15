@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Format.tcc (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -17,7 +17,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

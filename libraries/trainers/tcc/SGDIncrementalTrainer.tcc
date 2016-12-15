@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SGDIncrementalTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -13,7 +13,7 @@
 // data
 #include "Dataset.h"
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

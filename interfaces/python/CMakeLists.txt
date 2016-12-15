@@ -23,7 +23,7 @@ generate_interface(python ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "" ${P
 #        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 #        COMMAND python ./../../../interfaces/python/test/test.py)
 
-add_dependencies(_EMLL_python EMLL_common)
+add_dependencies(_ELL_python ELL_common)
 
 else()
   message(WARNING "Couldn't find Python libraries, python interfaces skipped.")

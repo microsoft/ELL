@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     L2NormNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -21,7 +21,7 @@
 #include <cmath>
 #include <string>
 
-namespace emll
+namespace ell
 {
 namespace nodes
 {

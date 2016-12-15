@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SparseDataVector.tcc (data)
 //  Authors:  Ofer Dekel
 //
@@ -9,7 +9,7 @@
 // utilities
 #include "Exception.h"
 
-namespace emll
+namespace ell
 {
 namespace data
 {

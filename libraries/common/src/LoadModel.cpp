@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     LoadModel.cpp (common)
 //  Authors:  Chuck Jacobs
 //
@@ -40,7 +40,7 @@
 #include "JsonArchiver.h"
 #include "XmlArchiver.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {

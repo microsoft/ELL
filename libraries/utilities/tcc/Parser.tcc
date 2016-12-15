@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Parser.tcc (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

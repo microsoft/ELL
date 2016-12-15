@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     TypeFactory.tcc (utilities)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
@@ -9,7 +9,7 @@
 #include <cassert>
 #include <iostream>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

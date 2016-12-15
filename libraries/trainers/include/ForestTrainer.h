@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ForestTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -25,7 +25,7 @@
 #include <memory>
 #include <queue>
 
-namespace emll
+namespace ell
 {
 /// <summary> trainers namespace </summary>
 namespace trainers

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     StringFormat.h (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 // stl
 #include <iostream>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

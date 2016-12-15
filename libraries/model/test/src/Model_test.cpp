@@ -28,7 +28,7 @@
 #include <iostream>
 #include <unordered_map>
 
-namespace emll
+namespace ell
 {
 
 void NodePrinter(const model::Node& node)

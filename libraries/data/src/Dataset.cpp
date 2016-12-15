@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Dataset.cpp (data)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "Dataset.h"
 
-namespace emll
+namespace ell
 {
 namespace data
 {

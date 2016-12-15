@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     BinaryErrorAggregator.cpp (evaluators)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "BinaryErrorAggregator.h"
 
-namespace emll
+namespace ell
 {
 namespace evaluators
 {

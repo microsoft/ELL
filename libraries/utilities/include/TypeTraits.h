@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     TypeTraits.h (utilities)
 //  Authors:  Chuck Jacobs, Ofer Dekel
 //
@@ -10,7 +10,7 @@
 
 #include <type_traits>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

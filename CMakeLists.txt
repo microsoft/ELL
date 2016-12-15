@@ -9,7 +9,7 @@ if(${CMAKE_GENERATOR} STREQUAL "Visual Studio 14 2015")
 message(FATAL_ERROR "Error: can't build this project in 32-bit mode. Try again using 64-bit mode: cmake -G \"Visual Studio 14 2015 Win64\"")
 endif()
 
-PROJECT(EMLL)
+PROJECT(ELL)
 
 # Define custom configuration types for VS
 if(CMAKE_CONFIGURATION_TYPES)

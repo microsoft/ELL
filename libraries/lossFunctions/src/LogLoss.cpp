@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     LogLoss.cpp (lossFunctions)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 // stl
 #include <cmath>
 
-namespace emll
+namespace ell
 {
 namespace lossFunctions
 {

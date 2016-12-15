@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Model.h (model)
 //  Authors:  Chuck Jacobs
 //
@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model

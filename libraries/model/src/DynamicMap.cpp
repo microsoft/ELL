@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DynamicMap.cpp (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <unordered_set>
 
-namespace emll
+namespace ell
 {
 namespace model
 {

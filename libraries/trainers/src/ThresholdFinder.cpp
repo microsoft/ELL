@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ThresholdFinder.cpp (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -12,7 +12,7 @@
 #include <functional>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

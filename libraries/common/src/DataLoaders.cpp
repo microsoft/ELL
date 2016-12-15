@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DataLoaders.cpp (common)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
@@ -25,7 +25,7 @@
 #include <memory>
 #include <stdexcept>
 
-namespace emll
+namespace ell
 {
 namespace common
 {

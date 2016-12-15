@@ -4,7 +4,7 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
-set (PROJ_NAME emll-python-interface-tests)
+set (PROJ_NAME ell-python-interface-tests)
 project(${PROJ_NAME})
 set (SRC test.py 
          testing.py 

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Model.cpp (model)
 //  Authors:  Chuck Jacobs
 //
@@ -13,7 +13,7 @@
 // stl
 #include <unordered_map>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model

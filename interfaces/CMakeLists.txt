@@ -15,7 +15,7 @@ else()
   endif()
 endif()
 
-set (INTERFACE_MAIN ../common/EMLL.i)
+set (INTERFACE_MAIN ../common/ELL.i)
 
 set (INTERFACE_FILES ../common/common.i
                      ../common/callback.i
@@ -34,7 +34,7 @@ set (INTERFACE_FILES ../common/common.i
 
 set (INTERFACE_DEPENDENCIES common evaluators lossFunctions trainers predictors testing treeLayout utilities)
 
-# Add EMLL library include directories
+# Add ELL library include directories
 include_directories(../libraries/common/include)
 include_directories(../libraries/data/include)
 include_directories(../libraries/evaluators/include)

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     HingeLoss.h (lossFunctions)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #pragma once
 
-namespace emll
+namespace ell
 {
 /// <summary> %lossFunctions namespace </summary>
 namespace lossFunctions

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     AnyIterator.tcc (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <utility>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

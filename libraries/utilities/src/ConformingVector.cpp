@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ConformingVector.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -8,7 +8,7 @@
 
 #include "ConformingVector.h"
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

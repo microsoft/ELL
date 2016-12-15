@@ -1,14 +1,14 @@
-import EMLL
+import ELL
 
 def test():
-    params = EMLL.SGDIncrementalTrainerParameters()
+    params = ELL.SGDIncrementalTrainerParameters()
     params.regularization = 0.01
-    loss = EMLL.LossArguments()
+    loss = ELL.LossArguments()
 
-    trainer = EMLL.GetSGDIncrementalTrainer(21, loss, params)
+    trainer = ELL.GetSGDIncrementalTrainer(21, loss, params)
     print type(trainer)
 
-    dataset = EMLL.GetDataset("../../../../examples/data/testData.txt")
+    dataset = ELL.GetDataset("../../../../examples/data/testData.txt")
     print type(dataset)
 
     ex = dataset.GetExample(0)

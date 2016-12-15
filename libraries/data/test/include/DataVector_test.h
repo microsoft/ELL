@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DataVector_test.h (data_test)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #pragma once
 
-namespace emll
+namespace ell
 {
 void IDataVectorTests();
 void ToDataVectorTests();

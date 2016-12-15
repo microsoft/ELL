@@ -28,7 +28,7 @@ set(CMAKE_CXX_FLAGS ${SWIG_CXX_COMPILER_FLAGS})
 #set(CMAKE_CXX_FLAGS_DISTRIBUTION "")
 #set(CMAKE_CXX_FLAGS_DEBUG "")
 
-set (module_name EMLL_${LANGUAGE_NAME})
+set (module_name ELL_${LANGUAGE_NAME})
 
 source_group("src" FILES ${INTERFACE_SRC})
 source_group("include" FILES ${INTERFACE_INCLUDE})
@@ -100,8 +100,8 @@ else()
     swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC}) # ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
 
     swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common evaluators lossFunctions model nodes predictors trainers utilities emitters compiler)
-    set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}EMLL)
-    add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} EMLL_common)
+    set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}ELL)
+    add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} ELL_common)
 endif()
 
 endif()

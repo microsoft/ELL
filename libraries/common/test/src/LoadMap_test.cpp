@@ -18,7 +18,7 @@
 // stl
 #include <iostream>
 
-namespace emll
+namespace ell
 {
 void TestLoadMapWithDefaultArgs()
 {

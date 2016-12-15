@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     LossAggregator.h (evaluators)
 //  Authors:  Ofer Dekel
 //
@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace evaluators
 {

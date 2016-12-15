@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     CompressedIntegerList.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -13,7 +13,7 @@
 #include <iterator>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

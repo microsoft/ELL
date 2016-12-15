@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DTWDistanceNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -8,7 +8,7 @@
 
 #include <limits>
 
-namespace emll
+namespace ell
 {
 namespace nodes
 {

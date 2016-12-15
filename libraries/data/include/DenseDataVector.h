@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DenseDataVector.h (data)
 //  Authors:  Ofer Dekel
 //
@@ -23,7 +23,7 @@
 
 #define DEFAULT_DENSE_VECTOR_CAPACITY 256
 
-namespace emll
+namespace ell
 {
 namespace data
 {

@@ -9,15 +9,15 @@ global.app_require =
 }
 
 var tap = require('tap');
-const EMLL = require('emll');
-console.log('Loaded EMLL');
+const ELL = require('ell');
+console.log('Loaded ELL');
 
 // `array` is a list of lists (a javascript jagged array)
-function ToEMLLVector(array) {
-  let result = new EMLL.DoubleVectorVector();
+function ToELLVector(array) {
+  let result = new ELL.DoubleVectorVector();
   for (var rowIndex = 0; rowIndex < array.length; rowIndex++) {
     let row = array[rowIndex];
-    let newRow = new EMLL.DoubleVector();
+    let newRow = new ELL.DoubleVector();
     for (var colIndex = 0; colIndex < row.length; colIndex++) {
       newRow.add(row[colIndex]);
     }
@@ -38,15 +38,15 @@ function PrintResults(map, data) {
 }
 
 
-let prototype = ToEMLLVector([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
-let map = EMLL.GenerateDTWClassifier(prototype);
+let prototype = ToELLVector([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+let map = ELL.GenerateDTWClassifier(prototype);
 console.log('Generated classifier');
 
 let code = map.GetCodeString();
 console.log('Code:');
 console.log(code);
 
-let testData = ToEMLLVector([
+let testData = ToELLVector([
   [1, 2, 3], [4, 5, 6], [7, 8, 9], [3, 2, 1], [5, 4, 3], [4, 5, 6], [7, 8, 9]
 ]);
 

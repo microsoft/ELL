@@ -1,5 +1,5 @@
-# Embedded Machine Learning Library (EMLL) style guide
-This is the C++ coding style guide for the EMLL project.
+# Embedded Learning Library (ELL) style guide
+This is the C++ coding style guide for the ELL project.
 
 ## File names and extensions
 Header files use the extension ".h". Source code files use the extension ".cpp" if they are compiled into a .lib or .exe, and ".tcc" if they contain templated source code.
@@ -58,7 +58,7 @@ Next, indicate all `#include` statements. First, include files from the local pr
 
     //////////////////////////////////////////////////////////////////////////////////////////////////// 
     // 
-    //  Project:  Embedded Machine Learning Library (EMLL)
+    //  Project:  Embedded Learning Library (ELL)
     //  File:     FileName.h (libraryName)
     //  Authors:  Author1, Author2
     //

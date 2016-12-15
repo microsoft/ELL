@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IntegerList.cpp (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -14,7 +14,7 @@
 // stl
 #include <stdexcept>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

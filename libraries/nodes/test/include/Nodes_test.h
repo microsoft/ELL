@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Nodes_test.h (nodes_test)
 //  Authors:  Chuck Jacobs
 //
@@ -8,7 +8,7 @@
 
 #pragma once
 
-namespace emll
+namespace ell
 {
 void TestL2NormNodeCompute();
 void TestAccumulatorNodeCompute();

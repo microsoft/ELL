@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     common.i (interfaces)
 //  Authors:  Chuck Jacobs, Piali Choudhury (pialic)
 //
@@ -18,7 +18,7 @@
 
 %}
 
-%ignore emll::common::GetDataset;
+%ignore ell::common::GetDataset;
 
 %include "ModelLoadArguments.h"
 %include "MapLoadArguments.h"
@@ -36,15 +36,15 @@
 #endif
 
 %inline %{
-	SGDTrainerProxy GetSGDIncrementalTrainer(uint64_t dim, const emll::common::LossArguments& lossArguments, const emll::common::SGDIncrementalTrainerArguments& trainerArguments)
+	SGDTrainerProxy GetSGDIncrementalTrainer(uint64_t dim, const ell::common::LossArguments& lossArguments, const ell::common::SGDIncrementalTrainerArguments& trainerArguments)
 	{
-		auto trainer = emll::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments);
+		auto trainer = ell::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments);
 		return SGDTrainerProxy(trainer);
 	}
 
-	SortingForestTrainerProxy GetForestTrainer(const emll::common::LossArguments& lossArguments, const emll::common::ForestTrainerArguments& trainerArguments)
+	SortingForestTrainerProxy GetForestTrainer(const ell::common::LossArguments& lossArguments, const ell::common::ForestTrainerArguments& trainerArguments)
 	{
-		auto trainer = emll::common::MakeSortingForestTrainer(lossArguments, trainerArguments);
+		auto trainer = ell::common::MakeSortingForestTrainer(lossArguments, trainerArguments);
 		return SortingForestTrainerProxy(trainer);
 	}
 %}

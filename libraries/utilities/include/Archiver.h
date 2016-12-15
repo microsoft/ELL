@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Archiver.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

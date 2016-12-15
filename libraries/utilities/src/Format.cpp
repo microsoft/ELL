@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Format.cpp (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "Format.h"
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

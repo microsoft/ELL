@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     AbstractInvoker.tcc (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "Exception.h"
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

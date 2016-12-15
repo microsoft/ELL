@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     AUCAggregator.cpp (evaluators)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 // stl
 #include <algorithm>
 
-namespace emll
+namespace ell
 {
 namespace evaluators
 {

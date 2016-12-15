@@ -1,8 +1,8 @@
-# Embedded Machine Learning Library (EMLL)
+# Embedded Learning Library (ELL)
 
 ## Overview
 
-EMLL is an early preview of our work on building and deploying machine-learned pipelines onto resource-constrained embedded platforms. 
+ELL is an early preview of our work on building and deploying machine-learned pipelines onto resource-constrained embedded platforms. 
 This project is a work in progress and we expect it to change rapidly. At this early stage, we recommend not to take any dependencies on our work.    
 
 ## License
@@ -16,7 +16,7 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 To build the module
 -------------------
 
-The EMLL module should automatically get built when you build the EMLL solution.
+The ELL module should automatically get built when you build the ELL solution.
 
 Note: If you get an error trying to build the module, and you've updated to Visual Studio 2015 Update 3, you need up update node-gyp from v3.2.1 to v3.4.0 or newer. Do the following:
 
@@ -30,8 +30,8 @@ Note: If you get an error trying to build the module, and you've updated to Visu
 To manually build and install the module
 ----------------------------------------
 
-1. Build a Release build of EMLL
-2. Build the EMLL module from npm:
+1. Build a Release build of ELL
+2. Build the ELL module from npm:
   * On Windows: `npm run build:win`
   * On Mac OS: `npm run build:mac`
   * On Linux: `npm run build:linux`
@@ -39,9 +39,9 @@ To manually build and install the module
 To run the tests
 ----------------
 
-1. Make sure you build the module (follow the required steps from the previous section) from the root EMLLModule folder.
+1. Make sure you build the module (follow the required steps from the previous section) from the root ELLModule folder.
 2. cd test/js
-3. run npm install. This should install the pre-requisites to run the tests for EMLL APIs
+3. run npm install. This should install the pre-requisites to run the tests for ELL APIs
 4. Run `node <filename>.js` to run the test.
 
 _Note: The tests currently only work in Windows_

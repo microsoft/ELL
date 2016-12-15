@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SequentialLineIterator.h (data)
 //  Authors:  Ofer Dekel
 //
@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 
-namespace emll
+namespace ell
 {
 namespace data
 {

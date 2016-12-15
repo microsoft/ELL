@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     FunctionUtils.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -10,7 +10,7 @@
 
 #include <tuple>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ForestTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -9,7 +9,7 @@
 //#define VERBOSE_MODE( x ) x   // uncomment this for very verbose mode
 #define VERBOSE_MODE(x) // uncomment this for nonverbose mode
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

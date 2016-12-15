@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     files.cpp (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -16,7 +16,7 @@
 #include <locale>
 #include <memory>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     CommandLineParser.tcc (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -12,7 +12,7 @@
 // stl
 #include <sstream>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

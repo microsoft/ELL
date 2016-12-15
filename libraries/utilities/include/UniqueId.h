@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     UniqueId.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -14,7 +14,7 @@
 #include <ostream>
 #include <string>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace utilities
@@ -84,10 +84,10 @@ namespace std
 {
 /// <summary> Implements a hash function for the UniqueId class, so that it can be used with associative containers (maps, sets, and the like). </summary>
 template <>
-class hash<emll::utilities::UniqueId>
+class hash<ell::utilities::UniqueId>
 {
 public:
-    typedef emll::utilities::UniqueId argument_type;
+    typedef ell::utilities::UniqueId argument_type;
     typedef std::size_t result_type;
 
     /// <summary> Computes a hash of the input value. </summary>

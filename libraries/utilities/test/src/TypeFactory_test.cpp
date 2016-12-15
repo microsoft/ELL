@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     TypeFactory_test.cpp (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 #include <memory>
 #include <string>
 
-namespace emll
+namespace ell
 {
 class Base
 {

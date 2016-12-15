@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     LoadModel.h (common)
 //  Authors:  Chuck Jacobs
 //
@@ -14,7 +14,7 @@
 #include "Model.h"
 #include "DynamicMap.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {

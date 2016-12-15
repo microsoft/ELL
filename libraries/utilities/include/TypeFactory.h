@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     TypeFactory.h (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -17,7 +17,7 @@
 #include <unordered_map>
 #include <utility>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

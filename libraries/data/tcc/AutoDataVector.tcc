@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     AutoDataVectorBase.tcc (data)
 //  Authors:  Ofer Dekel
 //
@@ -13,7 +13,7 @@
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
 
-namespace emll
+namespace ell
 {
 namespace data
 {

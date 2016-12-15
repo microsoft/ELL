@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     StlIndexValueIterator.h (data)
 //  Authors:  Chuck Jacobs
 //
@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace data
 {

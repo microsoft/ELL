@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ModelTransformer.h (model)
 //  Authors:  Chuck Jacobs
 //
@@ -25,7 +25,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model

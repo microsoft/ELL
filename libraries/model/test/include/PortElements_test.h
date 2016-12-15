@@ -3,7 +3,7 @@
 // PortElements tests
 //
 
-namespace emll
+namespace ell
 {
 void TestSlice();
 void TestAppend();

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     PrintArguments.h (print)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 // stl
 #include <string>
 
-namespace emll
+namespace ell
 {
 /// <summary> Arguments for print. </summary>
 struct PrintArguments
