@@ -14,9 +14,9 @@
 #include "Parser.h"
 
 // stl
+#include <algorithm>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 namespace ell
 {
@@ -55,7 +55,7 @@ namespace common
         {
             if (!isFileReadable)
             {
-                parseErrorMessages.push_back("Couldn't read data file");    
+                parseErrorMessages.push_back("Couldn't read data file");
                 return parseErrorMessages;
             }
 

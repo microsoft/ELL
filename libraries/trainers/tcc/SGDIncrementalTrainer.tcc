@@ -79,7 +79,7 @@ namespace trainers
             bLast += lastCoeff;
 
             double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
-            auto vAvgTranspose = vAvg.Transpose(); 
+            auto vAvgTranspose = vAvg.Transpose();
             dataVector.AddTo(vAvgTranspose, avgCoeff);
             bAvg += avgCoeff;
 

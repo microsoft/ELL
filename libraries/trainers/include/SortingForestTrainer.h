@@ -51,7 +51,7 @@ namespace trainers
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::PredictorType;
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::DataVectorType;
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::TrainerExampleType;
-        
+
     protected:
         using ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::_dataset;
         virtual SplitCandidate GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;

@@ -6,10 +6,10 @@
 #include "LoadMap_test.h"
 
 // common
+#include "DataLoadArguments.h"
 #include "DataLoaders.h"
 #include "LoadModel.h"
 #include "MapLoadArguments.h"
-#include "DataLoadArguments.h"
 
 // testing
 #include "testing.h"

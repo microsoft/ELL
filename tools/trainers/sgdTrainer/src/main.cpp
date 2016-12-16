@@ -24,18 +24,18 @@
 #include "LoadModel.h"
 #include "MakeEvaluator.h"
 #include "MakeTrainer.h"
-#include "ModelLoadArguments.h"
-#include "ModelSaveArguments.h"
 #include "MapLoadArguments.h"
 #include "MapSaveArguments.h"
+#include "ModelLoadArguments.h"
+#include "ModelSaveArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "SGDIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // model
+#include "DynamicMap.h"
 #include "InputNode.h"
 #include "Model.h"
-#include "DynamicMap.h"
 
 // nodes
 #include "LinearPredictorNode.h"
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 
         // Train the predictor
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(mappedDataset.GetAnyDataset()); 
+        trainer->Update(mappedDataset.GetAnyDataset());
         auto predictor = trainer->GetPredictor();
 
         // Print loss and errors

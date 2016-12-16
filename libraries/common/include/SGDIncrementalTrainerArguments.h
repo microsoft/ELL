@@ -18,7 +18,7 @@ namespace ell
 {
 namespace common
 {
-    typedef trainers::SGDIncrementalTrainerParameters SGDIncrementalTrainerArguments; 
+    typedef trainers::SGDIncrementalTrainerParameters SGDIncrementalTrainerArguments;
 
     /// <summary> Parsed version of stochastic gradient descent parameters. </summary>
     struct ParsedSGDIncrementalTrainerArguments : public SGDIncrementalTrainerArguments, public utilities::ParsedArgSet

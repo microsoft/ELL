@@ -135,7 +135,6 @@ namespace model
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
-
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(ModelTransformer& transformer) const;
 

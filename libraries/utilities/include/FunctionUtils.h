@@ -15,7 +15,7 @@ namespace ell
 namespace utilities
 {
 
-    /// <summary> 
+    /// <summary>
     /// InOrderFunctionEvaluator() is a template function that evaluates a number of zero-argument functions in order.
     /// Usage:
     ///
@@ -24,7 +24,7 @@ namespace utilities
     /// The above is equivalent to:
     ///
     /// f1(); f2(); f3()
-    /// 
+    ///
     /// </summary>
 
     /// <summary> Recursive base case with zero functions. Does nothing. </summary>
@@ -37,8 +37,7 @@ namespace utilities
     template <typename Function, typename... Functions>
     void InOrderFunctionEvaluator(Function&& function, Functions&&... functions);
 
-
-    /// <summary> 
+    /// <summary>
     /// ApplyToEach() is a template function that applies a single-argument function to each
     /// of a number of arguments.
     /// Usage:
@@ -48,13 +47,14 @@ namespace utilities
     /// The above is equivalent to:
     ///
     /// f(arg1); f(arg2); f(arg3);
-    /// 
+    ///
     /// </summary>
 
     /// <summary> Recursive base case with zero arguments. Does nothing. </summary>
     template <typename FunctionType>
     inline void ApplyToEach(FunctionType&& function)
-    {}
+    {
+    }
 
     /// <summary> Applies a single-argument function to each of a number of arguments. </summary>
     ///

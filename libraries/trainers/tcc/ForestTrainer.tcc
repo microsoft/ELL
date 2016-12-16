@@ -110,7 +110,7 @@ namespace trainers
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::InitializeMetadata()
     {
         for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)

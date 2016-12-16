@@ -20,16 +20,16 @@ namespace nodes
             double sum = 0; // sum(x)
             double sumSquares = 0; // sum(x^2)
             size_t size = 0;
-            for(const auto& vec: prototype)
+            for (const auto& vec : prototype)
             {
                 size += vec.size();
-                for(auto x: vec)
+                for (auto x : vec)
                 {
                     sum += x;
-                    sumSquares += (x*x);
+                    sumSquares += (x * x);
                 }
             }
-            return (sumSquares - ((sum*sum) / size)) / size;
+            return (sumSquares - ((sum * sum) / size)) / size;
         }
     }
 
@@ -105,7 +105,7 @@ namespace nodes
                 bestStart = sPrev_iMinus1;
             }
             bestDist += distance(_prototype[index - 1], input);
-            
+
             _d[index] = bestDist;
             _s[index] = bestStart;
         }

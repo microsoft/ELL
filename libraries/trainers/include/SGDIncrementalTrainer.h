@@ -15,8 +15,8 @@
 #include "LinearPredictor.h"
 
 // data
-#include "Example.h"
 #include "Dataset.h"
+#include "Example.h"
 
 // stl
 #include <cstdint>

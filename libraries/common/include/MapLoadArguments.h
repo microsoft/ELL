@@ -11,9 +11,9 @@
 #include "ModelLoadArguments.h"
 
 // model
-#include "PortElements.h"
-#include "Model.h"
 #include "InputNode.h"
+#include "Model.h"
+#include "PortElements.h"
 
 // utilities
 #include "CommandLineParser.h"
@@ -42,22 +42,22 @@ namespace common
 
         /// <summary> The default size for the input of a newly-generated map (e.g., if no model/map file is specified) </summary>
         size_t defaultInputSize;
-        
+
         /// <summary> Query if the arguments specify a map file. </summary>
         ///
         /// <returns> true if the arguments specify a map file. </returns>
         bool HasMapFilename() const { return inputMapFilename != ""; }
-        
+
         /// <summary> Query if the arguments specify a model file. </summary>
         ///
         /// <returns> true if the arguments specify a model file. </returns>
         bool HasModelFilename() const { return inputModelFilename != ""; }
-        
+
         /// <summary> Query if the arguments specify either a map file or a model file. </summary>
         ///
         /// <returns> true if the arguments specify a map file or a model file. </returns>
         bool HasInputFilename() const { return HasMapFilename() || HasModelFilename(); }
-        
+
         /// <summary> Get the input node for the loaded model, given the input definition string. </summary>
         ///
         /// <param name="model"> The model as specified by the input model filename </param>

@@ -14,7 +14,7 @@ namespace utilities
 {
     BoolProxy::BoolProxy(bool value)
         : _value(value){};
-    
+
     BoolProxy::BoolProxy(std::vector<bool>::reference value)
         : _value((bool)value) {}
 }

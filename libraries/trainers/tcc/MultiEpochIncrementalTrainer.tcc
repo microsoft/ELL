@@ -24,7 +24,7 @@ namespace trainers
     void MultiEpochIncrementalTrainer<PredictorType>::Update(const data::AnyDataset& anyDataset)
     {
         using ExampleType = data::Example<typename PredictorType::DataVectorType, data::WeightLabel>;
-        auto dataset = data::Dataset<ExampleType>(anyDataset); 
+        auto dataset = data::Dataset<ExampleType>(anyDataset);
 
         // calculate epoch size
         uint64_t epochSize = _parameters.epochSize;

@@ -52,19 +52,19 @@ namespace common
 
         switch (lossArguments.lossFunction)
         {
-        case LossFunctionEnum::squared:
+            case LossFunctionEnum::squared:
 
-            if(trainerArguments.sortingTrainer)
-            {
-                return trainers::MakeSortingForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
-            }
-            else
-            {
-                return trainers::MakeHistogramForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
-            }
+                if (trainerArguments.sortingTrainer)
+                {
+                    return trainers::MakeSortingForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
+                }
+                else
+                {
+                    return trainers::MakeHistogramForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
+                }
 
-        default:
-            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+            default:
+                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 }

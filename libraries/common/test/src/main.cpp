@@ -6,9 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LoadModel_test.h"
-#include "LoadMap_test.h"
 #include "LoadDataset_test.h"
+#include "LoadMap_test.h"
+#include "LoadModel_test.h"
 
 // testing
 #include "testing.h"

@@ -106,7 +106,8 @@ namespace trainers
         return _childSums[position];
     }
 
-    ForestTrainerBase::TrainerMetadata::TrainerMetadata(const data::WeightLabel& metaData) : strong(metaData)
+    ForestTrainerBase::TrainerMetadata::TrainerMetadata(const data::WeightLabel& metaData)
+        : strong(metaData)
     {
     }
 

@@ -70,6 +70,5 @@ namespace model
                 return "Unknown";
         };
     }
-
 }
 }

@@ -264,7 +264,7 @@ namespace utilities
                 _tokenizer.ReadNextToken();
             }
         }
-}
+    }
 
     void JsonUnarchiver::MatchFieldName(const char* key)
     {

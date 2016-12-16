@@ -93,7 +93,6 @@ namespace model
             return GetOutput(0).Size();
         }
 
-
         //
         // Internal routines for getting information about inputs / outputs of the map
         // and doing type-safe operations.

@@ -9,9 +9,9 @@
 #include "MapLoadArguments.h"
 
 // model
-#include "Node.h"
-#include "Model.h"
 #include "DynamicMap.h"
+#include "Model.h"
+#include "Node.h"
 
 // utilities
 #include "Files.h"
@@ -95,7 +95,7 @@ namespace common
             // get port
             auto node = model.GetNode(utilities::UniqueId(nodeId));
             assert(node != nullptr);
-            if(node == nullptr)
+            if (node == nullptr)
                 throw utilities::InputException(utilities::InputExceptionErrors::nullReference, std::string("Couldn't find node ") + nodeId);
             auto port = node->GetOutputPort(portName);
 

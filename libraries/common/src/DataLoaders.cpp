@@ -12,8 +12,8 @@
 #include "Files.h"
 
 // data
-#include "ParsingExampleIterator.h"
 #include "Dataset.h"
+#include "ParsingExampleIterator.h"
 #include "SequentialLineIterator.h"
 #include "SparseEntryParser.h"
 

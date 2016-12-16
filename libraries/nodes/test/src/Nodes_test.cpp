@@ -12,9 +12,9 @@
 // nodes
 #include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
+#include "DTWDistanceNode.h"
 #include "DelayNode.h"
 #include "DemultiplexerNode.h"
-#include "DTWDistanceNode.h"
 #include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
@@ -443,14 +443,14 @@ void TestDTWDistanceNodeCompute()
     auto prototypeLength = prototype.size();
     size_t numSamples = 200;
     size_t increment = 3;
-    for(int index = 0; index < numSamples; ++index)
-    {        
-        auto sampleIndex = (index*increment)%prototypeLength;
+    for (int index = 0; index < numSamples; ++index)
+    {
+        auto sampleIndex = (index * increment) % prototypeLength;
         auto inputValue = prototype[sampleIndex];
         inputNode->SetInput(inputValue);
         std::vector<double> outputVec = model.ComputeOutput(dtwNode->output);
-        std::cout << "[" << sampleIndex << "]: \t" << outputVec[0] << std::endl; 
-        if(sampleIndex+increment >= prototypeLength) std::cout << std::endl;
+        std::cout << "[" << sampleIndex << "]: \t" << outputVec[0] << std::endl;
+        if (sampleIndex + increment >= prototypeLength) std::cout << std::endl;
     }
 }
 }
