@@ -1,4 +1,4 @@
-# Building the Embedded Learning Libraries (ELL) using CMake
+# Building the Embedded Learning Library (ELL) using CMake
 
 Prerequisites
 =============
