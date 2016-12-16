@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     JsonArchiver.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -16,7 +16,7 @@
 #include <sstream>
 #include <string>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {
@@ -264,7 +264,7 @@ namespace utilities
                 _tokenizer.ReadNextToken();
             }
         }
-}
+    }
 
     void JsonUnarchiver::MatchFieldName(const char* key)
     {

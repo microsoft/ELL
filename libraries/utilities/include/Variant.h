@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Variant.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -22,7 +22,7 @@
 
 class IArchivable;
 
-namespace emll
+namespace ell
 {
 /// <summary> utilities namespace </summary>
 namespace utilities

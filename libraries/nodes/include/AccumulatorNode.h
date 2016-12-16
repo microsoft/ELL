@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     AccumulatorNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace nodes
 {
@@ -72,7 +72,7 @@ namespace nodes
     protected:
         virtual void Compute() const override;
 
-    // private:
+        // private:
         // Input
         model::InputPort<ValueType> _input;
 

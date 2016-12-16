@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (predictors_test)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 // testing
 #include "testing.h"
 
-using namespace emll;
+using namespace ell;
 
 void ForestPredictorTest()
 {

@@ -1,0 +1,2 @@
+# Build the ELL module
+node-gyp rebuild

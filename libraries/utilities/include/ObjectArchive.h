@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ObjectArchive.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -18,7 +18,7 @@
 #include <type_traits>
 #include <unordered_map>
 
-namespace emll
+namespace ell
 {
 /// <summary> utilities namespace </summary>
 namespace utilities

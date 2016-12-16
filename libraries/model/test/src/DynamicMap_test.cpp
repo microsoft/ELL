@@ -38,7 +38,7 @@
 //
 // Test code for dynamic map class
 //
-namespace emll
+namespace ell
 {
 
 // Returns a model with 1 3-dimensional double input and 1 2-dimensional double output

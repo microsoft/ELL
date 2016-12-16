@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     BinaryOperationNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -12,7 +12,7 @@
 #define BEGIN_FROM_STRING if (false)
 #define ADD_FROM_STRING_ENTRY(NAMESPACE, OPERATOR) else if (name == #OPERATOR) return NAMESPACE::OPERATOR
 
-namespace emll
+namespace ell
 {
 namespace nodes
 {

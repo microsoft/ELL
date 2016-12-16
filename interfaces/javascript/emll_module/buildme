@@ -1,2 +1,0 @@
-# Build the EMLL module
-node-gyp rebuild

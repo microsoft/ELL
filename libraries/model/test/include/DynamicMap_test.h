@@ -3,7 +3,7 @@
 // Model tests
 //
 
-namespace emll
+namespace ell
 {
 void TestDynamicMapCreate();
 void TestDynamicMapCompute();

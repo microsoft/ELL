@@ -1,7 +1,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Itetator_test.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -23,7 +23,7 @@
 #include <numeric>
 #include <thread>
 
-namespace emll
+namespace ell
 {
 void TestIteratorAdapter()
 {

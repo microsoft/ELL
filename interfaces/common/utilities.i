@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     utilities.i (interfaces)
 //  Authors:  Chuck Jacobs
 //
@@ -8,9 +8,9 @@
 
 %include "stl.i"
 
-%ignore emll::utilities::operator<<;
-%ignore emll::utilities::MakeAnyIterator;
-%ignore emll::utilities::IteratorWrapper;
+%ignore ell::utilities::operator<<;
+%ignore ell::utilities::MakeAnyIterator;
+%ignore ell::utilities::IteratorWrapper;
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -28,38 +28,38 @@
 
 // ignores
 %ignore std::enable_if_t<>;
-%ignore std::hash<emll::utilities::UniqueId>;
+%ignore std::hash<ell::utilities::UniqueId>;
 
-%ignore emll::utilities::JsonUtilities;
-%ignore emll::utilites::Variant::Variant(emll::utilities::Variant&&);
-%ignore emll::utilities::CompressedIntegerList;
+%ignore ell::utilities::JsonUtilities;
+%ignore ell::utilites::Variant::Variant(ell::utilities::Variant&&);
+%ignore ell::utilities::CompressedIntegerList;
 
-namespace emll { namespace utilities {} };
+namespace ell { namespace utilities {} };
 
 // SWIG can't interpret StlIterator.h, so we need to include a simpler signature of the class
 template <typename IteratorType, typename ValueType>
-class emll::utilities::StlIterator
+class ell::utilities::StlIterator
 {
 public:
     StlIterator();
     StlIterator(IteratorType begin, IteratorType end);
     bool IsValid() const;
     bool HasSize() const;
-    uint64_t NumIteratesLeft() const;
+    size_t NumIteratesLeft() const;
     void Next();
     const ValueType& Get() const;
 };
 
 // SWIG can't interpret StlIndexValueIterator.h, so we need to include a simpler signature of the class
 template <typename IteratorType, typename ValueType>
-class emll::utilities::StlIndexValueIterator
+class ell::utilities::StlIndexValueIterator
 {
 public:
     StlIndexValueIterator();
     StlIndexValueIterator(IteratorType begin, IteratorType end);
     bool IsValid() const;
     bool HasSize() const;
-    uint64_t NumIteratesLeft() const;
+    size_t NumIteratesLeft() const;
     void Next();
     linear::IndexValue Get() const;
 };
@@ -80,5 +80,5 @@ public:
 %include "RandomEngines.h"
 
 // wrap print
-WRAP_OSTREAM_OUT_TO_STR(emll::utilities::UniqueId)
+WRAP_OSTREAM_OUT_TO_STR(ell::utilities::UniqueId)
 

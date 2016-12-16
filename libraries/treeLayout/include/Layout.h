@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Layout.h (treeLayout)
 //  Authors:  Ofer Dekel
 //
@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> %treeLayout namespace </summary>
 namespace treeLayout
@@ -74,26 +74,26 @@ namespace treeLayout
         /// <param name="max_offset"> The maximum offset. </param>
         /// <param name="min_depth"> The minimum depth. </param>
         /// <param name="max_depth"> The maximum depth. </param>
-        Layout(uint64_t size, double min_offset, double max_offset, double min_depth, double max_depth);
+        Layout(size_t size, double min_offset, double max_offset, double min_depth, double max_depth);
 
         /// <summary> Returns a reference to the position of a specified vertex. </summary>
         ///
         /// <param name="index"> Zero-based index of the vertex. </param>
         ///
         /// <returns> The vertex position. </returns>
-        VertexPosition& operator[](uint64_t index);
+        VertexPosition& operator[](size_t index);
 
         /// <summary> Returns a reference to the position of a specified vertex. </summary>
         ///
         /// <param name="index"> Zero-based index of the vertex. </param>
         ///
         /// <returns> The vertex position. </returns>
-        const VertexPosition& operator[](uint64_t index) const;
+        const VertexPosition& operator[](size_t index) const;
 
         /// <summary> Returns The number of vertices. </summary>
         ///
         /// <returns> The number of vertices. </returns>
-        uint64_t Size() const { return (uint64_t)_positions.size(); }
+        size_t Size() const { return (size_t)_positions.size(); }
 
         /// <summary>
         /// Returns the min offset (if the tree is top down, this is the left of its bounding box)

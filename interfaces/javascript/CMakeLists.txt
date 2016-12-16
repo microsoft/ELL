@@ -7,9 +7,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 include (CommonInterfaces)
 
 generate_interface(javascript ${CMAKE_CURRENT_SOURCE_DIR} "" "")
-add_dependencies(EMLL_javascript EMLL_common)
+add_dependencies(ELL_javascript ELL_common)
 
-add_subdirectory(emll_module)
+add_subdirectory(ell_module)
 
 if(WIN32)
     add_subdirectory(swigToTypescript)

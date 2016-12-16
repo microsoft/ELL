@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     AppendNodeToModel.h (common)
 //  Authors:  Chuck Jacobs
 //
@@ -12,7 +12,7 @@
 #include "DynamicMap.h"
 #include "Model.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {

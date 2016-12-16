@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DataVector_test.cpp (data_test)
 //  Authors:  Ofer Dekel
 //
@@ -24,7 +24,7 @@
 #include <sstream>
 #include <string>
 
-namespace emll
+namespace ell
 {
 template <typename DataVectorType>
 void IDataVectorTest()

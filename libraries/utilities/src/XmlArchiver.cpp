@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     XmlArchiver.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -18,7 +18,7 @@
 #include <sstream>
 #include <string>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {
@@ -41,12 +41,12 @@ namespace utilities
     {
         // Write XML declaration
         _out << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-        _out << "<emll version=\"1.0\">\n";
+        _out << "<ell version=\"1.0\">\n";
     }
 
     void XmlArchiver::WriteFileFooter()
     {
-        _out << "</emll>\n";
+        _out << "</ell>\n";
     }
 
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, bool);
@@ -172,12 +172,12 @@ namespace utilities
             _tokenizer.ReadNextToken();
         }
         _tokenizer.MatchTokens({ "?", ">" });
-        _tokenizer.MatchTokens({ "<", "emll", "version", "=", "\"", "1.0", "\"", ">" });
+        _tokenizer.MatchTokens({ "<", "ell", "version", "=", "\"", "1.0", "\"", ">" });
     }
 
     void XmlUnarchiver::ReadFileFooter()
     {
-        _tokenizer.MatchTokens({ "<", "/", "emll", ">" });
+        _tokenizer.MatchTokens({ "<", "/", "ell", ">" });
     }
 
     // strings

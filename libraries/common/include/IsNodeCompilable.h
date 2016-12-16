@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IsNodeCompilable.h (common)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 #include <string>
 #include <unordered_set>
 
-namespace emll
+namespace ell
 {
 namespace common
 {

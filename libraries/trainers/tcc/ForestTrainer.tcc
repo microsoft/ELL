@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ForestTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -9,7 +9,7 @@
 //#define VERBOSE_MODE( x ) x   // uncomment this for very verbose mode
 #define VERBOSE_MODE(x) // uncomment this for nonverbose mode
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {
@@ -75,7 +75,7 @@ namespace trainers
     {
         Sums sums;
 
-        for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
+        for (size_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
             auto& metadata = _dataset[rowIndex].GetMetadata();
             metadata.weak = _booster.GetWeakWeightLabel(metadata.strong, metadata.currentOutput);
@@ -93,7 +93,7 @@ namespace trainers
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::UpdateCurrentOutputs(double value)
     {
-        for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
+        for (size_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
             example.GetMetadata().currentOutput += value;
@@ -103,17 +103,17 @@ namespace trainers
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::UpdateCurrentOutputs(Range range, const EdgePredictorType& edgePredictor)
     {
-        for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
+        for (size_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size; ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
             example.GetMetadata().currentOutput += edgePredictor.Predict(example.GetDataVector());
         }
     }
 
-    template<typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
+    template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     void ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::InitializeMetadata()
     {
-        for (uint64_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
+        for (size_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
             auto prediction = _forest->Predict(example.GetDataVector());

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Nodes_test.cpp (nodes_test)
 //  Authors:  Chuck Jacobs
 //
@@ -12,9 +12,9 @@
 // nodes
 #include "AccumulatorNode.h"
 #include "BinaryOperationNode.h"
+#include "DTWDistanceNode.h"
 #include "DelayNode.h"
 #include "DemultiplexerNode.h"
-#include "DTWDistanceNode.h"
 #include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
@@ -42,7 +42,7 @@
 #include <sstream>
 #include <string>
 
-namespace emll
+namespace ell
 {
 using namespace nodes;
 
@@ -262,8 +262,6 @@ void TestLinearPredictorNodeCompute()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dim);
     auto predNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
-
-    // TODO: test
 }
 
 void TestDemultiplexerNodeCompute()
@@ -443,14 +441,14 @@ void TestDTWDistanceNodeCompute()
     auto prototypeLength = prototype.size();
     size_t numSamples = 200;
     size_t increment = 3;
-    for(int index = 0; index < numSamples; ++index)
-    {        
-        auto sampleIndex = (index*increment)%prototypeLength;
+    for (int index = 0; index < numSamples; ++index)
+    {
+        auto sampleIndex = (index * increment) % prototypeLength;
         auto inputValue = prototype[sampleIndex];
         inputNode->SetInput(inputValue);
         std::vector<double> outputVec = model.ComputeOutput(dtwNode->output);
-        std::cout << "[" << sampleIndex << "]: \t" << outputVec[0] << std::endl; 
-        if(sampleIndex+increment >= prototypeLength) std::cout << std::endl;
+        std::cout << "[" << sampleIndex << "]: \t" << outputVec[0] << std::endl;
+        if (sampleIndex + increment >= prototypeLength) std::cout << std::endl;
     }
 }
 }

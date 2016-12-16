@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (trainers_test)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "ForestTrainer.h"
 
-using namespace emll;
+using namespace ell;
 
 /// Runs all tests
 ///

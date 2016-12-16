@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Exception.h (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 #include <exception>
 #include <string>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

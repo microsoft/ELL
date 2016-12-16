@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     MapLoadArguments.cpp (common)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
@@ -9,9 +9,9 @@
 #include "MapLoadArguments.h"
 
 // model
-#include "Node.h"
-#include "Model.h"
 #include "DynamicMap.h"
+#include "Model.h"
+#include "Node.h"
 
 // utilities
 #include "Files.h"
@@ -20,7 +20,7 @@
 // stl
 #include <sstream>
 
-namespace emll
+namespace ell
 {
 namespace common
 {
@@ -95,7 +95,7 @@ namespace common
             // get port
             auto node = model.GetNode(utilities::UniqueId(nodeId));
             assert(node != nullptr);
-            if(node == nullptr)
+            if (node == nullptr)
                 throw utilities::InputException(utilities::InputExceptionErrors::nullReference, std::string("Couldn't find node ") + nodeId);
             auto port = node->GetOutputPort(portName);
 
@@ -131,7 +131,6 @@ namespace common
         model::PortElementsBase ParsePortElements(const model::Model& model, utilities::Tokenizer& tokenizer) // start state
         {
             auto t = tokenizer.PeekNextToken();
-            // TODO: if text is just a number, take it as the index of the input node
             if (t == "{")
             {
                 tokenizer.MatchToken(t);

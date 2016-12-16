@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     TransformIterator.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -11,7 +11,7 @@
 // stl
 #include <utility>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

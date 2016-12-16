@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     GenerateModels.cpp (makeExamples)
 //  Authors:  Chuck Jacobs
 //
@@ -34,7 +34,7 @@
 // stl
 #include <string>
 
-namespace emll
+namespace ell
 {
 model::Model GenerateIdentityModel(size_t dimension)
 {
@@ -81,7 +81,7 @@ model::Model GenerateMultiOutModel(size_t dimension)
     auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, nodes::BinaryOperationType::coordinatewiseMultiply);
     auto plusNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTenNode->output, nodes::BinaryOperationType::add);
 
-    model.AddNode<model::OutputNode<double>>(model::PortElements<double>{{timesNode->output}, {plusNode->output}});
+    model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ { timesNode->output }, { plusNode->output } });
     return model;
 }
 

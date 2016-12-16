@@ -1,7 +1,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Variant_test.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -19,7 +19,7 @@
 // stl
 #include <vector>
 
-namespace emll
+namespace ell
 {
 void TestScalarVariant()
 {

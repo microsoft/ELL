@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SGDIncrementalTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -15,14 +15,14 @@
 #include "LinearPredictor.h"
 
 // data
-#include "Example.h"
 #include "Dataset.h"
+#include "Example.h"
 
 // stl
 #include <cstdint>
 #include <memory>
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {
@@ -48,7 +48,7 @@ namespace trainers
         /// <param name="dim"> The dimension. </param>
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="parameters"> The training parameters. </param>
-        SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
+        SGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
 
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
@@ -67,7 +67,7 @@ namespace trainers
         LossFunctionType _lossFunction;
         SGDIncrementalTrainerParameters _parameters;
 
-        uint64_t _total_iterations = 0;
+        size_t _total_iterations = 0;
         PredictorType _lastPredictor;
         std::shared_ptr<PredictorType> _averagedPredictor;
     };
@@ -81,7 +81,7 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
 }
 }
 

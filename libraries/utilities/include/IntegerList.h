@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IntegerList.h (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {
@@ -21,7 +21,7 @@ namespace utilities
     {
     public:
         /// <summary> Defines an alias representing the vector iterator. </summary>
-        typedef std::vector<uint64_t>::const_iterator vector_iterator;
+        typedef std::vector<size_t>::const_iterator vector_iterator;
 
         /// <summary> A read-only forward iterator for the IntegerList. </summary>
         class Iterator
@@ -41,8 +41,8 @@ namespace utilities
 
             /// <summary> Returns the value of the current iterate. </summary>
             ///
-            /// <returns> An uint64_t. </returns>
-            uint64_t Get() const { return *_begin; }
+            /// <returns> An size_t. </returns>
+            size_t Get() const { return *_begin; }
 
         private:
             // private ctor, can only be called from IntegerList class.
@@ -66,23 +66,23 @@ namespace utilities
 
         /// <summary> Gets the number of entries in the list. </summary>
         ///
-        /// <returns> An uint64_t. </returns>
-        uint64_t Size() const { return (uint64_t)_list.size(); }
+        /// <returns> An size_t. </returns>
+        size_t Size() const { return (size_t)_list.size(); }
 
         /// <summary> Allocates a specified number of entires to the list. </summary>
         ///
         /// <param name="size"> The size. </param>
-        void Reserve(uint64_t size);
+        void Reserve(size_t size);
 
         /// <summary> Gets the maximal integer in the list. </summary>
         ///
         /// <returns> The maximum value. </returns>
-        uint64_t Max() const;
+        size_t Max() const;
 
         /// <summary> Appends an integer to the end of the list. </summary>
         ///
         /// <param name="value"> The value. </param>
-        void Append(uint64_t value);
+        void Append(size_t value);
 
         /// <summary> Deletes all of the vector content and sets its Size to zero. </summary>
         void Reset() { _list.resize(0); }
@@ -94,7 +94,7 @@ namespace utilities
 
     private:
         // The list
-        std::vector<uint64_t> _list;
+        std::vector<size_t> _list;
     };
 }
 }

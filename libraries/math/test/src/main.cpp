@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (math)
 //  Authors:  Ofer Dekel
 //
@@ -18,7 +18,7 @@
 #include <iostream>
 #include <random>
 
-using namespace emll;
+using namespace ell;
 
 template <typename ElementType, math::VectorOrientation Orientation>
 void TestVector()

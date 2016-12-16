@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SortingForestTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 #include "ConstantPredictor.h"
 #include "SingleElementThresholdPredictor.h"
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {
@@ -51,7 +51,7 @@ namespace trainers
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::PredictorType;
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::DataVectorType;
         using typename ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::TrainerExampleType;
-        
+
     protected:
         using ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::_dataset;
         virtual SplitCandidate GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;

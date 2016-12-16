@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     InputNode.cpp (model)
 //  Authors:  Chuck Jacobs
 //
@@ -8,7 +8,7 @@
 
 #include "InputNode.h"
 
-namespace emll
+namespace ell
 {
 namespace model
 {

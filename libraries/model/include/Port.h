@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Port.h (model)
 //  Authors:  Chuck Jacobs
 //
@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model
@@ -102,7 +102,7 @@ namespace model
     ///
     /// <param name="type"> The type of the port </param>
     /// <returns> A string representation of the C type to use </returns>
-    std::string GetPortCTypeName(emll::model::Port::PortType type);
+    std::string GetPortCTypeName(ell::model::Port::PortType type);
 
     template <Port::PortType portType>
     struct PortTypeToValueType

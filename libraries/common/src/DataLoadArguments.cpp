@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DataLoadArguments.cpp (common)
 //  Authors:  Ofer Dekel
 //
@@ -14,11 +14,11 @@
 #include "Parser.h"
 
 // stl
+#include <algorithm>
 #include <string>
 #include <vector>
-#include <algorithm>
 
-namespace emll
+namespace ell
 {
 namespace common
 {
@@ -55,7 +55,7 @@ namespace common
         {
             if (!isFileReadable)
             {
-                parseErrorMessages.push_back("Couldn't read data file");    
+                parseErrorMessages.push_back("Couldn't read data file");
                 return parseErrorMessages;
             }
 

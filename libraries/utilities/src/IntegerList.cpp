@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IntegerList.cpp (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -14,7 +14,7 @@
 // stl
 #include <stdexcept>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {
@@ -23,12 +23,12 @@ namespace utilities
     {
     }
 
-    void IntegerList::Reserve(uint64_t size)
+    void IntegerList::Reserve(size_t size)
     {
         _list.reserve(size);
     }
 
-    uint64_t IntegerList::Max() const
+    size_t IntegerList::Max() const
     {
         if (_list.size() == 0)
         {
@@ -38,7 +38,7 @@ namespace utilities
         return _list[Size() - 1];
     }
 
-    void IntegerList::Append(uint64_t value)
+    void IntegerList::Append(size_t value)
     {
         _list.push_back(value);
     }

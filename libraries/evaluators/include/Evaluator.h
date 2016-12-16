@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Evaluator.h (evaluators)
 //  Authors:  Ofer Dekel
 //
@@ -17,7 +17,7 @@
 #include <tuple>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace evaluators
 {
@@ -49,7 +49,7 @@ namespace evaluators
     /// <summary> Evaluator parameters. </summary>
     struct EvaluatorParameters
     {
-        uint64_t evaluationFrequency;
+        size_t evaluationFrequency;
         bool addZeroEvaluation;
     };
 
@@ -114,7 +114,7 @@ namespace evaluators
         // member variables
         data::Dataset<ExampleType> _dataset;
         EvaluatorParameters _evaluatorParameters;
-        uint64_t _evaluateCounter = 0;
+        size_t _evaluateCounter = 0;
         typename std::tuple<AggregatorTypes...> _aggregatorTuple;
         std::vector<std::vector<std::vector<double>>> _values;
     };

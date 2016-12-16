@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     MapSaveArguments.h (common)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 // stl
 #include <string>
 
-namespace emll
+namespace ell
 {
 namespace common
 {
@@ -24,13 +24,13 @@ namespace common
     {
         /// <summary> The filename to store the output map in. </summary>
         std::string outputMapFilename = "";
- 
+
         /// <summary> An output stream to write the output map to. </summary>
         utilities::OutputStreamImpostor outputMapStream;
 
         /// <summary> Checks if there's a valid output stream </summary>
         bool hasOutputStream = false;
-   };
+    };
 
     /// <summary> A version of MapSaveArguments that adds its members to the command line parser. </summary>
     struct ParsedMapSaveArguments : public MapSaveArguments, public utilities::ParsedArgSet

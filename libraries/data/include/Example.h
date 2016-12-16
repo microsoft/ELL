@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Example.h (data)
 //  Authors:  Ofer Dekel
 //
@@ -21,7 +21,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace emll
+namespace ell
 {
 namespace data
 {

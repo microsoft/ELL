@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ParametersEnumerator.h (common)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 #include <tuple>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace common
 {

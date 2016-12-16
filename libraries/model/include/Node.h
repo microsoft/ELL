@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Node.h (model)
 //  Authors:  Chuck Jacobs
 //
@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model
@@ -134,7 +134,6 @@ namespace model
 
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
-
 
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(ModelTransformer& transformer) const;

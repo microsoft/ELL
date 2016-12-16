@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     PrintArguments.cpp (print)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 // utilities
 #include "Files.h"
 
-namespace emll
+namespace ell
 {
 void ParsedPrintArguments::AddArgs(utilities::CommandLineParser& parser)
 {

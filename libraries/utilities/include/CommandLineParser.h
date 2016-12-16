@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     CommandLineParser.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {
@@ -191,7 +191,7 @@ namespace utilities
             OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
 
             std::string optionNameString() const;
-            uint64_t optionNameHelpLength() const;
+            size_t optionNameHelpLength() const;
         };
 
         std::vector<std::string> _originalArgs;

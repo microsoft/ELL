@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SweepingIncrementalTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -9,7 +9,7 @@
 // utilities
 #include "RandomEngines.h"
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {
@@ -27,7 +27,7 @@ namespace trainers
         auto dataset = data::Dataset<ExampleType>(anyDataset);
 
         // calculate epoch size
-        uint64_t epochSize = _parameters.epochSize;
+        size_t epochSize = _parameters.epochSize;
         if (epochSize == 0 || epochSize > dataset.NumExamples())
         {
             epochSize = dataset.NumExamples();

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     EvaluatingIncrementalTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -9,7 +9,7 @@
 // stl
 #include <utility>
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

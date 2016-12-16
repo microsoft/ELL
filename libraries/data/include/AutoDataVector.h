@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     AutoDataVector.h (data)
 //  Authors:  Ofer Dekel
 //
@@ -18,7 +18,7 @@
 // stl
 #include <initializer_list>
 
-namespace emll
+namespace ell
 {
 namespace data
 {

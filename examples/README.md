@@ -1,2 +1,2 @@
-Example code for the Embedded Machine Learning Library
+Example code for the Embedded Learning Library
 

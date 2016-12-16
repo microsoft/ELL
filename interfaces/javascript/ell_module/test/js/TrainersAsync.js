@@ -8,22 +8,22 @@ global.app_require = function(name) {
 }
 
 var tap = require('tap');
-const EMLL = require("emll");
-console.log("Loaded EMLL");
+const ELL = require("ell");
+console.log("Loaded ELL");
 
-var lossarg = new EMLL.LossArguments();
+var lossarg = new ELL.LossArguments();
 lossarg.lossFunction = 0;
 
-var sgdtrainarg = new EMLL.SGDIncrementalTrainerParameters();
+var sgdtrainarg = new ELL.SGDIncrementalTrainerParameters();
 sgdtrainarg.regularization = .75;
 
 console.log("Done settings Loss and SGD Training Params ...");
 
-var dataset = EMLL.GetDataset("../data/testData.txt");
+var dataset = ELL.GetDataset("../data/testData.txt");
 console.log(dataset);
 if(dataset)
 {  
-  var sgdIncrementalTrainer = EMLL.GetSGDIncrementalTrainer(21, lossarg, sgdtrainarg);
+  var sgdIncrementalTrainer = ELL.GetSGDIncrementalTrainer(21, lossarg, sgdtrainarg);
   console.log(sgdIncrementalTrainer);
   
   var trainSetIterator = dataset.GetIterator();
@@ -64,7 +64,7 @@ if(dataset)
   }
 }
 
-/*EMLL.GetDatasetAsync("../data/testData.txt", function(datasetasync)
+/*ELL.GetDatasetAsync("../data/testData.txt", function(datasetasync)
 {
   if(datasetasync)
   {

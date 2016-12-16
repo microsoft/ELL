@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SGDIncrementalTrainerArguments.h (common)
 //  Authors:  Ofer Dekel
 //
@@ -14,11 +14,11 @@
 // trainers
 #include "SGDIncrementalTrainer.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {
-    typedef trainers::SGDIncrementalTrainerParameters SGDIncrementalTrainerArguments; 
+    typedef trainers::SGDIncrementalTrainerParameters SGDIncrementalTrainerArguments;
 
     /// <summary> Parsed version of stochastic gradient descent parameters. </summary>
     struct ParsedSGDIncrementalTrainerArguments : public SGDIncrementalTrainerArguments, public utilities::ParsedArgSet

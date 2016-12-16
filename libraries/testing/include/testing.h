@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     testing.h (testing)
 //  Authors:  Ofer Dekel
 //
@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> testing namespace </summary>
 namespace testing

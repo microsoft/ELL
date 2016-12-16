@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Dataset_test.cpp (data_test)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 // stl
 #include <sstream>
 
-namespace emll
+namespace ell
 {
 template <typename ExampleType>
 ExampleType GetExample()

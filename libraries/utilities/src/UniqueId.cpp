@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     UniqueId.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -10,7 +10,7 @@
 
 #include <string>
 
-namespace emll
+namespace ell
 {
 /// <summary> utilities namespace </summary>
 namespace utilities
@@ -78,7 +78,7 @@ namespace utilities
 }
 }
 
-std::hash<emll::utilities::UniqueId>::result_type std::hash<emll::utilities::UniqueId>::operator()(argument_type const& id) const
+std::hash<ell::utilities::UniqueId>::result_type std::hash<ell::utilities::UniqueId>::operator()(argument_type const& id) const
 {
     return std::hash<size_t>()(id._id);
 }

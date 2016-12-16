@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IndexValue.h (data)
 //  Authors:  Ofer Dekel
 //
@@ -12,14 +12,14 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace emll
+namespace ell
 {
 namespace data
 {
     /// <summary> An entry in a vector </summary>
     struct IndexValue
     {
-        uint64_t index;
+        size_t index;
         double value;
     };
 

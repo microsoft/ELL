@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SGDIncrementalTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -13,12 +13,12 @@
 // data
 #include "Dataset.h"
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {
     template <typename LossFunctionType>
-    SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
+    SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
         : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(std::make_shared<PredictorType>(dim)) // iterations start from 1 to prevent divide-by-zero
     {
     }
@@ -30,7 +30,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
     {
         return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, lossFunction, parameters);
     }
@@ -79,7 +79,7 @@ namespace trainers
             bLast += lastCoeff;
 
             double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
-            auto vAvgTranspose = vAvg.Transpose(); 
+            auto vAvgTranspose = vAvg.Transpose();
             dataVector.AddTo(vAvgTranspose, avgCoeff);
             bAvg += avgCoeff;
 

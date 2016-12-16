@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
-//  File:     EMLL.i (interfaces)
+//  Project:  Embedded Learning Library (ELL)
+//  File:     ELL.i (interfaces)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-%module "EMLL"
+%module "ELL"
 #if defined(SWIGJAVASCRIPT)
 %{
 #include "LLVMInclude.h" // LLVM headers must be included before Windows headers (which are included by node.h)

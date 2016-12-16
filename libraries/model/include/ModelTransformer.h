@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ModelTransformer.h (model)
 //  Authors:  Chuck Jacobs
 //
@@ -25,7 +25,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 /// <summary> model namespace </summary>
 namespace model
@@ -94,11 +94,11 @@ namespace model
         /// <returns> The copied Model. </returns>
         Model CopyModel(const Model& model, const std::vector<const Node*>& outputNodes, const TransformContext& context);
 
-        /// <summary> 
+        /// <summary>
         /// Performs one or more refinement iterations on a given model and returns the result.
         /// If context.IsNodeCompilable is not set, this call performs one refinement iteration. If
         /// context.IsNodeCompilable is set, this call refines the model until all its nodes are
-        /// compilable or until none of the nodes refine themselves. 
+        /// compilable or until none of the nodes refine themselves.
         /// </summary>
         ///
         /// <param name="model"> The model. </param>

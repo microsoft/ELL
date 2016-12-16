@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     LoadModel.cpp (common)
 //  Authors:  Chuck Jacobs
 //
@@ -40,7 +40,7 @@
 #include "JsonArchiver.h"
 #include "XmlArchiver.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {
@@ -149,7 +149,6 @@ namespace common
 
     void RegisterNodeTypes(utilities::SerializationContext& context)
     {
-        // TODO: add more node types!
         context.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
         context.GetTypeFactory().AddType<model::Node, model::InputNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();
@@ -257,7 +256,7 @@ namespace common
         else
         {
             auto ext = utilities::GetFileExtension(filename, true);
-            if (IsKnownExtension(ext))
+            if (IsKnownExtension(ext) || ext == "model")
             {
                 if (!utilities::IsFileReadable(filename))
                 {
@@ -269,7 +268,7 @@ namespace common
                 {
                     return LoadArchivedModel<utilities::XmlUnarchiver>(filestream);
                 }
-                else if (ext == "json")
+                else
                 {
                     return LoadArchivedModel<utilities::JsonUnarchiver>(filestream);
                 }
@@ -283,7 +282,7 @@ namespace common
     void SaveModel(const model::Model& model, const std::string& filename)
     {
         auto ext = utilities::GetFileExtension(filename);
-        if (IsKnownExtension(ext))
+        if (IsKnownExtension(ext) || ext == "model")
         {
             if (!utilities::IsFileWritable(filename))
             {
@@ -300,13 +299,9 @@ namespace common
         {
             SaveArchivedObject<utilities::XmlArchiver>(model, outStream);
         }
-        else if (filetype == "json")
+        else 
         {
             SaveArchivedObject<utilities::JsonArchiver>(model, outStream);
-        }
-        else
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + filetype + "\"");
         }
     }
 
@@ -321,7 +316,7 @@ namespace common
         }
 
         auto ext = utilities::GetFileExtension(filename, true);
-        if (IsKnownExtension(ext))
+        if (IsKnownExtension(ext) || ext == "map")
         {
             if (!utilities::IsFileReadable(filename))
             {
@@ -333,7 +328,7 @@ namespace common
             {
                 return LoadArchivedMap<utilities::XmlUnarchiver>(filestream);
             }
-            else if (ext == "json")
+            else
             {
                 return LoadArchivedMap<utilities::JsonUnarchiver>(filestream);
             }
@@ -409,7 +404,7 @@ namespace common
     void SaveMap(const model::DynamicMap& map, const std::string& filename)
     {
         auto ext = utilities::GetFileExtension(filename);
-        if (IsKnownExtension(ext))
+        if (IsKnownExtension(ext) || ext == "map")
         {
             if (!utilities::IsFileWritable(filename))
             {
@@ -426,13 +421,9 @@ namespace common
         {
             SaveArchivedObject<utilities::XmlArchiver>(map, outStream);
         }
-        else if (filetype == "json")
+        else 
         {
             SaveArchivedObject<utilities::JsonArchiver>(map, outStream);
-        }
-        else
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + filetype + "\"");
         }
     }
 }

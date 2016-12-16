@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     OutputStreamImpostor.cpp (utilities)
 //  Authors:  Chuck Jacobs, Ofer Dekel
 //
@@ -18,7 +18,7 @@
 #include <ostream>
 #include <string>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

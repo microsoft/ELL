@@ -5,7 +5,7 @@
 
 #include <string>
 
-namespace emll
+namespace ell
 {
 void TestLoadDataset();
 void TestLoadMappedDataset();

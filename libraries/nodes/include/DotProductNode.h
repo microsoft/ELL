@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DotProductNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -24,7 +24,7 @@
 // stl
 #include <string>
 
-namespace emll
+namespace ell
 {
 namespace nodes
 {

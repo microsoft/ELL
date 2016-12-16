@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     LogitBooster.cpp (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -10,7 +10,7 @@
 
 #include <cmath>
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

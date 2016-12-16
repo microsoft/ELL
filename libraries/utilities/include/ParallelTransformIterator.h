@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ParallelTransformIterator.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -12,7 +12,7 @@
 #include <future>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

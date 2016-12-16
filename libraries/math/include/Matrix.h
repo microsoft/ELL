@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:    Matrix.h (math)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-namespace emll
+namespace ell
 {
 namespace math
 {

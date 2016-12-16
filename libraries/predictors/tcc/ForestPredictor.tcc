@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ForestPredictor.tcc (predictors)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 // utilities
 #include "Exception.h"
 
-namespace emll
+namespace ell
 {
 namespace predictors
 {

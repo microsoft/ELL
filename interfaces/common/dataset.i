@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     dataset.i (interfaces)
 //  Authors:  Chuck Jacobs
 //
@@ -18,19 +18,19 @@
 %}
 
 // ignores
-%ignore emll::dataset::RowDataset::operator[];
-%ignore emll::dataset::IDataVector::Clone;
-%ignore emll::dataset::GenericRowDataset::GenericRowDataset(emll::dataset::GenericRowDataset&&);
-%ignore emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>::RowDataset(emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>&&);
-%ignore emll::dataset::GenericSupervisedExample::GenericSupervisedExample;
-%ignore emll::dataset::GenericSupervisedExample::GenericSupervisedExample(emll::dataset::GenericSupervisedExample&&);
-%ignore emll::dataset::DenseSupervisedExample::DenseSupervisedExample(emll::dataset::DenseSupervisedExample&&);
-%ignore emll::dataset::RowDataset< emll::dataset::GenericSupervisedExample >::RowDataset(emll::dataset::RowDataset< emll::dataset::GenericSupervisedExample > &&);
-%ignore emll::dataset::Example< emll::dataset::IDataVector,emll::dataset::WeightLabel >::Example(emll::dataset::Example< emll::dataset::IDataVector,emll::dataset::WeightLabel > &&);
-%ignore emll::dataset::SparseDataVector<double, emll::utilities::CompressedIntegerList>;
-%ignore emll::dataset::SparseDataVector<float, emll::utilities::CompressedIntegerList>;
-%ignore emll::dataset::SparseDataVector<short, emll::utilities::CompressedIntegerList>;
-%ignore emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>::Example;
+%ignore ell::dataset::RowDataset::operator[];
+%ignore ell::dataset::IDataVector::Clone;
+%ignore ell::dataset::GenericRowDataset::GenericRowDataset(ell::dataset::GenericRowDataset&&);
+%ignore ell::dataset::RowDataset<ell::dataset::GenericSupervisedExample>::RowDataset(ell::dataset::RowDataset<ell::dataset::GenericSupervisedExample>&&);
+%ignore ell::dataset::GenericSupervisedExample::GenericSupervisedExample;
+%ignore ell::dataset::GenericSupervisedExample::GenericSupervisedExample(ell::dataset::GenericSupervisedExample&&);
+%ignore ell::dataset::DenseSupervisedExample::DenseSupervisedExample(ell::dataset::DenseSupervisedExample&&);
+%ignore ell::dataset::RowDataset< ell::dataset::GenericSupervisedExample >::RowDataset(ell::dataset::RowDataset< ell::dataset::GenericSupervisedExample > &&);
+%ignore ell::dataset::Example< ell::dataset::IDataVector,ell::dataset::WeightLabel >::Example(ell::dataset::Example< ell::dataset::IDataVector,ell::dataset::WeightLabel > &&);
+%ignore ell::dataset::SparseDataVector<double, ell::utilities::CompressedIntegerList>;
+%ignore ell::dataset::SparseDataVector<float, ell::utilities::CompressedIntegerList>;
+%ignore ell::dataset::SparseDataVector<short, ell::utilities::CompressedIntegerList>;
+%ignore ell::dataset::Example<ell::dataset::IDataVector, ell::dataset::WeightLabel>::Example;
 
 %include "noncopyable.i"
 %include "unique_ptr.i"
@@ -48,27 +48,27 @@
 %include "RowDataset.h"
 %include "SparseDataVector.h"
 
-wrap_unique_ptr(IDataVectorPtr, emll::dataset::IDataVector)
+wrap_unique_ptr(IDataVectorPtr, ell::dataset::IDataVector)
 
-%template (GenericSupervisedExample) emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>;
-%template (GenericRowDataset) emll::dataset::RowDataset<emll::dataset::GenericSupervisedExample>;
-%template (GenericRowIterator) emll::utilities::StlIterator<typename std::vector<emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>>::const_iterator, emll::dataset::Example<emll::dataset::IDataVector, emll::dataset::WeightLabel>>;
+%template (GenericSupervisedExample) ell::dataset::Example<ell::dataset::IDataVector, ell::dataset::WeightLabel>;
+%template (GenericRowDataset) ell::dataset::RowDataset<ell::dataset::GenericSupervisedExample>;
+%template (GenericRowIterator) ell::utilities::StlIterator<typename std::vector<ell::dataset::Example<ell::dataset::IDataVector, ell::dataset::WeightLabel>>::const_iterator, ell::dataset::Example<ell::dataset::IDataVector, ell::dataset::WeightLabel>>;
 
 // The following template definitions are necessary to eliminate the "warning 315: Nothing known about ..." messages
-%template () emll::dataset::DenseDataVector<double>;
-%template () emll::dataset::DenseDataVector<float>;
-%template () emll::dataset::SparseDataVector<double, emll::utilities::CompressedIntegerList>;
-%template () emll::dataset::SparseDataVector<float, emll::utilities::CompressedIntegerList>;
-%template () emll::dataset::SparseDataVector<short, emll::utilities::CompressedIntegerList>;
+%template () ell::dataset::DenseDataVector<double>;
+%template () ell::dataset::DenseDataVector<float>;
+%template () ell::dataset::SparseDataVector<double, ell::utilities::CompressedIntegerList>;
+%template () ell::dataset::SparseDataVector<float, ell::utilities::CompressedIntegerList>;
+%template () ell::dataset::SparseDataVector<short, ell::utilities::CompressedIntegerList>;
 
 // wrap operator[] for python
-WRAP_OP_AT(emll::dataset::DoubleDataVector, double)
+WRAP_OP_AT(ell::dataset::DoubleDataVector, double)
 
 // wrap "Print" method for python
 //    WRAP_PRINT_TO_STR(GenericSupervisedExample)
-WRAP_PRINT_TO_STR(emll::dataset::FloatDataVector)
-WRAP_PRINT_TO_STR(emll::dataset::DoubleDataVector)
+WRAP_PRINT_TO_STR(ell::dataset::FloatDataVector)
+WRAP_PRINT_TO_STR(ell::dataset::DoubleDataVector)
 
-WRAP_PRINT_TO_STR(emll::dataset::SparseDoubleDataVector)
-WRAP_PRINT_TO_STR(emll::dataset::SparseFloatDataVector) 
-WRAP_PRINT_TO_STR(emll::dataset::SparseShortDataVector)
+WRAP_PRINT_TO_STR(ell::dataset::SparseDoubleDataVector)
+WRAP_PRINT_TO_STR(ell::dataset::SparseFloatDataVector) 
+WRAP_PRINT_TO_STR(ell::dataset::SparseShortDataVector)

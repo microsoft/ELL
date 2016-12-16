@@ -1,4 +1,4 @@
-import EMLL
+import ELL
 
 def test():
     print "trainers_test.test -- TBD"

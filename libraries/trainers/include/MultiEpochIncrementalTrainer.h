@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     MultiEpochIncrementalTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -22,15 +22,15 @@
 #include <string>
 #include <utility>
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {
     /// <summary> Parameters for the multi-epoch meta-trainer. </summary>
     struct MultiEpochIncrementalTrainerParameters
     {
-        uint64_t epochSize = 0;
-        uint64_t numEpochs = 1;
+        size_t epochSize = 0;
+        size_t numEpochs = 1;
         std::string dataPermutationRandomSeed = "";
     };
 

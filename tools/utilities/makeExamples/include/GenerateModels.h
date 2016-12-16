@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     GenerateModels.h (makeExamples)
 //  Authors:  Chuck Jacobs
 //
@@ -11,7 +11,7 @@
 // model
 #include "Model.h"
 
-namespace emll
+namespace ell
 {
 model::Model GenerateIdentityModel(size_t dimension);
 model::Model GenerateTimesTwoModel(size_t dimension);

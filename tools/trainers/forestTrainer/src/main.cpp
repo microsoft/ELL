@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (forestTrainer)
 //  Authors:  Ofer Dekel
 //
@@ -29,22 +29,22 @@
 #include "MapSaveArguments.h"
 #include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
-#include "TrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
+#include "TrainerArguments.h"
 
 // model
+#include "DynamicMap.h"
 #include "InputNode.h"
 #include "Model.h"
-#include "DynamicMap.h"
 
 // nodes
 #include "ForestPredictorNode.h"
 
 // trainers
-#include "HistogramForestTrainer.h"
-#include "SortingForestTrainer.h"
 #include "EvaluatingIncrementalTrainer.h"
+#include "HistogramForestTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
+#include "SortingForestTrainer.h"
 
 // lossFunctions
 #include "LogLoss.h"
@@ -61,7 +61,7 @@
 #include <iostream>
 #include <stdexcept>
 
-using namespace emll;
+using namespace ell;
 
 int main(int argc, char* argv[])
 {
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
             evaluator->Print(std::cout);
             std::cout << std::endl;
         }
-        
+
         // Save predictor model
         if (modelSaveArguments.outputModelFilename != "")
         {

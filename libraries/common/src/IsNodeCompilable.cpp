@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IsNodeCompilable.cpp (common)
 //  Authors:  Ofer Dekel
 //
@@ -23,7 +23,7 @@
 #include "UnaryOperationNode.h"
 #include "ValueSelectorNode.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {

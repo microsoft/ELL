@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DelayNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace nodes
 {

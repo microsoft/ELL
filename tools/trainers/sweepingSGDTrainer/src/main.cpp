@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (sweepingSGDTrainer)
 //  Authors:  Ofer Dekel
 //
@@ -24,10 +24,10 @@
 #include "LoadModel.h"
 #include "MakeEvaluator.h"
 #include "MakeTrainer.h"
-#include "ModelLoadArguments.h"
-#include "ModelSaveArguments.h"
 #include "MapLoadArguments.h"
 #include "MapSaveArguments.h"
+#include "ModelLoadArguments.h"
+#include "ModelSaveArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "ParametersEnumerator.h"
 #include "SGDIncrementalTrainerArguments.h"
@@ -60,7 +60,7 @@
 #include <stdexcept>
 #include <tuple>
 
-using namespace emll;
+using namespace ell;
 
 int main(int argc, char* argv[])
 {

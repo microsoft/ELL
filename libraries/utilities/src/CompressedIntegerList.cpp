@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     CompressedIntegerList.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -14,15 +14,16 @@
 // stl
 #include <cassert>
 #include <cstring>
+#include <limits>
 #include <stdexcept>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {
     void CompressedIntegerList::Iterator::Next()
     {
-        uint64_t delta;
+        size_t delta;
         _iter += _iter_increment;
         uint8_t first_val = *_iter;
 
@@ -57,21 +58,21 @@ namespace utilities
     }
 
     CompressedIntegerList::CompressedIntegerList()
-        : _last(UINT64_MAX), _size(0)
+        : _last(std::numeric_limits<size_t>::max()), _size(0)
     {
     }
 
-    uint64_t CompressedIntegerList::Size() const
+    size_t CompressedIntegerList::Size() const
     {
         return _size;
     }
 
-    void CompressedIntegerList::Reserve(uint64_t size)
+    void CompressedIntegerList::Reserve(size_t size)
     {
         _data.reserve(size * 2); // guess that, on average, every entry will occupy 2 bytes
     }
 
-    uint64_t CompressedIntegerList::Max() const
+    size_t CompressedIntegerList::Max() const
     {
         if (_size == 0)
         {
@@ -82,12 +83,12 @@ namespace utilities
     }
 
     /// adds an integer at the end of the list
-    void CompressedIntegerList::Append(uint64_t value)
+    void CompressedIntegerList::Append(size_t value)
     {
         assert(value != UINT64_MAX); // special value reserved for initialization
 
         // calculate the delta from the previous number pushed
-        uint64_t delta = 0;
+        size_t delta = 0;
 
         // allow the first Append to have a value of zero, but subsequently require an increasing value
         if (_last < UINT64_MAX)
@@ -128,7 +129,7 @@ namespace utilities
         unsigned int mask = log2bytes << 6; // mask == log2(# bytes) shifted to be high-order 2 bits of a byte
         // splice the data length encoding in as the top 2 bits of the first byte
         // So, move all high-order bits of the delta over by 2 to make room, Add the mask, and Add the residual low-order bits of the delta
-        uint64_t write_val = ((delta << 2) & 0xffffffffffffff00) | mask | (delta & 0x3f);
+        size_t write_val = ((delta << 2) & 0xffffffffffffff00) | mask | (delta & 0x3f);
         std::memcpy(buf, &write_val, total_bytes);
 
         ++_size;

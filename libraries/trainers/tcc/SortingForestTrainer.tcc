@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SortingForestTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {
@@ -23,7 +23,7 @@ namespace trainers
 
         SplitCandidate bestSplitCandidate(nodeId, range, sums);
 
-        for (uint64_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
+        for (size_t inputIndex = 0; inputIndex < numFeatures; ++inputIndex)
         {
             // sort the relevant rows of data set in ascending order by inputIndex
             SortNodeDataset(range, inputIndex);
@@ -32,7 +32,7 @@ namespace trainers
 
             // consider all thresholds
             double nextFeatureValue = _dataset[range.firstIndex].GetDataVector()[inputIndex];
-            for (uint64_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size - 1; ++rowIndex)
+            for (size_t rowIndex = range.firstIndex; rowIndex < range.firstIndex + range.size - 1; ++rowIndex)
             {
                 // get friendly names
                 double currentFeatureValue = nextFeatureValue;

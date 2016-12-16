@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     EvaluatorArguments.h (common)
 //  Authors:  Ofer Dekel
 //
@@ -14,7 +14,7 @@
 // evaluators
 #include "Evaluator.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {

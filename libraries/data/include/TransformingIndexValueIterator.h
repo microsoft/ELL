@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     TransformingIndexValueIterator.h (data)
 //  Authors:  Chuck Jacobs
 //
@@ -13,7 +13,7 @@
 // stl
 #include <memory>
 
-namespace emll
+namespace ell
 {
 namespace data
 {

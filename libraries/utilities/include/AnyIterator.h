@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     AnyIterator.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -15,7 +15,7 @@
 #include <memory>
 #include <utility>
 
-namespace emll
+namespace ell
 {
 /// <summary> utilities namespace </summary>
 namespace utilities
@@ -63,7 +63,7 @@ namespace utilities
         /// </summary>
         ///
         /// <returns> The total number of iterates left. </returns>
-        uint64_t NumIteratesLeft() const;
+        size_t NumIteratesLeft() const;
 
         /// <summary> Proceeds to the Next item. </summary>
         void Next();

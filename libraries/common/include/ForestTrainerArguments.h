@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ForestTrainerArguments.h (common)
 //  Authors:  Ofer Dekel
 //
@@ -15,7 +15,7 @@
 #include "HistogramForestTrainer.h"
 #include "SortingForestTrainer.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {

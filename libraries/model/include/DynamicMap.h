@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DynamicMap.h (model)
 //  Authors:  Chuck Jacobs
 //
@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace model
 {
@@ -76,6 +76,11 @@ namespace model
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
 
+        /// <summary> Returns the size of the map's output </summary>
+        ///
+        /// <returns> The dimensionality of the map's output port </returns>
+        size_t GetOutputSize() const;
+
         /// <summary> Refines the model wrapped by this map. </summary>
         ///
         /// <param name="context"> The TransformContext to use during refinement. </param>
@@ -87,12 +92,6 @@ namespace model
         /// <param name="transformFunction"> The function to apply on each node </param>
         /// <param name="context"> The TransformContext to use during the transformation </param>
         void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
-
-        size_t ComputeSize() const // TODO
-        {
-            return GetOutput(0).Size();
-        }
-
 
         //
         // Internal routines for getting information about inputs / outputs of the map

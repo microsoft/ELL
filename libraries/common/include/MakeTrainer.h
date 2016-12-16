@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     MakeTrainer.h (common)
 //  Authors:  Ofer Dekel
 //
@@ -22,7 +22,7 @@
 // stl
 #include <memory>
 
-namespace emll
+namespace ell
 {
 namespace common
 {
@@ -33,7 +33,7 @@ namespace common
     /// <param name="trainerArguments"> trainer arguments. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments);
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments);
 
     /// <summary> Makes a forest trainer. </summary>
     ///

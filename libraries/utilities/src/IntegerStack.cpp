@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IntegerStack.cpp (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -11,13 +11,13 @@
 // stl
 #include <cassert>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {
-    uint64_t IntegerStack::Pop()
+    size_t IntegerStack::Pop()
     {
-        uint64_t top;
+        size_t top;
 
         if (_stack.empty())
         {
@@ -32,7 +32,7 @@ namespace utilities
 
         return top;
     }
-    uint64_t IntegerStack::Top() const
+    size_t IntegerStack::Top() const
     {
         if (_stack.empty())
         {
@@ -43,7 +43,7 @@ namespace utilities
             return _stack.top();
         }
     }
-    void IntegerStack::Push(uint64_t value)
+    void IntegerStack::Push(size_t value)
     {
         _stack.push(value);
 

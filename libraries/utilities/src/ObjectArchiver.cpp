@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ObjectArchiver.cpp (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -16,7 +16,7 @@
 #include <sstream>
 #include <string>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

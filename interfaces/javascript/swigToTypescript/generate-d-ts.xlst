@@ -34,7 +34,7 @@
         return null;
     }
 
-    // This method is horribly heuristic based on the mix of types we use in EMLL.
+    // This method is horribly heuristic based on the mix of types we use in ELL.
     // We could invest in really learning SWIG's weird string syntax, but is it worth it?
     //
     public static string TranslateType(string encodedType)
@@ -90,8 +90,8 @@
 <!-- 
 
 We start the output file with a standard header that includes any types
-that EMLL uses but doesn't define itself. Hopefully this list will be
-short, perhaps even empty once EMLL has a nice white-listed API.
+that ELL uses but doesn't define itself. Hopefully this list will be
+short, perhaps even empty once ELL has a nice white-listed API.
 
 -->
 

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     MakeEvaluator.tcc (common)
 //  Authors:  Ofer Dekel
 //
@@ -16,7 +16,7 @@
 #include "BinaryErrorAggregator.h"
 #include "LossAggregator.h"
 
-namespace emll
+namespace ell
 {
 namespace common
 {

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DTWDistanceNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -8,7 +8,7 @@
 
 #include <limits>
 
-namespace emll
+namespace ell
 {
 namespace nodes
 {
@@ -20,16 +20,16 @@ namespace nodes
             double sum = 0; // sum(x)
             double sumSquares = 0; // sum(x^2)
             size_t size = 0;
-            for(const auto& vec: prototype)
+            for (const auto& vec : prototype)
             {
                 size += vec.size();
-                for(auto x: vec)
+                for (auto x : vec)
                 {
                     sum += x;
-                    sumSquares += (x*x);
+                    sumSquares += (x * x);
                 }
             }
-            return (sumSquares - ((sum*sum) / size)) / size;
+            return (sumSquares - ((sum * sum) / size)) / size;
         }
     }
 
@@ -65,12 +65,12 @@ namespace nodes
     template <typename T>
     float distance(const std::vector<T>& a, const std::vector<T>& b)
     {
-        int s = 0;
+        T s = 0;
         for (size_t index = 0; index < a.size(); index++)
         {
             s += std::abs(a[index] - b[index]);
         }
-        return s;
+        return static_cast<float>(s);
     }
 
     template <typename ValueType>
@@ -105,7 +105,7 @@ namespace nodes
                 bestStart = sPrev_iMinus1;
             }
             bestDist += distance(_prototype[index - 1], input);
-            
+
             _d[index] = bestDist;
             _s[index] = bestStart;
         }

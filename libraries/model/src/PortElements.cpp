@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     PortElements.cpp (model)
 //  Authors:  Chuck Jacobs
 //
@@ -15,7 +15,7 @@
 // utilities
 #include "Exception.h"
 
-namespace emll
+namespace ell
 {
 namespace model
 {
@@ -301,16 +301,16 @@ namespace model
 //
 // hash functions for PortElementUntyped and PortRange
 //
-std::hash<emll::model::PortElementBase>::result_type std::hash<emll::model::PortElementBase>::operator()(argument_type const& element) const
+std::hash<ell::model::PortElementBase>::result_type std::hash<ell::model::PortElementBase>::operator()(argument_type const& element) const
 {
-    auto hash1 = std::hash<const emll::model::OutputPortBase*>()(element.ReferencedPort());
+    auto hash1 = std::hash<const ell::model::OutputPortBase*>()(element.ReferencedPort());
     auto hash2 = std::hash<size_t>()(element.GetIndex());
     return hash1 ^ (hash2 << 1);
 }
 
-std::hash<emll::model::PortRange>::result_type std::hash<emll::model::PortRange>::operator()(argument_type const& range) const
+std::hash<ell::model::PortRange>::result_type std::hash<ell::model::PortRange>::operator()(argument_type const& range) const
 {
-    auto hash1 = std::hash<const emll::model::OutputPortBase*>()(range.ReferencedPort());
+    auto hash1 = std::hash<const ell::model::OutputPortBase*>()(range.ReferencedPort());
     auto hash2 = std::hash<size_t>()(range.Size());
     auto hash3 = std::hash<size_t>()(range.GetStartIndex());
     return hash1 ^ ((hash2 ^ (hash3 << 1)) << 1);

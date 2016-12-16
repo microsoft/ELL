@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     model.i (interfaces)
 //  Authors:  Chuck Jacobs, Kirk Olynyk
 //
@@ -12,7 +12,7 @@
 // common
 #include "LoadModel.h"
 
-// comiler
+// compiler
 #include "CompiledMap.h"
 
 // model
@@ -42,12 +42,12 @@
 %}
 
 #if 0
-%nodefaultctor emll::model::NodeIterator;
-%nodefaultctor emll::model::Node;
-%nodefaultctor emll::model::Port;
-%nodefaultctor emll::model::OutputPortBase;
-%nodefaultctor emll::model::OutputPort<double>;
-%nodefaultctor emll::model::InputPortBase;
+%nodefaultctor ell::model::NodeIterator;
+%nodefaultctor ell::model::Node;
+%nodefaultctor ell::model::Port;
+%nodefaultctor ell::model::OutputPortBase;
+%nodefaultctor ell::model::OutputPort<double>;
+%nodefaultctor ell::model::InputPortBase;
 #endif
 
 %inline %{
@@ -87,10 +87,10 @@ public:
     ELL_InputPortBaseIterator GetInputPorts();
     std::string GetRuntimeTypeName();
 #ifndef SWIG
-    ELL_Node(const emll::model::Node* other);
+    ELL_Node(const ell::model::Node* other);
 #endif
 private:
-    const emll::model::Node* _node;
+    const ell::model::Node* _node;
 };
 
 //
@@ -106,11 +106,11 @@ public:
     void Next();
     ELL_InputPortBase Get();
 #ifndef SWIG
-    ELL_InputPortBaseIterator(std::vector<emll::model::InputPortBase*> ports);
+    ELL_InputPortBaseIterator(std::vector<ell::model::InputPortBase*> ports);
 #endif
 private:
     int _i;
-    std::vector<emll::model::InputPortBase*> _ports;
+    std::vector<ell::model::InputPortBase*> _ports;
 };
 
 //
@@ -126,11 +126,11 @@ public:
     void Next();
     ELL_OutputPortBase Get();
 #ifndef SWIG
-    ELL_OutputPortBaseIterator(std::vector<emll::model::OutputPortBase*> ports);
+    ELL_OutputPortBaseIterator(std::vector<ell::model::OutputPortBase*> ports);
 #endif
 private:
     int _i;
-    std::vector<emll::model::OutputPortBase*> _ports;
+    std::vector<ell::model::OutputPortBase*> _ports;
 };
 
 //
@@ -146,14 +146,14 @@ public:
     void Next();
     ELL_Node Get();
 #ifndef SWIG
-    ELL_NodeIterator(std::vector<const emll::model::Node*> nodes);
-    ELL_NodeIterator(emll::model::NodeIterator& other);
+    ELL_NodeIterator(std::vector<const ell::model::Node*> nodes);
+    ELL_NodeIterator(ell::model::NodeIterator& other);
 #endif    
 private:
     int _i;
     bool _isVector;
-    std::vector<const emll::model::Node*> _nodes;
-    emll::model::NodeIterator _iterator;
+    std::vector<const ell::model::Node*> _nodes;
+    ell::model::NodeIterator _iterator;
 };
 
 //
@@ -171,10 +171,10 @@ public:
     std::string GetJson() const;
     std::string GetRuntimeTypeName() const;
 #ifndef SWIG
-    ELL_Model(const emll::model::Model& other);
+    ELL_Model(const ell::model::Model& other);
 #endif
 private:
-    emll::model::Model _model;
+    ell::model::Model _model;
 };
 
 //
@@ -200,10 +200,10 @@ public:
     int GetOutputType();
     int Size();
 #ifndef SWIG
-    ELL_Port(const emll::model::Port* other);
+    ELL_Port(const ell::model::Port* other);
 #endif
 private:
-    const emll::model::Port* _port;
+    const ell::model::Port* _port;
 };
 
 //
@@ -220,10 +220,10 @@ public:
     ELL_OutputPortBase ReferencedPort();
 
 #ifndef SWIG
-    ELL_PortElementBase(const emll::model::PortElementBase& other);
+    ELL_PortElementBase(const ell::model::PortElementBase& other);
 #endif
 private:
-    emll::model::PortElementBase _port;
+    ell::model::PortElementBase _port;
 };
 
 //
@@ -240,10 +240,10 @@ public:
     ELL_PortElementBase GetElement(int index) const;
 
 #ifndef SWIG
-    ELL_PortElementsBase(const emll::model::PortElementsBase& other);
+    ELL_PortElementsBase(const ell::model::PortElementsBase& other);
 #endif
 private:
-    emll::model::PortElementsBase _elements;
+    ell::model::PortElementsBase _elements;
 };
 
 //
@@ -263,10 +263,10 @@ public:
     ELL_NodeIterator GetParentNodes();
     ELL_PortElementsBase GetInputElements();
 #ifndef SWIG
-    ELL_InputPortBase(const emll::model::InputPortBase* other);
+    ELL_InputPortBase(const ell::model::InputPortBase* other);
 #endif
 private:
-    const emll::model::InputPortBase* _port;
+    const ell::model::InputPortBase* _port;
 };
 
 //
@@ -288,10 +288,10 @@ public:
     void ReferencePort();
     std::string GetRuntimeTypeName();
 #ifndef SWIG
-    ELL_OutputPortBase(const emll::model::OutputPortBase* other);
+    ELL_OutputPortBase(const ell::model::OutputPortBase* other);
 #endif
 private:
-    const emll::model::OutputPortBase* _port;
+    const ell::model::OutputPortBase* _port;
 };
 
 class ELL_TransformContext
@@ -303,7 +303,7 @@ public:
 //    ELL_TransformContext(const std::function<bool(const Node&)>& isNodeCompilable);
 #endif
 private:
-    emll::model::TransformContext _context;
+    ell::model::TransformContext _context;
 };
 
 ELL_TransformContext::ELL_TransformContext() : _context()
@@ -331,7 +331,7 @@ ELL_TransformContext::~ELL_TransformContext()
 //
 
 #ifndef SWIG
-ELL_PortElementBase::ELL_PortElementBase(const emll::model::PortElementBase& other) : 
+ELL_PortElementBase::ELL_PortElementBase(const ell::model::PortElementBase& other) : 
     _port(other) 
 {
 } 
@@ -365,7 +365,7 @@ ELL_OutputPortBase ELL_PortElementBase::ReferencedPort()
 //
 
 #ifndef SWIG
-ELL_PortElementsBase::ELL_PortElementsBase(const emll::model::PortElementsBase& other) : 
+ELL_PortElementsBase::ELL_PortElementsBase(const ell::model::PortElementsBase& other) : 
     _elements(other) 
 {
 } 
@@ -391,7 +391,7 @@ ELL_PortElementBase ELL_PortElementsBase::GetElement(int index) const
 //
 
 #ifndef SWIG
-ELL_OutputPortBase::ELL_OutputPortBase(const emll::model::OutputPortBase* other) : 
+ELL_OutputPortBase::ELL_OutputPortBase(const ell::model::OutputPortBase* other) : 
     _port(other) 
 {
 }
@@ -455,7 +455,7 @@ std::string ELL_OutputPortBase::GetRuntimeTypeName()
 //
 
 #ifndef SWIG
-ELL_InputPortBase::ELL_InputPortBase(const emll::model::InputPortBase* other) : 
+ELL_InputPortBase::ELL_InputPortBase(const ell::model::InputPortBase* other) : 
     _port(other) {
 }
 #endif
@@ -521,7 +521,7 @@ int ELL_Port::GetOutputType()
 }
 
 #ifndef SWIG
-ELL_Port::ELL_Port(const emll::model::Port* other) : _port(other) 
+ELL_Port::ELL_Port(const ell::model::Port* other) : _port(other) 
 {
 }
 #endif
@@ -596,12 +596,12 @@ ELL_Node ELL_NodeIterator::Get()
 }
 
 #ifndef SWIG
-ELL_NodeIterator::ELL_NodeIterator(std::vector<const emll::model::Node*> nodes) : 
+ELL_NodeIterator::ELL_NodeIterator(std::vector<const ell::model::Node*> nodes) : 
     _nodes(nodes) , _i(0), _isVector(true), _iterator() 
 {
 }
 
-ELL_NodeIterator::ELL_NodeIterator(emll::model::NodeIterator& other) : 
+ELL_NodeIterator::ELL_NodeIterator(ell::model::NodeIterator& other) : 
     _nodes(0), _i(0), _isVector(false), _iterator(other) 
 {
 }
@@ -636,7 +636,7 @@ ELL_InputPortBase ELL_InputPortBaseIterator::Get()
 }
 
 #ifndef SWIG
-ELL_InputPortBaseIterator::ELL_InputPortBaseIterator(std::vector<emll::model::InputPortBase*> ports) : 
+ELL_InputPortBaseIterator::ELL_InputPortBaseIterator(std::vector<ell::model::InputPortBase*> ports) : 
     _i(0), _ports(ports) 
 {
 }
@@ -666,10 +666,10 @@ public:
     }
 
 #ifndef SWIG
-    ELL_CompiledMap(const emll::compiler::CompiledMap& other) : _map(std::make_shared<emll::compiler::CompiledMap>(other)) {}
+    ELL_CompiledMap(const ell::compiler::CompiledMap& other) : _map(std::make_shared<ell::compiler::CompiledMap>(other)) {}
 #endif
 private:
-    std::shared_ptr<emll::compiler::CompiledMap> _map;
+    std::shared_ptr<ell::compiler::CompiledMap> _map;
 };
 
 //
@@ -700,7 +700,7 @@ ELL_OutputPortBase ELL_OutputPortBaseIterator::Get()
 }
 
 #ifndef SWIG
-ELL_OutputPortBaseIterator::ELL_OutputPortBaseIterator(std::vector<emll::model::OutputPortBase*> ports) : 
+ELL_OutputPortBaseIterator::ELL_OutputPortBaseIterator(std::vector<ell::model::OutputPortBase*> ports) : 
     _i(0), _ports(ports) 
 {
 }
@@ -719,7 +719,7 @@ ELL_Node::~ELL_Node()
 }
 
 #ifndef SWIG
-ELL_Node::ELL_Node(const emll::model::Node* other) : 
+ELL_Node::ELL_Node(const ell::model::Node* other) : 
     _node(other) 
 {
 }
@@ -779,13 +779,13 @@ ELL_Model::ELL_Model()
 }
 
 ELL_Model::ELL_Model(const std::string& filename) : 
-    _model(emll::common::LoadModel(filename)) 
+    _model(ell::common::LoadModel(filename)) 
 {
 }
 
 void ELL_Model::Save(const std::string& filename) 
 {
-    emll::common::SaveModel(_model, filename);
+    ell::common::SaveModel(_model, filename);
 }
 
 size_t ELL_Model::Size() 
@@ -795,7 +795,7 @@ size_t ELL_Model::Size()
 
 ELL_NodeIterator ELL_Model::GetNodes() 
 {
-    emll::model::NodeIterator iter = _model.GetNodeIterator();
+    ell::model::NodeIterator iter = _model.GetNodeIterator();
     return ELL_NodeIterator(iter);
 }
 
@@ -805,7 +805,7 @@ std::string ELL_Model::GetRuntimeTypeName() const
 }
 
 #ifndef SWIG
-ELL_Model::ELL_Model(const emll::model::Model& other) : 
+ELL_Model::ELL_Model(const ell::model::Model& other) : 
     _model(other) 
 {
 }
@@ -814,7 +814,7 @@ ELL_Model::ELL_Model(const emll::model::Model& other) :
 std::string ELL_Model::GetJson() const
 {
     std::stringstream stream;
-    emll::utilities::JsonArchiver ar(stream);
+    ell::utilities::JsonArchiver ar(stream);
     ar << _model;
     return stream.str();
 }
@@ -830,9 +830,9 @@ ELL_Model ELL_LoadModel(std::string filename)
 ELL_Model ELL_LoadModelFromString(std::string str)
 {
     std::stringstream stream(str);
-    emll::utilities::SerializationContext context;
-    emll::utilities::JsonUnarchiver ar(stream, context);
-    emll::model::Model model;
+    ell::utilities::SerializationContext context;
+    ell::utilities::JsonUnarchiver ar(stream, context);
+    ell::model::Model model;
     ar >> model;
     return ELL_Model(model);
 }

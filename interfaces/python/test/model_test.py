@@ -1,4 +1,4 @@
-import EMLL
+import ELL
 
 def GetName(node): return node.GetId()
 def GetNodeIndex(index, node): return index[GetName(node)]
@@ -149,7 +149,7 @@ def GetGraphStats(adj):
     return stats
 
 def work(key):
-    model = EMLL.ELL_Model(key)
+    model = ELL.ELL_Model(key)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
     print key,

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     SparseBinaryDataVector.h (data)
 //  Authors:  Ofer Dekel
 //
@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace data
 {

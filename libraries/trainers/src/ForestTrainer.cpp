@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ForestTrainer.cpp (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -11,7 +11,7 @@
 // utilites
 #include "Exception.h"
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {
@@ -106,7 +106,8 @@ namespace trainers
         return _childSums[position];
     }
 
-    ForestTrainerBase::TrainerMetadata::TrainerMetadata(const data::WeightLabel& metaData) : strong(metaData)
+    ForestTrainerBase::TrainerMetadata::TrainerMetadata(const data::WeightLabel& metaData)
+        : strong(metaData)
     {
     }
 

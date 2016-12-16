@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     BlasWrapper.cpp (math)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "BlasWrapper.h"
 
-namespace emll
+namespace ell
 {
 namespace math
 {

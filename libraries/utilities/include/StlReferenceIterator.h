@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     StlReferenceIterator.h (utilities)
 //  Authors:  Ofer Dekel, Chuck Jacobs
 //
@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {
@@ -44,7 +44,7 @@ namespace utilities
         /// </summary>
         ///
         /// <returns> The total number of iterates left. </returns>
-        uint64_t NumIteratesLeft() const { return _end - _current; }
+        size_t NumIteratesLeft() const { return _end - _current; }
 
         /// <summary> Proceeds to the Next iterate. </summary>
         void Next();

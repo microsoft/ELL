@@ -2,7 +2,7 @@
 # Build node module
 # 
 
-set (PROJ_NAME emll_module)
+set (PROJ_NAME ell_module)
 PROJECT(${PROJ_NAME})
 
 set (MODULE_FILES 
@@ -12,8 +12,8 @@ set (MODULE_FILES
     copyMacLib.sh
     copyLinuxLib.sh
     copyWindowsLib.cmd
-    emll.d.ts
-    emll_manual.d.ts
+    ell.d.ts
+    ell_manual.d.ts
     index.d.ts
     index.js
     package.json
@@ -41,7 +41,7 @@ if(NPM_EXECUTABLE)
 
     add_custom_target(${PROJ_NAME}_install ALL
                     COMMAND ${NPM_EXECUTABLE} install
-                    DEPENDS EMLL_javascript common data evaluators lossFunctions math model nodes predictors trainers utilities compiler emitters
+                    DEPENDS ELL_javascript common data evaluators lossFunctions math model nodes predictors trainers utilities compiler emitters
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Installing prerequisites"
                     VERBATIM)
@@ -51,7 +51,7 @@ if(NPM_EXECUTABLE)
         COMMENT "Building module"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-    add_dependencies(${PROJ_NAME} ${PROJ_NAME}_files ${PROJ_NAME}_install EMLL_xml)
+    add_dependencies(${PROJ_NAME} ${PROJ_NAME}_files ${PROJ_NAME}_install ELL_xml)
 
     foreach(MODULE_FILE ${MODULE_FILES})
         configure_file(${MODULE_FILE} ${MODULE_FILE} @ONLY)
@@ -74,7 +74,7 @@ if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
 
     add_custom_command(TARGET ${PROJ_NAME} 
                     POST_BUILD
-                    COMMAND ${NPM_EXECUTABLE} install emll
+                    COMMAND ${NPM_EXECUTABLE} install ell
                     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js
                     VERBATIM)
 

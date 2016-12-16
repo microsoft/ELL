@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ForestPredictor.h (predictors)
 //  Authors:  Ofer Dekel
 //
@@ -24,7 +24,7 @@
 #include <iterator>
 #include <vector>
 
-namespace emll
+namespace ell
 {
 namespace predictors
 {

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ParallelTransformIterator.tcc (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -11,7 +11,7 @@
 
 #define DEFAULT_MAX_TASKS 8
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {

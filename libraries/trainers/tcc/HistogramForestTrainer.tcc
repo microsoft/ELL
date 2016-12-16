@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     HistogramForestTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -9,7 +9,7 @@
 // utilities
 #include "RandomEngines.h"
 
-namespace emll
+namespace ell
 {
 namespace trainers
 {

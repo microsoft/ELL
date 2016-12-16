@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IncrementalEvaluator.tcc (evaluators)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace emll
+namespace ell
 {
 namespace evaluators
 {
@@ -24,7 +24,7 @@ namespace evaluators
         bool evaluate = BaseClassType::_evaluateCounter % BaseClassType::_evaluatorParameters.evaluationFrequency == 0 ? true : false;
 
         auto iterator = BaseClassType::_dataset.GetExampleIterator();
-        uint64_t index = 0;
+        size_t index = 0;
 
         while (iterator.IsValid())
         {

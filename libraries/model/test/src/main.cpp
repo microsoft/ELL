@@ -15,7 +15,7 @@
 // stl
 #include <iostream>
 
-using namespace emll;
+using namespace ell;
 
 int main()
 {
@@ -44,7 +44,7 @@ int main()
     }
     catch (const utilities::Exception& exception)
     {
-        std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
+        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
         throw;
     }
 

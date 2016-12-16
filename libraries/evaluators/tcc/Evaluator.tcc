@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Evaluator.tcc (evaluators)
 //  Authors:  Ofer Dekel
 //
@@ -8,7 +8,7 @@
 
 #include "BinaryErrorAggregator.h"
 
-namespace emll
+namespace ell
 {
 namespace evaluators
 {
@@ -65,7 +65,7 @@ namespace evaluators
         if (v.size() == 0) return;
 
         os << v[0];
-        for (uint64_t j = 1; j < v.size(); ++j)
+        for (size_t j = 1; j < v.size(); ++j)
         {
             os << '\t' << v[j];
         }

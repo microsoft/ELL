@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     IIterator.h (utilities)
 //  Authors:  Chuck Jacobs
 //
@@ -9,9 +9,9 @@
 #pragma once
 
 // stl
-#include <cstdint>
+#include <cstddef>
 
-namespace emll
+namespace ell
 {
 namespace utilities
 {
@@ -39,7 +39,7 @@ namespace utilities
         /// </summary>
         ///
         /// <returns> The total number of iterates left. </returns>
-        virtual uint64_t NumIteratesLeft() const { return 0; }
+        virtual size_t NumIteratesLeft() const { return 0; }
 
         /// <summary> Proceeds to the Next item. </summary>
         virtual void Next() = 0;

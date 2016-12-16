@@ -36,27 +36,26 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")
 set (EXAMPLE_DIR ${CMAKE_SOURCE_DIR}/examples/data)
 
 set (MODEL_FILES 
-${EXAMPLE_DIR}/identity.json
-${EXAMPLE_DIR}/times_two.json
-${EXAMPLE_DIR}/is_equal.json
-${EXAMPLE_DIR}/arg_max.json
-${EXAMPLE_DIR}/multi_out.json
-${EXAMPLE_DIR}/model_1.json 
-${EXAMPLE_DIR}/model_2.json
-${EXAMPLE_DIR}/model_3.json
-${EXAMPLE_DIR}/tree_0.json
-${EXAMPLE_DIR}/tree_1.json
-${EXAMPLE_DIR}/tree_2.json
-${EXAMPLE_DIR}/tree_3.json
-${EXAMPLE_DIR}/refined_tree_0.json
-${EXAMPLE_DIR}/refined_tree_1.json
-${EXAMPLE_DIR}/refined_tree_2.json
-${EXAMPLE_DIR}/refined_tree_3.json
+  ${EXAMPLE_DIR}/identity.model
+  ${EXAMPLE_DIR}/is_equal.model
+  ${EXAMPLE_DIR}/model_1.model 
+  ${EXAMPLE_DIR}/model_2.model
+  ${EXAMPLE_DIR}/model_3.model
+  ${EXAMPLE_DIR}/multi_out.model
+  ${EXAMPLE_DIR}/refined_tree_0.model
+  ${EXAMPLE_DIR}/refined_tree_1.model
+  ${EXAMPLE_DIR}/refined_tree_2.model
+  ${EXAMPLE_DIR}/refined_tree_3.model
+  ${EXAMPLE_DIR}/times_two.model
+  ${EXAMPLE_DIR}/tree_0.model
+  ${EXAMPLE_DIR}/tree_1.model
+  ${EXAMPLE_DIR}/tree_2.model
+  ${EXAMPLE_DIR}/tree_3.model
 )
 
 add_custom_command(TARGET ${PROJ_NAME} 
   POST_BUILD
-  COMMAND makeExamples -mf json
+  COMMAND makeExamples -mf model
   WORKING_DIRECTORY ${EXAMPLE_DIR}
   BYPRODUCTS ${MODEL_FILES}
   COMMENT "Generating example models")

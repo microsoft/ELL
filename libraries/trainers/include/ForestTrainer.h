@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ForestTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
@@ -11,8 +11,8 @@
 #include "IIncrementalTrainer.h"
 
 // data
-#include "DenseDataVector.h"
 #include "Dataset.h"
+#include "DenseDataVector.h"
 
 // predictors
 #include "ForestPredictor.h"
@@ -25,7 +25,7 @@
 #include <memory>
 #include <queue>
 
-namespace emll
+namespace ell
 {
 /// <summary> trainers namespace </summary>
 namespace trainers
@@ -77,7 +77,7 @@ namespace trainers
         // metadata that the forest trainer keeps with each example
         struct TrainerMetadata
         {
-            TrainerMetadata(const data::WeightLabel& metaData);  
+            TrainerMetadata(const data::WeightLabel& metaData);
             void Print(std::ostream& os) const;
 
             // strong weight and label
@@ -168,7 +168,7 @@ namespace trainers
         //
 
         // initializes weak weights and labels, as well as currentOutput
-        void InitializeMetadata(); 
+        void InitializeMetadata();
 
         // performs an epoch of splits
         void PerformSplits(size_t maxSplits);

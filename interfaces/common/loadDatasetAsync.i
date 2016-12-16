@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     loadDatasetAsync.i (interfaces)
 //  Authors:  Piali Choudhury (pialic)
 //
@@ -24,21 +24,21 @@
 		virtual void Execute() override
 		{
 			// call load dataset here
-			_dataset = emll::interfaces::GetDataset(_filename);
+			_dataset = ell::interfaces::GetDataset(_filename);
 		}
 
 		virtual void HandleOKCallback() override
 		{
 			Nan::HandleScope scope;
 			// passing out a new pointer to JS world, why cant we send a copy??
-			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_dataset), SWIGTYPE_p_emll__dataset__RowDatasetT_emll__dataset__ExampleT_emll__dataset__IDataVector_emll__dataset__WeightLabel_t_t, 0 | 0);
+			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_dataset), SWIGTYPE_p_ell__dataset__RowDatasetT_ell__dataset__ExampleT_ell__dataset__IDataVector_ell__dataset__WeightLabel_t_t, 0 | 0);
 			v8::Local<v8::Value> argv[] = { jsresult };
 			callback->Call(1, argv);
 		}
 
 	private:
 		std::string _filename;
-		emll::dataset::GenericRowDataset _dataset;
+		ell::dataset::GenericRowDataset _dataset;
 	};	
 %}
 

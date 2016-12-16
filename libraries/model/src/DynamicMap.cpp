@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     DynamicMap.cpp (nodes)
 //  Authors:  Chuck Jacobs
 //
@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <unordered_set>
 
-namespace emll
+namespace ell
 {
 namespace model
 {
@@ -167,6 +167,11 @@ namespace model
         FixTransformedIO(transformer);
         _model = minimalModel;
         return transformer;
+    }
+
+    size_t DynamicMap::GetOutputSize() const
+    {
+        return GetOutput(0).Size();
     }
 
     void DynamicMap::Refine(const TransformContext& context, int maxIterations)

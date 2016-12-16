@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (makeExamples)
 //  Authors:  Chuck Jacobs
 //
@@ -20,7 +20,7 @@
 // stl
 #include <iostream>
 
-using namespace emll;
+using namespace ell;
 
 void SaveModels(std::string ext)
 {
@@ -50,18 +50,18 @@ int main(int argc, char* argv[])
 {
     try
     {
-        std::string format = "json";
+        std::string format = "model";
 
         // create a command line parser
         utilities::CommandLineParser commandLineParser(argc, argv);
-        commandLineParser.AddOption(format, "modelFormat", "mf", "xml or json", "json");
+        commandLineParser.AddOption(format, "modelFormat", "mf", "xml or model", "model");
 
         // parse command line
         commandLineParser.Parse();
         if (format == "both")
         {
             SaveModels("xml");
-            SaveModels("json");
+            SaveModels("model");
         }
         else
         {
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
     }
     catch (const utilities::Exception& exception)
     {
-        std::cerr << "ERROR, got EMLL exception. Message: " << exception.GetMessage() << std::endl;
+        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
         throw;
     }
     catch (const std::exception& exception)

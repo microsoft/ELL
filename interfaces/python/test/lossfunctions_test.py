@@ -1,4 +1,4 @@
-import EMLL
+import ELL
 from math import exp, log
 from testing import Testing
 
@@ -19,21 +19,21 @@ def hingeLossTest(testing):
     def df(y, t):                                   # derivative
         if t*y <= 1.0: return -float(t)
         else: return 0.0
-    x = EMLL.ELL_HingeLoss()
+    x = ELL.ELL_HingeLoss()
     compareTest(testing, "HingeLoss.Evaluate",  x.Evaluate, getData(f, hingeLossInput))
     compareTest(testing, "HingeLoss.GetDerivative", x.GetDerivative, getData(df, hingeLossInput))
 
 def logLossTest(testing):
     def f(y, t): return log(1.0 + exp(-y*t))        # reference logloss
     def df(y,t): return (-t/(1.0 + exp(y*t)))       # derivative
-    x = EMLL.ELL_LogLoss()
+    x = ELL.ELL_LogLoss()
     compareTest(testing, "LogLoss.Evaluate", x.Evaluate,  getData(f, logLossInput))
     compareTest(testing, "LogLoss.GetDerivative", x.GetDerivative, getData(df, logLossInput))
 
 def squaredLossTest(testing):
     def f(y, t): return 0.5 * (y - t) * (y - t)
     def df(y, t): return float(y - t)
-    x = EMLL.ELL_SquaredLoss()
+    x = ELL.ELL_SquaredLoss()
     compareTest(testing, "SquaredLoss.Evaluate", x.Evaluate, getData(f, squareLossInput))
     compareTest(testing, "SquaredLoss.GetDerivative", x.GetDerivative, getData(df, squareLossInput))
 
