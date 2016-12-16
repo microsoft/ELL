@@ -227,7 +227,8 @@
                     {
                         'cflags_cc': [
                             '-std=c++1y',
-                            '-fexceptions'
+                            '-fexceptions',
+                            '-fPIC'
                         ],
                         'cflags_cc!': [
                             '-fno-rtti',
