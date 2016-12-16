@@ -80,15 +80,15 @@ int main(int argc, char* argv[])
                 map2 = std::make_unique<model::DynamicMap>(common::LoadMap(applyArguments.inputMapFilename2));
             }
 
-            math::RowVector<double> u(map.ComputeSize());
-            math::RowVector<double> v(map.ComputeSize());
+            math::RowVector<double> u(map.GetOutputSize());
+            math::RowVector<double> v(map.GetOutputSize());
             size_t count = 0;
 
             while (dataIterator->IsValid())
             {
                 auto example = dataIterator->Get();
                 auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
-                math::RowVector<double> w(map.ComputeSize());
+                math::RowVector<double> w(map.GetOutputSize());
                 mappedDataVector.AddTo(w);
 
                 if (map2 != nullptr)

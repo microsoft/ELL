@@ -76,6 +76,11 @@ namespace model
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
 
+        /// <summary> Returns the size of the map's output </summary>
+        ///
+        /// <returns> The dimensionality of the map's output port </returns>
+        size_t GetOutputSize() const;
+
         /// <summary> Refines the model wrapped by this map. </summary>
         ///
         /// <param name="context"> The TransformContext to use during refinement. </param>
