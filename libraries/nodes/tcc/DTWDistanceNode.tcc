@@ -65,12 +65,12 @@ namespace nodes
     template <typename T>
     float distance(const std::vector<T>& a, const std::vector<T>& b)
     {
-        int s = 0;
+        T s = 0;
         for (size_t index = 0; index < a.size(); index++)
         {
             s += std::abs(a[index] - b[index]);
         }
-        return s;
+        return static_cast<float>(s);
     }
 
     template <typename ValueType>
