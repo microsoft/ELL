@@ -44,8 +44,8 @@ namespace utilities
 
             /// <summary> Returns the value of the current iterate. </summary>
             ///
-            /// <returns> An uint64_t. </returns>
-            uint64_t Get() const { return _value; }
+            /// <returns> An size_t. </returns>
+            size_t Get() const { return _value; }
 
         private:
             // private ctor, can only be called from CompressedIntegerList class
@@ -55,8 +55,8 @@ namespace utilities
             // members
             const uint8_t* _iter;
             const uint8_t* _end;
-            uint64_t _value;
-            uint64_t _iter_increment;
+            size_t _value;
+            size_t _iter_increment;
         };
 
         /// <summary> Default Constructor. Constructs an empty list. </summary>
@@ -72,23 +72,23 @@ namespace utilities
 
         /// <summary> Returns The number of entries in the list. </summary>
         ///
-        /// <returns> An uint64_t. </returns>
-        uint64_t Size() const;
+        /// <returns> An size_t. </returns>
+        size_t Size() const;
 
         /// <summary> Allocates a specified number of entires to the list. </summary>
         ///
         /// <param name="size"> The size. </param>
-        void Reserve(uint64_t size);
+        void Reserve(size_t size);
 
         /// <summary> Returns The maximal integer in the list. </summary>
         ///
         /// <returns> The maximum value. </returns>
-        uint64_t Max() const;
+        size_t Max() const;
 
         /// <summary> Appends an integer to the end of the list. </summary>
         ///
         /// <param name="value"> The value. </param>
-        void Append(uint64_t value);
+        void Append(size_t value);
 
         /// <summary> Deletes all of the std::vector content and sets its Size to zero. </summary>
         void Reset();
@@ -100,8 +100,8 @@ namespace utilities
 
     private:
         std::vector<uint8_t> _data;
-        uint64_t _last;
-        uint64_t _size;
+        size_t _last;
+        size_t _size;
     };
 }
 }

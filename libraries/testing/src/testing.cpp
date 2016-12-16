@@ -83,13 +83,13 @@ namespace testing
     bool IsVectorApproxEqual(const std::vector<ValueType>& a, const std::vector<ValueType>& b, ValueType tolerance)
     {
         // allow vectors of different size, provided that they differ by a suffix of zeros
-        uint64_t size = a.size();
+        size_t size = a.size();
         if (b.size() < size)
         {
             size = b.size();
         }
 
-        for (uint64_t i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
         {
             if (IsEqual(a[i], b[i], tolerance) == false)
             {
@@ -98,7 +98,7 @@ namespace testing
         }
 
         // confirm suffix of zeros
-        for (uint64_t i = size; i < a.size(); ++i)
+        for (size_t i = size; i < a.size(); ++i)
         {
             if (IsEqual(a[i], 0, tolerance) == false)
             {
@@ -106,7 +106,7 @@ namespace testing
             }
         }
 
-        for (uint64_t i = size; i < b.size(); ++i)
+        for (size_t i = size; i < b.size(); ++i)
         {
             if (IsEqual(b[i], 0, tolerance) == false)
             {

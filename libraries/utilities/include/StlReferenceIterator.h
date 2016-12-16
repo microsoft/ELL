@@ -44,7 +44,7 @@ namespace utilities
         /// </summary>
         ///
         /// <returns> The total number of iterates left. </returns>
-        uint64_t NumIteratesLeft() const { return _end - _current; }
+        size_t NumIteratesLeft() const { return _end - _current; }
 
         /// <summary> Proceeds to the Next iterate. </summary>
         void Next();

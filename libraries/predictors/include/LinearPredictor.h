@@ -40,7 +40,7 @@ namespace predictors
         /// <summary> Constructs an instance of Linear. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
-        LinearPredictor(uint64_t dim);
+        LinearPredictor(size_t dim);
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
@@ -65,7 +65,7 @@ namespace predictors
         /// <summary> Gets the dimension of the linear predictor. </summary>
         ///
         /// <returns> The dimension. </returns>
-        uint64_t GetDimension() const { return _w.Size(); }
+        size_t GetDimension() const { return _w.Size(); }
 
         /// <summary> Returns the output of the predictor for a given example. </summary>
         ///

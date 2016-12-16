@@ -19,7 +19,7 @@ namespace data
     /// <summary> An entry in a vector </summary>
     struct IndexValue
     {
-        uint64_t index;
+        size_t index;
         double value;
     };
 

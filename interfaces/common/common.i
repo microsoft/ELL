@@ -36,7 +36,7 @@
 #endif
 
 %inline %{
-	SGDTrainerProxy GetSGDIncrementalTrainer(uint64_t dim, const ell::common::LossArguments& lossArguments, const ell::common::SGDIncrementalTrainerArguments& trainerArguments)
+	SGDTrainerProxy GetSGDIncrementalTrainer(size_t dim, const ell::common::LossArguments& lossArguments, const ell::common::SGDIncrementalTrainerArguments& trainerArguments)
 	{
 		auto trainer = ell::common::MakeSGDIncrementalTrainer(dim, lossArguments, trainerArguments);
 		return SGDTrainerProxy(trainer);

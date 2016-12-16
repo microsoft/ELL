@@ -20,7 +20,7 @@ namespace predictors
     {
     }
 
-    LinearPredictor::LinearPredictor(uint64_t dim)
+    LinearPredictor::LinearPredictor(size_t dim)
         : _w(dim), _b(0)
     {
     }
