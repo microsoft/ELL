@@ -39,7 +39,7 @@ namespace utilities
         /// </summary>
         ///
         /// <returns> The total number of iterates left. </returns>
-        virtual uint64_t NumIteratesLeft() const { return 0; }
+        virtual size_t NumIteratesLeft() const { return 0; }
 
         /// <summary> Proceeds to the Next item. </summary>
         virtual void Next() = 0;

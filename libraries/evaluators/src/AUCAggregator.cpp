@@ -30,7 +30,7 @@ namespace evaluators
         double sumNegativeWeights = 0.0;
         double sumOrderedWeights = 0.0;
 
-        for (uint64_t i = 0; i < _aggregates.size(); ++i)
+        for (size_t i = 0; i < _aggregates.size(); ++i)
         {
             double weight = _aggregates[i].weight;
 

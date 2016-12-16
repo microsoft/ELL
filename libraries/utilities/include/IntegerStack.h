@@ -25,17 +25,17 @@ namespace utilities
         /// <summary> Removes and returns the top-of-stack object. </summary>
         ///
         /// <returns> The previous top-of-stack object. </returns>
-        uint64_t Pop();
+        size_t Pop();
 
         /// <summary> Gets the top element in the stack. </summary>
         ///
         /// <returns> An element at the top of the stack. </returns>
-        uint64_t Top() const;
+        size_t Top() const;
 
         /// <summary> Pushes an object onto this stack. </summary>
         ///
         /// <param name="value"> The value to push. This must be a value that was previously popped. </param>
-        void Push(uint64_t value);
+        void Push(size_t value);
 
         /// <summary> Query if the top value in the stack is novel, which means that it has never been popped before. </summary>
         ///
@@ -43,8 +43,8 @@ namespace utilities
         bool IsTopNovel() const { return _stack.empty(); }
 
     private:
-        uint64_t _smallestUnpopped = 0;
-        std::stack<uint64_t> _stack;
+        size_t _smallestUnpopped = 0;
+        std::stack<size_t> _stack;
     };
 }
 }

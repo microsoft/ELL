@@ -47,7 +47,7 @@ namespace data
     protected:
         IteratorType _begin;
         IteratorType _end;
-        uint64_t _index = 0;
+        size_t _index = 0;
         void SkipZeros();
     };
 

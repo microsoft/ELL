@@ -63,7 +63,7 @@ namespace utilities
         /// </summary>
         ///
         /// <returns> The total number of iterates left. </returns>
-        uint64_t NumIteratesLeft() const;
+        size_t NumIteratesLeft() const;
 
         /// <summary> Proceeds to the Next item. </summary>
         void Next();

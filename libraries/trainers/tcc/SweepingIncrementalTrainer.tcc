@@ -27,7 +27,7 @@ namespace trainers
         auto dataset = data::Dataset<ExampleType>(anyDataset);
 
         // calculate epoch size
-        uint64_t epochSize = _parameters.epochSize;
+        size_t epochSize = _parameters.epochSize;
         if (epochSize == 0 || epochSize > dataset.NumExamples())
         {
             epochSize = dataset.NumExamples();

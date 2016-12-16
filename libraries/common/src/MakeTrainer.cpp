@@ -26,7 +26,7 @@ namespace ell
 {
 namespace common
 {
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(uint64_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments)
+    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 

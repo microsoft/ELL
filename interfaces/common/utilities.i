@@ -45,7 +45,7 @@ public:
     StlIterator(IteratorType begin, IteratorType end);
     bool IsValid() const;
     bool HasSize() const;
-    uint64_t NumIteratesLeft() const;
+    size_t NumIteratesLeft() const;
     void Next();
     const ValueType& Get() const;
 };
@@ -59,7 +59,7 @@ public:
     StlIndexValueIterator(IteratorType begin, IteratorType end);
     bool IsValid() const;
     bool HasSize() const;
-    uint64_t NumIteratesLeft() const;
+    size_t NumIteratesLeft() const;
     void Next();
     linear::IndexValue Get() const;
 };

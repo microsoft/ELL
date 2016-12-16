@@ -64,7 +64,7 @@ namespace utilities
     /// variables to a string stream is as simple as
     ///
     ///     double x = 5.3;
-    ///     uint64_t y = 12;
+    ///     size_t y = 12;
     ///     std::stringstream stream;
     ///     ArchiverType archiver(stream);
     ///     archiver.WriteToArchive(x);
@@ -74,7 +74,7 @@ namespace utilities
     ///
     ///     UnarchiverType unarchiver(stream);
     ///     double xx;
-    ///     uint64_t yy;
+    ///     size_t yy;
     ///     unarchiver.deserialize(xx);
     ///     unarchiver.deserialize(yy);
     ///     assert(x == xx &amp;&amp; y == yy);

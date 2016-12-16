@@ -83,9 +83,9 @@ namespace utilities
         }
     }
 
-    uint64_t CommandLineParser::OptionInfo::optionNameHelpLength() const
+    size_t CommandLineParser::OptionInfo::optionNameHelpLength() const
     {
-        uint64_t len = name.size() + 2;
+        size_t len = name.size() + 2;
         if (shortName != "")
         {
             len += (shortName.size() + 4);
@@ -93,7 +93,7 @@ namespace utilities
 
         len += defaultValueString.size() + 3; // 3 for " [" + "]" at begin/end
 
-        const uint64_t maxNameLen = 32;
+        const size_t maxNameLen = 32;
         return std::min(maxNameLen, len);
     }
 
@@ -116,7 +116,7 @@ namespace utilities
         _originalArgs.insert(_originalArgs.end(), &argv[0], &argv[argc]);
 
         std::string exe_path = _originalArgs[0];
-        uint64_t slashPos = exe_path.find_last_of("/\\");
+        size_t slashPos = exe_path.find_last_of("/\\");
         if (slashPos == std::string::npos)
         {
             _exeName = exe_path;
@@ -374,7 +374,7 @@ namespace utilities
     {
         std::stringstream out;
         // Find longest option name so we can align descriptions
-        uint64_t longest_name = 0;
+        size_t longest_name = 0;
         for (const auto& iter : _options)
         {
             if (iter.first == iter.second.name) // wasn't a previously-undefined option
@@ -394,8 +394,8 @@ namespace utilities
                 {
                     const OptionInfo& info = _options[entry.EntryString];
                     std::string option_name = info.optionNameString();
-                    uint64_t thisOptionNameLen = info.optionNameHelpLength();
-                    uint64_t pad_len = 2 + (longest_name - thisOptionNameLen);
+                    size_t thisOptionNameLen = info.optionNameHelpLength();
+                    size_t pad_len = 2 + (longest_name - thisOptionNameLen);
                     std::string padding(pad_len, ' ');
                     out << "\t--" << option_name << padding << info.description;
                     if (info.enumValues.size() > 0)

@@ -32,7 +32,7 @@ namespace utilities
 
         virtual bool IsValid() const override { return _iterator.IsValid(); }
         virtual bool HasSize() const override { return _iterator.HasSize(); }
-        virtual uint64_t NumIteratesLeft() const override { return _iterator.NumIteratesLeft(); }
+        virtual size_t NumIteratesLeft() const override { return _iterator.NumIteratesLeft(); }
         virtual void Next() override { _iterator.Next(); }
         virtual ValueType Get() const override { return _iterator.Get(); }
     private:
@@ -71,7 +71,7 @@ namespace utilities
     }
 
     template <typename ValueType>
-    uint64_t AnyIterator<ValueType>::NumIteratesLeft() const
+    size_t AnyIterator<ValueType>::NumIteratesLeft() const
     {
         if (_iterator == nullptr)
         {
