@@ -35,7 +35,7 @@ void TestLoadDataset()
 void TestLoadMappedDataset()
 {
     common::MapLoadArguments args;
-    args.inputModelFilename = "../../../examples/data/model_1.json";
+    args.inputModelFilename = "../../../examples/data/model_1.model";
     args.modelInputsString = "";
     args.modelOutputsString = "1017.output";
 

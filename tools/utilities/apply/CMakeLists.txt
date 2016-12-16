@@ -35,4 +35,4 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")
 set (TEST_NAME ${PROJ_NAME}_test)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -imf ${CMAKE_SOURCE_DIR}/examples/data/times_two.json -odf null)
+         COMMAND ${PROJ_NAME} -idf ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -imf ${CMAKE_SOURCE_DIR}/examples/data/times_two.model -odf null)

@@ -30,7 +30,7 @@ def TestLoadModel(fileName):
 
 def TestLoadModels():
     prefix = "../../../examples/data/"
-    fileNames = ["model_1.json", "model_2.json"]
+    fileNames = ["model_1.model", "model_2.model"]
     for fileName in fileNames:
         TestLoadModel(prefix + fileName)
 

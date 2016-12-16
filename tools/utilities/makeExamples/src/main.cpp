@@ -50,18 +50,18 @@ int main(int argc, char* argv[])
 {
     try
     {
-        std::string format = "json";
+        std::string format = "model";
 
         // create a command line parser
         utilities::CommandLineParser commandLineParser(argc, argv);
-        commandLineParser.AddOption(format, "modelFormat", "mf", "xml or json", "json");
+        commandLineParser.AddOption(format, "modelFormat", "mf", "xml or model", "model");
 
         // parse command line
         commandLineParser.Parse();
         if (format == "both")
         {
             SaveModels("xml");
-            SaveModels("json");
+            SaveModels("model");
         }
         else
         {
