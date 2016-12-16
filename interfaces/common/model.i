@@ -12,7 +12,7 @@
 // common
 #include "LoadModel.h"
 
-// comiler
+// compiler
 #include "CompiledMap.h"
 
 // model

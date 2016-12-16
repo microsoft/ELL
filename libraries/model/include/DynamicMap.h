@@ -88,11 +88,6 @@ namespace model
         /// <param name="context"> The TransformContext to use during the transformation </param>
         void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
 
-        size_t ComputeSize() const // TODO
-        {
-            return GetOutput(0).Size();
-        }
-
         //
         // Internal routines for getting information about inputs / outputs of the map
         // and doing type-safe operations.

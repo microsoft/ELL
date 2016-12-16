@@ -13,8 +13,7 @@ See LICENSE.txt.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information on this code of conduct, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-To build the module
--------------------
+## To build the module
 
 The ELL module should automatically get built when you build the ELL solution.
 
@@ -27,8 +26,7 @@ Note: If you get an error trying to build the module, and you've updated to Visu
 5.	Run "npm install" in this directory to install node-gyp@3.4.0 (which fixes the problem)
 6.  Alternately, this might work: `npm install -g node-gyp@3.4.0`
 
-To manually build and install the module
-----------------------------------------
+## To manually build and install the module
 
 1. Build a Release build of ELL
 2. Build the ELL module from npm:
@@ -36,8 +34,7 @@ To manually build and install the module
   * On Mac OS: `npm run build:mac`
   * On Linux: `npm run build:linux`
 
-To run the tests
-----------------
+## To run the tests
 
 1. Make sure you build the module (follow the required steps from the previous section) from the root ELLModule folder.
 2. cd test/js
