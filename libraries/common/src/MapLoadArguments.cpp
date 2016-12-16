@@ -131,7 +131,6 @@ namespace common
         model::PortElementsBase ParsePortElements(const model::Model& model, utilities::Tokenizer& tokenizer) // start state
         {
             auto t = tokenizer.PeekNextToken();
-            // TODO: if text is just a number, take it as the index of the input node
             if (t == "{")
             {
                 tokenizer.MatchToken(t);

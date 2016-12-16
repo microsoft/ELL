@@ -262,8 +262,6 @@ void TestLinearPredictorNodeCompute()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dim);
     auto predNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
-
-    // TODO: test
 }
 
 void TestDemultiplexerNodeCompute()

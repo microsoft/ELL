@@ -149,7 +149,6 @@ namespace common
 
     void RegisterNodeTypes(utilities::SerializationContext& context)
     {
-        // TODO: add more node types!
         context.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
         context.GetTypeFactory().AddType<model::Node, model::InputNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, model::OutputNode<double>>();

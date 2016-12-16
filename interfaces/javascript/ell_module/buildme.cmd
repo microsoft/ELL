@@ -8,7 +8,6 @@ IF "%1"=="" (
   Echo building ELL for Electron
   REM call node-gyp rebuild
   
-  :: TODO: see if this step is really necessary. It isn't on OS X
    call node-gyp rebuild --runtime=electron --target=1.4.4 --arch-x64 --dist-url=https://atom.io/download/atom-shell
 )
 

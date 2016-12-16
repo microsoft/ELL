@@ -44,8 +44,7 @@ source_group("tcc" FILES ${TCC})
 
 set (BLAS_LIB_NAMES ${BLAS_LIB_NAMES} cblas openblas libopenblas.dll.a)
 
-## libopenblas install on ubuntu in /usr/lib and /usr/include
-## TODO: Add private/dependencies/OpenBlas/linux/...
+## Note: libopenblas install on ubuntu in /usr/lib and /usr/include
 
 if(${WIN32})
   set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".dll.a" ".a")
