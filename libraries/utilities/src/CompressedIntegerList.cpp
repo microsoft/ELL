@@ -14,6 +14,7 @@
 // stl
 #include <cassert>
 #include <cstring>
+#include <limits>
 #include <stdexcept>
 
 namespace ell
@@ -57,7 +58,7 @@ namespace utilities
     }
 
     CompressedIntegerList::CompressedIntegerList()
-        : _last(UINT64_MAX), _size(0)
+        : _last(std::numeric_limits<size_t>::max()), _size(0)
     {
     }
 

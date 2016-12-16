@@ -39,14 +39,14 @@ namespace utilities
     }
 
     // wrapper for strtoul
-    inline void cParse(const char* pStr, char*& pEnd, size_t& value)
+    inline void cParse(const char* pStr, char*& pEnd, uint64_t& value)
     {
         unsigned long x = strtoul(pStr, &pEnd, 0);
-        if (x != (size_t)x)
+        if (x != (uint64_t)x)
         {
             errno = ERANGE;
         }
-        value = (size_t)x;
+        value = (uint64_t)x;
     }
 
     // wrapper for strtol
