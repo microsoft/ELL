@@ -169,6 +169,11 @@ namespace model
         return transformer;
     }
 
+    size_t DynamicMap::GetOutputSize() const
+    {
+        return GetOutput(0).Size();
+    }
+
     void DynamicMap::Refine(const TransformContext& context, int maxIterations)
     {
         DoRefine(context, maxIterations);
