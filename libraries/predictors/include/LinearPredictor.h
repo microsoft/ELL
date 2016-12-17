@@ -20,7 +20,7 @@
 #include "IArchivable.h"
 
 // stl
-#include <cstdint>
+#include <cstddef>
 #include <memory>
 
 namespace ell

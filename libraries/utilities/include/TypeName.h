@@ -10,7 +10,7 @@
 
 // stl
 #include <cstdint>
-#include <cstdint>
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <vector>

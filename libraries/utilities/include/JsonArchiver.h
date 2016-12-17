@@ -16,6 +16,7 @@
 
 // stl
 #include <cstdint>
+#include <cstddef>
 #include <memory>
 #include <ostream>
 #include <sstream>

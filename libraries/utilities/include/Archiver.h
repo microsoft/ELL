@@ -15,6 +15,7 @@
 
 // stl
 #include <cstdint>
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>

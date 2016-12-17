@@ -21,7 +21,6 @@
 #include "DynamicMap.h"
 
 // stl
-#include <cstdint>
 #include <memory>
 #include <stdexcept>
 

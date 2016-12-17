@@ -16,7 +16,7 @@
 #include "CompressedIntegerList.h"
 
 // stl
-#include <cstdint>
+#include <cstddef>
 #include <initializer_list>
 #include <type_traits>
 #include <vector>

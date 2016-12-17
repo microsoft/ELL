@@ -9,7 +9,7 @@
 #pragma once
 
 // stl
-#include <cstdint>
+#include <cstddef>
 #include <stack>
 
 namespace ell

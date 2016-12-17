@@ -11,7 +11,7 @@
 #include "Layout.h"
 
 // stl
-#include <cstdint>
+#include <cstddef>
 #include <vector>
 
 namespace ell

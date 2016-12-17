@@ -19,7 +19,7 @@
 #include "Example.h"
 
 // stl
-#include <cstdint>
+#include <cstddef>
 #include <memory>
 
 namespace ell

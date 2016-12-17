@@ -17,7 +17,7 @@
 
 // stl
 #include <algorithm> // for std::swap
-#include <cstdint>
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 
