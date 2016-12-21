@@ -9,7 +9,6 @@
     <xsl:output method="text" omit-xml-declaration="yes" indent="no"/>
     <xsl:strip-space elements="*" />
 
-
     <!--
 
     SWIG's XML describes the interface in a highly structured way, 

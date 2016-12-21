@@ -32,8 +32,5 @@
   "gypfile": true,
   "dependencies": {
     "nan": "^2.4.0"
-  },
-  "devDependencies": {
-    "libxslt": "^0.6.3"
   }
 }
