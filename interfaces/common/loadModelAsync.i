@@ -14,6 +14,8 @@
 %}
 
 %{
+	namespace ELL_API
+	{
 	class LoadModelWorker : public Nan::AsyncWorker
 	{
 	public:
@@ -31,7 +33,7 @@
 		{
 			Nan::HandleScope scope;
 			// passing out a new pointer to JS world, why cant we send a copy??
-			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_model),  SWIGTYPE_p_ELL_Model, 0 | 0);
+			v8::Handle<v8::Value> jsresult = SWIG_NewPointerObj(SWIG_as_voidptr(&_model),  SWIGTYPE_p_ELL_API__ELL_Model, 0 | 0);
 			v8::Local<v8::Value> argv[] = { jsresult };
 			callback->Call(1, argv);
 		}
@@ -40,13 +42,16 @@
 		std::string _filename;
 		ELL_Model _model;
 	};
+	}
 %}
 
 %inline {
+	namespace ELL_API
+	{
     void ELL_ModelAsync(std::string filename, Callback doneCb)
     {
        auto doneCallback = doneCb.GetFunction();
        Nan::AsyncQueueWorker(new LoadModelWorker(doneCallback, filename));
     }
+	}
 }
-

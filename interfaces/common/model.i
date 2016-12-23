@@ -52,6 +52,8 @@
 
 %inline %{
 
+namespace ELL_API
+{
 //
 // Forward declartions
 //
@@ -837,4 +839,5 @@ ELL_Model ELL_LoadModelFromString(std::string str)
     return ELL_Model(model);
 }
 
+} // end namespace
 %}
