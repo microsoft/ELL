@@ -1,7 +1,7 @@
 var libxslt = require('libxslt');
 
-var xsltFilename = './test.xslt';
-var documentFilename = '';
+var xsltFilename = './generate-d-ts.xslt';
+var documentFilename = '../../../build/interfaces/xml/ELLXML_wrap.xml';
 libxslt.parseFile(xsltFilename, function (err, stylesheet) {
     if (err) {
         console.log(err);
