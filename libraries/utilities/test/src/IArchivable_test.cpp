@@ -210,7 +210,7 @@ void TestUnarchiver()
             auto in = g.AddNode<model::InputNode<double>>(3);
             auto constNode = g.AddNode<nodes::ConstantNode<double>>(constVector);
             auto binaryOpNode = g.AddNode<nodes::BinaryOperationNode<double>>(in->output, constNode->output, nodes::BinaryOperationType::add);
-            auto out = g.AddNode<model::OutputNode<double>>(in->output);
+            g.AddNode<model::OutputNode<double>>(in->output);
 
             archiver.Archive("node1", *constNode);
             archiver.Archive("node2", *in);

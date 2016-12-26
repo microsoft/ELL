@@ -30,7 +30,7 @@ namespace utilities
     /// <summary> Recursive base case with zero functions. Does nothing. </summary>
     inline void InOrderFunctionEvaluator() {}
 
-    /// <summary> Applies a single-argument function to each of a number of arguments. </summary>
+    /// <summary> Invokes a series of zero-argument functions. </summary>
     ///
     /// <param name="function"> The first function to evaluate </param>
     /// <param name="functions"> The rest of the functions to evaluate </param>

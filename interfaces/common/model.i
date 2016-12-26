@@ -597,12 +597,12 @@ ELL_Node ELL_NodeIterator::Get()
 
 #ifndef SWIG
 ELL_NodeIterator::ELL_NodeIterator(std::vector<const ell::model::Node*> nodes) : 
-    _nodes(nodes) , _i(0), _isVector(true), _iterator() 
+    _i(0), _isVector(true), _nodes(nodes), _iterator() 
 {
 }
 
 ELL_NodeIterator::ELL_NodeIterator(ell::model::NodeIterator& other) : 
-    _nodes(0), _i(0), _isVector(false), _iterator(other) 
+    _i(0), _isVector(false), _nodes(0), _iterator(other) 
 {
 }
 #endif
