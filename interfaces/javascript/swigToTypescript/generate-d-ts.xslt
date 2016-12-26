@@ -14,16 +14,8 @@
     *except* for types, which are encoded as mysterious strings like this
     "q(const).model::OutputPort&lt;(double)>" 
 
-    Parsing these strings is too much for XSLT's capabilities, so we've 
-    had to supplement vanilla XSLT with C# code. The embedded C# code
-    requires an XSLT engine that understands this embedding, hence the
-    LaunchXslt program, which uses .NET's powerful XSLT engine.
-
     -->
 <!--
-    <msxsl:script language="C#" implements-prefix="user">
-     <![CDATA[
-
     public static string TryRegexpPrefix(string regexp, string encodedType)
     {
         var nsRx = new System.Text.RegularExpressions.Regex(regexp);
@@ -77,12 +69,7 @@
 
         return "any /*!!!" + encodedType + "*/"; // This should not appear in the final file!
     }
-
-      ]]>
-    </msxsl:script>
     -->
-
-
 
     <xsl:template match="/">
 

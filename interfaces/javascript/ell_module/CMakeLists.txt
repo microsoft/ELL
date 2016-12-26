@@ -12,7 +12,7 @@ set (MODULE_FILES
     copyMacLib.sh
     copyLinuxLib.sh
     copyWindowsLib.cmd
-    ell.d.ts
+#    ell.d.ts
     ell_manual.d.ts
     index.d.ts
     index.js
@@ -35,7 +35,7 @@ if(NPM_EXECUTABLE)
     endif()
 
     add_custom_target(${PROJ_NAME}_files ALL
-        DEPENDS ${MODULE_FILES} 
+        DEPENDS ${MODULE_FILES} ell_module_d_ts
         COMMENT "Copying module files"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
