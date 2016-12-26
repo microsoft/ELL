@@ -109,7 +109,7 @@ public:
     ELL_InputPortBaseIterator(std::vector<ell::model::InputPortBase*> ports);
 #endif
 private:
-    int _i;
+    size_t _i;
     std::vector<ell::model::InputPortBase*> _ports;
 };
 
@@ -129,7 +129,7 @@ public:
     ELL_OutputPortBaseIterator(std::vector<ell::model::OutputPortBase*> ports);
 #endif
 private:
-    int _i;
+    size_t _i;
     std::vector<ell::model::OutputPortBase*> _ports;
 };
 
@@ -150,7 +150,7 @@ public:
     ELL_NodeIterator(ell::model::NodeIterator& other);
 #endif    
 private:
-    int _i;
+    size_t _i;
     bool _isVector;
     std::vector<const ell::model::Node*> _nodes;
     ell::model::NodeIterator _iterator;
