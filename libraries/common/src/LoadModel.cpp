@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LoadModel.h"
-#include "IsNodeCompilable.h"
 
 // model
 #include "DynamicMap.h"
@@ -141,7 +140,7 @@ namespace common
     model::Model GetRefinedTreeModel(size_t numSplits)
     {
         auto model = GetTreeModel(numSplits);
-        model::TransformContext context{ common::IsNodeCompilable() };
+        model::TransformContext context;
         model::ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(model, context);
         return refinedModel;

@@ -23,7 +23,7 @@ namespace model
     //
     TransformContext::TransformContext()
     {
-        _isNodeCompilableFunction = [](const Node& node) { return false; };
+        _isNodeCompilableFunction = [](const Node& node) { return node.IsCompilable(); };
     }
 
     TransformContext::TransformContext(const std::function<bool(const Node&)>& isNodeCompilable)

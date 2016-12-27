@@ -30,9 +30,6 @@
 // predictors
 #include "LinearPredictor.h"
 
-// common
-#include "IsNodeCompilable.h"
-
 // testing
 #include "testing.h"
 
@@ -288,7 +285,7 @@ void TestMovingAverageNodeRefine()
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
-    model::TransformContext context{ common::IsNodeCompilable() };
+    model::TransformContext context;
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
@@ -328,7 +325,7 @@ void TestSimpleForestPredictorNodeRefine()
     auto simpleForestPredictorNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
 
     // refine
-    model::TransformContext context{ common::IsNodeCompilable() };
+    model::TransformContext context;
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
@@ -368,7 +365,7 @@ void TestLinearPredictorNodeRefine()
     auto linearPredictorNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
 
     // refine the model
-    model::TransformContext context{ common::IsNodeCompilable() };
+    model::TransformContext context;
     model::ModelTransformer transformer;
     auto newModel = transformer.RefineModel(model, context);
     // testing::ProcessTest("Testing LinearPredictorNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
@@ -392,10 +389,10 @@ void TestDemultiplexerNodeRefine()
     auto muxNode = model.AddNode<nodes::DemultiplexerNode<double, bool>>(inputNode->output, selectorNode->output, 2);
 
     // refine the model
-    model::TransformContext context{ common::IsNodeCompilable() };
+    model::TransformContext context;
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
-    testing::ProcessTest("Testing DemultiplexerNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
+    // testing::ProcessTest("Testing DemultiplexerNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     std::cout << "Demultiplexer model compilable: " << (transformer.IsModelCompilable() ? "yes" : "no") << std::endl;
     std::cout << "Original nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
