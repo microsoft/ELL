@@ -368,7 +368,6 @@ void TestLinearPredictorNodeRefine()
     model::TransformContext context;
     model::ModelTransformer transformer;
     auto newModel = transformer.RefineModel(model, context);
-    // testing::ProcessTest("Testing LinearPredictorNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     // check for equality
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
@@ -392,7 +391,6 @@ void TestDemultiplexerNodeRefine()
     model::TransformContext context;
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
-    // testing::ProcessTest("Testing DemultiplexerNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     std::cout << "Demultiplexer model compilable: " << (transformer.IsModelCompilable() ? "yes" : "no") << std::endl;
     std::cout << "Original nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
