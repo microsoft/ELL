@@ -31,7 +31,7 @@ if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
     add_custom_target(${PROJ_NAME} ALL
                     COMMAND ${NPM_EXECUTABLE} run run generate-d-ts.xslt ${CMAKE_CURRENT_BINARY_DIR}/../../xml/ELLXML_wrap.xml ${CMAKE_CURRENT_BINARY_DIR}/../ell_module/ell.d.ts
                     DEPENDS ELL_xml ${PROJ_NAME}_install
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Creating .d.ts files"
                     VERBATIM)
 
