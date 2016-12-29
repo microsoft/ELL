@@ -290,10 +290,7 @@ void TestMovingAverageNodeRefine()
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ meanNode->output });
-
-    std::cout << "MovingAverage model compilable: " << (transformer.IsModelCompilable() ? "yes" : "no") << std::endl;
     std::cout << "Original nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
-
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
@@ -332,7 +329,6 @@ void TestSimpleForestPredictorNodeRefine()
     auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestPredictorNode->output });
     auto refinedTreeOutputsElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ simpleForestPredictorNode->treeOutputs });
     auto refinedEdgeIndicatorVectorElements = transformer.GetCorrespondingOutputs(model::PortElements<bool>{ simpleForestPredictorNode->edgeIndicatorVector });
-    // testing::ProcessTest("Testing SimpleForestPredictorNode compilable", testing::IsEqual(transformer.IsModelCompilable(), true));
 
     // check equivalence
     inputNode->SetInput({ 0.18, 0.5, 0.0 });
@@ -391,10 +387,7 @@ void TestDemultiplexerNodeRefine()
     model::TransformContext context;
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
-
-    std::cout << "Demultiplexer model compilable: " << (transformer.IsModelCompilable() ? "yes" : "no") << std::endl;
     std::cout << "Original nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
-
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newSelectorNode = transformer.GetCorrespondingInputNode(selectorNode);
     auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output);
