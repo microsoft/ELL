@@ -12,7 +12,6 @@ set (MODULE_FILES
     copyMacLib.sh
     copyLinuxLib.sh
     copyWindowsLib.cmd
-#    ell.d.ts
     ell_manual.d.ts
     index.d.ts
     index.js

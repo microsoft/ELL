@@ -15,61 +15,6 @@
     "q(const).model::OutputPort&lt;(double)>" 
 
     -->
-<!--
-    public static string TryRegexpPrefix(string regexp, string encodedType)
-    {
-        var nsRx = new System.Text.RegularExpressions.Regex(regexp);
-        var m = nsRx.Match(encodedType);
-        if (m.Success) return m.Groups[1].Value;
-        return null;
-    }
-
-    // This method is horribly heuristic based on the mix of types we use in ELL.
-    // We could invest in really learning SWIG's weird string syntax, but is it worth it?
-    //
-    public static string TranslateType(string encodedType)
-    {
-        var ltIndex = encodedType.IndexOf("<(");
-        if (ltIndex >= 0) // it's a template instance
-        {
-            var typeName = TranslateType(encodedType.Substring(0, ltIndex));
-            var gtIndex = encodedType.LastIndexOf(")>");
-            var parmStrings = encodedType.Substring(ltIndex + 2, gtIndex - ltIndex - 2).Split(',');
-            var parms = new string[parmStrings.Length];
-            for (int i=0; i<parms.Length; i++)
-              parms[i] = TranslateType(parmStrings[i]);
-            return typeName + "<" + String.Join(",", parms) + ">";
-        }
-
-        var rest = 
-            TryRegexpPrefix(@"r\.q\(const\)\.(.*)", encodedType) ??
-            TryRegexpPrefix(@"q\(const\)\.(.*)", encodedType) ??
-            TryRegexpPrefix(@"r\.(.*)", encodedType) ??
-            TryRegexpPrefix(@"z\.(.*)", encodedType) ??
-            TryRegexpPrefix("^[A-Za-z0-9]+::(.*)", encodedType);
-        if (rest != null) return TranslateType(rest);
-
-        switch (encodedType)
-        {
-            case "void": return "void";
-            case "bool": return "boolean";
-            case "char": return "number";
-            case "short": return "number";
-            case "int": return "number";
-            case "float": return "number";
-            case "double": return "number";
-            case "uint64_t": return "number";
-            case "size_t": return "number";
-            case "string": return "string";
-            case "nullptr_t": return "any";
-        }
-
-        var ident = TryRegexpPrefix("^([A-Za-z0-9_]+)$", encodedType);
-        if (ident != null) return ident;
-
-        return "any /*!!!" + encodedType + "*/"; // This should not appear in the final file!
-    }
-    -->
 
     <xsl:template match="/">
 
@@ -277,7 +222,6 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
             <xsl:text>export class </xsl:text>
             <xsl:value-of select="attribute[@name='sym_name']/@value"/>
             <xsl:text> extends </xsl:text>
-            <!-- NOTE: I could find no built-in functions for getting the info needed, so I had to rely on scripting. -->
             <xsl:call-template name="TranslateType">
                 <xsl:with-param name="value">
                     <xsl:value-of select="attribute[@name='type']/@value"/>
@@ -308,7 +252,6 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
                 <xsl:if test="position() != 1"><xsl:text>, </xsl:text></xsl:if>
                 <xsl:value-of select="attributelist/attribute[@name='name']/@value"/>
                 <xsl:text>: </xsl:text>
-                <!--<xsl:value-of select="user:TranslateType(attributelist/attribute[@name='type']/@value)"/>-->
                 <xsl:call-template name="TranslateType">
                     <xsl:with-param name="value">
                         <xsl:value-of select="attributelist/attribute[@name='type']/@value"/>
@@ -316,7 +259,6 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
                 </xsl:call-template>
             </xsl:for-each>
             <xsl:text>): </xsl:text>
-            <!--<xsl:value-of select="user:TranslateType(attribute[@name='type']/@value)"/>-->
             <xsl:call-template name="TranslateType">
                 <xsl:with-param name="value">
                     <xsl:value-of select="attribute[@name='type']/@value"/>
@@ -381,6 +323,7 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
         </xsl:choose>
     </xsl:template>
 
+    <!-- strip the weird SWIG decorations and namespace qualifiers from type names -->
     <xsl:template name="StripDecoration">
         <xsl:param name="value"/>
         <xsl:variable name="result">
@@ -418,6 +361,7 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
         </xsl:choose>
     </xsl:template>
 
+    <!-- template parameter lists -->
     <xsl:template name="TransformTemplateContents">
         <xsl:param name="value"/>
 
@@ -445,6 +389,7 @@ export type shared_ptr&lt;T&gt; = T; // Is this right?
         </xsl:choose>
     </xsl:template>
 
+    <!-- XSL template to convert SWIG-formatted types to typescript -->
     <xsl:template name="TranslateType">
         <xsl:param name="value"/>
 
