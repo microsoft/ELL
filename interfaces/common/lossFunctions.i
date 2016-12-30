@@ -15,6 +15,9 @@
 
 %inline %{
 
+namespace ELL_API
+{
+
 class ELL_LogLoss {
 public:
     double Evaluate(double p, double l) { return _loss.Evaluate(p,l); }
@@ -52,4 +55,5 @@ private:
     ell::lossFunctions::SquaredLoss _loss;
 };
 
+} // end namespace
 %}
