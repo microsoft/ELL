@@ -83,8 +83,6 @@ namespace model
         _context = context;
         _model = oldModel;
 
-        int iterationCount = 0;
-
         // refine until all nodes are compilable according to context.IsNodeCompilable(), until
         // the model is fully refined, or until the maximum number of iterations is reached.
         for (int i = 0; i < maxIterations; ++i)

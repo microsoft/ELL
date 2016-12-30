@@ -109,7 +109,7 @@ public:
     ELL_InputPortBaseIterator(std::vector<ell::model::InputPortBase*> ports);
 #endif
 private:
-    int _i;
+    size_t _i;
     std::vector<ell::model::InputPortBase*> _ports;
 };
 
@@ -129,7 +129,7 @@ public:
     ELL_OutputPortBaseIterator(std::vector<ell::model::OutputPortBase*> ports);
 #endif
 private:
-    int _i;
+    size_t _i;
     std::vector<ell::model::OutputPortBase*> _ports;
 };
 
@@ -150,7 +150,7 @@ public:
     ELL_NodeIterator(ell::model::NodeIterator& other);
 #endif    
 private:
-    int _i;
+    size_t _i;
     bool _isVector;
     std::vector<const ell::model::Node*> _nodes;
     ell::model::NodeIterator _iterator;
@@ -597,12 +597,12 @@ ELL_Node ELL_NodeIterator::Get()
 
 #ifndef SWIG
 ELL_NodeIterator::ELL_NodeIterator(std::vector<const ell::model::Node*> nodes) : 
-    _nodes(nodes) , _i(0), _isVector(true), _iterator() 
+    _i(0), _isVector(true), _nodes(nodes), _iterator() 
 {
 }
 
 ELL_NodeIterator::ELL_NodeIterator(ell::model::NodeIterator& other) : 
-    _nodes(0), _i(0), _isVector(false), _iterator(other) 
+    _i(0), _isVector(false), _nodes(0), _iterator(other) 
 {
 }
 #endif

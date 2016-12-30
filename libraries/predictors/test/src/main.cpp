@@ -19,7 +19,6 @@ void ForestPredictorTest()
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
     using SplitRule = predictors::SingleElementThresholdPredictor;
     using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
-    using NodeId = predictors::SimpleForestPredictor::SplittableNodeId;
 
     // add a tree
     predictors::SimpleForestPredictor forest;

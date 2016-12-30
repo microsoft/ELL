@@ -231,8 +231,6 @@ namespace treeLayout
     template <typename ChildrenVectorType>
     void QpLayoutGenerator::ComputeGradient(const ChildrenVectorType& Children, const std::vector<double>& offsets, const std::vector<size_t>& depths, double step_size, std::vector<double>& grad)
     {
-        size_t num_nodes = Children.size() * 2 + 1;
-
         for (size_t i = 0; i < Children.size(); ++i)
         {
             size_t child0 = Children[i].GetChild0();
@@ -242,7 +240,6 @@ namespace treeLayout
             double child0_offset = offsets[child0];
             double child1_offset = offsets[child1];
 
-            double max_depth = (double)_layers.size();
             double spring_coeff = (1.0 + pow(depths[i], _parameters.spring_coeff_growth));
 
             double spring0_len = (parent_offset - child0_offset);

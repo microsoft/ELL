@@ -97,7 +97,6 @@ int main(int argc, char* argv[])
         }
 
         // load map
-        size_t numColumns = dataLoadArguments.parsedDataDimension;
         mapLoadArguments.defaultInputSize = dataLoadArguments.parsedDataDimension;
         model::DynamicMap map = common::LoadMap(mapLoadArguments);
 

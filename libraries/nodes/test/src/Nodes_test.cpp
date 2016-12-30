@@ -81,15 +81,6 @@ namespace
         }
         return var / vec.size();
     }
-
-    std::ostream& operator<<(std::ostream& out, const std::vector<double> array)
-    {
-        out << "[";
-        for (auto x : array)
-            out << x << "  ";
-        out << "]";
-        return out;
-    }
 }
 
 //
@@ -261,7 +252,7 @@ void TestLinearPredictorNodeCompute()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(dim);
-    auto predNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
+    model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
 }
 
 void TestDemultiplexerNodeCompute()

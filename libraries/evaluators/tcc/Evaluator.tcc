@@ -8,6 +8,9 @@
 
 #include "BinaryErrorAggregator.h"
 
+// utilities
+#include "FunctionUtils.h"
+
 namespace ell
 {
 namespace evaluators
@@ -126,8 +129,7 @@ namespace evaluators
     void Evaluator<PredictorType, AggregatorTypes...>::DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Sequence...>)
     {
         // Call (X.Update(), 0) for each X in _aggregatorTuple
-        // The ',0' above is due to the fact that Update returns void
-        auto dummy = { (std::get<Sequence>(_aggregatorTuple).Update(prediction, label, weight), 0)... };
+        utilities::InOrderFunctionEvaluator([this, &prediction, &label, &weight](){std::get<Sequence>(_aggregatorTuple).Update(prediction, label, weight);}...);
     }
 
     template <typename PredictorType, typename... AggregatorTypes>
@@ -138,7 +140,7 @@ namespace evaluators
         _values.push_back({ std::get<Sequence>(_aggregatorTuple).GetResult()... });
 
         // Call X.Reset() for each X in _aggregatorTuple
-        auto dummy = { (std::get<Sequence>(_aggregatorTuple).Reset(), 0)... };
+        utilities::InOrderFunctionEvaluator([this](){std::get<Sequence>(_aggregatorTuple).Reset();}...);
     }
 
     template <typename PredictorType, typename... AggregatorTypes>
