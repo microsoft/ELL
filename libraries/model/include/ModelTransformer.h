@@ -34,6 +34,17 @@ namespace model
     template <typename ValueType>
     class InputNode;
 
+    /// <summary> An action to perform on a node during transformation (refinement/compilation)
+    enum class NodeAction
+    {
+        defaultAction,
+        refine,
+        compile        
+    };
+
+    /// <summary> A function that determines how to process a node </summary>
+    typedef std::function<NodeAction(const Node&)> NodeActionFunction;
+
     /// <summary> A context object that carries information about the compiler or other process driving the transformation. </summary>
     class TransformContext
     {
@@ -43,8 +54,8 @@ namespace model
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name='IsNodeCompilable'> A function that indicates which nodes are compilable </param>
-        TransformContext(const std::function<bool(const Node&)>& isNodeCompilable);
+        /// <param name='nodeActionFunction'> A function that indicates how to override the default refinement or compilation of a node </param>
+        TransformContext(const NodeActionFunction& nodeActionFunction);
 
         /// <summary> Indicates if a node is compilable. </summary>
         ///
@@ -52,8 +63,14 @@ namespace model
         /// <returns> Returns true if the node is compilable. </returns>
         bool IsNodeCompilable(const Node& node) const;
 
+        /// <summary> Gets the action to take on the node during refinement </summary>
+        ///
+        /// <param name="node"> A node. </param>
+        /// <returns> A `NodeAction` enum indicating what action to take on the node </returns>
+        NodeAction GetNodeAction(const Node& node) const;
+
     private:
-        std::function<bool(const Node&)> _isNodeCompilableFunction;
+        NodeActionFunction _nodeActionFunction;
     };
 
     /// <summary> A class that refines or copies models </summary>

@@ -302,7 +302,7 @@ public:
     ELL_TransformContext();
     ~ELL_TransformContext();
 #ifndef SWIG
-//    ELL_TransformContext(const std::function<bool(const Node&)>& isNodeCompilable);
+//    ELL_TransformContext(const model::NodeActionFunction& isNodeCompilable);
 #endif
 private:
     ell::model::TransformContext _context;
@@ -318,7 +318,7 @@ ELL_TransformContext::~ELL_TransformContext()
 
 
 #ifndef SWIG
-//ELL_TransformContext(const std::function<bool(const Node&)>& isNodeCompilable) :
+//ELL_TransformContext(const model::NodeActionFunction& isNodeCompilable) :
 //    _context(isNodeCompilable)
 //{
 //}

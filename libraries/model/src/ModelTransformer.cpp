@@ -21,19 +21,33 @@ namespace model
     //
     // TransformContext implementation
     //
-    TransformContext::TransformContext()
+    TransformContext::TransformContext() : _nodeActionFunction(nullptr)
     {
-        _isNodeCompilableFunction = [](const Node& node) { return node.IsCompilable(); };
     }
 
-    TransformContext::TransformContext(const std::function<bool(const Node&)>& isNodeCompilable)
-        : _isNodeCompilableFunction(isNodeCompilable)
+    TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction)
+        : _nodeActionFunction(nodeActionFunction)
     {
     }
 
     bool TransformContext::IsNodeCompilable(const Node& node) const
     {
-        return _isNodeCompilableFunction(node);
+        return node.IsCompilable();
+    }
+
+    NodeAction TransformContext::GetNodeAction(const Node& node) const
+    {
+        auto action = NodeAction::defaultAction;
+        if(_nodeActionFunction)
+        {
+            action = _nodeActionFunction(node);
+        }
+
+        if(action == NodeAction::defaultAction)
+        {
+            action = node.IsCompilable() ? NodeAction::compile : NodeAction::refine;
+        }
+        return action;
     }
 
     //
@@ -97,8 +111,13 @@ namespace model
 
             // one refinement pass
             bool didRefineAny = false;
-            currentModel.Visit([this, &didRefineAny](const Node& node) {
-                bool didRefineNode = node.InvokeRefine(*this);
+            currentModel.Visit([this, &context, &didRefineAny](const Node& node) {
+                bool didRefineNode = false;
+                auto action = context.GetNodeAction(node);
+                if(action == NodeAction::refine)
+                {
+                    didRefineNode = node.InvokeRefine(*this);
+                }
                 didRefineAny |= didRefineNode;
             });
 
