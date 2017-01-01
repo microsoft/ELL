@@ -19,6 +19,7 @@ set (SRC src/Archiver.cpp
          src/Files.cpp
          src/Format.cpp
          src/IArchivable.cpp
+         src/IndentedTextWriter.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
          src/JsonArchiver.cpp
@@ -45,6 +46,7 @@ set (INCLUDE include/AbstractInvoker.h
              include/FunctionUtils.h
              include/IArchivable.h
              include/IIterator.h
+             include/IndentedTextWriter.h
              include/IntegerList.h
              include/IntegerStack.h
              include/JsonArchiver.h
