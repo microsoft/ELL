@@ -63,6 +63,11 @@ namespace model
         /// <returns> Returns true if the node is compilable. </returns>
         bool IsNodeCompilable(const Node& node) const;
 
+        /// <summary> Adds a custom node action function to call during refinement </summary>
+        ///
+        /// <param name='nodeActionFunction'> A function that indicates how to override the default refinement or compilation of a node </param>
+        void SetNodeActionFunction(const NodeActionFunction& nodeActionFunction);
+
         /// <summary> Gets the action to take on the node during refinement </summary>
         ///
         /// <param name="node"> A node. </param>

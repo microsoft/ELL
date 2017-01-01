@@ -26,4 +26,5 @@ void TestInputRouting2();
 void TestCopyModel();
 
 void TestRefineSplitOutputs();
+void TestCustomRefine();
 }

@@ -35,6 +35,11 @@ namespace model
         return node.IsCompilable();
     }
 
+    void TransformContext::SetNodeActionFunction(const NodeActionFunction& nodeActionFunction) 
+    {
+        _nodeActionFunction = nodeActionFunction;
+    }
+
     NodeAction TransformContext::GetNodeAction(const Node& node) const
     {
         auto action = NodeAction::defaultAction;
