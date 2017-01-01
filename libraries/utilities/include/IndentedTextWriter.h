@@ -92,7 +92,7 @@ namespace utilities
         /// <summary> Return the precision with which doubles are serialized. Default is 17. </summary>
         ///
         /// <returns> The precision. </returns>
-        uint32_t GetPrecision() const { return _buffer.precision(); }
+        size_t GetPrecision() const { return _buffer.precision(); }
 
         /// <summary> Set the precision with which doubles are serialized. </summary>
         ///
