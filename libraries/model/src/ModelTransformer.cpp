@@ -21,13 +21,13 @@ namespace model
     //
     // TransformContext implementation
     //
-    TransformContext::TransformContext() : _nodeActionFunction(nullptr)
+    TransformContext::TransformContext()
     {
     }
 
     TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction)
-        : _nodeActionFunction(nodeActionFunction)
     {
+        _nodeActionFunctions.emplace_back(nodeActionFunction);
     }
 
     bool TransformContext::IsNodeCompilable(const Node& node) const
@@ -35,24 +35,22 @@ namespace model
         return node.IsCompilable();
     }
 
-    void TransformContext::SetNodeActionFunction(const NodeActionFunction& nodeActionFunction) 
+    void TransformContext::AddNodeActionFunction(const NodeActionFunction& nodeActionFunction) 
     {
-        _nodeActionFunction = nodeActionFunction;
+        _nodeActionFunctions.emplace_back(nodeActionFunction);
     }
 
     NodeAction TransformContext::GetNodeAction(const Node& node) const
     {
-        auto action = NodeAction::defaultAction;
-        if(_nodeActionFunction)
+        for(auto& actionFunction: _nodeActionFunctions)
         {
-            action = _nodeActionFunction(node);
+            auto action = actionFunction(node);
+            if(action != NodeAction::defaultAction)
+            {
+                return action;
+            }
         }
-
-        if(action == NodeAction::defaultAction)
-        {
-            action = node.IsCompilable() ? NodeAction::compile : NodeAction::refine;
-        }
-        return action;
+        return node.IsCompilable() ? NodeAction::compile : NodeAction::refine;
     }
 
     //
@@ -119,9 +117,14 @@ namespace model
             currentModel.Visit([this, &context, &didRefineAny](const Node& node) {
                 bool didRefineNode = false;
                 auto action = context.GetNodeAction(node);
-                if(action == NodeAction::refine)
+                // If the node action is "refine" or the default, try to refine the node, otherwise leave it alone
+                if(action == NodeAction::refine || action == NodeAction::defaultAction)
                 {
                     didRefineNode = node.InvokeRefine(*this);
+                }
+                else
+                {
+                    node.InvokeCopy(*this);
                 }
                 didRefineAny |= didRefineNode;
             });

@@ -402,22 +402,19 @@ void TestCustomRefine()
     // Create a simple computation model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(2);
-    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{1.0, 2.0});
-    auto outputNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
+    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0 });
+    model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
 
     model::ModelTransformer transformer;
-    model::TransformContext context;
-
-    context.SetNodeActionFunction([](const model::Node& node) { 
-    return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::defaultAction : model::NodeAction::refine; }
-        );
-    auto model1 = transformer.RefineModel(model, context);
-
-    context.SetNodeActionFunction([](const model::Node& node) { 
-    return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::defaultAction : model::NodeAction::compile; }
-        );
-    auto model2 = transformer.RefineModel(model, context);
-
-    testing::ProcessTest("testing custom refine function", model1.Size() == 4 && model2.Size() == 2);
+    model::TransformContext context1;
+    context1.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::defaultAction : model::NodeAction::refine; });
+    auto model1 = transformer.RefineModel(model, context1);
+    auto size1 = model1.Size();
+    
+    model::TransformContext context2;
+    context2.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::defaultAction : model::NodeAction::compile; });
+    auto model2 = transformer.RefineModel(model, context2);
+    auto size2 = model2.Size();
+    testing::ProcessTest("testing custom refine function", model1.Size() == 4 && model2.Size() == 3);
 }
 }
