@@ -112,7 +112,7 @@ namespace utilities
         return *this;
     }
 
-    void IndentedTextWriter::SetPrecision(uint32_t precision) 
+    void IndentedTextWriter::SetPrecision(size_t precision) 
     {
         _buffer.precision(precision);
     }

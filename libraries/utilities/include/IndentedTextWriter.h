@@ -97,7 +97,7 @@ namespace utilities
         /// <summary> Set the precision with which doubles are serialized. </summary>
         ///
         /// <param name="precision"> The precision. </param>
-        void SetPrecision(uint32_t precision);
+        void SetPrecision(size_t precision);
 
     private:
         void WriteIndent();
