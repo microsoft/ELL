@@ -9,9 +9,9 @@
                     'include_path_prefix%': '../../../..',
                     'library_path_prefix%': '../../../..',
                     'library_path_suffix%': '/Release',
-                    'llvm_include_path': '../../../../private/binaries/llvm/include',
+                    'llvm_include_path': '@LLVM_INCLUDE_DIRS@',
                     'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
-                    'llvm_library_path': '../../../../private/binaries/llvm/Rel/lib'
+                    'llvm_library_path': '@LLVM_LIBRARY_DIRS@',
                 },
             }
         ],
