@@ -5,23 +5,26 @@ if(MSVC)
     set (LLVM_PACKAGE_NAME LLVMNativeLibraries)
     set (LLVM_PACKAGE_VERSION 3.9.0)
     set (LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})
+
     # Get LLVM libraries via NuGet if we're on Windows
     find_program(NUGET nuget)
-    if(NOT NUGET)
-        message(FATAL "Can't find NuGet, and can't install LLVM")
-        set(FOUND_LLVM FALSE)
-    else()
+    if(NUGET)
         message(STATUS "Installing LLVM NuGet package")
         execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -source ${PACKAGE_SOURCE} -outputdirectory ${CMAKE_SOURCE_DIR}/packages)
-        set(LLVM_INCLUDEROOT ${LLVM_PACKAGE_DIR}/build/native/include)
-        set(LLVM_LIBROOT_DEBUG ${LLVM_PACKAGE_DIR}/build/native/lib/Debug)
-        set(LLVM_LIBROOT_RELEASE ${LLVM_PACKAGE_DIR}/build/native/lib/Release)
+    endif()
+        
+    set(LLVM_INCLUDEROOT ${LLVM_PACKAGE_DIR}/build/native/include)
+    set(LLVM_LIBROOT_DEBUG ${LLVM_PACKAGE_DIR}/build/native/lib/Debug)
+    set(LLVM_LIBROOT_RELEASE ${LLVM_PACKAGE_DIR}/build/native/lib/Release)
 
+    # Mirror variables used by LLVM's cmake find module
+    set(LLVM_LIBRARY_DIRS ${LLVM_LIBROOT_RELEASE})
+    set(LLVM_INCLUDE_DIRS ${LLVM_INCLUDEROOT})
+
+    if(EXISTS ${LLVM_INCLUDEROOT})
         set(LLVM_FOUND TRUE)
-
-        # Mirror variables used by LLVM's cmake find module
-        set(LLVM_LIBRARY_DIRS ${LLVM_LIBROOT_RELEASE})
-        set(LLVM_INCLUDE_DIRS ${LLVM_INCLUDEROOT})
+    else()
+        set(LLVM_FOUND FALSE)
     endif()
 endif()
 
