@@ -40,8 +40,8 @@ if(LLVM_FOUND)
 
         # Warnings that must be disabled. See LLVM documentation. 
         add_compile_options(/D_SCL_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_WARNINGS)
-        add_compile_options( /wd4141 /wd4146 /wd4180 /wd4244 /wd4258 /wd4267 /wd4291 /wd4345 /wd4351 /wd4355 /wd4456 /wd4457 /wd4458 /wd4459 /wd4503 /wd4624 /wd4722 /wd4800 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702 /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4805 /wd4204 /wd4577 /wd4091 /wd4592 /wd4319 /wd4324 /wd4996)
-        add_compile_options( /wd4996)
+        add_compile_options(/wd4141 /wd4146 /wd4180 /wd4244 /wd4258 /wd4267 /wd4291 /wd4345 /wd4351 /wd4355 /wd4456 /wd4457 /wd4458 /wd4459 /wd4503 /wd4624 /wd4722 /wd4800 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702 /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4805 /wd4204 /wd4577 /wd4091 /wd4592 /wd4319 /wd4324 /wd4996)
+        add_compile_options(/wd4996)
     endif()
 
     # LLVM Include files are here
@@ -53,39 +53,32 @@ if(LLVM_FOUND)
 
     link_directories(${LLVM_LIBROOT_DEBUG}) ## TODO: Why only debug?
 
-    ## TODO:
+   set (LLVM_LIBS
 
-    #=====================
-    # LLVM static Libraries
-    #=====================
-
-   set (LLVM_LIBRARIES
+        # Core libs
         LLVMAnalysis
         LLVMAsmParser
+        LLVMBitWriter
         LLVMCore
         LLVMSupport
-        LLVMBitWriter
 
         # Optimizer libs
         LLVMInstCombine
-        LLVMTransformUtils
         LLVMScalarOpts
+        LLVMTransformUtils
 
         # Jitter libs
-        LLVMExecutionEngine
-        LLVMRuntimeDyld
-        LLVMObject
-
-
-
+        LLVMAsmPrinter
         LLVMBitReader
         LLVMCodeGen
-        LLVMAsmPrinter
         LLVMDebugInfoCodeView
+        LLVMExecutionEngine
         LLVMMC
         LLVMMCDisassembler
         LLVMMCJIT
         LLVMMCParser
+        LLVMObject
+        LLVMRuntimeDyld
         LLVMSelectionDAG
         LLVMTarget
         LLVMX86AsmPrinter
@@ -95,87 +88,10 @@ if(LLVM_FOUND)
         LLVMX86Utils
    )
 
-    foreach(LIBRARY ${LLVM_LIBRARIES})
+    foreach(LIBRARY ${LLVM_LIBS})
         add_library(${LIBRARY} STATIC IMPORTED)
         set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/${LIBRARY}.lib)
         set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
     endforeach()
 
-    #=====================
-    # Jitter Libs
-    #=====================
-
-    add_library(LLVMExecutionEngine STATIC IMPORTED)
-    set_property(TARGET LLVMExecutionEngine PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMExecutionEngine.lib)
-    set_property(TARGET LLVMExecutionEngine PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMExecutionEngine.lib)
-
-    add_library(LLVMRuntimeDyld STATIC IMPORTED)
-    set_property(TARGET LLVMRuntimeDyld PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMRuntimeDyld.lib)
-    set_property(TARGET LLVMRuntimeDyld PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMRuntimeDyld.lib)
-
-    add_library(LLVMObject STATIC IMPORTED)
-    set_property(TARGET LLVMObject PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMObject.lib)
-    set_property(TARGET LLVMObject PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMObject.lib)
-
-    add_library(LLVMMC STATIC IMPORTED)
-    set_property(TARGET LLVMMC PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMMC.lib)
-    set_property(TARGET LLVMMC PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMMC.lib)
-
-    add_library(LLVMTarget STATIC IMPORTED)
-    set_property(TARGET LLVMTarget PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMTarget.lib)
-    set_property(TARGET LLVMTarget PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMTarget.lib)
-
-    add_library(LLVMMCParser STATIC IMPORTED)
-    set_property(TARGET LLVMMCParser PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMMCParser.lib)
-    set_property(TARGET LLVMMCParser PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMMCParser.lib)
-
-    add_library(LLVMBitReader STATIC IMPORTED)
-    set_property(TARGET LLVMBitReader PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMBitReader.lib)
-    set_property(TARGET LLVMBitReader PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMBitReader.lib)
-
-    add_library(LLVMCodeGen STATIC IMPORTED)
-    set_property(TARGET LLVMCodeGen PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMCodeGen.lib)
-    set_property(TARGET LLVMCodeGen PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMCodeGen.lib)
-
-    add_library(LLVMSelectionDAG STATIC IMPORTED)
-    set_property(TARGET LLVMSelectionDAG PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMSelectionDAG.lib)
-    set_property(TARGET LLVMSelectionDAG PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMSelectionDAG.lib)
-
-    add_library(LLVMAsmPrinter STATIC IMPORTED)
-    set_property(TARGET LLVMAsmPrinter PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMAsmPrinter.lib)
-    set_property(TARGET LLVMAsmPrinter PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMAsmPrinter.lib)
-
-    add_library(LLVMX86CodeGen STATIC IMPORTED)
-    set_property(TARGET LLVMX86CodeGen PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMX86CodeGen.lib)
-    set_property(TARGET LLVMX86CodeGen PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMX86CodeGen.lib)
-
-    add_library(LLVMX86Info STATIC IMPORTED)
-    set_property(TARGET LLVMX86Info PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMX86Info.lib)
-    set_property(TARGET LLVMX86Info PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMX86Info.lib)
-
-    add_library(LLVMX86Desc STATIC IMPORTED)
-    set_property(TARGET LLVMX86Desc PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMX86Desc.lib)
-    set_property(TARGET LLVMX86Desc PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMX86Desc.lib)
-
-    add_library(LLVMX86Utils STATIC IMPORTED)
-    set_property(TARGET LLVMX86Utils PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMX86Utils.lib)
-    set_property(TARGET LLVMX86Utils PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMX86Utils.lib)
-
-    add_library(LLVMX86AsmPrinter STATIC IMPORTED)
-    set_property(TARGET LLVMX86AsmPrinter PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMX86AsmPrinter.lib)
-    set_property(TARGET LLVMX86AsmPrinter PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMX86AsmPrinter.lib)
-
-    add_library(LLVMMCDisassembler STATIC IMPORTED)
-    set_property(TARGET LLVMMCDisassembler PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMMCDisassembler.lib)
-    set_property(TARGET LLVMMCDisassembler PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMMCDisassembler.lib)
-
-    add_library(LLVMDebugInfoCodeView STATIC IMPORTED)
-    set_property(TARGET LLVMDebugInfoCodeView PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMDebugInfoCodeView.lib)
-    set_property(TARGET LLVMDebugInfoCodeView PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMDebugInfoCodeView.lib)
-
-    add_library(LLVMMCJIT STATIC IMPORTED)
-    set_property(TARGET LLVMMCJIT PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMMCJIT.lib)
-    set_property(TARGET LLVMMCJIT PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMMCJIT.lib)
-
-    set(LLVM_LIBS LLVMCore LLVMAnalysis LLVMAsmParser LLVMSupport LLVMBitWriter LLVMInstCombine LLVMTransformUtils LLVMScalarOpts LLVMExecutionEngine LLVMRuntimeDyld LLVMObject LLVMMC LLVMTarget LLVMMCParser LLVMBitReader LLVMCodeGen LLVMSelectionDAG LLVMAsmPrinter LLVMX86CodeGen LLVMX86Info LLVMX86Desc LLVMX86Utils LLVMX86AsmPrinter LLVMMCDisassembler LLVMDebugInfoCodeView LLVMMCJIT)
 endif()
