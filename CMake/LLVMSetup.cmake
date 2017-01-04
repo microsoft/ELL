@@ -26,11 +26,8 @@ if(MSVC)
     else()
         set(LLVM_FOUND FALSE)
     endif()
-endif()
 
-if(LLVM_FOUND)
-
-    if(MSVC)
+    if(LLVM_FOUND)
         # Required to compile against LLVM libraries. See LLVM documentation
         if(${CMAKE_GENERATOR_TOOLSET} MATCHES "clang")
             message(STATUS "Using clang toolset")
@@ -42,56 +39,75 @@ if(LLVM_FOUND)
         add_compile_options(/D_SCL_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_WARNINGS)
         add_compile_options(/wd4141 /wd4146 /wd4180 /wd4244 /wd4258 /wd4267 /wd4291 /wd4345 /wd4351 /wd4355 /wd4456 /wd4457 /wd4458 /wd4459 /wd4503 /wd4624 /wd4722 /wd4800 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702 /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4805 /wd4204 /wd4577 /wd4091 /wd4592 /wd4319 /wd4324 /wd4996)
         add_compile_options(/wd4996)
+
+        # LLVM Include files are here
+        include_directories(${LLVM_INCLUDEROOT})
+        include_directories(${LLVM_INCLUDEROOT}/llvm)
+        include_directories(${LLVM_INCLUDEROOT}/Support)
+        include_directories(${LLVM_INCLUDEROOT}/machine) ## TODO: This doesn't exist, remove?
+        include_directories(${LLVM_INCLUDEROOT}/IR)
+
+        link_directories(${LLVM_LIBROOT_DEBUG}) ## TODO: Why only debug?
+
+        set (LLVM_LIBS
+
+                # Core libs
+                LLVMAnalysis
+                LLVMAsmParser
+                LLVMBitWriter
+                LLVMCore
+                LLVMSupport
+
+                # Optimizer libs
+                LLVMInstCombine
+                LLVMScalarOpts
+                LLVMTransformUtils
+
+                # Jitter libs
+                LLVMAsmPrinter
+                LLVMBitReader
+                LLVMCodeGen
+                LLVMDebugInfoCodeView
+                LLVMExecutionEngine
+                LLVMMC
+                LLVMMCDisassembler
+                LLVMMCJIT
+                LLVMMCParser
+                LLVMObject
+                LLVMRuntimeDyld
+                LLVMSelectionDAG
+                LLVMTarget
+                LLVMX86AsmPrinter
+                LLVMX86CodeGen
+                LLVMX86Desc
+                LLVMX86Info
+                LLVMX86Utils
+        )
+
+        foreach(LIBRARY ${LLVM_LIBS})
+            add_library(${LIBRARY} STATIC IMPORTED)
+            set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/${LIBRARY}.lib)
+            set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
+        endforeach()
+
     endif()
+else() # Non-Windows: use LLVM's cmake module
+    #
+    # Documentation on CMake LLVM package:
+    # http://llvm.org/releases/3.7.0/docs/CMake.html
+    #
+    find_package(LLVM REQUIRED CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
+    if(LLVM_FOUND)
+        message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+        message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+        message(STATUS "LLVM definitions: ${LLVM_DEFINITIONS}")
+        include_directories(${LLVM_INCLUDE_DIRS})
+        add_definitions(${LLVM_DEFINITIONS})
+        # Find the libraries that correspond to the LLVM components
+        # that we wish to use
+        llvm_map_components_to_libnames(LLVM_LIBS all) #support core irreader)
+        #    set(LLVM_LIBS LLVMCore LLVMAnalysis LLVMAsmParser LLVMSupport LLVMBitWriter LLVMInstCombine LLVMTransformUtils LLVMScalarOpts LLVMExecutionEngine LLVMRuntimeDyld LLVMObject LLVMMC LLVMTarget LLVMMCParser LLVMBitReader LLVMCodeGen LLVMSelectionDAG LLVMAsmPrinter LLVMX86CodeGen LLVMX86Info LLVMX86Desc LLVMX86Utils LLVMX86AsmPrinter LLVMMCDisassembler LLVMDebugInfoCodeView LLVMMCJIT)
 
-    # LLVM Include files are here
-    include_directories(${LLVM_INCLUDEROOT})
-    include_directories(${LLVM_INCLUDEROOT}/llvm)
-    include_directories(${LLVM_INCLUDEROOT}/Support)
-    include_directories(${LLVM_INCLUDEROOT}/machine) ## TODO: This doesn't exist, remove?
-    include_directories(${LLVM_INCLUDEROOT}/IR)
-
-    link_directories(${LLVM_LIBROOT_DEBUG}) ## TODO: Why only debug?
-
-   set (LLVM_LIBS
-
-        # Core libs
-        LLVMAnalysis
-        LLVMAsmParser
-        LLVMBitWriter
-        LLVMCore
-        LLVMSupport
-
-        # Optimizer libs
-        LLVMInstCombine
-        LLVMScalarOpts
-        LLVMTransformUtils
-
-        # Jitter libs
-        LLVMAsmPrinter
-        LLVMBitReader
-        LLVMCodeGen
-        LLVMDebugInfoCodeView
-        LLVMExecutionEngine
-        LLVMMC
-        LLVMMCDisassembler
-        LLVMMCJIT
-        LLVMMCParser
-        LLVMObject
-        LLVMRuntimeDyld
-        LLVMSelectionDAG
-        LLVMTarget
-        LLVMX86AsmPrinter
-        LLVMX86CodeGen
-        LLVMX86Desc
-        LLVMX86Info
-        LLVMX86Utils
-   )
-
-    foreach(LIBRARY ${LLVM_LIBS})
-        add_library(${LIBRARY} STATIC IMPORTED)
-        set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/${LIBRARY}.lib)
-        set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
-    endforeach()
-
+        message(STATUS "Libs: ${LLVM_LIBS}")
+    endif()
 endif()
