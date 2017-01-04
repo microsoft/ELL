@@ -1,11 +1,32 @@
 # Centralized macros to define LLVM variables that we can leverage in components with dependencies on the emittersLib
 
-# First try to use LLVM's CMake target
 
+# LLVM CMake variables:
+# LLVM_CMAKE_DIR
+# The path to the LLVM CMake directory (i.e. the directory containing LLVMConfig.cmake).
 #
-# Documentation on CMake LLVM package:
-# http://llvm.org/releases/3.7.0/docs/CMake.html
+# +LLVM_DEFINITIONS
+# A list of preprocessor defines that should be used when building against LLVM.
 #
+# LLVM_ENABLE_ASSERTIONS
+# This is set to ON if LLVM was built with assertions, otherwise OFF.
+#
+# LLVM_ENABLE_EH
+# This is set to ON if LLVM was built with exception handling (EH) enabled, otherwise OFF.
+#
+# LLVM_ENABLE_RTTI
+# This is set to ON if LLVM was built with run time type information (RTTI), otherwise OFF.
+#
+# +LLVM_INCLUDE_DIRS
+# A list of include paths to directories containing LLVM header files.
+#
+# LLVM_PACKAGE_VERSION
+# The LLVM version. This string can be used with CMake conditionals. E.g. if (${LLVM_PACKAGE_VERSION} VERSION_LESS "3.5").
+#
+# + LLVM_TOOLS_BINARY_DIR
+# The path to the directory containing the LLVM tools (e.g. llvm-as).
+
+# First try to use LLVM's CMake target  (see http://llvm.org/releases/3.7.0/docs/CMake.html for documentation)
 find_package(LLVM QUIET CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
 if(LLVM_FOUND)
     message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
@@ -55,40 +76,123 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
         list(APPEND LLVM_COMPILE_OPTIONS -w14062 /Zc:inline /Zc:rvalueCast /Zc:sizedDealloc-)
     endif()
 
-    # link_directories(${LLVM_LIBROOT_DEBUG}) ## TODO: Why only debug?
-    set (LLVM_LIBS
-
-            # Core libs
-            LLVMAnalysis
-            LLVMAsmParser
-            LLVMBitWriter
-            LLVMCore
-            LLVMSupport
-
-            # Optimizer libs
-            LLVMInstCombine
-            LLVMScalarOpts
-            LLVMTransformUtils
-
-            # Jitter libs
-            LLVMAsmPrinter
-            LLVMBitReader
-            LLVMCodeGen
-            LLVMDebugInfoCodeView
-            LLVMExecutionEngine
-            LLVMMC
-            LLVMMCDisassembler
-            LLVMMCJIT
-            LLVMMCParser
-            LLVMObject
-            LLVMRuntimeDyld
-            LLVMSelectionDAG
-            LLVMTarget
-            LLVMX86AsmPrinter
-            LLVMX86CodeGen
-            LLVMX86Desc
-            LLVMX86Info
-            LLVMX86Utils
+    set(LLVM_LIBS
+        LLVMAArch64AsmParser
+        LLVMAArch64AsmPrinter
+        LLVMAArch64CodeGen
+        LLVMAArch64Desc
+        LLVMAArch64Disassembler
+        LLVMAArch64Info
+        LLVMAArch64Utils
+        LLVMAMDGPUAsmParser
+        LLVMAMDGPUAsmPrinter
+        LLVMAMDGPUCodeGen
+        LLVMAMDGPUDesc
+        LLVMAMDGPUDisassembler
+        LLVMAMDGPUInfo
+        LLVMAMDGPUUtils
+        LLVMAnalysis
+        LLVMARMAsmParser
+        LLVMARMAsmPrinter
+        LLVMARMCodeGen
+        LLVMARMDesc
+        LLVMARMDisassembler
+        LLVMARMInfo
+        LLVMAsmParser
+        LLVMAsmPrinter
+        LLVMBitReader
+        LLVMBitWriter
+        LLVMBPFAsmPrinter
+        LLVMBPFCodeGen
+        LLVMBPFDesc
+        LLVMBPFInfo
+        LLVMCodeGen
+        LLVMCore
+        LLVMCoverage
+        LLVMDebugInfoCodeView
+        LLVMDebugInfoDWARF
+        LLVMDebugInfoPDB
+        LLVMExecutionEngine
+        LLVMGlobalISel
+        LLVMHexagonAsmParser
+        LLVMHexagonCodeGen
+        LLVMHexagonDesc
+        LLVMHexagonDisassembler
+        LLVMHexagonInfo
+        LLVMInstCombine
+        LLVMInstrumentation
+        LLVMInterpreter
+        LLVMipo
+        LLVMIRReader
+        LLVMLibDriver
+        LLVMLineEditor
+        LLVMLinker
+        LLVMLTO
+        LLVMMC
+        LLVMMCDisassembler
+        LLVMMCJIT
+        LLVMMCParser
+        LLVMMipsAsmParser
+        LLVMMipsAsmPrinter
+        LLVMMipsCodeGen
+        LLVMMipsDesc
+        LLVMMipsDisassembler
+        LLVMMipsInfo
+        LLVMMIRParser
+        LLVMMSP430AsmPrinter
+        LLVMMSP430CodeGen
+        LLVMMSP430Desc
+        LLVMMSP430Info
+        LLVMNVPTXAsmPrinter
+        LLVMNVPTXCodeGen
+        LLVMNVPTXDesc
+        LLVMNVPTXInfo
+        LLVMObjCARCOpts
+        LLVMObject
+        LLVMObjectYAML
+        LLVMOption
+        LLVMOrcJIT
+        LLVMPasses
+        LLVMPowerPCAsmParser
+        LLVMPowerPCAsmPrinter
+        LLVMPowerPCCodeGen
+        LLVMPowerPCDesc
+        LLVMPowerPCDisassembler
+        LLVMPowerPCInfo
+        LLVMProfileData
+        LLVMRuntimeDyld
+        LLVMScalarOpts
+        LLVMSelectionDAG
+        LLVMSparcAsmParser
+        LLVMSparcAsmPrinter
+        LLVMSparcCodeGen
+        LLVMSparcDesc
+        LLVMSparcDisassembler
+        LLVMSparcInfo
+        LLVMSupport
+        LLVMSymbolize
+        LLVMSystemZAsmParser
+        LLVMSystemZAsmPrinter
+        LLVMSystemZCodeGen
+        LLVMSystemZDesc
+        LLVMSystemZDisassembler
+        LLVMSystemZInfo
+        LLVMTableGen
+        LLVMTarget
+        LLVMTransformUtils
+        LLVMVectorize
+        LLVMX86AsmParser
+        LLVMX86AsmPrinter
+        LLVMX86CodeGen
+        LLVMX86Desc
+        LLVMX86Disassembler
+        LLVMX86Info
+        LLVMX86Utils
+        LLVMXCoreAsmPrinter
+        LLVMXCoreCodeGen
+        LLVMXCoreDesc
+        LLVMXCoreDisassembler
+        LLVMXCoreInfo
     )
 
     foreach(LIBRARY ${LLVM_LIBS})
@@ -103,28 +207,3 @@ if(LLVM_FOUND)
     add_definitions(${LLVM_DEFINITIONS})
     add_compile_options(${LLVM_COMPILE_OPTIONS})
 endif()
-
-# LLVM CMake variables:
-# LLVM_CMAKE_DIR
-# The path to the LLVM CMake directory (i.e. the directory containing LLVMConfig.cmake).
-#
-# +LLVM_DEFINITIONS
-# A list of preprocessor defines that should be used when building against LLVM.
-#
-# LLVM_ENABLE_ASSERTIONS
-# This is set to ON if LLVM was built with assertions, otherwise OFF.
-#
-# LLVM_ENABLE_EH
-# This is set to ON if LLVM was built with exception handling (EH) enabled, otherwise OFF.
-#
-# LLVM_ENABLE_RTTI
-# This is set to ON if LLVM was built with run time type information (RTTI), otherwise OFF.
-#
-# +LLVM_INCLUDE_DIRS
-# A list of include paths to directories containing LLVM header files.
-#
-# LLVM_PACKAGE_VERSION
-# The LLVM version. This string can be used with CMake conditionals. E.g. if (${LLVM_PACKAGE_VERSION} VERSION_LESS "3.5").
-#
-# + LLVM_TOOLS_BINARY_DIR
-# The path to the directory containing the LLVM tools (e.g. llvm-as).
