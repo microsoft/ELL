@@ -1,5 +1,21 @@
 # Centralized macros to define LLVM variables that we can leverage in components with dependencies on the emittersLib
-if(MSVC)
+
+# First try to use LLVM's CMake target
+
+#
+# Documentation on CMake LLVM package:
+# http://llvm.org/releases/3.7.0/docs/CMake.html
+#
+find_package(LLVM QUIET CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
+if(LLVM_FOUND)
+    message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+    message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+    message(STATUS "LLVM definitions: ${LLVM_DEFINITIONS}")
+
+    # Find the libraries that correspond to the LLVM components that we wish to use
+    llvm_map_components_to_libnames(LLVM_LIBS all) #support core irreader)
+    message(STATUS "Using LLVM libraries: ${LLVM_LIBS}")
+elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
     set (PACKAGE_SOURCE "\\\\cjacobs-z840w10\\packages")
     set (PACKAGE_ROOT ${CMAKE_SOURCE_DIR}/packages)
     set (LLVM_PACKAGE_NAME LLVMNativeLibraries)
@@ -28,7 +44,6 @@ if(MSVC)
     set(LLVM_LIBRARY_DIRS ${LLVM_LIBROOT_RELEASE})
     set(LLVM_TOOLS_BINARY_DIR ${LLVM_PACKAGE_DIR}/build/native/tools)
         
-
     # Warnings that must be disabled. See LLVM documentation. 
     set(LLVM_DEFINITIONS /D_SCL_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_WARNINGS)
     set(LLVM_COMPILE_OPTIONS /wd4141 /wd4146 /wd4180 /wd4244 /wd4258 /wd4267 /wd4291 /wd4345 /wd4351 /wd4355 /wd4456 /wd4457 /wd4458 /wd4459 /wd4503 /wd4624 /wd4722 /wd4800 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702 /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4805 /wd4204 /wd4577 /wd4091 /wd4592 /wd4319 /wd4324 /wd4996)
@@ -81,26 +96,7 @@ if(MSVC)
         set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/${LIBRARY}.lib)
         set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
     endforeach()
-
-else(MSVC) # Non-Windows: use LLVM's cmake module
-    #
-    # Documentation on CMake LLVM package:
-    # http://llvm.org/releases/3.7.0/docs/CMake.html
-    #
-    find_package(LLVM REQUIRED CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
-    if(LLVM_FOUND)
-        message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-        message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-        message(STATUS "LLVM definitions: ${LLVM_DEFINITIONS}")
-        include_directories(${LLVM_INCLUDE_DIRS})
-        add_definitions(${LLVM_DEFINITIONS})
-
-        # Find the libraries that correspond to the LLVM components that we wish to use
-        llvm_map_components_to_libnames(LLVM_LIBS all) #support core irreader)
-
-        message(STATUS "Libs: ${LLVM_LIBS}")
-    endif()
-endif(MSVC)
+endif()
 
 if(LLVM_FOUND)
     include_directories(${LLVM_INCLUDE_DIRS})
