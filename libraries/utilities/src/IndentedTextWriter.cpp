@@ -20,7 +20,7 @@ namespace utilities
     }
 
     IndentedTextWriter::IndentedTextWriter(const IndentedTextWriter& other)
-        : _tabString(other._tabString), _indentCount(other._indentCount)
+        : _tabString(other._tabString), _indentLevel(other._indentLevel)
     {
         SetPrecision(other.GetPrecision());
     }
@@ -99,15 +99,15 @@ namespace utilities
 
     IndentedTextWriter& IndentedTextWriter::IncreaseIndent()
     {
-        ++_indentCount;
+        ++_indentLevel;
         return *this;
     }
 
     IndentedTextWriter& IndentedTextWriter::DecreaseIndent()
     {
-        if (_indentCount > 0)
+        if (_indentLevel > 0)
         {
-            _indentCount--;
+            _indentLevel--;
         }
         return *this;
     }
@@ -121,7 +121,7 @@ namespace utilities
     {
         if (_needsIndent)
         {
-            WriteIndent(_indentCount);
+            WriteIndent(_indentLevel);
             _needsIndent = false;
         }
     }

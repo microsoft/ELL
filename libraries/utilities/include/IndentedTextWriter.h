@@ -32,10 +32,10 @@ namespace utilities
         /// <returns> The indentation string </returns>
         std::string& TabString() { return _tabString; }
 
-        /// <summary> Gets a reference to the indent count. </summary>
+        /// <summary> Gets a reference to the indent level. </summary>
         ///
         /// <returns> The indent count </returns>
-        uint32_t& IndentCount() { return _indentCount; }
+        uint32_t& GetIndentLevel() { return _indentLevel; }
 
         /// <summary> Increase the indent. </summary>
         ///
@@ -105,7 +105,7 @@ namespace utilities
 
         std::stringstream _buffer;
         std::string _tabString;
-        uint32_t _indentCount = 0;
+        uint32_t _indentLevel = 0;
         bool _needsIndent = true;
     };
 }
