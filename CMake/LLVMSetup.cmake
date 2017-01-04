@@ -30,7 +30,7 @@ endif()
 
 if(LLVM_FOUND)
 
-    if(WIN32)
+    if(MSVC)
         # Required to compile against LLVM libraries. See LLVM documentation
         if(${CMAKE_GENERATOR_TOOLSET} MATCHES "clang")
             message(STATUS "Using clang toolset")
