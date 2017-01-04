@@ -35,7 +35,7 @@ namespace utilities
         /// <summary> Gets a reference to the indent level. </summary>
         ///
         /// <returns> The indent count </returns>
-        uint32_t& GetIndentLevel() { return _indentLevel; }
+        size_t& GetIndentLevel() { return _indentLevel; }
 
         /// <summary> Increase the indent. </summary>
         ///
@@ -101,11 +101,11 @@ namespace utilities
 
     private:
         void WriteIndent();
-        void WriteIndent(int count);
+        void WriteIndent(size_t count);
 
         std::stringstream _buffer;
         std::string _tabString;
-        uint32_t _indentLevel = 0;
+        size_t _indentLevel = 0;
         bool _needsIndent = true;
     };
 }
