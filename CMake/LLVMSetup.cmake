@@ -48,49 +48,58 @@ if(LLVM_FOUND)
     include_directories(${LLVM_INCLUDEROOT})
     include_directories(${LLVM_INCLUDEROOT}/llvm)
     include_directories(${LLVM_INCLUDEROOT}/Support)
-    include_directories(${LLVM_INCLUDEROOT}/machine)
+    include_directories(${LLVM_INCLUDEROOT}/machine) ## TODO: This doesn't exist, remove?
     include_directories(${LLVM_INCLUDEROOT}/IR)
+
+    link_directories(${LLVM_LIBROOT_DEBUG}) ## TODO: Why only debug?
+
+    ## TODO:
 
     #=====================
     # LLVM static Libraries
     #=====================
 
-    link_directories(${LLVM_LIBROOT_DEBUG})
+   set (LLVM_LIBRARIES
+        LLVMAnalysis
+        LLVMAsmParser
+        LLVMCore
+        LLVMSupport
+        LLVMBitWriter
 
-    add_library(LLVMAnalysis STATIC IMPORTED)
-    set_property(TARGET LLVMAnalysis PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMAnalysis.lib)
-    set_property(TARGET LLVMAnalysis PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMAnalysis.lib)
+        # Optimizer libs
+        LLVMInstCombine
+        LLVMTransformUtils
+        LLVMScalarOpts
 
-    add_library(LLVMAsmParser STATIC IMPORTED)
-    set_property(TARGET LLVMAsmParser PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMAsmParser.lib)
-    set_property(TARGET LLVMAsmParser PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMAsmParser.lib)
+        # Jitter libs
+        LLVMExecutionEngine
+        LLVMRuntimeDyld
+        LLVMObject
 
-    add_library(LLVMCore STATIC IMPORTED)
-    set_property(TARGET LLVMCore PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMCore.lib)
-    set_property(TARGET LLVMCore PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMCore.lib)
 
-    add_library(LLVMSupport STATIC IMPORTED)
-    set_property(TARGET LLVMSupport PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMSupport.lib)
-    set_property(TARGET LLVMSupport PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMSupport.lib)
 
-    add_library(LLVMBitWriter STATIC IMPORTED)
-    set_property(TARGET LLVMBitWriter PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMBitWriter.lib)
-    set_property(TARGET LLVMBitWriter PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMBitWriter.lib)
+        LLVMBitReader
+        LLVMCodeGen
+        LLVMAsmPrinter
+        LLVMDebugInfoCodeView
+        LLVMMC
+        LLVMMCDisassembler
+        LLVMMCJIT
+        LLVMMCParser
+        LLVMSelectionDAG
+        LLVMTarget
+        LLVMX86AsmPrinter
+        LLVMX86CodeGen
+        LLVMX86Desc
+        LLVMX86Info
+        LLVMX86Utils
+   )
 
-    #=====================
-    # Optimizer Libs
-    #=====================
-    add_library(LLVMInstCombine STATIC IMPORTED)
-    set_property(TARGET LLVMInstCombine PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMInstCombine.lib)
-    set_property(TARGET LLVMInstCombine PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMInstCombine.lib)
-
-    add_library(LLVMTransformUtils STATIC IMPORTED)
-    set_property(TARGET LLVMTransformUtils PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMTransformUtils.lib)
-    set_property(TARGET LLVMTransformUtils PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMTransformUtils.lib)
-
-    add_library(LLVMScalarOpts STATIC IMPORTED)
-    set_property(TARGET LLVMScalarOpts PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/LLVMScalarOpts.lib)
-    set_property(TARGET LLVMScalarOpts PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/LLVMScalarOpts.lib)
+    foreach(LIBRARY ${LLVM_LIBRARIES})
+        add_library(${LIBRARY} STATIC IMPORTED)
+        set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/${LIBRARY}.lib)
+        set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
+    endforeach()
 
     #=====================
     # Jitter Libs
