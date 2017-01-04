@@ -4,16 +4,7 @@
 include (CommonInterfaces)
 
 # Get include directories for LLVM
-if(WIN32)
-  include (LLVMSetup)
-else()
-  find_package(LLVM REQUIRED CONFIG 
-    PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
-  if(LLVM_FOUND)
-    include_directories(${LLVM_INCLUDE_DIRS})
-    add_definitions(${LLVM_DEFINITIONS})
-  endif()
-endif()
+include (LLVMSetup)
 
 set (INTERFACE_MAIN ../common/ELL.i)
 

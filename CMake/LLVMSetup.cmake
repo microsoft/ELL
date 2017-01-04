@@ -13,85 +13,76 @@ if(MSVC)
         execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -source ${PACKAGE_SOURCE} -outputdirectory ${CMAKE_SOURCE_DIR}/packages)
     endif()
         
-    set(LLVM_INCLUDEROOT ${LLVM_PACKAGE_DIR}/build/native/include)
     set(LLVM_LIBROOT_DEBUG ${LLVM_PACKAGE_DIR}/build/native/lib/Debug)
     set(LLVM_LIBROOT_RELEASE ${LLVM_PACKAGE_DIR}/build/native/lib/Release)
+    set(LLVM_INCLUDEROOT ${LLVM_PACKAGE_DIR}/build/native/include)
+    if(NOT EXISTS ${LLVM_INCLUDEROOT})
+        set(LLVM_FOUND FALSE)
+        return() 
+    endif()
+
+    set(LLVM_FOUND TRUE)
 
     # Mirror variables used by LLVM's cmake find module
-    set(LLVM_LIBRARY_DIRS ${LLVM_LIBROOT_RELEASE})
     set(LLVM_INCLUDE_DIRS ${LLVM_INCLUDEROOT})
+    set(LLVM_LIBRARY_DIRS ${LLVM_LIBROOT_RELEASE})
+    set(LLVM_TOOLS_BINARY_DIR ${LLVM_PACKAGE_DIR}/build/native/tools)
+        
 
-    if(EXISTS ${LLVM_INCLUDEROOT})
-        set(LLVM_FOUND TRUE)
+    # Warnings that must be disabled. See LLVM documentation. 
+    set(LLVM_DEFINITIONS /D_SCL_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_WARNINGS)
+    set(LLVM_COMPILE_OPTIONS /wd4141 /wd4146 /wd4180 /wd4244 /wd4258 /wd4267 /wd4291 /wd4345 /wd4351 /wd4355 /wd4456 /wd4457 /wd4458 /wd4459 /wd4503 /wd4624 /wd4722 /wd4800 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702 /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4805 /wd4204 /wd4577 /wd4091 /wd4592 /wd4319 /wd4324 /wd4996)
+
+    # Required to compile against LLVM libraries. See LLVM documentation
+    if(${CMAKE_GENERATOR_TOOLSET} MATCHES "clang")
+        message(STATUS "Using clang toolset")
     else()
-        set(LLVM_FOUND FALSE)
+        list(APPEND LLVM_COMPILE_OPTIONS -w14062 /Zc:inline /Zc:rvalueCast /Zc:sizedDealloc-)
     endif()
 
-    if(LLVM_FOUND)
-        # Required to compile against LLVM libraries. See LLVM documentation
-        if(${CMAKE_GENERATOR_TOOLSET} MATCHES "clang")
-            message(STATUS "Using clang toolset")
-        else()
-            add_compile_options(-w14062 /Zc:inline /Zc:rvalueCast /Zc:sizedDealloc-)
-        endif()
+    # link_directories(${LLVM_LIBROOT_DEBUG}) ## TODO: Why only debug?
+    set (LLVM_LIBS
 
-        # Warnings that must be disabled. See LLVM documentation. 
-        add_compile_options(/D_SCL_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_WARNINGS)
-        add_compile_options(/wd4141 /wd4146 /wd4180 /wd4244 /wd4258 /wd4267 /wd4291 /wd4345 /wd4351 /wd4355 /wd4456 /wd4457 /wd4458 /wd4459 /wd4503 /wd4624 /wd4722 /wd4800 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702 /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4805 /wd4204 /wd4577 /wd4091 /wd4592 /wd4319 /wd4324 /wd4996)
-        add_compile_options(/wd4996)
+            # Core libs
+            LLVMAnalysis
+            LLVMAsmParser
+            LLVMBitWriter
+            LLVMCore
+            LLVMSupport
 
-        # LLVM Include files are here
-        include_directories(${LLVM_INCLUDEROOT})
-        include_directories(${LLVM_INCLUDEROOT}/llvm)
-        include_directories(${LLVM_INCLUDEROOT}/Support)
-        include_directories(${LLVM_INCLUDEROOT}/machine) ## TODO: This doesn't exist, remove?
-        include_directories(${LLVM_INCLUDEROOT}/IR)
+            # Optimizer libs
+            LLVMInstCombine
+            LLVMScalarOpts
+            LLVMTransformUtils
 
-        link_directories(${LLVM_LIBROOT_DEBUG}) ## TODO: Why only debug?
+            # Jitter libs
+            LLVMAsmPrinter
+            LLVMBitReader
+            LLVMCodeGen
+            LLVMDebugInfoCodeView
+            LLVMExecutionEngine
+            LLVMMC
+            LLVMMCDisassembler
+            LLVMMCJIT
+            LLVMMCParser
+            LLVMObject
+            LLVMRuntimeDyld
+            LLVMSelectionDAG
+            LLVMTarget
+            LLVMX86AsmPrinter
+            LLVMX86CodeGen
+            LLVMX86Desc
+            LLVMX86Info
+            LLVMX86Utils
+    )
 
-        set (LLVM_LIBS
+    foreach(LIBRARY ${LLVM_LIBS})
+        add_library(${LIBRARY} STATIC IMPORTED)
+        set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/${LIBRARY}.lib)
+        set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
+    endforeach()
 
-                # Core libs
-                LLVMAnalysis
-                LLVMAsmParser
-                LLVMBitWriter
-                LLVMCore
-                LLVMSupport
-
-                # Optimizer libs
-                LLVMInstCombine
-                LLVMScalarOpts
-                LLVMTransformUtils
-
-                # Jitter libs
-                LLVMAsmPrinter
-                LLVMBitReader
-                LLVMCodeGen
-                LLVMDebugInfoCodeView
-                LLVMExecutionEngine
-                LLVMMC
-                LLVMMCDisassembler
-                LLVMMCJIT
-                LLVMMCParser
-                LLVMObject
-                LLVMRuntimeDyld
-                LLVMSelectionDAG
-                LLVMTarget
-                LLVMX86AsmPrinter
-                LLVMX86CodeGen
-                LLVMX86Desc
-                LLVMX86Info
-                LLVMX86Utils
-        )
-
-        foreach(LIBRARY ${LLVM_LIBS})
-            add_library(${LIBRARY} STATIC IMPORTED)
-            set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/${LIBRARY}.lib)
-            set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
-        endforeach()
-
-    endif()
-else() # Non-Windows: use LLVM's cmake module
+else(MSVC) # Non-Windows: use LLVM's cmake module
     #
     # Documentation on CMake LLVM package:
     # http://llvm.org/releases/3.7.0/docs/CMake.html
@@ -103,11 +94,41 @@ else() # Non-Windows: use LLVM's cmake module
         message(STATUS "LLVM definitions: ${LLVM_DEFINITIONS}")
         include_directories(${LLVM_INCLUDE_DIRS})
         add_definitions(${LLVM_DEFINITIONS})
-        # Find the libraries that correspond to the LLVM components
-        # that we wish to use
+
+        # Find the libraries that correspond to the LLVM components that we wish to use
         llvm_map_components_to_libnames(LLVM_LIBS all) #support core irreader)
-        #    set(LLVM_LIBS LLVMCore LLVMAnalysis LLVMAsmParser LLVMSupport LLVMBitWriter LLVMInstCombine LLVMTransformUtils LLVMScalarOpts LLVMExecutionEngine LLVMRuntimeDyld LLVMObject LLVMMC LLVMTarget LLVMMCParser LLVMBitReader LLVMCodeGen LLVMSelectionDAG LLVMAsmPrinter LLVMX86CodeGen LLVMX86Info LLVMX86Desc LLVMX86Utils LLVMX86AsmPrinter LLVMMCDisassembler LLVMDebugInfoCodeView LLVMMCJIT)
 
         message(STATUS "Libs: ${LLVM_LIBS}")
     endif()
+endif(MSVC)
+
+if(LLVM_FOUND)
+    include_directories(${LLVM_INCLUDE_DIRS})
+    add_definitions(${LLVM_DEFINITIONS})
+    add_compile_options(${LLVM_COMPILE_OPTIONS})
 endif()
+
+# LLVM CMake variables:
+# LLVM_CMAKE_DIR
+# The path to the LLVM CMake directory (i.e. the directory containing LLVMConfig.cmake).
+#
+# +LLVM_DEFINITIONS
+# A list of preprocessor defines that should be used when building against LLVM.
+#
+# LLVM_ENABLE_ASSERTIONS
+# This is set to ON if LLVM was built with assertions, otherwise OFF.
+#
+# LLVM_ENABLE_EH
+# This is set to ON if LLVM was built with exception handling (EH) enabled, otherwise OFF.
+#
+# LLVM_ENABLE_RTTI
+# This is set to ON if LLVM was built with run time type information (RTTI), otherwise OFF.
+#
+# +LLVM_INCLUDE_DIRS
+# A list of include paths to directories containing LLVM header files.
+#
+# LLVM_PACKAGE_VERSION
+# The LLVM version. This string can be used with CMake conditionals. E.g. if (${LLVM_PACKAGE_VERSION} VERSION_LESS "3.5").
+#
+# + LLVM_TOOLS_BINARY_DIR
+# The path to the directory containing the LLVM tools (e.g. llvm-as).
