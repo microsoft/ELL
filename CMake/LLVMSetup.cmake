@@ -49,7 +49,7 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
     find_program(NUGET nuget PATHS ${CMAKE_SOURCE_DIR}/private/binaries/nuget)
     if(NUGET)
         message(STATUS "Installing LLVM NuGet package")
-        execute_process(COMMAND ${NUGET} sources add -name ${PACKAGE_SOURCE_NAME} -source ${PACKAGE_SOURCE_URL} -username USER -password ${PACKAGE_SOURCE_TOKEN}
+        execute_process(COMMAND ${NUGET} sources add -name ${PACKAGE_SOURCE_NAME} -source ${PACKAGE_SOURCE_URL} -username USER -password ${PACKAGE_SOURCE_TOKEN} -Verbosity quiet)
         execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -Version ${LLVM_PACKAGE_VERSION} -source ${PACKAGE_SOURCE_NAME} -outputdirectory ${CMAKE_SOURCE_DIR}/packages -Verbosity quiet)
     endif()
         
