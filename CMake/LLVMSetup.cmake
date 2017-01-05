@@ -1,31 +1,26 @@
-# Centralized macros to define LLVM variables that we can leverage in components with dependencies on the emittersLib
-
-# LLVM CMake variables:
-# LLVM_CMAKE_DIR
-# The path to the LLVM CMake directory (i.e. the directory containing LLVMConfig.cmake).
+# Centralized place to define LLVM variables that we can leverage in components with dependencies on the emittersLib
+# Sets the following variables:
 #
-# +LLVM_DEFINITIONS
-# A list of preprocessor defines that should be used when building against LLVM.
-#
-# LLVM_ENABLE_ASSERTIONS
-# This is set to ON if LLVM was built with assertions, otherwise OFF.
-#
-# LLVM_ENABLE_EH
-# This is set to ON if LLVM was built with exception handling (EH) enabled, otherwise OFF.
-#
-# LLVM_ENABLE_RTTI
-# This is set to ON if LLVM was built with run time type information (RTTI), otherwise OFF.
-#
-# +LLVM_INCLUDE_DIRS
-# A list of include paths to directories containing LLVM header files.
-#
+# General information:
+# LLVM_FOUND
 # LLVM_PACKAGE_VERSION
-# The LLVM version. This string can be used with CMake conditionals. E.g. if (${LLVM_PACKAGE_VERSION} VERSION_LESS "3.5").
 #
-# + LLVM_TOOLS_BINARY_DIR
-# The path to the directory containing the LLVM tools (e.g. llvm-as).
+# Settings for compiling against LLVM libraries:
+# LLVM_DEFINITIONS
+# LLVM_COMPILE_OPTIONS
+# LLVM_INCLUDE_DIRS
+# LLVM_LIBRARY_DIRS
+# LLVM_LIBS
+#
+# Info about how LLVM was built:
+# LLVM_ENABLE_ASSERTIONS
+# LLVM_ENABLE_EH
+# LLVM_ENABLE_RTTI
+#
+# Location of the executable tools:
+# LLVM_TOOLS_BINARY_DIR
 
-# First try to use LLVM's CMake target  (see http://llvm.org/releases/3.7.0/docs/CMake.html for documentation)
+# First try to use LLVM's CMake target (see http://llvm.org/releases/3.7.0/docs/CMake.html for documentation)
 find_package(LLVM QUIET CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
 if(LLVM_FOUND)
     message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
@@ -52,7 +47,9 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
         execute_process(COMMAND ${NUGET} sources add -name ${PACKAGE_SOURCE_NAME} -source ${PACKAGE_SOURCE_URL} -username USER -password ${PACKAGE_SOURCE_TOKEN} -Verbosity quiet)
         execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -Version ${LLVM_PACKAGE_VERSION} -source ${PACKAGE_SOURCE_NAME} -outputdirectory ${CMAKE_SOURCE_DIR}/packages -Verbosity quiet)
     endif()
-        
+    set(LLVM_ENABLE_ASSERTIONS OFF) # But ON for debug build
+    set(LLVM_ENABLE_EH OFF)
+    set(LLVM_ENABLE_RTTI OFF)
     set(LLVM_LIBROOT_DEBUG ${LLVM_PACKAGE_DIR}/build/native/lib/Debug)
     set(LLVM_LIBROOT_RELEASE ${LLVM_PACKAGE_DIR}/build/native/lib/Release)
     set(LLVM_INCLUDEROOT ${LLVM_PACKAGE_DIR}/build/native/include)
