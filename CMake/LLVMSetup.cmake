@@ -47,8 +47,8 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
         set(NUGET_CONFIG_FILE "${CMAKE_BINARY_DIR}/NuGet.config")
         # Write an empty NuGet.config file and use it so we don't mess up the user's global NuGet configuration
         file(WRITE ${NUGET_CONFIG_FILE} "<?xml version=\"1.0\" encoding=\"utf-8\"?><configuration></configuration>")
-        execute_process(COMMAND ${NUGET} sources add -Name ${PACKAGE_SOURCE_NAME} -Source ${PACKAGE_SOURCE_LOCAL} -UserName USER -Password ${PACKAGE_SOURCE_TOKEN} -ConfigFile ${NUGET_CONFIG_FILE} -StorePasswordInClearText -Verbosity detailed)
-        execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -Version ${LLVM_PACKAGE_VERSION} -Source ${PACKAGE_SOURCE_NAME} -Outputdirectory ${CMAKE_SOURCE_DIR}/packages -PackageSaveMode nuspec -Verbosity detailed)
+        execute_process(COMMAND ${NUGET} sources add -Name ${PACKAGE_SOURCE_NAME} -Source ${PACKAGE_SOURCE_LOCAL} -UserName USER -Password ${PACKAGE_SOURCE_TOKEN} -ConfigFile ${NUGET_CONFIG_FILE} -StorePasswordInClearText -Verbosity quiet)
+        execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -Version ${LLVM_PACKAGE_VERSION} -Source ${PACKAGE_SOURCE_NAME} -Outputdirectory ${CMAKE_SOURCE_DIR}/packages -PackageSaveMode nuspec -Verbosity quiet)
     endif()
     set(LLVM_ENABLE_ASSERTIONS OFF) # But ON for debug build
     set(LLVM_ENABLE_EH OFF)
