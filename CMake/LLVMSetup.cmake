@@ -36,7 +36,8 @@ if(LLVM_FOUND)
     llvm_map_components_to_libnames(LLVM_LIBS all) #support core irreader)
     message(STATUS "Using LLVM libraries: ${LLVM_LIBS}")
 elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
-    set (PACKAGE_SOURCE "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
+    set (PACKAGE_SOURCE_LOCAL "\\\\cjacobs-z840w10\\packages")
+    set (PACKAGE_SOURCE_REMOTE "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
     set (PACKAGE_ROOT ${CMAKE_SOURCE_DIR}/packages)
     set (LLVM_PACKAGE_NAME LLVMNativeLibraries)
     set (LLVM_PACKAGE_VERSION 3.9.0)
@@ -46,7 +47,7 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
     find_program(NUGET nuget PATHS ${CMAKE_SOURCE_DIR}/private/binaries/nuget)
     if(NUGET)
         message(STATUS "Installing LLVM NuGet package")
-        execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -Version ${LLVM_PACKAGE_VERSION} -source ${PACKAGE_SOURCE} -outputdirectory ${CMAKE_SOURCE_DIR}/packages -Verbosity quiet)
+        execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -Version ${LLVM_PACKAGE_VERSION} -source ${PACKAGE_SOURCE_LOCAL} -outputdirectory ${CMAKE_SOURCE_DIR}/packages -Verbosity quiet)
     endif()
         
     set(LLVM_LIBROOT_DEBUG ${LLVM_PACKAGE_DIR}/build/native/lib/Debug)
