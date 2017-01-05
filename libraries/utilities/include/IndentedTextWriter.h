@@ -79,7 +79,7 @@ namespace utilities
         /// <summary> Output the current buffer to a string. </summary>
         ///
         /// <returns> A std::string that represents the contents of this IndentedTextWriter. </returns>
-        std::string ToString() { return _buffer.str(); }
+        std::string ToString() const { return _buffer.str(); }
 
         /// <summary> Clear the buffer. </summary>
         void Clear() { _buffer.clear(); }
@@ -87,7 +87,7 @@ namespace utilities
         /// <summary> Is the writer empty? </summary>
         ///
         /// <returns> true if empty, false if not. </returns>
-        bool IsEmpty() { return (_buffer.tellp() <= 0); }
+        bool IsEmpty() const { return (_buffer.str().size() <= 0); }
 
         /// <summary> Return the precision with which doubles are serialized. Default is 17. </summary>
         ///
