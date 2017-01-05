@@ -1,6 +1,5 @@
 # Centralized macros to define LLVM variables that we can leverage in components with dependencies on the emittersLib
 
-
 # LLVM CMake variables:
 # LLVM_CMAKE_DIR
 # The path to the LLVM CMake directory (i.e. the directory containing LLVMConfig.cmake).
@@ -44,10 +43,10 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
     set (LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})
 
     # Get LLVM libraries via NuGet if we're on Windows
-    find_program(NUGET nuget)
+    find_program(NUGET nuget PATHS ${CMAKE_SOURCE_DIR}/private/binaries/nuget)
     if(NUGET)
         message(STATUS "Installing LLVM NuGet package")
-        execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -source ${PACKAGE_SOURCE} -outputdirectory ${CMAKE_SOURCE_DIR}/packages)
+        execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -Version ${LLVM_PACKAGE_VERSION} -source ${PACKAGE_SOURCE} -outputdirectory ${CMAKE_SOURCE_DIR}/packages -Verbosity quiet)
     endif()
         
     set(LLVM_LIBROOT_DEBUG ${LLVM_PACKAGE_DIR}/build/native/lib/Debug)
