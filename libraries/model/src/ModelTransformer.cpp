@@ -42,11 +42,12 @@ namespace model
 
     NodeAction TransformContext::GetNodeAction(const Node& node) const
     {
-        for(auto& actionFunction: _nodeActionFunctions)
+        for(auto iter = _nodeActionFunctions.rbegin(); iter != _nodeActionFunctions.rend(); ++iter)
         {
+            auto& actionFunction = *iter;
             auto action = actionFunction(node);
-            if(action != NodeAction::defaultAction)
-            {
+            if(action != NodeAction::abstain)
+            {                
                 return action;
             }
         }
@@ -118,7 +119,7 @@ namespace model
                 bool didRefineNode = false;
                 auto action = context.GetNodeAction(node);
                 // If the node action is "refine" or the default, try to refine the node, otherwise leave it alone
-                if(action == NodeAction::refine || action == NodeAction::defaultAction)
+                if(action == NodeAction::refine || action == NodeAction::abstain)
                 {
                     didRefineNode = node.InvokeRefine(*this);
                 }
