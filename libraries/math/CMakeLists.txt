@@ -14,6 +14,8 @@ else()
   add_compile_options(-D_SCL_SECURE_NO_WARNINGS)
 endif()
 
+include (OpenBLASSetup)
+
 set (SRC src/BlasWrapper.cpp)
 
 set (INCLUDE include/BlasWrapper.h
@@ -31,63 +33,11 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-# Using FindBLAS module:
-#find_package(BLAS)
-#if(BLAS_FOUND)
-#  message(WARNING "BLAS Found!")
-#  message(WARNING "Blas libraries: ${BLAS_LIBRARIES}")
-#  message(WARNING "Blas linker flags: ${BLAS_LINKER_FLAGS}")
-#  message(WARNING "Blas vendor: ${BLA_VENDOR}")
-#else()
-#  message(WARNING "BLAS NOT Found!")
-#endif()
-
-set (BLAS_LIB_NAMES ${BLAS_LIB_NAMES} cblas openblas libopenblas.dll.a)
-
-## Note: libopenblas install on ubuntu in /usr/lib and /usr/include
-
-if(${WIN32})
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".dll.a" ".a")
-endif()
-
-find_path(BLAS_INCLUDE_DIR cblas.h
-  PATHS /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/
-    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers/
-    /usr/include
-    /usr/local/include
-    ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include/
-    ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/include/
-  NO_DEFAULT_PATH
-  )
-message(STATUS "Using BLAS include path: ${BLAS_INCLUDE_DIR}")
-
-find_library(BLAS_LIBRARY
-  NAMES ${BLAS_LIB_NAMES}
-  PATHS /usr/lib64/atlas-sse3 /usr/lib64/atlas /usr/lib64 /usr/local/lib64/atlas /usr/local/lib64 /usr/lib/atlas-sse3 /usr/lib/atlas-sse2 /usr/lib/atlas-sse /usr/lib/atlas-3dnow /usr/lib/atlas /usr/lib /usr/local/lib/atlas /usr/local/lib
-    ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/lib/
-    ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/sandybridge/lib/
-  NO_DEFAULT_PATH
-  )
-message(STATUS "Using BLAS library: ${BLAS_LIBRARY}")
-
-if(${APPLE})
-  # To install commandline tools (which seems to also install headers in /System/Library/Frameworks/...), do this:
-  # xcode-select --install
-elseif(${WIN32})
-
-endif()
-
-if (BLAS_LIBRARY AND BLAS_INCLUDE_DIR)
-    set(CBLAS_FOUND "YES")
-else ()
-    set(CBLAS_FOUND "NO")
-endif ()
-
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PUBLIC include ${BLAS_INCLUDE_DIR})
+target_include_directories(${PROJ_NAME} PUBLIC include ${BLAS_INCLUDE_DIRS})
 
-if(CBLAS_FOUND)
+if(BLAS_FOUND)
 target_compile_definitions(${PROJ_NAME} PRIVATE USE_BLAS=1)
 endif()
 
@@ -95,7 +45,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
 endif()
 
-target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBRARY})
+target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBS})
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #
@@ -117,12 +67,11 @@ target_include_directories(${TEST_NAME} PRIVATE test/include)
 target_link_libraries(${TEST_NAME} math testing)
 
 if(${WIN32})
-  set (BLASDLLDirectory ${CMAKE_SOURCE_DIR}/private/dependencies/OpenBLAS/win64/v0.2.19/haswell/bin)
-  if(EXISTS ${BLASDLLDirectory})
-    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLASDLLDirectory}/libopenblas.dll $<TARGET_FILE_DIR:math_test>)
-    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLASDLLDirectory}/libgcc_s_seh-1.dll $<TARGET_FILE_DIR:math_test>)
-    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLASDLLDirectory}/libgfortran-3.dll $<TARGET_FILE_DIR:math_test>)
-    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLASDLLDirectory}/libquadmath-0.dll $<TARGET_FILE_DIR:math_test>)
+  if(EXISTS ${BLAS_DLL_DIRECTORY})
+    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLAS_DLL_DIRECTORY}/libopenblas.dll $<TARGET_FILE_DIR:math_test>)
+    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLAS_DLL_DIRECTORY}/libgcc_s_seh-1.dll $<TARGET_FILE_DIR:math_test>)
+    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLAS_DLL_DIRECTORY}/libgfortran-3.dll $<TARGET_FILE_DIR:math_test>)
+    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLAS_DLL_DIRECTORY}/libquadmath-0.dll $<TARGET_FILE_DIR:math_test>)
   endif()
 endif()
 
