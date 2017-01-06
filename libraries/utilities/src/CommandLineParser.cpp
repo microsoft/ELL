@@ -248,15 +248,15 @@ namespace utilities
     bool CommandLineParser::SetDefaultArgs(const std::set<std::string>& unset_args)
     {
         bool needsReparse = false;
-        for (std::string argName : unset_args)
+        for (std::string argumentName : unset_args)
         {
             // look up arg
-            auto iter = _options.find(argName);
+            auto iter = _options.find(argumentName);
             if (iter != _options.end())
             {
                 const OptionInfo& arg_info = iter->second;
                 std::string default_val = arg_info.defaultValueString;
-                needsReparse = SetOption(argName, default_val) || needsReparse;
+                needsReparse = SetOption(argumentName, default_val) || needsReparse;
             }
         }
         return needsReparse;

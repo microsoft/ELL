@@ -19,6 +19,7 @@ set (SRC src/Archiver.cpp
          src/Files.cpp
          src/Format.cpp
          src/IArchivable.cpp
+         src/IndentedTextWriter.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
          src/JsonArchiver.cpp
@@ -38,12 +39,14 @@ set (INCLUDE include/AbstractInvoker.h
              include/CommandLineParser.h
              include/CompressedIntegerList.h
              include/ConformingVector.h
+             include/DynamicArray.h
              include/Exception.h
              include/Files.h
              include/Format.h
              include/FunctionUtils.h
              include/IArchivable.h
              include/IIterator.h
+             include/IndentedTextWriter.h
              include/IntegerList.h
              include/IntegerStack.h
              include/JsonArchiver.h
@@ -68,6 +71,7 @@ set (TCC tcc/AbstractInvoker.tcc
          tcc/AnyIterator.tcc
          tcc/Archiver.tcc
          tcc/CommandLineParser.tcc
+         tcc/DynamicArray.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
          tcc/FunctionUtils.tcc
