@@ -88,6 +88,21 @@
                     '<(library_path_prefix)/build/private/libraries/compiler<(library_path_suffix)',
                     '<(library_path_prefix)/build/private/libraries/emitters<(library_path_suffix)',
                     '<(llvm_library_path)',
+                ],
+                'libraries': [
+                    '-lcommon',
+                    '-ldata',
+                    '-levaluators',                                                                
+                    '-llossFunctions',
+                    '-lmath',
+                    '-lmodel',
+                    '-lnodes',
+                    '-lpredictors',
+                    '-ltrainers',
+                    '-lutilities',
+                    '-lcompiler',
+                    '-lemitters',
+                    @MODULE_LLVM_LIBS@
                 ]
             },
             'conditions': [
@@ -95,21 +110,6 @@
                     'OS=="win"',
                     {
                         'link_settings': {
-                            'libraries': [
-                                '-lcommon',
-                                '-ldata',
-                                '-levaluators',                                                                
-                                '-llossFunctions',
-                                '-lmath',
-                                '-lmodel',
-                                '-lnodes',
-                                '-lpredictors',
-                                '-ltrainers',
-                                '-lutilities',
-                                '-lcompiler',
-                                '-lemitters',
-                                @MODULE_LLVM_LIBS@
-                            ]
                         },
                         'msvs_settings': {
                             'VCCLCompilerTool': {
@@ -126,21 +126,6 @@
                     'OS=="mac"',
                     {
                         'link_settings': {
-                            'libraries': [
-                                '-lcommon',
-                                '-ldata',
-                                '-levaluators',                                                                
-                                '-llossFunctions',
-                                '-lmath',
-                                '-lmodel',
-                                '-lnodes',
-                                '-lpredictors',
-                                '-ltrainers',
-                                '-lutilities',
-                                '-lcompiler',
-                                '-lemitters',
-                                @MODULE_LLVM_LIBS@
-                            ]
                         },
                         'cflags_cc!': [
                             '-fno-rtti',
@@ -178,21 +163,6 @@
                             '-fno-exceptions'
                         ],
                         'link_settings': {
-                            'libraries': [
-                                '-lcommon',
-                                '-ldata',
-                                '-levaluators',                                                                
-                                '-llossFunctions',
-                                '-lmath',
-                                '-lmodel',
-                                '-lnodes',
-                                '-lpredictors',
-                                '-ltrainers',
-                                '-lutilities',
-                                '-lcompiler',
-                                '-lemitters',
-                                @MODULE_LLVM_LIBS@                            
-                            ]
                         }
                     }
                 ]
