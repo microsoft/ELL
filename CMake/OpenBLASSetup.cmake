@@ -20,6 +20,12 @@
 #  message(WARNING "BLAS NOT Found!")
 #endif()
 
+# Include guard so we don't try to find or download BLAS more than once
+if(BLASSetup_included)
+    return()
+endif()
+set(BLASSetup_included true)
+
 set (BLAS_LIB_NAMES cblas openblas libopenblas.dll.a)
 
 set (BLAS_INCLUDE_SEARCH_PATHS
