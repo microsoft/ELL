@@ -29,6 +29,11 @@ set (BLAS_INCLUDE_SEARCH_PATHS
     /usr/local/include
 )
 
+if(${APPLE})
+  # To install commandline tools (which seems to also install headers in /System/Library/Frameworks/...), do this:
+  # xcode-select --install
+endif()
+
 if(WIN32)
     set (PACKAGE_SOURCE_LOCAL "\\\\cjacobs-z840w10\\packages")
     set (PACKAGE_SOURCE_URL "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
@@ -36,7 +41,7 @@ if(WIN32)
     set (PACKAGE_READ_TOKEN "7xn3h6i6f5zes3nfnk2cqm3r6jt5l5n4c7nausukx5mbskywewjq")
     set (PACKAGE_ROOT ${CMAKE_SOURCE_DIR}/packages)
 
-    set (BLAS_PACKAGE_NAME OpenBLASWin64.Haswell)
+    set (BLAS_PACKAGE_NAME OpenBLASWin64)
     set (BLAS_PACKAGE_VERSION 0.2.19.1)
     set (BLAS_PACKAGE_DIR ${PACKAGE_ROOT}/${BLAS_PACKAGE_NAME}.${BLAS_PACKAGE_VERSION})
     set (BLAS_DLL_DIR ${BLAS_PACKAGE_DIR}/build/native/haswell/bin)
@@ -55,7 +60,6 @@ if(WIN32)
         execute_process(COMMAND ${NUGET} sources add -Name ${PACKAGE_SOURCE_NAME} -Source ${PACKAGE_SOURCE_URL} -UserName USER -Password ${PACKAGE_READ_TOKEN} -ConfigFile ${NUGET_CONFIG_FILE} -StorePasswordInClearText -Verbosity quiet)
         execute_process(COMMAND ${NUGET} install ${BLAS_PACKAGE_NAME} -Version ${BLAS_PACKAGE_VERSION} -Source ${PACKAGE_SOURCE_NAME} -Outputdirectory ${CMAKE_SOURCE_DIR}/packages -PackageSaveMode nuspec -Verbosity quiet)
     endif()
-
 endif()
 
 ## Note: libopenblas install on ubuntu in /usr/lib and /usr/include
@@ -83,12 +87,6 @@ find_library(BLAS_LIBS
   )
 message(STATUS "Using BLAS library: ${BLAS_LIBS}")
 
-if(${APPLE})
-  # To install commandline tools (which seems to also install headers in /System/Library/Frameworks/...), do this:
-  # xcode-select --install
-elseif(${WIN32})
-
-endif()
 
 if (BLAS_LIBS AND BLAS_INCLUDE_DIRS)
     set(BLAS_FOUND "YES")

@@ -33,16 +33,15 @@ source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
 
-
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include ${BLAS_INCLUDE_DIRS})
 
 if(BLAS_FOUND)
-target_compile_definitions(${PROJ_NAME} PRIVATE USE_BLAS=1)
-endif()
+  target_compile_definitions(${PROJ_NAME} PRIVATE USE_BLAS=1)
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+  endif()
 endif()
 
 target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBS})
