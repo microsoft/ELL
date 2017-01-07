@@ -56,7 +56,7 @@ if(WIN32)
 
     set (BLAS_PACKAGE_NAME OpenBLASWin64)
     set (BLAS_PACKAGE_VERSION 0.2.19.1)
-    set (PROCESSOR_GENERATION haswell)
+    set (PROCESSOR_GENERATION sandybridge)
     if(processor_family EQUAL 6)
         if(processor_model EQUAL 60 OR processor_model EQUAL 63 OR processor_model EQUAL 69 OR processor_model EQUAL 70)
             set (PROCESSOR_GENERATION haswell)
