@@ -31,7 +31,6 @@ if(LLVM_FOUND)
     llvm_map_components_to_libnames(LLVM_LIBS all) #support core irreader)
     message(STATUS "Using LLVM libraries: ${LLVM_LIBS}")
 elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
-    set (PACKAGE_SOURCE_LOCAL "\\\\cjacobs-z840w10\\packages")
     set (PACKAGE_SOURCE_URL "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
     set (PACKAGE_SOURCE_NAME "ELLNugetPackages")
     set (PACKAGE_SOURCE_TOKEN "7xn3h6i6f5zes3nfnk2cqm3r6jt5l5n4c7nausukx5mbskywewjq")
