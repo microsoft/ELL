@@ -20,6 +20,12 @@
 # Location of the executable tools:
 # LLVM_TOOLS_BINARY_DIR
 
+# Include guard so we don't try to find or download LLVM more than once
+if(LLVMSetup_included)
+    return()
+endif()
+set(LLVMSetup_included true)
+
 # First try to use LLVM's CMake target (see http://llvm.org/releases/3.7.0/docs/CMake.html for documentation)
 find_package(LLVM QUIET CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
 if(LLVM_FOUND)
