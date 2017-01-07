@@ -209,9 +209,3 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
         set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
     endforeach()
 endif()
-
-if(LLVM_FOUND)
-    include_directories(${LLVM_INCLUDE_DIRS})
-    add_definitions(${LLVM_DEFINITIONS})
-    add_compile_options(${LLVM_COMPILE_OPTIONS})
-endif()
