@@ -30,12 +30,9 @@ set(LLVMSetup_included true)
 find_package(LLVM QUIET CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
 if(LLVM_FOUND)
     message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-    message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-    message(STATUS "LLVM definitions: ${LLVM_DEFINITIONS}")
 
     # Find the libraries that correspond to the LLVM components that we wish to use
-    llvm_map_components_to_libnames(LLVM_LIBS all) #support core irreader)
-    message(STATUS "Using LLVM libraries: ${LLVM_LIBS}")
+    llvm_map_components_to_libnames(LLVM_LIBS all) 
 elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
     set (PACKAGE_SOURCE_URL "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
     set (PACKAGE_SOURCE_NAME "ELLNugetPackages")
