@@ -35,7 +35,7 @@ set (BLAS_INCLUDE_SEARCH_PATHS
     /usr/local/include
 )
 
-if(${APPLE})
+if(APPLE)
   # To install commandline tools (which seems to also install headers in /System/Library/Frameworks/...), do this:
   # xcode-select --install
 endif()
@@ -49,11 +49,12 @@ if(WIN32)
 
     set (BLAS_PACKAGE_NAME OpenBLASWin64)
     set (BLAS_PACKAGE_VERSION 0.2.19.1)
-    set (BLAS_PACKAGE_DIR ${PACKAGE_ROOT}/${BLAS_PACKAGE_NAME}.${BLAS_PACKAGE_VERSION})
-    set (BLAS_DLL_DIR ${BLAS_PACKAGE_DIR}/build/native/haswell/bin)
+    set (PROCESSOR_GENERATION haswell)
+    set (BLAS_PACKAGE_DIR ${PACKAGE_ROOT}/${BLAS_PACKAGE_NAME}.${BLAS_PACKAGE_VERSION}/build/native/${PROCESSOR_GENERATION})
+    set (BLAS_DLL_DIR ${BLAS_PACKAGE_DIR}/bin)
 
     list (APPEND BLAS_INCLUDE_SEARCH_PATHS
-        ${BLAS_PACKAGE_DIR}/build/native/haswell/include/
+        ${BLAS_PACKAGE_DIR}/include/
      )
 
     # Install via nuget
@@ -82,7 +83,7 @@ set (BLAS_LIB_SEARCH_PATHS
 if(WIN32)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".dll.a" ".a")
     list (APPEND BLAS_LIB_SEARCH_PATHS 
-        ${BLAS_PACKAGE_DIR}/build/native/haswell/lib/
+        ${BLAS_PACKAGE_DIR}/lib/
     )    
 endif()
 
