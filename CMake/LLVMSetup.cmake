@@ -30,17 +30,16 @@ set(LLVMSetup_included true)
 find_package(LLVM QUIET CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
 if(LLVM_FOUND)
     message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-
     # Find the libraries that correspond to the LLVM components that we wish to use
     llvm_map_components_to_libnames(LLVM_LIBS all) 
 elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
-    set (PACKAGE_SOURCE_URL "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
-    set (PACKAGE_SOURCE_NAME "ELLNugetPackages")
-    set (PACKAGE_READ_TOKEN "7xn3h6i6f5zes3nfnk2cqm3r6jt5l5n4c7nausukx5mbskywewjq")
-    set (PACKAGE_ROOT ${CMAKE_SOURCE_DIR}/packages)
-    set (LLVM_PACKAGE_NAME LLVMNativeLibraries)
-    set (LLVM_PACKAGE_VERSION 3.9.0)
-    set (LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})
+    set(PACKAGE_SOURCE_URL "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
+    set(PACKAGE_SOURCE_NAME "ELLNugetPackages")
+    set(PACKAGE_READ_TOKEN "7xn3h6i6f5zes3nfnk2cqm3r6jt5l5n4c7nausukx5mbskywewjq")
+    set(PACKAGE_ROOT ${CMAKE_SOURCE_DIR}/packages)
+    set(LLVM_PACKAGE_NAME LLVMNativeLibraries)
+    set(LLVM_PACKAGE_VERSION 3.9.0)
+    set(LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})
 
     # Get LLVM libraries via NuGet if we're on Windows
     find_program(NUGET nuget HINTS ${CMAKE_SOURCE_DIR}/private/binaries/nuget)
