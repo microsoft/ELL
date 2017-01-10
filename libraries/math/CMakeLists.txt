@@ -35,6 +35,7 @@ source_group("tcc" FILES ${TCC})
 
 add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
 target_include_directories(${PROJ_NAME} PUBLIC include ${BLAS_INCLUDE_DIRS})
+target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBS})
 
 if(BLAS_FOUND)
   target_compile_definitions(${PROJ_NAME} PRIVATE USE_BLAS=1)
@@ -44,7 +45,6 @@ if(BLAS_FOUND)
   endif()
 endif()
 
-target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBS})
 set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
 
 #
