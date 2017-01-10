@@ -14,6 +14,7 @@
 
 // nodes
 #include "ConstantNode.h"
+#include "DotProductNode.h"
 #include "ExtremalValueNode.h"
 #include "MovingAverageNode.h"
 #include "ValueSelectorNode.h"
@@ -394,5 +395,26 @@ void TestRefineSplitOutputs()
         testing::ProcessTest("testing refined splitting model", testing::IsEqual(output[0], newOutput[0]));
         testing::ProcessTest("testing refined splitting model", testing::IsEqual(output[1], newOutput[1]));
     }
+}
+
+void TestCustomRefine()
+{
+    // Create a simple computation model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(2);
+    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0 });
+    model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
+
+    model::ModelTransformer transformer;
+    model::TransformContext context1;
+    context1.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::refine; });
+    auto model1 = transformer.RefineModel(model, context1);
+    auto size1 = model1.Size();
+    
+    model::TransformContext context2;
+    context2.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::compile; });
+    auto model2 = transformer.RefineModel(model, context2);
+    auto size2 = model2.Size();
+    testing::ProcessTest("testing custom refine function", model1.Size() == 4 && model2.Size() == 3);
 }
 }

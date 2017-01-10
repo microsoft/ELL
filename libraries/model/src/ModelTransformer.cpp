@@ -23,17 +23,35 @@ namespace model
     //
     TransformContext::TransformContext()
     {
-        _isNodeCompilableFunction = [](const Node& node) { return false; };
     }
 
-    TransformContext::TransformContext(const std::function<bool(const Node&)>& isNodeCompilable)
-        : _isNodeCompilableFunction(isNodeCompilable)
+    TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction)
     {
+        _nodeActionFunctions.emplace_back(nodeActionFunction);
     }
 
     bool TransformContext::IsNodeCompilable(const Node& node) const
     {
-        return _isNodeCompilableFunction(node);
+        return node.IsCompilable();
+    }
+
+    void TransformContext::AddNodeActionFunction(const NodeActionFunction& nodeActionFunction) 
+    {
+        _nodeActionFunctions.emplace_back(nodeActionFunction);
+    }
+
+    NodeAction TransformContext::GetNodeAction(const Node& node) const
+    {
+        for(auto iter = _nodeActionFunctions.rbegin(); iter != _nodeActionFunctions.rend(); ++iter)
+        {
+            auto& actionFunction = *iter;
+            auto action = actionFunction(node);
+            if(action != NodeAction::abstain)
+            {                
+                return action;
+            }
+        }
+        return node.IsCompilable() ? NodeAction::compile : NodeAction::refine;
     }
 
     //
@@ -97,8 +115,18 @@ namespace model
 
             // one refinement pass
             bool didRefineAny = false;
-            currentModel.Visit([this, &didRefineAny](const Node& node) {
-                bool didRefineNode = node.InvokeRefine(*this);
+            currentModel.Visit([this, &context, &didRefineAny](const Node& node) {
+                bool didRefineNode = false;
+                auto action = context.GetNodeAction(node);
+                // If the node action is "refine" or the default, try to refine the node, otherwise leave it alone
+                if(action == NodeAction::refine || action == NodeAction::abstain)
+                {
+                    didRefineNode = node.InvokeRefine(*this);
+                }
+                else
+                {
+                    node.InvokeCopy(*this);
+                }
                 didRefineAny |= didRefineNode;
             });
 

@@ -20,7 +20,6 @@
 #include "MovingAverageNode.h"
 
 // common
-#include "IsNodeCompilable.h"
 #include "LoadModel.h" // for RegisterNodeTypes
 
 // utilities
@@ -111,7 +110,7 @@ void TestDynamicMapRefine()
     auto map1 = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
     auto map2 = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
 
-    model::TransformContext context{ common::IsNodeCompilable() };
+    model::TransformContext context;
     map2.Refine(context);
 
     auto input = std::vector<std::vector<double>>{ { 1.0, 2.0, 3.0 },

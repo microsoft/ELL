@@ -6,9 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// common
-#include "IsNodeCompilable.h"
-
 // model
 #include "InputNode.h"
 #include "Model.h"
@@ -182,7 +179,7 @@ model::Model GenerateTreeModel(size_t numSplits)
 model::Model GenerateRefinedTreeModel(size_t numSplits)
 {
     auto model = GenerateTreeModel(numSplits);
-    model::TransformContext context{ common::IsNodeCompilable() };
+    model::TransformContext context;
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     return refinedModel;

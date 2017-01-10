@@ -17,7 +17,6 @@ set (SRC
   src/DataSaveArguments.cpp
   src/DataLoaders.cpp
   src/EvaluatorArguments.cpp
-  src/IsNodeCompilable.cpp
   src/LoadModel.cpp
   src/MakeTrainer.cpp
   src/MapLoadArguments.cpp
@@ -36,7 +35,6 @@ set (INCLUDE
   include/DataSaveArguments.h
   include/DataLoaders.h
   include/EvaluatorArguments.h
-  include/IsNodeCompilable.h
   include/LoadModel.h
   include/MakeEvaluator.h
   include/MakeTrainer.h
@@ -53,7 +51,6 @@ set (INCLUDE
 
 set (TCC 
   tcc/AppendNodeToModel.tcc
-  tcc/IsNodeCompilable.tcc
   tcc/DataLoaders.tcc
   tcc/MakeEvaluator.tcc
   tcc/ParametersEnumerator.tcc
