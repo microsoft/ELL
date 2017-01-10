@@ -5,8 +5,8 @@ Prerequisites
 If you don't have cmake installed, download and install it from <https://cmake.org/download/>
 
 If you want to build the compiler part of ELL, you will need to have LLVM installed. On Windows, CMake will 
-download a LLVM package via NuGet, but you must have NuGet installed in order to download the package. You
-can find instructions for installing NuGet [here](https://docs.nuget.org/ndocs/guides/install-nuget).
+download a LLVM package via NuGet, but you must have a recent version (at least version 3.5) of NuGet installed in order
+to download the package. You can find instructions for installing NuGet [here](https://docs.nuget.org/ndocs/guides/install-nuget).
 
 Python interfaces
 -----------------

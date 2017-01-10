@@ -40,7 +40,6 @@ include_directories(../libraries/nodes/include)
 include_directories(../libraries/predictors/include)
 include_directories(../libraries/trainers/include)
 include_directories(../libraries/utilities/include)
-include_directories(common/include)
 
 add_subdirectory(common)
 add_subdirectory(python)

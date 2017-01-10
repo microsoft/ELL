@@ -79,7 +79,7 @@ if(WIN32)
      )
 
     # Install via nuget
-    find_program(NUGET nuget HINTS ${CMAKE_SOURCE_DIR}/private/binaries/nuget)
+    find_program(NUGET nuget HINTS)
     if(NUGET)
         message(STATUS "Installing OpenBLAS NuGet package")
         set(NUGET_CONFIG_FILE "${CMAKE_BINARY_DIR}/NuGet.config")
