@@ -4,15 +4,11 @@
 include (CommonInterfaces)
 
 # Get include directories for LLVM
-if(WIN32)
-  include (LLVMSetup)
-else()
-  find_package(LLVM REQUIRED CONFIG 
-    PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
-  if(LLVM_FOUND)
+include (LLVMSetup)
+if(LLVM_FOUND)
     include_directories(${LLVM_INCLUDE_DIRS})
     add_definitions(${LLVM_DEFINITIONS})
-  endif()
+    add_compile_options(${LLVM_COMPILE_OPTIONS})
 endif()
 
 set (INTERFACE_MAIN ../common/ELL.i)
@@ -44,7 +40,6 @@ include_directories(../libraries/nodes/include)
 include_directories(../libraries/predictors/include)
 include_directories(../libraries/trainers/include)
 include_directories(../libraries/utilities/include)
-include_directories(common/include)
 
 add_subdirectory(common)
 add_subdirectory(python)

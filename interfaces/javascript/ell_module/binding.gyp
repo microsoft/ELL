@@ -1,5 +1,8 @@
 {
     'variables': {
+        'blas_include_path': '@BLAS_INCLUDE_DIRS@',
+        'llvm_include_path': '@LLVM_INCLUDE_DIRS@',
+        'llvm_library_path': '@LLVM_LIBRARY_DIRS@',
     },
     'conditions': [
         [
@@ -9,9 +12,6 @@
                     'include_path_prefix%': '../../../..',
                     'library_path_prefix%': '../../../..',
                     'library_path_suffix%': '/Release',
-                    'llvm_include_path': '../../../../private/binaries/llvm/include',
-                    'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
-                    'llvm_library_path': '../../../../private/binaries/llvm/Rel/lib'
                 },
             }
         ],
@@ -22,9 +22,6 @@
                     'include_path_prefix%':'../../../..',
                     'library_path_prefix%':'../../../../..',
                     'library_path_suffix%': '',
-                    'llvm_include_path': '@LLVM_INCLUDE_DIRS@',
-                    'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
-                    'llvm_library_path': '@LLVM_LIBRARY_DIRS@'
                 },
             }
         ],
@@ -35,9 +32,6 @@
                     'include_path_prefix%':'../../../..',
                     'library_path_prefix%':'../../../../..',
                     'library_path_suffix%': '',
-                    'llvm_include_path': '@LLVM_INCLUDE_DIRS@',
-                    'blas_include_path': '../../../../private/dependencies/OpenBLAS/win64/v0.2.19/haswell/include',
-                    'llvm_library_path': '@LLVM_LIBRARY_DIRS@'
                 },
             }
         ]
@@ -94,6 +88,21 @@
                     '<(library_path_prefix)/build/private/libraries/compiler<(library_path_suffix)',
                     '<(library_path_prefix)/build/private/libraries/emitters<(library_path_suffix)',
                     '<(llvm_library_path)',
+                ],
+                'libraries': [
+                    '-lcommon',
+                    '-ldata',
+                    '-levaluators',                                                                
+                    '-llossFunctions',
+                    '-lmath',
+                    '-lmodel',
+                    '-lnodes',
+                    '-lpredictors',
+                    '-ltrainers',
+                    '-lutilities',
+                    '-lcompiler',
+                    '-lemitters',
+                    @MODULE_LLVM_LIBS@
                 ]
             },
             'conditions': [
@@ -101,47 +110,6 @@
                     'OS=="win"',
                     {
                         'link_settings': {
-                            'libraries': [
-                                '-lcommon',
-                                '-ldata',
-                                '-levaluators',                                                                
-                                '-llossFunctions',
-                                '-lmath',
-                                '-lmodel',
-                                '-lnodes',
-                                '-lpredictors',
-                                '-ltrainers',
-                                '-lutilities',
-                                '-lcompiler',
-                                '-lemitters',
-
-                                '-lLLVMAnalysis',
-                                '-lLLVMAsmParser',
-                                '-lLLVMAsmPrinter',
-                                '-lLLVMBitReader',
-                                '-lLLVMBitWriter',
-                                '-lLLVMCodeGen',
-                                '-lLLVMCore',
-                                '-lLLVMDebugInfoCodeView',
-                                '-lLLVMExecutionEngine',
-                                '-lLLVMInstCombine',
-                                '-lLLVMMC',
-                                '-lLLVMMCDisassembler',
-                                '-lLLVMMCJIT',
-                                '-lLLVMMCParser',
-                                '-lLLVMObject',
-                                '-lLLVMRuntimeDyld',
-                                '-lLLVMScalarOpts',
-                                '-lLLVMSelectionDAG',
-                                '-lLLVMSupport',
-                                '-lLLVMTarget',
-                                '-lLLVMTransformUtils',
-                                '-lLLVMX86AsmPrinter',
-                                '-lLLVMX86CodeGen',
-                                '-lLLVMX86Desc',
-                                '-lLLVMX86Info',
-                                '-lLLVMX86Utils'                                
-                            ]
                         },
                         'msvs_settings': {
                             'VCCLCompilerTool': {
@@ -158,46 +126,6 @@
                     'OS=="mac"',
                     {
                         'link_settings': {
-                            'libraries': [
-                                '-lcommon',
-                                '-ldata',
-                                '-levaluators',                                                                
-                                '-llossFunctions',
-                                '-lmath',
-                                '-lmodel',
-                                '-lnodes',
-                                '-lpredictors',
-                                '-ltrainers',
-                                '-lutilities',
-                                '-lcompiler',
-                                '-lemitters',
-                                '-lLLVMAnalysis',
-                                '-lLLVMAsmParser',
-                                '-lLLVMAsmPrinter',
-                                '-lLLVMBitReader',
-                                '-lLLVMBitWriter',
-                                '-lLLVMCodeGen',
-                                '-lLLVMCore',
-                                '-lLLVMDebugInfoCodeView',
-                                '-lLLVMExecutionEngine',
-                                '-lLLVMInstCombine',
-                                '-lLLVMMC',
-                                '-lLLVMMCDisassembler',
-                                '-lLLVMMCJIT',
-                                '-lLLVMMCParser',
-                                '-lLLVMObject',
-                                '-lLLVMRuntimeDyld',
-                                '-lLLVMScalarOpts',
-                                '-lLLVMSelectionDAG',
-                                '-lLLVMSupport',
-                                '-lLLVMTarget',
-                                '-lLLVMTransformUtils',
-                                '-lLLVMX86AsmPrinter',
-                                '-lLLVMX86CodeGen',
-                                '-lLLVMX86Desc',
-                                '-lLLVMX86Info',
-                                '-lLLVMX86Utils'                                
-                            ]
                         },
                         'cflags_cc!': [
                             '-fno-rtti',
@@ -235,46 +163,6 @@
                             '-fno-exceptions'
                         ],
                         'link_settings': {
-                            'libraries': [
-                                '-lcommon',
-                                '-ldata',
-                                '-levaluators',                                                                
-                                '-llossFunctions',
-                                '-lmath',
-                                '-lmodel',
-                                '-lnodes',
-                                '-lpredictors',
-                                '-ltrainers',
-                                '-lutilities',
-                                '-lcompiler',
-                                '-lemitters',
-                                '-lLLVMAnalysis',
-                                '-lLLVMAsmParser',
-                                '-lLLVMAsmPrinter',
-                                '-lLLVMBitReader',
-                                '-lLLVMBitWriter',
-                                '-lLLVMCodeGen',
-                                '-lLLVMCore',
-                                '-lLLVMDebugInfoCodeView',
-                                '-lLLVMExecutionEngine',
-                                '-lLLVMInstCombine',
-                                '-lLLVMMC',
-                                '-lLLVMMCDisassembler',
-                                '-lLLVMMCJIT',
-                                '-lLLVMMCParser',
-                                '-lLLVMObject',
-                                '-lLLVMRuntimeDyld',
-                                '-lLLVMScalarOpts',
-                                '-lLLVMSelectionDAG',
-                                '-lLLVMSupport',
-                                '-lLLVMTarget',
-                                '-lLLVMTransformUtils',
-                                '-lLLVMX86AsmPrinter',
-                                '-lLLVMX86CodeGen',
-                                '-lLLVMX86Desc',
-                                '-lLLVMX86Info',
-                                '-lLLVMX86Utils'                                
-                            ]
                         }
                     }
                 ]
