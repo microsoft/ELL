@@ -35,6 +35,7 @@ namespace nodes
     public:
         /// @name Input and Output Ports
         /// @{
+        static constexpr const char* dummy = ""; // Workaround for an apparent VC++ bug
         static constexpr const char* input1PortName = "input1";
         static constexpr const char* input2PortName = "input2";
         static constexpr const char* outputPortName = "output";
