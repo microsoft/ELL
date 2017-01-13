@@ -60,6 +60,16 @@ namespace trainers
         /// <returns> A shared pointer to the current predictor. </returns>
         virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
 
+        /// <summary> Returns a const reference to the last predictor. </summary>
+        ///
+        /// <returns> A const reference to the last predictor. </returns>
+        const PredictorType& GetLastPredictor() const { return _lastPredictor; }
+
+        /// <summary> Returns a const reference to the averaged predictor. </summary>
+        ///
+        /// <returns> A const reference to the averaged predictor. </returns>
+        const PredictorType& GetAveragedPredictor() const { return *_averagedPredictor; }
+
     private:
         void UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples);
         void UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator);
