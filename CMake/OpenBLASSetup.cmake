@@ -48,11 +48,10 @@ if(WIN32)
     string(REGEX REPLACE ".* Model ([0-9]+) .*" "\\1" processor_model "${processor_id}")
     message(STATUS "Processor family: ${processor_family}, model: ${processor_model}")
 
-    set(PACKAGE_SOURCE_LOCAL "\\\\cjacobs-z840w10\\packages")
     set(PACKAGE_SOURCE_URL "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
     set(PACKAGE_SOURCE_NAME "ELLNugetPackages")
     set(PACKAGE_READ_TOKEN "7xn3h6i6f5zes3nfnk2cqm3r6jt5l5n4c7nausukx5mbskywewjq")
-    set(PACKAGE_ROOT ${CMAKE_SOURCE_DIR}/packages)
+    set(PACKAGE_ROOT ${CMAKE_SOURCE_DIR}/external/packages)
 
     set(BLAS_PACKAGE_NAME OpenBLASWin64)
     set(BLAS_PACKAGE_VERSION 0.2.19.1)
@@ -91,7 +90,7 @@ if(WIN32)
         # Write an empty NuGet.config file and use it so we don't mess up the user's global NuGet configuration
         file(WRITE ${NUGET_CONFIG_FILE} "<?xml version=\"1.0\" encoding=\"utf-8\"?><configuration></configuration>")
         execute_process(COMMAND ${NUGET} sources add -Name ${PACKAGE_SOURCE_NAME} -Source ${PACKAGE_SOURCE_URL} -UserName USER -Password ${PACKAGE_READ_TOKEN} -ConfigFile ${NUGET_CONFIG_FILE} -StorePasswordInClearText -Verbosity quiet)
-        execute_process(COMMAND ${NUGET} install ${BLAS_PACKAGE_NAME} -Version ${BLAS_PACKAGE_VERSION} -Source ${PACKAGE_SOURCE_NAME} -Outputdirectory ${CMAKE_SOURCE_DIR}/packages -PackageSaveMode nuspec -Verbosity quiet)
+        execute_process(COMMAND ${NUGET} install ${BLAS_PACKAGE_NAME} -Version ${BLAS_PACKAGE_VERSION} -Source ${PACKAGE_SOURCE_NAME} -Outputdirectory ${PACKAGE_ROOT} -PackageSaveMode nuspec -Verbosity quiet)
     endif()
 endif()
 
