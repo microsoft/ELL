@@ -26,7 +26,7 @@ namespace ell
 {
 namespace common
 {
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
@@ -46,7 +46,7 @@ namespace common
         }
     }
 
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments)
+    std::unique_ptr<trainers::ITrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 

@@ -65,7 +65,7 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeSweepingIncrementalTrainer(std::vector<EvaluatingIncrementalTrainer<PredictorType>>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<PredictorType>> MakeSweepingIncrementalTrainer(std::vector<EvaluatingIncrementalTrainer<PredictorType>>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters)
     {
         return std::make_unique<SweepingIncrementalTrainer<PredictorType>>(std::move(evaluatingTrainers), parameters);
     }

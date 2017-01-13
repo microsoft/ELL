@@ -30,7 +30,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
     {
         return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, lossFunction, parameters);
     }

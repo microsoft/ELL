@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IIncrementalTrainer.h"
+#include "ITrainer.h"
 
 // data
 #include "Dataset.h"
@@ -111,7 +111,7 @@ namespace trainers
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to optimize. </typeparam>
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
-    class ForestTrainer : public ForestTrainerBase, public IIncrementalTrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>>
+    class ForestTrainer : public ForestTrainerBase, public ITrainer<predictors::ForestPredictor<SplitRuleType, EdgePredictorType>>
     {
     public:
         using PredictorType = typename predictors::ForestPredictor<SplitRuleType, EdgePredictorType>;

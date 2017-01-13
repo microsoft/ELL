@@ -19,7 +19,7 @@ set (SRC src/ForestTrainer.cpp
 set (INCLUDE include/EvaluatingIncrementalTrainer.h
              include/ForestTrainer.h
              include/HistogramForestTrainer.h
-             include/IIncrementalTrainer.h
+             include/ITrainer.h
              include/LogitBooster.h
              include/MultiEpochIncrementalTrainer.h
              include/SortingForestTrainer.h

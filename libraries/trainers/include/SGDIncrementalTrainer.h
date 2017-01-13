@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IIncrementalTrainer.h"
+#include "ITrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
 
 // predictors
@@ -38,7 +38,7 @@ namespace trainers
     /// </summary>
     /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
     template <typename LossFunctionType>
-    class SGDIncrementalTrainer : public IIncrementalTrainer<predictors::LinearPredictor>
+    class SGDIncrementalTrainer : public ITrainer<predictors::LinearPredictor>
     {
     public:
         typedef predictors::LinearPredictor PredictorType;
@@ -81,7 +81,7 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters);
 }
 }
 

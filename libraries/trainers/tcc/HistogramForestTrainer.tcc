@@ -104,7 +104,7 @@ namespace trainers
     };
 
     template <typename LossFunctionType, typename BoosterType, typename ThresholdFinderType>
-    std::unique_ptr<IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<predictors::SimpleForestPredictor>> MakeHistogramForestTrainer(const LossFunctionType& lossFunction, const BoosterType& booster, const ThresholdFinderType& thresholdFinder, const HistogramForestTrainerParameters& parameters)
     {
         return std::make_unique<HistogramForestTrainer<LossFunctionType, BoosterType, ThresholdFinderType>>(lossFunction, booster, thresholdFinder, parameters);
     }

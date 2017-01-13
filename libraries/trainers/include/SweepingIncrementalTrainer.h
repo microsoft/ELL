@@ -9,7 +9,7 @@
 #pragma once
 
 #include "EvaluatingIncrementalTrainer.h"
-#include "IIncrementalTrainer.h"
+#include "ITrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
 
 // data
@@ -33,7 +33,7 @@ namespace trainers
     ///
     /// <typeparam name="PredictorType"> The type of predictor returned by this trainer. </typeparam>
     template <typename PredictorType>
-    class SweepingIncrementalTrainer : public IIncrementalTrainer<PredictorType>
+    class SweepingIncrementalTrainer : public ITrainer<PredictorType>
     {
     public:
         typedef EvaluatingIncrementalTrainer<PredictorType> EvaluatingTrainerType;
@@ -67,7 +67,7 @@ namespace trainers
     ///
     /// <returns> A unique_ptr to a sweeping trainer. </returns>
     template <typename PredictorType>
-    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeSweepingIncrementalTrainer(std::vector<EvaluatingIncrementalTrainer<PredictorType>>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters);
+    std::unique_ptr<ITrainer<PredictorType>> MakeSweepingIncrementalTrainer(std::vector<EvaluatingIncrementalTrainer<PredictorType>>&& evaluatingTrainers, const MultiEpochIncrementalTrainerParameters& parameters);
 }
 }
 
