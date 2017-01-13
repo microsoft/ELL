@@ -238,6 +238,7 @@ namespace math
         {
             return VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
         }
+
         using ConstVectorReference<ElementType, Orientation>::Transpose;
 
         /// <summary> Applies an operation to all items in this collection. </summary>
@@ -309,6 +310,9 @@ namespace math
         /// <param name="size"> The vector size. </param>
         Vector(size_t size);
 
+        /// <summary> Constructs a vector by copying a std::vector. </summary>
+        ///
+        /// <param name="data"> The std::vector to copy. </param>
         Vector(std::vector<ElementType> data);
 
         /// <summary> Constructs a vector from an initializer list. </summary>
@@ -340,6 +344,7 @@ namespace math
 
     private:
         using ConstVectorReference<ElementType, Orientation>::_pData;
+
         // member variables
         std::vector<ElementType> _data;
     };

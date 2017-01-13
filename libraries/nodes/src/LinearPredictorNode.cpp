@@ -34,7 +34,7 @@ namespace nodes
     LinearPredictorNode::LinearPredictorNode(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor)
         : Node({ &_input }, { &_output, &_weightedElements }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
     {
-        assert(input.Size() == predictor.GetDimension());
+        assert(input.Size() == predictor.Size());
     }
 
     void LinearPredictorNode::WriteToArchive(utilities::Archiver& archiver) const

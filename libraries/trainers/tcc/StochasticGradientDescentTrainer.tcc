@@ -19,7 +19,7 @@ namespace trainers
 {
     template <typename LossFunctionType>
     StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(size_t dim, const LossFunctionType& lossFunction, const StochasticGradientDescentTrainerParameters& parameters)
-        : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(std::make_shared<PredictorType>(dim)) // iterations start from 1 to prevent divide-by-zero
+        : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(0), _lastPredictor(dim), _averagedPredictor(std::make_shared<PredictorType>(dim))
     {
     }
 
@@ -38,12 +38,19 @@ namespace trainers
     template <typename LossFunctionType>
     void StochasticGradientDescentTrainer<LossFunctionType>::UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples)
     {
-        // get references to the vector and biases
-        auto& vLast = _lastPredictor.GetWeights();
-        auto& vAvg = _averagedPredictor->GetWeights();
+        // this code follows the notation in https://arxiv.org/abs/1612.09147
 
-        double& bLast = _lastPredictor.GetBias();
-        double& bAvg = _averagedPredictor->GetBias();
+        // get references to the vector and biases
+        auto& lastV = _lastPredictor.GetWeights();
+        auto& averagedV = _averagedPredictor->GetWeights();
+
+        double& lastB = _lastPredictor.GetBias();
+        double& averagedB = _averagedPredictor->GetBias();
+
+
+
+
+
 
         // define some constants
         const double T_prev = double(_total_iterations);
@@ -53,8 +60,8 @@ namespace trainers
 
         // calulate the contribution of the old lastPredictor to the new avergedPredictor
         const double historyWeight = sigma - std::log(T_prev) - 0.5 / T_prev;
-        math::Operations::Add(historyWeight, vLast, vAvg);
-        bAvg += bLast * historyWeight;
+        math::Operations::Add(historyWeight, lastV, averagedV);
+        averagedB += lastB * historyWeight;
         while (exampleIterator.IsValid())
         {
             ++_total_iterations;
@@ -72,16 +79,16 @@ namespace trainers
             // calculate the loss derivative
             double beta = weight * _lossFunction.GetDerivative(alpha, label);
 
-            // Update vLast and vAvg
+            // Update lastV and averagedV
             double lastCoeff = -eta * beta;
-            auto vLastTranspose = vLast.Transpose();
-            dataVector.AddTo(vLastTranspose, lastCoeff);
-            bLast += lastCoeff;
+            auto lastVTranspose = lastV.Transpose();
+            dataVector.AddTo(lastVTranspose, lastCoeff);
+            lastB += lastCoeff;
 
             double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
-            auto vAvgTranspose = vAvg.Transpose();
-            dataVector.AddTo(vAvgTranspose, avgCoeff);
-            bAvg += avgCoeff;
+            auto averagedVTranspose = averagedV.Transpose();
+            dataVector.AddTo(averagedVTranspose, avgCoeff);
+            averagedB += avgCoeff;
 
             exampleIterator.Next();
         }
@@ -90,21 +97,21 @@ namespace trainers
 
         // calculate w and w_avg
         double scale = T_prev / T_next;
-        math::Operations::Multiply(scale, vLast);
-        bLast *= scale;
-        math::Operations::Multiply(scale, vAvg);
-        bAvg *= scale;
+        math::Operations::Multiply(scale, lastV);
+        lastB *= scale;
+        math::Operations::Multiply(scale, averagedV);
+        averagedB *= scale;
     }
 
     template <typename LossFunctionType>
     void StochasticGradientDescentTrainer<LossFunctionType>::UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
     {
         // get references to the vector and biases
-        auto& vLast = _lastPredictor.GetWeights();
-        auto& vAvg = _averagedPredictor->GetWeights();
+        auto& lastV = _lastPredictor.GetWeights();
+        auto& averagedV = _averagedPredictor->GetWeights();
 
-        double& bLast = _lastPredictor.GetBias();
-        double& bAvg = _averagedPredictor->GetBias();
+        double& lastB = _lastPredictor.GetBias();
+        double& averagedB = _averagedPredictor->GetBias();
 
         while (exampleIterator.IsValid())
         {
@@ -125,20 +132,20 @@ namespace trainers
 
             // update last
             double scaleCoefficient = 1.0 - 1.0 / t;
-            math::Operations::Multiply(scaleCoefficient, vLast);
-            bLast *= scaleCoefficient;
+            math::Operations::Multiply(scaleCoefficient, lastV);
+            lastB *= scaleCoefficient;
 
             double updateCoefficient = -beta / t / _parameters.regularization;
-            auto vLastTranspose = vLast.Transpose();
-            dataVector.AddTo(vLastTranspose, updateCoefficient);
-            bLast += updateCoefficient;
+            auto lastVTranspose = lastV.Transpose();
+            dataVector.AddTo(lastVTranspose, updateCoefficient);
+            lastB += updateCoefficient;
 
             // update average
             double averageingCoefficient = (t - 1) / t;
-            math::Operations::Multiply(averageingCoefficient, vAvg);
-            bAvg *= averageingCoefficient;
-            // vLast.AddTo(vAvg, 1 / t); // dense operation
-            bAvg += bLast / t;
+            math::Operations::Multiply(averageingCoefficient, averagedV);
+            averagedB *= averageingCoefficient;
+            // lastV.AddTo(averagedV, 1 / t); // dense operation
+            averagedB += lastB / t;
 
             exampleIterator.Next();
         }

@@ -65,7 +65,7 @@ namespace predictors
         /// <summary> Gets the dimension of the linear predictor. </summary>
         ///
         /// <returns> The dimension. </returns>
-        size_t GetDimension() const { return _w.Size(); }
+        size_t Size() const { return _w.Size(); }
 
         /// <summary> Returns the output of the predictor for a given example. </summary>
         ///
