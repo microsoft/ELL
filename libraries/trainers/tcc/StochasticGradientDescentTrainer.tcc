@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     SGDIncrementalTrainer.tcc (trainers)
+//  File:     StochasticGradientDescentTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,25 +18,25 @@ namespace ell
 namespace trainers
 {
     template <typename LossFunctionType>
-    SGDIncrementalTrainer<LossFunctionType>::SGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
+    StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(size_t dim, const LossFunctionType& lossFunction, const StochasticGradientDescentTrainerParameters& parameters)
         : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(1), _lastPredictor(dim), _averagedPredictor(std::make_shared<PredictorType>(dim)) // iterations start from 1 to prevent divide-by-zero
     {
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
+    void StochasticGradientDescentTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
     {
         UpdateSparse(anyDataset.GetExampleIterator<data::AutoSupervisedExample>(), anyDataset.NumExamples());
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossFunctionType& lossFunction, const SGDIncrementalTrainerParameters& parameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(size_t dim, const LossFunctionType& lossFunction, const StochasticGradientDescentTrainerParameters& parameters)
     {
-        return std::make_unique<SGDIncrementalTrainer<LossFunctionType>>(dim, lossFunction, parameters);
+        return std::make_unique<StochasticGradientDescentTrainer<LossFunctionType>>(dim, lossFunction, parameters);
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples)
+    void StochasticGradientDescentTrainer<LossFunctionType>::UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();
@@ -97,7 +97,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void SGDIncrementalTrainer<LossFunctionType>::UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
+    void StochasticGradientDescentTrainer<LossFunctionType>::UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
     {
         // get references to the vector and biases
         auto& vLast = _lastPredictor.GetWeights();

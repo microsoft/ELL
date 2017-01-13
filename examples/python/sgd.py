@@ -36,7 +36,7 @@ def sgd():
 
     # create sgd trainer    
     loss = LogLoss()
-    params = SGDIncrementalTrainerParameters()
+    params = StochasticGradientDescentTrainerParameters()
     params.regularization = l2Regularization
     trainer = LogLossSGDTrainer(dataDimension, loss, params)
 

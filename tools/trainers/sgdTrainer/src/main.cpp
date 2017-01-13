@@ -29,7 +29,7 @@
 #include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
-#include "SGDIncrementalTrainerArguments.h"
+#include "StochasticGradientDescentTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // model
@@ -43,7 +43,7 @@
 // trainers
 #include "EvaluatingIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
-#include "SGDIncrementalTrainer.h"
+#include "StochasticGradientDescentTrainer.h"
 
 // evaluators
 #include "BinaryErrorAggregator.h"
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedTrainerArguments trainerArguments;
-        common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
+        common::ParsedStochasticGradientDescentTrainerArguments StochasticGradientDescentTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
 
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
-        commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
+        commandLineParser.AddOptionSet(StochasticGradientDescentTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
 
         // parse command line
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
         using PredictorType = predictors::LinearPredictor;
 
         // create sgd trainer
-        auto trainer = common::MakeSGDIncrementalTrainer(mappedDatasetDimension, trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
+        auto trainer = common::MakeStochasticGradientDescentTrainer(mappedDatasetDimension, trainerArguments.lossArguments, StochasticGradientDescentTrainerArguments);
 
         // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;

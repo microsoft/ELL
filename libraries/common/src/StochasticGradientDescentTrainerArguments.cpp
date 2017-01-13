@@ -1,18 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     SGDIncrementalTrainerArguments.cpp (common)
+//  File:     StochasticGradientDescentTrainerArguments.cpp (common)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SGDIncrementalTrainerArguments.h"
+#include "StochasticGradientDescentTrainerArguments.h"
 
 namespace ell
 {
 namespace common
 {
-    void ParsedSGDIncrementalTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
+    void ParsedStochasticGradientDescentTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(regularization,
                          "regularization",

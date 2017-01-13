@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     SGDIncrementalTrainerArguments.h (common)
+//  File:     StochasticGradientDescentTrainerArguments.h (common)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,16 +12,16 @@
 #include "CommandLineParser.h"
 
 // trainers
-#include "SGDIncrementalTrainer.h"
+#include "StochasticGradientDescentTrainer.h"
 
 namespace ell
 {
 namespace common
 {
-    typedef trainers::SGDIncrementalTrainerParameters SGDIncrementalTrainerArguments;
+    typedef trainers::StochasticGradientDescentTrainerParameters StochasticGradientDescentTrainerArguments;
 
     /// <summary> Parsed version of stochastic gradient descent parameters. </summary>
-    struct ParsedSGDIncrementalTrainerArguments : public SGDIncrementalTrainerArguments, public utilities::ParsedArgSet
+    struct ParsedStochasticGradientDescentTrainerArguments : public StochasticGradientDescentTrainerArguments, public utilities::ParsedArgSet
     {
         /// <summary> Adds the arguments to the command line parser. </summary>
         ///

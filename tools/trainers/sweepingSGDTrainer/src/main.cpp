@@ -30,12 +30,12 @@
 #include "ModelSaveArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "ParametersEnumerator.h"
-#include "SGDIncrementalTrainerArguments.h"
+#include "StochasticGradientDescentTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // trainers
 #include "EvaluatingIncrementalTrainer.h"
-#include "SGDIncrementalTrainer.h"
+#include "StochasticGradientDescentTrainer.h"
 #include "SweepingIncrementalTrainer.h"
 
 // evaluators
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
-        common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
+        common::ParsedStochasticGradientDescentTrainerArguments StochasticGradientDescentTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
-        commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
+        commandLineParser.AddOptionSet(StochasticGradientDescentTrainerArguments);
 
         // parse command line
         commandLineParser.Parse();
@@ -112,14 +112,14 @@ int main(int argc, char* argv[])
         evaluators::EvaluatorParameters evaluatorParameters{ multiEpochTrainerArguments.numEpochs, false };
 
         // create trainers
-        auto generator = common::MakeParametersEnumerator<trainers::SGDIncrementalTrainerParameters>(regularization);
+        auto generator = common::MakeParametersEnumerator<trainers::StochasticGradientDescentTrainerParameters>(regularization);
         std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
         for (size_t i = 0; i < regularization.size(); ++i)
         {
-            auto sgdIncrementalTrainer = common::MakeSGDIncrementalTrainer(mappedDatasetDimension, trainerArguments.lossArguments, generator.GenerateParameters(i));
+            auto StochasticGradientDescentTrainer = common::MakeStochasticGradientDescentTrainer(mappedDatasetDimension, trainerArguments.lossArguments, generator.GenerateParameters(i));
             evaluators.push_back(common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossArguments));
-            evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(sgdIncrementalTrainer), evaluators.back()));
+            evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(StochasticGradientDescentTrainer), evaluators.back()));
         }
 
         // create meta trainer
