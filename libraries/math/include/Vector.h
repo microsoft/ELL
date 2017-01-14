@@ -330,6 +330,11 @@ namespace math
         /// <param name="other"> [in,out] The vector being copied. </param>
         Vector(const Vector<ElementType, Orientation>& other);
 
+        /// <summary> Resize the vector. This function possibly invalidates references to the old vector. </summary>
+        ///
+        /// <param name="size"> The new vector size. </param>
+        void Resize(size_t size);
+
         /// <summary> Assignment operator. </summary>
         ///
         /// <param name="other"> The other vector. </param>

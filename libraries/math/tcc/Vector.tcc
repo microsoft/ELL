@@ -14,6 +14,7 @@
 
 // stl
 #include <algorithm> // for std::generate
+#include "..\include\Vector.h"
 
 namespace ell
 {
@@ -329,6 +330,14 @@ namespace math
         : VectorReference<ElementType, Orientation>(nullptr, other._size, other._increment), _data(other._data)
     {
         _pData = _data.data();
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void Vector<ElementType, Orientation>::Resize(size_t size)
+    {
+        _data.resize(size);
+        _pData = _data.data();
+        _size = size;
     }
 
     template <typename ElementType, VectorOrientation Orientation>
