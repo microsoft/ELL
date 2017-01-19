@@ -28,6 +28,7 @@ endif()
 option(SWIG_ENABLED "Enable swig interfaces" ON)
 option(DOXYGEN_ENABLED "Enable Doxygen interfaces" ON)
 
+set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 
@@ -51,7 +52,7 @@ add_subdirectory(tools)
 add_subdirectory(scripts)
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/private)
-add_subdirectory(private)
+  add_subdirectory(private)
 endif()
 
 # Add examples
@@ -61,9 +62,7 @@ add_subdirectory(examples)
 if(SWIG_ENABLED)
   find_package(SWIG 3.0)
   if(SWIG_FOUND)
-    add_subdirectory(interfaces)
-
-  
+    add_subdirectory(interfaces)  
   else()
     message(WARNING "Couldn't find SWIG, skipping interface generation.")
   endif()
