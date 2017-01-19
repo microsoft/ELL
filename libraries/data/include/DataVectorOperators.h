@@ -17,16 +17,24 @@ namespace ell
 {
 namespace data
 {
+    /// <summary> A class that holds a const reference to a data vector and a scalar. </summary>
     class ScaledDataVector
     {
     public:
-        // TODO document
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="scalar"> The scalar. </param>
+        /// <param name="dataVector"> The data vector. </param>
         ScaledDataVector(double scalar, const IDataVector& dataVector);
 
-        // TODO document
+        /// <summary> Gets the scalar. </summary>
+        ///
+        /// <returns> The scalar. </returns>
         double GetScalar() const { return _scalar; }
 
-        // TODO document
+        /// <summary> Gets a const reference to the data vector. </summary>
+        ///
+        /// <returns> The data vector. </returns>
         const IDataVector& GetDataVector() const { return _dataVector; }
 
     private:
@@ -34,16 +42,32 @@ namespace data
         const IDataVector& _dataVector;
     };
 
-    // TODO document
+    /// <summary> Creates a ScaledDataVector from a scalar and a data vector. </summary>
+    ///
+    /// <param name="scalar"> The scalar. </param>
+    /// <param name="dataVector"> The data vector. </param>
+    ///
+    /// <returns> A ScaledDataVector that represents the result of the operation. </returns>
     ScaledDataVector operator*(double scalar, const IDataVector& dataVector);
 
-    // TODO document
+    /// <summary> Adds a ScaledDataVector to a math::RowVector. </summary>
+    ///
+    /// <param name="vector"> The math::RowVector being modified. </param>
+    /// <param name="scaledDataVector"> The ScaledDataVector being added to the vector. </param>
     void operator+=(math::RowVectorReference<double> vector, const ScaledDataVector& scaledDataVector);
 
-    // TODO document
+    /// <summary> Adds a DataVector to a math::RowVector. </summary>
+    ///
+    /// <param name="vector"> The math::RowVector being modified. </param>
+    /// <param name="scaledDataVector"> The DataVector being added to the vector. </param>
     void operator+=(math::RowVectorReference<double> vector, const IDataVector& dataVector);
 
-    // TODO document
-    double operator*(const IDataVector& dataVector, math::UnorientedConstVectorReference<double> vector);
+    /// <summary> Calculates the dot product of a DataVector and a math::ColumnVector. </summary>
+    ///
+    /// <param name="dataVector"> The DataVector. </param>
+    /// <param name="vector"> The math::ColumnVector. </param>
+    ///
+    /// <returns> The result of the operation. </returns>
+    double operator*(const IDataVector& dataVector, math::ColumnConstVectorReference<double> vector);
 }
 }

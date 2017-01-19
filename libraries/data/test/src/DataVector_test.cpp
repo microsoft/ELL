@@ -187,6 +187,4 @@ void DataVectorOperatorTest()
     auto d = u * v.Transpose();
     testing::ProcessTest("DataVectorOperatorTest", d == 10);
 }
-
-
 }

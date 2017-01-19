@@ -8,13 +8,10 @@
 
 #include "DataVectorOperators.h"
 
-
 namespace ell
 {
 namespace data
 {
-    // TODO document and move
-
     ScaledDataVector::ScaledDataVector(double scalar, const IDataVector & dataVector) : _scalar(scalar), _dataVector(dataVector) 
     {
     }
@@ -34,7 +31,7 @@ namespace data
         dataVector.AddTo(vector);
     }
 
-    double operator*(const IDataVector& dataVector, math::UnorientedConstVectorReference<double> vector)
+    double operator*(const IDataVector& dataVector, math::ColumnConstVectorReference<double> vector)
     {
         return dataVector.Dot(vector);
     }
