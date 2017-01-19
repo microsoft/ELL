@@ -30,12 +30,12 @@
 #include "ModelSaveArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "ParametersEnumerator.h"
-#include "StochasticGradientDescentTrainerArguments.h"
+#include "LinearSGDTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // trainers
 #include "EvaluatingIncrementalTrainer.h"
-#include "StochasticGradientDescentTrainer.h"
+#include "LinearSGDTrainer.h"
 #include "SweepingIncrementalTrainer.h"
 
 // evaluators
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
-        common::ParsedStochasticGradientDescentTrainerArguments StochasticGradientDescentTrainerArguments;
+        common::ParsedLinearSGDTrainerArguments LinearSGDTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
-        commandLineParser.AddOptionSet(StochasticGradientDescentTrainerArguments);
+        commandLineParser.AddOptionSet(LinearSGDTrainerArguments);
 
         // parse command line
         commandLineParser.Parse();
@@ -112,14 +112,14 @@ int main(int argc, char* argv[])
         evaluators::EvaluatorParameters evaluatorParameters{ multiEpochTrainerArguments.numEpochs, false };
 
         // create trainers
-        auto generator = common::MakeParametersEnumerator<trainers::StochasticGradientDescentTrainerParameters>(regularization);
+        auto generator = common::MakeParametersEnumerator<trainers::LinearSGDTrainerParameters>(regularization);
         std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
         for (size_t i = 0; i < regularization.size(); ++i)
         {
-            auto StochasticGradientDescentTrainer = common::MakeStochasticGradientDescentTrainer(mappedDatasetDimension, trainerArguments.lossArguments, generator.GenerateParameters(i));
+            auto LinearSGDTrainer = common::MakeLinearSGDTrainer(mappedDatasetDimension, trainerArguments.lossArguments, generator.GenerateParameters(i));
             evaluators.push_back(common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossArguments));
-            evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(StochasticGradientDescentTrainer), evaluators.back()));
+            evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(LinearSGDTrainer), evaluators.back()));
         }
 
         // create meta trainer

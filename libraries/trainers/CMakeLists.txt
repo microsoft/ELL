@@ -24,7 +24,7 @@ set (INCLUDE include/EvaluatingIncrementalTrainer.h
              include/MultiEpochIncrementalTrainer.h
              include/SortingForestTrainer.h
              include/SweepingIncrementalTrainer.h
-             include/StochasticGradientDescentTrainer.h
+             include/LinearSGDTrainer.h
              include/ThresholdFinder.h)
 
 set (TCC tcc/EvaluatingIncrementalTrainer.tcc
@@ -33,7 +33,7 @@ set (TCC tcc/EvaluatingIncrementalTrainer.tcc
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingForestTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc
-         tcc/StochasticGradientDescentTrainer.tcc
+         tcc/LinearSGDTrainer.tcc
          tcc/ThresholdFinder.tcc)
 
 source_group("src" FILES ${SRC})

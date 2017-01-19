@@ -24,7 +24,7 @@ set (SRC
   src/ModelLoadArguments.cpp
   src/ModelSaveArguments.cpp
   src/MultiEpochIncrementalTrainerArguments.cpp
-  src/StochasticGradientDescentTrainerArguments.cpp
+  src/LinearSGDTrainerArguments.cpp
   src/ForestTrainerArguments.cpp
   src/TrainerArguments.cpp
 )
@@ -44,7 +44,7 @@ set (INCLUDE
   include/ModelSaveArguments.h
   include/MultiEpochIncrementalTrainerArguments.h
   include/ParametersEnumerator.h
-  include/StochasticGradientDescentTrainerArguments.h
+  include/LinearSGDTrainerArguments.h
   include/ForestTrainerArguments.h
   include/TrainerArguments.h
 )

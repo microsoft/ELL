@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     StochasticGradientDescentTrainer.tcc (trainers)
+//  File:     LinearSGDTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,25 +18,19 @@ namespace ell
 namespace trainers
 {
     template <typename LossFunctionType>
-    StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(size_t dim, const LossFunctionType& lossFunction, const StochasticGradientDescentTrainerParameters& parameters)
+    LinearSGDTrainer<LossFunctionType>::LinearSGDTrainer(size_t dim, const LossFunctionType& lossFunction, const LinearSGDTrainerParameters& parameters)
         : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(0), _averagedPredictor(std::make_shared<PredictorType>(0))
     { // TODO dim is ignored
     }
 
     template <typename LossFunctionType>
-    void StochasticGradientDescentTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
+    void LinearSGDTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
     {
         UpdateSparse(anyDataset.GetExampleIterator<data::AutoSupervisedExample>(), anyDataset.NumExamples());
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeStochasticGradientDescentTrainer(size_t dim, const LossFunctionType& lossFunction, const StochasticGradientDescentTrainerParameters& parameters)
-    {
-        return std::make_unique<StochasticGradientDescentTrainer<LossFunctionType>>(dim, lossFunction, parameters);
-    }
-
-    template <typename LossFunctionType>
-    void StochasticGradientDescentTrainer<LossFunctionType>::UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples)
+    void LinearSGDTrainer<LossFunctionType>::UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples)
     {
         // this code follows the notation in https://arxiv.org/abs/1612.09147
 
@@ -121,7 +115,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    void StochasticGradientDescentTrainer<LossFunctionType>::UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
+    void LinearSGDTrainer<LossFunctionType>::UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator)
     {
         // get references to the vector and biases
         auto& lastV = _lastPredictor.GetWeights();
@@ -166,6 +160,12 @@ namespace trainers
 
             exampleIterator.Next();
         }
+    }
+
+    template <typename LossFunctionType>
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(size_t dim, const LossFunctionType& lossFunction, const LinearSGDTrainerParameters& parameters)
+    {
+        return std::make_unique<LinearSGDTrainer<LossFunctionType>>(dim, lossFunction, parameters);
     }
 }
 }
