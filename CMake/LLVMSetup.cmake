@@ -33,7 +33,7 @@ if(LLVM_FOUND)
     # Find the libraries that correspond to the LLVM components that we wish to use
     llvm_map_components_to_libnames(LLVM_LIBS all) 
 elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
-    set(PACKAGE_ROOT ${EXTERNAL_DIR}/packages)
+    set(PACKAGE_ROOT ${EXTERNAL_DIR})
     set(LLVM_PACKAGE_NAME LLVMNativeLibraries)
     set(LLVM_PACKAGE_VERSION 3.9.0)
     set(LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})

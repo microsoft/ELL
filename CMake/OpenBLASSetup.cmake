@@ -48,7 +48,7 @@ if(WIN32)
     string(REGEX REPLACE ".* Model ([0-9]+) .*" "\\1" processor_model "${processor_id}")
     message(STATUS "Processor family: ${processor_family}, model: ${processor_model}")
 
-    set(PACKAGE_ROOT ${EXTERNAL_DIR}/packages)
+    set(PACKAGE_ROOT ${EXTERNAL_DIR})
 
     set(BLAS_PACKAGE_NAME OpenBLASWin64)
     set(BLAS_PACKAGE_VERSION 0.2.19.1)

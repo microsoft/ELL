@@ -16,8 +16,8 @@ of the source tree.
 
 ```
     > nuget.exe sources add -Name ELLNugetPackages -Source https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json -UserName USER -Password 7xn3h6i6f5zes3nfnk2cqm3r6jt5l5n4c7nausukx5mbskywewjq
-    > nuget.exe install OpenBLASWin64 -Version 0.2.19.1 -Source ELLNugetPackages -Outputdirectory external/packages
-    > nuget.exe install LLVMNativeLibraries -Version 3.9.0 -Source ELLNugetPackages -Outputdirectory external/packages
+    > nuget.exe install OpenBLASWin64 -Version 0.2.19.1 -Source ELLNugetPackages -Outputdirectory external
+    > nuget.exe install LLVMNativeLibraries -Version 3.9.0 -Source ELLNugetPackages -Outputdirectory external
 ```
 
 Python interfaces
