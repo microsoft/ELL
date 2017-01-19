@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "LinearTrainerArguments.h"
+
 // utilities
 #include "CommandLineParser.h"
 #include "Exception.h"
@@ -29,7 +31,6 @@
 #include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
-#include "LinearSGDTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // model
@@ -69,20 +70,20 @@ int main(int argc, char* argv[])
         utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
+        ParsedLinearTrainerArguments linearTrainerArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedTrainerArguments trainerArguments;
-        common::ParsedLinearSGDTrainerArguments LinearSGDTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
 
+        commandLineParser.AddOptionSet(linearTrainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
-        commandLineParser.AddOptionSet(LinearSGDTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
 
         // parse command line
@@ -107,7 +108,7 @@ int main(int argc, char* argv[])
         using PredictorType = predictors::LinearPredictor;
 
         // create sgd trainer
-        auto trainer = common::MakeLinearSGDTrainer(mappedDatasetDimension, trainerArguments.lossArguments, LinearSGDTrainerArguments);
+        auto trainer = common::MakeLinearSGDTrainer(mappedDatasetDimension, trainerArguments.lossArguments, { linearTrainerArguments.regularization });
 
         // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;

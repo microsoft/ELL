@@ -26,20 +26,20 @@ namespace ell
 {
 namespace common
 {
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(size_t dim, const LossArguments& lossArguments, const LinearSGDTrainerArguments& trainerArguments)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(size_t dim, const LossArguments& lossArguments, const trainers::LinearSGDTrainerParameters& trainerParameters)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
         switch (lossArguments.lossFunction)
         {
             case LossFunctionEnum::squared:
-                return trainers::MakeLinearSGDTrainer(dim, lossFunctions::SquaredLoss(), trainerArguments);
+                return trainers::MakeLinearSGDTrainer(dim, lossFunctions::SquaredLoss(), trainerParameters);
 
             case LossFunctionEnum::log:
-                return trainers::MakeLinearSGDTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerArguments);
+                return trainers::MakeLinearSGDTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
 
             case LossFunctionEnum::hinge:
-                return trainers::MakeLinearSGDTrainer(dim, lossFunctions::HingeLoss(), trainerArguments);
+                return trainers::MakeLinearSGDTrainer(dim, lossFunctions::HingeLoss(), trainerParameters);
 
             default:
                 throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");

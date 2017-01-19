@@ -30,7 +30,6 @@
 #include "ModelSaveArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
 #include "ParametersEnumerator.h"
-#include "LinearSGDTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // trainers
@@ -74,7 +73,6 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
-        common::ParsedLinearSGDTrainerArguments LinearSGDTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
@@ -82,7 +80,6 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
-        commandLineParser.AddOptionSet(LinearSGDTrainerArguments);
 
         // parse command line
         commandLineParser.Parse();

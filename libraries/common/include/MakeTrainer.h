@@ -10,7 +10,6 @@
 
 #include "ForestTrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
-#include "LinearSGDTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // predictors
@@ -18,6 +17,7 @@
 
 // trainers
 #include "ITrainer.h"
+#include "LinearSGDTrainer.h"
 
 // stl
 #include <memory>
@@ -33,7 +33,7 @@ namespace common
     /// <param name="trainerArguments"> trainer arguments. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(size_t dim, const LossArguments& lossArguments, const LinearSGDTrainerArguments& trainerArguments);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(size_t dim, const LossArguments& lossArguments, const trainers::LinearSGDTrainerParameters& trainerParameters);
 
     /// <summary> Makes a forest trainer. </summary>
     ///

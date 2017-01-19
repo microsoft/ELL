@@ -13,14 +13,18 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID 
   add_compile_options(-std=c++1y)
 endif()
 
-set (SRC src/main.cpp)
+set (SRC src/LinearTrainerArguments.cpp
+         src/main.cpp)
+
+set (INCLUDE include/LinearTrainerArguments.h)
 
 source_group("src" FILES ${SRC})
+source_group("include" FILES ${INCLUDE})
 
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
-add_executable(${PROJ_NAME} ${SRC})
+add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
 target_include_directories(${PROJ_NAME} PRIVATE include)
 target_link_libraries(${PROJ_NAME} common data lossFunctions model predictors trainers evaluators utilities)
 
@@ -39,4 +43,4 @@ add_test(NAME ${TEST_NAME}
 set (TEST_NAME ${PROJ_NAME}_test_2)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto --outputModelFilename linearTrainer_model_0.model -v -ne 20)
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto --outputModelFilename linearTrainer_model_0.model -v -ne 20 -r 0.1)
