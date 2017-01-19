@@ -48,10 +48,7 @@ if(WIN32)
     string(REGEX REPLACE ".* Model ([0-9]+) .*" "\\1" processor_model "${processor_id}")
     message(STATUS "Processor family: ${processor_family}, model: ${processor_model}")
 
-    set(PACKAGE_SOURCE_URL "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
-    set(PACKAGE_SOURCE_NAME "ELLNugetPackages")
-    set(PACKAGE_READ_TOKEN "7xn3h6i6f5zes3nfnk2cqm3r6jt5l5n4c7nausukx5mbskywewjq")
-    set(PACKAGE_ROOT ${CMAKE_SOURCE_DIR}/external/packages)
+    set(PACKAGE_ROOT ${EXTERNAL_DIR}/packages)
 
     set(BLAS_PACKAGE_NAME OpenBLASWin64)
     set(BLAS_PACKAGE_VERSION 0.2.19.1)
@@ -69,29 +66,12 @@ if(WIN32)
     else()
         message(WARNING "Unknown processor, assuming ${PROCESSOR_GENERATION}")
     endif()
-
     set(BLAS_PACKAGE_DIR ${PACKAGE_ROOT}/${BLAS_PACKAGE_NAME}.${BLAS_PACKAGE_VERSION}/build/native/${PROCESSOR_GENERATION})
-    set(BLAS_DLL_DIR ${BLAS_PACKAGE_DIR}/bin)
 
+    set(BLAS_DLL_DIR ${BLAS_PACKAGE_DIR}/bin)
     list(APPEND BLAS_INCLUDE_SEARCH_PATHS
         ${BLAS_PACKAGE_DIR}/include/
      )
-
-    # Install via nuget
-    find_program(NUGET nuget HINTS ${EXTERNAL_DIR}/nuget NO_DEFAULT_PATH)
-    if(NOT NUGET)
-        message(STATUS "Downloading nuget.exe")
-        file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" "${EXTERNAL_DIR}/nuget/nuget.exe")
-        find_program(NUGET nuget HINTS ${EXTERNAL_DIR}/nuget NO_DEFAULT_PATH)
-    endif()
-    if(NUGET)
-        message(STATUS "Installing OpenBLAS NuGet package")
-        set(NUGET_CONFIG_FILE "${CMAKE_BINARY_DIR}/NuGet.config")
-        # Write an empty NuGet.config file and use it so we don't mess up the user's global NuGet configuration
-        file(WRITE ${NUGET_CONFIG_FILE} "<?xml version=\"1.0\" encoding=\"utf-8\"?><configuration></configuration>")
-        execute_process(COMMAND ${NUGET} sources add -Name ${PACKAGE_SOURCE_NAME} -Source ${PACKAGE_SOURCE_URL} -UserName USER -Password ${PACKAGE_READ_TOKEN} -ConfigFile ${NUGET_CONFIG_FILE} -StorePasswordInClearText -Verbosity quiet)
-        execute_process(COMMAND ${NUGET} install ${BLAS_PACKAGE_NAME} -Version ${BLAS_PACKAGE_VERSION} -Source ${PACKAGE_SOURCE_NAME} -Outputdirectory ${PACKAGE_ROOT} -PackageSaveMode nuspec -Verbosity quiet)
-    endif()
 endif()
 
 ## Note: libopenblas install on ubuntu in /usr/lib and /usr/include

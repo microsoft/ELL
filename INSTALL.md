@@ -6,7 +6,19 @@ If you don't have cmake installed, download and install it from <https://cmake.o
 
 If you want to build the compiler part of ELL, you will need to have LLVM installed. On Windows, CMake will 
 download a LLVM package via NuGet, but you must have a recent version (at least version 3.5) of NuGet installed in order
-to download the package. You can find instructions for installing NuGet [here](https://docs.nuget.org/ndocs/guides/install-nuget).
+to download the package. You can find instructions for installing the NuGet CLI [here](https://docs.nuget.org/ndocs/guides/install-nuget).
+If you have an older version of NuGet, you can update it in-place via the command `nuget.exe update -Self`.
+
+External dependencies
+---------------------
+To install the external dependencies (OpenBLAS and LLVM) on Windows, use NuGet. Type the following commands from the root 
+of the source tree.
+
+```
+    > nuget.exe sources add -Name ELLNugetPackages -Source https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json -UserName USER -Password 7xn3h6i6f5zes3nfnk2cqm3r6jt5l5n4c7nausukx5mbskywewjq
+    > nuget.exe install OpenBLASWin64 -Version 0.2.19.1 -Source ELLNugetPackages -Outputdirectory external/packages
+    > nuget.exe install LLVMNativeLibraries -Version 3.9.0 -Source ELLNugetPackages -Outputdirectory external/packages
+```
 
 Python interfaces
 -----------------
