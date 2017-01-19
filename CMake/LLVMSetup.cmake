@@ -33,39 +33,23 @@ if(LLVM_FOUND)
     # Find the libraries that correspond to the LLVM components that we wish to use
     llvm_map_components_to_libnames(LLVM_LIBS all) 
 elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
-    set(PACKAGE_SOURCE_URL "https://intelligentdevices.pkgs.visualstudio.com/_packaging/ELLNugetPackages/nuget/v3/index.json")
-    set(PACKAGE_SOURCE_NAME "ELLNugetPackages")
-    set(PACKAGE_READ_TOKEN "7xn3h6i6f5zes3nfnk2cqm3r6jt5l5n4c7nausukx5mbskywewjq")
-    set(PACKAGE_ROOT ${CMAKE_SOURCE_DIR}/external/packages)
+    set(PACKAGE_ROOT ${EXTERNAL_DIR})
     set(LLVM_PACKAGE_NAME LLVMNativeLibraries)
     set(LLVM_PACKAGE_VERSION 3.9.0)
     set(LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})
 
     # Get LLVM libraries via NuGet if we're on Windows
-    find_program(NUGET nuget HINTS ${CMAKE_SOURCE_DIR}/external/nuget NO_DEFAULT_PATH)
-    if(NOT NUGET)
-        file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" "${CMAKE_SOURCE_DIR}/external/nuget/nuget.exe")
-        find_program(NUGET nuget HINTS ${CMAKE_SOURCE_DIR}/external/nuget NO_DEFAULT_PATH)
-    endif()
-    if(NUGET)
-        message(STATUS "Installing LLVM NuGet package")
-        set(NUGET_CONFIG_FILE "${CMAKE_BINARY_DIR}/NuGet.config")
-        # Write an empty NuGet.config file and use it so we don't mess up the user's global NuGet configuration
-        file(WRITE ${NUGET_CONFIG_FILE} "<?xml version=\"1.0\" encoding=\"utf-8\"?><configuration></configuration>")
-        execute_process(COMMAND ${NUGET} sources add -Name ${PACKAGE_SOURCE_NAME} -Source ${PACKAGE_SOURCE_URL} -UserName USER -Password ${PACKAGE_READ_TOKEN} -ConfigFile ${NUGET_CONFIG_FILE} -StorePasswordInClearText -Verbosity quiet)
-        execute_process(COMMAND ${NUGET} install ${LLVM_PACKAGE_NAME} -Version ${LLVM_PACKAGE_VERSION} -Source ${PACKAGE_SOURCE_NAME} -Outputdirectory ${PACKAGE_ROOT} -PackageSaveMode nuspec -Verbosity quiet)
-    endif()
     set(LLVM_ENABLE_ASSERTIONS OFF) # But ON for debug build
     set(LLVM_ENABLE_EH OFF)
     set(LLVM_ENABLE_RTTI OFF)
     set(LLVM_LIBROOT_DEBUG ${LLVM_PACKAGE_DIR}/build/native/lib/Debug)
     set(LLVM_LIBROOT_RELEASE ${LLVM_PACKAGE_DIR}/build/native/lib/Release)
     set(LLVM_INCLUDEROOT ${LLVM_PACKAGE_DIR}/build/native/include)
+
     if(NOT EXISTS ${LLVM_INCLUDEROOT})
         set(LLVM_FOUND FALSE)
         return() 
     endif()
-
     set(LLVM_FOUND TRUE)
 
     # Mirror variables used by LLVM's cmake find module

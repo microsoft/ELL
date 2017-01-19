@@ -229,8 +229,9 @@ yotta_targets/
 /Testing/
 
 # ELL External Dependencies
-external/llvm/include/
-external/llvm/lib/
+external/**
+!external/README.md
+
 swig/
 dist/
 build/
