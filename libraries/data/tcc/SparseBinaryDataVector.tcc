@@ -80,7 +80,7 @@ namespace data
     }
 
     template <typename IntegerListType>
-    double SparseBinaryDataVectorBase<IntegerListType>::Dot(const math::UnorientedConstVectorReference<double>& vector) const
+    double SparseBinaryDataVectorBase<IntegerListType>::Dot(const math::UnorientedConstVectorReference<double> vector) const
     {
         double value = 0.0;
 
@@ -95,7 +95,7 @@ namespace data
     }
 
     template <typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::AddTo(math::RowVectorReference<double>& vector, double scalar) const
+    void SparseBinaryDataVectorBase<IntegerListType>::AddTo(math::RowVectorReference<double> vector, double scalar) const
     {
         auto iter = _indices.GetIterator();
         while (iter.IsValid())

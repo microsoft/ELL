@@ -308,7 +308,7 @@ namespace math
         /// <summary> Constructs an all-zeros vector of a given size. </summary>
         ///
         /// <param name="size"> The vector size. </param>
-        Vector(size_t size);
+        Vector(size_t size = 0);
 
         /// <summary> Constructs a vector by copying a std::vector. </summary>
         ///

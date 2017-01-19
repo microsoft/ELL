@@ -22,6 +22,7 @@ int main()
     IDataVectorTests();
     ToDataVectorTests();
     AutoDataVectorTest();
+    DataVectorOperatorTest();
     CopyAsTests();
     DatasetCastingTests();
 

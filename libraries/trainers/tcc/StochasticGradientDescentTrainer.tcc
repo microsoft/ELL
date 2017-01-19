@@ -19,8 +19,8 @@ namespace trainers
 {
     template <typename LossFunctionType>
     StochasticGradientDescentTrainer<LossFunctionType>::StochasticGradientDescentTrainer(size_t dim, const LossFunctionType& lossFunction, const StochasticGradientDescentTrainerParameters& parameters)
-        : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(0), _lastPredictor(dim), _averagedPredictor(std::make_shared<PredictorType>(dim))
-    {
+        : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(0), _averagedPredictor(std::make_shared<PredictorType>(0))
+    { // TODO dim is ignored
     }
 
     template <typename LossFunctionType>
@@ -47,8 +47,21 @@ namespace trainers
         double& lastB = _lastPredictor.GetBias();
         double& averagedB = _averagedPredictor->GetBias();
 
+        // first iteration handled separately
+        if (_total_iterations == 0)
+        {
+            const auto& example = exampleIterator.Get();
 
+            const auto& dataVector = example.GetDataVector();
+            double label = example.GetMetadata().label;
+            double weight = example.GetMetadata().weight;
 
+            double g = _lossFunction.GetDerivative(0, label);
+            dataVector.AddTo(lastV.Transpose(), g);
+            dataVector.AddTo(averagedV.Transpose(), g);
+
+            ++_total_iterations;
+        }
 
 
 
@@ -62,6 +75,8 @@ namespace trainers
         const double historyWeight = sigma - std::log(T_prev) - 0.5 / T_prev;
         math::Operations::Add(historyWeight, lastV, averagedV);
         averagedB += lastB * historyWeight;
+        
+        
         while (exampleIterator.IsValid())
         {
             ++_total_iterations;
@@ -71,6 +86,8 @@ namespace trainers
             const auto& example = exampleIterator.Get();
             double label = example.GetMetadata().label;
             double weight = example.GetMetadata().weight;
+
+
             const auto& dataVector = example.GetDataVector();
 
             // calculate the prediction

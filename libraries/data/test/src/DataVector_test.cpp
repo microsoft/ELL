@@ -14,6 +14,10 @@
 #include "DenseDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
+#include "DataVectorOperators.h"
+
+// math
+#include "Vector.h"
 
 // testing
 #include "testing.h"
@@ -173,4 +177,16 @@ void AutoDataVectorTest()
     data::AutoDataVector v9{ 0, 0, 0, 0, 0, 1, 0, 0, 0 };
     testing::ProcessTest("AutoDataVector ctor", v9.GetInternalType() == data::IDataVector::Type::SparseBinaryDataVector);
 }
+
+void DataVectorOperatorTest()
+{
+    math::RowVector<double> v{ 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    data::AutoDataVector u{ 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0 };
+    v += u;
+    v += 3.0 * u;
+    auto d = u * v.Transpose();
+    testing::ProcessTest("DataVectorOperatorTest", d == 10);
+}
+
+
 }
