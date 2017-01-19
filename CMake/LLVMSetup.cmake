@@ -42,10 +42,10 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
     set(LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})
 
     # Get LLVM libraries via NuGet if we're on Windows
-    find_program(NUGET nuget HINTS ${CMAKE_SOURCE_DIR}/external/nuget NO_DEFAULT_PATH)
+    find_program(NUGET nuget HINTS ${EXTERNAL_DIR}/nuget NO_DEFAULT_PATH)
     if(NOT NUGET)
-        file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" "${CMAKE_SOURCE_DIR}/external/nuget/nuget.exe")
-        find_program(NUGET nuget HINTS ${CMAKE_SOURCE_DIR}/external/nuget NO_DEFAULT_PATH)
+        file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" "${EXTERNAL_DIR}/nuget/nuget.exe")
+        find_program(NUGET nuget HINTS ${EXTERNAL_DIR}/nuget NO_DEFAULT_PATH)
     endif()
     if(NUGET)
         message(STATUS "Installing LLVM NuGet package")
