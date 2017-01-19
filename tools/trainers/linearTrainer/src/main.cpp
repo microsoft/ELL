@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     main.cpp (sgdTrainer)
+//  File:     main.cpp (linearTrainer)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,10 +44,11 @@
 #include "EvaluatingIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
 #include "LinearSGDTrainer.h"
+#include "LinearSparseDataSGDTrainer.h"
 
 // evaluators
-#include "BinaryErrorAggregator.h"
 #include "Evaluator.h"
+#include "BinaryErrorAggregator.h"
 #include "LossAggregator.h"
 
 // lossFunctions
@@ -57,7 +58,6 @@
 // stl
 #include <iostream>
 #include <memory>
-#include <stdexcept>
 
 using namespace ell;
 

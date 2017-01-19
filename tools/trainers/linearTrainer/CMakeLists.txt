@@ -1,11 +1,11 @@
 #
-# cmake file for sgd project
+# cmake file for linearTrainer project
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 # define project
-set (PROJ_NAME sgdTrainer)
+set (PROJ_NAME linearTrainer)
 PROJECT(${PROJ_NAME})
 
 #enable C++11 in GCC, etc
@@ -34,9 +34,9 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (TEST_NAME ${PROJ_NAME}_test_1)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFile ${CMAKE_SOURCE_DIR}/examples/data/model_3.model --modelInputs 1024 --modelOutputs 1031.output -dd 3 --outputModelFilename sgdTrainer_model_3.model -v -ne 20)
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFile ${CMAKE_SOURCE_DIR}/examples/data/model_3.model --modelInputs 1024 --modelOutputs 1031.output -dd 3 --outputModelFilename linearTrainer_model_3.model -v -ne 20)
 
 set (TEST_NAME ${PROJ_NAME}_test_2)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto --outputModelFilename sgdTrainer_model_0.model -v -ne 20)
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto --outputModelFilename linearTrainer_model_0.model -v -ne 20)
