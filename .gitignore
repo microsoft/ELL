@@ -231,6 +231,7 @@ yotta_targets/
 # ELL External Dependencies
 external/**
 !external/README.md
+!external/*.config
 
 swig/
 dist/
