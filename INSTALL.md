@@ -13,9 +13,7 @@ External dependencies
 ---------------------
 To install the external dependencies (OpenBLAS and LLVM) on Windows, use NuGet to restore the packages in the `external` directory.
 
-```
     > nuget.exe restore external/packages.config -PackagesDirectory external
-```
 
 Python interfaces
 -----------------
