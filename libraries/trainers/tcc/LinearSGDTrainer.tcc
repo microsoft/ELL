@@ -12,6 +12,7 @@
 
 // data
 #include "Dataset.h"
+#include "DataVectorOperators.h"
 
 namespace ell
 {
@@ -38,36 +39,44 @@ namespace trainers
 
         while (exampleIterator.IsValid())
         {
+            // get iteration index
             ++_total_iterations;
             double t = (double)_total_iterations;
 
-            // get the Next example
+            // get the next example
             const auto& example = exampleIterator.Get();
-            double label = example.GetMetadata().label;
+            double y = example.GetMetadata().label;
             double weight = example.GetMetadata().weight;
-            const auto& dataVector = example.GetDataVector();
+            const auto& x = example.GetDataVector();
 
             // predict
-            double alpha = _lastPredictor.Predict(dataVector);
+            double p = _lastPredictor.Predict(x);
+
+            // resize predictors as necessary
+            auto xSize = x.PrefixLength();
+            if (xSize > lastV.Size())
+            {
+                lastV.Resize(xSize);
+                averagedV.Resize(xSize);
+            }
 
             // calculate the loss derivative
-            double beta = weight * _lossFunction.GetDerivative(alpha, label);
+            double g = weight * _lossFunction.GetDerivative(p, y);
 
-            // update last
+            // update the (last) predictor
             double scaleCoefficient = 1.0 - 1.0 / t;
-            math::Operations::Multiply(scaleCoefficient, lastV);
+            lastV *= scaleCoefficient;
             lastB *= scaleCoefficient;
 
-            double updateCoefficient = -beta / t / _parameters.regularization;
-            auto lastVTranspose = lastV.Transpose();
-            dataVector.AddTo(lastVTranspose, updateCoefficient);
+            double updateCoefficient = -g / t / _parameters.regularization;
+            lastV.Transpose() += updateCoefficient * x;
             lastB += updateCoefficient;
 
-            // update average
-            double averageingCoefficient = (t - 1) / t;
-            math::Operations::Multiply(averageingCoefficient, averagedV);
-            averagedB *= averageingCoefficient;
-            // lastV.AddTo(averagedV, 1 / t); // dense operation
+            // update the average predictor
+            averagedV *= scaleCoefficient;
+            averagedB *= scaleCoefficient;
+
+            averagedV += 1.0 / t * lastV;
             averagedB += lastB / t;
 
             exampleIterator.Next();

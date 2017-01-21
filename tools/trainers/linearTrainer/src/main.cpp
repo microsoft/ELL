@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 
         if (trainerArguments.verbose)
         {
-            std::cout << "Stochastic Gradient Descent Trainer" << std::endl;
+            std::cout << "Linear Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
@@ -107,8 +107,19 @@ int main(int argc, char* argv[])
         // predictor type
         using PredictorType = predictors::LinearPredictor;
 
-        // create sgd trainer
-        auto trainer = common::MakeLinearSGDTrainer(mappedDatasetDimension, trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+        // create linear trainer
+        std::unique_ptr<trainers::ITrainer<PredictorType>> trainer;
+        switch (linearTrainerArguments.algorithm)
+        {
+        case LinearTrainerArguments::Algorithm::SGD:
+            trainer = common::MakeLinearSGDTrainer(mappedDatasetDimension, trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+            break;
+        case LinearTrainerArguments::Algorithm::SDSGD:
+            trainer = common::MakeLinearSparseDataSGDTrainer(mappedDatasetDimension, trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+            break;
+        default:
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized algorithm type");
+        }
 
         // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;

@@ -99,7 +99,6 @@ namespace math
     protected:
         UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
         void Swap(UnorientedConstVectorReference<ElementType>& other);
-        void CheckSize(const UnorientedConstVectorReference<ElementType>& other) const;
 
         ElementType* _pData;
         size_t _size;
@@ -177,6 +176,44 @@ namespace math
         friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
     };
 
+    /// <summary> A class that represents a scaled constant vector. </summary>
+    ///
+    /// <typeparam name="ElementType"> Type of the element type. </typeparam>
+    /// <typeparam name="Orientation"> Type of the orientation. </typeparam>
+    template <typename ElementType, VectorOrientation Orientation>
+    class ScaledConstVectorReference
+    {
+    public:
+
+        /// <summary> Constructs an instance of ScaledConstVectorReference. </summary>
+        ///
+        /// <param name="scalar"> The scalar. </param>
+        /// <param name="_vector"> The vector. </param>
+        ScaledConstVectorReference(double scalar, ConstVectorReference<ElementType, Orientation> vector) : _scalar(scalar), _vector(vector)
+        {
+        } // TODO move
+
+        /// <summary> Gets the scalar. </summary>
+        ///
+        /// <returns> The scalar. </returns>
+        double GetScalar() { return _scalar; }
+
+        /// <summary> Gets the vector reference. </summary>
+        ///
+        /// <returns> The vector reference. </returns>
+        ConstVectorReference<ElementType, Orientation> GetVector() const { return _vector; }
+
+    private:
+        double _scalar;
+        ConstVectorReference<ElementType, Orientation> _vector;
+    };
+
+    template <typename ElementType, VectorOrientation Orientation>
+    ScaledConstVectorReference<ElementType, Orientation> operator*(double scalar, ConstVectorReference<ElementType, Orientation> vector)
+    {
+        return ScaledConstVectorReference<ElementType, Orientation>(scalar, vector);
+    } // TODO move
+
     /// <summary> A reference to a non-constant algebraic vector. </summary>
     ///
     /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
@@ -253,6 +290,11 @@ namespace math
         /// <param name="other"> The other vector. </param>
         void operator+=(ConstVectorReference<ElementType, Orientation> other);
 
+        void operator+=(ScaledConstVectorReference<ElementType, Orientation> other)
+        {
+            Operations::Add(other.GetScalar(), other.GetVector(), *this);
+        } // TODO move
+
         /// <summary> Subtracts another vector from this vector. </summary>
         ///
         /// <param name="other"> The other vector. </param>
@@ -289,7 +331,6 @@ namespace math
         using ConstVectorReference<ElementType, Orientation>::_pData;
         using ConstVectorReference<ElementType, Orientation>::_size;
         using ConstVectorReference<ElementType, Orientation>::_increment;
-        using UnorientedConstVectorReference<ElementType>::CheckSize;
 
         template <typename T>
         friend class RectangularMatrixBase;

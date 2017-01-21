@@ -12,6 +12,14 @@ namespace ell
 {
     void ParsedLinearTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
     {
+        parser.AddOption(
+            algorithm,
+            "algorithm",
+            "a",
+            "Choice of linear training algorithm",
+            { { "SGD", Algorithm::SGD },{ "SDSGD", Algorithm::SDSGD } },
+            "SGD");
+
         parser.AddOption(regularization,
             "regularization",
             "r",
