@@ -12,6 +12,7 @@
 
 // data
 #include "Dataset.h"
+#include "DataVectorOperators.h"
 
 namespace ell
 {
@@ -19,56 +20,45 @@ namespace trainers
 {
     template <typename LossFunctionType>
     LinearSparseDataSGDTrainer<LossFunctionType>::LinearSparseDataSGDTrainer(const LossFunctionType& lossFunction, const LinearSparseDataSGDTrainerParameters& parameters)
-        : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(0)
+        : _lossFunction(lossFunction), _parameters(parameters)
     {
     }
 
+    // this code follows the notation in https://arxiv.org/abs/1612.09147
     template <typename LossFunctionType>
     void LinearSparseDataSGDTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
     {
+        const double lambda = _parameters.regularization;
+
         // get example iterator
         auto exampleIterator = anyDataset.GetExampleIterator<data::AutoSupervisedExample>();
-        auto numExamples = anyDataset.NumExamples();
-
-        // get references to the vector and biases
-        auto& lastV = _lastPredictor.GetWeights();
-        auto& averagedV = _averagedPredictor.GetWeights();
-
-        double& lastB = _lastPredictor.GetBias();
-        double& averagedB = _averagedPredictor.GetBias();
-
-        // this code follows the notation in https://arxiv.org/abs/1612.09147
 
         // first iteration handled separately
         if (_total_iterations == 0)
         {
             const auto& example = exampleIterator.Get();
 
-            const auto& dataVector = example.GetDataVector();
-            double label = example.GetMetadata().label;
+            const auto& x = example.GetDataVector();
+            double y = example.GetMetadata().label;
             double weight = example.GetMetadata().weight;
 
-            double g = _lossFunction.GetDerivative(0, label);
-            dataVector.AddTo(lastV.Transpose(), g);
-            dataVector.AddTo(averagedV.Transpose(), g);
+            double g = weight * _lossFunction.GetDerivative(0, y);
+            
+            auto xSize = x.PrefixLength();
+            if (xSize > _v.Size())
+            {
+                _v.Resize(xSize);
+                _u.Resize(xSize);
+            }
+
+            _v.Transpose() += g * x;
+            _a += g;
+            _c = _a;
+            _h = 1;
 
             ++_total_iterations;
         }
 
-
-
-        // define some constants
-        const double T_prev = double(_total_iterations);
-        const double T_next = T_prev + numExamples;
-        const double eta = 1.0 / _parameters.regularization / T_prev;
-        const double sigma = std::log(T_next) + 0.5 / T_next;
-
-        // calulate the contribution of the old lastPredictor to the new avergedPredictor
-        const double historyWeight = sigma - std::log(T_prev) - 0.5 / T_prev;
-        math::Operations::Add(historyWeight, lastV, averagedV);
-        averagedB += lastB * historyWeight;
-        
-        
         while (exampleIterator.IsValid())
         {
             ++_total_iterations;
@@ -76,40 +66,31 @@ namespace trainers
 
             // get the Next example
             const auto& example = exampleIterator.Get();
-            double label = example.GetMetadata().label;
+
+            const auto& x = example.GetDataVector();
+            double y = example.GetMetadata().label;
             double weight = example.GetMetadata().weight;
 
-
-            const auto& dataVector = example.GetDataVector();
-
-            // calculate the prediction
-            double alpha = T_prev / (t - 1) * _lastPredictor.Predict(dataVector);
-
-            // calculate the loss derivative
-            double beta = weight * _lossFunction.GetDerivative(alpha, label);
-
-            // Update lastV and averagedV
-            double lastCoeff = -eta * beta;
-            auto lastVTranspose = lastV.Transpose();
-            dataVector.AddTo(lastVTranspose, lastCoeff);
-            lastB += lastCoeff;
-
-            double avgCoeff = lastCoeff * (sigma - std::log(t) - 0.5 / t);
-            auto averagedVTranspose = averagedV.Transpose();
-            dataVector.AddTo(averagedVTranspose, avgCoeff);
-            averagedB += avgCoeff;
+            double d = x * _v;
+            double p = -(d + _a) / (lambda * (t - 1));
+            double g = weight * _lossFunction.GetDerivative(p, y);
+            _v.Transpose() += g * x;
+            _a += g;
+            _u.Transpose() += _h * g * x;
+            _c += _a / t;
+            _h += 1 / t;
 
             exampleIterator.Next();
         }
 
-        assert((double)_total_iterations == T_next);
+        // calculate the predictors
 
-        // calculate w and w_avg
-        double scale = T_prev / T_next;
-        math::Operations::Multiply(scale, lastV);
-        lastB *= scale;
-        math::Operations::Multiply(scale, averagedV);
-        averagedB *= scale;
+        //_lastPredictor.GetWeights() = 
+        _lastPredictor.GetBias() = -_a / (lambda * _total_iterations);
+
+        //_averagedPredictor.GetWeights() = -1 / (lambda * t)
+        _averagedPredictor.GetBias() = -_c / (lambda * _total_iterations);
+
     }
 
     template <typename LossFunctionType>

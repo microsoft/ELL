@@ -74,6 +74,14 @@ namespace trainers
         LinearSparseDataSGDTrainerParameters _parameters;
 
         size_t _total_iterations = 0;
+
+        // these variables follow the notation in https://arxiv.org/abs/1612.09147
+        math::ColumnVector<double> _v;
+        math::ColumnVector<double> _u;
+        double _a;
+        double _c;
+        double _h;
+
         PredictorType _lastPredictor;
         PredictorType _averagedPredictor;
     };
