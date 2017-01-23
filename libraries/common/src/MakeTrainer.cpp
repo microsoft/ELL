@@ -26,40 +26,40 @@ namespace ell
 {
 namespace common
 {
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(size_t dim, const LossArguments& lossArguments, const trainers::LinearSGDTrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(const LossArguments& lossArguments, const trainers::LinearSGDTrainerParameters& trainerParameters)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
         switch (lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return trainers::MakeLinearSGDTrainer(dim, lossFunctions::SquaredLoss(), trainerParameters);
+            return trainers::MakeLinearSGDTrainer(lossFunctions::SquaredLoss(), trainerParameters);
 
         case LossFunctionEnum::log:
-            return trainers::MakeLinearSGDTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
+            return trainers::MakeLinearSGDTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
 
         case LossFunctionEnum::hinge:
-            return trainers::MakeLinearSGDTrainer(dim, lossFunctions::HingeLoss(), trainerParameters);
+            return trainers::MakeLinearSGDTrainer(lossFunctions::HingeLoss(), trainerParameters);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSparseDataSGDTrainer(size_t dim, const LossArguments& lossArguments, const trainers::LinearSparseDataSGDTrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSparseDataSGDTrainer(const LossArguments& lossArguments, const trainers::LinearSparseDataSGDTrainerParameters& trainerParameters)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
         switch (lossArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return trainers::MakeLinearSparseDataSGDTrainer(dim, lossFunctions::SquaredLoss(), trainerParameters);
+            return trainers::MakeLinearSparseDataSGDTrainer(lossFunctions::SquaredLoss(), trainerParameters);
 
         case LossFunctionEnum::log:
-            return trainers::MakeLinearSparseDataSGDTrainer(dim, lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
+            return trainers::MakeLinearSparseDataSGDTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
 
         case LossFunctionEnum::hinge:
-            return trainers::MakeLinearSparseDataSGDTrainer(dim, lossFunctions::HingeLoss(), trainerParameters);
+            return trainers::MakeLinearSparseDataSGDTrainer(lossFunctions::HingeLoss(), trainerParameters);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");

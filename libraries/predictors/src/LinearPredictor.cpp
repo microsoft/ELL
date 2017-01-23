@@ -31,6 +31,11 @@ namespace predictors
         _b = 0;
     }
 
+    void LinearPredictor::Resize(size_t size)
+    {
+        _w.Resize(size);
+    }
+
     double LinearPredictor::Predict(const DataVectorType& dataVector) const
     {
         return dataVector.Dot(_w) + _b;

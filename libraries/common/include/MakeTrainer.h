@@ -29,21 +29,19 @@ namespace common
 {
     /// <summary> Makes a stochastic gradient descent trainer. </summary>
     ///
-    /// <param name="dim"> The dimension. </param>
     /// <param name="lossArguments"> loss arguments. </param>
     /// <param name="trainerArguments"> trainer arguments. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(size_t dim, const LossArguments& lossArguments, const trainers::LinearSGDTrainerParameters& trainerParameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(const LossArguments& lossArguments, const trainers::LinearSGDTrainerParameters& trainerParameters);
 
     /// <summary> Makes a stochastic gradient descent trainer for sparse data. </summary>
     ///
-    /// <param name="dim"> The dimension. </param>
     /// <param name="lossArguments"> loss arguments. </param>
     /// <param name="trainerArguments"> trainer arguments. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSparseDataSGDTrainer(size_t dim, const LossArguments& lossArguments, const trainers::LinearSparseDataSGDTrainerParameters& trainerParameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSparseDataSGDTrainer(const LossArguments& lossArguments, const trainers::LinearSparseDataSGDTrainerParameters& trainerParameters);
 
     /// <summary> Makes a forest trainer. </summary>
     ///

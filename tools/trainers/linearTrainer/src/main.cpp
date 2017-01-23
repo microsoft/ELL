@@ -112,10 +112,10 @@ int main(int argc, char* argv[])
         switch (linearTrainerArguments.algorithm)
         {
         case LinearTrainerArguments::Algorithm::SGD:
-            trainer = common::MakeLinearSGDTrainer(mappedDatasetDimension, trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+            trainer = common::MakeLinearSGDTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
             break;
         case LinearTrainerArguments::Algorithm::SDSGD:
-            trainer = common::MakeLinearSparseDataSGDTrainer(mappedDatasetDimension, trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+            trainer = common::MakeLinearSparseDataSGDTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized algorithm type");
@@ -135,7 +135,8 @@ int main(int argc, char* argv[])
         // Train the predictor
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->Update(mappedDataset.GetAnyDataset());
-        auto predictor = trainer->GetPredictor();
+        predictors::LinearPredictor predictor = *(trainer->GetPredictor());
+        predictor.Resize(mappedDatasetDimension);
 
         // Print loss and errors
         if (trainerArguments.verbose)
@@ -152,7 +153,7 @@ int main(int argc, char* argv[])
         if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
-            auto model = common::AppendNodeToModel<nodes::LinearPredictorNode, PredictorType>(map, *predictor);
+            auto model = common::AppendNodeToModel<nodes::LinearPredictorNode, PredictorType>(map, predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }

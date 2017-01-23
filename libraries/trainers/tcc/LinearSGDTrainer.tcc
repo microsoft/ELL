@@ -19,9 +19,9 @@ namespace ell
 namespace trainers
 {
     template <typename LossFunctionType>
-    LinearSGDTrainer<LossFunctionType>::LinearSGDTrainer(size_t dim, const LossFunctionType& lossFunction, const LinearSGDTrainerParameters& parameters)
+    LinearSGDTrainer<LossFunctionType>::LinearSGDTrainer(const LossFunctionType& lossFunction, const LinearSGDTrainerParameters& parameters)
         : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(0), _averagedPredictor(std::make_shared<PredictorType>(0))
-    { // TODO dim is ignored
+    {
     }
 
     template <typename LossFunctionType>
@@ -84,9 +84,9 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(size_t dim, const LossFunctionType& lossFunction, const LinearSGDTrainerParameters& parameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(const LossFunctionType& lossFunction, const LinearSGDTrainerParameters& parameters)
     {
-        return std::make_unique<LinearSGDTrainer<LossFunctionType>>(dim, lossFunction, parameters);
+        return std::make_unique<LinearSGDTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 }
 }

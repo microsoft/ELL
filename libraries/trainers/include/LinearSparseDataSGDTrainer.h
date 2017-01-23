@@ -45,10 +45,9 @@ namespace trainers
 
         /// <summary> Constructs the trainer. </summary>
         ///
-        /// <param name="dim"> The dimension. </param>
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="parameters"> The training parameters. </param>
-        LinearSparseDataSGDTrainer(size_t dim, const LossFunctionType& lossFunction, const LinearSparseDataSGDTrainerParameters& parameters);
+        LinearSparseDataSGDTrainer(const LossFunctionType& lossFunction, const LinearSparseDataSGDTrainerParameters& parameters);
 
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
@@ -71,9 +70,6 @@ namespace trainers
         const PredictorType& GetAveragedPredictor() const { return *_averagedPredictor; }
 
     private:
-        void UpdateSparse(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, size_t numExamples);
-        void UpdateDense(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator);
-
         LossFunctionType _lossFunction;
         LinearSparseDataSGDTrainerParameters _parameters;
 
@@ -85,13 +81,12 @@ namespace trainers
     /// <summary> Makes a sorting tree trainer. </summary>
     ///
     /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
-    /// <param name="dim"> The dimension. </param>
     /// <param name="parameters"> The trainer parameters. </param>
     /// <param name="lossFunction"> The loss function. </param>
     ///
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSparseDataSGDTrainer(size_t dim, const LossFunctionType& lossFunction, const LinearSparseDataSGDTrainerParameters& parameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSparseDataSGDTrainer(const LossFunctionType& lossFunction, const LinearSparseDataSGDTrainerParameters& parameters);
 }
 }
 

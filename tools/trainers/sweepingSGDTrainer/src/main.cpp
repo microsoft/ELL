@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
         for (size_t i = 0; i < regularization.size(); ++i)
         {
-            auto LinearSGDTrainer = common::MakeLinearSGDTrainer(mappedDatasetDimension, trainerArguments.lossArguments, generator.GenerateParameters(i));
+            auto LinearSGDTrainer = common::MakeLinearSGDTrainer(trainerArguments.lossArguments, generator.GenerateParameters(i));
             evaluators.push_back(common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossArguments));
             evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(LinearSGDTrainer), evaluators.back()));
         }
@@ -125,7 +125,8 @@ int main(int argc, char* argv[])
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->Update(mappedDataset.GetAnyDataset());
-        auto predictor = trainer->GetPredictor();
+        predictors::LinearPredictor predictor = *(trainer->GetPredictor());
+        predictor.Resize(mappedDatasetDimension);
 
         // print loss and errors
         if (trainerArguments.verbose)
@@ -145,7 +146,7 @@ int main(int argc, char* argv[])
         if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
-            auto model = common::AppendNodeToModel<nodes::LinearPredictorNode, PredictorType>(map, *predictor);
+            auto model = common::AppendNodeToModel<nodes::LinearPredictorNode, PredictorType>(map, predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }
