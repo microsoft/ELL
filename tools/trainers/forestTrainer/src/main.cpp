@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
         // print loss and errors
         if (trainerArguments.verbose)
         {
-            std::cout << "Finished training forest with " << predictor->NumTrees() << " trees." << std::endl;
+            std::cout << "Finished training forest with " << predictor.NumTrees() << " trees." << std::endl;
 
             // print evaluation
             std::cout << "Training error\n";
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
         // Save predictor model
         if (modelSaveArguments.outputModelFilename != "")
         {
-            auto model = common::AppendNodeToModel<nodes::SimpleForestPredictorNode, PredictorType>(map, *predictor);
+            auto model = common::AppendNodeToModel<nodes::SimpleForestPredictorNode, PredictorType>(map, predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }

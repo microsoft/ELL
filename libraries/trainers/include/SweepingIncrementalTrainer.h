@@ -51,8 +51,8 @@ namespace trainers
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
-        /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override;
+        /// <returns> A const reference to the current predictor. </returns>
+        virtual const PredictorType& GetPredictor() const override;
 
     private:
         std::vector<EvaluatingTrainerType> _evaluatingTrainers;

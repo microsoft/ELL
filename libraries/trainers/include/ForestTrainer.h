@@ -131,8 +131,8 @@ namespace trainers
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
-        /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _forest; };
+        /// <returns> A const reference to the current predictor. </returns>
+        virtual const PredictorType& GetPredictor() const override { return _forest; };
 
     protected:
         //
@@ -199,7 +199,7 @@ namespace trainers
         ForestTrainerParameters _parameters;
 
         // the forest being grown
-        std::shared_ptr<PredictorType> _forest;
+        PredictorType _forest;
 
         // the priority queue that holds the split candidates
         SplitCandidatePriorityQueue _queue;

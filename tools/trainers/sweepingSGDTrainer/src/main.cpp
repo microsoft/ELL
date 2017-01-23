@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->Update(mappedDataset.GetAnyDataset());
-        predictors::LinearPredictor predictor = *(trainer->GetPredictor());
+        predictors::LinearPredictor predictor(trainer->GetPredictor());
         predictor.Resize(mappedDatasetDimension);
 
         // print loss and errors

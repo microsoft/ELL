@@ -47,7 +47,7 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    const std::shared_ptr<const PredictorType> SweepingIncrementalTrainer<PredictorType>::GetPredictor() const
+    const PredictorType& SweepingIncrementalTrainer<PredictorType>::GetPredictor() const
     {
         double bestGoodness = _evaluatingTrainers[0].GetEvaluator()->GetGoodness();
         int best = 0;

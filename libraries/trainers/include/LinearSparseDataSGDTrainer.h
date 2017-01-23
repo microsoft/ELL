@@ -56,8 +56,8 @@ namespace trainers
 
         /// <summary> Returns The averaged predictor. </summary>
         ///
-        /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _averagedPredictor; }
+        /// <returns> A const reference to the averaged predictor. </returns>
+        virtual const PredictorType& GetPredictor() const override { return _averagedPredictor; }
 
         /// <summary> Returns a const reference to the last predictor. </summary>
         ///
@@ -75,7 +75,7 @@ namespace trainers
 
         size_t _total_iterations = 0;
         PredictorType _lastPredictor;
-        std::shared_ptr<PredictorType> _averagedPredictor;
+        PredictorType _averagedPredictor;
     };
 
     /// <summary> Makes a sorting tree trainer. </summary>

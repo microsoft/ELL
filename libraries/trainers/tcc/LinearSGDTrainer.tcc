@@ -20,7 +20,7 @@ namespace trainers
 {
     template <typename LossFunctionType>
     LinearSGDTrainer<LossFunctionType>::LinearSGDTrainer(const LossFunctionType& lossFunction, const LinearSGDTrainerParameters& parameters)
-        : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(0), _averagedPredictor(std::make_shared<PredictorType>(0))
+        : _lossFunction(lossFunction), _parameters(parameters), _total_iterations(0)
     {
     }
 
@@ -32,10 +32,10 @@ namespace trainers
 
         // get references to the vector and biases
         auto& lastV = _lastPredictor.GetWeights();
-        auto& averagedV = _averagedPredictor->GetWeights();
+        auto& averagedV = _averagedPredictor.GetWeights();
 
         double& lastB = _lastPredictor.GetBias();
-        double& averagedB = _averagedPredictor->GetBias();
+        double& averagedB = _averagedPredictor.GetBias();
 
         while (exampleIterator.IsValid())
         {
