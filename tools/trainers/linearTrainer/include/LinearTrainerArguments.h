@@ -11,9 +11,6 @@
 // utilities
 #include "CommandLineParser.h"
 
-// trainers
-#include "LinearSGDTrainer.h"
-
 namespace ell
 {
     struct LinearTrainerArguments

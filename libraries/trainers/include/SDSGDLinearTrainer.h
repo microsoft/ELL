@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     LinearSGDTrainer.h (trainers)
+//  File:     SDSGDLinearTrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@ namespace ell
 namespace trainers
 {
     /// <summary> Parameters for the stochastic gradient descent trainer. </summary>
-    struct LinearSGDTrainerParameters
+    struct SDSGDLinearTrainerParameters
     {
         double regularization;
     };
@@ -38,7 +38,7 @@ namespace trainers
     /// </summary>
     /// <typeparam name="LossFunctionType"> Type of loss function to use. </typeparam>
     template <typename LossFunctionType>
-    class LinearSGDTrainer : public ITrainer<predictors::LinearPredictor>
+    class SDSGDLinearTrainer : public ITrainer<predictors::LinearPredictor>
     {
     public:
         typedef predictors::LinearPredictor PredictorType;
@@ -47,7 +47,7 @@ namespace trainers
         ///
         /// <param name="lossFunction"> The loss function. </param>
         /// <param name="parameters"> The training parameters. </param>
-        LinearSGDTrainer(const LossFunctionType& lossFunction, const LinearSGDTrainerParameters& parameters);
+        SDSGDLinearTrainer(const LossFunctionType& lossFunction, const SDSGDLinearTrainerParameters& parameters);
 
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
@@ -71,9 +71,17 @@ namespace trainers
 
     private:
         LossFunctionType _lossFunction;
-        LinearSGDTrainerParameters _parameters;
+        SDSGDLinearTrainerParameters _parameters;
 
+
+        // these variables follow the notation in https://arxiv.org/abs/1612.09147
+        math::ColumnVector<double> _v;
+        math::ColumnVector<double> _u;
         double _t = 0;
+        double _a = 0;
+        double _c = 0;
+        double _h = 0;
+
         PredictorType _lastPredictor;
         PredictorType _averagedPredictor;
     };
@@ -86,8 +94,8 @@ namespace trainers
     ///
     /// <returns> A sorting tree trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSGDTrainer(const LossFunctionType& lossFunction, const LinearSGDTrainerParameters& parameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDSGDLinearTrainer(const LossFunctionType& lossFunction, const SDSGDLinearTrainerParameters& parameters);
 }
 }
 
-#include "../tcc/LinearSGDTrainer.tcc"
+#include "../tcc/SDSGDLinearTrainer.tcc"

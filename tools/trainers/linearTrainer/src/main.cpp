@@ -44,8 +44,8 @@
 // trainers
 #include "EvaluatingIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
-#include "LinearSGDTrainer.h"
-#include "LinearSparseDataSGDTrainer.h"
+#include "SGDLinearTrainer.h"
+#include "SDSGDLinearTrainer.h"
 
 // evaluators
 #include "Evaluator.h"
@@ -112,10 +112,10 @@ int main(int argc, char* argv[])
         switch (linearTrainerArguments.algorithm)
         {
         case LinearTrainerArguments::Algorithm::SGD:
-            trainer = common::MakeLinearSGDTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+            trainer = common::MakeSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
             break;
         case LinearTrainerArguments::Algorithm::SDSGD:
-            trainer = common::MakeLinearSparseDataSGDTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+            trainer = common::MakeSDSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized algorithm type");

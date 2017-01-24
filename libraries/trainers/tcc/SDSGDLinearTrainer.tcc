@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     LinearSparseDataSGDTrainer.tcc (trainers)
+//  File:     SDSGDLinearTrainer.tcc (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,14 +19,14 @@ namespace ell
 namespace trainers
 {
     template <typename LossFunctionType>
-    LinearSparseDataSGDTrainer<LossFunctionType>::LinearSparseDataSGDTrainer(const LossFunctionType& lossFunction, const LinearSparseDataSGDTrainerParameters& parameters)
+    SDSGDLinearTrainer<LossFunctionType>::SDSGDLinearTrainer(const LossFunctionType& lossFunction, const SDSGDLinearTrainerParameters& parameters)
         : _lossFunction(lossFunction), _parameters(parameters)
     {
     }
 
     // this code follows the notation and pseudocode in https://arxiv.org/abs/1612.09147
     template <typename LossFunctionType>
-    void LinearSparseDataSGDTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
+    void SDSGDLinearTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
     {
         const double lambda = _parameters.regularization;
 
@@ -96,9 +96,9 @@ namespace trainers
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeLinearSparseDataSGDTrainer(const LossFunctionType& lossFunction, const LinearSparseDataSGDTrainerParameters& parameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDSGDLinearTrainer(const LossFunctionType& lossFunction, const SDSGDLinearTrainerParameters& parameters)
     {
-        return std::make_unique<LinearSparseDataSGDTrainer<LossFunctionType>>(lossFunction, parameters);
+        return std::make_unique<SDSGDLinearTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 }
 }

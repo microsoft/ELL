@@ -34,7 +34,7 @@
 
 // trainers
 #include "EvaluatingIncrementalTrainer.h"
-#include "LinearSGDTrainer.h"
+#include "SGDLinearTrainer.h"
 #include "SweepingIncrementalTrainer.h"
 
 // evaluators
@@ -109,14 +109,14 @@ int main(int argc, char* argv[])
         evaluators::EvaluatorParameters evaluatorParameters{ multiEpochTrainerArguments.numEpochs, false };
 
         // create trainers
-        auto generator = common::MakeParametersEnumerator<trainers::LinearSGDTrainerParameters>(regularization);
+        auto generator = common::MakeParametersEnumerator<trainers::SGDLinearTrainerParameters>(regularization);
         std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
         for (size_t i = 0; i < regularization.size(); ++i)
         {
-            auto LinearSGDTrainer = common::MakeLinearSGDTrainer(trainerArguments.lossArguments, generator.GenerateParameters(i));
+            auto SGDLinearTrainer = common::MakeSGDLinearTrainer(trainerArguments.lossArguments, generator.GenerateParameters(i));
             evaluators.push_back(common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossArguments));
-            evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(LinearSGDTrainer), evaluators.back()));
+            evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(SGDLinearTrainer), evaluators.back()));
         }
 
         // create meta trainer

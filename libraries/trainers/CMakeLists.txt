@@ -24,8 +24,8 @@ set (INCLUDE include/EvaluatingIncrementalTrainer.h
              include/MultiEpochIncrementalTrainer.h
              include/SortingForestTrainer.h
              include/SweepingIncrementalTrainer.h
-             include/LinearSGDTrainer.h
-             include/LinearSparseDataSGDTrainer.h
+             include/SGDLinearTrainer.h
+             include/SDSGDLinearTrainer.h
              include/ThresholdFinder.h)
 
 set (TCC tcc/EvaluatingIncrementalTrainer.tcc
@@ -34,15 +34,18 @@ set (TCC tcc/EvaluatingIncrementalTrainer.tcc
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingForestTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc
-         tcc/LinearSGDTrainer.tcc
-         tcc/LinearSparseDataSGDTrainer.tcc
+         tcc/SGDLinearTrainer.tcc
+         tcc/SDSGDLinearTrainer.tcc
          tcc/ThresholdFinder.tcc)
+
+set (DOC doc/README.md)
 
 source_group("src" FILES ${SRC})
 source_group("include" FILES ${INCLUDE})
 source_group("tcc" FILES ${TCC})
+source_group("doc" FILES ${DOC})
 
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
+add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC} ${DOC})
 target_include_directories(${PROJ_NAME} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
