@@ -24,7 +24,7 @@ namespace trainers
     {
     }
 
-    // this code follows the notation in https://arxiv.org/abs/1612.09147
+    // this code follows the notation and pseudocode in https://arxiv.org/abs/1612.09147
     template <typename LossFunctionType>
     void LinearSparseDataSGDTrainer<LossFunctionType>::Update(const data::AnyDataset& anyDataset)
     {
