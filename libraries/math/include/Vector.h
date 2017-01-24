@@ -184,7 +184,6 @@ namespace math
     class ScaledConstVectorReference
     {
     public:
-
         /// <summary> Constructs an instance of ScaledConstVectorReference. </summary>
         ///
         /// <param name="scalar"> The scalar. </param>
@@ -225,7 +224,6 @@ namespace math
     class VectorReference : public ConstVectorReference<ElementType, Orientation>
     {
     public:
-
         /// <summary> Copies values from another vector into this vector. </summary>
         ///
         /// <param name="other"> The other vector. </param>
