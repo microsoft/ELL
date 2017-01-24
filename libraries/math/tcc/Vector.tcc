@@ -14,7 +14,6 @@
 
 // stl
 #include <algorithm> // for std::generate
-#include "..\include\Vector.h"
 
 namespace ell
 {
@@ -151,7 +150,7 @@ namespace math
     }
 
     template<typename ElementType, VectorOrientation Orientation>
-    inline void VectorReference<ElementType, Orientation>::Set(ScaledConstVectorReference<ElementType, Orientation> other)
+    void VectorReference<ElementType, Orientation>::Set(ScaledConstVectorReference<ElementType, Orientation> other)
     {
         Reset();
         Operations::Add(other.GetScalar(), other.GetVector(), *this);
