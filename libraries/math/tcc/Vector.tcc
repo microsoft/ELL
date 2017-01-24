@@ -145,6 +145,19 @@ namespace math
     //
 
     template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::Set(ConstVectorReference<ElementType, Orientation> other)
+    {
+        Operations::Copy(other, *this);
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    inline void VectorReference<ElementType, Orientation>::Set(ScaledConstVectorReference<ElementType, Orientation> other)
+    {
+        Reset();
+        Operations::Add(other.GetScalar(), other.GetVector(), *this);
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::Reset()
     {
         Fill(0);
@@ -235,6 +248,12 @@ namespace math
     {
         Operations::Add(1.0, other, *this);
     }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::operator+=(ScaledConstVectorReference<ElementType, Orientation> other)
+    {
+        Operations::Add(other.GetScalar(), other.GetVector(), *this);
+    } 
 
     template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator-=(ConstVectorReference<ElementType, Orientation> other)

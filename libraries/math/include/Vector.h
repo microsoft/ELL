@@ -222,6 +222,17 @@ namespace math
     class VectorReference : public ConstVectorReference<ElementType, Orientation>
     {
     public:
+
+        /// <summary> Copies values from another vector into this vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        void Set(ConstVectorReference<ElementType, Orientation> other);
+
+        /// <summary> Copies values from a scaled vector into this vector. </summary>
+        ///
+        /// <param name="other"> The scaled vector. </param>
+        void Set(ScaledConstVectorReference<ElementType, Orientation> other);
+
         /// <summary> Gets a pointer to the underlying data storage. </summary>
         ///
         /// <returns> Pointer to the data. </returns>
@@ -290,10 +301,10 @@ namespace math
         /// <param name="other"> The other vector. </param>
         void operator+=(ConstVectorReference<ElementType, Orientation> other);
 
-        void operator+=(ScaledConstVectorReference<ElementType, Orientation> other)
-        {
-            Operations::Add(other.GetScalar(), other.GetVector(), *this);
-        } // TODO move
+        /// <summary> Adds a scaled vector to this vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        void operator+=(ScaledConstVectorReference<ElementType, Orientation> other);
 
         /// <summary> Subtracts another vector from this vector. </summary>
         ///

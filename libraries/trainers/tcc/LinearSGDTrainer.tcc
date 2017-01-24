@@ -42,8 +42,7 @@ namespace trainers
         while (exampleIterator.IsValid())
         {
             // get iteration index
-            ++_total_iterations;
-            double t = (double)_total_iterations;
+            ++_t;
 
             // get the next example
             const auto& example = exampleIterator.Get();
@@ -66,11 +65,11 @@ namespace trainers
             double g = weight * _lossFunction.GetDerivative(p, y);
 
             // update the (last) predictor
-            double scaleCoefficient = 1.0 - 1.0 / t;
+            double scaleCoefficient = 1.0 - 1.0 / _t;
             lastW *= scaleCoefficient;
             lastB *= scaleCoefficient;
 
-            double updateCoefficient = -g / (lambda * t);
+            double updateCoefficient = -g / (lambda * _t);
             lastW.Transpose() += updateCoefficient * x;
             lastB += updateCoefficient;
 
@@ -78,8 +77,8 @@ namespace trainers
             averagedW *= scaleCoefficient;
             averagedB *= scaleCoefficient;
 
-            averagedW += 1.0 / t * lastW;
-            averagedB += lastB / t;
+            averagedW += 1.0 / _t * lastW;
+            averagedB += lastB / _t;
 
             exampleIterator.Next();
         }

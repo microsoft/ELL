@@ -34,8 +34,10 @@ namespace trainers
         auto exampleIterator = anyDataset.GetExampleIterator<data::AutoSupervisedExample>();
 
         // first iteration handled separately
-        if (_total_iterations == 0)
+        if (_t == 0 && exampleIterator.IsValid())
         {
+            ++_t;
+
             const auto& example = exampleIterator.Get();
 
             const auto& x = example.GetDataVector();
@@ -56,13 +58,12 @@ namespace trainers
             _c = _a;
             _h = 1;
 
-            ++_total_iterations;
+            exampleIterator.Next();
         }
 
         while (exampleIterator.IsValid())
         {
-            ++_total_iterations;
-            double t = (double)_total_iterations;
+            ++_t;
 
             // get the Next example
             const auto& example = exampleIterator.Get();
@@ -72,25 +73,26 @@ namespace trainers
             double weight = example.GetMetadata().weight;
 
             double d = x * _v;
-            double p = -(d + _a) / (lambda * (t - 1));
+            double p = -(d + _a) / (lambda * (_t - 1));
             double g = weight * _lossFunction.GetDerivative(p, y);
             _v.Transpose() += g * x;
             _a += g;
             _u.Transpose() += _h * g * x;
-            _c += _a / t;
-            _h += 1 / t;
+            _c += _a / _t;
+            _h += 1 / _t;
 
             exampleIterator.Next();
         }
 
         // calculate the predictors
+        _lastPredictor.Resize(_v.Size());
+        _lastPredictor.GetWeights().Set((-1 / (lambda * _t)) * _v);
+        _lastPredictor.GetBias() = -_a / (lambda * _t);
 
-        //_lastPredictor.GetWeights() = 
-        _lastPredictor.GetBias() = -_a / (lambda * _total_iterations);
-
-        //_averagedPredictor.GetWeights() = -1 / (lambda * t)
-        _averagedPredictor.GetBias() = -_c / (lambda * _total_iterations);
-
+        _averagedPredictor.Resize(_v.Size());
+        _averagedPredictor.GetWeights().Set(-_h / (lambda * _t) * _v);
+        _averagedPredictor.GetWeights() += 1 / (lambda * _t) * _u;
+        _averagedPredictor.GetBias() = -_c / (lambda * _t);
     }
 
     template <typename LossFunctionType>

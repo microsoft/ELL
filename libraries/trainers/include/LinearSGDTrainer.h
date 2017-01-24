@@ -73,7 +73,7 @@ namespace trainers
         LossFunctionType _lossFunction;
         LinearSGDTrainerParameters _parameters;
 
-        size_t _total_iterations = 0;
+        double _t = 0;
         PredictorType _lastPredictor;
         PredictorType _averagedPredictor;
     };
