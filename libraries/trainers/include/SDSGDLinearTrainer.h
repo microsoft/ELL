@@ -73,7 +73,6 @@ namespace trainers
         LossFunctionType _lossFunction;
         SDSGDLinearTrainerParameters _parameters;
 
-
         // these variables follow the notation in https://arxiv.org/abs/1612.09147
         math::ColumnVector<double> _v;
         math::ColumnVector<double> _u;

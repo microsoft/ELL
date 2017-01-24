@@ -11,8 +11,8 @@
 #include <cmath>
 
 // data
-#include "Dataset.h"
 #include "DataVectorOperators.h"
+#include "Dataset.h"
 
 namespace ell
 {

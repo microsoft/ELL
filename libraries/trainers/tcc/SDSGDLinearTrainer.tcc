@@ -11,8 +11,8 @@
 #include <cmath>
 
 // data
-#include "Dataset.h"
 #include "DataVectorOperators.h"
+#include "Dataset.h"
 
 namespace ell
 {
@@ -45,7 +45,7 @@ namespace trainers
             double weight = example.GetMetadata().weight;
 
             double g = weight * _lossFunction.GetDerivative(0, y);
-            
+
             auto xSize = x.PrefixLength();
             if (xSize > _v.Size())
             {
