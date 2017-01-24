@@ -48,14 +48,29 @@ add_test(NAME ${TEST_NAME}
 set (TEST_NAME ${PROJ_NAME}_test_2)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.001)
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.001 -a SGD)
 
 set (TEST_NAME ${PROJ_NAME}_test_3)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.001)
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.001 -a SGD)
 
 set (TEST_NAME ${PROJ_NAME}_test_4)
 add_test(NAME ${TEST_NAME}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 0.001)
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SGD)
+
+set (TEST_NAME ${PROJ_NAME}_test_5)
+add_test(NAME ${TEST_NAME}
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.001 -a SDSGD)
+
+set (TEST_NAME ${PROJ_NAME}_test_6)
+add_test(NAME ${TEST_NAME}
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.001 -a SDSGD)
+
+set (TEST_NAME ${PROJ_NAME}_test_7)
+add_test(NAME ${TEST_NAME}
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SDSGD)
