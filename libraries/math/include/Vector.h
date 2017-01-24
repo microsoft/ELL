@@ -118,7 +118,7 @@ namespace math
 
     /// <summary> A reference to a constant algebraic vector. </summary>
     ///
-    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
     /// <typeparam name="Orientation"> The orientation. </typeparam>
     template <typename ElementType, VectorOrientation Orientation>
     class ConstVectorReference : public VectorBase<Orientation>, public UnorientedConstVectorReference<ElementType>
@@ -178,8 +178,8 @@ namespace math
 
     /// <summary> A class that represents a scaled constant vector. </summary>
     ///
-    /// <typeparam name="ElementType"> Type of the element type. </typeparam>
-    /// <typeparam name="Orientation"> Type of the orientation. </typeparam>
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
+    /// <typeparam name="Orientation"> The orientation. </typeparam>
     template <typename ElementType, VectorOrientation Orientation>
     class ScaledConstVectorReference
     {
@@ -189,9 +189,7 @@ namespace math
         ///
         /// <param name="scalar"> The scalar. </param>
         /// <param name="_vector"> The vector. </param>
-        ScaledConstVectorReference(double scalar, ConstVectorReference<ElementType, Orientation> vector) : _scalar(scalar), _vector(vector)
-        {
-        } // TODO move
+        ScaledConstVectorReference(double scalar, ConstVectorReference<ElementType, Orientation> vector);
 
         /// <summary> Gets the scalar. </summary>
         ///
@@ -208,15 +206,20 @@ namespace math
         ConstVectorReference<ElementType, Orientation> _vector;
     };
 
+    /// <summary> Multiplication operator for scalar and vector. </summary>
+    ///
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
+    /// <typeparam name="Orientation"> The orientation. </typeparam>
+    /// <param name="scalar"> The scalar. </param>
+    /// <param name="vector"> The vector. </param>
+    ///
+    /// <returns> The ScaledConstVectorReference that results from the operation. </returns>
     template <typename ElementType, VectorOrientation Orientation>
-    ScaledConstVectorReference<ElementType, Orientation> operator*(double scalar, ConstVectorReference<ElementType, Orientation> vector)
-    {
-        return ScaledConstVectorReference<ElementType, Orientation>(scalar, vector);
-    } // TODO move
+    ScaledConstVectorReference<ElementType, Orientation> operator*(double scalar, ConstVectorReference<ElementType, Orientation> vector);
 
     /// <summary> A reference to a non-constant algebraic vector. </summary>
     ///
-    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
     /// <typeparam name="Orientation"> The orientation. </typeparam>
     template <typename ElementType, VectorOrientation Orientation>
     class VectorReference : public ConstVectorReference<ElementType, Orientation>
@@ -351,7 +354,7 @@ namespace math
 
     /// <summary> An algebraic vector. </summary>
     ///
-    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
     /// <typeparam name="Orientation"> The orientationL row or colMajor. </typeparam>
     template <typename ElementType, VectorOrientation Orientation>
     class Vector : public VectorReference<ElementType, Orientation>

@@ -140,6 +140,21 @@ namespace math
     }
 
     //
+    // ScaledConstVectorReference
+    //
+
+    template <typename ElementType, VectorOrientation Orientation>
+    ScaledConstVectorReference<ElementType, Orientation>::ScaledConstVectorReference(double scalar, ConstVectorReference<ElementType, Orientation> vector) : _scalar(scalar), _vector(vector)
+    {
+    } 
+
+    template <typename ElementType, VectorOrientation Orientation>
+    ScaledConstVectorReference<ElementType, Orientation> operator*(double scalar, ConstVectorReference<ElementType, Orientation> vector)
+    {
+        return ScaledConstVectorReference<ElementType, Orientation>(scalar, vector);
+    }
+
+    //
     // VectorReference
     //
 
