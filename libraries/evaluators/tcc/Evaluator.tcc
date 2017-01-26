@@ -129,7 +129,8 @@ namespace evaluators
     void Evaluator<PredictorType, AggregatorTypes...>::DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Sequence...>)
     {
         // Call (X.Update(), 0) for each X in _aggregatorTuple
-        utilities::InOrderFunctionEvaluator([this, &prediction, &label, &weight](){std::get<Sequence>(_aggregatorTuple).Update(prediction, label, weight);}...);
+        utilities::InOrderFunctionEvaluator(std::bind(std::mem_fn(&std::tuple_element<Sequence, decltype(_aggregatorTuple)>::type::Update), std::get<Sequence>(_aggregatorTuple), prediction, label, weight)...);
+        // utilities::InOrderFunctionEvaluator([this, &prediction, &label, &weight](){std::get<Sequence>(_aggregatorTuple).Update(prediction, label, weight);}...); // GCC bug prevents compilation
     }
 
     template <typename PredictorType, typename... AggregatorTypes>
@@ -140,7 +141,8 @@ namespace evaluators
         _values.push_back({ std::get<Sequence>(_aggregatorTuple).GetResult()... });
 
         // Call X.Reset() for each X in _aggregatorTuple
-        utilities::InOrderFunctionEvaluator([this](){std::get<Sequence>(_aggregatorTuple).Reset();}...);
+        utilities::InOrderFunctionEvaluator(std::bind(std::mem_fn(&std::tuple_element<Sequence, decltype(_aggregatorTuple)>::type::Reset), std::get<Sequence>(_aggregatorTuple))...);
+        // utilities::InOrderFunctionEvaluator([this](){std::get<Sequence>(_aggregatorTuple).Reset();}...); // GCC bug prevents compilation
     }
 
     template <typename PredictorType, typename... AggregatorTypes>
