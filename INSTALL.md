@@ -57,10 +57,12 @@ The library currently can only be built in 64-bit mode on Windows. To create a 6
 
     > cmake -G "Visual Studio 14 2015 Win64" ..
 
-**Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, along with other files. 
-By default, the solution file also builds interfaces using SWIG and code documentation using Doxygen. Alternatively, you can turn these options of by typing:
+**Important:** don't forget the two dots (..) at the end of the command! 
 
-    > cmake -G "Visual Studio 14 2015 Win64" -DSWIG_ENABLED=false -DDOXYGEN_ENABLED=false ..
+This command creates a solution file named `ELL.sln`, along with other files. 
+The solution file can also build interfaces using SWIG (ON by default) and code documentation using Doxygen (OFF by default). You can change these options off by typing:
+
+    > cmake -G "Visual Studio 14 2015 Win64" -DUSE_SWIG=false -DBUILD_DOCS=true ..
 
 There are two ways to build the library. One option is to open the solution file in Visual Studio and build it there. To do this, type:
 
