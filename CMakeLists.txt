@@ -23,7 +23,7 @@ endif()
 # cmake -DMyOption=ON|OFF buildDirectory
 # (so if we're running cmake from a 'build' directory inside the main directory, do this:
 #      cmake -DBUILD_DOCS=OFF ..  )
-option(BUILD_INTERFACES "Build SWIG interfaces" ON)
+option(BUILD_INTERFACES "Build SWIG interfaces" OFF)
 option(BUILD_DOC "Build Doxygen documentation" ON)
 
 set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
