@@ -66,7 +66,7 @@ namespace trainers
         /// <summary> Returns a const reference to the averaged predictor. </summary>
         ///
         /// <returns> A const reference to the averaged predictor. </returns>
-        const PredictorType& GetAveragedPredictor() const { return *_averagedPredictor; }
+        const PredictorType& GetAveragedPredictor() const { return _averagedPredictor; }
 
     private:
         LossFunctionType _lossFunction;
