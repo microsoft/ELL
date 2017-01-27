@@ -78,7 +78,7 @@ namespace data
         /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        virtual double Dot(const math::UnorientedConstVectorReference<double>& vector) const = 0;
+        virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const = 0;
 
         /// <summary>
         /// Performs the operation: vector += scalar * (*this), where other is an array of doubles.
@@ -86,7 +86,7 @@ namespace data
         ///
         /// <param name="vector"> [in,out] The vector to which this data vector is added. </param>
         /// <param name="scalar"> The scalar. </param>
-        virtual void AddTo(math::RowVectorReference<double>& vector, double scalar = 1.0) const = 0;
+        virtual void AddTo(math::RowVectorReference<double> vector, double scalar = 1.0) const = 0;
 
         /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
         ///
@@ -174,7 +174,7 @@ namespace data
         /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        virtual double Dot(const math::UnorientedConstVectorReference<double>& vector) const override;
+        virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
 
         /// <summary>
         /// Performs the operation: vector += scalar * (*this), where other is an array of doubles.
@@ -182,7 +182,7 @@ namespace data
         ///
         /// <param name="vector"> [in,out] The vector to which this data vector is added. </param>
         /// <param name="scalar"> The scalar. </param>
-        virtual void AddTo(math::RowVectorReference<double>& vector, double scalar = 1.0) const override;
+        virtual void AddTo(math::RowVectorReference<double> vector, double scalar = 1.0) const override;
 
         /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
         ///

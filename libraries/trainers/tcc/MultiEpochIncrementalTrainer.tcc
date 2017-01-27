@@ -44,7 +44,7 @@ namespace trainers
     }
 
     template <typename PredictorType>
-    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer, const MultiEpochIncrementalTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(std::unique_ptr<ITrainer<PredictorType>>&& internalTrainer, const MultiEpochIncrementalTrainerParameters& parameters)
     {
         return std::make_unique<MultiEpochIncrementalTrainer<PredictorType>>(std::move(internalTrainer), parameters);
     }

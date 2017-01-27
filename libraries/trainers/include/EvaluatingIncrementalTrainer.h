@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Evaluator.h"
-#include "IIncrementalTrainer.h"
+#include "ITrainer.h"
 
 // stl
 #include <memory>
@@ -25,10 +25,10 @@ namespace trainers
     ///
     /// <typeparam name="PredictorType"> The predictor type. </typeparam>
     template <typename PredictorType>
-    class EvaluatingIncrementalTrainer : public IIncrementalTrainer<PredictorType>
+    class EvaluatingIncrementalTrainer : public ITrainer<PredictorType>
     {
     public:
-        typedef IIncrementalTrainer<PredictorType> InternalTrainerType;
+        typedef ITrainer<PredictorType> InternalTrainerType;
         typedef evaluators::IEvaluator<PredictorType> EvaluatorType;
 
         /// <summary> Constructs an instance of EvaluatingIncrementalTrainer. </summary>
@@ -44,8 +44,8 @@ namespace trainers
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
-        /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _internalTrainer->GetPredictor(); }
+        /// <returns> A const reference to the current predictor. </returns>
+        virtual const PredictorType& GetPredictor() const override { return _internalTrainer->GetPredictor(); }
 
         /// <summary> Gets a const reference to the evaluator. </summary>
         ///
@@ -66,7 +66,7 @@ namespace trainers
     /// <returns> A unique_ptr to an evaluating trainer. </returns>
     template <typename PredictorType>
     EvaluatingIncrementalTrainer<PredictorType> MakeEvaluatingIncrementalTrainer(
-        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer,
+        std::unique_ptr<ITrainer<PredictorType>>&& internalTrainer,
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator);
 }
 }

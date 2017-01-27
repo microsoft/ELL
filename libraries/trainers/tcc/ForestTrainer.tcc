@@ -15,7 +15,7 @@ namespace trainers
 {
     template <typename SplitRuleType, typename EdgePredictorType, typename BoosterType>
     ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters)
-        : _booster(booster), _parameters(parameters), _forest(std::make_shared<predictors::SimpleForestPredictor>())
+        : _booster(booster), _parameters(parameters), _forest()
     {
     }
 
@@ -36,15 +36,15 @@ namespace trainers
 
             // use the computed sums to calaculate the bias term, set it in the forest and the data set
             double bias = sums.GetMeanLabel();
-            _forest->AddToBias(bias);
+            _forest.AddToBias(bias);
             UpdateCurrentOutputs(bias);
 
             VERBOSE_MODE(_dataset.Print(std::cout));
             VERBOSE_MODE(std::cout << "\nBoosting iteration\n");
-            VERBOSE_MODE(_forest->PrintLine(std::cout, 1));
+            VERBOSE_MODE(_forest.PrintLine(std::cout, 1));
 
             // find split candidate for root node and push it onto the priority queue
-            auto rootSplit = GetBestSplitRuleAtNode(_forest->GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
+            auto rootSplit = GetBestSplitRuleAtNode(_forest.GetNewRootId(), Range{ 0, _dataset.NumExamples() }, sums);
 
             // check for positive gain
             if (rootSplit.gain < _parameters.minSplitGain || _parameters.maxSplitsPerRound == 0)
@@ -116,7 +116,7 @@ namespace trainers
         for (size_t rowIndex = 0; rowIndex < _dataset.NumExamples(); ++rowIndex)
         {
             auto& example = _dataset[rowIndex];
-            auto prediction = _forest->Predict(example.GetDataVector());
+            auto prediction = _forest.Predict(example.GetDataVector());
             auto& metadata = example.GetMetadata();
             metadata.currentOutput = prediction;
             metadata.weak = _booster.GetWeakWeightLabel(metadata.strong, prediction);
@@ -154,11 +154,11 @@ namespace trainers
             // have the forest perform the split
             using SplitAction = predictors::SimpleForestPredictor::SplitAction;
             SplitAction splitAction(splitCandidate.nodeId, splitCandidate.splitRule, edgePredictors);
-            auto interiorNodeIndex = _forest->Split(splitAction);
+            auto interiorNodeIndex = _forest.Split(splitAction);
 
             VERBOSE_MODE(_dataset.Print(std::cout, 1));
             VERBOSE_MODE(std::cout << "\n");
-            VERBOSE_MODE(_forest->PrintLine(std::cout, 1));
+            VERBOSE_MODE(_forest.PrintLine(std::cout, 1));
 
             // if max number of splits reached, exit the loop
             if (++splitCount >= maxSplits)
@@ -169,7 +169,7 @@ namespace trainers
             // queue new split candidates
             for (size_t i = 0; i < splitCandidate.splitRule.NumOutputs(); ++i)
             {
-                auto splitCandidate = GetBestSplitRuleAtNode(_forest->GetChildId(interiorNodeIndex, i), ranges.GetChildRange(i), stats.GetChildSums(i));
+                auto splitCandidate = GetBestSplitRuleAtNode(_forest.GetChildId(interiorNodeIndex, i), ranges.GetChildRange(i), stats.GetChildSums(i));
                 if (splitCandidate.gain > _parameters.minSplitGain)
                 {
                     _queue.push(std::move(splitCandidate));

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IIncrementalTrainer.h (trainers)
+//  File:     ITrainer.h (trainers)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,10 +25,10 @@ namespace trainers
     ///
     /// <typeparam name="PredictorType"> Type of the predictor created by the trainer. </typeparam>
     template <typename PredictorType>
-    class IIncrementalTrainer
+    class ITrainer
     {
     public:
-        virtual ~IIncrementalTrainer() = default;
+        virtual ~ITrainer() = default;
 
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
         ///
@@ -37,8 +37,8 @@ namespace trainers
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
-        /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const = 0;
+        /// <returns> A const reference to the current predictor. </returns>
+        virtual const PredictorType& GetPredictor() const = 0;
     };
 }
 }

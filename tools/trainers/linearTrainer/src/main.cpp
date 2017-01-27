@@ -1,10 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     main.cpp (sgdTrainer)
+//  File:     main.cpp (linearTrainer)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "LinearTrainerArguments.h"
 
 // utilities
 #include "CommandLineParser.h"
@@ -29,7 +31,6 @@
 #include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
-#include "SGDIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // model
@@ -43,11 +44,12 @@
 // trainers
 #include "EvaluatingIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
-#include "SGDIncrementalTrainer.h"
+#include "SGDLinearTrainer.h"
+#include "SDSGDLinearTrainer.h"
 
 // evaluators
-#include "BinaryErrorAggregator.h"
 #include "Evaluator.h"
+#include "BinaryErrorAggregator.h"
 #include "LossAggregator.h"
 
 // lossFunctions
@@ -57,7 +59,6 @@
 // stl
 #include <iostream>
 #include <memory>
-#include <stdexcept>
 
 using namespace ell;
 
@@ -69,20 +70,20 @@ int main(int argc, char* argv[])
         utilities::CommandLineParser commandLineParser(argc, argv);
 
         // add arguments to the command line parser
+        ParsedLinearTrainerArguments linearTrainerArguments;
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedTrainerArguments trainerArguments;
-        common::ParsedSGDIncrementalTrainerArguments sgdIncrementalTrainerArguments;
         common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
 
+        commandLineParser.AddOptionSet(linearTrainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(multiEpochTrainerArguments);
-        commandLineParser.AddOptionSet(sgdIncrementalTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
 
         // parse command line
@@ -90,7 +91,7 @@ int main(int argc, char* argv[])
 
         if (trainerArguments.verbose)
         {
-            std::cout << "Stochastic Gradient Descent Trainer" << std::endl;
+            std::cout << "Linear Trainer" << std::endl;
             std::cout << commandLineParser.GetCurrentValuesString() << std::endl;
         }
 
@@ -106,8 +107,19 @@ int main(int argc, char* argv[])
         // predictor type
         using PredictorType = predictors::LinearPredictor;
 
-        // create sgd trainer
-        auto trainer = common::MakeSGDIncrementalTrainer(mappedDatasetDimension, trainerArguments.lossArguments, sgdIncrementalTrainerArguments);
+        // create linear trainer
+        std::unique_ptr<trainers::ITrainer<PredictorType>> trainer;
+        switch (linearTrainerArguments.algorithm)
+        {
+        case LinearTrainerArguments::Algorithm::SGD:
+            trainer = common::MakeSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+            break;
+        case LinearTrainerArguments::Algorithm::SDSGD:
+            trainer = common::MakeSDSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+            break;
+        default:
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized algorithm type");
+        }
 
         // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
@@ -123,7 +135,8 @@ int main(int argc, char* argv[])
         // Train the predictor
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->Update(mappedDataset.GetAnyDataset());
-        auto predictor = trainer->GetPredictor();
+        predictors::LinearPredictor predictor(trainer->GetPredictor());
+        predictor.Resize(mappedDatasetDimension);
 
         // Print loss and errors
         if (trainerArguments.verbose)
@@ -140,7 +153,7 @@ int main(int argc, char* argv[])
         if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
-            auto model = common::AppendNodeToModel<nodes::LinearPredictorNode, PredictorType>(map, *predictor);
+            auto model = common::AppendNodeToModel<nodes::LinearPredictorNode, PredictorType>(map, predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }

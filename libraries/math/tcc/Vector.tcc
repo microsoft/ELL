@@ -83,15 +83,6 @@ namespace math
     }
 
     template <typename ElementType>
-    void UnorientedConstVectorReference<ElementType>::CheckSize(const UnorientedConstVectorReference<ElementType>& other) const
-    {
-        if (_size != other.Size())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors must have the same size");
-        }
-    }
-
-    template <typename ElementType>
     std::ostream& operator<<(std::ostream& ostream, UnorientedConstVectorReference<ElementType> vector)
     {
         vector.Print(ostream);
@@ -149,8 +140,36 @@ namespace math
     }
 
     //
+    // ScaledConstVectorReference
+    //
+
+    template <typename ElementType, VectorOrientation Orientation>
+    ScaledConstVectorReference<ElementType, Orientation>::ScaledConstVectorReference(double scalar, ConstVectorReference<ElementType, Orientation> vector) : _scalar(scalar), _vector(vector)
+    {
+    } 
+
+    template <typename ElementType, VectorOrientation Orientation>
+    ScaledConstVectorReference<ElementType, Orientation> operator*(double scalar, ConstVectorReference<ElementType, Orientation> vector)
+    {
+        return ScaledConstVectorReference<ElementType, Orientation>(scalar, vector);
+    }
+
+    //
     // VectorReference
     //
+
+    template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::Set(ConstVectorReference<ElementType, Orientation> other)
+    {
+        Operations::Copy(other, *this);
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::Set(ScaledConstVectorReference<ElementType, Orientation> other)
+    {
+        Reset();
+        Operations::Add(other.GetScalar(), other.GetVector(), *this);
+    }
 
     template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::Reset()
@@ -241,14 +260,18 @@ namespace math
     template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator+=(ConstVectorReference<ElementType, Orientation> other)
     {
-        CheckSize(other);
         Operations::Add(1.0, other, *this);
     }
 
     template <typename ElementType, VectorOrientation Orientation>
+    void VectorReference<ElementType, Orientation>::operator+=(ScaledConstVectorReference<ElementType, Orientation> other)
+    {
+        Operations::Add(other.GetScalar(), other.GetVector(), *this);
+    } 
+
+    template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator-=(ConstVectorReference<ElementType, Orientation> other)
     {
-        CheckSize(other);
         Operations::Add(-1.0, other, *this);
     }
 
@@ -329,6 +352,14 @@ namespace math
         : VectorReference<ElementType, Orientation>(nullptr, other._size, other._increment), _data(other._data)
     {
         _pData = _data.data();
+    }
+
+    template<typename ElementType, VectorOrientation Orientation>
+    void Vector<ElementType, Orientation>::Resize(size_t size)
+    {
+        _data.resize(size);
+        _pData = _data.data();
+        _size = size;
     }
 
     template <typename ElementType, VectorOrientation Orientation>

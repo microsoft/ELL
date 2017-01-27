@@ -99,7 +99,6 @@ namespace math
     protected:
         UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
         void Swap(UnorientedConstVectorReference<ElementType>& other);
-        void CheckSize(const UnorientedConstVectorReference<ElementType>& other) const;
 
         ElementType* _pData;
         size_t _size;
@@ -119,7 +118,7 @@ namespace math
 
     /// <summary> A reference to a constant algebraic vector. </summary>
     ///
-    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
     /// <typeparam name="Orientation"> The orientation. </typeparam>
     template <typename ElementType, VectorOrientation Orientation>
     class ConstVectorReference : public VectorBase<Orientation>, public UnorientedConstVectorReference<ElementType>
@@ -177,14 +176,64 @@ namespace math
         friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
     };
 
+    /// <summary> A class that represents a scaled constant vector. </summary>
+    ///
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
+    /// <typeparam name="Orientation"> The orientation. </typeparam>
+    template <typename ElementType, VectorOrientation Orientation>
+    class ScaledConstVectorReference
+    {
+    public:
+        /// <summary> Constructs an instance of ScaledConstVectorReference. </summary>
+        ///
+        /// <param name="scalar"> The scalar. </param>
+        /// <param name="_vector"> The vector. </param>
+        ScaledConstVectorReference(double scalar, ConstVectorReference<ElementType, Orientation> vector);
+
+        /// <summary> Gets the scalar. </summary>
+        ///
+        /// <returns> The scalar. </returns>
+        double GetScalar() { return _scalar; }
+
+        /// <summary> Gets the vector reference. </summary>
+        ///
+        /// <returns> The vector reference. </returns>
+        ConstVectorReference<ElementType, Orientation> GetVector() const { return _vector; }
+
+    private:
+        double _scalar;
+        ConstVectorReference<ElementType, Orientation> _vector;
+    };
+
+    /// <summary> Multiplication operator for scalar and vector. </summary>
+    ///
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
+    /// <typeparam name="Orientation"> The orientation. </typeparam>
+    /// <param name="scalar"> The scalar. </param>
+    /// <param name="vector"> The vector. </param>
+    ///
+    /// <returns> The ScaledConstVectorReference that results from the operation. </returns>
+    template <typename ElementType, VectorOrientation Orientation>
+    ScaledConstVectorReference<ElementType, Orientation> operator*(double scalar, ConstVectorReference<ElementType, Orientation> vector);
+
     /// <summary> A reference to a non-constant algebraic vector. </summary>
     ///
-    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
     /// <typeparam name="Orientation"> The orientation. </typeparam>
     template <typename ElementType, VectorOrientation Orientation>
     class VectorReference : public ConstVectorReference<ElementType, Orientation>
     {
     public:
+        /// <summary> Copies values from another vector into this vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        void Set(ConstVectorReference<ElementType, Orientation> other);
+
+        /// <summary> Copies values from a scaled vector into this vector. </summary>
+        ///
+        /// <param name="other"> The scaled vector. </param>
+        void Set(ScaledConstVectorReference<ElementType, Orientation> other);
+
         /// <summary> Gets a pointer to the underlying data storage. </summary>
         ///
         /// <returns> Pointer to the data. </returns>
@@ -238,6 +287,7 @@ namespace math
         {
             return VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
         }
+
         using ConstVectorReference<ElementType, Orientation>::Transpose;
 
         /// <summary> Applies an operation to all items in this collection. </summary>
@@ -251,6 +301,11 @@ namespace math
         ///
         /// <param name="other"> The other vector. </param>
         void operator+=(ConstVectorReference<ElementType, Orientation> other);
+
+        /// <summary> Adds a scaled vector to this vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        void operator+=(ScaledConstVectorReference<ElementType, Orientation> other);
 
         /// <summary> Subtracts another vector from this vector. </summary>
         ///
@@ -288,7 +343,6 @@ namespace math
         using ConstVectorReference<ElementType, Orientation>::_pData;
         using ConstVectorReference<ElementType, Orientation>::_size;
         using ConstVectorReference<ElementType, Orientation>::_increment;
-        using UnorientedConstVectorReference<ElementType>::CheckSize;
 
         template <typename T>
         friend class RectangularMatrixBase;
@@ -298,7 +352,7 @@ namespace math
 
     /// <summary> An algebraic vector. </summary>
     ///
-    /// <typeparam name="ElementPointerType"> Vector element type. </typeparam>
+    /// <typeparam name="ElementType"> Vector element type. </typeparam>
     /// <typeparam name="Orientation"> The orientationL row or colMajor. </typeparam>
     template <typename ElementType, VectorOrientation Orientation>
     class Vector : public VectorReference<ElementType, Orientation>
@@ -307,8 +361,11 @@ namespace math
         /// <summary> Constructs an all-zeros vector of a given size. </summary>
         ///
         /// <param name="size"> The vector size. </param>
-        Vector(size_t size);
+        Vector(size_t size = 0);
 
+        /// <summary> Constructs a vector by copying a std::vector. </summary>
+        ///
+        /// <param name="data"> The std::vector to copy. </param>
         Vector(std::vector<ElementType> data);
 
         /// <summary> Constructs a vector from an initializer list. </summary>
@@ -326,6 +383,11 @@ namespace math
         /// <param name="other"> [in,out] The vector being copied. </param>
         Vector(const Vector<ElementType, Orientation>& other);
 
+        /// <summary> Resize the vector. This function possibly invalidates references to the old vector. </summary>
+        ///
+        /// <param name="size"> The new vector size. </param>
+        void Resize(size_t size);
+
         /// <summary> Assignment operator. </summary>
         ///
         /// <param name="other"> The other vector. </param>
@@ -340,6 +402,8 @@ namespace math
 
     private:
         using ConstVectorReference<ElementType, Orientation>::_pData;
+        using ConstVectorReference<ElementType, Orientation>::_size;
+
         // member variables
         std::vector<ElementType> _data;
     };

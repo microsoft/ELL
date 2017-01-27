@@ -27,12 +27,12 @@ namespace trainers
     void EvaluatingIncrementalTrainer<PredictorType>::Update(const data::AnyDataset& anyDataset)
     {
         _internalTrainer->Update(anyDataset);
-        _evaluator->Evaluate(*_internalTrainer->GetPredictor());
+        _evaluator->Evaluate(_internalTrainer->GetPredictor());
     }
 
     template <typename PredictorType>
     EvaluatingIncrementalTrainer<PredictorType> MakeEvaluatingIncrementalTrainer(
-        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer,
+        std::unique_ptr<ITrainer<PredictorType>>&& internalTrainer,
         std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator)
     {
         return EvaluatingIncrementalTrainer<PredictorType>(std::move(internalTrainer), evaluator);

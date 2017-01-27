@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IIncrementalTrainer.h"
+#include "ITrainer.h"
 
 // data
 #include "Dataset.h"
@@ -38,10 +38,10 @@ namespace trainers
     ///
     /// <typeparam name="PredictorType"> The type of predictor returned by this trainer. </typeparam>
     template <typename PredictorType>
-    class MultiEpochIncrementalTrainer : public IIncrementalTrainer<PredictorType>
+    class MultiEpochIncrementalTrainer : public ITrainer<PredictorType>
     {
     public:
-        typedef IIncrementalTrainer<PredictorType> InternalTrainerType;
+        typedef ITrainer<PredictorType> InternalTrainerType;
 
         /// <summary> Constructs an instance of MultiEpochIncrementalTrainer. </summary>
         ///
@@ -56,8 +56,8 @@ namespace trainers
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
-        /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const std::shared_ptr<const PredictorType> GetPredictor() const override { return _internalTrainer->GetPredictor(); }
+        /// <returns> A const reference to the current predictor. </returns>
+        virtual const PredictorType& GetPredictor() const override { return _internalTrainer->GetPredictor(); }
 
     private:
         std::unique_ptr<InternalTrainerType> _internalTrainer;
@@ -73,8 +73,8 @@ namespace trainers
     ///
     /// <returns> A unique_ptr to a multi-epoch trainer. </returns>
     template <typename PredictorType>
-    std::unique_ptr<IIncrementalTrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(
-        std::unique_ptr<IIncrementalTrainer<PredictorType>>&& internalTrainer,
+    std::unique_ptr<ITrainer<PredictorType>> MakeMultiEpochIncrementalTrainer(
+        std::unique_ptr<ITrainer<PredictorType>>&& internalTrainer,
         const MultiEpochIncrementalTrainerParameters& parameters);
 }
 }

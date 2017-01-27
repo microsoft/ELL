@@ -10,14 +10,15 @@
 
 #include "ForestTrainerArguments.h"
 #include "MultiEpochIncrementalTrainerArguments.h"
-#include "SGDIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // predictors
 #include "LinearPredictor.h"
 
 // trainers
-#include "IIncrementalTrainer.h"
+#include "ITrainer.h"
+#include "SGDLinearTrainer.h"
+#include "SDSGDLinearTrainer.h"
 
 // stl
 #include <memory>
@@ -26,14 +27,21 @@ namespace ell
 {
 namespace common
 {
-    /// <summary> Makes a stochastic gradient descent incremental trainer. </summary>
+    /// <summary> Makes a stochastic gradient descent trainer. </summary>
     ///
-    /// <param name="dim"> The dimension. </param>
     /// <param name="lossArguments"> loss arguments. </param>
     /// <param name="trainerArguments"> trainer arguments. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::LinearPredictor>> MakeSGDIncrementalTrainer(size_t dim, const LossArguments& lossArguments, const SGDIncrementalTrainerArguments& trainerArguments);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDLinearTrainer(const LossArguments& lossArguments, const trainers::SGDLinearTrainerParameters& trainerParameters);
+
+    /// <summary> Makes a stochastic gradient descent trainer for sparse data. </summary>
+    ///
+    /// <param name="lossArguments"> loss arguments. </param>
+    /// <param name="trainerArguments"> trainer arguments. </param>
+    ///
+    /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDSGDLinearTrainer(const LossArguments& lossArguments, const trainers::SDSGDLinearTrainerParameters& trainerParameters);
 
     /// <summary> Makes a forest trainer. </summary>
     ///
@@ -41,6 +49,6 @@ namespace common
     /// <param name="trainerArguments"> trainer arguments. </param>
     ///
     /// <returns> A unique_ptr to a forest trainer. </returns>
-    std::unique_ptr<trainers::IIncrementalTrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments);
+    std::unique_ptr<trainers::ITrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments);
 }
 }

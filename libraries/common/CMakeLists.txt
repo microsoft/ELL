@@ -24,7 +24,6 @@ set (SRC
   src/ModelLoadArguments.cpp
   src/ModelSaveArguments.cpp
   src/MultiEpochIncrementalTrainerArguments.cpp
-  src/SGDIncrementalTrainerArguments.cpp
   src/ForestTrainerArguments.cpp
   src/TrainerArguments.cpp
 )
@@ -44,7 +43,6 @@ set (INCLUDE
   include/ModelSaveArguments.h
   include/MultiEpochIncrementalTrainerArguments.h
   include/ParametersEnumerator.h
-  include/SGDIncrementalTrainerArguments.h
   include/ForestTrainerArguments.h
   include/TrainerArguments.h
 )

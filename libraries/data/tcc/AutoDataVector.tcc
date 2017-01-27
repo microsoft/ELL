@@ -66,13 +66,13 @@ namespace data
     }
 
     template <typename DefaultDataVectorType>
-    double AutoDataVectorBase<DefaultDataVectorType>::Dot(const math::UnorientedConstVectorReference<double>& vector) const
+    double AutoDataVectorBase<DefaultDataVectorType>::Dot(const math::UnorientedConstVectorReference<double> vector) const
     {
         return _pInternal->Dot(vector);
     }
 
     template <typename DefaultDataVectorType>
-    void AutoDataVectorBase<DefaultDataVectorType>::AddTo(math::RowVectorReference<double>& vector, double scalar) const
+    void AutoDataVectorBase<DefaultDataVectorType>::AddTo(math::RowVectorReference<double> vector, double scalar) const
     {
         _pInternal->AddTo(vector, scalar);
     }

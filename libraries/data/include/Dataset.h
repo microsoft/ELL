@@ -124,7 +124,6 @@ namespace data
             /// <returns> The example. </returns>
             virtual IteratorExampleType Get() const override { return _current->template CopyAs<IteratorExampleType>(); }
 
-            // TODO: move this to private and make the dataset a friend
             using InternalIteratorType = typename std::vector<DatasetExampleType>::const_iterator;
             DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end);
 
