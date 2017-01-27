@@ -402,6 +402,7 @@ namespace math
 
     private:
         using ConstVectorReference<ElementType, Orientation>::_pData;
+        using ConstVectorReference<ElementType, Orientation>::_size;
 
         // member variables
         std::vector<ElementType> _data;

@@ -9,7 +9,6 @@
 #pragma once
 
 #include "ITrainer.h"
-#include "MultiEpochIncrementalTrainer.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -73,7 +72,7 @@ namespace trainers
         LossFunctionType _lossFunction;
         SGDLinearTrainerParameters _parameters;
 
-        double _t = 0;
+        double _t = 0; // iteration counter
         PredictorType _lastPredictor;
         PredictorType _averagedPredictor;
     };

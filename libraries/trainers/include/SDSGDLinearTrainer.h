@@ -9,7 +9,6 @@
 #pragma once
 
 #include "ITrainer.h"
-#include "MultiEpochIncrementalTrainer.h"
 
 // predictors
 #include "LinearPredictor.h"
@@ -74,12 +73,12 @@ namespace trainers
         SDSGDLinearTrainerParameters _parameters;
 
         // these variables follow the notation in https://arxiv.org/abs/1612.09147
-        math::ColumnVector<double> _v;
-        math::ColumnVector<double> _u;
-        double _t = 0;
-        double _a = 0;
-        double _c = 0;
-        double _h = 0;
+        double _t = 0;                  // iteration counter
+        math::ColumnVector<double> _v;  // gradient sum - weights
+        double _a = 0;                  // gradient sum - bias
+        double _h = 0;                  // harmonic number
+        math::ColumnVector<double> _u;  // harmonic-weighted gradient sum - weights
+        double _c = 0;                  // 1/t-weighted sum of _a
 
         PredictorType _lastPredictor;
         PredictorType _averagedPredictor;
