@@ -112,7 +112,7 @@ namespace model
     {
         for (const auto& range : other.GetRanges())
         {
-            if (range.GetType() != Port::GetPortType<ValueType>())
+            if (range.GetPortType() != Port::GetPortType<ValueType>())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
             }

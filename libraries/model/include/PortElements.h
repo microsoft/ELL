@@ -49,7 +49,7 @@ namespace model
         /// <summary> Returns the type of the value referenced </summary>
         ///
         /// <returns> The type of the value referenced </returns>
-        Port::PortType GetType() const { return _referencedPort->GetType(); }
+        Port::PortType GetPortType() const { return _referencedPort->GetType(); }
 
         /// <summary> The index within the port of the element this refers to </summary>
         ///
@@ -118,7 +118,7 @@ namespace model
         /// <summary> Returns the type of the values referenced </summary>
         ///
         /// <returns> The type of the values referenced </returns>
-        Port::PortType GetType() const { return _referencedPort->GetType(); }
+        Port::PortType GetPortType() const { return _referencedPort->GetType(); }
 
         /// <summary> The dimensionality of the output </summary>
         ///
@@ -228,7 +228,7 @@ namespace model
         /// <summary> Returns the type of the values referenced </summary>
         ///
         /// <returns> The type of the values referenced </returns>
-        Port::PortType GetType() const;
+        Port::PortType GetPortType() const;
 
         /// <summary> The dimensionality of the output </summary>
         ///
@@ -273,11 +273,6 @@ namespace model
 
         /// <summary> Consolidates adjacent ranges </summary>
         virtual void Consolidate();
-
-        /// <summary> Gets the type of this port. </summary>
-        ///
-        /// <returns> The type of the port. </returns>
-        Port::PortType GetPortType(); // ## redundant with GetType
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

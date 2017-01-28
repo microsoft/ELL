@@ -227,11 +227,6 @@ namespace model
         /// <returns> The context in use by the transformer. </returns>
         TransformContext& GetContext() { return _context; }
 
-        /// <summary> Gets the underlying model. </summary>
-        ///
-        /// <returns> The model. </returns>
-        Model& GetModel() { return _model; }
-
     private:
         friend class Node;
 

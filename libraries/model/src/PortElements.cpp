@@ -206,14 +206,14 @@ namespace model
         ComputeSize();
     }
 
-    Port::PortType PortElementsBase::GetType() const
+    Port::PortType PortElementsBase::GetPortType() const
     {
         if (Size() == 0)
         {
             return Port::PortType::none;
         }
 
-        return _ranges[0].GetType();
+        return _ranges[0].GetPortType();
     }
 
     void PortElementsBase::Reserve(size_t numRanges)
@@ -274,15 +274,6 @@ namespace model
 
             ComputeSize();
         }
-    }
-
-    Port::PortType PortElementsBase::GetPortType()
-    {
-        if (_ranges.size() == 0)
-        {
-            return Port::PortType::none;
-        }
-        return _ranges[0].ReferencedPort()->GetType();
     }
 
     void PortElementsBase::WriteToArchive(utilities::Archiver& archiver) const

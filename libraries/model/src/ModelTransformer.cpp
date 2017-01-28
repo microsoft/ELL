@@ -65,7 +65,7 @@ namespace model
         oldModel.Visit([this](const Node& node) { node.InvokeCopy(*this); });
         _context = TransformContext();
 
-        return _model;
+        return std::move(_model);
     }
 
     Model ModelTransformer::CopyModel(const Model& oldModel, const Node* outputNode, const TransformContext& context)
@@ -76,7 +76,7 @@ namespace model
         oldModel.Visit(outputNode, [this](const Node& node) { node.InvokeCopy(*this); });
         _context = TransformContext();
 
-        return _model;
+        return std::move(_model);
     }
 
     Model ModelTransformer::CopyModel(const Model& oldModel, const std::vector<const Node*>& outputNodes, const TransformContext& context)
@@ -87,7 +87,7 @@ namespace model
         oldModel.Visit(outputNodes, [this](const Node& node) { node.InvokeCopy(*this); });
         _context = TransformContext();
 
-        return _model;
+        return std::move(_model);
     }
 
     Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context, int maxIterations)
@@ -95,11 +95,10 @@ namespace model
         if (maxIterations <= 0)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "maxIterations must be positive");
-            return oldModel;
         }
 
         _context = context;
-        _model = oldModel;
+        _model = oldModel; // need to make a copy here
 
         // refine until all nodes are compilable according to context.IsNodeCompilable(), until
         // the model is fully refined, or until the maximum number of iterations is reached.
@@ -150,7 +149,7 @@ namespace model
 
         // clear out the context
         _context = TransformContext();
-        return _model;
+        return std::move(_model);
     }
 
     Model ModelTransformer::TransformModel(const Model& model, const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
@@ -160,7 +159,7 @@ namespace model
         _elementToElementMap.clear();
         model.Visit([this, transformFunction](const Node& node) { transformFunction(node, *this); });
         _context = TransformContext(); // reset context
-        return _model;
+        return std::move(_model);
     }
 
     PortElementsBase ModelTransformer::TransformPortElements(const PortElementsBase& elements)

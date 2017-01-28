@@ -134,7 +134,7 @@ namespace model
     template <typename DataVectorType, data::IsDataVector<DataVectorType>>
     DataVectorType DynamicMap::ComputeOutput(const PortElementsBase& elements) const
     {
-        switch (elements.GetType())
+        switch (elements.GetPortType())
         {
             case Port::PortType::none:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);

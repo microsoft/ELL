@@ -107,7 +107,7 @@ namespace model
     template <Port::PortType portType>
     struct PortTypeToValueType
     {
-        typedef int value_type; // PortTypeToValueType
+        typedef int value_type;
     };
 
     struct unknown_t

@@ -13,7 +13,7 @@
 #include "LoadModel.h"
 
 // compiler
-#include "CompiledMap.h"
+#include "IRCompiledMap.h"
 
 // model
 #include "InputNode.h"
@@ -354,7 +354,7 @@ int ELL_PortElementBase::GetIndex()
 
 int ELL_PortElementBase::GetType() 
 {
-    return (int)(_port.GetType());
+    return (int)(_port.GetPortType());
 }
 
 ELL_OutputPortBase ELL_PortElementBase::ReferencedPort() 
@@ -380,7 +380,7 @@ int ELL_PortElementsBase::Size() const
 
 int ELL_PortElementsBase::GetType() const
 {
-    return static_cast<int>(_elements.GetType());
+    return static_cast<int>(_elements.GetPortType());
 }
 
 ELL_PortElementBase ELL_PortElementsBase::GetElement(int index) const
@@ -667,11 +667,8 @@ public:
         return _map->ComputeOutput<double>(0);
     }
 
-#ifndef SWIG
-    ELL_CompiledMap(const ell::compiler::CompiledMap& other) : _map(std::make_shared<ell::compiler::CompiledMap>(other)) {}
-#endif
 private:
-    std::shared_ptr<ell::compiler::CompiledMap> _map;
+    std::shared_ptr<ell::model::IRCompiledMap> _map;
 };
 
 //

@@ -18,14 +18,12 @@ namespace ell
 {
 namespace model
 {
-    DynamicMap::DynamicMap(const Model& model)
-        : _model(model)
-    {
-    }
-
     DynamicMap::DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
-        : _model(model)
     {
+        TransformContext context;
+        ModelTransformer transformer;
+        _model = transformer.CopyModel(model, context);
+
         for (const auto& input : inputs)
         {
             AddInput(input.first, input.second);
@@ -154,19 +152,13 @@ namespace model
 
     void DynamicMap::Prune()
     {
-        DoPrune();
-    }
-
-    ModelTransformer DynamicMap::DoPrune()
-    {
         TransformContext context;
         ModelTransformer transformer;
 
         auto outputNodeVec = GetOutputNodes();
         auto minimalModel = transformer.CopyModel(_model, outputNodeVec, context);
         FixTransformedIO(transformer);
-        _model = minimalModel;
-        return transformer;
+        _model = std::move(minimalModel);
     }
 
     size_t DynamicMap::GetOutputSize() const
@@ -176,22 +168,15 @@ namespace model
 
     void DynamicMap::Refine(const TransformContext& context, int maxIterations)
     {
-        DoRefine(context, maxIterations);
-    }
-
-    ModelTransformer DynamicMap::DoRefine(const TransformContext& context, int maxIterations)
-    {
-        ModelTransformer transformer;
-
         if (maxIterations == 0)
         {
-            return transformer;
+            return;
         }
 
+        ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(_model, context, maxIterations);
         FixTransformedIO(transformer);
-        _model = refinedModel;
-        return transformer;
+        _model = std::move(refinedModel);
     }
 
     void DynamicMap::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)
@@ -199,7 +184,7 @@ namespace model
         ModelTransformer transformer;
         auto refinedModel = transformer.TransformModel(_model, transformFunction, context);
         FixTransformedIO(transformer);
-        _model = refinedModel;
+        _model = std::move(refinedModel);
     }
 
     void DynamicMap::WriteToArchive(utilities::Archiver& archiver) const
