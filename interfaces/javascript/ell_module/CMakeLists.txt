@@ -52,11 +52,17 @@ if(NPM_EXECUTABLE)
 
     add_dependencies(${PROJ_NAME} ${PROJ_NAME}_files ${PROJ_NAME}_install ELL_xml)
 
-    # Generate list of LLVM libraries to link against in a format binding.gyp will like
+    # Generate list of external libraries to link against in a format binding.gyp will like
     foreach(LIB ${LLVM_LIBS})
         list(APPEND MODULE_LLVM_LIBS "'-l${LIB}',\n")
     endforeach()
     string(CONCAT MODULE_LLVM_LIBS ${MODULE_LLVM_LIBS})
+
+    foreach(LIB ${BLAS_LIBS})
+        list(APPEND MODULE_BLAS_LIBS "'-l${LIB}',\n")
+    endforeach()
+    string(CONCAT MODULE_BLAS_LIBS ${MODULE_BLAS_LIBS})
+
     foreach(MODULE_FILE ${MODULE_FILES})
         configure_file(${MODULE_FILE} ${MODULE_FILE} @ONLY)
         set_property(TARGET ${PROJ_NAME}_files APPEND PROPERTY OBJECT_DEPENDS ${MODULE_FILE})

@@ -38,7 +38,7 @@ target_include_directories(${PROJ_NAME} PUBLIC include ${BLAS_INCLUDE_DIRS})
 target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBS})
 
 if(BLAS_FOUND)
-  target_compile_definitions(${PROJ_NAME} PRIVATE USE_BLAS=1)
+  target_compile_definitions(${PROJ_NAME} PUBLIC USE_BLAS=1)
 
   if(CMAKE_COMPILER_IS_GNUCXX)
     target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
@@ -64,15 +64,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
 target_link_libraries(${TEST_NAME} math testing)
-
-if(${WIN32})
-  if(EXISTS ${BLAS_DLL_DIRECTORY})
-    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLAS_DLL_DIRECTORY}/libopenblas.dll $<TARGET_FILE_DIR:math_test>)
-    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLAS_DLL_DIRECTORY}/libgcc_s_seh-1.dll $<TARGET_FILE_DIR:math_test>)
-    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLAS_DLL_DIRECTORY}/libgfortran-3.dll $<TARGET_FILE_DIR:math_test>)
-    add_custom_command(TARGET math_test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${BLAS_DLL_DIRECTORY}/libquadmath-0.dll $<TARGET_FILE_DIR:math_test>)
-  endif()
-endif()
+copy_shared_libraries(${TEST_NAME} $<TARGET_FILE_DIR:${TEST_NAME}>)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

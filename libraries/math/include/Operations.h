@@ -8,6 +8,9 @@
 
 #include "Matrix.h"
 #include "Vector.h"
+#ifdef USE_BLAS
+#include "BlasWrapper.h"
+#endif
 
 #ifndef MATH_OPERATIONS_H
 #define MATH_OPERATIONS_H

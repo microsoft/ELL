@@ -82,6 +82,7 @@ source_group("include" FILES ${TEST_INCLUDE})
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
 target_link_libraries(${TEST_NAME} common model nodes testing utilities)
+copy_shared_libraries(${TEST_NAME} $<TARGET_FILE_DIR:${TEST_NAME}>)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 

@@ -102,6 +102,7 @@
                     '-lutilities',
                     '-lcompiler',
                     '-lemitters',
+                    @MODULE_BLAS_LIBS@
                     @MODULE_LLVM_LIBS@
                 ]
             },

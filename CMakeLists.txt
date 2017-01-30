@@ -45,6 +45,9 @@ endif()
 
 # Set up global variables to help find NuGet projects
 set(PACKAGE_ROOT ${EXTERNAL_DIR})
+include(OpenBLASSetup)
+include(LLVMSetup)
+include(CopyDLLs)
 
 enable_testing()
 

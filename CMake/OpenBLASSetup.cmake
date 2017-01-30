@@ -7,7 +7,14 @@
 # Settings for compiling against OpenBLAS libraries:
 # BLAS_INCLUDE_DIRS
 # BLAS_LIBS
-# BLAS_DLL_DIRECTORY
+# BLAS_DLL_DIR
+#
+# Using FindBLAS module:
+# find_package(BLAS)
+# if(BLAS_FOUND)
+#     message(STATUS "Blas libraries: ${BLAS_LIBRARIES}")
+#     message(STATUS "Blas linker flags: ${BLAS_LINKER_FLAGS}")
+#     message(STATUS "Blas vendor: ${BLA_VENDOR}")
 #
 # Variables defined by FindBLAS module that we don't set:
 #     BLAS_LIBRARIES
@@ -34,6 +41,7 @@ if(APPLE)
   # xcode-select --install
 endif()
 
+set(BLAS_FOUND "NO")
 if(WIN32)
     # Determine CPU type
     unset(processor_id CACHE)
@@ -49,17 +57,22 @@ if(WIN32)
         if(processor_model EQUAL 60 OR processor_model EQUAL 63 OR processor_model EQUAL 69 OR processor_model EQUAL 70)
             set(PROCESSOR_GENERATION haswell)
             message(STATUS "Using OpenBLAS compiled for ${PROCESSOR_GENERATION}")
-        elseif(processor_model EQUAL 42 OR processor_model EQUAL 45)
-            set(PROCESSOR_GENERATION sandybridge)
-            message(STATUS "Using OpenBLAS compiled for ${PROCESSOR_GENERATION}")
+        # elseif(processor_model EQUAL 42 OR processor_model EQUAL 45)
+        #     set(PROCESSOR_GENERATION sandybridge)
+        #     message(STATUS "Using OpenBLAS compiled for ${PROCESSOR_GENERATION}")
         else()
-            message(WARNING "Unknown processor, assuming ${PROCESSOR_GENERATION}")
+            # message(WARNING "Unknown processor, assuming ${PROCESSOR_GENERATION}")
+            message(WARNING "Unknown processor, diabling OpenBLAS")
+            return()
         endif()
     else()
-        message(WARNING "Unknown processor, assuming ${PROCESSOR_GENERATION}")
+        # message(WARNING "Unknown processor, assuming ${PROCESSOR_GENERATION}")
+        message(WARNING "Unknown processor, diabling OpenBLAS")
+        return()
     endif()
-    set(BLAS_PACKAGE_DIR ${PACKAGE_ROOT}/${BLAS_PACKAGE_NAME}.${BLAS_PACKAGE_VERSION}/build/native/x64/${PROCESSOR_GENERATION})
 
+    set(BLAS_PACKAGE_DIR ${PACKAGE_ROOT}/${BLAS_PACKAGE_NAME}.${BLAS_PACKAGE_VERSION}/build/native/x64/${PROCESSOR_GENERATION})
+    set(BLAS_DLLS libopenblas.dll libgcc_s_seh-1.dll libgfortran-3.dll libquadmath-0.dll)
     set(BLAS_DLL_DIR ${BLAS_PACKAGE_DIR}/bin)
     list(APPEND BLAS_INCLUDE_SEARCH_PATHS
         ${BLAS_PACKAGE_DIR}/include/
@@ -90,7 +103,11 @@ find_library(BLAS_LIBS
 if(BLAS_LIBS AND BLAS_INCLUDE_DIRS)
     message(STATUS "Using BLAS include path: ${BLAS_INCLUDE_DIRS}")
     message(STATUS "Using BLAS library: ${BLAS_LIBS}")
+    message(STATUS "Using BLAS DLLs: ${BLAS_DLLS}")
     set(BLAS_FOUND "YES")
 else()
+    message(STATUS "BLAS library not found")
+    set(BLAS_INCLUDE_DIRS "")
+    set(BLAS_LIBS "")
     set(BLAS_FOUND "NO")
 endif()
