@@ -2,17 +2,9 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+set (library_name common)
 
-set (PROJ_NAME common)
-
-PROJECT(${PROJ_NAME})
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++1y)
-endif()
-
-set (SRC 
+set (src 
   src/DataLoadArguments.cpp
   src/DataSaveArguments.cpp
   src/DataLoaders.cpp
@@ -28,7 +20,7 @@ set (SRC
   src/TrainerArguments.cpp
 )
 
-set (INCLUDE 
+set (include 
   include/AppendNodeToModel.h
   include/DataLoadArguments.h
   include/DataSaveArguments.h
@@ -47,55 +39,53 @@ set (INCLUDE
   include/TrainerArguments.h
 )
 
-set (TCC 
+set (tcc 
   tcc/AppendNodeToModel.tcc
   tcc/DataLoaders.tcc
   tcc/MakeEvaluator.tcc
   tcc/ParametersEnumerator.tcc
 )
 
-source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
-source_group("tcc" FILES ${TCC})
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
+source_group("tcc" FILES ${tcc})
 
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PUBLIC include)
+add_library(${library_name} ${src} ${include} ${tcc})
+target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+  target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
-target_link_libraries(${PROJ_NAME} data utilities lossFunctions model nodes predictors evaluators trainers)
+target_link_libraries(${library_name} data utilities lossFunctions model nodes predictors evaluators trainers)
 
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 #
 # test project
 #
 
-set (TEST_NAME ${PROJ_NAME}_test)
+set (test_name ${library_name}_test)
 
-PROJECT(${TEST_NAME})
-
-set (TEST_SRC 
+set (test_src 
   test/src/main.cpp
   test/src/LoadDataset_test.cpp
   test/src/LoadMap_test.cpp
   test/src/LoadModel_test.cpp
 )
 
-set (TEST_INCLUDE 
+set (test_include 
   test/include/LoadDataset_test.h
   test/include/LoadMap_test.h
   test/include/LoadModel_test.h
 )
 
-source_group("src" FILES ${TEST_SRC})
-source_group("include" FILES ${TEST_INCLUDE})
+source_group("src" FILES ${test_src})
+source_group("include" FILES ${test_include})
 
-add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
-target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} common data testing utilities lossFunctions predictors trainers model nodes)
-copy_shared_libraries(${TEST_NAME} $<TARGET_FILE_DIR:${TEST_NAME}>)
+add_executable(${test_name} ${test_src} ${test_include} ${include})
+target_include_directories(${test_name} PRIVATE test/include)
+target_link_libraries(${test_name} common data testing utilities lossFunctions predictors trainers model nodes)
+copy_shared_libraries(${test_name} $<TARGET_FILE_DIR:${test_name}>)
 
-set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
+set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+add_test(NAME ${test_name} COMMAND ${test_name})

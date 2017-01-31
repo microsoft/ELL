@@ -2,8 +2,7 @@
 # Build node module
 # 
 
-set (PROJ_NAME ell_module)
-PROJECT(${PROJ_NAME})
+set (module_name ell_module)
 
 set (MODULE_FILES 
     binding.gyp
@@ -33,24 +32,24 @@ if(NPM_EXECUTABLE)
         set (MODULE_BUILD_COMMAND build:linux)
     endif()
 
-    add_custom_target(${PROJ_NAME}_files ALL
+    add_custom_target(${module_name}_files ALL
         DEPENDS ${MODULE_FILES} ell_module_d_ts
         COMMENT "Copying module files"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-    add_custom_target(${PROJ_NAME}_install ALL
+    add_custom_target(${module_name}_install ALL
                     COMMAND ${NPM_EXECUTABLE} install
                     DEPENDS ELL_javascript common data evaluators lossFunctions math model nodes predictors trainers utilities compiler emitters
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Installing prerequisites"
                     VERBATIM)
 
-    add_custom_target(${PROJ_NAME} ALL
+    add_custom_target(${module_name} ALL
         COMMAND ${NPM_EXECUTABLE} run ${MODULE_BUILD_COMMAND}
         COMMENT "Building module"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-    add_dependencies(${PROJ_NAME} ${PROJ_NAME}_files ${PROJ_NAME}_install ELL_xml)
+    add_dependencies(${module_name} ${module_name}_files ${module_name}_install ELL_xml)
 
     # Generate list of external libraries to link against in a format binding.gyp will like
     foreach(LIB ${LLVM_LIBS})
@@ -65,7 +64,7 @@ if(NPM_EXECUTABLE)
 
     foreach(MODULE_FILE ${MODULE_FILES})
         configure_file(${MODULE_FILE} ${MODULE_FILE} @ONLY)
-        set_property(TARGET ${PROJ_NAME}_files APPEND PROPERTY OBJECT_DEPENDS ${MODULE_FILE})
+        set_property(TARGET ${module_name}_files APPEND PROPERTY OBJECT_DEPENDS ${MODULE_FILE})
     endforeach()
 
 endif()
@@ -76,21 +75,21 @@ endif()
 find_program(NODE_EXECUTABLE node)
 if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
     # set up environment for test
-    add_custom_command(TARGET ${PROJ_NAME} 
+    add_custom_command(TARGET ${module_name} 
                     POST_BUILD
                     COMMAND ${NPM_EXECUTABLE} install 
                     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js
                     VERBATIM)
 
-    add_custom_command(TARGET ${PROJ_NAME} 
+    add_custom_command(TARGET ${module_name} 
                     POST_BUILD
                     COMMAND ${NPM_EXECUTABLE} install ell
                     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js
                     VERBATIM)
 
     # add test
-    set (TEST_NAME ${PROJ_NAME}_test)
-    add_test(NAME ${TEST_NAME}
+    set (test_name ${module_name}_test)
+    add_test(NAME ${test_name}
             COMMAND ${NODE_EXECUTABLE} TestCompiler.js
             WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js )
 

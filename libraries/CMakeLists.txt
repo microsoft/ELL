@@ -1,8 +1,6 @@
 #
-# cmake file for Embedded Learning Library sub projects
+# cmake file for Embedded Learning Library subprojects
 #
-
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 add_subdirectory(common)
 add_subdirectory(data)
@@ -14,5 +12,4 @@ add_subdirectory(nodes)
 add_subdirectory(predictors)
 add_subdirectory(testing)
 add_subdirectory(trainers)
-add_subdirectory(treeLayout)
 add_subdirectory(utilities)

@@ -2,34 +2,26 @@
 # cmake file for makeExamples project
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
-
 # define project
-set (PROJ_NAME makeExamples)
-PROJECT(${PROJ_NAME})
+set (tool_name makeExamples)
 
-#enable C++11 in GCC, etc
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++1y)
-endif()
-
-set (SRC src/main.cpp
+set (src src/main.cpp
          src/GenerateModels.cpp)
 
-set (INCLUDE include/GenerateModels.h)
+set (include include/GenerateModels.h)
 
-source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
 
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
-add_executable(${PROJ_NAME} ${SRC} ${INCLUDE})
-target_include_directories(${PROJ_NAME} PRIVATE include)
-target_link_libraries(${PROJ_NAME} utilities model nodes common)
-copy_shared_libraries(${PROJ_NAME} $<TARGET_FILE_DIR:${PROJ_NAME}>)
+add_executable(${tool_name} ${src} ${include})
+target_include_directories(${tool_name} PRIVATE include)
+target_link_libraries(${tool_name} utilities model nodes common)
+copy_shared_libraries(${tool_name} $<TARGET_FILE_DIR:${tool_name}>)
 
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")
+set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
 
 #
 # Add build command to generate the examples
@@ -54,7 +46,7 @@ set (MODEL_FILES
   ${EXAMPLE_DIR}/tree_3.model
 )
 
-add_custom_command(TARGET ${PROJ_NAME} 
+add_custom_command(TARGET ${tool_name} 
   POST_BUILD
   COMMAND makeExamples -mf model
   WORKING_DIRECTORY ${EXAMPLE_DIR}

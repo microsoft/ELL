@@ -1,15 +1,15 @@
 #
-# cmake file for Embedded Learning Library sub projects
+# cmake file for Embedded Learning Library subprojects
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
-PROJECT(ELL)
+project(ELL)
 
-# Define custom configuration types for VS
+# Define custom configuration types for Visual Studio
 if(CMAKE_CONFIGURATION_TYPES)
-#  list(APPEND CMAKE_CONFIGURATION_TYPES Documentation)
   # Copy important configuration info from Release config to new Documentation config  
+  list(APPEND CMAKE_CONFIGURATION_TYPES Documentation)
   set(CMAKE_CXX_FLAGS_DOCUMENTATION ${CMAKE_CXX_FLAGS_RELEASE})
   set(CMAKE_C_FLAGS_DOCUMENTATION ${CMAKE_C_FLAGS_RELEASE})
   set(CMAKE_EXE_LINKER_FLAGS_DOCUMENTATION ${CMAKE_EXE_LINKER_FLAGS_RELEASE})
@@ -29,16 +29,15 @@ option(BUILD_DOC "Build Doxygen documentation" ON)
 set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
 
 # Include modules in the CMake directory.
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
 
 # Turn on ability to create folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  add_compile_options(-std=c++14 -Wall) 
-elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++14 -Wall)
-elseif(MSVC)
+# Set C++ version
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(MSVC)
   add_definitions(-DUNICODE)
   add_compile_options(/MP)
 endif()
@@ -47,7 +46,7 @@ endif()
 set(PACKAGE_ROOT ${EXTERNAL_DIR})
 include(OpenBLASSetup)
 include(LLVMSetup)
-include(CopyDLLs)
+include(CopySharedLibraries)
 
 enable_testing()
 
@@ -65,9 +64,9 @@ add_subdirectory(examples)
 
 # Add SWIG-generated interfaces
 if(BUILD_INTERFACES)
-  find_package(SWIG 3.0.9)
+  find_package(SWIG 3.0.10)
   if(SWIG_FOUND)
-    add_subdirectory(interfaces)  
+    add_subdirectory(interfaces)
   else()
     message(WARNING "SWIG not found, skipping interface generation.")
   endif()

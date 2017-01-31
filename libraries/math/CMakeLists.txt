@@ -2,71 +2,63 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
-
-set (PROJ_NAME math)
-
-PROJECT(${PROJ_NAME})
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++1y)
-else()
-  add_compile_options(-D_SCL_SECURE_NO_WARNINGS)
-endif()
+set (library_name math)
 
 include (OpenBLASSetup)
 
-set (SRC src/BlasWrapper.cpp)
+if(MSVC)
+  add_compile_options(-D_SCL_SECURE_NO_WARNINGS)
+endif()
 
-set (INCLUDE include/BlasWrapper.h
+set (src src/BlasWrapper.cpp)
+
+set (include include/BlasWrapper.h
              include/Matrix.h
              include/Vector.h
              include/Operations.h
              include/Print.h)
 
-set (TCC tcc/Matrix.tcc
+set (tcc tcc/Matrix.tcc
          tcc/Vector.tcc
          tcc/Operations.tcc
          tcc/Print.tcc)
 
-source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
-source_group("tcc" FILES ${TCC})
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
+source_group("tcc" FILES ${tcc})
 
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PUBLIC include ${BLAS_INCLUDE_DIRS})
-target_link_libraries(${PROJ_NAME} utilities ${BLAS_LIBS})
+add_library(${library_name} ${src} ${include} ${tcc})
+target_include_directories(${library_name} PUBLIC include ${BLAS_INCLUDE_DIRS})
+target_link_libraries(${library_name} utilities ${BLAS_LIBS})
 
 if(BLAS_FOUND)
-  target_compile_definitions(${PROJ_NAME} PUBLIC USE_BLAS=1)
+  target_compile_definitions(${library_name} PUBLIC USE_BLAS=1)
 
   if(CMAKE_COMPILER_IS_GNUCXX)
-    target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+    target_compile_options(${library_name} PRIVATE -fPIC)
   endif()
 endif()
 
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 #
 # test project
 #
 
-set (TEST_NAME ${PROJ_NAME}_test)
+set (test_name ${library_name}_test)
 
-PROJECT(${TEST_NAME})
+set (test_src test/src/main.cpp)
+set (test_include )
 
-set (TEST_SRC test/src/main.cpp)
-set (TEST_INCLUDE )
+source_group("src" FILES ${test_src})
+source_group("include" FILES ${test_include})
 
-source_group("src" FILES ${TEST_SRC})
-source_group("include" FILES ${TEST_INCLUDE})
+add_executable(${test_name} ${test_src} ${test_include} ${include})
+target_include_directories(${test_name} PRIVATE test/include)
+target_link_libraries(${test_name} math testing)
+copy_shared_libraries(${test_name} $<TARGET_FILE_DIR:${test_name}>)
 
-add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
-target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} math testing)
-copy_shared_libraries(${TEST_NAME} $<TARGET_FILE_DIR:${TEST_NAME}>)
+set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
-set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
-
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+add_test(NAME ${test_name} COMMAND ${test_name})
 

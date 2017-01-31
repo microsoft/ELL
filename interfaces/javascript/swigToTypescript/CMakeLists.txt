@@ -2,10 +2,8 @@
 # swigToTypescript project
 #
 
-set (PROJ_NAME ell_module_d_ts)
-PROJECT(${PROJ_NAME})
+set (tool_name ell_module_d_ts)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 set (MODULE_FILES 
     generate-d-ts.xslt
@@ -17,29 +15,29 @@ find_program(NPM_EXECUTABLE npm)
 find_program(NODE_EXECUTABLE node)
 if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
 
-    add_custom_target(${PROJ_NAME}_files ALL
+    add_custom_target(${tool_name}_files ALL
         DEPENDS ${MODULE_FILES}
         COMMENT "Copying module files"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-    add_custom_target(${PROJ_NAME}_install ALL
+    add_custom_target(${tool_name}_install ALL
                     COMMAND ${NPM_EXECUTABLE} install
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Installing prerequisites"
                     VERBATIM)
 
-    add_custom_target(${PROJ_NAME} ALL
+    add_custom_target(${tool_name} ALL
                     COMMAND ${NPM_EXECUTABLE} run run generate-d-ts.xslt ${CMAKE_CURRENT_BINARY_DIR}/../../xml/ELLXML_wrap.xml ${CMAKE_CURRENT_BINARY_DIR}/../ell_module/ell.d.ts
-                    DEPENDS ELL_xml ${PROJ_NAME}_install
+                    DEPENDS ELL_xml ${tool_name}_install
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Creating .d.ts files"
                     VERBATIM)
 
-    add_dependencies(${PROJ_NAME} ${PROJ_NAME}_files ${PROJ_NAME}_install)
+    add_dependencies(${tool_name} ${tool_name}_files ${tool_name}_install)
 
     foreach(MODULE_FILE ${MODULE_FILES})
         configure_file(${MODULE_FILE} ${MODULE_FILE} @ONLY)
-        set_property(TARGET ${PROJ_NAME}_files APPEND PROPERTY OBJECT_DEPENDS ${MODULE_FILE})
+        set_property(TARGET ${tool_name}_files APPEND PROPERTY OBJECT_DEPENDS ${MODULE_FILE})
     endforeach()
 
 endif()

@@ -2,54 +2,44 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+set (library_name lossFunctions)
 
-set (PROJ_NAME lossFunctions)
-
-PROJECT(${PROJ_NAME})
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++1y)
-endif()
-
-set (SRC src/HingeLoss.cpp
+set (src src/HingeLoss.cpp
          src/LogLoss.cpp
          src/SquaredLoss.cpp)
 
-set (INCLUDE include/HingeLoss.h
+set (include include/HingeLoss.h
              include/LogLoss.h
              include/SquaredLoss.h)
 
 
-source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
 
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE})
-target_include_directories(${PROJ_NAME} PUBLIC include)
+add_library(${library_name} ${src} ${include})
+target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+  target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
 
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 #
 # test project
 #
 
-set (TEST_NAME ${PROJ_NAME}_test)
+set (test_name ${library_name}_test)
 
-PROJECT(${TEST_NAME})
+set (test_src test/src/main.cpp)
+set (test_include )
 
-set (TEST_SRC test/src/main.cpp)
-set (TEST_INCLUDE )
+source_group("src" FILES ${test_src})
+source_group("include" FILES ${test_include})
 
-source_group("src" FILES ${TEST_SRC})
-source_group("include" FILES ${TEST_INCLUDE})
+add_executable(${test_name} ${test_src} ${test_include} ${include})
+target_include_directories(${test_name} PRIVATE test/include)
+target_link_libraries(${test_name} lossFunctions testing)
 
-add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
-target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} lossFunctions testing)
+set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
-set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
-
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+add_test(NAME ${test_name} COMMAND ${test_name})

@@ -2,11 +2,9 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+set (test_name ell-python-interface-test)
 
-set (PROJ_NAME ell-python-interface-tests)
-project(${PROJ_NAME})
-set (SRC test.py 
+set (src test.py 
          testing.py 
          lossfunctions_test.py 
          model_test.py 
@@ -20,16 +18,16 @@ set (SRC test.py
          sgd_trainer_test.py
          treelayout_test.py
          )
-add_custom_target(${PROJ_NAME} ALL DEPENDS ${SRC} SOURCES ${SRC})
+add_custom_target(${test_name} ALL DEPENDS ${src} SOURCES ${src})
 
 # copy the contents of the test directory to build/interfaces/python
 
-foreach(PYTHON_FILE ${SRC})
+foreach(PYTHON_FILE ${src})
         configure_file(${PYTHON_FILE} ${PYTHON_FILE} COPYONLY)
 endforeach()
 
 # add the python test to the cmake suite of tests
 
-add_test(NAME python_interface_test
+add_test(NAME ${test_name}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMAND python test.py)

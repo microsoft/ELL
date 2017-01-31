@@ -2,16 +2,13 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+set (tool_name scripts)
 
-set (PROJ_NAME scripts)
-PROJECT(${PROJ_NAME})
+set (src recipeUtil.py)
 
-set (SRC recipeUtil.py)
-
-add_custom_target(${PROJ_NAME} ALL DEPENDS ${SRC} SOURCES ${SRC})
+add_custom_target(${tool_name} ALL DEPENDS ${src} SOURCES ${src})
 
 # copy contents of scripts directory to build/scripts
-foreach(SCRIPT_FILE ${SRC})
-    configure_file(${SCRIPT_FILE} ${SCRIPT_FILE} COPYONLY)
+foreach(script_file ${src})
+    configure_file(${script_file} ${script_file} COPYONLY)
 endforeach()                   

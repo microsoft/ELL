@@ -2,17 +2,9 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+set (library_name utilities)
 
-set (PROJ_NAME utilities)
-
-PROJECT(${PROJ_NAME})
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-std=c++1y)
-endif()
-
-set (SRC src/Archiver.cpp
+set (src src/Archiver.cpp
          src/CommandLineParser.cpp
          src/CompressedIntegerList.cpp
          src/ConformingVector.cpp
@@ -33,7 +25,7 @@ set (SRC src/Archiver.cpp
          src/Variant.cpp
          src/XmlArchiver.cpp)
 
-set (INCLUDE include/AbstractInvoker.h
+set (include include/AbstractInvoker.h
              include/AnyIterator.h
              include/Archiver.h
              include/CommandLineParser.h
@@ -67,7 +59,7 @@ set (INCLUDE include/AbstractInvoker.h
              include/Variant.h
              include/XmlArchiver.h)
 
-set (TCC tcc/AbstractInvoker.tcc
+set (tcc tcc/AbstractInvoker.tcc
          tcc/AnyIterator.tcc
          tcc/Archiver.tcc
          tcc/CommandLineParser.tcc
@@ -90,56 +82,53 @@ set (TCC tcc/AbstractInvoker.tcc
          tcc/Variant.tcc
          tcc/XmlArchiver.tcc)
 
-source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
-source_group("tcc" FILES ${TCC})
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
+source_group("tcc" FILES ${tcc})
 
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PUBLIC include)
+add_library(${library_name} ${src} ${include} ${tcc})
+target_include_directories(${library_name} PUBLIC include)
+
 if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+  target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(${PROJ_NAME} -pthread)
-else()
-target_link_libraries(${PROJ_NAME})
+  target_link_libraries(${library_name} -pthread)
 endif()
 
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 #
 # test projects
 #
 
-set (TEST_NAME ${PROJ_NAME}_test)
+set (test_name ${library_name}_test)
 
-PROJECT(${TEST_NAME})
-
-set (TEST_SRC test/src/main.cpp 
+set (test_src test/src/main.cpp 
               test/src/IArchivable_test.cpp
               test/src/Iterator_test.cpp
               test/src/ObjectArchive_test.cpp
               test/src/TypeFactory_test.cpp
               test/src/Variant_test.cpp)
 
-set (TEST_INCLUDE test/include/IArchivable_test.h
+set (test_include test/include/IArchivable_test.h
                   test/include/Iterator_test.h
                   test/include/ObjectArchive_test.h
                   test/src/TypeFactory_test.cpp
                   test/src/Variant_test.cpp)
                   
-source_group("src" FILES ${TEST_SRC})
-source_group("include" FILES ${TEST_INCLUDE})
+source_group("src" FILES ${test_src})
+source_group("include" FILES ${test_include})
 
-add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
-target_include_directories(${TEST_NAME} PRIVATE test/include)
+add_executable(${test_name} ${test_src} ${test_include} ${include})
+target_include_directories(${test_name} PRIVATE test/include)
 
+target_link_libraries(${test_name} utilities testing data model nodes)
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(utilities_test utilities data model nodes testing -pthread)
-else()
-target_link_libraries(utilities_test utilities data model nodes testing)
+  target_link_libraries(${test_name} -pthread)
 endif()
-set_property(TARGET utilities_test PROPERTY FOLDER "tests")
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+
+set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
+add_test(NAME ${test_name} COMMAND ${test_name})
 

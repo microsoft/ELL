@@ -2,17 +2,9 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+set (library_name model)
 
-set (PROJ_NAME model)
-
-PROJECT(${PROJ_NAME})
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++1y)
-endif()
-
-set (SRC src/DynamicMap.cpp
+set (src src/DynamicMap.cpp
          src/InputNode.cpp
          src/Model.cpp
          src/ModelTransformer.cpp
@@ -23,7 +15,7 @@ set (SRC src/DynamicMap.cpp
          src/Port.cpp
 )
 
-set (INCLUDE include/DynamicMap.h
+set (include include/DynamicMap.h
              include/InputNode.h
              include/InputPort.h
              include/Model.h
@@ -35,7 +27,7 @@ set (INCLUDE include/DynamicMap.h
              include/Port.h
 )
 
-set (TCC tcc/DynamicMap.tcc
+set (tcc tcc/DynamicMap.tcc
          tcc/InputNode.tcc
          tcc/InputPort.tcc
          tcc/Model.tcc
@@ -45,45 +37,43 @@ set (TCC tcc/DynamicMap.tcc
          tcc/PortElements.tcc
 )
 
-source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
-source_group("tcc" FILES ${TCC})
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
+source_group("tcc" FILES ${tcc})
 
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PUBLIC include)
+add_library(${library_name} ${src} ${include} ${tcc})
+target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+  target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
 
-target_link_libraries(${PROJ_NAME} utilities data)
+target_link_libraries(${library_name} utilities data)
 
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 #
 # test project
 #
 
-set (TEST_NAME ${PROJ_NAME}_test)
+set (test_name ${library_name}_test)
 
-PROJECT(${TEST_NAME})
-
-set (TEST_SRC test/src/main.cpp
+set (test_src test/src/main.cpp
               test/src/DynamicMap_test.cpp
               test/src/Model_test.cpp
               test/src/PortElements_test.cpp)
 
-set (TEST_INCLUDE test/include/PortElements_test.h
+set (test_include test/include/PortElements_test.h
                   test/include/DynamicMap_test.h
                   test/include/Model_test.h)
 
-source_group("src" FILES ${TEST_SRC})
-source_group("include" FILES ${TEST_INCLUDE})
+source_group("src" FILES ${test_src})
+source_group("include" FILES ${test_include})
 
-add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
-target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} common model nodes testing utilities)
-copy_shared_libraries(${TEST_NAME} $<TARGET_FILE_DIR:${TEST_NAME}>)
+add_executable(${test_name} ${test_src} ${test_include} ${include})
+target_include_directories(${test_name} PRIVATE test/include)
+target_link_libraries(${test_name} common model nodes testing utilities)
+copy_shared_libraries(${test_name} $<TARGET_FILE_DIR:${test_name}>)
 
-set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
+set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+add_test(NAME ${test_name} COMMAND ${test_name})

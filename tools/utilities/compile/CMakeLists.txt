@@ -2,33 +2,25 @@
 # cmake file for compile project
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
-
 # define project
-set (PROJ_NAME compile)
-PROJECT(${PROJ_NAME})
+set (tool_name compile)
 
-#enable C++11 in GCC, etc.
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++1y)
-endif()
+set (src src/main.cpp)
 
-set (SRC src/main.cpp)
+set (include )
 
-set (INCLUDE )
+set (tcc )
 
-set (TCC )
-
-source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
-source_group("tcc" FILES ${TCC})
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
+source_group("tcc" FILES ${tcc})
 
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
-add_executable(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PRIVATE include)
-target_link_libraries(${PROJ_NAME} utilities model common)
-copy_shared_libraries(${PROJ_NAME} $<TARGET_FILE_DIR:${PROJ_NAME}>)
+add_executable(${tool_name} ${src} ${include} ${tcc})
+target_include_directories(${tool_name} PRIVATE include)
+target_link_libraries(${tool_name} utilities model common)
+copy_shared_libraries(${tool_name} $<TARGET_FILE_DIR:${tool_name}>)
 
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/utilities")
+set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")

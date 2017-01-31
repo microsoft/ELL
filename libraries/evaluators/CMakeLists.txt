@@ -2,62 +2,52 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+set (library_name evaluators)
 
-set (PROJ_NAME evaluators)
-
-PROJECT(${PROJ_NAME})
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  add_compile_options(-std=c++1y)
-endif()
-
-set (SRC src/AUCAggregator.cpp
+set (src src/AUCAggregator.cpp
          src/BinaryErrorAggregator.cpp)
 
-set (INCLUDE include/AUCAggregator.h
+set (include include/AUCAggregator.h
              include/BinaryErrorAggregator.h
              include/Evaluator.h
              include/IncrementalEvaluator.h
              include/LossAggregator.h)
 
-set (TCC tcc/Evaluator.tcc
+set (tcc tcc/Evaluator.tcc
          tcc/IncrementalEvaluator.tcc
          tcc/LossAggregator.tcc)
 
-source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
-source_group("tcc" FILES ${TCC})
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
+source_group("tcc" FILES ${tcc})
 
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PUBLIC include)
+add_library(${library_name} ${src} ${include} ${tcc})
+target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${PROJ_NAME} PRIVATE -fPIC)
+  target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
-target_link_libraries(${TEST_NAME} data)
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+target_link_libraries(${library_name} data)
+set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 #
 # test project
 #
 
-set (TEST_NAME ${PROJ_NAME}_test)
+set (test_name ${library_name}_test)
 
-PROJECT(${TEST_NAME})
+set (test_src test/src/main.cpp test/src/Evaluators_test.cpp)
+set (test_include test/include/Evaluators_test.h)
 
-set (TEST_SRC test/src/main.cpp test/src/Evaluators_test.cpp)
-set (TEST_INCLUDE test/include/Evaluators_test.h)
+source_group("src" FILES ${test_src})
+source_group("include" FILES ${test_include})
 
-source_group("src" FILES ${TEST_SRC})
-source_group("include" FILES ${TEST_INCLUDE})
+add_executable(${test_name} ${test_src} ${test_include})
+target_include_directories(${test_name} PRIVATE test/include)
+target_link_libraries(${test_name} common evaluators data testing)
+copy_shared_libraries(${test_name} $<TARGET_FILE_DIR:${test_name}>)
 
-add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
-target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} common evaluators data testing)
-copy_shared_libraries(${TEST_NAME} $<TARGET_FILE_DIR:${TEST_NAME}>)
+set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
-set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
-
-add_test(NAME ${TEST_NAME} 
+add_test(NAME ${test_name} 
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${TEST_NAME})
+         COMMAND ${test_name})

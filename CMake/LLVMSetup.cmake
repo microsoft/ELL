@@ -19,6 +19,9 @@
 #
 # Location of the executable tools:
 # LLVM_TOOLS_BINARY_DIR
+#
+# Misc:
+# LLVM_CMAKE_DIR
 
 # Include guard so we don't try to find or download LLVM more than once
 if(LLVMSetup_included)
@@ -29,9 +32,13 @@ set(LLVMSetup_included true)
 # First try to use LLVM's CMake target (see http://llvm.org/releases/3.7.0/docs/CMake.html for documentation)
 find_package(LLVM QUIET CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
 if(LLVM_FOUND)
-    message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
     # Find the libraries that correspond to the LLVM components that we wish to use
     llvm_map_components_to_libnames(LLVM_LIBS all) 
+
+    if(NOT WIN32 AND NOT CYGWIN)
+        list(APPEND LLVM_COMPILE_OPTIONS "-fvisibility-inlines-hidden")
+    endif()
+
 elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
     set(LLVM_PACKAGE_NAME LLVMLibs)
     set(LLVM_PACKAGE_VERSION 3.9.0.1)

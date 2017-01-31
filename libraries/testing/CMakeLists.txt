@@ -2,26 +2,18 @@
 # cmake file
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+set (library_name testing)
 
-set (PROJ_NAME testing)
+set (src src/testing.cpp)
+set (include include/testing.h)
+set (tcc )
 
-PROJECT(${PROJ_NAME})
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
+source_group("tcc" FILES ${tcc})
 
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  add_compile_options(-std=c++1y)
-endif()
+add_library(${library_name} ${src} ${include} ${tcc})
+target_include_directories(${library_name} PUBLIC include)
+target_link_libraries(${library_name})
 
-set (SRC src/testing.cpp)
-set (INCLUDE include/testing.h)
-set (TCC )
-
-source_group("src" FILES ${SRC})
-source_group("include" FILES ${INCLUDE})
-source_group("tcc" FILES ${TCC})
-
-add_library(${PROJ_NAME} ${SRC} ${INCLUDE} ${TCC})
-target_include_directories(${PROJ_NAME} PUBLIC include)
-target_link_libraries(${PROJ_NAME})
-
-set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "libraries")
+set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
