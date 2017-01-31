@@ -12,15 +12,13 @@
 // common
 #include "LoadModel.h"
 
-// compiler
-#include "IRCompiledMap.h"
-
 // emitters
 #include "ModuleEmitter.h"
 
 // model
 #include "InputNode.h"
 #include "InputPort.h"
+#include "IRCompiledMap.h"
 #include "Model.h"
 #include "Node.h"
 #include "OutputNode.h"

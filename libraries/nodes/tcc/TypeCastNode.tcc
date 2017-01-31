@@ -13,11 +13,11 @@ namespace nodes
 {
     template <typename InputValueType, typename OutputValueType>
     TypeCastNode<InputValueType, OutputValueType>::TypeCastNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
 
     template <typename InputValueType, typename OutputValueType>
     TypeCastNode<InputValueType, OutputValueType>::TypeCastNode(const model::PortElements<InputValueType>& input)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
 
     template <typename InputValueType, typename OutputValueType>
     void TypeCastNode<InputValueType, OutputValueType>::Compute() const
@@ -37,6 +37,36 @@ namespace nodes
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<TypeCastNode<InputValueType, OutputValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename InputValueType, typename OutputValueType>
+    void TypeCastNode<InputValueType, OutputValueType>::Compile(model::IRMapCompiler& compiler)
+    {
+        auto& function = compiler.GetCurrentFunction();
+        // The IR compiler currently implements bools using integers. We'll just use the already created variable.
+
+        auto inputType = emitters::GetVariableType<InputValueType>();
+        auto outputType = emitters::GetVariableType<OutputValueType>();
+
+        // Typecast has 1 input and 1 output port
+        auto inputPort = GetInputPorts()[0];
+        auto outputPort = GetOutputPorts()[0];
+        VerifyIsScalar(*inputPort);
+        VerifyIsScalar(*outputPort);
+
+        if (inputType == outputType)
+        {
+            emitters::Variable* elementVar = compiler.GetVariableFor(inputPort->GetInputElement(0));
+            compiler.SetVariableFor(outputPort, elementVar);
+        }
+        else
+        {
+            llvm::Value* inputValue = compiler.LoadVariable(inputPort->GetInputElement(0));
+            llvm::Value* outputValue = compiler.EnsureEmitted(outputPort);
+
+            llvm::Value* castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
+            function.Store(outputValue, castElement);
+        }
     }
 
     template <typename InputValueType, typename OutputValueType>

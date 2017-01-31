@@ -12,13 +12,13 @@ namespace nodes
 {
     template <typename ValueType>
     AccumulatorNode<ValueType>::AccumulatorNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
     {
     }
 
     template <typename ValueType>
     AccumulatorNode<ValueType>::AccumulatorNode(const model::PortElements<ValueType>& input)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size())
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size())
     {
         auto dimension = input.Size();
         _accumulator = std::vector<ValueType>(dimension);
@@ -40,6 +40,65 @@ namespace nodes
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType>
+    void AccumulatorNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    {
+        static_assert(!std::is_same<ValueType, bool>(), "Cannot instantiate boolean accumulator nodes");
+        compiler.NewBlockRegion(*this);
+
+        // AccumulatorNode has exactly 1 input and 1 output
+        // Accumulators are always long lived - either globals or heap. Currently, we use globals
+        auto inputPort = GetInputPorts()[0];
+        auto outputPort = GetOutputPorts()[0];
+        assert(GetPortVariableType(*inputPort) == GetPortVariableType(*outputPort));
+
+        emitters::Variable* pAccumulatorVar = compiler.Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, outputPort->Size());
+        llvm::Value* accumulator = compiler.EnsureEmitted(*pAccumulatorVar);
+
+        if (model::IsPureVector(*inputPort) && !compiler.GetCompilerParameters().unrollLoops)
+        {
+            CompileAccumulatorLoop(compiler, accumulator);
+        }
+        else
+        {
+            CompileAccumulatorExpanded(compiler, accumulator);
+        }
+
+        compiler.TryMergeRegion(*this);
+    }
+
+    template <typename ValueType>
+    void AccumulatorNode<ValueType>::CompileAccumulatorLoop(model::IRMapCompiler& compiler, llvm::Value* accumulator)
+    {
+        auto inputPort = this->GetInputPorts()[0];
+        auto outputPort = this->GetOutputPorts()[0];
+        llvm::Value* result = compiler.EnsureEmitted(outputPort);
+        llvm::Value* inputVector = compiler.EnsureEmitted(inputPort);
+        auto& function = compiler.GetCurrentFunction();
+
+        function.VectorOperator(emitters::GetAddForValueType<ValueType>(), outputPort->Size(), accumulator, inputVector, [&accumulator, &result, &function, this](llvm::Value* i, llvm::Value* value) {
+            function.SetValueAt(accumulator, i, value);
+            function.SetValueAt(result, i, value);
+        });
+    }
+
+    template <typename ValueType>
+    void AccumulatorNode<ValueType>::CompileAccumulatorExpanded(model::IRMapCompiler& compiler, llvm::Value* accumulator)
+    {
+        auto inputPort = GetInputPorts()[0];
+        auto outputPort = GetOutputPorts()[0];
+        llvm::Value* result = compiler.EnsureEmitted(outputPort);
+        auto& function = compiler.GetCurrentFunction();
+        for (size_t index = 0; index < outputPort->Size(); ++index)
+        {
+            llvm::Value* inputValue = compiler.LoadVariable(inputPort->GetInputElement(index));
+            llvm::Value* accumValue = function.ValueAt(accumulator, function.Literal((int)index));
+            llvm::Value* sum = function.Operator(emitters::GetAddForValueType<ValueType>(), inputValue, accumValue);
+            function.SetValueAt(accumulator, function.Literal((int)index), sum);
+            function.SetValueAt(result, function.Literal((int)index), sum);
+        }
     }
 
     template <typename ValueType>

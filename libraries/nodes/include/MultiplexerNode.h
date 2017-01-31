@@ -8,7 +8,11 @@
 
 #pragma once
 
+// model
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
 #include "InputPort.h"
+#include "MapCompiler.h"
 #include "Node.h"
 #include "OutputPort.h"
 
@@ -28,7 +32,7 @@ namespace nodes
 {
     /// <summary> A node that outputs a dynamically specified element from an input array. </summary>
     template <typename ValueType, typename SelectorType>
-    class MultiplexerNode : public model::Node
+    class MultiplexerNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -75,6 +79,11 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
+
+    private:
+        void CompileMultiplexerBinary(model::IRMapCompiler& compiler);
+        void CompileUnrolled(model::IRMapCompiler& compiler);
 
         // Inputs
         model::InputPort<ValueType> _elements;

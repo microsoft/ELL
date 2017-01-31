@@ -46,6 +46,12 @@ namespace model
     }
 
     template <typename ValueType>
+    void InputNode<ValueType>::Compile(IRMapCompiler& compiler)
+    {
+        // Input node is typically set up during pass1. By default, no further work needed
+    }
+
+    template <typename ValueType>
     void InputNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);

@@ -13,7 +13,7 @@ namespace ell
 namespace model
 {
     InputNodeBase::InputNodeBase(OutputPortBase& output)
-        : Node({}, { &output }), _outputBase(output)
+        : CompilableNode({}, { &output }), _outputBase(output)
     {
     }
 }

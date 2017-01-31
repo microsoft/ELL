@@ -35,13 +35,13 @@ namespace nodes
 
     template <typename ValueType>
     DTWDistanceNode<ValueType>::DTWDistanceNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _sampleDimension(0), _prototypeLength(0), _prototypeVariance(0)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _sampleDimension(0), _prototypeLength(0), _prototypeVariance(0)
     {
     }
 
     template <typename ValueType>
     DTWDistanceNode<ValueType>::DTWDistanceNode(const model::PortElements<ValueType>& input, const std::vector<std::vector<ValueType>>& prototype)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _prototype(prototype)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _prototype(prototype)
     {
         _sampleDimension = input.Size();
         _prototypeLength = prototype.size();
@@ -129,6 +129,102 @@ namespace nodes
         auto newinput = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<DTWDistanceNode<ValueType>>(newinput, _prototype);
         transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType>
+    std::vector<ValueType> DTWDistanceNode<ValueType>::GetPrototypeData() const
+    {
+        std::vector<ValueType> result;
+        result.reserve(_prototypeLength * _sampleDimension);
+
+        for (const auto& vec : _prototype)
+        {
+            result.insert(result.end(), vec.begin(), vec.end());
+        }
+        return result;
+    }
+
+    template <typename ValueType>
+    void DTWDistanceNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    {
+        static_assert(!std::is_same<ValueType, bool>(), "Cannot instantiate boolean DTW nodes");
+        compiler.NewBlockRegion(*this);
+
+        auto inputPort = GetInputPorts()[0];
+        auto outputPort = GetOutputPorts()[0];
+        auto inputType = GetPortVariableType(*inputPort);
+        assert(inputType == GetPortVariableType(*outputPort));
+        VerifyIsScalar(*outputPort);
+
+        auto& function = compiler.GetCurrentFunction();
+
+        llvm::Value* pInput = compiler.EnsureEmitted(inputPort);
+        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
+
+        // The prototype (constant)
+        emitters::Variable* pVarPrototype = compiler.Variables().AddVariable<emitters::LiteralVectorVariable<ValueType>>(GetPrototypeData());
+
+        // Global variables for the dynamic programming memory
+        emitters::Variable* pVarD = compiler.Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, _prototypeLength + 1);
+
+        // get global state vars
+        llvm::Value* pPrototypeVector = compiler.EnsureEmitted(*pVarPrototype);
+        llvm::Value* pD = compiler.EnsureEmitted(*pVarD);
+
+        llvm::Value* dist = function.Variable(inputType, "dist");
+        llvm::Value* protoIndex = function.Variable(ell::emitters::VariableType::Int32, "i");
+        llvm::Value* dLast = function.Variable(inputType, "dLast");
+        llvm::Value* bestDist = function.Variable(inputType, "bestDist");
+
+        // initialize variables
+        function.Store(protoIndex, function.Literal(0));
+        function.Store(dLast, function.Literal(0.0));
+
+        auto forLoop = function.ForLoop();
+        forLoop.Begin(_prototypeLength);
+        {
+            auto iMinusOne = forLoop.LoadIterationVariable();
+            auto i = function.Operator(emitters::TypedOperator::add, iMinusOne, function.Literal(1));
+
+            auto d_iMinus1 = function.ValueAt(pD, iMinusOne);
+            auto dPrev_iMinus1 = function.Load(dLast);
+            auto dPrev_i = function.ValueAt(pD, i);
+
+            function.Store(bestDist, d_iMinus1);
+            emitters::IRIfEmitter if1 = function.If(emitters::TypedComparison::lessThanFloat, dPrev_i, d_iMinus1);
+            {
+                function.Store(bestDist, dPrev_i);
+            }
+            if1.End();
+
+            emitters::IRIfEmitter if2 = function.If(emitters::TypedComparison::lessThanFloat, dPrev_iMinus1, function.Load(bestDist));
+            {
+                function.Store(bestDist, dPrev_iMinus1);
+            }
+            if2.End();
+
+            // Get dist
+            function.Store(dist, function.Literal(0.0));
+            auto diffLoop = function.ForLoop();
+            diffLoop.Begin(_sampleDimension);
+            {
+                auto j = diffLoop.LoadIterationVariable();
+                llvm::Value* inputValue = function.ValueAt(pInput, j);
+                llvm::Value* protoValue = function.ValueAt(pPrototypeVector, function.Load(protoIndex));
+                llvm::Value* diff = function.Operator(emitters::GetSubtractForValueType<ValueType>(), inputValue, protoValue);
+                llvm::Value* absDiff = function.Call(compiler.GetRuntime().GetAbsFunction<ValueType>(), { diff });
+                function.OperationAndUpdate(dist, emitters::GetAddForValueType<ValueType>(), absDiff);
+                function.OperationAndUpdate(protoIndex, emitters::TypedOperator::add, function.Literal(1));
+            }
+            diffLoop.End();
+
+            function.OperationAndUpdate(bestDist, emitters::GetAddForValueType<ValueType>(), function.Load(dist)); // x += dist;
+            function.SetValueAt(pD, i, function.Load(bestDist)); // d[i] = x;
+        }
+        forLoop.End();
+
+        function.Store(pResult, function.Operator(emitters::GetDivideForValueType<ValueType>(), function.Load(bestDist), function.Literal(static_cast<ValueType>(_prototypeVariance))));
+        compiler.TryMergeRegion(*this);
     }
 
     template <typename ValueType>

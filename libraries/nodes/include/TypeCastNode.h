@@ -8,10 +8,15 @@
 
 #pragma once
 
+// model
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
+#include "MapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
 
+// stl
 #include <memory>
 #include <string>
 #include <vector>
@@ -23,7 +28,7 @@ namespace nodes
 {
     /// <summary> A node that represents an output from the system. </summary>
     template <typename InputValueType, typename OutputValueType>
-    class TypeCastNode : public model::Node
+    class TypeCastNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -67,6 +72,7 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
 
         model::InputPort<InputValueType> _input;
         model::OutputPort<OutputValueType> _output;

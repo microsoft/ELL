@@ -8,11 +8,18 @@
 
 #pragma once
 
+// model
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
 #include "InputPort.h"
+#include "MapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
 #include "PortElements.h"
+
+// emitters
+#include "EmitterTypes.h"
 
 // utilities
 #include "TypeName.h"
@@ -26,17 +33,9 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> Types of unary operations supported by this node type. </summary>
-    enum class UnaryOperationType
-    {
-        none,
-        sqrt, // real only
-        logicalNot // bool only
-    };
-
     /// <summary> A node that represents a unary function of its input </summary>
     template <typename ValueType>
-    class UnaryOperationNode : public model::Node
+    class UnaryOperationNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -54,7 +53,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to process. </param>
         /// <param name="operation"> The function to use to process the signal. </param>
-        UnaryOperationNode(const model::PortElements<ValueType>& input, UnaryOperationType operation);
+        UnaryOperationNode(const model::PortElements<ValueType>& input, emitters::UnaryOperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -82,10 +81,16 @@ namespace nodes
         /// <summary> Gets the operation performed by this node </summary>
         ///
         /// <returns> The operation </returns>
-        UnaryOperationType GetOperation() const { return _operation; }
+        emitters::UnaryOperationType GetOperation() const { return _operation; }
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
+
+    private:
+        llvm::Function* GetOperator(model::IRMapCompiler& compiler) const;
+        void CompileUnaryOperationLoop(model::IRMapCompiler& compiler);
+        void CompileUnaryOperationExpanded(model::IRMapCompiler& compiler);
 
         template <typename Operation>
         std::vector<ValueType> ComputeOutput(Operation&& function) const;
@@ -97,7 +102,7 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         // Operation
-        UnaryOperationType _operation;
+        emitters::UnaryOperationType _operation;
     };
 }
 }

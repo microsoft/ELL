@@ -8,7 +8,12 @@
 
 #pragma once
 
+// model
+#include "CompilableNodeUtilities.h"
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
 #include "InputPort.h"
+#include "MapCompiler.h"
 #include "Node.h"
 #include "OutputPort.h"
 
@@ -26,7 +31,7 @@ namespace nodes
 {
     /// <summary> An example node that computes an extremal value (min or max) of its input, as well as the index of the extremal value. </summary>
     template <typename ValueType, bool max>
-    class ExtremalValueNode : public model::Node
+    class ExtremalValueNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -68,10 +73,23 @@ namespace nodes
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
+        /// <summary> Indicates if this is an argmin or argmax node </summary>
+        ///
+        /// <returns> `true` if this is an argmax node, `false` if is an argmin node </returns>
         bool IsMaxNode() const { return max; }
+
+        /// <summary> Gets the emitter typed comparison type used for computing this node </summary>
+        ///
+        /// <returns> A `TypedComparison` indicating the comarison type and data type for this node </returns>
+        emitters::TypedComparison GetComparison() const;
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
+
+        llvm::Function* GetOperator(model::IRMapCompiler& compiler) const;
+        void CompileLoop(model::IRMapCompiler& compiler);
+        void CompileExpanded(model::IRMapCompiler& compiler);
 
         // My inputs
         model::InputPort<ValueType> _input;

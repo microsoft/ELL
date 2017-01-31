@@ -8,9 +8,17 @@
 
 #pragma once
 
+// model
+#include "CompilableNodeUtilities.h"
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
+#include "MapCompiler.h"
 #include "Model.h"
 #include "ModelTransformer.h"
 #include "Node.h"
+
+// emitters
+#include "EmitterTypes.h"
 
 // utilities
 #include "Exception.h"
@@ -25,22 +33,9 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> Types of coordinatewise operations supported by this node type. </summary>
-    enum class BinaryOperationType
-    {
-        none,
-        add,
-        subtract,
-        coordinatewiseMultiply, // coordinatewise multiplication
-        coordinatewiseDivide, // coordinatewise division
-        logicalAnd,
-        logicalOr,
-        logicalXor
-    };
-
     /// <summary> A node that performs a coordinatewise binary arithmetic operation on its inputs. </summary>
     template <typename ValueType>
-    class BinaryOperationNode : public model::Node
+    class BinaryOperationNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -61,7 +56,7 @@ namespace nodes
         /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
         /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
         /// <param name="operation"> The type of operation to perform. </param>
-        BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, BinaryOperationType operation);
+        BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryOperationType operation);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -89,10 +84,16 @@ namespace nodes
         /// <summary> Gets the operation performed by this node </summary>
         ///
         /// <returns> The operation </returns>
-        BinaryOperationType GetOperation() const { return _operation; }
+        emitters::BinaryOperationType GetOperation() const { return _operation; }
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
+
+    private:
+        llvm::Function* GetOperator(model::IRMapCompiler& compiler) const;
+        void CompileBinaryOperationLoop(model::IRMapCompiler& compiler);
+        void CompileBinaryOperationExpanded(model::IRMapCompiler& compiler);
 
         template <typename Operation>
         std::vector<ValueType> ComputeOutput(Operation&& function) const;
@@ -105,7 +106,7 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         // Operation
-        BinaryOperationType _operation;
+        emitters::BinaryOperationType _operation;
     };
 }
 }

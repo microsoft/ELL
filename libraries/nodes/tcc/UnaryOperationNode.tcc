@@ -18,25 +18,25 @@ namespace nodes
 {
     namespace UnaryOperations
     {
-        inline std::string to_string(UnaryOperationType op)
+        inline std::string to_string(emitters::UnaryOperationType op)
         {
             switch (op)
             {
-                ADD_TO_STRING_ENTRY(UnaryOperationType, none);
-                ADD_TO_STRING_ENTRY(UnaryOperationType, sqrt);
-                ADD_TO_STRING_ENTRY(UnaryOperationType, logicalNot);
+                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, none);
+                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, sqrt);
+                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, logicalNot);
 
                 default:
                     throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
             }
         }
 
-        inline UnaryOperationType from_string(std::string name)
+        inline emitters::UnaryOperationType from_string(std::string name)
         {
             BEGIN_FROM_STRING;
-            ADD_FROM_STRING_ENTRY(UnaryOperationType, none);
-            ADD_FROM_STRING_ENTRY(UnaryOperationType, sqrt);
-            ADD_FROM_STRING_ENTRY(UnaryOperationType, logicalNot);
+            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, none);
+            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, sqrt);
+            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, logicalNot);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
         }
@@ -68,13 +68,13 @@ namespace nodes
 
     template <typename ValueType>
     UnaryOperationNode<ValueType>::UnaryOperationNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _operation(UnaryOperationType::none)
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _operation(emitters::UnaryOperationType::none)
     {
     }
 
     template <typename ValueType>
-    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::PortElements<ValueType>& input, UnaryOperationType operation)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _operation(operation)
+    UnaryOperationNode<ValueType>::UnaryOperationNode(const model::PortElements<ValueType>& input, emitters::UnaryOperationType operation)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _operation(operation)
     {
     }
 
@@ -96,12 +96,12 @@ namespace nodes
         std::vector<ValueType> output;
         switch (_operation)
         {
-            case UnaryOperationType::sqrt:
+            case emitters::UnaryOperationType::sqrt:
             {
                 output = ComputeOutput(UnaryOperations::Sqrt<ValueType>);
             }
             break;
-            case UnaryOperationType::logicalNot:
+            case emitters::UnaryOperationType::logicalNot:
             {
                 output = ComputeOutput(UnaryOperations::LogicalNot<ValueType>);
             }
@@ -119,6 +119,78 @@ namespace nodes
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<UnaryOperationNode<ValueType>>(newPortElements, _operation);
         transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType>
+    llvm::Function* UnaryOperationNode<ValueType>::GetOperator(model::IRMapCompiler& compiler) const
+    {
+        switch (this->GetOperation())
+        {
+            case emitters::UnaryOperationType::sqrt:
+            {
+                return compiler.GetRuntime().GetSqrtFunction<ValueType>();
+            }
+            break;
+            default:
+                throw emitters::EmitterException(emitters::EmitterError::unaryOperationNotSupported);
+        }
+    }
+
+    template <typename ValueType>
+    void UnaryOperationNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    {
+        compiler.NewBlockRegion(*this);
+
+        auto inputPort = GetInputPorts()[0];
+
+        if (IsPureVector(*inputPort) && !compiler.GetCompilerParameters().unrollLoops)
+        {
+            CompileUnaryOperationLoop(compiler);
+        }
+        else
+        {
+            CompileUnaryOperationExpanded(compiler);
+        }
+
+        compiler.TryMergeRegion(*this);
+    }
+
+    template <typename ValueType>
+    void UnaryOperationNode<ValueType>::CompileUnaryOperationLoop(model::IRMapCompiler& compiler)
+    {
+        // Loop version broken
+        auto inputPort = GetInputPorts()[0];
+        auto outputPort = GetOutputPorts()[0];
+        auto count = inputPort->Size();
+        llvm::Value* pInput = compiler.EnsureEmitted(inputPort);
+        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
+        auto& function = compiler.GetCurrentFunction();
+
+        auto forLoop = function.ForLoop();
+        forLoop.Begin(count);
+        {
+            auto i = forLoop.LoadIterationVariable();
+            llvm::Value* inputValue = function.ValueAt(pInput, i);
+            llvm::Value* pOpResult = function.Call(GetOperator(compiler), { inputValue });
+            function.SetValueAt(pResult, i, pOpResult);
+        }
+        forLoop.End();
+    }
+
+    template <typename ValueType>
+    void UnaryOperationNode<ValueType>::CompileUnaryOperationExpanded(model::IRMapCompiler& compiler)
+    {
+        auto inputPort = GetInputPorts()[0];
+        auto outputPort = GetOutputPorts()[0];
+        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
+        auto& function = compiler.GetCurrentFunction();
+
+        for (size_t i = 0; i < inputPort->Size(); ++i)
+        {
+            llvm::Value* inputValue = compiler.LoadVariable(inputPort->GetInputElement(i));
+            llvm::Value* pOpResult = function.Call(GetOperator(compiler), { inputValue });
+            function.SetValueAt(pResult, function.Literal((int)i), pOpResult);
+        }
     }
 
     template <typename ValueType>

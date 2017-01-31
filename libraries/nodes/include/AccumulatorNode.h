@@ -9,6 +9,10 @@
 #pragma once
 
 // model
+#include "CompilableNodeUtilities.h"
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
+#include "MapCompiler.h"
 #include "Model.h"
 #include "ModelTransformer.h"
 #include "Node.h"
@@ -28,7 +32,7 @@ namespace nodes
 {
     /// <summary> A node that accumulates a running sum of its input. </summary>
     template <typename ValueType>
-    class AccumulatorNode : public model::Node
+    class AccumulatorNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -71,8 +75,12 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
 
-        // private:
+    private:
+        void CompileAccumulatorLoop(model::IRMapCompiler& compiler, llvm::Value* accumulator);
+        void CompileAccumulatorExpanded(model::IRMapCompiler& compiler, llvm::Value* accumulator);
+
         // Input
         model::InputPort<ValueType> _input;
 

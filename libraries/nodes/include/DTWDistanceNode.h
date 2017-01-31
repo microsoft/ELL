@@ -12,7 +12,10 @@
 
 // model
 #include "BinaryOperationNode.h"
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
 #include "InputPort.h"
+#include "MapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
@@ -31,7 +34,7 @@ namespace nodes
 {
     /// <summary> A node that computes the dynamic time-warping distance between its inputs </summary>
     template <typename ValueType>
-    class DTWDistanceNode : public model::Node
+    class DTWDistanceNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -86,8 +89,13 @@ namespace nodes
     protected:
         virtual void Compute() const override;
         void Reset() const;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
 
-        // private:
+    private:
+        std::vector<ValueType> GetPrototypeData() const;
+        void CompileDTWLoop(model::IRMapCompiler& compiler);
+        void CompileDTWExpanded(model::IRMapCompiler& compiler);
+
         model::InputPort<ValueType> _input;
         model::OutputPort<ValueType> _output;
 

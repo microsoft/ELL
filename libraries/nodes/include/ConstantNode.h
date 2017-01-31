@@ -9,9 +9,16 @@
 #pragma once
 
 // model
+#include "CompilableNode.h"
+#include "CompilableNodeUtilities.h"
+#include "IRMapCompiler.h"
+#include "MapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
+
+// emitters
+#include "VectorVariable.h"
 
 // predictors
 #include "ConstantPredictor.h"
@@ -32,7 +39,7 @@ namespace nodes
 {
     /// <summary> A node that contains a constant value. Has no inputs. </summary>
     template <typename ValueType>
-    class ConstantNode : public model::Node
+    class ConstantNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -84,8 +91,12 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
 
     private:
+        void CompileConstantLoop(model::IRMapCompiler& compiler);
+        void CompileConstantExpanded(model::IRMapCompiler& compiler);
+
         // Output
         model::OutputPort<ValueType> _output;
 

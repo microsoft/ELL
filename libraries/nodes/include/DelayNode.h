@@ -9,7 +9,10 @@
 #pragma once
 
 // model
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
 #include "InputPort.h"
+#include "MapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
@@ -30,7 +33,7 @@ namespace nodes
 {
     /// <summary> A node that returns a delayed sample of the input signal. </summary>
     template <typename ValueType>
-    class DelayNode : public model::Node
+    class DelayNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -78,6 +81,7 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
 
         // Inputs
         model::InputPort<ValueType> _input;

@@ -64,8 +64,7 @@
                 '<(include_path_prefix)/libraries/predictors/include',
                 '<(include_path_prefix)/libraries/trainers/include',
                 '<(include_path_prefix)/libraries/utilities/include',
-                '<(include_path_prefix)/private/libraries/compiler/include',
-                '<(include_path_prefix)/private/libraries/emitters/include',
+                '<(include_path_prefix)/libraries/emitters/include',
 
                 '<(llvm_include_path)',
                 '<(blas_include_path)'
@@ -85,8 +84,7 @@
                     '<(library_path_prefix)/build/libraries/predictors<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/trainers<(library_path_suffix)',
                     '<(library_path_prefix)/build/libraries/utilities<(library_path_suffix)',
-                    '<(library_path_prefix)/build/private/libraries/compiler<(library_path_suffix)',
-                    '<(library_path_prefix)/build/private/libraries/emitters<(library_path_suffix)',
+                    '<(library_path_prefix)/build/libraries/emitters<(library_path_suffix)',
                     '<(llvm_library_path)',
                 ],
                 'libraries': [
@@ -100,7 +98,6 @@
                     '-lpredictors',
                     '-ltrainers',
                     '-lutilities',
-                    '-lcompiler',
                     '-lemitters',
                     @MODULE_BLAS_LIBS@
                     @MODULE_LLVM_LIBS@
@@ -140,7 +137,6 @@
                                 '-std=c++14',
                                 '-stdlib=libc++',
                                 '-v',
-
                             ],
                             'OTHER_LDFLAGS': [
                                 '-stdlib=libc++'

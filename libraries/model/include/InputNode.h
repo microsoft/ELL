@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "CompilableNode.h"
 #include "InputPort.h"
 #include "ModelTransformer.h"
 #include "Node.h"
@@ -27,7 +28,7 @@ namespace ell
 namespace model
 {
     /// <summary> Base class for a node that represents an input to the system. </summary>
-    class InputNodeBase : public Node
+    class InputNodeBase : public CompilableNode
     {
     public:
         /// <summary> Gets the output port. </summary>
@@ -108,6 +109,7 @@ namespace model
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(IRMapCompiler& compiler) override;
 
     private:
         std::vector<ValueType> _inputValues;

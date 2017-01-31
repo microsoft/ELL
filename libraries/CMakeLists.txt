@@ -4,6 +4,7 @@
 
 add_subdirectory(common)
 add_subdirectory(data)
+add_subdirectory(emitters)
 add_subdirectory(evaluators)
 add_subdirectory(lossFunctions)
 add_subdirectory(math)

@@ -34,6 +34,26 @@ namespace model
     }
 
     template <typename ValueType>
+    void OutputNode<ValueType>::Compile(IRMapCompiler& compiler)
+    {
+        // OutputNode has exactly 1 input and 1 output
+        // Outputs are always long lived - either globals or heap. Currently, we use globals
+        auto inputPort = GetInputPorts()[0];
+        auto outputPort = GetOutputPorts()[0];
+        assert(GetPortVariableType(*inputPort) == GetPortVariableType(*outputPort));
+
+        auto& function = compiler.GetCurrentFunction();
+
+        // Output ports have exactly 1 input, output
+        llvm::Value* pOutputVar = compiler.EnsureEmitted(outputPort);
+        for (size_t i = 0; i < inputPort->Size(); ++i)
+        {
+            llvm::Value* pVal = compiler.LoadVariable(inputPort->GetInputElement(i));
+            function.SetValueAt(pOutputVar, function.Literal((int)i), pVal);
+        }
+    }
+
+    template <typename ValueType>
     void OutputNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);

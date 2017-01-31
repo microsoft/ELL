@@ -12,7 +12,11 @@
 
 // model
 #include "BinaryOperationNode.h"
+#include "CompilableNodeUtilities.h"
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
 #include "InputPort.h"
+#include "MapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
@@ -30,7 +34,7 @@ namespace nodes
 {
     /// <summary> A node that takes two vector inputs and returns their dot product </summary>
     template <typename ValueType>
-    class DotProductNode : public model::Node
+    class DotProductNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -85,6 +89,11 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
+
+    private:
+        void CompileDotProductLoop(model::IRMapCompiler& compiler);
+        void CompileDotProductExpanded(model::IRMapCompiler& compiler);
 
         // Inputs
         model::InputPort<ValueType> _input1;

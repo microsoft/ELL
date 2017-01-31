@@ -69,9 +69,9 @@ namespace nodes
 
         auto weightsNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetWeights().ToArray());
         auto dotProductNode = transformer.AddNode<DotProductNode<double>>(weightsNode->output, newPortElements);
-        auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<double>>(weightsNode->output, newPortElements, BinaryOperationType::coordinatewiseMultiply);
+        auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<double>>(weightsNode->output, newPortElements, emitters::BinaryOperationType::coordinatewiseMultiply);
         auto biasNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetBias());
-        auto addNode = transformer.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, BinaryOperationType::add);
+        auto addNode = transformer.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, emitters::BinaryOperationType::add);
 
         transformer.MapNodeOutput(output, addNode->output);
         transformer.MapNodeOutput(weightedElements, coordinatewiseMultiplyNode->output);

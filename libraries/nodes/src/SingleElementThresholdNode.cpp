@@ -62,7 +62,7 @@ namespace nodes
         auto thresholdNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetThreshold());
 
         // create a predicate that implements the split rule
-        auto binaryPredicateNode = transformer.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, BinaryPredicateType::greater);
+        auto binaryPredicateNode = transformer.AddNode<BinaryPredicateNode<double>>(element, thresholdNode->output, emitters::BinaryPredicateType::greater);
 
         transformer.MapNodeOutput(output, binaryPredicateNode->output);
         return true;

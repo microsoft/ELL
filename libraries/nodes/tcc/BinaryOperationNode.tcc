@@ -18,34 +18,34 @@ namespace nodes
 {
     namespace BinaryOperations
     {
-        inline std::string to_string(BinaryOperationType op)
+        inline std::string to_string(emitters::BinaryOperationType op)
         {
             switch (op)
             {
-                ADD_TO_STRING_ENTRY(BinaryOperationType, none);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, add);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, subtract);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalAnd);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalOr);
-                ADD_TO_STRING_ENTRY(BinaryOperationType, logicalXor);
+                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, none);
+                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, add);
+                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, subtract);
+                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, coordinatewiseMultiply);
+                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, coordinatewiseDivide);
+                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, logicalAnd);
+                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, logicalOr);
+                ADD_TO_STRING_ENTRY(emitters::BinaryOperationType, logicalXor);
                 default:
                     throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
             }
         }
 
-        inline BinaryOperationType from_string(std::string name)
+        inline emitters::BinaryOperationType from_string(std::string name)
         {
             BEGIN_FROM_STRING;
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, none);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, add);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, subtract);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseMultiply);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, coordinatewiseDivide);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalAnd);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalOr);
-            ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalXor);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, none);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, add);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, subtract);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, coordinatewiseMultiply);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, coordinatewiseDivide);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, logicalAnd);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, logicalOr);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryOperationType, logicalXor);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
         }
@@ -140,13 +140,13 @@ namespace nodes
 
     template <typename ValueType>
     BinaryOperationNode<ValueType>::BinaryOperationNode()
-        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(BinaryOperationType::none)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _operation(emitters::BinaryOperationType::none)
     {
     }
 
     template <typename ValueType>
-    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, BinaryOperationType operation)
-        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
+    BinaryOperationNode<ValueType>::BinaryOperationNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryOperationType operation)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _operation(operation)
     {
         if (input1.Size() != input2.Size())
         {
@@ -173,25 +173,25 @@ namespace nodes
         std::vector<ValueType> output;
         switch (_operation)
         {
-            case BinaryOperationType::add:
+            case emitters::BinaryOperationType::add:
                 output = ComputeOutput(BinaryOperations::Add<ValueType>);
                 break;
-            case BinaryOperationType::subtract:
+            case emitters::BinaryOperationType::subtract:
                 output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
                 break;
-            case BinaryOperationType::coordinatewiseMultiply:
+            case emitters::BinaryOperationType::coordinatewiseMultiply:
                 output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
                 break;
-            case BinaryOperationType::coordinatewiseDivide:
+            case emitters::BinaryOperationType::coordinatewiseDivide:
                 output = ComputeOutput(BinaryOperations::Divide<ValueType>);
                 break;
-            case BinaryOperationType::logicalAnd:
+            case emitters::BinaryOperationType::logicalAnd:
                 output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
                 break;
-            case BinaryOperationType::logicalOr:
+            case emitters::BinaryOperationType::logicalOr:
                 output = ComputeOutput(BinaryOperations::LogicalOr<ValueType>);
                 break;
-            case BinaryOperationType::logicalXor:
+            case emitters::BinaryOperationType::logicalXor:
                 output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
                 break;
             default:
@@ -207,6 +207,61 @@ namespace nodes
         auto PortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
         auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(PortElements1, PortElements2, _operation);
         transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType>
+    void BinaryOperationNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    {
+        compiler.NewBlockRegion(*this);
+
+        auto inputPort1 = GetInputPorts()[0];
+        auto inputPort2 = GetInputPorts()[1];
+        if (IsPureVector(*inputPort1) && IsPureVector(*inputPort2) && !compiler.GetCompilerParameters().unrollLoops)
+        {
+            CompileBinaryOperationLoop(compiler);
+        }
+        else
+        {
+            CompileBinaryOperationExpanded(compiler);
+        }
+
+        compiler.TryMergeRegion(*this);
+    }
+
+    template <typename ValueType>
+    void BinaryOperationNode<ValueType>::CompileBinaryOperationLoop(model::IRMapCompiler& compiler)
+    {
+        auto inputPort1 = GetInputPorts()[0];
+        auto inputPort2 = GetInputPorts()[1];
+        auto outputPort = GetOutputPorts()[0];
+        llvm::Value* pInput1 = compiler.EnsureEmitted(inputPort1);
+        llvm::Value* pInput2 = compiler.EnsureEmitted(inputPort2);
+        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
+        auto& function = compiler.GetCurrentFunction();
+
+        auto count = inputPort1->Size();
+        function.VectorOperator(emitters::GetOperator<ValueType>(GetOperation()), count, pInput1, pInput2, [&pResult, &function, this](llvm::Value* i, llvm::Value* pValue) {
+            function.SetValueAt(pResult, i, pValue);
+        });
+    }
+
+    template <typename ValueType>
+    void BinaryOperationNode<ValueType>::CompileBinaryOperationExpanded(model::IRMapCompiler& compiler)
+    {
+        auto inputPort1 = GetInputPorts()[0];
+        auto inputPort2 = GetInputPorts()[1];
+        auto outputPort = GetOutputPorts()[0];
+        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
+        auto& function = compiler.GetCurrentFunction();
+
+        auto count = inputPort1->Size();
+        for (size_t i = 0; i < count; ++i)
+        {
+            llvm::Value* inputValue1 = compiler.LoadVariable(inputPort1->GetInputElement(i));
+            llvm::Value* inputValue2 = compiler.LoadVariable(inputPort2->GetInputElement(i));
+            llvm::Value* pOpResult = function.Operator(emitters::GetOperator<ValueType>(GetOperation()), inputValue1, inputValue2);
+            function.SetValueAt(pResult, function.Literal((int)i), pOpResult);
+        }
     }
 
     template <typename ValueType>

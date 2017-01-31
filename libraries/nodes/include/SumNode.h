@@ -8,7 +8,12 @@
 
 #pragma once
 
+// model
+#include "CompilableNodeUtilities.h"
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
 #include "InputPort.h"
+#include "MapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
@@ -26,7 +31,7 @@ namespace nodes
 {
     /// <summary> A node that takes a vector input and returns the sum of its elements. </summary>
     template <typename ValueType>
-    class SumNode : public model::Node
+    class SumNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -70,7 +75,11 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler) override;
 
+    private:
+        void CompileSumLoop(model::IRMapCompiler& compiler);
+        void CompileSumExpanded(model::IRMapCompiler& compiler);
         // Inputs
         model::InputPort<ValueType> _input;
 

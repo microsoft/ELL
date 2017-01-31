@@ -18,32 +18,32 @@ namespace nodes
 {
     namespace BinaryPredicates
     {
-        inline std::string to_string(BinaryPredicateType op)
+        inline std::string to_string(emitters::BinaryPredicateType op)
         {
             switch (op)
             {
-                ADD_TO_STRING_ENTRY(BinaryPredicateType, none);
-                ADD_TO_STRING_ENTRY(BinaryPredicateType, equal);
-                ADD_TO_STRING_ENTRY(BinaryPredicateType, less);
-                ADD_TO_STRING_ENTRY(BinaryPredicateType, greater);
-                ADD_TO_STRING_ENTRY(BinaryPredicateType, notEqual);
-                ADD_TO_STRING_ENTRY(BinaryPredicateType, lessOrEqual);
-                ADD_TO_STRING_ENTRY(BinaryPredicateType, greaterOrEqual);
+                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, none);
+                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, equal);
+                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, less);
+                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, greater);
+                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, notEqual);
+                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, lessOrEqual);
+                ADD_TO_STRING_ENTRY(emitters::BinaryPredicateType, greaterOrEqual);
                 default:
                     throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
             }
         }
 
-        inline BinaryPredicateType from_string(std::string name)
+        inline emitters::BinaryPredicateType from_string(std::string name)
         {
             BEGIN_FROM_STRING;
-            ADD_FROM_STRING_ENTRY(BinaryPredicateType, none);
-            ADD_FROM_STRING_ENTRY(BinaryPredicateType, equal);
-            ADD_FROM_STRING_ENTRY(BinaryPredicateType, less);
-            ADD_FROM_STRING_ENTRY(BinaryPredicateType, greater);
-            ADD_FROM_STRING_ENTRY(BinaryPredicateType, notEqual);
-            ADD_FROM_STRING_ENTRY(BinaryPredicateType, lessOrEqual);
-            ADD_FROM_STRING_ENTRY(BinaryPredicateType, greaterOrEqual);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, none);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, equal);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, less);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, greater);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, notEqual);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, lessOrEqual);
+            ADD_FROM_STRING_ENTRY(emitters::BinaryPredicateType, greaterOrEqual);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary predicate");
         }
@@ -87,13 +87,13 @@ namespace nodes
 
     template <typename ValueType>
     BinaryPredicateNode<ValueType>::BinaryPredicateNode()
-        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _predicate(BinaryPredicateType::none)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, {}, input1PortName), _input2(this, {}, input2PortName), _output(this, outputPortName, 0), _predicate(emitters::BinaryPredicateType::none)
     {
     }
 
     template <typename ValueType>
-    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, BinaryPredicateType predicate)
-        : Node({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _predicate(predicate)
+    BinaryPredicateNode<ValueType>::BinaryPredicateNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2, emitters::BinaryPredicateType predicate)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, _input1.Size()), _predicate(predicate)
     {
         if (input1.Size() != input2.Size())
         {
@@ -120,22 +120,22 @@ namespace nodes
         std::vector<bool> output;
         switch (_predicate)
         {
-            case BinaryPredicateType::equal:
+            case emitters::BinaryPredicateType::equal:
                 output = ComputeOutput(BinaryPredicates::Equal<ValueType>);
                 break;
-            case BinaryPredicateType::less:
+            case emitters::BinaryPredicateType::less:
                 output = ComputeOutput(BinaryPredicates::Less<ValueType>);
                 break;
-            case BinaryPredicateType::greater:
+            case emitters::BinaryPredicateType::greater:
                 output = ComputeOutput(BinaryPredicates::Greater<ValueType>);
                 break;
-            case BinaryPredicateType::notEqual:
+            case emitters::BinaryPredicateType::notEqual:
                 output = ComputeOutput(BinaryPredicates::NotEqual<ValueType>);
                 break;
-            case BinaryPredicateType::lessOrEqual:
+            case emitters::BinaryPredicateType::lessOrEqual:
                 output = ComputeOutput(BinaryPredicates::LessOrEqual<ValueType>);
                 break;
-            case BinaryPredicateType::greaterOrEqual:
+            case emitters::BinaryPredicateType::greaterOrEqual:
                 output = ComputeOutput(BinaryPredicates::GreaterOrEqual<ValueType>);
                 break;
             default:
@@ -143,6 +143,82 @@ namespace nodes
         }
         _output.SetOutput(output);
     };
+
+    template <typename ValueType>
+    void BinaryPredicateNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    {
+        auto PortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
+        auto PortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
+        auto newNode = transformer.AddNode<BinaryPredicateNode<ValueType>>(PortElements1, PortElements2, _predicate);
+        transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    template <typename ValueType>
+    void BinaryPredicateNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    {
+        auto& function = compiler.GetCurrentFunction();
+
+        compiler.NewBlockRegion(*this);
+
+        auto inputPort1 = GetInputPorts()[0];
+        auto inputPort2 = GetInputPorts()[1];
+        auto outputPort = GetOutputPorts()[0];
+
+        // Binary predicate has 2 inputs and 1 output
+        // Currently, compiled BinaryPredicate nodes are limited to operating on scalars
+        VerifyIsScalar(*inputPort1);
+        VerifyIsScalar(*inputPort2);
+        VerifyIsScalar(*outputPort);
+
+        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
+        // emitters::Variable& resultVar = *(GetVariableFor(pOutput));
+        emitters::TypedComparison cmp = emitters::GetComparison<ValueType>(GetPredicate());
+
+        llvm::Value* inputValue1 = compiler.LoadVariable(inputPort1->GetInputElement(0));
+        llvm::Value* inputValue2 = compiler.LoadVariable(inputPort2->GetInputElement(0));
+        llvm::Value* pOpResult = function.Comparison(cmp, inputValue1, inputValue2);
+        // LLVM internally uses 1 bit for boolean. We use integers to store boolean results (see CompileElementSelector). That requires a typecast in LLVM
+        function.Store(pResult, function.CastBoolToInt(pOpResult));
+
+        compiler.TryMergeRegion(*this);
+    }
+
+    template <typename ValueType>
+    void BinaryPredicateNode<ValueType>::CompileBinaryPredicateLoop(model::IRMapCompiler& compiler)
+    {
+        // Loop version broken
+        auto inputPort1 = GetInputPorts()[0];
+        auto inputPort2 = GetInputPorts()[1];
+        auto outputPort = GetOutputPorts()[0];
+        llvm::Value* pInput1 = compiler.EnsureEmitted(inputPort1);
+        llvm::Value* pInput2 = compiler.EnsureEmitted(inputPort2);
+        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
+        auto& function = compiler.GetCurrentFunction();
+
+        auto count = inputPort1->Size();
+        function.VectorOperator(emitters::GetComparison<ValueType>(GetPredicate()), outputPort->Size(), pInput1, pInput2, [&pResult, &function, this](llvm::Value* i, llvm::Value* pValue) {
+            function.SetValueAt(pResult, i, pValue);
+        });
+    }
+
+    template <typename ValueType>
+    void BinaryPredicateNode<ValueType>::CompileBinaryPredicateExpanded(model::IRMapCompiler& compiler)
+    {
+        auto inputPort1 = GetInputPorts()[0];
+        auto inputPort2 = GetInputPorts()[1];
+        auto outputPort = GetOutputPorts()[0];
+        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
+        auto& function = compiler.GetCurrentFunction();
+
+        auto count = inputPort1->Size();
+        for (size_t i = 0; i < count; ++i)
+        {
+            llvm::Value* inputValue1 = compiler.LoadVariable(inputPort1->GetInputElement(i));
+            llvm::Value* inputValue2 = compiler.LoadVariable(inputPort2->GetInputElement(i));
+            llvm::Value* pOpResult = function.Operator(emitters::GetComparison<ValueType>(GetPredicate()), inputValue1, inputValue2);
+            function.SetValueAt(pResult, function.Literal((int)i), pOpResult);
+        }
+    }
 
     template <typename ValueType>
     void BinaryPredicateNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
@@ -164,15 +240,6 @@ namespace nodes
         std::string predicate;
         archiver["predicate"] >> predicate;
         _predicate = BinaryPredicates::from_string(predicate);
-    }
-
-    template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::Copy(model::ModelTransformer& transformer) const
-    {
-        auto PortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
-        auto PortElements2 = transformer.TransformPortElements(_input2.GetPortElements());
-        auto newNode = transformer.AddNode<BinaryPredicateNode<ValueType>>(PortElements1, PortElements2, _predicate);
-        transformer.MapNodeOutput(output, newNode->output);
     }
 }
 }

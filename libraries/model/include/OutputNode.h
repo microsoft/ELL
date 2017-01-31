@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "CompilableNode.h"
+#include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
@@ -26,7 +28,7 @@ namespace ell
 namespace model
 {
     /// <summary> A node that represents an output from the system. </summary>
-    class OutputNodeBase : public Node
+    class OutputNodeBase : public CompilableNode
     {
     public:
         const InputPortBase& GetInputPort() const { return _inputBase; }
@@ -88,6 +90,7 @@ namespace model
 
     protected:
         virtual void Compute() const override;
+        virtual void Compile(IRMapCompiler& compiler) override;
 
         InputPort<ValueType> _input;
         OutputPort<ValueType> _output;
