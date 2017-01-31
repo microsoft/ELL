@@ -12,7 +12,8 @@ namespace ell
 {
 namespace data
 {
-    ScaledDataVector::ScaledDataVector(double scalar, const IDataVector & dataVector) : _scalar(scalar), _dataVector(dataVector) 
+    ScaledDataVector::ScaledDataVector(double scalar, const IDataVector& dataVector)
+        : _scalar(scalar), _dataVector(dataVector)
     {
     }
 
@@ -35,6 +36,5 @@ namespace data
     {
         return dataVector.Dot(vector);
     }
-
 }
 }

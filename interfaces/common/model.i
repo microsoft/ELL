@@ -15,6 +15,9 @@
 // compiler
 #include "IRCompiledMap.h"
 
+// emitters
+#include "ModuleEmitter.h"
+
 // model
 #include "InputNode.h"
 #include "InputPort.h"
@@ -656,7 +659,7 @@ public:
         std::stringstream s;
         if(_map != nullptr)
         {
-            _map->WriteCode(s, "asm");
+            _map->WriteCode(s, ell::emitters::ModuleOutputFormat::ir);
         }
         return s.str();
     }

@@ -44,12 +44,12 @@
 // trainers
 #include "EvaluatingIncrementalTrainer.h"
 #include "MultiEpochIncrementalTrainer.h"
-#include "SGDLinearTrainer.h"
 #include "SDSGDLinearTrainer.h"
+#include "SGDLinearTrainer.h"
 
 // evaluators
-#include "Evaluator.h"
 #include "BinaryErrorAggregator.h"
+#include "Evaluator.h"
 #include "LossAggregator.h"
 
 // lossFunctions
@@ -111,14 +111,14 @@ int main(int argc, char* argv[])
         std::unique_ptr<trainers::ITrainer<PredictorType>> trainer;
         switch (linearTrainerArguments.algorithm)
         {
-        case LinearTrainerArguments::Algorithm::SGD:
-            trainer = common::MakeSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
-            break;
-        case LinearTrainerArguments::Algorithm::SDSGD:
-            trainer = common::MakeSDSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
-            break;
-        default:
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized algorithm type");
+            case LinearTrainerArguments::Algorithm::SGD:
+                trainer = common::MakeSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+                break;
+            case LinearTrainerArguments::Algorithm::SDSGD:
+                trainer = common::MakeSDSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+                break;
+            default:
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized algorithm type");
         }
 
         // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer

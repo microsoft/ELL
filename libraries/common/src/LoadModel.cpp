@@ -298,7 +298,7 @@ namespace common
         {
             SaveArchivedObject<utilities::XmlArchiver>(model, outStream);
         }
-        else 
+        else
         {
             SaveArchivedObject<utilities::JsonArchiver>(model, outStream);
         }
@@ -412,6 +412,10 @@ namespace common
             auto filestream = utilities::OpenOfstream(filename);
             SaveMap(map, filestream, ext);
         }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: Unknown file type \"" + ext + "\"");
+        }
     }
 
     void SaveMap(const model::DynamicMap& map, std::ostream& outStream, std::string filetype)
@@ -420,7 +424,7 @@ namespace common
         {
             SaveArchivedObject<utilities::XmlArchiver>(map, outStream);
         }
-        else 
+        else
         {
             SaveArchivedObject<utilities::JsonArchiver>(map, outStream);
         }

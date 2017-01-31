@@ -410,7 +410,7 @@ void TestCustomRefine()
     context1.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::refine; });
     auto model1 = transformer.RefineModel(model, context1);
     auto size1 = model1.Size();
-    
+
     model::TransformContext context2;
     context2.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::compile; });
     auto model2 = transformer.RefineModel(model, context2);

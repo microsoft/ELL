@@ -11,10 +11,10 @@
 // data
 #include "AutoDataVector.h"
 #include "DataVector.h"
+#include "DataVectorOperators.h"
 #include "DenseDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
-#include "DataVectorOperators.h"
 
 // math
 #include "Vector.h"

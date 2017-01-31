@@ -143,9 +143,10 @@ namespace math
     //
 
     template <typename ElementType, VectorOrientation Orientation>
-    ScaledConstVectorReference<ElementType, Orientation>::ScaledConstVectorReference(double scalar, ConstVectorReference<ElementType, Orientation> vector) : _scalar(scalar), _vector(vector)
+    ScaledConstVectorReference<ElementType, Orientation>::ScaledConstVectorReference(double scalar, ConstVectorReference<ElementType, Orientation> vector)
+        : _scalar(scalar), _vector(vector)
     {
-    } 
+    }
 
     template <typename ElementType, VectorOrientation Orientation>
     ScaledConstVectorReference<ElementType, Orientation> operator*(double scalar, ConstVectorReference<ElementType, Orientation> vector)
@@ -163,7 +164,7 @@ namespace math
         Operations::Copy(other, *this);
     }
 
-    template<typename ElementType, VectorOrientation Orientation>
+    template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::Set(ScaledConstVectorReference<ElementType, Orientation> other)
     {
         Reset();
@@ -266,7 +267,7 @@ namespace math
     void VectorReference<ElementType, Orientation>::operator+=(ScaledConstVectorReference<ElementType, Orientation> other)
     {
         Operations::Add(other.GetScalar(), other.GetVector(), *this);
-    } 
+    }
 
     template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator-=(ConstVectorReference<ElementType, Orientation> other)
@@ -353,7 +354,7 @@ namespace math
         _pData = _data.data();
     }
 
-    template<typename ElementType, VectorOrientation Orientation>
+    template <typename ElementType, VectorOrientation Orientation>
     void Vector<ElementType, Orientation>::Resize(size_t size)
     {
         _data.resize(size);

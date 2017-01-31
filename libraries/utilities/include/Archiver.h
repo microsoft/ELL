@@ -14,8 +14,8 @@
 #include "TypeTraits.h"
 
 // stl
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>

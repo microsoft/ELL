@@ -32,17 +32,17 @@ namespace common
 
         switch (lossArguments.lossFunction)
         {
-        case LossFunctionEnum::squared:
-            return trainers::MakeSGDLinearTrainer(lossFunctions::SquaredLoss(), trainerParameters);
+            case LossFunctionEnum::squared:
+                return trainers::MakeSGDLinearTrainer(lossFunctions::SquaredLoss(), trainerParameters);
 
-        case LossFunctionEnum::log:
-            return trainers::MakeSGDLinearTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
+            case LossFunctionEnum::log:
+                return trainers::MakeSGDLinearTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
 
-        case LossFunctionEnum::hinge:
-            return trainers::MakeSGDLinearTrainer(lossFunctions::HingeLoss(), trainerParameters);
+            case LossFunctionEnum::hinge:
+                return trainers::MakeSGDLinearTrainer(lossFunctions::HingeLoss(), trainerParameters);
 
-        default:
-            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+            default:
+                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
@@ -52,17 +52,17 @@ namespace common
 
         switch (lossArguments.lossFunction)
         {
-        case LossFunctionEnum::squared:
-            return trainers::MakeSDSGDLinearTrainer(lossFunctions::SquaredLoss(), trainerParameters);
+            case LossFunctionEnum::squared:
+                return trainers::MakeSDSGDLinearTrainer(lossFunctions::SquaredLoss(), trainerParameters);
 
-        case LossFunctionEnum::log:
-            return trainers::MakeSDSGDLinearTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
+            case LossFunctionEnum::log:
+                return trainers::MakeSDSGDLinearTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
 
-        case LossFunctionEnum::hinge:
-            return trainers::MakeSDSGDLinearTrainer(lossFunctions::HingeLoss(), trainerParameters);
+            case LossFunctionEnum::hinge:
+                return trainers::MakeSDSGDLinearTrainer(lossFunctions::HingeLoss(), trainerParameters);
 
-        default:
-            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+            default:
+                throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 

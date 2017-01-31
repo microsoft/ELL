@@ -17,8 +17,8 @@
 
 // trainers
 #include "ITrainer.h"
-#include "SGDLinearTrainer.h"
 #include "SDSGDLinearTrainer.h"
+#include "SGDLinearTrainer.h"
 
 // stl
 #include <memory>

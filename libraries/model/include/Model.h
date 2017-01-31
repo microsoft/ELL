@@ -69,7 +69,7 @@ namespace model
         Model(Model&& other) = default;
         Model& operator=(const Model& other) = default;
         Model& operator=(Model&& other) = default;
-        
+
         /// <summary> Factory method used to create nodes and add them to the model. </summary>
         template <typename NodeType, typename... Args>
         NodeType* AddNode(Args&&... args);

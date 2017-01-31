@@ -39,7 +39,7 @@ namespace model
     {
         abstain,
         refine,
-        compile        
+        compile
     };
 
     /// <summary> A function that determines how to process a node </summary>
@@ -68,12 +68,12 @@ namespace model
         /// <param name='nodeActionFunction'> A function that indicates how to override the default refinement or compilation of a node </param>
         void AddNodeActionFunction(const NodeActionFunction& nodeActionFunction);
 
-        /// <summary> 
+        /// <summary>
         /// Gets the action to take on the node during refinement. If any custom node action
-        /// have been registered with this context, return the result of the last one that 
+        /// have been registered with this context, return the result of the last one that
         /// returns something other than `NodeAction::abstain`. If all of the functions
         /// abstain, or there are no custom functions, return `NodeAction::compile` if the node
-        /// is compilable, otherwise return `NodeAction::refine`. 
+        /// is compilable, otherwise return `NodeAction::refine`.
         /// </summary>
         ///
         /// <param name="node"> A node. </param>

@@ -41,7 +41,7 @@ int main()
         TestDynamicMapComputeDataVector();
         TestDynamicMapRefine();
         TestDynamicMapSerialization();
-        
+
         TestCustomRefine();
     }
     catch (const utilities::Exception& exception)
