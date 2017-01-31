@@ -13,6 +13,7 @@
 #include "Example.h"
 
 // stl
+#include <functional>
 #include <memory>
 #include <tuple>
 #include <vector>
@@ -98,6 +99,46 @@ namespace evaluators
 
     protected:
         void EvaluateZero();
+
+        template <size_t Index>
+        using AggregatorType = typename std::tuple_element<Index, std::tuple<AggregatorTypes...>>::type;
+
+        struct ElementUpdaterParameters
+        {
+            double prediction;
+            double label;
+            double weight;
+        };
+
+        template <typename AggregatorT>
+        class ElementUpdater
+        {
+        public:
+            ElementUpdater(AggregatorT& aggregator, const ElementUpdaterParameters& params);
+            void operator()();
+
+        private:
+            ElementUpdaterParameters _params;
+            AggregatorT& _aggregator;
+        };
+
+        template <typename AggregatorT>
+        class ElementResetter
+        {
+        public:
+            ElementResetter(AggregatorT& aggregator);
+
+            void operator()();
+
+        private:
+            AggregatorT& _aggregator;
+        };
+
+        template <std::size_t Index>
+        auto GetElementUpdateFunction(const ElementUpdaterParameters& params) -> ElementUpdater<AggregatorType<Index>>;
+
+        template <std::size_t Index>
+        auto GetElementResetFunction() -> ElementResetter<AggregatorType<Index>>;
 
         template <std::size_t... Sequence>
         void DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Sequence...>);

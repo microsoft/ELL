@@ -25,6 +25,11 @@ namespace predictors
     {
     }
 
+    LinearPredictor::LinearPredictor(const math::ColumnVector<double>& weights, double bias)
+        : _w(weights), _b(bias)
+    {
+    }
+
     void LinearPredictor::Reset()
     {
         _w.Reset();

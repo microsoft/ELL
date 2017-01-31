@@ -125,12 +125,57 @@ namespace evaluators
     }
 
     template <typename PredictorType, typename... AggregatorTypes>
+    template <typename AggregatorT>
+    Evaluator<PredictorType, AggregatorTypes...>::ElementUpdater<AggregatorT>::ElementUpdater(AggregatorT& aggregator, const ElementUpdaterParameters& params)
+            : _aggregator(aggregator), _params(params) 
+            {
+            }
+
+
+    template <typename PredictorType, typename... AggregatorTypes>
+    template <typename AggregatorT>
+    void Evaluator<PredictorType, AggregatorTypes...>::ElementUpdater<AggregatorT>::operator()()
+    {
+        _aggregator.Update(_params.prediction, _params.label, _params.weight);
+    }
+
+    template <typename PredictorType, typename... AggregatorTypes>
+    template <typename AggregatorT>
+    Evaluator<PredictorType, AggregatorTypes...>::ElementResetter<AggregatorT>::ElementResetter(AggregatorT& aggregator)
+            : _aggregator(aggregator)
+    {
+    }
+
+
+    template <typename PredictorType, typename... AggregatorTypes>
+    template <typename AggregatorT>
+    void Evaluator<PredictorType, AggregatorTypes...>::ElementResetter<AggregatorT>::operator()()
+    {
+        _aggregator.Reset();
+    }
+
+    template <typename PredictorType, typename... AggregatorTypes>
+    template <std::size_t Index>
+    auto Evaluator<PredictorType, AggregatorTypes...>::GetElementUpdateFunction(const ElementUpdaterParameters& params) -> ElementUpdater<AggregatorType<Index>>
+    {
+        return {std::get<Index>(_aggregatorTuple), params};
+    }
+
+    template <typename PredictorType, typename... AggregatorTypes>
+    template <std::size_t Index>
+    auto Evaluator<PredictorType, AggregatorTypes...>::GetElementResetFunction() -> ElementResetter<AggregatorType<Index>>
+    {
+        return {std::get<Index>(_aggregatorTuple)};
+    }
+
+    template <typename PredictorType, typename... AggregatorTypes>
     template <std::size_t... Sequence>
     void Evaluator<PredictorType, AggregatorTypes...>::DispatchUpdate(double prediction, double label, double weight, std::index_sequence<Sequence...>)
     {
         // Call (X.Update(), 0) for each X in _aggregatorTuple
-        utilities::InOrderFunctionEvaluator(std::bind(std::mem_fn(&std::tuple_element<Sequence, decltype(_aggregatorTuple)>::type::Update), std::get<Sequence>(_aggregatorTuple), prediction, label, weight)...);
-        // utilities::InOrderFunctionEvaluator([this, &prediction, &label, &weight](){std::get<Sequence>(_aggregatorTuple).Update(prediction, label, weight);}...); // GCC bug prevents compilation
+        ElementUpdaterParameters params{ prediction, label, weight };
+        utilities::InOrderFunctionEvaluator(GetElementUpdateFunction<Sequence>(params)...);
+        // [this, prediction, label, weight]() { std::get<Sequence>(_aggregatorTuple).Update(prediction, label, weight); }...); // GCC bug prevents compilation
     }
 
     template <typename PredictorType, typename... AggregatorTypes>
@@ -141,8 +186,8 @@ namespace evaluators
         _values.push_back({ std::get<Sequence>(_aggregatorTuple).GetResult()... });
 
         // Call X.Reset() for each X in _aggregatorTuple
-        utilities::InOrderFunctionEvaluator(std::bind(std::mem_fn(&std::tuple_element<Sequence, decltype(_aggregatorTuple)>::type::Reset), std::get<Sequence>(_aggregatorTuple))...);
-        // utilities::InOrderFunctionEvaluator([this](){std::get<Sequence>(_aggregatorTuple).Reset();}...); // GCC bug prevents compilation
+        utilities::InOrderFunctionEvaluator(GetElementResetFunction<Sequence>()...);
+        // utilities::InOrderFunctionEvaluator([this]() { std::get<Sequence>(_aggregatorTuple).Reset(); }...); // GCC bug prevents compilation
     }
 
     template <typename PredictorType, typename... AggregatorTypes>

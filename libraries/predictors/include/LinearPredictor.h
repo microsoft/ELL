@@ -37,10 +37,16 @@ namespace predictors
         /// <summary> Default Constructor. </summary>
         LinearPredictor();
 
-        /// <summary> Constructs an instance of Linear. </summary>
+        /// <summary> Constructs an instance of LinearPredictor. </summary>
         ///
         /// <param name="dim"> The dimension. </param>
         LinearPredictor(size_t dim);
+
+        /// <summary> Constructs an instance of LinearPredictor. </summary>
+        ///
+        /// <param name="weights"> The weights. </param>
+        /// <param name="bias"> The bias. </param>
+        LinearPredictor(const math::ColumnVector<double>& weights, double bias);
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///

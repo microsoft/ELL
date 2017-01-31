@@ -28,7 +28,7 @@ namespace ell
 {
 namespace data
 {
-    // forward declaratin of Dataset, since AnyDataset and Dataset have a cyclical dependence
+    // forward declaration of Dataset, since AnyDataset and Dataset have a cyclical dependence
     template <typename ExampleType>
     class Dataset;
 

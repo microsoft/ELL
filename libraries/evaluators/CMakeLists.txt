@@ -45,17 +45,19 @@ set (TEST_NAME ${PROJ_NAME}_test)
 
 PROJECT(${TEST_NAME})
 
-set (TEST_SRC test/src/main.cpp)
-set (TEST_INCLUDE )
+set (TEST_SRC test/src/main.cpp test/src/Evaluators_test.cpp)
+set (TEST_INCLUDE test/include/Evaluators_test.h)
 
 source_group("src" FILES ${TEST_SRC})
 source_group("include" FILES ${TEST_INCLUDE})
 
 add_executable(${TEST_NAME} ${TEST_SRC} ${TEST_INCLUDE} ${INCLUDE})
 target_include_directories(${TEST_NAME} PRIVATE test/include)
-target_link_libraries(${TEST_NAME} evaluators data testing)
+target_link_libraries(${TEST_NAME} common evaluators data testing)
 copy_shared_libraries(${TEST_NAME} $<TARGET_FILE_DIR:${TEST_NAME}>)
 
 set_property(TARGET ${TEST_NAME} PROPERTY FOLDER "tests")
 
-add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+add_test(NAME ${TEST_NAME} 
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${TEST_NAME})
