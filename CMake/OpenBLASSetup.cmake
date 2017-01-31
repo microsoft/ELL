@@ -27,14 +27,13 @@ if(BLASSetup_included)
 endif()
 set(BLASSetup_included true)
 
-find_package(BLAS)
+find_package(BLAS QUIET)
 if(BLAS_FOUND)
     message(STATUS "Blas libraries: ${BLAS_LIBRARIES}")
     message(STATUS "Blas linker flags: ${BLAS_LINKER_FLAGS}")
     message(STATUS "Blas include directories: ${BLAS_INCLUDE_DIRS}")
     set(BLAS_LIBS ${BLAS_LIBRARIES})
 else()
-
     set(BLAS_LIB_NAMES cblas openblas libopenblas.dll.a)
 
     set(BLAS_INCLUDE_SEARCH_PATHS
