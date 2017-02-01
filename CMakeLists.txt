@@ -73,7 +73,11 @@ if(BUILD_INTERFACES)
 endif()
 
 # Add project for solution-level documentation
-set (DOC INSTALL.md StyleGuide.md)
+set (DOC INSTALL-Mac.md
+         INSTALL-Ubuntu.md
+         INSTALL-Windows.md
+         README.md
+         StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 
 # Generate doxygen documentation
