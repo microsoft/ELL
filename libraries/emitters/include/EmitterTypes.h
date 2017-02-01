@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     EmitterTypes.h (emitter)
-//  Authors:  Umesh Madan
+//  Authors:  Umesh Madan, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
@@ -234,13 +234,22 @@ namespace emitters
     struct VariableValueType
     {
         using type = T;
+        using DestType = type;
+
+        static std::vector<DestType> ToVariableVector(const std::vector<T>& src);
+        static std::vector<T> FromVariableVector(const std::vector<DestType>& src);
     };
 
     template <>
     struct VariableValueType<bool>
     {
         using type = int;
-    };
+        using DestType = type;
 
+        static std::vector<DestType> ToVariableVector(const std::vector<bool>& src);
+        static std::vector<bool> FromVariableVector(const std::vector<DestType>& src);
+    };
 }
 }
+
+#include "../tcc/EmitterTypes.tcc"

@@ -50,6 +50,7 @@ set (include
 )
 
 set (tcc 
+    tcc/EmitterTypes.tcc
     tcc/IRFunctionEmitter.tcc
     tcc/IRModuleEmitter.tcc
     tcc/IRRuntime.tcc

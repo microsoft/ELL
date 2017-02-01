@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     IRAssemblyEmitter.h (emitters)
-//  Authors:
+//  Authors:  Chuck Jacobs, Piali Choudhury, Kirk Olynyk
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -184,6 +184,9 @@ namespace emitters
         // Build up all of the passes that we want to apply to the module
         llvm::legacy::PassManager passManager;
 
+        // This code is if-d out, because its presence somehow causes executables using the emitters library
+        // to crash, even if they never call this function. 
+#if 0   
         // Get a targetLibraryInfo describing the library functions available for this triple,
         // and any special processing we might want to do. For instance, if we want to
         // disable all builtin library functions, do this: `targetLibraryInfo.disableAllFunctions();`
@@ -191,6 +194,7 @@ namespace emitters
 
         // ...and add it to the pass manager, so various optimizations can be done
         passManager.add(new llvm::TargetLibraryInfoWrapperPass(targetLibraryInfo));
+#endif
 
         // Set the data layout of the module to match the target machine
         module.setDataLayout(targetMachine->createDataLayout());

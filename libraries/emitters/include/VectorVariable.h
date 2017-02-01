@@ -40,6 +40,8 @@ namespace emitters
     class InitializedVectorVariable : public VectorVariable<T>
     {
     public:
+        using ElementType = typename VariableValueType<T>::type;
+
         ///<summary>   Create a new vector variable initialized with the given data </summary>
         InitializedVectorVariable(const VariableScope scope, const std::vector<T>& data, int flags = Variable::VariableFlags::isMutable);
 
@@ -47,13 +49,13 @@ namespace emitters
         InitializedVectorVariable(const VariableScope scope, size_t size, int flags = Variable::VariableFlags::isMutable);
 
         ///<summary>  The data this vector is initialized with </summary>
-        const std::vector<T>& Data() const
+        const std::vector<T> Data() const
         {
-            return _data;
+           return VariableValueType<T>::FromVariableVector(_initialData);
         }
 
     private:
-        std::vector<T> _data;
+       std::vector<ElementType> _initialData;
     };
 
     ///<summary>  A vector variable that is typically emitted as a static const or global - depending on the language </summary>
@@ -64,13 +66,16 @@ namespace emitters
         using ElementType = typename VariableValueType<T>::type;
 
         /// <summary>  Create a new literal using the given data </summary>
-        LiteralVectorVariable(std::vector<T> data);
+        LiteralVectorVariable(const std::vector<T>& data);
 
         ///<summary>  The data this vector is initialized with </summary>
-        const std::vector<T>& Data() const { return _data; }
+        const std::vector<T> Data() const
+        { 
+           return VariableValueType<T>::FromVariableVector(_data);
+        }
 
     private:
-        std::vector<T> _data;
+       std::vector<ElementType> _data;
     };
 }
 }

@@ -16,7 +16,6 @@ set (src test.py
          evaluators_test.py
          dataset_test.py
          sgd_trainer_test.py
-         treelayout_test.py
          )
 add_custom_target(${test_name} ALL DEPENDS ${src} SOURCES ${src})
 
