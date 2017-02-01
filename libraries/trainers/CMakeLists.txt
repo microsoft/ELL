@@ -30,14 +30,14 @@ set (tcc tcc/EvaluatingIncrementalTrainer.tcc
          tcc/SDSGDLinearTrainer.tcc
          tcc/ThresholdFinder.tcc)
 
-set (DOC doc/README.md)
+set (doc doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
-source_group("doc" FILES ${DOC})
+source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${DOC})
+add_library(${library_name} ${src} ${include} ${tcc})
 target_include_directories(${library_name} PUBLIC include)
 
 if(CMAKE_COMPILER_IS_GNUCXX)

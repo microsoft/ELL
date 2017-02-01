@@ -23,9 +23,12 @@ set (tcc tcc/Matrix.tcc
          tcc/Operations.tcc
          tcc/Print.tcc)
 
+set (doc doc/README.md)
+
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
+source_group("doc" FILES ${doc})
 
 add_library(${library_name} ${src} ${include} ${tcc})
 target_include_directories(${library_name} PUBLIC include ${BLAS_INCLUDE_DIRS})

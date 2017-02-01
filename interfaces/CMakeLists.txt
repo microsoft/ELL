@@ -28,7 +28,7 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/unique_ptr.i
                      ../common/utilities.i)
 
-set (INTERFACE_DEPENDENCIES common evaluators lossFunctions trainers predictors testing treeLayout utilities)
+set (INTERFACE_DEPENDENCIES common evaluators lossFunctions trainers predictors testing utilities)
 
 # Add ELL library include directories
 include_directories(../libraries/common/include)

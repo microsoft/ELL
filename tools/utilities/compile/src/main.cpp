@@ -89,16 +89,21 @@ int main(int argc, char* argv[])
                     break;
 
                 case CompileArguments::OutputType::assembly:
-                    emitters::MachineCodeOutputOptions compileAssemblyOptions;
-                    compileAssemblyOptions.optimizationLevel = emitters::OptimizationLevel::Default;
-                    compileAssemblyOptions.cpu = compileArguments.cpu;
-                    if ("cortex-m4" == compileArguments.cpu)
                     {
-                        compileAssemblyOptions.triple = "arm-none-eabi";
-                        compileAssemblyOptions.targetFeatures = "+armv7e-m,+v7,soft-float";
-                    }
+                        emitters::MachineCodeOutputOptions compileAssemblyOptions;
+                        compileAssemblyOptions.optimizationLevel = emitters::OptimizationLevel::Default;
+                        compileAssemblyOptions.cpu = compileArguments.cpu;
+                        if ("cortex-m4" == compileArguments.cpu)
+                        {
+                            compileAssemblyOptions.triple = "arm-none-eabi";
+                            compileAssemblyOptions.targetFeatures = "+armv7e-m,+v7,soft-float";
+                        }
 
-                    compiledMap.WriteCode(compileArguments.outputCodeStream, emitters::ModuleOutputFormat::assembly, compileAssemblyOptions);
+                        compiledMap.WriteCode(compileArguments.outputCodeStream, emitters::ModuleOutputFormat::assembly, compileAssemblyOptions);
+                    }
+                
+                default:
+                    throw emitters::EmitterException(emitters::EmitterError::notSupported);
             }
         }
     }

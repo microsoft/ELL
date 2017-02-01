@@ -13,7 +13,6 @@ import predictors_test
 import nodes_test
 import linear_test
 import evaluators_test
-import treelayout_test
 
 tests = [   
     (lossfunctions_test.test, "lossfunctions_test"),
@@ -23,8 +22,7 @@ tests = [
     (predictors_test.test,    "predictors_test"   ),
     (nodes_test.test,         "nodes_test"        ),
     (linear_test.test,        "linear_test"       ),
-    (evaluators_test.test,    "evaluators_test"   ),
-    (treelayout_test.test,    "treelayout_test"   )
+    (evaluators_test.test,    "evaluators_test"   )
     ]
 
 def interface_test():
