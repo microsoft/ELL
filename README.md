@@ -7,7 +7,7 @@ This project is a work in progress and we expect it to change rapidly. At this e
 
 ## License
 
-See [LICENSE.txt](License.txt). 
+See [LICENSE.txt](LICENSE.txt). 
 
 ## Code of conduct
 
