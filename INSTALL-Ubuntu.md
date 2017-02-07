@@ -31,8 +31,12 @@ and look for the version number. If the version number is 3.9 or greater, you ca
     wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
     sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-3.9 main"
     sudo apt-get -y update
-    sudo apt-get install -y llvm-3.9-dev 
+    sudo apt-get install -y llvm-3.9-dev
 
+##### libedit
+Install the BSD editline and history libraries
+
+    sudo apt-get install libedit-dev
 
 ### Optional Prerequisites (OpenBLAS and Doxygen)
 ELL can optionally take advantage of the optimized linear algebra libraries in [*OpenBlas*](http://www.openblas.net/), and generate code documentation using *Doxygen*. To install these optional dependencies, type
