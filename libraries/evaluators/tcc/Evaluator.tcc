@@ -127,7 +127,7 @@ namespace evaluators
     template <typename PredictorType, typename... AggregatorTypes>
     template <typename AggregatorT>
     Evaluator<PredictorType, AggregatorTypes...>::ElementUpdater<AggregatorT>::ElementUpdater(AggregatorT& aggregator, const ElementUpdaterParameters& params)
-            : _aggregator(aggregator), _params(params) 
+            : _params(params), _aggregator(aggregator) 
             {
             }
 

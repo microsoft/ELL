@@ -182,7 +182,7 @@ namespace emitters
         }
 
         // Finally, run the passes to emit code to the straem
-        bool didModifyModule = passManager.run(module);
+        passManager.run(module); // run() returns a bool indicating if the module was modified (true if it was)
 
         if (handler.HadError())
         {

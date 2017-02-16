@@ -591,6 +591,7 @@ void TestForest()
     size_t i = 0;
     for (auto& arg : args)
     {
+        (void)arg; // stifle compiler warning
         if (i > 0)
         {
             llvm::Value* pArg = nullptr;
@@ -646,6 +647,7 @@ void TestForestMap()
     size_t i = 0;
     for (auto& arg : args)
     {
+        (void)arg; // stifle compiler warning
         if (i > 0)
         {
             llvm::Value* pArg = nullptr;
