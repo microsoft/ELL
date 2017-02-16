@@ -73,7 +73,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 target_link_libraries(${library_name} utilities ${LLVM_LIBS})
-target_compile_definitions(${library_name} PUBLIC __STDC_LIMIT_MACROS=1 __STDC_CONSTANT_MACROS=1)
 target_compile_definitions(${library_name} PUBLIC ${LLVM_DEFINITIONS})
 target_compile_options(${library_name} PUBLIC ${LLVM_COMPILE_OPTIONS})
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
@@ -100,8 +99,7 @@ source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} nodes model testing utilities predictors ${LLVM_LIBS})
-target_compile_definitions(${test_name} PRIVATE __STDC_LIMIT_MACROS=1 __STDC_CONSTANT_MACROS=1)
+target_link_libraries(${test_name} nodes model testing utilities predictors emitters ${LLVM_LIBS})
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
