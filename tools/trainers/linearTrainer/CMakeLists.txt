@@ -19,7 +19,7 @@ set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
 add_executable(${tool_name} ${src} ${include})
 target_include_directories(${tool_name} PRIVATE include)
 target_link_libraries(${tool_name} common data lossFunctions model predictors trainers evaluators utilities)
-copy_shared_libraries(${tool_name} $<TARGET_FILE_DIR:${tool_name}>)
+copy_shared_libraries(${tool_name})
 
 # put this project in the trainers folder in the IDE 
 set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/trainers")

@@ -21,6 +21,6 @@ set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
 add_executable(${tool_name} ${src} ${include})
 target_include_directories(${tool_name} PRIVATE include)
 target_link_libraries(${tool_name} utilities model nodes common)
-copy_shared_libraries(${tool_name} $<TARGET_FILE_DIR:${tool_name}>)
+copy_shared_libraries(${tool_name})
 
 set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")

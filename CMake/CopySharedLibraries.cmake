@@ -1,7 +1,8 @@
 # CopySharedLibraries.cmake
 #
 # Copies necessary DLLs to a target's location and sets up propery dependencies 
-function(copy_shared_libraries target_name target_location)
+macro(copy_shared_libraries target_name)
+    set(target_location $<TARGET_FILE_DIR:${target_name}>)
     if(WIN32)
         if(EXISTS ${BLAS_DLL_DIR})
             set(command_target_name copy_dlls_to_${target_name})
@@ -14,4 +15,4 @@ function(copy_shared_libraries target_name target_location)
             endforeach()
         endif()
     endif()
-endfunction()
+endmacro()

@@ -14,8 +14,8 @@
 macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INTERFACE)
 
 string(TOLOWER "${LANGUAGE_NAME}" language)
-  
-cmake_minimum_required(VERSION 2.8.11)
+
+cmake_minimum_required(VERSION 3.3)
 find_package(SWIG 3.0.10 REQUIRED)
 include(${SWIG_USE_FILE})
 

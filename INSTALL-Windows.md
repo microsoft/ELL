@@ -25,6 +25,18 @@ and invoke the command
 
 NuGet will download the prerequisites into the `ELL/external` directory.
 
+By default, CMake will try to determine the correct version of the OpenBLAS library to use for your processor
+type. If you want to override the automatic choice, you can tell CMake which version to use by setting the `DPROCESSOR_HINT`
+cache variable when you initially call CMake.
+
+    cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..
+
+Or, if you have already run CMake to set up the build environment, you can just set the variable:
+
+    cmake -DPROCESSOR_HINT=haswell ..
+
+Currently, the only supported option for this variable is `haswell`.
+
 ### Building ELL
 Next, use CMake to create a Visual Studio solution. In the repository's root directory (`ELL`), create a `build` subdirectory and change to that directory:
 
