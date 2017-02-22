@@ -50,6 +50,7 @@ set(PACKAGE_ROOT ${EXTERNAL_DIR})
 include(OpenBLASSetup)
 include(LLVMSetup)
 include(CopySharedLibraries)
+include(AddPrecompiledHeader)
 
 # Include cmake projects for libraries and executables
 add_subdirectory(libraries)

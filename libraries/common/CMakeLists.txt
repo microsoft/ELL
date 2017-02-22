@@ -52,6 +52,9 @@ source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 
+message(STATUS "src: ${src}")
+add_precompiled_header("../windows/include/stdafx.h" "../windows/src/stdafx.cpp" src)
+message(STATUS "src2: ${src}")
 add_library(${library_name} ${src} ${include} ${tcc})
 target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -83,6 +86,7 @@ set (test_include
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
+add_precompiled_header("stdafx.h" "stdafx.cpp" ${src})
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
 target_link_libraries(${test_name} common data testing utilities lossFunctions predictors trainers model nodes)
