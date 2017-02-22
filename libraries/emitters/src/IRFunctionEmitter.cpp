@@ -15,6 +15,13 @@
 // stl
 #include <iostream>
 
+// llvm
+#include "llvm/IR/Verifier.h"
+#include "llvm/Support/raw_os_ostream.h"
+
+// stl
+#include <iostream>
+
 namespace ell
 {
 namespace emitters

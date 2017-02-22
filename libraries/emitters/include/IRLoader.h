@@ -7,7 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "LLVMInclude.h"
+// llvm
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/Support/SourceMgr.h"
+
+// stl
+#include <string>
 
 namespace ell
 {

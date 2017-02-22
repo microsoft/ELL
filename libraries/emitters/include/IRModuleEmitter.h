@@ -13,7 +13,6 @@
 #include "IRExecutionEngine.h"
 #include "IRFunctionEmitter.h"
 #include "IRRuntime.h"
-#include "LLVMInclude.h"
 #include "ModuleEmitter.h"
 #include "ScalarVariable.h"
 #include "VectorVariable.h"

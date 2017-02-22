@@ -7,7 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "LLVMInclude.h"
+// llvm
+#include "llvm/ADT/Triple.h"
+#include "llvm/IR/Module.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
 
 namespace ell
 {

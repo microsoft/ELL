@@ -7,7 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IROptimizer.h"
+
+// llvm
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/Scalar/GVN.h"
+
+// stl
 #include <memory>
+
 namespace ell
 {
 namespace emitters

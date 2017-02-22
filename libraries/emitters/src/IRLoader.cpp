@@ -7,7 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IRLoader.h"
-#include "IRModuleEmitter.h"
+#include "EmitterException.h"
+
+// llvm
+#include "llvm/AsmParser/Parser.h"
+#include "llvm/Support/raw_os_ostream.h"
 
 // stl
 #include <sstream>
