@@ -52,19 +52,23 @@ source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 
-message(STATUS "src: ${src}")
-include_directories("../windows/include")
-# add_precompiled_header("../windows/include/stdafx.h" "../windows/src/stdafx.cpp" src)
-add_precompiled_header("stdafx.h" "../windows/src/stdafx.cpp" src)
-message(STATUS "src2: ${src}")
+# Precompiled header test
+# include_directories("../windows/include")
+# add_precompiled_header("stdafx.h" "../windows/src/stdafx.cpp" src)
+
 add_library(${library_name} ${src} ${include} ${tcc})
 target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
 target_link_libraries(${library_name} data utilities lossFunctions model nodes predictors evaluators trainers)
+add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
+
+get_target_property(library_sources ${library_name} SOURCES)
+
+# message(STATUS "${library_name} sources: ${library_sources}")
 
 #
 # test project
@@ -88,11 +92,11 @@ set (test_include
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
-add_precompiled_header("stdafx.h" "stdafx.cpp" ${src})
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
 target_link_libraries(${test_name} common data testing utilities lossFunctions predictors trainers model nodes)
 copy_shared_libraries(${test_name})
+# add_precompiled_header(${test_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 

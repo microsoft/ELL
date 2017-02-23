@@ -69,6 +69,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 target_link_libraries(${library_name} utilities data emitters)
+add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
@@ -145,6 +146,7 @@ source_group("tcc" FILES ${compiler_test_tcc})
 add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include})
 target_include_directories(${compiler_test_name} PRIVATE test/include)
 target_link_libraries(${compiler_test_name} common model nodes testing utilities)
+add_precompiled_header(${compiler_test_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${compiler_test_name} PROPERTY FOLDER "tests")
 

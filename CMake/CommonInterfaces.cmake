@@ -13,89 +13,89 @@
 
 macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INTERFACE)
 
-string(TOLOWER "${LANGUAGE_NAME}" language)
+  string(TOLOWER "${LANGUAGE_NAME}" language)
+  
+  cmake_minimum_required(VERSION 2.8.11)
+  find_package(SWIG 3.0.10 REQUIRED)
+  include(${SWIG_USE_FILE})
 
-cmake_minimum_required(VERSION 3.3)
-find_package(SWIG 3.0.10 REQUIRED)
-include(${SWIG_USE_FILE})
+  # set compiler SWIG generated cxx compiler flags
+  set(CMAKE_CXX_FLAGS ${SWIG_CXX_COMPILER_FLAGS})
 
-# set compiler SWIG generated cxx compiler flags
-set(CMAKE_CXX_FLAGS ${SWIG_CXX_COMPILER_FLAGS})
+  # unset any release or distribution flags
+  # we don't want them when compiling SWIG generated source
+  #set(CMAKE_CXX_FLAGS_RELEASE "")
+  #set(CMAKE_CXX_FLAGS_DISTRIBUTION "")
+  #set(CMAKE_CXX_FLAGS_DEBUG "")
 
-# unset any release or distribution flags
-# we don't want them when compiling SWIG generated source
-#set(CMAKE_CXX_FLAGS_RELEASE "")
-#set(CMAKE_CXX_FLAGS_DISTRIBUTION "")
-#set(CMAKE_CXX_FLAGS_DEBUG "")
+  set (module_name ELL_${LANGUAGE_NAME})
 
-set (module_name ELL_${LANGUAGE_NAME})
+  source_group("src" FILES ${INTERFACE_SRC})
+  source_group("include" FILES ${INTERFACE_INCLUDE})
+  source_group("tcc" FILES ${INTERFACE_TCC})
+  source_group("interface" FILES ${INTERFACE_MAIN} ${INTERFACE_FILES})
 
-source_group("src" FILES ${INTERFACE_SRC})
-source_group("include" FILES ${INTERFACE_INCLUDE})
-source_group("tcc" FILES ${INTERFACE_TCC})
-source_group("interface" FILES ${INTERFACE_MAIN} ${INTERFACE_FILES})
-
-if(${language} STREQUAL "common")
+  if(${language} STREQUAL "common")
     find_file(THIS_FILE_PATH CommonInterfaces.cmake PATHS ${CMAKE_MODULE_PATH})
     add_custom_target(${module_name} ALL DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
 
     # Make interface code be dependent on all libraries
     add_dependencies(${module_name} ${INTERFACE_DEPENDENCIES})
 
-else()
+  else()
 
-include_directories(${EXTRA_INCLUDE_PATHS})
+  include_directories(${EXTRA_INCLUDE_PATHS})
 
-# FOREACH(file ${INTERFACE_FILES} ${INTERFACE_MAIN})
-# 	get_filename_component(fname ${file} NAME)
-# 	add_custon_command(OUTPUT ${fname}
-# 		DEPENDS ${file}
-# 		COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${file} ${fname}
-# 		COMMENT ""
-# 	)
-# ENDFOREACH()
+  # FOREACH(file ${INTERFACE_FILES} ${INTERFACE_MAIN})
+  # 	get_filename_component(fname ${file} NAME)
+  # 	add_custon_command(OUTPUT ${fname}
+  # 		DEPENDS ${file}
+  # 		COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${file} ${fname}
+  # 		COMMENT ""
+  # 	)
+  # ENDFOREACH()
 
-foreach(file ${INTERFACE_FILES})
+  foreach(file ${INTERFACE_FILES})
     configure_file(${file} ${file} COPYONLY)
-endforeach()
+  endforeach()
 
-foreach(file ${INTERFACE_SRC})
-    configure_file(${file} ${file} COPYONLY)
-endforeach()
+  foreach(file ${INTERFACE_SRC})
+      configure_file(${file} ${file} COPYONLY)
+  endforeach()
 
-foreach(file ${INTERFACE_INCLUDE})
-    configure_file(${file} ${file} COPYONLY)
-endforeach()
+  foreach(file ${INTERFACE_INCLUDE})
+      configure_file(${file} ${file} COPYONLY)
+  endforeach()
 
-set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-classes -debug-typedef  -debug-template)
-if(${language} STREQUAL "javascript")
+  set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-classes -debug-typedef  -debug-template)
+  if(${language} STREQUAL "javascript")
     # Note: if compiling against older version of node, we may have to specify the 
     # V8 version explicitly. For instance, when building against electron 0.36.7,
     # add this flag to the CMAKE_SWIG_FLAGS: -DV8_VERSION=0x032530
-	set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node)
-endif()
+    set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node)
+  endif()
 
-set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
+  set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
 
-foreach(file ${INTERFACE_INCLUDE} ${INTERFACE_SRC})
+  foreach(file ${INTERFACE_INCLUDE} ${INTERFACE_SRC})
     set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${file})
-endforeach()
+  endforeach()
 
-# set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_INCLUDE}) # Doesn't seem to work
-# set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work
+  # set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_INCLUDE}) # Doesn't seem to work
+  # set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${INTERFACE_FILES}) # Doesn't seem to work
 
-# set_source_files_properties(${INTERFACE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties(${INTERFACE_MAIN} ${INTERFACE_FILES} PROPERTIES CPLUSPLUS ON)
-# set_source_files_properties(${INTERFACE_FILES} PROPERTIES SWIG_FLAGS "-includeall") # Don't want this, I think
+  # set_source_files_properties(${INTERFACE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+  set_source_files_properties(${INTERFACE_MAIN} ${INTERFACE_FILES} PROPERTIES CPLUSPLUS ON)
+  # set_source_files_properties(${INTERFACE_FILES} PROPERTIES SWIG_FLAGS "-includeall") # Don't want this, I think
 
-message(STATUS "Creating wrappers for ${LANGUAGE_NAME}")
+  message(STATUS "Creating wrappers for ${LANGUAGE_NAME}")
 
-# create target here
-if(${language} STREQUAL "python")
+  # create target here
+  if(${language} STREQUAL "python")
     SET(PREPEND_TARGET "_")
-endif()
+  endif()
 
-if( ((${language} STREQUAL "xml") OR (${language} STREQUAL "javascript")))
+  if( ((${language} STREQUAL "xml") OR (${language} STREQUAL "javascript")))
     SWIG_MODULE_INITIALIZE(${module_name} ${language})
     set(generated_sources)
     foreach(i_file ${INTERFACE_MAIN})
@@ -104,16 +104,16 @@ if( ((${language} STREQUAL "xml") OR (${language} STREQUAL "javascript")))
     endforeach()
     add_custom_target(${module_name} ALL 
         DEPENDS ${generated_sources})
-else()
+  else()
     swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
 
     swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common evaluators lossFunctions model nodes predictors trainers utilities emitters)
     set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}ELL)
     add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} ELL_common)
-endif()
+  endif()
 
-endif()
+  endif()
 
-set_property(TARGET ${PREPEND_TARGET}${module_name} PROPERTY FOLDER "interfaces") 
+  set_property(TARGET ${PREPEND_TARGET}${module_name} PROPERTY FOLDER "interfaces") 
 
 endmacro()
