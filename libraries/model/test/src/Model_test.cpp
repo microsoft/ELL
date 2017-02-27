@@ -1,8 +1,13 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Model tests
+//  Project:  Embedded Learning Library (ELL)
+//  File:     Model_test.cpp (model_test)
+//  Authors:  Chuck Jacobs
 //
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Model_test.h"
+#include "ModelTestUtilities.h"
 
 // model
 #include "InputNode.h"
@@ -31,81 +36,6 @@
 
 namespace ell
 {
-
-void NodePrinter(const model::Node& node)
-{
-    bool isFirstInputPort = true;
-    std::cout << "node_" << node.GetId() << " = " << node.GetRuntimeTypeName() << "(";
-    for (const auto& inputPort : node.GetInputPorts())
-    {
-        std::cout << (isFirstInputPort ? "" : ", ");
-        isFirstInputPort = false;
-
-        auto elements = inputPort->GetInputElements();
-        if (elements.NumRanges() > 1)
-        {
-            std::cout << "{";
-        }
-
-        bool isFirstRange = true;
-        for (const auto& range : elements.GetRanges())
-        {
-            std::cout << (isFirstRange ? "" : ", ");
-            isFirstRange = false;
-
-            auto port = range.ReferencedPort();
-            std::cout << "node_" << port->GetNode()->GetId() << "." << port->GetName();
-            if (!range.IsFullPortRange())
-            {
-                auto start = range.GetStartIndex();
-                auto size = range.Size();
-                std::cout << "[" << start << ":" << (start + size) << "]";
-            }
-        }
-
-        if (elements.NumRanges() > 1)
-        {
-            std::cout << "}";
-        }
-    }
-    std::cout << ")" << std::endl;
-};
-
-void PrintModel(const model::Model& model)
-{
-    model.Visit(NodePrinter);
-}
-
-void PrintModel(const model::Model& model, const model::Node* output)
-{
-    model.Visit(output, NodePrinter);
-}
-
-model::Model GetSimpleModel()
-{
-    model::Model g;
-    auto in = g.AddNode<model::InputNode<double>>(3);
-    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
-    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 2);
-    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 2);
-    g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
-    return g;
-}
-
-model::Model GetComplexModel()
-{
-    model::Model g;
-    auto in = g.AddNode<model::InputNode<double>>(3);
-    auto in2 = g.AddNode<model::InputNode<bool>>(3);
-    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
-    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 2);
-    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 2);
-    g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
-    g.AddNode<model::OutputNode<bool>>(model::PortElements<bool>({ in2->output }));
-    return g;
-}
 
 void TestStaticModel()
 {
@@ -296,6 +226,8 @@ void TestCopyModel()
     std::cout << "\n\nCopied model" << std::endl;
     std::cout << "---------" << std::endl;
     PrintModel(newModel);
+
+    std::cout << "\n\n" << std::endl;
 }
 
 // Define new node that splits its outputs when refined
@@ -409,12 +341,10 @@ void TestCustomRefine()
     model::TransformContext context1;
     context1.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::refine; });
     auto model1 = transformer.RefineModel(model, context1);
-    auto size1 = model1.Size();
 
     model::TransformContext context2;
     context2.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::compile; });
     auto model2 = transformer.RefineModel(model, context2);
-    auto size2 = model2.Size();
     testing::ProcessTest("testing custom refine function", model1.Size() == 4 && model2.Size() == 3);
 }
 }

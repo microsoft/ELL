@@ -7,6 +7,7 @@ sys.path.append('./../Debug')
 
 import lossfunctions_test
 import model_test
+import modelbuilder_test
 import common_test
 import trainers_test
 import predictors_test
@@ -22,7 +23,8 @@ tests = [
     (predictors_test.test,    "predictors_test"   ),
     (nodes_test.test,         "nodes_test"        ),
     (linear_test.test,        "linear_test"       ),
-    (evaluators_test.test,    "evaluators_test"   )
+    (evaluators_test.test,    "evaluators_test"   ),
+    (modelbuilder_test.test,  "modelbuilder_test" )
     ]
 
 def interface_test():

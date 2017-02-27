@@ -65,86 +65,6 @@ namespace common
             1);
     }
 
-    namespace
-    {
-        // forward declaration
-        model::PortRange ParseRange(const model::Model& model, utilities::Tokenizer& tokenizer);
-
-        std::vector<model::PortRange> ParseRangeList(const model::Model& model, utilities::Tokenizer& tokenizer)
-        {
-            std::vector<model::PortRange> result;
-            while (true)
-            {
-                // read a range
-                result.push_back(ParseRange(model, tokenizer));
-                if (tokenizer.PeekNextToken() != ",")
-                {
-                    break;
-                }
-                tokenizer.MatchToken(",");
-            }
-            return result;
-        }
-
-        model::PortRange ParseRange(const model::Model& model, utilities::Tokenizer& tokenizer)
-        {
-            auto nodeId = tokenizer.ReadNextToken();
-            tokenizer.MatchToken(".");
-            auto portName = tokenizer.ReadNextToken();
-
-            // get port
-            auto node = model.GetNode(utilities::UniqueId(nodeId));
-            assert(node != nullptr);
-            if (node == nullptr)
-                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, std::string("Couldn't find node ") + nodeId);
-            auto port = node->GetOutputPort(portName);
-
-            // now check for element/element slice
-            if (tokenizer.PeekNextToken() == "[")
-            {
-                tokenizer.MatchToken("[");
-                model::PortRange result;
-                auto token = tokenizer.ReadNextToken();
-                auto startIndex = std::stoi(token);
-                if (tokenizer.PeekNextToken() == ":")
-                {
-                    tokenizer.MatchToken(":");
-                    auto endIndex = std::stoi(tokenizer.ReadNextToken());
-                    result = model::PortRange(*port, startIndex, endIndex - startIndex);
-                }
-                else
-                {
-                    result = model::PortRange(*port, startIndex);
-                }
-
-                // number
-                // (colon, number)
-                tokenizer.MatchToken("]");
-                return result;
-            }
-            else
-            {
-                return model::PortRange(*port);
-            }
-        }
-
-        model::PortElementsBase ParsePortElements(const model::Model& model, utilities::Tokenizer& tokenizer) // start state
-        {
-            auto t = tokenizer.PeekNextToken();
-            if (t == "{")
-            {
-                tokenizer.MatchToken(t);
-                auto ranges = ParseRangeList(model, tokenizer);
-                tokenizer.MatchToken("}");
-                return model::PortElementsBase(ranges);
-            }
-            else
-            {
-                return model::PortElementsBase(ParseRange(model, tokenizer));
-            }
-        }
-    }
-
     model::InputNodeBase* MapLoadArguments::GetInput(model::Model& model) const
     {
         // name of input node
@@ -154,11 +74,8 @@ namespace common
 
     model::PortElementsBase MapLoadArguments::GetOutput(model::Model& model) const
     {
-        std::stringstream stream(modelOutputsString);
-        std::string delimiters = "{}[],.:";
-        utilities::Tokenizer tokenizer(stream, delimiters);
-        // set up
-        return ParsePortElements(model, tokenizer);
+        auto elementsProxy = model::ParsePortElementsProxy(modelOutputsString);
+        return model::ProxyToPortElements(model, elementsProxy);
     }
 
     //

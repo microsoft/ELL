@@ -45,31 +45,34 @@ namespace utilities
             else if (!std::isspace(ch))
             {
                 tokenStream << (char)ch;
+                bool isParsingString = _currentStringDelimiter != '\0';
                 bool isStringDelimiter = _stringDelimiters.find(ch) != std::string::npos;
-                if (_currentStringDelimiter == '\0') // didn't just finish parsing a string, so set the delimiter if we got one
-                {
-                    _currentStringDelimiter = isStringDelimiter ? ch : '\0';
-                }
-                else // did just finished parsing a delimiter or a string
+                if (isParsingString) // we're in the middle of parsing a string: probably because we just read in a quotation mark last time
                 {
                     if (isStringDelimiter)
                     {
                         assert(_currentStringDelimiter == ch);
                         _currentStringDelimiter = '\0';
+                        return tokenStream.str(); // return the end-delimiter
                     }
                     else
                     {
-                        // we're good.
+                        // we're good, keep eating characters from the string and adding them to the token
+                        break;
                     }
                 }
+                else // not parsing a string currently, set the string delimiter if we hit one
+                {
+                    _currentStringDelimiter = isStringDelimiter ? ch : '\0';
 
-                if (_tokenStartChars.find(ch) == std::string::npos) // if we didn't hit a token-stop char, break out of this loop and keep reading
-                {
-                    break;
-                }
-                else
-                {
-                    return tokenStream.str(); // we did hit a token-stop char. Return it.
+                    if (_tokenStartChars.find(ch) == std::string::npos) // if we didn't hit a token-stop char, break out of this loop and keep reading
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        return tokenStream.str(); // we did hit a token-stop char. Return it.
+                    }
                 }
             }
         }

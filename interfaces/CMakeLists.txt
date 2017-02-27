@@ -11,6 +11,11 @@ if(LLVM_FOUND)
     add_compile_options(${LLVM_COMPILE_OPTIONS})
 endif()
 
+set (INTERFACE_SRC ../common/src/ModelInterface.cpp)
+set (INTERFACE_INCLUDE 
+    ../common/include/ModelInterface.h
+)
+
 set (INTERFACE_MAIN ../common/ELL.i)
 
 set (INTERFACE_FILES ../common/common.i
@@ -28,9 +33,10 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/unique_ptr.i
                      ../common/utilities.i)
 
-set (INTERFACE_DEPENDENCIES common evaluators lossFunctions trainers predictors testing utilities)
+set (INTERFACE_DEPENDENCIES common data emitters evaluators lossFunctions math trainers model nodes predictors testing trainers utilities)
 
 # Add ELL library include directories
+include_directories(common/include)
 include_directories(../libraries/common/include)
 include_directories(../libraries/data/include)
 include_directories(../libraries/evaluators/include)

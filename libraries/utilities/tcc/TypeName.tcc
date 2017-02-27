@@ -11,6 +11,18 @@ namespace ell
 namespace utilities
 {
     template <typename T>
+    std::string TypeName<T, std::enable_if_t<HasGetTypeName<std::decay_t<T>>::value>>::GetName()
+    {
+        return std::string(std::decay_t<T>::GetTypeName());
+    };
+
+    template <typename T>
+    std::string TypeName<T, std::enable_if_t<std::is_enum<std::decay_t<T>>::value>>::GetName()
+    {
+        return "enum";
+    };
+
+    template <typename T>
     std::string TypeName<T*>::GetName()
     {
         return GetCompositeTypeName<T>("ptr");
@@ -24,6 +36,12 @@ namespace utilities
 
     template <typename T>
     std::string TypeName<std::vector<T>>::GetName()
+    {
+        return GetCompositeTypeName<T>("vector");
+    }
+
+    template <typename T>
+    std::string TypeName<const std::vector<T>&>::GetName()
     {
         return GetCompositeTypeName<T>("vector");
     }

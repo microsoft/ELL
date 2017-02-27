@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ModelBuilder.h (compile_test)
+//  File:     ModelMaker.h (compile_test)
 //  Authors:  Umesh Madan, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,12 +25,12 @@
 
 namespace ell
 {
-class ModelBuilder
+class ModelMaker
 {
 public:
-    ModelBuilder();
-    ModelBuilder(const ModelBuilder& src);
-    ModelBuilder(ModelBuilder&& src);
+    ModelMaker();
+    ModelMaker(const ModelMaker& src);
+    ModelMaker(ModelMaker&& src);
 
     template <typename T>
     nodes::ConstantNode<T>* Constant(const T value);
@@ -88,4 +88,4 @@ private:
 };
 }
 
-#include "../tcc/ModelBuilder.tcc"
+#include "../tcc/ModelMaker.tcc"

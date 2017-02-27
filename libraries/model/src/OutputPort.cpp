@@ -17,6 +17,11 @@ namespace model
     {
     }
 
+    void OutputPortBase::SetSize(size_t size)
+    {
+        _size = size;
+    }
+    
     void OutputPortBase::WriteToArchive(utilities::Archiver& archiver) const
     {
         Port::WriteToArchive(archiver);

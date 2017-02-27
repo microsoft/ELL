@@ -39,9 +39,6 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
-        archiver[treeOutputsPortName] << _treeOutputs;
-        archiver[edgeIndicatorVectorPortName] << _edgeIndicatorVector;
         archiver["forest"] << _forest;
     }
 
@@ -50,10 +47,10 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
-        archiver[treeOutputsPortName] >> _treeOutputs;
-        archiver[edgeIndicatorVectorPortName] >> _edgeIndicatorVector;
         archiver["forest"] >> _forest;
+
+        _treeOutputs.SetSize(_forest.NumTrees());
+        _edgeIndicatorVector.SetSize(_forest.NumEdges());
     }
 
     template <typename SplitRuleType, typename EdgePredictorType>

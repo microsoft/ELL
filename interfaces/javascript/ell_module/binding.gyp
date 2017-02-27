@@ -70,7 +70,8 @@
                 '<(blas_include_path)'
             ],
             'sources': [
-                '../ELLJAVASCRIPT_wrap.cxx'
+                '../ELLJAVASCRIPT_wrap.cxx',
+                @MODULE_INTERFACE_SRC@
             ],
             'link_settings': {
                 'library_dirs': [

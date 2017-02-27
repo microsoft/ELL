@@ -94,6 +94,12 @@ namespace utilities
         value.ReadFromArchive(*this);
     }
 
+    void Unarchiver::UnarchiveObjectAsPrimitive(const char* name, IArchivable& value)
+    {
+        // ### Likely wrong
+        value.ReadFromArchive(*this);
+    }
+
     void Unarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
     }

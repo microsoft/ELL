@@ -51,7 +51,7 @@ set (include include/AbstractInvoker.h
              include/StlReferenceIterator.h
              include/Tokenizer.h
              include/TransformIterator.h
-             include/TupleWrapper.h
+             include/TupleUtils.h
              include/TypeFactory.h
              include/TypeName.h
              include/TypeTraits.h
@@ -103,20 +103,33 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 # test projects
 #
 
+#
+# main tests
+#
 set (test_name ${library_name}_test)
 
-set (test_src test/src/main.cpp 
-              test/src/IArchivable_test.cpp
-              test/src/Iterator_test.cpp
-              test/src/ObjectArchive_test.cpp
-              test/src/TypeFactory_test.cpp
-              test/src/Variant_test.cpp)
+set (test_src 
+  test/src/main.cpp 
+  test/src/Format_test.cpp
+  test/src/FunctionUtils_test.cpp
+  test/src/IArchivable_test.cpp
+  test/src/Iterator_test.cpp
+  test/src/ObjectArchive_test.cpp
+  test/src/TypeFactory_test.cpp
+  test/src/TypeName_test.cpp
+  test/src/Variant_test.cpp
+)
 
-set (test_include test/include/IArchivable_test.h
-                  test/include/Iterator_test.h
-                  test/include/ObjectArchive_test.h
-                  test/src/TypeFactory_test.cpp
-                  test/src/Variant_test.cpp)
+set (test_include 
+  test/include/Format_test.h
+  test/include/FunctionUtils_test.h
+  test/include/IArchivable_test.h
+  test/include/Iterator_test.h
+  test/include/ObjectArchive_test.h
+  test/include/TypeFactory_test.h
+  test/include/TypeName_test.h
+  test/include/Variant_test.h
+)
                   
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
@@ -131,4 +144,3 @@ endif()
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 add_test(NAME ${test_name} COMMAND ${test_name})
-

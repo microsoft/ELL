@@ -48,7 +48,7 @@ set (MODEL_FILES
 
 add_custom_command(TARGET ${tool_name} 
   POST_BUILD
-  COMMAND makeExamples -mf model
+  COMMAND makeExamples
   WORKING_DIRECTORY ${EXAMPLE_DIR}
   BYPRODUCTS ${MODEL_FILES}
   COMMENT "Generating example models")

@@ -39,6 +39,11 @@ namespace model
         /// <returns> The size of the output </returns>
         virtual size_t Size() const override { return _size; }
 
+        /// <summary> Sets the size of the output </summary>
+        ///
+        /// <param name="size> The size of the output </param>
+        void SetSize(size_t size);
+
         /// <summary> Indicate if this port is referenced. </summary>
         ///
         /// <returns> Returns true if the port is referenced by another node. </returns>
@@ -50,6 +55,7 @@ namespace model
         static std::string GetTypeName() { return "OutputPortBase"; }
 
         virtual std::vector<double> GetDoubleOutput() const = 0;
+
         virtual double GetDoubleOutput(size_t index) const = 0;
 
         /// <summary> Gets the name of this type (for serialization). </summary>

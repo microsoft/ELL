@@ -31,8 +31,7 @@ int main()
         TestLoadTreeModels();
         TestLoadSavedModels();
 
-        TestSaveModels("xml");
-        TestSaveModels("json");
+        TestSaveModels();
 
         TestLoadMapWithDefaultArgs();
         TestLoadMapWithPorts();
@@ -55,4 +54,11 @@ int main()
         std::cerr << "ERROR, got unknown exception." << std::endl;
         throw;
     }
+
+    if (testing::DidTestFail())
+    {
+        return 1;
+    }
+
+    return 0;
 }

@@ -1,9 +1,13 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Model tests
+//  Project:  Embedded Learning Library (ELL)
+//  File:     DynamicMap_test.cpp (model_test)
+//  Authors:  Chuck Jacobs
 //
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DynamicMap_test.h"
-#include "Model_test.h"
+#include "ModelTestUtilities.h"
 
 // data
 #include "DenseDataVector.h"
@@ -23,7 +27,7 @@
 #include "LoadModel.h" // for RegisterNodeTypes
 
 // utilities
-#include "XmlArchiver.h"
+#include "JsonArchiver.h"
 
 // testing
 #include "testing.h"
@@ -140,14 +144,17 @@ void TestDynamicMapSerialization()
     auto map = model::DynamicMap(model, { { "doubleInput", inputNodes[0] } }, { { "doubleOutput", outputNodes[0]->output } });
 
     std::stringstream outStream;
-    utilities::XmlArchiver archiver(outStream);
+    utilities::JsonArchiver archiver(outStream);
     archiver << map;
 
+    std::cout << "Archived map" << std::endl;
+    std::cout << outStream.str() << std::endl;
+    
     // Now read it back in
     utilities::SerializationContext context;
     common::RegisterNodeTypes(context);
     std::stringstream inStream(outStream.str());
-    utilities::XmlUnarchiver unarchiver(inStream, context);
+    utilities::JsonUnarchiver unarchiver(inStream, context);
     model::DynamicMap map2;
     unarchiver >> map2;
 }

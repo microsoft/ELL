@@ -106,7 +106,6 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
@@ -114,10 +113,10 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
 
         auto dimension = _input.Size();
         _accumulator = std::vector<ValueType>(dimension);
+        _output.SetSize(dimension);
     }
 }
 }

@@ -20,7 +20,7 @@ namespace ell
 namespace utilities
 {
     /// <summary> UniqueId: A placeholder for a real GUID-type class </summary>
-    class UniqueId : public IArchivable
+    class UniqueId : public ArchivedAsPrimitive
     {
     public:
         /// <summary> Default constructor </summary>
@@ -47,10 +47,6 @@ namespace utilities
         /// <summary> Greater-than comparison </summary>
         bool operator>(const UniqueId& other) const;
 
-        /// <summary> Stream output </summary>
-        friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id);
-        friend std::string to_string(const UniqueId& id);
-
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -71,9 +67,15 @@ namespace utilities
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(Unarchiver& archiver) override;
 
+        /// <summary> Stream output </summary>
+        friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id);
+
+        /// <summary> String conversion </summary>
+        friend std::string to_string(const UniqueId& id);
+
     private:
         friend std::hash<UniqueId>;
-        size_t _id = 0;
+        std::string _id = "0";
         static size_t _nextId;
     };
 }

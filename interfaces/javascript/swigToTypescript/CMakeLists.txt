@@ -4,8 +4,7 @@
 
 set (tool_name ell_module_d_ts)
 
-
-set (MODULE_FILES 
+set (module_files 
     generate-d-ts.xslt
     index.js
     package.json
@@ -16,7 +15,7 @@ find_program(NODE_EXECUTABLE node)
 if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
 
     add_custom_target(${tool_name}_files ALL
-        DEPENDS ${MODULE_FILES}
+        DEPENDS ${module_files}
         COMMENT "Copying module files"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -35,9 +34,9 @@ if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
 
     add_dependencies(${tool_name} ${tool_name}_files ${tool_name}_install)
 
-    foreach(MODULE_FILE ${MODULE_FILES})
-        configure_file(${MODULE_FILE} ${MODULE_FILE} @ONLY)
-        set_property(TARGET ${tool_name}_files APPEND PROPERTY OBJECT_DEPENDS ${MODULE_FILE})
+    foreach(module_file ${module_files})
+        configure_file(${module_file} ${module_file} @ONLY)
+        set_property(TARGET ${tool_name}_files APPEND PROPERTY OBJECT_DEPENDS ${module_file})
     endforeach()
 
 endif()

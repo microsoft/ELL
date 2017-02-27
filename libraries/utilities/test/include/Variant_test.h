@@ -12,4 +12,14 @@ namespace ell
 {
 void TestScalarVariant();
 void TestVectorVariant();
+void TestObjectVariant();
+
+void TestVariantGetValueAs();
+
+void TestVariantParseSimple();
+void TestParseVectorVaraint();
+void TestParsePortElementsProxyVariant();
+void TestParseObjVariant();
+
+void TestVariantToString();
 }

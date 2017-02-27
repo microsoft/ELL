@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "InputPort.h"
 #include "Node.h"
 #include "OutputPort.h"
+#include "PortElements.h"
 
 // utilities
 #include "IArchivable.h"

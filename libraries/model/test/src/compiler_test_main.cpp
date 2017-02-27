@@ -8,7 +8,6 @@
 
 #include "CompilableNodesTest.h"
 #include "CompilerTest.h"
-#include "ModelBuilder.h"
 
 // testing
 #include "testing.h"

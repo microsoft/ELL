@@ -3,80 +3,18 @@
   "nodes": [
   {
     "_type": "InputNode<double>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1032"
-    },
-    "output": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1032"
-      },
-      "name": "output",
-      "type": 1,
-      "size": 3
-    }
+    "id":     "1066",
+    "size": 3
   }, 
   {
     "_type": "ForestPredictorNode<SingleElementThresholdPredictor,ConstantPredictor>",
-    "id": {
-      "_type": "UniqueId",
-      "id": "1033"
-    },
+    "id":     "1067",
     "input": {
       "_type": "InputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1033"
-      },
+      "nodeId":       "1067",
       "name": "input",
       "type": 1,
-      "input": {
-        "_type": "PortElements<double>",
-        "ranges": [
-        {
-          "_type": "PortRange",
-          "startIndex": 0,
-          "numValues": 3,
-          "isFixedSize": false,
-          "referencedNodeId": {
-            "_type": "UniqueId",
-            "id": "1032"
-          },
-          "referencedPortName": "output"
-        }]
-      }
-    },
-    "output": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1033"
-      },
-      "name": "output",
-      "type": 1,
-      "size": 1
-    },
-    "treeOutputs": {
-      "_type": "OutputPort<double>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1033"
-      },
-      "name": "treeOutputs",
-      "type": 1,
-      "size": 1
-    },
-    "edgeIndicatorVector": {
-      "_type": "OutputPort<bool>",
-      "nodeId": {
-        "_type": "UniqueId",
-        "id": "1033"
-      },
-      "name": "edgeIndicatorVector",
-      "type": 4,
-      "size": 2
+      "input":       "1066.output"
     },
     "forest": {
       "_type": "ForestPredictor<SingleElementThresholdPredictor,ConstantPredictor>",

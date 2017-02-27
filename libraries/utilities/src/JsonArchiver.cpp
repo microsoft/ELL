@@ -50,28 +50,37 @@ namespace utilities
     // IArchivable
     void JsonArchiver::BeginArchiveObject(const char* name, const IArchivable& value)
     {
-        bool hasName = name != std::string("");
         FinishPreviousLine();
+
         auto indent = GetCurrentIndent();
         _out << indent;
+        bool hasName = name != std::string("");
         if (hasName)
         {
             _out << "\"" << name << "\": ";
         }
+
+        if (value.ArchiveAsPrimitive())
+        {
+            return;
+        }
+
         _out << "{\n";
-        _out << indent << "  \"_type\": \"" << GetArchivedTypeName(value) << "\"";
-        SetEndOfLine(",\n");
-        FinishPreviousLine();
+        _out << indent << "  \"_type\": \"" << GetArchivedTypeName(value) << "\",\n";
         IncrementIndent();
     }
 
     void JsonArchiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
-        DecrementIndent();
         bool hasName = name != std::string("");
-        _out << "\n"; // Output newline instead of calling "FinishPreviousLine"
-        auto indent = GetCurrentIndent();
-        _out << indent << "}";
+        if (!value.ArchiveAsPrimitive())
+        {
+            _out << "\n"; // Output newline instead of calling "FinishPreviousLine"
+            DecrementIndent();
+            auto indent = GetCurrentIndent();
+            _out << indent << "}";
+        }
+
         // need to output a comma if we're serializing a field (that is, if name != "")
         SetEndOfLine(hasName ? ",\n" : "\n");
     }
@@ -175,6 +184,7 @@ namespace utilities
         {
             MatchFieldName(name);
         }
+        
         _tokenizer.MatchToken("{");
         MatchFieldName("_type");
         _tokenizer.MatchToken("\"");
@@ -187,6 +197,26 @@ namespace utilities
             _tokenizer.ReadNextToken();
         }
         return encodedTypeName;
+    }
+
+    void JsonUnarchiver::UnarchiveObjectAsPrimitive(const char* name, IArchivable& value) 
+    {
+        bool hasName = name != std::string("");
+        if (hasName)
+        {
+            MatchFieldName(name);
+        }
+
+        UnarchiveObject(name, value);
+
+        // eat a comma if it exists
+        if (hasName)
+        {
+            if (_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
     }
 
     void JsonUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)

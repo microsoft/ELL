@@ -74,7 +74,6 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
     }
 
     template <typename InputValueType, typename OutputValueType>
@@ -82,7 +81,7 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
+        _output.SetSize(_input.Size());
     }
 }
 }

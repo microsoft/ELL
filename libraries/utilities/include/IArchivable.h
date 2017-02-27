@@ -52,6 +52,7 @@ namespace utilities
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
 
+        virtual bool ArchiveAsPrimitive() const { return false; }
     protected:
         friend class Archiver;
         friend class Unarchiver;
@@ -65,6 +66,11 @@ namespace utilities
         ///
         /// <param name="archiver"> The unarchiver. </param>
         virtual void ReadFromArchive(Unarchiver& archiver) = 0;
+    };
+
+    class ArchivedAsPrimitive : public IArchivable
+    {
+        virtual bool ArchiveAsPrimitive() const { return true; }
     };
 }
 }

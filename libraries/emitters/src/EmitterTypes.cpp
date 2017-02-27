@@ -50,6 +50,22 @@ namespace emitters
     }
 
     template <>
+    TypedOperator GetOperator<bool>(BinaryOperationType operation)
+    {
+        switch (operation)
+        {
+            case BinaryOperationType::logicalAnd:
+                return TypedOperator::logicalAnd;
+            case BinaryOperationType::logicalOr:
+                return TypedOperator::logicalOr;
+            case BinaryOperationType::logicalXor:
+                return TypedOperator::logicalXor;
+            default:
+                throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
+        }
+    }
+
+    template <>
     TypedComparison GetComparison<double>(BinaryPredicateType predicate)
     {
         switch (predicate)

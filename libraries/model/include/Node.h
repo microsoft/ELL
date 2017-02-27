@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "InputPort.h"
-#include "OutputPort.h"
 #include "UniqueId.h"
 
 // utilities
@@ -27,6 +25,9 @@ namespace ell
 namespace model
 {
     class ModelTransformer;
+    class InputPortBase;
+    class OutputPortBase;
+    class Port;
 
     /// <summary> Superclass for all node types. </summary>
     class Node : public utilities::IArchivable

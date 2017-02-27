@@ -198,7 +198,6 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
         archiver["operation"] << UnaryOperations::to_string(_operation);
     }
 
@@ -207,10 +206,10 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
         std::string operation;
         archiver["operation"] >> operation;
         _operation = UnaryOperations::from_string(operation);
+        _output.SetSize(_input.Size());
     }
 }
 }

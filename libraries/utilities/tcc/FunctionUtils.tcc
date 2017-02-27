@@ -35,5 +35,29 @@ namespace utilities
     {
         return Index;
     }
+
+    template <typename FunctionType>
+    FunctionArgTypes<FunctionType> GetFunctionArgTuple(FunctionType& function)
+    {
+        return FunctionArgTypes<FunctionType>{};
+    }
+
+    template <typename FunctionType, typename... Args>
+    auto ApplyFunction(const FunctionType& function, Args... args) -> FunctionReturnType<FunctionType>
+    {
+        return function(args...);
+    }
+
+    template <typename FunctionType, typename... Args, std::size_t... Sequence>
+    auto ApplyFunctionHelper(const FunctionType& function, std::tuple<Args...>&& args, std::index_sequence<Sequence...>) -> FunctionReturnType<FunctionType>
+    {
+        return function(std::get<Sequence>(args)...);
+    }
+
+    template <typename FunctionType, typename... Args>
+    auto ApplyFunction(const FunctionType& function, std::tuple<Args...>&& args) -> FunctionReturnType<FunctionType>
+    {
+        return ApplyFunctionHelper(function, args, std::make_index_sequence<sizeof...(Args)>());
+    }
 }
 }

@@ -8,6 +8,7 @@ set (src test.py
          testing.py 
          lossfunctions_test.py 
          model_test.py 
+         modelbuilder_test.py 
          common_test.py
          trainers_test.py
          predictors_test.py

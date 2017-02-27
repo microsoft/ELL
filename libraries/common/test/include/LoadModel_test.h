@@ -10,5 +10,5 @@ namespace ell
 void TestLoadSampleModels();
 void TestLoadTreeModels();
 void TestLoadSavedModels();
-void TestSaveModels(std::string ext);
+void TestSaveModels();
 }

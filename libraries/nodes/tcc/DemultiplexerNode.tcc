@@ -46,7 +46,7 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[selectorPortName] << _selector;
-        archiver[outputPortName] << _output;
+        archiver["size"] << _output.Size();
         archiver["defaultValue"] << _defaultValue;
     }
 
@@ -56,7 +56,9 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
         archiver[selectorPortName] >> _selector;
-        archiver[outputPortName] >> _output;
+        size_t size;
+        archiver["size"] >> size;
+        _output.SetSize(size);
         archiver["defaultValue"] >> _defaultValue;
     }
 

@@ -49,7 +49,7 @@ namespace utilities
         ///
         /// <param name="token"> The token to match. </param>
         void MatchToken(std::string token);
-
+        
         /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
         ///
         /// <param name="token"> The token to match. </param>

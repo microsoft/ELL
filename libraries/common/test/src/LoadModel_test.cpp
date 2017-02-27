@@ -50,8 +50,9 @@ void TestLoadSavedModels()
     std::cout << "Model 1 size: " << model1.Size() << std::endl;
 }
 
-void TestSaveModels(std::string ext)
+void TestSaveModels()
 {
+    std::string ext = "model";
     auto model1 = common::LoadModel("[1]");
     auto model2 = common::LoadModel("[2]");
     auto model3 = common::LoadModel("[3]");

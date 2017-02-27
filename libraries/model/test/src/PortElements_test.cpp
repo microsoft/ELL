@@ -1,6 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// PortElements tests
+//  Project:  Embedded Learning Library (ELL)
+//  File:     PortElements_test.cpp (model_test)
+//  Authors:  Chuck Jacobs
 //
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PortElements_test.h"
 
@@ -12,12 +16,19 @@
 // testing
 #include "testing.h"
 
+// utilities
+#include "JsonArchiver.h"
+
 // stl
 #include <iostream>
+#include <sstream>
 
 namespace ell
 {
 
+//
+// Helpers
+//
 void PrintRange(const model::PortRange& range)
 {
     std::cout << "[" << range.ReferencedPort()->GetNode()->GetId() << ", " << range.GetStartIndex() << "--" << (range.GetStartIndex() + range.Size() - 1) << "]";
@@ -34,6 +45,9 @@ void PrintElements(const model::PortElements<T>& elements)
     std::cout << std::endl;
 }
 
+//
+// Tests
+//
 void TestSlice()
 {
     model::Model g;
@@ -68,5 +82,14 @@ void TestAppend()
 
     testing::ProcessTest("Testing Append", testing::IsEqual(elements1.Size(), (size_t)5));
     testing::ProcessTest("Testing Append", testing::IsEqual(elements2.Size(), (size_t)7));
+}
+
+void TestParsePortElements()
+{
+    auto elements = model::ParsePortElementsProxy("123.bar");
+    testing::ProcessTest("Testing PortElementProxy::Parse", elements.GetRanges().size() == 1);
+
+    elements = model::ParsePortElementsProxy("123.bar[3:5]");
+    testing::ProcessTest("Testing PortElementProxy::Parse", elements.GetRanges()[0].Size() == 2);
 }
 }

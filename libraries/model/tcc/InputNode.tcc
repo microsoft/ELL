@@ -55,14 +55,16 @@ namespace model
     void InputNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[outputPortName] << _output;
+        archiver["size"] << _output.Size();
     }
 
     template <typename ValueType>
     void InputNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[outputPortName] >> _output;
+        int size;
+        archiver["size"] >> size;
+        _output.SetSize(size);
     }
 }
 }

@@ -8,7 +8,7 @@
 
 #include "CompilerTest.h"
 #include "CompilerTestUtilities.h"
-#include "ModelBuilder.h"
+#include "ModelMaker.h"
 
 // model
 #include "CompilableNode.h"
@@ -209,7 +209,7 @@ void TestBinaryVector(bool expanded, bool runJit)
     std::vector<double> data2 = { 4, 4, 4, 4 };
     const int c_InputSize = 4;
     const std::string c_ModelFnName = "TestBinaryVector";
-    ModelBuilder mb;
+    ModelMaker mb;
 
     auto input1 = mb.Inputs<double>(c_InputSize);
     auto c1 = mb.Constant<double>(data);
@@ -260,7 +260,7 @@ void TestBinaryScalar()
     std::vector<double> data = { 5 };
     std::vector<double> data2 = { 4 };
 
-    ModelBuilder mb;
+    ModelMaker mb;
 
     auto input1 = mb.Inputs<double>(1);
     auto c1 = mb.Constant<double>(data);
@@ -278,7 +278,7 @@ void TestDotProduct(emitters::CompilerParameters& settings)
 {
     std::vector<double> data = { 5, 10, 15, 20 };
 
-    ModelBuilder mb;
+    ModelMaker mb;
     auto c1 = mb.Constant<double>(data);
     auto input1 = mb.Inputs<double>(4);
     auto dotProduct = mb.DotProduct<double>(c1->output, input1->output);
@@ -313,7 +313,7 @@ void TestSum(bool expanded)
 {
     std::vector<double> data = { 5, 10, 15, 20 };
 
-    ModelBuilder mb;
+    ModelMaker mb;
     auto c1 = mb.Constant<double>(data);
     auto input1 = mb.Inputs<double>(4);
     auto product = mb.Multiply<double>(c1->output, input1->output);
@@ -333,7 +333,7 @@ void TestAccumulator(bool expanded)
 {
     std::vector<double> data = { 5, 10, 15, 20 };
 
-    ModelBuilder mb;
+    ModelMaker mb;
     auto c1 = mb.Constant<double>(data);
     auto input1 = mb.Inputs<double>(4);
     auto product = mb.Multiply<double>(c1->output, input1->output);
@@ -353,7 +353,7 @@ void TestAccumulator(bool expanded)
 
 void TestDelay()
 {
-    ModelBuilder mb;
+    ModelMaker mb;
     auto input1 = mb.Inputs<double>(4);
     auto delay = mb.Delay<double>(input1->output, 3);
     auto outputNode = mb.Outputs<double>(delay->output);
@@ -368,7 +368,7 @@ void TestDelay()
 
 void TestSqrt()
 {
-    ModelBuilder mb;
+    ModelMaker mb;
     auto input1 = mb.Inputs<double>(1);
     auto sqrt = mb.Sqrt<double>(input1->output);
     auto outputNode = mb.Outputs<double>(sqrt->output);
@@ -385,7 +385,7 @@ void TestBinaryPredicate(bool expanded)
 {
     std::vector<double> data = { 5 };
 
-    ModelBuilder mb;
+    ModelMaker mb;
     auto input1 = mb.Inputs<double>(data.size());
     auto c1 = mb.Constant<double>(data);
     auto eq = mb.Equals(input1->output, c1->output);
@@ -401,7 +401,7 @@ void TestBinaryPredicate(bool expanded)
 
 void TestMultiplexer()
 {
-    ModelBuilder mb;
+    ModelMaker mb;
 
     std::vector<double> data = { 5, 10 };
     auto c1 = mb.Constant<bool>(true);
@@ -421,7 +421,7 @@ void TestMultiplexer()
 
 void TestSlidingAverage()
 {
-    ModelBuilder mb;
+    ModelMaker mb;
     auto dim = mb.Constant<double>(4);
     auto input1 = mb.Inputs<double>(4);
     auto delay = mb.Delay<double>(input1->output, 2);
@@ -459,7 +459,7 @@ void TestDotProductOutput()
     settings.inlineOperators = false;
     std::vector<double> data = { 5, 10, 15, 20 };
 
-    ModelBuilder mb;
+    ModelMaker mb;
     auto c1 = mb.Constant<double>(data);
     auto input1 = mb.Inputs<double>(4);
     auto dotProduct = mb.DotProduct<double>(c1->output, input1->output);

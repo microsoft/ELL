@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "Node.h"
 #include "OutputPort.h"
 #include "Port.h"
 
@@ -17,6 +18,7 @@
 // utilities
 #include "Exception.h"
 #include "IArchivable.h"
+#include "Tokenizer.h"
 
 // stl
 #include <algorithm>
@@ -29,6 +31,7 @@ namespace ell
 /// <summary> model namespace </summary>
 namespace model
 {
+    class Model;
     class Node;
 
     /// <summary> Represents a single value from an output port </summary>
@@ -66,6 +69,16 @@ namespace model
         /// <returns> true if this element is equivalent to other. </returns>
         bool operator==(const PortElementBase& other) const;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "PortElementBase"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
+
     protected:
         const OutputPortBase* _referencedPort = nullptr;
         size_t _index = 0;
@@ -92,7 +105,7 @@ namespace model
     };
 
     /// <summary> Represents a contiguous set of values from an output port </summary>
-    class PortRange : public utilities::IArchivable
+    class PortRange : public utilities::ArchivedAsPrimitive
     {
     public:
         PortRange() = default;
@@ -140,6 +153,11 @@ namespace model
         /// <returns> true if this range spans the port's entire range </returns>
         bool IsFullPortRange() const;
 
+        /// <summary> Indicates if this range was created with a fixed size </summary>
+        ///
+        /// <returns> true if this range was created with a fixed size </returns>
+        bool IsFixedSize() const { return _isFixedSize; }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -184,7 +202,7 @@ namespace model
     };
 
     /// <summary> Represents a set of values from one or more output ports </summary>
-    class PortElementsBase : public utilities::IArchivable
+    class PortElementsBase : public utilities::ArchivedAsPrimitive
     {
     public:
         /// <summary> A read-only forward iterator for the output values of a `PortElementsBase`. </summary>
@@ -369,6 +387,11 @@ namespace model
         ///   any of the input elements have the wrong type </exception>
         explicit PortElements(const PortElementsBase& other);
 
+        /// <summary> Returns the type of the values referenced </summary>
+        ///
+        /// <returns> The type of the values referenced </returns>
+        Port::PortType GetPortType() const { return Port::GetPortType<ValueType>(); }
+
         /// <summary> Gets an element in the elements. </summary>
         ///
         /// <param name="index"> Zero-based index of the element. </param>
@@ -433,10 +456,132 @@ namespace model
     /// <returns> The composite PortElements </returns>
     template <typename RefType, typename... Refs>
     RefType Concat(const RefType& ref1, Refs&&... refs);
+
+    //
+    // Proxy types for runtime model creation and interrogation
+    //
+
+    /// <summary> Proxy class to hold information in a PortRange </summary>
+    class PortRangeProxy : public utilities::ArchivedAsPrimitive
+    {
+    public:
+        /// <summary> Constructor </summary>
+        PortRangeProxy(Node::NodeId nodeId, std::string portName);
+
+        /// <summary> Constructor </summary>
+        PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex);
+
+        /// <summary> Constructor </summary>
+        PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex, size_t numValues);
+
+        /// <summary> Constructor </summary>
+        PortRangeProxy(Node::NodeId nodeId, std::string portName, Port::PortType portType, size_t startIndex, size_t numValues);
+
+        /// <summary> Constructor </summary>
+        PortRangeProxy(const PortRange& range);
+
+        /// <summary> Returns the ID of the node </summary>
+        Node::NodeId GetNodeId() const { return _nodeId; }
+
+        /// <summary> Returns the name of the port </summary>
+        std::string GetPortName() const { return _portName; }
+
+        /// <summary> Returns the type of the output values </summary>
+        Port::PortType GetPortType() const { return _portType; }
+
+        /// <summary> Returns the dimensionality of the output </summary>
+        size_t Size() const { return _numValues; }
+
+        /// <summary> Returns the dimensionality of the output </summary>
+        size_t GetStartIndex() const { return _startIndex; }
+        
+        /// <summary> Indicates if this range was created with a fixed size </summary>
+        ///
+        /// <returns> true if this range was created with a fixed size </returns>
+        bool IsFixedSize() const { return _isFixedSize; }
+
+        /// <summary> Adds an object to an `Archiver` </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to add the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+    private:
+        friend class PortElementsProxy;
+
+        Node::NodeId _nodeId;
+        std::string _portName;
+        Port::PortType _portType = Port::PortType::none;
+        size_t _startIndex = 0;
+        size_t _numValues = 0;
+        bool _isFixedSize = false;
+    };
+
+    /// <summary> Proxy class to hold information in a PortElements </summary>
+    class PortElementsProxy : public utilities::ArchivedAsPrimitive
+    {
+    public:
+        /// <summary> Constructor </summary>
+        PortElementsProxy();
+
+        /// <summary> Constructor </summary>
+        PortElementsProxy(Port::PortType portType);
+
+        /// <summary> Constructor </summary>
+        PortElementsProxy(const PortElementsBase& elements);
+
+        /// <summary> Constructor </summary>
+        PortElementsProxy(const PortRangeProxy& range);
+
+        /// <summary> Constructor </summary>
+        PortElementsProxy(const std::vector<PortRangeProxy>& ranges);
+
+        /// <summary> Gets the number of contiguous ranges in this object </summary>
+        size_t NumRanges() const { return _ranges.size(); }
+        /// <summary> Gets the list of contiguous ranges of elements </summary>
+        const std::vector<PortRangeProxy>& GetRanges() const { return _ranges; }
+
+        /// <summary> Returns the type of the output values </summary>
+        Port::PortType GetPortType() const { return _portType; }
+
+        /// <summaruy> Appends a range onto this PortElementsProxy </summary>
+        void Append(const PortRangeProxy& range);
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        static std::string GetTypeName() { return "PortElementProxy"; }
+
+        /// <summary> Adds an object to an `Archiver` </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to add the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+    private:
+        std::vector<PortRangeProxy> _ranges;
+        Port::PortType _portType = Port::PortType::none;
+    };
+
+    // Helper functions
+    PortElementsProxy ParsePortElementsProxy(std::string str);
+
+    PortElementsBase ProxyToPortElements(const Model& model, const PortElementsProxy& proxy);
+
+    template <typename ValueType>
+    PortElements<ValueType> ProxyToPortElements(const Model& model, const PortElementsProxy& proxy);
 }
 }
 
-// custom specialization of std::hash so we can keep PortRanges in containers that require hashable types
+//
+// Custom specialization of std::hash so we can keep PortRanges in containers that require hashable types
+//
 namespace std
 {
 /// <summary> Implements a hash function for the PortRange class, so that it can be used with associative containers (maps, sets, and the like). </summary>

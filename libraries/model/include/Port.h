@@ -29,7 +29,7 @@ namespace model
     public:
         enum class PortType
         {
-            none,
+            none = 0,
             real,
             integer,
             categorical,

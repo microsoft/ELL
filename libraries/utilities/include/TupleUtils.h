@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     TupleWrapper.h (utilities)
+//  File:     TupleUtils.h (utilities)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,6 +15,22 @@ namespace ell
 {
 namespace utilities
 {
+    //
+    // Extracting the tail of a tuple
+    //
+
+    template <typename T>
+    struct TupleTailImpl; // undefined
+
+    template <typename FirstType, typename... RestTypes>
+    struct TupleTailImpl<std::tuple<FirstType, RestTypes...>>
+    {
+        typedef std::tuple<RestTypes...> type;
+    };
+
+    template <typename TupleType>
+    using TupleTailType = typename TupleTailImpl<TupleType>::type;
+
     //
     // General "wrap tuple types" mechanism
     //

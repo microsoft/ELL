@@ -1,26 +1,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ModelBuilder.cpp (compile_test)
-//  Authors:  Umesh Madan, Chuck Jacobs
+//  File:     RegisterNodeCreators.h (common)
+//  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma once
+
+// model
 #include "ModelBuilder.h"
 
 namespace ell
 {
-ModelBuilder::ModelBuilder()
+namespace common
 {
-}
-
-ModelBuilder::ModelBuilder(const ModelBuilder& src)
-    : _model(src._model)
-{
-}
-
-ModelBuilder::ModelBuilder(ModelBuilder&& src)
-    : _model(std::move(src._model))
-{
+    /// <summary> Registers node-creation functions with the ModelBuilder class </summary>
+    void RegisterNodeCreators(model::ModelBuilder& builder);
 }
 }

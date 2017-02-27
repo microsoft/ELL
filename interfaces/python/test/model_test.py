@@ -148,7 +148,7 @@ def GetGraphStats(adj):
             E = E1
     return stats
 
-def work(key):
+def testModel(key):
     model = ELL.ELL_Model(key)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
@@ -171,7 +171,7 @@ def work(key):
 def test():
     keys = ['[1]','[2]','[3]','[tree_0]','[tree_1]','[tree_2]','[tree_3]']
     for key in keys: 
-        work(key)
+        testModel(key)
     return 0
 
 if __name__ == '__main__':

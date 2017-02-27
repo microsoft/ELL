@@ -46,7 +46,6 @@ namespace nodes
         archiver[input1PortName] << _input1;
         archiver[input2PortName] << _input2;
         archiver[conditionPortName] << _condition;
-        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType>
@@ -56,7 +55,7 @@ namespace nodes
         archiver[input1PortName] >> _input1;
         archiver[input2PortName] >> _input2;
         archiver[conditionPortName] >> _condition;
-        archiver[outputPortName] >> _output;
+        _output.SetSize(_input1.Size());
     }
 
     template <typename ValueType>

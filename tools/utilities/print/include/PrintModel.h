@@ -11,9 +11,6 @@
 // model
 #include "Model.h"
 
-// utilities
-#include "OutputStreamImpostor.h"
-
 // stl
 #include <ostream>
 

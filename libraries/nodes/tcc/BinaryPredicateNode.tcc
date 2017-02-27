@@ -226,7 +226,6 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[input1PortName] << _input1;
         archiver[input2PortName] << _input2;
-        archiver[outputPortName] << _output;
         archiver["predicate"] << BinaryPredicates::to_string(_predicate);
     }
 
@@ -236,10 +235,10 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[input1PortName] >> _input1;
         archiver[input2PortName] >> _input2;
-        archiver[outputPortName] >> _output;
         std::string predicate;
         archiver["predicate"] >> predicate;
         _predicate = BinaryPredicates::from_string(predicate);
+        _output.SetSize(_input1.Size());
     }
 }
 }

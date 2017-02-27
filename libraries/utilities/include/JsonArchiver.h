@@ -76,7 +76,7 @@ namespace utilities
         template <typename ValueType>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
-        template <typename ValueType, IsArchivable<ValueType> concept = 0>
+        template <typename ValueType, IsIArchivable<ValueType> concept = 0>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
         std::ostream& _out;
@@ -128,6 +128,7 @@ namespace utilities
 
         virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName) override;
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName) override;
+        virtual void UnarchiveObjectAsPrimitive(const char* name, IArchivable& value) override;
 
     private:
         template <typename ValueType, IsFundamental<ValueType> concept = 0>

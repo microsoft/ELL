@@ -9,6 +9,7 @@
 #pragma once
 
 #include <type_traits>
+#include <vector>
 
 namespace ell
 {
@@ -31,29 +32,33 @@ namespace utilities
 
     /// <summary> Enabled if ValueType is a fundamental value. </summary>
     template <typename ValueType>
-    using IsFundamental = typename std::enable_if_t<std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
+    using IsFundamental = std::enable_if_t<std::is_fundamental<std::decay_t<ValueType>>::value, int>;
 
     /// <summary> Enabled if ValueType is not a fundamental value. </summary>
     template <typename ValueType>
-    using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<typename std::decay<ValueType>::type>::value, int>;
+    using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<std::decay_t<ValueType>>::value, int>;
 
     template <typename ValueType>
-    using IsIntegral = typename std::enable_if_t<std::is_integral<typename std::decay<ValueType>::type>::value && !std::is_same<typename std::decay<ValueType>::type, bool>::value && !std::is_same<typename std::decay<ValueType>::type, char>::value, bool>;
+    using IsIntegral = typename std::enable_if_t<std::is_integral<std::decay_t<ValueType>>::value && !std::is_same<std::decay_t<ValueType>, bool>::value && !std::is_same<std::decay_t<ValueType>, char>::value, bool>;
 
     template <typename ValueType>
-    using IsFloatingPoint = typename std::enable_if_t<std::is_floating_point<typename std::decay<ValueType>::type>::value, bool>;
+    using IsFloatingPoint = typename std::enable_if_t<std::is_floating_point<std::decay_t<ValueType>>::value, bool>;
 
     /// <summary> Enabled if ValueType is a class. </summary>
     template <typename ValueType>
-    using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, int>;
+    using IsClass = typename std::enable_if_t<std::is_class<ValueType>::value, bool>;
+
+    /// <summary> Enabled if ValueType is an enum. </summary>
+    template <typename ValueType>
+    using IsEnum = typename std::enable_if_t<std::is_enum<ValueType>::value, bool>;
 
     /// <summary> Enabled if ValueType is a specialization of std::vector. </summary>
     template <typename ValueType>
-    using IsVector = typename std::enable_if_t<IsVectorType<typename std::decay<ValueType>::type>::value, int>;
+    using IsVector = typename std::enable_if_t<IsVectorType<std::decay_t<ValueType>>::value, int>;
 
     /// <summary> Enabled if ValueType is not a specialization of std::vector. </summary>
     template <typename ValueType>
-    using IsNotVector = typename std::enable_if_t<!IsVectorType<typename std::decay<ValueType>::type>::value, int>;
+    using IsNotVector = typename std::enable_if_t<!IsVectorType<std::decay_t<ValueType>>::value, int>;
 
     /// <summary> Enabled if the two classes are the same. </summary>
     template <typename T, typename S>

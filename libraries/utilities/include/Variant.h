@@ -10,11 +10,15 @@
 
 #include "Archiver.h"
 #include "Exception.h"
+#include "FunctionUtils.h"
 #include "TypeName.h"
+#include "JsonArchiver.h"
 
 // stl
 #include <cassert>
+#include <cstdint>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <type_traits>
 #include <typeindex>
@@ -24,72 +28,22 @@ class IArchivable;
 
 namespace ell
 {
-/// <summary> utilities namespace </summary>
 namespace utilities
 {
-    //
-    // VariantBase --- private implementation class used by Variant
-    //
-    class VariantBase
+    namespace VariantDetail
     {
-    public:
-        virtual ~VariantBase() = default;
-
-    protected:
-        VariantBase(std::type_index type);
-        virtual std::unique_ptr<VariantBase> Clone() const = 0;
-        virtual std::string ToString() const = 0;
-        virtual std::string GetStoredTypeName() const = 0;
-        virtual bool IsPrimitiveType() const = 0;
-        virtual bool IsArchivable() const = 0;
-        virtual bool IsPointer() const = 0;
-        virtual void ArchiveProperty(const char* name, Archiver& archiver) const = 0;
-        virtual void UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context) = 0;
-
-    private:
-        friend class Variant;
-
-        template <typename ValueType>
-        ValueType GetValue() const;
-
-        std::type_index _type; // redundant with type in Variant class.
-    };
-
-    //
-    // VariantDerived --- private implementation class used by Variant
-    //
-    template <typename ValueType>
-    class VariantDerived : public VariantBase
-    {
-    public:
-        /// <summary> Constructor </summary>
-        ///
-        /// <param name="val"> Value to wrap in a variant </param>
-        VariantDerived(const ValueType& val);
-
-    protected:
-        const ValueType& GetValue() const { return _value; }
-        virtual std::unique_ptr<VariantBase> Clone() const override;
-        virtual std::string ToString() const override;
-        virtual std::string GetStoredTypeName() const override;
-        virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
-        virtual bool IsArchivable() const override { return !IsPrimitiveType(); }
-        virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
-        virtual void ArchiveProperty(const char* name, Archiver& archiver) const override;
-        virtual void UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context) override;
-
-    private:
-        friend class Variant;
-        friend class VariantBase;
-
-        ValueType _value;
-    };
+        class VariantBase;
+    }
 
     /// <summary> A class that can hold any kind of value and provide a type-safe way to access it </summary>
     class Variant
     {
     public:
-        /// <summary> Default Constructor </summary>
+        /// <summary> Default Constructor for an empty variant </summary>
+        Variant();
+
+        /// <summary> Constructor for default-constructed variant of the given type. </summary>
+        template <typename ValueType, ValueType Default = ValueType()>
         Variant();
 
         /// <summary> Constructor from basic (non-variant) types. </summary>
@@ -98,21 +52,103 @@ namespace utilities
 
         /// <summary> Copy constructor. </summary>
         Variant(const Variant& other);
+
+        /// <summary> Move constructor. </summary>
         Variant(Variant&& other) = default;
 
         /// <summary> Copy assignment operator. </summary>
         Variant& operator=(const Variant& other);
+
+        /// <summary> Move assignment operator. </summary>
         Variant& operator=(Variant&& other) = default;
 
         /// <summary> Assignment operator from basic (non-variant) types. </summary>
         template <typename ValueType>
         Variant& operator=(ValueType&& value);
 
+        /// <summary> Gets a string representation of the value. </summary>
+        ///
+        /// <returns> A string representation of the value. </summary>
+        std::string ToString() const;
+
+        /// <summary> Gets the type name of the value stored in the variant. </summary>
+        ///
+        /// <returns> The type name of the value stored in the variant. </returns>
+        std::string GetStoredTypeName() const;
+
         /// <summary> Get a type-safe value from the variant. </summary>
         ///
         /// <returns> The variant's current value. </returns>
         template <typename ValueType>
         ValueType GetValue() const;
+
+        /// <summary> Attempt to get a type-safe value from the variant. </summary>
+        ///
+        /// <param name="value"> Gets the variant's current value if possible. </returns>
+        /// <returns> `true` if the `value` argument was assigned. </returns>
+        template <typename ValueType>
+        bool TryGetValue(ValueType& value) const;
+
+        /// <summary> Set the variant to a value of the same type. </summary>
+        ///
+        /// <param name="value"> The value to set this Variant to </param>
+        /// <returns> `true` if success, `false` if types differ. </returns>
+        template <typename ValueType>
+        void SetValue(ValueType&& value);
+
+        /// <summary> Attempt to set a the variant to a value of the same type. </summary>
+        ///
+        /// <param name="value"> The value to set this Variant to </param>
+        /// <returns> `true` if success, `false` if types differ. </returns>
+        template <typename ValueType>
+        bool TrySetValue(ValueType&& value);
+
+        /// <summary> Set the variant to a value regardless of its current type. </summary>
+        ///
+        /// <param name="value"> The value to set this Variant to </param>
+        template <typename ValueType>
+        void ResetValue(ValueType&& value);
+
+        /// <summary> Get a value from the variant. </summary>
+        ///
+        /// <returns> The variant's current value. </returns>
+        template <typename ValueType>
+        ValueType GetValueAs() const;
+
+        /// <summary> Attempt to get a value from the variant. </summary>
+        ///
+        /// <param name="value"> Gets the variant's current value if possible. </returns>
+        /// <returns> `true` if the `value` argument was assigned. </returns>
+        template <typename ValueType>
+        bool TryGetValueAs(ValueType& value) const;
+
+        /// <summary> Set the variant to a value of the same type. </summary>
+        ///
+        /// <param name="value"> The value to set this Variant to </param>
+        /// <returns> `true` if success, `false` if types differ. </returns>
+        template <typename ValueType>
+        void SetValueFrom(ValueType&& value);
+
+        /// <summary> Set the variant to a value of the same type. </summary>
+        ///
+        /// <param name="value"> The value to set this Variant to </param>
+        /// <returns> `true` if success, `false` if types differ. </returns>
+        template <typename ValueType>
+        bool TrySetValueFrom(ValueType&& value);
+
+        bool TrySetValueFrom(const Variant& value);
+        bool TrySetValueFrom(Variant& value);
+
+        /// <summary> Set a Variant's value from a string (preserving its type) </summary>
+        ///
+        /// <param name="s"> The string to use to set the value </param>
+        void ParseInto(const std::string& s);
+
+        /// <summary> Attempt to set a Variant's value from a string (preserving its type) </summary>
+        ///
+        /// <param name="s"> The string to use to set the value </param>
+        /// <returns> `true` if the assignment was successful </returns>
+        bool TryParseInto(const std::string& s);
 
         /// <summary> Checks if the variant has a value assigned to it. </summary>
         ///
@@ -127,28 +163,39 @@ namespace utilities
 
         /// <summary> Checks if the variant is holding a primitive value. </summary>
         ///
-        /// <returns> True if the variant currently holds a primitive value. </returns>
+        /// <returns> True if the variant currently holds a primitive value (integral or floating-point type). </returns>
         bool IsPrimitiveType() const;
+
+        /// <summary> Checks if the variant is holding an integer value. </summary>
+        ///
+        /// <returns> True if the variant currently holds a primitive value. </returns>
+        bool IsIntegralType() const;
+
+        /// <summary> Checks if the variant is holding a floating point value. </summary>
+        ///
+        /// <returns> True if the variant currently holds a primitive value. </returns>
+        bool IsFloatingPointType() const;
+
+        /// <summary> Checks if the variant is holding a floating point value. </summary>
+        ///
+        /// <returns> True if the variant currently holds a primitive value. </returns>
+        bool IsEnumType() const;
 
         /// <summary> Checks if the variant is holding an archivable object. </summary>
         ///
         /// <returns> True if the variant currently holds a archivable object. </returns>
-        bool IsArchivable() const;
+        bool IsIArchivable() const;
 
         /// <summary> Checks if the variant is holding a pointer. </summary>
         ///
         /// <returns> True if the variant currently holds a pointer. </returns>
         bool IsPointer() const;
 
-        /// <summary> Gets a string representation of the value. </summary>
-        ///
-        /// <returns> A string representation of the value. </summary>
-        std::string ToString() const;
+        /// <summary> Checks if two variants hold the same type of value </summary>
+        bool IsSameTypeAs(const Variant& other) const;
 
-        /// <summary> Gets the type name of the value stored in the variant. </summary>
-        ///
-        /// <returns> The type name of the value stored in the variant. </returns>
-        std::string GetStoredTypeName() const;
+        /// <summary> Gets the name of this type. </summary>
+        static std::string GetTypeName() { return "Variant"; }
 
     private:
         friend std::string to_string(const Variant& variant);
@@ -157,13 +204,13 @@ namespace utilities
         template <typename ValueType, typename... Args>
         friend Variant MakeVariant(Args&&... args);
 
-        Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue);
+        Variant(std::type_index type, std::unique_ptr<VariantDetail::VariantBase> variantValue);
+
         void ArchiveProperty(const char* name, Archiver& archiver) const;
         void UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context);
-        void SetVariantValue(const Variant& value);
 
         std::type_index _type;
-        std::unique_ptr<VariantBase> _value;
+        std::unique_ptr<VariantDetail::VariantBase> _value;
     };
 
     /// <summary> Convenience function to create a Variant </summary>
@@ -172,6 +219,34 @@ namespace utilities
 
     /// <summary> Get string representation of a Variant </summary>
     std::string to_string(const Variant& variant);
+
+    //
+    // Helper functions for calling functions with vectors of Variants
+    //
+
+    // <summary> Returns a vector of default-initialized variants of the types given in TupleType </summary>
+    template <typename TupleType>
+    std::vector<Variant> GetVariantsFromTupleType();
+
+    // <summary> Returns a vector of default-initialized variants of the types needed to call a function of the type FunctionType </summary>
+    template <typename FunctionType>
+    std::vector<Variant> GetVariantsFromFunctionArgs();
+
+    // <summary> Returns a vector of default-initialized variants of the types needed to call a function of the given function </summary>
+    template <typename FunctionType>
+    std::vector<Variant> GetVariantsFromFunctionArgs(FunctionType& f);
+
+    /// <summary> Fills in tuple with values taken from vector of Variants </summary>
+    template <typename ArgsTupleType>
+    ArgsTupleType GetTupleFromVariants(const std::vector<Variant>& args);
+
+    /// <summary> Fills in tuple with values taken from vector of Variants </summary>
+    template <typename FunctionType>
+    FunctionArgTypes<FunctionType> GetArgTupleFromVariants(FunctionType& function, const std::vector<Variant>& args);
+
+    /// <summary> Call a function with a vector of Variants </summary>
+    template <typename FunctionType>
+    FunctionReturnType<FunctionType> CallFunctionWithVariants(FunctionType& function, const std::vector<utilities::Variant>& args);
 }
 }
 

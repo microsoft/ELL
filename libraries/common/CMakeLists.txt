@@ -17,6 +17,7 @@ set (src
   src/ModelSaveArguments.cpp
   src/MultiEpochIncrementalTrainerArguments.cpp
   src/ForestTrainerArguments.cpp
+  src/RegisterNodeCreators.cpp
   src/TrainerArguments.cpp
 )
 
@@ -35,6 +36,7 @@ set (include
   include/ModelSaveArguments.h
   include/MultiEpochIncrementalTrainerArguments.h
   include/ParametersEnumerator.h
+  include/RegisterNodeCreators.h
   include/ForestTrainerArguments.h
   include/TrainerArguments.h
 )

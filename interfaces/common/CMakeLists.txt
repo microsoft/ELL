@@ -3,4 +3,6 @@
 #
 include (CommonInterfaces)
 
+set (INTERFACE_SRC src/ModelInterface.cpp)
+
 generate_interface(common ${CMAKE_CURRENT_SOURCE_DIR} "" "" "")

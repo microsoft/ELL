@@ -2,9 +2,17 @@
 # Build node module
 # 
 
+# Exports the following global variables
+# 
+# MODULE_INTERFACE_SRC
+# MODULE_BLAS_LIBS
+# MODULE_LLVM_LIBS
+# MODULE_BUILD_COMMAND
+#
+
 set (module_name ell_module)
 
-set (MODULE_FILES 
+set (module_files 
     binding.gyp
     buildme
     buildme.cmd
@@ -33,7 +41,7 @@ if(NPM_EXECUTABLE)
     endif()
 
     add_custom_target(${module_name}_files ALL
-        DEPENDS ${MODULE_FILES} ell_module_d_ts
+        DEPENDS ${module_files} ell_module_d_ts
         COMMENT "Copying module files"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -52,19 +60,24 @@ if(NPM_EXECUTABLE)
     add_dependencies(${module_name} ${module_name}_files ${module_name}_install ELL_xml)
 
     # Generate list of external libraries to link against in a format binding.gyp will like
-    foreach(LIB ${LLVM_LIBS})
-        list(APPEND MODULE_LLVM_LIBS "'-l${LIB}',\n")
+    foreach(lib ${LLVM_LIBS})
+        list(APPEND MODULE_LLVM_LIBS "'-l${lib}',\n")
     endforeach()
     string(CONCAT MODULE_LLVM_LIBS ${MODULE_LLVM_LIBS})
 
-    foreach(LIB ${BLAS_LIBS})
-        list(APPEND MODULE_BLAS_LIBS "'-l${LIB}',\n")
+    foreach(lib ${BLAS_LIBS})
+        list(APPEND MODULE_BLAS_LIBS "'-l${lib}',\n")
     endforeach()
     string(CONCAT MODULE_BLAS_LIBS ${MODULE_BLAS_LIBS})
 
-    foreach(MODULE_FILE ${MODULE_FILES})
-        configure_file(${MODULE_FILE} ${MODULE_FILE} @ONLY)
-        set_property(TARGET ${module_name}_files APPEND PROPERTY OBJECT_DEPENDS ${MODULE_FILE})
+    foreach(src ${INTERFACE_SRC})
+        list(APPEND MODULE_INTERFACE_SRC "'../${src}',\n")
+    endforeach()
+    string(CONCAT MODULE_BLAS_LIBS ${MODULE_BLAS_LIBS})
+
+    foreach(module_file ${module_files})
+        configure_file(${module_file} ${module_file} @ONLY)
+        set_property(TARGET ${module_name}_files APPEND PROPERTY OBJECT_DEPENDS ${module_file})
     endforeach()
 
 endif()

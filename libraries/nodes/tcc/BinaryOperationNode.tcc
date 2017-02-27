@@ -270,7 +270,6 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[input1PortName] << _input1;
         archiver[input2PortName] << _input2;
-        archiver[outputPortName] << _output;
         archiver["operation"] << BinaryOperations::to_string(_operation);
     }
 
@@ -280,10 +279,10 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[input1PortName] >> _input1;
         archiver[input2PortName] >> _input2;
-        archiver[outputPortName] >> _output;
         std::string operation;
         archiver["operation"] >> operation;
         _operation = BinaryOperations::from_string(operation);
+        _output.SetSize(_input1.Size());
     }
 }
 }

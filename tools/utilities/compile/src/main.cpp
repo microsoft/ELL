@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
         {
             model::TransformContext context;
             map.Refine(context, compileArguments.maxRefinementIterations);
-            common::SaveMap(map, compileArguments.outputCodeStream, "json");
+            common::SaveMap(map, compileArguments.outputCodeStream);
         }
         else
         {
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
             switch (compileArguments.outputType)
             {
                 case CompileArguments::OutputType::compiledMap:
-                    common::SaveMap(compiledMap, compileArguments.outputCodeStream, "json");
+                    common::SaveMap(compiledMap, compileArguments.outputCodeStream);
                     break;
 
                 case CompileArguments::OutputType::ir:

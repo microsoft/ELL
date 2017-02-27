@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "TypeTraits.h"
+
 // stl
 #include <cstddef>
 #include <cstdint>
@@ -19,6 +21,27 @@ namespace ell
 {
 namespace utilities
 {
+    // Forward declaration of IArchivable
+    class IArchivable;
+
+    // struct to help determine if a class has GetTypeName() defined
+    template <typename CheckType>
+    class HasGetTypeName
+    {
+        // Fallback returns false if we don't have GetTypeName
+        template <typename>
+        static constexpr std::false_type FindGetTypeName(...);
+
+        // returns true if we have GetTypeName()->string
+        template <typename T>
+        static constexpr auto FindGetTypeName(T*) -> typename std::is_same<std::string, decltype(std::declval<T>().GetTypeName())>::type;
+
+        typedef decltype(FindGetTypeName<CheckType>(nullptr)) type;
+
+    public:
+        static constexpr bool value = type::value;
+    };
+
     /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
     ///
     /// <param name="baseType"> The base type (e.g., 'Vector') </param>
@@ -32,16 +55,25 @@ namespace utilities
     /// <param name="subtypes"> The list of templated types (e.g., 'double') </param>
     std::string GetCompositeTypeName(std::string baseType, const std::vector<std::string>& subtypes);
 
-    /// <summary> Class used to get information about class types. </summary>
-    ///
-    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template <typename T, typename Enable = void>
+    struct TypeName; // undefined
+
     template <typename T>
-    struct TypeName
+    struct TypeName<T, std::enable_if_t<HasGetTypeName<std::decay_t<T>>::value>>
     {
         /// <summary> Gets the serialization name of the type. </summary>
         ///
         /// <returns> The serialization name. </returns>
-        static std::string GetName() { return std::string(std::decay<T>::type::GetTypeName()); }
+        static std::string GetName();
+    };
+
+    template <typename T>
+    struct TypeName<T, std::enable_if_t<std::is_enum<std::decay_t<T>>::value>>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName();
     };
 
     /// <summary> Class used to get information about pointer types. </summary>
@@ -80,6 +112,18 @@ namespace utilities
         static std::string GetName();
     };
 
+    /// <summary> Class used to get information about std::vector types. </summary>
+    ///
+    /// <typeparam name="T"> Generic type parameter. </typeparam>
+    template <typename T>
+    struct TypeName<const std::vector<T>&>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName();
+    };
+
     /// <summary> Class used to get information about tuple types. </summary>
     ///
     /// <typeparam name="T"> Generic type parameter. </typeparam>
@@ -91,7 +135,7 @@ namespace utilities
         /// <returns> The serialization name. </returns>
         static std::string GetName()
         {
-            return GetCompositeTypeName<typename std::decay<T>::type...>("tuple");
+            return GetCompositeTypeName<std::decay_t<T>...>("tuple");
         }
     };
 
@@ -283,6 +327,26 @@ namespace utilities
         ///
         /// <returns> The serialization name. </returns>
         static std::string GetName() { return "std::false_type"; }
+    };
+
+    /// <summary> Class used to get information about the double type. </summary>
+    template <>
+    struct TypeName<IArchivable>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "IArchivable"; }
+    };
+
+    /// <summary> Class used to get information about the double type. </summary>
+    template <>
+    struct TypeName<const IArchivable>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "IArchivable"; }
     };
 }
 }

@@ -3,6 +3,7 @@
 //
 
 #include "DynamicMap_test.h"
+#include "ModelBuilder_test.h"
 #include "Model_test.h"
 #include "PortElements_test.h"
 
@@ -19,7 +20,7 @@ using namespace ell;
 
 int main()
 {
-    try
+//    try
     {
         // Model tests
         TestStaticModel();
@@ -34,6 +35,7 @@ int main()
         // PortElements tests
         TestSlice();
         TestAppend();
+        TestParsePortElements();
 
         // DynamicMap tests
         TestDynamicMapCreate();
@@ -43,12 +45,37 @@ int main()
         TestDynamicMapSerialization();
 
         TestCustomRefine();
+
+        //
+        // ModelBuilder tests
+        //
+
+        // Test passthrough to Model::AddNode
+        TestTemplateAddNode();
+
+        // Test ModelBuilder::GetAddNodeArgs(string)
+        TestInputNodeGetArgumentTypes();
+        TestConstantNodeGetArgumentTypes();
+        TestOutputNodeGetArgumentTypes();
+        TestBinaryOpNodeGetArgumentTypes();
+
+        // Test ModelBuilder::AddNode(string, vector<Variant>) with exact types
+        TestVariantAddConstantNodes();
+        TestVariantAddInputNodes();
+        TestVariantAddOutputNode();
+        TestVariantAddBinaryOpNode();
+
+        // Test ModelBuilder::AddNode(string, vector<Variant>) with convertable types
+        TestVariantAddInputNodesConvertableArgs();
+
+        // Test ModelBuilder::AddNode(string, vector<string>)
+        TestVariantAddInputNodesParsedArgs();
     }
-    catch (const utilities::Exception& exception)
-    {
-        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
-        throw;
-    }
+//    catch (const utilities::Exception& exception)
+//    {
+//        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
+//        throw;
+//    }
 
     if (testing::DidTestFail())
     {

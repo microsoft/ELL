@@ -34,8 +34,7 @@ namespace common
     ///
     /// <param name="model"> The model. </param>
     /// <param name="outStream"> The stream. </param>
-    /// <param name="filetype"> The format for the output ('xml' or 'json') </param>
-    void SaveModel(const model::Model& model, std::ostream& outStream, std::string filetype);
+    void SaveModel(const model::Model& model, std::ostream& outStream);
 
     /// <summary> Register known node types to a serialization context </summary>
     ///
@@ -64,7 +63,6 @@ namespace common
     ///
     /// <param name="map"> The map. </param>
     /// <param name="outStream"> The stream. </param>
-    /// <param name="filetype"> The format for the output ('xml' or 'json') </param>
-    void SaveMap(const model::DynamicMap& map, std::ostream& outStream, std::string filetype);
+    void SaveMap(const model::DynamicMap& map, std::ostream& outStream);
 }
 }

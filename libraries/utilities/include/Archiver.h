@@ -27,10 +27,23 @@ namespace ell
 namespace utilities
 {
     class IArchivable;
+    class ArchivedAsPrimitive;
 
     /// <summary> Enabled if ValueType inherits from IArchivable. </summary>
     template <typename ValueType>
-    using IsArchivable = typename std::enable_if_t<std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value, int>;
+    using IsIArchivable = typename std::enable_if_t<std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value, int>;
+
+    /// <summary> Enabled if ValueType inherits from IArchivable but not from ArchivedAsPrimitive. </summary>
+    template <typename ValueType>
+    using IsStandardArchivable = typename std::enable_if_t<std::is_base_of<IArchivable, typename std::decay<ValueType>::type>::value && !std::is_base_of<ArchivedAsPrimitive, typename std::decay<ValueType>::type>::value, int>;
+
+    /// <summary> Enabled if ValueType inherits from IArchivable. </summary>
+    template <typename ValueType>
+    using IsArchivedAsPrimitive = typename std::enable_if_t<std::is_base_of<ArchivedAsPrimitive, typename std::decay<ValueType>::type>::value, int>;
+
+    /// <summary> Enabled if ValueType does not inherit from ArchivedAsPrimitive. </summary>
+    template <typename ValueType>
+    using IsNotArchivedAsPrimitive = typename std::enable_if_t<!std::is_base_of<ArchivedAsPrimitive, typename std::decay<ValueType>::type>::value, int>;
 
     /// <summary> Enabled if ValueType does not inherit from IArchivable. </summary>
     template <typename ValueType>
@@ -208,10 +221,10 @@ namespace utilities
 
         void ArchiveItem(const char* name, const std::vector<std::string>& value);
 
-        template <typename ValueType, IsArchivable<ValueType> concept = 0>
+        template <typename ValueType, IsIArchivable<ValueType> concept = 0>
         void ArchiveItem(const char* name, const std::vector<ValueType>& value);
 
-        template <typename ValueType, IsArchivable<ValueType> concept = 0>
+        template <typename ValueType, IsIArchivable<ValueType> concept = 0>
         void ArchiveItem(const char* name, const std::vector<const ValueType*>& value);
     };
 
@@ -318,6 +331,7 @@ namespace utilities
         virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName);
         virtual void UnarchiveObject(const char* name, IArchivable& value);
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName);
+        virtual void UnarchiveObjectAsPrimitive(const char* name, IArchivable& value);
 
         virtual void EndUnarchiving() {}
 
@@ -325,16 +339,24 @@ namespace utilities
         SerializationContext _baseContext;
         std::vector<std::reference_wrapper<SerializationContext>> _contexts;
 
-        // non-vector
-        template <typename ValueType, IsNotVector<ValueType> concept = 0>
+        // non-vector standard thing
+        template <typename ValueType, IsNotVector<ValueType> concept1 = 0, IsNotArchivedAsPrimitive<ValueType> concept2 = 0>
         void UnarchiveItem(const char* name, ValueType&& value);
 
-        // pointer to non-archivable object
+        // non-vector archivable-as-fundamental
+        template <typename ValueType, IsNotVector<ValueType> concept1 = 0, IsArchivedAsPrimitive<ValueType> concept2 = 0>
+        void UnarchiveItem(const char* name, ValueType&& value);
+
+        // unique pointer to non-archivable object
         template <typename ValueType, IsNotArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value);
 
-        // pointer to archivable object
-        template <typename ValueType, IsArchivable<ValueType> concept = 0>
+        // unique pointer to standard archivable object
+        template <typename ValueType, IsStandardArchivable<ValueType> concept = 0>
+        void UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value);
+
+        // unique pointer to archived-as-primitive object
+        template <typename ValueType, IsArchivedAsPrimitive<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value);
 
         // vector of fundamental values
@@ -345,15 +367,15 @@ namespace utilities
         void UnarchiveItem(const char* name, std::vector<std::string>& value);
 
         // vector of IArchivable values
-        template <typename ValueType, IsArchivable<ValueType> concept = 0>
+        template <typename ValueType, IsIArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::vector<ValueType>& value);
 
         // vector of unique pointers to IArchivable
-        template <typename ValueType, IsArchivable<ValueType> concept = 0>
+        template <typename ValueType, IsIArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::vector<std::unique_ptr<ValueType>>& value);
 
         // vector of pointers to IArchivable
-        template <typename ValueType, IsArchivable<ValueType> concept = 0>
+        template <typename ValueType, IsIArchivable<ValueType> concept = 0>
         void UnarchiveItem(const char* name, std::vector<const ValueType*>& value);
     };
 

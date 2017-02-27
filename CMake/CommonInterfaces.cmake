@@ -59,6 +59,14 @@ foreach(file ${INTERFACE_FILES})
     configure_file(${file} ${file} COPYONLY)
 endforeach()
 
+foreach(file ${INTERFACE_SRC})
+    configure_file(${file} ${file} COPYONLY)
+endforeach()
+
+foreach(file ${INTERFACE_INCLUDE})
+    configure_file(${file} ${file} COPYONLY)
+endforeach()
+
 set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-classes -debug-typedef  -debug-template)
 if(${language} STREQUAL "javascript")
     # Note: if compiling against older version of node, we may have to specify the 
@@ -97,7 +105,7 @@ if( ((${language} STREQUAL "xml") OR (${language} STREQUAL "javascript")))
     add_custom_target(${module_name} ALL 
         DEPENDS ${generated_sources})
 else()
-    swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC}) # ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
+    swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
 
     swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common evaluators lossFunctions model nodes predictors trainers utilities emitters)
     set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}ELL)

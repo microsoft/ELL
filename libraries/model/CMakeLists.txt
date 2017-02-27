@@ -14,6 +14,7 @@ set (src
     src/IRMapCompiler.cpp
     src/MapCompiler.cpp
     src/Model.cpp
+    src/ModelBuilder.cpp
     src/ModelTransformer.cpp
     src/Node.cpp
     src/OutputNode.cpp
@@ -33,6 +34,7 @@ set (include
     include/IRMapCompiler.h
     include/MapCompiler.h
     include/Model.h
+    include/ModelBuilder.h
     include/ModelTransformer.h
     include/Node.h
     include/NodeMap.h
@@ -48,6 +50,7 @@ set (tcc
     tcc/InputPort.tcc
     tcc/IRCompiledMap.tcc
     tcc/Model.tcc
+    tcc/ModelBuilder.tcc
     tcc/ModelTransformer.tcc
     tcc/NodeMap.tcc
     tcc/OutputNode.tcc
@@ -78,14 +81,18 @@ set (test_name ${library_name}_test)
 set (test_src
     test/src/main.cpp
     test/src/DynamicMap_test.cpp
+    test/src/ModelTestUtilities.cpp
+    test/src/ModelBuilder_test.cpp
     test/src/Model_test.cpp
     test/src/PortElements_test.cpp
 )
 
 set (test_include 
-    test/include/PortElements_test.h
     test/include/DynamicMap_test.h
+    test/include/ModelBuilder_test.h
+    test/include/ModelTestUtilities.h
     test/include/Model_test.h
+    test/include/PortElements_test.h
 )
 
 source_group("src" FILES ${test_src})
@@ -109,18 +116,18 @@ set (compiler_test_src
     test/src/compiler_test_main.cpp
     test/src/CompilableNodesTest.cpp
     test/src/CompilerTest.cpp
-    test/src/ModelBuilder.cpp
+    test/src/ModelMaker.cpp
 )
 
 set (compiler_test_include
     test/include/CompilableNodesTest.h
     test/include/CompilerTest.h
     test/include/CompilerTestUtilities.h
-    test/include/ModelBuilder.h
+    test/include/ModelMaker.h
 )
 
 set (compiler_test_tcc
-    test/tcc/ModelBuilder.tcc
+    test/tcc/ModelMaker.tcc
 )
 
 source_group("src" FILES ${compiler_test_src})

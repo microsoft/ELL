@@ -41,7 +41,6 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
         archiver["weightedElements"] << _weightedElements;
         archiver["predictor"] << _predictor;
     }
@@ -50,7 +49,6 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
         archiver["weightedElements"] >> _weightedElements;
         archiver["predictor"] >> _predictor;
     }

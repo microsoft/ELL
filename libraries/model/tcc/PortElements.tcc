@@ -163,5 +163,26 @@ namespace model
     {
         return RefType({ ref1, refs... });
     }
+
+    //
+    // Proxy classes
+    //
+    template <typename ValueType>
+    PortElementsProxy PortElementsToProxy(const PortElements<ValueType>& elements)
+    {
+        PortElementsProxy proxy(elements.GetPortType());
+        for (auto r : elements.GetRanges())
+        {
+            proxy.Append(r);
+        }
+        return proxy;
+    }
+
+    template <typename ValueType>
+    PortElements<ValueType> ProxyToPortElements(const Model& model, const PortElementsProxy& proxy)
+    {
+        return PortElements<ValueType>(ProxyToPortElements(model, proxy));
+    }
+
 }
 }

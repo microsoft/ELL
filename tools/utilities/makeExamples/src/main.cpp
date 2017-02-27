@@ -50,23 +50,12 @@ int main(int argc, char* argv[])
 {
     try
     {
-        std::string format = "model";
-
         // create a command line parser
         utilities::CommandLineParser commandLineParser(argc, argv);
-        commandLineParser.AddOption(format, "modelFormat", "mf", "xml or model", "model");
 
         // parse command line
         commandLineParser.Parse();
-        if (format == "both")
-        {
-            SaveModels("xml");
-            SaveModels("model");
-        }
-        else
-        {
-            SaveModels(format);
-        }
+        SaveModels("model");
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

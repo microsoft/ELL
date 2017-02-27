@@ -141,7 +141,6 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver["elements"] << _elements;
         archiver["selector"] << _selector;
-        archiver[outputPortName] << _output;
     }
 
     template <typename ValueType, typename SelectorType>
@@ -150,7 +149,6 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver["elements"] >> _elements;
         archiver["selector"] >> _selector;
-        archiver[outputPortName] >> _output;
     }
 }
 }

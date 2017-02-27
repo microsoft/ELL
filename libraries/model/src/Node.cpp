@@ -9,6 +9,7 @@
 #include "Node.h"
 #include "InputPort.h"
 #include "ModelTransformer.h"
+#include "OutputPort.h"
 
 // utilities
 #include "IArchivable.h"

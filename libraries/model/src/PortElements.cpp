@@ -10,15 +10,176 @@
 #include "Model.h"
 #include "Node.h"
 
-#include <cassert>
-
 // utilities
 #include "Exception.h"
+#include "Tokenizer.h"
+
+// stl
+#include <cassert>
+#include <sstream>
 
 namespace ell
 {
 namespace model
 {
+    namespace
+    {
+        //
+        // Helper functions for parsing and stringifying proxies
+        //
+        std::string GetRangeString(const PortRangeProxy& range)
+        {
+            using std::to_string;
+            std::string prefix = to_string(range.GetNodeId()) + "." + range.GetPortName();
+            if (!range.IsFixedSize())
+            {
+                return prefix;
+            }
+            else if (range.Size() == 1)
+            {
+                return prefix + "[" + to_string(range.GetStartIndex()) + "]";
+            }
+            return prefix + "[" + to_string(range.GetStartIndex()) + ":" + to_string(range.GetStartIndex() + range.Size()) + "]";
+        }
+
+        PortRangeProxy ParseRange(utilities::Tokenizer& tokenizer)
+        {
+            auto nodeIdStr = tokenizer.ReadNextToken();
+            auto nodeId = utilities::UniqueId(nodeIdStr);
+            tokenizer.MatchToken(".");
+            auto portName = tokenizer.ReadNextToken();
+            // now check for element/element slice
+            if (tokenizer.PeekNextToken() == "[")
+            {
+                tokenizer.MatchToken("[");
+                auto token = tokenizer.ReadNextToken();
+                size_t startIndex = std::stoi(token);
+                size_t size = 1;
+                if (tokenizer.PeekNextToken() == ":")
+                {
+                    tokenizer.MatchToken(":");
+                    auto endIndex = std::stoi(tokenizer.ReadNextToken());
+                    size = endIndex - startIndex;
+                }
+
+                tokenizer.MatchToken("]");
+                return { nodeId, portName, startIndex, size };
+            }
+            else
+            {
+                return { nodeId, portName };
+            }
+        }
+
+        PortRangeProxy ParseRange(const std::string& str)
+        {
+            std::stringstream stream(str);
+            std::string delimiters = "{}[],.:";
+            utilities::Tokenizer tokenizer(stream, delimiters);
+            return ParseRange(tokenizer);
+        }
+
+        std::vector<PortRangeProxy> ParseRangeList(utilities::Tokenizer& tokenizer)
+        {
+            std::vector<PortRangeProxy> result;
+            while (true)
+            {
+                // read a range
+                result.push_back(ParseRange(tokenizer));
+                if (tokenizer.PeekNextToken() != ",")
+                {
+                    break;
+                }
+                tokenizer.MatchToken(",");
+            }
+            return result;
+        }
+
+        std::string GetPortElementsString(const PortElementsProxy& elements)
+        {
+            if (elements.NumRanges() == 0)
+            {
+                return "{}";
+            }
+
+            if (elements.NumRanges() == 1)
+            {
+                return GetRangeString(elements.GetRanges()[0]);
+            }
+
+            std::string valueString = "{";
+            bool first = true;
+            for (const auto& range : elements.GetRanges())
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    valueString += ", ";
+                }
+                valueString += GetRangeString(range);
+            }
+
+            valueString += "}";
+            return valueString;
+        }
+
+        // Create a PortElementsProxy from a tokenizer
+        PortElementsProxy ParsePortElements(utilities::Tokenizer& tokenizer)
+        {
+            auto t = tokenizer.PeekNextToken();
+            if (t == "{")
+            {
+                tokenizer.MatchToken(t);
+                auto ranges = ParseRangeList(tokenizer);
+                tokenizer.MatchToken("}");
+                return PortElementsProxy(ranges);
+            }
+            else
+            {
+                return PortElementsProxy(ParseRange(tokenizer));
+            }
+        }
+
+        // Create a PortElementsProxy from a string
+        PortElementsProxy ParsePortElements(const std::string& str)
+        {
+            std::stringstream stream(str);
+            std::string delimiters = "{}[],.:";
+            utilities::Tokenizer tokenizer(stream, delimiters);
+            return ParsePortElements(tokenizer);
+        }
+
+        PortRange PortRangeFromArchivedProxy(utilities::Unarchiver& archiver, const PortRangeProxy& proxy)
+        {
+            auto& context = archiver.GetContext();
+            ModelSerializationContext& modelContext = dynamic_cast<ModelSerializationContext&>(context);
+            Node* node = modelContext.GetNodeFromSerializedId(proxy.GetNodeId());
+            if (node == nullptr)
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find archived node.");
+            }
+
+            OutputPortBase* newPort = node->GetOutputPort(proxy.GetPortName());
+            if (newPort == nullptr)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive PortRange port -- no port of that name");
+            }
+
+            if (proxy.IsFixedSize())
+            {
+                return PortRange(*newPort, proxy.GetStartIndex(), proxy.Size());
+            }
+            else
+            {
+                return PortRange(*newPort);
+            }
+        }
+
+    } // end anonymous namespace
+
     //
     // PortElementBase::Iterator
     //
@@ -71,7 +232,10 @@ namespace model
         }
     }
 
-    bool PortElementBase::operator==(const PortElementBase& other) const { return (_referencedPort == other._referencedPort) && (_index == other._index); }
+    bool PortElementBase::operator==(const PortElementBase& other) const
+    {
+        return (_referencedPort == other._referencedPort) && (_index == other._index);
+    }
 
     //
     // PortRange
@@ -101,58 +265,17 @@ namespace model
 
     void PortRange::WriteToArchive(utilities::Archiver& archiver) const
     {
-        archiver["startIndex"] << _startIndex;
-        archiver["numValues"] << _numValues;
-        archiver["isFixedSize"] << _isFixedSize;
-        if (_referencedPort != nullptr)
-        {
-            archiver["referencedNodeId"] << _referencedPort->GetNode()->GetId();
-            archiver["referencedPortName"] << _referencedPort->GetName();
-        }
-        else
-        {
-            archiver["referencedNodeId"] << utilities::UniqueId();
-            archiver["referencedPortName"] << std::string{ "" };
-        }
+        PortRangeProxy proxy(*this);
+        archiver << GetRangeString(proxy);
     }
 
     void PortRange::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        archiver["startIndex"] >> _startIndex;
-        archiver["numValues"] >> _numValues;
-        archiver["isFixedSize"] >> _isFixedSize;
-        Node::NodeId newId;
-        archiver["referencedNodeId"] >> newId;
-        std::string portName;
-        archiver["referencedPortName"] >> portName;
-
-        auto& context = archiver.GetContext();
-        ModelSerializationContext& newContext = dynamic_cast<ModelSerializationContext&>(context);
-        Node* newNode = newContext.GetNodeFromSerializedId(newId);
-        if (newNode == nullptr)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Could not find archived node.");
-        }
-
-        auto ports = newNode->GetOutputPorts();
-        OutputPortBase* newPort = nullptr;
-        for (auto port : ports)
-        {
-            if (port->GetName() == portName)
-            {
-                newPort = port;
-                break;
-            }
-        }
-        if (_referencedPort == newPort)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Error unarchiving port.");
-        }
-        _referencedPort = newPort;
-        if (newPort == nullptr)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive PortRange port");
-        }
+        std::string str;
+        archiver >> str;
+        auto proxy = ParseRange(str);
+        auto portRange = PortRangeFromArchivedProxy(archiver, proxy);
+        *this = portRange;
     }
 
     bool PortRange::IsAdjacent(const PortRange& other) const
@@ -278,13 +401,175 @@ namespace model
 
     void PortElementsBase::WriteToArchive(utilities::Archiver& archiver) const
     {
-        archiver["ranges"] << _ranges;
+        PortElementsProxy proxy(*this);
+        archiver << GetPortElementsString(proxy);
     }
 
     void PortElementsBase::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        archiver["ranges"] >> _ranges;
+        std::string str;
+        archiver >> str;
+        auto proxy = ParsePortElements(str);
+        for (const auto& rangeProxy : proxy.GetRanges())
+        {
+            _ranges.push_back(PortRangeFromArchivedProxy(archiver, rangeProxy));
+        }
         ComputeSize();
+    }
+
+    //
+    // PortRangeProxy
+    //
+
+    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName)
+        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(0), _numValues(0), _isFixedSize(false)
+    {
+    }
+
+    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex)
+        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(startIndex), _numValues(0), _isFixedSize(true)
+    {
+    }
+
+    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, size_t startIndex, size_t numValues)
+        : _nodeId(nodeId), _portName(portName), _portType(Port::PortType::none), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true)
+    {
+    }
+
+    PortRangeProxy::PortRangeProxy(Node::NodeId nodeId, std::string portName, Port::PortType portType, size_t startIndex, size_t numValues)
+        : _nodeId(nodeId), _portName(portName), _portType(portType), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true)
+    {
+    }
+
+    PortRangeProxy::PortRangeProxy(const PortRange& range)
+    {
+        if (range.ReferencedPort() == nullptr || range.ReferencedPort()->GetNode() == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference);
+        }
+
+        _nodeId = range.ReferencedPort()->GetNode()->GetId();
+        _portName = range.ReferencedPort()->GetName();
+        _portType = range.GetPortType();
+        _startIndex = range.GetStartIndex();
+        _numValues = range.Size();
+        _isFixedSize = range.IsFixedSize();
+    }
+
+    void PortRangeProxy::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        archiver << GetRangeString(*this);
+    }
+
+    void PortRangeProxy::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        std::string str;
+        archiver >> str;
+        auto proxy = ParseRange(str);
+        *this = proxy;
+    }
+
+    //
+    // PortElementsProxy
+    //
+
+    PortElementsProxy::PortElementsProxy()
+        : _portType(Port::PortType::none)
+    {
+    }
+
+    PortElementsProxy::PortElementsProxy(Port::PortType portType)
+        : _portType(portType)
+    {
+    }
+
+    PortElementsProxy::PortElementsProxy(const PortElementsBase& elements)
+    {
+        for (auto r : elements.GetRanges())
+        {
+            Append(r);
+        }
+    }
+
+    PortElementsProxy::PortElementsProxy(const PortRangeProxy& range)
+    {
+        Append(range);
+    }
+
+    PortElementsProxy::PortElementsProxy(const std::vector<PortRangeProxy>& ranges)
+    {
+        for (auto r : ranges)
+        {
+            Append(r);
+        }
+    }
+
+    void PortElementsProxy::Append(const PortRangeProxy& range)
+    {
+        if (_portType == Port::PortType::none)
+        {
+            _portType = range.GetPortType();
+        }
+        else if (_portType != range.GetPortType())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+        _ranges.push_back(range);
+    }
+
+    void PortElementsProxy::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        archiver << GetPortElementsString(*this);
+    }
+
+    void PortElementsProxy::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        std::string str;
+        archiver >> str;
+        auto proxy = ParsePortElements(str);
+        *this = proxy;
+    }
+
+    //
+    // Helper functions
+    //
+
+    PortElementsProxy ParsePortElementsProxy(std::string str)
+    {
+        return ParsePortElements(str);
+    }
+
+    PortElementsBase ProxyToPortElements(const Model& model, const PortElementsProxy& proxy)
+    {
+        PortElementsBase elements;
+        for (auto rangeProxy : proxy.GetRanges())
+        {
+            const Node* node = model.GetNode(rangeProxy.GetNodeId());
+            if (node == nullptr)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive PortRange port -- bad node id");
+            }
+
+            const OutputPortBase* port = node->GetOutputPort(rangeProxy.GetPortName());
+            if (port == nullptr)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "Couldn't unarchive PortRange port -- bad port name");
+            }
+
+            if (rangeProxy.GetPortType() != Port::PortType::none && port->GetType() != rangeProxy.GetPortType())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+            }
+
+            // Transform to real range
+            auto size = rangeProxy.Size();
+            if (!rangeProxy.IsFixedSize())
+            {
+                size = port->Size();
+            }
+            elements.Append(PortRange(*port, rangeProxy.GetStartIndex(), size));
+        }
+        return elements;
     }
 }
 }

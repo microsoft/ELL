@@ -22,29 +22,33 @@ namespace ell
 {
 void TestLoadMapWithDefaultArgs()
 {
-    std::cout << "Testing map loading" << std::endl;
     common::MapLoadArguments args;
     args.inputModelFilename = "../../../examples/data/model_1.model";
     args.modelInputsString = "";
-    args.modelOutputsString = "1017.output";
+    args.modelOutputsString = "1026.output"; // the LinearPredictorNode
 
+    std::cout << "Testing map loading, file " << args.inputModelFilename << std::endl;
     auto map = common::LoadMap(args);
 
     // check stuff out
-    std::cout << "Input[0] size: " << map.GetInput(0)->Size() << std::endl;
     std::cout << "Input[0] node id: " << map.GetInput(0)->GetId() << std::endl;
+    testing::ProcessTest("Testing map load", map.GetInput(0)->Size() == 3);
+    testing::ProcessTest("Testing map load", map.GetOutput(0).Size() == 1);
 }
 
 void TestLoadMapWithPorts()
 {
-    std::cout << "Testing map loading" << std::endl;
     common::MapLoadArguments args;
     args.inputModelFilename = "../../../examples/data/model_1.model";
     args.modelInputsString = "";
-    args.modelOutputsString = "1017.weightedElements[0:2]";
+    args.modelOutputsString = "{1026.weightedElements[0:2], 1026.weightedElements[4:6]}";
 
+    std::cout << "Testing map loading, file " << args.inputModelFilename << std::endl;
     auto map = common::LoadMap(args);
 
     // check stuff out
+    std::cout << "Input[0] node id: " << map.GetInput(0)->GetId() << std::endl;
+    testing::ProcessTest("Testing map load", map.GetInput(0)->Size() == 3);
+    testing::ProcessTest("Testing map load", map.GetOutput(0).Size() == 4);
 }
 }

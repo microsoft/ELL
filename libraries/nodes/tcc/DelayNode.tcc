@@ -80,7 +80,6 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
         archiver["windowSize"] << _windowSize;
     }
 
@@ -89,7 +88,6 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
         archiver["windowSize"] >> _windowSize;
 
         auto dimension = _input.Size();
@@ -99,6 +97,7 @@ namespace nodes
         {
             _samples.push_back(std::vector<ValueType>(dimension));
         }
+        _output.SetSize(dimension);
     }
 }
 }

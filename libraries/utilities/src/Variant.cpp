@@ -13,12 +13,6 @@ namespace ell
 namespace utilities
 {
     //
-    // VariantBase implementation
-    //
-    VariantBase::VariantBase(std::type_index type)
-        : _type(type){};
-
-    //
     // Variant implementation
     //
     Variant::Variant()
@@ -40,7 +34,7 @@ namespace utilities
         }
     }
 
-    Variant::Variant(std::type_index type, std::unique_ptr<VariantBase> variantValue)
+    Variant::Variant(std::type_index type, std::unique_ptr<VariantDetail::VariantBase> variantValue)
         : _type(type)
     {
         _value = std::move(variantValue);
@@ -61,6 +55,16 @@ namespace utilities
         return _value->ToString();
     }
 
+    void Variant::ParseInto(const std::string& s)
+    {
+        _value->ParseInto(s);
+    }
+
+    bool Variant::TryParseInto(const std::string& s)
+    {
+        return _value->TryParseInto(s);
+    }
+
     std::string Variant::GetStoredTypeName() const
     {
         return _value->GetStoredTypeName();
@@ -76,14 +80,34 @@ namespace utilities
         return _value->IsPrimitiveType();
     }
 
-    bool Variant::IsArchivable() const
+    bool Variant::IsIntegralType() const
     {
-        return _value->IsArchivable();
+        return _value->IsIntegralType();
+    }
+
+    bool Variant::IsFloatingPointType() const
+    {
+        return _value->IsFloatingPointType();
+    }
+
+    bool Variant::IsEnumType() const
+    {
+        return _value->IsEnumType();
+    }
+
+    bool Variant::IsIArchivable() const
+    {
+        return _value->IsIArchivable();
     }
 
     bool Variant::IsPointer() const
     {
         return _value->IsPointer();
+    }
+
+    bool Variant::IsSameTypeAs(const Variant& other) const
+    {
+        return other._type == _type;
     }
 
     void Variant::ArchiveProperty(const char* name, Archiver& archiver) const

@@ -14,7 +14,7 @@ data = [
     ("[tree_2]", "Tree 2",  "tree_2" ), 
     ("[tree_3]", "Tree 3",  "tree_3" )  ]
 
-extensions = ["xml", "json"]
+extensions = ["json"]
 
 def TestModelSize(key, label):
     model = ELL.ELL_Model(key)

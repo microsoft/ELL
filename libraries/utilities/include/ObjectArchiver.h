@@ -104,7 +104,7 @@ namespace utilities
         template <typename ValueType>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
-        template <typename ValueType, IsArchivable<ValueType> concept = 0>
+        template <typename ValueType, IsIArchivable<ValueType> concept = 0>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
         // Deserialization

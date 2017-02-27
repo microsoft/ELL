@@ -64,7 +64,6 @@ namespace nodes
     void ConstantNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
-        archiver[outputPortName] << _output;
         archiver["values"] << _values;
     }
 
@@ -72,8 +71,8 @@ namespace nodes
     void ConstantNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-        archiver[outputPortName] >> _output;
         archiver["values"] >> _values;
+        _output.SetSize(_values.size());
     }
 }
 }
