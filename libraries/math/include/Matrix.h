@@ -73,6 +73,7 @@ namespace math
     protected:
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
         MatrixBase(size_t numRows, size_t numColumns);
+        MatrixBase(size_t numRows, size_t numColumns, ElementType* pData);
 
         using RectangularMatrixBase<ElementType>::_pData;
         using RectangularMatrixBase<ElementType>::_numRows;
@@ -95,6 +96,7 @@ namespace math
     protected:
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
         MatrixBase(size_t numRows, size_t numColumns);
+        MatrixBase(size_t numRows, size_t numColumns, ElementType* pData);
 
         using RectangularMatrixBase<ElementType>::_pData;
         using RectangularMatrixBase<ElementType>::_numRows;
@@ -233,6 +235,8 @@ namespace math
         friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
 
+        ConstMatrixReference(size_t numRows, size_t numColumns, ElementType* pData) : MatrixBase(numRows, numColumns, pData) {}
+            
         ElementType* GetMajorVectorBegin(size_t index) const;
 
         using RectangularMatrixBase<ElementType>::_pData;
@@ -254,6 +258,17 @@ namespace math
     class MatrixReference : public ConstMatrixReference<ElementType, Layout>
     {
     public:
+
+        /// <summary> Constructs a matrix that uses a pointer to an external buffer as the element data. 
+        /// This allows the matrix to use data provided by some other source, and this matrix does not
+        /// own the data buffer.
+        /// The buffer has (numRows * numColumns) number of elements. </summary>
+        ///
+        /// <param name="numRows"> Number of rows in the matrix. </param>
+        /// <param name="numColumns"> Number of columns in the matrix. </param>
+        /// <param name="pData"> A pointer where the elements are stored. </param>
+        MatrixReference(size_t numRows, size_t numColumns, ElementType* pData);
+
         /// <summary> Gets a pointer to the underlying data storage. </summary>
         ///
         /// <returns> Pointer to the data. </returns>
@@ -290,7 +305,7 @@ namespace math
         ///// <summary> Gets a const reference to this matrix. </summary>
         /////
         ///// <returns> A const reference to this matrix. </returns>
-        //ConstMatrixReference<ElementType, Layout> GetConstReference() const;
+        ConstMatrixReference<ElementType, Layout> GetConstReference() const;
 
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
@@ -339,6 +354,11 @@ namespace math
             return RectangularMatrixBase<ElementType>::template ConstructVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
         }
 
+        /// <summary> Swaps the contents of this matrix with the contents of another matrix. </summary>
+        ///
+        /// <param name="other"> [in,out] The other matrix. </param>
+        void Swap(MatrixReference<ElementType, Layout>& other);
+
         using RectangularMatrixBase<ElementType>::NumRows;
         using RectangularMatrixBase<ElementType>::NumColumns;
 
@@ -377,6 +397,22 @@ namespace math
         ///
         /// <param name="list"> A list of initialization lists (row by row). </param>
         Matrix(std::initializer_list<std::initializer_list<ElementType>> list);
+
+        /// <summary> Constructs a matrix from an vector. The vector has
+        /// (numRows * numColumns) number of elements. </summary>
+        ///
+        /// <param name="numRows"> Number of rows in the matrix. </param>
+        /// <param name="numColumns"> Number of columns in the matrix. </param>
+        /// <param name="list"> A list of elements. These elements are expected to be in the layout order of this matrix's layout type. </param>
+        Matrix(size_t numRows, size_t numColumns, const std::vector<ElementType>& data);
+
+        /// <summary> Constructs a matrix from an vector. The vector has
+        /// (numRows * numColumns) number of elements. </summary>
+        ///
+        /// <param name="numRows"> Number of rows in the matrix. </param>
+        /// <param name="numColumns"> Number of columns in the matrix. </param>
+        /// <param name="list"> A list of elements. These elements are expected to be in the layout order of this matrix's layout type. </param>
+        Matrix(size_t numRows, size_t numColumns, std::vector<ElementType>&& data);
 
         /// <summary> Move Constructor. </summary>
         ///

@@ -257,6 +257,42 @@ void TestMatrix2()
     testing::ProcessTest("Matrix::Fill()", M == R2);
 }
 
+template <typename ElementType>
+void TestReferenceMatrix()
+{
+    std::vector<ElementType> elements = { 1, 2, 3, 4, 5, 6 };
+    math::MatrixReference<ElementType, math::MatrixLayout::rowMajor> Mref1(2, 3, elements.data());
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> M1{
+        { 1, 2, 3 },
+        { 4, 5, 6 }
+    };
+    testing::ProcessTest("ReferenceMatrix testing initial values", Mref1 == M1);
+
+    elements[2] = 11;
+    elements[4] = 10;
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> M2{
+        { 1, 2, 11 },
+        { 4, 10, 6 }
+    };
+    testing::ProcessTest("ReferenceMatrix testing modification of values", Mref1 == M2);
+
+    math::MatrixReference<ElementType, math::MatrixLayout::columnMajor> Mref2(2, 3, elements.data());
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> M3{
+        { 1, 11, 10 },
+        { 2,  4,  6 }
+    };
+    testing::ProcessTest("ReferenceMatrix testing second round of intial values", Mref2 == M3);
+
+    elements[1] = 12;
+    elements[2] = 13;
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> M4{
+        { 1, 13, 10 },
+        { 12, 4, 6 }
+    };
+    testing::ProcessTest("ReferenceMatrix testing second round of modified values", Mref2 == M4);
+}
+
 template <typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
 void TestMatrixOperations()
 {
@@ -279,6 +315,29 @@ void TestMatrixOperations()
     Ops::Multiply(s, M, v, t, u);
     math::ColumnVector<ElementType> r0{ 9, 11, 28 };
     testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Vector)", u == r0);
+
+    math::Matrix<ElementType, Layout> A1{
+        { 1, 2 },
+        { 3, 1 },
+        { 2, 0 }
+    };
+    math::Matrix<ElementType, Layout> B1{
+        { 3, 4,  5,  6 },
+        { 8, 9, 10, 11 }
+    };
+    math::Matrix<ElementType, Layout> C1{
+        { 1, 1, 1, 1 },
+        { 2, 1, 2, 1 },
+        { 1, 3, 1, 3 }
+    };
+    // C = s * A * B + t * C
+    Ops::Multiply(s, A1, B1, t, C1);
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> R {
+        { 41, 47, 53, 59 },
+        { 40, 45, 56, 61 },
+        { 15, 25, 23, 33 },
+    };
+    testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Matrix)", C1 == R);
 
     auto A = M.GetSubMatrix(1, 0, 2, 2);
     auto w = M.GetRow(0).Transpose();
@@ -342,6 +401,8 @@ int main()
     TestMatrix2<float, math::MatrixLayout::columnMajor>();
     TestMatrix2<double, math::MatrixLayout::rowMajor>();
     TestMatrix2<double, math::MatrixLayout::columnMajor>();
+
+    TestReferenceMatrix<int>();
 
     TestMatrixOperations<float, math::MatrixLayout::rowMajor, math::ImplementationType::native>();
     TestMatrixOperations<float, math::MatrixLayout::columnMajor, math::ImplementationType::native>();

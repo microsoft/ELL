@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Exception.h"
+#include "..\include\Operations.h"
 
 namespace ell
 {
@@ -192,6 +193,25 @@ namespace math
         }
     }
 
+    template <typename ElementType, MatrixLayout Layout>
+    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C)
+    {
+        if (A.NumColumns() != B.NumRows() || A.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes.");
+        }
+
+        for (size_t i = 0; i < A.NumRows(); ++i)
+        {
+            for (size_t j = 0; j < B.NumColumns(); ++j)
+            {
+                auto row = A.GetRow(i);
+                auto column = B.GetColumn(j);
+                C(i, j) = s * Dot(row, column) + t * C(i, j);
+            }
+        }
+    }
+
 #ifdef USE_BLAS
     //
     // OpenBLAS wrappers
@@ -279,6 +299,34 @@ namespace math
     {
         Multiply(s, M.Transpose(), v.Transpose(), t, u.Transpose());
     }
+
+    template <typename ElementType, MatrixLayout Layout>
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C)
+    {
+        if (A.NumColumns() != B.NumRows() || A.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes.");
+        }
+
+        // map Layout to CBLAS_ORDER
+        CBLAS_ORDER order;
+        switch (A.GetLayout())
+        {
+        case MatrixLayout::rowMajor:
+            order = CBLAS_ORDER::CblasRowMajor;
+            break;
+        case MatrixLayout::columnMajor:
+            order = CBLAS_ORDER::CblasColMajor;
+            break;
+        default:
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Layout not supported");
+        }
+
+        Blas::Gemm(order, CBLAS_TRANSPOSE::CblasNoTrans, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(A.NumRows()), static_cast<int>(B.NumColumns()), static_cast<int>(A.NumColumns()), s,
+                   A.GetDataPointer(), static_cast<int>(A.GetIncrement()), B.GetDataPointer(), static_cast<int>(B.GetIncrement()), t,
+                   C.GetDataPointer(), static_cast<int>(C.GetIncrement()));
+    }
+
 #endif
 }
 }

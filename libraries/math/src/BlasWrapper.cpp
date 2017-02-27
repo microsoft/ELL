@@ -85,6 +85,16 @@ namespace math
         {
             cblas_dgemv(order, transpose, m, n, alpha, M, lda, x, incx, beta, y, incy);
         }
+
+        void Gemm(CBLAS_ORDER order, CBLAS_TRANSPOSE transposeA, CBLAS_TRANSPOSE transposeB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc)
+        {
+            cblas_sgemm(order, transposeA, transposeB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+        }
+
+        void Gemm(CBLAS_ORDER order, CBLAS_TRANSPOSE transposeA, CBLAS_TRANSPOSE transposeB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc)
+        {
+            cblas_dgemm(order, transposeA, transposeB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+        }
     }
 }
 }

@@ -113,6 +113,27 @@ namespace math
         void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, float alpha, const float* M, int lda, const float* x, int incx, float beta, float* y, int incy);
         void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, double alpha, const double* M, int lda, const double* x, int incx, double beta, double* y, int incy);
         /// @}
+
+        /// @{
+        /// <summary> Wraps the BLAS GEMM function, which implements generalized matrix matric multiplication, C = alpha*A*B + beta*C. </summary>
+        ///
+        /// <param name="order"> Row major or column major. </param>
+        /// <param name="transposeA"> Whether or not to transpose the matrix A. </param>
+        /// <param name="transposeB"> Whether or not to transpose the matrix B. </param>
+        /// <param name="m"> Number of matrix rows in A and C. </param>
+        /// <param name="n"> Number of matrix columns in B and C. </param>
+        /// <param name="k"> Number of matrix columns in A and matrix rows in B. </param>
+        /// <param name="alpha"> The scalar alpha, which multiplies A * B. </param>
+        /// <param name="A"> The matrix A. </param>
+        /// <param name="lda"> The matrix increment for A. </param>
+        /// <param name="B"> The matrix B. </param>
+        /// <param name="lda"> The matrix increment for B. </param>
+        /// <param name="beta"> The scalar beta, which multiplies the matrix C. </param>
+        /// <param name="C"> The matrix C. </param>
+        /// <param name="ldc"> The matrix increment for C. </param>
+        void Gemm(CBLAS_ORDER order, CBLAS_TRANSPOSE transposeA, CBLAS_TRANSPOSE transposeB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
+        void Gemm(CBLAS_ORDER order, CBLAS_TRANSPOSE transposeA, CBLAS_TRANSPOSE transposeB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc);
+        /// @}
     }
 }
 }

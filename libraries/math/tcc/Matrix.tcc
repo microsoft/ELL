@@ -60,8 +60,20 @@ namespace math
     }
 
     template <typename ElementType>
+    MatrixBase<ElementType, MatrixLayout::rowMajor>::MatrixBase(size_t numRows, size_t numColumns, ElementType* pData)
+        : RectangularMatrixBase<ElementType>(pData, numRows, numColumns, numColumns)
+    {
+    }
+
+    template <typename ElementType>
     MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(size_t numRows, size_t numColumns)
         : RectangularMatrixBase<ElementType>(nullptr, numRows, numColumns, numRows)
+    {
+    }
+
+    template <typename ElementType>
+    MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(size_t numRows, size_t numColumns, ElementType* pData)
+        : RectangularMatrixBase<ElementType>(pData, numRows, numColumns, numRows)
     {
     }
 
@@ -150,6 +162,18 @@ namespace math
     //
     // MatrixReference
     //
+
+    template <typename ElementType, MatrixLayout Layout>
+    MatrixReference<ElementType, Layout>::MatrixReference(size_t numRows, size_t numColumns, ElementType* pData) :
+        ConstMatrixReference(numRows, numColumns, pData)
+    {
+    }
+
+    template <typename ElementType, MatrixLayout Layout>
+    void MatrixReference<ElementType, Layout>::Swap(MatrixReference<ElementType, Layout>& other)
+    {
+        RectangularMatrixBase<ElementType>::Swap(other);
+    }
 
     template <typename ElementType, MatrixLayout Layout>
     ElementType& MatrixReference<ElementType, Layout>::operator()(size_t rowIndex, size_t columnIndex)
@@ -255,6 +279,20 @@ namespace math
             }
             ++i;
         }
+    }
+
+    template <typename ElementType, MatrixLayout Layout>
+    Matrix<ElementType, Layout>::Matrix(size_t numRows, size_t numColumns, const std::vector<ElementType>& data)
+        : MatrixReference<ElementType, Layout>(numRows, numColumns), _data(data)
+    {
+        _pData = _data.data();
+    }
+
+    template <typename ElementType, MatrixLayout Layout>
+    Matrix<ElementType, Layout>::Matrix(size_t numRows, size_t numColumns, std::vector<ElementType>&& data)
+        : MatrixReference<ElementType, Layout>(numRows, numColumns), _data(std::move(data))
+    {
+        _pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout Layout>

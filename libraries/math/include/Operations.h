@@ -88,6 +88,18 @@ namespace math
         /// <param name="u"> [in,out] A row vector, multiplied by t and used to store the result. </param>
         template <typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u);
+
+        /// <summary> Generalized matrix matrix multiplication, C = s * A * B + t * C. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <param name="s"> The scalar that multiplies the matrix. </param>
+        /// <param name="A"> The first matrix. </param>
+        /// <param name="B"> The second matrix. </param>
+        /// <param name="t"> The scalar that multiplies C. </param>
+        /// <param name="u"> [in,out] A matrix, multiplied by t and used to store the result. </param>
+        //template <typename ElementType, MatrixLayout Layout>
+        //static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C);
     };
 
     /// <summary> An enum that represent different implementation types. </summary>
@@ -194,6 +206,18 @@ namespace math
         /// <param name="u"> [in,out] A column vector, multiplied by t and used to store the result. </param>
         template <typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u);
+
+        /// <summary> Generalized matrix matrix multiplication, C = s * A * B + t * C. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <param name="s"> The scalar that multiplies the matrix. </param>
+        /// <param name="A"> The first matrix. </param>
+        /// <param name="B"> The second matrix. </param>
+        /// <param name="t"> The scalar that multiplies C. </param>
+        /// <param name="u"> [in,out] A matrix, multiplied by t and used to store the result. </param>
+        template <typename ElementType, MatrixLayout Layout>
+        static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C);
     };
 
 #ifdef USE_BLAS
@@ -298,6 +322,18 @@ namespace math
         /// <param name="u"> [in,out] A row vector, multiplied by t and used to store the result. </param>
         template <typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, const ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u);
+
+        /// <summary> Generalized matrix matrix multiplication, C = s * A * B + t * C. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <param name="s"> The scalar that multiplies the matrix. </param>
+        /// <param name="A"> The first matrix. </param>
+        /// <param name="B"> The second matrix. </param>
+        /// <param name="t"> The scalar that multiplies C. </param>
+        /// <param name="u"> [in,out] A matrix, multiplied by t and used to store the result. </param>
+        template <typename ElementType, MatrixLayout Layout>
+        static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C);
     };
 
     using Operations = OperationsImplementation<ImplementationType::openBlas>;
