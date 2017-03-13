@@ -85,12 +85,12 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler) override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
     private:
-        llvm::Function* GetOperator(model::IRMapCompiler& compiler) const;
-        void CompileUnaryOperationLoop(model::IRMapCompiler& compiler);
-        void CompileUnaryOperationExpanded(model::IRMapCompiler& compiler);
+        llvm::Function* GetOperator(emitters::IRFunctionEmitter& function) const;
+        void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+        void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 
         template <typename Operation>
         std::vector<ValueType> ComputeOutput(Operation&& function) const;

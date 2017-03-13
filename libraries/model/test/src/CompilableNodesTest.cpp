@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompilableNodesTest.h"
-#include "CompilerTestUtilities.h"
+#include "ModelTestUtilities.h"
 
 // model
 #include "DynamicMap.h"
@@ -16,7 +16,9 @@
 #include "IRCompiledMap.h"
 #include "IREmitter.h"
 #include "IRMapCompiler.h"
+#include "InputNode.h"
 #include "Model.h"
+#include "OutputNode.h"
 
 // nodes
 #include "AccumulatorNode.h"
@@ -42,6 +44,53 @@
 
 namespace ell
 {
+void TestCompileIsEqualModel()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(2);
+
+    // Error: passing in a single-element PortElements for the inputs to the BinaryPredicateNode causes us to think it's a scalar and pass in the first value of the port, not the selected one
+    auto predicateNode = model.AddNode<nodes::BinaryPredicateNode<double>>(model::PortElements<double>{ inputNode->output, 0 }, model::PortElements<double>{ inputNode->output, 1 }, emitters::BinaryPredicateType::equal);
+    auto outputNode = model.AddNode<model::OutputNode<bool>>(predicateNode->output);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1, 1 }, { 2, 2 }, { 1, 3 }, { 1, 4 }, { 5, 5 }, { 1, 4 }, { 3, 3 }, { 2, 2 }, { 1, 0 } };
+    PrintIR(compiledMap);
+    VerifyCompiledOutput(map, compiledMap, signal, "IsEqual model");
+}
+
+void TestCompilableScalarOutputNode()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(1);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 4 }, { 3 }, { 2 }, { 1 } };
+    PrintIR(compiledMap);
+    VerifyCompiledOutput(map, compiledMap, signal, "scalar OutputNode");
+}
+
+void TestCompilableVectorOutputNode()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    PrintIR(compiledMap);
+    VerifyCompiledOutput(map, compiledMap, signal, "ScalarOutputNode");
+}
 
 void TestCompilableAccumulatorNode()
 {
@@ -49,13 +98,13 @@ void TestCompilableAccumulatorNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", accumNode->output } });
-    auto compiledMapA = model::IRCompiledMap(map);
+    model::IRMapCompiler compiler;
+    auto compiledMapA = compiler.Compile(map);
     auto compiledMap = std::move(compiledMapA);
-    // compiledMap.WriteCode(std::cout, "asm");
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    //    VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNode");
+    VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNode");
 }
 
 void TestCompilableConstantNode()
@@ -65,8 +114,9 @@ void TestCompilableConstantNode()
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dotNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    // compiledMap.WriteCode(std::cout, "asm");
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -80,8 +130,8 @@ void TestCompilableDotProductNode()
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dotNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    // compiledMap.WriteCode(std::cout, "asm");
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -94,8 +144,10 @@ void TestCompilableDelayNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto delayNode = model.AddNode<nodes::DelayNode<double>>(inputNode->output, 8);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", delayNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    compiledMap.WriteCode(std::cout, emitters::ModuleOutputFormat::ir);
+    model::IRMapCompiler compiler;
+
+    auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -109,10 +161,8 @@ void TestCompilableDTWDistanceNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto dtwNode = model.AddNode<nodes::DTWDistanceNode<double>>(inputNode->output, prototype);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dtwNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    // compiledMap.WriteCode(std::cout, "asm");
-    compiledMap.WriteCodeHeader(std::cout);
-    std::cout << std::endl;
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -170,12 +220,30 @@ void TestCompilableMulticlassDTW()
     std::vector<LabeledPrototype> prototypes = { { 3, prototype1 }, { 21, prototype2 } };
 
     auto map = GenerateMulticlassDTWClassifier(prototypes);
-    auto compiledMap = model::IRCompiledMap(map);
-    compiledMap.WriteCode(std::cout, emitters::ModuleOutputFormat::ir);
 
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+
+    PrintIR(compiledMap);
+    
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "MulticlassDTW");
+}
+
+void TestCompilableScalarSumNode()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(1);
+    auto sumNode = model.AddNode<nodes::SumNode<double>>(inputNode->output);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", sumNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 4 }, { 3 }, { 2 }, { 1 } };
+    VerifyCompiledOutput(map, compiledMap, signal, "scalar SumNode");
 }
 
 void TestCompilableSumNode()
@@ -184,8 +252,8 @@ void TestCompilableSumNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto sumNode = model.AddNode<nodes::SumNode<double>>(inputNode->output);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", sumNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    // compiledMap.WriteCode(std::cout, emitters::ModuleOutputFormat::ir);
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -198,8 +266,8 @@ void TestCompilableUnaryOperationNode()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto testNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, emitters::UnaryOperationType::sqrt);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    // compiledMap.WriteCode(std::cout, "asm");
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -213,8 +281,8 @@ void TestCompilableBinaryOperationNode()
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto testNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantNode->output, emitters::BinaryOperationType::add);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    // compiledMap.WriteCode(std::cout, "asm");
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -222,24 +290,42 @@ void TestCompilableBinaryOperationNode()
 }
 
 // Problem: memory corruption for BinaryPredicateNode (probably because of bool foolishness)
-void TestCompilableBinaryPredicateNode()
+void TestCompilableScalarBinaryPredicateNode()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    //    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 2 });
     auto testNode = model.AddNode<nodes::BinaryPredicateNode<double>>(inputNode->output, constantNode->output, emitters::BinaryPredicateType::equal);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    // compiledMap.WriteCode(std::cout, "asm");
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1 }, { 4 }, { 7 }, { 2 }, { 4 }, { 1 }, { 11 }, { 24 }, { 92 }, { 1 } };
+    VerifyCompiledOutput(map, compiledMap, signal, "scalar BinaryPredicateNode");
+    // TODO: Fix VerifyCompiledOutput --- types don't match for booleans
+    PrintIR(compiledMap);
+    PrintCompiledOutput(map, compiledMap, signal, "scalar BinaryPredicateNode");
+}
+
+// Problem: memory corruption for BinaryPredicateNode (probably because of bool foolishness)
+void TestCompilableBinaryPredicateNode()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
+    auto testNode = model.AddNode<nodes::BinaryPredicateNode<double>>(inputNode->output, constantNode->output, emitters::BinaryPredicateType::equal);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    VerifyCompiledOutput(map, compiledMap, signal, "vector BinaryPredicateNode");
+    PrintIR(compiledMap);
 
     // TODO: Fix VerifyCompiledOutput --- types don't match for booleans
-    PrintCompiledOutput(map, compiledMap, signal, "BinaryPredicateNode");
-
-    std::cout << "Done with binary predicate" << std::endl;
+    PrintCompiledOutput(map, compiledMap, signal, "vector BinaryPredicateNode");
 }
 
 void TestCompilableMultiplexerNode()
@@ -249,13 +335,12 @@ void TestCompilableMultiplexerNode()
     auto constantNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1.0, 2.0, 3.0 });
     auto testNode = model.AddNode<nodes::MultiplexerNode<double, int>>(constantNode->output, inputNode->output);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    // compiledMap.WriteCode(std::cout, "asm");
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
 
     // compare output
     std::vector<std::vector<int>> signal = { { 0 }, { 1 }, { 0 }, { 1 }, { 1 }, { 0 }, { 0 }, { 1 }, { 1 }, { 0 } };
     VerifyCompiledOutput(map, compiledMap, signal, "MultiplexerNode");
-    std::cout << "Done with multiplexer" << std::endl;
 }
 
 void TestCompilableTypeCastNode()
@@ -264,12 +349,43 @@ void TestCompilableTypeCastNode()
     auto inputNode = model.AddNode<model::InputNode<int>>(1);
     auto testNode = model.AddNode<nodes::TypeCastNode<int, double>>(inputNode->output);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
-    auto compiledMap = model::IRCompiledMap(map);
-    // compiledMap.WriteCode(std::cout, "asm");
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
 
     // compare output
     std::vector<std::vector<int>> signal = { { 1 }, { 4 }, { 7 }, { 2 }, { 4 }, { 1 }, { 11 }, { 24 }, { 92 }, { 1 } };
-    VerifyCompiledOutput(map, compiledMap, signal, "MultiplexerNode");
-    std::cout << "Done with typecast" << std::endl;
+    VerifyCompiledOutput(map, compiledMap, signal, "TypeCastNode");
+}
+
+//
+// Now test nodes that compile themselves as a function
+//
+void TestCompilableAccumulatorNodeFunction()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto accumNode1 = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
+
+    // auto outputNode = model.AddNode<model::OutputNode<double>>(accumNode1->output);
+
+    auto constNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1, 2, 3 });
+    auto accumNode2 = model.AddNode<nodes::AccumulatorNode<double>>(accumNode1->output);
+    auto accumNode3 = model.AddNode<nodes::AccumulatorNode<double>>(constNode->output);
+    auto dotNode1 = model.AddNode<nodes::DotProductNode<double>>(accumNode2->output, accumNode3->output);
+    auto dotNode2 = model.AddNode<nodes::DotProductNode<double>>(accumNode2->output, accumNode3->output);
+    auto accumNode4 = model.AddNode<nodes::AccumulatorNode<double>>(dotNode2->output);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ accumNode4->output, dotNode2->output });
+
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.unrollLoops = true;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNodeAsFunction");
 }
 }

@@ -42,13 +42,6 @@ namespace model
     class IRCompiledMap : public CompiledMap
     {
     public:
-        /// <summary> Constructor </summary>
-        ///
-        /// <param name="map"> The input map to compile </param>
-        /// <param name="functionName"> The name of the function to compile the map to </param>
-        /// <param name="optimize"> Flag indicating if the output should be optimized </param>
-        IRCompiledMap(const model::DynamicMap& other, const std::string& functionName = "predict", bool optimize = true);
-
         /// <summary> Move Constructor. </summary>
         ///
         /// <param name="other"> The compiled map being moved. </param>
@@ -117,9 +110,17 @@ namespace model
         /// <returns> true if active, false if not. </returns>
         virtual bool IsValid() const override;
 
-    protected:
-        virtual void Compile() override;
+        /// <summary> Gets a reference to the underlying IRModuleEmitter. </summary>
+        ///
+        /// <returns> Reference to an IRModuleEmitter. </returns>
+        emitters::IRModuleEmitter& GetModule() { return *_module; }
 
+        /// <summary> Gets a reference to the underlying jitter. </summary>
+        ///
+        /// <returns> The jitter. </returns>
+        emitters::IRExecutionEngine& GetJitter();
+
+    protected:
         virtual void SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) const override;
         virtual void SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const override;
         virtual void SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues) const override;
@@ -128,30 +129,32 @@ namespace model
         virtual std::vector<int> ComputeIntOutput(const model::PortElementsBase& outputs) const override;
         virtual std::vector<double> ComputeDoubleOutput(const model::PortElementsBase& outputs) const override;
 
+    private:
+        friend class IRMapCompiler;
         template <typename InputType, typename OutputType>
         void SetComputeFunction();
 
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        IRCompiledMap(DynamicMap other, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> _module);
 
-    private:
+        void EnsureExecutionEngine() const;
+
         template <typename InputType>
         using ComputeFunction = std::function<void(const InputType*)>;
 
         std::string _moduleName = "ELL";
-
         std::unique_ptr<emitters::IRModuleEmitter> _module;
-        std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
+
+        mutable std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
 
         // Only one of the entries in the tuple is active, depending on the input and output types of the map
-        std::tuple<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<double>> _computeInputFunction;
-        std::tuple<utilities::ConformingVector<bool>, utilities::ConformingVector<int>, utilities::ConformingVector<double>> _cachedOutput;
+        mutable std::tuple<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<double>> _computeInputFunction;
+        mutable std::tuple<utilities::ConformingVector<bool>, utilities::ConformingVector<int>, utilities::ConformingVector<double>> _cachedOutput;
 
         void EnsureValidMap(); // fixes up model if necessary and checks inputs/outputs are compilable
-        void SetComputeFunction();
+        void SetComputeFunction() const;
 
         template <typename InputType>
-        void SetComputeFunctionForInputType();
+        void SetComputeFunctionForInputType() const;
     };
 }
 }

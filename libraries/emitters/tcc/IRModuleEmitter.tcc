@@ -36,7 +36,7 @@ namespace emitters
     //
 
     template <typename T>
-    llvm::Value* IRModuleEmitter::Emit(Variable& var)
+    llvm::Value* IRModuleEmitter::EmitVariable(Variable& var)
     {
         if (var.IsScalar())
         {
@@ -62,6 +62,7 @@ namespace emitters
                 pVal = EmitLiteral<T>(static_cast<LiteralVariable<T>&>(var));
                 _literals.Add(var.EmittedName(), pVal);
                 break;
+
             case VariableScope::local:
                 if (var.IsVectorRef())
                 {
@@ -75,7 +76,6 @@ namespace emitters
                 {
                     pVal = EmitLocal<T>(static_cast<ScalarVariable<T>&>(var));
                 }
-                _locals.Add(var.EmittedName(), pVal);
                 break;
 
             case VariableScope::global:
@@ -98,6 +98,7 @@ namespace emitters
                 pVal = EmitLiteralVector<T>(static_cast<LiteralVectorVariable<T>&>(var));
                 _literals.Add(var.EmittedName(), pVal);
                 break;
+
             case VariableScope::global:
                 if (var.HasInitValue())
                 {
@@ -109,6 +110,7 @@ namespace emitters
                 }
                 _globals.Add(var.EmittedName(), pVal);
                 break;
+
             default:
                 throw EmitterException(EmitterError::variableScopeNotSupported);
         }
@@ -119,18 +121,20 @@ namespace emitters
     template <typename T>
     llvm::Value* IRModuleEmitter::EmitLiteral(LiteralVariable<T>& var)
     {
-        llvm::Value* pVar = _currentFunction.Literal(var.Data());
+        auto& currentFunction = GetCurrentFunction();
+        llvm::Value* pVar = currentFunction.Literal(var.Data());
         return pVar;
     }
 
     template <typename T>
     llvm::Value* IRModuleEmitter::EmitGlobal(InitializedScalarVariable<T>& var)
     {
+        auto& currentFunction = GetCurrentFunction();
         llvm::Value* pVal = nullptr;
         if (var.IsMutable())
         {
             pVal = Global(var.Type(), var.EmittedName());
-            _currentFunction.Store(pVal, _currentFunction.Literal(var.Data()));
+            currentFunction.Store(pVal, currentFunction.Literal(var.Data()));
         }
         else
         {
@@ -142,14 +146,16 @@ namespace emitters
     template <typename T>
     llvm::Value* IRModuleEmitter::EmitLocal(ScalarVariable<T>& var)
     {
-        return _currentFunction.Variable(var.Type(), var.EmittedName());
+        auto& currentFunction = GetCurrentFunction();
+        return currentFunction.EmittedVariable(var.Type(), var.EmittedName());
     }
 
     template <typename T>
     llvm::Value* IRModuleEmitter::EmitLocal(InitializedScalarVariable<T>& var)
     {
-        llvm::Value* pVar = _currentFunction.Variable(var.Type(), var.EmittedName());
-        _currentFunction.Store(pVar, _currentFunction.Literal(var.Data()));
+        auto& currentFunction = GetCurrentFunction();
+        llvm::Value* pVar = currentFunction.EmittedVariable(var.Type(), var.EmittedName());
+        currentFunction.Store(pVar, currentFunction.Literal(var.Data()));
         return pVar;
     }
 
@@ -174,8 +180,9 @@ namespace emitters
     template <typename T>
     llvm::Value* IRModuleEmitter::EmitRef(VectorElementVariable<T>& var)
     {
+        auto& currentFunction = GetCurrentFunction();
         llvm::Value* pSrcVar = EnsureEmitted(var.Src());
-        return _currentFunction.PtrOffsetA(pSrcVar, _currentFunction.Literal(var.Offset()), var.EmittedName());
+        return currentFunction.PtrOffsetA(pSrcVar, currentFunction.Literal(var.Offset()), var.EmittedName());
     }
 }
 }

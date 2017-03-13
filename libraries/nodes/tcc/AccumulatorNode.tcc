@@ -43,57 +43,44 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void AccumulatorNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    void AccumulatorNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         static_assert(!std::is_same<ValueType, bool>(), "Cannot instantiate boolean accumulator nodes");
-        compiler.NewBlockRegion(*this);
+        assert(GetPortVariableType(input) == GetPortVariableType(output));
 
-        // AccumulatorNode has exactly 1 input and 1 output
-        // Accumulators are always long lived - either globals or heap. Currently, we use globals
-        auto inputPort = GetInputPorts()[0];
-        auto outputPort = GetOutputPorts()[0];
-        assert(GetPortVariableType(*inputPort) == GetPortVariableType(*outputPort));
+        // Allocate a global variable to accumulate the input
+        emitters::Variable* pAccumulatorVar = function.GetModule().Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, output.Size());
+        llvm::Value* accumulator = function.GetModule().EnsureEmitted(*pAccumulatorVar);
 
-        emitters::Variable* pAccumulatorVar = compiler.Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, outputPort->Size());
-        llvm::Value* accumulator = compiler.EnsureEmitted(*pAccumulatorVar);
-
-        if (model::IsPureVector(*inputPort) && !compiler.GetCompilerParameters().unrollLoops)
+        if (model::IsPureVector(input) && !compiler.GetCompilerParameters().unrollLoops)
         {
-            CompileAccumulatorLoop(compiler, accumulator);
+            CompileLoop(compiler, function, accumulator);
         }
         else
         {
-            CompileAccumulatorExpanded(compiler, accumulator);
+            CompileExpanded(compiler, function, accumulator);
         }
-
-        compiler.TryMergeRegion(*this);
     }
 
     template <typename ValueType>
-    void AccumulatorNode<ValueType>::CompileAccumulatorLoop(model::IRMapCompiler& compiler, llvm::Value* accumulator)
+    void AccumulatorNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* accumulator)
     {
-        auto inputPort = this->GetInputPorts()[0];
-        auto outputPort = this->GetOutputPorts()[0];
-        llvm::Value* result = compiler.EnsureEmitted(outputPort);
-        llvm::Value* inputVector = compiler.EnsureEmitted(inputPort);
-        auto& function = compiler.GetCurrentFunction();
+        llvm::Value* inputVector = compiler.EnsurePortEmitted(input);
+        llvm::Value* result = compiler.EnsurePortEmitted(output);
 
-        function.VectorOperator(emitters::GetAddForValueType<ValueType>(), outputPort->Size(), accumulator, inputVector, [&accumulator, &result, &function, this](llvm::Value* i, llvm::Value* value) {
+        function.VectorOperator(emitters::GetAddForValueType<ValueType>(), output.Size(), accumulator, inputVector, [&accumulator, &result, &function, this](llvm::Value* i, llvm::Value* value) {
             function.SetValueAt(accumulator, i, value);
             function.SetValueAt(result, i, value);
         });
     }
 
     template <typename ValueType>
-    void AccumulatorNode<ValueType>::CompileAccumulatorExpanded(model::IRMapCompiler& compiler, llvm::Value* accumulator)
+    void AccumulatorNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* accumulator)
     {
-        auto inputPort = GetInputPorts()[0];
-        auto outputPort = GetOutputPorts()[0];
-        llvm::Value* result = compiler.EnsureEmitted(outputPort);
-        auto& function = compiler.GetCurrentFunction();
-        for (size_t index = 0; index < outputPort->Size(); ++index)
+        llvm::Value* result = compiler.EnsurePortEmitted(output);
+        for (size_t index = 0; index < output.Size(); ++index)
         {
-            llvm::Value* inputValue = compiler.LoadVariable(inputPort->GetInputElement(index));
+            llvm::Value* inputValue = compiler.LoadPortElementVariable(input.GetInputElement(index));
             llvm::Value* accumValue = function.ValueAt(accumulator, function.Literal((int)index));
             llvm::Value* sum = function.Operator(emitters::GetAddForValueType<ValueType>(), inputValue, accumValue);
             function.SetValueAt(accumulator, function.Literal((int)index), sum);

@@ -31,7 +31,6 @@ set (include include/AbstractInvoker.h
              include/CommandLineParser.h
              include/CompressedIntegerList.h
              include/ConformingVector.h
-             include/DynamicArray.h
              include/Exception.h
              include/Files.h
              include/Format.h
@@ -63,7 +62,6 @@ set (tcc tcc/AbstractInvoker.tcc
          tcc/AnyIterator.tcc
          tcc/Archiver.tcc
          tcc/CommandLineParser.tcc
-         tcc/DynamicArray.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
          tcc/FunctionUtils.tcc

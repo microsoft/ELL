@@ -91,11 +91,11 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler) override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        virtual bool HasState() const override { return true; }
+        virtual bool ShouldCompileInline() const override { return true; }
 
     private:
-        void CompileConstantLoop(model::IRMapCompiler& compiler);
-        void CompileConstantExpanded(model::IRMapCompiler& compiler);
 
         // Output
         model::OutputPort<ValueType> _output;

@@ -73,13 +73,15 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+
     protected:
         virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler) override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        virtual bool HasState() const override { return true; }
 
     private:
-        void CompileAccumulatorLoop(model::IRMapCompiler& compiler, llvm::Value* accumulator);
-        void CompileAccumulatorExpanded(model::IRMapCompiler& compiler, llvm::Value* accumulator);
+        void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* accumulator);
+        void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* accumulator);
 
         // Input
         model::InputPort<ValueType> _input;

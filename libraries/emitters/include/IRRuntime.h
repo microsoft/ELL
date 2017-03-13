@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include "IRFunctionEmitter.h"
+#include "LLVMInclude.h"
+#include "EmitterTypes.h"
 
 namespace ell
 {
@@ -45,7 +46,6 @@ namespace emitters
         llvm::Function* EmitDotProductFunctionF();
 
         IRModuleEmitter& _module;
-        NamedVariableTypeList _arguments;
         llvm::Function* _pDotProductFunctionFloat = nullptr;
         llvm::Function* _pDotProductFunction = nullptr;
     };

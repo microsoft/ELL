@@ -235,7 +235,7 @@ namespace math
         friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
 
-        ConstMatrixReference(size_t numRows, size_t numColumns, ElementType* pData) : MatrixBase(numRows, numColumns, pData) {}
+        ConstMatrixReference(size_t numRows, size_t numColumns, ElementType* pData) : MatrixBase<ElementType, Layout>(numRows, numColumns, pData) {}
             
         ElementType* GetMajorVectorBegin(size_t index) const;
 

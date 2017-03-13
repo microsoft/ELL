@@ -39,10 +39,27 @@ namespace emitters
     }
 
     template <typename ValueType, ValueType DefaultValue>
+    std::string SymbolTable<ValueType, DefaultValue>::GetUniqueName(const std::string& namePrefix) const
+    {
+        // return namePrefix;
+        int index = 0;
+        while(true)
+        {
+            auto name = namePrefix + "_" + std::to_string(index);
+            if(!Contains(name))
+            {
+                return name;
+            }
+            ++index;
+        }
+    }
+
+    template <typename ValueType, ValueType DefaultValue>
     bool SymbolTable<ValueType, DefaultValue>::Contains(const std::string& name) const
     {
         return (Get(name) != DefaultValue);
     }
+
 
     template <typename ValueType, ValueType DefaultValue>
     void SymbolTable<ValueType, DefaultValue>::Remove(const std::string& name)

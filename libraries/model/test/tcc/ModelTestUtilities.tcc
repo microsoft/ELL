@@ -1,24 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     CompilerTestUtilities.cpp (compile_test)
+//  File:     ModelTestUtilities.tcc (compile_test)
 //  Authors:  Umesh Madan, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma once
-
-// model
-#include "DynamicMap.h"
-#include "IRCompiledMap.h"
-#include "Port.h"
-
-// testing
-#include "testing.h"
-
-// stl
-#include <ostream>
-#include <string>
-#include <vector>
 
 namespace ell
 {
@@ -39,13 +25,16 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
 template <typename InputType, typename OutputType>
 void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
-    bool ok = true;
+    if (!IsVerbose())
+    {
+        return;
+    }
+
     // compare output
     for (const auto& input : signal)
     {
         auto computedResult = map.Compute<OutputType>(input);
         auto compiledResult = compiledMap.Compute<OutputType>(input);
-        ok = ok && testing::IsEqual(computedResult, compiledResult);
         std::cout << computedResult << " \t" << compiledResult << std::endl;
     }
 }
@@ -83,9 +72,12 @@ void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledM
         auto compiledResult = compiledMap.ComputeOutput<OutputType>(0);
         ok = ok && testing::IsEqual(computedResult, compiledResult);
 
-        std::cout << computedResult << " \t" << compiledResult << std::endl;
+        if (IsVerbose())
+        {
+            std::cout << computedResult << " \t" << compiledResult << std::endl;
+        }
     }
-    testing::ProcessTest(std::string("Testing Compiled" + name + " compute"), ok);
+    testing::ProcessTest(std::string("Testing compiled " + name + " compute"), ok);
 }
 
 template <typename InputType>

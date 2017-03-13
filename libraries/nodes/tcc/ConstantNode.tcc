@@ -42,22 +42,20 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void ConstantNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    void ConstantNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        using VarType = ValueType; //typename emitters::VariableValueType<ValueType>::type;
-        auto output = this->GetOutputPorts()[0];
         auto values = this->GetValues();
         emitters::Variable* pVar = nullptr;
 
-        if (output->Size() == 1)
+        if (output.Size() == 1)
         {
-            pVar = compiler.Variables().AddVariable<emitters::LiteralVariable<VarType>>(values[0]);
+            pVar = function.GetModule().Variables().AddVariable<emitters::LiteralVariable<ValueType>>(values[0]);
         }
         else
         {
-            pVar = compiler.Variables().AddVariable<emitters::LiteralVectorVariable<VarType>>(values);
+            pVar = function.GetModule().Variables().AddVariable<emitters::LiteralVectorVariable<ValueType>>(values);
         }
-        compiler.SetVariableFor(output, pVar);
+        compiler.SetVariableForPort(output, pVar); // Just set the variable corresponding to the output port to be the global variable we created
     }
 
     template <typename ValueType>

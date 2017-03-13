@@ -38,6 +38,9 @@ namespace model
     public:
         DynamicMap() = default;
 
+        /// <summary> Copy constructor </summary>
+        DynamicMap(const DynamicMap& other);
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="model"> The model to wrap </param>
@@ -135,6 +138,12 @@ namespace model
         /// <returns> The outputs </returns>
         const std::vector<PortElementsBase>& GetOutputs() { return _outputElements; }
 
+        /// <summary> Resets a specified output. </summary>
+        ///
+        /// <param name="index"> Output index. </param>
+        /// <param name="outputElements"> The output elements. </param>
+        void ResetOutput(size_t index, PortElementsBase outputElements);
+
         //
         // Routines for computing output (processing data)
         //
@@ -142,7 +151,7 @@ namespace model
         /// <summary> Set a single InputNode's input </summary>
         ///
         /// <typeparam name="ValueType"> The datatype of the input node </typeparam>
-        /// <param name="inputName"> The name assigned to the input node </param>
+        /// <param name="index"> index of the input node </param>
         /// <param name="inputValues"> The values to set on the input node </param>
         template <typename ValueType>
         void SetInputValue(int index, const std::vector<ValueType>& inputValues) const;
@@ -241,7 +250,6 @@ namespace model
 
         void AddInput(const std::string& inputName, InputNodeBase* inputNode);
         void AddOutput(const std::string& outputName, PortElementsBase outputElements);
-        void ResetOutput(size_t index, PortElementsBase outputElements);
         void Prune(); // prune away unused parts of internal model
 
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;

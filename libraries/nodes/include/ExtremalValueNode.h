@@ -85,11 +85,11 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler) override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
         llvm::Function* GetOperator(model::IRMapCompiler& compiler) const;
-        void CompileLoop(model::IRMapCompiler& compiler);
-        void CompileExpanded(model::IRMapCompiler& compiler);
+        void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+        void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 
         // My inputs
         model::InputPort<ValueType> _input;

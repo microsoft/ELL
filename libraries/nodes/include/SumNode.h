@@ -75,11 +75,12 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler) override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
     private:
-        void CompileSumLoop(model::IRMapCompiler& compiler);
-        void CompileSumExpanded(model::IRMapCompiler& compiler);
+        void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+        void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+
         // Inputs
         model::InputPort<ValueType> _input;
 

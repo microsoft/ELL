@@ -48,11 +48,11 @@ namespace emitters
     {
         auto curBlock = _module.GetIREmitter().GetCurrentBlock();
 
-        _arguments.Replace({ { countName, VariableType::Int32 },
-                             { lVectorName, VariableType::DoublePointer },
-                             { rVectorName, VariableType::DoublePointer },
-                             { resultName, VariableType::DoublePointer } });
-        auto function = _module.Function(dotProductFloatName, VariableType::Void, _arguments);
+        NamedVariableTypeList argList = { { countName, VariableType::Int32 },
+                                          { lVectorName, VariableType::DoublePointer },
+                                          { rVectorName, VariableType::DoublePointer },
+                                          { resultName, VariableType::DoublePointer } };
+        auto function = _module.Function(dotProductFloatName, VariableType::Void, argList);
         auto arguments = function.Arguments().begin();
         llvm::Argument& count = *arguments++;
         llvm::Argument& leftValue = *arguments++;
@@ -60,9 +60,9 @@ namespace emitters
         llvm::Argument& result = *arguments++;
         function.DotProductFloat(&count, &leftValue, &rightValue, &result);
         function.Return();
-        function.Complete();
+        function.Complete(true);
 
-        _module.GetIREmitter().SetCurrentBlock(curBlock);
+        _module.GetIREmitter().SetCurrentBlock(curBlock); // TODO: Remove this when IRFunctionEmitter has its own emitter
 
         return function.GetFunction();
     }
@@ -71,11 +71,11 @@ namespace emitters
     {
         auto curBlock = _module.GetIREmitter().GetCurrentBlock();
 
-        _arguments.Replace({ { countName, VariableType::Int32 },
-                             { lVectorName, VariableType::Int32Pointer },
-                             { rVectorName, VariableType::Int32Pointer },
-                             { resultName, VariableType::Int32Pointer } });
-        auto function = _module.Function(dotProductIntName, VariableType::Void, _arguments);
+        NamedVariableTypeList argList = { { countName, VariableType::Int32 },
+                                          { lVectorName, VariableType::Int32Pointer },
+                                          { rVectorName, VariableType::Int32Pointer },
+                                          { resultName, VariableType::Int32Pointer } };
+        auto function = _module.Function(dotProductIntName, VariableType::Void, argList);
         auto arguments = function.Arguments().begin();
         llvm::Argument& count = *arguments++;
         llvm::Argument& leftValue = *arguments++;
@@ -83,9 +83,9 @@ namespace emitters
         llvm::Argument& result = *arguments++;
         function.DotProduct(&count, &leftValue, &rightValue, &result);
         function.Return();
-        function.Complete();
+        function.Complete(true);
 
-        _module.GetIREmitter().SetCurrentBlock(curBlock);
+        _module.GetIREmitter().SetCurrentBlock(curBlock); // TODO: Remove this when IRFunctionEmitter has its own emitter
 
         return function.GetFunction();
     }

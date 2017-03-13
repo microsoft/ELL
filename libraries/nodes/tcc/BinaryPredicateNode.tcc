@@ -154,69 +154,52 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    void BinaryPredicateNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto& function = compiler.GetCurrentFunction();
+        if (IsPureVector(input1) && IsPureVector(input2) && !compiler.GetCompilerParameters().unrollLoops)
+        {
+            CompileLoop(compiler, function);
+        }
+        else
+        {
+            CompileExpanded(compiler, function);
+        }
+    }
 
-        compiler.NewBlockRegion(*this);
-
-        auto inputPort1 = GetInputPorts()[0];
-        auto inputPort2 = GetInputPorts()[1];
-        auto outputPort = GetOutputPorts()[0];
-
-        // Binary predicate has 2 inputs and 1 output
-        // Currently, compiled BinaryPredicate nodes are limited to operating on scalars
-        VerifyIsScalar(*inputPort1);
-        VerifyIsScalar(*inputPort2);
-        VerifyIsScalar(*outputPort);
-
-        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
-        // emitters::Variable& resultVar = *(GetVariableFor(pOutput));
+    template <typename ValueType>
+    void BinaryPredicateNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    {
+        llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
+        llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
         emitters::TypedComparison cmp = emitters::GetComparison<ValueType>(GetPredicate());
 
-        llvm::Value* inputValue1 = compiler.LoadVariable(inputPort1->GetInputElement(0));
-        llvm::Value* inputValue2 = compiler.LoadVariable(inputPort2->GetInputElement(0));
-        llvm::Value* pOpResult = function.Comparison(cmp, inputValue1, inputValue2);
-        // LLVM internally uses 1 bit for boolean. We use integers to store boolean results (see CompileElementSelector). That requires a typecast in LLVM
-        function.Store(pResult, function.CastBoolToInt(pOpResult));
-
-        compiler.TryMergeRegion(*this);
+        auto forLoop = function.ForLoop();
+        forLoop.Begin(input1.Size());
+        {
+            auto i = forLoop.LoadIterationVariable();
+            llvm::Value* inputValue1 = function.ValueAt(pInput1, i);
+            llvm::Value* inputValue2 = function.ValueAt(pInput2, i);
+            llvm::Value* pOpResult = function.Comparison(cmp, inputValue1, inputValue2);
+            // LLVM internally uses 1 bit for boolean. We use integers to store boolean results (see CompileElementSelector). That requires a typecast in LLVM
+            function.SetValueAt(pResult, i, function.CastBoolToByte(pOpResult));
+        }
+        forLoop.End();
     }
 
     template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::CompileBinaryPredicateLoop(model::IRMapCompiler& compiler)
+    void BinaryPredicateNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        // Loop version broken
-        auto inputPort1 = GetInputPorts()[0];
-        auto inputPort2 = GetInputPorts()[1];
-        auto outputPort = GetOutputPorts()[0];
-        llvm::Value* pInput1 = compiler.EnsureEmitted(inputPort1);
-        llvm::Value* pInput2 = compiler.EnsureEmitted(inputPort2);
-        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
-        auto& function = compiler.GetCurrentFunction();
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        auto count = inputPort1->Size();
-        function.VectorOperator(emitters::GetComparison<ValueType>(GetPredicate()), outputPort->Size(), pInput1, pInput2, [&pResult, &function, this](llvm::Value* i, llvm::Value* pValue) {
-            function.SetValueAt(pResult, i, pValue);
-        });
-    }
-
-    template <typename ValueType>
-    void BinaryPredicateNode<ValueType>::CompileBinaryPredicateExpanded(model::IRMapCompiler& compiler)
-    {
-        auto inputPort1 = GetInputPorts()[0];
-        auto inputPort2 = GetInputPorts()[1];
-        auto outputPort = GetOutputPorts()[0];
-        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
-        auto& function = compiler.GetCurrentFunction();
-
-        auto count = inputPort1->Size();
+        auto count = input1.Size();
         for (size_t i = 0; i < count; ++i)
         {
-            llvm::Value* inputValue1 = compiler.LoadVariable(inputPort1->GetInputElement(i));
-            llvm::Value* inputValue2 = compiler.LoadVariable(inputPort2->GetInputElement(i));
-            llvm::Value* pOpResult = function.Operator(emitters::GetComparison<ValueType>(GetPredicate()), inputValue1, inputValue2);
-            function.SetValueAt(pResult, function.Literal((int)i), pOpResult);
+            llvm::Value* inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
+            llvm::Value* inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
+            llvm::Value* pOpResult = function.Comparison(emitters::GetComparison<ValueType>(GetPredicate()), inputValue1, inputValue2);
+            
+            function.SetValueAt(pResult, function.Literal((int)i), function.CastBoolToByte(pOpResult));
         }
     }
 

@@ -145,32 +145,28 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DTWDistanceNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    void DTWDistanceNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         static_assert(!std::is_same<ValueType, bool>(), "Cannot instantiate boolean DTW nodes");
-        compiler.NewBlockRegion(*this);
 
-        auto inputPort = GetInputPorts()[0];
-        auto outputPort = GetOutputPorts()[0];
-        auto inputType = GetPortVariableType(*inputPort);
-        assert(inputType == GetPortVariableType(*outputPort));
-        VerifyIsScalar(*outputPort);
+        auto inputType = GetPortVariableType(input);
+        assert(inputType == GetPortVariableType(output));
+        VerifyIsScalar(output);
 
-        auto& function = compiler.GetCurrentFunction();
-
-        llvm::Value* pInput = compiler.EnsureEmitted(inputPort);
-        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
+        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
         // The prototype (constant)
-        emitters::Variable* pVarPrototype = compiler.Variables().AddVariable<emitters::LiteralVectorVariable<ValueType>>(GetPrototypeData());
+        emitters::Variable* pVarPrototype = function.GetModule().Variables().AddVariable<emitters::LiteralVectorVariable<ValueType>>(GetPrototypeData());
 
         // Global variables for the dynamic programming memory
-        emitters::Variable* pVarD = compiler.Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, _prototypeLength + 1);
+        emitters::Variable* pVarD = function.GetModule().Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, _prototypeLength + 1);
 
         // get global state vars
-        llvm::Value* pPrototypeVector = compiler.EnsureEmitted(*pVarPrototype);
-        llvm::Value* pD = compiler.EnsureEmitted(*pVarD);
+        llvm::Value* pPrototypeVector = function.GetModule().EnsureEmitted(*pVarPrototype);
+        llvm::Value* pD = function.GetModule().EnsureEmitted(*pVarD);
 
+        // incorrect usage of function.Variable --- should use IRModuleEmitter::EmitX(variable)
         llvm::Value* dist = function.Variable(inputType, "dist");
         llvm::Value* protoIndex = function.Variable(ell::emitters::VariableType::Int32, "i");
         llvm::Value* dLast = function.Variable(inputType, "dLast");
@@ -212,7 +208,7 @@ namespace nodes
                 llvm::Value* inputValue = function.ValueAt(pInput, j);
                 llvm::Value* protoValue = function.ValueAt(pPrototypeVector, function.Load(protoIndex));
                 llvm::Value* diff = function.Operator(emitters::GetSubtractForValueType<ValueType>(), inputValue, protoValue);
-                llvm::Value* absDiff = function.Call(compiler.GetRuntime().GetAbsFunction<ValueType>(), { diff });
+                llvm::Value* absDiff = function.Call(function.GetModule().GetRuntime().GetAbsFunction<ValueType>(), { diff });
                 function.OperationAndUpdate(dist, emitters::GetAddForValueType<ValueType>(), absDiff);
                 function.OperationAndUpdate(protoIndex, emitters::TypedOperator::add, function.Literal(1));
             }
@@ -224,7 +220,6 @@ namespace nodes
         forLoop.End();
 
         function.Store(pResult, function.Operator(emitters::GetDivideForValueType<ValueType>(), function.Load(bestDist), function.Literal(static_cast<ValueType>(_prototypeVariance))));
-        compiler.TryMergeRegion(*this);
     }
 
     template <typename ValueType>

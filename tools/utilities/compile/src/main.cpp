@@ -73,7 +73,10 @@ int main(int argc, char* argv[])
         }
         else
         {
-            model::IRCompiledMap compiledMap{ std::move(map), compileArguments.compiledFunctionName, compileArguments.optimize };
+            model::MapCompilerParameters settings;
+            settings.compilerSettings.optimize = compileArguments.optimize;
+            model::IRMapCompiler compiler(settings);
+            auto compiledMap = compiler.Compile(map, compileArguments.compiledFunctionName);
             switch (compileArguments.outputType)
             {
                 case CompileArguments::OutputType::compiledMap:

@@ -40,29 +40,25 @@ namespace nodes
     }
 
     template <typename InputValueType, typename OutputValueType>
-    void TypeCastNode<InputValueType, OutputValueType>::Compile(model::IRMapCompiler& compiler)
+    void TypeCastNode<InputValueType, OutputValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto& function = compiler.GetCurrentFunction();
         // The IR compiler currently implements bools using integers. We'll just use the already created variable.
-
         auto inputType = emitters::GetVariableType<InputValueType>();
         auto outputType = emitters::GetVariableType<OutputValueType>();
 
-        // Typecast has 1 input and 1 output port
-        auto inputPort = GetInputPorts()[0];
-        auto outputPort = GetOutputPorts()[0];
-        VerifyIsScalar(*inputPort);
-        VerifyIsScalar(*outputPort);
+        // TypeCast nodes are currently only scalar. TODO: Fix them to work for vectors as well.
+        VerifyIsScalar(input);
+        VerifyIsScalar(output);
 
         if (inputType == outputType)
         {
-            emitters::Variable* elementVar = compiler.GetVariableFor(inputPort->GetInputElement(0));
-            compiler.SetVariableFor(outputPort, elementVar);
+            emitters::Variable* elementVar = compiler.GetVariableForElement(input.GetInputElement(0));
+            compiler.SetVariableForPort(output, elementVar); // The types are the same, so this is a no-op. Just set the output variable to be the same as the input variable
         }
         else
         {
-            llvm::Value* inputValue = compiler.LoadVariable(inputPort->GetInputElement(0));
-            llvm::Value* outputValue = compiler.EnsureEmitted(outputPort);
+            llvm::Value* inputValue = compiler.LoadPortElementVariable(input.GetInputElement(0));
+            llvm::Value* outputValue = compiler.EnsurePortEmitted(output);
 
             llvm::Value* castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
             function.Store(outputValue, castElement);

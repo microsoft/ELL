@@ -122,13 +122,13 @@ namespace nodes
     }
 
     template <typename ValueType>
-    llvm::Function* UnaryOperationNode<ValueType>::GetOperator(model::IRMapCompiler& compiler) const
+    llvm::Function* UnaryOperationNode<ValueType>::GetOperator(emitters::IRFunctionEmitter& function) const
     {
         switch (this->GetOperation())
         {
             case emitters::UnaryOperationType::sqrt:
             {
-                return compiler.GetRuntime().GetSqrtFunction<ValueType>();
+                return function.GetModule().GetRuntime().GetSqrtFunction<ValueType>();
             }
             break;
             default:
@@ -137,58 +137,46 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    void UnaryOperationNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        compiler.NewBlockRegion(*this);
-
-        auto inputPort = GetInputPorts()[0];
-
-        if (IsPureVector(*inputPort) && !compiler.GetCompilerParameters().unrollLoops)
+        if (IsPureVector(input) && !compiler.GetCompilerParameters().unrollLoops)
         {
-            CompileUnaryOperationLoop(compiler);
+            CompileLoop(compiler, function);
         }
         else
         {
-            CompileUnaryOperationExpanded(compiler);
+            CompileExpanded(compiler, function);
         }
-
-        compiler.TryMergeRegion(*this);
     }
 
     template <typename ValueType>
-    void UnaryOperationNode<ValueType>::CompileUnaryOperationLoop(model::IRMapCompiler& compiler)
+    void UnaryOperationNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         // Loop version broken
-        auto inputPort = GetInputPorts()[0];
-        auto outputPort = GetOutputPorts()[0];
-        auto count = inputPort->Size();
-        llvm::Value* pInput = compiler.EnsureEmitted(inputPort);
-        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
-        auto& function = compiler.GetCurrentFunction();
+        auto count = input.Size();
+        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
         auto forLoop = function.ForLoop();
         forLoop.Begin(count);
         {
             auto i = forLoop.LoadIterationVariable();
             llvm::Value* inputValue = function.ValueAt(pInput, i);
-            llvm::Value* pOpResult = function.Call(GetOperator(compiler), { inputValue });
+            llvm::Value* pOpResult = function.Call(GetOperator(function), { inputValue });
             function.SetValueAt(pResult, i, pOpResult);
         }
         forLoop.End();
     }
 
     template <typename ValueType>
-    void UnaryOperationNode<ValueType>::CompileUnaryOperationExpanded(model::IRMapCompiler& compiler)
+    void UnaryOperationNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto inputPort = GetInputPorts()[0];
-        auto outputPort = GetOutputPorts()[0];
-        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
-        auto& function = compiler.GetCurrentFunction();
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        for (size_t i = 0; i < inputPort->Size(); ++i)
+        for (size_t i = 0; i < input.Size(); ++i)
         {
-            llvm::Value* inputValue = compiler.LoadVariable(inputPort->GetInputElement(i));
-            llvm::Value* pOpResult = function.Call(GetOperator(compiler), { inputValue });
+            llvm::Value* inputValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
+            llvm::Value* pOpResult = function.Call(GetOperator(function), { inputValue });
             function.SetValueAt(pResult, function.Literal((int)i), pOpResult);
         }
     }

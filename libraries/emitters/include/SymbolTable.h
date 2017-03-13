@@ -44,6 +44,13 @@ namespace emitters
         /// <param name="value"> The value of the symbol. </param>
         void Add(const std::string& name, ValueType value);
 
+        /// <summary> Gets a unique name from a prefix. </summary>
+        ///
+        /// <param name="namePrefix"> The name prefix. </param>
+        ///
+        /// <returns> The unique name. </returns>
+        std::string GetUniqueName(const std::string& namePrefix) const;
+
         /// <summary> Returns true if the table contains a symbol with a given name. </summary>
         ///
         /// <param name="name"> The name of the symbol. </param>

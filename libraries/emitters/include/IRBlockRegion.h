@@ -18,7 +18,7 @@ namespace ell
 {
 namespace emitters
 {
-    ///<summary>A single operator can be compiled into one or more CONTIGUOUS blocks. This trival class helps track them</summary>
+    ///<summary> A span of code can be compiled into one or more CONTIGUOUS blocks. This trival class helps track them. </summary>
     class IRBlockRegion
     {
     public:

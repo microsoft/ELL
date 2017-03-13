@@ -46,7 +46,7 @@ namespace model
     }
 
     template <typename ValueType>
-    void InputNode<ValueType>::Compile(IRMapCompiler& compiler)
+    void InputNode<ValueType>::Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         // Input node is typically set up during pass1. By default, no further work needed
     }

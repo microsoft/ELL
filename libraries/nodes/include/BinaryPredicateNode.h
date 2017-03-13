@@ -92,12 +92,11 @@ namespace nodes
         template <typename Operation>
         std::vector<bool> ComputeOutput(Operation&& fn) const;
 
-        virtual void Compile(model::IRMapCompiler& compiler) override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
     private:
-        llvm::Function* GetOperator(model::IRMapCompiler& compiler) const;
-        void CompileBinaryPredicateLoop(model::IRMapCompiler& compiler);
-        void CompileBinaryPredicateExpanded(model::IRMapCompiler& compiler);
+        void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+        void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 
         // Inputs
         model::InputPort<ValueType> _input1;

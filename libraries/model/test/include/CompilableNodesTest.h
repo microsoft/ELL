@@ -10,16 +10,23 @@
 
 namespace ell
 {
+void TestCompileIsEqualModel();
+void TestCompilableScalarOutputNode();
+void TestCompilableVectorOutputNode();
 void TestCompilableAccumulatorNode();
 void TestCompilableConstantNode();
 void TestCompilableDotProductNode();
 void TestCompilableDelayNode();
 void TestCompilableDTWDistanceNode();
 void TestCompilableMulticlassDTW();
+void TestCompilableScalarSumNode();
 void TestCompilableSumNode();
 void TestCompilableUnaryOperationNode();
 void TestCompilableBinaryOperationNode();
+void TestCompilableScalarBinaryPredicateNode();
 void TestCompilableBinaryPredicateNode();
 void TestCompilableMultiplexerNode();
 void TestCompilableTypeCastNode();
+void TestCompilableAccumulatorNodeFunction();
+
 }

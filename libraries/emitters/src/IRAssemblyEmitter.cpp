@@ -13,6 +13,7 @@
 
 #include "IRAssemblyEmitter.h"
 #include "EmitterException.h"
+#include "IRDiagnosticHandler.h"
 
 // llvm
 #include "llvm/ADT/Triple.h"
@@ -52,36 +53,6 @@ namespace emitters
 {
     namespace
     {
-        // An error handler to catch any errors and record info about them
-        class ErrorHandler
-        {
-        public:
-            ErrorHandler(llvm::LLVMContext& context)
-            {
-                context.setDiagnosticHandler(&HandleMessage, this);
-            }
-
-            bool HadError() { return _hadError; }
-
-            std::vector<std::string> GetMessages() { return _messagePrefixes; }
-
-        private:
-            static void HandleMessage(const llvm::DiagnosticInfo& info, void* context)
-            {
-                ErrorHandler* handler = static_cast<ErrorHandler*>(context);
-                auto severity = info.getSeverity();
-                if (severity == llvm::DS_Error)
-                {
-                    handler->_hadError = true;
-                }
-
-                handler->_messagePrefixes.push_back(llvm::LLVMContext::getDiagnosticMessagePrefix(severity));
-            }
-
-            bool _hadError = false;
-            std::vector<std::string> _messagePrefixes;
-        };
-
         // Append attributes to a function
         void AddAttributes(llvm::Function& function, const llvm::AttributeSet& attributes)
         {
@@ -141,7 +112,7 @@ namespace emitters
         context.setDiscardValueNames(false); // Don't throw away names of non-global values
 
         // Create a diagnostic handler to record if there was an error
-        ErrorHandler handler(context);
+        IRDiagnosticHandler handler(context);
 
         // Verify module if requested
         if (ellOptions.verifyModule && llvm::verifyModule(module))
@@ -184,8 +155,8 @@ namespace emitters
         // Build up all of the passes that we want to apply to the module
         llvm::legacy::PassManager passManager;
 
-        // This code is if-d out, because its presence somehow causes executables using the emitters library
-        // to crash, even if they never call this function. 
+// This code is if-d out, because its presence somehow causes executables using the emitters library
+// to crash, even if they never call this function.
 #if 0   
         // Get a targetLibraryInfo describing the library functions available for this triple,
         // and any special processing we might want to do. For instance, if we want to

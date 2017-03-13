@@ -37,8 +37,9 @@ namespace model
     //
     bool IsPureVector(const model::InputPortBase& port)
     {
-        auto ranges = port.GetInputElements().GetRanges();
-        return (ranges.size() == 1 && ranges[0].Size() > 1);
+
+        const auto& elements = port.GetInputElements();
+        return elements.Size() > 1 && elements.IsFullPortOutput();
     }
 
     bool HasSingleDescendant(const model::Node& node)
@@ -69,12 +70,12 @@ namespace model
     {
         switch (type)
         {
-            case model::Port::PortType::real:
-                return emitters::VariableType::Double;
+            case model::Port::PortType::boolean:
+                return emitters::VariableType::Byte;
             case model::Port::PortType::integer:
                 return emitters::VariableType::Int32;
-            case model::Port::PortType::boolean:
-                return emitters::VariableType::Int32;
+            case model::Port::PortType::real:
+                return emitters::VariableType::Double;
             default:
                 throw emitters::EmitterException(emitters::EmitterError::notSupported, "Port type not supported");
         }

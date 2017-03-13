@@ -23,7 +23,6 @@ namespace emitters
     static const std::string c_globalVar = "g_";
     static const std::string c_localVar = "t_";
     static const std::string c_fnVar = "Fn";
-    static const std::string c_nodeVar = "Node";
     static const std::string c_inputVar = "input";
     static const std::string c_outputVar = "output";
 
@@ -109,7 +108,7 @@ namespace emitters
         var.SetEmittedName(*pPrefix + std::to_string(emittedVar.varIndex));
     }
 
-    void ModuleEmitter::FreeVar(Variable& var)
+    void ModuleEmitter::FreeVariable(Variable& var)
     {
         if (!var.HasEmittedName())
         {

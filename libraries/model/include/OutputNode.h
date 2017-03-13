@@ -38,6 +38,7 @@ namespace model
 
     protected:
         OutputNodeBase(InputPortBase& input, OutputPortBase& output);
+        virtual bool ShouldCompileInline() const override { return true; }
 
     private:
         InputPortBase& _inputBase;
@@ -90,7 +91,7 @@ namespace model
 
     protected:
         virtual void Compute() const override;
-        virtual void Compile(IRMapCompiler& compiler) override;
+        virtual void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
         InputPort<ValueType> _input;
         OutputPort<ValueType> _output;

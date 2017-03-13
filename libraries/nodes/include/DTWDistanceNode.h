@@ -87,14 +87,13 @@ namespace nodes
         std::vector<std::vector<ValueType>> GetPrototype() const { return _prototype; }
 
     protected:
-        virtual void Compute() const override;
         void Reset() const;
-        virtual void Compile(model::IRMapCompiler& compiler) override;
+        virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        virtual bool HasState() const override { return true; }
 
     private:
         std::vector<ValueType> GetPrototypeData() const;
-        void CompileDTWLoop(model::IRMapCompiler& compiler);
-        void CompileDTWExpanded(model::IRMapCompiler& compiler);
 
         model::InputPort<ValueType> _input;
         model::OutputPort<ValueType> _output;

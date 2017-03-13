@@ -34,22 +34,34 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputNode<ValueType>::Compile(IRMapCompiler& compiler)
+    void OutputNode<ValueType>::Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        // OutputNode has exactly 1 input and 1 output
         // Outputs are always long lived - either globals or heap. Currently, we use globals
-        auto inputPort = GetInputPorts()[0];
-        auto outputPort = GetOutputPorts()[0];
-        assert(GetPortVariableType(*inputPort) == GetPortVariableType(*outputPort));
+        assert(GetPortVariableType(input) == GetPortVariableType(output));
 
-        auto& function = compiler.GetCurrentFunction();
-
-        // Output ports have exactly 1 input, output
-        llvm::Value* pOutputVar = compiler.EnsureEmitted(outputPort);
-        for (size_t i = 0; i < inputPort->Size(); ++i)
+        // If the input to this node is a "pure" input port (it only refers to one output port), then we can just
+        // use the input instead.
+        if (IsPureVector(input) && false) // TODO: Re-enable when scalar output port test working
         {
-            llvm::Value* pVal = compiler.LoadVariable(inputPort->GetInputElement(i));
-            function.SetValueAt(pOutputVar, function.Literal((int)i), pVal);
+            auto pVar = compiler.GetVariableForElement(input.GetInputElement(0));
+            compiler.SetVariableForPort(output, pVar);
+        }
+        else
+        {
+            llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+            if (input.Size() == 1)
+            {
+                llvm::Value* pVal = compiler.LoadPortElementVariable(input.GetInputElement(0));
+                function.Store(pResult, pVal);
+            }
+            else
+            {
+                for (size_t i = 0; i < input.Size(); ++i)
+                {
+                    llvm::Value* pVal = compiler.LoadPortElementVariable(input.GetInputElement(i));
+                    function.SetValueAt(pResult, function.Literal((int)i), pVal);
+                }
+            }
         }
     }
 

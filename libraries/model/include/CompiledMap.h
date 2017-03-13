@@ -38,23 +38,6 @@ namespace model
     class CompiledMap : public model::DynamicMap
     {
     public:
-        /// <summary> Default constructor </summary>
-        CompiledMap();
-
-        /// <summary> Constructor </summary>
-        ///
-        /// <param name="model"> The model to wrap </param>
-        /// <param name="inputs"> A vector of name/value pairs for the inputs this map uses </param>
-        /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
-        CompiledMap(const model::Model& model, const std::vector<std::pair<std::string, model::InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, model::PortElementsBase>>& outputs);
-
-        /// <summary> Constructor </summary>
-        ///
-        /// <param name="map"> The input map to compile </param>
-        /// <param name="functionName"> The name of the function to compile the map to </param>
-        /// <param name="optimize"> Flag indicating if the output should be optimized </param>
-        CompiledMap(const model::DynamicMap& other, const std::string& functionName = "predict", bool optimize = true);
-
         CompiledMap(const CompiledMap& other) = delete;
 
         CompiledMap(CompiledMap&& other) = default;
@@ -114,12 +97,8 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-        virtual void Compile() = 0;
-
+        CompiledMap(const DynamicMap& map, std::string functionName);
         std::string _functionName;
-        bool _optimize = false;
     };
 }
 }

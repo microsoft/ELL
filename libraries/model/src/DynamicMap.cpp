@@ -14,6 +14,9 @@
 #include <algorithm>
 #include <unordered_set>
 
+#include <iomanip>
+#include <iostream>
+
 namespace ell
 {
 namespace model
@@ -34,7 +37,27 @@ namespace model
             AddOutput(output.first, output.second);
         }
 
+        // Important: we don't need to call FixTransformedIO here because we do it in the call to Prune
+        // FixTransformedIO(transformer);
         Prune();
+    }
+
+    DynamicMap::DynamicMap(const DynamicMap& other)
+    {
+        TransformContext context;
+        ModelTransformer transformer;
+        _model = transformer.CopyModel(other._model, context);
+        for (const auto& input : other._inputNodeMap)
+        {
+            AddInput(input.first, input.second);
+        }
+
+        for (const auto& output : other._outputElementsMap)
+        {
+            AddOutput(output.first, output.second);
+        }
+
+        FixTransformedIO(transformer);
     }
 
     void DynamicMap::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const

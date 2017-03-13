@@ -98,7 +98,7 @@ void TestLLVMShiftRegister()
     fn.ShiftAndUpdate<double>(pRegister, data.size(), newData2.size(), c2);
     fn.PrintForEach("%f\n", pRegister, data.size());
     fn.Return();
-    fn.Complete();
+    fn.Complete(true);
 
     module.DebugDump();
     module.WriteToFile(OutputPath("shift.bc"));
@@ -178,7 +178,7 @@ void TestLLVM()
 
     fnMain.Return();
 
-    fnMain.Complete();
+    fnMain.Complete(true);
     module.DebugDump();
 
     module.WriteToFile(OutputPath("loop.bc"));
@@ -226,7 +226,7 @@ void TestIfElseComplex()
         fn.Branch(pCondBlock);
     }
 
-    fn.Complete();
+    fn.Complete(true);
     module.DebugDump();
     module.WriteToFile(OutputPath("ifelse.bc"));
 }
@@ -283,7 +283,7 @@ void TestIfElseBlockRegions(bool runJit)
         fn.Branch(pCondBlock);
     }
 
-    fn.Complete();
+    fn.Complete(true);
     if (runJit)
     {
         IRExecutionEngine iee(std::move(module));
@@ -327,7 +327,7 @@ void TestLogical()
 
     fn.Return();
     fn.Verify();
-    //fn.Complete();  //Uncomment to turn on optimizations
+    //fn.Complete(true);  //Uncomment to turn on optimizations
 
     auto fnMain = module.AddMain();
     // We do this to prevent LLVM from doing constant folding.. so we can debug/see what is happening.
@@ -344,23 +344,3 @@ void TestLogical()
     {
     }
 }
-
-// #define countof(xs) (sizeof(xs)/sizeof(xs[0]))
-// void TestLLC()
-// {
-//         extern int llc(int, char**);
-//         char* argv[] = {
-//                 "",
-//                 "-mtriple=armv6m-unknown-none-eabi",
-//                 "-march=thumb",
-//                 "-mcpu=cortex-m0",
-//                 "-float-abi=soft",
-//                 "-mattr=+armv6-m,+v6m",
-//                 "-filetype=asm",
-//                 "-asm-verbose=0",
-//                 "-o=identity.S",
-//                 "./../../../../../private/examples/compiled_code/identity.asm"
-//         };
-//         llc(countof(argv), argv);
-// }
-// #undef countof

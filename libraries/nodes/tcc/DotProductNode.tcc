@@ -56,59 +56,48 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void DotProductNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    void DotProductNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         static_assert(!std::is_same<ValueType, bool>(), "Cannot instantiate boolean dot product nodes");
-        compiler.NewBlockRegion(*this);
-
-        auto pInput1 = this->GetInputPorts()[0];
-        auto pInput2 = this->GetInputPorts()[1];
-        if ((IsPureVector(*pInput1) && IsPureVector(*pInput2)) && !compiler.GetCompilerParameters().unrollLoops)
+        if ((IsPureVector(input1) && IsPureVector(input2)) && !compiler.GetCompilerParameters().unrollLoops)
         {
-            CompileDotProductLoop(compiler);
+            CompileDotProductLoop(compiler, function);
         }
         else
         {
-            CompileDotProductExpanded(compiler);
+            CompileDotProductExpanded(compiler, function);
         }
-
-        compiler.TryMergeRegion(*this);
     }
 
     template <typename ValueType>
-    void DotProductNode<ValueType>::CompileDotProductLoop(model::IRMapCompiler& compiler)
+    void DotProductNode<ValueType>::CompileDotProductLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pLVector = compiler.EnsureEmitted(this->GetInputPorts()[0]);
-        llvm::Value* pRVector = compiler.EnsureEmitted(this->GetInputPorts()[1]);
-        auto pOutput = this->GetOutputPorts()[0];
-        int count = (int)(this->GetInputPorts()[0])->Size();
-        llvm::Value* pResult = compiler.EnsureEmitted(pOutput);
+        llvm::Value* pLVector = compiler.EnsurePortEmitted(input1);
+        llvm::Value* pRVector = compiler.EnsurePortEmitted(input2);
+        int count = static_cast<int>(input1.Size());
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
         if (compiler.GetCompilerParameters().inlineOperators)
         {
-            compiler.GetCurrentFunction().DotProductFloat(count, pLVector, pRVector, pResult);
+            function.DotProductFloat(count, pLVector, pRVector, pResult);
         }
         else
         {
-            compiler.GetCurrentFunction().Call(compiler.GetRuntime().GetDotProductFloatFunction(), { compiler.GetCurrentFunction().Literal(count), compiler.GetCurrentFunction().PointerOffset(pLVector, 0), compiler.GetCurrentFunction().PointerOffset(pRVector, 0), compiler.GetCurrentFunction().PointerOffset(pResult, 0) });
+            function.Call(function.GetModule().GetRuntime().GetDotProductFloatFunction(), { function.Literal(count), function.PointerOffset(pLVector, 0), function.PointerOffset(pRVector, 0), function.PointerOffset(pResult, 0) });
         }
     }
 
     template <typename ValueType>
-    void DotProductNode<ValueType>::CompileDotProductExpanded(model::IRMapCompiler& compiler)
+    void DotProductNode<ValueType>::CompileDotProductExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto pInput1 = this->GetInputPorts()[0];
-        auto pInput2 = this->GetInputPorts()[1];
-        auto pOutput = this->GetOutputPorts()[0];
-        llvm::Value* pResult = compiler.EnsureEmitted(pOutput);
-        // emitters::Variable& resultVar = *(GetVariableFor(pOutput));
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        compiler.GetCurrentFunction().Store(pResult, compiler.GetCurrentFunction().Literal(0.0));
-        for (size_t i = 0; i < pInput1->Size(); ++i)
+        function.Store(pResult, function.Literal(0.0));
+        for (size_t i = 0; i < input1.Size(); ++i)
         {
-            llvm::Value* pLeftValue = compiler.LoadVariable(pInput1->GetInputElement(i));
-            llvm::Value* pRightValue = compiler.LoadVariable(pInput2->GetInputElement(i));
-            llvm::Value* pMultiplyResult = compiler.GetCurrentFunction().Operator(emitters::GetMultiplyForValueType<ValueType>(), pLeftValue, pRightValue);
-            compiler.GetCurrentFunction().OperationAndUpdate(pResult, emitters::GetAddForValueType<ValueType>(), pMultiplyResult);
+            llvm::Value* pLeftValue = compiler.LoadPortElementVariable(input1.GetInputElement(i));
+            llvm::Value* pRightValue = compiler.LoadPortElementVariable(input2.GetInputElement(i));
+            llvm::Value* pMultiplyResult = function.Operator(emitters::GetMultiplyForValueType<ValueType>(), pLeftValue, pRightValue);
+            function.OperationAndUpdate(pResult, emitters::GetAddForValueType<ValueType>(), pMultiplyResult);
         }
     }
 

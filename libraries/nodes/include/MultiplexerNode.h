@@ -79,11 +79,11 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler) override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
     private:
-        void CompileMultiplexerBinary(model::IRMapCompiler& compiler);
-        void CompileUnrolled(model::IRMapCompiler& compiler);
+        void CompileMultiplexerBinary(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+        void CompileUnrolled(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 
         // Inputs
         model::InputPort<ValueType> _elements;

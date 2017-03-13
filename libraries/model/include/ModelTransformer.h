@@ -169,12 +169,12 @@ namespace model
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         PortElementsBase GetCorrespondingOutputs(const PortElementsBase& elements);
 
-        /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
+        /// <summary> Returns the input node from the new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         template <typename ValueType>
         InputNode<ValueType>* GetCorrespondingInputNode(const InputNode<ValueType>* node);
 
-        /// <summary> Returns the input node from new new model corresponding to the given input node on the input model </summary>
+        /// <summary> Returns the input node from the new model corresponding to the given input node on the input model </summary>
         /// <remarks> Only available after calling CopyModel or RefineModel </remarks>
         InputNodeBase* GetCorrespondingInputNode(const InputNodeBase* node);
 

@@ -12,43 +12,51 @@
 #include "IRIfEmitter.h"
 #include "IRLoopEmitter.h"
 #include "IROptimizer.h"
+#include "LLVMInclude.h"
+#include "Variable.h"
 
 namespace ell
 {
 namespace emitters
 {
+    class IRModuleEmitter;
+
     /// <summary> Used to emit code into an existing LLVM IR Function </summary>
     class IRFunctionEmitter
     {
     public:
         IRFunctionEmitter() = default;
 
-        /// <summary> Copy constructor. </summary>
-        ///
-        /// <param name="other"> The other function emitter. </param>
-        IRFunctionEmitter(const IRFunctionEmitter& other);
+        IRFunctionEmitter(const IRFunctionEmitter&) = default;
+        IRFunctionEmitter(IRFunctionEmitter&&) = default;
+        IRFunctionEmitter& operator=(const IRFunctionEmitter&) = default;
+        IRFunctionEmitter& operator=(IRFunctionEmitter&&) = default;
 
-        /// <summary>
-        /// Create a new emitter to emit code into a given function, using a given IR emitter.
-        /// </summary>
+        /// <summary> Complete the function. Optionally also run an optimizer pass on it. </summary>
         ///
-        /// <param name="pEmitter"> Pointer to an IREmitter. </param>
-        /// <param name="pFunction"> Pointer to an llvm::Function. </param>
-        IRFunctionEmitter(IREmitter* pEmitter, llvm::Function* pFunction);
-
-        /// <summary> Initialize the emitter. </summary>
-        ///
-        /// <param name="pEmitter"> Pointer to an IREmitter. </param>
-        /// <param name="pFunction"> Pointer to an llvm::Function. </param>
-        void Initialize(IREmitter* pEmitter, llvm::Function* pFunction);
+        /// <param name="optimize"> If true, optimize using default optimizations. </param>
+        void Complete(bool optimize = true);
 
         /// <summary> Complete the function. Optionally also run an optimizer pass on it. </summary>
         ///
         /// <param name="pOptimizer"> If non-null, pointer to an optimizer. </param>
         void Complete(IRFunctionOptimizer* pOptimizer = nullptr);
 
+        /// <summary> Query if this IRFunctionEmitter is valid. </summary>
+        ///
+        /// <returns> True if valid, false if not. </returns>
+        bool IsValid() const { return _pModuleEmitter != nullptr; }
+
         /// <summary> Verify (as far as possible) if the function's IR is valid. </summary>
         void Verify();
+
+        /// <summary> Gets an emitted variable by scope and name. </summary>
+        ///
+        /// <param name="scope"> The variable scope. </param>
+        /// <param name="name"> The variable name. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the variable. </returns>
+        llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
 
         /// <summary> Emit a literal into the function. </summary>
         ///
@@ -65,6 +73,7 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::Value that represents the function argument. </returns>
         llvm::Value* LoadArgument(llvm::ilist_iterator<llvm::Argument>& argument);
+        llvm::Value* LoadArgument(llvm::Argument& argument);
 
         /// <summary> Emit a cast. </summary>
         ///
@@ -90,6 +99,13 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         llvm::Value* CastFloatToInt(llvm::Value* pValue);
+
+        /// <summary> Emit a cast from bool to byte. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        llvm::Value* CastBoolToByte(llvm::Value* pValue);
 
         /// <summary> Emit a cast from bool to int. </summary>
         ///
@@ -138,6 +154,14 @@ namespace emitters
         ///
         /// <returns> Pointer to the result of the function call. </returns>
         llvm::Value* Call(llvm::Function* pFunction, std::initializer_list<llvm::Value*> arguments);
+
+        /// <summary> Emit a call to a function with arguments. </summary>
+        ///
+        /// <param name="pFunction"> Pointer to the llvm::Function. </param>
+        /// <param name="arguments"> The function arguments. </param>
+        ///
+        /// <returns> Pointer to the result of the function call. </returns>
+        llvm::Value* Call(llvm::Function* pFunction, std::vector<llvm::Value*> arguments);
 
         /// <summary> Emit a return void. </summary>
         void Return();
@@ -377,19 +401,19 @@ namespace emitters
         /// <param name="regions"> The block region list. </param>
         void ConcatRegions(IRBlockRegionList& regions);
 
+        /// <summary> Concat regions in the function. </summary>
+        ///
+        /// <param name="regions"> The block region list. </param>
+        void ConcatRegions();
+
         //
-        // Variables
+        // Function arguments and Variables
         //
 
         /// <summary> Iterate over this function's arguments. </summary>
         ///
         /// <returns> A llvm::iterator_range over the function's arguments. </returns>
         llvm::iterator_range<llvm::Function::arg_iterator> Arguments() { return _pFunction->args(); }
-
-        /// <summary> Get the first function argument. </summary>
-        ///
-        /// <returns> The first function argument. </returns>
-        llvm::Argument& FirstArgument() { return *(Arguments().begin()); }
 
         /// <summary> Emit a stack variable. </summary>
         ///
@@ -405,6 +429,9 @@ namespace emitters
         ///
         /// <returns> Pointer to the resulting variable. </returns>
         llvm::Value* Variable(VariableType type, const std::string& name);
+        
+        // TODO
+        llvm::Value* EmittedVariable(VariableType type, const std::string& name);
 
         /// <summary> Emit a stack vector of the given size. </summary>
         ///
@@ -466,38 +493,64 @@ namespace emitters
         /// <returns> Pointer to a value that represents that entry in the array. </returns>
         llvm::Value* PointerOffset(llvm::Value* pPointer, int offset);
 
+        // TODO
         llvm::Value* ValueAt(llvm::Value* pPointer, llvm::Value* pOffset);
 
+        // TODO
         llvm::Value* ValueAt(llvm::Value* pPointer, int offset);
 
+        // TODO
+        llvm::Value* ValueAt(llvm::Value* pPointer);
+
+        // TODO
         llvm::Value* ValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
 
+        // TODO
+        llvm::Value* ValueAt(llvm::GlobalVariable* pGlobal, int offset);
+
+        // TODO
+        llvm::Value* ValueAt(llvm::GlobalVariable* pGlobal);
+
+        // TODO
         llvm::Value* SetValueAt(llvm::Value* pPointer, llvm::Value* pOffset, llvm::Value* pValue);
 
+        // TODO
         llvm::Value* SetValueAt(llvm::Value* pPointer, int offset, llvm::Value* pValue);
 
+        // TODO
         llvm::Value* SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pValue);
 
+        // TODO
         llvm::Value* PtrOffsetA(llvm::Value* pPointer, int offset);
 
+        // TODO
         llvm::Value* PtrOffsetA(llvm::Value* pPointer, llvm::Value* pOffset, const std::string& name = "");
 
+        // TODO
         llvm::Value* ValueAtA(llvm::Value* pPointer, int offset);
 
+        // TODO
         llvm::Value* ValueAtA(llvm::Value* pPointer, llvm::Value* pOffset);
 
+        // TODO
         llvm::Value* SetValueAtA(llvm::Value* pPointer, int offset, llvm::Value* pValue);
 
+        // TODO
         llvm::Value* SetValueAtA(llvm::Value* pPointer, llvm::Value* pOffset, llvm::Value* pValue);
 
+        // TODO
         llvm::Value* PtrOffsetH(llvm::Value* pPointer, int offset);
 
+        // TODO
         llvm::Value* PtrOffsetH(llvm::Value* pPointer, llvm::Value* pOffset);
 
+        // TODO
         llvm::Value* ValueAtH(llvm::Value* pPointer, int offset);
 
+        // TODO
         llvm::Value* ValueAtH(llvm::Value* pPointer, llvm::Value* pOffset);
 
+        // TODO
         llvm::Value* SetValueAtH(llvm::Value* pPointer, int offset, llvm::Value* pValue);
 
         /// <summary> Emits a pointer to a global. </summary>
@@ -705,6 +758,17 @@ namespace emitters
         /// <returns> Pointer to an llvm::Function. </returns>
         llvm::Function* GetFunction() const { return _pFunction; }
 
+        /// <summary> Gets a reference to the module emitter. </summary>
+        ///
+        /// <returns> Reference to an `IRModuleEmitter`. </returns>
+        IRModuleEmitter& GetModule() const { return *_pModuleEmitter; }
+
+        /// <summary> Returns the current block being emitted into </summary>
+        IRBlockRegion* GetCurrentRegion() { return _pCurRegion; }
+
+        /// <summary> Adds an`IRBlockRegion` to the region list and sets it as the current region </summary>
+        IRBlockRegion* AddRegion(llvm::BasicBlock* pBlock);
+
         //
         // Serialization
         //
@@ -718,13 +782,29 @@ namespace emitters
         void WriteToStream(std::ostream& os);
 
     private:
-        llvm::Module* GetLLVMModule() { return _pFunction->getParent(); }
-        llvm::Function* ResolveFunction(const std::string& name);
+        friend class IRModuleEmitter;
+        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction);
+        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments);
 
-        llvm::Function* _pFunction = nullptr;
+        void RegisterFunctionArgs(const NamedVariableTypeList& args);
+        void SetUpFunction();
+
+        llvm::Function* ResolveFunction(const std::string& name);
+        llvm::Module* GetLLVMModule() { return _pFunction->getParent(); }
+        friend void swap(IRFunctionEmitter& first, IRFunctionEmitter& second);
+
+        IRVariableTable _locals; // Symbol table - name -> stack variables or function arguments
+
+        IRModuleEmitter* _pModuleEmitter = nullptr;
         IREmitter* _pEmitter = nullptr;
-        IRValueList _values;
+        IRBlockRegionList _regions;
+        IRBlockRegion* _pCurRegion = nullptr;
+        llvm::Function* _pFunction = nullptr;
     };
+
+    //
+    // IRFunctionCallArguments
+    //
 
     /// <summary> Class that helps build argument lists for a function call </summary>
     class IRFunctionCallArguments
@@ -739,7 +819,7 @@ namespace emitters
         /// <summary> Gets the number of arguments. </summary>
         ///
         /// <returns> The number of arguments. </returns>
-        size_t NumArguments() const { return _arguments.Size(); }
+        size_t NumArguments() const { return _arguments.size(); }
 
         /// <summary> Get the argument at the given index. </summary>
         ///

@@ -51,38 +51,56 @@ namespace emitters
     // Creating functions
     //
 
-    void IRModuleEmitter::BeginFunction(const std::string& functionName, NamedVariableTypeList& args)
+    void IRModuleEmitter::BeginTopLevelFunction(const std::string& functionName, NamedVariableTypeList& args)
     {
-        EndFunction(); // If we're currently emitting a function, close it
-
-        _locals.Clear(); // Locals can be reused.
-        _regions.Clear();
-        _pCurRegion = nullptr;
-
+        // TODO
+        // ugh:
         if (GetCompilerParameters().includeDiagnosticInfo)
         {
             DeclarePrintf();
         }
+        BeginFunction(functionName, VariableType::Void, args);
+    }
 
-        _currentFunction = Function(functionName, VariableType::Void, args, true);
-        RegisterFunctionArgs(args);
+    void IRModuleEmitter::EndTopLevelFunction()
+    {
+        EndFunction();
+    }
+
+    IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, NamedVariableTypeList& args)
+    {
+        auto currentBlock = _emitter.GetCurrentBlock();
+        // assert(currentBlock != nullptr);
+        IRFunctionEmitter currentFunction = Function(functionName, returnType, args, true);
+        _functionStack.emplace(currentFunction, currentBlock);
+        return _functionStack.top().first;
     }
 
     void IRModuleEmitter::EndFunction()
     {
-        if (_currentFunction.GetFunction() != nullptr)
+        if (_functionStack.empty())
         {
-            _currentFunction.Return();
-            _currentFunction.ConcatRegions(_regions);
-            if (GetCompilerParameters().optimize)
-            {
-                _currentFunction.Complete();
-            }
-            else
-            {
-                _currentFunction.Verify();
-            }
+            throw EmitterException(EmitterError::indexOutOfRange);
         }
+
+        // TODO: assert passed-in function is same as top of function stack
+        auto currentFunctionInfo = _functionStack.top();
+        _functionStack.pop();
+
+        auto currentFunction = currentFunctionInfo.first;
+        auto previousBlock = currentFunctionInfo.second;
+        if (currentFunction.GetFunction() != nullptr)
+        {
+            currentFunction.Return();
+            currentFunction.ConcatRegions();
+            currentFunction.Complete(GetCompilerParameters().optimize);
+        }
+        _emitter.SetCurrentBlock(previousBlock);
+    }
+    
+    IRFunctionEmitter& IRModuleEmitter::GetCurrentFunction()
+    {
+        return _functionStack.top().first;
     }
 
     //
@@ -103,7 +121,7 @@ namespace emitters
             pVal = GetEmittedVariable(var.Scope(), var.EmittedName());
             if (pVal == nullptr)
             {
-                pVal = Emit(var);
+                pVal = EmitVariable(var);
             }
         }
         return pVal;
@@ -114,13 +132,14 @@ namespace emitters
         llvm::Value* pVal = EnsureEmitted(var);
         if (!var.IsLiteral())
         {
-            pVal = _currentFunction.Load(pVal);
+            pVal = GetCurrentFunction().Load(pVal);
         }
         return pVal;
     }
 
     void IRModuleEmitter::SetVariable(Variable& var, llvm::Value* pDestination, int offset, llvm::Value* pValue)
     {
+        auto currentFunction = GetCurrentFunction();
         assert(pValue != nullptr);
         if (var.IsScalar())
         {
@@ -128,14 +147,14 @@ namespace emitters
             {
                 throw EmitterException(EmitterError::indexOutOfRange);
             }
-            _currentFunction.Store(pDestination, pValue);
+            currentFunction.Store(pDestination, pValue);
             return;
         }
         if (offset >= var.Dimension())
         {
             throw EmitterException(EmitterError::indexOutOfRange);
         }
-        _currentFunction.SetValueAt(pDestination, _currentFunction.Literal(offset), pValue);
+        currentFunction.SetValueAt(pDestination, currentFunction.Literal(offset), pValue);
     }
 
     //
@@ -183,7 +202,7 @@ namespace emitters
 
     llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, llvm::Type* pType, llvm::Constant* pInitial, bool isConst)
     {
-        return new llvm::GlobalVariable(*_pModule, pType, isConst, llvm::GlobalValue::InternalLinkage, pInitial, name);
+        return new llvm::GlobalVariable(*GetLLVMModule(), pType, isConst, llvm::GlobalValue::InternalLinkage, pInitial, name);
     }
 
     //
@@ -220,6 +239,12 @@ namespace emitters
         return Function(name, returnType, &arguments, isPublic);
     }
 
+    IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType> arguments, bool isPublic)
+    {
+        _valueTypeList = arguments;
+        return Function(name, returnType, &_valueTypeList, isPublic);
+    }
+
     IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments, bool isPublic)
     {
         llvm::Function* pFunction = _emitter.Function(GetLLVMModule(), name, returnType, Linkage(isPublic), arguments);
@@ -227,25 +252,9 @@ namespace emitters
         {
             throw EmitterException(EmitterError::functionNotFound);
         }
-        BeginFunction(pFunction);
-        return IRFunctionEmitter(&_emitter, pFunction);
-    }
+        // TODO: put the above IREmitter call in the IRFunctionEmitter constructor
 
-    IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType> arguments, bool isPublic)
-    {
-        _valueTypeList.Replace(arguments);
-        return Function(name, returnType, &_valueTypeList, isPublic);
-    }
-
-    llvm::Function* IRModuleEmitter::GetFunction(const std::string& name)
-    {
-        return _pModule->getFunction(name);
-    }
-
-    llvm::Function* IRModuleEmitter::GetIntrinsic(llvm::Intrinsic::ID id, std::initializer_list<VariableType> arguments)
-    {
-        _valueTypeList.Replace(arguments);
-        return _emitter.GetIntrinsic(_pModule.get(), id, _valueTypeList);
+        return IRFunctionEmitter(this, &_emitter, pFunction, arguments);
     }
 
     IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const ValueTypeList* pArguments, bool isPublic)
@@ -255,8 +264,23 @@ namespace emitters
         {
             throw EmitterException(EmitterError::functionNotFound);
         }
-        BeginFunction(pFunction);
-        return IRFunctionEmitter(&_emitter, pFunction);
+        return IRFunctionEmitter(this, &_emitter, pFunction);
+    }
+
+    bool IRModuleEmitter::HasFunction(const std::string& name)
+    {
+        return GetLLVMModule()->getFunction(name) != nullptr;
+    }
+
+    llvm::Function* IRModuleEmitter::GetFunction(const std::string& name)
+    {
+        return GetLLVMModule()->getFunction(name);
+    }
+
+    llvm::Function* IRModuleEmitter::GetIntrinsic(llvm::Intrinsic::ID id, std::initializer_list<VariableType> arguments)
+    {
+        _valueTypeList = arguments;
+        return _emitter.GetIntrinsic(GetLLVMModule(), id, _valueTypeList);
     }
 
     //
@@ -265,7 +289,7 @@ namespace emitters
 
     llvm::StructType* IRModuleEmitter::Struct(const std::string& name, std::initializer_list<VariableType> fields)
     {
-        _valueTypeList.Replace(fields);
+        _valueTypeList = fields;
         return _emitter.Struct(name, _valueTypeList);
     }
 
@@ -315,7 +339,7 @@ namespace emitters
     {
         if (ModuleOutputFormat::bitcode == format)
         {
-            llvm::WriteBitcodeToFile(_pModule.get(), os);
+            llvm::WriteBitcodeToFile(GetLLVMModule(), os);
         }
         else if (ModuleOutputFormat::ir == format)
         {
@@ -364,12 +388,7 @@ namespace emitters
     void IRModuleEmitter::SetTargetMachine(llvm::TargetMachine* pMachine)
     {
         assert(pMachine != nullptr);
-        _pModule->setDataLayout(pMachine->createDataLayout());
-    }
-
-    std::unique_ptr<IRExecutionEngine> IRModuleEmitter::Jit()
-    {
-        return std::make_unique<IRExecutionEngine>(TransferOwnership());
+        GetLLVMModule()->setDataLayout(pMachine->createDataLayout());
     }
 
     //
@@ -389,13 +408,13 @@ namespace emitters
 
     void IRModuleEmitter::DeclareMalloc()
     {
-        _valueTypeList.Replace({ VariableType::Int64 });
+        _valueTypeList = { VariableType::Int64 };
         DeclareFunction("malloc", VariableType::BytePointer, _valueTypeList);
     }
 
     void IRModuleEmitter::DeclareFree()
     {
-        _valueTypeList.Replace({ VariableType::BytePointer });
+        _valueTypeList = { VariableType::BytePointer };
         DeclareFunction("free", VariableType::Void, _valueTypeList);
     }
 
@@ -407,7 +426,7 @@ namespace emitters
 
     void IRModuleEmitter::DebugDump()
     {
-        _pModule->dump();
+        GetLLVMModule()->dump();
     }
 
     //
@@ -424,12 +443,6 @@ namespace emitters
     //
     // Protected methods
     //
-
-    IRBlockRegion* IRModuleEmitter::AddRegion(llvm::BasicBlock* pBlock)
-    {
-        _pCurRegion = _regions.Add(pBlock);
-        return _pCurRegion;
-    }
 
     //
     // Private methods
@@ -452,41 +465,30 @@ namespace emitters
             case VariableScope::local:
             case VariableScope::input:
             case VariableScope::output:
-                return _locals.Get(name);
+                return GetCurrentFunction().GetEmittedVariable(scope, name);
 
             default:
                 throw EmitterException(EmitterError::variableScopeNotSupported);
         }
     }
 
-    llvm::Value* IRModuleEmitter::Emit(Variable& var)
+    llvm::Value* IRModuleEmitter::EmitVariable(Variable& var)
     {
         assert(var.HasEmittedName());
         switch (var.Type())
         {
-            case VariableType::Double:
-                return Emit<double>(var);
             case VariableType::Byte:
-                return Emit<uint8_t>(var);
+                return EmitVariable<uint8_t>(var);
             case VariableType::Int32:
-                return Emit<int>(var);
+                return EmitVariable<int>(var);
             case VariableType::Int64:
-                return Emit<int64_t>(var);
+                return EmitVariable<int64_t>(var);
+            case VariableType::Double:
+                return EmitVariable<double>(var);
             default:
                 break;
         }
         throw EmitterException(EmitterError::variableTypeNotSupported);
-    }
-
-    void IRModuleEmitter::RegisterFunctionArgs(NamedVariableTypeList& args)
-    {
-        auto fnArgs = _currentFunction.Arguments().begin();
-        for (size_t i = 0; i < args.Size(); ++i)
-        {
-            auto arg = &(*fnArgs);
-            _locals.Add(args[i].first, arg);
-            ++fnArgs;
-        }
     }
 
     llvm::Function::LinkageTypes IRModuleEmitter::Linkage(bool isPublic)
@@ -498,16 +500,6 @@ namespace emitters
     {
         assert(pType != nullptr);
         return llvm::ConstantAggregateZero::get(pType);
-    }
-
-    void IRModuleEmitter::BeginFunction(llvm::Function* pFunction)
-    {
-        //
-        // Set us up with a default entry point, since we'll always need one
-        // We may add additional annotations here
-        //
-        auto pBlock = _emitter.Block(pFunction, "entry");
-        _emitter.SetCurrentBlock(pBlock);
     }
 
     //

@@ -37,9 +37,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Set C++ version
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Set Visual Studio-specific options
 if(MSVC)
   add_definitions(-DUNICODE)
   add_compile_options(/MP)
+  add_compile_options(/bigobj)
 endif()
 
 # Set up global variables to help find NuGet projects
@@ -47,8 +50,6 @@ set(PACKAGE_ROOT ${EXTERNAL_DIR})
 include(OpenBLASSetup)
 include(LLVMSetup)
 include(CopySharedLibraries)
-
-enable_testing()
 
 # Include cmake projects for libraries and executables
 add_subdirectory(libraries)
@@ -58,6 +59,9 @@ add_subdirectory(scripts)
 if(EXISTS ${CMAKE_SOURCE_DIR}/private)
   add_subdirectory(private)
 endif()
+
+# Turn on ctest tests
+enable_testing()
 
 # Add examples
 add_subdirectory(examples)

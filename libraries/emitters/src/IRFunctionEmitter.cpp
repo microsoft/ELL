@@ -6,12 +6,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
+#include "IRFunctionEmitter.h"
 #include "EmitterException.h"
 #include "IRBlockRegion.h"
 #include "IREmitter.h"
-#include "IRFunctionEmitter.h"
+#include "IRModuleEmitter.h"
+
+// stl
+#include <iostream>
 
 namespace ell
 {
@@ -21,22 +23,28 @@ namespace emitters
     const std::string MallocFnName = "malloc";
     const std::string FreeFnName = "free";
 
-    IRFunctionEmitter::IRFunctionEmitter(IREmitter* pEmitter, llvm::Function* pFunction)
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction)
+        : _pModuleEmitter(pModuleEmitter), _pEmitter(pEmitter), _pFunction(pFunction)
     {
-        Initialize(pEmitter, pFunction);
+        assert(_pModuleEmitter != nullptr);
+        assert(_pEmitter != nullptr);
+        assert(_pFunction != nullptr);
+        SetUpFunction();
     }
 
-    IRFunctionEmitter::IRFunctionEmitter(const IRFunctionEmitter& other)
-        : _pFunction(other._pFunction), _pEmitter(other._pEmitter)
-    {
-    }
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments)
+        : IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction)
+        {
+            RegisterFunctionArgs(arguments);
+        }
 
-    void IRFunctionEmitter::Initialize(IREmitter* pEmitter, llvm::Function* pFunction)
+    void IRFunctionEmitter::Complete(bool optimize)
     {
-        assert(pEmitter != nullptr);
-        assert(pFunction != nullptr);
-        _pEmitter = pEmitter;
-        _pFunction = pFunction;
+        Verify();
+        if (optimize)
+        {
+            Optimize();
+        }
     }
 
     void IRFunctionEmitter::Complete(IRFunctionOptimizer* pOptimizer)
@@ -44,11 +52,47 @@ namespace emitters
         Verify();
         if (pOptimizer != nullptr)
         {
-            pOptimizer->Run(_pFunction);
+            Optimize(*pOptimizer);
         }
-        else
+    }
+
+    void IRFunctionEmitter::RegisterFunctionArgs(const NamedVariableTypeList& args)
+    {
+        auto argumentsIterator = Arguments().begin();
+        for (size_t i = 0; i < args.size(); ++i)
         {
-            Optimize();
+            auto arg = &(*argumentsIterator);
+            _locals.Add(args[i].first, arg);
+            ++argumentsIterator;
+        }
+    }
+
+    void IRFunctionEmitter::SetUpFunction()
+    {
+        // Set us up with a default entry point, since we'll always need one
+        // We may add additional annotations here
+        auto pBlock = Block("entry");
+        AddRegion(pBlock);
+        _pEmitter->SetCurrentBlock(pBlock); // if/when we get our own IREmitter, this statefulness won't be so objectionable
+    }
+
+    IRBlockRegion* IRFunctionEmitter::AddRegion(llvm::BasicBlock* pBlock)
+    {
+        _pCurRegion = _regions.Add(pBlock);
+        return _pCurRegion;
+    }
+
+    llvm::Value* IRFunctionEmitter::GetEmittedVariable(const VariableScope scope, const std::string& name)
+    {
+        switch (scope)
+        {
+            case VariableScope::local:
+            case VariableScope::input:
+            case VariableScope::output:
+                return _locals.Get(name);
+
+            default:
+                return GetModule().GetEmittedVariable(scope, name);
         }
     }
 
@@ -62,6 +106,11 @@ namespace emitters
         return _pEmitter->Load(&(*argument));
     }
 
+    llvm::Value* IRFunctionEmitter::LoadArgument(llvm::Argument& argument)
+    {
+        return _pEmitter->Load(&argument);
+    }
+
     llvm::Value* IRFunctionEmitter::Cast(llvm::Value* pValue, VariableType valueType)
     {
         return _pEmitter->Cast(pValue, valueType);
@@ -70,6 +119,11 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::CastFloatToInt(llvm::Value* pValue)
     {
         return _pEmitter->CastFloatToInt(pValue, VariableType::Int32);
+    }
+
+    llvm::Value* IRFunctionEmitter::CastBoolToByte(llvm::Value* pValue)
+    {
+        return _pEmitter->CastInt(pValue, VariableType::Byte, false);
     }
 
     llvm::Value* IRFunctionEmitter::CastBoolToInt(llvm::Value* pValue)
@@ -94,15 +148,19 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::Call(const std::string& name, std::initializer_list<llvm::Value*> arguments)
     {
-        _values.Replace(arguments);
-        return _pEmitter->Call(ResolveFunction(name), _values);
+        return _pEmitter->Call(ResolveFunction(name), arguments);
     }
 
     llvm::Value* IRFunctionEmitter::Call(llvm::Function* pFunction, std::initializer_list<llvm::Value*> arguments)
     {
         assert(pFunction != nullptr);
-        _values.Replace(arguments);
-        return _pEmitter->Call(pFunction, _values);
+        return _pEmitter->Call(pFunction, arguments);
+    }
+
+    llvm::Value* IRFunctionEmitter::Call(llvm::Function* pFunction, std::vector<llvm::Value*> arguments)
+    {
+        assert(pFunction != nullptr);
+        return _pEmitter->Call(pFunction, arguments);
     }
 
     void IRFunctionEmitter::Return()
@@ -211,7 +269,7 @@ namespace emitters
         assert(pTestValue1 != nullptr);
         assert(pTestValue2 != nullptr);
 
-        llvm::Value* pResult = Variable(VariableType::Int32);
+        llvm::Value* pResult = Variable(VariableType::Byte);
         IRIfEmitter ifEmitter = If();
         ifEmitter.If([&pTestValue1, this] { return _pEmitter->IsFalse(pTestValue1); });
         {
@@ -234,7 +292,7 @@ namespace emitters
         assert(pTestValue1 != nullptr);
         assert(pTestValue2 != nullptr);
 
-        llvm::Value* pResult = Variable(VariableType::Int32);
+        llvm::Value* pResult = Variable(VariableType::Byte);
         IRIfEmitter ifEmitter = If();
         ifEmitter.If([&pTestValue1, this] { return _pEmitter->IsTrue(pTestValue1); });
         {
@@ -404,14 +462,30 @@ namespace emitters
         }
     }
 
+    void IRFunctionEmitter::ConcatRegions()
+    {
+        ConcatRegions(_regions);
+    }
+
     llvm::Value* IRFunctionEmitter::Variable(VariableType type)
     {
         return _pEmitter->Variable(type);
     }
 
-    llvm::Value* IRFunctionEmitter::Variable(VariableType type, const std::string& name)
+    llvm::Value* IRFunctionEmitter::Variable(VariableType type, const std::string& namePrefix)
     {
-        return _pEmitter->Variable(type, name);
+        // don't do this for emitted variables!
+        auto name = _locals.GetUniqueName(namePrefix);
+        auto result = _pEmitter->Variable(type, name);
+        _locals.Add(name, result);
+        return result;
+    }
+
+    llvm::Value* IRFunctionEmitter::EmittedVariable(VariableType type, const std::string& name)
+    {
+        auto result = _pEmitter->Variable(type, name);
+        _locals.Add(name, result);
+        return result;
     }
 
     llvm::Value* IRFunctionEmitter::Variable(VariableType type, int size)
@@ -517,6 +591,16 @@ namespace emitters
         return Load(_pEmitter->PointerOffset(pGlobal, pOffset));
     }
 
+    llvm::Value* IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal, int offset)
+    {
+        return Load(_pEmitter->PointerOffset(pGlobal, Literal(offset)));
+    }
+
+    llvm::Value* IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal)
+    {
+        return Load(_pEmitter->Pointer(pGlobal));
+    }
+
     llvm::Value* IRFunctionEmitter::PointerOffset(llvm::Value* pPointer, llvm::Value* pOffset)
     {
         llvm::GlobalVariable* pGlobal = llvm::dyn_cast<llvm::GlobalVariable>(pPointer);
@@ -545,6 +629,11 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::ValueAt(llvm::Value* pPointer, int offset)
     {
         return ValueAt(pPointer, Literal(offset));
+    }
+
+    llvm::Value* IRFunctionEmitter::ValueAt(llvm::Value* pPointer)
+    {
+        return ValueAt(pPointer, 0);
     }
 
     llvm::Value* IRFunctionEmitter::SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pValue)
@@ -596,8 +685,8 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::Malloc(VariableType type, int64_t size)
     {
-        _values.Replace({ Literal(size) });
-        return Cast(Call(MallocFnName, _values), type);
+        IRValueList arguments = { Literal(size) };
+        return Cast(Call(MallocFnName, arguments), type);
     }
 
     void IRFunctionEmitter::Free(llvm::Value* pValue)
@@ -618,8 +707,8 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::Printf(const std::string& format, std::initializer_list<llvm::Value*> arguments)
     {
         IRValueList callArgs;
-        callArgs.Append(_pEmitter->Literal(format));
-        callArgs.Append(arguments);
+        callArgs.push_back(_pEmitter->Literal(format));
+        callArgs.insert(callArgs.end(), arguments);
         return Call(PrintfFnName, callArgs);
     }
 
@@ -703,6 +792,9 @@ namespace emitters
         _pFunction->print(out);
     }
 
+    //
+    // IRFunctionCallArguments
+    //
     IRFunctionCallArguments::IRFunctionCallArguments(IRFunctionEmitter& caller)
         : _functionEmitter(caller)
     {
@@ -718,11 +810,11 @@ namespace emitters
         assert(pValue != nullptr);
         if (pValue->getType()->isPointerTy())
         {
-            _arguments.Append(_functionEmitter.PointerOffset(pValue, 0));
+            _arguments.push_back(_functionEmitter.PointerOffset(pValue, 0));
         }
         else
         {
-            _arguments.Append(pValue);
+            _arguments.push_back(pValue);
         }
     }
 

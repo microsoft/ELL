@@ -210,55 +210,41 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    void BinaryOperationNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        compiler.NewBlockRegion(*this);
-
-        auto inputPort1 = GetInputPorts()[0];
-        auto inputPort2 = GetInputPorts()[1];
-        if (IsPureVector(*inputPort1) && IsPureVector(*inputPort2) && !compiler.GetCompilerParameters().unrollLoops)
+        if (IsPureVector(input1) && IsPureVector(input2) && !compiler.GetCompilerParameters().unrollLoops)
         {
-            CompileBinaryOperationLoop(compiler);
+            CompileLoop(compiler, function);
         }
         else
         {
-            CompileBinaryOperationExpanded(compiler);
+            CompileExpanded(compiler, function);
         }
-
-        compiler.TryMergeRegion(*this);
     }
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::CompileBinaryOperationLoop(model::IRMapCompiler& compiler)
+    void BinaryOperationNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto inputPort1 = GetInputPorts()[0];
-        auto inputPort2 = GetInputPorts()[1];
-        auto outputPort = GetOutputPorts()[0];
-        llvm::Value* pInput1 = compiler.EnsureEmitted(inputPort1);
-        llvm::Value* pInput2 = compiler.EnsureEmitted(inputPort2);
-        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
-        auto& function = compiler.GetCurrentFunction();
+        llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
+        llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        auto count = inputPort1->Size();
+        auto count = input1.Size();
         function.VectorOperator(emitters::GetOperator<ValueType>(GetOperation()), count, pInput1, pInput2, [&pResult, &function, this](llvm::Value* i, llvm::Value* pValue) {
             function.SetValueAt(pResult, i, pValue);
         });
     }
 
     template <typename ValueType>
-    void BinaryOperationNode<ValueType>::CompileBinaryOperationExpanded(model::IRMapCompiler& compiler)
+    void BinaryOperationNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto inputPort1 = GetInputPorts()[0];
-        auto inputPort2 = GetInputPorts()[1];
-        auto outputPort = GetOutputPorts()[0];
-        llvm::Value* pResult = compiler.EnsureEmitted(outputPort);
-        auto& function = compiler.GetCurrentFunction();
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        auto count = inputPort1->Size();
+        auto count = input1.Size();
         for (size_t i = 0; i < count; ++i)
         {
-            llvm::Value* inputValue1 = compiler.LoadVariable(inputPort1->GetInputElement(i));
-            llvm::Value* inputValue2 = compiler.LoadVariable(inputPort2->GetInputElement(i));
+            llvm::Value* inputValue1 = compiler.LoadPortElementVariable(input1.GetInputElement(i));
+            llvm::Value* inputValue2 = compiler.LoadPortElementVariable(input2.GetInputElement(i));
             llvm::Value* pOpResult = function.Operator(emitters::GetOperator<ValueType>(GetOperation()), inputValue1, inputValue2);
             function.SetValueAt(pResult, function.Literal((int)i), pOpResult);
         }

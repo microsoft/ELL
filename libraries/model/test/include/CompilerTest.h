@@ -38,11 +38,13 @@ model::DynamicMap MakeSimpleMap();
 model::Model MakeForestModel();
 model::DynamicMap MakeForestMap();
 
+void TestSimpleMap(bool optimize);
 void TestCompiledMapMove();
 void TestBinaryVector(bool expanded, bool runJit = false);
 void TestBinaryScalar();
 void TestDotProduct();
-void TestSum(bool expanded);
+void TestSimpleSum(bool expanded, bool optimize = false);
+void TestSum(bool expanded, bool optimize = false);
 void TestAccumulator(bool expanded);
 void TestDelay();
 void TestSqrt();

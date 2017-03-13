@@ -84,6 +84,7 @@ set (test_src
     test/src/ModelTestUtilities.cpp
     test/src/ModelBuilder_test.cpp
     test/src/Model_test.cpp
+    test/src/ModelTestUtilities.cpp
     test/src/PortElements_test.cpp
 )
 
@@ -93,6 +94,11 @@ set (test_include
     test/include/ModelTestUtilities.h
     test/include/Model_test.h
     test/include/PortElements_test.h
+    test/include/ModelTestUtilities.h
+)
+
+set (test_tcc
+    test/tcc/ModelTestUtilities.tcc
 )
 
 source_group("src" FILES ${test_src})
@@ -117,17 +123,19 @@ set (compiler_test_src
     test/src/CompilableNodesTest.cpp
     test/src/CompilerTest.cpp
     test/src/ModelMaker.cpp
+    test/src/ModelTestUtilities.cpp
 )
 
 set (compiler_test_include
     test/include/CompilableNodesTest.h
     test/include/CompilerTest.h
-    test/include/CompilerTestUtilities.h
     test/include/ModelMaker.h
+    test/include/ModelTestUtilities.h
 )
 
 set (compiler_test_tcc
     test/tcc/ModelMaker.tcc
+    test/tcc/ModelTestUtilities.tcc
 )
 
 source_group("src" FILES ${compiler_test_src})

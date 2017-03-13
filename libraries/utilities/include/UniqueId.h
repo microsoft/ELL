@@ -78,6 +78,8 @@ namespace utilities
         std::string _id = "0";
         static size_t _nextId;
     };
+    
+    std::string to_string(const UniqueId& id);
 }
 }
 

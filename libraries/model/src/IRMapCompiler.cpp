@@ -2,69 +2,150 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     IRMapCompiler.cpp (model)
-//  Authors:  Umesh Madan
+//  Authors:  Umesh Madan, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IRMapCompiler.h"
-
-#include "CompilableNodeUtilities.h"
 #include "CompilableNode.h"
+#include "CompilableNodeUtilities.h"
+#include "OutputNode.h"
 
 // emitters
 #include "Variable.h"
+#include "EmitterException.h"
 
 namespace ell
 {
 namespace model
 {
     IRMapCompiler::IRMapCompiler()
-        : IRMapCompiler("ELL")
+        : IRMapCompiler(MapCompilerParameters{})
     {
     }
 
-    IRMapCompiler::IRMapCompiler(const std::string& moduleName)
-        : emitters::IRModuleEmitter(moduleName)
+    IRMapCompiler::IRMapCompiler(const MapCompilerParameters& settings)
+        : MapCompiler(settings), _moduleEmitter(settings.moduleName)
     {
+        _moduleEmitter.SetCompilerParameters(settings.compilerSettings);
+        _nodeRegions.emplace_back();
+    }
+
+    void IRMapCompiler::EnsureValidMap(DynamicMap& map)
+    {
+        if (map.NumInputPorts() != 1)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Compiled maps must have a single input");
+        }
+
+        if (map.NumOutputPorts() != 1)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Compiled maps must have a single output");
+        }
+
+        // if output isn't a simple port, add an output node to model
+        auto out = map.GetOutput(0);
+        if (!out.IsFullPortOutput())
+        {
+            model::OutputNodeBase* outputNode = nullptr;
+            switch (out.GetPortType())
+            {
+                case model::Port::PortType::boolean:
+                    outputNode = map.GetModel().AddNode<model::OutputNode<bool>>(model::PortElements<bool>(out));
+                    break;
+                case model::Port::PortType::integer:
+                    outputNode = map.GetModel().AddNode<model::OutputNode<int>>(model::PortElements<int>(out));
+                    break;
+                case model::Port::PortType::real:
+                    outputNode = map.GetModel().AddNode<model::OutputNode<double>>(model::PortElements<double>(out));
+                    break;
+                default:
+                    throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+            }
+
+            map.ResetOutput(0, outputNode->GetOutputPort());
+        }
+    }
+
+    IRCompiledMap IRMapCompiler::Compile(DynamicMap map, const std::string& functionName)
+    {
+        EnsureValidMap(map);
+        model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() ? model::NodeAction::compile : model::NodeAction::refine; } };
+        map.Refine(context);
+
+        // Now we have the refined map, compile it
+        emitters::CompilerParameters settings;
+        settings.includeDiagnosticInfo = false;
+
+        CompileMap(map, functionName); // base class
+
+        auto module = std::make_unique<emitters::IRModuleEmitter>(GetModule().TransferOwnership());
+        return IRCompiledMap(map, functionName, std::move(module));
     }
 
     //
+    // Node implementor methods:
     //
-    //
-    llvm::Value* IRMapCompiler::EnsureEmitted(PortElementBase& element)
+
+    llvm::Value* IRMapCompiler::EnsurePortEmitted(const InputPortBase& port)
     {
-        return EnsureEmitted(*EnsureVariableFor(element));
+        auto portElement = port.GetInputElement(0);
+        return EnsurePortElementEmitted(portElement);
     }
 
-    llvm::Value* IRMapCompiler::EnsureEmitted(OutputPortBase* pPort)
+    llvm::Value* IRMapCompiler::EnsurePortEmitted(const OutputPortBase& port)
     {
-        auto pVar = GetOrAllocatePortVariable(pPort);
-        return EnsureEmitted(*pVar);
+        auto pVar = GetOrAllocatePortVariable(port);
+        return GetModule().EnsureEmitted(*pVar);
     }
 
-    llvm::Value* IRMapCompiler::EnsureEmitted(InputPortBase* pPort)
+    llvm::Value* IRMapCompiler::EnsurePortElementEmitted(const PortElementBase& element)
     {
-        assert(pPort != nullptr);
-        auto portElement = pPort->GetInputElement(0); // ?
-        return EnsureEmitted(portElement);
+        auto pVar = GetVariableForElement(element);
+        if (pVar == nullptr)
+        {
+            throw emitters::EmitterException(emitters::EmitterError::notSupported, "Variable for output port not found");
+        }
+        return GetModule().EnsureEmitted(*pVar);
     }
 
     void IRMapCompiler::OnBeginCompileNode(const Node& node)
     {
-        if (GetCurrentRegion() == nullptr)
+        auto& currentFunction = GetModule().GetCurrentFunction();
+        if (currentFunction.GetCurrentRegion() == nullptr)
         {
-            AddRegion(GetCurrentFunction().GetCurrentBlock());
+            currentFunction.AddRegion(currentFunction.GetCurrentBlock());
         }
     }
 
     void IRMapCompiler::OnEndCompileNode(const Node& node)
     {
-        assert(GetCurrentRegion() != nullptr);
-        auto pCurBlock = GetCurrentFunction().GetCurrentBlock();
-        if (pCurBlock != GetCurrentRegion()->End())
+        auto& currentFunction = GetModule().GetCurrentFunction();
+        assert(currentFunction.GetCurrentRegion() != nullptr);
+        auto pCurBlock = currentFunction.GetCurrentBlock();
+        if (pCurBlock != currentFunction.GetCurrentRegion()->End())
         {
-            GetCurrentRegion()->SetEnd(pCurBlock);
+            currentFunction.GetCurrentRegion()->SetEnd(pCurBlock);
         }
+    }
+
+    void IRMapCompiler::PushScope()
+    {
+        MapCompiler::PushScope();
+        _nodeRegions.emplace_back();
+    }
+
+    void IRMapCompiler::PopScope()
+    {
+        MapCompiler::PopScope();
+        assert(_nodeRegions.size() > 0);
+        _nodeRegions.pop_back();
+    }
+
+    NodeMap<emitters::IRBlockRegion*>& IRMapCompiler::GetCurrentNodeBlocks()
+    {
+        assert(_nodeRegions.size() > 0);
+        return _nodeRegions.back();
     }
 
     const Node* IRMapCompiler::GetUniqueParent(const Node& node)
@@ -80,7 +161,7 @@ namespace model
                 {
                     return nullptr;
                 }
-                emitters::IRBlockRegion* pNodeRegion = _nodeBlocks.Get(*parentNode);
+                emitters::IRBlockRegion* pNodeRegion = GetCurrentNodeBlocks().Get(*parentNode);
                 if (pNodeRegion != nullptr)
                 {
                     if (pParentRegion != nullptr && pNodeRegion != pParentRegion)
@@ -95,21 +176,24 @@ namespace model
         return pParentNode;
     }
 
-    void IRMapCompiler::NewBlockRegion(const Node& node)
+    void IRMapCompiler::NewNodeRegion(const Node& node)
     {
-        auto pBlock = GetCurrentFunction().Block(IdString(node));
-        GetCurrentFunction().SetCurrentBlock(pBlock);
-        auto currentRegion = AddRegion(pBlock);
-        _nodeBlocks.Set(node, currentRegion);
-        if (GetCompilerParameters().includeDiagnosticInfo)
+        auto& currentFunction = GetModule().GetCurrentFunction();
+        auto pBlock = currentFunction.Block(IdString(node));
+        assert(pBlock != nullptr && "Got null new block");
+        currentFunction.SetCurrentBlock(pBlock);
+        auto currentRegion = currentFunction.AddRegion(pBlock);
+        GetCurrentNodeBlocks().Set(node, currentRegion);
+
+        if (GetMapCompilerParameters().compilerSettings.includeDiagnosticInfo)
         {
-            GetCurrentFunction().Print(DiagnosticString(node) + '\n');
+            currentFunction.Print(DiagnosticString(node) + '\n');
         }
     }
 
-    bool IRMapCompiler::TryMergeRegion(const Node& node)
+    bool IRMapCompiler::TryMergeNodeRegion(const Node& node)
     {
-        auto pRegion = _nodeBlocks.Get(node);
+        auto pRegion = GetCurrentNodeBlocks().Get(node);
         if (pRegion == nullptr)
         {
             return false;
@@ -121,12 +205,12 @@ namespace model
             return false;
         }
 
-        return TryMergeRegions(*pParentNode, node);
+        return TryMergeNodeRegions(*pParentNode, node);
     }
 
-    bool IRMapCompiler::TryMergeRegions(const Node& dest, const Node& src)
+    bool IRMapCompiler::TryMergeNodeRegions(const Node& dest, const Node& src)
     {
-        emitters::IRBlockRegion* pDestRegion = _nodeBlocks.Get(dest);
+        emitters::IRBlockRegion* pDestRegion = GetCurrentNodeBlocks().Get(dest);
         if (pDestRegion == nullptr)
         {
             return false;
@@ -136,60 +220,106 @@ namespace model
 
     bool IRMapCompiler::TryMergeNodeIntoRegion(emitters::IRBlockRegion* pDestRegion, const Node& src)
     {
-        emitters::IRBlockRegion* pSrcRegion = _nodeBlocks.Get(src);
+        auto& currentFunction = GetModule().GetCurrentFunction();
+
+        emitters::IRBlockRegion* pSrcRegion = GetCurrentNodeBlocks().Get(src);
         if (pSrcRegion == nullptr || pSrcRegion == pDestRegion)
         {
             return false;
         }
-        GetCurrentRegion()->SetEnd(GetCurrentFunction().GetCurrentBlock());
-        GetCurrentFunction().ConcatRegions(pDestRegion, pSrcRegion);
-        _nodeBlocks.Set(src, pDestRegion);
+
+        GetModule().GetCurrentRegion()->SetEnd(currentFunction.GetCurrentBlock());
+        currentFunction.ConcatRegions(pDestRegion, pSrcRegion);
+        GetCurrentNodeBlocks().Set(src, pDestRegion);
         return true;
     }
 
-    emitters::IRBlockRegion* IRMapCompiler::GetMergeableRegion(const PortElementBase& element)
+    emitters::IRBlockRegion* IRMapCompiler::GetMergeableNodeRegion(const PortElementBase& element)
     {
         const Node* pNode = nullptr;
         if (HasSingleDescendant(element))
         {
-            emitters::Variable* pVar = GetVariableFor(element);
+            emitters::Variable* pVar = GetVariableForElement(element);
             if (pVar != nullptr && !pVar->IsLiteral())
             {
                 pNode = element.ReferencedPort()->GetNode();
             }
         }
 
-        return (pNode != nullptr) ? _nodeBlocks.Get(*pNode) : nullptr;
+        return (pNode != nullptr) ? GetCurrentNodeBlocks().Get(*pNode) : nullptr;
     }
 
-    llvm::Value* IRMapCompiler::LoadVariable(const PortElementBase& element)
+    llvm::LLVMContext& IRMapCompiler::GetLLVMContext()
     {
-        emitters::Variable* pVar = EnsureVariableFor(element);
-        llvm::Value* pVal = EnsureEmitted(*pVar);
+        return _moduleEmitter.GetLLVMContext();
+    }
+
+    //
+    // Port variables
+    //
+    llvm::Value* IRMapCompiler::LoadPortVariable(const InputPortBase& port)
+    {
+        return LoadPortElementVariable(port.GetInputElement(0)); // Note: this fails on scalar input variables
+    }
+
+    llvm::Value* IRMapCompiler::LoadPortElementVariable(const PortElementBase& element)
+    {
+        auto& currentFunction = GetModule().GetCurrentFunction();
+
+        // Error: if we pass in a single element from a range, we need to use startindex as part of the key for looking up the element. In fact, we should have a separate map for vector port and scalar element variables... 
+        emitters::Variable* pVar = GetVariableForElement(element);
+        llvm::Value* pVal = GetModule().EnsureEmitted(*pVar);
         if (pVar->IsScalar())
         {
-            if (element.GetIndex() > 0)
-            {
-                throw emitters::EmitterException(emitters::EmitterError::vectorVariableExpected);
-            }
             if (pVar->IsLiteral())
             {
                 return pVal;
             }
-            return GetCurrentFunction().Load(pVal);
+            else if (pVar->IsInputArgument())
+            {
+                return pVal;
+            }
+            else
+            {
+                return currentFunction.Load(pVal);
+            }
         }
 
-        if (element.GetIndex() >= pVar->Dimension())
+        // Else return an element from a vector (unless it was in fact passed in by value)
+        auto valType = pVal->getType();
+        bool needsDereference = valType->isPointerTy(); // TODO: Maybe this should be `isPtrOrPtrVectorTy()` or even `isPtrOrPtrVectorTy() || isArrayTy()`
+        if(needsDereference)
+        {
+            return currentFunction.ValueAt(pVal, currentFunction.Literal((int)element.GetIndex()));
+        }
+        else
+        {
+            return pVal;
+        }
+    }
+
+    emitters::Variable* IRMapCompiler::GetPortElementVariable(const PortElementBase& element)
+    {
+        emitters::Variable* pVar = GetVariableForElement(element);
+        if (pVar == nullptr)
+        {
+            throw emitters::EmitterException(emitters::EmitterError::notSupported, "Variable for output port not found");
+        }
+        if (pVar->IsScalar() && element.GetIndex() > 0)
+        {
+            throw emitters::EmitterException(emitters::EmitterError::vectorVariableExpected);
+        }
+        else if (element.GetIndex() >= pVar->Dimension())
         {
             throw emitters::EmitterException(emitters::EmitterError::indexOutOfRange);
         }
-        return GetCurrentFunction().ValueAt(pVal, GetCurrentFunction().Literal((int)element.GetIndex()));
+
+        return pVar;
     }
 
-    llvm::Value* IRMapCompiler::LoadVariable(InputPortBase* pPort)
+    emitters::Variable* IRMapCompiler::GetPortVariable(const InputPortBase& port)
     {
-        assert(pPort != nullptr);
-        return LoadVariable(pPort->GetInputElement(0));
+        return GetPortElementVariable(port.GetInputElement(0)); // Note: Potential error: scalar vars passed by value won't work here
     }
 }
 }

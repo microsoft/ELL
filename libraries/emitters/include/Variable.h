@@ -75,8 +75,7 @@ namespace emitters
             none = 0,
             isMutable = 0x00000001, /// <summary> Mutable or constant </summary>
             hasInitValue = 0x00000002, /// <summary> Initialized or not </summary>
-            isVectorRef = 0x00000004, /// <summary> Is this a offset into a vector or array </summary>
-            isTreeNode = 0x00000008 /// <summary> Is this a helper for a tree node </summary>
+            isVectorRef = 0x00000004 /// <summary> Is this a offset into a vector or array </summary>
         };
 
     public:
@@ -93,25 +92,27 @@ namespace emitters
         bool IsVector() const { return !IsScalar(); }
 
         /// <summary> Is this a scalar variable? </summary>
-        virtual bool IsScalar() const { return (Dimension() == 1); }
+        virtual bool IsScalar() const { return Dimension() == 1; }
 
         /// <summary> When a variable is emitted, it is bound to a name </summary>
         const std::string& EmittedName() const { return _emittedName; }
 
         /// <summary> Was the variable emitted? </summary>
-        bool HasEmittedName() const { return (_emittedName.length() > 0); }
+        bool HasEmittedName() const { return _emittedName.length() > 0; }
 
         /// <summary> Set the emitted name for the variable </summary>
         void SetEmittedName(std::string emittedName);
 
         /// <summary> Is this a literal variable? </summary>
-        bool IsLiteral() const { return (_scope == VariableScope::literal); }
+        bool IsLiteral() const { return _scope == VariableScope::literal; }
 
+        bool IsInputArgument() const { return _scope == VariableScope::input; }
+        
         /// <summary> Is this a global variable? </summary>
-        bool IsGlobal() const { return (_scope == VariableScope::global); }
+        bool IsGlobal() const { return _scope == VariableScope::global; }
 
         /// <summary> Is this an RValue variable? </summary>
-        bool IsRValue() const { return (_scope == VariableScope::rValue); }
+        bool IsRValue() const { return _scope == VariableScope::rValue; }
 
         /// <summary> Is this a variable mutable? </summary>
         bool IsMutable() const { return TestFlags(VariableFlags::isMutable); }
@@ -129,7 +130,7 @@ namespace emitters
         bool IsNew() const { return _emittedVar.isNew; }
 
         /// <summary> Test if the given set of flags are set </summary>
-        bool TestFlags(int flags) const { return ((_flags & flags) != 0); }
+        bool TestFlags(int flags) const { return (_flags & flags) != 0; }
 
         /// <summary> Bind the logical variable to a physical one </summary>
         void AssignVar(EmittedVar var) { _emittedVar = var; }

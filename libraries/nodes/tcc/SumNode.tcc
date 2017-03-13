@@ -43,58 +43,45 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void SumNode<ValueType>::Compile(model::IRMapCompiler& compiler)
+    void SumNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        compiler.NewBlockRegion(*this);
-
-        // SumNode has exactly 1 input and 1 output
-        auto pInput = this->GetInputPorts()[0];
-        if (IsPureVector(*pInput) && !compiler.GetCompilerParameters().unrollLoops)
+        if (IsPureVector(input) && !compiler.GetCompilerParameters().unrollLoops)
         {
-            CompileSumLoop(compiler);
+            CompileLoop(compiler, function);
         }
         else
         {
-            CompileSumExpanded(compiler);
+            CompileExpanded(compiler, function);
         }
-
-        compiler.TryMergeRegion(*this);
     }
 
     template <typename ValueType>
-    void SumNode<ValueType>::CompileSumLoop(model::IRMapCompiler& compiler)
+    void SumNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto pInput = this->GetInputPorts()[0];
-        auto pOutput = this->GetOutputPorts()[0];
-        llvm::Value* pSrcVector = compiler.EnsureEmitted(pInput);
-        llvm::Value* pResult = compiler.EnsureEmitted(pOutput);
-        // emitters::Variable& resultVar = *(compiler.GetVariableFor(pOutput));
+        llvm::Value* pSrcVector = compiler.EnsurePortEmitted(input);
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        compiler.GetCurrentFunction().Store(pResult, compiler.GetCurrentFunction().Literal(0.0));
-        auto forLoop = compiler.GetCurrentFunction().ForLoop();
-        // auto pBodyBlock = forLoop.Begin(pInput->Size());
-        forLoop.Begin(pInput->Size());
+        function.Store(pResult, function.Literal(0.0));
+        auto forLoop = function.ForLoop();
+        forLoop.Begin(input.Size());
         {
             auto i = forLoop.LoadIterationVariable();
-            llvm::Value* pValue = compiler.GetCurrentFunction().ValueAt(pSrcVector, i);
-            compiler.GetCurrentFunction().OperationAndUpdate(pResult, emitters::GetAddForValueType<ValueType>(), pValue);
+            llvm::Value* pValue = function.ValueAt(pSrcVector, i);
+            function.OperationAndUpdate(pResult, emitters::GetAddForValueType<ValueType>(), pValue);
         }
         forLoop.End();
     }
 
     template <typename ValueType>
-    void SumNode<ValueType>::CompileSumExpanded(model::IRMapCompiler& compiler)
+    void SumNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto pInput = this->GetInputPorts()[0];
-        auto pOutput = this->GetOutputPorts()[0];
-        llvm::Value* pResult = compiler.EnsureEmitted(pOutput);
-        // emitters::Variable& resultVar = *(compiler.GetVariableFor(pOutput));
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        compiler.GetCurrentFunction().Store(pResult, compiler.GetCurrentFunction().Literal(0.0));
-        for (size_t i = 0; i < pInput->Size(); ++i)
+        function.Store(pResult, function.Literal(0.0));
+        for (size_t i = 0; i < input.Size(); ++i)
         {
-            llvm::Value* pValue = compiler.LoadVariable(pInput->GetInputElement(i));
-            compiler.GetCurrentFunction().OperationAndUpdate(pResult, emitters::GetAddForValueType<ValueType>(), pValue);
+            llvm::Value* pValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
+            function.OperationAndUpdate(pResult, emitters::GetAddForValueType<ValueType>(), pValue);
         }
     }
 

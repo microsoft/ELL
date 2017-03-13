@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     Model_test.cpp (model_test)
+//  File:     ModelTestUtilities.cpp (compile_test)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,11 +25,33 @@
 
 namespace ell
 {
+static bool g_isVerbose = false;
+
+VerboseRegion::VerboseRegion(bool verbose)
+    : _oldVerbose(IsVerbose())
+{
+    SetVerbose(verbose);
+}
+
+VerboseRegion::~VerboseRegion()
+{
+    SetVerbose(_oldVerbose);
+}
+
+void SetVerbose(bool verbose)
+{
+    g_isVerbose = verbose;
+}
+
+bool IsVerbose()
+{
+    return g_isVerbose;
+}
 
 void NodePrinter(const model::Node& node)
 {
     bool isFirstInputPort = true;
-    std::cout << "node_" << node.GetId() << " = " << node.GetRuntimeTypeName() << "(";
+    std::cout << "node_" << node.GetId() << " (" << std::hex << (&node) << std::dec << ") = " << node.GetRuntimeTypeName() << "(";
     for (const auto& inputPort : node.GetInputPorts())
     {
         std::cout << (isFirstInputPort ? "" : ", ");
@@ -99,5 +121,41 @@ model::Model GetComplexModel()
     g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
     g.AddNode<model::OutputNode<bool>>(model::PortElements<bool>({ in2->output }));
     return g;
+}
+
+void PrintIR(emitters::IRModuleEmitter& module)
+{
+    if (IsVerbose())
+    {
+        module.DebugDump();
+    }
+}
+
+void PrintIR(model::IRCompiledMap& compiledMap)
+{
+    if (IsVerbose())
+    {
+        compiledMap.WriteCode(std::cout, emitters::ModuleOutputFormat::ir);
+    }
+}
+
+void PrintDiagnostics(emitters::IRDiagnosticHandler& handler)
+{
+    if (!IsVerbose()) return;
+
+    // Print out any diagnostic messages
+    auto messages = handler.GetMessages();
+    if (messages.size() > 0)
+    {
+        std::cout << "Diagnostic messages" << std::endl;
+        for (auto message : messages)
+        {
+            std::cout << message << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Diagnostic messages -- none" << std::endl;
+    }
 }
 }

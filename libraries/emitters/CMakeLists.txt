@@ -14,6 +14,7 @@ set (src
     src/EmitterTypes.cpp
     src/IRAssemblyEmitter.cpp
     src/IRBlockRegion.cpp
+    src/IRDiagnosticHandler.cpp
     src/IREmitter.cpp
     src/IRExecutionEngine.cpp
     src/IRFunctionEmitter.cpp
@@ -32,6 +33,7 @@ set (include
     include/EmitterTypes.h
     include/IRAssemblyEmitter.h
     include/IRBlockRegion.h
+    include/IRDiagnosticHandler.h
     include/IREmitter.h
     include/IRExecutionEngine.h
     include/IRFunctionEmitter.h

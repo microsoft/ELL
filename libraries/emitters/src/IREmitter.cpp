@@ -157,14 +157,17 @@ namespace emitters
 
     llvm::Constant* IREmitter::True()
     {
-        return Literal(1);
+        return Literal(true);
     }
 
     llvm::Constant* IREmitter::False()
     {
-        return Literal(0);
+        return Literal(false);
     }
 
+    //
+    // Typecast
+    //
     template <>
     llvm::Value* IREmitter::CastValue<bool, bool>(llvm::Value* pValue)
     {
@@ -267,7 +270,7 @@ namespace emitters
 
     llvm::Value* IREmitter::CastBool(llvm::Value* pValue)
     {
-        return Cast(pValue, VariableType::Int32);
+        return Cast(pValue, VariableType::Byte);
     }
 
     llvm::ReturnInst* IREmitter::ReturnVoid()
@@ -275,12 +278,18 @@ namespace emitters
         return _irBuilder.CreateRetVoid();
     }
 
+    //
+    // Return
+    //
     llvm::ReturnInst* IREmitter::Return(llvm::Value* pValue)
     {
         assert(pValue != nullptr);
         return _irBuilder.CreateRet(pValue);
     }
 
+    //
+    // Operations / Comparisons
+    //
     llvm::Value* IREmitter::BinaryOperation(const TypedOperator type, llvm::Value* pLeftValue, llvm::Value* pRightValue, const std::string& variableName)
     {
         assert(pLeftValue != nullptr);
@@ -357,8 +366,8 @@ namespace emitters
         auto pValueType = pValue->getType();
         if (pValueType->isIntegerTy(1))
         {
-            // We use integers as booleans
-            pTestValue = CastInt(pValue, VariableType::Int32, false);
+            // We use bytes as booleans
+            pTestValue = CastInt(pValue, VariableType::Byte, false);
         }
         else if (!pValueType->isIntegerTy(4))
         {
@@ -367,11 +376,17 @@ namespace emitters
         return Comparison(TypedComparison::equals, pTestValue, testValue ? True() : False());
     }
 
+    //
+    // AddModule
+    //
     std::unique_ptr<llvm::Module> IREmitter::AddModule(const std::string& name)
     {
         return std::make_unique<llvm::Module>(name, _llvmContext);
     }
 
+    //
+    // Functions
+    //
     llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const ValueTypeList* pArguments)
     {
         return Function(pModule, name, returnType, llvm::Function::LinkageTypes::ExternalLinkage, pArguments);
@@ -417,6 +432,9 @@ namespace emitters
         return pFunction;
     }
 
+    //
+    // Blocks
+    //
     llvm::BasicBlock* IREmitter::Block(llvm::Function* pFunction, const std::string& label)
     {
         assert(pFunction != nullptr);
@@ -468,10 +486,16 @@ namespace emitters
 
     void IREmitter::SetCurrentBlock(llvm::BasicBlock* pBlock)
     {
-        assert(pBlock != nullptr);
-        _irBuilder.SetInsertPoint(pBlock);
+        // assert(pBlock != nullptr);
+        if (pBlock != nullptr)
+        {
+            _irBuilder.SetInsertPoint(pBlock);
+        }
     }
 
+    //
+    // Calling functions
+    //
     llvm::CallInst* IREmitter::Call(llvm::Function* pFunction)
     {
         assert(pFunction != nullptr);
@@ -487,9 +511,10 @@ namespace emitters
     llvm::CallInst* IREmitter::Call(llvm::Function* pFunction, const IRValueList& arguments)
     {
         assert(pFunction != nullptr);
-        return _irBuilder.CreateCall(pFunction, arguments.GetVector());
+        return _irBuilder.CreateCall(pFunction, arguments);
     }
 
+    // Intrinsics / library functions
     llvm::CallInst* IREmitter::MemoryMove(llvm::Value* pSource, llvm::Value* pDestination, llvm::Value* pCountBytes)
     {
         assert(pSource != nullptr);
@@ -683,18 +708,18 @@ namespace emitters
     void IREmitter::BindTypes(const ValueTypeList& arguments)
     {
         _types.clear();
-        for (auto argument = arguments.Begin(); argument != arguments.End(); ++argument)
+        for (auto argument : arguments)
         {
-            _types.push_back(Type(*argument));
+            _types.push_back(Type(argument));
         }
     }
 
     void IREmitter::BindArgumentTypes(const NamedVariableTypeList& arguments)
     {
         _types.clear();
-        for (auto argument = arguments.Begin(); argument != arguments.End(); ++argument)
+        for (auto argument : arguments)
         {
-            _types.push_back(Type(argument->second));
+            _types.push_back(Type(argument.second));
         }
     }
 

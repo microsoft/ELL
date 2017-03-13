@@ -18,6 +18,15 @@
 #include "ScalarVariable.h"
 #include "VectorVariable.h"
 
+// stl
+#include <initializer_list>
+#include <iosfwd>
+#include <memory>
+#include <stack>
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace ell
 {
 namespace emitters
@@ -44,11 +53,11 @@ namespace emitters
         // Getting state
         //
 
-        /// <summary> The root function that the last model was compiled into </summary>
-        IRFunctionEmitter& GetCurrentFunction() { return _currentFunction; }
+        /// <summary> The current function being emitted </summary>
+        IRFunctionEmitter& GetCurrentFunction();
 
         /// <summary> Returns the current block being emitted into </summary>
-        IRBlockRegion* GetCurrentRegion() { return _pCurRegion; }
+        IRBlockRegion* GetCurrentRegion() { return GetCurrentFunction().GetCurrentRegion(); } 
 
         /// <summary> Returns the runtime object that manages functions </summary>
         IRRuntime& GetRuntime() { return _runtime; }
@@ -67,14 +76,21 @@ namespace emitters
         // Creating functions
         //
 
-        /// <summary> Begins the IR function that will contain our compiled model </summary>
+        /// <summary> Begins an IR function and directs subsequent commands to it </summary>
         ///
         /// <param name="functionName"> The name of the function </param>
         /// <param name="args"> The arguments to the function </param>
-        virtual void BeginFunction(const std::string& functionName, NamedVariableTypeList& args) override;
+        virtual void BeginTopLevelFunction(const std::string& functionName, NamedVariableTypeList& args) override; // TODO: add return type
 
-        /// <summary> Ends the IR function that will contain our compiled model </summary>
-        virtual void EndFunction() override;
+        /// <summary> Ends the current function </summary>
+        virtual void EndTopLevelFunction() override;
+
+
+        // TODO: replace BeginTopLevelFunction with this
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, VariableType returnType, NamedVariableTypeList& args);
+
+        /// <summary> Ends the current function </summary>
+        void EndFunction();
 
         //
         // Variable management
@@ -252,6 +268,13 @@ namespace emitters
         /// <returns> An IRFunctionEmitter. </returns>
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, std::initializer_list<VariableType> arguments, bool isPublic = false);
 
+        /// <summary> Check if a given function name exists. </summary>
+        ///
+        /// <param name="name"> The function name. </param>
+        ///
+        /// <returns> True if the function name exists, false if not. </returns>
+        bool HasFunction(const std::string& name);
+
         /// <summary> Get an emitted or declared function with the given name. </summary>
         ///
         /// <param name="name"> The function name. </param>
@@ -283,31 +306,31 @@ namespace emitters
         // Code output / input
         //
 
-        /// <summary> Output the compiled model to the given file, using file extension to determine output format </summary>
+        /// <summary> Output the compiled module to the given file, using file extension to determine output format </summary>
         ///
         /// <param name="filePath"> The path of the file to write to </param>
         using ModuleEmitter::WriteToFile;
 
-        /// <summary> Output the compiled model to an output file with the given format </summary>
+        /// <summary> Output the compiled module to an output file with the given format </summary>
         ///
         /// <param name="filePath"> Full pathname of the file. </param>
         /// <param name="format"> The format of the output </param>
         void WriteToFile(const std::string& filePath, ModuleOutputFormat format);
 
-        /// <summary> Output the compiled model to an output file with the given format </summary>
+        /// <summary> Output the compiled module to an output file with the given format </summary>
         ///
         /// <param name="filePath"> Full pathname of the file. </param>
         /// <param name="format"> The format of the output </param>
         /// <param name="options"> Options to control how machine code is generated during output </params>
         void WriteToFile(const std::string& filePath, ModuleOutputFormat format, const MachineCodeOutputOptions& options);
 
-        /// <summary> Output the compiled model to an output stream with the given format </summary>
+        /// <summary> Output the compiled module to an output stream with the given format </summary>
         ///
         /// <param name="stream"> The stream to write to </param>
         /// <param name="format"> The format of the output </param>
         virtual void WriteToStream(std::ostream& stream, ModuleOutputFormat format) override;
 
-        /// <summary> Output the compiled model to an output stream with the given format </summary>
+        /// <summary> Output the compiled module to an output stream with the given format </summary>
         ///
         /// <param name="stream"> The stream to write to </param>
         /// <param name="format"> The format of the output </param>
@@ -330,16 +353,6 @@ namespace emitters
         ///
         /// <param name="optimizer"> The optimizer. </param>
         void Optimize(IRModuleOptimizer& optimizer);
-
-        //
-        // Code execution
-        //
-
-        /// <summary>
-        /// This will enable runtime evaluation of the module. Note: after you call `Jit`, you can no longer
-        /// emit further models into this module, nor can you output llvm IR code.
-        /// <summary>
-        std::unique_ptr<IRExecutionEngine> Jit();
 
         /// <summary>
         /// Set the target machine and arch for this module. This aids the system in optimizations and
@@ -393,11 +406,14 @@ namespace emitters
         /// <returns> true if active, false if not. </returns>
         bool IsActive() const { return (_pModule != nullptr); }
 
-    protected:
-        /// <summary> Adds an`IRBlockRegion` to the region list and sets it as the current region </summary>
-        IRBlockRegion* AddRegion(llvm::BasicBlock* pBlock);
+        /// <summary> Gets a reference to the underlying llvm context. </summary>
+        ///
+        /// <returns> Reference to the underlying llvm context. </returns>
+        llvm::LLVMContext& GetLLVMContext() { return _llvmContext; }
 
     private:
+        friend class IRFunctionEmitter;
+
         //
         // Internal variable and function creation implementation
         //
@@ -406,11 +422,11 @@ namespace emitters
         llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
 
         /// <summary> Emit IR for a variable </summary>
-        llvm::Value* Emit(Variable& var);
+        llvm::Value* EmitVariable(Variable& var);
 
         // Templated version implementing above
         template <typename T>
-        llvm::Value* Emit(Variable& var);
+        llvm::Value* EmitVariable(Variable& var);
 
         /// <summary> Emit IR for a scalar variable </summary>
         template <typename T>
@@ -452,8 +468,6 @@ namespace emitters
         template <typename T>
         llvm::Value* EmitRef(VectorElementVariable<T>& var);
 
-        void RegisterFunctionArgs(NamedVariableTypeList& args);
-
         // Actual code output implementation
         void WriteToLLVMStream(llvm::raw_ostream& stream, ModuleOutputFormat format, const MachineCodeOutputOptions& options);
 
@@ -462,7 +476,6 @@ namespace emitters
         //
         llvm::GlobalVariable* Global(const std::string& name, llvm::Type* pType, llvm::Constant* pInitial, bool isConst);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const ValueTypeList* pArguments, bool isPublic);
-        void BeginFunction(llvm::Function* pFunction);
         llvm::Function::LinkageTypes Linkage(bool isPublic);
         llvm::ConstantAggregateZero* InitializeArray(llvm::ArrayType* pType);
 
@@ -477,16 +490,13 @@ namespace emitters
         //
         llvm::LLVMContext& _llvmContext; // LLVM global context
         IREmitter _emitter;
-        IRFunctionEmitter _currentFunction; // The main function for the module we are writing into.
+        std::stack<std::pair<IRFunctionEmitter, llvm::BasicBlock*>> _functionStack;
 
         IRVariableTable _literals; // Symbol table - name to literals
-        IRVariableTable _locals; // Symbol table - name to stack variables
         IRVariableTable _globals; // Symbol table - name to global variables
         IRRuntime _runtime; // Manages emission of runtime functions
 
         std::unique_ptr<llvm::Module> _pModule; // The LLVM Module being emitted
-        IRBlockRegionList _regions;
-        IRBlockRegion* _pCurRegion = nullptr;
 
         ValueTypeList _valueTypeList;
     };

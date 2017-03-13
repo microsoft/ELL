@@ -72,7 +72,8 @@ namespace nodes
 
     protected:
         virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler) override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        virtual bool ShouldCompileInline() const override { return true; }
 
         model::InputPort<InputValueType> _input;
         model::OutputPort<OutputValueType> _output;

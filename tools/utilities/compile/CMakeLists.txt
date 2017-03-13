@@ -44,4 +44,4 @@ add_test(NAME ${test_name}
 set (test_name ${tool_name}_test2)
 add_test(NAME ${test_name}
         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-        COMMAND ${tool_name} -imf ${CMAKE_SOURCE_DIR}/examples/data/is_equal.model -of is_equal.asm)
+        COMMAND ${tool_name} -imf ${CMAKE_SOURCE_DIR}/examples/data/is_equal.model -of is_equal.ll)

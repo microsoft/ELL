@@ -7,9 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// model
-#include "DynamicArray.h"
-
 // stl
 #include <cstddef>
 #include <initializer_list>
@@ -162,10 +159,10 @@ namespace emitters
     using NamedVariableType = std::pair<std::string, VariableType>;
 
     ///<summary> Collections of variable types </summary>
-    using ValueTypeList = utilities::DynamicArray<VariableType>;
+    using ValueTypeList = std::vector<VariableType>;
 
     ///<summary> Collections of named variable types </summary>
-    using NamedVariableTypeList = utilities::DynamicArray<NamedVariableType>;
+    using NamedVariableTypeList = std::vector<NamedVariableType>;
 
     /// <summary> Gets the value form the VariableType enum that corresponds to a given native c++ type. </summary>
     ///

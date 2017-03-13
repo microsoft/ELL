@@ -44,27 +44,28 @@ namespace emitters
         /// <summary> Return the base compiler settings </summary>
         ///
         /// <returns> The settings for the compiler </returns>
-        const CompilerParameters& GetCompilerParameters() { return _parameters; }
+        const CompilerParameters& GetCompilerParameters() const { return _parameters; }
 
         /// <summary> Set the base compiler settings </summary>
         ///
         /// <param name="parameters"> The settings for the compiler to use </param>
         void SetCompilerParameters(const CompilerParameters& parameters);
 
-        /// <summary> Set a function declaration </summary>
+        /// <summary> Set a function declaration. Note that BeginTopLevelFunction can't be called from within a function - it completes the currently-being-emitted function </summary>
         ///
         /// <param name="functionName"> The name of the function to create </param>
         /// <param name="args"> The names and types of the arguments </param>
-        virtual void BeginFunction(const std::string& functionName, NamedVariableTypeList& args) = 0;
+        virtual void BeginTopLevelFunction(const std::string& functionName, NamedVariableTypeList& args) = 0;
 
         /// <summary> End the function </summary>
-        virtual void EndFunction() = 0;
+        virtual void EndTopLevelFunction() = 0;
 
         /// <summary> Variable allocator </summary>
         ///
         /// <returns> The variable allocator </returns>
         VariableAllocator& Variables() { return _variables; }
 
+        // TODO: What does "runtime" variable mean? Stack/heap? This is only called in 1 place, from MapCompiler::AllocateNodeFunctionArgument
         /// <summary> Allocate a *runtime* variable.. </summary>
         void AllocateVariable(Variable& var);
 
@@ -93,19 +94,17 @@ namespace emitters
 
     protected:
         void Reset();
-
-        /// <summary> Free a *runtime* variable.. </summary>
-        void FreeVar(Variable& var);
+        void FreeVariable(Variable& var);
 
     private:
         CompilerParameters _parameters;
 
         EmittedVariableAllocator _inputVars; // Runtime input variable table
         EmittedVariableAllocator _outputVars; // Runtime output variable table
+        EmittedVariableAllocator _localVars; // Runtime local variable table (don't these belong to a function?)
 
         EmittedVariableAllocator _globalVars; // Runtime global variable table
         EmittedVariableAllocator _literalVars; // Runtime literal variable table
-        EmittedVariableAllocator _localVars; // Runtime local variable table (don't these belong to a function?)
         EmittedVariableAllocator _rValueVars; // Runtime RValues variable table (what scope?)
 
         VariableAllocator _variables; // variable object manager

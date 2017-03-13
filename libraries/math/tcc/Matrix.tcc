@@ -165,7 +165,7 @@ namespace math
 
     template <typename ElementType, MatrixLayout Layout>
     MatrixReference<ElementType, Layout>::MatrixReference(size_t numRows, size_t numColumns, ElementType* pData) :
-        ConstMatrixReference(numRows, numColumns, pData)
+        ConstMatrixReference<ElementType, Layout>(numRows, numColumns, pData)
     {
     }
 

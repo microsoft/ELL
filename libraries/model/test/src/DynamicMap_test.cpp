@@ -76,7 +76,7 @@ void TestDynamicMapCompute()
         resultValues = map.ComputeOutput<double>("doubleOutput");
     }
 
-    testing::ProcessTest("Testing map compute", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
+    testing::ProcessTest("Testing map compute 1", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
 }
 
 void TestDynamicMapComputeDataVector()
@@ -101,7 +101,7 @@ void TestDynamicMapComputeDataVector()
         resultValues = map.ComputeOutput<double>("doubleOutput");
     }
 
-    testing::ProcessTest("Testing map compute", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
+    testing::ProcessTest("Testing map compute 2", testing::IsEqual(resultValues[0], 8.5) && testing::IsEqual(resultValues[1], 10.5));
 }
 
 void TestDynamicMapRefine()

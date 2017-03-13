@@ -12,17 +12,16 @@
 #include "LLVMInclude.h"
 #include "SymbolTable.h"
 
-// utilities
-#include "DynamicArray.h"
-
+// stl
 #include <unordered_map>
+#include <vector>
 
 namespace ell
 {
 namespace emitters
 {
     /// <summary> A list of LLVM IR Value* </summary>
-    using IRValueList = utilities::DynamicArray<llvm::Value*>;
+    using IRValueList = std::vector<llvm::Value*>;
 
     /// <summary> Symbol Table that maps Symbol Names to emitted IR Value* </summary>
     using IRVariableTable = SymbolTable<llvm::Value*>;
@@ -33,6 +32,8 @@ namespace emitters
     /// <summary> 
     /// Wraps the LLVM API with an easy to use object model that hides some unncessary detail.
     /// Incorporates our own x-compiler abstractions such as VariableType and TypedOperator.
+    ///
+    /// Note: IREmitter is stateful. It has a "current block" that it is emitting IR into. 
     /// </summary>
     class IREmitter
     {
@@ -605,7 +606,7 @@ namespace emitters
 
         llvm::LLVMContext& _llvmContext; // LLVM global context
         llvm::IRBuilder<> _irBuilder; // IRBuilder API
-        IRVariableTable _stringLiterals; // String literals are emitted as constants. We have to track them ourselves to prevent dupes
+        IRVariableTable _stringLiterals; // String literals are emitted as constants. We have to track them ourselves to prevent dupes.
         llvm::Value* _pZeroLiteral = nullptr;
 
         // Reusable buffers

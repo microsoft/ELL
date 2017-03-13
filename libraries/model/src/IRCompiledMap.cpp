@@ -20,6 +20,9 @@
 #include "Exception.h"
 #include "Files.h"
 
+// llvm
+#include "llvm/Transforms/Utils/Cloning.h"
+
 // stl
 #include <sstream>
 
@@ -27,49 +30,19 @@ namespace ell
 {
 namespace model
 {
-    IRCompiledMap::IRCompiledMap(const model::DynamicMap& other, const std::string& functionName, bool optimize)
-        : CompiledMap(other, functionName, optimize)
-    {
-        Compile();
-    }
-
     IRCompiledMap::IRCompiledMap(IRCompiledMap&& other)
-        : CompiledMap(std::move(other)), _moduleName(std::move(other._moduleName)), _module(std::move(other._module)), _executionEngine(std::move(other._executionEngine))
+        : CompiledMap(std::move(other), other._functionName), _moduleName(std::move(other._moduleName)), _module(std::move(other._module)), _executionEngine(std::move(other._executionEngine))
     {
-        // We need to re-extract the compute function address -- the default move constructor doesn't do that correctly for some reason
-        SetComputeFunction();
+        if (_executionEngine)
+        {
+            SetComputeFunction();
+        }
     }
 
-    void IRCompiledMap::Compile()
+    // private constructor:
+    IRCompiledMap::IRCompiledMap(DynamicMap other, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module)
+        : CompiledMap(std::move(other), functionName), _module(std::move(module))
     {
-        // Make sure the compilable node registry is initialized
-        // InitCompilableNodeRegistry();
-
-        EnsureValidMap();
-
-        // model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() || CanMakeCompilable(node) ? model::NodeAction::compile : model::NodeAction::refine; } };
-        model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() ? model::NodeAction::compile : model::NodeAction::refine; } };
-        Refine(context);
-
-        // Now transform nodes into compilable nodes
-        // Transform(TryMakeCompilableNode, context);
-
-        // Now we have the map, compile it
-        emitters::CompilerParameters settings;
-        settings.optimize = _optimize;
-        settings.includeDiagnosticInfo = false;
-
-        IRMapCompiler compiler(_moduleName);
-        compiler.SetCompilerParameters(settings);
-        compiler.CompileMap(*this, _functionName);
-        _module = std::make_unique<emitters::IRModuleEmitter>(compiler.TransferOwnership());
-
-        // Instead of recompiling, can we just clone the module and jit it?
-        IRMapCompiler jitCompiler(_moduleName + "_jit");
-        jitCompiler.SetCompilerParameters(settings);
-        jitCompiler.CompileMap(*this, _functionName);
-        _executionEngine = jitCompiler.Jit();
-        SetComputeFunction(); // extract the compute function from the execution engine
     }
 
     bool IRCompiledMap::IsValid() const
@@ -77,7 +50,23 @@ namespace model
         return _module != nullptr && _module->IsValid();
     }
 
-    void IRCompiledMap::SetComputeFunction()
+    emitters::IRExecutionEngine& IRCompiledMap::GetJitter()
+    {
+        EnsureExecutionEngine();
+        return *_executionEngine;
+    }
+
+    void IRCompiledMap::EnsureExecutionEngine() const
+    {
+        if (!_executionEngine)
+        {
+            auto moduleClone = std::unique_ptr<llvm::Module>(llvm::CloneModule(_module->GetLLVMModule()));
+            _executionEngine = std::make_unique<emitters::IRExecutionEngine>(std::move(moduleClone));
+            SetComputeFunction();
+        }
+    }
+
+    void IRCompiledMap::SetComputeFunction() const
     {
         switch (GetInput(0)->GetOutputPort().GetType())
         {
@@ -100,6 +89,7 @@ namespace model
 
     void IRCompiledMap::SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) const
     {
+        EnsureExecutionEngine();
         if (GetInput(0)->GetOutputPort().GetType() != node->GetOutputPort().GetType())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
@@ -115,6 +105,7 @@ namespace model
 
     void IRCompiledMap::SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const
     {
+        EnsureExecutionEngine();
         if (GetInput(0)->GetOutputPort().GetType() != node->GetOutputPort().GetType())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
@@ -125,6 +116,7 @@ namespace model
 
     void IRCompiledMap::SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues) const
     {
+        EnsureExecutionEngine();
         if (GetInput(0)->GetOutputPort().GetType() != node->GetOutputPort().GetType())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
@@ -135,6 +127,7 @@ namespace model
 
     std::vector<bool> IRCompiledMap::ComputeBoolOutput(const model::PortElementsBase& outputs) const
     {
+        EnsureExecutionEngine();
         if (GetOutput(0).GetPortType() != model::Port::PortType::boolean)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
@@ -146,6 +139,7 @@ namespace model
 
     std::vector<int> IRCompiledMap::ComputeIntOutput(const model::PortElementsBase& outputs) const
     {
+        EnsureExecutionEngine();
         if (GetOutput(0).GetPortType() != model::Port::PortType::integer)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
@@ -156,6 +150,7 @@ namespace model
 
     std::vector<double> IRCompiledMap::ComputeDoubleOutput(const model::PortElementsBase& outputs) const
     {
+        EnsureExecutionEngine();
         if (GetOutput(0).GetPortType() != model::Port::PortType::real)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
@@ -248,17 +243,6 @@ namespace model
 
             ResetOutput(0, outputNode->GetOutputPort());
         }
-    }
-
-    void IRCompiledMap::WriteToArchive(utilities::Archiver& archiver) const
-    {
-        model::DynamicMap::WriteToArchive(archiver);
-    }
-
-    void IRCompiledMap::ReadFromArchive(utilities::Unarchiver& archiver)
-    {
-        model::DynamicMap::ReadFromArchive(archiver);
-        Compile();
     }
 }
 }

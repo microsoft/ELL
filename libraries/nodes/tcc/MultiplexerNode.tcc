@@ -44,44 +44,34 @@ namespace nodes
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexerNode<ValueType, SelectorType>::Compile(model::IRMapCompiler& compiler)
+    void MultiplexerNode<ValueType, SelectorType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        compiler.NewBlockRegion(*this);
-
         if (std::is_same<SelectorType, bool>())
         {
-            CompileMultiplexerBinary(compiler);
+            CompileMultiplexerBinary(compiler, function);
         }
         else if (std::is_same<SelectorType, int>())
         {
-            CompileUnrolled(compiler);
+            CompileUnrolled(compiler, function);
         }
         else
         {
             throw emitters::EmitterException(emitters::EmitterError::valueTypeNotSupported, "Multiplexer node selectors must be bool or int");
         }
-
-        compiler.TryMergeRegion(*this);
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexerNode<ValueType, SelectorType>::CompileMultiplexerBinary(model::IRMapCompiler& compiler)
+    void MultiplexerNode<ValueType, SelectorType>::CompileMultiplexerBinary(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto& function = compiler.GetCurrentFunction();
+        VerifyIsScalar(selector);
+        VerifyIsScalar(output);
 
-        auto pElements = GetInputPorts()[0];
-        auto pSelector = GetInputPorts()[1];
-        VerifyIsScalar(*pSelector);
-
-        auto pOutput = GetOutputPorts()[0];
-        VerifyIsScalar(*pOutput);
-
-        llvm::Value* pSelectorVal = compiler.LoadVariable(pSelector);
-        llvm::Value* pResult = compiler.EnsureEmitted(pOutput);
-        auto lVal = pElements->GetInputElement(0); // lval is selected if the result of the "if" comparison is NON-zero
-        auto rVal = pElements->GetInputElement(1);
-        auto pLMergeableSrc = compiler.GetMergeableRegion(lVal);
-        auto pRMergeableSrc = compiler.GetMergeableRegion(rVal);
+        llvm::Value* pSelectorVal = compiler.EnsurePortEmitted(selector);
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+        auto lVal = elements.GetInputElement(0); // lval is selected if the result of the "if" comparison is NON-zero
+        auto rVal = elements.GetInputElement(1);
+        auto pLMergeableSrc = compiler.GetMergeableNodeRegion(lVal);
+        auto pRMergeableSrc = compiler.GetMergeableNodeRegion(rVal);
 
         emitters::IRIfEmitter ife = function.If();
         ife.If(emitters::TypedComparison::equals, pSelectorVal, function.Literal(0));
@@ -90,7 +80,7 @@ namespace nodes
             {
                 function.MergeRegion(pLMergeableSrc);
             }
-            function.Store(pResult, compiler.LoadVariable(pElements->GetInputElement(0)));
+            function.Store(pResult, compiler.LoadPortElementVariable(elements.GetInputElement(0)));
         }
         ife.Else();
         {
@@ -98,37 +88,31 @@ namespace nodes
             {
                 function.MergeRegion(pRMergeableSrc);
             }
-            function.Store(pResult, compiler.LoadVariable(pElements->GetInputElement(1)));
+            function.Store(pResult, compiler.LoadPortElementVariable(elements.GetInputElement(1)));
         }
         ife.End();
 
-        auto pSelectorNode = pSelector->GetParentNodes()[0];
+        auto pSelectorNode = selector.GetParentNodes()[0];
         if (HasSingleDescendant(*pSelectorNode))
         {
-            compiler.TryMergeRegions(*pSelectorNode, *this);
+            compiler.TryMergeNodeRegions(*pSelectorNode, *this);
         }
     }
 
     template <typename ValueType, typename SelectorType>
-    void MultiplexerNode<ValueType, SelectorType>::CompileUnrolled(model::IRMapCompiler& compiler)
+    void MultiplexerNode<ValueType, SelectorType>::CompileUnrolled(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        auto& function = compiler.GetCurrentFunction();
+        VerifyIsScalar(selector);
+        VerifyIsScalar(output);
+        auto numElements = elements.Size();
 
-        auto elementsPort = GetInputPorts()[0];
-        auto selectorPort = GetInputPorts()[1];
-        VerifyIsScalar(*selectorPort);
-        auto numElements = elementsPort->Size();
-
-        auto outputPort = GetOutputPorts()[0];
-        VerifyIsScalar(*outputPort);
-
-        llvm::Value* selector = compiler.LoadVariable(selectorPort);
-        llvm::Value* result = compiler.EnsureEmitted(outputPort);
+        llvm::Value* pSelectorVal = compiler.LoadPortVariable(selector); // TODO: change this to EnsurePortEmitted
+        llvm::Value* result = compiler.EnsurePortEmitted(output);
         for (size_t index = 0; index < numElements; ++index)
         {
-            emitters::IRIfEmitter if1 = function.If(emitters::TypedComparison::equals, function.Literal((int)index), selector);
+            emitters::IRIfEmitter if1 = function.If(emitters::TypedComparison::equals, function.Literal((int)index), pSelectorVal);
             {
-                llvm::Value* val = compiler.LoadVariable(elementsPort->GetInputElement(index));
+                llvm::Value* val = compiler.LoadPortElementVariable(elements.GetInputElement(index));
                 function.Store(result, val);
             }
             if1.End();
