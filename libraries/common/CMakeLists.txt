@@ -52,17 +52,13 @@ source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 
-# Precompiled header test
-# include_directories("../windows/include")
-# add_precompiled_header("stdafx.h" "../windows/src/stdafx.cpp" src)
-
 add_library(${library_name} ${src} ${include} ${tcc})
 target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
 target_link_libraries(${library_name} data utilities lossFunctions model nodes predictors evaluators trainers)
-add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
+# add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 

@@ -11,9 +11,6 @@
 #include "Exception.h"
 #include "SymbolTable.h"
 
-// utilities
-#include "DynamicArray.h"
-
 // llvm
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Constant.h"

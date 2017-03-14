@@ -75,8 +75,6 @@ endif()
 target_link_libraries(${library_name} utilities ${LLVM_LIBS})
 target_compile_definitions(${library_name} PUBLIC ${LLVM_DEFINITIONS})
 target_compile_options(${library_name} PUBLIC ${LLVM_COMPILE_OPTIONS})
-add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
-
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 

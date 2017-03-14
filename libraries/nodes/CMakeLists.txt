@@ -58,7 +58,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
 target_link_libraries(${library_name} model predictors utilities)
-add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 

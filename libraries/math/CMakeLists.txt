@@ -41,7 +41,6 @@ if(BLAS_FOUND)
     target_compile_options(${library_name} PRIVATE -fPIC)
   endif()
 endif()
-add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
