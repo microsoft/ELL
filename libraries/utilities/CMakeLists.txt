@@ -94,7 +94,6 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   target_link_libraries(${library_name} -pthread)
 endif()
-add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
@@ -140,7 +139,6 @@ target_link_libraries(${test_name} utilities testing data model nodes)
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   target_link_libraries(${test_name} -pthread)
 endif()
-add_precompiled_header(${test_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 add_test(NAME ${test_name} COMMAND ${test_name})

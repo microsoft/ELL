@@ -45,6 +45,9 @@ if(MSVC)
   add_compile_options(/bigobj)
 endif()
 
+# Turn on ctest tests
+enable_testing()
+
 # Set up global variables to help find NuGet projects
 set(PACKAGE_ROOT ${EXTERNAL_DIR})
 include(OpenBLASSetup)
@@ -60,9 +63,6 @@ add_subdirectory(scripts)
 if(EXISTS ${CMAKE_SOURCE_DIR}/private)
   add_subdirectory(private)
 endif()
-
-# Turn on ctest tests
-enable_testing()
 
 # Add examples
 add_subdirectory(examples)
