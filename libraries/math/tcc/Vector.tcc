@@ -9,6 +9,7 @@
 #include "Operations.h"
 
 // utilities
+#include "Debug.h"
 #include "Exception.h"
 
 // stl
@@ -25,10 +26,8 @@ namespace math
     template <typename ElementType>
     ElementType UnorientedConstVectorReference<ElementType>::operator[](size_t index) const
     {
-        if (index >= _size)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size.");
-        }
+        DEBUG_THROW(index >= _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size."));
+
         return _pData[index * _increment];
     }
 
@@ -101,10 +100,8 @@ namespace math
     template <typename ElementType, VectorOrientation Orientation>
     ConstVectorReference<ElementType, Orientation> ConstVectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size) const
     {
-        if (offset + size > _size)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size.");
-        }
+        DEBUG_THROW(offset + size > _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size."));
+
         return ConstVectorReference<ElementType, Orientation>(_pData + offset * _increment, size, _increment);
     }
 
@@ -221,10 +218,8 @@ namespace math
     template <typename ElementType, VectorOrientation Orientation>
     ElementType& VectorReference<ElementType, Orientation>::operator[](size_t index)
     {
-        if (index >= _size)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size.");
-        }
+        DEBUG_THROW(index >= _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size."));
+
         return _pData[index * _increment];
     }
 
@@ -237,10 +232,8 @@ namespace math
     template <typename ElementType, VectorOrientation Orientation>
     VectorReference<ElementType, Orientation> VectorReference<ElementType, Orientation>::GetSubVector(size_t offset, size_t size)
     {
-        if (offset + size > _size)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size.");
-        }
+        DEBUG_THROW(offset + size > _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size."));
+
         return VectorReference<ElementType, Orientation>(_pData + offset * _increment, size, _increment);
     }
 
@@ -296,10 +289,8 @@ namespace math
     template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator/=(ElementType value)
     {
-        if (value == 0)
-        {
-            throw utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "divide by zero");
-        }
+        DEBUG_THROW(value == 0, utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "divide by zero"));
+
         Operations::Multiply(1.0 / value, *this);
     }
 

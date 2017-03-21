@@ -14,14 +14,18 @@ set (src src/BlasWrapper.cpp)
 
 set (include include/BlasWrapper.h
              include/Matrix.h
-             include/Vector.h
              include/Operations.h
-             include/Print.h)
+             include/Print.h
+             include/Tensor.h
+             include/Vector.h
+)
 
 set (tcc tcc/Matrix.tcc
-         tcc/Vector.tcc
          tcc/Operations.tcc
-         tcc/Print.tcc)
+         tcc/Print.tcc
+         tcc/Tensor.tcc
+         tcc/Vector.tcc
+)
 
 set (doc doc/README.md)
 

@@ -31,6 +31,7 @@ set (include include/AbstractInvoker.h
              include/CommandLineParser.h
              include/CompressedIntegerList.h
              include/ConformingVector.h
+             include/Debug.h
              include/Exception.h
              include/Files.h
              include/Format.h

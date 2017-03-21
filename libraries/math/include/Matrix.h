@@ -15,20 +15,6 @@ namespace ell
 {
 namespace math
 {
-    /// <summary> Enum of possible matrix layouts. </summary>
-    enum class MatrixLayout
-    {
-        columnMajor,
-        rowMajor
-    };
-
-    /// <summary> Forward declaration of a base class for matrices, for subsequent specialization according to layout. </summary>
-    ///
-    /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
-    /// <typeparam name="Layout"> Type of the layout. </typeparam>
-    template <typename ElementType, MatrixLayout Layout>
-    class MatrixBase;
-
     /// <summary> Base class for rectangular dense matrices. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
@@ -36,6 +22,14 @@ namespace math
     class RectangularMatrixBase
     {
     public:
+        /// <summary> Constructs an instance of RectangularMatrixBase. </summary>
+        ///
+        /// <param name="numRows"> Number of matrix rows. </param>
+        /// <param name="numColumns"> Number of matrix columns. </param>
+        /// <param name="increment"> The matrix increment. </param>
+        /// <param name="pData"> Pointer to the underlying std::vector that contains the tensor data. </param>
+        RectangularMatrixBase(size_t numRows, size_t numColumns, size_t increment, ElementType* pData = nullptr);
+
         /// <summary> Gets the number of rows. </summary>
         ///
         /// <returns> The number of rows. </returns>
@@ -47,9 +41,6 @@ namespace math
         size_t NumColumns() const { return _numColumns; }
 
     protected:
-        // protected ctor accessible only through derived classes
-        RectangularMatrixBase(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
-
         void Swap(RectangularMatrixBase<ElementType>& other);
 
         template <VectorOrientation Orientation>
@@ -64,6 +55,20 @@ namespace math
         size_t _increment;
     };
 
+    /// <summary> Enum of possible matrix layouts. </summary>
+    enum class MatrixLayout
+    {
+        columnMajor,
+        rowMajor
+    };
+
+    /// <summary> Forward declaration of a base class for matrices, for subsequent specialization according to layout. </summary>
+    ///
+    /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
+    /// <typeparam name="Layout"> Type of the layout. </typeparam>
+    template <typename ElementType, MatrixLayout Layout>
+    class MatrixBase;
+
     /// <summary> Base class for column major rectangular dense matrices. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix Element type. </typeparam>
@@ -72,15 +77,15 @@ namespace math
     {
     protected:
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
-        MatrixBase(size_t numRows, size_t numColumns);
-        MatrixBase(size_t numRows, size_t numColumns, ElementType* pData);
+        MatrixBase(size_t numRows, size_t numColumns, ElementType* pData = nullptr);
 
-        using RectangularMatrixBase<ElementType>::_pData;
         using RectangularMatrixBase<ElementType>::_numRows;
         using RectangularMatrixBase<ElementType>::_numColumns;
         using RectangularMatrixBase<ElementType>::_increment;
+
         static constexpr MatrixLayout _transposeLayout = MatrixLayout::rowMajor;
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::column;
+
         const size_t _numIntervals = _numColumns;
         const size_t _intervalSize = _numRows;
         static constexpr size_t _rowIncrement = 1;
@@ -95,15 +100,15 @@ namespace math
     {
     protected:
         using RectangularMatrixBase<ElementType>::RectangularMatrixBase;
-        MatrixBase(size_t numRows, size_t numColumns);
-        MatrixBase(size_t numRows, size_t numColumns, ElementType* pData);
+        MatrixBase(size_t numRows, size_t numColumns, ElementType* pData = nullptr);
 
-        using RectangularMatrixBase<ElementType>::_pData;
         using RectangularMatrixBase<ElementType>::_numRows;
         using RectangularMatrixBase<ElementType>::_numColumns;
         using RectangularMatrixBase<ElementType>::_increment;
+
         static constexpr MatrixLayout _transposeLayout = MatrixLayout::columnMajor;
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::row;
+
         const size_t _numIntervals = _numRows;
         const size_t _intervalSize = _numColumns;
         const size_t _rowIncrement = _increment;
@@ -117,6 +122,8 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     class ConstMatrixReference : public MatrixBase<ElementType, Layout>
     {
+        using MatrixBase<ElementType, Layout>::_transposeLayout;
+
     public:
         /// <summary> Gets a const pointer to the underlying data storage. </summary>
         ///
@@ -146,10 +153,7 @@ namespace math
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const -> ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
-        {
-            return ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>(_pData, _numColumns, _numRows, _increment);
-        }
+        auto Transpose() const;
 
         /// <summary> Gets a constant reference to a block-shaped sub-matrix. </summary>
         ///
@@ -185,10 +189,7 @@ namespace math
         /// <param name="index"> The interval index. </param>
         ///
         /// <returns> Constant reference to the interval. </returns>
-        auto GetMajorVector(size_t index) const -> ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
-        {
-            return RectangularMatrixBase<ElementType>::template ConstructConstVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
-        }
+        auto GetMajorVector(size_t index) const;
 
         /// <summary> Equality operator for matrices with the same layout. </summary>
         ///
@@ -202,22 +203,7 @@ namespace math
         /// <param name="other"> The other matrix. </param>
         ///
         /// <returns> true if the two matrices are equivalent. </returns>
-        bool operator==(const ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>& other) const
-        {
-            if (NumRows() != other.NumRows() || NumColumns() != other.NumColumns())
-            {
-                return false;
-            }
-
-            for (size_t i = 0; i < NumRows(); ++i)
-            {
-                if (GetRow(i) != other.GetRow(i))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+        bool operator==(const ConstMatrixReference<ElementType, _transposeLayout>& other) const;
 
         /// <summary> Inequality operator. </summary>
         ///
@@ -232,11 +218,11 @@ namespace math
         using RectangularMatrixBase<ElementType>::NumColumns;
 
     protected:
-        friend class ConstMatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
+        friend class ConstMatrixReference<ElementType, _transposeLayout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
 
         ConstMatrixReference(size_t numRows, size_t numColumns, ElementType* pData) : MatrixBase<ElementType, Layout>(numRows, numColumns, pData) {}
-            
+
         ElementType* GetMajorVectorBegin(size_t index) const;
 
         using RectangularMatrixBase<ElementType>::_pData;
@@ -257,8 +243,9 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     class MatrixReference : public ConstMatrixReference<ElementType, Layout>
     {
-    public:
+        using MatrixBase<ElementType, Layout>::_transposeLayout;
 
+    public:
         /// <summary> Constructs a matrix that uses a pointer to an external buffer as the element data. 
         /// This allows the matrix to use data provided by some other source, and this matrix does not
         /// own the data buffer.
@@ -302,18 +289,15 @@ namespace math
         /// <returns> A reference to this matrix. </returns>
         MatrixReference<ElementType, Layout> GetReference();
 
-        ///// <summary> Gets a const reference to this matrix. </summary>
-        /////
-        ///// <returns> A const reference to this matrix. </returns>
+        /// <summary> Gets a const reference to this matrix. </summary>
+        ///
+        /// <returns> A const reference to this matrix. </returns>
         ConstMatrixReference<ElementType, Layout> GetConstReference() const;
 
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const -> MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>
-        {
-            return MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>(_pData, _numColumns, _numRows, _increment);
-        }
+        auto Transpose() const;
 
         /// <summary> Gets a const reference to a block-shaped sub-matrix. </summary>
         ///
@@ -363,7 +347,7 @@ namespace math
         using RectangularMatrixBase<ElementType>::NumColumns;
 
     protected:
-        friend MatrixReference<ElementType, MatrixBase<ElementType, Layout>::_transposeLayout>;
+        friend MatrixReference<ElementType, _transposeLayout>;
         using ConstMatrixReference<ElementType, Layout>::ConstMatrixReference;
 
         using RectangularMatrixBase<ElementType>::_pData;
@@ -386,6 +370,8 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     class Matrix : public MatrixReference<ElementType, Layout>
     {
+        using MatrixBase<ElementType, Layout>::_transposeLayout;
+
     public:
         /// <summary> Constructs an all-zeros matrix of a given size. </summary>
         ///
@@ -423,6 +409,11 @@ namespace math
         ///
         /// <param name="other"> [in,out] The matrix being copied. </param>
         Matrix(const Matrix<ElementType, Layout>& other);
+
+        /// <summary> Copies a matrix of the opposite layout. </summary>
+        ///
+        /// <param name="other"> The matrix being copied. </param>
+        Matrix(ConstMatrixReference<ElementType, _transposeLayout> other);
 
         /// <summary> Assignment operator. </summary>
         ///
