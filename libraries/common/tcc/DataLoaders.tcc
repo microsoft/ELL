@@ -14,12 +14,12 @@ namespace common
     template <typename DatasetType>
     DatasetType GetDataset(const DataLoadArguments& dataLoadArguments)
     {
-        auto dataIterator = GetDataIterator(dataLoadArguments);
+        auto dataIterator = GetExampleIterator(dataLoadArguments);
         DatasetType dataset;
-        while (dataIterator->IsValid())
+        while (dataIterator.IsValid())
         {
-            dataset.AddExample(dataIterator->Get());
-            dataIterator->Next();
+            dataset.AddExample(dataIterator.Get());
+            dataIterator.Next();
         }
 
         return dataset;
@@ -28,18 +28,18 @@ namespace common
     template <typename DatasetType>
     DatasetType GetMappedDataset(const DataLoadArguments& dataLoadArguments, const model::DynamicMap& map)
     {
-        auto dataIterator = GetDataIterator(dataLoadArguments);
+        auto dataIterator = GetExampleIterator(dataLoadArguments);
         DatasetType dataset;
 
         // generate mapped dataset
-        while (dataIterator->IsValid())
+        while (dataIterator.IsValid())
         {
-            auto example = dataIterator->Get();
+            auto example = dataIterator.Get();
             auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
             auto mappedExample = typename DatasetType::DatasetExampleType(std::move(mappedDataVector), example.GetMetadata());
             dataset.AddExample(mappedExample);
 
-            dataIterator->Next();
+            dataIterator.Next();
         }
         return dataset;
     }

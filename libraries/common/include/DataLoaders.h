@@ -12,7 +12,7 @@
 
 // data
 #include "Dataset.h"
-#include "ParsingExampleIterator.h"
+#include "ExampleIterator.h"
 
 // model
 #include "DynamicMap.h"
@@ -30,7 +30,7 @@ namespace common
     /// <param name="dataLoadArguments"> The data load arguments. </param>
     ///
     /// <returns> The data iterator. </returns>
-    std::unique_ptr<data::IParsingExampleIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments);
+    data::ExampleIterator<data::AutoSupervisedExample> GetExampleIterator(const DataLoadArguments& dataLoadArguments);
 
     /// <summary> Gets a dataset from data load arguments. </summary>
     ///

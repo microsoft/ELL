@@ -8,6 +8,9 @@
 
 #pragma once
 
+// utilities
+#include "IIterator.h"
+
 namespace ell
 {
 namespace data
@@ -16,23 +19,7 @@ namespace data
     ///
     /// <typeparam name="ExampleType"> Example type. </typeparam>
     template <typename ExampleType>
-    struct IExampleIterator
-    {
-        virtual ~IExampleIterator() = default;
-
-        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
-        ///
-        /// <returns> true if the iterator is currently pointing to a valid iterate. </returns>
-        virtual bool IsValid() const = 0;
-
-        /// <summary> Proceeds to the Next iterate. </summary>
-        virtual void Next() = 0;
-
-        /// <summary> Returns the current example. </summary>
-        ///
-        /// <returns> An example. </returns>
-        virtual ExampleType Get() const = 0;
-    };
+    using IExampleIterator = typename utilities::IIterator<ExampleType>;
 
     /// <summary> An example iterator that wraps an IExampleIterator. </summary>
     ///

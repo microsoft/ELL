@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
         auto map = common::LoadMap(mapLoadArguments);
 
         // get data iterator
-        auto dataIterator = GetDataIterator(dataLoadArguments);
+        auto dataIterator = GetExampleIterator(dataLoadArguments);
 
         // get output stream
         auto& outputStream = dataSaveArguments.outputDataStream;
@@ -84,9 +84,9 @@ int main(int argc, char* argv[])
             math::RowVector<double> v(map.GetOutputSize());
             size_t count = 0;
 
-            while (dataIterator->IsValid())
+            while (dataIterator.IsValid())
             {
-                auto example = dataIterator->Get();
+                auto example = dataIterator.Get();
                 auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
                 math::RowVector<double> w(map.GetOutputSize());
                 mappedDataVector.AddTo(w);
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
                 w.CoordinatewiseSquare();
                 v += w;
 
-                dataIterator->Next();
+                dataIterator.Next();
                 ++count;
             }
 
@@ -121,14 +121,14 @@ int main(int argc, char* argv[])
         // output new dataset mode
         else
         {
-            while (dataIterator->IsValid())
+            while (dataIterator.IsValid())
             {
-                auto example = dataIterator->Get();
+                auto example = dataIterator.Get();
                 auto mappedDataVector = map.Compute<data::FloatDataVector>(example.GetDataVector());
                 auto mappedExample = data::DenseSupervisedExample(std::move(mappedDataVector), example.GetMetadata());
                 mappedExample.Print(outputStream);
                 outputStream << '\n';
-                dataIterator->Next();
+                dataIterator.Next();
             }
         }
     }

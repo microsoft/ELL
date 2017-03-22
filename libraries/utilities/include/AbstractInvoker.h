@@ -33,36 +33,27 @@ namespace utilities
     ///         ReturnType Func() const { ReturnType x = 2; return x; }
     ///     };
     ///
-    /// Note that this example purposely uses templated functions, which cannot be virtualized. Next, we
-    /// have a special function object with two requirements: (1) is specifies its return type with a
-    /// using statement, (2) it's operator() takes a const reference to a templated type. Namely, it
-    /// could look like this
+    /// Note that this example purposely uses templated functions, which cannot be virtualized.
+    /// It is easy to invoke the function object on an instance of Foo1 or Foo2, as follows:
     ///
-    ///     struct MyFunctor
-    ///     {
-    ///         using ReturnType = double;
+    ///     Foo1 foo1;
+    ///     Foo2 foo2;
     ///
-    ///         template&lt;typename ReturnType&gt;
-    ///         ReturnType operator()(const FooType& derived) const { return derived.Func&lt;typename ReturnType&gt;(); }
-    ///     };
+    ///     auto result1 = foo1.Func&lt;float&gt;();
+    ///     auto result2 = foo2.Func&lt;float&gt;();
     ///
-    /// It is trivial to invoke the function object on an instance of Foo1 or Foo2, as follows:
+    /// Using the AbstractInvoker, we can call the templated function given a pointer to the base class
     ///
-    ///     MyFunctor myFunctor;
-    ///     Foo1 foo;
-    ///     auto result = myFunctor(foo);
+    ///     Foo1 foo1;
+    ///     Foo2 foo2;
+    ///     const IFoo* baseClassPtr1 = &foo1;
+    ///     const IFoo* baseClassPtr2 = &foo2;
     ///
-    /// However, it is not trivial to call the function object on a const reference to the base class:
+    ///     auto funcCaller = [](const auto* ptr){ return ptr->Func();};
+    ///     using Invoker = AbstractInvoker&lt;IFoo, Foo1, Foo2&gt;;
     ///
-    ///     MyFunctor myFunctor;
-    ///     IFoo& fooRef = Foo1();
-    ///     auto result1 = myFunctor(fooRef); // compilation error, because IFoo doesn't have a member Func
-    ///
-    /// This is where the helper class comes in handy:
-    ///
-    ///     MyFunctor myFunctor;
-    ///     IFoo& fooRef = Foo1();
-    ///     auto result1 = AbstractInvoker&lt;IFoo, Foo1, Foo2&gt;::Invoke(functor, fooRef);
+    ///     auto result1 = Invoke(funcCaller, baseClassPtr1);
+    ///     auto result2 = Invoke(funcCaller, baseClassPtr2);
     ///
     /// <typeparam name="BaseType"> The base type. </typeparam>
     /// <typeparam name="DerivedTypes"> List of derived types to match against. </typeparam>
@@ -73,16 +64,16 @@ namespace utilities
     class AbstractInvoker<BaseType, DerivedType, DerivedTypes...>
     {
     public:
-        template <typename FunctorType>
-        static auto Invoke(const FunctorType& functor, const BaseType& abstractArgument) -> typename FunctorType::ReturnType;
+        template <typename ReturnType, typename FunctorType>
+        static ReturnType Invoke(const FunctorType& functor, const BaseType* basePointer);
     };
 
     template <typename BaseType>
     class AbstractInvoker<BaseType>
     {
     public:
-        template <typename FunctorType>
-        static auto Invoke(const FunctorType& functor, const BaseType& abstractArgument) -> typename FunctorType::ReturnType;
+        template <typename ReturnType, typename FunctorType>
+        static ReturnType Invoke(const FunctorType& functor, const BaseType* basePointer);
     };
 }
 }

@@ -32,36 +32,6 @@ namespace data
     template <typename ExampleType>
     class Dataset;
 
-    /// <summary> A functor class that calls the GetExampleIterator member of a Dataset. </summary>
-    ///
-    /// <typeparam name="IteratorExampleType"> Example type. </typeparam>
-    template <typename IteratorExampleType>
-    class GetExampleIteratorFunctor
-    {
-    public:
-        /// <summary> Functor return type. </summary>
-        using ReturnType = ExampleIterator<IteratorExampleType>;
-
-        /// <summary> Constructor. </summary>
-        ///
-        /// <param name="fromIndex"> Zero-based index of the first example referenced by the iterator. </param>
-        /// <param name="size"> The number of examples referenced by the iterator. </param>
-        GetExampleIteratorFunctor(size_t fromIndex, size_t size);
-
-        /// <summary> Function call operator. Calls a dataset's GetExampleIterator member. </summary>
-        ///
-        /// <typeparam name="ExampleType"> Type of example kept by the Dataset. </typeparam>
-        /// <param name="dataset"> The dataset. </param>
-        ///
-        /// <returns> The example iterator returned by the call to GetExampleIterator. </returns>
-        template <typename ExampleType>
-        ReturnType operator()(const Dataset<ExampleType>& dataset) const;
-
-    private:
-        size_t _fromIndex;
-        size_t _size;
-    };
-
     /// <summary> Polymorphic interface for datasets, enables dynamic_cast operations. </summary>
     struct DatasetBase
     {

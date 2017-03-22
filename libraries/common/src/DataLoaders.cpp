@@ -33,7 +33,7 @@ namespace common
     //
     // Public functions
     //
-    std::unique_ptr<data::IParsingExampleIterator> GetDataIterator(const DataLoadArguments& dataLoadArguments)
+    data::ExampleIterator<data::AutoSupervisedExample> GetExampleIterator(const DataLoadArguments& dataLoadArguments)
     {
         // create parser for sparse vectors (SVMLight format)
         data::SparseEntryParser sparseEntryParser;

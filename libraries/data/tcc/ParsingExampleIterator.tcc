@@ -27,9 +27,10 @@ namespace data
     }
 
     template <typename RowIteratorType, typename VectorElementParserType>
-    std::unique_ptr<IParsingExampleIterator> GetParsingExampleIterator(RowIteratorType row_iter, VectorElementParserType parser)
+    ExampleIterator<AutoSupervisedExample> GetParsingExampleIterator(RowIteratorType row_iter, VectorElementParserType parser)
     {
-        return std::make_unique<ParsingExampleIterator<RowIteratorType, VectorElementParserType>>(std::move(row_iter), std::move(parser));
+        auto pIterator = std::make_unique<ParsingExampleIterator<RowIteratorType, VectorElementParserType>>(std::move(row_iter), std::move(parser));
+        return ExampleIterator<AutoSupervisedExample>(std::move(pIterator));
     }
 }
 }

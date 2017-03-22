@@ -19,26 +19,19 @@ namespace ell
 {
 namespace data
 {
-    template <typename IteratorExampleType>
-    GetExampleIteratorFunctor<IteratorExampleType>::GetExampleIteratorFunctor(size_t fromIndex, size_t size)
-        : _fromIndex(fromIndex), _size(size)
-    {
-    }
-
-    template <typename IteratorExampleType>
-    template <typename ExampleType>
-    auto GetExampleIteratorFunctor<IteratorExampleType>::operator()(const Dataset<ExampleType>& dataset) const -> ReturnType
-    {
-        return dataset.template GetExampleIterator<IteratorExampleType>(_fromIndex, _size);
-    }
-
     template <typename ExampleType>
     ExampleIterator<ExampleType> AnyDataset::GetExampleIterator() const
     {
-        GetExampleIteratorFunctor<ExampleType> abstractor(_fromIndex, _size);
+        auto fromIndex = _fromIndex;
+        auto size = _size;
+        auto getExampleIterator = [fromIndex, size](const auto* pDataset) { return pDataset->template GetExampleIterator<ExampleType>(fromIndex, size); };
 
         // all Dataset types for which GetAnyDataset() is called must be listed below, in the variadic template argument.
-        return utilities::AbstractInvoker<DatasetBase, Dataset<data::AutoSupervisedExample>, Dataset<data::DenseSupervisedExample>>::Invoke(abstractor, *_pDataset);
+        using Invoker = utilities::AbstractInvoker<DatasetBase,
+            Dataset<data::AutoSupervisedExample>,
+            Dataset<data::DenseSupervisedExample>>;
+
+        return Invoker::Invoke<ExampleIterator<ExampleType>>(getExampleIterator, _pDataset);
     }
 
     template <typename DatasetExampleType>

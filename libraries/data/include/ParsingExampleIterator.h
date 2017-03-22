@@ -9,9 +9,8 @@
 #pragma once
 
 #include "Example.h"
-
-// utilities
-#include "IIterator.h"
+#include "ExampleIterator.h"
+#include "AutoDataVector.h"
 
 // stl
 #include <memory>
@@ -21,15 +20,13 @@ namespace ell
 {
 namespace data
 {
-    using IParsingExampleIterator = typename utilities::IIterator<AutoSupervisedExample>;
-
     /// <summary> An input iterator that traverses a textual data set row by row and applies a parser to
     /// each row into a dense feature std::vector of doubles, a double label, and a double weight. </summary>
     ///
     /// <typeparam name="RowIteratorType"> Type of the row iterator type. </typeparam>
     /// <typeparam name="VectorElementParserType"> Type of the vector element parser type. </typeparam>
     template <typename RowIteratorType, typename VectorElementParserType>
-    class ParsingExampleIterator : public IParsingExampleIterator
+    class ParsingExampleIterator : public IExampleIterator<AutoSupervisedExample>
     {
     public:
         /// <summary> Constructs a parsing iterator \param row_iter An input iterator of strings, that
@@ -66,7 +63,7 @@ namespace data
     ///
     /// <returns> The parsing iterator. </returns>
     template <typename RowIteratorType, typename VectorElementParserType>
-    std::unique_ptr<IParsingExampleIterator> GetParsingExampleIterator(RowIteratorType row_iter, VectorElementParserType parser);
+    ExampleIterator<AutoSupervisedExample> GetParsingExampleIterator(RowIteratorType row_iter, VectorElementParserType parser);
 }
 }
 
