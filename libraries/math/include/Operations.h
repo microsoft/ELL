@@ -88,6 +88,27 @@ namespace math
         /// <param name="u"> [in,out] A row vector, multiplied by t and used to store the result. </param>
         template <typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u);
+
+        /// <summary> Vector vector element wise multiplication, t = u .* v. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientaton of result vector. </typeparam>
+        /// <param name="u"> The first vector. </param>
+        /// <param name="v"> The second vector. </param>
+        /// <param name="t"> [in,out] The vector used to store the result. </param>
+        template <typename ElementType, VectorOrientation Orientation>
+        static void MultiplyElementWise(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, Orientation> t);
+
+        /// <summary> Matrix matrix element wise multiplication, C = A .* B. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
+        /// <param name="A"> The first matrix. </param>
+        /// <param name="B"> The second matrix. </param>
+        /// <param name="C"> [in,out] A matrix used to store the result in the layout of first matrix. </param>
+        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+        static void MultiplyElementWise(ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
     };
 
     /// <summary> An enum that represent different implementation types. </summary>
@@ -183,6 +204,19 @@ namespace math
         template <typename ElementType>
         static void Multiply(ConstVectorReference<ElementType, VectorOrientation::row> u, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType& r);
 
+        /// <summary> Generalized matrix matrix addition, C = s * A + t * B. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
+        /// <param name="s"> The scalar that multiplies the first matrix. </param>
+        /// <param name="A"> The first matrix. </param>
+        /// <param name="t"> The scalar that multiplies the second matrix. </param>
+        /// <param name="B"> The second matrix. </param>
+        /// <param name="C"> [in,out] A matrix used to store the result in the layout of first matrix. </param>
+        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+        static void Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
+
         /// <summary> Generalized matrix column-vector multiplication, u = s * M * v + t * u. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
@@ -198,14 +232,15 @@ namespace math
         /// <summary> Generalized matrix matrix multiplication, C = s * A * B + t * C. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="A"> The first matrix. </param>
         /// <param name="B"> The second matrix. </param>
         /// <param name="t"> The scalar that multiplies C. </param>
-        /// <param name="u"> [in,out] A matrix, multiplied by t and used to store the result. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C);
+        /// <param name="C"> [in,out] A matrix, multiplied by t and used to store the result in the layout of first matrix. </param>
+        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+        static void Multiply(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, ElementType t, MatrixReference<ElementType, LayoutA> C);
     };
 
 #ifdef USE_BLAS
@@ -268,6 +303,19 @@ namespace math
         /// <returns> The dot Multiply. </returns>
         template <typename ElementType>
         static ElementType Dot(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v);
+
+        /// <summary> Generalized matrix matrix addition, C = s * A + t * B. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
+        /// <param name="s"> The scalar that multiplies the first matrix. </param>
+        /// <param name="A"> The first matrix. </param>
+        /// <param name="t"> The scalar that multiplies the second matrix. </param>
+        /// <param name="B"> The second matrix. </param>
+        /// <param name="C"> [in,out] A matrix used to store the result in the layout of first matrix. </param>
+        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+        static void Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
 
         /// <summary> Calculates the product of a vector and a scalar, v = v * s. </summary>
         ///

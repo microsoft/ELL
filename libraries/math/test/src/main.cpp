@@ -144,6 +144,43 @@ void TestVectorOperations()
     testing::ProcessTest(implementationName + "Operations::Copy(VectorReference, VectorReference)", M == R3);
 }
 
+template <typename ElementType>
+void TestElementWiseOperations()
+{
+    using Ops = math::DerivedOperations<ElementType>;
+
+    math::RowVector<ElementType> u{ 0, 1, 2, 2, 10 };
+    math::ColumnVector<ElementType> v{ 1, 2, 3, 4, 5 };
+    math::ColumnVector<ElementType> r{ 0, 2, 6, 8, 50 };
+
+    math::ColumnVector<ElementType> t(u.Size());
+    Ops::MultiplyElementWise(u, v, t);
+    testing::ProcessTest("Operations::VectorElementwise(VectorReference, VectorReference)", t == r);
+
+    math::ColumnMatrix<ElementType> A{
+        { 1, 2, 4 },
+        { 3, 1, 5 },
+        { 8, 2, 3 }
+    };
+
+    math::RowMatrix<ElementType> B{
+        { 2, 7, 4 },
+        { 1, 9, 3 },
+        { 3, 10, 2 }
+    };
+
+    math::ColumnMatrix<ElementType> R{
+        { 2, 14, 16 },
+        { 3, 9, 15 },
+        { 24, 20, 6 }
+    };
+
+    math::ColumnMatrix<ElementType> C(A.NumRows(), B.NumColumns());
+    Ops::MultiplyElementWise(A, B, C);
+
+    testing::ProcessTest("Operations::MuliplyElementwise(MatrixReference, MatrixReference)", C == R);
+}
+
 template <typename ElementType, math::MatrixLayout Layout>
 void TestMatrix1()
 {
@@ -346,14 +383,6 @@ void TestMatrixOperations()
         { 2, 1, 2, 1 },
         { 1, 3, 1, 3 }
     };
-    // C = s * A * B + t * C
-    Ops::Multiply(s, A1, B1, t, C1);
-    math::Matrix<ElementType, math::MatrixLayout::rowMajor> R {
-        { 41, 47, 53, 59 },
-        { 40, 45, 56, 61 },
-        { 15, 25, 23, 33 },
-    };
-    testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Matrix)", C1 == R);
 
     auto A = M.GetSubMatrix(1, 0, 2, 2);
     auto w = M.GetRow(0).Transpose();
@@ -391,6 +420,123 @@ void TestMatrixOperations()
     };
     Ops::Copy(R2, M);
     testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R2);
+}
+
+
+template <typename ElementType, math::ImplementationType Implementation>
+void TestMatrixOperations1()
+{
+    auto implementationName = math::OperationsImplementation<Implementation>::GetImplementationName();
+    using Ops = math::OperationsImplementation<Implementation>;
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> A{
+        { 41, 47, 53, 59 },
+        { 40, 45, 56, 61 },
+        { 15, 25, 23, 33 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> B{
+        { 41, 47, 53, 59 },
+        { 40, 45, 56, 61 },
+        { 15, 25, 23, 33 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> C{
+        { 41, 47, 53, 59 },
+        { 40, 45, 56, 61 },
+        { 15, 25, 23, 33 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> R{
+        { 123, 141, 159, 177 },
+        { 120, 135, 168, 183 },
+        { 45, 75, 69, 99 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> D(A.NumRows(), A.NumColumns());
+    Ops::Add(1.0, A, 2.0, B, D);
+    testing::ProcessTest(implementationName + "Operations::Add(MatrixReference RowMajor, MatrixReference RowMajor)", D == R);
+
+	math::Matrix<ElementType, math::MatrixLayout::columnMajor> R1(R);
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> E(A.NumRows(), A.NumColumns());
+    Ops::Add(2.0, C, 1.0, A, E);
+    testing::ProcessTest(implementationName + "Operations::Add(MatrixReference ColumnMajor, MatrixReference RowMajor)", E == R1);
+}
+
+template <typename ElementType, math::ImplementationType Implementation>
+void TestMatrixMultiplication()
+{
+    using Ops = math::OperationsImplementation<Implementation>;
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> A1{
+        { 41, 47, 53 },
+        { 40, 45, 56 },
+        { 15, 25, 23 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> B1{
+        { 1, 2 },
+        { 3, 4 },
+        { 5, 6 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> R1{
+        { 447, 588 },
+        { 455, 596 },
+        { 205, 268 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> C1(A1.NumRows(), B1.NumColumns());
+    Ops::Multiply(1.0, A1, B1, 0.0, C1);
+    testing::ProcessTest("Operations::Multiply(RowMajor, ColumnMajor)", C1 == R1);
+
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> A2{
+        { 41, 47, 53 },
+        { 40, 45, 56 },
+        { 15, 25, 23 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> B2{
+        { 1, 2 },
+        { 3, 4 },
+        { 5, 6 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R2{
+        { 447, 588 },
+        { 455, 596 },
+        { 205, 268 },
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> C2(A2.NumRows(), B2.NumColumns());
+    Ops::Multiply(1.0, A2, B2, 0.0, C2);
+    testing::ProcessTest("Operations::Multiply(ColumnMajor, RowMajor)", C2 == R2);
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> A3{
+        { 1, 2 },
+        { 3, 1 },
+        { 2, 0 }
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> B3{
+        { 3, 4,  5,  6 },
+        { 8, 9, 10, 11 }
+    };
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> C3{
+        { 1, 1, 1, 1 },
+        { 2, 1, 2, 1 },
+        { 1, 3, 1, 3 }
+    };
+
+    Ops::Multiply(1.0, A3, B3, 2.0, C3);
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> R3 {
+        { 21, 24, 27, 30 },
+        { 21, 23, 29, 31 },
+        { 8, 14, 12, 18 },
+    };
+
+    testing::ProcessTest("Operations::Multiply(RowMajor, RowMajor)", C3 == R3);
 }
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
@@ -515,6 +661,8 @@ int main()
     TestVectorOperations<float, math::ImplementationType::openBlas>();
     TestVectorOperations<double, math::ImplementationType::openBlas>();
 
+    TestElementWiseOperations<double>();
+
     TestMatrix1<float, math::MatrixLayout::rowMajor>();
     TestMatrix1<float, math::MatrixLayout::columnMajor>();
     TestMatrix1<double, math::MatrixLayout::rowMajor>();
@@ -544,6 +692,11 @@ int main()
     TestMatrixOperations<float, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
     TestMatrixOperations<double, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
     TestMatrixOperations<double, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
+
+    TestMatrixOperations1<double, math::ImplementationType::native>();
+    TestMatrixOperations1<double, math::ImplementationType::openBlas>();
+
+    TestMatrixMultiplication<double, math::ImplementationType::native>();
 
     TestTensor<double, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
     TestTensor<double, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
