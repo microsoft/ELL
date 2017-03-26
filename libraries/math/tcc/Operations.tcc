@@ -360,8 +360,8 @@ namespace math
         Multiply(s, M.Transpose(), v.Transpose(), t, u.Transpose());
     }
 
-    template <typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C)
+    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, ElementType t, MatrixReference<ElementType, LayoutA> C)
     {
         if (A.NumColumns() != B.NumRows() || A.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
         {
@@ -382,9 +382,15 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Layout not supported");
         }
 
-        Blas::Gemm(order, CBLAS_TRANSPOSE::CblasNoTrans, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(A.NumRows()), static_cast<int>(B.NumColumns()), static_cast<int>(A.NumColumns()), s,
-                   A.GetDataPointer(), static_cast<int>(A.GetIncrement()), B.GetDataPointer(), static_cast<int>(B.GetIncrement()), t,
-                   C.GetDataPointer(), static_cast<int>(C.GetIncrement()));
+        CBLAS_TRANSPOSE IsTransposeB = CBLAS_TRANSPOSE::CblasNoTrans;
+        if (A.GetLayout() != B.GetLayout())
+        {
+            IsTransposeB = CBLAS_TRANSPOSE::CblasTrans;
+        }
+
+        Blas::Gemm(order, CBLAS_TRANSPOSE::CblasNoTrans, IsTransposeB, static_cast<int>(A.NumRows()), static_cast<int>(B.NumColumns()), static_cast<int>(A.NumColumns()), s,
+            A.GetDataPointer(), static_cast<int>(A.GetIncrement()), B.GetDataPointer(), static_cast<int>(B.GetIncrement()), t,
+            C.GetDataPointer(), static_cast<int>(C.GetIncrement()));
     }
 #endif
 }

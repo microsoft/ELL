@@ -457,7 +457,7 @@ void TestMatrixOperations1()
     Ops::Add(1.0, A, 2.0, B, D);
     testing::ProcessTest(implementationName + "Operations::Add(MatrixReference RowMajor, MatrixReference RowMajor)", D == R);
 
-	math::Matrix<ElementType, math::MatrixLayout::columnMajor> R1(R);
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R1(R);
     math::Matrix<ElementType, math::MatrixLayout::columnMajor> E(A.NumRows(), A.NumColumns());
     Ops::Add(2.0, C, 1.0, A, E);
     testing::ProcessTest(implementationName + "Operations::Add(MatrixReference ColumnMajor, MatrixReference RowMajor)", E == R1);
@@ -697,6 +697,7 @@ int main()
     TestMatrixOperations1<double, math::ImplementationType::openBlas>();
 
     TestMatrixMultiplication<double, math::ImplementationType::native>();
+    TestMatrixMultiplication<double, math::ImplementationType::openBlas>();
 
     TestTensor<double, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
     TestTensor<double, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();

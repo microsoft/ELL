@@ -362,14 +362,15 @@ namespace math
         /// <summary> Generalized matrix matrix multiplication, C = s * A * B + t * C. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="A"> The first matrix. </param>
         /// <param name="B"> The second matrix. </param>
         /// <param name="t"> The scalar that multiplies C. </param>
-        /// <param name="u"> [in,out] A matrix, multiplied by t and used to store the result. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C);
+        /// <param name="u"> [in,out] A matrix, multiplied by t and used to store the result, in layout of first matrix. </param>
+        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+        static void Multiply(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, ElementType t, MatrixReference<ElementType, LayoutA> C);
     };
 
     using Operations = OperationsImplementation<ImplementationType::openBlas>;
