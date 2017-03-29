@@ -646,7 +646,7 @@ int main()
     TestMatrixOperations<double, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
     TestMatrixOperations<double, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
 
-    TestMatrixMatrixAdd<float, math::ImplementationType::openBlas>();
+    TestMatrixMatrixAdd<float, math::ImplementationType::native>();
     TestMatrixMatrixAdd<float, math::ImplementationType::openBlas>();
     TestMatrixMatrixAdd<double, math::ImplementationType::native>();
     TestMatrixMatrixAdd<double, math::ImplementationType::openBlas>();

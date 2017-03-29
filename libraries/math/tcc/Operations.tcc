@@ -85,9 +85,17 @@ namespace math
     {
         DEBUG_THROW(u.Size() != v.Size() || u.Size() != t.Size(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible vector sizes."));
 
-        for (size_t i = 0; i < u.Size(); ++i)
+        const ElementType* uData = u.GetDataPointer();
+        const ElementType* vData = v.GetDataPointer();
+
+        size_t i = 0;
+        const ElementType* end = u.GetDataPointer() + u.GetIncrement() * u.Size();
+
+        while (uData < end)
         {
-            t[i] = u[i] * v[i];
+            t[i++] = (*uData) * (*vData);
+            uData += u.GetIncrement();
+            vData += v.GetIncrement();
         }
     }
 
@@ -274,7 +282,7 @@ namespace math
 
     template <typename ElementType, VectorOrientation Orientation>
     void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u)
-    {
+        {
         if (v.Size() != u.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors u and v are not the same size.");
