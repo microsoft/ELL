@@ -97,7 +97,7 @@ namespace math
         /// <param name="v"> The second vector. </param>
         /// <param name="t"> [in,out] The vector used to store the result. </param>
         template <typename ElementType, VectorOrientation Orientation>
-        static void MultiplyElementWise(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, Orientation> t);
+        static void ElementWiseMultiply(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, Orientation> t);
 
         /// <summary> Matrix matrix element wise multiplication, C = A .* B. </summary>
         ///
@@ -108,7 +108,7 @@ namespace math
         /// <param name="B"> The second matrix. </param>
         /// <param name="C"> [in,out] A matrix used to store the result in the layout of first matrix. </param>
         template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-        static void MultiplyElementWise(ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
+        static void ElementWiseMultiply(ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
     };
 
     /// <summary> An enum that represent different implementation types. </summary>

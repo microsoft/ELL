@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Debug.h"
 #include "Exception.h"
 
 namespace ell
@@ -79,12 +81,9 @@ namespace math
 
     template <class DerivedClass>
     template <typename ElementType, VectorOrientation Orientation>
-    void DerivedOperations<DerivedClass>::MultiplyElementWise(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, Orientation> t)
+    void DerivedOperations<DerivedClass>::ElementWiseMultiply(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, Orientation> t)
     {
-        if (u.Size() != v.Size() || u.Size() != t.Size())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible vector sizes.");
-        }
+        DEBUG_THROW(u.Size() != v.Size() || u.Size() != t.Size(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible vector sizes."));
 
         for (size_t i = 0; i < u.Size(); ++i)
         {
@@ -94,16 +93,13 @@ namespace math
 
     template <class DerivedClass>
     template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-    void DerivedOperations<DerivedClass>::MultiplyElementWise(ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
+    void DerivedOperations<DerivedClass>::ElementWiseMultiply(ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
     {
-        if (A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes.");
-        }
+        DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
 
         for (size_t i = 0; i < A.NumRows(); ++i)
         {
-            MultiplyElementWise(A.GetRow(i), B.GetRow(i), C.GetRow(i));
+            ElementWiseMultiply(A.GetRow(i), B.GetRow(i), C.GetRow(i));
         }
     }
 
@@ -210,10 +206,7 @@ namespace math
     template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
     void OperationsImplementation<ImplementationType::native>::Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
     {
-        if (A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes.");
-        }
+        DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
 
         for (size_t i = 0; i < A.NumRows(); ++i)
         {
@@ -316,10 +309,7 @@ namespace math
     template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
     void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
     {
-        if (A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes.");
-        }
+        DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
 
         for (size_t i = 0; i < A.NumRows(); ++i)
         {
@@ -382,13 +372,13 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Layout not supported");
         }
 
-        CBLAS_TRANSPOSE IsTransposeB = CBLAS_TRANSPOSE::CblasNoTrans;
+        CBLAS_TRANSPOSE transposeB = CBLAS_TRANSPOSE::CblasNoTrans;
         if (A.GetLayout() != B.GetLayout())
         {
-            IsTransposeB = CBLAS_TRANSPOSE::CblasTrans;
+            transposeB = CBLAS_TRANSPOSE::CblasTrans;
         }
 
-        Blas::Gemm(order, CBLAS_TRANSPOSE::CblasNoTrans, IsTransposeB, static_cast<int>(A.NumRows()), static_cast<int>(B.NumColumns()), static_cast<int>(A.NumColumns()), s,
+        Blas::Gemm(order, CBLAS_TRANSPOSE::CblasNoTrans, transposeB, static_cast<int>(A.NumRows()), static_cast<int>(B.NumColumns()), static_cast<int>(A.NumColumns()), s,
             A.GetDataPointer(), static_cast<int>(A.GetIncrement()), B.GetDataPointer(), static_cast<int>(B.GetIncrement()), t,
             C.GetDataPointer(), static_cast<int>(C.GetIncrement()));
     }
