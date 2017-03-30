@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// utilities
+#include "Debug.h"
 #include "Exception.h"
 
 namespace ell
@@ -75,6 +77,38 @@ namespace math
     void DerivedOperations<DerivedClass>::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u)
     {
         DerivedClass::Multiply(s, M.Transpose(), v.Transpose(), t, u.Transpose());
+    }
+
+    template <class DerivedClass>
+    template <typename ElementType, VectorOrientation Orientation>
+    void DerivedOperations<DerivedClass>::ElementWiseMultiply(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, Orientation> t)
+    {
+        DEBUG_THROW(u.Size() != v.Size() || u.Size() != t.Size(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible vector sizes."));
+
+        const ElementType* uData = u.GetDataPointer();
+        const ElementType* vData = v.GetDataPointer();
+
+        size_t i = 0;
+        const ElementType* end = u.GetDataPointer() + u.GetIncrement() * u.Size();
+
+        while (uData < end)
+        {
+            t[i++] = (*uData) * (*vData);
+            uData += u.GetIncrement();
+            vData += v.GetIncrement();
+        }
+    }
+
+    template <class DerivedClass>
+    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+    void DerivedOperations<DerivedClass>::ElementWiseMultiply(ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
+    {
+        DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
+
+        for (size_t i = 0; i < A.NumRows(); ++i)
+        {
+            ElementWiseMultiply(A.GetRow(i), B.GetRow(i), C.GetRow(i));
+        }
     }
 
     //
@@ -177,6 +211,18 @@ namespace math
         r = Dot(u, v);
     }
 
+    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+    void OperationsImplementation<ImplementationType::native>::Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
+    {
+        DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
+
+        for (size_t i = 0; i < A.NumRows(); ++i)
+        {
+            Add(s, A.GetRow(i), C.GetRow(i));
+            Add(t, B.GetRow(i), C.GetRow(i));
+        }
+    }
+
     template <typename ElementType, MatrixLayout Layout>
     void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u)
     {
@@ -192,8 +238,8 @@ namespace math
         }
     }
 
-    template <typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C)
+    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, ElementType t, MatrixReference<ElementType, LayoutA> C)
     {
         if (A.NumColumns() != B.NumRows() || A.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
         {
@@ -236,7 +282,7 @@ namespace math
 
     template <typename ElementType, VectorOrientation Orientation>
     void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u)
-    {
+        {
         if (v.Size() != u.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors u and v are not the same size.");
@@ -267,6 +313,19 @@ namespace math
     {
         r = Dot(u, v);
     }
+
+    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+    void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
+    {
+        DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
+
+        for (size_t i = 0; i < A.NumRows(); ++i)
+        {
+            Add(s, A.GetRow(i), C.GetRow(i));
+            Add(t, B.GetRow(i), C.GetRow(i));
+        }
+    }
+
 
     template <typename ElementType, MatrixLayout Layout>
     void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u)
@@ -299,8 +358,8 @@ namespace math
         Multiply(s, M.Transpose(), v.Transpose(), t, u.Transpose());
     }
 
-    template <typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> A, ConstMatrixReference<ElementType, Layout> B, ElementType t, MatrixReference<ElementType, Layout> C)
+    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, ElementType t, MatrixReference<ElementType, LayoutA> C)
     {
         if (A.NumColumns() != B.NumRows() || A.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
         {
@@ -321,11 +380,16 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Layout not supported");
         }
 
-        Blas::Gemm(order, CBLAS_TRANSPOSE::CblasNoTrans, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(A.NumRows()), static_cast<int>(B.NumColumns()), static_cast<int>(A.NumColumns()), s,
-                   A.GetDataPointer(), static_cast<int>(A.GetIncrement()), B.GetDataPointer(), static_cast<int>(B.GetIncrement()), t,
-                   C.GetDataPointer(), static_cast<int>(C.GetIncrement()));
-    }
+        CBLAS_TRANSPOSE transposeB = CBLAS_TRANSPOSE::CblasNoTrans;
+        if (A.GetLayout() != B.GetLayout())
+        {
+            transposeB = CBLAS_TRANSPOSE::CblasTrans;
+        }
 
+        Blas::Gemm(order, CBLAS_TRANSPOSE::CblasNoTrans, transposeB, static_cast<int>(A.NumRows()), static_cast<int>(B.NumColumns()), static_cast<int>(A.NumColumns()), s,
+            A.GetDataPointer(), static_cast<int>(A.GetIncrement()), B.GetDataPointer(), static_cast<int>(B.GetIncrement()), t,
+            C.GetDataPointer(), static_cast<int>(C.GetIncrement()));
+    }
 #endif
 }
 }
