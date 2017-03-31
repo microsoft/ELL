@@ -25,6 +25,8 @@ namespace nodes
                 ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, none);
                 ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, sqrt);
                 ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, logicalNot);
+                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, tanh);
+                ADD_TO_STRING_ENTRY(emitters::UnaryOperationType, exp);
 
                 default:
                     throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
@@ -37,6 +39,8 @@ namespace nodes
             ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, none);
             ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, sqrt);
             ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, logicalNot);
+            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, tanh);
+            ADD_FROM_STRING_ENTRY(emitters::UnaryOperationType, exp);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
         }
@@ -63,6 +67,30 @@ namespace nodes
         inline bool LogicalNot(bool x)
         {
             return !x;
+        }
+
+        template <typename ValueType>
+        ValueType Tanh(ValueType a)
+        {
+            return std::tanh(a);
+        }
+
+        template <>
+        inline bool Tanh(bool x)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking tanh of a boolean value");
+        }
+
+        template <typename ValueType>
+        ValueType Exp(ValueType a)
+        {
+            return std::exp(a);
+        }
+
+        template <>
+        inline bool Exp(bool x)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking exp of a boolean value");
         }
     }
 
@@ -104,6 +132,16 @@ namespace nodes
             case emitters::UnaryOperationType::logicalNot:
             {
                 output = ComputeOutput(UnaryOperations::LogicalNot<ValueType>);
+            }
+            break;
+            case emitters::UnaryOperationType::exp:
+            {
+                output = ComputeOutput(UnaryOperations::Exp<ValueType>);
+            }
+            break;
+            case emitters::UnaryOperationType::tanh:
+            {
+                output = ComputeOutput(UnaryOperations::Tanh<ValueType>);
             }
             break;
 

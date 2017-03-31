@@ -82,7 +82,9 @@ namespace emitters
     {
         none,
         sqrt, // real only
-        logicalNot // bool only
+        logicalNot, // bool only
+        tanh, // real only
+        exp // real only
     };
 
     ///<summary> An enumeration of strongly TYPED operations on numbers </summary>

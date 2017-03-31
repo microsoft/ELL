@@ -21,6 +21,7 @@
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
 #include "UnaryOperationNode.h"
+#include "MatrixVectorProductNode.h"
 
 // model
 #include "InputNode.h"
@@ -214,6 +215,25 @@ void TestUnaryOperationNodeCompute()
         for (int d = 0; d < inputValue.size(); ++d)
         {
             auto expectedOutput = std::sqrt(inputValue[d]);
+            testing::ProcessTest("Testing UnaryOperationNode compute", testing::IsEqual(outputVec[d], expectedOutput));
+        }
+    }
+}
+
+void TestUnaryOperationNodeCompute1()
+{
+    std::vector<std::vector<double>> data = { { 1 },{ 2 },{ 3 },{ 4 },{ 5 },{ 6 },{ 7 },{ 8 },{ 9 },{ 10 } };
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
+    auto outputNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, emitters::UnaryOperationType::exp);
+    for (int index = 0; index < data.size(); ++index)
+    {
+        auto inputValue = data[index];
+        inputNode->SetInput(inputValue);
+        std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
+        for (int d = 0; d < inputValue.size(); ++d)
+        {
+            auto expectedOutput = std::exp(inputValue[d]);
             testing::ProcessTest("Testing UnaryOperationNode compute", testing::IsEqual(outputVec[d], expectedOutput));
         }
     }
@@ -429,5 +449,34 @@ void TestDTWDistanceNodeCompute()
         std::cout << "[" << sampleIndex << "]: \t" << outputVec[0] << std::endl;
         if (sampleIndex + increment >= prototypeLength) std::cout << std::endl;
     }
+}
+
+void TestMatrixVectorProductRefine()
+{
+    math::ColumnMatrix<double> w(2, 3);
+    w(0, 0) = 1.0; w(0, 1) = 0.2; w(0, 2) = 0.3;
+    w(1, 0) = 0.3; w(1, 1) = 0.7; w(1, 2) = 0.5;
+
+    std::vector<double> input = { 1, 2, 3 };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(input.size());
+
+    inputNode->SetInput(input);
+
+    auto matrixVectorProductNode = model.AddNode<nodes::MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, w);
+
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ matrixVectorProductNode->output });
+
+    refinedInputNode->SetInput(input);
+
+    auto refinedOutput = refinedModel.ComputeOutput(refinedOutputElements);
+    auto computeOutput = model.ComputeOutput(matrixVectorProductNode->output);
+
+    testing::ProcessTest("Testing matrix vector product node refine", testing::IsEqual(refinedOutput, computeOutput));
 }
 }
