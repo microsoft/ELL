@@ -84,7 +84,7 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     auto ConstMatrixReference<ElementType, Layout>::Transpose() const
     {
-        return ConstMatrixReference<ElementType, _transposeLayout>(_pData, _numColumns, _numRows, _increment);
+        return ConstMatrixReference<ElementType, _transposeLayout>(_numColumns, _numRows, _increment, _pData);
     }
 
     template <typename ElementType, MatrixLayout Layout>
@@ -92,7 +92,7 @@ namespace math
     {
         DEBUG_THROW(firstRow + numRows > _numRows || firstColumn + numColumns > _numColumns, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "block exceeds matrix dimensions."));
 
-        return ConstMatrixReference<ElementType, Layout>(_pData + firstRow * _rowIncrement + firstColumn * _columnIncrement, numRows, numColumns, _increment);
+        return ConstMatrixReference<ElementType, Layout>(numRows, numColumns, _increment, _pData + firstRow * _rowIncrement + firstColumn * _columnIncrement);
     }
 
     template <typename ElementType, MatrixLayout Layout>
@@ -227,7 +227,7 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     ConstMatrixReference<ElementType, Layout> MatrixReference<ElementType, Layout>::GetConstReference() const
     {
-        return constMatrixReference<ElementType, Layout>(_numRows, _numColumns, _increment, _pData);
+        return ConstMatrixReference<ElementType, Layout>(_numRows, _numColumns, _increment, _pData);
     }
 
     template <typename ElementType, MatrixLayout Layout>
