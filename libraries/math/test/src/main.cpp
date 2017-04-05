@@ -423,7 +423,7 @@ void TestMatrixOperations()
 }
 
 template <typename ElementType, math::MatrixLayout Layout>
-void TestMatrixOperations1()
+void TestConstMatrixReference()
 {
     math::Matrix<ElementType, Layout> M{
         { 1, 2, 4, 0 },
@@ -676,10 +676,10 @@ int main()
     TestMatrixOperations<double, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
     TestMatrixOperations<double, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
 
-    TestMatrixOperations1<float, math::MatrixLayout::rowMajor>();
-    TestMatrixOperations1<float, math::MatrixLayout::rowMajor>();
-    TestMatrixOperations1<double, math::MatrixLayout::columnMajor>();
-    TestMatrixOperations1<double, math::MatrixLayout::columnMajor>();
+    TestConstMatrixReference<float, math::MatrixLayout::rowMajor>();
+    TestConstMatrixReference<float, math::MatrixLayout::rowMajor>();
+    TestConstMatrixReference<double, math::MatrixLayout::columnMajor>();
+    TestConstMatrixReference<double, math::MatrixLayout::columnMajor>();
 
     TestMatrixMatrixAdd<float, math::ImplementationType::native>();
     TestMatrixMatrixAdd<float, math::ImplementationType::openBlas>();
