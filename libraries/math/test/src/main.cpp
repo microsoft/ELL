@@ -422,6 +422,36 @@ void TestMatrixOperations()
     testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R2);
 }
 
+template <typename ElementType, math::MatrixLayout Layout>
+void TestConstMatrixReference()
+{
+    math::Matrix<ElementType, Layout> M{
+        { 1, 2, 4, 0 },
+        { 1, 3, 5, 3 },
+        { 0, 8, 1, 6 },
+        { 1, 2, 4, 3 }
+    };
+
+    math::ConstMatrixReference<ElementType, Layout> N(M);
+    auto P = M.GetConstReference();
+    testing::ProcessTest("ConstMatrixReference testing operator ==", M == N);
+    testing::ProcessTest("ConstMatrixReference testing GetConstReference", N == P);
+
+    std::vector<ElementType> v;
+    v.assign(P.GetDataPointer(), P.GetDataPointer() + (size_t)(P.NumRows() * P.NumColumns()));
+    ElementType sum = 0;
+    std::for_each(v.begin(), v.end(), [&sum](int val) { sum += val; });
+    testing::ProcessTest("ConstMatrixReference testing GetDataPointer", sum == 44);
+
+    math::ColumnVector<ElementType> r{ 1, 3, 1, 3 };
+    auto u = N.GetDiagonal();
+    testing::ProcessTest("ConstMatrixReference testing GetDiagonal", u == r);
+
+    auto R = N.GetSubMatrix(1, 1, 3, 2);
+    auto S = R.Transpose();
+    testing::ProcessTest("ConstMatrixReference testing GetRow", math::Operations::Norm1(S.GetRow(0)) == 3 + 8 + 2);
+    testing::ProcessTest("ConstMatrixReference testing GetRow", math::Operations::Norm1(S.GetRow(1)) == 5 + 1 + 4);
+}
 
 template <typename ElementType, math::ImplementationType Implementation>
 void TestMatrixMatrixAdd()
@@ -645,6 +675,11 @@ int main()
     TestMatrixOperations<float, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
     TestMatrixOperations<double, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
     TestMatrixOperations<double, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
+
+    TestConstMatrixReference<float, math::MatrixLayout::rowMajor>();
+    TestConstMatrixReference<float, math::MatrixLayout::rowMajor>();
+    TestConstMatrixReference<double, math::MatrixLayout::columnMajor>();
+    TestConstMatrixReference<double, math::MatrixLayout::columnMajor>();
 
     TestMatrixMatrixAdd<float, math::ImplementationType::native>();
     TestMatrixMatrixAdd<float, math::ImplementationType::openBlas>();
