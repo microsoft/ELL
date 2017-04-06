@@ -522,6 +522,39 @@ void TestMatrixMatrixMultiply()
     testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Matrix)", C == R);
 }
 
+template <typename ElementType>
+void TestVectorToArray()
+{
+    std::vector<ElementType> r0{ 41, 47, 53, 59 };
+    std::vector<ElementType> r1{ 15, 25, 23, 33 };
+
+    math::RowVector<ElementType> p(r0);
+    testing::ProcessTest("Testing vector reference to array for a row vector", p.ToArray() == r0);
+
+    math::ColumnVector<ElementType> q(r1);
+    testing::ProcessTest("Testing vector reference to array for a column vector", q.ToArray() == r1);
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> A{
+        { 41, 47, 53, 59 },
+        { 40, 45, 56, 61 },
+        { 15, 25, 23, 33 },
+    };
+
+    std::vector<ElementType> r(A.GetRow(0).ToArray());
+    testing::ProcessTest("Testing vector reference to array for a row matrix", r == r0);
+
+    std::vector<ElementType> s(A.GetRow(2).ToArray());
+    testing::ProcessTest("Testing vector reference to array for a row matrix", s == r1);
+
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> B(A);
+
+    std::vector<ElementType> t(B.GetRow(0).ToArray());
+    testing::ProcessTest("Testing vector reference to array for a column matrix", t == r0);
+
+    std::vector<ElementType> u(B.GetRow(2).ToArray());
+    testing::ProcessTest("Testing vector reference to array for a column matrix", u == r1);
+}
+
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensor()
 {
@@ -694,6 +727,9 @@ int main()
     TestMatrixMatrixMultiply<double, math::MatrixLayout::rowMajor, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
     TestMatrixMatrixMultiply<double, math::MatrixLayout::columnMajor, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
     TestMatrixMatrixMultiply<double, math::MatrixLayout::columnMajor, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
+
+    TestVectorToArray<double>();
+    TestVectorToArray<float>();
 
     TestTensor<double, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
     TestTensor<double, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
