@@ -23,7 +23,8 @@ set (include include/AccumulatorNode.h
              include/SumNode.h
              include/TypeCastNode.h
              include/UnaryOperationNode.h
-             include/ValueSelectorNode.h)
+             include/ValueSelectorNode.h
+             include/MatrixVectorProductNode.h)
 
 set (src src/ConstantNode.cpp
          src/LinearPredictorNode.cpp
@@ -46,7 +47,8 @@ set (tcc tcc/AccumulatorNode.tcc
          tcc/SumNode.tcc
          tcc/TypeCastNode.tcc
          tcc/UnaryOperationNode.tcc
-         tcc/ValueSelectorNode.tcc)
+         tcc/ValueSelectorNode.tcc
+         tcc/MatrixVectorProductNode.tcc)
 
 source_group("include" FILES ${include})
 source_group("src" FILES ${src})
