@@ -84,11 +84,7 @@ namespace nodes
         for (size_t r = 0; r < _w.NumRows(); r++)
         {
             auto matrixRow = projectionMatrix.GetRow(r);
-            // todo: can we avoid this loop
-            std::vector<ValueType> rowData;
-            for (size_t i = 0; i < matrixRow.Size(); ++i)
-                rowData.push_back(matrixRow[i]);
-
+            auto rowData = matrixRow.ToArray();
             auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(rowData);
             auto dotProductNode = transformer.AddNode<DotProductNode<ValueType>>(weightsNode->output, newPortElements);
             dotProductOutputs.Append(dotProductNode->output);
