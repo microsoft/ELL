@@ -422,6 +422,36 @@ void TestMatrixOperations()
     testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R2);
 }
 
+template <typename ElementType, math::MatrixLayout Layout>
+void TestConstMatrixReference()
+{
+    math::Matrix<ElementType, Layout> M{
+        { 1, 2, 4, 0 },
+        { 1, 3, 5, 3 },
+        { 0, 8, 1, 6 },
+        { 1, 2, 4, 3 }
+    };
+
+    math::ConstMatrixReference<ElementType, Layout> N(M);
+    auto P = M.GetConstReference();
+    testing::ProcessTest("ConstMatrixReference testing operator ==", M == N);
+    testing::ProcessTest("ConstMatrixReference testing GetConstReference", N == P);
+
+    std::vector<ElementType> v;
+    v.assign(P.GetDataPointer(), P.GetDataPointer() + (size_t)(P.NumRows() * P.NumColumns()));
+    ElementType sum = 0;
+    std::for_each(v.begin(), v.end(), [&sum](int val) { sum += val; });
+    testing::ProcessTest("ConstMatrixReference testing GetDataPointer", sum == 44);
+
+    math::ColumnVector<ElementType> r{ 1, 3, 1, 3 };
+    auto u = N.GetDiagonal();
+    testing::ProcessTest("ConstMatrixReference testing GetDiagonal", u == r);
+
+    auto R = N.GetSubMatrix(1, 1, 3, 2);
+    auto S = R.Transpose();
+    testing::ProcessTest("ConstMatrixReference testing GetRow", math::Operations::Norm1(S.GetRow(0)) == 3 + 8 + 2);
+    testing::ProcessTest("ConstMatrixReference testing GetRow", math::Operations::Norm1(S.GetRow(1)) == 5 + 1 + 4);
+}
 
 template <typename ElementType, math::ImplementationType Implementation>
 void TestMatrixMatrixAdd()
@@ -490,6 +520,39 @@ void TestMatrixMatrixMultiply()
     Ops::Multiply(1.0, A, B, 0.0, C);
 
     testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Matrix)", C == R);
+}
+
+template <typename ElementType>
+void TestVectorToArray()
+{
+    std::vector<ElementType> r0{ 41, 47, 53, 59 };
+    std::vector<ElementType> r1{ 15, 25, 23, 33 };
+
+    math::RowVector<ElementType> p(r0);
+    testing::ProcessTest("Testing vector reference to array for a row vector", p.ToArray() == r0);
+
+    math::ColumnVector<ElementType> q(r1);
+    testing::ProcessTest("Testing vector reference to array for a column vector", q.ToArray() == r1);
+
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> A{
+        { 41, 47, 53, 59 },
+        { 40, 45, 56, 61 },
+        { 15, 25, 23, 33 },
+    };
+
+    std::vector<ElementType> r(A.GetRow(0).ToArray());
+    testing::ProcessTest("Testing vector reference to array for a row matrix", r == r0);
+
+    std::vector<ElementType> s(A.GetRow(2).ToArray());
+    testing::ProcessTest("Testing vector reference to array for a row matrix", s == r1);
+
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> B(A);
+
+    std::vector<ElementType> t(B.GetRow(0).ToArray());
+    testing::ProcessTest("Testing vector reference to array for a column matrix", t == r0);
+
+    std::vector<ElementType> u(B.GetRow(2).ToArray());
+    testing::ProcessTest("Testing vector reference to array for a column matrix", u == r1);
 }
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
@@ -646,6 +709,11 @@ int main()
     TestMatrixOperations<double, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
     TestMatrixOperations<double, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
 
+    TestConstMatrixReference<float, math::MatrixLayout::rowMajor>();
+    TestConstMatrixReference<float, math::MatrixLayout::rowMajor>();
+    TestConstMatrixReference<double, math::MatrixLayout::columnMajor>();
+    TestConstMatrixReference<double, math::MatrixLayout::columnMajor>();
+
     TestMatrixMatrixAdd<float, math::ImplementationType::native>();
     TestMatrixMatrixAdd<float, math::ImplementationType::openBlas>();
     TestMatrixMatrixAdd<double, math::ImplementationType::native>();
@@ -659,6 +727,9 @@ int main()
     TestMatrixMatrixMultiply<double, math::MatrixLayout::rowMajor, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
     TestMatrixMatrixMultiply<double, math::MatrixLayout::columnMajor, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
     TestMatrixMatrixMultiply<double, math::MatrixLayout::columnMajor, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
+
+    TestVectorToArray<double>();
+    TestVectorToArray<float>();
 
     TestTensor<double, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
     TestTensor<double, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
