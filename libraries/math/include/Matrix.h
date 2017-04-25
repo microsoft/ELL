@@ -43,12 +43,6 @@ namespace math
     protected:
         void Swap(RectangularMatrixBase<ElementType>& other);
 
-        template <VectorOrientation Orientation>
-        VectorReference<ElementType, Orientation> ConstructVectorReference(ElementType* pData, size_t size, size_t increment);
-
-        template <VectorOrientation Orientation>
-        ConstVectorReference<ElementType, Orientation> ConstructConstVectorReference(ElementType* pData, size_t size, size_t increment) const;
-
         ElementType* _pData;
         size_t _numRows;
         size_t _numColumns;
@@ -60,6 +54,25 @@ namespace math
     {
         columnMajor,
         rowMajor
+    };
+
+    /// <summary> Helper class to obtain the transpose of a MatrixLayout </summary>
+    ///
+    /// Usage: auto transposedLayout = TransposeMatrixLayout<Layout>::layout
+    
+    template <MatrixLayout>
+    struct TransposeMatrixLayout;
+
+    template <>
+    struct TransposeMatrixLayout<MatrixLayout::columnMajor>
+    {
+        static constexpr MatrixLayout layout = MatrixLayout::rowMajor;
+    };
+
+    template <>
+    struct TransposeMatrixLayout<MatrixLayout::rowMajor>
+    {
+        static constexpr MatrixLayout layout = MatrixLayout::columnMajor;
     };
 
     /// <summary> Forward declaration of a base class for matrices, for subsequent specialization according to layout. </summary>
@@ -83,7 +96,6 @@ namespace math
         using RectangularMatrixBase<ElementType>::_numColumns;
         using RectangularMatrixBase<ElementType>::_increment;
 
-        static constexpr MatrixLayout _transposeLayout = MatrixLayout::rowMajor;
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::column;
 
         const size_t _numIntervals = _numColumns;
@@ -106,7 +118,6 @@ namespace math
         using RectangularMatrixBase<ElementType>::_numColumns;
         using RectangularMatrixBase<ElementType>::_increment;
 
-        static constexpr MatrixLayout _transposeLayout = MatrixLayout::columnMajor;
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::row;
 
         const size_t _numIntervals = _numRows;
@@ -122,8 +133,6 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     class ConstMatrixReference : public MatrixBase<ElementType, Layout>
     {
-        using MatrixBase<ElementType, Layout>::_transposeLayout;
-
     public:
         /// <summary> Gets a const pointer to the underlying data storage. </summary>
         ///
@@ -203,7 +212,7 @@ namespace math
         /// <param name="other"> The other matrix. </param>
         ///
         /// <returns> true if the two matrices are equivalent. </returns>
-        bool operator==(const ConstMatrixReference<ElementType, _transposeLayout>& other) const;
+        bool operator==(const ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>& other) const;
 
         /// <summary> Inequality operator. </summary>
         ///
@@ -218,7 +227,7 @@ namespace math
         using RectangularMatrixBase<ElementType>::NumColumns;
 
     protected:
-        friend class ConstMatrixReference<ElementType, _transposeLayout>;
+        friend class ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>;
         using MatrixBase<ElementType, Layout>::MatrixBase;
 
         ConstMatrixReference(size_t numRows, size_t numColumns, ElementType* pData) : MatrixBase<ElementType, Layout>(numRows, numColumns, pData) {}
@@ -243,8 +252,6 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     class MatrixReference : public ConstMatrixReference<ElementType, Layout>
     {
-        using MatrixBase<ElementType, Layout>::_transposeLayout;
-
     public:
         /// <summary> Constructs a matrix that uses a pointer to an external buffer as the element data. 
         /// This allows the matrix to use data provided by some other source, and this matrix does not
@@ -275,7 +282,7 @@ namespace math
         void Fill(ElementType value);
 
         /// <summary>
-        /// Generates elements of the vector by repeatedly calling a generator function (such as a random
+        /// Generates elements of the matrix by repeatedly calling a generator function (such as a random
         /// number generator).
         /// </summary>
         ///
@@ -335,7 +342,7 @@ namespace math
         /// <returns> Reference to the interval. </returns>
         auto GetMajorVector(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
         {
-            return RectangularMatrixBase<ElementType>::template ConstructVectorReference<MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
+            return VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
         }
 
         /// <summary> Swaps the contents of this matrix with the contents of another matrix. </summary>
@@ -347,7 +354,7 @@ namespace math
         using RectangularMatrixBase<ElementType>::NumColumns;
 
     protected:
-        friend MatrixReference<ElementType, _transposeLayout>;
+        friend MatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>;
         using ConstMatrixReference<ElementType, Layout>::ConstMatrixReference;
 
         using RectangularMatrixBase<ElementType>::_pData;
@@ -370,8 +377,6 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     class Matrix : public MatrixReference<ElementType, Layout>
     {
-        using MatrixBase<ElementType, Layout>::_transposeLayout;
-
     public:
         /// <summary> Constructs an all-zeros matrix of a given size. </summary>
         ///
@@ -413,7 +418,7 @@ namespace math
         /// <summary> Copies a matrix of the opposite layout. </summary>
         ///
         /// <param name="other"> The matrix being copied. </param>
-        Matrix(ConstMatrixReference<ElementType, _transposeLayout> other);
+        Matrix(ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout> other);
 
         /// <summary> Assignment operator. </summary>
         ///

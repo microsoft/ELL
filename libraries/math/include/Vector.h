@@ -55,6 +55,13 @@ namespace math
     class UnorientedConstVectorReference
     {
     public:
+        /// <summary> Constructs an instance of UnorientedConstVectorReference. </summary>
+        ///
+        /// <param name="pData"> [in,out] Pointer to the data. </param>
+        /// <param name="size"> The size of the vector. </param>
+        /// <param name="increment"> The vector increment. </param>
+        UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
+
         /// <summary> Gets a const pointer to the underlying data storage. </summary>
         ///
         /// <returns> Const pointer to the data. </returns>
@@ -97,7 +104,6 @@ namespace math
         void Print(std::ostream& ostream) const;
 
     protected:
-        UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
         void Swap(UnorientedConstVectorReference<ElementType>& other);
 
         ElementType* _pData;
@@ -124,6 +130,8 @@ namespace math
     class ConstVectorReference : public VectorBase<Orientation>, public UnorientedConstVectorReference<ElementType>
     {
     public:
+        using UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference;
+
         /// <summary> Gets a reference to this vector. </summary>
         ///
         /// <returns> A constant reference to this vector. </returns>
@@ -165,15 +173,9 @@ namespace math
         bool operator!=(const ConstVectorReference<ElementType, Orientation>& other) const;
 
     protected:
-        using UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference;
         using UnorientedConstVectorReference<ElementType>::_pData;
         using UnorientedConstVectorReference<ElementType>::_size;
         using UnorientedConstVectorReference<ElementType>::_increment;
-
-        template <typename T>
-        friend class RectangularMatrixBase;
-
-        friend class ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
     };
 
     /// <summary> A class that represents a scaled constant vector. </summary>
@@ -224,6 +226,8 @@ namespace math
     class VectorReference : public ConstVectorReference<ElementType, Orientation>
     {
     public:
+        using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
+
         /// <summary> Copies values from another vector into this vector. </summary>
         ///
         /// <param name="other"> The other vector. </param>
@@ -339,15 +343,9 @@ namespace math
         void CoordinatewiseSquareRoot();
 
     protected:
-        using ConstVectorReference<ElementType, Orientation>::ConstVectorReference;
         using ConstVectorReference<ElementType, Orientation>::_pData;
         using ConstVectorReference<ElementType, Orientation>::_size;
         using ConstVectorReference<ElementType, Orientation>::_increment;
-
-        template <typename T>
-        friend class RectangularMatrixBase;
-
-        friend class VectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>;
     };
 
     /// <summary> An algebraic vector. </summary>

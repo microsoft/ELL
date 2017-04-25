@@ -16,64 +16,203 @@ namespace ell
 namespace math
 {
     //
-    // TensorBase
-    // 
-
-    template<typename ElementType>
-    TensorBase<ElementType>::TensorBase(size_t numRows, size_t numColumns, size_t numChannels, TensorLayout layout, ElementType* pData)
-        : _numRows(numRows), _numColumns(numColumns), _numChannels(numChannels), _layout(layout), _pData(pData)
-    {}
-
-    //
-    // TensorLayoutBase
+    // TensorSlicers
     //
 
-    template<typename ElementType>
-    TensorLayoutBase<ElementType, Dimension::column, Dimension::row, Dimension::channel>::TensorLayoutBase(size_t numRows, size_t numColumns, size_t numChannels)
-        : TensorBase(numRows, numColumns, numChannels, { numColumns, numRows, numChannels, numColumns, numColumns*numRows })
-    {}
+    /// <summary> TensorSlicer is a helper class in lieu of the ability to specialize the GetSlice() function </summary>
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, Dimension rowDimension, Dimension columnDimension>
+    struct TensorSlicer;
 
-    template<typename ElementType>
-    TensorLayoutBase<ElementType, Dimension::channel, Dimension::column, Dimension::row>::TensorLayoutBase(size_t numRows, size_t numColumns, size_t numChannels)
-        : TensorBase(numRows, numColumns, numChannels, { numChannels, numColumns, numRows, numChannels, numChannels*numColumns })
-    {}
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>
+    {
+        using SliceType = MatrixReference<ElementType, MatrixLayout::columnMajor>;
+        using ConstSliceType = ConstMatrixReference<ElementType, MatrixLayout::columnMajor>;
+        
+        static SliceType GetSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            return GetSlice<SliceType>(contents, index);
+        }
 
+        static ConstSliceType GetConstSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            return GetSlice<SliceType>(contents, index);
+        }
+
+    private:
+        template <typename ReturnType>
+        static ReturnType GetSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            DEBUG_THROW(index >= contents.layoutShape[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+
+            return ReturnType(contents.layoutShape[0], contents.layoutShape[1], contents.increments[0], contents.pData + index * contents.increments[1]);
+        }
+    };
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension2>
+    {
+        using SliceType = MatrixReference<ElementType, MatrixLayout::columnMajor>;
+        using ConstSliceType = ConstMatrixReference<ElementType, MatrixLayout::columnMajor>;
+
+        static SliceType GetSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            return GetSlice<SliceType>(contents, index);
+        }
+
+        static ConstSliceType GetConstSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            return GetSlice<SliceType>(contents, index);
+        }
+
+    private:
+        template <typename ReturnType>
+        static ReturnType GetSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            DEBUG_THROW(index >= contents.layoutShape[1], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+
+            return ReturnType(contents.layoutShape[0], contents.layoutShape[2], contents.increments[1], contents.pData + index * contents.increments[0]);
+        }
+
+    };
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension1, dimension0>
+    {
+        using SliceType = MatrixReference<ElementType, MatrixLayout::rowMajor>;
+        using ConstSliceType = ConstMatrixReference<ElementType, MatrixLayout::rowMajor>;
+
+        static SliceType GetSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            return GetSlice<SliceType>(contents, index);
+        }
+
+        static ConstSliceType GetConstSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            return GetSlice<SliceType>(contents, index);
+        }
+
+    private:
+        template <typename ReturnType>
+        static ReturnType GetSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            DEBUG_THROW(index >= contents.layoutShape[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+
+            return ReturnType(contents.layoutShape[1], contents.layoutShape[0], contents.increments[0], contents.pData + index * contents.increments[1]);
+        }
+    };
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension2, dimension0>
+    {
+        using SliceType = MatrixReference<ElementType, MatrixLayout::rowMajor>;
+        using ConstSliceType = MatrixReference<ElementType, MatrixLayout::rowMajor>;
+        
+        static SliceType GetSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            return GetSlice<SliceType>(contents, index);
+        }
+
+        static ConstSliceType GetConstSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            return GetSlice<SliceType>(contents, index);
+        }
+
+    private:
+        template <typename ReturnType>
+        static ReturnType GetSlice(const TensorContents<ElementType>& contents, size_t index)
+        {
+            DEBUG_THROW(index >= contents.layoutShape[1], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+
+            return ReturnType(contents.layoutShape[2], contents.layoutShape[0], contents.increments[1], contents.pData + index * contents.increments[0]);
+        }
+    };
+    
     //
     // ConstTensorReference
     // 
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ConstTensorReference(Triplet shape)
+    {
+        _contents.layoutShape = TensorLayoutT::CanonicalToLayout(shape);
+        _contents.increments[0] = _contents.layoutShape[0];
+        _contents.increments[1] = _contents.layoutShape[0] * _contents.layoutShape[1];
+        _contents.pData = nullptr;
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::NumElements() const
+    {
+        return _contents.layoutShape[0] * _contents.layoutShape[1] * _contents.layoutShape[2];
+    }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ElementType ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::operator()(size_t row, size_t column, size_t channel) const
     {
-        DEBUG_THROW(row >= _numRows || column >= _numColumns || channel >= _numChannels, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
-
-        return _pData[row * _rowIncrement + column * _columnIncrement + channel * _channelIncrement];
+        return operator()({ row, column, channel });
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    ConstMatrixReference<ElementType, MatrixLayout::rowMajor> ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::FlattenFirstDimension() const
+    ElementType ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::operator()(Triplet coordinate) const
     {
-        return ConstMatrixReference<ElementType, MatrixLayout::rowMajor>(_layout.size2, _layout.size0 * _layout.size1, _layout.increment2, _pData);
+        return _contents.pData[this->GetOffset(coordinate)];
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    ConstVectorReference<ElementType, VectorOrientation::row> ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ReferenceAsVector() const
+    {
+        DEBUG_THROW(_contents.layoutShape[0] != _contents.increments[0] || _contents.layoutShape[0]*_contents.layoutShape[1] != _contents.increments[1], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when alll the dimensions are full"));
+
+        return ConstVectorReference<ElementType, VectorOrientation::row>(_contents.pData, NumElements(), 1);
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    ConstMatrixReference<ElementType, MatrixLayout::rowMajor> ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ReferenceAsMatrix() const
+    {
+        DEBUG_THROW(_contents.layoutShape[0] != _contents.increments[0], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when the first dimension is full"));
+
+        return ConstMatrixReference<ElementType, MatrixLayout::rowMajor>(_contents.layoutShape[2], _contents.layoutShape[0] * _contents.layoutShape[1], _contents.increments[1], _contents.pData);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     template<Dimension rowDimension, Dimension columnDimension>
     auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index) const
     {
-        return ConstTensorSlicer<rowDimension, columnDimension>::GetSlice(_layout, index, _pData);
+        return TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::GetConstSlice(_contents, index);
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index) const
+    {
+        return TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::GetConstSlice(_contents, index);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ConstTensorReference<ElementType, dimension0, dimension1, dimension2> ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetSubTensor(size_t firstRow, size_t firstColumn, size_t firstChannel, size_t numRows, size_t numColumns, size_t numChannels) const
     {
-        DEBUG_THROW(firstRow+numRows >= _numRows || firstColumn+numColumns >= _numColumns || firstChannel+numChannels >= _numChannels, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subtensor exceeds tensor dimensions."));
+        return GetSubTensor({ firstRow, firstColumn, firstChannel }, { numRows, numColumns, numChannels });
+    }
 
-        size_t offset = firstRow * _rowIncrement + firstColumn * _columnIncrement + firstChannel * _channelIncrement;
-        return ConstTensorReference(numRows,
-            numColumns,
-            numChannels,
-            _layout,
-            _pData + offset);
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    ConstTensorReference<ElementType, dimension0, dimension1, dimension2> ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetSubTensor(Triplet firstCoordinate, Triplet shape) const
+    {
+        DEBUG_THROW(firstCoordinate[0]+shape[0] > NumRows() || firstCoordinate[1]+shape[1] > NumColumns() || firstCoordinate[2]+shape[2] > NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subtensor exceeds tensor dimensions."));
+
+        return ConstTensorReference({ TensorLayoutT::CanonicalToLayout(shape), _contents.increments, _contents.pData + this->GetOffset(firstCoordinate) });
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ConstTensorReference(TensorContents<ElementType> contents)
+        : _contents(std::move(contents))
+    {
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetOffset(Triplet coordinate) const
+    {
+        auto layoutCoordinate = TensorLayoutT::CanonicalToLayout(coordinate);
+        DEBUG_THROW(layoutCoordinate[0] >= _contents.layoutShape[0] || layoutCoordinate[1] >= _contents.layoutShape[1] || layoutCoordinate[2] >= _contents.layoutShape[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+        return layoutCoordinate[0] + layoutCoordinate[1] * _contents.increments[0] + layoutCoordinate[2] * _contents.increments[1];
     }
 
     //
@@ -81,42 +220,71 @@ namespace math
     // 
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    TensorReference<ElementType, dimension0, dimension1, dimension2>::TensorReference(size_t numRows, size_t numColumns, size_t numChannels) 
-        : ConstTensorRef(numRows, numColumns, numChannels)
-    {}
-
-    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ElementType& TensorReference<ElementType, dimension0, dimension1, dimension2>::operator()(size_t row, size_t column, size_t channel)
     {
-        DEBUG_THROW(row >= _numRows || column >= _numColumns || channel >= _numChannels, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
-
-        return _pData[row * _rowIncrement + column * _columnIncrement + channel * _channelIncrement];
+        return operator()({ row, column, channel });
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    MatrixReference<ElementType, MatrixLayout::rowMajor> TensorReference<ElementType, dimension0, dimension1, dimension2>::FlattenFirstDimension()
+    ElementType& TensorReference<ElementType, dimension0, dimension1, dimension2>::operator()(Triplet coordinate)
     {
-        return MatrixReference<ElementType, MatrixLayout::rowMajor>(_layout.size2, _layout.size0 * _layout.size1, _layout.increment2, _pData);
+        return _contents.pData[this->GetOffset(coordinate)];
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    MatrixReference<ElementType, MatrixLayout::rowMajor> TensorReference<ElementType, dimension0, dimension1, dimension2>::ReferenceAsMatrix()
+    {
+        DEBUG_THROW(_contents.layoutShape[0] != _contents.increments[0], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when the first dimension is full"));
+
+        return MatrixReference<ElementType, MatrixLayout::rowMajor>(_contents.layoutShape[2], _contents.layoutShape[0] * _contents.layoutShape[1], _contents.increments[1], _contents.pData);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     template<Dimension rowDimension, Dimension columnDimension>
     auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index)
     {
-        return TensorSlicer<rowDimension, columnDimension>::GetSlice(_layout, index, _pData);
+        return TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::GetSlice(_contents, index);
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index)
+    {
+        return TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::GetSlice(_contents, index);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     TensorReference<ElementType, dimension0, dimension1, dimension2> TensorReference<ElementType, dimension0, dimension1, dimension2>::GetSubTensor(size_t firstRow, size_t firstColumn, size_t firstChannel, size_t numRows, size_t numColumns, size_t numChannels)
     {
-        DEBUG_THROW(firstRow + numRows >= _numRows || firstColumn + numColumns >= _numColumns || firstChannel + numChannels >= _numChannels, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subtensor exceeds tensor dimensions."));
+        return GetSubTensor({ firstRow, firstColumn, firstChannel }, { numRows, numColumns, numChannels });
+    }
 
-        size_t offset = firstRow * _rowIncrement + firstColumn * _columnIncrement + firstChannel * _channelIncrement;
-        return TensorReference(numRows,
-            numColumns,
-            numChannels,
-            _layout,
-            _pData + offset);
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    TensorReference<ElementType, dimension0, dimension1, dimension2> TensorReference<ElementType, dimension0, dimension1, dimension2>::GetSubTensor(Triplet firstCoordinate, Triplet shape)
+    {
+        DEBUG_THROW(firstCoordinate[0] + shape[0] > this->NumRows() || firstCoordinate[1] + shape[1] > this->NumColumns() || firstCoordinate[2] + shape[2] > this->NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subtensor exceeds tensor dimensions."));
+
+        return TensorReference({ TensorLayoutT::CanonicalToLayout(shape), _contents.increments, _contents.pData + this->GetOffset(firstCoordinate) });
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    void TensorReference<ElementType, dimension0, dimension1, dimension2>::Fill(ElementType value)
+    {
+        for (size_t i = 0; i < _contents.layoutShape[2]; ++i)
+        {
+            auto slice = GetPrimarySlice(i);
+            slice.Fill(value);
+        }
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <typename GeneratorType>
+    void TensorReference<ElementType, dimension0, dimension1, dimension2>::Generate(GeneratorType generator)
+    {
+        for (size_t i = 0; i < _contents.layoutShape[2]; ++i)
+        {
+            auto slice = GetPrimarySlice(i);
+            slice.Generate(generator);
+        }
     }
 
     //
@@ -125,28 +293,35 @@ namespace math
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(size_t numRows, size_t numColumns, size_t numChannels) 
-        : TensorRef(numRows, numColumns, numChannels), _data(numRows*numColumns*numChannels)
+        : Tensor(Triplet{ numRows, numColumns, numChannels }) 
     {
-        _pData = _data.data();
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(Triplet shape)
+        : TensorRef(shape), _data(shape[0] * shape[1] * shape[2])
+    {
+        _contents.pData = _data.data();
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(const Tensor<ElementType, dimension0, dimension1, dimension2>& other) 
         : TensorRef(other), _data(other._data)
     {
-        _pData = _data.data();
+        _contents.pData = _data.data();
     }
+
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
     Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other)
-        : TensorRef(other.NumRows(), other.NumColumns(), other.NumChannels()), _data(other.NumRows() * other.NumColumns() * other.NumChannels())
+        : TensorRef(Triplet{ other.NumRows(), other.NumColumns(), other.NumChannels() }), _data(other.NumElements())
     {
-        _pData = _data.data();
-        for (size_t i = 0; i < _numRows; ++i)
+        _contents.pData = _data.data();
+        for (size_t i = 0; i < this->NumRows(); ++i)
         {
-            for (size_t j = 0; j < _numColumns; ++j)
+            for (size_t j = 0; j < this->NumColumns(); ++j)
             {
-                for (size_t k = 0; k < _numChannels; ++k)
+                for (size_t k = 0; k < this->NumChannels(); ++k)
                 {
                     (*this)(i, j, k) = other(i, j, k);
                 }

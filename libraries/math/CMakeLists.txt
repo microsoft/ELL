@@ -55,12 +55,20 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 set (test_name ${library_name}_test)
 
 set (test_src test/src/main.cpp)
-set (test_include )
+
+set (test_include test/include/Matrix_test.h
+                  test/include/Tensor_test.h
+                  test/include/Vector_test.h)
+
+set (test_tcc test/tcc/Matrix_test.tcc
+              test/tcc/Tensor_test.tcc
+              test/tcc/Vector_test.tcc)
 
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
+source_group("tcc" FILES ${test_tcc})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include})
+add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
 target_link_libraries(${test_name} math testing)
 copy_shared_libraries(${test_name})
