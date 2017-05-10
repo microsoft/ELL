@@ -230,7 +230,7 @@ void TestMatrixOperations()
         { 1, 2 },
         { 3, 3 }
     };
-    testing::ProcessTest(implementationName + "Operations::Add(MatrixReference, scalar)", M == R0);
+    testing::ProcessTest(implementationName + "Operations::Add(scalar, MatrixReference)", M == R0);
 
     Ops::Multiply(static_cast<ElementType>(2), M);
     math::Matrix<ElementType, math::MatrixLayout::columnMajor> R1{
@@ -238,7 +238,7 @@ void TestMatrixOperations()
         { 2, 4 },
         { 6, 6 }
     };
-    testing::ProcessTest(implementationName + "Operations::Add(MatrixReference, scalar)", M == R1);
+    testing::ProcessTest(implementationName + "Operations::Add(scalar, MatrixReference)", M == R1);
 
     math::Matrix<ElementType, Layout> R2{
         { 0, 2 },
@@ -247,6 +247,100 @@ void TestMatrixOperations()
     };
     Ops::Copy(R2, M);
     testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R2);
+}
+
+
+template <typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
+void TestContiguousMatrixOperations()
+{
+    auto implementationName = math::OperationsImplementation<Implementation>::GetImplementationName();
+    using Ops = math::OperationsImplementation<Implementation>;
+
+    math::Matrix<ElementType, Layout> M{
+        { 1, 0 },
+        { 0, 1 },
+        { 2, 2 }
+    };
+
+    // Add to entire matrix (contiguous)
+    Ops::Add(static_cast<ElementType>(1), M);
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R1{
+        { 2, 1 },
+        { 1, 2 },
+        { 3, 3 }
+    };
+    testing::ProcessTest(implementationName + "Operations::Add(scalar, MatrixReference)", M == R1);
+
+    // Add to block (contiguous in one orientation and noncontiguous in another)
+    Ops::Add(static_cast<ElementType>(1), M.GetSubMatrix(0, 0, 2, 2));
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R2{
+        { 3, 2 },
+        { 2, 3 },
+        { 3, 3 }
+    };
+    testing::ProcessTest(implementationName + "Operations::Add(scalar, MatrixReference)", M == R2);
+
+    // Add to block (contiguous in both orientaitons)
+    Ops::Add(static_cast<ElementType>(1), M.GetSubMatrix(1, 0, 2, 1));
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R3{
+        { 3, 2 },
+        { 3, 3 },
+        { 4, 3 }
+    };
+    testing::ProcessTest(implementationName + "Operations::Add(scalar, MatrixReference)", M == R3);
+
+    math::Matrix<ElementType, Layout> A1{
+        { 0, 1 },
+        { 2, 3 },
+        { 4, 5 }
+    };
+    Ops::Copy(A1, M);
+    testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == A1);
+
+    math::Matrix<ElementType, Layout> A2{
+        { 1 },
+        { 3 }
+    };
+
+    Ops::Copy(A2, M.GetSubMatrix(1, 0, 2, 1));
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R4{
+        { 0, 1 },
+        { 1, 3 },
+        { 3, 5 }
+    };
+    testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R4);
+
+    Ops::Multiply(static_cast<ElementType>(2.0), M);
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R5{
+        { 0, 2 },
+        { 2, 6 },
+        { 6, 10 }
+    };
+    testing::ProcessTest(implementationName + "Operations::Multiply(scalar, MatrixReference)", M == R5);
+
+    Ops::Multiply(static_cast<ElementType>(2.0), M.GetSubMatrix(1, 0, 2, 1));
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R6{
+        { 0, 2 },
+        { 4, 6 },
+        { 12, 10 }
+    };
+    testing::ProcessTest(implementationName + "Operations::Multiply(scalar, MatrixReference)", M == R6);
+
+    Ops::MultiplyAdd(static_cast<ElementType>(0.5), static_cast<ElementType>(1), M);
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R7{
+        { 1, 2 },
+        { 3, 4 },
+        { 7, 6 }
+    };
+    testing::ProcessTest(implementationName + "Operations::MultiplyAdd(scalar, scalar, MatrixReference)", M == R7);
+
+    Ops::MultiplyAdd(static_cast<ElementType>(2), static_cast<ElementType>(-1), M.GetSubMatrix(1, 0, 2, 1));
+    math::Matrix<ElementType, math::MatrixLayout::columnMajor> R8{
+        { 1, 2 },
+        { 5, 4 },
+        { 13, 6 }
+    };
+    testing::ProcessTest(implementationName + "Operations::MultiplyAdd(scalar, scalar, MatrixReference)", M == R8);
 }
 
 template <typename ElementType, math::MatrixLayout Layout>

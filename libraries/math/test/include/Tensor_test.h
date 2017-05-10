@@ -24,4 +24,13 @@ void TestTensorReferenceAsMatrix();
 template<typename ElementType>
 void TestGetSubTensorAndReferenceAsMatrix();
 
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorVectorAdd();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorVectorMultiply();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorVectorMultiplyAdd();
+
 #include "../tcc/Tensor_test.tcc"

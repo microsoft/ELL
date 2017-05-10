@@ -86,6 +86,7 @@ namespace utilities
         indexOutOfRange,
         invalidArgument,
         nullReference,
+        sizeMismatch,
         typeMismatch
     };
 

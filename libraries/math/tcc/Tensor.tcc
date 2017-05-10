@@ -159,6 +159,39 @@ namespace math
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
+    bool ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::IsEqual(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other, ElementType tolerance) const
+    {
+        if (NumRows() != other.NumRows() || NumColumns() != other.NumColumns() || NumChannels() != other.NumChannels())
+        {
+            return false;
+        }
+
+        for (size_t i = 0; i < NumRows(); ++i)
+        {
+            for (size_t j = 0; j < NumColumns(); ++j)
+            {
+                for (size_t k = 0; k < NumChannels(); ++k)
+                {
+                    auto diff = (*this)(i, j, k) - other(i, j, k);
+                    if (diff > tolerance || -diff > tolerance)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
+    bool ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::operator==(const ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2>& other) const
+    {
+        return IsEqual(other);
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ConstVectorReference<ElementType, VectorOrientation::row> ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ReferenceAsVector() const
     {
         DEBUG_THROW(_contents.layoutShape[0] != _contents.increments[0] || _contents.layoutShape[0]*_contents.layoutShape[1] != _contents.increments[1], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when alll the dimensions are full"));
@@ -328,5 +361,36 @@ namespace math
             }
         }
     }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(std::initializer_list<std::initializer_list<std::initializer_list<ElementType>>> list)
+        : TensorRef(Triplet{ list.size(), list.begin()->size(), list.begin()->begin()->size() }), _data(list.size() * list.begin()->size() * list.begin()->begin()->size())
+    {
+        _contents.pData = _data.data();
+        auto numColumns = list.begin()->size();
+        auto numChannels = list.begin()->begin()->size();
+
+        size_t i = 0;
+        for (auto rowIter = list.begin(); rowIter < list.end(); ++rowIter)
+        {
+            DEBUG_THROW(rowIter->size() != numColumns, utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
+
+            size_t j = 0;
+            for (auto columnIter = rowIter->begin(); columnIter < rowIter->end(); ++columnIter)
+            {
+                DEBUG_THROW(columnIter->size() != numChannels, utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
+
+                size_t k = 0;
+                for (auto channelIter = columnIter->begin(); channelIter < columnIter->end(); ++channelIter)
+                {
+                    (*this)(i, j, k) = *channelIter;
+                    ++k;
+                }
+                ++j;
+            }
+            ++i;
+        }
+    }
+
 }
 }

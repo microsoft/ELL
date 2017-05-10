@@ -26,6 +26,9 @@ void TestMatrixReference();
 template <typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
 void TestMatrixOperations();
 
+template <typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
+void TestContiguousMatrixOperations();
+
 template <typename ElementType, math::MatrixLayout Layout>
 void TestConstMatrixReference();
 
@@ -34,14 +37,5 @@ void TestMatrixMatrixAdd();
 
 template <typename ElementType, math::MatrixLayout LayoutA, math::MatrixLayout LayoutB, math::ImplementationType Implementation>
 void TestMatrixMatrixMultiply();
-
-
-
-
-
-
-
-
-
 
 #include "../tcc/Matrix_test.tcc"

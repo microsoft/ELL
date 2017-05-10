@@ -123,6 +123,11 @@ namespace math
         /// <returns> The number of channels. </returns>
         size_t NumChannels() const { return _contents.layoutShape[TensorLayoutT::channelPosition]; }
 
+        /// <summary> Gets the three sizes that make up the tensor's layout shape. </summary>
+        ///
+        /// <returns> The layout shape. </returns>
+        Triplet GetLayoutShape() const { return _contents.layoutShape; }
+
         /// <summary> Element access operator. </summary>
         ///
         /// <param name="row"> The row. </param>
@@ -139,8 +144,24 @@ namespace math
         /// <returns> A copy of a tensor element. </returns>
         ElementType operator()(Triplet coordinate) const;
 
-        /// <summary> Flattens a tensor into a row vector. Works only when the tensor dimensions are full 
-        /// (namely, not a subtensor). </summary>
+        /// <summary> Determines if two tensors are equal. </summary>
+        ///
+        /// <param name="other"> The other tensor. </param>
+        /// <param name="tolerance"> The element comparison tolerance. </param>
+        ///
+        /// <returns> true if the two tensors are equivalent. </returns>
+        template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
+        bool IsEqual(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other, ElementType tolerance = 1.0e-8) const;
+
+        /// <summary> Equality operator for tensors. </summary>
+        ///
+        /// <param name="other"> The other tensor. </param>
+        ///
+        /// <returns> true if the two tensors are equivalent. </returns>
+        template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
+        bool operator==(const ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2>& other) const;
+
+        /// <summary> Flattens a tensor into a row vector. Works only when the tensor dimensions are full </summary>
         ///
         /// <returns> A ConstVectorReference that which includes all of the tensor elements. </returns>
         ConstVectorReference<ElementType, VectorOrientation::row> ReferenceAsVector() const;
@@ -351,7 +372,12 @@ namespace math
         /// <param name="other"> The other tensor. </param>
         template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
         Tensor(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other);
-    
+
+        /// <summary> Constructs a tensor from a triply nested initializer list, given in canonical order. </summary>
+        ///
+        /// <param name="list"> A triply nested initalizer list. </param>
+        Tensor(std::initializer_list<std::initializer_list<std::initializer_list<ElementType>>> list);
+
     private:
         // abbreviation
         using ConstTensorRef = ConstTensorReference<ElementType, dimension0, dimension1, dimension2>;

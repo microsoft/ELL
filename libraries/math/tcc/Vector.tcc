@@ -112,7 +112,7 @@ namespace math
     }
 
     template <typename ElementType, VectorOrientation Orientation>
-    bool ConstVectorReference<ElementType, Orientation>::operator==(const ConstVectorReference<ElementType, Orientation>& other) const
+    bool ConstVectorReference<ElementType, Orientation>::IsEqual(ConstVectorReference<ElementType, Orientation> other, ElementType tolerance) const
     {
         if (_size != other._size)
         {
@@ -125,7 +125,9 @@ namespace math
 
         while (pThis < pThisEnd)
         {
-            if ((*pThis) != (*pOther))
+            auto diff = (*pThis) - (*pOther);
+
+            if(diff > tolerance || -diff > tolerance)
             {
                 return false;
             }
@@ -133,6 +135,12 @@ namespace math
             pOther += other._increment;
         }
         return true;
+    }
+
+    template <typename ElementType, VectorOrientation Orientation>
+    bool ConstVectorReference<ElementType, Orientation>::operator==(const ConstVectorReference<ElementType, Orientation>& other) const
+    {
+        return IsEqual(other);
     }
 
     template <typename ElementType, VectorOrientation Orientation>
@@ -259,7 +267,7 @@ namespace math
     template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator+=(ConstVectorReference<ElementType, Orientation> other)
     {
-        Operations::Add(1.0, other, *this);
+        Operations::Add(static_cast<ElementType>(1.0), other, *this);
     }
 
     template <typename ElementType, VectorOrientation Orientation>
@@ -271,7 +279,7 @@ namespace math
     template <typename ElementType, VectorOrientation Orientation>
     void VectorReference<ElementType, Orientation>::operator-=(ConstVectorReference<ElementType, Orientation> other)
     {
-        Operations::Add(-1.0, other, *this);
+        Operations::Add(static_cast<ElementType>(-1.0), other, *this);
     }
 
     template <typename ElementType, VectorOrientation Orientation>
@@ -297,7 +305,7 @@ namespace math
     {
         DEBUG_THROW(value == 0, utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "divide by zero"));
 
-        Operations::Multiply(1.0 / value, *this);
+        Operations::Multiply(static_cast<ElementType>(1.0) / value, *this);
     }
 
     template <typename ElementType, VectorOrientation Orientation>

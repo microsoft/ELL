@@ -17,6 +17,7 @@ set (include include/BlasWrapper.h
              include/Operations.h
              include/Print.h
              include/Tensor.h
+             include/TensorOperations.h
              include/Vector.h
 )
 
@@ -24,6 +25,7 @@ set (tcc tcc/Matrix.tcc
          tcc/Operations.tcc
          tcc/Print.tcc
          tcc/Tensor.tcc
+         tcc/TensorOperations.tcc
          tcc/Vector.tcc
 )
 

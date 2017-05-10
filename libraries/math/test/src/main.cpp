@@ -67,6 +67,15 @@ int main()
     TestMatrixOperations<double, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
     TestMatrixOperations<double, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
 
+    TestContiguousMatrixOperations<float, math::MatrixLayout::rowMajor, math::ImplementationType::native>();
+    TestContiguousMatrixOperations<float, math::MatrixLayout::columnMajor, math::ImplementationType::native>();
+    TestContiguousMatrixOperations<double, math::MatrixLayout::rowMajor, math::ImplementationType::native>();
+    TestContiguousMatrixOperations<double, math::MatrixLayout::columnMajor, math::ImplementationType::native>();
+    TestContiguousMatrixOperations<float, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
+    TestContiguousMatrixOperations<float, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
+    TestContiguousMatrixOperations<double, math::MatrixLayout::rowMajor, math::ImplementationType::openBlas>();
+    TestContiguousMatrixOperations<double, math::MatrixLayout::columnMajor, math::ImplementationType::openBlas>();
+
     TestConstMatrixReference<float, math::MatrixLayout::rowMajor>();
     TestConstMatrixReference<float, math::MatrixLayout::rowMajor>();
     TestConstMatrixReference<double, math::MatrixLayout::columnMajor>();
@@ -110,6 +119,21 @@ int main()
 
     TestGetSubTensorAndReferenceAsMatrix<double>();
     TestGetSubTensorAndReferenceAsMatrix<float>();
+
+    TestTensorVectorAdd<double, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
+    TestTensorVectorAdd<double, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
+    TestTensorVectorAdd<float, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
+    TestTensorVectorAdd<float, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
+
+    TestTensorVectorMultiply<double, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
+    TestTensorVectorMultiply<double, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
+    TestTensorVectorMultiply<float, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
+    TestTensorVectorMultiply<float, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
+
+    TestTensorVectorMultiplyAdd<double, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
+    TestTensorVectorMultiplyAdd<double, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
+    TestTensorVectorMultiplyAdd<float, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
+    TestTensorVectorMultiplyAdd<float, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
 
     if (testing::DidTestFail())
     {

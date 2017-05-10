@@ -58,6 +58,11 @@ namespace math
     //
     // ConstMatrixReference
     //
+    template<typename ElementType, MatrixLayout Layout>
+    bool ConstMatrixReference<ElementType, Layout>::IsContiguous() const
+    {
+        return (_increment == _intervalSize);
+    }
 
     template <typename ElementType, MatrixLayout Layout>
     ElementType ConstMatrixReference<ElementType, Layout>::operator()(size_t rowIndex, size_t columnIndex) const
@@ -104,14 +109,16 @@ namespace math
         return ConstVectorReference<ElementType, VectorOrientation::column>(_pData, size, _increment + 1);
     }
 
-    template <typename ElementType, MatrixLayout Layout>
-    auto ConstMatrixReference<ElementType, Layout>::GetMajorVector(size_t index) const
+    template<typename ElementType, MatrixLayout Layout>
+    ConstVectorReference<ElementType, VectorOrientation::column> ConstMatrixReference<ElementType, Layout>::ReferenceAsVector() const
     {
-        return ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
+        DEBUG_THROW(_increment != _intervalSize, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only flatten a matrix when its memory is contiguous"));
+
+        return ConstVectorReference<ElementType, VectorOrientation::column>(_pData, _numRows * _numColumns, 1);
     }
 
     template <typename ElementType, MatrixLayout Layout>
-    bool ConstMatrixReference<ElementType, Layout>::operator==(const ConstMatrixReference<ElementType, Layout>& other) const
+    bool ConstMatrixReference<ElementType, Layout>::IsEqual(ConstMatrixReference<ElementType, Layout> other, ElementType tolerance) const
     {
         if (NumRows() != other.NumRows() || NumColumns() != other.NumColumns())
         {
@@ -120,7 +127,7 @@ namespace math
 
         for (size_t i = 0; i < NumIntervals(); ++i)
         {
-            if (GetMajorVector(i) != other.GetMajorVector(i))
+            if (!GetMajorVector(i).IsEqual(other.GetMajorVector(i), tolerance))
             {
                 return false;
             }
@@ -129,7 +136,7 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout Layout>
-    bool ConstMatrixReference<ElementType, Layout>::operator==(const ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>& other) const
+    bool ConstMatrixReference<ElementType, Layout>::IsEqual(ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout> other, ElementType tolerance) const
     {
         if (NumRows() != other.NumRows() || NumColumns() != other.NumColumns())
         {
@@ -138,14 +145,26 @@ namespace math
 
         for (size_t i = 0; i < NumRows(); ++i)
         {
-            if (GetRow(i) != other.GetRow(i))
+            if (!GetRow(i).IsEqual(other.GetRow(i), tolerance))
             {
                 return false;
             }
         }
         return true;
     }
-    
+
+    template <typename ElementType, MatrixLayout Layout>
+    bool ConstMatrixReference<ElementType, Layout>::operator==(const ConstMatrixReference<ElementType, Layout>& other) const
+    {
+        return IsEqual(other);
+    }
+
+    template <typename ElementType, MatrixLayout Layout>
+    bool ConstMatrixReference<ElementType, Layout>::operator==(const ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>& other) const
+    {
+        return IsEqual(other);
+    }
+
     template <typename ElementType, MatrixLayout Layout>
     template <MatrixLayout OtherLayout>
     bool ConstMatrixReference<ElementType, Layout>::operator!=(const ConstMatrixReference<ElementType, OtherLayout>& other)
@@ -253,6 +272,14 @@ namespace math
         return VectorReference<ElementType, VectorOrientation::column>(_pData, size, _increment + 1);
     }
 
+    template<typename ElementType, MatrixLayout Layout>
+    VectorReference<ElementType, VectorOrientation::column> MatrixReference<ElementType, Layout>::ReferenceAsVector()
+    {
+        DEBUG_THROW(_increment != _intervalSize, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only flatten a matrix when its memory is contiguous"));
+
+        return VectorReference<ElementType, VectorOrientation::column>(_pData, _numRows * _numColumns, 1);
+    }
+
     //
     // Matrix
     //
@@ -269,11 +296,12 @@ namespace math
         : MatrixReference<ElementType, Layout>(list.size(), list.begin()->size(), nullptr), _data(list.size() * list.begin()->size())
     {
         _pData = _data.data();
+        auto numColumns = list.begin()->size();
 
         size_t i = 0;
         for (auto rowIter = list.begin(); rowIter < list.end(); ++rowIter)
         {
-            // check that the length of the row is the same as NumColumns();
+            DEBUG_THROW(rowIter->size() != numColumns, utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "incorrect number of elements in initializer list"));
 
             size_t j = 0;
             for (auto elementIter = rowIter->begin(); elementIter < rowIter->end(); ++elementIter)
@@ -312,6 +340,8 @@ namespace math
     {
         _pData = _data.data();
     }
+
+    // TODO missing copy ctor from reference to same layout
 
     template <typename ElementType, MatrixLayout Layout>
     Matrix<ElementType, Layout>::Matrix(ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout> other)

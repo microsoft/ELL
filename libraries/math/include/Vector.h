@@ -158,6 +158,14 @@ namespace math
             return ConstVectorReference<ElementType, VectorBase<Orientation>::transposeOrientation>(_pData, _size, _increment);
         }
 
+        /// <summary> Check vector equality. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        /// <param name="tolerance"> The element comparison tolerance. </param>
+        ///
+        /// <returns> true if the vectors are considered equivalent. </returns>
+        bool IsEqual(ConstVectorReference<ElementType, Orientation> other, ElementType tolerance=1.0e-8) const;
+
         /// <summary> Equality operator. </summary>
         ///
         /// <param name="other"> The other vector. </param>

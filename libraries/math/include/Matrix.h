@@ -149,6 +149,11 @@ namespace math
         /// <returns> The number of columns. </returns>
         size_t NumIntervals() const { return _numIntervals; }
 
+        /// <summary> Determines of this Matrix is stored in contiguous memory. </summary>
+        ///
+        /// <returns> True if contiguous, false if not. </returns>
+        bool IsContiguous() const;
+
         /// <summary> Matrix element access operator. </summary>
         ///
         /// <returns> A copy of the element in a given position. </returns>
@@ -198,7 +203,32 @@ namespace math
         /// <param name="index"> The interval index. </param>
         ///
         /// <returns> Constant reference to the interval. </returns>
-        auto GetMajorVector(size_t index) const;
+        auto GetMajorVector(size_t index) const
+        {
+            // STYLE intentional deviation from project style
+            return ConstVectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
+        }
+
+        /// <summary> Returns a vew of this matrix as a vector reference (requires the matrix to be contiguous). </summary>
+        ///
+        /// <returns> A ConstVectorReference. </returns>
+        ConstVectorReference<ElementType, VectorOrientation::column> ReferenceAsVector() const;
+
+        /// <summary> Determines if two matrices with the same layout are equal. </summary>
+        ///
+        /// <param name="other"> The other matrix. </param>
+        /// <param name="tolerance"> The element comparison tolerance. </param>
+        ///
+        /// <returns> true if the two matrices are equivalent. </returns>
+        bool IsEqual(ConstMatrixReference<ElementType, Layout> other, ElementType tolerance = 1.0e-8) const;
+
+        /// <summary> Determines if two matrices with opposite layouts are equal. </summary>
+        ///
+        /// <param name="other"> The other matrix. </param>
+        /// <param name="tolerance"> The element comparison tolerance. </param>
+        ///
+        /// <returns> true if the two matrices are equivalent. </returns>
+        bool IsEqual(ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout> other, ElementType tolerance = 1.0e-8) const;
 
         /// <summary> Equality operator for matrices with the same layout. </summary>
         ///
@@ -335,13 +365,19 @@ namespace math
         /// <returns> A const reference to the matrix diagnoal. </returns>
         VectorReference<ElementType, VectorOrientation::column> GetDiagonal();
 
+        /// <summary> Returns a vew of this matrix as a vector reference (requires the matrix to be contiguous). </summary>
+        ///
+        /// <returns> A VectorReference. </returns>
+        VectorReference<ElementType, VectorOrientation::column> ReferenceAsVector();
+
         /// <summary> Gets a reference to a row of a row major matrix or to a column of a column major matrix. </summary>
         ///
         /// <param name="index"> The interval index. </param>
         ///
         /// <returns> Reference to the interval. </returns>
-        auto GetMajorVector(size_t index) -> VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>
+        auto GetMajorVector(size_t index)
         {
+            // STYLE intentional deviation from project style
             return VectorReference<ElementType, MatrixBase<ElementType, Layout>::_intervalOrientation>(GetMajorVectorBegin(index), _intervalSize, 1);
         }
 

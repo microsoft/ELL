@@ -33,16 +33,36 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     void CommonOperations::Add(ElementType s, MatrixReference<ElementType, Layout> M)
     {
-        for (size_t i = 0; i < M.NumIntervals(); ++i)
+        if (M.IsContiguous())
         {
-            auto interval = M.GetMajorVector(i);
-            Add(s, interval);
+            Add(s, M.ReferenceAsVector());
+        }
+        else
+        {
+            for (size_t i = 0; i < M.NumIntervals(); ++i)
+            {
+                auto interval = M.GetMajorVector(i);
+                Add(s, interval);
+            }
         }
     }
 
     //
     // DerivedOperations
     //
+
+    template <class DerivedClass>
+    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+    void DerivedOperations<DerivedClass>::Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
+    {
+        DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
+
+        for (size_t i = 0; i < A.NumRows(); ++i)
+        {
+            DerivedClass::Add(s, A.GetRow(i), C.GetRow(i));
+            DerivedClass::Add(t, B.GetRow(i), C.GetRow(i));
+        }
+    }
 
     template <class DerivedClass>
     template <typename ElementType, MatrixLayout Layout>
@@ -53,11 +73,16 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Matrix dimensions are not the same size.");
         }
 
-        for (size_t i = 0; i < B.NumIntervals(); ++i)
+        if (A.IsContiguous() && B.IsContiguous())
         {
-            auto intervalA = A.GetMajorVector(i);
-            auto intervalB = B.GetMajorVector(i);
-            DerivedClass::Copy(intervalB, intervalA);
+            DerivedClass::Copy(B.ReferenceAsVector(), A.ReferenceAsVector());
+        }
+        else
+        {
+            for (size_t i = 0; i < B.NumIntervals(); ++i)
+            {
+                DerivedClass::Copy(B.GetMajorVector(i), A.GetMajorVector(i));
+            }
         }
     }
 
@@ -65,10 +90,16 @@ namespace math
     template <typename ElementType, MatrixLayout Layout>
     void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, Layout> M)
     {
-        for (size_t i = 0; i < M.NumIntervals(); ++i)
+        if (M.IsContiguous())
         {
-            auto interval = M.GetMajorVector(i);
-            DerivedClass::Multiply(s, interval);
+            DerivedClass::Multiply(s, M.ReferenceAsVector());
+        }
+        else
+        {
+            for (size_t i = 0; i < M.NumIntervals(); ++i)
+            {
+                DerivedClass::Multiply(s, M.GetMajorVector(i));
+            }
         }
     }
 
@@ -77,6 +108,42 @@ namespace math
     void DerivedOperations<DerivedClass>::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u)
     {
         DerivedClass::Multiply(s, M.Transpose(), v.Transpose(), t, u.Transpose());
+    }
+
+    template <class DerivedClass>
+    template <typename ElementType, VectorOrientation Orientation>
+    void DerivedOperations<DerivedClass>::MultiplyAdd(ElementType s, ElementType b, VectorReference<ElementType, Orientation> v)
+    {
+        if (b == 0)
+        {
+            DerivedClass::Multiply(s, v);
+        }
+        else
+        {
+            v.Transform([s, b](ElementType x) { return (s*x) + b; });
+        }
+    }
+
+    template <class DerivedClass>
+    template <typename ElementType, MatrixLayout Layout>
+    void DerivedOperations<DerivedClass>::MultiplyAdd(ElementType s, ElementType b, MatrixReference<ElementType, Layout> M)
+    {
+        if (b == 0)
+        {
+            DerivedClass::Multiply(s, M);
+        }
+        else if (M.IsContiguous())
+        {
+            MultiplyAdd(s, b, M.ReferenceAsVector());
+        }
+        else
+        {
+            for (size_t i = 0; i < M.NumIntervals(); ++i)
+            {
+                auto interval = M.GetMajorVector(i);
+                MultiplyAdd(s, b, interval);
+            }
+        }
     }
 
     template <class DerivedClass>
@@ -211,18 +278,6 @@ namespace math
         r = Dot(u, v);
     }
 
-    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-    void OperationsImplementation<ImplementationType::native>::Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
-    {
-        DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
-
-        for (size_t i = 0; i < A.NumRows(); ++i)
-        {
-            Add(s, A.GetRow(i), C.GetRow(i));
-            Add(t, B.GetRow(i), C.GetRow(i));
-        }
-    }
-
     template <typename ElementType, MatrixLayout Layout>
     void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u)
     {
@@ -282,7 +337,7 @@ namespace math
 
     template <typename ElementType, VectorOrientation Orientation>
     void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u)
-        {
+    {
         if (v.Size() != u.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors u and v are not the same size.");
@@ -313,19 +368,6 @@ namespace math
     {
         r = Dot(u, v);
     }
-
-    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-    void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
-    {
-        DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
-
-        for (size_t i = 0; i < A.NumRows(); ++i)
-        {
-            Add(s, A.GetRow(i), C.GetRow(i));
-            Add(t, B.GetRow(i), C.GetRow(i));
-        }
-    }
-
 
     template <typename ElementType, MatrixLayout Layout>
     void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u)

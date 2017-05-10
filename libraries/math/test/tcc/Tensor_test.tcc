@@ -8,6 +8,9 @@
 
 #include "Print.h"
 
+// math
+#include "TensorOperations.h"
+
 // utilities
 #include "testing.h"
 
@@ -237,3 +240,133 @@ void TestGetSubTensorAndReferenceAsMatrix()
 
     testing::ProcessTest("void TestGetSubTensorAndReferenceAsMatrix()", C2 == E2);
 }
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorVectorAdd()
+{
+    auto T = math::Tensor<ElementType, dimension0, dimension1, dimension2>(2, 3, 4);
+
+    auto v1 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2 };
+    math::TensorOperations::Add<math::Dimension::row>(v1, T);
+    auto R1 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 1,1,1,1 }, { 1,1,1,1 }, { 1,1,1,1 } },
+                                                                             { { 2,2,2,2 }, { 2,2,2,2 }, { 2,2,2,2 } } };
+    testing::ProcessTest("void TestTensorVectorAdd()", T == R1);
+
+    T.Fill(0);
+    auto v2 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2,3 };
+    math::TensorOperations::Add<math::Dimension::column>(v2, T);
+    auto R2 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 1,1,1,1 },{ 2,2,2,2 },{ 3,3,3,3 } },
+                                                                             { { 1,1,1,1 },{ 2,2,2,2 },{ 3,3,3,3 } } };
+    testing::ProcessTest("void TestTensorVectorAdd()", T == R2);
+
+    T.Fill(0);
+    auto v3 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2,3,4 };
+    math::TensorOperations::Add<math::Dimension::channel>(v3, T);
+    auto R3 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 1,2,3,4 },{ 1,2,3,4 },{ 1,2,3,4 } },
+                                                                             { { 1,2,3,4 },{ 1,2,3,4 },{ 1,2,3,4 } } };
+    testing::ProcessTest("void TestTensorVectorAdd()", T == R3);
+
+    // subtensors
+    auto TT = math::Tensor<ElementType, dimension0, dimension1, dimension2>(10, 10, 10);
+    auto TR = TT.GetSubTensor({ 5,3,1 }, {2,3,4});
+
+    TR.Fill(0);
+    math::TensorOperations::Add<math::Dimension::row>(v1, TR);
+    testing::ProcessTest("void TestTensorVectorAdd() with subtensor", TR == R1);
+
+    TR.Fill(0);
+    math::TensorOperations::Add<math::Dimension::column>(v2, TR);
+    testing::ProcessTest("void TestTensorVectorAdd() with subtensor", TR == R2);
+
+    TR.Fill(0);
+    math::TensorOperations::Add<math::Dimension::channel>(v3, TR);
+    testing::ProcessTest("void TestTensorVectorAdd() with subtensor", TR == R3);
+}
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorVectorMultiply()
+{
+    auto T = math::Tensor<ElementType, dimension0, dimension1, dimension2>(2, 3, 4);
+    T.Fill(1);
+    auto v1 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2 };
+    math::TensorOperations::Multiply<math::Dimension::row>(v1, T);
+    auto R1 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 1,1,1,1 },{ 1,1,1,1 },{ 1,1,1,1 } },
+    { { 2,2,2,2 },{ 2,2,2,2 },{ 2,2,2,2 } } };
+    testing::ProcessTest("void TestTensorVectorMultiply()", T == R1);
+
+    T.Fill(1);
+    auto v2 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2,3 };
+    math::TensorOperations::Multiply<math::Dimension::column>(v2, T);
+    auto R2 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 1,1,1,1 },{ 2,2,2,2 },{ 3,3,3,3 } },
+    { { 1,1,1,1 },{ 2,2,2,2 },{ 3,3,3,3 } } };
+    testing::ProcessTest("void TestTensorVectorMultiply()", T == R2);
+
+    T.Fill(1);
+    auto v3 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2,3,4 };
+    math::TensorOperations::Multiply<math::Dimension::channel>(v3, T);
+    auto R3 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 1,2,3,4 },{ 1,2,3,4 },{ 1,2,3,4 } },
+    { { 1,2,3,4 },{ 1,2,3,4 },{ 1,2,3,4 } } };
+    testing::ProcessTest("void TestTensorVectorMultiply()", T == R3);
+
+    // subtensors
+    auto TT = math::Tensor<ElementType, dimension0, dimension1, dimension2>(10, 10, 10);
+    auto TR = TT.GetSubTensor({ 5,3,1 }, { 2,3,4 });
+
+    TR.Fill(1);
+    math::TensorOperations::Multiply<math::Dimension::row>(v1, TR);
+    testing::ProcessTest("void TestTensorVectorMultiply() with subtensor", TR == R1);
+
+    TR.Fill(1);
+    math::TensorOperations::Multiply<math::Dimension::column>(v2, TR);
+    testing::ProcessTest("void TestTensorVectorMultiply() with subtensor", TR == R2);
+
+    TR.Fill(1);
+    math::TensorOperations::Multiply<math::Dimension::channel>(v3, TR);
+    testing::ProcessTest("void TestTensorVectoMultiply() with subtensor", TR == R3);
+}
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorVectorMultiplyAdd()
+{
+    auto T = math::Tensor<ElementType, dimension0, dimension1, dimension2>(2, 3, 4);
+    T.Fill(1);
+    auto s1 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2 };
+    auto b1 = math::Vector<ElementType, math::VectorOrientation::row>{ 3,4 };
+    math::TensorOperations::MultiplyAdd<math::Dimension::row>(s1, b1, T);
+    auto R1 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 4,4,4,4 },{ 4,4,4,4 },{ 4,4,4,4 } },
+                                                                             { { 6,6,6,6 },{ 6,6,6,6 },{ 6,6,6,6 } } };
+    testing::ProcessTest("void TestTensorVectorMultiplyAdd()", T == R1);
+
+    T.Fill(1);
+    auto s2 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2,3 };
+    auto b2 = math::Vector<ElementType, math::VectorOrientation::row>{ 4,5,6 };
+    math::TensorOperations::MultiplyAdd<math::Dimension::column>(s2, b2, T);
+    auto R2 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 5,5,5,5 },{ 7,7,7,7 },{ 9,9,9,9 } },
+                                                                             { { 5,5,5,5 },{ 7,7,7,7 },{ 9,9,9,9 } } };
+    testing::ProcessTest("void TestTensorVectorMultiplyAdd()", T == R2);
+
+    T.Fill(1);
+    auto s3 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2,3,4 };
+    auto b3 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,1,2,2 };
+    math::TensorOperations::MultiplyAdd<math::Dimension::channel>(s3, b3, T);
+    auto R3 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 2,3,5,6 },{ 2,3,5,6 },{ 2,3,5,6 } },
+                                                                             { { 2,3,5,6 },{ 2,3,5,6 },{ 2,3,5,6 } } };
+    testing::ProcessTest("void TestTensorVectorMultiplyAdd()", T == R3);
+
+    // subtensors
+    auto TT = math::Tensor<ElementType, dimension0, dimension1, dimension2>(10, 10, 10);
+    auto TR = TT.GetSubTensor({ 5,3,1 }, { 2,3,4 });
+
+    TR.Fill(1);
+    math::TensorOperations::MultiplyAdd<math::Dimension::row>(s1, b1, TR);
+    testing::ProcessTest("void TestTensorVectorMultiplyAdd() with subtensor", TR == R1);
+
+    TR.Fill(1);
+    math::TensorOperations::MultiplyAdd<math::Dimension::column>(s2, b2, TR);
+    testing::ProcessTest("void TestTensorVectorMultiplyAdd() with subtensor", TR == R2);
+
+    TR.Fill(1);
+    math::TensorOperations::MultiplyAdd<math::Dimension::channel>(s3, b3, TR);
+    testing::ProcessTest("void TestTensorVectoMultiplyAdd() with subtensor", TR == R3);
+}
+

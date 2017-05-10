@@ -41,7 +41,7 @@ namespace math
         template <typename ElementType, VectorOrientation Orientation>
         static void Add(ElementType s, VectorReference<ElementType, Orientation> v);
 
-        /// <summary> Adds a scalar to a row major matrix, M += s. </summary>
+        /// <summary> Adds a scalar to a matrix, M += s. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
         /// <param name="s"> The scalar being added. </param>
@@ -68,6 +68,19 @@ namespace math
         template <typename ElementType, MatrixLayout Layout>
         static void Copy(ConstMatrixReference<ElementType, Layout> B, MatrixReference<ElementType, Layout> A);
 
+        /// <summary> Generalized matrix matrix addition, C = s * A + t * B. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
+        /// <param name="s"> The scalar that multiplies the first matrix. </param>
+        /// <param name="A"> The first matrix. </param>
+        /// <param name="t"> The scalar that multiplies the second matrix. </param>
+        /// <param name="B"> The second matrix. </param>
+        /// <param name="C"> [in,out] A matrix used to store the result in the layout of first matrix. </param>
+        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
+        static void Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
+
         /// <summary> Multiplies a row major matrix by a scalar, M *= s. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
@@ -88,6 +101,25 @@ namespace math
         /// <param name="u"> [in,out] A row vector, multiplied by t and used to store the result. </param>
         template <typename ElementType, MatrixLayout Layout>
         static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u);
+
+        /// <summary> Multiplies a vector by a scalar s and then adds a scalar b to it, v = s*v + b. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <param name="s"> The scalar that multiplies the vector. </param>
+        /// <param name="b"> The scalar added to the vector. </param>
+        /// <param name="v"> [in,out] The vector being modified. </param>
+        template <typename ElementType, VectorOrientation Orientation>
+        static void MultiplyAdd(ElementType s, ElementType b, VectorReference<ElementType, Orientation> v);
+
+        /// <summary> Multiplies a matrix by a scalar s and then adds a scalar b to it, M = s*M + b. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <param name="s"> The scalar that multiplies the matrix. </param>
+        /// <param name="b"> The scalar added to the matrix. </param>
+        /// <param name="M"> [in,out] The matrix being modified. </param>
+        template <typename ElementType, MatrixLayout Layout>
+        static void MultiplyAdd(ElementType s, ElementType b, MatrixReference<ElementType, Layout> M);
 
         /// <summary> Vector vector element wise multiplication, t = u .* v. </summary>
         ///
@@ -134,7 +166,9 @@ namespace math
         using CommonOperations::Norm0;
         using CommonOperations::Add;
         using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Copy;
+        using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Add;
         using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Multiply;
+        using DerivedOperations<OperationsImplementation<ImplementationType::native>>::MultiplyAdd;
 
         /// <summary> Gets the implementation name. </summary>
         ///
@@ -204,19 +238,6 @@ namespace math
         template <typename ElementType>
         static void Multiply(ConstVectorReference<ElementType, VectorOrientation::row> u, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType& r);
 
-        /// <summary> Generalized matrix matrix addition, C = s * A + t * B. </summary>
-        ///
-        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
-        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
-        /// <param name="s"> The scalar that multiplies the first matrix. </param>
-        /// <param name="A"> The first matrix. </param>
-        /// <param name="t"> The scalar that multiplies the second matrix. </param>
-        /// <param name="B"> The second matrix. </param>
-        /// <param name="C"> [in,out] A matrix used to store the result in the layout of first matrix. </param>
-        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-        static void Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
-
         /// <summary> Generalized matrix column-vector multiplication, u = s * M * v + t * u. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
@@ -252,7 +273,9 @@ namespace math
         using CommonOperations::Norm0;
         using CommonOperations::Add;
         using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Copy;
+        using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Add;
         using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Multiply;
+        using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::MultiplyAdd;
 
         /// <summary> Gets the implementation name. </summary>
         ///
@@ -303,19 +326,6 @@ namespace math
         /// <returns> The dot Multiply. </returns>
         template <typename ElementType>
         static ElementType Dot(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v);
-
-        /// <summary> Generalized matrix matrix addition, C = s * A + t * B. </summary>
-        ///
-        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
-        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
-        /// <param name="s"> The scalar that multiplies the first matrix. </param>
-        /// <param name="A"> The first matrix. </param>
-        /// <param name="t"> The scalar that multiplies the second matrix. </param>
-        /// <param name="B"> The second matrix. </param>
-        /// <param name="C"> [in,out] A matrix used to store the result in the layout of first matrix. </param>
-        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-        static void Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
 
         /// <summary> Calculates the product of a vector and a scalar, v = v * s. </summary>
         ///
