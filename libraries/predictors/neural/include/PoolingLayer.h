@@ -36,7 +36,9 @@ namespace neural
     class PoolingLayer : public Layer<ElementType>
     {
     public:
-
+        using LayerParameters = typename Layer<ElementType>::LayerParameters;
+        using Layer<ElementType>::GetOutputMinusPadding;
+        
         /// <summary> Instantiates an instance of a pooling layer. </summary>
         ///
         /// <param name="layerParameters"> The parameters common to every layer. </param>

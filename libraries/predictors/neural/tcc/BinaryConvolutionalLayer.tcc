@@ -124,7 +124,7 @@ namespace neural
     void BinaryConvolutionalLayer<ElementType>::Compute()
     {
         auto output = GetOutputMinusPadding();
-        auto& input = _layerParameters.input;
+        auto input = _layerParameters.input;
 
         if (_convolutionalParameters.method == BinaryConvolutionMethod::gemm)
         {

@@ -269,7 +269,7 @@ namespace math
     {
         DEBUG_THROW(_contents.layout[0] != _contents.increments[0] || _contents.layout[0] * _contents.layout[1] != _contents.increments[1], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor to vector when alll the dimensions are full"));
 
-        return VectorReference<ElementType, VectorOrientation::row>(_contents.pData, NumElements(), 1);
+        return VectorReference<ElementType, VectorOrientation::row>(_contents.pData, this->NumElements(), 1);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>

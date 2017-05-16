@@ -49,6 +49,14 @@ namespace neural
     class ConvolutionalLayer : public Layer<ElementType>
     {
     public:
+        using LayerParameters = typename Layer<ElementType>::LayerParameters;
+        using MatrixType = typename Layer<ElementType>::MatrixType;
+        using TensorType = typename Layer<ElementType>::TensorType;
+        using ConstTensorReferenceType = typename Layer<ElementType>::ConstTensorReferenceType;
+        using Layer<ElementType>::GetOutputMinusPadding;
+        using Layer<ElementType>::NumOutputRowsMinusPadding;
+        using Layer<ElementType>::NumOutputColumnsMinusPadding;
+        using Layer<ElementType>::NumOutputChannels;
 
         /// <summary> Instantiates an instance of a convolutional layer. </summary>
         ///

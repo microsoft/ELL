@@ -20,6 +20,11 @@ namespace neural
     class BiasLayer : public Layer<ElementType>
     {
     public:
+        using LayerParameters = typename Layer<ElementType>::LayerParameters;
+        using VectorType = typename Layer<ElementType>::VectorType;
+        using Layer<ElementType>::GetOutputMinusPadding;
+        using Layer<ElementType>::NumOutputChannels;
+        using Layer<ElementType>::AssignValues;
 
         /// <summary> Instantiates an instance of a bias layer. </summary>
         ///

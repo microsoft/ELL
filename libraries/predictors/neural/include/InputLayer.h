@@ -25,6 +25,17 @@ namespace neural
     {
     public:
 
+        using Shape = typename Layer<ElementType>::Shape;
+        using LayerParameters = typename Layer<ElementType>::LayerParameters;
+        using VectorType = typename Layer<ElementType>::VectorType;
+        using TensorType = typename Layer<ElementType>::TensorType;
+        using DataVectorType = typename Layer<ElementType>::DataVectorType;
+        using Layer<ElementType>::GetOutputMinusPadding;
+        using Layer<ElementType>::NumOutputRowsMinusPadding;
+        using Layer<ElementType>::NumOutputColumnsMinusPadding;
+        using Layer<ElementType>::NumOutputChannels;
+        using Layer<ElementType>::AssignValues;
+
         /// <summary> Parameters common to all layers. </summary>
         struct InputParameters
         {
@@ -54,7 +65,7 @@ namespace neural
         /// <summary> Gets a writeable reference to the input. </summary>
         ///
         /// <returns> The output tensor. </returns>
-        TensorType& GetInput() { return _inputParameters.data; }
+        TensorType& GetInput() { return _data; }
 
         /// <summary> Feeds the input forward through the layer. </summary>
         void Compute() override;
@@ -75,6 +86,7 @@ namespace neural
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        using Layer<ElementType>::_layerParameters;
         using Layer<ElementType>::_output;
 
         VectorType _scale;

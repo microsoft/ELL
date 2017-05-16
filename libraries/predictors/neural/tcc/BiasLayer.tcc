@@ -34,7 +34,7 @@ namespace neural
     void BiasLayer<ElementType>::Compute()
     {
         auto output = GetOutputMinusPadding();
-        auto& input = _layerParameters.input;
+        auto input = _layerParameters.input;
 
         AssignValues(input, output);
         math::TensorOperations::Add<math::Dimension::channel>(_bias, output);

@@ -21,7 +21,7 @@ namespace neural
     ActivationLayer<ElementType, ActivationFunctionType>::ActivationLayer(const LayerParameters& layerParameters) :
         Layer<ElementType>(layerParameters)
     {
-        auto& output = GetOutputMinusPadding();
+        auto output = GetOutputMinusPadding();
         auto& input = _layerParameters.input;
         if (input.NumRows() > output.NumRows() || input.NumColumns() > output.NumColumns() || input.NumChannels() > output.NumChannels())
         {
@@ -32,15 +32,15 @@ namespace neural
     template <typename ElementType, template <typename> class ActivationFunctionType>
     void ActivationLayer<ElementType, ActivationFunctionType>::Compute()
     {
-        auto& output = GetOutputMinusPadding();
-        auto& input = _layerParameters.input;
+        auto output = GetOutputMinusPadding();
+        auto input = _layerParameters.input;
 
-        auto& flattenedInput = input.ReferenceAsMatrix();
-        auto& flattenedOutput = output.ReferenceAsMatrix();
+        auto flattenedInput = input.ReferenceAsMatrix();
+        auto flattenedOutput = output.ReferenceAsMatrix();
 
         for (size_t i = 0; i < flattenedInput.NumRows(); i++)
         {
-            auto& rowVector = flattenedInput.GetMajorVector(i);
+            auto rowVector = flattenedInput.GetMajorVector(i);
             for (size_t j = 0; j < rowVector.Size(); j++)
             {
                 ElementType value = flattenedInput(i, j);

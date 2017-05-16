@@ -50,7 +50,7 @@ namespace predictors
         /// <summary> Type of the input vector expected by this predictor type. </summary>
         using DataVectorType = typename neural::Layer<ElementType>::DataVectorType;
         /// <summary> Dimensions of the input and output tensors. </summary>
-        using Shape = typename math::Triplet;
+        using Shape = typename neural::Layer<ElementType>::Shape;
 
         /// <summary> A unique_ptr to the input layer for this predictor. </summary>
         using InputLayerReference = std::unique_ptr<neural::InputLayer<ElementType>>;

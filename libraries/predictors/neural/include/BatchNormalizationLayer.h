@@ -20,7 +20,14 @@ namespace neural
     class BatchNormalizationLayer : public Layer<ElementType>
     {
     public:
-
+        using LayerParameters = typename Layer<ElementType>::LayerParameters;
+        using VectorType = typename Layer<ElementType>::VectorType;
+        using Layer<ElementType>::GetOutputMinusPadding;
+        using Layer<ElementType>::NumOutputRowsMinusPadding;
+        using Layer<ElementType>::NumOutputColumnsMinusPadding;
+        using Layer<ElementType>::NumOutputChannels;
+        using Layer<ElementType>::AssignValues;
+        
         /// <summary> Instantiates an instance of a batch normalization layer. </summary>
         ///
         /// <param name="layerParameters"> The parameters common to every layer. </param>

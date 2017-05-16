@@ -24,6 +24,15 @@ namespace neural
     class FullyConnectedLayer : public Layer<ElementType>
     {
     public:
+        using LayerParameters = typename Layer<ElementType>::LayerParameters;
+        using VectorType = typename Layer<ElementType>::VectorType;
+        using MatrixType = typename Layer<ElementType>::MatrixType;
+        using MatrixReferenceType = typename Layer<ElementType>::MatrixReferenceType;
+        using ConstTensorReferenceType = typename Layer<ElementType>::ConstTensorReferenceType;
+        using Layer<ElementType>::GetOutputMinusPadding;
+        using Layer<ElementType>::NumOutputRowsMinusPadding;
+        using Layer<ElementType>::NumOutputColumnsMinusPadding;
+        using Layer<ElementType>::NumOutputChannels;
 
         /// <summary> Instantiates an instance of a fully connected layer. </summary>
         ///

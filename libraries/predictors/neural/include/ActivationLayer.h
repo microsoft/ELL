@@ -20,6 +20,8 @@ namespace neural
     class ActivationLayer : public Layer<ElementType>
     {
     public:
+        using LayerParameters = typename Layer<ElementType>::LayerParameters;
+        using Layer<ElementType>::GetOutputMinusPadding;
 
         /// <summary> Instantiates an instance of an activation layer. </summary>
         ///

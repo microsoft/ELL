@@ -62,7 +62,7 @@ namespace predictors
 
         if (_layers.size() > 0)
         {
-            auto& output = _layers.back()->GetOutput();
+            auto output = _layers.back()->GetOutput();
             size_t vectorIndex = 0;
 
             //_output.resize(output.NumElements());

@@ -21,6 +21,9 @@ namespace neural
     class SoftmaxLayer : public Layer<ElementType>
     {
     public:
+        using LayerParameters = typename Layer<ElementType>::LayerParameters;
+        using Layer<ElementType>::GetOutputMinusPadding;
+        using Layer<ElementType>::AssignValues;
 
         /// <summary> Instantiates an instance of a softmax layer. </summary>
         ///

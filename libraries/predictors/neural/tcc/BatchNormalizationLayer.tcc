@@ -53,7 +53,7 @@ namespace neural
     void BatchNormalizationLayer<ElementType>::Compute()
     {
         auto output = GetOutputMinusPadding();
-        auto& input = _layerParameters.input;
+        auto input = _layerParameters.input;
 
         AssignValues(input, output);
         math::TensorOperations::MultiplyAdd<math::Dimension::channel>(_multiplicationValues, _additionValues, output);
