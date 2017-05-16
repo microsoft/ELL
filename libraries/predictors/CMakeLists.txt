@@ -6,7 +6,6 @@ set (library_name predictors)
 
 set (src src/ConstantPredictor.cpp
          src/LinearPredictor.cpp
-         src/NeuralNetworkPredictor.cpp
          src/SingleElementThresholdPredictor.cpp)
 
 set (include include/ConstantPredictor.h
@@ -17,51 +16,54 @@ set (include include/ConstantPredictor.h
              include/SignPredictor.h
              include/SingleElementThresholdPredictor.h)
 
-set (tcc tcc/SignPredictor.tcc
-         tcc/ForestPredictor.tcc)
+set (tcc tcc/ForestPredictor.tcc
+         tcc/SignPredictor.tcc
+         tcc/NeuralNetworkPredictor.tcc)
 
-set (nn_include neural/include/ActivationLayer.h
-                neural/include/BatchNormalizationLayer.h
-                neural/include/BiasLayer.h
-                neural/include/ConvolutionalLayer.h
-                neural/include/FullyConnectedLayer.h
-                neural/include/ILayer.h
-                neural/include/InputLayer.h
-                neural/include/LeakyReLUActivation.h
-                neural/include/MaxPoolingFunction.h
-                neural/include/MeanPoolingFunction.h
-                neural/include/PoolingLayer.h
-                neural/include/ReLUActivation.h
-                neural/include/ScaledInputLayer.h
-                neural/include/ScalingLayer.h
-                neural/include/SigmoidActivation.h
-                neural/include/SoftMaxActivation.h)
+set (neural_include neural/include/ActivationLayer.h
+                    neural/include/BatchNormalizationLayer.h
+                    neural/include/BiasLayer.h
+                    neural/include/BinaryConvolutionalLayer.h
+                    neural/include/ConvolutionalLayer.h
+                    neural/include/FullyConnectedLayer.h
+                    neural/include/Layer.h
+                    neural/include/InputLayer.h
+                    neural/include/LeakyReLUActivation.h
+                    neural/include/MaxPoolingFunction.h
+                    neural/include/MeanPoolingFunction.h
+                    neural/include/PoolingLayer.h
+                    neural/include/ReLUActivation.h
+                    neural/include/ScalingLayer.h
+                    neural/include/SigmoidActivation.h
+                    neural/include/SoftmaxLayer.h)
 
-set (nn_src neural/src/BatchNormalizationLayer.cpp
-            neural/src/BiasLayer.cpp
-            neural/src/ConvolutionalLayer.cpp
-            neural/src/FullyConnectedLayer.cpp
-            neural/src/InputLayer.cpp
-            neural/src/LeakyReLUActivation.cpp
-            neural/src/MaxPoolingFunction.cpp
-            neural/src/MeanPoolingFunction.cpp
-            neural/src/ReLUActivation.cpp
-            neural/src/ScaledInputLayer.cpp
-            neural/src/ScalingLayer.cpp
-            neural/src/SigmoidActivation.cpp
-            neural/src/SoftMaxActivation.cpp)
+set (neural_src )
 
-set (nn_tcc neural/tcc/ActivationLayer.tcc
-            neural/tcc/PoolingLayer.tcc)
+set (neural_tcc neural/tcc/ActivationLayer.tcc
+                neural/tcc/BatchNormalizationLayer.tcc
+                neural/tcc/BiasLayer.tcc
+                neural/tcc/BinaryConvolutionalLayer.tcc
+                neural/tcc/ConvolutionalLayer.tcc
+                neural/tcc/FullyConnectedLayer.tcc
+                neural/tcc/InputLayer.tcc
+                neural/tcc/Layer.tcc
+                neural/tcc/LeakyReLUActivation.tcc
+                neural/tcc/MaxPoolingFunction.tcc
+                neural/tcc/MeanPoolingFunction.tcc
+                neural/tcc/PoolingLayer.tcc
+                neural/tcc/ReLUActivation.tcc
+                neural/tcc/ScalingLayer.tcc
+                neural/tcc/SigmoidActivation.tcc
+                neural/tcc/SoftmaxLayer.tcc)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
-source_group("neural\\include" FILES ${nn_include})
-source_group("neural\\src" FILES ${nn_src})
-source_group("neural\\tcc" FILES ${nn_tcc})
+source_group("neural\\include" FILES ${neural_include})
+source_group("neural\\src" FILES ${neural_src})
+source_group("neural\\tcc" FILES ${neural_tcc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${nn_src} ${nn_include} ${nn_tcc})
+add_library(${library_name} ${src} ${include} ${tcc} ${neural_src} ${neural_include} ${neural_tcc})
 target_include_directories(${library_name} PUBLIC include neural/include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)
@@ -82,7 +84,7 @@ set (test_include )
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include} ${tcc} ${nn_include} ${nn_tcc})
+add_executable(${test_name} ${test_src} ${test_include} ${include} ${tcc} ${neural_include} ${neural_tcc})
 target_include_directories(${test_name} PRIVATE test/include)
 
 target_link_libraries(${test_name} data predictors testing)

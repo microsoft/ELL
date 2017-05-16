@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "ILayer.h"
+#include "Layer.h"
 
 namespace ell
 {
@@ -15,37 +15,54 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> A layer in a neural network that implements an input layer, meaning input of the nodes is simply passed to the output. </summary>
-    class InputLayer : public ILayer
+    
+
+    /// <summary> An input layer in a neural network. This is the only layer type that takes input from an external source, and not from the output of another layer.
+    /// This must be the first layer in the list of layers that get set on a Neural Predictor.
+    /// </summary>
+    template <typename ElementType>
+    class InputLayer : public Layer<ElementType>
     {
     public:
 
+        /// <summary> Parameters common to all layers. </summary>
+        struct InputParameters
+        {
+            /// <summary> Shape of the input tensor.. </summary>
+            Shape inputShape;
+            /// <summary> The padding requirements for the input. </summary>
+            PaddingParameters inputPaddingParameters;
+            /// <summary> The extents of the tensor in canonical row, column, channel order. This size includes padding. </summary>
+            Shape outputShape;
+            /// <summary> The padding requirements for the output. </summary>
+            PaddingParameters outputPaddingParameters;
+            /// <summary> The scale factor to apply to each input value. Default is 1 (i.e. no scale). </summary>
+            ElementType scale;
+        };
+
         /// <summary> Instantiates an instance of an input layer. </summary>
         ///
-        /// <param name="numNodes"> The number of nodes in the layer. For this layer type, it is equivalent to the number of inputs and outputs. </param>
-        InputLayer(size_t numNodes) : _output(numNodes) { };
+        /// <param name="inputParameters"> The parameters for the input layer. </param>
+        /// <param name="inputParameters">   </param>
+        InputLayer(const InputParameters& inputParameters);
 
-        /// <summary> Feeds the input forward throught the layer and returns a reference to the output. </summary>
+        /// <summary> Sets the input. </summary>
         ///
-        /// <param name="input"> The input vector. </param>
-        ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& FeedForward(const LayerVector& input) override;
+        /// <param name="input"> Copies the input vector to the input tensor. </param>
+        void SetInput(const DataVectorType& input);
 
-        /// <summary> Returns a reference to the output values, which is the result after the last #Forward call. </summary>
+        /// <summary> Gets a writeable reference to the input. </summary>
         ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& GetOutput() override { return _output; }
+        /// <returns> The output tensor. </returns>
+        TensorType& GetInput() { return _inputParameters.data; }
 
-        /// <summary> Returns the expected size of the input vector. </summary>
-        ///
-        /// <returns> Expected size of the input vector. </returns>
-        size_t NumInputs() const override { return _output.Size(); }
+        /// <summary> Feeds the input forward through the layer. </summary>
+        void Compute() override;
 
-        /// <summary> Returns the size of the output vector. </summary>
+        /// <summary> Indicates the kind of layer. </summary>
         ///
-        /// <returns> Size of the output vector. </returns>
-        size_t NumOutputs() const override { return _output.Size(); }
+        /// <returns> An enum indicating the layer type. </returns>
+        LayerType GetLayerType() const override { return LayerType::input; }
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -58,10 +75,15 @@ namespace neural
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        LayerVector _output;
+        using Layer<ElementType>::_output;
+
+        VectorType _scale;
+        TensorType _data;
     };
 
 }
 }
 }
+
+#include "../tcc/InputLayer.tcc"
 

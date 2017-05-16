@@ -1,0 +1,150 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     Layer.tcc (neural)
+//  Authors:  Byron Changuion
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "Layer.h"
+#include "Print.h"
+
+// stl
+#include <iostream>
+#include <limits>
+#include <type_traits>
+
+namespace ell
+{
+namespace predictors
+{
+namespace neural
+{
+
+    template <typename ElementType>
+    Layer<ElementType>::Layer(const LayerParameters& layerParameters) :
+        _layerParameters(layerParameters),
+        _output(layerParameters.outputShape)
+    {
+        InitializeOutputValues(_output, layerParameters.outputPaddingParameters);
+    }
+
+    template <typename ElementType>
+    void Layer<ElementType>::InitializeOutputValues(TensorType& output, PaddingParameters outputPaddingParameters)
+    {
+        switch (outputPaddingParameters.paddingScheme)
+        {
+            case PaddingScheme::minusOnes:
+                output.Fill(-1);
+                break;
+            case PaddingScheme::randomZeroAndOnes:
+                output.Generate([] { return (std::rand() % 2); });
+                break;
+            case PaddingScheme::alternatingZeroAndOnes:
+                {
+                    for (size_t row = 0; row < output.NumRows(); row++)
+                    {
+                        for (size_t column = 0; column < output.NumColumns(); column++)
+                        {
+                            ElementType value = static_cast<ElementType>((row % 2) ^ (column % 2));
+                            for (size_t channel = 0; channel < output.NumChannels(); channel++)
+                            {
+                                output(row, column, channel) = value;
+                            }
+                        }
+                    }
+                }
+                break;
+            case PaddingScheme::min:
+                if (std::is_signed<ElementType>::value)
+                {
+                    output.Fill(-std::numeric_limits<ElementType>::max());
+                }
+                else
+                {
+                    output.Fill(std::numeric_limits<ElementType>::min());
+                }
+                break;
+            case PaddingScheme::max:
+                output.Fill(std::numeric_limits<ElementType>::max());
+                break;
+            default:
+                output.Fill(0);
+                break;
+        }
+    }
+
+    template <typename ElementType>
+    void Layer<ElementType>::Print(std::ostream& os, size_t numValuesToPrint) const
+    {
+        static constexpr size_t bufferLength = 1024;
+        char buffer[bufferLength] = {0};
+        std::string layerName = LayerNames[static_cast<uint32_t>(GetLayerType())];
+
+        snprintf(buffer, bufferLength, "======== %s layer (%zd x %zd x %zd) pad: %zd -> (%zd x %zd x %zd) pad: %zd ========",
+            layerName.c_str(),
+            _layerParameters.input.NumRows() - 2 * _layerParameters.inputPaddingParameters.paddingSize, _layerParameters.input.NumColumns() - 2 * _layerParameters.inputPaddingParameters.paddingSize, _layerParameters.input.NumChannels(), _layerParameters.inputPaddingParameters.paddingSize,
+            _layerParameters.outputShape[0] - 2 * _layerParameters.outputPaddingParameters.paddingSize, _layerParameters.outputShape[1] - 2 * _layerParameters.outputPaddingParameters.paddingSize, _layerParameters.outputShape[2], _layerParameters.outputPaddingParameters.paddingSize);
+
+        os << buffer;
+
+        const ConstTensorReferenceType output(_output);
+        for (size_t i = 0; (i < numValuesToPrint) && (i < output.NumElements()); i++)
+        {
+            size_t channel = i % output.NumChannels();
+            size_t col = i / output.NumChannels();
+            size_t row = i / (output.NumChannels() * output.NumColumns());
+
+            if (i % 10 == 0) os << std::endl;
+
+            if (channel < output.NumChannels() &&
+                (col + _layerParameters.outputPaddingParameters.paddingSize) < output.NumColumns() &&
+                (row + _layerParameters.outputPaddingParameters.paddingSize) < output.NumRows())
+            {
+                const ElementType val = output({ row + _layerParameters.outputPaddingParameters.paddingSize, col + _layerParameters.outputPaddingParameters.paddingSize, channel });
+                snprintf(buffer, bufferLength, "%+9.5f ", val);
+                os << buffer;
+            }
+        }
+        os << std::endl << "======== End of " << layerName << " ========" << std::endl;
+    }
+
+    template <typename ElementType>
+    void Layer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        //TODO: Write the output Tensor and padding configs
+    }
+
+    template <typename ElementType>
+    void Layer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        //TODO: Read the output Tensor and padding configs
+    }
+
+    template <typename ElementType>
+    typename Layer<ElementType>::TensorReferenceType Layer<ElementType>::GetOutputMinusPadding()
+    { 
+        return _output.GetSubTensor({ _layerParameters.outputPaddingParameters.paddingSize, _layerParameters.outputPaddingParameters.paddingSize, 0 }, { _output.NumRows() - 2 * _layerParameters.outputPaddingParameters.paddingSize, _output.NumColumns() - 2 * _layerParameters.outputPaddingParameters.paddingSize, _output.NumChannels() });
+    }
+
+    template <typename ElementType>
+    void Layer<ElementType>::AssignValues(ConstTensorReferenceType& input, TensorReferenceType& output)
+    {
+        DEBUG_THROW(input.NumRows() > output.NumRows() || input.NumColumns() > output.NumColumns() || input.NumChannels() > output.NumChannels(), utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Input tensor must not exceed output tensor dimensions."));
+
+        for (size_t i = 0; i < input.NumRows(); i++)
+        {
+            for (size_t j = 0; j < input.NumColumns(); j++)
+            {
+                for (size_t k = 0; k < input.NumChannels(); k++)
+                {
+                    output(i, j, k) = input(i, j, k);
+                }
+            }
+        }
+    }
+
+}
+}
+}
+

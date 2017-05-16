@@ -43,9 +43,9 @@ namespace math
         template <typename ReturnType>
         static ReturnType GetSlice(const TensorContents<ElementType>& contents, size_t index)
         {
-            DEBUG_THROW(index >= contents.layoutShape[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+            DEBUG_THROW(index >= contents.layout[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
 
-            return ReturnType(contents.layoutShape[0], contents.layoutShape[1], contents.increments[0], contents.pData + index * contents.increments[1]);
+            return ReturnType(contents.layout[0], contents.layout[1], contents.increments[0], contents.pData + index * contents.increments[1]);
         }
     };
 
@@ -69,9 +69,9 @@ namespace math
         template <typename ReturnType>
         static ReturnType GetSlice(const TensorContents<ElementType>& contents, size_t index)
         {
-            DEBUG_THROW(index >= contents.layoutShape[1], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+            DEBUG_THROW(index >= contents.layout[1], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
 
-            return ReturnType(contents.layoutShape[0], contents.layoutShape[2], contents.increments[1], contents.pData + index * contents.increments[0]);
+            return ReturnType(contents.layout[0], contents.layout[2], contents.increments[1], contents.pData + index * contents.increments[0]);
         }
 
     };
@@ -96,9 +96,9 @@ namespace math
         template <typename ReturnType>
         static ReturnType GetSlice(const TensorContents<ElementType>& contents, size_t index)
         {
-            DEBUG_THROW(index >= contents.layoutShape[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+            DEBUG_THROW(index >= contents.layout[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
 
-            return ReturnType(contents.layoutShape[1], contents.layoutShape[0], contents.increments[0], contents.pData + index * contents.increments[1]);
+            return ReturnType(contents.layout[1], contents.layout[0], contents.increments[0], contents.pData + index * contents.increments[1]);
         }
     };
 
@@ -122,9 +122,9 @@ namespace math
         template <typename ReturnType>
         static ReturnType GetSlice(const TensorContents<ElementType>& contents, size_t index)
         {
-            DEBUG_THROW(index >= contents.layoutShape[1], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+            DEBUG_THROW(index >= contents.layout[1], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
 
-            return ReturnType(contents.layoutShape[2], contents.layoutShape[0], contents.increments[1], contents.pData + index * contents.increments[0]);
+            return ReturnType(contents.layout[2], contents.layout[0], contents.increments[1], contents.pData + index * contents.increments[0]);
         }
     };
     
@@ -134,16 +134,16 @@ namespace math
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ConstTensorReference(Triplet shape)
     {
-        _contents.layoutShape = TensorLayoutT::CanonicalToLayout(shape);
-        _contents.increments[0] = _contents.layoutShape[0];
-        _contents.increments[1] = _contents.layoutShape[0] * _contents.layoutShape[1];
+        _contents.layout = TensorLayoutT::CanonicalToLayout(shape);
+        _contents.increments[0] = _contents.layout[0];
+        _contents.increments[1] = _contents.layout[0] * _contents.layout[1];
         _contents.pData = nullptr;
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::NumElements() const
     {
-        return _contents.layoutShape[0] * _contents.layoutShape[1] * _contents.layoutShape[2];
+        return _contents.layout[0] * _contents.layout[1] * _contents.layout[2];
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
@@ -194,7 +194,7 @@ namespace math
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ConstVectorReference<ElementType, VectorOrientation::row> ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ReferenceAsVector() const
     {
-        DEBUG_THROW(_contents.layoutShape[0] != _contents.increments[0] || _contents.layoutShape[0]*_contents.layoutShape[1] != _contents.increments[1], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when alll the dimensions are full"));
+        DEBUG_THROW(_contents.layout[0] != _contents.increments[0] || _contents.layout[0]*_contents.layout[1] != _contents.increments[1], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when alll the dimensions are full"));
 
         return ConstVectorReference<ElementType, VectorOrientation::row>(_contents.pData, NumElements(), 1);
     }
@@ -202,9 +202,9 @@ namespace math
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ConstMatrixReference<ElementType, MatrixLayout::rowMajor> ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ReferenceAsMatrix() const
     {
-        DEBUG_THROW(_contents.layoutShape[0] != _contents.increments[0], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when the first dimension is full"));
+        DEBUG_THROW(_contents.layout[0] != _contents.increments[0], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when the first dimension is full"));
 
-        return ConstMatrixReference<ElementType, MatrixLayout::rowMajor>(_contents.layoutShape[2], _contents.layoutShape[0] * _contents.layoutShape[1], _contents.increments[1], _contents.pData);
+        return ConstMatrixReference<ElementType, MatrixLayout::rowMajor>(_contents.layout[2], _contents.layout[0] * _contents.layout[1], _contents.increments[1], _contents.pData);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
@@ -244,7 +244,7 @@ namespace math
     size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetOffset(Triplet coordinate) const
     {
         auto layoutCoordinate = TensorLayoutT::CanonicalToLayout(coordinate);
-        DEBUG_THROW(layoutCoordinate[0] >= _contents.layoutShape[0] || layoutCoordinate[1] >= _contents.layoutShape[1] || layoutCoordinate[2] >= _contents.layoutShape[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
+        DEBUG_THROW(layoutCoordinate[0] >= _contents.layout[0] || layoutCoordinate[1] >= _contents.layout[1] || layoutCoordinate[2] >= _contents.layout[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
         return layoutCoordinate[0] + layoutCoordinate[1] * _contents.increments[0] + layoutCoordinate[2] * _contents.increments[1];
     }
 
@@ -265,11 +265,19 @@ namespace math
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    VectorReference<ElementType, VectorOrientation::row> TensorReference<ElementType, dimension0, dimension1, dimension2>::ReferenceAsVector()
+    {
+        DEBUG_THROW(_contents.layout[0] != _contents.increments[0] || _contents.layout[0] * _contents.layout[1] != _contents.increments[1], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor to vector when alll the dimensions are full"));
+
+        return VectorReference<ElementType, VectorOrientation::row>(_contents.pData, NumElements(), 1);
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     MatrixReference<ElementType, MatrixLayout::rowMajor> TensorReference<ElementType, dimension0, dimension1, dimension2>::ReferenceAsMatrix()
     {
-        DEBUG_THROW(_contents.layoutShape[0] != _contents.increments[0], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when the first dimension is full"));
+        DEBUG_THROW(_contents.layout[0] != _contents.increments[0], utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can only flatten a tensor when the first dimension is full"));
 
-        return MatrixReference<ElementType, MatrixLayout::rowMajor>(_contents.layoutShape[2], _contents.layoutShape[0] * _contents.layoutShape[1], _contents.increments[1], _contents.pData);
+        return MatrixReference<ElementType, MatrixLayout::rowMajor>(_contents.layout[2], _contents.layout[0] * _contents.layout[1], _contents.increments[1], _contents.pData);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
@@ -302,7 +310,7 @@ namespace math
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     void TensorReference<ElementType, dimension0, dimension1, dimension2>::Fill(ElementType value)
     {
-        for (size_t i = 0; i < _contents.layoutShape[2]; ++i)
+        for (size_t i = 0; i < _contents.layout[2]; ++i)
         {
             auto slice = GetPrimarySlice(i);
             slice.Fill(value);
@@ -313,7 +321,7 @@ namespace math
     template <typename GeneratorType>
     void TensorReference<ElementType, dimension0, dimension1, dimension2>::Generate(GeneratorType generator)
     {
-        for (size_t i = 0; i < _contents.layoutShape[2]; ++i)
+        for (size_t i = 0; i < _contents.layout[2]; ++i)
         {
             auto slice = GetPrimarySlice(i);
             slice.Generate(generator);
@@ -390,6 +398,19 @@ namespace math
             }
             ++i;
         }
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    void Tensor<ElementType, dimension0, dimension1, dimension2>::Fill(ElementType value)
+    {
+        std::fill(_data.begin(), _data.end(), value);
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <typename GeneratorType>
+    void Tensor<ElementType, dimension0, dimension1, dimension2>::Generate(GeneratorType generator)
+    {
+        std::generate(_data.begin(), _data.end(), generator);;
     }
 
 }

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ILayer.h"
+#include "Layer.h"
 
 namespace ell
 {
@@ -16,8 +16,8 @@ namespace predictors
 {
 namespace neural
 {
-    using LayerVector = predictors::neural::ILayer::LayerVector;
     /// <summary> Implements the leaky ReLU function: activation(x) = (x > 0) ? x : leakyFactor * x  </summary>
+    template <typename ElementType>
     class LeakyReLUActivation
     {
     public:
@@ -26,16 +26,18 @@ namespace neural
         /// </summary>
         ///
         /// <param name="leakyFactor"> The value to multiply the input by if it is less than zero. </param>
-        LeakyReLUActivation(double leakyFactor = 0.1) : _leakyFactor(leakyFactor) {}
+        LeakyReLUActivation(ElementType leakyFactor = static_cast<ElementType>(0.01)) : _leakyFactor(leakyFactor) {}
 
-        /// <summary> Sets the values of the output as a function of the input. </summary>
+        /// <summary> Sets the output as a function of the input. </summary>
         ///
-        /// <param name="input"> The input values. </param>
-        /// <param name="output"> The output values. </param>
-        void Apply(const LayerVector& input, LayerVector& output) const;
+        /// <param name="input"> The input value. </param>
+        ElementType Apply(const ElementType input) const;
+
     private:
-        double _leakyFactor;
+        ElementType _leakyFactor;
     };
 }
 }
 }
+
+#include "../tcc/LeakyReLUActivation.tcc"

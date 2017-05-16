@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "ILayer.h"
+#include "Layer.h"
 
 // math
 #include "Matrix.h"
@@ -18,47 +18,34 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> A layer in a neural network that implements a fully connected layer, meaning all nodes in this layer are connected to all
+    /// <summary> A layer in a neural network that implements a fully connected layer, meaning all neurons in this layer are connected to all
     /// outputs of the previous layer (which are the inputs of this layer). </summary>
-    class FullyConnectedLayer : public ILayer
+    template <typename ElementType>
+    class FullyConnectedLayer : public Layer<ElementType>
     {
     public:
 
         /// <summary> Instantiates an instance of a fully connected layer. </summary>
         ///
-        /// <param name="numNodes"> The number of nodes in the layer. For this layer type, it is equivalent to the number of outputs. </param>
-        /// <param name="numInputsPerNode"> The number of inputs per node. For this layer type, it should equal the number of outputs of the previous layer. </param>
-        /// <param name="weights"> The set of weights to apply, in row order. The number of weights should be numNodes * numInputsPerNode. </param>
-        FullyConnectedLayer(size_t numNodes, size_t numInputsPerNode, const std::vector<double>& weights);
+        /// <param name="layerParameters"> The parameters common to every layer. </param>
+        /// <param name="weights"> The weights to apply as a matrix in rowMajor order, where number of rows equals output neurons
+        /// and columns represent input (in canonical Tensor order).  </param>
+        FullyConnectedLayer(const LayerParameters& layerParameters, MatrixReferenceType& weights);
 
         /// <summary> Instantiates an instance of a fully connected layer. </summary>
         ///
-        /// <param name="numNodes"> The number of nodes in the layer. For this layer type, it is equivalent to the number of outputs. </param>
-        /// <param name="numInputsPerNode"> The number of inputs per node. For this layer type, it should equal the number of outputs of the previous layer. </param>
-        /// <param name="weights"> The set of weights to apply, in row order. The number of weights should be numNodes * numInputsPerNode. </param>
-        FullyConnectedLayer(size_t numNodes, size_t numInputsPerNode, std::vector<double>&& weights);
+        /// <param name="layerParameters"> The parameters common to every layer. </param>
+        /// <param name="weights"> The weights to apply as stacked Tensors. Each sub-tensor Tensor is the same size as the input,
+        /// and the number of tensors stacked (in row dimension) equals the number of outputs in canonical Tensor order.  </param>
+        FullyConnectedLayer(const LayerParameters& layerParameters, ConstTensorReferenceType& weights);
 
-        /// <summary> Feeds the input forward throught the layer and returns a reference to the output. </summary>
-        ///
-        /// <param name="input"> The input vector. </param>
-        ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& FeedForward(const LayerVector& input) override;
+        /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
+        void Compute() override;
 
-        /// <summary> Returns a reference to the output values, which is the result after the last #Forward call. </summary>
+        /// <summary> Indicates the kind of layer. </summary>
         ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& GetOutput() override { return _output; }
-
-        /// <summary> Returns the expected size of the input vector. </summary>
-        ///
-        /// <returns> Expected size of the input vector. </returns>
-        size_t NumInputs() const override { return _numInputs; }
-
-        /// <summary> Returns the size of the output vector. </summary>
-        ///
-        /// <returns> Size of the output vector. </returns>
-        size_t NumOutputs() const override { return _output.Size(); }
+        /// <returns> An enum indicating the layer type. </returns>
+        LayerType GetLayerType() const override { return LayerType::fullyConnected; }
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -71,12 +58,16 @@ namespace neural
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        size_t _numInputs;
-        LayerMatrix _weights;
-        LayerVector _output;
+        using Layer<ElementType>::_layerParameters;
+        using Layer<ElementType>::_output;
+
+        MatrixType _weights;
+        VectorType _shapedInput;
+        VectorType _outputVector;
     };
 
 }
 }
 }
 
+#include "../tcc/FullyConnectedLayer.tcc"

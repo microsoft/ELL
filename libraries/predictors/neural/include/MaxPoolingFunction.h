@@ -17,7 +17,8 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> Implements the max function used in poolng layers. </summary>
+    /// <summary> Implements the max function used in pooling layers. </summary>
+    template <typename ElementType>
     class MaxPoolingFunction
     {
     public:
@@ -27,21 +28,23 @@ namespace neural
         /// <summary> Adds another value for consideration. </summary>
         ///
         /// <param name="input"> The input value. </param>
-        void Accumulate(double value);
+        void Accumulate(ElementType value);
 
         /// <summary> Adds another value for consideration. </summary>
         ///
         /// <return> The average value from all accumulated values. </return>
-        double GetValue() const;
+        ElementType GetValue() const;
         
         /// <summary> Value to accumulate when on padding. </summary>
         ///
         /// <return> The value when accumulate is called on padding. </return>
-        double GetValueAtPadding() const { return -std::numeric_limits<double>::max(); }
+        ElementType GetValueAtPadding() const { return -std::numeric_limits<ElementType>::max(); }
 
     private:
-        double _max;
+        ElementType _max;
     };
 }
 }
 }
+
+#include "../tcc/MaxPoolingFunction.tcc"

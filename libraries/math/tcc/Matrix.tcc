@@ -73,7 +73,7 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout Layout>
-    auto ConstMatrixReference<ElementType, Layout>::Transpose() const
+    auto ConstMatrixReference<ElementType, Layout>::Transpose() const -> ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>
     {
         return ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>(_numColumns, _numRows, _increment, _pData);
     }
@@ -236,7 +236,7 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout Layout>
-    auto MatrixReference<ElementType, Layout>::Transpose() const
+    auto MatrixReference<ElementType, Layout>::Transpose() const -> MatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>
     {
         return MatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>(_numColumns, _numRows, _increment, _pData);
     }
@@ -341,7 +341,19 @@ namespace math
         _pData = _data.data();
     }
 
-    // TODO missing copy ctor from reference to same layout
+    template <typename ElementType, MatrixLayout Layout>
+    Matrix<ElementType, Layout>::Matrix(ConstMatrixReference<ElementType, Layout>& other)
+        : MatrixReference<ElementType, Layout>(other.NumRows(), other.NumColumns(), nullptr), _data(other.NumRows() * other.NumColumns())
+    {
+        _pData = _data.data();
+        for (size_t i = 0; i < _numRows; ++i)
+        {
+            for (size_t j = 0; j < _numColumns; ++j)
+            {
+                (*this)(i, j) = other(i, j);
+            }
+        }
+    }
 
     template <typename ElementType, MatrixLayout Layout>
     Matrix<ElementType, Layout>::Matrix(ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout> other)

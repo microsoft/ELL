@@ -17,28 +17,48 @@ namespace predictors
 {
 namespace neural
 {
-    template <typename ActivationFunctionType>
-    ILayer::LayerVector& ActivationLayer<ActivationFunctionType>::FeedForward(const ILayer::LayerVector& input)
+    template <typename ElementType, template <typename> class ActivationFunctionType>
+    ActivationLayer<ElementType, ActivationFunctionType>::ActivationLayer(const LayerParameters& layerParameters) :
+        Layer<ElementType>(layerParameters)
     {
-        // Apply the activation function for each element
-        _activation.Apply(input, _output);
-        
-        return _output;
+        auto& output = GetOutputMinusPadding();
+        auto& input = _layerParameters.input;
+        if (input.NumRows() > output.NumRows() || input.NumColumns() > output.NumColumns() || input.NumChannels() > output.NumChannels())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Input tensor must not exceed output tensor (minus padding) dimensions for activation layer.");
+        }
     }
 
-    template <typename ActivationFunctionType>
-    void ActivationLayer<ActivationFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
+    template <typename ElementType, template <typename> class ActivationFunctionType>
+    void ActivationLayer<ElementType, ActivationFunctionType>::Compute()
     {
-        std::vector<double> temp = _output.ToArray();
-        archiver["output"] << temp;
+        auto& output = GetOutputMinusPadding();
+        auto& input = _layerParameters.input;
+
+        auto& flattenedInput = input.ReferenceAsMatrix();
+        auto& flattenedOutput = output.ReferenceAsMatrix();
+
+        for (size_t i = 0; i < flattenedInput.NumRows(); i++)
+        {
+            auto& rowVector = flattenedInput.GetMajorVector(i);
+            for (size_t j = 0; j < rowVector.Size(); j++)
+            {
+                ElementType value = flattenedInput(i, j);
+                flattenedOutput(i, j) = _activation.Apply(value);
+            }
+        }
     }
 
-    template <typename ActivationFunctionType>
-    void ActivationLayer<ActivationFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    template <typename ElementType, template <typename> class ActivationFunctionType>
+    void ActivationLayer<ElementType, ActivationFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        std::vector<double> temp;
-        archiver["output"] >> temp;
-        _output = ILayer::LayerVector(temp);
+        // TODO:
+    }
+
+    template <typename ElementType, template <typename> class ActivationFunctionType>
+    void ActivationLayer<ElementType, ActivationFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        // TODO:
     }
 
 }

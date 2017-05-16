@@ -1,13 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ConvolutionalLayer.h (neural)
+//  File:     BinaryConvolutionalLayer.h (neural)
 //  Authors:  Byron Changuion
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 #include "Layer.h"
+#include "ConvolutionalLayer.h"
 
 // math
 #include "Matrix.h"
@@ -18,17 +19,18 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> The method for performing convolutions. </summary>
-    enum class ConvolutionMethod : int
+
+    /// <summary> The method for performing binary convolutions. </summary>
+    enum class BinaryConvolutionMethod : int
     {
-        /// <summary> Normal method of doing convolution via reshaping input into columns and performing a gemm operation. </summary>
-        columnwise = 0,
-        /// <summary> A different method of doing convolution which avoids reshaping the input, and uses gemm on smaller matrices with diagonal sums to create output. </summary>
-        diagonal = 1
+        /// <summary> Perform the binary convolution as a real-valued GEMM operation (e.g. values are -1.0 and 1.0). </summary>
+        gemm = 0,
+        /// <summary> Perform binary convolution as bitwise operations. </summary>
+        bitwise = 1
     };
 
     /// <summary> Specifies the hyper parameters of the convolutional layer. </summary>
-    struct ConvolutionalParameters
+    struct BinaryConvolutionalParameters
     {
         /// <summary> Width and height of the receptive field that is slid over the input. </summary>
         size_t receptiveField;
@@ -37,25 +39,22 @@ namespace neural
         size_t stride;
 
         /// <summary> Method for doing convolution. </summary>
-        ConvolutionMethod method;
-
-        /// <summary> Number of filters to batch at a time when using the Diagonal method. </summary>
-        size_t numFiltersAtATime;
+        BinaryConvolutionMethod method;
     };
 
-    /// <summary> A layer in a neural network that implements a fully connected layer, meaning all nodes in this layer are connected to all
-    /// outputs of the previous layer (which are the inputs of this layer). </summary>
+    /// <summary> A layer in a neural network that implements a binarized convolutional layer, where operations will occur
+    /// on binarized input with binarized weights. </summary>
     template <typename ElementType>
-    class ConvolutionalLayer : public Layer<ElementType>
+    class BinaryConvolutionalLayer : public Layer<ElementType>
     {
     public:
 
-        /// <summary> Instantiates an instance of a convolutional layer. </summary>
+        /// <summary> Instantiates an instance of a binarized convolutional layer. </summary>
         ///
         /// <param name="layerParameters"> The parameters common to every layer. </param>
         /// <param name="convolutionalParameters"> The hyperparameters for this convolutional layer. </param>
         /// <param name="weights"> The set of weights to apply. </param>
-        ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, ConstTensorReferenceType& weights);
+        BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, ConstTensorReferenceType& weights);
 
         /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
         void Compute() override;
@@ -63,7 +62,7 @@ namespace neural
         /// <summary> Indicates the kind of layer. </summary>
         ///
         /// <returns> An enum indicating the layer type. </returns>
-        LayerType GetLayerType() const override { return LayerType::convolution; }
+        LayerType GetLayerType() const override { return LayerType::binaryConvolution; }
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -76,6 +75,10 @@ namespace neural
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        // Fills a vector of vectors where each row is the set of input values corresponding to a filter, stretched into a vector.
+        // The number of vectors is equal to the number of locations that the filter is slid over the input tensor.
+        void ReceptiveFieldToBinaryRows(ConstTensorReferenceType input, std::vector<std::vector<uint64_t>>& shapedInput);
+
         // Fills a matrix (backed by the array outputMatrix) where the columns the set of input values corresponding to a filter, stretched into a vector.
         // The number of columns is equal to the number of locations that a filter is slide over the input tensor.
         void ReceptiveFieldToColumns(ConstTensorReferenceType input, MatrixType& shapedInput);
@@ -83,16 +86,19 @@ namespace neural
         using Layer<ElementType>::_layerParameters;
         using Layer<ElementType>::_output;
 
-        ConvolutionalParameters _convolutionalParameters;
-        TensorType _weights;
+        BinaryConvolutionalParameters _convolutionalParameters;
+        constexpr static size_t _binaryElementSize = 64;
+        std::vector<std::vector<uint64_t>> _binarizedWeights;
+        std::vector<std::vector<uint64_t>> _binarizedShapedInput;
+        std::vector<ElementType> _filterMeans;
 
-        MatrixType _shapedInput;
-        MatrixType _weightsMatrix;
-        MatrixType _outputMatrix;
+        MatrixType _realValuedShapedInput;
+        MatrixType _realValuedWeightsMatrix;
+        MatrixType _realValuedOutputMatrix;
     };
 
 }
 }
 }
 
-#include "../tcc/ConvolutionalLayer.tcc"
+#include "../tcc/BinaryConvolutionalLayer.tcc"

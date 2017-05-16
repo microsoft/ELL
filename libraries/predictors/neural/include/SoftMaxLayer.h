@@ -1,12 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     BiasLayer.h (neural)
+//  File:     SoftmaxLayer.h (neural)
 //  Authors:  Byron Changuion
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
 #include "Layer.h"
 
 namespace ell
@@ -15,17 +16,16 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> A layer in a neural network that applies a bias to the input. </summary>
+    /// <summary> A layer in a neural network that provides a softmax mapping of the input to output such that the output probabilities sum up to 1. </summary>
     template <typename ElementType>
-    class BiasLayer : public Layer<ElementType>
+    class SoftmaxLayer : public Layer<ElementType>
     {
     public:
 
-        /// <summary> Instantiates an instance of a bias layer. </summary>
+        /// <summary> Instantiates an instance of a softmax layer. </summary>
         ///
         /// <param name="layerParameters"> The parameters common to every layer. </param>
-        /// <param name="bias"> The bias values to apply to input values. </param>
-        BiasLayer(const LayerParameters& layerParameters, const VectorType& bias);
+        SoftmaxLayer(const LayerParameters& layerParameters);
 
         /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
         void Compute() override;
@@ -33,7 +33,7 @@ namespace neural
         /// <summary> Indicates the kind of layer. </summary>
         ///
         /// <returns> An enum indicating the layer type. </returns>
-        LayerType GetLayerType() const override { return LayerType::bias; }
+        LayerType GetLayerType() const override { return LayerType::softmax; }
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -48,12 +48,10 @@ namespace neural
     private:
         using Layer<ElementType>::_layerParameters;
         using Layer<ElementType>::_output;
-
-        VectorType _bias;
     };
 
 }
 }
 }
 
-#include "../tcc/BiasLayer.tcc"
+#include "../tcc/SoftmaxLayer.tcc"

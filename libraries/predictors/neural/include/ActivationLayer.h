@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "ILayer.h"
+#include "Layer.h"
 
 namespace ell
 {
@@ -15,38 +15,24 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> A layer in a neural network that applies a function to the input. </summary>
-    template <typename ActivationFunctionType>
-    class ActivationLayer : public ILayer
+    /// <summary> A layer in a neural network that applies an activation function to the input. </summary>
+    template <typename ElementType, template <typename> class ActivationFunctionType>
+    class ActivationLayer : public Layer<ElementType>
     {
     public:
 
         /// <summary> Instantiates an instance of an activation layer. </summary>
         ///
-        /// <param name="numNodes"> The number of nodes in the layer. For this layer type, it is equivalent to the number of inputs and outputs. </param>
-        ActivationLayer(size_t numNodes) : _output(numNodes) { };
+        /// <param name="layerParameters"> The parameters common to every layer. </param>
+        ActivationLayer(const LayerParameters& layerParameters);
 
-        /// <summary> Feeds the input forward throught the layer and returns a reference to the output. </summary>
-        ///
-        /// <param name="input"> The input vector. </param>
-        ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& FeedForward(const LayerVector& input) override;
+        /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
+        void Compute() override;
 
-        /// <summary> Returns a reference to the output values, which is the result after the last #Forward call. </summary>
+        /// <summary> Indicates the kind of layer. </summary>
         ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& GetOutput() override { return _output; }
-
-        /// <summary> Returns the expected size of the input vector. </summary>
-        ///
-        /// <returns> Expected size of the input vector. </returns>
-        size_t NumInputs() const override { return _output.Size(); }
-
-        /// <summary> Returns the size of the output vector. </summary>
-        ///
-        /// <returns> Size of the output vector. </returns>
-        size_t NumOutputs() const override { return _output.Size(); }
+        /// <returns> An enum indicating the layer type. </returns>
+        LayerType GetLayerType() const override { return LayerType::activation; }
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -59,8 +45,10 @@ namespace neural
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        LayerVector _output;
-        ActivationFunctionType _activation;
+        using Layer<ElementType>::_layerParameters;
+        using Layer<ElementType>::_output;
+
+        ActivationFunctionType<ElementType> _activation;
     };
 
 }

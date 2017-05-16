@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "ILayer.h"
+#include "Layer.h"
 
 // math
 #include "Matrix.h"
@@ -24,57 +24,32 @@ namespace neural
     /// <summary> Specifies the hyper parameters of the convolutional layer. </summary>
     struct PoolingParameters
     {
-        /// <summary> Width of the input. </summary>
-        size_t width;
-
-        /// <summary> Height of the input. </summary>
-        size_t height;
-
-        /// <summary> Depth of the input. </summary>
-        size_t depth;
-
         /// <summary> Width and height of the pooling field that is slid over the input. </summary>
         size_t poolingSize;
 
         /// <summary> Number of elements to move/jump when sliding over the input. Often this is the same as poolingSize. </summary>
         size_t stride;
-
-        /// <summary> Amount of zero padding to use on the input to ensure the output is of the proper size. Often this is 0. </summary>
-        size_t padding;
     };
 
     /// <summary> A layer in a neural network that implements pooling. </summary>
-    template <typename PoolingFunctionType>
-    class PoolingLayer : public ILayer
+    template <typename ElementType, template <typename> class PoolingFunctionType>
+    class PoolingLayer : public Layer<ElementType>
     {
     public:
 
         /// <summary> Instantiates an instance of a pooling layer. </summary>
         ///
-        /// <param name="poolingParameters"> Specifies the input and pooling characteristics of the layer. </param>
-        PoolingLayer(PoolingParameters poolingParameters);
+        /// <param name="layerParameters"> The parameters common to every layer. </param>
+        /// <param name="poolingParameters"> Specifies the pooling characteristics of the layer. </param>
+        PoolingLayer(const LayerParameters& layerParameters, PoolingParameters poolingParameters);
 
-        /// <summary> Feeds the input forward throught the layer and returns a reference to the output. </summary>
-        ///
-        /// <param name="input"> The input vector. </param>
-        ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& FeedForward(const LayerVector& input) override;
+        /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
+        void Compute() override;
 
-        /// <summary> Returns a reference to the output values, which is the result after the last #Forward call. </summary>
+        /// <summary> Indicates the kind of layer. </summary>
         ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& GetOutput() override { return _output; }
-
-        /// <summary> Returns the expected size of the input vector. </summary>
-        ///
-        /// <returns> Expected size of the input vector. </returns>
-        size_t NumInputs() const override;
-
-        /// <summary> Returns the size of the output vector. </summary>
-        ///
-        /// <returns> Size of the output vector. </returns>
-        size_t NumOutputs() const override;
+        /// <returns> An enum indicating the layer type. </returns>
+        LayerType GetLayerType() const override { return LayerType::pooling; }
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -87,10 +62,10 @@ namespace neural
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        size_t _outputWidth;
-        size_t _outputHeight;
+        using Layer<ElementType>::_layerParameters;
+        using Layer<ElementType>::_output;
+
         PoolingParameters _poolingParameters;
-        LayerVector _output;
     };
 
 }

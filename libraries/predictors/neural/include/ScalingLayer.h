@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "ILayer.h"
+#include "Layer.h"
 
 namespace ell
 {
@@ -15,41 +15,25 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> A layer in a neural network that applies a bias to the input. </summary>
-    class ScalingLayer : public ILayer
+    /// <summary> A layer in a neural network that applies a scale to the input. </summary>
+    template <typename ElementType>
+    class ScalingLayer : public Layer<ElementType>
     {
     public:
 
-        /// <summary> Instantiates an instance of a scale layer. </summary>
+        /// <summary> Instantiates an instance of a scaling layer. </summary>
         ///
-        /// <param name="numNodes"> The number of nodes in the layer. For this layer type, it is equivalent to the number of inputs and outputs. </param>
+        /// <param name="layerParameters"> The parameters common to every layer. </param>
         /// <param name="bias"> The scaling values to apply to input values. </param>
-        /// <param name="applyCount"> The number of times to apply each bias value. Often, there is one scale value for each input value, but not always.
-        /// For example in a convolutional layer, there may be one value for every input value in the same filter. In that case, the 
-        /// applyCount equals the number of neurons per fitler.
-        ScalingLayer(size_t numNodes, std::vector<double>& scales, size_t applyCount = 1);
+        ScalingLayer(const LayerParameters& layerParameters, const VectorType& scales);
 
-        /// <summary> Feeds the input forward throught the layer and returns a reference to the output. </summary>
-        ///
-        /// <param name="input"> The input vector. </param>
-        ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& FeedForward(const LayerVector& input) override;
+        /// <summary> Feeds the input forward through the layer. </summary>
+        void Compute() override;
 
-        /// <summary> Returns a reference to the output values, which is the result after the last #Forward call. </summary>
+        /// <summary> Indicates the kind of layer. </summary>
         ///
-        /// <returns> A reference to the output vector. </returns>
-        LayerVector& GetOutput() override { return _output; }
-
-        /// <summary> Returns the expected size of the input vector. </summary>
-        ///
-        /// <returns> Expected size of the input vector. </returns>
-        size_t NumInputs() const override { return _output.Size(); }
-
-        /// <summary> Returns the size of the output vector. </summary>
-        ///
-        /// <returns> Size of the output vector. </returns>
-        size_t NumOutputs() const override { return _output.Size(); }
+        /// <returns> An enum indicating the layer type. </returns>
+        LayerType GetLayerType() const override { return LayerType::scaling; }
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
@@ -62,12 +46,14 @@ namespace neural
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        size_t _applyCount;
-        LayerVector _scales;
-        LayerVector _output;
+        using Layer<ElementType>::_layerParameters;
+        using Layer<ElementType>::_output;
+
+        VectorType _scales;
     };
 
 }
 }
 }
 
+#include "../tcc/ScalingLayer.tcc"

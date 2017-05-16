@@ -1,0 +1,49 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     ScalingLayer.tcc (neural)
+//  Authors:  Byron Changuion
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "ScalingLayer.h"
+
+namespace ell
+{
+namespace predictors
+{
+namespace neural
+{
+    template <typename ElementType>
+    ScalingLayer<ElementType>::ScalingLayer(const LayerParameters& layerParameters, const VectorType& scales) :
+        Layer<ElementType>(layerParameters),
+        _scales(scales)
+    {
+    }
+
+    template <typename ElementType>
+    void ScalingLayer<ElementType>::Compute()
+    {
+        auto output = GetOutputMinusPadding();
+        auto& input = _layerParameters.input;
+
+        AssignValues(input, output);
+        math::TensorOperations::Multiply<math::Dimension::channel>(_scales, output);
+    }
+
+    template <typename ElementType>
+    void ScalingLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        // TODO:
+    }
+
+    template <typename ElementType>
+    void ScalingLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        // TODO:
+    }
+
+}
+}
+}
+

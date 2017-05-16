@@ -167,7 +167,7 @@ namespace math
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const;
+        auto Transpose() const -> ConstMatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>;
 
         /// <summary> Gets a constant reference to a block-shaped sub-matrix. </summary>
         ///
@@ -334,7 +334,7 @@ namespace math
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const;
+        auto Transpose() const -> MatrixReference<ElementType, TransposeMatrixLayout<Layout>::layout>;
 
         /// <summary> Gets a const reference to a block-shaped sub-matrix. </summary>
         ///
@@ -448,6 +448,11 @@ namespace math
 
         /// <summary> Copy Constructor. </summary>
         ///
+        /// <param name="other"> The matrix being copied. </param>
+        Matrix(ConstMatrixReference<ElementType, Layout>& other);
+
+        /// <summary> Copy Constructor. </summary>
+        ///
         /// <param name="other"> [in,out] The matrix being copied. </param>
         Matrix(const Matrix<ElementType, Layout>& other);
 
@@ -501,7 +506,13 @@ namespace math
     using ColumnMatrix = Matrix<ElementType, MatrixLayout::columnMajor>;
 
     template <typename ElementType>
+    using ColumnMatrixReference = Matrix<ElementType, MatrixLayout::columnMajor>;
+
+    template <typename ElementType>
     using RowMatrix = Matrix<ElementType, MatrixLayout::rowMajor>;
+
+    template <typename ElementType>
+    using RowMatrixReference = MatrixReference<ElementType, MatrixLayout::rowMajor>;
 }
 }
 

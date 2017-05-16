@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     MaxPoolingFunction.cpp (neural)
+//  File:     MaxPoolingFunction.tcc (neural)
 //  Authors:  Byron Changuion
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,16 +18,19 @@ namespace predictors
 {
 namespace neural
 {
-    MaxPoolingFunction::MaxPoolingFunction() : _max(-(std::numeric_limits<double>::max()))
+    template <typename ElementType>
+    MaxPoolingFunction<ElementType>::MaxPoolingFunction() : _max(-(std::numeric_limits<ElementType>::max()))
     {
     }
 
-    void MaxPoolingFunction::Accumulate(double input)
+    template <typename ElementType>
+    void MaxPoolingFunction<ElementType>::Accumulate(ElementType input)
     {
         _max = std::max(_max, input);
     }
 
-    double MaxPoolingFunction::GetValue() const
+    template <typename ElementType>
+    ElementType MaxPoolingFunction<ElementType>::GetValue() const
     {
         return _max;
     }

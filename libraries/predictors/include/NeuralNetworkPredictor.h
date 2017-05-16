@@ -18,15 +18,17 @@
 #include "Dataset.h"
 
 // neural network
-#include "ILayer.h"
+#include "Layer.h"
 #include "ActivationLayer.h"
 #include "BatchNormalizationLayer.h"
 #include "BiasLayer.h"
+#include "BinaryConvolutionalLayer.h"
 #include "ConvolutionalLayer.h"
 #include "FullyConnectedLayer.h"
 #include "InputLayer.h"
 #include "PoolingLayer.h"
-#include "ScaledInputLayer.h"
+#include "ScalingLayer.h"
+#include "SoftmaxLayer.h"
 
 // utilities
 #include "IArchivable.h"
@@ -41,21 +43,28 @@ namespace ell
 namespace predictors
 {
     /// <summary> A neural network predictor. </summary>
-    class NeuralNetworkPredictor : public IPredictor<std::vector<double>>, public utilities::IArchivable
+    template <typename ElementType>
+    class NeuralNetworkPredictor : public IPredictor<std::vector<ElementType>>, public utilities::IArchivable
     {
     public:
         /// <summary> Type of the input vector expected by this predictor type. </summary>
-        using DataVectorType = data::FloatDataVector;
+        using DataVectorType = typename neural::Layer<ElementType>::DataVectorType;
+        /// <summary> Dimensions of the input and output tensors. </summary>
+        using Shape = typename math::Triplet;
 
+        /// <summary> A unique_ptr to the input layer for this predictor. </summary>
+        using InputLayerReference = std::unique_ptr<neural::InputLayer<ElementType>>;
         /// <summary> A vector of layers. </summary>
-        using Layers = std::vector<std::unique_ptr<neural::ILayer>>;
+        using Layers = std::vector<std::unique_ptr<neural::Layer<ElementType>>>;
 
         NeuralNetworkPredictor() = default;
 
         /// <summary> Constructs an instance of NerualNetworkPredictor. </summary>
         ///
-        /// <param name="layers"> The layers making up this network. </param>
-        NeuralNetworkPredictor(Layers&& layers);
+        /// <param name="inputLayer"> The input layer for this network. </param>
+        /// <param name="layers"> The substative layers comprising this network. The first layer
+        /// in this vector receives its input from the input layer. </param>
+        NeuralNetworkPredictor(InputLayerReference&& inputLayer, Layers&& layers);
 
         /// <summary> Returns the underlying layers. </summary>
         ///
@@ -70,24 +79,24 @@ namespace predictors
         /// <summary> Gets the dimension of the input layer. </summary>
         ///
         /// <returns> The dimension. </returns>
-        size_t NumInputs() const;
+        Shape GetInputShape() const;
 
         /// <summary> Gets the dimension of the output layer. </summary>
         ///
         /// <returns> The dimension. </returns>
-        size_t NumOutputs() const;
+        Shape GetOutputShape() const;
 
         /// <summary> Returns the output of the network for a given input. </summary>
         ///
         /// <param name="input"> The data vector. </param>
         ///
         /// <returns> The prediction. </returns>
-        const std::vector<double>& Predict(const DataVectorType& dataVector) const;
+        const std::vector<ElementType>& Predict(const DataVectorType& dataVector) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "NeuralPredictor"; }
+        static std::string GetTypeName() { return "NeuralPredictor2"; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -105,9 +114,12 @@ namespace predictors
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        InputLayerReference _inputLayer;
         Layers _layers;
-        mutable std::vector<double> _output;
+        mutable std::vector<ElementType> _output;
     };
 
 }
 }
+
+#include "../tcc/NeuralNetworkPredictor.tcc"

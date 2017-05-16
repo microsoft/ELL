@@ -74,7 +74,7 @@ namespace math
     template<typename ElementType>
     struct TensorContents
     {
-        Triplet layoutShape;
+        Triplet layout;
         std::array<size_t, 2> increments;
         ElementType* pData;
     };
@@ -111,22 +111,27 @@ namespace math
         /// <summary> Gets the number of rows. </summary>
         ///
         /// <returns> The number of rows. </returns>
-        size_t NumRows() const { return _contents.layoutShape[TensorLayoutT::rowPosition]; }
+        size_t NumRows() const { return _contents.layout[TensorLayoutT::rowPosition]; }
 
         /// <summary> Gets the number of columns. </summary>
         ///
         /// <returns> The number of columns. </returns>
-        size_t NumColumns() const { return _contents.layoutShape[TensorLayoutT::columnPosition]; }
+        size_t NumColumns() const { return _contents.layout[TensorLayoutT::columnPosition]; }
 
         /// <summary> Gets the number of channels. </summary>
         ///
         /// <returns> The number of channels. </returns>
-        size_t NumChannels() const { return _contents.layoutShape[TensorLayoutT::channelPosition]; }
+        size_t NumChannels() const { return _contents.layout[TensorLayoutT::channelPosition]; }
 
         /// <summary> Gets the three sizes that make up the tensor's layout shape. </summary>
         ///
         /// <returns> The layout shape. </returns>
-        Triplet GetLayoutShape() const { return _contents.layoutShape; }
+        Triplet GetLayout() const { return _contents.layout; }
+
+        /// <summary> Gets the three dimenions of the tensor in canonical order (row, column, channel). </summary>
+        ///
+        /// <returns> The shape of the dimensions in canonical order. </returns>
+        Triplet GetShape() const { return {NumRows(), NumColumns(), NumChannels()}; }
 
         /// <summary> Element access operator. </summary>
         ///
@@ -259,6 +264,12 @@ namespace math
         /// <returns> A reference to a tensor element. </returns>
         ElementType& operator()(Triplet coordinate);
 
+        /// <summary> Flattens a tensor into a row vector. Works only when the tensor dimensions are full
+        /// (namely, not a subtensor). </summary>
+        ///
+        /// <returns> A VectorReference that which includes all of the tensor elements. </returns>
+        VectorReference<ElementType, VectorOrientation::row> ReferenceAsVector();
+
         /// <summary>
         /// Returns a matrix reference that includes all of the tensor elements, by flattening the first
         /// tensor dimension.
@@ -377,6 +388,22 @@ namespace math
         ///
         /// <param name="list"> A triply nested initalizer list. </param>
         Tensor(std::initializer_list<std::initializer_list<std::initializer_list<ElementType>>> list);
+
+
+        /// <summary> Fills the Tensor with a given value. </summary>
+        ///
+        /// <param name="value"> The value. </param>
+        void Fill(ElementType value);
+
+        /// <summary>
+        /// Generates elements of the tensor by repeatedly calling a generator function (such as a random
+        /// number generator).
+        /// </summary>
+        ///
+        /// <typeparam name="GeneratorType"> Type of lambda or functor to use as a generator. </typeparam>
+        /// <param name="generator"> The generator function. </param>
+        template <typename GeneratorType>
+        void Generate(GeneratorType generator);
 
     private:
         // abbreviation

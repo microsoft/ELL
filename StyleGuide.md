@@ -33,6 +33,8 @@ Names should be descriptive and self-evident, rather than terse. Use whole words
 Classes, structs, and enum classes:
 use PascalCase, e.g., `class MyClass {};`
 
+use camelCase for name of enum values e.g., `enum MyEnum { valueOne, valueTwo };`
+
 Functions, member and non-member:  
 use PascalCase, e.g., `int GetValue() const { return _value; }`  
 
