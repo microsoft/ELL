@@ -39,7 +39,7 @@ namespace math
         DEBUG_THROW(v.Size() != T.GetLayoutShape()[2], utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
         for (size_t i = 0; i < v.Size(); ++i)
         {
-            Operations::Add(v[i], T.GetSlice<dimension0, dimension1>(i));
+            Operations::Add(v[i], T.template GetSlice<dimension0, dimension1 >(i));
         }
     }
 
@@ -49,7 +49,7 @@ namespace math
         DEBUG_THROW(v.Size() != T.GetLayoutShape()[2], utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
         for (size_t i = 0; i < v.Size(); ++i)
         {
-            Operations::Multiply(v[i], T.GetSlice<dimension0, dimension1>(i));
+            Operations::Multiply(v[i], T.template GetSlice<dimension0, dimension1>(i));
         }
     }
 
@@ -59,7 +59,7 @@ namespace math
         DEBUG_THROW(s.Size() != T.GetLayoutShape()[2], utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
         for (size_t i = 0; i < s.Size(); ++i)
         {
-            Operations::MultiplyAdd(s[i], b[i], T.GetSlice<dimension0, dimension1>(i));
+            Operations::MultiplyAdd(s[i], b[i], T.template GetSlice<dimension0, dimension1>(i));
         }
     }
 
@@ -69,7 +69,7 @@ namespace math
         DEBUG_THROW(s.Size() != T.GetLayoutShape()[1], utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
         for (size_t i = 0; i < s.Size(); ++i)
         {
-            Operations::MultiplyAdd(s[i], b[i], T.GetSlice<dimension0, dimension2>(i));
+            Operations::MultiplyAdd(s[i], b[i], T.template GetSlice<dimension0, dimension2>(i));
         }
     }
 
@@ -99,7 +99,7 @@ namespace math
         DEBUG_THROW(v.Size() != T.GetLayoutShape()[1], utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
         for (size_t i = 0; i < v.Size(); ++i)
         {
-            Operations::Multiply(v[i], T.GetSlice<dimension0, dimension2>(i));
+            Operations::Multiply(v[i], T.template GetSlice<dimension0, dimension2>(i));
         }
     }
 
@@ -129,7 +129,7 @@ namespace math
         DEBUG_THROW(v.Size() != T.GetLayoutShape()[1], utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "vector and tensor dimensions must be the same"));
         for (size_t i = 0; i < v.Size(); ++i)
         {
-            Operations::Add(v[i], T.GetSlice<dimension0, dimension2>(i));
+            Operations::Add(v[i], T.template GetSlice<dimension0, dimension2>(i));
         }
     }
 }
