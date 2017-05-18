@@ -13,17 +13,19 @@
 
 namespace ell
 {
-struct LinearTrainerArguments
-{
-    enum class Algorithm
+    struct LinearTrainerArguments
     {
-        SGD,
-        SDSGD
-    };
+        enum class Algorithm
+        {
+            SGD,
+            SDSGD,
+            SDCSGD
+        };
 
     Algorithm algorithm = Algorithm::SGD;
 
     double regularization;
+    bool normalize;
 };
 
 /// <summary> Parsed version of LinearTrainerArguments. </summary>

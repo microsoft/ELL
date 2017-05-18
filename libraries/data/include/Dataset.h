@@ -15,7 +15,6 @@
 
 // utilities
 #include "AbstractInvoker.h"
-#include "StlReferenceIterator.h"
 #include "TypeTraits.h"
 
 // stl
@@ -74,7 +73,6 @@ namespace data
     {
     public:
         using DatasetExampleType = DatasetExampleT;
-        using ExampleReferenceIterator = utilities::VectorReferenceIterator<DatasetExampleType>;
 
         /// <summary> Iterator class. </summary>
         template <typename IteratorExampleType>
@@ -121,6 +119,11 @@ namespace data
         Dataset<DatasetExampleType>& operator=(Dataset&&) = default;
 
         Dataset<DatasetExampleType>& operator=(const Dataset&) = delete;
+
+        /// <summary> Swaps the contents of this dataset with the contents of another. </summary>
+        ///
+        /// <param name="other"> The other dataset. </param>
+        void Swap(Dataset& other);
 
         /// <summary> Returns the number of examples in the data set. </summary>
         ///
@@ -177,7 +180,7 @@ namespace data
         /// the way to the end. </param>
         ///
         /// <returns> The example reference iterator. </returns>
-        ExampleReferenceIterator GetExampleReferenceIterator(size_t fromIndex = 0, size_t size = 0) const;
+        ExampleReferenceIterator<DatasetExampleType> GetExampleReferenceIterator(size_t fromIndex = 0, size_t size = 0) const;
 
         /// <summary> Returns an AnyDataset that represents an interval of examples from this dataset. </summary>
         ///

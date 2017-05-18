@@ -27,7 +27,7 @@ ExampleType GetExample()
 }
 
 template <typename DataVectorType1, typename DataVectorType2>
-void CopyAsTest()
+void ExampleCopyAsTest()
 {
     using ExampleType1 = data::Example<DataVectorType1, data::WeightLabel>;
     using ExampleType2 = data::Example<DataVectorType2, data::WeightLabel>;
@@ -49,31 +49,31 @@ void CopyAsTest()
 }
 
 template <typename DataVectorType>
-void CopyAsTestDispatch()
+void ExampleCopyAsTestDispatch()
 {
-    CopyAsTest<DataVectorType, data::AutoDataVector>();
-    CopyAsTest<DataVectorType, data::DoubleDataVector>();
-    CopyAsTest<DataVectorType, data::FloatDataVector>();
-    CopyAsTest<DataVectorType, data::ShortDataVector>();
-    CopyAsTest<DataVectorType, data::ByteDataVector>();
-    CopyAsTest<DataVectorType, data::SparseDoubleDataVector>();
-    CopyAsTest<DataVectorType, data::SparseFloatDataVector>();
-    CopyAsTest<DataVectorType, data::SparseShortDataVector>();
-    CopyAsTest<DataVectorType, data::SparseByteDataVector>();
-    CopyAsTest<DataVectorType, data::SparseBinaryDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::AutoDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::DoubleDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::FloatDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::ShortDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::ByteDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::SparseDoubleDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::SparseFloatDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::SparseShortDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::SparseByteDataVector>();
+    ExampleCopyAsTest<DataVectorType, data::SparseBinaryDataVector>();
 }
 
-void CopyAsTests()
+void ExampleCopyAsTests()
 {
-    CopyAsTestDispatch<data::AutoDataVector>();
-    CopyAsTestDispatch<data::DoubleDataVector>();
-    CopyAsTestDispatch<data::FloatDataVector>();
-    CopyAsTestDispatch<data::ShortDataVector>();
-    CopyAsTestDispatch<data::ByteDataVector>();
-    CopyAsTestDispatch<data::SparseDoubleDataVector>();
-    CopyAsTestDispatch<data::SparseFloatDataVector>();
-    CopyAsTestDispatch<data::SparseShortDataVector>();
-    CopyAsTestDispatch<data::SparseByteDataVector>();
-    CopyAsTestDispatch<data::SparseBinaryDataVector>();
+    ExampleCopyAsTestDispatch<data::AutoDataVector>();
+    ExampleCopyAsTestDispatch<data::DoubleDataVector>();
+    ExampleCopyAsTestDispatch<data::FloatDataVector>();
+    ExampleCopyAsTestDispatch<data::ShortDataVector>();
+    ExampleCopyAsTestDispatch<data::ByteDataVector>();
+    ExampleCopyAsTestDispatch<data::SparseDoubleDataVector>();
+    ExampleCopyAsTestDispatch<data::SparseFloatDataVector>();
+    ExampleCopyAsTestDispatch<data::SparseShortDataVector>();
+    ExampleCopyAsTestDispatch<data::SparseByteDataVector>();
+    ExampleCopyAsTestDispatch<data::SparseBinaryDataVector>();
 }
 }

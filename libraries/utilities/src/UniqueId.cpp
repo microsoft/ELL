@@ -12,7 +12,6 @@
 
 namespace ell
 {
-/// <summary> utilities namespace </summary>
 namespace utilities
 {
     size_t UniqueId::_nextId = 1000;

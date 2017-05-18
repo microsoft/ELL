@@ -24,15 +24,15 @@ namespace data
 
     void SequentialLineIterator::Next()
     {
-        auto spNextLine = std::make_shared<std::string>();
-        std::getline(_iFStream, *spNextLine, _delim);
+        auto pNextLine = std::make_shared<std::string>();
+        std::getline(_iFStream, *pNextLine, _delim);
         if (_iFStream.fail())
         {
-            _spCurrentLine = nullptr;
+            _pCurrentLine = nullptr;
         }
         else
         {
-            _spCurrentLine = spNextLine;
+            _pCurrentLine = pNextLine;
         }
     }
 }

@@ -14,11 +14,13 @@ set (include include/ConstantPredictor.h
              include/LinearPredictor.h
              include/NeuralNetworkPredictor.h
              include/SignPredictor.h
-             include/SingleElementThresholdPredictor.h)
+             include/SingleElementThresholdPredictor.h
+             include/Normalizer.h)
 
 set (tcc tcc/ForestPredictor.tcc
          tcc/SignPredictor.tcc
-         tcc/NeuralNetworkPredictor.tcc)
+         tcc/NeuralNetworkPredictor.tcc
+         tcc/Normalizer.tcc)
 
 set (neural_include neural/include/ActivationLayer.h
                     neural/include/BatchNormalizationLayer.h

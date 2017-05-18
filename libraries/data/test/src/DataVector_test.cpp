@@ -11,10 +11,10 @@
 // data
 #include "AutoDataVector.h"
 #include "DataVector.h"
-#include "DataVectorOperators.h"
 #include "DenseDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
+#include "DataVectorTransformations.h"
 
 // math
 #include "Vector.h"
@@ -33,20 +33,28 @@ namespace ell
 template <typename DataVectorType>
 void IDataVectorTest()
 {
-    DataVectorType u{ { 0, 12 }, { 3, -7 }, { 4, 1 } };
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(12 * 12 + 7 * 7 + 1 * 1)));
+    DataVectorType u{ { 0, 2 }, { 3, -7 }, { 4, 1 } };
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(2 * 2 + 7 * 7 + 1 * 1)));
 
-    math::RowVector<double> w{ 1, 1, 1, 1, 1, 1 };
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w), 12.0 - 7.0 + 1.0));
+    math::RowVector<double> w{ 1, 1, 1, 0, -1, 0 };
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w), 1.0));
 
-    u.AddTo(w, 2);
-    math::RowVector<double> z{ 25, 1, 1, -13, 3, 1 };
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w.ToArray(), z.ToArray()));
+    u.AddTo(w);
+    math::RowVector<double> r0{ 3, 1, 1, -7, 0, 0 };
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w.ToArray(), r0.ToArray()));
+
+    u.AddTransformedTo<data::IterationPolicy::skipZeros>(w, [](data::IndexValue x){ return -2 * x.value; });
+    math::RowVector<double> r1{ -1, 1, 1, 7, -2, 0 };
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTransformedTo<skipZeros>()", testing::IsEqual(w.ToArray(), r1.ToArray()));
+
+    u.AddTransformedTo<data::IterationPolicy::all>(w, [](data::IndexValue x) { return x.value+1; });
+    math::RowVector<double> r2{ 2, 2, 2, 1, 0, 1 };
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTransformedTo<all>()", testing::IsEqual(w.ToArray(), r2.ToArray()));
 
     std::stringstream ss;
     u.Print(ss);
     auto sss = ss.str();
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Print()", sss == "0:12\t3:-7\t4:1");
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Print()", sss == "0:2\t3:-7\t4:1");
 }
 
 template <typename DataVectorType>
@@ -58,9 +66,17 @@ void IDataVectorBinaryTest()
     math::RowVector<double> w{ 1, 2, 3, 4, 5, 6 };
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w), 1.0 + 4.0 + 5.0));
 
-    u.AddTo(w, 2);
-    math::RowVector<double> z{ 3, 2, 3, 6, 7, 6 };
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w.ToArray(), z.ToArray()));
+    u.AddTo(w);
+    math::RowVector<double> r0{ 2, 2, 3, 5, 6, 6 };
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w.ToArray(), r0.ToArray()));
+
+    u.AddTransformedTo<data::IterationPolicy::skipZeros>(w, [](data::IndexValue x) { return -2 * x.value; });
+    math::RowVector<double> r1{ 0, 2, 3, 3, 4, 6 };
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTransformedTo<skipZeros>()", testing::IsEqual(w.ToArray(), r1.ToArray()));
+
+    u.AddTransformedTo<data::IterationPolicy::all>(w, [](data::IndexValue x) { return x.value + 1; });
+    math::RowVector<double> r2{ 2, 3, 4, 5, 6, 7 };
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTransformedTo<all>()", testing::IsEqual(w.ToArray(), r2.ToArray()));
 
     std::stringstream ss;
     u.Print(ss);
@@ -93,17 +109,30 @@ void IDataVectorTests()
 }
 
 template <typename DataVectorType1, typename DataVectorType2>
-void ToDataVectorTest(std::initializer_list<double> list)
+void DataVectorCopyAsTest(std::initializer_list<double> list, bool testDense = true)
 {
-    const DataVectorType1 v(list);
-    auto u = v.template DeepCopyAs<DataVectorType2>();
-    auto w = v.ToArray();
-    auto z = u.ToArray();
+    const DataVectorType1 a(list);
+    auto b = a.template CopyAs<DataVectorType2>();
+    auto av = a.ToArray();
+    auto bv = b.ToArray();
 
     std::string name1 = typeid(DataVectorType1).name();
     std::string name2 = typeid(DataVectorType2).name();
 
-    testing::ProcessTest(name1 + "::DeepCopyAs<" + name2 + ">", testing::IsEqual(w, z, 1.0e-6));
+    testing::ProcessTest(name1 + "::CopyAs<" + name2 + ">", testing::IsEqual(av, bv, 1.0e-6));
+
+    if (testDense)
+    {
+        auto d = a.template TransformAs<data::IterationPolicy::all, DataVectorType2>([](data::IndexValue x) { return x.value + 3; }, 3);
+        auto dv = d.ToArray();
+        std::vector<double> r{ av[0] + 3, av[1] + 3, av[2] + 3 };
+        testing::ProcessTest(name1 + "::TransformAs<all," + name2 + ">", testing::IsEqual(r, dv, 1.0e-6));
+    }
+
+    auto c = a.template TransformAs<data::IterationPolicy::skipZeros, DataVectorType2>([](data::IndexValue x) { return x.value*x.value; });
+    auto cv = c.ToArray();
+    std::transform(av.begin(), av.end(), av.begin(), [](double x) { return x*x; });
+    testing::ProcessTest(name1 + "::TransformAs<skipZeros," + name2 + ">", testing::IsEqual(av, cv, 1.0e-6));
 }
 
 enum class InitType
@@ -114,7 +143,7 @@ enum class InitType
 };
 
 template <typename DataVectorType>
-void ToDataVectorTestDispatch(InitType maxType)
+void DataVectorCopyAsTestDispatch(InitType maxType)
 {
     std::initializer_list<double> binaryInit = { 1, 0, 1, 0, 0, 0, 0, 1, 0, 1 };
     std::initializer_list<double> integeralInit = { 1, 0, 1, 0, 0, 0, 0, 3, 0, 4 };
@@ -122,30 +151,30 @@ void ToDataVectorTestDispatch(InitType maxType)
     if (maxType == InitType::binary) integeralInit = binaryInit;
     if (maxType != InitType::fractional) fractionalInit = integeralInit;
 
-    ToDataVectorTest<DataVectorType, data::AutoDataVector>(fractionalInit);
-    ToDataVectorTest<DataVectorType, data::DoubleDataVector>(fractionalInit);
-    ToDataVectorTest<DataVectorType, data::FloatDataVector>(fractionalInit);
-    ToDataVectorTest<DataVectorType, data::ShortDataVector>(integeralInit);
-    ToDataVectorTest<DataVectorType, data::ByteDataVector>(integeralInit);
-    ToDataVectorTest<DataVectorType, data::SparseDoubleDataVector>(fractionalInit);
-    ToDataVectorTest<DataVectorType, data::SparseFloatDataVector>(fractionalInit);
-    ToDataVectorTest<DataVectorType, data::SparseShortDataVector>(integeralInit);
-    ToDataVectorTest<DataVectorType, data::SparseByteDataVector>(integeralInit);
-    ToDataVectorTest<DataVectorType, data::SparseBinaryDataVector>(binaryInit);
+    DataVectorCopyAsTest<DataVectorType, data::AutoDataVector>(fractionalInit);
+    DataVectorCopyAsTest<DataVectorType, data::DoubleDataVector>(fractionalInit);
+    DataVectorCopyAsTest<DataVectorType, data::FloatDataVector>(fractionalInit);
+    DataVectorCopyAsTest<DataVectorType, data::ShortDataVector>(integeralInit);
+    DataVectorCopyAsTest<DataVectorType, data::ByteDataVector>(integeralInit);
+    DataVectorCopyAsTest<DataVectorType, data::SparseDoubleDataVector>(fractionalInit);
+    DataVectorCopyAsTest<DataVectorType, data::SparseFloatDataVector>(fractionalInit);
+    DataVectorCopyAsTest<DataVectorType, data::SparseShortDataVector>(integeralInit);
+    DataVectorCopyAsTest<DataVectorType, data::SparseByteDataVector>(integeralInit);
+    DataVectorCopyAsTest<DataVectorType, data::SparseBinaryDataVector>(binaryInit, false);
 }
 
-void ToDataVectorTests()
+void DataVectorCopyAsTests()
 {
-    ToDataVectorTestDispatch<data::AutoDataVector>(InitType::fractional);
-    ToDataVectorTestDispatch<data::DoubleDataVector>(InitType::fractional);
-    ToDataVectorTestDispatch<data::FloatDataVector>(InitType::fractional);
-    ToDataVectorTestDispatch<data::ShortDataVector>(InitType::integral);
-    ToDataVectorTestDispatch<data::ByteDataVector>(InitType::integral);
-    ToDataVectorTestDispatch<data::SparseDoubleDataVector>(InitType::fractional);
-    ToDataVectorTestDispatch<data::SparseFloatDataVector>(InitType::fractional);
-    ToDataVectorTestDispatch<data::SparseShortDataVector>(InitType::integral);
-    ToDataVectorTestDispatch<data::SparseByteDataVector>(InitType::integral);
-    ToDataVectorTestDispatch<data::SparseBinaryDataVector>(InitType::binary);
+    DataVectorCopyAsTestDispatch<data::AutoDataVector>(InitType::fractional);
+    DataVectorCopyAsTestDispatch<data::DoubleDataVector>(InitType::fractional);
+    DataVectorCopyAsTestDispatch<data::FloatDataVector>(InitType::fractional);
+    DataVectorCopyAsTestDispatch<data::ShortDataVector>(InitType::integral);
+    DataVectorCopyAsTestDispatch<data::ByteDataVector>(InitType::integral);
+    DataVectorCopyAsTestDispatch<data::SparseDoubleDataVector>(InitType::fractional);
+    DataVectorCopyAsTestDispatch<data::SparseFloatDataVector>(InitType::fractional);
+    DataVectorCopyAsTestDispatch<data::SparseShortDataVector>(InitType::integral);
+    DataVectorCopyAsTestDispatch<data::SparseByteDataVector>(InitType::integral);
+    DataVectorCopyAsTestDispatch<data::SparseBinaryDataVector>(InitType::binary);
 }
 
 void AutoDataVectorTest()
@@ -178,13 +207,66 @@ void AutoDataVectorTest()
     testing::ProcessTest("AutoDataVector ctor", v9.GetInternalType() == data::IDataVector::Type::SparseBinaryDataVector);
 }
 
-void DataVectorOperatorTest()
+void TransformedDataVectorTest()
 {
     math::RowVector<double> v{ 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    data::AutoDataVector u{ 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0 };
-    v += u;
-    v += 3.0 * u;
-    auto d = u * v.Transpose();
-    testing::ProcessTest("DataVectorOperatorTest", d == 10);
+    data::AutoDataVector u{ 0, 0, 2, 0, -1, 0, 0, 0, 0, 0, 0, 0 };
+
+    v += u * 3.0;
+    math::RowVector<double> r0{ 0, 0, 8, 0, -3, 0, 0, 0, 0, 0, 0, 0 };
+    testing::ProcessTest("TransformedDataVectorTest: operator *", v == r0);
+
+    v += Abs(u);
+    math::RowVector<double> r1{ 0, 0, 10, 0, -2, 0, 0, 0, 0, 0, 0, 0 };
+    testing::ProcessTest("TransformedDataVectorTest: Abs()", v == r1);
+
+    v += Square(u);
+    math::RowVector<double> r2{ 0, 0, 14, 0, -1, 0, 0, 0, 0, 0, 0, 0 };
+    testing::ProcessTest("TransformedDataVectorTest: Square()", v == r2);
+
+    v += ZeroIndicator(u);
+    math::RowVector<double> r3{ 1, 1, 14, 1, -1, 1, 1, 1, 1, 1, 1, 1 };
+    testing::ProcessTest("TransformedDataVectorTest: ZeroIndicator()", v == r3);
+
+    v += Sqrt(u);
+}
+
+template <typename DataVectorType>
+void IteratorTest()
+{
+    DataVectorType u{ 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0 };
+    auto a = u.ToArray(13);
+
+    std::vector<double> b(13);
+    auto denseIter = u.GetIterator<data::IterationPolicy::all>(13);
+    while (denseIter.IsValid())
+    {
+        b[denseIter.Get().index] = denseIter.Get().value;
+        denseIter.Next();
+    }
+    std::string name = typeid(DataVectorType).name();
+    testing::ProcessTest("IteratorTest<" + name + ">", std::equal(a.begin(), a.end(), b.begin()));
+
+    std::vector<double> c(13);
+    auto sparseIter = u.GetIterator<data::IterationPolicy::skipZeros>();
+    while (sparseIter.IsValid())
+    {
+        c[sparseIter.Get().index] = sparseIter.Get().value;
+        sparseIter.Next();
+    }
+    testing::ProcessTest("IteratorTest<" + name + ">", std::equal(b.begin(), b.end(), c.begin()));
+}
+
+void IteratorTests()
+{
+    IteratorTest<data::DoubleDataVector>();
+    IteratorTest<data::FloatDataVector>();
+    IteratorTest<data::ShortDataVector>();
+    IteratorTest<data::ByteDataVector>();
+    IteratorTest<data::SparseDoubleDataVector>();
+    IteratorTest<data::SparseFloatDataVector>();
+    IteratorTest<data::SparseShortDataVector>();
+    IteratorTest<data::SparseByteDataVector>();
+    IteratorTest<data::SparseBinaryDataVector>();
 }
 }

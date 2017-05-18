@@ -19,7 +19,7 @@ namespace data
     template <typename DataVectorType, typename MetadataType>
     template <typename InputDataVectorType, typename InputMetadataType, utilities::IsDifferent<InputDataVectorType, DataVectorType>, IsDataVector<InputDataVectorType>>
     Example<DataVectorType, MetadataType>::Example(const InputDataVectorType& dataVector, const InputMetadataType& metadata)
-        : _dataVector(std::make_shared<const DataVectorType>(dataVector.GetIterator())), _metadata(MetadataType(metadata))
+        : _dataVector(std::make_shared<const DataVectorType>(dataVector.GetIterator<IterationPolicy::skipZeros>())), _metadata(MetadataType(metadata))
     {
     }
 
@@ -44,7 +44,7 @@ namespace data
         // deep copy of data vector
         using DataType = typename TargetExampleType::DataVectorType;
         using MetadataType = typename TargetExampleType::MetadataType;
-        return TargetExampleType(std::make_shared<DataType>(_dataVector->template DeepCopyAs<DataType>()), MetadataType(_metadata));
+        return TargetExampleType(std::make_shared<DataType>(_dataVector->template CopyAs<DataType>()), MetadataType(_metadata));
     }
 
     template <typename DataVectorType, typename MetadataType>

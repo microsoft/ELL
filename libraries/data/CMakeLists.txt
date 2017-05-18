@@ -5,7 +5,7 @@
 set (library_name data)
 
 set (src src/Dataset.cpp
-         src/DataVectorOperators.cpp
+         src/DataVector.cpp
          src/SequentialLineIterator.cpp
          src/SparseEntryParser.cpp
          src/Example.cpp)
@@ -15,7 +15,7 @@ set (include include/AutoDataVector.h
              include/Example.h
              include/ExampleIterator.h
              include/DataVector.h
-             include/DataVectorOperators.h
+             include/DataVectorTransformations.h
              include/ParsingExampleIterator.h
              include/Dataset.h
              include/IndexValue.h
@@ -25,10 +25,12 @@ set (include include/AutoDataVector.h
              include/SparseEntryParser.h
              include/StlIndexValueIterator.h
              include/SupervisedExampleBuilder.h
+             include/TransformedDataVector.h
              include/TransformingIndexValueIterator.h)
 
 set (tcc tcc/AutoDataVector.tcc
          tcc/DataVector.tcc
+         tcc/DataVectorTransformations.tcc
          tcc/DenseDataVector.tcc
          tcc/Example.tcc
          tcc/ExampleIterator.tcc
@@ -38,6 +40,7 @@ set (tcc tcc/AutoDataVector.tcc
          tcc/SparseDataVector.tcc
          tcc/StlIndexValueIterator.tcc
          tcc/SupervisedExampleBuilder.tcc
+         tcc/TransformedDataVector.tcc
          tcc/TransformingIndexValueIterator.tcc)
 
 set (doc doc/README.md)
@@ -47,7 +50,7 @@ source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include} ${tcc} ${doc})
 target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)

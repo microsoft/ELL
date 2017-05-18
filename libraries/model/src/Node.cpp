@@ -19,7 +19,6 @@
 
 namespace ell
 {
-/// <summary> model namespace </summary>
 namespace model
 {
     Node::Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs)

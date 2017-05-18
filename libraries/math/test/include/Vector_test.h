@@ -12,10 +12,10 @@
 
 using namespace ell;
 
-template <typename ElementType, math::VectorOrientation Orientation>
+template <typename ElementType, math::VectorOrientation orientation>
 void TestVector();
 
-template <typename ElementType, math::ImplementationType Implementation>
+template <typename ElementType, math::ImplementationType implementation>
 void TestVectorOperations();
 
 template <typename ElementType>
@@ -23,5 +23,11 @@ void TestElementWiseOperations();
 
 template <typename ElementType>
 void TestVectorToArray();
+
+template<typename ElementType>
+void TestElementwiseTransform();
+
+template<typename ElementType>
+void TestTransformedVectors();
 
 #include "../tcc/Vector_test.tcc"

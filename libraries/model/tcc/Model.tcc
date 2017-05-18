@@ -8,7 +8,6 @@
 
 namespace ell
 {
-/// <summary> model namespace </summary>
 namespace model
 {
     // Hiding some stuff in this namespace that's unlikely to confict with anything

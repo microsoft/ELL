@@ -72,9 +72,9 @@ namespace data
     }
 
     template <typename DefaultDataVectorType>
-    void AutoDataVectorBase<DefaultDataVectorType>::AddTo(math::RowVectorReference<double> vector, double scalar) const
+    void AutoDataVectorBase<DefaultDataVectorType>::AddTo(math::RowVectorReference<double> vector) const
     {
-        _pInternal->AddTo(vector, scalar);
+        _pInternal->AddTo(vector);
     }
 
     template <typename DefaultDataVectorType>
@@ -89,11 +89,25 @@ namespace data
         _pInternal->Print(os);
     }
 
+    template<typename DefaultDataVectorType>
+    template<IterationPolicy policy, typename TransformationType>
+    void AutoDataVectorBase<DefaultDataVectorType>::AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const
+    {
+        _pInternal->AddTransformedTo<policy>(vector, transformation);
+    }
+
     template <typename DefaultDataVectorType>
     template <typename ReturnType, typename... ArgTypes>
-    ReturnType AutoDataVectorBase<DefaultDataVectorType>::DeepCopyAs(ArgTypes... args) const
+    ReturnType AutoDataVectorBase<DefaultDataVectorType>::CopyAs(ArgTypes... args) const
     {
-        return _pInternal->DeepCopyAs<ReturnType>(args...);
+        return _pInternal->CopyAs<ReturnType>(args...);
+    }
+
+    template <typename DefaultDataVectorType>
+    template <IterationPolicy policy, typename ReturnType, typename... ArgTypes>
+    ReturnType AutoDataVectorBase<DefaultDataVectorType>::TransformAs(ArgTypes... args) const
+    {
+        return _pInternal->TransformAs<policy, ReturnType>(args...);
     }
 
     template <typename TargetType>
@@ -112,7 +126,7 @@ namespace data
         bool includesNonBytes = false;
         bool includesNonBinary = false;
 
-        auto iter = defaultDataVector.GetIterator();
+        auto iter = defaultDataVector.GetIterator<IterationPolicy::skipZeros>();
         while (iter.IsValid())
         {
             double value = iter.Get().value;
@@ -177,7 +191,7 @@ namespace data
     template <typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept>
     void AutoDataVectorBase<DefaultDataVectorType>::SetInternal(DefaultDataVectorType defaultDataVector)
     {
-        _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator());
+        _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator<IterationPolicy::skipZeros>());
     }
 
     template <typename DefaultDataVectorType>

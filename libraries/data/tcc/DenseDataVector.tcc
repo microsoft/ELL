@@ -63,6 +63,20 @@ namespace data
         return static_cast<double>(_data[index]);
     }
 
+    template<typename ElementType>
+    template<IterationPolicy policy>
+    VectorIndexValueIterator<policy, ElementType> DenseDataVector<ElementType>::GetIterator(size_t size) const
+    { 
+        return MakeVectorIndexValueIterator<policy>(_data, size); 
+    }
+
+    template<typename ElementType> // move this to datavectorbase?
+    template<IterationPolicy policy>
+    VectorIndexValueIterator<policy, ElementType> DenseDataVector<ElementType>::GetIterator() const
+    {
+        return GetIterator<policy>(PrefixLength());
+    }
+
     template <typename ElementType>
     void DenseDataVector<ElementType>::AppendElement(size_t index, double value)
     {

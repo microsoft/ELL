@@ -47,7 +47,7 @@ namespace trainers
         UniqueValuesResult UniqueValues(ExampleIteratorType exampleIterator) const;
 
     private:
-        size_t SortReduceDeepCopyAss(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const;
+        size_t SortReduceCopy(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const;
     };
 
     /// <summary> A threshold finder that finds all possible thresholds. </summary>

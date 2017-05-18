@@ -41,7 +41,7 @@ use PascalCase, e.g., `int GetValue() const { return _value; }`
 When possible, function names should be imperative mood verbs, e.g., `GetValue()` and `Permute()`. Specifically, accessor member functions should start with `Get`, e.g., `GetOutputVector()`. 
 Exceptions to this rule are:
 
-* a member functions that returns the size of an object, which can simply be `Size()`
+* member functions that returns the size of an object, which can simply be `Size()`
 * type conversion functions, which can start with `To`, e.g., `ToString()`
 * functions that return the number of elements in a collection, which can start with `Num`, e.g. `NumVariables()`
 
@@ -50,6 +50,8 @@ Use `_` (underscore) followed by camelCase, e.g., `_myMemberVariable`
 
 Template typenames: 
 Use PascalCase and add the suffix "Type", e.g., `template <typename SparseVectorType>`
+
+Template variables that are not typenames: Use camelCase, e.g., `template <size_t size>`
 
 ## File structure
 All source code files should start with a header that specifies project name, file name, and author list (see example below)

@@ -8,7 +8,6 @@
 
 namespace ell
 {
-/// <summary> nodes namespace </summary>
 namespace nodes
 {
     template <typename ValueType, bool max>

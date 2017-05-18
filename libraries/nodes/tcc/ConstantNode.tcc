@@ -8,7 +8,6 @@
 
 namespace ell
 {
-/// <summary> nodes namespace </summary>
 namespace nodes
 {
     // superclass (Node) constructor takes two array arguments: inputs and outputs. These are pointers to our local InputPort and OutputPort storage.

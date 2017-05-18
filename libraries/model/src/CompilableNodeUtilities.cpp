@@ -81,7 +81,6 @@ namespace model
         }
     }
 
-    /// <summary>Get this port's value type</summary>
     emitters::VariableType GetPortVariableType(const model::Port& port)
     {
         return PortTypeToVariableType(port.GetType());

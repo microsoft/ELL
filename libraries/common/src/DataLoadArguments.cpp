@@ -59,12 +59,12 @@ namespace common
                 return parseErrorMessages;
             }
 
-            auto dataIterator = GetExampleIterator(*this);
-            while (dataIterator.IsValid())
+            auto exampleIterator = GetExampleIterator(*this);
+            while (exampleIterator.IsValid())
             {
-                auto size = dataIterator.Get().GetDataVector().PrefixLength();
+                auto size = exampleIterator.Get().GetDataVector().PrefixLength();
                 parsedDataDimension = std::max(parsedDataDimension, size);
-                dataIterator.Next();
+                exampleIterator.Next();
             }
         }
         else if (dataDimension != "")

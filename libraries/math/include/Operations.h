@@ -35,19 +35,19 @@ namespace math
         /// <summary> Adds a scalar to a vector, v += s. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <typeparam name="orientation"> Vector orientation. </typeparam>
         /// <param name="s"> The scalar being added. </param>
         /// <param name="v"> [in,out] The vector to which the scalar is added. </param>
-        template <typename ElementType, VectorOrientation Orientation>
-        static void Add(ElementType s, VectorReference<ElementType, Orientation> v);
+        template <typename ElementType, VectorOrientation orientation>
+        static void Add(ElementType s, VectorReference<ElementType, orientation> v);
 
         /// <summary> Adds a scalar to a matrix, M += s. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
         /// <param name="s"> The scalar being added. </param>
         /// <param name="M"> [in,out] The row major matrix to which the scalar is added. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void Add(ElementType s, MatrixReference<ElementType, Layout> M);
+        template <typename ElementType, MatrixLayout layout>
+        static void Add(ElementType s, MatrixReference<ElementType, layout> M);
     };
 
     /// <summary>
@@ -62,55 +62,55 @@ namespace math
         /// <summary> Copy values from one matrix to another, A = B. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="Orientation"> Matrix layout. </typeparam>
+        /// <typeparam name="orientation"> Matrix layout. </typeparam>
         /// <param name="u"> A const reference to a matrix whose values will be copied. </param>
         /// <param name="v"> [in,out] Reference to a matrix whose values will be overwritten. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void Copy(ConstMatrixReference<ElementType, Layout> B, MatrixReference<ElementType, Layout> A);
+        template <typename ElementType, MatrixLayout layout>
+        static void Copy(ConstMatrixReference<ElementType, layout> B, MatrixReference<ElementType, layout> A);
 
         /// <summary> Generalized matrix matrix addition, C = s * A + t * B. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
-        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
+        /// <typeparam name="layoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="layoutB"> Matrix layout of second matrix. </typeparam>
         /// <param name="s"> The scalar that multiplies the first matrix. </param>
         /// <param name="A"> The first matrix. </param>
         /// <param name="t"> The scalar that multiplies the second matrix. </param>
         /// <param name="B"> The second matrix. </param>
         /// <param name="C"> [in,out] A matrix used to store the result in the layout of first matrix. </param>
-        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-        static void Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
+        template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
+        static void Add(ElementType s, ConstMatrixReference<ElementType, layoutA> A, ElementType t, ConstMatrixReference<ElementType, layoutB> B, MatrixReference<ElementType, layoutA> C);
 
         /// <summary> Multiplies a row major matrix by a scalar, M *= s. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <typeparam name="layout"> Matrix layout. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="M"> [in,out] The row major matrix which is multiplied by s. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void Multiply(ElementType s, MatrixReference<ElementType, Layout> M);
+        template <typename ElementType, MatrixLayout layout>
+        static void Multiply(ElementType s, MatrixReference<ElementType, layout> M);
 
         /// <summary> Generalized (left-size) matrix row-vector multiplication, u = s * v * M + t * u. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
-        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <typeparam name="layout"> Matrix layout. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="v"> The row  vector that multiplies the matrix on the left. </param>
         /// <param name="M"> The matrix. </param>
         /// <param name="t"> The scalar that multiplies u. </param>
         /// <param name="u"> [in,out] A row vector, multiplied by t and used to store the result. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u);
+        template <typename ElementType, MatrixLayout layout>
+        static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u);
 
         /// <summary> Multiplies a vector by a scalar s and then adds a scalar b to it, v = s*v + b. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <typeparam name="orientation"> Vector orientation. </typeparam>
         /// <param name="s"> The scalar that multiplies the vector. </param>
         /// <param name="b"> The scalar added to the vector. </param>
         /// <param name="v"> [in,out] The vector being modified. </param>
-        template <typename ElementType, VectorOrientation Orientation>
-        static void MultiplyAdd(ElementType s, ElementType b, VectorReference<ElementType, Orientation> v);
+        template <typename ElementType, VectorOrientation orientation>
+        static void MultiplyAdd(ElementType s, ElementType b, VectorReference<ElementType, orientation> v);
 
         /// <summary> Multiplies a matrix by a scalar s and then adds a scalar b to it, M = s*M + b. </summary>
         ///
@@ -118,29 +118,29 @@ namespace math
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="b"> The scalar added to the matrix. </param>
         /// <param name="M"> [in,out] The matrix being modified. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void MultiplyAdd(ElementType s, ElementType b, MatrixReference<ElementType, Layout> M);
+        template <typename ElementType, MatrixLayout layout>
+        static void MultiplyAdd(ElementType s, ElementType b, MatrixReference<ElementType, layout> M);
 
         /// <summary> Vector vector element wise multiplication, t = u .* v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Vector orientaton of result vector. </typeparam>
+        /// <typeparam name="orientation"> Vector orientaton of result vector. </typeparam>
         /// <param name="u"> The first vector. </param>
         /// <param name="v"> The second vector. </param>
         /// <param name="t"> [in,out] The vector used to store the result. </param>
-        template <typename ElementType, VectorOrientation Orientation>
-        static void ElementWiseMultiply(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, Orientation> t);
+        template <typename ElementType, VectorOrientation orientation>
+        static void ElementWiseMultiply(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, orientation> t);
 
         /// <summary> Matrix matrix element wise multiplication, C = A .* B. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
-        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
+        /// <typeparam name="layoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="layoutB"> Matrix layout of second matrix. </typeparam>
         /// <param name="A"> The first matrix. </param>
         /// <param name="B"> The second matrix. </param>
         /// <param name="C"> [in,out] A matrix used to store the result in the layout of first matrix. </param>
-        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-        static void ElementWiseMultiply(ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C);
+        template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
+        static void ElementWiseMultiply(ConstMatrixReference<ElementType, layoutA> A, ConstMatrixReference<ElementType, layoutB> B, MatrixReference<ElementType, layoutA> C);
     };
 
     /// <summary> An enum that represent different implementation types. </summary>
@@ -152,8 +152,8 @@ namespace math
 
     /// <summary> Forward declaration of OperationsImplementation, for subsequent specialization. </summary>
     ///
-    /// <typeparam name="Implementation"> Type of implementation. </typeparam>
-    template <ImplementationType Implementation>
+    /// <typeparam name="implementation"> Type of implementation. </typeparam>
+    template <ImplementationType implementation>
     struct OperationsImplementation;
 
     /// <summary>
@@ -178,11 +178,11 @@ namespace math
         /// <summary> Copy values from one vector to another, u = v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <typeparam name="orientation"> Vector orientation. </typeparam>
         /// <param name="v"> A const reference to a vector whose values will be copied. </param>
         /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
-        template <typename ElementType, VectorOrientation Orientation>
-        static void Copy(ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u);
+        template <typename ElementType, VectorOrientation orientation>
+        static void Copy(ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u);
 
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///
@@ -201,12 +201,12 @@ namespace math
         /// <summary> Adds a scaled vector to another vector, u += s * v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Orientation of the two vectors. </typeparam>
+        /// <typeparam name="orientation"> orientation of the two vectors. </typeparam>
         /// <param name="s"> The scalar that multiplies the right hand side vector v. </param>
         /// <param name="v"> The right hand side vector. </param>
         /// <param name="u"> [in,out] The left hand side vector. </param>
-        template <typename ElementType, VectorOrientation Orientation>
-        static void Add(ElementType s, ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u);
+        template <typename ElementType, VectorOrientation orientation>
+        static void Add(ElementType s, ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u);
 
         /// <summary>
         /// Calculates a vector dot product (between vectors in any orientation), u * v.
@@ -223,11 +223,11 @@ namespace math
         /// <summary> Multiplies a vector by a scalar, v *= s. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <typeparam name="orientation"> Vector orientation. </typeparam>
         /// <param name="s"> The scalar that multiplies the vector. </param>
         /// <param name="v"> [in,out] The vector, in any orientation, which is multiplied by s. </param>
-        template <typename ElementType, VectorOrientation Orientation>
-        static void Multiply(ElementType s, VectorReference<ElementType, Orientation> v);
+        template <typename ElementType, VectorOrientation orientation>
+        static void Multiply(ElementType s, VectorReference<ElementType, orientation> v);
 
         /// <summary> Calculates the product of a row vector with a column vector, r = u * v. </summary>
         ///
@@ -241,27 +241,27 @@ namespace math
         /// <summary> Generalized matrix column-vector multiplication, u = s * M * v + t * u. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
-        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <typeparam name="layout"> Matrix layout. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="M"> The matrix. </param>
         /// <param name="v"> The column vector that multiplies the matrix on the right. </param>
         /// <param name="t"> The scalar that multiplies the left hand side vector u. </param>
         /// <param name="u"> [in,out] A column vector, multiplied by t and used to store the result. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u);
+        template <typename ElementType, MatrixLayout layout>
+        static void Multiply(ElementType s, ConstMatrixReference<ElementType, layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u);
 
         /// <summary> Generalized matrix matrix multiplication, C = s * A * B + t * C. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
-        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
+        /// <typeparam name="layoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="layoutB"> Matrix layout of second matrix. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="A"> The first matrix. </param>
         /// <param name="B"> The second matrix. </param>
         /// <param name="t"> The scalar that multiplies C. </param>
         /// <param name="C"> [in,out] A matrix, multiplied by t and used to store the result in the layout of first matrix. </param>
-        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-        static void Multiply(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, ElementType t, MatrixReference<ElementType, LayoutA> C);
+        template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
+        static void Multiply(ElementType s, ConstMatrixReference<ElementType, layoutA> A, ConstMatrixReference<ElementType, layoutB> B, ElementType t, MatrixReference<ElementType, layoutA> C);
     };
 
 #ifdef USE_BLAS
@@ -285,11 +285,11 @@ namespace math
         /// <summary> Copy values from one vector to another, u = v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <typeparam name="orientation"> Vector orientation. </typeparam>
         /// <param name="v"> A const reference to a vector whose values will be copied. </param>
         /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
-        template <typename ElementType, VectorOrientation Orientation>
-        static void Copy(ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u);
+        template <typename ElementType, VectorOrientation orientation>
+        static void Copy(ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u);
 
         /// <summary> Computes the 1-norm of a vector. </summary>
         ///
@@ -308,12 +308,12 @@ namespace math
         /// <summary> Adds a scaled vector to another vector, u += s * v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Orientation of the two vectors. </typeparam>
+        /// <typeparam name="orientation"> orientation of the two vectors. </typeparam>
         /// <param name="s"> The scalar that multiplies the right hand side vector v. </param>
         /// <param name="v"> The right hand side vector. </param>
         /// <param name="u"> [in,out] The left hand side vector. </param>
-        template <typename ElementType, VectorOrientation Orientation>
-        static void Add(ElementType s, ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u);
+        template <typename ElementType, VectorOrientation orientation>
+        static void Add(ElementType s, ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u);
 
         /// <summary>
         /// Calculates a vector dot Multiply (between vectors in any orientation), u * v.
@@ -330,11 +330,11 @@ namespace math
         /// <summary> Calculates the product of a vector and a scalar, v = v * s. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+        /// <typeparam name="orientation"> Vector orientation. </typeparam>
         /// <param name="s"> The scalar that multiplies the vector. </param>
         /// <param name="v"> [in,out] The vector, in any orientation, which is multiplied by s. </param>
-        template <typename ElementType, VectorOrientation Orientation>
-        static void Multiply(ElementType s, VectorReference<ElementType, Orientation> v);
+        template <typename ElementType, VectorOrientation orientation>
+        static void Multiply(ElementType s, VectorReference<ElementType, orientation> v);
 
         /// <summary> Calculates the product of a row vector with a column vector, r = u * v. </summary>
         ///
@@ -348,39 +348,39 @@ namespace math
         /// <summary> Generalized matrix column-vector multiplication, u = s * M * v + t * u. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
-        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <typeparam name="layout"> Matrix layout. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="M"> The matrix. </param>
         /// <param name="v"> The column vector that multiplies the matrix on the right. </param>
         /// <param name="t"> The scalar that multiplies the left hand side vector u. </param>
         /// <param name="u"> [in,out] A column vector, multiplied by t and used to store the result. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u);
+        template <typename ElementType, MatrixLayout layout>
+        static void Multiply(ElementType s, ConstMatrixReference<ElementType, layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u);
 
         /// <summary> Generalized matrix row-vector multiplication, u = s * v * M + t * u. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
-        /// <typeparam name="Layout"> Matrix layout. </typeparam>
+        /// <typeparam name="layout"> Matrix layout. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="v"> The row  vector that multiplies the matrix on the left. </param>
         /// <param name="M"> The matrix. </param>
         /// <param name="t"> The scalar that multiplies u. </param>
         /// <param name="u"> [in,out] A row vector, multiplied by t and used to store the result. </param>
-        template <typename ElementType, MatrixLayout Layout>
-        static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, const ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u);
+        template <typename ElementType, MatrixLayout layout>
+        static void Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, const ConstMatrixReference<ElementType, layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u);
 
         /// <summary> Generalized matrix matrix multiplication, C = s * A * B + t * C. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="LayoutA"> Matrix layout of first matrix. </typeparam>
-        /// <typeparam name="LayoutB"> Matrix layout of second matrix. </typeparam>
+        /// <typeparam name="layoutA"> Matrix layout of first matrix. </typeparam>
+        /// <typeparam name="layoutB"> Matrix layout of second matrix. </typeparam>
         /// <param name="s"> The scalar that multiplies the matrix. </param>
         /// <param name="A"> The first matrix. </param>
         /// <param name="B"> The second matrix. </param>
         /// <param name="t"> The scalar that multiplies C. </param>
         /// <param name="u"> [in,out] A matrix, multiplied by t and used to store the result, in layout of first matrix. </param>
-        template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-        static void Multiply(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, ElementType t, MatrixReference<ElementType, LayoutA> C);
+        template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
+        static void Multiply(ElementType s, ConstMatrixReference<ElementType, layoutA> A, ConstMatrixReference<ElementType, layoutB> B, ElementType t, MatrixReference<ElementType, layoutA> C);
     };
 
     using Operations = OperationsImplementation<ImplementationType::openBlas>;

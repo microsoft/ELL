@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     StlIndexValueIteratorAdapter.h (data)
+//  File:     StlIndexValueIterator.h (data)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,42 +10,67 @@ namespace ell
 {
 namespace data
 {
-    //
-    // StlIndexValueIterator implementation
-    //
     template <typename IteratorType>
-    StlIndexValueIterator<IteratorType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end)
-        : _begin(begin), _end(end), _index(0)
+    StlIndexValueIterator<IterationPolicy::skipZeros, IteratorType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end, size_t size)
+        : _current(begin), _end(end), _index(0), _size(size)
     {
         SkipZeros();
     }
 
-    template <typename IteratorType>
-    void StlIndexValueIterator<IteratorType>::Next()
+    template<typename IteratorType>
+    void StlIndexValueIterator<IterationPolicy::skipZeros, IteratorType>::Next()
     {
-        ++_begin;
+        ++_current;
         ++_index;
         SkipZeros();
     }
 
     template <typename IteratorType>
-    void StlIndexValueIterator<IteratorType>::SkipZeros()
+    void StlIndexValueIterator<IterationPolicy::skipZeros, IteratorType>::SkipZeros()
     {
-        while (_begin < _end && *_begin == 0)
+        while (_current < _end && *_current == 0)
         {
-            ++_begin;
+            ++_current;
             ++_index;
         }
+    }
+
+    template <typename IteratorType>
+    StlIndexValueIterator<IterationPolicy::all, IteratorType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end, size_t size)
+        : _current(begin), _end(end), _size(size)
+    {
+    }
+
+    template<typename IteratorType>
+    void StlIndexValueIterator<IterationPolicy::all, IteratorType>::Next()
+    {
+        ++_index;
+        if (_current < _end)
+        {
+            ++_current;
+        }
+    }
+
+    template<typename IteratorType>
+    IndexValue StlIndexValueIterator<IterationPolicy::all, IteratorType>::Get() const
+    { 
+        return _current < _end ? IndexValue{ _index, (double)*_current } : IndexValue{ _index, 0.0 }; 
     }
 
     //
     // Convenience function to create iterator
     //
 
-    template <typename ValueType>
-    VectorIndexValueIterator<ValueType> MakeVectorIndexValueIterator(const std::vector<ValueType>& arr)
+    template <IterationPolicy policy, typename ElementType>
+    VectorIndexValueIterator<policy, ElementType> MakeVectorIndexValueIterator(const std::vector<ElementType>& vector)
     {
-        return VectorIndexValueIterator<ValueType>(arr.cbegin(), arr.cend());
+        return VectorIndexValueIterator<policy, ElementType>(vector.cbegin(), vector.cend(), vector.size());
+    }
+
+    template <IterationPolicy policy, typename ElementType>
+    VectorIndexValueIterator<policy, ElementType> MakeVectorIndexValueIterator(const std::vector<ElementType>& vector, size_t size)
+    {
+        return VectorIndexValueIterator<policy, ElementType>(vector.cbegin(), vector.cend(), size);
     }
 }
 }

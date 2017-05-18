@@ -29,10 +29,23 @@ int main()
     TestVectorOperations<double, math::ImplementationType::openBlas>();
 
     TestElementWiseOperations<double>();
+    TestElementWiseOperations<float>();
 
     TestVectorToArray<double>();
     TestVectorToArray<float>();
 
+    TestElementwiseTransform<double>();
+    TestElementwiseTransform<float>();
+
+    TestTransformedVectors<double>();
+    TestTransformedVectors<float>();
+
+    TestElementwiseTransform<double>();
+    TestElementwiseTransform<float>();
+
+    TestTransformedVectors<double>();
+    TestTransformedVectors<float>();
+    
     //
     // Matrix tests
     // 

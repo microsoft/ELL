@@ -24,14 +24,14 @@ namespace math
         return v.Aggregate([](ElementType x) { return x != 0 ? 1 : 0; });
     }
 
-    template <typename ElementType, VectorOrientation Orientation>
-    void CommonOperations::Add(ElementType s, VectorReference<ElementType, Orientation> v)
+    template <typename ElementType, VectorOrientation orientation>
+    void CommonOperations::Add(ElementType s, VectorReference<ElementType, orientation> v)
     {
         v.Transform([s](ElementType x) { return x + s; });
     }
 
-    template <typename ElementType, MatrixLayout Layout>
-    void CommonOperations::Add(ElementType s, MatrixReference<ElementType, Layout> M)
+    template <typename ElementType, MatrixLayout layout>
+    void CommonOperations::Add(ElementType s, MatrixReference<ElementType, layout> M)
     {
         if (M.IsContiguous())
         {
@@ -52,8 +52,8 @@ namespace math
     //
 
     template <class DerivedClass>
-    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-    void DerivedOperations<DerivedClass>::Add(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ElementType t, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
+    template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
+    void DerivedOperations<DerivedClass>::Add(ElementType s, ConstMatrixReference<ElementType, layoutA> A, ElementType t, ConstMatrixReference<ElementType, layoutB> B, MatrixReference<ElementType, layoutA> C)
     {
         DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
 
@@ -65,8 +65,8 @@ namespace math
     }
 
     template <class DerivedClass>
-    template <typename ElementType, MatrixLayout Layout>
-    void DerivedOperations<DerivedClass>::Copy(ConstMatrixReference<ElementType, Layout> B, MatrixReference<ElementType, Layout> A)
+    template <typename ElementType, MatrixLayout layout>
+    void DerivedOperations<DerivedClass>::Copy(ConstMatrixReference<ElementType, layout> B, MatrixReference<ElementType, layout> A)
     {
         if (A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns())
         {
@@ -87,8 +87,8 @@ namespace math
     }
 
     template <class DerivedClass>
-    template <typename ElementType, MatrixLayout Layout>
-    void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, Layout> M)
+    template <typename ElementType, MatrixLayout layout>
+    void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, layout> M)
     {
         if (M.IsContiguous())
         {
@@ -104,15 +104,15 @@ namespace math
     }
 
     template <class DerivedClass>
-    template <typename ElementType, MatrixLayout Layout>
-    void DerivedOperations<DerivedClass>::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u)
+    template <typename ElementType, MatrixLayout layout>
+    void DerivedOperations<DerivedClass>::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u)
     {
         DerivedClass::Multiply(s, M.Transpose(), v.Transpose(), t, u.Transpose());
     }
 
     template <class DerivedClass>
-    template <typename ElementType, VectorOrientation Orientation>
-    void DerivedOperations<DerivedClass>::MultiplyAdd(ElementType s, ElementType b, VectorReference<ElementType, Orientation> v)
+    template <typename ElementType, VectorOrientation orientation>
+    void DerivedOperations<DerivedClass>::MultiplyAdd(ElementType s, ElementType b, VectorReference<ElementType, orientation> v)
     {
         if (b == 0)
         {
@@ -125,8 +125,8 @@ namespace math
     }
 
     template <class DerivedClass>
-    template <typename ElementType, MatrixLayout Layout>
-    void DerivedOperations<DerivedClass>::MultiplyAdd(ElementType s, ElementType b, MatrixReference<ElementType, Layout> M)
+    template <typename ElementType, MatrixLayout layout>
+    void DerivedOperations<DerivedClass>::MultiplyAdd(ElementType s, ElementType b, MatrixReference<ElementType, layout> M)
     {
         if (b == 0)
         {
@@ -147,8 +147,8 @@ namespace math
     }
 
     template <class DerivedClass>
-    template <typename ElementType, VectorOrientation Orientation>
-    void DerivedOperations<DerivedClass>::ElementWiseMultiply(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, Orientation> t)
+    template <typename ElementType, VectorOrientation orientation>
+    void DerivedOperations<DerivedClass>::ElementWiseMultiply(UnorientedConstVectorReference<ElementType> u, UnorientedConstVectorReference<ElementType> v, VectorReference<ElementType, orientation> t)
     {
         DEBUG_THROW(u.Size() != v.Size() || u.Size() != t.Size(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible vector sizes."));
 
@@ -167,8 +167,8 @@ namespace math
     }
 
     template <class DerivedClass>
-    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-    void DerivedOperations<DerivedClass>::ElementWiseMultiply(ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, MatrixReference<ElementType, LayoutA> C)
+    template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
+    void DerivedOperations<DerivedClass>::ElementWiseMultiply(ConstMatrixReference<ElementType, layoutA> A, ConstMatrixReference<ElementType, layoutB> B, MatrixReference<ElementType, layoutA> C)
     {
         DEBUG_THROW(A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns() || B.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
 
@@ -182,8 +182,8 @@ namespace math
     // Native implementations of operations
     //
 
-    template <typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::native>::Copy(ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u)
+    template <typename ElementType, VectorOrientation orientation>
+    void OperationsImplementation<ImplementationType::native>::Copy(ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u)
     {
         if (v.Size() != u.Size())
         {
@@ -223,8 +223,8 @@ namespace math
         return std::sqrt(v.Aggregate([](ElementType x) { return x * x; }));
     }
 
-    template <typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::native>::Add(ElementType s, ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u)
+    template <typename ElementType, VectorOrientation orientation>
+    void OperationsImplementation<ImplementationType::native>::Add(ElementType s, ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u)
     {
         if (v.Size() != u.Size())
         {
@@ -266,10 +266,10 @@ namespace math
         return result;
     }
 
-    template <typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, VectorReference<ElementType, Orientation> v)
+    template <typename ElementType, VectorOrientation orientation>
+    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, VectorReference<ElementType, orientation> v)
     {
-        v.Transform([s](ElementType x) { return x * s; });
+        v.Transform([s](ElementType x) { return s*x; });
     }
 
     template <typename ElementType>
@@ -278,8 +278,8 @@ namespace math
         r = Dot(u, v);
     }
 
-    template <typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u)
+    template <typename ElementType, MatrixLayout layout>
+    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u)
     {
         if (M.NumRows() != u.Size() || M.NumColumns() != v.Size())
         {
@@ -293,8 +293,8 @@ namespace math
         }
     }
 
-    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, ElementType t, MatrixReference<ElementType, LayoutA> C)
+    template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
+    void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, ConstMatrixReference<ElementType, layoutA> A, ConstMatrixReference<ElementType, layoutB> B, ElementType t, MatrixReference<ElementType, layoutA> C)
     {
         if (A.NumColumns() != B.NumRows() || A.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
         {
@@ -317,8 +317,8 @@ namespace math
     // OpenBLAS wrappers
     //
 
-    template <typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::openBlas>::Copy(ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u)
+    template <typename ElementType, VectorOrientation orientation>
+    void OperationsImplementation<ImplementationType::openBlas>::Copy(ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u)
     {
         Blas::Copy(static_cast<int>(u.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()), u.GetDataPointer(), static_cast<int>(u.GetIncrement()));
     }
@@ -335,8 +335,8 @@ namespace math
         return Blas::Nrm2(static_cast<int>(v.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
     }
 
-    template <typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, ConstVectorReference<ElementType, Orientation> v, VectorReference<ElementType, Orientation> u)
+    template <typename ElementType, VectorOrientation orientation>
+    void OperationsImplementation<ImplementationType::openBlas>::Add(ElementType s, ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u)
     {
         if (v.Size() != u.Size())
         {
@@ -357,8 +357,8 @@ namespace math
         return Blas::Dot(static_cast<int>(u.Size()), u.GetDataPointer(), static_cast<int>(u.GetIncrement()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
     }
 
-    template <typename ElementType, VectorOrientation Orientation>
-    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, VectorReference<ElementType, Orientation> v)
+    template <typename ElementType, VectorOrientation orientation>
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, VectorReference<ElementType, orientation> v)
     {
         Blas::Scal(static_cast<int>(v.Size()), s, v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
     }
@@ -369,15 +369,15 @@ namespace math
         r = Dot(u, v);
     }
 
-    template <typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, Layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u)
+    template <typename ElementType, MatrixLayout layout>
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, layout> M, ConstVectorReference<ElementType, VectorOrientation::column> v, ElementType t, VectorReference<ElementType, VectorOrientation::column> u)
     {
         if (M.NumRows() != u.Size() || M.NumColumns() != v.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix and vectors sizes.");
         }
 
-        // map Layout to CBLAS_ORDER
+        // map layout to CBLAS_ORDER
         CBLAS_ORDER order;
         switch (M.GetLayout())
         {
@@ -388,27 +388,27 @@ namespace math
                 order = CBLAS_ORDER::CblasColMajor;
                 break;
             default:
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Layout not supported");
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "layout not supported");
         }
 
         Blas::Gemv(order, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(M.NumRows()), static_cast<int>(M.NumColumns()), s, M.GetDataPointer(), static_cast<int>(M.GetIncrement()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()), t, u.GetDataPointer(), static_cast<int>(u.GetIncrement()));
     }
 
-    template <typename ElementType, MatrixLayout Layout>
-    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, Layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u)
+    template <typename ElementType, MatrixLayout layout>
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstVectorReference<ElementType, VectorOrientation::row> v, ConstMatrixReference<ElementType, layout> M, ElementType t, VectorReference<ElementType, VectorOrientation::row> u)
     {
         Multiply(s, M.Transpose(), v.Transpose(), t, u.Transpose());
     }
 
-    template <typename ElementType, MatrixLayout LayoutA, MatrixLayout LayoutB>
-    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, LayoutA> A, ConstMatrixReference<ElementType, LayoutB> B, ElementType t, MatrixReference<ElementType, LayoutA> C)
+    template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
+    void OperationsImplementation<ImplementationType::openBlas>::Multiply(ElementType s, ConstMatrixReference<ElementType, layoutA> A, ConstMatrixReference<ElementType, layoutB> B, ElementType t, MatrixReference<ElementType, layoutA> C)
     {
         if (A.NumColumns() != B.NumRows() || A.NumRows() != C.NumRows() || B.NumColumns() != C.NumColumns())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes.");
         }
 
-        // map Layout to CBLAS_ORDER
+        // map layout to CBLAS_ORDER
         CBLAS_ORDER order;
         switch (A.GetLayout())
         {
@@ -419,7 +419,7 @@ namespace math
             order = CBLAS_ORDER::CblasColMajor;
             break;
         default:
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Layout not supported");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "layout not supported");
         }
 
         CBLAS_TRANSPOSE transposeB = CBLAS_TRANSPOSE::CblasNoTrans;

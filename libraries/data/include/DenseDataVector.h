@@ -7,12 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "DataVector.h"
+#include "StlIndexValueIterator.h"
 
 #ifndef DENSEDATAVECTOR_H
 #define DENSEDATAVECTOR_H
 
 // utilities
-#include "StlIndexValueIterator.h"
+#include "StlContainerIterator.h"
 
 // stl
 #include <cstddef>
@@ -34,8 +35,6 @@ namespace data
     class DenseDataVector : public DataVectorBase<DenseDataVector<ElementType>>
     {
     public:
-        using Iterator = VectorIndexValueIterator<ElementType>;
-
         /// <summary> Constructor. </summary>
         DenseDataVector();
 
@@ -77,10 +76,28 @@ namespace data
         /// <returns> Value of the desired element. </returns>
         double operator[](size_t index) const;
 
-        /// <summary> Returns an Iterator that points to the beginning of the std::vector. </summary>
+        /// <summary>
+        /// Returns an indexValue iterator that points to the beginning of the vector, which iterates
+        /// over a prefix of the vector.
+        /// </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        /// <param name="size"> The prefix size. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const { return Iterator(_data.begin(), _data.end()); }
+        template<IterationPolicy policy>
+        VectorIndexValueIterator<policy, ElementType> GetIterator(size_t size) const;
+
+        /// <summary>
+        /// Returns an indexValue iterator that points to the beginning of the vector, which iterates
+        /// over a prefix of length PrefixLength().
+        /// </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        ///
+        /// <returns> The iterator. </returns>
+        template<IterationPolicy policy>
+        VectorIndexValueIterator<policy, ElementType> GetIterator() const;
 
         /// <summary> Appends an element to the end of the data vector. </summary>
         ///

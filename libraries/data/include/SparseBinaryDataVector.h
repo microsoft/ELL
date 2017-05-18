@@ -28,59 +28,102 @@ namespace ell
 {
 namespace data
 {
+    // forward declaration
+    template <typename IndexListType>
+    class SparseBinaryDataVectorBase;
+
+    // forward declaration
+    template <IterationPolicy policy, typename IndexListType>
+    class SparseBinaryDataVectorIterator;
+
+    /// <summary> A dense iterator for SparseBinaryDataVectors. </summary>
+    template <typename IndexListType>
+    class SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType> : public IIndexValueIterator
+    {
+    public:
+        SparseBinaryDataVectorIterator(const SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType>&) = default;
+
+        SparseBinaryDataVectorIterator(SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType>&&) = default;
+
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        ///
+        /// <returns> true if it succeeds, false if it fails. </returns>
+        bool IsValid() const { return _index < _size; }
+
+        /// <summary> Proceeds to the Next iterate. </summary>
+        void Next();
+
+        /// <summary> Returns the current iterate. </summary>
+        ///
+        /// <returns> The current iterate. </returns>
+        IndexValue Get() const;
+
+    protected:
+
+        using IndexIteratorType = typename IndexListType::Iterator;
+
+        // private ctor that can only be called from the parent class
+        SparseBinaryDataVectorIterator(const IndexIteratorType& listIterator, size_t size);
+        friend SparseBinaryDataVectorBase<IndexListType>;
+
+        IndexIteratorType _indexIterator;
+        size_t _iteratorIndex;
+        size_t _size;
+        size_t _index = 0;
+    };
+
+    /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
+    template <typename IndexListType>
+    class SparseBinaryDataVectorIterator<IterationPolicy::skipZeros, IndexListType> : public IIndexValueIterator
+    {
+    public:
+        SparseBinaryDataVectorIterator(const SparseBinaryDataVectorIterator<IterationPolicy::skipZeros, IndexListType>&) = default;
+
+        SparseBinaryDataVectorIterator(SparseBinaryDataVectorIterator<IterationPolicy::skipZeros, IndexListType>&&) = default;
+
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        ///
+        /// <returns> true if it succeeds, false if it fails. </returns>
+        bool IsValid() const { return _indexIterator.IsValid() && _indexIterator.Get() < _size; }
+
+        /// <summary> Proceeds to the Next iterate. </summary>
+        void Next() { _indexIterator.Next(); }
+
+        /// <summary> Returns The current value. </summary>
+        ///
+        /// <returns> An IndexValue. </returns>
+        IndexValue Get() const { return IndexValue{ _indexIterator.Get(), 1.0 }; }
+
+    private:
+        using IndexIteratorType = typename IndexListType::Iterator;
+
+        // private ctor, can only be called from SparseBinaryDataVectorBase class.
+        SparseBinaryDataVectorIterator(const IndexIteratorType& listIterator, size_t size);
+        friend SparseBinaryDataVectorBase<IndexListType>;
+
+        // members
+        IndexIteratorType _indexIterator;
+        size_t _size;
+    };
+
     /// <summary> Implements a sparse binary vector as an increasing list of the coordinates where the
     /// value is 1.0. </summary>
     ///
     /// <typeparam name="tegerListType"> Type of the teger list type. </typeparam>
-    template <typename IntegerListType>
-    class SparseBinaryDataVectorBase : public DataVectorBase<SparseBinaryDataVectorBase<IntegerListType>>
+    template <typename IndexListType>
+    class SparseBinaryDataVectorBase : public DataVectorBase<SparseBinaryDataVectorBase<IndexListType>>
     {
     public:
-        /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
-        class Iterator : public IIndexValueIterator
-        {
-        public:
-            Iterator(const Iterator&) = default;
-
-            Iterator(Iterator&&) = default;
-
-            /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
-            ///
-            /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const { return _list_iterator.IsValid(); }
-
-            /// <summary> Proceeds to the Next iterate. </summary>
-            void Next() { _list_iterator.Next(); }
-
-            /// <summary> Returns The current value. </summary>
-            ///
-            /// <returns> An IndexValue. </returns>
-            IndexValue Get() const { return IndexValue{ _list_iterator.Get(), 1.0 }; }
-
-        private:
-            /// <summary> define typename to improve readability. </summary>
-            using IndexIteratorType = typename IntegerListType::Iterator;
-
-            /// <summary> private ctor, can only be called from SparseBinaryDataVectorBase class. </summary>
-            ///
-            /// <param name="list_iterator"> The list iterator. </param>
-            Iterator(const typename IntegerListType::Iterator& list_iterator);
-            friend SparseBinaryDataVectorBase<IntegerListType>;
-
-            // members
-            IndexIteratorType _list_iterator;
-        };
-
         SparseBinaryDataVectorBase() = default;
 
-        SparseBinaryDataVectorBase(SparseBinaryDataVectorBase<IntegerListType>&& other) = default;
+        SparseBinaryDataVectorBase(SparseBinaryDataVectorBase<IndexListType>&& other) = default;
 
-        SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IntegerListType>& other) = delete;
+        SparseBinaryDataVectorBase(const SparseBinaryDataVectorBase<IndexListType>& other) = delete;
 
         /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
         ///
         /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
-        /// <param name="IndexValueIterator"> The index value iterator. </param>
+        /// <param name="indexValueIterator"> The index value iterator. </param>
         template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
         SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator);
 
@@ -104,10 +147,31 @@ namespace data
         /// <param name="list"> The initializer list of values. </param>
         SparseBinaryDataVectorBase(std::vector<double> vec);
 
-        /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
+        template <IterationPolicy policy>
+        using Iterator = SparseBinaryDataVectorIterator<policy, IndexListType>;
+
+        /// <summary>
+        /// Returns an indexValue iterator that points to the beginning of the vector, which iterates
+        /// over a prefix of the vector.
+        /// </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        /// <param name="size"> The prefix size. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const { return Iterator(_indices.GetIterator()); }
+        template<IterationPolicy policy>
+        Iterator<policy> GetIterator(size_t size) const;
+
+        /// <summary>
+        /// Returns an indexValue iterator that points to the beginning of the vector, which iterates
+        /// over a prefix of length PrefixLength().
+        /// </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        ///
+        /// <returns> The iterator. </returns>
+        template<IterationPolicy policy>
+        Iterator<policy> GetIterator() const;
 
         /// <summary> Sets the element at the given index to 1.0. Calls to this function must have a
         /// monotonically increasing argument. The value argument must equal 1.0. </summary>
@@ -128,7 +192,7 @@ namespace data
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
         /// <returns> A double. </returns>
-        virtual double Norm2() const override { return std::sqrt(_indices.Size()); }
+        virtual double Norm2() const override { return std::sqrt(_indexList.Size()); }
 
         /// <summary> Computes the Dot product. </summary>
         ///
@@ -137,15 +201,14 @@ namespace data
         /// <returns> A double. </returns>
         virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
 
-        /// <summary> Performs vector += scalar * (*this), where other a dense vector. </summary>
+        /// <summary> Adds this data vector to a math::RowVector </summary>
         ///
         /// <param name="vector"> [in,out] The vector that this DataVector is added to. </param>
-        /// <param name="scalar">  The scalar. </param>
-        virtual void AddTo(math::RowVectorReference<double> vector, double scalar = 1.0) const override;
+        virtual void AddTo(math::RowVectorReference<double> vector) const override;
 
     private:
-        using DataVectorBase<SparseBinaryDataVectorBase<IntegerListType>>::AppendElements;
-        IntegerListType _indices;
+        using DataVectorBase<SparseBinaryDataVectorBase<IndexListType>>::AppendElements;
+        IndexListType _indexList;
     };
 
     /// <summary> A sparse data vector with binary elements. </summary>

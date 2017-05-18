@@ -46,7 +46,7 @@ namespace common
         }
     }
 
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDSGDLinearTrainer(const LossArguments& lossArguments, const trainers::SDSGDLinearTrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDSGDLinearTrainer(const LossArguments& lossArguments, const trainers::SGDLinearTrainerParameters& trainerParameters)
     {
         using LossFunctionEnum = common::LossArguments::LossFunction;
 
@@ -63,6 +63,26 @@ namespace common
 
             default:
                 throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+        }
+    }
+
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDCSGDLinearTrainer(const LossArguments& lossArguments, math::RowVector<double> center, const trainers::SGDLinearTrainerParameters& trainerParameters)
+    {
+        using LossFunctionEnum = common::LossArguments::LossFunction;
+
+        switch (lossArguments.lossFunction)
+        {
+        case LossFunctionEnum::squared:
+            return trainers::MakeSDCSGDLinearTrainer(lossFunctions::SquaredLoss(), std::move(center), trainerParameters);
+
+        case LossFunctionEnum::log:
+            return trainers::MakeSDCSGDLinearTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), std::move(center), trainerParameters);
+
+        case LossFunctionEnum::hinge:
+            return trainers::MakeSDCSGDLinearTrainer(lossFunctions::HingeLoss(), std::move(center), trainerParameters);
+
+        default:
+            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 

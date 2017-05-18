@@ -67,3 +67,18 @@ set (test_name ${tool_name}_test_7)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SDSGD)
+
+set (test_name ${tool_name}_test_8)
+add_test(NAME ${test_name}
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.01 -a SDCSGD)
+
+set (test_name ${tool_name}_test_9)
+add_test(NAME ${test_name}
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.01 -a SDCSGD)
+
+set (test_name ${tool_name}_test_10)
+add_test(NAME ${test_name}
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SDCSGD)

@@ -18,78 +18,78 @@ namespace ell
 {
 namespace data
 {
-    template <typename ReturnType>
-    ReturnType IDataVector::DeepCopyAs() const
+    template <typename ReturnType, typename GenericLambdaType>
+    ReturnType IDataVector::InvokeWithThis(GenericLambdaType lambda) const
     {
-        switch (GetType())
+        auto type = GetType();
+        switch (type)
         {
-            case Type::DoubleDataVector:
-                return ReturnType(static_cast<const DoubleDataVector*>(this)->GetIterator());
+        case Type::DoubleDataVector:
+            return lambda(static_cast<const DoubleDataVector*>(this));
 
-            case Type::FloatDataVector:
-                return ReturnType(static_cast<const FloatDataVector*>(this)->GetIterator());
+        case Type::FloatDataVector:
+            return lambda(static_cast<const FloatDataVector*>(this));
 
-            case Type::ShortDataVector:
-                return ReturnType(static_cast<const ShortDataVector*>(this)->GetIterator());
+        case Type::ShortDataVector:
+            return lambda(static_cast<const ShortDataVector*>(this));
 
-            case Type::ByteDataVector:
-                return ReturnType(static_cast<const ByteDataVector*>(this)->GetIterator());
+        case Type::ByteDataVector:
+            return lambda(static_cast<const ByteDataVector*>(this));
 
-            case Type::SparseDoubleDataVector:
-                return ReturnType(static_cast<const SparseDoubleDataVector*>(this)->GetIterator());
+        case Type::SparseDoubleDataVector:
+            return lambda(static_cast<const SparseDoubleDataVector*>(this));
 
-            case Type::SparseFloatDataVector:
-                return ReturnType(static_cast<const SparseFloatDataVector*>(this)->GetIterator());
+        case Type::SparseFloatDataVector:
+            return lambda(static_cast<const SparseFloatDataVector*>(this));
 
-            case Type::SparseShortDataVector:
-                return ReturnType(static_cast<const SparseShortDataVector*>(this)->GetIterator());
+        case Type::SparseShortDataVector:
+            return lambda(static_cast<const SparseShortDataVector*>(this));
 
-            case Type::SparseByteDataVector:
-                return ReturnType(static_cast<const SparseByteDataVector*>(this)->GetIterator());
+        case Type::SparseByteDataVector:
+            return lambda(static_cast<const SparseByteDataVector*>(this));
 
-            case Type::SparseBinaryDataVector:
-                return ReturnType(static_cast<const SparseBinaryDataVector*>(this)->GetIterator());
+        case Type::SparseBinaryDataVector:
+            return lambda(static_cast<const SparseBinaryDataVector*>(this));
 
-            default:
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
+        default:
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
         }
     }
 
-    template <typename ReturnType, typename TransformType>
-    ReturnType IDataVector::DeepCopyAs(TransformType nonZeroTransform) const
+    template<IterationPolicy policy, typename TransformationType>
+    void IDataVector::AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const
     {
-        switch (GetType())
+        InvokeWithThis<void>([vector, transformation](const auto* pThis)
         {
-            case Type::DoubleDataVector:
-                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const DoubleDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+            pThis->AddTransformedTo<policy>(vector, transformation);
+        });
+    }
 
-            case Type::FloatDataVector:
-                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const FloatDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+    template <typename ReturnType>
+    ReturnType IDataVector::CopyAs() const
+    {
+        return InvokeWithThis<ReturnType>([](const auto* pThis) 
+        {
+            return ReturnType(pThis->GetIterator<IterationPolicy::skipZeros>());
+        });
+    }
 
-            case Type::ShortDataVector:
-                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const ShortDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
+    template <IterationPolicy policy, typename ReturnType, typename TransformationType>
+    ReturnType IDataVector::TransformAs(TransformationType transformation, size_t size) const
+    {
+        return InvokeWithThis<ReturnType>([transformation, size](const auto* pThis)
+        {
+            return ReturnType(MakeTransformingIndexValueIterator(pThis->GetIterator<policy>(size), transformation));
+        });
+    }
 
-            case Type::ByteDataVector:
-                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const ByteDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-            case Type::SparseDoubleDataVector:
-                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseDoubleDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-            case Type::SparseFloatDataVector:
-                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseFloatDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-            case Type::SparseShortDataVector:
-                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseShortDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-            case Type::SparseByteDataVector:
-                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseByteDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-            case Type::SparseBinaryDataVector:
-                return ReturnType(MakeTransformingIndexValueIterator(static_cast<const SparseBinaryDataVector*>(this)->GetIterator(), std::move(nonZeroTransform)));
-
-            default:
-                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempted to cast unsupported data vector type");
-        }
+    template <IterationPolicy policy, typename ReturnType, typename TransformationType>
+    ReturnType IDataVector::TransformAs(TransformationType transformation) const
+    {
+        return InvokeWithThis<ReturnType>([transformation](const auto* pThis)
+        {
+            return ReturnType(MakeTransformingIndexValueIterator(pThis->GetIterator<policy>(), transformation));
+        });
     }
 
     template <class DerivedType>
@@ -145,7 +145,7 @@ namespace data
     template <class DerivedType>
     double DataVectorBase<DerivedType>::Norm2() const
     {
-        auto iter = static_cast<const DerivedType*>(this)->GetIterator();
+        auto iter = static_cast<const DerivedType*>(this)->GetIterator<IterationPolicy::skipZeros>();
 
         double result = 0.0;
         while (iter.IsValid())
@@ -160,7 +160,7 @@ namespace data
     template <class DerivedType>
     double DataVectorBase<DerivedType>::Dot(const math::UnorientedConstVectorReference<double> vector) const
     {
-        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator<IterationPolicy::skipZeros>();
 
         double result = 0.0;
         auto size = vector.Size();
@@ -178,50 +178,28 @@ namespace data
     }
 
     template <class DerivedType>
-    void DataVectorBase<DerivedType>::AddTo(math::RowVectorReference<double> vector, double scalar) const
+    void DataVectorBase<DerivedType>::AddTo(math::RowVectorReference<double> vector) const
     {
-        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator<IterationPolicy::skipZeros>();
 
-        auto originalSize = vector.Size();
-        while (indexValueIterator.IsValid())
-        {
-            auto indexValue = indexValueIterator.Get();
-            if (indexValue.index >= originalSize)
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "vector size is smaller than data vector prefix length");
-            }
-            vector[indexValue.index] += scalar * indexValue.value;
-            indexValueIterator.Next();
-        }
-    }
-
-    template <class DerivedType>
-    std::vector<double> DataVectorBase<DerivedType>::ToArray() const
-    {
-        auto size = static_cast<const DerivedType*>(this)->PrefixLength();
-
-        std::vector<double> result(size);
-        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
-
+        auto size = vector.Size();
         while (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();
             if (indexValue.index >= size)
             {
-                break;
+                return;
             }
-            result[indexValue.index] = indexValue.value;
+            vector[indexValue.index] += indexValue.value;
             indexValueIterator.Next();
         }
-
-        return result;
     }
 
     template <class DerivedType>
     std::vector<double> DataVectorBase<DerivedType>::ToArray(size_t size) const
     {
         std::vector<double> result(size);
-        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator<IterationPolicy::skipZeros>();
 
         while (indexValueIterator.IsValid())
         {
@@ -237,24 +215,51 @@ namespace data
         return result;
     }
 
-    template <class DerivedType>
-    template <typename ReturnType>
-    ReturnType DataVectorBase<DerivedType>::DeepCopyAs() const
+    template<class DerivedType>
+    template<IterationPolicy policy, typename TransformationType>
+    void DataVectorBase<DerivedType>::AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const
     {
-        return ReturnType(static_cast<const DerivedType*>(this)->GetIterator());
+        auto size = vector.Size();
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator<policy>(size);
+
+        while (indexValueIterator.IsValid())
+        {
+            auto indexValue = indexValueIterator.Get();
+            if (indexValue.index >= size)
+            {
+                return;
+            }
+            double result = transformation(indexValue);
+            vector[indexValue.index] += result;
+            indexValueIterator.Next();
+        }
     }
 
     template <class DerivedType>
-    template <typename ReturnType, typename TransformType>
-    ReturnType DataVectorBase<DerivedType>::DeepCopyAs(TransformType nonZeroTransform) const
+    template <typename ReturnType>
+    ReturnType DataVectorBase<DerivedType>::CopyAs() const
     {
-        return ReturnType(MakeTransformingIndexValueIterator(static_cast<const DerivedType*>(this)->GetIterator(), std::move(nonZeroTransform)));
+        return ReturnType(static_cast<const DerivedType*>(this)->GetIterator<IterationPolicy::skipZeros>());
+    }
+
+    template <class DerivedType>
+    template <IterationPolicy policy, typename ReturnType, typename TransformationType>
+    ReturnType DataVectorBase<DerivedType>::TransformAs(TransformationType transformation, size_t size) const
+    {
+        return ReturnType(MakeTransformingIndexValueIterator(static_cast<const DerivedType*>(this)->GetIterator<policy>(size), std::move(transformation)));
+    }
+
+    template <class DerivedType>
+    template <IterationPolicy policy, typename ReturnType, typename TransformationType>
+    ReturnType DataVectorBase<DerivedType>::TransformAs(TransformationType transformation) const
+    {
+        return ReturnType(MakeTransformingIndexValueIterator(static_cast<const DerivedType*>(this)->GetIterator<policy>(), std::move(transformation)));
     }
 
     template <class DerivedType>
     void DataVectorBase<DerivedType>::Print(std::ostream& os) const
     {
-        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator();
+        auto indexValueIterator = static_cast<const DerivedType*>(this)->GetIterator<IterationPolicy::skipZeros>();
         if (indexValueIterator.IsValid())
         {
             auto indexValue = indexValueIterator.Get();

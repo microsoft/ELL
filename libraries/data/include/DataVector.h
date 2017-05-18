@@ -80,13 +80,20 @@ namespace data
         /// <returns> A dot product. </returns>
         virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const = 0;
 
-        /// <summary>
-        /// Performs the operation: vector += scalar * (*this), where other is an array of doubles.
-        /// </summary>
+        /// <summary> Adds this data vector to a math::RowVector </summary>
         ///
         /// <param name="vector"> [in,out] The vector to which this data vector is added. </param>
-        /// <param name="scalar"> The scalar. </param>
-        virtual void AddTo(math::RowVectorReference<double> vector, double scalar = 1.0) const = 0;
+        virtual void AddTo(math::RowVectorReference<double> vector) const = 0;
+
+        /// <summary> Adds a transformed version of this data vector to a math::RowVector. </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        /// <typeparam name="TransformationType"> Non zero transformation type, which is a functor that
+        /// takes an IndexValue and returns a double, and is applied to each element of the vector. </typeparam>
+        /// <param name="vector"> The vector. </param>
+        /// <param name="transformation"> The transformation.. </param>
+        template<IterationPolicy policy, typename TransformationType>
+        void AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const;
 
         /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
         ///
@@ -106,26 +113,62 @@ namespace data
         ///
         /// <returns> The new data vector. </returns>
         template <typename ReturnType>
-        ReturnType DeepCopyAs() const;
+        ReturnType CopyAs() const;
 
-        /// <summary> Copies this data vector into another type of data vector. </summary>
+        /// <summary> Copies a transformed version of a prefix of this data vector. </summary>
         ///
-        /// <typeparam name="ReturnType"> The return type. </typeparam>
-        /// <param name="nonZeroTransform"> A functor that takes an IndexValue and returns a double, which is applied to each non-zero elements during the copy. </param>
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
+        /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+        /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
+        /// applied to the elements of the data vector. </param>
+        /// <param name="size"> The prefix size. </param>
         ///
-        /// <returns> The new data vector. </returns>
-        template <typename ReturnType, typename TransformType>
-        ReturnType DeepCopyAs(TransformType nonZeroTransform) const;
+        /// <returns> The transformed data vector. </returns>
+        template <IterationPolicy policy, typename ReturnType, typename TransformationType>
+        ReturnType TransformAs(TransformationType transformation, size_t size) const;
+
+        /// <summary> Copies a transformed version of this data vector. </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
+        /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+        /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
+        /// applied to the elements of the data vector. </param>
+        ///
+        /// <returns> The transformed data vector. </returns>
+        template <IterationPolicy policy, typename ReturnType, typename TransformationType>
+        ReturnType TransformAs(TransformationType transformation) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write to. </param>
         virtual void Print(std::ostream& os) const = 0;
+
+    private:
+        // calls a generic (polymorphic) lambda of the form `[](const auto* pThis){ return ReturnType();}`, where pThis is a pointer to the concrete
+        // DataVector implementation (e.g., DenseDataVector, SparseDataVector,...)
+        template <typename ReturnType, typename GenericLambdaType>
+        ReturnType InvokeWithThis(GenericLambdaType lambda) const;
     };
 
     /// <summary> A helper definition used to define the IsDataVector SFINAE concept. </summary>
     template <typename T>
     using IsDataVector = typename std::enable_if_t<std::is_base_of<IDataVector, T>::value, bool>;
+
+    /// <summary> Adds a DataVector to a math::RowVector. </summary>
+    ///
+    /// <param name="vector"> The math::RowVector being modified. </param>
+    /// <param name="scaledDataVector"> The DataVector being added to the vector. </param>
+    void operator+=(math::RowVectorReference<double> vector, const IDataVector& dataVector);
+
+    /// <summary> Calculates the dot product of a DataVector and a math::ColumnVector. </summary>
+    ///
+    /// <param name="dataVector"> The DataVector. </param>
+    /// <param name="vector"> The math::ColumnVector. </param>
+    ///
+    /// <returns> The result of the operation. </returns>
+    double operator*(const IDataVector& dataVector, math::ColumnConstVectorReference<double> vector);
 
     /// <summary>
     /// Base class for some of the data vector classes. This class uses a curiously recurring
@@ -176,18 +219,30 @@ namespace data
         /// <returns> A dot product. </returns>
         virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
 
-        /// <summary>
-        /// Performs the operation: vector += scalar * (*this), where other is an array of doubles.
-        /// </summary>
+        /// <summary> Adds this data vector to a math::RowVector </summary>
         ///
         /// <param name="vector"> [in,out] The vector to which this data vector is added. </param>
-        /// <param name="scalar"> The scalar. </param>
-        virtual void AddTo(math::RowVectorReference<double> vector, double scalar = 1.0) const override;
+        virtual void AddTo(math::RowVectorReference<double> vector) const override;
+
+        /// <summary> Adds a transformed version of this data vector to a math::RowVector. </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        /// <typeparam name="TransformationType"> Non zero transformation type, which is a functor that
+        /// takes an IndexValue and returns a double, and is applied to each element of the vector. </typeparam>
+        /// <param name="vector"> The vector. </param>
+        /// <param name="transformation"> The transformation.. </param>
+        template<IterationPolicy policy, typename TransformationType>
+        void AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const;
+
+        /// <summary> Returns a (dense) iterator of the vector elements, excluding the final suffix of zeros. </summary>
+        ///
+        /// <returns> A value iterator. </returns>
+        auto GetValueIterator() { return static_cast<DerivedType*>(this)->GetValueIterator(PrefixLength()); }
 
         /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override;
+        virtual std::vector<double> ToArray() const override { return ToArray(PrefixLength()); }
 
         /// <summary> Copies the contents of this DataVector into a double array of a given size. </summary>
         ///
@@ -202,16 +257,32 @@ namespace data
         ///
         /// <returns> A data vector of a specified type. </returns>
         template <typename ReturnType>
-        ReturnType DeepCopyAs() const;
+        ReturnType CopyAs() const;
 
-        /// <summary> Copies the contents of a data vector to another data vector. </summary>
+        /// <summary> Copies a transformed version of a prefix of this data vector. </summary>
         ///
-        /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam>
-        /// <param name="nonZeroTransform"> A functor that takes an IndexValue and returns a double, which is applied to each non-zero elements during the copy. </param>
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
+        /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+        /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
+        /// applied to the elements of the data vector. </param>
+        /// <param name="size"> The prefix size. </param>
         ///
-        /// <returns> A data vector of a specified type. </returns>
-        template <typename ReturnType, typename TransformType>
-        ReturnType DeepCopyAs(TransformType nonZeroTransform) const;
+        /// <returns> The transformed data vector. </returns>
+        template <IterationPolicy policy, typename ReturnType, typename TransformationType>
+        ReturnType TransformAs(TransformationType transformation, size_t size) const;
+
+        /// <summary> Copies a transformed version of this data vector. </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
+        /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+        /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
+        /// applied to the elements of the data vector. </param>
+        ///
+        /// <returns> The transformed data vector. </returns>
+        template <IterationPolicy policy, typename ReturnType, typename TransformationType>
+        ReturnType TransformAs(TransformationType transformation) const;
 
         /// <summary> Human readable printout to an output stream. </summary>
         ///

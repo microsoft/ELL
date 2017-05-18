@@ -12,31 +12,31 @@
 // stl
 #include <random>
 
-template <typename ElementType, math::VectorOrientation Orientation>
+template <typename ElementType, math::VectorOrientation orientation>
 void TestVector()
 {
-    math::Vector<ElementType, Orientation> v(10);
+    math::Vector<ElementType, orientation> v(10);
     v.Fill(2);
-    math::Vector<ElementType, Orientation> r0{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+    math::Vector<ElementType, orientation> r0{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
     testing::ProcessTest("Vector::Fill", v == r0);
 
     v.Reset();
-    math::Vector<ElementType, Orientation> r1{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    math::Vector<ElementType, orientation> r1{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     testing::ProcessTest("Vector::Reset", v == r1);
 
     v[3] = 7;
     v[7] = 9;
-    math::Vector<ElementType, Orientation> r2{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
+    math::Vector<ElementType, orientation> r2{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("Vector::operator[]", v == r2);
 
     auto w = v.GetSubVector(1, 3);
     w.Fill(3);
-    math::Vector<ElementType, Orientation> r3{ 0, 3, 3, 3, 0, 0, 0, 9, 0, 0 };
+    math::Vector<ElementType, orientation> r3{ 0, 3, 3, 3, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("VectorReference::Fill", v == r3);
 
     auto u = v.GetSubVector(3, 2);
     u.Reset();
-    math::Vector<ElementType, Orientation> r4{ 0, 3, 3, 0, 0, 0, 0, 9, 0, 0 };
+    math::Vector<ElementType, orientation> r4{ 0, 3, 3, 0, 0, 0, 0, 9, 0, 0 };
     testing::ProcessTest("VectorReference::Reset", v == r4);
 
     // just checking compilation
@@ -47,11 +47,11 @@ void TestVector()
     u.Generate(generator);
 }
 
-template <typename ElementType, math::ImplementationType Implementation>
+template <typename ElementType, math::ImplementationType implementation>
 void TestVectorOperations()
 {
-    auto implementationName = math::OperationsImplementation<Implementation>::GetImplementationName();
-    using Ops = math::OperationsImplementation<Implementation>;
+    auto implementationName = math::OperationsImplementation<implementation>::GetImplementationName();
+    using Ops = math::OperationsImplementation<implementation>;
 
     math::RowVector<ElementType> u{ 0, 1, 0, 2, 0 };
     math::ColumnVector<ElementType> v{ 1, 2, 3, 4, 5 };
@@ -203,4 +203,55 @@ void TestVectorToArray()
 
     std::vector<ElementType> u(B.GetRow(2).ToArray());
     testing::ProcessTest("Testing vector reference to array for a column matrix", u == r1);
+}
+
+template<typename ElementType>
+void TestElementwiseTransform()
+{
+    math::ColumnVector<ElementType> v{ 2, 2, -1, 2, 2, 2, 2, 2, -2, -2 };
+    auto u = v.GetSubVector(1, 4);
+    u.Transform([](ElementType x) { return static_cast<ElementType>(-3) * x; });
+
+    math::ColumnVector<ElementType> r0{ 2, -6, 3, -6, -6, 2, 2, 2, -2, -2 };
+    testing::ProcessTest("Vector::Transform(Linear)", v == r0);
+
+    v.Transform([](ElementType x) { return std::abs(x); });
+    math::ColumnVector<ElementType> r1{ 2, 6, 3, 6, 6, 2, 2, 2, 2, 2 };
+    testing::ProcessTest("Vector::Transform(Abs)", v == r1);
+
+    v.Transform([](ElementType x) { return x*x; });
+    v.Transform([](ElementType x) { return std::sqrt(x); });
+    testing::ProcessTest("Vector::Transform(Square/SquareRoot)", v == r1);
+}
+
+template<typename ElementType>
+void TestTransformedVectors()
+{
+    math::ColumnVector<ElementType> u(10);
+
+    u += 1.0;
+    math::ColumnVector<ElementType> r0{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    testing::ProcessTest("Vector::operator+=(scalar)", u == r0);
+
+    u *= 2.0;
+    math::ColumnVector<ElementType> r1{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+    testing::ProcessTest("Vector::operator*=(scalar)", u == r1);
+
+    math::ColumnVector<ElementType> v{ 1, 2, -1, -2, 1, 1, 1, 1, 1, 1 };
+    u += 3.0 * v;
+    math::ColumnVector<ElementType> r2{ 5, 8, -1, -4, 5, 5, 5, 5, 5, 5 };
+    testing::ProcessTest("Vector::operator+=(transformed vector)", u == r2);
+
+    u += Abs(v);
+    math::ColumnVector<ElementType> r3{ 6, 10, 0, -2, 6, 6, 6, 6, 6, 6 };
+    testing::ProcessTest("Vector::operator+=(abs vector)", u == r3);
+
+    u.Set(Abs(v));
+    math::ColumnVector<ElementType> r4{ 1, 2, 1, 2, 1, 1, 1, 1, 1, 1 };
+    testing::ProcessTest("Vector::Set(abs vector)", u == r4);
+
+    u.Reset();
+    u += Square(v);
+    v.Set(Sqrt(u));
+    testing::ProcessTest("Vector::Set(square/sqrt)", v == r4);
 }

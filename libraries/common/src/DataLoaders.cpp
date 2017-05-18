@@ -30,10 +30,7 @@ namespace ell
 {
 namespace common
 {
-    //
-    // Public functions
-    //
-    data::ExampleIterator<data::AutoSupervisedExample> GetExampleIterator(const DataLoadArguments& dataLoadArguments)
+    data::AutoSupervisedExampleIterator GetExampleIterator(const DataLoadArguments& dataLoadArguments)
     {
         // create parser for sparse vectors (SVMLight format)
         data::SparseEntryParser sparseEntryParser;
@@ -43,6 +40,23 @@ namespace common
 
         // Create iterator
         return data::GetParsingExampleIterator(std::move(lineIterator), std::move(sparseEntryParser));
+    }
+
+    data::AutoSupervisedDataset GetDataset(data::AutoSupervisedExampleIterator exampleIterator)
+    {
+        data::AutoSupervisedDataset dataset;
+        while (exampleIterator.IsValid())
+        {
+            dataset.AddExample(exampleIterator.Get());
+            exampleIterator.Next();
+        }
+
+        return dataset;
+    }
+
+    data::AutoSupervisedDataset GetDataset(const DataLoadArguments& dataLoadArguments)
+    {
+        return GetDataset(GetExampleIterator(dataLoadArguments));
     }
 }
 }

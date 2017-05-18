@@ -55,7 +55,7 @@ namespace utilities
 
         /// <summary> Returns true if the iterator knows its size. </summary>
         ///
-        /// <returns> true if NumIteratesLeft returns a valid number, false if not. </returns>
+        /// <returns> true if NumItemsLeft returns a valid number, false if not. </returns>
         bool HasSize() const;
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace utilities
         /// </summary>
         ///
         /// <returns> The total number of iterates left. </returns>
-        size_t NumIteratesLeft() const;
+        size_t NumItemsLeft() const;
 
         /// <summary> Proceeds to the Next item. </summary>
         void Next();

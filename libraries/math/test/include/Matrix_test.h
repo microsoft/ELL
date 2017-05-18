@@ -11,31 +11,31 @@
 
 using namespace ell;
 
-template <typename ElementType, math::MatrixLayout Layout>
+template <typename ElementType, math::MatrixLayout layout>
 void TestMatrix1();
 
-template <typename ElementType, math::MatrixLayout Layout>
+template <typename ElementType, math::MatrixLayout layout>
 void TestMatrix2();
 
-template <typename ElementType, math::MatrixLayout Layout1, math::MatrixLayout Layout2>
+template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
 void TestMatrixCopy();
 
 template <typename ElementType>
 void TestMatrixReference();
 
-template <typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType Implementation>
 void TestMatrixOperations();
 
-template <typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType Implementation>
 void TestContiguousMatrixOperations();
 
-template <typename ElementType, math::MatrixLayout Layout>
+template <typename ElementType, math::MatrixLayout layout>
 void TestConstMatrixReference();
 
 template <typename ElementType, math::ImplementationType Implementation>
 void TestMatrixMatrixAdd();
 
-template <typename ElementType, math::MatrixLayout LayoutA, math::MatrixLayout LayoutB, math::ImplementationType Implementation>
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType Implementation>
 void TestMatrixMatrixMultiply();
 
 #include "../tcc/Matrix_test.tcc"

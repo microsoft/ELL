@@ -20,22 +20,22 @@ namespace math
     /// <summary> Prints a vector in initializer list format. </summary>
     ///
     /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="Orientation"> Vector orientation. </typeparam>
+    /// <typeparam name="orientation"> Vector orientation. </typeparam>
     /// <param name="v"> The vector. </param>
     /// <param name="os"> [in,out] The output stream. </param>
     /// <param name="indent"> (Optional) How many indent to print before the tensor. </param>
-    template <typename ElementType, VectorOrientation Orientation>
-    void Print(const ConstVectorReference<ElementType, Orientation>& v, std::ostream& os, size_t indent=0);
+    template <typename ElementType, VectorOrientation orientation>
+    void Print(const ConstVectorReference<ElementType, orientation>& v, std::ostream& os, size_t indent=0);
 
     /// <summary> Prints a matrix in initializer list format. </summary>
     ///
     /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-    /// <typeparam name="Layout"> Matrix layout. </typeparam>
+    /// <typeparam name="layout"> Matrix layout. </typeparam>
     /// <param name="M"> The matrix. </param>
     /// <param name="os"> [in,out] The output stream. </param>
     /// <param name="indent"> (Optional) How many indent to print before the tensor. </param>
-    template <typename ElementType, MatrixLayout Layout>
-    void Print(const ConstMatrixReference<ElementType, Layout>& M, std::ostream& os, size_t indent = 0);
+    template <typename ElementType, MatrixLayout layout>
+    void Print(const ConstMatrixReference<ElementType, layout>& M, std::ostream& os, size_t indent = 0);
 
     /// <summary> Prints a tensor in initializer list format. </summary>
     ///

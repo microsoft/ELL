@@ -44,7 +44,7 @@ namespace common
     ///
     /// <returns> A unique_ptr to an IEvaluator. </returns>
     template <typename PredictorType>
-    std::shared_ptr<evaluators::IIncrementalEvaluator<PredictorType>> MakeIncrementalEvaluator(data::ExampleIterator<data::AutoSupervisedExample> exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments);
+    std::shared_ptr<evaluators::IIncrementalEvaluator<PredictorType>> MakeIncrementalEvaluator(data::AutoSupervisedExampleIterator exampleIterator, const evaluators::EvaluatorParameters& evaluatorParameters, const LossArguments& lossArguments);
 }
 }
 

@@ -48,18 +48,18 @@ namespace data
             }
             if (result == utilities::ParseResult::badFormat)
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expected unsigned integer near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expected unsigned integer near '... " + getSnippet(_currentPos) + " ...' in '" + *_pExampleString + "'");
             }
             else if (result == utilities::ParseResult::outOfRange)
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "out of unsigned integer range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "out of unsigned integer range near '... " + getSnippet(_currentPos) + " ...' in '" + *_pExampleString + "'");
             }
         }
 
         // expect ':' character between index and value
         if (*_currentPos != ':')
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expected ':' between index and value near '" + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+            throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expected ':' between index and value near '" + getSnippet(_currentPos) + " ...' in '" + *_pExampleString + "'");
         }
         ++_currentPos;
 
@@ -70,30 +70,30 @@ namespace data
         {
             if (result == utilities::ParseResult::endOfString || result == utilities::ParseResult::beginComment)
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "string ended prematurely in " + *_spExampleString);
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "string ended prematurely in " + *_pExampleString);
             }
             if (result == utilities::ParseResult::badFormat)
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expected double near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "expected double near '... " + getSnippet(_currentPos) + " ...' in '" + *_pExampleString + "'");
             }
             else if (result == utilities::ParseResult::outOfRange)
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "out of double range near '... " + getSnippet(_currentPos) + " ...' in '" + *_spExampleString + "'");
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "out of double range near '... " + getSnippet(_currentPos) + " ...' in '" + *_pExampleString + "'");
             }
         }
 
         _currentIndexValue = IndexValue{ index, value };
     }
 
-    SparseEntryParser::Iterator::Iterator(std::shared_ptr<const std::string> spExampleString, const char* pStr)
-        : _spExampleString(spExampleString), _currentPos(pStr)
+    SparseEntryParser::Iterator::Iterator(std::shared_ptr<const std::string> pExampleString, const char* pStr)
+        : _pExampleString(pExampleString), _currentPos(pStr)
     {
         Next();
     }
 
-    SparseEntryParser::Iterator SparseEntryParser::GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const
+    SparseEntryParser::Iterator SparseEntryParser::GetIterator(std::shared_ptr<const std::string> pExampleString, const char* pStr) const
     {
-        return Iterator(spExampleString, pStr);
+        return Iterator(pExampleString, pStr);
     }
 }
 }

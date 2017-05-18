@@ -11,7 +11,8 @@
 namespace ell
 {
 void IDataVectorTests();
-void ToDataVectorTests();
+void DataVectorCopyAsTests();
 void AutoDataVectorTest();
-void DataVectorOperatorTest();
+void TransformedDataVectorTest();
+void IteratorTests();
 }

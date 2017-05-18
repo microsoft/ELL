@@ -39,10 +39,10 @@ namespace data
         /// <summary> Takes a std::string that represents a supervised example, and returns a
         /// SupervisedExample object. </summary>
         ///
-        /// <param name="spExampleString"> The sp example string. </param>
+        /// <param name="pExampleString"> The sp example string. </param>
         ///
         /// <returns> A SupervisedExample. </returns>
-        AutoSupervisedExample Build(std::shared_ptr<const std::string> spExampleString);
+        AutoSupervisedExample Build(std::shared_ptr<const std::string> pExampleString);
 
     private:
         void HandleErrors(utilities::ParseResult result, const std::string& str);

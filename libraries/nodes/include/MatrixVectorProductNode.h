@@ -26,9 +26,9 @@ namespace nodes
     /// <summary> A node that represents a Matrix-Vector product. </summary>
     ///
     /// <typeparam name="ValueType"> The Matrix element type. </typeparam>
-    /// <typeparam name="Layout"> The Matrix layout. </typeparam>
+    /// <typeparam name="layout"> The Matrix layout. </typeparam>
     ///
-    template <typename ValueType, math::MatrixLayout Layout>
+    template <typename ValueType, math::MatrixLayout layout>
     class MatrixVectorProductNode : public model::Node
     {
         public:
@@ -47,7 +47,7 @@ namespace nodes
             ///
             /// <param name="input"> The signal to predict from </param>
             /// <param name="predictor"> The projection matrix </param>
-            MatrixVectorProductNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, Layout>& w);
+            MatrixVectorProductNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& w);
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
@@ -86,20 +86,20 @@ namespace nodes
             model::OutputPort<ValueType> _output;
 
             // Projection matrix
-            math::Matrix<ValueType, Layout> _w;
+            math::Matrix<ValueType, layout> _w;
     };
 
     /// <summary> Adds a Matrix vector product node to a model transformer. </summary>
     ///
     /// <typeparam name="ValueType"> The Matrix element type. </typeparam>
-    /// <typeparam name="Layout"> The Matrix layout. </typeparam>
+    /// <typeparam name="layout"> The Matrix layout. </typeparam>
     /// <param name="input"> The input to the predictor. </param>
     /// <param name="w"> The Matrix. </param>
     /// <param name="transformer"> [in,out] The model transformer. </param>
     ///
     /// <returns> The node added to the model. </returns>
-    template <typename ValueType, math::MatrixLayout Layout>
-    MatrixVectorProductNode<ValueType, Layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, Layout> w, model::ModelTransformer& transformer);
+    template <typename ValueType, math::MatrixLayout layout>
+    MatrixVectorProductNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> w, model::ModelTransformer& transformer);
 }
 }
 

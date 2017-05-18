@@ -20,10 +20,11 @@ using namespace ell;
 int main()
 {
     IDataVectorTests();
-    ToDataVectorTests();
+    DataVectorCopyAsTests();
     AutoDataVectorTest();
-    DataVectorOperatorTest();
-    CopyAsTests();
+    TransformedDataVectorTest();
+    IteratorTests();
+    ExampleCopyAsTests();
     DatasetCastingTests();
 
     if (testing::DidTestFail())

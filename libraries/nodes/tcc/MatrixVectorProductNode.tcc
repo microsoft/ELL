@@ -20,21 +20,21 @@ namespace ell
 {
 namespace nodes
 {
-    template <typename ValueType, math::MatrixLayout Layout>
-    MatrixVectorProductNode<ValueType, Layout>::MatrixVectorProductNode()
+    template <typename ValueType, math::MatrixLayout layout>
+    MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode()
         : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _w(0, 0)
     {
     }
 
-    template <typename ValueType, math::MatrixLayout Layout>
-    MatrixVectorProductNode<ValueType, Layout>::MatrixVectorProductNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, Layout>& w)
+    template <typename ValueType, math::MatrixLayout layout>
+    MatrixVectorProductNode<ValueType, layout>::MatrixVectorProductNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& w)
         : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, w.NumRows()), _w(w)
     {
         assert(input.Size() == w.NumColumns());
     }
 
-    template <typename ValueType, math::MatrixLayout Layout>
-    void MatrixVectorProductNode<ValueType, Layout>::WriteToArchive(utilities::Archiver& archiver) const
+    template <typename ValueType, math::MatrixLayout layout>
+    void MatrixVectorProductNode<ValueType, layout>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
 
@@ -48,8 +48,8 @@ namespace nodes
         archiver[outputPortName] << _output;
     }
 
-    template <typename ValueType, math::MatrixLayout Layout>
-    void MatrixVectorProductNode<ValueType, Layout>::ReadFromArchive(utilities::Unarchiver& archiver)
+    template <typename ValueType, math::MatrixLayout layout>
+    void MatrixVectorProductNode<ValueType, layout>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
 
@@ -59,22 +59,22 @@ namespace nodes
         archiver["w_columns"] >> w_columns;
         std::vector<double> temp;
         archiver["w"] >> temp;
-        _w = math::Matrix<ValueType, Layout>(w_rows, w_columns, temp);
+        _w = math::Matrix<ValueType, layout>(w_rows, w_columns, temp);
 
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
     }
 
-    template <typename ValueType, math::MatrixLayout Layout>
-    void MatrixVectorProductNode<ValueType, Layout>::Copy(model::ModelTransformer& transformer) const
+    template <typename ValueType, math::MatrixLayout layout>
+    void MatrixVectorProductNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<MatrixVectorProductNode<double, Layout>>(newPortElements, _w);
+        auto newNode = transformer.AddNode<MatrixVectorProductNode<double, layout>>(newPortElements, _w);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    template <typename ValueType, math::MatrixLayout Layout>
-    bool MatrixVectorProductNode<ValueType, Layout>::Refine(model::ModelTransformer& transformer) const
+    template <typename ValueType, math::MatrixLayout layout>
+    bool MatrixVectorProductNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto projectionMatrix = _w;
@@ -95,8 +95,8 @@ namespace nodes
         return true;
     }
 
-    template <typename ValueType, math::MatrixLayout Layout>
-    void MatrixVectorProductNode<ValueType, Layout>::Compute() const
+    template <typename ValueType, math::MatrixLayout layout>
+    void MatrixVectorProductNode<ValueType, layout>::Compute() const
     {
         math::ColumnVector<ValueType> input(_input.Size());
         for (size_t index = 0; index < _input.Size(); ++index)
@@ -112,8 +112,8 @@ namespace nodes
         _output.SetOutput({ result.ToArray() });
     }
 
-    template <typename ValueType, math::MatrixLayout Layout>
-    MatrixVectorProductNode<ValueType, Layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, Layout> w, model::ModelTransformer& transformer)
+    template <typename ValueType, math::MatrixLayout layout>
+    MatrixVectorProductNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> w, model::ModelTransformer& transformer)
     {
         return transformer.AddNode<MatrixVectorProductNode>(input, w);
     }

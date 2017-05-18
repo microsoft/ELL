@@ -10,12 +10,17 @@
 
 // utilities
 #include "IIterator.h"
+#include "StlContainerIterator.h"
 
 namespace ell
 {
 namespace data
 {
-    /// <summary> Interface for example iterators. </summary>
+    /// <summary> An iterator over examples whose Get() function returns a const reference to an example. </summary>
+    template <typename ExampleType>
+    using ExampleReferenceIterator = utilities::VectorReferenceIterator<ExampleType>;
+
+    /// <summary> Interface for example iterators whose Get() function returns an example (rather than a const reference). </summary>
     ///
     /// <typeparam name="ExampleType"> Example type. </typeparam>
     template <typename ExampleType>
@@ -54,6 +59,8 @@ namespace data
     private:
         std::unique_ptr<IExampleIterator<ExampleType>> _iterator;
     };
+
+    using AutoSupervisedExampleIterator = ExampleIterator<AutoSupervisedExample>;
 }
 }
 

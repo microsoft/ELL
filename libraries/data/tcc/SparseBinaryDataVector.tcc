@@ -16,45 +16,83 @@ namespace ell
 {
 namespace data
 {
-    template <typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::Iterator::Iterator(const IndexIteratorType& list_iterator)
-        : _list_iterator(list_iterator)
+    template <typename IndexListType>
+    SparseBinaryDataVectorIterator<IterationPolicy::skipZeros, IndexListType>::SparseBinaryDataVectorIterator(const IndexIteratorType& listIterator, size_t size)
+        : _indexIterator(listIterator), _size(size)
     {
     }
 
-    template <typename IntegerListType>
+    template<typename IndexListType>
+    void SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType>::Next()
+    {
+        if (_index == _iteratorIndex)
+        {
+            _indexIterator.Next();
+            _iteratorIndex = _indexIterator.IsValid() ? _indexIterator.Get() : _size;
+        }
+        ++_index;
+    }
+
+    template<typename IndexListType>
+    IndexValue SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType>::Get() const
+    { 
+        return _index == _iteratorIndex ? IndexValue{ _index, 1.0 } : IndexValue{ _index, 0.0 }; 
+    }
+
+    template<typename IndexListType>
+    SparseBinaryDataVectorIterator<IterationPolicy::all, IndexListType>::SparseBinaryDataVectorIterator(const IndexIteratorType & listIterator, size_t size) :
+        _indexIterator(listIterator), _size(size)
+    {
+        _iteratorIndex = _indexIterator.IsValid() ? _indexIterator.Get() : _size;
+    }
+
+    template <typename IndexListType>
     template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
+    SparseBinaryDataVectorBase<IndexListType>::SparseBinaryDataVectorBase(IndexValueIteratorType indexValueIterator)
     {
         AppendElements(std::move(indexValueIterator));
     }
 
-    template <typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<IndexValue> list)
+    template<typename IndexListType>
+    template<IterationPolicy policy>
+    auto SparseBinaryDataVectorBase<IndexListType>::GetIterator(size_t size) const -> Iterator<policy>
+    { 
+        return Iterator<policy>(_indexList.GetIterator(), size); 
+    }
+
+    template<typename IndexListType>
+    template<IterationPolicy policy>
+    auto SparseBinaryDataVectorBase<IndexListType>::GetIterator() const -> Iterator<policy>
+    {
+        return GetIterator<policy>(PrefixLength()); 
+    }
+
+    template <typename IndexListType>
+    SparseBinaryDataVectorBase<IndexListType>::SparseBinaryDataVectorBase(std::initializer_list<IndexValue> list)
     {
         AppendElements(std::move(list));
     }
 
-    template <typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::initializer_list<double> list)
+    template <typename IndexListType>
+    SparseBinaryDataVectorBase<IndexListType>::SparseBinaryDataVectorBase(std::initializer_list<double> list)
     {
         AppendElements(std::move(list));
     }
 
-    template <typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::vector<IndexValue> vec)
+    template <typename IndexListType>
+    SparseBinaryDataVectorBase<IndexListType>::SparseBinaryDataVectorBase(std::vector<IndexValue> vec)
     {
         AppendElements(std::move(vec));
     }
 
-    template <typename IntegerListType>
-    SparseBinaryDataVectorBase<IntegerListType>::SparseBinaryDataVectorBase(std::vector<double> vec)
+    template <typename IndexListType>
+    SparseBinaryDataVectorBase<IndexListType>::SparseBinaryDataVectorBase(std::vector<double> vec)
     {
         AppendElements(std::move(vec));
     }
 
-    template <typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::AppendElement(size_t index, double value)
+    template <typename IndexListType>
+    void SparseBinaryDataVectorBase<IndexListType>::AppendElement(size_t index, double value)
     {
         if (value == 0)
         {
@@ -63,28 +101,28 @@ namespace data
 
         assert(value == 1);
 
-        _indices.Append(index);
+        _indexList.Append(index);
     }
 
-    template <typename IntegerListType>
-    size_t SparseBinaryDataVectorBase<IntegerListType>::PrefixLength() const
+    template <typename IndexListType>
+    size_t SparseBinaryDataVectorBase<IndexListType>::PrefixLength() const
     {
-        if (_indices.Size() == 0)
+        if (_indexList.Size() == 0)
         {
             return 0;
         }
         else
         {
-            return _indices.Max() + 1;
+            return _indexList.Max() + 1;
         }
     }
 
-    template <typename IntegerListType>
-    double SparseBinaryDataVectorBase<IntegerListType>::Dot(const math::UnorientedConstVectorReference<double> vector) const
+    template <typename IndexListType>
+    double SparseBinaryDataVectorBase<IndexListType>::Dot(const math::UnorientedConstVectorReference<double> vector) const
     {
         double value = 0.0;
 
-        auto iter = _indices.GetIterator();
+        auto iter = _indexList.GetIterator();
         while (iter.IsValid())
         {
             value += vector[iter.Get()];
@@ -94,13 +132,21 @@ namespace data
         return value;
     }
 
-    template <typename IntegerListType>
-    void SparseBinaryDataVectorBase<IntegerListType>::AddTo(math::RowVectorReference<double> vector, double scalar) const
+    template <typename IndexListType>
+    void SparseBinaryDataVectorBase<IndexListType>::AddTo(math::RowVectorReference<double> vector) const
     {
-        auto iter = _indices.GetIterator();
+        auto iter = _indexList.GetIterator();
+        auto size = vector.Size();
+
         while (iter.IsValid())
         {
-            vector[iter.Get()] += scalar;
+            auto index = iter.Get();
+            if (index >= size)
+            {
+                return;
+            }
+
+            vector[index] += 1.0;
             iter.Next();
         }
     }

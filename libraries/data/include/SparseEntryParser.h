@@ -44,23 +44,23 @@ namespace data
             IndexValue Get() const { return _currentIndexValue; }
 
         private:
-            std::shared_ptr<const std::string> _spExampleString; // hold on to the shared ptr to make sure that std::string is not deleted
+            std::shared_ptr<const std::string> _pExampleString; // hold on to the shared ptr to make sure that std::string is not deleted
             const char* _currentPos = 0;
             IndexValue _currentIndexValue;
             bool _isValid = true;
 
             // Private constructor that can only be called from SparseEntryParser
-            Iterator(std::shared_ptr<const std::string> spExampleString, const char* pStr);
+            Iterator(std::shared_ptr<const std::string> pExampleString, const char* pStr);
             friend class SparseEntryParser;
         };
 
         /// <summary> Gets an iterator. </summary>
         ///
-        /// <param name="spExampleString"> The sp example string. </param>
+        /// <param name="pExampleString"> The example string. </param>
         /// <param name="pStr"> The string. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator(std::shared_ptr<const std::string> spExampleString, const char* pStr) const;
+        Iterator GetIterator(std::shared_ptr<const std::string> pExampleString, const char* pStr) const;
     };
 }
 }

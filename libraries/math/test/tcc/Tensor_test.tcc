@@ -291,21 +291,21 @@ void TestTensorVectorMultiply()
     auto v1 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2 };
     math::TensorOperations::Multiply<math::Dimension::row>(v1, T);
     auto R1 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 1,1,1,1 },{ 1,1,1,1 },{ 1,1,1,1 } },
-    { { 2,2,2,2 },{ 2,2,2,2 },{ 2,2,2,2 } } };
+                                                                             { { 2,2,2,2 },{ 2,2,2,2 },{ 2,2,2,2 } } };
     testing::ProcessTest("void TestTensorVectorMultiply()", T == R1);
 
     T.Fill(1);
     auto v2 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2,3 };
     math::TensorOperations::Multiply<math::Dimension::column>(v2, T);
     auto R2 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 1,1,1,1 },{ 2,2,2,2 },{ 3,3,3,3 } },
-    { { 1,1,1,1 },{ 2,2,2,2 },{ 3,3,3,3 } } };
+                                                                             { { 1,1,1,1 },{ 2,2,2,2 },{ 3,3,3,3 } } };
     testing::ProcessTest("void TestTensorVectorMultiply()", T == R2);
 
     T.Fill(1);
     auto v3 = math::Vector<ElementType, math::VectorOrientation::row>{ 1,2,3,4 };
     math::TensorOperations::Multiply<math::Dimension::channel>(v3, T);
     auto R3 = math::Tensor<ElementType, dimension0, dimension1, dimension2>{ { { 1,2,3,4 },{ 1,2,3,4 },{ 1,2,3,4 } },
-    { { 1,2,3,4 },{ 1,2,3,4 },{ 1,2,3,4 } } };
+                                                                             { { 1,2,3,4 },{ 1,2,3,4 },{ 1,2,3,4 } } };
     testing::ProcessTest("void TestTensorVectorMultiply()", T == R3);
 
     // subtensors

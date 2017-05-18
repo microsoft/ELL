@@ -8,10 +8,10 @@
 
 #include "Matrix.h"
 
-template <typename ElementType, math::MatrixLayout Layout>
+template <typename ElementType, math::MatrixLayout layout>
 void TestMatrix1()
 {
-    math::Matrix<ElementType, Layout> M(3, 4);
+    math::Matrix<ElementType, layout> M(3, 4);
     M(0, 0) = 1;
     M(0, 2) = 4;
     M(2, 3) = 7;
@@ -82,10 +82,10 @@ void TestMatrix1()
     M.Generate(generator);
 }
 
-template <typename ElementType, math::MatrixLayout Layout>
+template <typename ElementType, math::MatrixLayout layout>
 void TestMatrix2()
 {
-    math::Matrix<ElementType, Layout> M(7, 7);
+    math::Matrix<ElementType, layout> M(7, 7);
 
     auto N = M.GetSubMatrix(1, 1, 5, 5);
     N.GetRow(0).Fill(1);
@@ -122,17 +122,17 @@ void TestMatrix2()
     testing::ProcessTest("Matrix::Fill()", M == R2);
 }
 
-template <typename ElementType, math::MatrixLayout Layout1, math::MatrixLayout Layout2>
+template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
 void TestMatrixCopy()
 {
-    math::Matrix<ElementType, Layout1> M1{
+    math::Matrix<ElementType, layout1> M1{
         { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
         { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
         { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
         { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
     };
 
-    math::Matrix<ElementType, Layout2> M2(M1);
+    math::Matrix<ElementType, layout2> M2(M1);
 
     testing::ProcessTest("Matrix copy ctor", M1 == M2);
 }
@@ -173,13 +173,13 @@ void TestMatrixReference()
     testing::ProcessTest("ReferenceMatrix testing second round of modified values", Mref2 == M4);
 }
 
-template <typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType Implementation>
 void TestMatrixOperations()
 {
     auto implementationName = math::OperationsImplementation<Implementation>::GetImplementationName();
     using Ops = math::OperationsImplementation<Implementation>;
 
-    math::Matrix<ElementType, Layout> M{
+    math::Matrix<ElementType, layout> M{
         { 1, 0 },
         { 0, 1 },
         { 2, 2 }
@@ -196,16 +196,16 @@ void TestMatrixOperations()
     math::ColumnVector<ElementType> r0{ 9, 11, 28 };
     testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Vector)", u == r0);
 
-    math::Matrix<ElementType, Layout> A1{
+    math::Matrix<ElementType, layout> A1{
         { 1, 2 },
         { 3, 1 },
         { 2, 0 }
     };
-    math::Matrix<ElementType, Layout> B1{
+    math::Matrix<ElementType, layout> B1{
         { 3, 4,  5,  6 },
         { 8, 9, 10, 11 }
     };
-    math::Matrix<ElementType, Layout> C1{
+    math::Matrix<ElementType, layout> C1{
         { 1, 1, 1, 1 },
         { 2, 1, 2, 1 },
         { 1, 3, 1, 3 }
@@ -240,7 +240,7 @@ void TestMatrixOperations()
     };
     testing::ProcessTest(implementationName + "Operations::Add(scalar, MatrixReference)", M == R1);
 
-    math::Matrix<ElementType, Layout> R2{
+    math::Matrix<ElementType, layout> R2{
         { 0, 2 },
         { 4, 8 },
         { 1, 3 }
@@ -250,13 +250,13 @@ void TestMatrixOperations()
 }
 
 
-template <typename ElementType, math::MatrixLayout Layout, math::ImplementationType Implementation>
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType Implementation>
 void TestContiguousMatrixOperations()
 {
     auto implementationName = math::OperationsImplementation<Implementation>::GetImplementationName();
     using Ops = math::OperationsImplementation<Implementation>;
 
-    math::Matrix<ElementType, Layout> M{
+    math::Matrix<ElementType, layout> M{
         { 1, 0 },
         { 0, 1 },
         { 2, 2 }
@@ -289,7 +289,7 @@ void TestContiguousMatrixOperations()
     };
     testing::ProcessTest(implementationName + "Operations::Add(scalar, MatrixReference)", M == R3);
 
-    math::Matrix<ElementType, Layout> A1{
+    math::Matrix<ElementType, layout> A1{
         { 0, 1 },
         { 2, 3 },
         { 4, 5 }
@@ -297,7 +297,7 @@ void TestContiguousMatrixOperations()
     Ops::Copy(A1, M);
     testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == A1);
 
-    math::Matrix<ElementType, Layout> A2{
+    math::Matrix<ElementType, layout> A2{
         { 1 },
         { 3 }
     };
@@ -343,17 +343,17 @@ void TestContiguousMatrixOperations()
     testing::ProcessTest(implementationName + "Operations::MultiplyAdd(scalar, scalar, MatrixReference)", M == R8);
 }
 
-template <typename ElementType, math::MatrixLayout Layout>
+template <typename ElementType, math::MatrixLayout layout>
 void TestConstMatrixReference()
 {
-    math::Matrix<ElementType, Layout> M{
+    math::Matrix<ElementType, layout> M{
         { 1, 2, 4, 0 },
         { 1, 3, 5, 3 },
         { 0, 8, 1, 6 },
         { 1, 2, 4, 3 }
     };
 
-    math::ConstMatrixReference<ElementType, Layout> N(M);
+    math::ConstMatrixReference<ElementType, layout> N(M);
     auto P = M.GetConstReference();
     testing::ProcessTest("ConstMatrixReference testing operator ==", M == N);
     testing::ProcessTest("ConstMatrixReference testing GetConstReference", N == P);
@@ -414,30 +414,30 @@ void TestMatrixMatrixAdd()
     testing::ProcessTest(implementationName + "Operations::Add(MatrixReference ColumnMajor, MatrixReference RowMajor)", E == R1);
 }
 
-template <typename ElementType, math::MatrixLayout LayoutA, math::MatrixLayout LayoutB, math::ImplementationType Implementation>
+template <typename ElementType, math::MatrixLayout layoutA, math::MatrixLayout layoutB, math::ImplementationType Implementation>
 void TestMatrixMatrixMultiply()
 {
     auto implementationName = math::OperationsImplementation<Implementation>::GetImplementationName();
     using Ops = math::OperationsImplementation<Implementation>;
 
-    math::Matrix<ElementType, LayoutA> A{
+    math::Matrix<ElementType, layoutA> A{
         { 1, 2 },
         { 3, 1 },
         { 2, 0 }
     };
 
-    math::Matrix<ElementType, LayoutB> B{
+    math::Matrix<ElementType, layoutB> B{
         { 3, 4,  5,  6 },
         { 8, 9, 10, 11 }
     };
 
-    math::Matrix<ElementType, LayoutA> R{
+    math::Matrix<ElementType, layoutA> R{
         { 19, 22, 25, 28 },
         { 17, 21, 25, 29 },
         { 6, 8, 10, 12 }
     };
 
-    math::Matrix<ElementType, LayoutA> C(A.NumRows(), B.NumColumns());
+    math::Matrix<ElementType, layoutA> C(A.NumRows(), B.NumColumns());
     Ops::Multiply(1.0, A, B, 0.0, C);
 
     testing::ProcessTest(implementationName + "Operations::Multiply(Matrix, Matrix)", C == R);

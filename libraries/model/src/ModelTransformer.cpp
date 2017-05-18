@@ -15,7 +15,6 @@
 
 namespace ell
 {
-/// <summary> model namespace </summary>
 namespace model
 {
     //

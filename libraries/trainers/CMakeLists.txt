@@ -4,30 +4,33 @@
 
 set (library_name trainers)
 
-set (src src/ForestTrainer.cpp
+set (src src/AbsoluteMeanTrainer.cpp
+         src/ForestTrainer.cpp
          src/LogitBooster.cpp
+         src/SGDLinearTrainer.cpp
          src/ThresholdFinder.cpp)
 
-set (include include/EvaluatingIncrementalTrainer.h
+set (include include/AbsoluteMeanTrainer.h
+             include/EvaluatingIncrementalTrainer.h
              include/ForestTrainer.h
              include/HistogramForestTrainer.h
              include/ITrainer.h
              include/LogitBooster.h
+             include/MeanTrainer.h
              include/MultiEpochIncrementalTrainer.h
              include/SortingForestTrainer.h
              include/SweepingIncrementalTrainer.h
              include/SGDLinearTrainer.h
-             include/SDSGDLinearTrainer.h
              include/ThresholdFinder.h)
 
 set (tcc tcc/EvaluatingIncrementalTrainer.tcc
          tcc/ForestTrainer.tcc
          tcc/HistogramForestTrainer.tcc
+         tcc/MeanTrainer.tcc
          tcc/MultiEpochIncrementalTrainer.tcc
          tcc/SortingForestTrainer.tcc
          tcc/SweepingIncrementalTrainer.tcc
          tcc/SGDLinearTrainer.tcc
-         tcc/SDSGDLinearTrainer.tcc
          tcc/ThresholdFinder.tcc)
 
 set (doc doc/README.md)
@@ -37,7 +40,7 @@ source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include} ${tcc} ${doc})
 target_include_directories(${library_name} PUBLIC include)
 
 if(CMAKE_COMPILER_IS_GNUCXX)

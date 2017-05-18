@@ -17,6 +17,8 @@
 // data
 #include "Dataset.h"
 #include "Example.h"
+#include "DataVector.h"
+#include "DataVectorTransformations.h"
 
 // common
 #include "DataLoadArguments.h"
@@ -66,7 +68,7 @@ int main(int argc, char* argv[])
         auto map = common::LoadMap(mapLoadArguments);
 
         // get data iterator
-        auto dataIterator = GetExampleIterator(dataLoadArguments);
+        auto exampleIterator = GetExampleIterator(dataLoadArguments);
 
         // get output stream
         auto& outputStream = dataSaveArguments.outputDataStream;
@@ -84,25 +86,25 @@ int main(int argc, char* argv[])
             math::RowVector<double> v(map.GetOutputSize());
             size_t count = 0;
 
-            while (dataIterator.IsValid())
+            while (exampleIterator.IsValid())
             {
-                auto example = dataIterator.Get();
+                auto example = exampleIterator.Get();
                 auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
                 math::RowVector<double> w(map.GetOutputSize());
-                mappedDataVector.AddTo(w);
+                w += mappedDataVector;
 
                 if (map2 != nullptr)
                 {
                     auto mappedDataVector2 = map2->Compute<data::DoubleDataVector>(example.GetDataVector());
-                    mappedDataVector2.AddTo(w, -1.0);
+                    w += (-1.0) * mappedDataVector2;
                 }
 
                 // accumulate vectors for mean and standard deviation computation
                 u += w;
-                w.CoordinatewiseSquare();
+                w.Transform([](double x) { return x*x; });
                 v += w;
 
-                dataIterator.Next();
+                exampleIterator.Next();
                 ++count;
             }
 
@@ -111,24 +113,24 @@ int main(int argc, char* argv[])
             u /= denominator;
             outputStream << "mean:\t" << u << '\n';
 
-            u.CoordinatewiseSquare();
+            u.Transform([](double x) { return x*x; });
             v /= denominator;
             v -= u;
-            v.CoordinatewiseSquareRoot();
+            v.Transform([](double x) { return std::sqrt(x); });
             outputStream << "std:\t" << v << '\n';
         }
 
         // output new dataset mode
         else
         {
-            while (dataIterator.IsValid())
+            while (exampleIterator.IsValid())
             {
-                auto example = dataIterator.Get();
+                auto example = exampleIterator.Get();
                 auto mappedDataVector = map.Compute<data::FloatDataVector>(example.GetDataVector());
                 auto mappedExample = data::DenseSupervisedExample(std::move(mappedDataVector), example.GetMetadata());
                 mappedExample.Print(outputStream);
                 outputStream << '\n';
-                dataIterator.Next();
+                exampleIterator.Next();
             }
         }
     }

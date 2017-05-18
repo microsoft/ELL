@@ -21,8 +21,8 @@ namespace data
     /// transformation to each of its non-zero elements. </summary>
     ///
     /// <typeparam name="WrappedIndexValueIteratorType"> Type of the wrapped index value iterator. </typeparam>
-    /// <typeparam name="TransformType"> A functor type that takes an IndexValue and returns a double. </typeparam>
-    template <typename WrappedIndexValueIteratorType, typename TransformType>
+    /// <typeparam name="TransformationType"> A functor type that takes an IndexValue and returns a double. </typeparam>
+    template <typename WrappedIndexValueIteratorType, typename TransformationType>
     class TransformingIndexValueIterator : public IIndexValueIterator
     {
     public:
@@ -30,7 +30,7 @@ namespace data
         ///
         /// <param name="wrappedIterator"> The index value iterator whose non-zero values are to be transformed. </param>
         /// <param name="transform"> A transform that takes an IndexValue and returns the transformed double value. </param>
-        TransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformType transform);
+        TransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformationType transform);
 
         /// <summary> Returns True if the iterator is currently pointing to a valid iterate. </summary>
         ///
@@ -47,17 +47,17 @@ namespace data
 
     protected:
         WrappedIndexValueIteratorType _wrappedIterator;
-        TransformType _transform;
+        TransformationType _transform;
     };
 
     /// <summary> Creates an TransformingIndexValueIterator.</summary>
     ///
     /// <param name="wrappedIterator"> STL iterator pointing at beginning of range to iterate over. </param>
     /// <param name="transform"> STL iterator pointing at end of range to iterate over. </param>
-    template <typename WrappedIndexValueIteratorType, typename TransformType>
-    TransformingIndexValueIterator<WrappedIndexValueIteratorType, TransformType> MakeTransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformType transform)
+    template <typename WrappedIndexValueIteratorType, typename TransformationType>
+    TransformingIndexValueIterator<WrappedIndexValueIteratorType, TransformationType> MakeTransformingIndexValueIterator(WrappedIndexValueIteratorType wrappedIterator, TransformationType transform)
     {
-        return TransformingIndexValueIterator<WrappedIndexValueIteratorType, TransformType>(std::move(wrappedIterator), std::move(transform));
+        return TransformingIndexValueIterator<WrappedIndexValueIteratorType, TransformationType>(std::move(wrappedIterator), std::move(transform));
     }
 }
 }

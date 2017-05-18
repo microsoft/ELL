@@ -25,61 +25,109 @@ namespace ell
 {
 namespace data
 {
+    // forward declaration of SparseDataVector
+    template <typename ElementType, typename IndexListType>
+    class SparseDataVector;
+
+    // forward declaration of SparseDataVectorIterator
+    template <IterationPolicy policy, typename ElementType, typename IndexListType>
+    class SparseDataVectorIterator;
+
+    /// <summary> A read-only forward iterator that traverses the non-zero elements. </summary>
+    template <typename ElementType, typename IndexListType>
+    class SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType> : public IIndexValueIterator
+    {
+    public:
+        SparseDataVectorIterator(const SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType>&) = default;
+
+        SparseDataVectorIterator(SparseDataVectorIterator<IterationPolicy::skipZeros, ElementType, IndexListType>&&) = default;
+
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        ///
+        /// <returns> true if it succeeds, false if it fails. </returns>
+        bool IsValid() const;
+
+        /// <summary> Proceeds to the Next iterate. </summary>
+        void Next();
+
+        /// <summary> Returns the current iterate. </summary>
+        ///
+        /// <returns> An IndexValue that represents the current iterate. </returns>
+        IndexValue Get() const;
+
+    private:
+        // define typenames to improve readability
+        using IndexIteratorType = typename IndexListType::Iterator;
+        using ValueIteratorType = typename std::vector<ElementType>::const_iterator;
+
+        // private ctor, can only be called from SparseDataVector and the dense Iterator classes
+        SparseDataVectorIterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator, size_t size);
+        friend SparseDataVector<ElementType, IndexListType>;
+
+        // members
+        IndexIteratorType _indexIterator;
+        ValueIteratorType _valueIterator;
+        size_t _size;
+    };
+
+    /// <summary> A read-only forward iterator that traverses a prefix of the vector, including zero elements. </summary>
+    template <typename ElementType, typename IndexListType>
+    class SparseDataVectorIterator<IterationPolicy::all, ElementType, IndexListType> : public IIndexValueIterator
+    {
+    public:
+        SparseDataVectorIterator(const SparseDataVectorIterator<IterationPolicy::all, ElementType, IndexListType>&) = default;
+
+        SparseDataVectorIterator(SparseDataVectorIterator<IterationPolicy::all, ElementType, IndexListType>&&) = default;
+
+        /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
+        ///
+        /// <returns> true if it succeeds, false if it fails. </returns>
+        bool IsValid() const { return _index < _size; }
+
+        /// <summary> Proceeds to the Next iterate. </summary>
+        void Next();
+
+        /// <summary> Returns the current iterate. </summary>
+        ///
+        /// <returns> An IndexValue that represents the current iterate. </returns>
+        IndexValue Get() const;
+
+    protected:
+
+        using IndexIteratorType = typename IndexListType::Iterator;
+        using ValueIteratorType = typename std::vector<ElementType>::const_iterator;
+
+        // private ctor that can only be called from the containing class
+        SparseDataVectorIterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator, size_t size);
+        friend SparseDataVector<ElementType, IndexListType>;
+
+        IndexIteratorType _indexIterator;
+        ValueIteratorType _valueIterator;
+        size_t _iteratorIndex;
+        size_t _size;
+        size_t _index = 0;
+    };
+
     /// <summary> Implements a sparse vector as an increasing list of indices and their corresponding values.
     ///
     /// <typeparam name="ElementType"> Type of the vector elements. </typeparam>
     /// <typeparam name="tegerListType"> Type of the integer list used to store indices. </typeparam>
-    template <typename ElementType, typename IntegerListType>
-    class SparseDataVector : public DataVectorBase<SparseDataVector<ElementType, IntegerListType>>
+    template <typename ElementType, typename IndexListType>
+    class SparseDataVector : public DataVectorBase<SparseDataVector<ElementType, IndexListType>>
     {
     public:
-        /// <summary> A read-only forward iterator for the sparse binary vector. </summary>
-        class Iterator : public IIndexValueIterator
-        {
-        public:
-            Iterator(const Iterator&) = default;
-
-            Iterator(Iterator&&) = default;
-
-            /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
-            ///
-            /// <returns> true if it succeeds, false if it fails. </returns>
-            bool IsValid() const { return _index_iterator.IsValid(); }
-
-            /// <summary> Proceeds to the Next iterate. </summary>
-            void Next();
-
-            /// <summary> Returns The current index-value pair. </summary>
-            ///
-            /// <returns> An IndexValue. </returns>
-            IndexValue Get() const { return IndexValue{ _index_iterator.Get(), (double)*_value_iterator }; }
-
-        private:
-            // define typenames to improve readability
-            using IndexIteratorType = typename IntegerListType::Iterator;
-            using ValueIteratorType = typename std::vector<ElementType>::const_iterator;
-
-            // private ctor, can only be called from SparseDataVector class
-            Iterator(const IndexIteratorType& list_iterator, const ValueIteratorType& value_iterator);
-            friend SparseDataVector<ElementType, IntegerListType>;
-
-            // members
-            IndexIteratorType _index_iterator;
-            ValueIteratorType _value_iterator;
-        };
-
         SparseDataVector() = default;
 
-        SparseDataVector(SparseDataVector<ElementType, IntegerListType>&& other) = default;
+        SparseDataVector(SparseDataVector<ElementType, IndexListType>&& other) = default;
 
-        SparseDataVector(const SparseDataVector<ElementType, IntegerListType>& other) = delete;
+        SparseDataVector(const SparseDataVector<ElementType, IndexListType>& other) = delete;
 
         /// <summary> Constructs a DenseDataVector from an index value iterator. </summary>
         ///
-        /// <typeparam name="IndexValueIteratorType"> Type of index value iterator. </typeparam>
-        /// <param name="IndexValueIterator"> The index value iterator. </param>
-        template <typename IndexValueIteratorType, IsIndexValueIterator<IndexValueIteratorType> Concept = true>
-        SparseDataVector(IndexValueIteratorType indexValueIterator);
+        /// <typeparam name="SparseIteratorType"> Type of index value iterator. </typeparam>
+        /// <param name="SparseIterator"> The index value iterator. </param>
+        template <typename SparseIteratorType, IsIndexValueIterator<SparseIteratorType> Concept = true>
+        SparseDataVector(SparseIteratorType SparseIterator);
 
         /// <summary> Constructs a data vector from an initializer list of index value pairs. </summary>
         ///
@@ -101,10 +149,31 @@ namespace data
         /// <param name="list"> The initializer list of values. </param>
         SparseDataVector(std::vector<double> vec);
 
-        /// <summary> Returns a Iterator that traverses the non-zero entries of the sparse vector. </summary>
+        template <IterationPolicy policy>
+        using Iterator = SparseDataVectorIterator<policy, ElementType, IndexListType>;
+
+        /// <summary>
+        /// Returns an indexValue iterator that points to the beginning of the vector, which iterates
+        /// over a prefix of the vector.
+        /// </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        /// <param name="size"> The prefix size. </param>
         ///
         /// <returns> The iterator. </returns>
-        Iterator GetIterator() const;
+        template<IterationPolicy policy>
+        Iterator<policy> GetIterator(size_t size) const;
+
+        /// <summary>
+        /// Returns an indexValue iterator that points to the beginning of the vector, which iterates
+        /// over a prefix of length PrefixLength().
+        /// </summary>
+        ///
+        /// <typeparam name="policy"> The iteration policy. </typeparam>
+        ///
+        /// <returns> The iterator. </returns>
+        template<IterationPolicy policy>
+        Iterator<policy> GetIterator() const { return GetIterator<policy>(PrefixLength()); }
 
         /// <summary> Appends an element to the end of the data vector. </summary>
         ///
@@ -122,8 +191,8 @@ namespace data
         virtual size_t PrefixLength() const override;
 
     private:
-        using DataVectorBase<SparseDataVector<ElementType, IntegerListType>>::AppendElements;
-        IntegerListType _indices;
+        using DataVectorBase<SparseDataVector<ElementType, IndexListType>>::AppendElements;
+        IndexListType _indexList;
         std::vector<ElementType> _values;
     };
 

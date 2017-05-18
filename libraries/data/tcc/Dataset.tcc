@@ -24,7 +24,7 @@ namespace data
     {
         auto fromIndex = _fromIndex;
         auto size = _size;
-        auto getExampleIterator = [fromIndex, size](const auto* pDataset) { return pDataset->template GetExampleIterator<ExampleType>(fromIndex, size); };
+        auto getExampleIterator = [fromIndex, size](const auto* pDataset) { return pDataset->GetExampleIterator<ExampleType>(fromIndex, size); };
 
         // all Dataset types for which GetAnyDataset() is called must be listed below, in the variadic template argument.
         using Invoker = utilities::AbstractInvoker<DatasetBase,
@@ -55,6 +55,13 @@ namespace data
     Dataset<DatasetExampleType>::Dataset(const AnyDataset& anyDataset)
         : Dataset(anyDataset.GetExampleIterator<DatasetExampleType>())
     {
+    }
+
+    template <typename DatasetExampleType>
+    void Dataset<DatasetExampleType>::Swap(Dataset& other)
+    {
+        std::swap(_examples, other._examples);
+        std::swap(_numFeatures, other._numFeatures);
     }
 
     template <typename DatasetExampleType>
@@ -90,10 +97,10 @@ namespace data
     }
 
     template <typename DatasetExampleType>
-    auto Dataset<DatasetExampleType>::GetExampleReferenceIterator(size_t fromIndex, size_t size) const -> ExampleReferenceIterator
+    auto Dataset<DatasetExampleType>::GetExampleReferenceIterator(size_t fromIndex, size_t size) const -> ExampleReferenceIterator<DatasetExampleType>
     {
         size = CorrectRangeSize(fromIndex, size);
-        return ExampleReferenceIterator(_examples.cbegin() + fromIndex, _examples.cbegin() + fromIndex + size);
+        return ExampleReferenceIterator<DatasetExampleType>(_examples.cbegin() + fromIndex, _examples.cbegin() + fromIndex + size);
     }
 
     template <typename DatasetExampleType>

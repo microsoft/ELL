@@ -31,7 +31,7 @@ namespace utilities
 
         /// <summary> Returns true if the iterator knows its size. </summary>
         ///
-        /// <returns> true if NumIteratesLeft returns a valid number, false if not. </returns>
+        /// <returns> true if NumItemsLeft returns a valid number, false if not. </returns>
         virtual bool HasSize() const { return false; }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace utilities
         /// </summary>
         ///
         /// <returns> The total number of iterates left. </returns>
-        virtual size_t NumIteratesLeft() const { return 0; }
+        virtual size_t NumItemsLeft() const { return 0; }
 
         /// <summary> Proceeds to the Next item. </summary>
         virtual void Next() = 0;

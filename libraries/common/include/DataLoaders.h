@@ -17,6 +17,8 @@
 // model
 #include "DynamicMap.h"
 
+// utilities
+#include "StlContainerIterator.h"
 
 // stl
 #include <string>
@@ -30,29 +32,45 @@ namespace common
     /// <param name="dataLoadArguments"> The data load arguments. </param>
     ///
     /// <returns> The data iterator. </returns>
-    data::ExampleIterator<data::AutoSupervisedExample> GetExampleIterator(const DataLoadArguments& dataLoadArguments);
+    data::AutoSupervisedExampleIterator GetExampleIterator(const DataLoadArguments& dataLoadArguments);
+
+    /// <summary> Creates a dataset from an example iterator. </summary>
+    ///
+    /// <param name="exampleIterator"> The example iterator. </param>
+    ///
+    /// <returns> The dataset. </returns>
+    data::AutoSupervisedDataset GetDataset(data::AutoSupervisedExampleIterator exampleIterator);
 
     /// <summary> Gets a dataset from data load arguments. </summary>
     ///
-    /// <typeparam name="DatasetType"> Dataset type. </typeparam>
     /// <param name="dataLoadArguments"> The data load arguments. </param>
     ///
     /// <returns> The dataset. </returns>
-    template <typename DatasetType = data::AutoSupervisedDataset>
-    DatasetType GetDataset(const DataLoadArguments& dataLoadArguments);
+    data::AutoSupervisedDataset GetDataset(const DataLoadArguments& dataLoadArguments);
+
+    /// <summary>
+    /// Gets a dataset by loading it from an example iterator and running it through a map.
+    /// </summary>
+    ///
+    /// <typeparam name="MapType"> Map type. </typeparam>
+    /// <param name="exampleIterator"> The example iterator. </param>
+    /// <param name="map"> The map. </param>
+    ///
+    /// <returns> The mapped dataset. </returns>
+    template <typename MapType>
+    data::AutoSupervisedDataset GetMappedDataset(data::AutoSupervisedExampleIterator exampleIterator, const MapType& map);
 
     /// <summary>
     /// Gets a dataset by loading it according to data load arguments and then running it through a
     /// map.
     /// </summary>
     ///
-    /// <typeparam name="DatasetType"> The Dataset type. </typeparam>
     /// <param name="dataLoadArguments"> The data load arguments. </param>
     /// <param name="map"> The map. </param>
     ///
     /// <returns> The dataset. </returns>
-    template <typename DatasetType = data::AutoSupervisedDataset>
-    DatasetType GetMappedDataset(const DataLoadArguments& dataLoadArguments, const model::DynamicMap& map);
+    template <typename MapType>
+    data::AutoSupervisedDataset GetMappedDataset(const DataLoadArguments& dataLoadArguments, const MapType& map);
 }
 }
 

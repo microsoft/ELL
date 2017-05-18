@@ -27,9 +27,13 @@ namespace data
     struct IIndexValueIterator
     {
     };
+
 #ifndef SWIG
     template <typename IteratorType>
     using IsIndexValueIterator = typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IteratorType>::value, bool>;
 #endif
+
+    /// <summary> Iteration policies. </summary>
+    enum class IterationPolicy { all, skipZeros };
 }
 }

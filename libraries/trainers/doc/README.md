@@ -7,6 +7,7 @@ Linear trainers output biased linear predictors by minimizing a regularized empi
 
 * `SGDLinearTrainer`: Implements the "Stochastic Gradient Descent" algorithm. Finds the biased linear predictor that minimzes an L2-regularized empirical loss. The loss function can be any subdifferentiable function.
 * `SDSGDLinearTrainer`: Implements the ["Sparse Data Stochastic Gradient Descent"](https://arxiv.org/abs/1612.09147) algorithm, which is mathematically equivalent to SGD but may differ numerically, and uses only sparse vector operations. Therefore, this algorithm should be significantly faster than SGD on sparse datasets, and up to twice as slow on dense datasets.
+* `SDCSGDLinearTrainer`: Implements the ["Sparse Data Centered Stochastic Gradient Descent"](https://arxiv.org/abs/1612.09147) algorithm, which is equivalent to centering the training data (shifting its mean to the origin), running SGD, and then correcting the trained predictor so that it can be applied directly to uncentered data. Like SDSGD, this implementation relies on sparse vector operations (where sparsity is with respect to the original uncentered data).
 
 ## Decision Forest Trainers
 * `SortingForestTrainer`

@@ -32,7 +32,6 @@ namespace ell
 {
 namespace common
 {
-    /// <summary> Registers node-creation functions with the ModelBuilder class </summary>
     void RegisterNodeCreators(model::ModelBuilder& builder)
     {        
         builder.RegisterNodeCreator<model::InputNode<bool>, size_t>();

@@ -10,38 +10,28 @@ namespace ell
 {
 namespace common
 {
-
-    template <typename DatasetType>
-    DatasetType GetDataset(const DataLoadArguments& dataLoadArguments)
+    template <typename MapType>
+    data::AutoSupervisedDataset GetMappedDataset(data::AutoSupervisedExampleIterator exampleIterator, const MapType& map)
     {
-        auto dataIterator = GetExampleIterator(dataLoadArguments);
-        DatasetType dataset;
-        while (dataIterator.IsValid())
-        {
-            dataset.AddExample(dataIterator.Get());
-            dataIterator.Next();
-        }
+        data::AutoSupervisedDataset dataset;
 
+        // generate mapped dataset
+        while (exampleIterator.IsValid())
+        {
+            auto example = exampleIterator.Get();
+            auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
+            auto mappedExample = data::AutoSupervisedExample(std::move(mappedDataVector), example.GetMetadata());
+            dataset.AddExample(mappedExample);
+
+            exampleIterator.Next();
+        }
         return dataset;
     }
 
-    template <typename DatasetType>
-    DatasetType GetMappedDataset(const DataLoadArguments& dataLoadArguments, const model::DynamicMap& map)
+    template <typename MapType>
+    data::AutoSupervisedDataset GetMappedDataset(const DataLoadArguments& dataLoadArguments, const MapType& map)
     {
-        auto dataIterator = GetExampleIterator(dataLoadArguments);
-        DatasetType dataset;
-
-        // generate mapped dataset
-        while (dataIterator.IsValid())
-        {
-            auto example = dataIterator.Get();
-            auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
-            auto mappedExample = typename DatasetType::DatasetExampleType(std::move(mappedDataVector), example.GetMetadata());
-            dataset.AddExample(mappedExample);
-
-            dataIterator.Next();
-        }
-        return dataset;
+        return GetMappedDataset(GetExampleIterator(dataLoadArguments), map);
     }
 }
 }

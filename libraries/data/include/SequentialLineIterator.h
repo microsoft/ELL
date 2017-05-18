@@ -34,7 +34,7 @@ namespace data
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>
-        bool IsValid() const { return (_spCurrentLine != nullptr); }
+        bool IsValid() const { return (_pCurrentLine != nullptr); }
 
         /// <summary> Proceeds to the Next row. </summary>
         void Next();
@@ -42,10 +42,10 @@ namespace data
         /// <summary> Returns a const reference to the row. </summary>
         ///
         /// <returns> A std::shared_ptr&lt;const std::string&gt; </returns>
-        std::shared_ptr<const std::string> Get() const { return _spCurrentLine; }
+        std::shared_ptr<const std::string> Get() const { return _pCurrentLine; }
 
     private:
-        std::shared_ptr<std::string> _spCurrentLine = nullptr;
+        std::shared_ptr<std::string> _pCurrentLine = nullptr;
         std::ifstream _iFStream;
         char _delim;
     };

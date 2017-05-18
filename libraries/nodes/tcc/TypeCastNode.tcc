@@ -8,7 +8,6 @@
 
 namespace ell
 {
-/// <summary> model namespace </summary>
 namespace nodes
 {
     template <typename InputValueType, typename OutputValueType>

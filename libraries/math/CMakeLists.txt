@@ -10,23 +10,32 @@ if(MSVC)
   add_compile_options(-D_SCL_SECURE_NO_WARNINGS)
 endif()
 
+include (OpenBLASSetup)
+
 set (src src/BlasWrapper.cpp)
 
 set (include include/BlasWrapper.h
+             include/ConstVectorReference.h
              include/Matrix.h
              include/Operations.h
              include/Print.h
              include/Tensor.h
+             include/TransformedConstVectorReference.h
              include/TensorOperations.h
              include/Vector.h
+             include/VectorBase.h
+             include/VectorReference.h
 )
 
-set (tcc tcc/Matrix.tcc
+set (tcc tcc/ConstVectorReference.tcc
+         tcc/Matrix.tcc
          tcc/Operations.tcc
          tcc/Print.tcc
          tcc/Tensor.tcc
+         tcc/TransformedConstVectorReference.tcc
          tcc/TensorOperations.tcc
          tcc/Vector.tcc
+         tcc/VectorReference.tcc
 )
 
 set (doc doc/README.md)

@@ -23,9 +23,9 @@ namespace data
     }
 
     template <typename VectorElementParserType, typename DataVectorType>
-    AutoSupervisedExample SupervisedExampleBuilder<VectorElementParserType, DataVectorType>::Build(std::shared_ptr<const std::string> spExampleString)
+    AutoSupervisedExample SupervisedExampleBuilder<VectorElementParserType, DataVectorType>::Build(std::shared_ptr<const std::string> pExampleString)
     {
-        const char* pStr = spExampleString->c_str();
+        const char* pStr = pExampleString->c_str();
 
         double label = 0.0;
         double weight = 1.0;
@@ -37,7 +37,7 @@ namespace data
 
             if (result != utilities::ParseResult::success)
             {
-                HandleErrors(result, *spExampleString);
+                HandleErrors(result, *pExampleString);
             }
         }
 
@@ -46,11 +46,11 @@ namespace data
 
         if (result != utilities::ParseResult::success)
         {
-            HandleErrors(result, *spExampleString);
+            HandleErrors(result, *pExampleString);
         }
 
         // create index-value iterator from the rest of the std::string
-        auto IndexValueIterator = _instanceParser.GetIterator(spExampleString, pStr);
+        auto IndexValueIterator = _instanceParser.GetIterator(pExampleString, pStr);
 
         // create instance
         auto dataVector = std::make_shared<DataVectorType>(IndexValueIterator);

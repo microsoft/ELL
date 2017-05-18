@@ -10,8 +10,8 @@ namespace ell
 {
 namespace math
 {
-    template <typename ElementType, VectorOrientation Orientation>
-    void Print(const ConstVectorReference<ElementType, Orientation>& v, std::ostream& os, size_t indent)
+    template <typename ElementType, VectorOrientation orientation>
+    void Print(const ConstVectorReference<ElementType, orientation>& v, std::ostream& os, size_t indent)
     {
         os << std::string(indent, '\t');
         os << "{ " << v[0];
@@ -22,8 +22,8 @@ namespace math
         os << " }";
     }
 
-    template <typename ElementType, MatrixLayout Layout>
-    void Print(const ConstMatrixReference<ElementType, Layout>& M, std::ostream& os, size_t indent)
+    template <typename ElementType, MatrixLayout layout>
+    void Print(const ConstMatrixReference<ElementType, layout>& M, std::ostream& os, size_t indent)
     {
         os << std::string(indent, '\t') << "{\n";
         for (size_t i = 0; i < M.NumRows(); ++i)

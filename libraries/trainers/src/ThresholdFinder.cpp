@@ -16,7 +16,7 @@ namespace ell
 {
 namespace trainers
 {
-    size_t ThresholdFinder::SortReduceDeepCopyAss(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const
+    size_t ThresholdFinder::SortReduceCopy(std::vector<ValueWeight>::iterator begin, const std::vector<ValueWeight>::iterator end) const
     {
         // sort the values
         std::sort(begin, end, std::less<double>());
@@ -24,7 +24,6 @@ namespace trainers
         auto iter = begin;
         auto current = begin;
 
-        // remove DeepCopyAss while incrementing counts
         while (++iter != end)
         {
             if (iter->value == current->value)
