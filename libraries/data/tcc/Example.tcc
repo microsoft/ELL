@@ -19,7 +19,7 @@ namespace data
     template <typename DataVectorType, typename MetadataType>
     template <typename InputDataVectorType, typename InputMetadataType, utilities::IsDifferent<InputDataVectorType, DataVectorType>, IsDataVector<InputDataVectorType>>
     Example<DataVectorType, MetadataType>::Example(const InputDataVectorType& dataVector, const InputMetadataType& metadata)
-        : _dataVector(std::make_shared<const DataVectorType>(dataVector.GetIterator<IterationPolicy::skipZeros>())), _metadata(MetadataType(metadata))
+        : _dataVector(std::make_shared<const DataVectorType>(GetIterator<InputDataVectorType, IterationPolicy::skipZeros>(dataVector))), _metadata(MetadataType(metadata))
     {
     }
 

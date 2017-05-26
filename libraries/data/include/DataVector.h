@@ -92,7 +92,7 @@ namespace data
         /// takes an IndexValue and returns a double, and is applied to each element of the vector. </typeparam>
         /// <param name="vector"> The vector. </param>
         /// <param name="transformation"> The transformation.. </param>
-        template<IterationPolicy policy, typename TransformationType>
+        template <IterationPolicy policy, typename TransformationType>
         void AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const;
 
         /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
@@ -231,7 +231,7 @@ namespace data
         /// takes an IndexValue and returns a double, and is applied to each element of the vector. </typeparam>
         /// <param name="vector"> The vector. </param>
         /// <param name="transformation"> The transformation.. </param>
-        template<IterationPolicy policy, typename TransformationType>
+        template <IterationPolicy policy, typename TransformationType>
         void AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const;
 
         /// <summary> Returns a (dense) iterator of the vector elements, excluding the final suffix of zeros. </summary>
@@ -289,6 +289,116 @@ namespace data
         /// <param name="os"> [in,out] Stream to write to. </param>
         virtual void Print(std::ostream& os) const override;
     };
+
+    /// <summary> Wrapper for AddTransformedTo that hides the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call AddTransformedTo on </typeparam>
+    /// <typeparam name="policy"> The iteration policy. </typeparam>
+    /// <typeparam name="TransformationType"> Non zero transformation type, which is a functor that
+    /// takes an IndexValue and returns a double, and is applied to each element of the vector. </typeparam>
+    /// <param name="vector"> The data vector that we're calling AddTransformedTo. </param>
+    /// <param name="vector"> The vector. </param>
+    /// <param name="transformation"> The transformation.. </param>
+    template <typename DataVectorType, IterationPolicy policy, typename TransformationType>
+    static void AddTransformedTo(const DataVectorType& dataVector, math::RowVectorReference<double> vector, TransformationType transformation)
+    {
+        return dataVector.template AddTransformedTo<policy, TransformationType>(vector, transformation);
+    }
+
+    /// <summary> Wrappers for GetIterator that hide the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call GetIterator on </typeparam>
+    /// <typeparam name="policy"> The iteration policy. </typeparam>
+    /// <param name="vector"> The data vector that we're getting the iterator from. </param>
+    /// <returns> The iterator. </returns>
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(DataVectorType& vector)
+    {
+        return vector.template GetIterator<policy>();
+    }
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(const DataVectorType& vector)
+    {
+        return vector.template GetIterator<policy>();
+    }
+
+    /// <summary> Wrappers for GetIterator that hide the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call GetIterator on </typeparam>
+    /// <typeparam name="policy"> The iteration policy. </typeparam>
+    /// <param name="vector"> The data vector that we're getting the iterator from. </param>
+    /// <param name="size"> The size of the vector. </param>
+    /// <returns> The iterator. </returns>
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(DataVectorType& vector, size_t size)
+    {
+        return vector.template GetIterator<policy>(size);
+    }
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(const DataVectorType& vector, size_t size)
+    {
+        return vector.template GetIterator<policy>(size);
+    }
+
+    /// <summary> Wrappers for CopyAs that hide the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call CopyAs on </typeparam>
+    /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam>
+    ///
+    /// <returns> A data vector of a specified type. </returns>
+    template <typename DataVectorType, typename ReturnType>
+    static ReturnType CopyAs(DataVectorType& vector)
+    {
+        return vector.template CopyAs<ReturnType>();
+    }
+    template <typename DataVectorType, typename ReturnType>
+    static ReturnType CopyAs(const DataVectorType& vector)
+    {
+        return vector.template CopyAs<ReturnType>();
+    }
+
+    /// <summary> Wrappers for TransformAs that hide the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call TransformAs on </typeparam>
+    /// <typeparam name="policy"> The iteration policy. </typeparam>
+    /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
+    /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+    /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
+    /// applied to the elements of the data vector. </param>
+    /// <param name="size"> The prefix size. </param>
+    ///
+    /// <returns> The transformed data vector. </returns>
+    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
+    static ReturnType TransformAs(DataVectorType& vector, TransformationType transformation, size_t size)
+    {
+        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation, size);
+    }
+    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
+    static ReturnType TransformAs(const DataVectorType& vector, TransformationType transformation, size_t size)
+    {
+        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation, size);
+    }
+
+    /// <summary> Wrappers for TransformAs that hide the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call TransformAs on </typeparam>
+    /// <typeparam name="policy"> The iteration policy. </typeparam>
+    /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
+    /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+    /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
+    /// applied to the elements of the data vector. </param>
+    ///
+    /// <returns> The transformed data vector. </returns>
+    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
+    static ReturnType TransformAs(DataVectorType& vector, TransformationType transformation)
+    {
+        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation);
+    }
+    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
+    static ReturnType TransformAs(const DataVectorType& vector, TransformationType transformation)
+    {
+        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation);
+    }
 }
 }
 

@@ -89,8 +89,8 @@ namespace data
         _pInternal->Print(os);
     }
 
-    template<typename DefaultDataVectorType>
-    template<IterationPolicy policy, typename TransformationType>
+    template <typename DefaultDataVectorType>
+    template <IterationPolicy policy, typename TransformationType>
     void AutoDataVectorBase<DefaultDataVectorType>::AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const
     {
         _pInternal->AddTransformedTo<policy>(vector, transformation);
@@ -126,7 +126,7 @@ namespace data
         bool includesNonBytes = false;
         bool includesNonBinary = false;
 
-        auto iter = defaultDataVector.GetIterator<IterationPolicy::skipZeros>();
+        auto iter = GetIterator<DefaultDataVectorType, IterationPolicy::skipZeros>(defaultDataVector);
         while (iter.IsValid())
         {
             double value = iter.Get().value;
@@ -191,7 +191,7 @@ namespace data
     template <typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept>
     void AutoDataVectorBase<DefaultDataVectorType>::SetInternal(DefaultDataVectorType defaultDataVector)
     {
-        _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator<IterationPolicy::skipZeros>());
+        _pInternal = std::make_unique<DataVectorType>(GetIterator<DefaultDataVectorType, IterationPolicy::skipZeros>(defaultDataVector));
     }
 
     template <typename DefaultDataVectorType>

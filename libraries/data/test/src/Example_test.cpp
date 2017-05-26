@@ -37,7 +37,7 @@ void ExampleCopyAsTest()
 
     size_t expectedReferenceCount = (typeName1 == typeName2) ? 2 : 1;
     auto example1 = GetExample<ExampleType1>();
-    auto example2 = example1.template CopyAs<ExampleType2>();
+    auto example2 = data::CopyAs<ExampleType1, ExampleType2>(example1);
     bool isExpectedReferenceCount = (example2.GetDataVectorReferenceCount() == expectedReferenceCount);
 
     std::stringstream ss1, ss2;

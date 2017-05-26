@@ -11,10 +11,10 @@
 // data
 #include "AutoDataVector.h"
 #include "DataVector.h"
+#include "DataVectorTransformations.h"
 #include "DenseDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
-#include "DataVectorTransformations.h"
 
 // math
 #include "Vector.h"
@@ -43,11 +43,11 @@ void IDataVectorTest()
     math::RowVector<double> r0{ 3, 1, 1, -7, 0, 0 };
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w.ToArray(), r0.ToArray()));
 
-    u.AddTransformedTo<data::IterationPolicy::skipZeros>(w, [](data::IndexValue x){ return -2 * x.value; });
+    data::AddTransformedTo<DataVectorType, data::IterationPolicy::skipZeros>(u, w, [](data::IndexValue x) { return -2 * x.value; });
     math::RowVector<double> r1{ -1, 1, 1, 7, -2, 0 };
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTransformedTo<skipZeros>()", testing::IsEqual(w.ToArray(), r1.ToArray()));
 
-    u.AddTransformedTo<data::IterationPolicy::all>(w, [](data::IndexValue x) { return x.value+1; });
+    data::AddTransformedTo<DataVectorType, data::IterationPolicy::all>(u, w, [](data::IndexValue x) { return x.value + 1; });
     math::RowVector<double> r2{ 2, 2, 2, 1, 0, 1 };
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTransformedTo<all>()", testing::IsEqual(w.ToArray(), r2.ToArray()));
 
@@ -70,11 +70,11 @@ void IDataVectorBinaryTest()
     math::RowVector<double> r0{ 2, 2, 3, 5, 6, 6 };
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTo()", testing::IsEqual(w.ToArray(), r0.ToArray()));
 
-    u.AddTransformedTo<data::IterationPolicy::skipZeros>(w, [](data::IndexValue x) { return -2 * x.value; });
+    data::AddTransformedTo<DataVectorType, data::IterationPolicy::skipZeros>(u, w, [](data::IndexValue x) { return -2 * x.value; });
     math::RowVector<double> r1{ 0, 2, 3, 3, 4, 6 };
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTransformedTo<skipZeros>()", testing::IsEqual(w.ToArray(), r1.ToArray()));
 
-    u.AddTransformedTo<data::IterationPolicy::all>(w, [](data::IndexValue x) { return x.value + 1; });
+    data::AddTransformedTo<DataVectorType, data::IterationPolicy::all>(u, w, [](data::IndexValue x) { return x.value + 1; });
     math::RowVector<double> r2{ 2, 3, 4, 5, 6, 7 };
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::AddTransformedTo<all>()", testing::IsEqual(w.ToArray(), r2.ToArray()));
 
@@ -112,7 +112,7 @@ template <typename DataVectorType1, typename DataVectorType2>
 void DataVectorCopyAsTest(std::initializer_list<double> list, bool testDense = true)
 {
     const DataVectorType1 a(list);
-    auto b = a.template CopyAs<DataVectorType2>();
+    auto b = data::CopyAs<DataVectorType1, DataVectorType2>(a);
     auto av = a.ToArray();
     auto bv = b.ToArray();
 
@@ -123,15 +123,15 @@ void DataVectorCopyAsTest(std::initializer_list<double> list, bool testDense = t
 
     if (testDense)
     {
-        auto d = a.template TransformAs<data::IterationPolicy::all, DataVectorType2>([](data::IndexValue x) { return x.value + 3; }, 3);
+        auto d = data::TransformAs<DataVectorType1,data::IterationPolicy::all, DataVectorType2>(a, [](data::IndexValue x) { return x.value + 3; }, 3);
         auto dv = d.ToArray();
         std::vector<double> r{ av[0] + 3, av[1] + 3, av[2] + 3 };
         testing::ProcessTest(name1 + "::TransformAs<all," + name2 + ">", testing::IsEqual(r, dv, 1.0e-6));
     }
 
-    auto c = a.template TransformAs<data::IterationPolicy::skipZeros, DataVectorType2>([](data::IndexValue x) { return x.value*x.value; });
+    auto c = data::TransformAs<DataVectorType1, data::IterationPolicy::skipZeros, DataVectorType2>(a, [](data::IndexValue x) { return x.value * x.value; });
     auto cv = c.ToArray();
-    std::transform(av.begin(), av.end(), av.begin(), [](double x) { return x*x; });
+    std::transform(av.begin(), av.end(), av.begin(), [](double x) { return x * x; });
     testing::ProcessTest(name1 + "::TransformAs<skipZeros," + name2 + ">", testing::IsEqual(av, cv, 1.0e-6));
 }
 
@@ -238,7 +238,7 @@ void IteratorTest()
     auto a = u.ToArray(13);
 
     std::vector<double> b(13);
-    auto denseIter = u.GetIterator<data::IterationPolicy::all>(13);
+    auto denseIter = data::GetIterator<DataVectorType, data::IterationPolicy::all>(u, 13);
     while (denseIter.IsValid())
     {
         b[denseIter.Get().index] = denseIter.Get().value;
@@ -248,7 +248,7 @@ void IteratorTest()
     testing::ProcessTest("IteratorTest<" + name + ">", std::equal(a.begin(), a.end(), b.begin()));
 
     std::vector<double> c(13);
-    auto sparseIter = u.GetIterator<data::IterationPolicy::skipZeros>();
+    auto sparseIter = data::GetIterator<DataVectorType, data::IterationPolicy::skipZeros>(u);
     while (sparseIter.IsValid())
     {
         c[sparseIter.Get().index] = sparseIter.Get().value;

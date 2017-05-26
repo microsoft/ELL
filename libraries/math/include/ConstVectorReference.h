@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ConstVectorReference.h (math_test)
 //  Authors:  Ofer Dekel
 //
@@ -151,7 +151,7 @@ namespace math
         /// <param name="tolerance"> The element comparison tolerance. </param>
         ///
         /// <returns> true if the vectors are considered equivalent. </returns>
-        bool IsEqual(ConstVectorReference<ElementType, orientation> other, ElementType tolerance=1.0e-8) const;
+        bool IsEqual(ConstVectorReference<ElementType, orientation> other, ElementType tolerance = 1.0e-8) const;
 
         /// <summary> Equality operator. </summary>
         ///

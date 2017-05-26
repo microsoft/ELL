@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ConstVectorReference.tcc (math)
 //  Authors:  Ofer Dekel
 //
@@ -24,25 +24,8 @@ namespace math
     ElementType UnorientedConstVectorReference<ElementType>::operator[](size_t index) const
     {
         DEBUG_THROW(index >= _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size."));
-        
+
         return _pData[index * _increment];
-    }
-    template<typename ElementType>
-    ElementType UnorientedConstVectorReference<ElementType>::Norm0() const 
-    { 
-        return Operations::Norm0(*this); 
-    }
-
-    template<typename ElementType>
-    ElementType UnorientedConstVectorReference<ElementType>::Norm1() const 
-    { 
-        return Operations::Norm1(*this); 
-    }
-
-    template<typename ElementType>
-    ElementType UnorientedConstVectorReference<ElementType>::Norm2() const 
-    { 
-        return Operations::Norm2(*this); 
     }
 
     template <typename ElementType>
@@ -141,7 +124,7 @@ namespace math
         {
             auto diff = (*pThis) - (*pOther);
 
-            if(diff > tolerance || -diff > tolerance)
+            if (diff > tolerance || -diff > tolerance)
             {
                 return false;
             }

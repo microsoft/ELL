@@ -6,12 +6,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// stl
+#include <cmath>
+
 namespace ell
 {
 namespace math
 {
     template <typename ElementType, VectorOrientation orientation, typename TransformationType>
-    TransformedConstVectorReference<ElementType, orientation, TransformationType>::TransformedConstVectorReference(ConstVectorReference<ElementType, orientation> vector, TransformationType transformation) : _vector(vector), _transformation(std::move(transformation))
+    TransformedConstVectorReference<ElementType, orientation, TransformationType>::TransformedConstVectorReference(ConstVectorReference<ElementType, orientation> vector, TransformationType transformation)
+        : _vector(vector), _transformation(std::move(transformation))
     {
     }
 
@@ -25,13 +29,13 @@ namespace math
     auto operator*(double scalar, ConstVectorReference<ElementType, orientation> vector)
     {
         ElementType typedScalar = static_cast<ElementType>(scalar);
-        return TransformVector(vector, [typedScalar](ElementType x) { return typedScalar*x; });
+        return TransformVector(vector, [typedScalar](ElementType x) { return typedScalar * x; });
     }
 
     template <typename ElementType, VectorOrientation orientation>
     auto Square(ConstVectorReference<ElementType, orientation> vector)
     {
-        return TransformVector(vector, [](ElementType x) { return x*x; });
+        return TransformVector(vector, [](ElementType x) { return x * x; });
     }
 
     template <typename ElementType, VectorOrientation orientation>

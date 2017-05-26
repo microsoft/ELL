@@ -19,7 +19,7 @@ namespace common
         while (exampleIterator.IsValid())
         {
             auto example = exampleIterator.Get();
-            auto mappedDataVector = map.Compute<data::DoubleDataVector>(example.GetDataVector());
+            auto mappedDataVector = map.template Compute<data::DoubleDataVector>(example.GetDataVector());
             auto mappedExample = data::AutoSupervisedExample(std::move(mappedDataVector), example.GetMetadata());
             dataset.AddExample(mappedExample);
 
