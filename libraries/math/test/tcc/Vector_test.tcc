@@ -242,16 +242,16 @@ void TestTransformedVectors()
     math::ColumnVector<ElementType> r2{ 5, 8, -1, -4, 5, 5, 5, 5, 5, 5 };
     testing::ProcessTest("Vector::operator+=(transformed vector)", u == r2);
 
-    u += Abs(v);
+    u += math::Abs<ElementType, math::VectorOrientation::column>(v);
     math::ColumnVector<ElementType> r3{ 6, 10, 0, -2, 6, 6, 6, 6, 6, 6 };
     testing::ProcessTest("Vector::operator+=(abs vector)", u == r3);
 
-    u.Set(Abs(v));
+    u.Set(math::Abs<ElementType, math::VectorOrientation::column>(v));
     math::ColumnVector<ElementType> r4{ 1, 2, 1, 2, 1, 1, 1, 1, 1, 1 };
     testing::ProcessTest("Vector::Set(abs vector)", u == r4);
 
     u.Reset();
-    u += Square(v);
-    v.Set(Sqrt(u));
+    u += math::Square<ElementType, math::VectorOrientation::column>(v);
+    v.Set(math::Sqrt<ElementType, math::VectorOrientation::column>(u));
     testing::ProcessTest("Vector::Set(square/sqrt)", v == r4);
 }
