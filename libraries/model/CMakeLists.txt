@@ -32,6 +32,7 @@ set (include
     include/InputPort.h
     include/IRCompiledMap.h
     include/IRMapCompiler.h
+    include/IRSteppableMapCompiler.h
     include/MapCompiler.h
     include/Model.h
     include/ModelBuilder.h
@@ -42,6 +43,7 @@ set (include
     include/OutputPort.h
     include/PortElements.h
     include/Port.h
+    include/SteppableMap.h
 )
 
 set (tcc 
@@ -49,6 +51,7 @@ set (tcc
     tcc/InputNode.tcc
     tcc/InputPort.tcc
     tcc/IRCompiledMap.tcc
+    tcc/IRSteppableMapCompiler.tcc
     tcc/Model.tcc
     tcc/ModelBuilder.tcc
     tcc/ModelTransformer.tcc
@@ -56,6 +59,7 @@ set (tcc
     tcc/OutputNode.tcc
     tcc/OutputPort.tcc
     tcc/PortElements.tcc
+    tcc/SteppableMap.tcc
 )
 
 source_group("src" FILES ${src})

@@ -55,4 +55,5 @@ void TestDotProductOutput();
 void TestLinearPredictor();
 void TestForest();
 void TestForestMap();
+void TestSteppableMap(bool runJit = false);
 }

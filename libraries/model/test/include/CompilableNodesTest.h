@@ -28,5 +28,5 @@ void TestCompilableBinaryPredicateNode();
 void TestCompilableMultiplexerNode();
 void TestCompilableTypeCastNode();
 void TestCompilableAccumulatorNodeFunction();
-
+void TestCompilableSourceNode(bool runJit);
 }

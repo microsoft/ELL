@@ -29,6 +29,7 @@ set (src
 )
 
 set (include 
+    include/ClockInterface.h
     include/EmitterException.h
     include/EmitterTypes.h
     include/IRAssemblyEmitter.h
@@ -54,6 +55,7 @@ set (include
 set (tcc 
     tcc/EmitterTypes.tcc
     tcc/IRFunctionEmitter.tcc
+    tcc/IRLoopEmitter.tcc
     tcc/IRModuleEmitter.tcc
     tcc/IRRuntime.tcc
     tcc/ScalarVariable.tcc
@@ -100,7 +102,7 @@ source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} nodes model testing utilities predictors emitters ${LLVM_LIBS})
+target_link_libraries(${test_name} nodes model testing utilities predictors emitters)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

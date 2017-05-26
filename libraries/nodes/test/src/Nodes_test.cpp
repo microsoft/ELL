@@ -18,10 +18,11 @@
 #include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
+#include "MatrixVectorProductNode.h"
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
+#include "SourceNode.h"
 #include "UnaryOperationNode.h"
-#include "MatrixVectorProductNode.h"
 
 // model
 #include "InputNode.h"
@@ -35,10 +36,12 @@
 #include "testing.h"
 
 // stl
+#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <thread>
 
 namespace ell
 {
@@ -222,7 +225,7 @@ void TestUnaryOperationNodeCompute()
 
 void TestUnaryOperationNodeCompute1()
 {
-    std::vector<std::vector<double>> data = { { 1 },{ 2 },{ 3 },{ 4 },{ 5 },{ 6 },{ 7 },{ 8 },{ 9 },{ 10 } };
+    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
     auto outputNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, emitters::UnaryOperationType::exp);
@@ -289,6 +292,63 @@ void TestDemultiplexerNodeCompute()
     selectorNode->SetInput(true); // output[1] should get the input
     outputVec = model.ComputeOutput(muxNode->output);
     testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, { 0.0, 5.0 }));
+}
+
+// Callbacks
+struct SourceNodeTester
+{
+    void Initialize(const std::vector<std::vector<double>>& inputSeries)
+    {
+        it = inputSeries.begin();
+        end = inputSeries.end();
+        assert(it != end);
+    }
+
+    bool InputCallback(std::vector<double>& input)
+    {
+        if (it == end)
+        {
+            return false;
+        }
+        input = *it;
+        it++;
+        return true;
+    }
+
+private:
+    std::vector<std::vector<double>>::const_iterator it;
+    std::vector<std::vector<double>>::const_iterator end;
+} sourceNodeTester;
+
+// Needed for compile-time template non-type parameter deduction
+bool SourceNodeTester_InputCallback(std::vector<double>& input)
+{
+    return sourceNodeTester.InputCallback(input);
+}
+
+void TestSourceNodeCompute()
+{
+    const std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
+    sourceNodeTester.Initialize(data);
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
+    auto sourceNode = model.AddNode<nodes::SourceNode<double, &SourceNodeTester_InputCallback>>(
+        inputNode->output, data[0].size());
+
+    for (const auto& inputValue : data)
+    {
+        using namespace std::chrono_literals;
+
+        const model::TimeTickType now = std::chrono::steady_clock::now().time_since_epoch().count();
+        std::vector<model::TimeTickType> timeInput{ now - 50, now };
+        inputNode->SetInput(timeInput);
+
+        auto output = model.ComputeOutput(sourceNode->output);
+        testing::ProcessTest("Testing SourceNode output", testing::IsEqual(output, inputValue));
+
+        std::this_thread::sleep_for(2ms);
+    }
 }
 
 //
@@ -454,8 +514,12 @@ void TestDTWDistanceNodeCompute()
 void TestMatrixVectorProductRefine()
 {
     math::ColumnMatrix<double> w(2, 3);
-    w(0, 0) = 1.0; w(0, 1) = 0.2; w(0, 2) = 0.3;
-    w(1, 0) = 0.3; w(1, 1) = 0.7; w(1, 2) = 0.5;
+    w(0, 0) = 1.0;
+    w(0, 1) = 0.2;
+    w(0, 2) = 0.3;
+    w(1, 0) = 0.3;
+    w(1, 1) = 0.7;
+    w(1, 2) = 0.5;
 
     std::vector<double> input = { 1, 2, 3 };
 

@@ -98,4 +98,40 @@ void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledM
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
     }
 }
+
+template <typename InputType>
+void InputCallbackTester<InputType>::Initialize(const std::vector<std::vector<InputType>>& input)
+{
+    begin = input.begin();
+    end = input.end();
+    assert(begin != end);
+
+    cur = begin;
+}
+
+template <typename InputType>
+bool InputCallbackTester<InputType>::InputCallback(std::vector<InputType>& input)
+{
+    input = *cur;
+    std::cout << "    InputCallback(vector), input[0]: " << input[0] << std::endl;
+
+    if (++cur == end)
+    {
+        cur = begin; // simulate infinite series
+    }
+    return true;
+}
+
+template <typename InputType>
+bool InputCallbackTester<InputType>::InputCallback(InputType* input)
+{
+    std::copy((*cur).begin(), (*cur).end(), input);
+    std::cout << "    InputCallback(C array), input[0]: " << input[0] << std::endl;
+
+    if (++cur == end)
+    {
+        cur = begin; // simulate infinite series
+    }
+    return true;
+}
 }

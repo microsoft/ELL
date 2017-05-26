@@ -21,9 +21,9 @@
 #include "PortElements.h"
 
 // stl
+#include <stack>
 #include <string>
 #include <unordered_map>
-#include <stack>
 
 namespace ell
 {
@@ -94,6 +94,11 @@ namespace model
         emitters::Variable* AllocatePortVariable(const OutputPortBase& port);
         emitters::Variable* GetOrAllocatePortVariable(const OutputPortBase& port);
 
+        /// <summary>
+        /// Allocate variables for the map function arguments, based on the input and output nodes.
+        /// </summary>
+        emitters::NamedVariableTypeList AllocateNodeFunctionArguments(DynamicMap& map, emitters::ModuleEmitter& emitter);
+
         //
         // These methods may be implemented by specific compilers
         //
@@ -113,7 +118,6 @@ namespace model
         friend class CompilableNode;
 
         void CompileNodes(Model& model);
-        emitters::NamedVariableTypeList AllocateNodeFunctionArguments(DynamicMap& map, emitters::ModuleEmitter& emitter);
         emitters::Variable* AllocateNodeFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase* pPort, ArgType argType);
         emitters::Variable* AllocateNodeFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, ArgType argType);
 

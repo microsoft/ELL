@@ -669,6 +669,14 @@ namespace emitters
         template <typename ValueType>
         void MemoryCopy(llvm::Value* pSourcePointer, int sourceOffset, llvm::Value* pDestinationPointer, int destinationOffset, int size);
 
+        /// <summary> Emits an ELL_GetXXClockMilliseconds library function. </summary>
+        ///
+        /// <typeparam name="ClockType"> The clock type to use. </typeparam>
+        ///
+        /// <returns> Pointer to the value that receives the number of ticks. </returns>
+        template <typename ClockType>
+        llvm::Value* GetClockMilliseconds();
+
         //
         // Optimizations
         //

@@ -13,14 +13,12 @@
 #include "IRModuleEmitter.h"
 
 // stl
+#include <chrono>
 #include <iostream>
 
 // llvm
 #include "llvm/IR/Verifier.h"
 #include "llvm/Support/raw_os_ostream.h"
-
-// stl
-#include <iostream>
 
 namespace ell
 {
@@ -29,6 +27,8 @@ namespace emitters
     const std::string PrintfFnName = "printf";
     const std::string MallocFnName = "malloc";
     const std::string FreeFnName = "free";
+    const std::string GetSystemClockFnName = "ELL_GetSystemClockMilliseconds";
+    const std::string GetSteadyClockFnName = "ELL_GetSteadyClockMilliseconds";
 
     IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction)
         : _pModuleEmitter(pModuleEmitter), _pEmitter(pEmitter), _pFunction(pFunction)
@@ -797,6 +797,18 @@ namespace emitters
     {
         llvm::raw_os_ostream out(os);
         _pFunction->print(out);
+    }
+
+    template <>
+    llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::steady_clock>()
+    {
+        return Call(GetSteadyClockFnName, nullptr /*no arguments*/);
+    }
+
+    template <>
+    llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::system_clock>()
+    {
+        return Call(GetSystemClockFnName, nullptr /*no arguments*/);
     }
 
     //

@@ -31,8 +31,7 @@ namespace emitters
         }
     }
 
-    template <>
-    TypedOperator GetOperator<int>(BinaryOperationType operation)
+    TypedOperator GetIntegerOperator(BinaryOperationType operation)
     {
         switch (operation)
         {
@@ -47,6 +46,18 @@ namespace emitters
             default:
                 throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
         }
+    }
+
+    template <>
+    TypedOperator GetOperator<int>(BinaryOperationType operation)
+    {
+        return GetIntegerOperator(operation);
+    }
+
+    template <>
+    TypedOperator GetOperator<int64_t>(BinaryOperationType operation)
+    {
+        return GetIntegerOperator(operation);
     }
 
     template <>
@@ -87,8 +98,7 @@ namespace emitters
         }
     }
 
-    template <>
-    TypedComparison GetComparison<int>(BinaryPredicateType predicate)
+    TypedComparison GetIntegerComparison(BinaryPredicateType predicate)
     {
         switch (predicate)
         {
@@ -107,6 +117,18 @@ namespace emitters
             default:
                 throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
         }
+    }
+
+    template <>
+    TypedComparison GetComparison<int>(BinaryPredicateType predicate)
+    {
+        return GetIntegerComparison(predicate);
+    }
+
+    template <>
+    TypedComparison GetComparison<int64_t>(BinaryPredicateType predicate)
+    {
+        return GetIntegerComparison(predicate);
     }
     
     template <>
@@ -203,6 +225,12 @@ namespace emitters
     int GetDefaultValue<int>()
     {
         return 0;
+    }
+
+    template <>
+    int64_t GetDefaultValue<int64_t>()
+    {
+        return 0L;
     }
 
     VariableType GetPointerType(VariableType type)

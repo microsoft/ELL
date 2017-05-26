@@ -34,7 +34,6 @@ namespace model
     class IRMapCompiler : public MapCompiler
     {
     public:
-
         //
         // User-level API
         //
@@ -115,9 +114,9 @@ namespace model
         virtual void PushScope() override;
         virtual void PopScope() override;
         virtual emitters::ModuleEmitter* GetModuleEmitter() override { return &_moduleEmitter; }
+        void EnsureValidMap(DynamicMap& map);
 
     private:
-        void EnsureValidMap(DynamicMap& map);
         NodeMap<emitters::IRBlockRegion*>& GetCurrentNodeBlocks();
         const model::Node* GetUniqueParent(const model::Node& node);
 

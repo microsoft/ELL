@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "LLVMInclude.h"
 #include "EmitterTypes.h"
+#include "LLVMInclude.h"
 
 namespace ell
 {
@@ -48,6 +48,7 @@ namespace emitters
         IRModuleEmitter& _module;
         llvm::Function* _pDotProductFunctionFloat = nullptr;
         llvm::Function* _pDotProductFunction = nullptr;
+        llvm::Function* _pClockTicksFunction = nullptr;
     };
 }
 }

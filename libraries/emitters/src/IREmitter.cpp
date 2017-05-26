@@ -353,6 +353,8 @@ namespace emitters
                 return _irBuilder.CreateFCmpOGT(pLeftValue, pRightValue);
             case TypedComparison::greaterThanOrEqualsFloat:
                 return _irBuilder.CreateFCmpOGE(pLeftValue, pRightValue);
+            case TypedComparison::notEqualsFloat:
+                return _irBuilder.CreateFCmpONE(pLeftValue, pRightValue);
             default:
                 throw EmitterException(EmitterError::comparisonTypeNotSupported);
         }

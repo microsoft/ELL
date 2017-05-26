@@ -48,6 +48,8 @@ void TestIRCompiler()
     // TestLinearPredictor(); // Fails
     // TestForest(); // Fails
     // TestForestMap(); // Fails
+    TestSteppableMap(false);
+    // TestSteppableMap(true); // Fails on Windows
 
     TestCompilableScalarOutputNode();
     TestCompilableVectorOutputNode();
@@ -66,6 +68,8 @@ void TestIRCompiler()
     TestCompilableMultiplexerNode();
     TestCompilableTypeCastNode();
     TestCompilableAccumulatorNodeFunction();
+    TestCompilableSourceNode(false);
+    // TestCompilableSourceNode(true); // Fails on Windows
 }
 
 int main(int argc, char* argv[])

@@ -20,6 +20,7 @@ void TestIR()
     TestIfElseBlockRegions(false);
     TestIfElseBlockRegions(true);
     TestLogical();
+    TestMutableConditionForLoop();
 }
 
 int main(int argc, char* argv[])

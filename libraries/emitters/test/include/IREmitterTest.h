@@ -15,6 +15,7 @@ void TestLLVMShiftRegister();
 void TestIfElseComplex();
 void TestIfElseBlockRegions(bool runJit = false);
 void TestLogical();
+void TestMutableConditionForLoop();
 
 void SetOutputPathBase(std::string path);
 std::string OutputPath(const char* pRelPath);

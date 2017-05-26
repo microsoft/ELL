@@ -19,9 +19,12 @@
 #include "llvm/AsmParser/Parser.h"
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/IR/TypeBuilder.h"
-#include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/raw_os_ostream.h"
+
+// stl
+#include <chrono>
 
 namespace ell
 {
@@ -86,6 +89,11 @@ namespace emitters
 
     void IRModuleEmitter::EndFunction()
     {
+        EndFunction(nullptr);
+    }
+
+    void IRModuleEmitter::EndFunction(llvm::Value* pReturn)
+    {
         if (_functionStack.empty())
         {
             throw EmitterException(EmitterError::indexOutOfRange);
@@ -99,13 +107,20 @@ namespace emitters
         auto previousBlock = currentFunctionInfo.second;
         if (currentFunction.GetFunction() != nullptr)
         {
-            currentFunction.Return();
+            if (pReturn != nullptr)
+            {
+                currentFunction.Return(pReturn);
+            }
+            else
+            {
+                currentFunction.Return();
+            }
             currentFunction.ConcatRegions();
             currentFunction.Complete(GetCompilerParameters().optimize);
         }
         _emitter.SetCurrentBlock(previousBlock);
     }
-    
+
     IRFunctionEmitter& IRModuleEmitter::GetCurrentFunction()
     {
         return _functionStack.top().first;
@@ -424,6 +439,18 @@ namespace emitters
     {
         _valueTypeList = { VariableType::BytePointer };
         DeclareFunction("free", VariableType::Void, _valueTypeList);
+    }
+
+    template <>
+    void IRModuleEmitter::DeclareGetClockMilliseconds<std::chrono::steady_clock>()
+    {
+        DeclareFunction("ELL_GetSteadyClockMilliseconds", VariableType::Double);
+    }
+
+    template <>
+    void IRModuleEmitter::DeclareGetClockMilliseconds<std::chrono::system_clock>()
+    {
+        DeclareFunction("ELL_GetSystemClockMilliseconds", VariableType::Double);
     }
 
     IRFunctionEmitter IRModuleEmitter::AddMainDebug()

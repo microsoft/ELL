@@ -131,6 +131,9 @@ namespace model
 
     private:
         friend class IRMapCompiler;
+        template <typename ClockType>
+        friend class IRSteppableMapCompiler;
+
         template <typename InputType, typename OutputType>
         void SetComputeFunction();
 

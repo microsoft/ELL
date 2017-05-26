@@ -20,7 +20,7 @@ using namespace ell;
 
 int main()
 {
-//    try
+    //    try
     {
         // Model tests
         TestStaticModel();
@@ -43,6 +43,7 @@ int main()
         TestDynamicMapComputeDataVector();
         TestDynamicMapRefine();
         TestDynamicMapSerialization();
+        TestSteppableMapCompute();
 
         TestCustomRefine();
 
@@ -71,11 +72,11 @@ int main()
         // Test ModelBuilder::AddNode(string, vector<string>)
         TestVariantAddInputNodesParsedArgs();
     }
-//    catch (const utilities::Exception& exception)
-//    {
-//        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
-//        throw;
-//    }
+    //    catch (const utilities::Exception& exception)
+    //    {
+    //        std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
+    //        throw;
+    //    }
 
     if (testing::DidTestFail())
     {

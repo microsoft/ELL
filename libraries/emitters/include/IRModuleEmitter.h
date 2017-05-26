@@ -56,7 +56,7 @@ namespace emitters
         IRFunctionEmitter& GetCurrentFunction();
 
         /// <summary> Returns the current block being emitted into </summary>
-        IRBlockRegion* GetCurrentRegion() { return GetCurrentFunction().GetCurrentRegion(); } 
+        IRBlockRegion* GetCurrentRegion() { return GetCurrentFunction().GetCurrentRegion(); }
 
         /// <summary> Returns the runtime object that manages functions </summary>
         IRRuntime& GetRuntime() { return _runtime; }
@@ -84,12 +84,16 @@ namespace emitters
         /// <summary> Ends the current function </summary>
         virtual void EndTopLevelFunction() override;
 
-
         // TODO: replace BeginTopLevelFunction with this
         IRFunctionEmitter& BeginFunction(const std::string& functionName, VariableType returnType, NamedVariableTypeList& args);
 
         /// <summary> Ends the current function </summary>
         void EndFunction();
+
+        /// <summary> Ends the current function with a return value </summary>
+        ///
+        /// <param name="return"> The value the function returns </param>
+        void EndFunction(llvm::Value* pReturn);
 
         //
         // Variable management
@@ -378,6 +382,12 @@ namespace emitters
 
         /// <summary> Emit declaration of extern free </summary>
         void DeclareFree();
+
+        /// <summary> Emit declaration of GetXXClockMilliseconds </summary>
+        ///
+        /// <typeparam name="ClockType"> The clock type. </typeparam>
+        template <typename ClockType>
+        void DeclareGetClockMilliseconds();
 
         /// <summary> Add a main function into which you will inject debugging code </summary>
         IRFunctionEmitter AddMainDebug();

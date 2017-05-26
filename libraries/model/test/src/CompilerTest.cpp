@@ -15,6 +15,7 @@
 #include "DynamicMap.h"
 #include "IRCompiledMap.h"
 #include "Model.h"
+#include "SteppableMap.h"
 
 // nodes
 #include "AccumulatorNode.h"
@@ -23,6 +24,7 @@
 #include "DotProductNode.h"
 #include "ForestPredictorNode.h"
 #include "LinearPredictorNode.h"
+#include "SourceNode.h"
 #include "SumNode.h"
 
 // emitters
@@ -33,16 +35,21 @@
 #include "IRFunctionEmitter.h"
 #include "IRMapCompiler.h"
 #include "IRModuleEmitter.h"
+#include "IRSteppableMapCompiler.h"
 #include "ScalarVariable.h"
 #include "VectorVariable.h"
 
 // predictors
 #include "LinearPredictor.h"
 
+// clock interface
+#include "ClockInterface.h"
+
 // testing
 #include "testing.h"
 
 // stl
+#include <chrono>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -676,5 +683,97 @@ void TestForestMap()
 
     PrintIR(compiledMap);
     compiledMap.GetModule().WriteToFile(OutputPath("forest_map.asm"));
+}
+
+InputCallbackTester<double> g_steppableMapCallbackTester;
+bool SteppableMap_DataCallback(std::vector<double>& input)
+{
+    return g_steppableMapCallbackTester.InputCallback(input);
+}
+InputCallbackTester<double> g_compiledSteppableMapCallbackTester;
+extern "C" {
+bool CompiledSteppableMap_DataCallback(double* input)
+{
+    return g_compiledSteppableMapCallbackTester.InputCallback(input);
+}
+}
+template <typename ClockType>
+void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicksFn)
+{
+    const std::string callbackFunctionName("CompiledSteppableMap_DataCallback");
+    const std::string stepFunctionName("TestStep");
+
+    // Create the map
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
+    auto sourceNode = model.AddNode<nodes::SourceNode<double, &SteppableMap_DataCallback>>(inputNode->output, 3, callbackFunctionName);
+    auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(sourceNode->output);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>(accumNode->output));
+
+    auto map = model::SteppableMap<ClockType>(
+        model,
+        { { "timeSignal", inputNode } },
+        { { "doubleOutput", outputNode->output } },
+        std::chrono::milliseconds(2000));
+
+    // Compile the map
+    model::IRSteppableMapCompiler<ClockType> compiler;
+    auto compiledMap = compiler.Compile(map, stepFunctionName);
+
+    if (runJit)
+    {
+        auto ticks = getTicksFn();
+        std::cout << "Millisecond ticks: " << ticks << std::endl;
+
+        std::vector<std::vector<double>> data{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
+        g_steppableMapCallbackTester.Initialize(data);
+        g_compiledSteppableMapCallbackTester.Initialize(data);
+
+        // Time signal input to the model (currently unused because map internally generates a signal)
+        std::vector<std::vector<model::TimeTickType>> timeSignal{ { 0, 0 } };
+        VerifyCompiledOutput(map, compiledMap, timeSignal, " steppable map");
+    }
+    else
+    {
+        // Generate the callback that will be invoked by our model
+        emitters::NamedVariableTypeList callbackArgList = { { "inputVector", emitters::VariableType::DoublePointer } };
+        auto fnCallback = compiledMap.GetModule().Function(callbackFunctionName, emitters::VariableType::Byte, callbackArgList);
+        auto arguments = fnCallback.Arguments().begin();
+        llvm::Argument& inputVector = *arguments;
+
+        std::vector<double> data{ 5, 10, 15 };
+        fnCallback.template MemoryCopy<double>(compiledMap.GetModule().Constant("c_data", data), 0, &inputVector, 0, data.size());
+        fnCallback.Return(fnCallback.Literal(true));
+        fnCallback.Complete(true);
+
+        // Generate a Main method to invoke our model
+        auto fnMain = compiledMap.GetModule().AddMainDebug();
+        emitters::IRFunctionCallArguments args(fnMain);
+
+        // Time signal input to the model (currently unused because map internally generates a signal)
+        std::vector<model::TimeTickType> timeSignal{ 0, 0 }; // TODO: IRModuleEmitter::Constant() crashes with int vectors
+        args.Append(compiledMap.GetModule().Constant("c_timeSignal", timeSignal));
+        auto pResult = args.AppendOutput(emitters::VariableType::Double, 3);
+
+        fnMain.Call(stepFunctionName, args);
+        fnMain.PrintForEach("%f\n", pResult, 1);
+        fnMain.Return();
+        fnMain.Complete(true);
+
+        PrintIR(compiledMap);
+        compiledMap.GetModule().WriteToFile(OutputPath("step.asm"));
+    }
+}
+
+void TestSteppableMap(bool runJit)
+{
+    TestSteppableMap<std::chrono::steady_clock>(runJit, []() {
+        std::cout << "Calling ELL_GetSteadyClockMilliseconds()" << std::endl;
+        return ELL_GetSteadyClockMilliseconds();
+    });
+    TestSteppableMap<std::chrono::system_clock>(runJit, []() {
+        std::cout << "Calling ELL_GetSystemClockMilliseconds()" << std::endl;
+        return ELL_GetSystemClockMilliseconds();
+    });
 }
 }

@@ -12,8 +12,8 @@
 #include "OutputNode.h"
 
 // emitters
-#include "Variable.h"
 #include "EmitterException.h"
+#include "Variable.h"
 
 namespace ell
 {
@@ -74,9 +74,6 @@ namespace model
         map.Refine(context);
 
         // Now we have the refined map, compile it
-        emitters::CompilerParameters settings;
-        settings.includeDiagnosticInfo = false;
-
         CompileMap(map, functionName); // base class
 
         auto module = std::make_unique<emitters::IRModuleEmitter>(GetModule().TransferOwnership());
@@ -266,7 +263,7 @@ namespace model
     {
         auto& currentFunction = GetModule().GetCurrentFunction();
 
-        // Error: if we pass in a single element from a range, we need to use startindex as part of the key for looking up the element. In fact, we should have a separate map for vector port and scalar element variables... 
+        // Error: if we pass in a single element from a range, we need to use startindex as part of the key for looking up the element. In fact, we should have a separate map for vector port and scalar element variables...
         emitters::Variable* pVar = GetVariableForElement(element);
         llvm::Value* pVal = GetModule().EnsureEmitted(*pVar);
         if (pVar->IsScalar())
@@ -288,7 +285,7 @@ namespace model
         // Else return an element from a vector (unless it was in fact passed in by value)
         auto valType = pVal->getType();
         bool needsDereference = valType->isPointerTy(); // TODO: Maybe this should be `isPtrOrPtrVectorTy()` or even `isPtrOrPtrVectorTy() || isArrayTy()`
-        if(needsDereference)
+        if (needsDereference)
         {
             return currentFunction.ValueAt(pVal, currentFunction.Literal((int)element.GetIndex()));
         }

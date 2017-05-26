@@ -30,6 +30,7 @@
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
 #include "MultiplexerNode.h"
+#include "SourceNode.h"
 #include "SumNode.h"
 #include "TypeCastNode.h"
 #include "UnaryOperationNode.h"
@@ -224,9 +225,8 @@ void TestCompilableMulticlassDTW()
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
-
     PrintIR(compiledMap);
-    
+
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "MulticlassDTW");
@@ -387,5 +387,48 @@ void TestCompilableAccumulatorNodeFunction()
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNodeAsFunction");
+}
+
+//
+// Now test nodes that compile with callback(s)
+//
+InputCallbackTester<double> g_tester;
+InputCallbackTester<double> g_testerCompiled;
+
+// C callback (called by emitted model)
+extern "C" {
+bool CompiledSourceNode_InputCallback(double* input)
+{
+    return g_testerCompiled.InputCallback(input);
+}
+}
+
+// C++ callback (called by runtime model)
+bool SourceNode_InputCallback(std::vector<double>& input)
+{
+    return g_tester.InputCallback(input);
+}
+
+void TestCompilableSourceNode(bool runJit)
+{
+    const std::vector<std::vector<double>> data = { { 1, 2, 3 }, { 2, 4, 6 }, { 3, 6, 9 }, { 4, 8, 12 }, { 5, 10, 15 } };
+    g_tester.Initialize(data);
+    g_testerCompiled.Initialize(data);
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
+    auto testNode = model.AddNode<nodes::SourceNode<double, &SourceNode_InputCallback>>(
+        inputNode->output, data[0].size(), "CompiledSourceNode_InputCallback");
+
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    if (runJit)
+    {
+        // compare output
+        std::vector<std::vector<model::TimeTickType>> timeSignal = { { 10, 15 }, { 20, 20 }, { 30, 45 }, { 40, 60 }, { 50, 120 } };
+        VerifyCompiledOutput(map, compiledMap, timeSignal, "SourceNode");
+    }
 }
 }
