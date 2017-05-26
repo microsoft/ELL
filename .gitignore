@@ -236,9 +236,7 @@ external/**
 swig/
 dist/
 build/
-build_clang/
-build_xcode/
-build_linux/
+build_*/
 
 interfaces/javascript/ell_module/CMakeFiles/
 interfaces/javascript/ell_module/test/js/Testing/

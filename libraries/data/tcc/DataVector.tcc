@@ -61,7 +61,7 @@ namespace data
     {
         InvokeWithThis<void>([vector, transformation](const auto* pThis)
         {
-            pThis->AddTransformedTo<policy>(vector, transformation);
+            pThis->template AddTransformedTo<policy>(vector, transformation);
         });
     }
 

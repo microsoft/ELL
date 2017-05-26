@@ -24,7 +24,7 @@ namespace data
     {
         auto fromIndex = _fromIndex;
         auto size = _size;
-        auto getExampleIterator = [fromIndex, size](const auto* pDataset) { return pDataset->GetExampleIterator<ExampleType>(fromIndex, size); };
+        auto getExampleIterator = [fromIndex, size](const auto* pDataset) { return pDataset->template GetExampleIterator<ExampleType>(fromIndex, size); };
 
         // all Dataset types for which GetAnyDataset() is called must be listed below, in the variadic template argument.
         using Invoker = utilities::AbstractInvoker<DatasetBase,
