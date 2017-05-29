@@ -1,0 +1,163 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Machine Learning Library (ELL)
+//  File:     ProtoNNPredictor.h (predictors)
+//  Authors:  Suresh Iyengar
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+#include "IPredictor.h"
+
+// math
+#include "Operations.h"
+
+// datasets
+#include "AutoDataVector.h"
+
+// utilities
+#include "IArchivable.h"
+
+// stl
+#include <cstdint>
+#include <memory>
+
+namespace ell
+{
+namespace predictors
+{
+    /// <summary> A ProtoNN predictor. </summary>
+    ///
+    class ProtoNNPredictor : public IPredictor<double>, public utilities::IArchivable
+    {
+    public:
+        /// <summary> Type of the data vector expected by this predictor type. </summary>
+        using DataVectorType = data::AutoDataVector;
+
+        /// <summary> Default Constructor. </summary>
+        ProtoNNPredictor();
+
+        /// <summary> Constructs an instance of ProtoNN predictor. </summary>
+        ///
+        /// <param name="dim"> The dimension. </param>
+        /// <param name="projectedDim"> The projected dimension. </param>
+        /// <param name="numPrototypes"> Number of prototypes. </param>
+        /// <param name="numLabels"> Number of labels. </param>
+        /// <param name="gamma"> The Gamma value. </param>
+        ProtoNNPredictor::ProtoNNPredictor(size_t dim, size_t projectedDim, size_t numPrototypes, size_t numLabels, double gamma);
+
+        /// <summary> Returns the underlying projection matrix. </summary>
+        ///
+        /// <returns> The projection matrix. </returns>
+        math::ColumnMatrix<double>& GetProjectionMatrix() { return _W; }
+
+        /// <summary> Returns the underlying projection matrix. </summary>
+        ///
+        /// <returns> The underlying projection matrix. </returns>
+        const math::ColumnMatrix<double>& GetProjectionMatrix() const { return _W; }
+
+        /// <summary> Returns the underlying prototype matrix. </summary>
+        ///
+        /// <returns> The underlying prototype matrix. </returns>
+        math::ColumnMatrix<double>& GetPrototypes() { return _B; }
+
+        /// <summary> Returns the underlying prototype matrix. </summary>
+        ///
+        /// <returns> The underlying prototype matrix. </returns>
+        const math::ColumnMatrix<double>& GetPrototypes() const { return _B; }
+
+        /// <summary> Returns the underlying label embeddings. </summary>
+        ///
+        /// <returns> The label embeddings. </returns>
+        math::ColumnMatrix<double>& GetLabelEmbeddings() { return _Z; }
+
+        /// <summary> Returns the underlying label embeddings. </summary>
+        ///
+        /// <returns> The label embeddings. </returns>
+        const math::ColumnMatrix<double>& GetLabelEmbeddings() const { return _Z; }
+
+        /// <summary> Returns the underlying gamma. </summary>
+        ///
+        /// <returns> Gamma constant. </returns>
+        double& GetGamma() { return _gamma; }
+
+        /// <summary> Returns the underlying gamma. </summary>
+        ///
+        /// <returns> Gamma constant. </returns>
+        double GetGamma() const { return _gamma; }
+
+        /// <summary> Gets the dimension of the ProtoNN predictor. </summary>
+        ///
+        /// <returns> The dimension. </returns>
+        size_t GetDimension() const { return _dim; }
+
+        /// <summary> Gets the projected dimension of the ProtoNN predictor. </summary>
+        ///
+        /// <returns> The projected dimension. </returns>
+        size_t GetProjectedDimension() const { return _W.NumRows(); }
+
+        /// <summary> Gets the number of prototypes. </summary>
+        ///
+        /// <returns> The number of prototypes. </returns>
+        size_t GetNumPrototypes() const { return _Z.NumColumns(); }
+
+        /// <summary> Gets the number of labels. </summary>
+        ///
+        /// <returns> The number of labels. </returns>
+        size_t GetNumLabels() const { return _Z.NumRows(); }
+
+        /// <summary> Returns the output of the predictor for a given example. </summary>
+        ///
+        /// <param name="inputVector"> The data vector. </param>
+        ///
+        /// <returns> The predicted label. </returns>
+        double Predict(const DataVectorType& inputVector) const;
+
+        /// <summary> Resets the projection predictor to the zero projection matrix. </summary>
+        void Reset();
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "ProtoNNPredictor"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+    private:
+        /// <summary> Helper function to archive matrix </summary>
+        static void ProtoNNPredictor::WriteMatrixToArchive(utilities::Archiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> M);
+
+        /// <summary> Helper function to read archived matrix </summary>
+        static math::ColumnMatrix<double> ReadMatrixFromArchive(utilities::Unarchiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel);
+
+        /// <summary> Input dimension </summary>
+        size_t _dim;
+
+        /// <summary> Projection matrix </summary>
+        math::ColumnMatrix<double> _W;
+
+        /// <summary> Prototypes matrix </summary>
+        math::ColumnMatrix<double> _B;
+
+        /// <summary> Label embedding matrix </summary>
+        math::ColumnMatrix<double> _Z;
+
+        /// <summary> Gamma constant </summary>
+        double _gamma;
+    };
+}
+}
