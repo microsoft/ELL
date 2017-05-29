@@ -138,10 +138,8 @@ namespace predictors
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        /// <summary> Helper function to archive matrix </summary>
         static void ProtoNNPredictor::WriteMatrixToArchive(utilities::Archiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> M);
 
-        /// <summary> Helper function to read archived matrix </summary>
         static math::ColumnMatrix<double> ReadMatrixFromArchive(utilities::Unarchiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel);
 
         /// <summary> Input dimension </summary>
