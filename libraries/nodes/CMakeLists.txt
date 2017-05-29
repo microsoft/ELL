@@ -25,11 +25,13 @@ set (include include/AccumulatorNode.h
              include/UnaryOperationNode.h
              include/ValueSelectorNode.h
              include/MatrixVectorProductNode.h
-             include/SourceNode.h)
+             include/SourceNode.h
+             include/ProtoNNPredictorNode.h)
 
 set (src src/ConstantNode.cpp
          src/LinearPredictorNode.cpp
-         src/SingleElementThresholdNode.cpp)
+         src/SingleElementThresholdNode.cpp
+         src/ProtoNNPredictorNode.cpp)
 
 set (tcc tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc

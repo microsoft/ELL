@@ -543,4 +543,54 @@ void TestMatrixVectorProductRefine()
 
     testing::ProcessTest("Testing matrix vector product node refine", testing::IsEqual(refinedOutput, computeOutput));
 }
+
+void TestProtoNNPredictorNode()
+{
+    using ExampleType = predictors::ProtoNNPredictor::DataVectorType;
+
+    size_t dim = 5, projectedDim = 4, numPrototypes = 3, numLabels = 2;
+    double gamma = 0.3;
+    predictors::ProtoNNPredictor protonnPredictor(dim, projectedDim, numPrototypes, numLabels, gamma);
+
+    // projectedDim * dim
+    auto W = protonnPredictor.GetProjectionMatrix().GetReference();
+    W(0, 0) = 0.4; W(0, 1) = 0.5; W(0, 2) = 0.1; W(0, 3) = 0.1; W(0, 4) = 0.1;
+    W(1, 0) = 0.1; W(1, 1) = 0.4; W(1, 2) = 0.8; W(1, 3) = 0.2; W(1, 4) = 0.5;
+    W(2, 0) = 0.2; W(2, 1) = 0.1; W(2, 2) = 0.7; W(2, 3) = 0.3; W(2, 4) = 0.4;
+    W(3, 0) = 0.3; W(3, 1) = 0.3; W(3, 2) = 0.2; W(3, 3) = 0.5; W(3, 4) = 0.2;
+
+    // projectedDim * numPrototypes
+    auto B = protonnPredictor.GetPrototypes().GetReference();
+    B(0, 0) = 0.1; B(0, 1) = 0.2; B(0, 2) = 0.3;
+    B(1, 0) = 0.8; B(1, 1) = 0.7; B(1, 2) = 0.6;
+    B(2, 0) = 0.4; B(2, 1) = 0.6; B(2, 2) = 0.2;
+    B(3, 0) = 0.2; B(3, 1) = 0.1; B(3, 2) = 0.3;
+
+    // numLabels * numPrototypes
+    auto Z = protonnPredictor.GetLabelEmbeddings().GetReference();
+    Z(0, 0) = 0.1; Z(0, 1) = 0.3, Z(0, 2) = 0.2;
+    Z(1, 0) = 0.2; Z(1, 1) = 0.4, Z(1, 2) = 0.8;
+
+    std::vector<double> input = { 0.2, 0.5, 0.6, 0.8, 0.1 };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(input.size());
+
+    inputNode->SetInput(input);
+
+    auto protonnPredictorNode = model.AddNode<nodes::ProtoNNPredictorNode>(inputNode->output, protonnPredictor);
+
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<int>{ protonnPredictorNode->output });
+
+    refinedInputNode->SetInput(input);
+
+    auto refinedOutput = refinedModel.ComputeOutput(refinedOutputElements)[0];
+    auto computeOutput = model.ComputeOutput(protonnPredictorNode->output)[0];
+
+    testing::ProcessTest("Testing protonnPredictor node refine", testing::IsEqual(refinedOutput, computeOutput));
+}
 }
