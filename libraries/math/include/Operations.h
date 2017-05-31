@@ -198,6 +198,15 @@ namespace math
         template <typename ElementType>
         static ElementType Norm2(UnorientedConstVectorReference<ElementType> v);
 
+        ///// <summary> Columnwise sum of a matrix. </summary>
+        /////
+        ///// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
+        ///// <typeparam name="layout"> Matrix layout. </typeparam>
+        ///// <param name="M"> The matrix. </param>
+        ///// <param name="u"> [in,out] A column vector, used to store the result. </param>
+        template <typename ElementType, MatrixLayout layout>
+        static void ColumnWiseSum(ConstMatrixReference<ElementType, layout> M, VectorReference<ElementType, VectorOrientation::row> u);
+
         /// <summary> Adds a scaled vector to another vector, u += s * v. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
@@ -304,6 +313,15 @@ namespace math
         /// <returns> The 2-norm. </returns>
         template <typename ElementType>
         static ElementType Norm2(UnorientedConstVectorReference<ElementType> v);
+
+        ///// <summary> Generalized matrix column-vector multiplication, u = s * M * v + t * u. </summary>
+        /////
+        ///// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
+        ///// <typeparam name="layout"> Matrix layout. </typeparam>
+        ///// <param name="s"> The scalar that multiplies the matrix. </param>
+        ///// <param name="u"> [in,out] A column vector, multiplied by t and used to store the result. </param>
+        template <typename ElementType, MatrixLayout layout>
+        static void ColumnWiseSum(ConstMatrixReference<ElementType, layout> M, VectorReference<ElementType, VectorOrientation::row> u);
 
         /// <summary> Adds a scaled vector to another vector, u += s * v. </summary>
         ///
