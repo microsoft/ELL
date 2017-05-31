@@ -45,7 +45,7 @@ namespace predictors
         /// <param name="numPrototypes"> Number of prototypes. </param>
         /// <param name="numLabels"> Number of labels. </param>
         /// <param name="gamma"> The Gamma value. </param>
-        ProtoNNPredictor::ProtoNNPredictor(size_t dim, size_t projectedDim, size_t numPrototypes, size_t numLabels, double gamma);
+        ProtoNNPredictor(size_t dim, size_t projectedDim, size_t numPrototypes, size_t numLabels, double gamma);
 
         /// <summary> Returns the underlying projection matrix. </summary>
         ///
@@ -138,7 +138,7 @@ namespace predictors
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        static void ProtoNNPredictor::WriteMatrixToArchive(utilities::Archiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> M);
+        static void WriteMatrixToArchive(utilities::Archiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> M);
 
         static math::ColumnMatrix<double> ReadMatrixFromArchive(utilities::Unarchiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel);
 
