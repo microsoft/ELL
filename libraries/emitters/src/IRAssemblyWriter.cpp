@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IRAssemblyEmitter.h (emitters)
+//  File:     IRAssemblyWriter.h (emitters)
 //  Authors:  Chuck Jacobs, Piali Choudhury, Kirk Olynyk
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,9 +11,10 @@
 #pragma warning(disable : 4146 4996)
 #endif
 
-#include "IRAssemblyEmitter.h"
+#include "IRAssemblyWriter.h"
 #include "EmitterException.h"
 #include "IRDiagnosticHandler.h"
+#include "IRModuleEmitter.h"
 
 // llvm
 #include "llvm/ADT/Triple.h"
@@ -34,6 +35,7 @@
 
 #include "llvm/Pass.h"
 
+#include "llvm/Support/Host.h"
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_os_ostream.h"
@@ -42,7 +44,6 @@
 
 // stl
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -106,13 +107,12 @@ namespace emitters
     //
 
     // GenerateMachineCode may modify the Module object passed in. Should we clone it first?
-    void GenerateMachineCode(llvm::raw_ostream& os, llvm::Module& module, OutputFileType fileType, const MachineCodeOutputOptions& ellOptions)
+    void GenerateMachineCode(llvm::raw_ostream& os, IRModuleEmitter& moduleEmitter, OutputFileType fileType, const MachineCodeOutputOptions& ellOptions)
     {
+        llvm::Module& module = *(moduleEmitter.GetLLVMModule());
+
         llvm::LLVMContext context;
         context.setDiscardValueNames(false); // Don't throw away names of non-global values
-
-        // Create a diagnostic handler to record if there was an error
-        IRDiagnosticHandler handler(context);
 
         // Verify module if requested
         if (ellOptions.verifyModule && llvm::verifyModule(module))
@@ -121,12 +121,13 @@ namespace emitters
         }
 
         // Set the triple for the module, and retrieve it as a Triple object
-        module.setTargetTriple(llvm::Triple::normalize(ellOptions.triple));
+        auto targetTripleStr = ellOptions.targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : ellOptions.targetDevice.triple;
+        module.setTargetTriple(llvm::Triple::normalize(targetTripleStr));
         llvm::Triple targetTriple{ module.getTargetTriple() };
 
         // Get the target-specific parser. Note that targetTriple can be modified by lookupTarget.
         std::string error;
-        const llvm::Target* target = llvm::TargetRegistry::lookupTarget(ellOptions.architecture, targetTriple, error);
+        const llvm::Target* target = llvm::TargetRegistry::lookupTarget(ellOptions.targetDevice.architecture, targetTriple, error);
         if (!target)
         {
             throw EmitterException(EmitterError::unexpected, std::string("Couldn't create target ") + error);
@@ -140,8 +141,8 @@ namespace emitters
         llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
 
         std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(targetTriple.getTriple(),
-                                                                                       ellOptions.cpu,
-                                                                                       ellOptions.targetFeatures,
+                                                                                       ellOptions.targetDevice.cpu,
+                                                                                       ellOptions.targetDevice.features,
                                                                                        targetOptions,
                                                                                        relocModel,
                                                                                        codeModel,
@@ -155,9 +156,6 @@ namespace emitters
         // Build up all of the passes that we want to apply to the module
         llvm::legacy::PassManager passManager;
 
-// This code is if-d out, because its presence somehow causes executables using the emitters library
-// to crash, even if they never call this function.
-#if 0   
         // Get a targetLibraryInfo describing the library functions available for this triple,
         // and any special processing we might want to do. For instance, if we want to
         // disable all builtin library functions, do this: `targetLibraryInfo.disableAllFunctions();`
@@ -165,13 +163,15 @@ namespace emitters
 
         // ...and add it to the pass manager, so various optimizations can be done
         passManager.add(new llvm::TargetLibraryInfoWrapperPass(targetLibraryInfo));
-#endif
 
         // Set the data layout of the module to match the target machine
         module.setDataLayout(targetMachine->createDataLayout());
 
         // Override function attributes based on cpu and features
-        SetFunctionAttributes(ellOptions.cpu, ellOptions.targetFeatures, module);
+        if (ellOptions.targetDevice.cpu != "")
+        {
+            SetFunctionAttributes(ellOptions.targetDevice.cpu, ellOptions.targetDevice.features, module);
+        }
 
         // Set up passes to emit code to a memory stream
         llvm::SmallVector<char, 0> buffer;
@@ -184,7 +184,7 @@ namespace emitters
         // Finally, run the passes to emit code to the straem
         passManager.run(module); // run() returns a bool indicating if the module was modified (true if it was)
 
-        if (handler.HadError())
+        if (moduleEmitter.GetDiagnosticHandler().HadError())
         {
             throw EmitterException(EmitterError::unexpected, "Error compiling module");
         }

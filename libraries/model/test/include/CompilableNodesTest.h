@@ -10,7 +10,7 @@
 
 namespace ell
 {
-void TestCompileIsEqualModel();
+void TestCompileIsEqual();
 void TestCompilableScalarOutputNode();
 void TestCompilableVectorOutputNode();
 void TestCompilableAccumulatorNode();

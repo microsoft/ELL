@@ -30,8 +30,7 @@ namespace emitters
         llvm::InitializeNativeTargetAsmPrinter();
 
         _pBuilder = std::make_unique<llvm::EngineBuilder>(std::move(pModule));
-        _pBuilder->setEngineKind(llvm::EngineKind::JIT)
-            .setUseOrcMCJITReplacement(false);
+        _pBuilder->setEngineKind(llvm::EngineKind::JIT).setUseOrcMCJITReplacement(false);
     }
 
     void IRExecutionEngine::SelectTarget(const llvm::Triple& targetTriple, const std::string& cpuArchitecture, const std::string& cpuName, const std::vector<std::string>& attributes)

@@ -123,7 +123,7 @@ add_test(NAME ${test_name} COMMAND ${test_name})
 set (compiler_test_name ${library_name}_compiler_test)
 
 set (compiler_test_src
-    test/src/compiler_test_main.cpp
+    test/src/model_compiler_test_main.cpp
     test/src/CompilableNodesTest.cpp
     test/src/CompilerTest.cpp
     test/src/ModelMaker.cpp

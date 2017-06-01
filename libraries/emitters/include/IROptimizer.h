@@ -47,9 +47,12 @@ namespace emitters
         /// <summary> Add an optimization pass to simplify control flow. </summary>
         void AddControlFlowSimplification();
 
+        /// <summary> Add optimization passes to vectorize things. </summary>
+        void AddVectorizationPasses();
+
         /// <summary> Optimize the given function. </summary>
         ///
-        /// <param name="pFunction"> pointer to an llvm function. </param>
+        /// <param name="pFunction"> pointer to the function to optimize. </param>
         void Run(llvm::Function* pFunction);
 
     private:
@@ -57,7 +60,7 @@ namespace emitters
         bool _initialized = false;
     };
 
-    ///<summary>Class to apply module-wide optimizations</summary>
+    ///<summary> Class to apply module-wide optimizations </summary>
     class IRModuleOptimizer
     {
     public:

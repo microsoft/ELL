@@ -5,7 +5,9 @@
 //  Authors:  Umesh Madan, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "IREmitterTest.h"
+#include "IRFunctionTest.h"
 
 // testing
 #include "testing.h"
@@ -14,6 +16,7 @@ using namespace ell;
 
 void TestIR()
 {
+    // From IREmitterTest.h
     TestLLVM();
     TestLLVMShiftRegister();
     TestIfElseComplex();
@@ -21,6 +24,10 @@ void TestIR()
     TestIfElseBlockRegions(true);
     TestLogical();
     TestMutableConditionForLoop();
+
+    // From IRFunctionTest.h
+    TestIRAddFunction();
+    TestIRFunction();
 }
 
 int main(int argc, char* argv[])

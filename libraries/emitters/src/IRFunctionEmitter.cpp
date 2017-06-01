@@ -30,8 +30,8 @@ namespace emitters
     const std::string GetSystemClockFnName = "ELL_GetSystemClockMilliseconds";
     const std::string GetSteadyClockFnName = "ELL_GetSteadyClockMilliseconds";
 
-    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction)
-        : _pModuleEmitter(pModuleEmitter), _pEmitter(pEmitter), _pFunction(pFunction)
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name)
+        : _pModuleEmitter(pModuleEmitter), _pEmitter(pEmitter), _pFunction(pFunction), _name(name)
     {
         assert(_pModuleEmitter != nullptr);
         assert(_pEmitter != nullptr);
@@ -39,11 +39,12 @@ namespace emitters
         SetUpFunction();
     }
 
-    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments)
-        : IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction)
-        {
-            RegisterFunctionArgs(arguments);
-        }
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments, const std::string& name)
+        : IRFunctionEmitter(pModuleEmitter, pEmitter, pFunction, name)
+    {
+        // Note: already called other constructor
+        RegisterFunctionArgs(arguments);
+    }
 
     void IRFunctionEmitter::Complete(bool optimize)
     {
@@ -54,13 +55,10 @@ namespace emitters
         }
     }
 
-    void IRFunctionEmitter::Complete(IRFunctionOptimizer* pOptimizer)
+    void IRFunctionEmitter::Complete(IRFunctionOptimizer& optimizer)
     {
         Verify();
-        if (pOptimizer != nullptr)
-        {
-            Optimize(*pOptimizer);
-        }
+        Optimize(optimizer);
     }
 
     void IRFunctionEmitter::RegisterFunctionArgs(const NamedVariableTypeList& args)
@@ -81,6 +79,7 @@ namespace emitters
         auto pBlock = Block("entry");
         AddRegion(pBlock);
         _pEmitter->SetCurrentBlock(pBlock); // if/when we get our own IREmitter, this statefulness won't be so objectionable
+        _entryBlock = pBlock;
     }
 
     IRBlockRegion* IRFunctionEmitter::AddRegion(llvm::BasicBlock* pBlock)
@@ -331,6 +330,11 @@ namespace emitters
         return _pEmitter->Comparison(type, pValue, pTestValue);
     }
 
+    llvm::Value* IRFunctionEmitter::Select(llvm::Value* pCmp, llvm::Value* pTrueValue, llvm::Value* pFalseValue)
+    {
+        return _pEmitter->Select(pCmp, pTrueValue, pFalseValue);
+    }
+
     llvm::BasicBlock* IRFunctionEmitter::BlockBefore(llvm::BasicBlock* pBlock, llvm::BasicBlock* pNewBlock)
     {
         assert(pNewBlock != nullptr);
@@ -380,6 +384,11 @@ namespace emitters
         llvm::BasicBlock* pCurrentBlock = GetCurrentBlock();
         _pEmitter->SetCurrentBlock(pBlock);
         return pCurrentBlock;
+    }
+
+    void IRFunctionEmitter::SetCurrentInsertPoint(llvm::Instruction* position)
+    {
+        _pEmitter->SetCurrentInsertPoint(position);
     }
 
     llvm::BasicBlock* IRFunctionEmitter::BeginBlock(const std::string& label, bool shouldConcatenate)
@@ -474,35 +483,73 @@ namespace emitters
         ConcatRegions(_regions);
     }
 
-    llvm::Value* IRFunctionEmitter::Variable(VariableType type)
+    IRFunctionEmitter::EntryBlockScope::EntryBlockScope(IRFunctionEmitter& function)
+        : _function(function)
     {
-        return _pEmitter->Variable(type);
+        // Save current position
+        _oldBlock = function.GetCurrentBlock();
+
+        auto entryBlock = function.GetEntryBlock();
+        auto termInst = entryBlock->getTerminator();
+        if (termInst != nullptr)
+        {
+            function.SetCurrentInsertPoint(termInst);
+        }
+        else
+        {
+            function.SetCurrentBlock(entryBlock);
+        }
     }
 
-    llvm::Value* IRFunctionEmitter::Variable(VariableType type, const std::string& namePrefix)
+    IRFunctionEmitter::EntryBlockScope::~EntryBlockScope()
     {
+        _function.SetCurrentBlock(_oldBlock);
+    }
+
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type)
+    {
+        EntryBlockScope scope(*this);
+        return _pEmitter->StackAllocate(type);
+    }
+
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, const std::string& namePrefix)
+    {
+        EntryBlockScope scope(*this);
+
         // don't do this for emitted variables!
         auto name = _locals.GetUniqueName(namePrefix);
-        auto result = _pEmitter->Variable(type, name);
+        auto result = _pEmitter->StackAllocate(type, name);
         _locals.Add(name, result);
         return result;
     }
 
-    llvm::Value* IRFunctionEmitter::EmittedVariable(VariableType type, const std::string& name)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(llvm::Type* type, const std::string& namePrefix)
     {
-        auto result = _pEmitter->Variable(type, name);
+        EntryBlockScope scope(*this);
+        auto name = _locals.GetUniqueName(namePrefix);
+        auto result = _pEmitter->StackAllocate(type, name);
         _locals.Add(name, result);
         return result;
     }
 
-    llvm::Value* IRFunctionEmitter::Variable(VariableType type, int size)
+    llvm::AllocaInst* IRFunctionEmitter::EmittedVariable(VariableType type, const std::string& name)
     {
+        EntryBlockScope scope(*this);
+        auto result = _pEmitter->StackAllocate(type, name);
+        _locals.Add(name, result);
+        return result;
+    }
+
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int size)
+    {
+        EntryBlockScope scope(*this);
         return _pEmitter->StackAllocate(type, size);
     }
 
     llvm::Value* IRFunctionEmitter::Load(llvm::Value* pPointer)
     {
-        return _pEmitter->Load(pPointer);
+        auto result = _pEmitter->Load(pPointer);
+        return result;
     }
 
     llvm::Value* IRFunctionEmitter::Load(llvm::Value* pPointer, const std::string& name)
@@ -586,6 +633,11 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::PointerOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset)
     {
         return _pEmitter->PointerOffset(pGlobal, pOffset);
+    }
+
+    llvm::Value* IRFunctionEmitter::PointerOffset(llvm::GlobalVariable* pGlobal, int offset)
+    {
+        return _pEmitter->PointerOffset(pGlobal, Literal(offset));
     }
 
     llvm::Value* IRFunctionEmitter::PointerOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pFieldOffset)
@@ -732,6 +784,20 @@ namespace emitters
         forLoop.End();
     }
 
+    void IRFunctionEmitter::InsertMetadata(const std::string& tag, const std::string& content)
+    {
+        llvm::Value* instruction = Call("llvm.donothing");
+        if (!llvm::isa<llvm::Instruction>(instruction))
+        {
+            return;
+        }
+
+        auto& context = GetLLVMContext();
+        llvm::Metadata* metadataElements[] = { llvm::MDString::get(context, content) };
+        auto metadataNode = llvm::MDNode::get(context, metadataElements);
+        llvm::cast<llvm::Instruction>(instruction)->setMetadata(tag, metadataNode);
+    }
+
     llvm::Value* IRFunctionEmitter::DotProductFloat(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)
     {
         llvm::Value* pTotal = Variable(VariableType::Double);
@@ -809,6 +875,16 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::system_clock>()
     {
         return Call(GetSystemClockFnName, nullptr /*no arguments*/);
+    }
+
+    llvm::LLVMContext& IRFunctionEmitter::GetLLVMContext()
+    {
+        return _pModuleEmitter->GetLLVMContext();
+    }
+
+    IREmitter& IRFunctionEmitter::GetEmitter()
+    {
+        return *_pEmitter;
     }
 
     //

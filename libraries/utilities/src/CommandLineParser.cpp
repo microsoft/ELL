@@ -66,8 +66,8 @@ namespace utilities
     //
     // OptionInfo internal class
     //
-    CommandLineParser::OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback)
-        : name(name), shortName(shortName), description(description), defaultValueString(defaultValue), set_value_callbacks({ set_value_callback })
+    CommandLineParser::OptionInfo::OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::string emptyValueString, std::function<bool(std::string)> set_value_callback)
+        : name(name), shortName(shortName), description(description), defaultValueString(defaultValue), emptyValueString(emptyValueString), set_value_callbacks({ set_value_callback })
     {
     }
 
@@ -194,7 +194,8 @@ namespace utilities
                             std::string val = _originalArgs[index + 1];
                             if (val[0] == '-')
                             {
-                                needsReparse = SetOption(option, "true") || needsReparse;
+                                // next token in an option, so use the default unset-value string
+                                needsReparse = SetOption(option) || needsReparse;
                             }
                             else
                             {
@@ -204,7 +205,7 @@ namespace utilities
                         }
                         else // this is the last thing on the line --- assume it's a shortcut for --option true
                         {
-                            needsReparse = SetOption(option, "true") || needsReparse;
+                            needsReparse = SetOption(option) || needsReparse;
                         }
                     }
                 }
@@ -318,6 +319,12 @@ namespace utilities
         }
 
         return didFindOne;
+    }
+
+    bool CommandLineParser::SetOption(std::string option_name)
+    {
+        auto value = _options[option_name].emptyValueString;
+        return SetOption(option_name, value);
     }
 
     bool CommandLineParser::SetOption(std::string option_name, std::string option_val)

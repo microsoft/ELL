@@ -38,6 +38,11 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Set global compilation flags
+if(NOT WIN32 AND NOT CYGWIN)
+  add_compile_options("-fvisibility-inlines-hidden")
+endif()
+
 # Set Visual Studio-specific options
 if(MSVC)
   add_definitions(-DUNICODE)

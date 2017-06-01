@@ -46,6 +46,10 @@ namespace utilities
         DECLARE_ARCHIVE_VALUE_OVERRIDE(short);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(int);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(size_t);
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(int64_t);
+#ifdef __clang__
+        DECLARE_ARCHIVE_VALUE_OVERRIDE(uint64_t);
+#endif
         DECLARE_ARCHIVE_VALUE_OVERRIDE(float);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(double);
         virtual void ArchiveValue(const char* name, const std::string& value) override;
@@ -55,6 +59,10 @@ namespace utilities
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(short);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(int);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(size_t);
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(int64_t);
+#ifdef __clang__
+        DECLARE_ARCHIVE_ARRAY_OVERRIDE(uint64_t);
+#endif
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(float);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(double);
         virtual void ArchiveArray(const char* name, const std::vector<std::string>& array) override;
@@ -109,6 +117,10 @@ namespace utilities
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(short);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(int);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(size_t);
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(int64_t);
+#ifdef __clang__
+        DECLARE_UNARCHIVE_VALUE_OVERRIDE(uint64_t);
+#endif
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(float);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(double);
         virtual void UnarchiveValue(const char* name, std::string& value) override;
@@ -118,6 +130,10 @@ namespace utilities
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(short);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(int);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(size_t);
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(int64_t);
+#ifdef __clang__
+        DECLARE_UNARCHIVE_ARRAY_OVERRIDE(uint64_t);
+#endif
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(float);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(double);
         virtual void UnarchiveArray(const char* name, std::vector<std::string>& array) override;

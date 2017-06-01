@@ -27,9 +27,9 @@ namespace model
 
         emitters::NamedVariableTypeList mainFunctionArguments = AllocateNodeFunctionArguments(map, *pModuleEmitter);
 
-        pModuleEmitter->BeginTopLevelFunction(functionName, mainFunctionArguments);
+        pModuleEmitter->BeginMapPredictFunction(functionName, mainFunctionArguments);
         CompileNodes(map.GetModel());
-        pModuleEmitter->EndTopLevelFunction();
+        pModuleEmitter->EndMapPredictFunction();
     }
 
     void MapCompiler::CompileNodes(Model& model)

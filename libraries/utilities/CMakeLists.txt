@@ -18,6 +18,7 @@ set (src src/Archiver.cpp
          src/ObjectArchive.cpp
          src/ObjectArchiver.cpp
          src/OutputStreamImpostor.cpp
+         src/PPMImageParser.cpp
          src/RandomEngines.cpp
          src/Tokenizer.cpp
          src/TypeName.cpp
@@ -42,11 +43,13 @@ set (include include/AbstractInvoker.h
              include/IntegerList.h
              include/IntegerStack.h
              include/JsonArchiver.h
+             include/MillisecondTimer.h
              include/ObjectArchive.h
              include/ObjectArchiver.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
              include/Parser.h
+             include/PPMImageParser.h
              include/RandomEngines.h
              include/StlContainerIterator.h
              include/Tokenizer.h

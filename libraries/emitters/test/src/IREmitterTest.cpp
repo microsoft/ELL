@@ -85,9 +85,9 @@ void TestLLVMShiftRegister()
     std::vector<double> newData2({ 3.2, 4.2 });
 
     auto fn = module.AddMain();
-    llvm::GlobalVariable* pRegister = module.Global("g_shiftRegister", data);
-    llvm::Value* c1 = module.Constant("c_1", newData1);
-    llvm::Value* c2 = module.Constant("c_2", newData2);
+    llvm::GlobalVariable* pRegister = module.GlobalArray("g_shiftRegister", data);
+    llvm::Value* c1 = module.ConstantArray("c_1", newData1);
+    llvm::Value* c2 = module.ConstantArray("c_2", newData2);
 
     fn.Print("Begin\n");
     fn.PrintForEach("%f\n", pRegister, data.size());
@@ -101,8 +101,9 @@ void TestLLVMShiftRegister()
     fn.Complete(true);
 
     module.DebugDump();
-    module.WriteToFile(OutputPath("shift.bc"));
-    module.WriteToFile(OutputPath("shift.ll"));
+    module.WriteToFile("shift.bc");
+    module.WriteToFile("shift.ll");
+    module.WriteToFile("shift.asm");
 }
 
 void TestLLVM()
@@ -113,13 +114,17 @@ void TestLLVM()
     llvm::StructType* structType = module.Struct("ShiftRegister", { VariableType::Int32, VariableType::Double });
 
     std::vector<double> data({ 3.3, 4.4, 5.5, 6.6, 7.7 });
-    llvm::GlobalVariable* pData = module.Constant("g_weights", data);
-    llvm::GlobalVariable* pOutput = module.Global(VariableType::Double, "g_output", data.size());
+    llvm::GlobalVariable* pData = module.ConstantArray("g_weights", data);
+    llvm::GlobalVariable* pOutput = module.GlobalArray(VariableType::Double, "g_output", data.size());
     llvm::GlobalVariable* pTotal = module.Global(VariableType::Double, "g_total");
-    llvm::GlobalVariable* pRegisters = module.Global("g_registers", structType, data.size());
+    llvm::GlobalVariable* pRegisters = module.GlobalArray("g_registers", structType, data.size());
 
     auto fnMain = module.AddMain();
 
+    IRForLoopEmitter testLoop(fnMain);
+    testLoop.Begin(data.size());
+    testLoop.End();
+    
     auto vectorResult = fnMain.DotProductFloat(data.size(), fnMain.Pointer(pData), fnMain.Pointer(pData));
     fnMain.Printf({ fnMain.Literal("DOT %f\n"), fnMain.Load(vectorResult) });
 
@@ -178,10 +183,10 @@ void TestLLVM()
 
     fnMain.Return();
 
-    fnMain.Complete(true);
+    fnMain.Complete(false);
     module.DebugDump();
 
-    module.WriteToFile(OutputPath("loop.bc"));
+    module.WriteToFile("loop.bc");
 }
 
 // Generate the Then, Else blocks first, then combine then in an if,else
@@ -228,7 +233,7 @@ void TestIfElseComplex()
 
     fn.Complete(true);
     module.DebugDump();
-    module.WriteToFile(OutputPath("ifelse.bc"));
+    module.WriteToFile("ifelse.bc");
 }
 
 void TestIfElseBlockRegions(bool runJit)
@@ -292,7 +297,7 @@ void TestIfElseBlockRegions(bool runJit)
     else
     {
         module.DebugDump();
-        module.WriteToFile(OutputPath("ifelseRegion.bc"));
+        module.WriteToFile("ifelseRegion.bc");
     }
 }
 
@@ -301,7 +306,7 @@ void TestLogical()
     IRModuleEmitter module("Logical");
     module.DeclarePrintf();
 
-    auto fn = module.Function("TestLogical", VariableType::Void, { VariableType::Int32, VariableType::Int32, VariableType::Int32 });
+    auto fn = module.BeginFunction("TestLogical", VariableType::Void, { VariableType::Int32, VariableType::Int32, VariableType::Int32 });
     auto args = fn.Arguments().begin();
     llvm::Argument& val1 = *args++;
     llvm::Argument& val2 = *args++;
@@ -326,8 +331,9 @@ void TestLogical()
     fn.Printf("OR False %d\n", { fn.Load(pResult) });
 
     fn.Return();
+    module.EndFunction();
+
     fn.Verify();
-    //fn.Complete(true);  //Uncomment to turn on optimizations
 
     auto fnMain = module.AddMain();
     // We do this to prevent LLVM from doing constant folding.. so we can debug/see what is happening.
@@ -352,7 +358,7 @@ void TestMutableConditionForLoop(bool runJit)
 
     auto add = GetOperator<double>(BinaryOperationType::add);
     auto varType = GetVariableType<double>();
-    auto fn = module.Function("TestMutableConditionForLoop", VariableType::Void, { varType, varType, varType });
+    auto fn = module.BeginFunction("TestMutableConditionForLoop", VariableType::Void, { varType, varType, varType });
     auto args = fn.Arguments().begin();
     llvm::Argument& start = *args++;
     llvm::Argument& increment = *args++;
@@ -383,7 +389,7 @@ void TestMutableConditionForLoop(bool runJit)
 
     fn.Printf({ fn.Literal("Done ForLoop: start = %f, increment = %f, test = %f\n"), &start, &increment, fn.Load(fn.PointerOffset(pTest, fn.Literal(0))) });
     fn.Return();
-    fn.Complete(true);
+    module.EndFunction();
 
     auto fnMain = module.AddMain();
     fnMain.Call("TestMutableConditionForLoop", { fnMain.Literal<double>(0), fnMain.Literal<double>(5), fnMain.Literal<double>(20) });

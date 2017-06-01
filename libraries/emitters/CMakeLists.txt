@@ -12,12 +12,13 @@ endif()
 
 set (src 
     src/EmitterTypes.cpp
-    src/IRAssemblyEmitter.cpp
+    src/IRAssemblyWriter.cpp
     src/IRBlockRegion.cpp
     src/IRDiagnosticHandler.cpp
     src/IREmitter.cpp
     src/IRExecutionEngine.cpp
     src/IRFunctionEmitter.cpp
+    src/IRHeaderWriter.cpp
     src/IRIfEmitter.cpp
     src/IRLoader.cpp
     src/IRLoopEmitter.cpp
@@ -30,14 +31,16 @@ set (src
 
 set (include 
     include/ClockInterface.h
+    include/CompilableIRFunction.h
     include/EmitterException.h
     include/EmitterTypes.h
-    include/IRAssemblyEmitter.h
+    include/IRAssemblyWriter.h
     include/IRBlockRegion.h
     include/IRDiagnosticHandler.h
     include/IREmitter.h
     include/IRExecutionEngine.h
     include/IRFunctionEmitter.h
+    include/IRHeaderWriter.h
     include/IRIfEmitter.h
     include/IRLoader.h
     include/IRLoopEmitter.h
@@ -48,11 +51,13 @@ set (include
     include/ModuleEmitter.h
     include/ScalarVariable.h
     include/SymbolTable.h
+    include/TargetDevice.h
     include/Variable.h
     include/VectorVariable.h
 )
 
 set (tcc 
+    tcc/CompilableIRFunction.tcc
     tcc/EmitterTypes.tcc
     tcc/IRFunctionEmitter.tcc
     tcc/IRLoopEmitter.tcc
@@ -87,15 +92,19 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 set (test_name ${library_name}_test)
 
 if(MSVC)
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
+  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
 endif()
 
-set (test_src 
-    test/src/main.cpp
-    test/src/IREmitterTest.cpp
+set (test_src
+  test/src/main.cpp
+  test/src/IREmitterTest.cpp
+  test/src/IRFunctionTest.cpp
 )
 
-set (test_include test/include/IREmitterTest.h)
+set (test_include 
+  test/include/IREmitterTest.h
+  test/include/IRFunctionTest.h
+)
 
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})

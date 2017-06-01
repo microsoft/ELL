@@ -45,7 +45,7 @@
 
 namespace ell
 {
-void TestCompileIsEqualModel()
+void TestCompileIsEqual()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(2);

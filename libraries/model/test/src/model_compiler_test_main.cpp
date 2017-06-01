@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     main.cpp (compile_test)
+//  File:     model_compiler_test_main.cpp (model_compiler_test)
 //  Authors:  Umesh Madan, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,16 +18,9 @@ using namespace ell::emitters;
 
 void TestIRCompiler()
 {
-    // Currently-failing tests:
     // VerboseRegion region;
-    // TestCompileIsEqualModel();
-    // TestMultiplexer(); // fails on Mac, but intermittently. It appears to work on one machine but not another.
-    // TestLinearPredictor(); // Fails
-    // TestForest(); // Fails
-    // TestForestMap(); // Fails
-    // TestSlidingAverage(); // Fails
-    // return;
 
+    TestCompileIsEqual();    
     TestSimpleMap(true);
     TestCompiledMapMove();
     TestBinaryVector(true);
@@ -42,7 +35,7 @@ void TestIRCompiler()
     TestDelay();
     TestSqrt();
     TestBinaryPredicate(false);
-    // TestMultiplexer(); // fails
+    // TestMultiplexer(); // Fails
     // TestSlidingAverage(); // Fails
     TestDotProductOutput();
     // TestLinearPredictor(); // Fails

@@ -22,6 +22,8 @@ namespace emitters
     enum class VariableType
     {
         Void = 0,
+        ///<summary> 8 bit character </summary>
+        Char8,
         ///<summary> 8 bit unsigned integer </summary>
         Byte,
         ///<summary> 16 bit signed integer </summary>
@@ -30,14 +32,17 @@ namespace emitters
         Int32,
         ///<summary> 64 bit signed integer </summary>
         Int64,
+        ///<summary> 4 byte floating point </summary>
+        Float,
         ///<summary> 8 byte floating point </summary>
         Double,
-        ///<summary> 8 bit character </summary>
-        Char8,
+
         //
         // Pointers
         //
         VoidPointer,
+        ///<summary> Pointer to a character array </summary>
+        Char8Pointer,
         ///<summary> Pointer to a byte </summary>
         BytePointer,
         ///<summary> Pointer to a short </summary>
@@ -46,10 +51,14 @@ namespace emitters
         Int32Pointer,
         ///<summary> Pointer to an Int64 </summary>
         Int64Pointer,
+        ///<summary> Pointer to a Float </summary>
+        FloatPointer,
         ///<summary> Pointer to a Double </summary>
-        DoublePointer,
-        ///<summary> Pointer to a character array </summary>
-        Char8Pointer
+        DoublePointer
+
+        //
+        // Arrays
+        //
     };
 
     /// <summary> Types of coordinatewise operations supported by this node type. </summary>
@@ -62,7 +71,10 @@ namespace emitters
         coordinatewiseDivide, // coordinatewise division
         logicalAnd,
         logicalOr,
-        logicalXor
+        logicalXor,
+        shiftLeft,
+        logicalShiftRight,
+        arithmeticShiftRight
     };
 
     /// <summary> Types of coordinatewise operations supported by this node type. </summary>
@@ -81,10 +93,11 @@ namespace emitters
     enum class UnaryOperationType
     {
         none,
+        exp, // real only
+        log, // real only
         sqrt, // real only
         logicalNot, // bool only
-        tanh, // real only
-        exp // real only
+        tanh // real only
     };
 
     ///<summary> An enumeration of strongly TYPED operations on numbers </summary>
@@ -99,6 +112,8 @@ namespace emitters
         multiply,
         ///<summary> Signed division - returns an integer </summary>
         divideSigned,
+        ///<summary> modulo </summary>
+        moduloSigned,
         ///<summary> Floating point addition </summary>
         addFloat,
         ///<summary> Floating point subtraction </summary>
@@ -112,7 +127,13 @@ namespace emitters
         ///<summary> Binary or </summary>
         logicalOr,
         ///<summary> Xor </summary>
-        logicalXor
+        logicalXor,
+        ///<summary> Bit-shift left </summary>
+        shiftLeft,
+        ///<summary> Bit-shift right, padding with zeros </summary>
+        logicalShiftRight,
+        ///<summary> Bit-shift right, extending sign bit </summary>
+        arithmeticShiftRight
     };
 
     ///<summary> An enumeration of strongly TYPED comparisons on numbers </summary>
@@ -220,6 +241,14 @@ namespace emitters
     /// <returns> The divide operation that corresponds to the given type. </returns>
     template <typename ValueType>
     TypedOperator GetDivideForValueType();
+
+    /// <summary> Gets the type-specific modulo element of the TypedOperator enum. </summary>
+    ///
+    /// <typeparam name="ValueType"> The type. </typeparam>
+    ///
+    /// <returns> The modulo operation that corresponds to the given type. </returns>
+    template <typename ValueType>
+    TypedOperator GetModForValueType();
 
     /// <summary> Does the given primitive type have a sign? </summary>
     ///

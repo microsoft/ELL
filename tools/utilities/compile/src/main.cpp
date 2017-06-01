@@ -74,9 +74,10 @@ int main(int argc, char* argv[])
         else
         {
             model::MapCompilerParameters settings;
+            settings.mapFunctionName = compileArguments.compiledFunctionName;
             settings.compilerSettings.optimize = compileArguments.optimize;
             model::IRMapCompiler compiler(settings);
-            auto compiledMap = compiler.Compile(map, compileArguments.compiledFunctionName);
+            auto compiledMap = compiler.Compile(map);
             switch (compileArguments.outputType)
             {
                 case CompileArguments::OutputType::compiledMap:
@@ -95,11 +96,11 @@ int main(int argc, char* argv[])
                     {
                         emitters::MachineCodeOutputOptions compileAssemblyOptions;
                         compileAssemblyOptions.optimizationLevel = emitters::OptimizationLevel::Default;
-                        compileAssemblyOptions.cpu = compileArguments.cpu;
+                        compileAssemblyOptions.targetDevice.cpu = compileArguments.cpu;
                         if ("cortex-m4" == compileArguments.cpu)
                         {
-                            compileAssemblyOptions.triple = "arm-none-eabi";
-                            compileAssemblyOptions.targetFeatures = "+armv7e-m,+v7,soft-float";
+                            compileAssemblyOptions.targetDevice.triple = "arm-none-eabi";
+                            compileAssemblyOptions.targetDevice.features = "+armv7e-m,+v7,soft-float";
                         }
 
                         compiledMap.WriteCode(compileArguments.outputCodeStream, emitters::ModuleOutputFormat::assembly, compileAssemblyOptions);
