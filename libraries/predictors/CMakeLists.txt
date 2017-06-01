@@ -6,7 +6,8 @@ set (library_name predictors)
 
 set (src src/ConstantPredictor.cpp
          src/LinearPredictor.cpp
-         src/SingleElementThresholdPredictor.cpp)
+         src/SingleElementThresholdPredictor.cpp
+         src/ProtoNNPredictor.cpp)
 
 set (include include/ConstantPredictor.h
              include/ForestPredictor.h
@@ -15,7 +16,8 @@ set (include include/ConstantPredictor.h
              include/NeuralNetworkPredictor.h
              include/SignPredictor.h
              include/SingleElementThresholdPredictor.h
-             include/Normalizer.h)
+             include/Normalizer.h
+             include/ProtoNNPredictor.h)
 
 set (tcc tcc/ForestPredictor.tcc
          tcc/SignPredictor.tcc
