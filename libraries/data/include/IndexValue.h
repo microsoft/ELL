@@ -11,6 +11,7 @@
 // stl
 #include <cstddef>
 #include <type_traits>
+#include <vector>
 
 namespace ell
 {
@@ -28,10 +29,9 @@ namespace data
     {
     };
 
-#ifndef SWIG
+    // helper type for concepts
     template <typename IteratorType>
     using IsIndexValueIterator = typename std::enable_if_t<std::is_base_of<IIndexValueIterator, IteratorType>::value, bool>;
-#endif
 
     /// <summary> Iteration policies. </summary>
     enum class IterationPolicy { all, skipZeros };

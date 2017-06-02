@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "TextLine.h"
+
 // stl
 #include <fstream>
 #include <memory>
@@ -23,9 +25,9 @@ namespace data
     public:
         /// <summary> Constructs a sequential line iterator. </summary>
         ///
-        /// <param name="filepath"> The filepath. </param>
+        /// <param name="stream"> The input stream. </param>
         /// <param name="delim"> The delimiter. </param>
-        SequentialLineIterator(const std::string& filepath, char delim = '\n');
+        SequentialLineIterator(std::istream& stream, char delim = '\n');
 
         SequentialLineIterator(SequentialLineIterator&&) = default;
 
@@ -34,19 +36,20 @@ namespace data
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if it succeeds, false if it fails. </returns>
-        bool IsValid() const { return (_pCurrentLine != nullptr); }
+        bool IsValid() const { return _isValid; }
 
-        /// <summary> Proceeds to the Next row. </summary>
+        /// <summary> Proceeds to the next row. </summary>
         void Next();
 
-        /// <summary> Returns a const reference to the row. </summary>
+        /// <summary> Returns a TextLine that contains the current line. </summary>
         ///
-        /// <returns> A std::shared_ptr&lt;const std::string&gt; </returns>
-        std::shared_ptr<const std::string> Get() const { return _pCurrentLine; }
+        /// <returns> A TextLine </returns>
+        TextLine GetTextLine() const { return _currentLine; } 
 
     private:
-        std::shared_ptr<std::string> _pCurrentLine = nullptr;
-        std::ifstream _iFStream;
+        std::istream& _stream;
+        bool _isValid = true;
+        TextLine _currentLine;
         char _delim;
     };
 }

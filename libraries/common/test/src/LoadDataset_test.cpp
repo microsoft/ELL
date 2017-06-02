@@ -14,22 +14,19 @@
 // testing
 #include "testing.h"
 
+// utilities
+#include "Files.h"
+
 // stl
 #include <iostream>
 
 namespace ell
 {
 
-common::DataLoadArguments GetDataLoadArguments()
-{
-    common::DataLoadArguments args;
-    args.inputDataFilename = "../../../examples/data/testData.txt";
-    return args;
-}
 void TestLoadDataset()
 {
-    auto dataLoadArguments = GetDataLoadArguments();
-    auto dataset = common::GetDataset(dataLoadArguments);
+    auto stream = utilities::OpenIfstream("../../../examples/data/testData.txt");
+    auto dataset = common::GetDataset(stream);
 }
 
 void TestLoadMappedDataset()
@@ -40,7 +37,7 @@ void TestLoadMappedDataset()
     args.modelOutputsString = "1026.output";
 
     auto map = common::LoadMap(args);
-    auto dataLoadArguments = GetDataLoadArguments();
-    auto dataset = common::GetMappedDataset(dataLoadArguments, map);
+    auto stream = utilities::OpenIfstream("../../../examples/data/testData.txt");
+    auto dataset = common::GetMappedDataset(stream, map);
 }
 }

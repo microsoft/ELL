@@ -1,20 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     Example.cpp (data)
+//  File:     Parser_test.h (data_test)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "Example.h"
+#pragma once
 
 namespace ell
 {
-namespace data
-{
-    void data::WeightLabel::Print(std::ostream& os) const
-    {
-        os << "(" << weight << ", " << label << ")";
-    }
-}
+    void DataVectorParseTest();
+    void AutoDataVectorParseTest();
+    void SingleFileParseTest();
 }

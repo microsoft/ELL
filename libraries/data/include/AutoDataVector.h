@@ -10,6 +10,7 @@
 
 #include "DataVector.h"
 #include "DenseDataVector.h"
+#include "TextLine.h"
 
 // utilities
 #include "Exception.h"
@@ -162,10 +163,18 @@ namespace data
         void FindBestRepresentation(DefaultDataVectorType defaultDataVector);
 
         template <typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
-        void SetInternal(DefaultDataVectorType defaultDataVector);
+        void SetInternal(DefaultDataVectorType defaultDataVector)
+        {
+            // STYLE intentional deviation from project style due to compilation difficulties
+            _pInternal = std::make_unique<DefaultDataVectorType>(std::move(defaultDataVector));
+        }
 
         template <typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
-        void SetInternal(DefaultDataVectorType defaultDataVector);
+        void SetInternal(DefaultDataVectorType defaultDataVector)
+        {
+            // STYLE intentional deviation from project style due to compilation difficulties
+            _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator<IterationPolicy::skipZeros>());
+        }
 
         // members
         std::unique_ptr<IDataVector> _pInternal;
@@ -173,6 +182,20 @@ namespace data
 
     // friendly name
     using AutoDataVector = AutoDataVectorBase<DoubleDataVector>;
+
+    /// <summary> A helper class that constructs AutoDataVectors using a provided IndexValue iterator. </summary>
+    ///
+    /// <typeparam name="IndexValueParsingIterator"> Parsing iterator type. </typeparam>
+    template <typename IndexValueParsingIterator>
+    struct AutoDataVectorParser
+    {
+        /// <summary> Parses a given text line and constructs an AutoDataVector. </summary>
+        ///
+        /// <param name="textLine"> The text line. </param>
+        ///
+        /// <returns> An AutoDataVector. </returns>
+        static AutoDataVector Parse(TextLine& textLine);
+    };
 }
 }
 

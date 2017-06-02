@@ -8,6 +8,7 @@ set (src src/Archiver.cpp
          src/CommandLineParser.cpp
          src/CompressedIntegerList.cpp
          src/ConformingVector.cpp
+         src/CStringParser.cpp
          src/Files.cpp
          src/Format.cpp
          src/IArchivable.cpp
@@ -32,6 +33,7 @@ set (include include/AbstractInvoker.h
              include/CommandLineParser.h
              include/CompressedIntegerList.h
              include/ConformingVector.h
+             include/CStringParser.h
              include/Debug.h
              include/Exception.h
              include/Files.h
@@ -48,7 +50,6 @@ set (include include/AbstractInvoker.h
              include/ObjectArchiver.h
              include/OutputStreamImpostor.h
              include/ParallelTransformIterator.h
-             include/Parser.h
              include/PPMImageParser.h
              include/RandomEngines.h
              include/StlContainerIterator.h
@@ -66,6 +67,7 @@ set (tcc tcc/AbstractInvoker.tcc
          tcc/AnyIterator.tcc
          tcc/Archiver.tcc
          tcc/CommandLineParser.tcc
+         tcc/CStringParser.tcc
          tcc/Exception.tcc
          tcc/Format.tcc
          tcc/FunctionUtils.tcc
@@ -75,7 +77,6 @@ set (tcc tcc/AbstractInvoker.tcc
          tcc/ObjectArchiver.tcc
          tcc/OutputStreamImpostor.tcc
          tcc/ParallelTransformIterator.tcc
-         tcc/Parser.tcc
          tcc/StlContainerIterator.tcc
          tcc/TransformIterator.tcc
          tcc/TypeFactory.tcc

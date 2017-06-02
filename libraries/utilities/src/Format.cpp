@@ -35,12 +35,12 @@ namespace utilities
         {
             if (std::isspace(*format) && std::isspace(*content))
             {
-                Trim(content);
-                Trim(format);
+                TrimLeadingWhitespace(content);
+                TrimLeadingWhitespace(format);
             }
             else if (*format == whitespaceSymbol)
             {
-                Trim(content);
+                TrimLeadingWhitespace(content);
                 ++format;
             }
             else if (*format == *content)

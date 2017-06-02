@@ -29,9 +29,9 @@ namespace common
     }
 
     template <typename MapType>
-    data::AutoSupervisedDataset GetMappedDataset(const DataLoadArguments& dataLoadArguments, const MapType& map)
+    data::AutoSupervisedDataset GetMappedDataset(std::istream& stream, const MapType& map)
     {
-        return GetMappedDataset(GetExampleIterator(dataLoadArguments), map);
+        return GetMappedDataset(GetExampleIterator(stream), map);
     }
 }
 }

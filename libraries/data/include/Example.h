@@ -11,6 +11,7 @@
 #include "AutoDataVector.h"
 #include "DataVector.h"
 #include "DenseDataVector.h"
+#include "WeightLabel.h"
 
 // utilities
 #include "TypeTraits.h"
@@ -43,10 +44,7 @@ namespace data
         ///
         /// <param name="dataVector"> The data vector. </param>
         /// <param name="metadataType"> The metadata. </param>
-        Example(DataVectorType dataVector, const MetadataType& metadata);
-
-        template <typename InputDataVectorType, typename InputMetadataType, utilities::IsDifferent<InputDataVectorType, DataVectorType> IsDifferentConcept = true, IsDataVector<InputDataVectorType> IsDataConcept = true>
-        Example(const InputDataVectorType& dataVector, const InputMetadataType& metadata);
+        Example(DataVectorType dataVector, MetadataType metadata);
 
         /// <summary> Constructs a supervised example. </summary>
         ///
@@ -122,18 +120,7 @@ namespace data
         MetadataType _metadata;
     };
 
-    /// <summary> A metadata class that contains a weight and a real valued label. </summary>
-    struct WeightLabel
-    {
-        /// <summary> Prints the weight label pair. </summary>
-        ///
-        /// <param name="os"> [in,out] The output stream. </param>
-        void Print(std::ostream& os) const;
-
-        double weight;
-        double label;
-    };
-
+    // abbreviations
     typedef Example<AutoDataVector, WeightLabel> AutoSupervisedExample;
     typedef Example<FloatDataVector, WeightLabel> DenseSupervisedExample;
 
