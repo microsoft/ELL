@@ -23,6 +23,7 @@
 #include "MovingVarianceNode.h"
 #include "SourceNode.h"
 #include "UnaryOperationNode.h"
+#include "ProtoNNPredictorNode.h"
 
 // model
 #include "InputNode.h"
@@ -31,6 +32,7 @@
 
 // predictors
 #include "LinearPredictor.h"
+#include "ProtoNNPredictor.h"
 
 // testing
 #include "testing.h"
