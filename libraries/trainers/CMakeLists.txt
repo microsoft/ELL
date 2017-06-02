@@ -8,7 +8,8 @@ set (src src/AbsoluteMeanTrainer.cpp
          src/ForestTrainer.cpp
          src/LogitBooster.cpp
          src/SGDLinearTrainer.cpp
-         src/ThresholdFinder.cpp)
+         src/ThresholdFinder.cpp
+         src/KMeans.cpp)
 
 set (include include/AbsoluteMeanTrainer.h
              include/EvaluatingIncrementalTrainer.h
@@ -21,7 +22,8 @@ set (include include/AbsoluteMeanTrainer.h
              include/SortingForestTrainer.h
              include/SweepingIncrementalTrainer.h
              include/SGDLinearTrainer.h
-             include/ThresholdFinder.h)
+             include/ThresholdFinder.h
+             include/KMeans.h)
 
 set (tcc tcc/EvaluatingIncrementalTrainer.tcc
          tcc/ForestTrainer.tcc
