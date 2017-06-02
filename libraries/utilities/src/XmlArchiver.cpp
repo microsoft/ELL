@@ -55,7 +55,7 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, int);
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, size_t);
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, uint64_t);
 #endif
     IMPLEMENT_ARCHIVE_VALUE(XmlArchiver, float);
@@ -102,7 +102,7 @@ namespace utilities
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, int);
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, size_t);
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, uint64_t);
 #endif
     IMPLEMENT_ARCHIVE_ARRAY(XmlArchiver, float);
@@ -170,7 +170,7 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, int);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, size_t);
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, uint64_t);
 #endif
     IMPLEMENT_UNARCHIVE_VALUE(XmlUnarchiver, float);
@@ -230,7 +230,7 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, int);
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, size_t);
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, uint64_t);
 #endif
     IMPLEMENT_UNARCHIVE_ARRAY(XmlUnarchiver, float);

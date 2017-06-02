@@ -189,7 +189,7 @@ namespace utilities
         DECLARE_ARCHIVE_VALUE_BASE(int);
         DECLARE_ARCHIVE_VALUE_BASE(size_t);
         DECLARE_ARCHIVE_VALUE_BASE(int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
         DECLARE_ARCHIVE_VALUE_BASE(uint64_t);
 #endif
         DECLARE_ARCHIVE_VALUE_BASE(float);
@@ -203,7 +203,7 @@ namespace utilities
         DECLARE_ARCHIVE_ARRAY_BASE(int);
         DECLARE_ARCHIVE_ARRAY_BASE(size_t);
         DECLARE_ARCHIVE_ARRAY_BASE(int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
         DECLARE_ARCHIVE_ARRAY_BASE(uint64_t);
 #endif
         DECLARE_ARCHIVE_ARRAY_BASE(float);
@@ -316,7 +316,7 @@ namespace utilities
         DECLARE_UNARCHIVE_VALUE_BASE(int);
         DECLARE_UNARCHIVE_VALUE_BASE(size_t);
         DECLARE_UNARCHIVE_VALUE_BASE(int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
         DECLARE_UNARCHIVE_VALUE_BASE(uint64_t);
 #endif
         DECLARE_UNARCHIVE_VALUE_BASE(float);
@@ -330,7 +330,7 @@ namespace utilities
         DECLARE_UNARCHIVE_ARRAY_BASE(int);
         DECLARE_UNARCHIVE_ARRAY_BASE(size_t);
         DECLARE_UNARCHIVE_ARRAY_BASE(int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
         DECLARE_UNARCHIVE_ARRAY_BASE(uint64_t);
 #endif
         DECLARE_UNARCHIVE_ARRAY_BASE(float);

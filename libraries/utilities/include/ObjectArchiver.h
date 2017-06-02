@@ -55,7 +55,7 @@ namespace utilities
         DECLARE_ARCHIVE_VALUE_OVERRIDE(int);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(size_t);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
         DECLARE_ARCHIVE_VALUE_OVERRIDE(uint64_t);
 #endif
         DECLARE_ARCHIVE_VALUE_OVERRIDE(float);
@@ -68,7 +68,7 @@ namespace utilities
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(int);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(size_t);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(uint64_t);
 #endif
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(float);
@@ -85,7 +85,7 @@ namespace utilities
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(int);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(size_t);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(uint64_t);
 #endif
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(float);
@@ -98,7 +98,7 @@ namespace utilities
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(int);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(size_t);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(uint64_t);
 #endif
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(float);

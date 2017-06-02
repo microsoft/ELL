@@ -39,7 +39,7 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, int);
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, size_t);
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, uint64_t);
 #endif
     IMPLEMENT_ARCHIVE_VALUE(JsonArchiver, float);
@@ -103,7 +103,7 @@ namespace utilities
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, int);
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, size_t);
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, uint64_t);
 #endif
     IMPLEMENT_ARCHIVE_ARRAY(JsonArchiver, float);
@@ -176,7 +176,7 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, int);
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, size_t);
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, uint64_t);
 #endif
     IMPLEMENT_UNARCHIVE_VALUE(JsonUnarchiver, float);
@@ -255,7 +255,7 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, int);
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, size_t);
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, uint64_t);
 #endif
     IMPLEMENT_UNARCHIVE_ARRAY(JsonUnarchiver, float);

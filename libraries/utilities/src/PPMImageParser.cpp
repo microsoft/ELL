@@ -45,7 +45,7 @@ namespace utilities
         in >> maxValue;
         auto numValues = result.numChannels * result.width * result.height;
         result.data = std::vector<ValueType>(numValues);
-        int numPixels = result.width * result.height;
+        auto numPixels = result.width * result.height;
         for (size_t index = 0; index < numValues; ++index)
         {
             int rawValue;

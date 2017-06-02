@@ -8,8 +8,10 @@
 
 // stl
 #include <cctype>
+#include <cerrno>
 #include <cstdlib>
 #include <stdexcept>
+#include <string>
 
 namespace ell
 {
@@ -265,7 +267,6 @@ namespace utilities
 
         return ParseResult::success;
     }
-
 
     // wrapper for strtoul
     template <typename std::enable_if_t<!std::is_same<unsigned long, unsigned int>::value, int> = 0>

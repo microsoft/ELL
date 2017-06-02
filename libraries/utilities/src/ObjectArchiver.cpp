@@ -39,7 +39,7 @@ namespace utilities
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, int);
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, size_t);
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, uint64_t);
 #endif
     IMPLEMENT_ARCHIVE_VALUE(ObjectArchiver, float);
@@ -86,7 +86,7 @@ namespace utilities
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, int);
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, size_t);
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, uint64_t);
 #endif
     IMPLEMENT_ARCHIVE_ARRAY(ObjectArchiver, float);
@@ -119,7 +119,7 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, int);
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, size_t);
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, uint64_t);
 #endif
     IMPLEMENT_UNARCHIVE_VALUE(ObjectArchiver, float);
@@ -161,7 +161,7 @@ namespace utilities
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, int);
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, size_t);
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, int64_t);
-#ifdef __clang__
+#ifdef __APPLE__
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, uint64_t);
 #endif
     IMPLEMENT_UNARCHIVE_ARRAY(ObjectArchiver, float);
