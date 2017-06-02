@@ -117,7 +117,7 @@ namespace data
         /// <param name="vector"> The vector. </param>
         /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
         /// applied to each element before it is added to the vector. </param>
-        template<IterationPolicy policy, typename TransformationType>
+        template <IterationPolicy policy, typename TransformationType>
         void AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const;
 
         /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
@@ -170,11 +170,7 @@ namespace data
         }
 
         template <typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
-        void SetInternal(DefaultDataVectorType defaultDataVector)
-        {
-            // STYLE intentional deviation from project style due to compilation difficulties
-            _pInternal = std::make_unique<DataVectorType>(defaultDataVector.GetIterator<IterationPolicy::skipZeros>());
-        }
+        void SetInternal(DefaultDataVectorType defaultDataVector);
 
         // members
         std::unique_ptr<IDataVector> _pInternal;

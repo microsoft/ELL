@@ -187,8 +187,15 @@ namespace data
         }
     }
 
-    template<typename IndexValueParsingIterator>
-    AutoDataVector AutoDataVectorParser<IndexValueParsingIterator>::Parse(TextLine & textLine)
+    template <typename DefaultDataVectorType>
+    template <typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept>
+    void AutoDataVectorBase<DefaultDataVectorType>::SetInternal(DefaultDataVectorType defaultDataVector)
+    {
+        _pInternal = std::make_unique<DataVectorType>(GetIterator<DefaultDataVectorType, IterationPolicy::skipZeros>(defaultDataVector));
+    }
+
+    template <typename IndexValueParsingIterator>
+    AutoDataVector AutoDataVectorParser<IndexValueParsingIterator>::Parse(TextLine& textLine)
     {
         return AutoDataVector(IndexValueParsingIterator(textLine));
     }
