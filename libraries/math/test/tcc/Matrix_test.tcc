@@ -247,6 +247,23 @@ void TestMatrixOperations()
     };
     Ops::Copy(R2, M);
     testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R2);
+
+    math::Matrix<ElementType, layout> D{
+        { 10, 1, 9, 1 },
+        { 2, 11, 2, 13 },
+        { 1, 3, 1, 31 }
+    };
+
+    math::RowVector<ElementType> p(D.NumColumns());
+    math::RowVector<ElementType> q(D.NumRows());
+    math::RowVector<ElementType> a{ 13, 15, 12, 45 };
+    math::RowVector<ElementType> b{ 21, 28, 36 };
+
+    Ops::ColumnWiseSum(D, p);
+    testing::ProcessTest(implementationName + "Operations::ColumnWiseSum(MatrixReference)", p == a);
+
+    Ops::ColumnWiseSum(D.Transpose(), q);
+    testing::ProcessTest(implementationName + "Operations::ColumnWiseSum(MatrixReference)", q == b);
 }
 
 
