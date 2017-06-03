@@ -53,8 +53,8 @@ namespace utilities
             ValueType value = rawValue / static_cast<ValueType>(maxValue);
 
             // convert from rgbrgbrgbrgbrgbrgb to rrrrggggbbbb
-            int channel = index % result.numChannels;
-            int outIndex = numPixels * channel + index / result.numChannels;
+            int channel = static_cast<int>(index % result.numChannels);
+            int outIndex = static_cast<int>(numPixels * channel + index / result.numChannels);
             result.data[outIndex] = value;
         }
         return result;
