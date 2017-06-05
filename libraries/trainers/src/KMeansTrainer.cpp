@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     KMeans.cpp (trainers)
+//  File:     KMeansTrainer.cpp (trainers)
 //  Authors:  Suresh Iyengar
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "KMeans.h"
+#include "KMeansTrainer.h"
 
 // stl
 #include <cassert>
@@ -17,18 +17,18 @@ namespace ell
 {
 namespace trainers
 {
-    KMeans::KMeans(size_t dim, size_t K, size_t iters) : _mu(dim, K), _numClusters(K), _nIters(iters), _isInitialized(false) {	}
+    KMeansTrainer::KMeansTrainer(size_t dim, size_t K, size_t iterations) : _means(dim, K), _numClusters(K), _iterations(iterations), _isInitialized(false) {	}
 
-    KMeans::KMeans(size_t K, size_t iters, math::ColumnMatrix<double> mu) : _numClusters(K), _nIters(iters), _mu(mu), _isInitialized(true) {	}
+    KMeansTrainer::KMeansTrainer(size_t K, size_t iters, math::ColumnMatrix<double> means) : _numClusters(K), _iterations(iters), _means(means), _isInitialized(true) {	}
 
-    void KMeans::RunKMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X)
+    void KMeansTrainer::RunKMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X)
     {
         if (false == _isInitialized)
             initializeMeans(X);
 
         math::ColumnVector<size_t> clusterAssignment(X.NumColumns());
         double prevDistance = 0.0;
-        for (int i = 0; i < _nIters; ++i)
+        for (int i = 0; i < _iterations; ++i)
         {
             auto totalDistance = assignClosestCenter(X, clusterAssignment);
             if (totalDistance == prevDistance)
@@ -38,19 +38,19 @@ namespace trainers
         }
     }
 
-    void KMeans::initializeMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X)
+    void KMeansTrainer::initializeMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X)
     {
         size_t N = X.NumColumns();
         size_t K = _numClusters;
         size_t choice = rand() % N;
 
-        math::Operations::Copy(X.GetColumn(choice), _mu.GetColumn(0));
+        math::Operations::Copy(X.GetColumn(choice), _means.GetColumn(0));
 
         math::ColumnVector<double> minimumDistance(X.NumColumns());
         for (int k = 1; k < _numClusters; ++k)
         {
             // distance to previously selected mean
-            auto D = pairwiseDistance(X, _mu.GetSubMatrix(0, k - 1, _mu.NumRows(), 1));
+            auto D = pairwiseDistance(X, _means.GetSubMatrix(0, k - 1, _means.NumRows(), 1));
             auto distanceToPreviousMean = D.GetColumn(0);
 
             if (k == 1)
@@ -65,13 +65,13 @@ namespace trainers
             }
 
             choice = weightedSample(minimumDistance);
-            math::Operations::Copy(X.GetColumn(choice), _mu.GetColumn(k));
+            math::Operations::Copy(X.GetColumn(choice), _means.GetColumn(k));
         }
     }
 
     /// D_ij = || X_i - mu_j || ^ 2   (Distance of ith point to jth cluster)
-    /// distance = ||X||^2 + ||mu||^2 - 2 *  mu * X'
-    math::RowMatrix<double> KMeans::pairwiseDistance(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> means)
+    /// distance = ||X||^2 + ||means||^2 - 2 *  means * X'
+    math::RowMatrix<double> KMeansTrainer::pairwiseDistance(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> means)
     {
         auto n = X.NumColumns();
         auto k = means.NumColumns();
@@ -82,8 +82,11 @@ namespace trainers
         math::ColumnMatrix<double> muSq(means.NumRows(), k);
         math::Operations::ElementWiseMultiply(means, means, muSq);
 
-        auto xSqNorm = ColumnwiseSum(xSq);
-        auto muSqNorm = ColumnwiseSum(muSq);
+        math::ColumnMatrix<double> xSqNorm(1, xSq.NumColumns());
+        math::Operations::ColumnWiseSum(xSq, xSqNorm.GetRow(0));
+
+        math::ColumnMatrix<double> muSqNorm(1, muSq.NumColumns());
+        math::Operations::ColumnWiseSum(muSq, muSqNorm.GetRow(0));
 
         math::RowMatrix<double> onesMultiplier(k, 1);
         onesMultiplier.Fill(1.0);
@@ -107,9 +110,9 @@ namespace trainers
         return distance;
     }
 
-    double KMeans::assignClosestCenter(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X, math::VectorReference<size_t, math::VectorOrientation::column> clusterAssignment)
+    double KMeansTrainer::assignClosestCenter(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X, math::VectorReference<size_t, math::VectorOrientation::column> clusterAssignment)
     {
-        auto D = pairwiseDistance(X, _mu);
+        auto D = pairwiseDistance(X, _means);
 
         double totalDist = 0;
         for (int i = 0; i < D.NumRows(); ++i)
@@ -123,7 +126,7 @@ namespace trainers
         return totalDist;
     }
 
-    void KMeans::recomputeMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X, const math::ColumnVector<size_t> clusterAssignment)
+    void KMeansTrainer::recomputeMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X, const math::ColumnVector<size_t> clusterAssignment)
     {
         math::ColumnMatrix<double> clusterSum(X.NumRows(), _numClusters);
         math::ColumnVector<double> numPointsPerCluster(_numClusters);
@@ -139,21 +142,10 @@ namespace trainers
             clusterSum.GetColumn(i) /= numPointsPerCluster[i];
         }
 
-        math::Operations::Copy(clusterSum, _mu);
+        math::Operations::Copy(clusterSum, _means);
     }
 
-    math::RowMatrix<double> KMeans::ColumnwiseSum(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> A)
-    {
-        math::ColumnMatrix<double> R(1, A.NumColumns());
-        math::ColumnMatrix<double> ones(1, A.NumRows());
-        ones.Fill(1.0);
-
-        math::Operations::Multiply(1.0, ones, A, 0.0, R);
-
-        return std::move(R);
-    }
-
-    size_t KMeans::weightedSample(math::ColumnVector<double> weights)
+    size_t KMeansTrainer::weightedSample(math::ColumnVector<double> weights)
     {
         size_t n = weights.Size();
         double sum = weights.Aggregate([](double x) { return x; });

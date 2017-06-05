@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     KMeans.h (trainers)
+//  File:     KMeansTrainer.h (trainers)
 //  Authors:  Suresh Iyengar
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,32 +20,32 @@ namespace ell
 {
 namespace trainers
 {
-    /// <summary> Impements KMeans++ algorithm </summary>
+    /// <summary> Impements KMeansTrainer++ algorithm </summary>
     ///
-    class KMeans
+    class KMeansTrainer
     {
     public:
         /// <summary> Default constructor </summary>
         ///
-        KMeans() = default;
+        KMeansTrainer() = default;
 
-        /// <summary> Constructs an instance of KMeans trainer </summary>
+        /// <summary> Constructs an instance of KMeansTrainer trainer </summary>
         ///
-        /// <param name="dim"> The input dimension. </param>
+        /// <param name="dimension"> The input dimension. </param>
         /// <param name="K"> The number of clusters. </param>
-        /// <param name="iters"> The number of iterations. </param>
+        /// <param name="iterations"> The number of iterations. </param>
         ///
-        KMeans(size_t dim, size_t K, size_t iters);
+        KMeansTrainer(size_t dimension, size_t K, size_t iterations);
 
-        /// <summary> Constructs an instance of KMeans trainer </summary>
+        /// <summary> Constructs an instance of KMeansTrainer trainer </summary>
         ///
         /// <param name="K"> The number of clusters. </param>
-        /// <param name="iters"> The number of iterations. </param>
-        /// <param name="mu"> The cluster means. </param>
+        /// <param name="iterations"> The number of iterations. </param>
+        /// <param name="means"> The cluster means. </param>
         ///
-        KMeans(size_t K, size_t iters, math::ColumnMatrix<double> mu);
+        KMeansTrainer(size_t K, size_t iters, math::ColumnMatrix<double> means);
 
-        /// <summary> Runs the KMeans algorithm. </summary>
+        /// <summary> Runs the KMeansTrainer algorithm. </summary>
         ///
         /// <param name="X"> The input matrix. </param>
         ///
@@ -54,7 +54,7 @@ namespace trainers
         /// <summary> Returns the underlying cluster means. </summary>
         ///
         /// <returns> The underlying cluster means matrix. </returns>
-        const math::ColumnMatrix<double>& GetClusterMeans() const { return _mu; }
+        const math::ColumnMatrix<double>& GetClusterMeans() const { return _means; }
 
         /// <summary> Returns the underlying cluster assignment. </summary>
         ///
@@ -62,38 +62,34 @@ namespace trainers
         const math::ColumnVector<double>& GetClusterAssignment() const { return _clusterAssignment; }
 
     private:
-        /// <summary> Initializes the cluster means using the KMeans++ strategy. </summary>
+        // Initializes the cluster means using the KMeansTrainer++ strategy.
         void initializeMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X);
 
-        /// <summary> Distance of points to all the cluster means. </summary>
+        // Distance of points to all the cluster means.
         math::RowMatrix<double> pairwiseDistance(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> mu);
 
-        /// <summary> Assign each point to the closest mean. </summary>
+        // Assign each point to the closest mean.
         double assignClosestCenter(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X, math::VectorReference<size_t, math::VectorOrientation::column> clusterAssignment);
 
-        /// <summary> Recompute the cluster means. </summary>
+        // Recompute the cluster means.
         void recomputeMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X, const math::ColumnVector<size_t> clusterAssignment);
 
-        /// <summary> Helper function for column sum of a matrix. </summary>
-        /// This will get removed when this function gets included in operations
-        math::RowMatrix<double> ColumnwiseSum(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> A);
-
-        /// <summary> Weighted sampling. </summary>
+        // Weighted sampling.
         size_t weightedSample(math::ColumnVector<double> weights);
 
-        /// <summary> Cluster means. </summary>
-        math::ColumnMatrix<double> _mu;
+        // Cluster means.
+        math::ColumnMatrix<double> _means;
 
-        /// <summary> Are the means initialized? </summary>
+        // Are the means initialized?
         bool _isInitialized;
 
-        /// <summary> Cluster assignment for each data point. </summary>
+        // Cluster assignment for each data point.
         math::ColumnVector<double> _clusterAssignment;
 
-        /// <summary> Number of iterations of KMeans algorithm. </summary>
-        size_t _nIters;
+        // Number of iterations of KMeansTrainer algorithm.
+        size_t _iterations;
 
-        /// <summary> Number of clusters. </summary>
+        // Number of clusters.
         size_t _numClusters;
     };
 }
