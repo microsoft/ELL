@@ -82,7 +82,7 @@ namespace nodes
         }
         else
         {
-            function.Call(function.GetModule().GetRuntime().GetDotProductFloatFunction(), { function.Literal(count), function.PointerOffset(pLVector, 0), function.PointerOffset(pRVector, 0), function.PointerOffset(pResult, 0) });
+            function.Call(function.GetModule().GetRuntime().GetDotProductFunction<ValueType>(), { function.Literal(count), function.PointerOffset(pLVector, 0), function.PointerOffset(pRVector, 0), function.PointerOffset(pResult, 0) });
         }
     }
 

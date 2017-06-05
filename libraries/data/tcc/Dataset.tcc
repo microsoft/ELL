@@ -214,5 +214,11 @@ namespace data
         }
         return size;
     }
+
+    template <typename ExampleType>
+    Dataset<ExampleType> MakeDataset(ExampleIterator<ExampleType> exampleIterator)
+    {
+        return Dataset<ExampleType>(std::move(exampleIterator));
+    }
 }
 }

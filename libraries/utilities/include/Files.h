@@ -50,5 +50,12 @@ namespace utilities
     ///
     /// <returns> The file extension, not including the ".". </returns>
     std::string GetFileExtension(std::string filepath, bool toLowercase = false);
+
+    /// <summary> Returns the file path minus extension. </summary>
+    ///
+    /// <param name="filepath"> The path. </param>
+    ///
+    /// <returns> The filepath with extension. </returns>
+    std::string RemoveFileExtension(std::string filepath);
 }
 }

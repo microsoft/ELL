@@ -1,11 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IRAssemblyEmitter.h (emitters)
-//  Authors:
+//  File:     IRAssemblyWriter.h (emitters)
+//  Authors:  Kirk Olynyk, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
+
+#include "TargetDevice.h"
 
 // llvm
 #include "llvm/IR/LLVMContext.h"
@@ -14,13 +16,12 @@
 #include "llvm/Target/TargetMachine.h" // for CodeGenFileType
 #include "llvm/Target/TargetOptions.h" // for FloatABI::ABIType and FPOpFusion::FpOpFusionMode
 
-// stl
-#include <ostream>
-
 namespace ell
 {
 namespace emitters
 {
+    class IRModuleEmitter;
+
     /// <summary> An enum containing the optimization level {None, Less, Default, Aggressive} </summary>
     typedef llvm::CodeGenOpt::Level OptimizationLevel;
 
@@ -33,15 +34,14 @@ namespace emitters
     /// <summary> An enum containing the type of output to generate {CGFT_AssemblyFile, CGFT_ObjectFile, CGFT_Null} </summary>
     typedef llvm::TargetMachine::CodeGenFileType OutputFileType;
 
-    /// <summary> Options for the LLVM -> assembly compilation </summary>
+    /// <summary> Options for LLVM machine code output (assembly or object code) </summary>
     struct MachineCodeOutputOptions
     {
         bool verboseOutput = false;
         bool verifyModule = false;
-        std::string triple = "armv6m-unknown-none-eabi";
-        std::string architecture = "thumb";
-        std::string cpu = "cortex-m0";
-        std::string targetFeatures = "+armv6-m,+v6m";
+
+        TargetDevice targetDevice;
+
         OptimizationLevel optimizationLevel = OptimizationLevel::Default;
         FloatABIType floatABI = FloatABIType::Default;
         FloatFusionMode floatFusionMode = FloatFusionMode::Standard;
@@ -51,6 +51,6 @@ namespace emitters
     bool IsBinaryOutputType(const OutputFileType& filetype);
 
     /// <summary> Compile the given module to the given stream </summary>
-    void GenerateMachineCode(llvm::raw_ostream& os, llvm::Module& module, OutputFileType fileType, const MachineCodeOutputOptions& options);
+    void GenerateMachineCode(llvm::raw_ostream& os, IRModuleEmitter& module, OutputFileType fileType, const MachineCodeOutputOptions& options);
 }
 }

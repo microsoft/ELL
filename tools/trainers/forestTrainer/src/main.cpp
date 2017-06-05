@@ -103,7 +103,8 @@ int main(int argc, char* argv[])
 
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto mappedDataset = common::GetMappedDataset(dataLoadArguments, map);
+        auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
+        auto mappedDataset = common::GetMappedDataset(stream, map);
 
         // predictor type
         using PredictorType = predictors::SimpleForestPredictor;

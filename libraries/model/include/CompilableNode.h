@@ -10,17 +10,15 @@
 
 #include "Node.h"
 
-namespace llvm
-{
-class Value;
-}
-
 // emitters
 #include "EmitterTypes.h"
 #include "IRFunctionEmitter.h"
 
 // utilities
 #include "TypeName.h"
+
+// llvm
+#include "llvm/IR/Value.h"
 
 // stl
 #include <string>

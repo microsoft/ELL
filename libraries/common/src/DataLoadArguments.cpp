@@ -11,7 +11,7 @@
 
 // utilities
 #include "Files.h"
-#include "Parser.h"
+#include "CStringParser.h"
 
 // stl
 #include <algorithm>
@@ -59,7 +59,8 @@ namespace common
                 return parseErrorMessages;
             }
 
-            auto exampleIterator = GetExampleIterator(*this);
+            auto stream = utilities::OpenIfstream(inputDataFilename);
+            auto exampleIterator = GetExampleIterator(stream);
             while (exampleIterator.IsValid())
             {
                 auto size = exampleIterator.Get().GetDataVector().PrefixLength();

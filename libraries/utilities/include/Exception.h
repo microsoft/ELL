@@ -78,7 +78,7 @@ namespace utilities
         didNotConverge
     };
 
-    /// <summary> Error codes for exceptions related to inputs, such as public API calls or the format of files. </summary>
+    /// <summary> Error codes for exceptions related to inputs, such as public API calls. </summary>
     enum class InputExceptionErrors
     {
         badStringFormat,
@@ -90,10 +90,18 @@ namespace utilities
         typeMismatch
     };
 
+    enum class DataFormatErrors
+    {
+        badFormat,
+        illegalValue,
+        abruptEnd,
+    };
+
     typedef ErrorCodeException<LogicExceptionErrors> LogicException;
     typedef ErrorCodeException<SystemExceptionErrors> SystemException;
     typedef ErrorCodeException<NumericExceptionErrors> NumericException;
     typedef ErrorCodeException<InputExceptionErrors> InputException;
+    typedef ErrorCodeException<DataFormatErrors> DataFormatException;
 }
 }
 

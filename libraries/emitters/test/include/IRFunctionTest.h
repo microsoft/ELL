@@ -1,20 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     Example.cpp (data)
-//  Authors:  Ofer Dekel
+//  File:     IRFunctionTest.h (emitters_test)
+//  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma once
 
-#include "Example.h"
-
-namespace ell
-{
-namespace data
-{
-    void data::WeightLabel::Print(std::ostream& os) const
-    {
-        os << "(" << weight << ", " << label << ")";
-    }
-}
-}
+void TestIRAddFunction();
+void TestIRFunction();

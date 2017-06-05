@@ -11,15 +11,8 @@ namespace ell
 namespace data
 {
     template <typename DataVectorType, typename MetadataType>
-    Example<DataVectorType, MetadataType>::Example(DataVectorType dataVector, const MetadataType& metadata)
-        : _dataVector(std::make_shared<const DataVectorType>(std::move(dataVector))), _metadata(metadata)
-    {
-    }
-
-    template <typename DataVectorType, typename MetadataType>
-    template <typename InputDataVectorType, typename InputMetadataType, utilities::IsDifferent<InputDataVectorType, DataVectorType>, IsDataVector<InputDataVectorType>>
-    Example<DataVectorType, MetadataType>::Example(const InputDataVectorType& dataVector, const InputMetadataType& metadata)
-        : _dataVector(std::make_shared<const DataVectorType>(GetIterator<InputDataVectorType, IterationPolicy::skipZeros>(dataVector))), _metadata(MetadataType(metadata))
+    Example<DataVectorType, MetadataType>::Example(DataVectorType dataVector, MetadataType metadata)
+        : _dataVector(std::make_shared<const DataVectorType>(std::move(dataVector))), _metadata(std::move(metadata))
     {
     }
 

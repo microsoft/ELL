@@ -47,7 +47,7 @@ struct CompileArguments
     utilities::OutputStreamImpostor outputCodeStream;
 
     /// <summary> If output type is ASM then we need a target cpu (cortex-m0 or cortex-m4). </summary>
-    std::string cpu = "cortex-m0";
+    std::string cpu = "";
 };
 
 /// <summary> Parsed command line arguments for the compile executable. </summary>

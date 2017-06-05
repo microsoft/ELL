@@ -54,6 +54,16 @@ namespace emitters
         llvm::BasicBlock* If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue);
 
         /// <summary>
+        /// Emit a comparison testing if pValue is true and a branch to the "Then" block. Makes
+        /// the Then block the current block.
+        /// </summary>
+        ///
+        /// <param name="pValue"> Pointer to the llvm::Value that contains the boolean condition value. </param>
+        ///
+        /// <returns> Returns the "Then" block. </returns>
+        llvm::BasicBlock* If(llvm::Value* pValue);
+
+        /// <summary>
         /// Emit a comparison testing if pValue matches testValue and a branch to the "Then" block. Makes
         /// the Then block the current block.
         /// </summary>

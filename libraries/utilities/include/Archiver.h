@@ -188,6 +188,10 @@ namespace utilities
         DECLARE_ARCHIVE_VALUE_BASE(short);
         DECLARE_ARCHIVE_VALUE_BASE(int);
         DECLARE_ARCHIVE_VALUE_BASE(size_t);
+        DECLARE_ARCHIVE_VALUE_BASE(int64_t);
+#ifdef __APPLE__
+        DECLARE_ARCHIVE_VALUE_BASE(uint64_t);
+#endif
         DECLARE_ARCHIVE_VALUE_BASE(float);
         DECLARE_ARCHIVE_VALUE_BASE(double);
         virtual void ArchiveValue(const char* name, const std::string& value) = 0;
@@ -198,6 +202,10 @@ namespace utilities
         DECLARE_ARCHIVE_ARRAY_BASE(short);
         DECLARE_ARCHIVE_ARRAY_BASE(int);
         DECLARE_ARCHIVE_ARRAY_BASE(size_t);
+        DECLARE_ARCHIVE_ARRAY_BASE(int64_t);
+#ifdef __APPLE__
+        DECLARE_ARCHIVE_ARRAY_BASE(uint64_t);
+#endif
         DECLARE_ARCHIVE_ARRAY_BASE(float);
         DECLARE_ARCHIVE_ARRAY_BASE(double);
         virtual void ArchiveArray(const char* name, const std::vector<std::string>& array) = 0;
@@ -307,6 +315,10 @@ namespace utilities
         DECLARE_UNARCHIVE_VALUE_BASE(short);
         DECLARE_UNARCHIVE_VALUE_BASE(int);
         DECLARE_UNARCHIVE_VALUE_BASE(size_t);
+        DECLARE_UNARCHIVE_VALUE_BASE(int64_t);
+#ifdef __APPLE__
+        DECLARE_UNARCHIVE_VALUE_BASE(uint64_t);
+#endif
         DECLARE_UNARCHIVE_VALUE_BASE(float);
         DECLARE_UNARCHIVE_VALUE_BASE(double);
         virtual void UnarchiveValue(const char* name, std::string& value) = 0;
@@ -317,6 +329,10 @@ namespace utilities
         DECLARE_UNARCHIVE_ARRAY_BASE(short);
         DECLARE_UNARCHIVE_ARRAY_BASE(int);
         DECLARE_UNARCHIVE_ARRAY_BASE(size_t);
+        DECLARE_UNARCHIVE_ARRAY_BASE(int64_t);
+#ifdef __APPLE__
+        DECLARE_UNARCHIVE_ARRAY_BASE(uint64_t);
+#endif
         DECLARE_UNARCHIVE_ARRAY_BASE(float);
         DECLARE_UNARCHIVE_ARRAY_BASE(double);
         virtual void UnarchiveArray(const char* name, std::vector<std::string>& array) = 0;

@@ -68,7 +68,8 @@ int main(int argc, char* argv[])
         auto map = common::LoadMap(mapLoadArguments);
 
         // get data iterator
-        auto exampleIterator = GetExampleIterator(dataLoadArguments);
+        auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
+        auto exampleIterator = common::GetExampleIterator(stream);
 
         // get output stream
         auto& outputStream = dataSaveArguments.outputDataStream;

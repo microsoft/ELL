@@ -12,7 +12,7 @@ namespace ell
 {
 namespace trainers
 {
-    void SGDLinearTrainerBase::Update(const data::AnyDataset& anyDataset) // TODO: move to cpp file
+    void SGDLinearTrainerBase::Update(const data::AnyDataset& anyDataset)
     {
         // get example iterator
         auto exampleIterator = anyDataset.GetExampleIterator<data::AutoSupervisedExample>();

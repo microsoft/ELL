@@ -30,7 +30,6 @@
 // emitters
 #include "EmitterException.h"
 #include "EmitterTypes.h"
-#include "IRDiagnosticHandler.h"
 #include "IREmitter.h"
 #include "IRFunctionEmitter.h"
 #include "IRMapCompiler.h"
@@ -58,20 +57,16 @@
 namespace ell
 {
 
-std::string g_outputBasePath = "";
+std::string outputBasePath = "";
+
 void SetOutputPathBase(std::string path)
 {
-    g_outputBasePath = std::move(path);
+    outputBasePath = path;
 }
 
-std::string OutputPath(const char* pRelPath)
+std::string OutputPath(std::string relPath)
 {
-    return g_outputBasePath + pRelPath;
-}
-
-std::string OutputPath(const std::string& relPath)
-{
-    return g_outputBasePath + relPath;
+    return outputBasePath + relPath;
 }
 
 //
@@ -228,13 +223,14 @@ void TestCompiledMapMove()
     VerifyCompiledOutput(map, compiledMap2, signal, " moved compiled map");
 }
 
-typedef void (*FnInputOutput)(double*, double*);
+typedef void (*MapPredictFunction)(double*, double*);
+
 void TestBinaryVector(bool expanded, bool runJit)
 {
     std::vector<double> data = { 5, 10, 15, 20 };
     std::vector<double> data2 = { 4, 4, 4, 4 };
     const int c_InputSize = data.size();
-    const std::string c_ModelFnName = "TestBinaryVector";
+    const std::string modelFunctionName = "TestBinaryVector";
     ModelMaker mb;
 
     auto input1 = mb.Inputs<double>(c_InputSize);
@@ -247,34 +243,30 @@ void TestBinaryVector(bool expanded, bool runJit)
     model::MapCompilerParameters settings;
     settings.compilerSettings.unrollLoops = expanded;
     model::IRMapCompiler compiler(settings);
-    emitters::IRDiagnosticHandler handler(compiler.GetLLVMContext());
 
     model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", multiplyNode->output } } };
-    model::IRCompiledMap compiledMap = compiler.Compile(map, c_ModelFnName);
+    model::IRCompiledMap compiledMap = compiler.Compile(map, modelFunctionName);
 
     std::vector<double> testInput = { 1, 1, 1, 1 };
     std::vector<double> testOutput(testInput.size());
     PrintIR(compiledMap);
-    PrintDiagnostics(handler);
-
+    PrintDiagnostics(compiledMap.GetModule().GetDiagnosticHandler());
     if (runJit)
     {
         auto& jitter = compiledMap.GetJitter();
-        FnInputOutput fn = (FnInputOutput)jitter.ResolveFunctionAddress(c_ModelFnName);
-        fn(&testInput[0], testOutput.data());
+        auto predict = reinterpret_cast<MapPredictFunction>(jitter.ResolveFunctionAddress(modelFunctionName));
+        predict(&testInput[0], testOutput.data());
     }
     else
     {
-        auto fnMain = compiledMap.GetModule().AddMainDebug();
-
-        emitters::IRFunctionCallArguments args(fnMain);
-        args.Append(compiledMap.GetModule().Constant("c_data", testInput));
+        auto mainFunction = compiledMap.GetModule().AddMainDebug();
+        emitters::IRFunctionCallArguments args(mainFunction);
+        args.Append(compiledMap.GetModule().ConstantArray("c_data", testInput));
         auto* pResult = args.AppendOutput(emitters::VariableType::Double, testInput.size());
-        fnMain.Call(c_ModelFnName, args);
-        fnMain.PrintForEach("%f,", pResult, testInput.size());
-        fnMain.Return();
-        fnMain.Complete(true);
-
+        mainFunction.Call(modelFunctionName, args);
+        mainFunction.PrintForEach("%f,", pResult, testInput.size());
+        mainFunction.Return();
+        mainFunction.Complete(true);
         compiledMap.GetModule().WriteToFile(OutputPath(expanded ? "BinaryVector_E.asm" : "BinaryVector.asm"));
     }
 }
@@ -342,12 +334,11 @@ void TestSimpleSum(bool expanded, bool optimized)
     settings.compilerSettings.unrollLoops = expanded;
     settings.compilerSettings.optimize = optimized;
     model::IRMapCompiler compiler(settings);
-    emitters::IRDiagnosticHandler handler(compiler.GetLLVMContext());
 
     model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
-    PrintDiagnostics(handler);
+    PrintDiagnostics(compiledMap.GetModule().GetDiagnosticHandler());
 }
 
 void TestSum(bool expanded, bool optimized)
@@ -364,13 +355,12 @@ void TestSum(bool expanded, bool optimized)
     settings.compilerSettings.unrollLoops = expanded;
     settings.compilerSettings.optimize = optimized;
     model::IRMapCompiler compiler(settings);
-    emitters::IRDiagnosticHandler handler(compiler.GetLLVMContext());
     model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 
     // Print out any diagnostic messages
-    PrintDiagnostics(handler);
+    PrintDiagnostics(compiledMap.GetModule().GetDiagnosticHandler());
 }
 
 void TestAccumulator(bool expanded)
@@ -466,18 +456,18 @@ void TestSlidingAverage()
 
     auto& module = compiledMap.GetModule();
     module.DeclarePrintf();
-    auto fnMain = module.AddMain();
+    auto mainFunction = module.AddMain();
     std::vector<double> data = { 5, 10, 15, 20 };
-    llvm::Value* pData = module.Constant("c_data", data);
-    llvm::Value* pResult = fnMain.Variable(emitters::VariableType::Double, 1);
-    fnMain.Call("TestSlidingAverage", { fnMain.PointerOffset(pData, 0), fnMain.PointerOffset(pResult, 0) });
-    fnMain.PrintForEach("%f\n", pResult, 1);
-    fnMain.Call("TestSlidingAverage", { fnMain.PointerOffset(pData, 0), fnMain.PointerOffset(pResult, 0) });
-    fnMain.PrintForEach("%f\n", pResult, 1);
-    fnMain.Call("TestSlidingAverage", { fnMain.PointerOffset(pData, 0), fnMain.PointerOffset(pResult, 0) });
-    fnMain.PrintForEach("%f\n", pResult, 1);
-    fnMain.Return();
-    fnMain.Complete(true);
+    llvm::Value* pData = module.ConstantArray("c_data", data);
+    llvm::Value* pResult = mainFunction.Variable(emitters::VariableType::Double, 1);
+    mainFunction.Call("TestSlidingAverage", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
+    mainFunction.PrintForEach("%f\n", pResult, 1);
+    mainFunction.Call("TestSlidingAverage", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
+    mainFunction.PrintForEach("%f\n", pResult, 1);
+    mainFunction.Call("TestSlidingAverage", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
+    mainFunction.PrintForEach("%f\n", pResult, 1);
+    mainFunction.Return();
+    mainFunction.Complete(true);
 
     PrintIR(module);
     module.WriteToFile(OutputPath("avg.asm"));
@@ -499,14 +489,14 @@ void TestDotProductOutput()
     model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map, "TestDotProduct");
 
-    auto fnMain = compiledMap.GetModule().AddMainDebug();
-    emitters::IRFunctionCallArguments args(fnMain);
-    args.Append(compiledMap.GetModule().Constant("c_data", data));
+    auto mainFunction = compiledMap.GetModule().AddMainDebug();
+    emitters::IRFunctionCallArguments args(mainFunction);
+    args.Append(compiledMap.GetModule().ConstantArray("c_data", data));
     auto pResult = args.AppendOutput(emitters::VariableType::Double, 1);
-    fnMain.Call("TestDotProduct", args);
-    fnMain.PrintForEach("%f\n", pResult, 1);
-    fnMain.Return();
-    fnMain.Complete(true);
+    mainFunction.Call("TestDotProduct", args);
+    mainFunction.PrintForEach("%f\n", pResult, 1);
+    mainFunction.Return();
+    mainFunction.Complete(true);
 
     PrintIR(compiledMap);
     compiledMap.GetModule().WriteToFile(OutputPath("dot.asm"));
@@ -558,17 +548,17 @@ void TestLinearPredictor()
     auto& module = compiledMap.GetModule();
     module.DeclarePrintf();
 
-    auto fnMain = module.AddMain();
-    llvm::Value* pData = module.Constant("c_data", data);
+    auto mainFunction = module.AddMain();
+    llvm::Value* pData = module.ConstantArray("c_data", data);
 
-    llvm::Value* pResult1 = fnMain.Variable(emitters::VariableType::Double, 1);
-    llvm::Value* pResult2 = fnMain.Variable(emitters::VariableType::Double, 1);
-    fnMain.Call("TestLinear", { fnMain.PointerOffset(pData, 0), fnMain.PointerOffset(pResult1, 0), fnMain.PointerOffset(pResult2, 0) });
+    llvm::Value* pResult1 = mainFunction.Variable(emitters::VariableType::Double, 1);
+    llvm::Value* pResult2 = mainFunction.Variable(emitters::VariableType::Double, 1);
+    mainFunction.Call("TestLinear", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult1, 0), mainFunction.PointerOffset(pResult2, 0) });
 
-    fnMain.PrintForEach("%f\n", pResult1, 1);
-    fnMain.PrintForEach("%f\n", pResult2, 1);
-    fnMain.Return();
-    fnMain.Complete(true);
+    mainFunction.PrintForEach("%f\n", pResult1, 1);
+    mainFunction.PrintForEach("%f\n", pResult2, 1);
+    mainFunction.Return();
+    mainFunction.Complete(true);
 
     PrintIR(module);
     module.WriteToFile(OutputPath("linear.asm"));
@@ -589,12 +579,12 @@ void TestForest()
     auto& module = compiledMap.GetModule();
     module.DeclarePrintf();
 
-    auto fnMain = module.AddMain();
-    llvm::Value* pData = module.Constant("c_data", data);
+    auto mainFunction = module.AddMain();
+    llvm::Value* pData = module.ConstantArray("c_data", data);
     llvm::Value* pResult = nullptr;
     auto args = module.GetFunction("TestForest")->args();
     emitters::IRValueList callArgs;
-    callArgs.push_back(fnMain.PointerOffset(pData, 0));
+    callArgs.push_back(mainFunction.PointerOffset(pData, 0));
     size_t i = 0;
     for (auto& arg : args)
     {
@@ -604,25 +594,25 @@ void TestForest()
             llvm::Value* pArg = nullptr;
             if (pResult == nullptr)
             {
-                pArg = fnMain.Variable(emitters::VariableType::Double, 1);
+                pArg = mainFunction.Variable(emitters::VariableType::Double, 1);
                 pResult = pArg;
             }
             else
             {
-                pArg = fnMain.Variable(emitters::VariableType::Int32, 1);
+                pArg = mainFunction.Variable(emitters::VariableType::Int32, 1);
             }
-            callArgs.push_back(fnMain.PointerOffset(pArg, 0));
+            callArgs.push_back(mainFunction.PointerOffset(pArg, 0));
         }
         ++i;
     }
-    //fnMain.Call("TestForest", { fnMain.PointerOffset(pData, 0), fnMain.PointerOffset(pResult, 0) });
-    fnMain.Print("Calling TestForest\n");
-    fnMain.Call("TestForest", callArgs);
-    fnMain.Print("Done Calling TestForest\n");
+    //mainFunction.Call("TestForest", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
+    mainFunction.Print("Calling TestForest\n");
+    mainFunction.Call("TestForest", callArgs);
+    mainFunction.Print("Done Calling TestForest\n");
 
-    fnMain.PrintForEach("%f\n", pResult, 1);
-    fnMain.Return();
-    fnMain.Verify();
+    mainFunction.PrintForEach("%f\n", pResult, 1);
+    mainFunction.Return();
+    mainFunction.Verify();
 
     PrintIR(compiledMap);
     compiledMap.GetModule().WriteToFile(OutputPath("forest.asm"));
@@ -645,12 +635,12 @@ void TestForestMap()
     auto& module = compiledMap.GetModule();
     module.DeclarePrintf();
 
-    auto fnMain = module.AddMain();
-    llvm::Value* pData = module.Constant("c_data", data);
+    auto mainFunction = module.AddMain();
+    llvm::Value* pData = module.ConstantArray("c_data", data);
     llvm::Value* pResult = nullptr;
     auto args = module.GetFunction("TestForest")->args();
     emitters::IRValueList callArgs;
-    callArgs.push_back(fnMain.PointerOffset(pData, 0));
+    callArgs.push_back(mainFunction.PointerOffset(pData, 0));
     size_t i = 0;
     for (auto& arg : args)
     {
@@ -660,26 +650,26 @@ void TestForestMap()
             llvm::Value* pArg = nullptr;
             if (pResult == nullptr)
             {
-                pArg = fnMain.Variable(emitters::VariableType::Double, 1);
+                pArg = mainFunction.Variable(emitters::VariableType::Double, 1);
                 pResult = pArg;
             }
             else
             {
-                pArg = fnMain.Variable(emitters::VariableType::Int32, 1);
+                pArg = mainFunction.Variable(emitters::VariableType::Int32, 1);
             }
-            callArgs.push_back(fnMain.PointerOffset(pArg, 0));
+            callArgs.push_back(mainFunction.PointerOffset(pArg, 0));
         }
         ++i;
     }
 
-    //fnMain.Call("TestForest", { fnMain.PointerOffset(pData, 0), fnMain.PointerOffset(pResult, 0) });
-    fnMain.Print("Calling TestForest\n");
-    fnMain.Call("TestForest", callArgs);
-    fnMain.Print("Done Calling TestForest\n");
+    //mainFunction.Call("TestForest", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
+    mainFunction.Print("Calling TestForest\n");
+    mainFunction.Call("TestForest", callArgs);
+    mainFunction.Print("Done Calling TestForest\n");
 
-    fnMain.PrintForEach("%f\n", pResult, 1);
-    fnMain.Return();
-    fnMain.Verify();
+    mainFunction.PrintForEach("%f\n", pResult, 1);
+    mainFunction.Return();
+    mainFunction.Verify();
 
     PrintIR(compiledMap);
     compiledMap.GetModule().WriteToFile(OutputPath("forest_map.asm"));
@@ -690,6 +680,7 @@ bool SteppableMap_DataCallback(std::vector<double>& input)
 {
     return g_steppableMapCallbackTester.InputCallback(input);
 }
+
 InputCallbackTester<double> g_compiledSteppableMapCallbackTester;
 extern "C" {
 bool CompiledSteppableMap_DataCallback(double* input)
@@ -697,8 +688,9 @@ bool CompiledSteppableMap_DataCallback(double* input)
     return g_compiledSteppableMapCallbackTester.InputCallback(input);
 }
 }
+
 template <typename ClockType>
-void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicksFn)
+void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicksFunction)
 {
     const std::string callbackFunctionName("CompiledSteppableMap_DataCallback");
     const std::string stepFunctionName("TestStep");
@@ -722,7 +714,7 @@ void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicks
 
     if (runJit)
     {
-        auto ticks = getTicksFn();
+        auto ticks = getTicksFunction();
         std::cout << "Millisecond ticks: " << ticks << std::endl;
 
         std::vector<std::vector<double>> data{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
@@ -737,28 +729,28 @@ void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicks
     {
         // Generate the callback that will be invoked by our model
         emitters::NamedVariableTypeList callbackArgList = { { "inputVector", emitters::VariableType::DoublePointer } };
-        auto fnCallback = compiledMap.GetModule().Function(callbackFunctionName, emitters::VariableType::Byte, callbackArgList);
-        auto arguments = fnCallback.Arguments().begin();
+        auto callbackFunction = compiledMap.GetModule().BeginFunction(callbackFunctionName, emitters::VariableType::Byte, callbackArgList);
+        auto arguments = callbackFunction.Arguments().begin();
         llvm::Argument& inputVector = *arguments;
 
         std::vector<double> data{ 5, 10, 15 };
-        fnCallback.template MemoryCopy<double>(compiledMap.GetModule().Constant("c_data", data), 0, &inputVector, 0, data.size());
-        fnCallback.Return(fnCallback.Literal(true));
-        fnCallback.Complete(true);
+        callbackFunction.template MemoryCopy<double>(compiledMap.GetModule().ConstantArray("c_data", data), 0, &inputVector, 0, data.size());
+        callbackFunction.Return(callbackFunction.Literal(true));
+        compiledMap.GetModule().EndFunction();
 
         // Generate a Main method to invoke our model
-        auto fnMain = compiledMap.GetModule().AddMainDebug();
-        emitters::IRFunctionCallArguments args(fnMain);
+        auto mainFunction = compiledMap.GetModule().AddMainDebug();
+        emitters::IRFunctionCallArguments args(mainFunction);
 
         // Time signal input to the model (currently unused because map internally generates a signal)
         std::vector<model::TimeTickType> timeSignal{ 0, 0 }; // TODO: IRModuleEmitter::Constant() crashes with int vectors
-        args.Append(compiledMap.GetModule().Constant("c_timeSignal", timeSignal));
+        args.Append(compiledMap.GetModule().ConstantArray("c_timeSignal", timeSignal));
         auto pResult = args.AppendOutput(emitters::VariableType::Double, 3);
 
-        fnMain.Call(stepFunctionName, args);
-        fnMain.PrintForEach("%f\n", pResult, 1);
-        fnMain.Return();
-        fnMain.Complete(true);
+        mainFunction.Call(stepFunctionName, args);
+        mainFunction.PrintForEach("%f\n", pResult, 1);
+        mainFunction.Return();
+        mainFunction.Complete(true);
 
         PrintIR(compiledMap);
         compiledMap.GetModule().WriteToFile(OutputPath("step.asm"));

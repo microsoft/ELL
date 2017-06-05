@@ -223,6 +223,20 @@ namespace math
         return std::sqrt(v.Aggregate([](ElementType x) { return x * x; }));
     }
 
+    template <typename ElementType, MatrixLayout layout>
+    void OperationsImplementation<ImplementationType::native>::ColumnWiseSum(ConstMatrixReference<ElementType, layout> M, VectorReference<ElementType, VectorOrientation::row> u)
+    {
+        if (u.Size() != M.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible result size.");
+        }
+
+        math::RowVector<ElementType> ones(M.NumRows());
+        ones.Fill(1.0);
+
+        DerivedOperations::Multiply(static_cast<ElementType>(1), ones, M, static_cast<ElementType>(0), u);
+    }
+
     template <typename ElementType, VectorOrientation orientation>
     void OperationsImplementation<ImplementationType::native>::Add(ElementType s, ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u)
     {
@@ -333,6 +347,20 @@ namespace math
     ElementType OperationsImplementation<ImplementationType::openBlas>::Norm2(UnorientedConstVectorReference<ElementType> v)
     {
         return Blas::Nrm2(static_cast<int>(v.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
+    }
+
+    template <typename ElementType, MatrixLayout layout>
+    void OperationsImplementation<ImplementationType::openBlas>::ColumnWiseSum(ConstMatrixReference<ElementType, layout> M, VectorReference<ElementType, VectorOrientation::row> u)
+    {
+        if (u.Size() != M.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible result size.");
+        }
+
+        math::RowVector<ElementType> ones(M.NumRows());
+        ones.Fill(1.0);
+
+        DerivedOperations::Multiply(static_cast<ElementType>(1), ones, M, static_cast<ElementType>(0), u);
     }
 
     template <typename ElementType, VectorOrientation orientation>

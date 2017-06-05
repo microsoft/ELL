@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     TransformedConstVectorReference.tcc (math)
 //  Authors:  Ofer Dekel
 //

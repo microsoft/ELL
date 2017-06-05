@@ -28,19 +28,19 @@ namespace utilities
     // myexe.exe file1.tsv file2.tsv
     // myexe.exe -t 8 -x someString file1.tsv file2.tsv
     template <typename T, typename U>
-    void CommandLineParser::AddOption(T& option, std::string name, std::string shortName, std::string description, const U& defaultValue)
+    void CommandLineParser::AddOption(T& option, std::string name, std::string shortName, std::string description, const U& defaultValue, std::string emptyValueString)
     {
         auto callback = [&option, this](std::string optionVal) {
             bool didParse = ParseVal<T>(optionVal, option);
             return didParse;
         };
 
-        OptionInfo info(name, shortName, description, ToString(defaultValue), callback);
+        OptionInfo info(name, shortName, description, ToString(defaultValue), emptyValueString, callback);
         AddOption(info);
     }
 
     template <typename T>
-    void CommandLineParser::AddOption(T& option, std::string name, std::string shortName, std::string description, std::initializer_list<std::pair<std::string, T>> enumValues, std::string defaultValue)
+    void CommandLineParser::AddOption(T& option, std::string name, std::string shortName, std::string description, std::initializer_list<std::pair<std::string, T>> enumValues, std::string defaultValue, std::string emptyValueString)
     {
         // transform initializer list into useful things that will stick around
         std::vector<std::string> valueNameStrings;
@@ -66,7 +66,7 @@ namespace utilities
             }
         };
 
-        OptionInfo info(name, shortName, description, defaultValue, callback);
+        OptionInfo info(name, shortName, description, defaultValue, emptyValueString, callback);
         info.enumValues = valueNameStrings;
         AddOption(info);
     }

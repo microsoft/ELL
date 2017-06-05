@@ -223,7 +223,7 @@ namespace math
         /// <param name="tolerance"> The element comparison tolerance. </param>
         ///
         /// <returns> true if the two matrices are equivalent. </returns>
-        bool IsEqual(ConstMatrixReference<ElementType, layout> other, ElementType tolerance = 1.0e-8) const;
+        bool IsEqual(ConstMatrixReference<ElementType, layout> other, ElementType tolerance = static_cast<ElementType>(1.0e-8)) const;
 
         /// <summary> Determines if two matrices with opposite layouts are equal. </summary>
         ///
@@ -231,7 +231,7 @@ namespace math
         /// <param name="tolerance"> The element comparison tolerance. </param>
         ///
         /// <returns> true if the two matrices are equivalent. </returns>
-        bool IsEqual(ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value> other, ElementType tolerance = 1.0e-8) const;
+        bool IsEqual(ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value> other, ElementType tolerance = static_cast<ElementType>(1.0e-8)) const;
 
         /// <summary> Equality operator for matrices with the same layout. </summary>
         ///

@@ -57,6 +57,16 @@ namespace emitters
         return If(comparison, pValue, pTestValue);
     }
 
+    llvm::BasicBlock* IRIfEmitter::If(llvm::Value* pValue)
+    {
+        EndPrev();
+        PrepareBlocks();
+        _functionEmitter.SetCurrentBlock(_pConditionBlock);
+        _functionEmitter.Branch(pValue, _pThenBlock, _pEndBlock);
+        _functionEmitter.SetCurrentBlock(_pThenBlock);
+        return _pThenBlock;
+    }
+
     llvm::BasicBlock* IRIfEmitter::If(llvm::Value* pValue, bool testValue)
     {
         EndPrev();
