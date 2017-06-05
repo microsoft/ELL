@@ -112,7 +112,7 @@ namespace predictors
         /// <param name="inputVector"> The data vector. </param>
         ///
         /// <returns> The predicted label. </returns>
-        double Predict(const DataVectorType& inputVector) const;
+        size_t Predict(const DataVectorType& inputVector) const;
 
         /// <summary> Resets the projection predictor to the zero projection matrix. </summary>
         void Reset();
