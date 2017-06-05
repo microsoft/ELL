@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 
         // load map
         mapLoadArguments.defaultInputSize = dataLoadArguments.parsedDataDimension;
-        model::DynamicMap map = common::LoadMap(mapLoadArguments);
+        auto map = common::LoadMap(mapLoadArguments);
 
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;

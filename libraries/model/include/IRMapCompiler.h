@@ -106,6 +106,9 @@ namespace model
         /// <returns> The `IRBlockRegion` that computes `element` if that block is mergeable, `nullptr` otherwise. </returns>
         emitters::IRBlockRegion* GetMergeableNodeRegion(const model::PortElementBase& element);
 
+        /// <summary> Get the LLVM context for this compiler </summary>
+        ///
+        /// <returns> A reference to the LLVM context. </returns>
         llvm::LLVMContext& GetLLVMContext();
 
     protected:

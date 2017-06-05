@@ -274,5 +274,71 @@ namespace data
             indexValueIterator.Next();
         }
     }
+
+    template <typename DataVectorType, IterationPolicy policy, typename TransformationType>
+    static void AddTransformedTo(const DataVectorType& dataVector, math::RowVectorReference<double> vector, TransformationType transformation)
+    {
+        return dataVector.template AddTransformedTo<policy, TransformationType>(vector, transformation);
+    }
+
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(DataVectorType& vector)
+    {
+        return vector.template GetIterator<policy>();
+    }
+
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(const DataVectorType& vector)
+    {
+        return vector.template GetIterator<policy>();
+    }
+
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(DataVectorType& vector, size_t size)
+    {
+        return vector.template GetIterator<policy>(size);
+    }
+
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(const DataVectorType& vector, size_t size)
+    {
+        return vector.template GetIterator<policy>(size);
+    }
+
+    template <typename DataVectorType, typename ReturnType>
+    static ReturnType CopyAs(DataVectorType& vector)
+    {
+        return vector.template CopyAs<ReturnType>();
+    }
+
+    template <typename DataVectorType, typename ReturnType>
+    static ReturnType CopyAs(const DataVectorType& vector)
+    {
+        return vector.template CopyAs<ReturnType>();
+    }
+
+    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
+    static ReturnType TransformAs(DataVectorType& vector, TransformationType transformation, size_t size)
+    {
+        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation, size);
+    }
+
+    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
+    static ReturnType TransformAs(const DataVectorType& vector, TransformationType transformation, size_t size)
+    {
+        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation, size);
+    }
+
+    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
+    static ReturnType TransformAs(DataVectorType& vector, TransformationType transformation)
+    {
+        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation);
+    }
+
+    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
+    static ReturnType TransformAs(const DataVectorType& vector, TransformationType transformation)
+    {
+        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation);
+    }
 }
 }

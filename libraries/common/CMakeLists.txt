@@ -44,6 +44,7 @@ set (include
 set (tcc 
   tcc/AppendNodeToModel.tcc
   tcc/DataLoaders.tcc
+  tcc/LoadModel.tcc
   tcc/MakeEvaluator.tcc
   tcc/ParametersEnumerator.tcc
 )

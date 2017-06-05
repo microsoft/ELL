@@ -1,0 +1,75 @@
+{
+  "_type": "SteppableMap<std::chrono::steady_clock>",
+  "model": {
+    "_type": "Model",
+    "nodes": [
+    {
+      "_type": "InputNode<double>",
+      "id":       "1740",
+      "size": 2
+    }, 
+    {
+      "_type": "SourceNode<double>",
+      "id":       "1741",
+      "input": {
+        "_type": "InputPort<double>",
+        "nodeId":         "1741",
+        "name": "input",
+        "type": 1,
+        "input":         "1740.output[0:2]"
+      },
+      "output": {
+        "_type": "OutputPort<double>",
+        "nodeId":         "1741",
+        "name": "output",
+        "type": 1,
+        "size": 10
+      },
+      "outputSize": 10,
+      "samplingFunctionName": "SteppableMap_10_50_DataCallback"
+    }, 
+    {
+      "_type": "ConstantNode<double>",
+      "id":       "1742",
+      "values": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+    }, 
+    {
+      "_type": "BinaryOperationNode<double>",
+      "id":       "1743",
+      "input1": {
+        "_type": "InputPort<double>",
+        "nodeId":         "1743",
+        "name": "input1",
+        "type": 1,
+        "input":         "1741.output[0:10]"
+      },
+      "input2": {
+        "_type": "InputPort<double>",
+        "nodeId":         "1743",
+        "name": "input2",
+        "type": 1,
+        "input":         "1742.output[0:10]"
+      },
+      "operation": "coordinatewiseMultiply"
+    }, 
+    {
+      "_type": "OutputNode<double>",
+      "id":       "1744",
+      "input": {
+        "_type": "InputPort<double>",
+        "nodeId":         "1744",
+        "name": "input",
+        "type": 1,
+        "input":         "1743.output[0:10]"
+      }
+    }]
+  },
+  "inputNames": ["input"],
+  "inputIds": [
+    "1740"],
+  "outputNames": ["output"],
+  "outputElements": [
+    "1744.output[0:10]"],
+  "interval": 50,
+  "lastSampleTime": -9.22337e+12
+}
