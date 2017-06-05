@@ -32,18 +32,18 @@ namespace trainers
         /// <summary> Constructs an instance of KMeansTrainer trainer </summary>
         ///
         /// <param name="dimension"> The input dimension. </param>
-        /// <param name="K"> The number of clusters. </param>
+        /// <param name="numClusters"> The number of clusters. </param>
         /// <param name="iterations"> The number of iterations. </param>
         ///
-        KMeansTrainer(size_t dimension, size_t K, size_t iterations);
+        KMeansTrainer(size_t dimension, size_t numClusters, size_t iterations);
 
         /// <summary> Constructs an instance of KMeansTrainer trainer </summary>
         ///
-        /// <param name="K"> The number of clusters. </param>
+        /// <param name="numClusters"> The number of clusters. </param>
         /// <param name="iterations"> The number of iterations. </param>
         /// <param name="means"> The cluster means. </param>
         ///
-        KMeansTrainer(size_t K, size_t iters, math::ColumnMatrix<double> means);
+        KMeansTrainer(size_t numClusters, size_t iters, math::ColumnMatrix<double> means);
 
         /// <summary> Runs the KMeansTrainer algorithm. </summary>
         ///

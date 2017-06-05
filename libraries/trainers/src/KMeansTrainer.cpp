@@ -17,9 +17,9 @@ namespace ell
 {
 namespace trainers
 {
-    KMeansTrainer::KMeansTrainer(size_t dim, size_t K, size_t iterations) : _means(dim, K), _numClusters(K), _iterations(iterations), _isInitialized(false) {	}
+    KMeansTrainer::KMeansTrainer(size_t dim, size_t numClusters, size_t iterations) : _means(dim, numClusters), _numClusters(numClusters), _iterations(iterations), _isInitialized(false) {	}
 
-    KMeansTrainer::KMeansTrainer(size_t K, size_t iters, math::ColumnMatrix<double> means) : _numClusters(K), _iterations(iters), _means(means), _isInitialized(true) {	}
+    KMeansTrainer::KMeansTrainer(size_t numClusters, size_t iters, math::ColumnMatrix<double> means) : _numClusters(numClusters), _iterations(iters), _means(means), _isInitialized(true) {	}
 
     void KMeansTrainer::RunKMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X)
     {
