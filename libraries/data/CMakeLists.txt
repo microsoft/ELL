@@ -6,6 +6,7 @@ set (library_name data)
 
 set (src src/Dataset.cpp
          src/DataVector.cpp
+         src/DataVectorOperations.cpp
          src/GeneralizedSparseParsingIterator.cpp
          src/SequentialLineIterator.cpp
          src/TextLine.cpp
@@ -14,7 +15,7 @@ set (src src/Dataset.cpp
 set (include include/AutoDataVector.h
              include/Dataset.h
              include/DataVector.h
-             include/DataVectorTransformations.h
+             include/DataVectorOperations.h
              include/DenseDataVector.h
              include/Example.h
              include/ExampleIterator.h
@@ -33,7 +34,7 @@ set (include include/AutoDataVector.h
 
 set (tcc tcc/AutoDataVector.tcc
          tcc/DataVector.tcc
-         tcc/DataVectorTransformations.tcc
+         tcc/DataVectorOperations.tcc
          tcc/DenseDataVector.tcc
          tcc/Example.tcc
          tcc/ExampleIterator.tcc

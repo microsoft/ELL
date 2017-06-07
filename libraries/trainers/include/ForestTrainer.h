@@ -124,10 +124,13 @@ namespace trainers
         /// <param name="parameters"> Training Parameters. </param>
         ForestTrainer(const BoosterType& booster, const ForestTrainerParameters& parameters);
 
-        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
+        /// <summary> Sets the trainer's dataset. </summary>
         ///
         /// <param name="anyDataset"> A dataset. </param>
-        virtual void Update(const data::AnyDataset& anyDataset) override;
+        virtual void SetDataset(const data::AnyDataset& anyDataset) override;
+
+        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
+        virtual void Update() override;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
@@ -166,9 +169,6 @@ namespace trainers
         //
         // private member functions
         //
-
-        // initializes weak weights and labels, as well as currentOutput
-        void InitializeMetadata();
 
         // performs an epoch of splits
         void PerformSplits(size_t maxSplits);

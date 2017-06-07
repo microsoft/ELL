@@ -16,10 +16,5 @@ namespace data
     {
         dataVector.AddTo(vector);
     }
-
-    double operator*(const IDataVector& dataVector, math::ColumnConstVectorReference<double> vector)
-    {
-        return dataVector.Dot(vector);
-    }
 }
 }

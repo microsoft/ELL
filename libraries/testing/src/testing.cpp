@@ -141,15 +141,9 @@ namespace testing
 
     void ProcessTest(const std::string& testDescription, bool success)
     {
-        std::cout << testDescription << " ... ";
-
-        if (success)
+        if (!success)
         {
-            std::cout << "Passed\n";
-        }
-        else
-        {
-            std::cout << "Failed\n";
+            std::cout << testDescription << " ... Failed\n";
             testFailedFlag = true;
         }
     }

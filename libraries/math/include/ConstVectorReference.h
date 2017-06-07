@@ -71,6 +71,11 @@ namespace math
         /// <returns> The norm. </returns>
         ElementType Norm2() const;
 
+        /// <summary> Computes the squared 2-norm of the vector </summary>
+        ///
+        /// <returns> The squared norm. </returns>
+        ElementType Norm2Squared() const; 
+
         /// <summary> Convert this vector into an array. </summary>
         ///
         /// <returns> An array that represents the data in this object. </returns>

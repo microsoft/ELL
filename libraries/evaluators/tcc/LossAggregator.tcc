@@ -19,7 +19,7 @@ namespace evaluators
     template <typename LossFunctionType>
     void LossAggregator<LossFunctionType>::Update(double prediction, double label, double weight)
     {
-        double loss = _lossFunction.Evaluate(prediction, label);
+        double loss = _lossFunction(prediction, label);
         _sumWeights += weight;
         _sumWeightedLosses += weight * loss;
     }

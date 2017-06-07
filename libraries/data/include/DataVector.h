@@ -68,10 +68,10 @@ namespace data
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
         virtual size_t PrefixLength() const = 0;
 
-        /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
+        /// <summary> Computes the squared 2-norm of the vector. </summary>
         ///
-        /// <returns> The vector 2-norm. </returns>
-        virtual double Norm2() const = 0;
+        /// <returns> The squared 2-norm of the vector. </returns>
+        virtual double Norm2Squared() const = 0;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
@@ -162,14 +162,6 @@ namespace data
     /// <param name="scaledDataVector"> The DataVector being added to the vector. </param>
     void operator+=(math::RowVectorReference<double> vector, const IDataVector& dataVector);
 
-    /// <summary> Calculates the dot product of a DataVector and a math::ColumnVector. </summary>
-    ///
-    /// <param name="dataVector"> The DataVector. </param>
-    /// <param name="vector"> The math::ColumnVector. </param>
-    ///
-    /// <returns> The result of the operation. </returns>
-    double operator*(const IDataVector& dataVector, math::ColumnConstVectorReference<double> vector);
-
     /// <summary>
     /// Base class for some of the data vector classes. This class uses a curiously recurring
     /// template pattern to significantly reduce code duplication in the derived classes.
@@ -207,10 +199,10 @@ namespace data
         /// <param name="list"> The vector. </param>
         void AppendElements(std::vector<double> vec);
 
-        /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
+        /// <summary> Computes the 2-norm of the vector. </summary>
         ///
-        /// <returns> The vector 2-norm. </returns>
-        virtual double Norm2() const override;
+        /// <returns> The squared 2-norm of the vector. </returns>
+        virtual double Norm2Squared() const override;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///

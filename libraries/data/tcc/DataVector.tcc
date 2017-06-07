@@ -11,9 +11,6 @@
 #include "SparseDataVector.h"
 #include "TransformingIndexValueIterator.h"
 
-//stl
-#include <cmath>
-
 namespace ell
 {
 namespace data
@@ -143,7 +140,7 @@ namespace data
     }
 
     template <class DerivedType>
-    double DataVectorBase<DerivedType>::Norm2() const
+    double DataVectorBase<DerivedType>::Norm2Squared() const
     {
         auto iter = GetIterator<DerivedType, IterationPolicy::skipZeros>(*static_cast<const DerivedType*>(this));
 
@@ -154,7 +151,7 @@ namespace data
             result += value * value;
             iter.Next();
         }
-        return std::sqrt(result);
+        return result;
     }
 
     template <class DerivedType>

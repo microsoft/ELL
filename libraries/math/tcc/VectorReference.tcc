@@ -8,6 +8,7 @@
 
 // utilities
 #include "Debug.h"
+#include "Exception.h"
 
 // stl
 #include <algorithm> // for std::generate

@@ -30,10 +30,13 @@ namespace trainers
     public:
         virtual ~ITrainer() = default;
 
-        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
+        /// <summary> Sets the trainer's dataset. </summary>
         ///
         /// <param name="anyDataset"> A dataset. </param>
-        virtual void Update(const data::AnyDataset& anyDataset) = 0;
+        virtual void SetDataset(const data::AnyDataset& anyDataset) = 0;
+
+        /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
+        virtual void Update() = 0;
 
         /// <summary> Gets a const reference to the current predictor. </summary>
         ///
