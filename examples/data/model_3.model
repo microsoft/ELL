@@ -13,7 +13,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1048",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1047.output"
     },
     "windowSize": 16
@@ -25,14 +25,14 @@
       "_type": "InputPort<double>",
       "nodeId":       "1049",
       "name": "input1",
-      "type": 1,
+      "type": 2,
       "input":       "1047.output"
     },
     "input2": {
       "_type": "InputPort<double>",
       "nodeId":       "1049",
       "name": "input2",
-      "type": 1,
+      "type": 2,
       "input":       "1048.output"
     },
     "operation": "subtract"
@@ -44,7 +44,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1050",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1049.output"
     },
     "windowSize": 4
@@ -56,14 +56,14 @@
       "_type": "InputPort<double>",
       "nodeId":       "1052",
       "name": "input1",
-      "type": 1,
+      "type": 2,
       "input":       "1049.output"
     },
     "input2": {
       "_type": "InputPort<double>",
       "nodeId":       "1052",
       "name": "input2",
-      "type": 1,
+      "type": 2,
       "input":       "1050.output"
     }
   }, 
@@ -74,7 +74,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1051",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1049.output"
     },
     "windowSize": 8
@@ -86,14 +86,14 @@
       "_type": "InputPort<double>",
       "nodeId":       "1053",
       "name": "input1",
-      "type": 1,
+      "type": 2,
       "input":       "1049.output"
     },
     "input2": {
       "_type": "InputPort<double>",
       "nodeId":       "1053",
       "name": "input2",
-      "type": 1,
+      "type": 2,
       "input":       "1051.output"
     }
   }, 
@@ -104,14 +104,14 @@
       "_type": "InputPort<double>",
       "nodeId":       "1054",
       "name": "input1",
-      "type": 1,
+      "type": 2,
       "input":       "1052.output"
     },
     "input2": {
       "_type": "InputPort<double>",
       "nodeId":       "1054",
       "name": "input2",
-      "type": 1,
+      "type": 2,
       "input":       "1053.output"
     },
     "operation": "subtract"

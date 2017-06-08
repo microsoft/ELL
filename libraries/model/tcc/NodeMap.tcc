@@ -10,10 +10,10 @@ namespace ell
 {
 namespace model
 {
-    template <typename T, T Default>
-    T NodeMap<T, Default>::Get(const model::Node& node) const
+    template <typename T, T defaultValue>
+    T NodeMap<T, defaultValue>::Get(const model::Node& node) const
     {
-        T value = Default;
+        T value = defaultValue;
         auto search = _map.find(node.GetId());
         if (search != _map.end())
         {
@@ -22,20 +22,20 @@ namespace model
         return value;
     }
 
-    template <typename T, T Default>
-    void NodeMap<T, Default>::Set(const model::Node& node, T value)
+    template <typename T, T defaultValue>
+    void NodeMap<T, defaultValue>::Set(const model::Node& node, T value)
     {
         _map[node.GetId()] = value;
     }
 
-    template <typename T, T Default>
-    bool NodeMap<T, Default>::Contains(const model::Node& node) const
+    template <typename T, T defaultValue>
+    bool NodeMap<T, defaultValue>::Contains(const model::Node& node) const
     {
         return (Get(node) != nullptr);
     }
 
-    template <typename T, T Default>
-    void NodeMap<T, Default>::Remove(const model::Node& node)
+    template <typename T, T defaultValue>
+    void NodeMap<T, defaultValue>::Remove(const model::Node& node)
     {
         auto search = _map.find(node.GetId());
         if (search != _map.end())
@@ -44,8 +44,8 @@ namespace model
         }
     }
 
-    template <typename T, T Default>
-    void NodeMap<T, Default>::Clear()
+    template <typename T, T defaultValue>
+    void NodeMap<T, defaultValue>::Clear()
     {
         _map.clear();
     }

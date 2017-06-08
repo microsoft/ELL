@@ -15,7 +15,6 @@ set (src
   src/MapSaveArguments.cpp
   src/ModelLoadArguments.cpp
   src/ModelSaveArguments.cpp
-  src/MultiEpochIncrementalTrainerArguments.cpp
   src/ForestTrainerArguments.cpp
   src/RegisterNodeCreators.cpp
   src/TrainerArguments.cpp
@@ -34,7 +33,6 @@ set (include
   include/MapSaveArguments.h
   include/ModelLoadArguments.h
   include/ModelSaveArguments.h
-  include/MultiEpochIncrementalTrainerArguments.h
   include/ParametersEnumerator.h
   include/RegisterNodeCreators.h
   include/ForestTrainerArguments.h
@@ -44,6 +42,7 @@ set (include
 set (tcc 
   tcc/AppendNodeToModel.tcc
   tcc/DataLoaders.tcc
+  tcc/LoadModel.tcc
   tcc/MakeEvaluator.tcc
   tcc/ParametersEnumerator.tcc
 )
@@ -57,7 +56,7 @@ target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
-target_link_libraries(${library_name} data utilities lossFunctions model nodes predictors evaluators trainers)
+target_link_libraries(${library_name} data utilities functions model nodes predictors evaluators trainers)
 # add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
@@ -90,7 +89,7 @@ source_group("include" FILES ${test_include})
 
 add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} common data testing utilities lossFunctions predictors trainers model nodes)
+target_link_libraries(${test_name} common data testing utilities functions predictors trainers model nodes)
 copy_shared_libraries(${test_name})
 # add_precompiled_header(${test_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 

@@ -54,8 +54,7 @@
 #include <string>
 #include <vector>
 
-namespace ell
-{
+using namespace ell;
 
 std::string outputBasePath = "";
 
@@ -83,64 +82,6 @@ model::DynamicMap MakeSimpleMap()
     return model::DynamicMap{ model, { { "input", inputNode } }, { { "output", sumNode->output } } };
 }
 
-model::DynamicMap MakeUnrefinedForestMap()
-{
-    // define some abbreviations
-    using SplitAction = predictors::SimpleForestPredictor::SplitAction;
-    using SplitRule = predictors::SingleElementThresholdPredictor;
-    using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
-
-    // build a forest
-    predictors::SimpleForestPredictor forest;
-    auto root = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 } });
-    auto child1 = forest.Split(SplitAction{ forest.GetChildId(root, 0), SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 } });
-    forest.Split(SplitAction{ forest.GetChildId(child1, 0), SplitRule{ 1, 0.4 }, EdgePredictorVector{ -2.1, 2.1 } });
-    forest.Split(SplitAction{ forest.GetChildId(child1, 1), SplitRule{ 1, 0.7 }, EdgePredictorVector{ -2.2, 2.2 } });
-    forest.Split(SplitAction{ forest.GetChildId(root, 1), SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 } });
-
-    auto root2 = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 } });
-    forest.Split(SplitAction{ forest.GetChildId(root2, 0), SplitRule{ 1, 0.21 }, EdgePredictorVector{ -3.1, 3.1 } });
-    forest.Split(SplitAction{ forest.GetChildId(root2, 1), SplitRule{ 1, 0.22 }, EdgePredictorVector{ -3.2, 3.2 } });
-
-    // build the model
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto simpleForestNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
-
-    return { model, { { "input", inputNode } }, { { "output", simpleForestNode->output } } };
-}
-
-model::Model MakeForestModel()
-{
-    // define some abbreviations
-    using SplitAction = predictors::SimpleForestPredictor::SplitAction;
-    using SplitRule = predictors::SingleElementThresholdPredictor;
-    using EdgePredictorVector = std::vector<predictors::ConstantPredictor>;
-
-    // build a forest
-    predictors::SimpleForestPredictor forest;
-    auto root = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.3 }, EdgePredictorVector{ -1.0, 1.0 } });
-    auto child1 = forest.Split(SplitAction{ forest.GetChildId(root, 0), SplitRule{ 1, 0.6 }, EdgePredictorVector{ -2.0, 2.0 } });
-    forest.Split(SplitAction{ forest.GetChildId(child1, 0), SplitRule{ 1, 0.4 }, EdgePredictorVector{ -2.1, 2.1 } });
-    forest.Split(SplitAction{ forest.GetChildId(child1, 1), SplitRule{ 1, 0.7 }, EdgePredictorVector{ -2.2, 2.2 } });
-    forest.Split(SplitAction{ forest.GetChildId(root, 1), SplitRule{ 2, 0.9 }, EdgePredictorVector{ -4.0, 4.0 } });
-
-    auto root2 = forest.Split(SplitAction{ forest.GetNewRootId(), SplitRule{ 0, 0.2 }, EdgePredictorVector{ -3.0, 3.0 } });
-    forest.Split(SplitAction{ forest.GetChildId(root2, 0), SplitRule{ 1, 0.21 }, EdgePredictorVector{ -3.1, 3.1 } });
-    forest.Split(SplitAction{ forest.GetChildId(root2, 1), SplitRule{ 1, 0.22 }, EdgePredictorVector{ -3.2, 3.2 } });
-
-    // build the model
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
-
-    // refine
-    model::TransformContext context;
-    model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
-    return refinedModel;
-}
-
 model::DynamicMap MakeForestMap()
 {
     // define some abbreviations
@@ -165,11 +106,6 @@ model::DynamicMap MakeForestMap()
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto forestNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
 
-    // refine
-    model::TransformContext context;
-    model::ModelTransformer transformer;
-    auto refinedModel = transformer.RefineModel(model, context);
-
     return { model, { { "input", inputNode } }, { { "output", forestNode->output } } };
 }
 
@@ -191,12 +127,49 @@ void TestSimpleMap(bool optimize)
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    PrintIR(compiledMap);
     testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap.IsValid(), true));
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, " map");
+}
+
+void TestMultiOutputMap()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ inputNode->output, accumNode->output });
+
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::MapCompilerParameters settings;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap.IsValid(), true));
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    VerifyCompiledOutput(map, compiledMap, signal, " map");
+}
+
+// Map with 2 scalar values concatenated
+void TestMultiOutputMap2()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto sumNode = model.AddNode<nodes::SumNode<double>>(inputNode->output);
+    auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, inputNode->output);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ sumNode->output, dotNode->output });
+
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNodeAsFunction");
 }
 
 void TestCompiledMapMove()
@@ -242,10 +215,11 @@ void TestBinaryVector(bool expanded, bool runJit)
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.unrollLoops = expanded;
+    settings.mapFunctionName = modelFunctionName;
     model::IRMapCompiler compiler(settings);
 
     model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", multiplyNode->output } } };
-    model::IRCompiledMap compiledMap = compiler.Compile(map, modelFunctionName);
+    model::IRCompiledMap compiledMap = compiler.Compile(map);
 
     std::vector<double> testInput = { 1, 1, 1, 1 };
     std::vector<double> testOutput(testInput.size());
@@ -259,14 +233,14 @@ void TestBinaryVector(bool expanded, bool runJit)
     }
     else
     {
-        auto mainFunction = compiledMap.GetModule().AddMainDebug();
+        auto mainFunction = compiledMap.GetModule().BeginMainDebugFunction();
         emitters::IRFunctionCallArguments args(mainFunction);
         args.Append(compiledMap.GetModule().ConstantArray("c_data", testInput));
         auto* pResult = args.AppendOutput(emitters::VariableType::Double, testInput.size());
         mainFunction.Call(modelFunctionName, args);
         mainFunction.PrintForEach("%f,", pResult, testInput.size());
         mainFunction.Return();
-        mainFunction.Complete(true);
+        compiledMap.GetModule().EndFunction();
         compiledMap.GetModule().WriteToFile(OutputPath(expanded ? "BinaryVector_E.asm" : "BinaryVector.asm"));
     }
 }
@@ -450,13 +424,16 @@ void TestSlidingAverage()
     auto avg = mb.Divide<double>(sum->output, dim->output);
     auto outputNode = mb.Outputs<double>(avg->output);
 
-    model::IRMapCompiler compiler;
+    model::MapCompilerParameters settings;
+    settings.mapFunctionName = "TestSlidingAverage";
+    model::IRMapCompiler compiler(settings);
+
     model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
-    model::IRCompiledMap compiledMap = compiler.Compile(map, "TestSlidingAverage");
+    model::IRCompiledMap compiledMap = compiler.Compile(map);
 
     auto& module = compiledMap.GetModule();
     module.DeclarePrintf();
-    auto mainFunction = module.AddMain();
+    auto mainFunction = module.BeginMainFunction();
     std::vector<double> data = { 5, 10, 15, 20 };
     llvm::Value* pData = module.ConstantArray("c_data", data);
     llvm::Value* pResult = mainFunction.Variable(emitters::VariableType::Double, 1);
@@ -467,16 +444,18 @@ void TestSlidingAverage()
     mainFunction.Call("TestSlidingAverage", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
     mainFunction.PrintForEach("%f\n", pResult, 1);
     mainFunction.Return();
-    mainFunction.Complete(true);
+    module.EndFunction();
+
 
     PrintIR(module);
-    module.WriteToFile(OutputPath("avg.asm"));
+    module.WriteToFile(OutputPath("avg.ll"));
 }
 
 void TestDotProductOutput()
 {
     model::MapCompilerParameters settings;
     settings.compilerSettings.inlineOperators = false;
+    settings.mapFunctionName = "TestDotProduct";
     std::vector<double> data = { 5, 10, 15, 20 };
 
     ModelMaker mb;
@@ -487,19 +466,20 @@ void TestDotProductOutput()
 
     model::IRMapCompiler compiler(settings);
     model::DynamicMap map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
-    model::IRCompiledMap compiledMap = compiler.Compile(map, "TestDotProduct");
+    model::IRCompiledMap compiledMap = compiler.Compile(map);
 
-    auto mainFunction = compiledMap.GetModule().AddMainDebug();
+    auto mainFunction = compiledMap.GetModule().BeginMainDebugFunction();
     emitters::IRFunctionCallArguments args(mainFunction);
     args.Append(compiledMap.GetModule().ConstantArray("c_data", data));
     auto pResult = args.AppendOutput(emitters::VariableType::Double, 1);
     mainFunction.Call("TestDotProduct", args);
     mainFunction.PrintForEach("%f\n", pResult, 1);
     mainFunction.Return();
-    mainFunction.Complete(true);
+    compiledMap.GetModule().EndFunction();
+
 
     PrintIR(compiledMap);
-    compiledMap.GetModule().WriteToFile(OutputPath("dot.asm"));
+    compiledMap.GetModule().WriteToFile(OutputPath("dot.ll"));
 }
 
 model::DynamicMap MakeLinearPredictor()
@@ -539,8 +519,10 @@ void TestLinearPredictor()
 
     std::vector<double> data = { 1.0, 1.0, 1.0 };
 
-    model::IRMapCompiler compiler;
-    auto compiledMap = compiler.Compile(map, "TestLinear");
+    model::MapCompilerParameters settings;
+    settings.mapFunctionName = "TestLinear";
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
 
     //
     // Generate a Main method to invoke our model
@@ -548,7 +530,7 @@ void TestLinearPredictor()
     auto& module = compiledMap.GetModule();
     module.DeclarePrintf();
 
-    auto mainFunction = module.AddMain();
+    auto mainFunction = module.BeginMainFunction();
     llvm::Value* pData = module.ConstantArray("c_data", data);
 
     llvm::Value* pResult1 = mainFunction.Variable(emitters::VariableType::Double, 1);
@@ -558,10 +540,10 @@ void TestLinearPredictor()
     mainFunction.PrintForEach("%f\n", pResult1, 1);
     mainFunction.PrintForEach("%f\n", pResult2, 1);
     mainFunction.Return();
-    mainFunction.Complete(true);
+    module.EndFunction();
 
     PrintIR(module);
-    module.WriteToFile(OutputPath("linear.asm"));
+    module.WriteToFile(OutputPath("linear.ll"));
 }
 
 void TestForest()
@@ -573,69 +555,14 @@ void TestForest()
     model::MapCompilerParameters settings;
     settings.compilerSettings.optimize = true;
     settings.compilerSettings.includeDiagnosticInfo = false;
+    settings.mapFunctionName = "TestForest";
     model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map, "TestForest");
+    auto compiledMap = compiler.Compile(map);
 
     auto& module = compiledMap.GetModule();
     module.DeclarePrintf();
 
-    auto mainFunction = module.AddMain();
-    llvm::Value* pData = module.ConstantArray("c_data", data);
-    llvm::Value* pResult = nullptr;
-    auto args = module.GetFunction("TestForest")->args();
-    emitters::IRValueList callArgs;
-    callArgs.push_back(mainFunction.PointerOffset(pData, 0));
-    size_t i = 0;
-    for (auto& arg : args)
-    {
-        (void)arg; // stifle compiler warning
-        if (i > 0)
-        {
-            llvm::Value* pArg = nullptr;
-            if (pResult == nullptr)
-            {
-                pArg = mainFunction.Variable(emitters::VariableType::Double, 1);
-                pResult = pArg;
-            }
-            else
-            {
-                pArg = mainFunction.Variable(emitters::VariableType::Int32, 1);
-            }
-            callArgs.push_back(mainFunction.PointerOffset(pArg, 0));
-        }
-        ++i;
-    }
-    //mainFunction.Call("TestForest", { mainFunction.PointerOffset(pData, 0), mainFunction.PointerOffset(pResult, 0) });
-    mainFunction.Print("Calling TestForest\n");
-    mainFunction.Call("TestForest", callArgs);
-    mainFunction.Print("Done Calling TestForest\n");
-
-    mainFunction.PrintForEach("%f\n", pResult, 1);
-    mainFunction.Return();
-    mainFunction.Verify();
-
-    PrintIR(compiledMap);
-    compiledMap.GetModule().WriteToFile(OutputPath("forest.asm"));
-}
-
-void TestForestMap()
-{
-    auto map = MakeUnrefinedForestMap();
-    model::TransformContext context;
-    map.Refine(context);
-
-    std::vector<double> data = { 0.2, 0.5, 0.0 };
-
-    model::MapCompilerParameters settings;
-    settings.compilerSettings.optimize = true;
-    settings.compilerSettings.includeDiagnosticInfo = false;
-    model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map, "TestForest");
-
-    auto& module = compiledMap.GetModule();
-    module.DeclarePrintf();
-
-    auto mainFunction = module.AddMain();
+    auto mainFunction = module.BeginMainFunction();
     llvm::Value* pData = module.ConstantArray("c_data", data);
     llvm::Value* pResult = nullptr;
     auto args = module.GetFunction("TestForest")->args();
@@ -672,7 +599,7 @@ void TestForestMap()
     mainFunction.Verify();
 
     PrintIR(compiledMap);
-    compiledMap.GetModule().WriteToFile(OutputPath("forest_map.asm"));
+    compiledMap.GetModule().WriteToFile(OutputPath("forest_map.ll"));
 }
 
 InputCallbackTester<double> g_steppableMapCallbackTester;
@@ -709,8 +636,10 @@ void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicks
         std::chrono::milliseconds(2000));
 
     // Compile the map
-    model::IRSteppableMapCompiler<ClockType> compiler;
-    auto compiledMap = compiler.Compile(map, stepFunctionName);
+    model::MapCompilerParameters settings;
+    settings.mapFunctionName = stepFunctionName;
+    model::IRSteppableMapCompiler<ClockType> compiler(settings);
+    auto compiledMap = compiler.Compile(map);
 
     if (runJit)
     {
@@ -739,7 +668,7 @@ void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicks
         compiledMap.GetModule().EndFunction();
 
         // Generate a Main method to invoke our model
-        auto mainFunction = compiledMap.GetModule().AddMainDebug();
+        auto mainFunction = compiledMap.GetModule().BeginMainDebugFunction();
         emitters::IRFunctionCallArguments args(mainFunction);
 
         // Time signal input to the model (currently unused because map internally generates a signal)
@@ -750,10 +679,10 @@ void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicks
         mainFunction.Call(stepFunctionName, args);
         mainFunction.PrintForEach("%f\n", pResult, 1);
         mainFunction.Return();
-        mainFunction.Complete(true);
+        compiledMap.GetModule().EndFunction();
 
         PrintIR(compiledMap);
-        compiledMap.GetModule().WriteToFile(OutputPath("step.asm"));
+        compiledMap.GetModule().WriteToFile(OutputPath("step.ll"));
     }
 }
 
@@ -767,5 +696,4 @@ void TestSteppableMap(bool runJit)
         std::cout << "Calling ELL_GetSystemClockMilliseconds()" << std::endl;
         return ELL_GetSystemClockMilliseconds();
     });
-}
 }

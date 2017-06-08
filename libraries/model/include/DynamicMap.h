@@ -39,8 +39,18 @@ namespace model
         DynamicMap() = default;
 
         /// <summary> Copy constructor </summary>
+        ///
+        /// <param name="other"> The other map. </param>
         DynamicMap(const DynamicMap& other);
-
+        
+        DynamicMap(DynamicMap&& other) = default;
+        
+        /// <summary> Assignment operator. </summary>
+        ///
+        /// <param name="other"> The other map. </param>
+        /// <returns> A reference to this map. </returns>
+        DynamicMap& operator=(DynamicMap other);
+        
         /// <summary> Constructor </summary>
         ///
         /// <param name="model"> The model to wrap </param>
@@ -74,10 +84,20 @@ namespace model
         template <typename OutputVectorType, typename InputVectorType, data::IsDataVector<OutputVectorType> OutputConcept = true, data::IsDataVector<InputVectorType> InputConcept = true>
         OutputVectorType Compute(const InputVectorType& inputValues) const;
 
+        /// <summary> Returns the size of the map's input </summary>
+        ///
+        /// <returns> The dimensionality of the map's input port </returns>
+        size_t GetInputSize() const;
+
         /// <summary> Returns the size of the map's output </summary>
         ///
         /// <returns> The dimensionality of the map's output port </returns>
         size_t GetOutputSize() const;
+
+        /// <summary> Refines the model wrapped by this map. </summary>
+        ///
+        /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
+        void Refine(int maxIterations = 10);
 
         /// <summary> Refines the model wrapped by this map. </summary>
         ///
@@ -92,7 +112,7 @@ namespace model
         void Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context);
 
         //
-        // Internal routines for getting information about inputs / outputs of the map
+        // ELL-Internal routines for getting information about inputs / outputs of the map
         // and doing type-safe operations.
         //
 
@@ -121,7 +141,7 @@ namespace model
         /// <returns> The number of outputs </returns>
         size_t NumOutputPorts() const { return _outputElements.size(); }
 
-        /// <summary> Returns an outputs </summary>
+        /// <summary> Returns an output </summary>
         ///
         /// <param name="index"> The index of the output </param>
         /// <returns> The output </returns>
@@ -232,6 +252,12 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Swaps the contents of two maps. </summary>
+        ///
+        /// <param name="a"> One of the maps to swap. </param>
+        /// <param name="b"> The other map to swap. </param>
+        friend void swap(DynamicMap& a, DynamicMap& b);
+
     protected:
         template <typename DataVectorType, typename ElementsType, data::IsDataVector<DataVectorType> Concept = true>
         void SetInputValue(InputNodeBase* node, const DataVectorType& inputValues) const;
@@ -257,10 +283,14 @@ namespace model
 
         virtual void SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const;
         virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const;
+        virtual void SetNodeInput(InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const;
+        virtual void SetNodeInput(InputNode<float>* node, const std::vector<float>& inputValues) const;
         virtual void SetNodeInput(InputNode<double>* node, const std::vector<double>& inputValues) const;
 
         virtual std::vector<bool> ComputeBoolOutput(const PortElementsBase& outputs) const;
         virtual std::vector<int> ComputeIntOutput(const PortElementsBase& outputs) const;
+        virtual std::vector<int64_t> ComputeInt64Output(const PortElementsBase& outputs) const;
+        virtual std::vector<float> ComputeFloatOutput(const PortElementsBase& outputs) const;
         virtual std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs) const;
 
     private:

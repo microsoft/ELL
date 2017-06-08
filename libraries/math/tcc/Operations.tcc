@@ -223,6 +223,12 @@ namespace math
         return std::sqrt(v.Aggregate([](ElementType x) { return x * x; }));
     }
 
+    template <typename ElementType>
+    ElementType OperationsImplementation<ImplementationType::native>::Norm2Squared(UnorientedConstVectorReference<ElementType> v)
+    {
+        return v.Aggregate([](ElementType x) { return x * x; });
+    }
+
     template <typename ElementType, MatrixLayout layout>
     void OperationsImplementation<ImplementationType::native>::ColumnWiseSum(ConstMatrixReference<ElementType, layout> M, VectorReference<ElementType, VectorOrientation::row> u)
     {
@@ -347,6 +353,13 @@ namespace math
     ElementType OperationsImplementation<ImplementationType::openBlas>::Norm2(UnorientedConstVectorReference<ElementType> v)
     {
         return Blas::Nrm2(static_cast<int>(v.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
+    }
+
+    template <typename ElementType>
+    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm2Squared(UnorientedConstVectorReference<ElementType> v)
+    {
+        auto norm2 = Norm2(v);
+        return norm2*norm2;
     }
 
     template <typename ElementType, MatrixLayout layout>

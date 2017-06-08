@@ -11,6 +11,7 @@
 
 // utilities
 #include "Debug.h"
+#include "Exception.h"
 
 namespace ell
 {

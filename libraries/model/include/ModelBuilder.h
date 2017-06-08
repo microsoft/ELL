@@ -73,7 +73,7 @@ namespace model
         /// <summary>
         bool CanAddNode(std::string nodeTypeName) const;
 
-        /// <summary> 
+        /// <summary>
         /// Registers a node-creation function for a node type that already has an AddNode<NodeType>() function.
         /// </summary>
         ///
@@ -86,7 +86,7 @@ namespace model
         template <typename NodeType, typename... ArgTypes>
         void RegisterNodeCreator();
 
-        /// <summary> 
+        /// <summary>
         /// Registers a node-creation function that creates a node and adds it to the model being built.
         /// </summary>
         ///

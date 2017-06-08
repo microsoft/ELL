@@ -18,14 +18,18 @@ namespace ell
         enum class Algorithm
         {
             SGD,
-            SDSGD,
-            SDCSGD
+            SparseDataSGD,
+            SparseDataCenteredSGD,
+            SDCA
         };
 
     Algorithm algorithm = Algorithm::SGD;
-
-    double regularization;
     bool normalize;
+    double regularization;
+    double desiredPrecision;
+    size_t maxEpochs;
+    bool permute;
+    std::string randomSeedString;
 };
 
 /// <summary> Parsed version of LinearTrainerArguments. </summary>

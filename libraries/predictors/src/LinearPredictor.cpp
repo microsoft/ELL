@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LinearPredictor.h"
+#include "DataVectorOperations.h"
 
 // stl
 #include <memory>
@@ -43,7 +44,7 @@ namespace predictors
 
     double LinearPredictor::Predict(const DataVectorType& dataVector) const
     {
-        return dataVector.Dot(_w) + _b;
+        return _w * dataVector + _b;
     }
 
     auto LinearPredictor::GetWeightedElements(const DataVectorType& dataVector) const -> DataVectorType
@@ -54,7 +55,7 @@ namespace predictors
 
     void LinearPredictor::Scale(double scalar)
     {
-        math::Operations::Multiply(scalar, _w);
+        _w *= scalar; 
         _b *= scalar;
     }
 

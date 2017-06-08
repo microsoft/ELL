@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace ell
-{
 template <typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
 {
@@ -50,6 +48,12 @@ void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMa
         case model::Port::PortType::integer:
             PrintCompiledOutput<InputType, int>(map, compiledMap, signal, name);
             break;
+        case model::Port::PortType::bigInt:
+            PrintCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name);
+            break;
+        case model::Port::PortType::smallReal:
+            PrintCompiledOutput<InputType, float>(map, compiledMap, signal, name);
+            break;
         case model::Port::PortType::real:
             PrintCompiledOutput<InputType, double>(map, compiledMap, signal, name);
             break;
@@ -90,6 +94,12 @@ void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledM
             break;
         case model::Port::PortType::integer:
             VerifyCompiledOutput<InputType, int>(map, compiledMap, signal, name);
+            break;
+        case model::Port::PortType::bigInt:
+            VerifyCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name);
+            break;
+        case model::Port::PortType::smallReal:
+            VerifyCompiledOutput<InputType, float>(map, compiledMap, signal, name);
             break;
         case model::Port::PortType::real:
             VerifyCompiledOutput<InputType, double>(map, compiledMap, signal, name);
@@ -133,5 +143,4 @@ bool InputCallbackTester<InputType>::InputCallback(InputType* input)
         cur = begin; // simulate infinite series
     }
     return true;
-}
 }

@@ -14,19 +14,11 @@ namespace model
     // InputPortBase
     //
     template <typename ValueType>
-    InputPortBase::InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, std::string name)
+    InputPortBase::InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, const std::string& name)
         : Port(owningNode, name, Port::GetPortType<ValueType>()), _inputElements(inputs)
     {
-    }
-
-    inline void InputPortBase::ComputeParents()
-    {
-        for (const auto& range : _inputElements.GetRanges())
-        {
-            auto port = range.ReferencedPort();
-            auto node = port->GetNode();
-            _parentNodes.push_back(node);
-        }
+        // Note: we can't compute parents here because the elements our _inputElements points to is (typically) a member in a subclass and
+        // hasn't been initialized yet.
     }
 
     //
@@ -40,7 +32,7 @@ namespace model
     }
 
     template <typename ValueType>
-    InputPort<ValueType>::InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name)
+    InputPort<ValueType>::InputPort(const class Node* owningNode, const PortElements<ValueType>& input, const std::string& name)
         : InputPortBase(owningNode, _input, name), _input(input)
     {
         ComputeParents();

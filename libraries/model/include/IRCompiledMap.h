@@ -17,6 +17,7 @@
 
 // model
 #include "DynamicMap.h"
+#include "IRModelProfiler.h"
 #include "InputNode.h"
 #include "Model.h"
 #include "Node.h"
@@ -52,20 +53,20 @@ namespace model
         /// <summary> Output the compiled model to the given file </summary>
         ///
         /// <param name="filePath"> The file to write to </param>
-        virtual void WriteCode(const std::string& filePath) override;
+        virtual void WriteCode(const std::string& filePath) const override;
 
         /// <summary> Output the compiled model to the given file with the given format </summary>
         ///
         /// <param name="filePath"> The file to write to </param>
         /// <param name="format"> The format to write out </param>
-        virtual void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format) override;
+        virtual void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format) const override;
 
         /// <summary> Output the compiled model to the given file with the given format </summary>
         ///
         /// <param name="filePath"> The file to write to </param>
         /// <param name="format"> The format to write out </param>
         /// <param name="options"> The options to pass to the code generator </param>
-        void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options);
+        void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
@@ -76,14 +77,14 @@ namespace model
         ///
         /// <param name="stream"> The stream to write to </param>
         /// <param name="format"> The format to write out </param>
-        virtual void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format) override;
+        virtual void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format) const override;
 
         /// <summary> Output the compiled model to the given file with the given format </summary>
         ///
         /// <param name="filePath"> The file to write to </param>
         /// <param name="format"> The format to write out </param>
         /// <param name="options"> The options to pass to the code generator </param>
-        void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options);
+        void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
@@ -120,26 +121,86 @@ namespace model
         /// <returns> The jitter. </returns>
         emitters::IRExecutionEngine& GetJitter();
 
+        //
+        // Profiling support
+        //
+
+        /// <summary> Get a pointer to the performance counters struct for the whole model. </summary>
+        PerformanceCounters* GetModelPerformanceCounters();
+
+        /// <summary> Print a summary of the performance for the model. </summary>
+        void PrintModelProfilingInfo();
+
+        /// <summary> Reset the performance summary for the model to zero. </summary>
+        void ResetModelProfilingInfo();
+
+        /// <summary> Get the number of nodes that have profiling information. </summary>        
+        int GetNumProfiledNodes();
+
+        /// <summary> Get a pointer to the info struct for a node. </summary>        
+        ///
+        /// <param name="nodeIndex"> the index of the node. </param>
+        NodeInfo* GetNodeInfo(int nodeIndex);
+
+        /// <summary> Get a pointer to the performance counters struct for a node. </summary>        
+        ///
+        /// <param name="nodeIndex"> the index of the node. </param>
+        PerformanceCounters* GetNodePerformanceCounters(int nodeIndex);
+
+        /// <summary> Print a summary of the performance for the nodes. </summary>
+        void PrintNodeProfilingInfo();
+        
+        /// <summary> Reset the performance counters for all the nodes to zero. </summary>
+        void ResetNodeProfilingInfo();
+
+
+        /// <summary> Get the number of node types that have profiling information. </summary>        
+        int GetNumProfiledNodeTypes();
+
+        /// <summary> Get a pointer to the info struct for a node type. </summary>        
+        ///
+        /// <param name="nodeIndex"> the index of the node type. </param>
+        NodeInfo* GetNodeTypeInfo(int nodeIndex);
+
+        /// <summary> Get a pointer to the aggregated performance counters struct for a node type. </summary>        
+        ///
+        /// <param name="nodeIndex"> the index of the node type. </param>
+        PerformanceCounters* GetNodeTypePerformanceCounters(int nodeIndex);
+
+        /// <summary> Print a summary of the performance for the node types. </summary>
+        void PrintNodeTypeProfilingInfo();
+
+        /// <summary> Reset the performance counters for all the node types to zero. </summary>
+        void ResetNodeTypeProfilingInfo();
+
     protected:
         virtual void SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) const override;
         virtual void SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const override;
+        virtual void SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const override;
+        virtual void SetNodeInput(model::InputNode<float>* node, const std::vector<float>& inputValues) const override;
         virtual void SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues) const override;
 
         virtual std::vector<bool> ComputeBoolOutput(const model::PortElementsBase& outputs) const override;
         virtual std::vector<int> ComputeIntOutput(const model::PortElementsBase& outputs) const override;
+        virtual std::vector<int64_t> ComputeInt64Output(const model::PortElementsBase& outputs) const override;
+        virtual std::vector<float> ComputeFloatOutput(const model::PortElementsBase& outputs) const override;
         virtual std::vector<double> ComputeDoubleOutput(const model::PortElementsBase& outputs) const override;
 
     private:
         friend class IRMapCompiler;
+    
         template <typename ClockType>
         friend class IRSteppableMapCompiler;
 
-        template <typename InputType, typename OutputType>
-        void SetComputeFunction();
-
-        IRCompiledMap(DynamicMap other, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> _module);
+        IRCompiledMap(DynamicMap map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module);
 
         void EnsureExecutionEngine() const;
+        void EnsureValidMap(); // fixes up model if necessary and checks inputs/outputs are compilable
+        template <typename InputType, typename OutputType>
+        void SetComputeFunction();
+        void SetComputeFunction() const;
+        template <typename InputType>
+        void SetComputeFunctionForInputType() const;
 
         template <typename InputType>
         using ComputeFunction = std::function<void(const InputType*)>;
@@ -149,15 +210,9 @@ namespace model
 
         mutable std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
 
-        // Only one of the entries in the tuple is active, depending on the input and output types of the map
-        mutable std::tuple<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<double>> _computeInputFunction;
-        mutable std::tuple<utilities::ConformingVector<bool>, utilities::ConformingVector<int>, utilities::ConformingVector<double>> _cachedOutput;
-
-        void EnsureValidMap(); // fixes up model if necessary and checks inputs/outputs are compilable
-        void SetComputeFunction() const;
-
-        template <typename InputType>
-        void SetComputeFunctionForInputType() const;
+        // Only one of the entries in each of these tuples is active, depending on the input and output types of the map
+        mutable std::tuple<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<int64_t>, ComputeFunction<float>, ComputeFunction<double>> _computeInputFunction;
+        mutable std::tuple<utilities::ConformingVector<bool>, utilities::ConformingVector<int>, utilities::ConformingVector<int64_t>, utilities::ConformingVector<float>, utilities::ConformingVector<double>> _cachedOutput;
     };
 }
 }

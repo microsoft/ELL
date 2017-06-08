@@ -104,6 +104,11 @@ namespace math
         /// <param name="other"> The other vector. </param>
         void operator+=(ConstVectorReference<ElementType, orientation> other);
 
+        /// <summary> Copies the values from another vector into this vector. </summary>
+        ///
+        /// <param name="other"> The other vector. </param>
+        void operator=(ConstVectorReference<ElementType, orientation> other);
+
         /// <summary> Adds a transformed vector to this vector. </summary>
         ///
         /// <param name="other"> The other vector. </param>

@@ -15,10 +15,12 @@
 #include "OutputStreamImpostor.h"
 
 // data
+#include "DataVector.h"
+#include "DataVectorOperations.h"
 #include "Dataset.h"
 #include "Example.h"
-#include "DataVector.h"
-#include "DataVectorTransformations.h"
+
+
 
 // common
 #include "DataLoadArguments.h"
@@ -77,10 +79,10 @@ int main(int argc, char* argv[])
         // output summarization mode
         if (applyArguments.summarize)
         {
-            std::unique_ptr<model::DynamicMap> map2 = nullptr;
+            model::DynamicMap map2;
             if (applyArguments.inputMapFilename2 != "")
             {
-                map2 = std::make_unique<model::DynamicMap>(common::LoadMap(applyArguments.inputMapFilename2));
+                map2 = common::LoadMap(applyArguments.inputMapFilename2);
             }
 
             math::RowVector<double> u(map.GetOutputSize());
@@ -94,15 +96,12 @@ int main(int argc, char* argv[])
                 math::RowVector<double> w(map.GetOutputSize());
                 w += mappedDataVector;
 
-                if (map2 != nullptr)
-                {
-                    auto mappedDataVector2 = map2->Compute<data::DoubleDataVector>(example.GetDataVector());
-                    w += (-1.0) * mappedDataVector2;
-                }
+                auto mappedDataVector2 = map2.Compute<data::DoubleDataVector>(example.GetDataVector());
+                w += (-1.0) * mappedDataVector2;
 
                 // accumulate vectors for mean and standard deviation computation
                 u += w;
-                w.Transform([](double x) { return x*x; });
+                w.Transform([](double x) { return x * x; });
                 v += w;
 
                 exampleIterator.Next();
@@ -114,7 +113,7 @@ int main(int argc, char* argv[])
             u /= denominator;
             outputStream << "mean:\t" << u << '\n';
 
-            u.Transform([](double x) { return x*x; });
+            u.Transform([](double x) { return x * x; });
             v /= denominator;
             v -= u;
             v.Transform([](double x) { return std::sqrt(x); });

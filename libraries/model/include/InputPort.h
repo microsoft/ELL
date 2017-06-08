@@ -37,10 +37,17 @@ namespace model
         /// <summary> Constructor </summary>
         ///
         /// <param name="owningNode"> The node that contains this port </param>
-        /// <param name="inputRef"> The input group to fetch input values from </param>
+        /// <param name="inputs"> The input group to fetch input values from </param>
         /// <param name="name"> The name of this port </param>
         template <typename ValueType>
-        InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, std::string name);
+        InputPortBase(const class Node* owningNode, const PortElements<ValueType>& inputs, const std::string& name);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="owningNode"> The node that contains this port </param>
+        /// <param name="inputs"> The input group to fetch input values from </param>
+        /// <param name="name"> The name of this port </param>
+        InputPortBase(const class Node* owningNode, const PortElementsBase& inputs, const std::string& name);
 
         /// <summary> Returns the list of nodes this input port gets values from </summary>
         ///
@@ -76,7 +83,7 @@ namespace model
         }
 
     protected:
-        /// Subclasses _must_ call this method in their constructor
+        /// Note: Subclasses _must_ call this method in their constructor
         void ComputeParents();
 
     private:
@@ -95,7 +102,7 @@ namespace model
         ///
         /// <param name="owningNode"> The node this port belongs to </param>
         /// <param name="input"> A reference to the output port(s) this input port is consuming from </param>
-        InputPort(const class Node* owningNode, const PortElements<ValueType>& input, std::string name);
+        InputPort(const class Node* owningNode, const PortElements<ValueType>& input, const std::string& name);
 
         /// <summary> Assignment operator </summary>
         ///

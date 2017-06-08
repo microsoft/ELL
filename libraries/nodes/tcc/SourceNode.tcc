@@ -10,6 +10,13 @@ namespace ell
 {
 namespace nodes
 {
+    // Default constructor for type registration
+    template <typename ValueType, SamplingFunction<ValueType> getSample>
+    SourceNode<ValueType, getSample>::SourceNode()
+        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _samplingFunctionName("")
+    {
+    }
+
     template <typename ValueType, SamplingFunction<ValueType> getSample>
     SourceNode<ValueType, getSample>::SourceNode(
         const model::PortElements<TimeTickType>& input, size_t outputSize)
@@ -82,7 +89,7 @@ namespace nodes
         }
         if1.End();
 
-        // TODO: can this be more efficient?
+        // EFFICIENCY can we avoid looping over each sample?
         for (size_t i = 0; i < output.Size(); ++i)
         {
             auto sample = function.ValueAt(pBufferedSample, i);
@@ -106,7 +113,7 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
-        archiver["outputSize"] << output.Size();
+        archiver["outputSize"] << _output.Size();
         archiver["samplingFunctionName"] << _samplingFunctionName;
     }
 
@@ -125,7 +132,7 @@ namespace nodes
     template <typename ValueType, SamplingFunction<ValueType> getSample>
     void SourceNode<ValueType, getSample>::Interpolate(TimeTickType /*originalTime*/, TimeTickType /*newTime*/) const
     {
-        // TODO: make this a pure virtual function once we add derived source nodes
+        // Default to pass-through (derived classes will override).
     }
 }
 }

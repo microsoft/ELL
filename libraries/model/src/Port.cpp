@@ -17,6 +17,12 @@ namespace model
     // Specializations of GetPortType
     //
     template <>
+    Port::PortType Port::GetPortType<float>()
+    {
+        return Port::PortType::smallReal;
+    }
+
+    template <>
     Port::PortType Port::GetPortType<double>()
     {
         return Port::PortType::real;
@@ -26,6 +32,12 @@ namespace model
     Port::PortType Port::GetPortType<int>()
     {
         return Port::PortType::integer;
+    }
+
+    template <>
+    Port::PortType Port::GetPortType<int64_t>()
+    {
+        return Port::PortType::bigInt;
     }
 
     template <>
@@ -57,10 +69,14 @@ namespace model
         {
             case ell::model::Port::PortType::none:
                 return "void";
+            case ell::model::Port::PortType::smallReal:
+                return "float";
             case ell::model::Port::PortType::real:
                 return "double";
             case ell::model::Port::PortType::integer:
                 return "int";
+            case ell::model::Port::PortType::bigInt:
+                return "int64_t";
             case ell::model::Port::PortType::categorical:
                 return "int";
             case ell::model::Port::PortType::boolean:

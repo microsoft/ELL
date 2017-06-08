@@ -46,7 +46,7 @@ namespace emitters
         RegisterFunctionArgs(arguments);
     }
 
-    void IRFunctionEmitter::Complete(bool optimize)
+    void IRFunctionEmitter::CompleteFunction(bool optimize)
     {
         Verify();
         if (optimize)
@@ -55,7 +55,7 @@ namespace emitters
         }
     }
 
-    void IRFunctionEmitter::Complete(IRFunctionOptimizer& optimizer)
+    void IRFunctionEmitter::CompleteFunction(IRFunctionOptimizer& optimizer)
     {
         Verify();
         Optimize(optimizer);
@@ -491,6 +491,9 @@ namespace emitters
 
         auto entryBlock = function.GetEntryBlock();
         auto termInst = entryBlock->getTerminator();
+        // If the function entry block contains a terminator, set the insert point
+        // to be just before the terminator. Otherwise, set the insert point
+        // to be in the entry block.
         if (termInst != nullptr)
         {
             function.SetCurrentInsertPoint(termInst);

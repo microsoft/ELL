@@ -34,7 +34,7 @@ namespace predictors
         _gamma = 0.0;
     }
 
-    double ProtoNNPredictor::Predict(const DataVectorType& inputVector) const
+    size_t ProtoNNPredictor::Predict(const DataVectorType& inputVector) const
     {
         // Projection
         math::ColumnVector<double> data(inputVector.ToArray());
@@ -61,7 +61,7 @@ namespace predictors
         math::Operations::Multiply(1.0, GetLabelEmbeddings(), similarityToPrototypes, 0.0, labels);
 
         auto maxElement = std::max_element(labels.GetDataPointer(), labels.GetDataPointer() + labels.Size());
-        double maxLabelIndex = maxElement - labels.GetDataPointer();
+        auto maxLabelIndex = maxElement - labels.GetDataPointer();
 
         return maxLabelIndex;
     }

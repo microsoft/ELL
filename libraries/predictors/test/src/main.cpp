@@ -596,9 +596,9 @@ void ProtoNNPredictorTest()
 
     auto result = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
 
-    auto R = 1.0;
+    size_t R = 1;
 
-    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result, R, 1e-8));
+    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result, R));
 }
 
 /// Runs all tests

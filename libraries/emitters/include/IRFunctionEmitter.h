@@ -32,16 +32,6 @@ namespace emitters
         IRFunctionEmitter& operator=(const IRFunctionEmitter&) = default;
         IRFunctionEmitter& operator=(IRFunctionEmitter&&) = default;
 
-        /// <summary> Complete the function. Optionally also run an optimizer pass on it. </summary>
-        ///
-        /// <param name="optimize"> If true, optimize using default optimizations. </param>
-        void Complete(bool optimize = true);
-
-        /// <summary> Complete the function. Also run an optimizer pass on it. </summary>
-        ///
-        /// <param name="optimizer"> The optimizer to use. </param>
-        void Complete(IRFunctionOptimizer& optimizer);
-
         /// <summary> Query if this IRFunctionEmitter is valid. </summary>
         ///
         /// <returns> True if valid, false if not. </returns>
@@ -973,6 +963,8 @@ namespace emitters
         llvm::BasicBlock* GetEntryBlock() { return _entryBlock; }
         void SetUpFunction();
         void RegisterFunctionArgs(const NamedVariableTypeList& args);
+        void CompleteFunction(bool optimize = true);
+        void CompleteFunction(IRFunctionOptimizer& optimizer);
 
         llvm::Function* ResolveFunction(const std::string& name);
         llvm::Module* GetLLVMModule() { return _pFunction->getParent(); }

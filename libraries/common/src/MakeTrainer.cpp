@@ -8,9 +8,11 @@
 
 #include "MakeTrainer.h"
 
-// lossFunctions
+// functions
 #include "HingeLoss.h"
+#include "L2Regularizer.h"
 #include "LogLoss.h"
+#include "SmoothHingeLoss.h"
 #include "SquaredLoss.h"
 
 // utilities
@@ -26,81 +28,110 @@ namespace ell
 {
 namespace common
 {
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDLinearTrainer(const LossArguments& lossArguments, const trainers::SGDLinearTrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters)
     {
-        using LossFunctionEnum = common::LossArguments::LossFunction;
+        using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
 
-        switch (lossArguments.lossFunction)
+        switch (lossFunctionArguments.lossFunction)
         {
             case LossFunctionEnum::squared:
-                return trainers::MakeSGDLinearTrainer(lossFunctions::SquaredLoss(), trainerParameters);
+                return trainers::MakeSGDTrainer(functions::SquaredLoss(), trainerParameters);
 
             case LossFunctionEnum::log:
-                return trainers::MakeSGDLinearTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
+                return trainers::MakeSGDTrainer(functions::LogLoss(), trainerParameters);
 
             case LossFunctionEnum::hinge:
-                return trainers::MakeSGDLinearTrainer(lossFunctions::HingeLoss(), trainerParameters);
+                return trainers::MakeSGDTrainer(functions::HingeLoss(), trainerParameters);
+
+            case LossFunctionEnum::smoothHinge:
+                return trainers::MakeSGDTrainer(functions::SmoothHingeLoss(), trainerParameters);
 
             default:
                 throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDSGDLinearTrainer(const LossArguments& lossArguments, const trainers::SGDLinearTrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters)
     {
-        using LossFunctionEnum = common::LossArguments::LossFunction;
+        using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
 
-        switch (lossArguments.lossFunction)
+        switch (lossFunctionArguments.lossFunction)
         {
             case LossFunctionEnum::squared:
-                return trainers::MakeSDSGDLinearTrainer(lossFunctions::SquaredLoss(), trainerParameters);
+                return trainers::MakeSparseDataSGDTrainer(functions::SquaredLoss(), trainerParameters);
 
             case LossFunctionEnum::log:
-                return trainers::MakeSDSGDLinearTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), trainerParameters);
+                return trainers::MakeSparseDataSGDTrainer(functions::LogLoss(), trainerParameters);
 
             case LossFunctionEnum::hinge:
-                return trainers::MakeSDSGDLinearTrainer(lossFunctions::HingeLoss(), trainerParameters);
+                return trainers::MakeSparseDataSGDTrainer(functions::HingeLoss(), trainerParameters);
+
+            case LossFunctionEnum::smoothHinge:
+                return trainers::MakeSparseDataSGDTrainer(functions::SmoothHingeLoss(), trainerParameters);
 
             default:
                 throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDCSGDLinearTrainer(const LossArguments& lossArguments, math::RowVector<double> center, const trainers::SGDLinearTrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataCenteredSGDTrainer(const LossFunctionArguments& lossFunctionArguments, math::RowVector<double> center, const trainers::SGDTrainerParameters& trainerParameters)
     {
-        using LossFunctionEnum = common::LossArguments::LossFunction;
+        using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
 
-        switch (lossArguments.lossFunction)
+        switch (lossFunctionArguments.lossFunction)
         {
         case LossFunctionEnum::squared:
-            return trainers::MakeSDCSGDLinearTrainer(lossFunctions::SquaredLoss(), std::move(center), trainerParameters);
+            return trainers::MakeSparseDataCenteredSGDTrainer(functions::SquaredLoss(), std::move(center), trainerParameters);
 
         case LossFunctionEnum::log:
-            return trainers::MakeSDCSGDLinearTrainer(lossFunctions::LogLoss(lossArguments.lossFunctionParameter), std::move(center), trainerParameters);
+            return trainers::MakeSparseDataCenteredSGDTrainer(functions::LogLoss(), std::move(center), trainerParameters);
 
         case LossFunctionEnum::hinge:
-            return trainers::MakeSDCSGDLinearTrainer(lossFunctions::HingeLoss(), std::move(center), trainerParameters);
+            return trainers::MakeSparseDataCenteredSGDTrainer(functions::HingeLoss(), std::move(center), trainerParameters);
+
+        case LossFunctionEnum::smoothHinge:
+            return trainers::MakeSparseDataCenteredSGDTrainer(functions::SmoothHingeLoss(), std::move(center), trainerParameters);
 
         default:
             throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
         }
     }
 
-    std::unique_ptr<trainers::ITrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDCATrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SDCATrainerParameters& trainerParameters)
     {
-        using LossFunctionEnum = common::LossArguments::LossFunction;
+        using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
 
-        switch (lossArguments.lossFunction)
+        switch (lossFunctionArguments.lossFunction)
+        {
+        case LossFunctionEnum::squared:
+            return trainers::MakeSDCATrainer(functions::SquaredLoss(), functions::L2Regularizer(), trainerParameters);
+
+        case LossFunctionEnum::log:
+            return trainers::MakeSDCATrainer(functions::LogLoss(), functions::L2Regularizer(), trainerParameters);
+
+        case LossFunctionEnum::smoothHinge:
+            return trainers::MakeSDCATrainer(functions::SmoothHingeLoss(), functions::L2Regularizer(), trainerParameters);
+
+        default:
+            throw utilities::CommandLineParserErrorException("chosen loss function is not supported by this trainer");
+        }
+    }
+
+    std::unique_ptr<trainers::ITrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionArguments& lossFunctionArguments, const ForestTrainerArguments& trainerArguments)
+    {
+        using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
+
+        switch (lossFunctionArguments.lossFunction)
         {
             case LossFunctionEnum::squared:
 
                 if (trainerArguments.sortingTrainer)
                 {
-                    return trainers::MakeSortingForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
+                    return trainers::MakeSortingForestTrainer(functions::SquaredLoss(), trainers::LogitBooster(), trainerArguments);
                 }
                 else
                 {
-                    return trainers::MakeHistogramForestTrainer(lossFunctions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
+                    return trainers::MakeHistogramForestTrainer(functions::SquaredLoss(), trainers::LogitBooster(), trainers::ExhaustiveThresholdFinder(), trainerArguments);
                 }
 
             default:
