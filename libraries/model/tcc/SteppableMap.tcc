@@ -46,7 +46,7 @@ namespace model
         DynamicMap::WriteToArchive(archiver);
 
         archiver["interval"] << static_cast<int>(_interval.count());
-        archiver["lastSampleTime"] << static_cast<double>(ToTicks(_lastSampleTime));
+        archiver["lastSampleTime"] << ToTicks(_lastSampleTime);
     }
 
     template <typename ClockType>
@@ -143,7 +143,7 @@ namespace model
     }
 
     template <typename ClockType>
-    auto SteppableMap<ClockType>::ToTicks(StepTimepointType timepoint) const
+    TimeTickType SteppableMap<ClockType>::ToTicks(StepTimepointType timepoint) const
     {
         return std::chrono::duration_cast<DurationType>(timepoint.time_since_epoch()).count();
     }

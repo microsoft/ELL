@@ -68,10 +68,10 @@ namespace data
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
         virtual size_t PrefixLength() const = 0;
 
-        /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
+        /// <summary> Computes the squared 2-norm of the vector. </summary>
         ///
-        /// <returns> The vector 2-norm. </returns>
-        virtual double Norm2() const = 0;
+        /// <returns> The squared 2-norm of the vector. </returns>
+        virtual double Norm2Squared() const = 0;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
@@ -162,14 +162,6 @@ namespace data
     /// <param name="scaledDataVector"> The DataVector being added to the vector. </param>
     void operator+=(math::RowVectorReference<double> vector, const IDataVector& dataVector);
 
-    /// <summary> Calculates the dot product of a DataVector and a math::ColumnVector. </summary>
-    ///
-    /// <param name="dataVector"> The DataVector. </param>
-    /// <param name="vector"> The math::ColumnVector. </param>
-    ///
-    /// <returns> The result of the operation. </returns>
-    double operator*(const IDataVector& dataVector, math::ColumnConstVectorReference<double> vector);
-
     /// <summary>
     /// Base class for some of the data vector classes. This class uses a curiously recurring
     /// template pattern to significantly reduce code duplication in the derived classes.
@@ -207,10 +199,10 @@ namespace data
         /// <param name="list"> The vector. </param>
         void AppendElements(std::vector<double> vec);
 
-        /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
+        /// <summary> Computes the 2-norm of the vector. </summary>
         ///
-        /// <returns> The vector 2-norm. </returns>
-        virtual double Norm2() const override;
+        /// <returns> The squared 2-norm of the vector. </returns>
+        virtual double Norm2Squared() const override;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
@@ -300,105 +292,127 @@ namespace data
     /// <param name="vector"> The vector. </param>
     /// <param name="transformation"> The transformation.. </param>
     template <typename DataVectorType, IterationPolicy policy, typename TransformationType>
-    static void AddTransformedTo(const DataVectorType& dataVector, math::RowVectorReference<double> vector, TransformationType transformation)
-    {
-        return dataVector.template AddTransformedTo<policy, TransformationType>(vector, transformation);
-    }
+    static void AddTransformedTo(const DataVectorType& dataVector, math::RowVectorReference<double> vector, TransformationType transformation);
 
-    /// <summary> Wrappers for GetIterator that hide the template specifier. </summary>
+    /// <summary> Wrapper for GetIterator that hides the template specifier. </summary>
     ///
     /// <typeparam name="DataVectorType"> The data vector type to call GetIterator on </typeparam>
     /// <typeparam name="policy"> The iteration policy. </typeparam>
     /// <param name="vector"> The data vector that we're getting the iterator from. </param>
+    ///
     /// <returns> The iterator. </returns>
     template <typename DataVectorType, IterationPolicy policy>
-    static auto GetIterator(DataVectorType& vector)
-    {
-        return vector.template GetIterator<policy>();
-    }
-    template <typename DataVectorType, IterationPolicy policy>
-    static auto GetIterator(const DataVectorType& vector)
-    {
-        return vector.template GetIterator<policy>();
-    }
+    static auto GetIterator(DataVectorType& vector);
 
-    /// <summary> Wrappers for GetIterator that hide the template specifier. </summary>
+    /// <summary> Wrapper for GetIterator that hides the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call GetIterator on </typeparam>
+    /// <typeparam name="policy"> The iteration policy. </typeparam>
+    /// <param name="vector"> The const data vector that we're getting the iterator from. </param>
+    ///
+    /// <returns> The iterator. </returns>
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(const DataVectorType& vector);
+
+    /// <summary> Wrapper for GetIterator that hides the template specifier. </summary>
     ///
     /// <typeparam name="DataVectorType"> The data vector type to call GetIterator on </typeparam>
     /// <typeparam name="policy"> The iteration policy. </typeparam>
     /// <param name="vector"> The data vector that we're getting the iterator from. </param>
     /// <param name="size"> The size of the vector. </param>
+    ///
     /// <returns> The iterator. </returns>
     template <typename DataVectorType, IterationPolicy policy>
-    static auto GetIterator(DataVectorType& vector, size_t size)
-    {
-        return vector.template GetIterator<policy>(size);
-    }
-    template <typename DataVectorType, IterationPolicy policy>
-    static auto GetIterator(const DataVectorType& vector, size_t size)
-    {
-        return vector.template GetIterator<policy>(size);
-    }
+    static auto GetIterator(DataVectorType& vector, size_t size);
 
-    /// <summary> Wrappers for CopyAs that hide the template specifier. </summary>
+    /// <summary> Wrapper for GetIterator that hides the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call GetIterator on </typeparam>
+    /// <typeparam name="policy"> The iteration policy. </typeparam>
+    /// <param name="vector"> The const data vector that we're getting the iterator from. </param>
+    /// <param name="size"> The size of the vector. </param>
+    ///
+    /// <returns> The iterator. </returns>
+    template <typename DataVectorType, IterationPolicy policy>
+    static auto GetIterator(const DataVectorType& vector, size_t size);
+
+    /// <summary> Wrapper for CopyAs that hides the template specifier. </summary>
     ///
     /// <typeparam name="DataVectorType"> The data vector type to call CopyAs on </typeparam>
     /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam>
+    /// <param name="vector"> The data vector that we're copying. </param>
     ///
     /// <returns> A data vector of a specified type. </returns>
     template <typename DataVectorType, typename ReturnType>
-    static ReturnType CopyAs(DataVectorType& vector)
-    {
-        return vector.template CopyAs<ReturnType>();
-    }
-    template <typename DataVectorType, typename ReturnType>
-    static ReturnType CopyAs(const DataVectorType& vector)
-    {
-        return vector.template CopyAs<ReturnType>();
-    }
+    static ReturnType CopyAs(DataVectorType& vector);
 
-    /// <summary> Wrappers for TransformAs that hide the template specifier. </summary>
+    /// <summary> Wrapper for CopyAs that hides the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call CopyAs on </typeparam>
+    /// <typeparam name="ReturnType"> Type of the data vector to construct. </typeparam>
+    /// <param name="vector"> The const data vector that we're copying. </param>
+    ///
+    /// <returns> A data vector of a specified type. </returns>
+    template <typename DataVectorType, typename ReturnType>
+    static ReturnType CopyAs(const DataVectorType& vector);
+
+    /// <summary> Wrapper for TransformAs that hides the template specifier. </summary>
     ///
     /// <typeparam name="DataVectorType"> The data vector type to call TransformAs on </typeparam>
     /// <typeparam name="policy"> The iteration policy. </typeparam>
     /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
     /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+    /// <param name="vector"> The data vector that we're transforming. </param>
     /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
     /// applied to the elements of the data vector. </param>
     /// <param name="size"> The prefix size. </param>
     ///
     /// <returns> The transformed data vector. </returns>
     template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
-    static ReturnType TransformAs(DataVectorType& vector, TransformationType transformation, size_t size)
-    {
-        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation, size);
-    }
-    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
-    static ReturnType TransformAs(const DataVectorType& vector, TransformationType transformation, size_t size)
-    {
-        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation, size);
-    }
+    static ReturnType TransformAs(DataVectorType& vector, TransformationType transformation, size_t size);
 
-    /// <summary> Wrappers for TransformAs that hide the template specifier. </summary>
+    /// <summary> Wrapper for TransformAs that hides the template specifier. </summary>
     ///
     /// <typeparam name="DataVectorType"> The data vector type to call TransformAs on </typeparam>
     /// <typeparam name="policy"> The iteration policy. </typeparam>
     /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
     /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+    /// <param name="vector"> The const data vector that we're transforming. </param>
+    /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
+    /// applied to the elements of the data vector. </param>
+    /// <param name="size"> The prefix size. </param>
+    ///
+    /// <returns> The transformed data vector. </returns>
+    template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
+    static ReturnType TransformAs(const DataVectorType& vector, TransformationType transformation, size_t size);
+
+    /// <summary> Wrapper for TransformAs that hides the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call TransformAs on </typeparam>
+    /// <typeparam name="policy"> The iteration policy. </typeparam>
+    /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
+    /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+    /// <param name="vector"> The data vector that we're transforming. </param>
     /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
     /// applied to the elements of the data vector. </param>
     ///
     /// <returns> The transformed data vector. </returns>
     template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
-    static ReturnType TransformAs(DataVectorType& vector, TransformationType transformation)
-    {
-        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation);
-    }
+    static ReturnType TransformAs(DataVectorType& vector, TransformationType transformation);
+
+    /// <summary> Wrapper for TransformAs that hides the template specifier. </summary>
+    ///
+    /// <typeparam name="DataVectorType"> The data vector type to call TransformAs on </typeparam>
+    /// <typeparam name="policy"> The iteration policy. </typeparam>
+    /// <typeparam name="ReturnType"> The return data vector type. </typeparam>
+    /// <typeparam name="TransformationType"> The transformation type. </typeparam>
+    /// <param name="vector"> The const data vector that we're transforming. </param>
+    /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
+    /// applied to the elements of the data vector. </param>
+    ///
+    /// <returns> The transformed data vector. </returns>
     template <typename DataVectorType, IterationPolicy policy, typename ReturnType, typename TransformationType>
-    static ReturnType TransformAs(const DataVectorType& vector, TransformationType transformation)
-    {
-        return vector.template TransformAs<policy, ReturnType, TransformationType>(transformation);
-    }
+    static ReturnType TransformAs(const DataVectorType& vector, TransformationType transformation);
 }
 }
 

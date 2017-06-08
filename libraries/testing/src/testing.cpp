@@ -57,6 +57,21 @@ namespace testing
         return (a - b < tolerance && b - a < tolerance);
     }
 
+    bool IsEqual(float a, double b, double tolerance)
+    {
+        return (a - b < tolerance && b - a < tolerance);
+    }
+
+    bool IsEqual(double a, float b, double tolerance)
+    {
+        return (a - b < tolerance && b - a < tolerance);
+    }
+
+    bool IsEqual(float a, float b, double tolerance)
+    {
+        return (a - b < tolerance && b - a < tolerance);
+    }
+
     //
     // vectors
     //
@@ -79,8 +94,9 @@ namespace testing
         }
         return true;
     }
-    template <typename ValueType>
-    bool IsVectorApproxEqual(const std::vector<ValueType>& a, const std::vector<ValueType>& b, ValueType tolerance)
+
+    template <typename ValueType1, typename ValueType2, typename ValueType3>
+    bool IsVectorApproxEqual(const std::vector<ValueType1>& a, const std::vector<ValueType2>& b, ValueType3 tolerance)
     {
         // allow vectors of different size, provided that they differ by a suffix of zeros
         size_t size = a.size();
@@ -100,7 +116,7 @@ namespace testing
         // confirm suffix of zeros
         for (size_t i = size; i < a.size(); ++i)
         {
-            if (IsEqual(a[i], 0, tolerance) == false)
+            if (IsEqual(a[i], static_cast<ValueType1>(0), tolerance) == false)
             {
                 return false;
             }
@@ -108,7 +124,7 @@ namespace testing
 
         for (size_t i = size; i < b.size(); ++i)
         {
-            if (IsEqual(b[i], 0, tolerance) == false)
+            if (IsEqual(b[i], static_cast<ValueType2>(0), tolerance) == false)
             {
                 return false;
             }
@@ -127,6 +143,11 @@ namespace testing
         return IsVectorEqual(a, b);
     }
 
+    bool IsEqual(const std::vector<int64_t>& a, const std::vector<int64_t>& b)
+    {
+        return IsVectorEqual(a, b);
+    }
+
     bool IsEqual(const std::vector<float>& a, const std::vector<float>& b, float tolerance)
     {
         return IsVectorApproxEqual(a, b, tolerance);
@@ -137,26 +158,57 @@ namespace testing
         return IsVectorApproxEqual(a, b, tolerance);
     }
 
+    bool IsEqual(const std::vector<std::vector<float>>& a, const std::vector<std::vector<float>>& b, float tolerance)
+    {
+        for (size_t index = 0; index < a.size(); ++index)
+        {
+            if (!IsVectorApproxEqual(a[index], b[index], tolerance))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    template <typename ValueType1, typename ValueType2>
+    bool IsEqual(const std::vector<std::vector<ValueType1>>& a, const std::vector<std::vector<ValueType2>>& b, double tolerance)
+    {
+        if(a.size() != b.size())
+        {
+            return false;
+        }
+        
+        for (size_t index = 0; index < a.size(); ++index)
+        {
+            if (!IsVectorApproxEqual(a[index], b[index], tolerance))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     bool testFailedFlag = false;
 
-    void ProcessTest(const std::string& testDescription, bool success)
+    bool ProcessTest(const std::string& testDescription, bool success)
     {
-        std::cout << testDescription << " ... ";
-
-        if (success)
+        if (!success)
         {
-            std::cout << "Passed\n";
-        }
-        else
-        {
-            std::cout << "Failed\n";
+            std::cout << testDescription << " ... Failed\n";
             testFailedFlag = true;
         }
+
+        return success;
     }
 
     bool DidTestFail()
     {
         return testFailedFlag;
     }
+
+    template bool IsEqual(const std::vector<std::vector<float>>& a, const std::vector<std::vector<float>>& b, double tolerance);
+    template bool IsEqual(const std::vector<std::vector<float>>& a, const std::vector<std::vector<double>>& b, double tolerance);
+    template bool IsEqual(const std::vector<std::vector<double>>& a, const std::vector<std::vector<float>>& b, double tolerance);
+    template bool IsEqual(const std::vector<std::vector<double>>& a, const std::vector<std::vector<double>>& b, double tolerance);
 }
 }

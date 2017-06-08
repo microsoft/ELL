@@ -18,7 +18,7 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${tool_name} ${src} ${include})
 target_include_directories(${tool_name} PRIVATE include)
-target_link_libraries(${tool_name} common data lossFunctions model predictors trainers evaluators utilities)
+target_link_libraries(${tool_name} common data functions model predictors trainers evaluators utilities)
 copy_shared_libraries(${tool_name})
 
 # put this project in the trainers folder in the IDE 
@@ -56,29 +56,29 @@ add_test(NAME ${test_name}
 set (test_name ${tool_name}_test_5)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.001 -a SDSGD)
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.001 -a SparseDataSGD)
 
 set (test_name ${tool_name}_test_6)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.001 -a SDSGD)
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.001 -a SparseDataSGD)
 
 set (test_name ${tool_name}_test_7)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SDSGD)
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SparseDataSGD)
 
 set (test_name ${tool_name}_test_8)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.01 -a SDCSGD)
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.01 -a SparseDataCenteredSGD)
 
 set (test_name ${tool_name}_test_9)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.01 -a SDCSGD)
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.01 -a SparseDataCenteredSGD)
 
 set (test_name ${tool_name}_test_10)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SDCSGD)
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SparseDataCenteredSGD)

@@ -128,7 +128,7 @@ namespace model
         /// its inputs have first been visited.
         /// </summary>
         ///
-        /// <param name="visitor"> The visitor functor to use </param>
+        /// <param name="visitor"> The visitor functor to use. The type signature should be of the form `void visitor(const Node&)`. </param>
         template <typename Visitor>
         void Visit(Visitor&& visitor) const;
 
@@ -137,20 +137,20 @@ namespace model
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
-        /// <param name="visitor"> The visitor functor to use </param>
+        /// <param name="visitor"> The visitor functor to use. The type signature should be of the form `void visitor(const Node&)`. </param>
         /// <param name="outputNode"> The output node to use for deciding which nodes to visit </param>
         template <typename Visitor>
-        void Visit(const Node* outputNode, Visitor&& visitor) const;
+        void VisitSubset(const Node* outputNode, Visitor&& visitor) const;
 
         /// <summary>
         /// Visits the nodes in the model necessary to compute the outputs of the given nodes. Visits the nodes
         /// in dependency order. No nodes will be visited until all its inputs have first been visited.
         /// </summary>
         ///
-        /// <param name="visitor"> The visitor functor to use </param>
+        /// <param name="visitor"> The visitor functor to use. The type signature should be of the form `void visitor(const Node&)`. </param>
         /// <param name="outputNodes"> The output nodes to use for deciding which nodes to visit </param>
         template <typename Visitor>
-        void Visit(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const;
+        void VisitSubset(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const;
 
         /// <summary>
         /// Gets an iterator over all the nodes in the model in dependency order. No nodes will be visited until all
@@ -183,6 +183,17 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Print a human-readable representation of the model. </summary>
+        ///
+        /// <param name="os"> The stream to write data to. </param>
+        void Print(std::ostream& os) const;
+
+        /// <summary> Print a human-readable representation of the portion of the model necessary to compute the given output node. </summary>
+        ///
+        /// <param name="os"> The stream to write data to. </param>
+        /// <param name="outputNode"> The node to be computed. </param>
+        void PrintSubset(std::ostream& os, const Node* outputNode) const;
 
     protected:
         /// <summary> Adds an object's properties to an `Archiver` </summary>

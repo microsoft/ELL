@@ -45,7 +45,7 @@ Next, use CMake to create a Visual Studio solution. In the repository's root dir
 
 Next, invoke cmake as follows:
 
-    cmake -G "Visual Studio 14 2015 Win64" ..
+    cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..
 
 **Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, along with other files in the `build` directory. 
 

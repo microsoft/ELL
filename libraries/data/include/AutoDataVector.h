@@ -90,10 +90,10 @@ namespace data
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
         virtual size_t PrefixLength() const override { return _pInternal->PrefixLength(); }
 
-        /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
+        /// <summary> Computes the 2-norm of the vector. </summary>
         ///
-        /// <returns> The vector 2-norm. </returns>
-        virtual double Norm2() const override { return _pInternal->Norm2(); }
+        /// <returns> The squared 2-norm of the vector. </returns>
+        virtual double Norm2Squared() const override { return _pInternal->Norm2Squared(); }
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///

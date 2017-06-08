@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <ostream>
 
 namespace ell
 {
@@ -88,6 +89,18 @@ namespace model
         /// <returns> A pointer to the port </returns>
         const OutputPortBase* GetOutputPort(const std::string& portName) const;
 
+        /// <summary> Returns the named output port </summary>
+        ///
+        /// <param name="portIndex"> The index of the port </param>
+        /// <returns> A pointer to the port </returns>
+        OutputPortBase* GetOutputPort(size_t portIndex);
+
+        /// <summary> Returns the named output port </summary>
+        ///
+        /// <param name="portIndex"> The index of the port </param>
+        /// <returns> A pointer to the port </returns>
+        const OutputPortBase* GetOutputPort(size_t portIndex) const;
+
         /// <summary> Returns the named port </summary>
         ///
         /// <param name="portName"> The name of the port </param>
@@ -133,6 +146,11 @@ namespace model
         /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
         virtual void Copy(ModelTransformer& transformer) const = 0;
 
+        /// <summary> Print a human-readable representation of the Node. </summary>
+        ///
+        /// <param name="os"> The stream to write data to. </param>
+        void Print(std::ostream& os) const;
+
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
@@ -141,7 +159,10 @@ namespace model
 
         /// <summary> Computes the output of this node and stores it in the output ports </summary>
         virtual void Compute() const = 0;
+        virtual bool HasState() const;
+
         void AddInputPort(InputPortBase* input);
+        void AddOutputPort(OutputPortBase* output);
 
     private:
         friend class Model;

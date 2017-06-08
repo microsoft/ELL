@@ -35,70 +35,96 @@ namespace model
     //
     // Helper functions
     //
-    bool IsPureVector(const model::InputPortBase& port)
+    bool IsPureVector(const InputPortBase& port)
     {
-
         const auto& elements = port.GetInputElements();
         return elements.Size() > 1 && elements.IsFullPortOutput();
     }
 
-    bool HasSingleDescendant(const model::Node& node)
+    bool HasSingleDescendant(const Node& node)
     {
         return (node.GetDependentNodes().size() == 1);
     }
 
-    bool HasSingleDescendant(const model::PortElementBase& element)
+    bool HasSingleDescendant(const PortElementBase& element)
     {
         return HasSingleDescendant(*(element.ReferencedPort()->GetNode()));
     }
 
-    std::string IdString(const model::Node& node)
+    std::string IdString(const Node& node)
     {
         std::stringstream id;
         id << "Node_" << node.GetId();
         return id.str();
     }
 
-    std::string DiagnosticString(const model::Node& node)
+    std::string DiagnosticString(const Node& node)
     {
         std::stringstream logInfo;
         logInfo << node.GetRuntimeTypeName() << "::" << node.GetId();
         return logInfo.str();
     }
 
-    emitters::VariableType PortTypeToVariableType(model::Port::PortType type)
+    emitters::VariableType PortTypeToVariableType(Port::PortType type)
     {
         switch (type)
         {
-            case model::Port::PortType::boolean:
+            case Port::PortType::boolean:
                 return emitters::VariableType::Byte;
-            case model::Port::PortType::integer:
+            case Port::PortType::integer:
                 return emitters::VariableType::Int32;
-            case model::Port::PortType::real:
+            case Port::PortType::bigInt:
+                return emitters::VariableType::Int64;
+            case Port::PortType::smallReal:
+                return emitters::VariableType::Float;
+            case Port::PortType::real:
                 return emitters::VariableType::Double;
             default:
                 throw emitters::EmitterException(emitters::EmitterError::notSupported, "Port type not supported");
         }
     }
 
-    emitters::VariableType GetPortVariableType(const model::Port& port)
+    emitters::VariableType GetPortVariableType(const Port& port)
     {
         return PortTypeToVariableType(port.GetType());
     }
 
-    void VerifyIsScalar(const model::Port& port)
+    Port::PortType VariableTypeToPortType(emitters::VariableType type)
     {
-        if (port.Size() != 1)
+        switch (type)
+        {
+            case emitters::VariableType::Byte:
+                return Port::PortType::boolean;
+            case emitters::VariableType::Int32:
+                return Port::PortType::integer;
+            case emitters::VariableType::Int64:
+                return Port::PortType::bigInt;
+            case emitters::VariableType::Float:
+                return Port::PortType::smallReal;
+            case emitters::VariableType::Double:
+                return Port::PortType::real;
+            default:
+                throw emitters::EmitterException(emitters::EmitterError::notSupported, "Variable type not supported");
+        }
+    }
+
+    bool IsScalar(const Port& port)
+    {
+        return port.Size() == 1;
+    }
+
+    void VerifyIsScalar(const Port& port)
+    {
+        if (!IsScalar(port))
         {
             throw emitters::EmitterException(emitters::EmitterError::scalarInputsExpected);
         }
     }
 
-    void VerifyIsPureBinary(const model::Node& node)
+    void VerifyIsPureBinary(const Node& node)
     {
         if (node.NumInputPorts() != 2)
         {
-            // Only support binary right now
             throw emitters::EmitterException(emitters::EmitterError::binaryInputsExpected);
         }
     }

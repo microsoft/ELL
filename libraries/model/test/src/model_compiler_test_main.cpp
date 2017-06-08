@@ -9,6 +9,7 @@
 #include "CompilableNodesTest.h"
 #include "CompilerTest.h"
 #include "ModelTestUtilities.h"
+#include "PerformanceCountersTest.h"
 
 // testing
 #include "testing.h"
@@ -20,13 +21,18 @@ void TestIRCompiler()
 {
     // VerboseRegion region;
 
+    TestFloatNode();
+    TestCompilableDotProductNode2(3);
+    TestCompilableDotProductNode2(4);
+
     TestCompileIsEqual();    
+    TestSimpleMap(false);
     TestSimpleMap(true);
     TestCompiledMapMove();
+    TestBinaryScalar();
     TestBinaryVector(true);
     TestBinaryVector(false);
     TestBinaryVector(true, true);
-    TestBinaryScalar();
     TestDotProduct();
     TestSum(false);
     TestSum(true);
@@ -35,14 +41,13 @@ void TestIRCompiler()
     TestDelay();
     TestSqrt();
     TestBinaryPredicate(false);
-    // TestMultiplexer(); // Fails
-    // TestSlidingAverage(); // Fails
+    TestSlidingAverage();
     TestDotProductOutput();
-    // TestLinearPredictor(); // Fails
-    // TestForest(); // Fails
-    // TestForestMap(); // Fails
     TestSteppableMap(false);
     // TestSteppableMap(true); // Fails on Windows
+    // TestMultiplexer(); // FAILS -- crash 
+    // TestLinearPredictor(); // FAILS -- crash
+    // TestForest(); // FAILS -- crash
 
     TestCompilableScalarOutputNode();
     TestCompilableVectorOutputNode();
@@ -63,6 +68,11 @@ void TestIRCompiler()
     TestCompilableAccumulatorNodeFunction();
     TestCompilableSourceNode(false);
     // TestCompilableSourceNode(true); // Fails on Windows
+    TestCompilableAccumulatorNodeFunction(); 
+
+    TestPerformanceCounters();
+    TestCompilableDotProductNode2(3); // uses IR
+    TestCompilableDotProductNode2(4); // uses IR
 }
 
 int main(int argc, char* argv[])

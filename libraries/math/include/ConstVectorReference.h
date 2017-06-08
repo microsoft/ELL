@@ -32,7 +32,7 @@ namespace math
         /// <param name="pData"> [in,out] Pointer to the data. </param>
         /// <param name="size"> The size of the vector. </param>
         /// <param name="increment"> The vector increment. </param>
-        UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
+        UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment=1);
 
         /// <summary> Gets a const pointer to the underlying data storage. </summary>
         ///
@@ -70,6 +70,11 @@ namespace math
         ///
         /// <returns> The norm. </returns>
         ElementType Norm2() const;
+
+        /// <summary> Computes the squared 2-norm of the vector </summary>
+        ///
+        /// <returns> The squared norm. </returns>
+        ElementType Norm2Squared() const; 
 
         /// <summary> Convert this vector into an array. </summary>
         ///

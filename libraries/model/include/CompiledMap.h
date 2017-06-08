@@ -52,19 +52,19 @@ namespace model
         /// <summary> Output the compiled model to the given file </summary>
         ///
         /// <param name="filePath"> The file to write to </param>
-        virtual void WriteCode(const std::string& filePath) = 0;
+        virtual void WriteCode(const std::string& filePath) const = 0;
 
         /// <summary> Output the compiled model to the given file with the given format </summary>
         ///
         /// <param name="filePath"> The file to write to </param>
-        /// <param name="format"> The format to write out ("asm" or "bc") </param>
-        virtual void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format) = 0;
+        /// <param name="format"> The format to write out (ir, bitcode, or assembly) </param>
+        virtual void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format) const = 0;
 
         /// <summary> Output the compiled model to an output stream with the given format </summary>
         ///
         /// <param name="stream"> The stream to write to </param>
-        /// <param name="format"> The format to write out ("asm" or "bc") </param>
-        virtual void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format) = 0;
+        /// <param name="format"> The format to write out (ir, bitcode, or assembly) </param>
+        virtual void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format) const = 0;
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
@@ -97,7 +97,7 @@ namespace model
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        CompiledMap(const DynamicMap& map, std::string functionName);
+        CompiledMap(DynamicMap map, std::string functionName);
         std::string _functionName;
     };
 }

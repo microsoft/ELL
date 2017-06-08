@@ -42,7 +42,7 @@ namespace model
     template <typename NodeType, typename... Args>
     NodeType* Model::AddNode(Args&&... args)
     {
-        auto node = std::make_shared<NodeType>(args...);
+        auto node = std::make_shared<NodeType>(std::forward<Args>(args)...);
         node->RegisterDependencies();
         _idToNodeMap[node->GetId()] = node;
         return node.get();
@@ -55,7 +55,7 @@ namespace model
     std::vector<ValueType> Model::ComputeOutput(const OutputPort<ValueType>& outputPort) const
     {
         auto compute = [](const Node& node) { node.Compute(); };
-        Visit({ outputPort.GetNode() }, compute);
+        VisitSubset({ outputPort.GetNode() }, compute);
         return outputPort.GetOutput();
     }
 
@@ -71,7 +71,7 @@ namespace model
 
         auto compute = [](const Node& node) { node.Compute(); };
         auto nodes = std::vector<const Node*>(usedNodes.begin(), usedNodes.end());
-        Visit(nodes, compute);
+        VisitSubset(nodes, compute);
 
         // Now construct the output
         auto numElements = elements.Size();
@@ -135,19 +135,19 @@ namespace model
     void Model::Visit(Visitor&& visitor) const
     {
         std::vector<const Node*> emptyVec;
-        Visit(emptyVec, visitor);
+        VisitSubset(emptyVec, visitor);
     }
 
     // Visits just the parts necessary to compute output node
     template <typename Visitor>
-    void Model::Visit(const Node* outputNode, Visitor&& visitor) const
+    void Model::VisitSubset(const Node* outputNode, Visitor&& visitor) const
     {
-        Visit(std::vector<const Node*>{ outputNode }, visitor);
+        VisitSubset(std::vector<const Node*>{ outputNode }, visitor);
     }
 
-    // Real implementation function for `Visit()`
+    // Real implementation function for `VisitSubset()`
     template <typename Visitor>
-    void Model::Visit(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const
+    void Model::VisitSubset(const std::vector<const Node*>& outputNodes, Visitor&& visitor) const
     {
         auto iter = GetNodeIterator(outputNodes);
         while (iter.IsValid())

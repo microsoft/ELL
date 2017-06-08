@@ -21,8 +21,8 @@
 #include <string>
 #include <vector>
 
-namespace ell
-{
+using namespace ell;
+
 // RAII class for setting and restoring verbosity
 class VerboseRegion
 {
@@ -42,6 +42,9 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& v);
 
 void PrintModel(const model::Model& model);
 void PrintModel(const model::Model& model, const model::Node* output);
+
+void PrintHeader(emitters::IRModuleEmitter& module);
+void PrintHeader(model::IRCompiledMap& compiledMap);
 
 void PrintIR(emitters::IRModuleEmitter& module);
 void PrintIR(model::IRCompiledMap& compiledMap);
@@ -75,6 +78,5 @@ private:
     typename std::vector<std::vector<InputType>>::const_iterator cur;
     typename std::vector<std::vector<InputType>>::const_iterator end;
 };
-}
 
 #include "../tcc/ModelTestUtilities.tcc"

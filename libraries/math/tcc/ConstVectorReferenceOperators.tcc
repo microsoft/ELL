@@ -32,5 +32,11 @@ namespace math
     {
         return Operations::Norm2(*this);
     }
+
+    template <typename ElementType>
+    ElementType UnorientedConstVectorReference<ElementType>::Norm2Squared() const
+    { 
+        return Operations::Norm2Squared(*this); 
+    }
 }
 }

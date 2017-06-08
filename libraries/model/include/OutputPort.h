@@ -30,6 +30,15 @@ namespace model
     public:
         OutputPortBase() = default;
         OutputPortBase(const OutputPortBase& other) = delete;
+        OutputPortBase(OutputPortBase&& other) = default;
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="node"> The node to which this port belongs. </param>
+        /// <param name="name"> The name of this port. </param>
+        /// <param name="type"> The datatype for this port. </param>
+        /// <param name="size"> The size of the port's output. </param>
+        OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
 
         /// <summary> Notify this port that it is being referenced </summary>
         void ReferencePort() const { _isReferenced = true; }
@@ -54,9 +63,17 @@ namespace model
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "OutputPortBase"; }
 
-        virtual std::vector<double> GetDoubleOutput() const = 0;
+        /// <summary> Gets the output of this port, converted to `double`. </summary>
+        ///
+        /// <returns> The output of this port, converted to `double`. </returns>
+        virtual std::vector<double> GetDoubleOutput() const { return {}; };
 
-        virtual double GetDoubleOutput(size_t index) const = 0;
+        /// <summary> Gets the output of an element, converted to a `double`. </summary>
+        ///
+        /// <param name="index"> The index of the element to return. </param>
+        ///
+        /// <returns> The output element, converted to a `double`. </returns>
+        virtual double GetDoubleOutput(size_t index) const { return 0.0; };
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -74,8 +91,6 @@ namespace model
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
-        OutputPortBase(const class Node* node, std::string name, PortType type, size_t size);
-
         size_t _size = 0;
         mutable bool _isReferenced;
     };
@@ -106,7 +121,16 @@ namespace model
         /// <returns> The cached output for the element </returns>
         ValueType GetOutput(size_t index) const;
 
+        /// <summary> Gets the output of this port, converted to `double`. </summary>
+        ///
+        /// <returns> The output of this port, converted to `double`. </returns>
         virtual std::vector<double> GetDoubleOutput() const override;
+
+        /// <summary> Gets the output of an element, converted to a `double`. </summary>
+        ///
+        /// <param name="index"> The index of the element to return. </param>
+        ///
+        /// <returns> The output element, converted to a `double`. </returns>
         virtual double GetDoubleOutput(size_t index) const override;
 
         /// <summary> Sets the cached output from this port </summary>

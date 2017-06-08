@@ -20,7 +20,7 @@ namespace model
 {
     using DurationType = std::chrono::milliseconds;
     using TimeTickType = double;
-    
+
     /// <summary> Class that wraps a model and its designated outputs, and performs interval-based computes (steps) on the model </summary>
     template <typename ClockType = std::chrono::steady_clock>
     class SteppableMap : public DynamicMap
@@ -46,7 +46,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "SteppableMap"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ClockType>("SteppableMap"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -78,7 +78,7 @@ namespace model
         template <typename InputType>
         void SetInputValue(size_t index, StepTimepointType sampleTime, StepTimepointType currentTime) const;
 
-        auto ToTicks(StepTimepointType timepoint) const;
+        TimeTickType ToTicks(StepTimepointType timepoint) const;
 
         DurationType _interval;
         mutable StepTimepointType _lastSampleTime;

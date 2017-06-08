@@ -9,6 +9,7 @@
 #pragma once
 
 #include "CompilableNode.h"
+#include "CompilableNodeUtilities.h"
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"

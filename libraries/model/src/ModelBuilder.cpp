@@ -138,11 +138,17 @@ namespace model
                 PortElementsProxy proxy = v.GetValue<PortElementsProxy>();
                 switch (proxy.GetPortType())
                 {
+                    case Port::PortType::smallReal:
+                        result[index] = ProxyToPortElements<typename PortTypeToValueType<Port::PortType::smallReal>::value_type>(model, proxy);
+                        break;
                     case Port::PortType::real:
                         result[index] = ProxyToPortElements<typename PortTypeToValueType<Port::PortType::real>::value_type>(model, proxy);
                         break;
                     case Port::PortType::integer:
                         result[index] = ProxyToPortElements<typename PortTypeToValueType<Port::PortType::integer>::value_type>(model, proxy);
+                        break;
+                    case Port::PortType::bigInt:
+                        result[index] = ProxyToPortElements<typename PortTypeToValueType<Port::PortType::bigInt>::value_type>(model, proxy);
                         break;
                     case Port::PortType::boolean:
                         result[index] = ProxyToPortElements<typename PortTypeToValueType<Port::PortType::boolean>::value_type>(model, proxy);
@@ -177,11 +183,17 @@ namespace model
                 auto elementsBase = ProxyToPortElements(model, proxy);
                 switch (originalProxy.GetPortType())
                 {
+                    case Port::PortType::smallReal:
+                        result[index] = PortElements<typename PortTypeToValueType<Port::PortType::smallReal>::value_type>(elementsBase);
+                        break;
                     case Port::PortType::real:
                         result[index] = PortElements<typename PortTypeToValueType<Port::PortType::real>::value_type>(elementsBase);
                         break;
                     case Port::PortType::integer:
                         result[index] = PortElements<typename PortTypeToValueType<Port::PortType::integer>::value_type>(elementsBase);
+                        break;
+                    case Port::PortType::bigInt:
+                        result[index] = PortElements<typename PortTypeToValueType<Port::PortType::bigInt>::value_type>(elementsBase);
                         break;
                     case Port::PortType::boolean:
                         result[index] = PortElements<typename PortTypeToValueType<Port::PortType::boolean>::value_type>(elementsBase);

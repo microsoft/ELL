@@ -15,6 +15,7 @@ namespace model
     {
         return functionNamePrefix + "_predict";
     }
+
     static std::string WaitTimeForNextComputeFunctionName(const std::string& functionNamePrefix)
     {
         return functionNamePrefix + "_waitTimeForNextCompute";
@@ -57,18 +58,50 @@ namespace model
     }
 
     template <typename ClockType>
-    IRCompiledMap IRSteppableMapCompiler<ClockType>::Compile(SteppableMap<ClockType> map, const std::string& functionName)
+    std::string IRSteppableMapCompiler<ClockType>::GetPredictFunctionName() const
+    {
+        return MapFunctionName(GetMapCompilerParameters().mapFunctionName);
+    }
+
+    template <typename ClockType>
+    IRCompiledMap IRSteppableMapCompiler<ClockType>::Compile(SteppableMap<ClockType> map)
     {
         EnsureValidMap(map);
-
-        // Refine and compile the model
-        auto mapFunctionName = MapFunctionName(functionName);
         model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() ? model::NodeAction::compile : model::NodeAction::refine; } };
         map.Refine(context);
-        CompileMap(map, mapFunctionName);
-        assert(GetModule().GetFunction(mapFunctionName) != nullptr);
 
-        // Emit the clock library function
+        if (GetMapCompilerParameters().profile)
+        {
+            GetModule().AddPreprocessorDefinition(GetNamespacePrefix()+"_PROFILING", "1");
+        }
+        _profiler = { GetModule(), map.GetModel(), GetMapCompilerParameters().profile };
+        _profiler.EmitInitialization();
+
+        auto predictFunctionName = GetPredictFunctionName();
+        CompileMap(map, predictFunctionName);
+        assert(GetModule().GetFunction(predictFunctionName) != nullptr);
+
+        // Emit runtime model APIs
+        EmitModelAPIFunctions(map);
+
+        // Finish any profiling stuff we need to do and emit functions
+        _profiler.EmitModelProfilerFunctions();
+
+        auto module = std::make_unique<emitters::IRModuleEmitter>(std::move(_moduleEmitter));
+        module->SetTargetTriple(GetCompilerParameters().targetDevice.triple);
+        module->SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
+        return IRCompiledMap(std::move(map), GetMapCompilerParameters().mapFunctionName, std::move(module));
+    }
+
+    template <typename ClockType>
+    void IRSteppableMapCompiler<ClockType>::EmitModelAPIFunctions(const DynamicMap& map)
+    {
+        // Emit basic compiled map API functions 
+        IRMapCompiler::EmitModelAPIFunctions(map);
+
+        auto steppableMap = static_cast<const SteppableMap<ClockType>&>(map);
+
+        // Now emit steppable map-specific functionality
         GetModule().template DeclareGetClockMilliseconds<ClockType>();
 
         // Globals accessed by the functions
@@ -76,13 +109,12 @@ namespace model
         auto pLastSampleTicksVar = variables.template AddVariable<emitters::InitializedScalarVariable<TimeTickType>>(emitters::VariableScope::global, TimeTickType(0));
 
         // Emit the step function that wraps the map function
-        EmitStepFunction(map, functionName, pLastSampleTicksVar);
+        auto baseName = GetMapCompilerParameters().mapFunctionName;
+        EmitStepFunction(steppableMap, baseName, pLastSampleTicksVar);
 
         // Emit the WaitTimeForNextCompute function
-        EmitWaitTimeForNextComputeFunction(map, functionName, pLastSampleTicksVar);
+        EmitWaitTimeForNextComputeFunction(steppableMap, baseName, pLastSampleTicksVar);
 
-        auto module = std::make_unique<emitters::IRModuleEmitter>(GetModule().TransferOwnership());
-        return IRCompiledMap(map, functionName, std::move(module));
     }
 
     template <typename ClockType>

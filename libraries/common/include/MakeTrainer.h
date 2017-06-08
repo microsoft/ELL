@@ -9,7 +9,6 @@
 #pragma once
 
 #include "ForestTrainerArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // predictors
@@ -17,7 +16,8 @@
 
 // trainers
 #include "ITrainer.h"
-#include "SGDLinearTrainer.h"
+#include "SGDTrainer.h"
+#include "SDCATrainer.h"
 
 // stl
 #include <memory>
@@ -28,35 +28,43 @@ namespace common
 {
     /// <summary> Makes a stochastic gradient descent trainer. </summary>
     ///
-    /// <param name="lossArguments"> loss arguments. </param>
-    /// <param name="trainerArguments"> trainer arguments. </param>
+    /// <param name="lossFunctionArguments"> loss arguments. </param>
+    /// <param name="trainerParameters"> trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDLinearTrainer(const LossArguments& lossArguments, const trainers::SGDLinearTrainerParameters& trainerParameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters);
 
     /// <summary> Makes a stochastic gradient descent trainer for sparse data. </summary>
     ///
-    /// <param name="lossArguments"> loss arguments. </param>
-    /// <param name="trainerArguments"> trainer arguments. </param>
+    /// <param name="lossFunctionArguments"> loss arguments. </param>
+    /// <param name="trainerParameters"> trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDSGDLinearTrainer(const LossArguments& lossArguments, const trainers::SGDLinearTrainerParameters& trainerParameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters);
 
     /// <summary> Makes a stochastic gradient descent trainer for centered sparse data. </summary>
     ///
-    /// <param name="lossArguments"> loss arguments. </param>
+    /// <param name="lossFunctionArguments"> loss arguments. </param>
     /// <param name="center"> The center (mean) of the training set. </param>
-    /// <param name="trainerArguments"> trainer arguments. </param>
+    /// <param name="trainerParameters"> trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDCSGDLinearTrainer(const LossArguments& lossArguments, math::RowVector<double> center, const trainers::SGDLinearTrainerParameters& trainerParameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataCenteredSGDTrainer(const LossFunctionArguments& lossFunctionArguments, math::RowVector<double> center, const trainers::SGDTrainerParameters& trainerParameters);
+
+    /// <summary> Makes a stochastic dual coordinate ascent trainer. </summary>
+    ///
+    /// <param name="lossFunctionArguments"> loss arguments. </param>
+    /// <param name="trainerParameters"> trainer parameters. </param>
+    ///
+    /// <returns> A unique_ptr to a stochastic dual coordinate ascent trainer. </returns>
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDCATrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SDCATrainerParameters& trainerParameters);
 
     /// <summary> Makes a forest trainer. </summary>
     ///
-    /// <param name="lossArguments"> loss arguments. </param>
+    /// <param name="lossFunctionArguments"> loss arguments. </param>
     /// <param name="trainerArguments"> trainer arguments. </param>
     ///
     /// <returns> A unique_ptr to a forest trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossArguments& lossArguments, const ForestTrainerArguments& trainerArguments);
+    std::unique_ptr<trainers::ITrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionArguments& lossFunctionArguments, const ForestTrainerArguments& trainerArguments);
 }
 }

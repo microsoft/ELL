@@ -84,6 +84,16 @@ namespace model
         archiver.PopContext();
     }
 
+    void Model::Print(std::ostream& os) const
+    {
+        Visit([&os](const Node& node) { node.Print(os); });
+    }
+
+    void Model::PrintSubset(std::ostream& os, const Node* output) const
+    {
+        VisitSubset(output, [&os](const Node& node) { node.Print(os); });
+    }
+
     //
     // NodeIterator implementation
     //

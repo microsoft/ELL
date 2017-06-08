@@ -198,6 +198,13 @@ namespace math
         template <typename ElementType>
         static ElementType Norm2(UnorientedConstVectorReference<ElementType> v);
 
+        /// <summary> Computes the squared 2-norm of a vector (not the squared 2-norm). </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <returns> The squared 2-norm. </returns>
+        template <typename ElementType>
+        static ElementType Norm2Squared(UnorientedConstVectorReference<ElementType> v);
+
         ///// <summary> Columnwise sum of a matrix. </summary>
         /////
         ///// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
@@ -313,6 +320,13 @@ namespace math
         /// <returns> The 2-norm. </returns>
         template <typename ElementType>
         static ElementType Norm2(UnorientedConstVectorReference<ElementType> v);
+
+        /// <summary> Computes the squared 2-norm of a vector (not the squared 2-norm). </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <returns> The squared 2-norm. </returns>
+        template <typename ElementType>
+        static ElementType Norm2Squared(UnorientedConstVectorReference<ElementType> v);
 
         ///// <summary> Generalized matrix column-vector multiplication, u = s * M * v + t * u. </summary>
         /////

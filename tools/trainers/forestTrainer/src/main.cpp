@@ -29,7 +29,6 @@
 #include "MapSaveArguments.h"
 #include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // model
@@ -41,12 +40,10 @@
 #include "ForestPredictorNode.h"
 
 // trainers
-#include "EvaluatingIncrementalTrainer.h"
 #include "HistogramForestTrainer.h"
-#include "MultiEpochIncrementalTrainer.h"
 #include "SortingForestTrainer.h"
 
-// lossFunctions
+// functions
 #include "LogLoss.h"
 #include "SquaredLoss.h"
 
@@ -77,13 +74,11 @@ int main(int argc, char* argv[])
         common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedForestTrainerArguments forestTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
-        common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
-        commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(forestTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
 
@@ -99,7 +94,8 @@ int main(int argc, char* argv[])
         // load map
         size_t numColumns = dataLoadArguments.parsedDataDimension;
         mapLoadArguments.defaultInputSize = numColumns;
-        model::DynamicMap map = common::LoadMap(mapLoadArguments);
+
+        auto map = common::LoadMap(mapLoadArguments);
 
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
@@ -109,29 +105,19 @@ int main(int argc, char* argv[])
         // predictor type
         using PredictorType = predictors::SimpleForestPredictor;
 
-        // create trainer
-        auto trainer = common::MakeForestTrainer(trainerArguments.lossArguments, forestTrainerArguments);
-
-        // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
-        if (trainerArguments.verbose)
-        {
-            evaluator = common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossArguments);
-            trainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(trainer), evaluator));
-        }
-
-        // create multi epoch trainer
-        trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(trainer), multiEpochTrainerArguments);
-
-        // create random number generator
-        auto rng = utilities::GetRandomEngine(trainerArguments.randomSeedString);
-
-        // randomly permute the data
-        mappedDataset.RandomPermute(rng);
+        // create trainer and evaluator
+        auto trainer = common::MakeForestTrainer(trainerArguments.lossFunctionArguments, forestTrainerArguments);
+        auto evaluator = common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossFunctionArguments);
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(mappedDataset.GetAnyDataset());
+        trainer->SetDataset(mappedDataset.GetAnyDataset());
+        
+        for (size_t epoch = 0; epoch < trainerArguments.numEpochs; ++epoch)
+        {
+            trainer->Update();
+            evaluator->Evaluate(trainer->GetPredictor());
+        }
 
         auto predictor = trainer->GetPredictor();
         // print loss and errors

@@ -25,11 +25,17 @@ namespace emitters
     {
     public:
         /// <summary> Construct a new runtime </summary>
+        ///
+        /// <param name="module"> The module being compiled. </param>
         IRRuntime(IRModuleEmitter& module);
 
         //
         // Misc runtime functions
         //
+
+        /// <summary> Get a pointer to the device-side time function. </summary>
+        ///
+        /// <returns> An LLVM function pointer to the current time function. </returns>
         llvm::Function* GetCurrentTimeFunction(); // returns a double containing the current time (in _milliseconds_ from some arbitrary start time)
 
         //

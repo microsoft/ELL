@@ -62,11 +62,17 @@ namespace model
             case Port::PortType::none:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
                 break;
+            case Port::PortType::smallReal:
+                SetInputValue<DataVectorType, float>(inputNode, inputValues);
+                break;
             case Port::PortType::real:
                 SetInputValue<DataVectorType, double>(inputNode, inputValues);
                 break;
             case Port::PortType::integer:
                 SetInputValue<DataVectorType, int>(inputNode, inputValues);
+                break;
+            case Port::PortType::bigInt:
+                SetInputValue<DataVectorType, int64_t>(inputNode, inputValues);
                 break;
             case Port::PortType::categorical:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
@@ -139,11 +145,17 @@ namespace model
             case Port::PortType::none:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
                 break;
+            case Port::PortType::smallReal:
+                return ComputeOutput<DataVectorType, float>(elements);
+                break;
             case Port::PortType::real:
                 return ComputeOutput<DataVectorType, double>(elements);
                 break;
             case Port::PortType::integer:
                 return ComputeOutput<DataVectorType, int>(elements);
+                break;
+            case Port::PortType::bigInt:
+                return ComputeOutput<DataVectorType, int64_t>(elements);
                 break;
             case Port::PortType::categorical:
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);

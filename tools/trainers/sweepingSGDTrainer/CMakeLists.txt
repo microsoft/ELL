@@ -14,7 +14,7 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${tool_name} ${src})
 target_include_directories(${tool_name} PRIVATE include)
-target_link_libraries(${tool_name} common data lossFunctions predictors trainers evaluators utilities)
+target_link_libraries(${tool_name} common data functions predictors trainers evaluators utilities)
 copy_shared_libraries(${tool_name})
 
 # put this project in the trainers folder in the IDE 

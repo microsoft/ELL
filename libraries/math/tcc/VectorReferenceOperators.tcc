@@ -28,6 +28,12 @@ namespace math
     }
 
     template <typename ElementType, VectorOrientation orientation>
+    void VectorReference<ElementType, orientation>::operator=(ConstVectorReference<ElementType, orientation> other)
+    {
+        Operations::Copy(other, *this);
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
     void VectorReference<ElementType, orientation>::operator-=(ConstVectorReference<ElementType, orientation> other)
     {
         Operations::Add(static_cast<ElementType>(-1.0), other, *this);

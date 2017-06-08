@@ -10,6 +10,10 @@
 
 // model
 #include "Model.h"
+#include "SteppableMap.h"
+
+// stl
+#include <chrono>
 
 namespace ell
 {
@@ -23,4 +27,6 @@ model::Model GenerateModel2();
 model::Model GenerateModel3();
 model::Model GenerateTreeModel(size_t numSplits);
 model::Model GenerateRefinedTreeModel(size_t numSplits);
+
+model::SteppableMap<std::chrono::steady_clock> GenerateSteppableMap(size_t dimension, int intervalMs);
 }

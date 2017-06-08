@@ -18,7 +18,7 @@ All data vectors implement the `IDataVector` interface. The main functions defin
 * `ToArray()` - Copies the contents of this data vector into a `std::vector<double>` of size `PrefixLength()`
 * `CopyAs<DataVectorType>()` - Copies the contents of this data vector to a specific data vector representation. 
 * `Print()` - generates a human readable representation of the data vector
-* Basic linear operations, such as `Norm2()`, `Dot()`, `AddTo()`
+* Basic linear operations, such as `Norm2Squared()`, `Dot()`, `AddTo()`
 
 ## DataVector implementations
 The `data` library implements the following representations of a data vector

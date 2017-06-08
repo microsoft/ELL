@@ -99,6 +99,7 @@ namespace testing
     ///
     /// <returns> true if equal, false if not. </returns>
     bool IsEqual(const std::vector<int>& a, const std::vector<int>& b);
+    bool IsEqual(const std::vector<int64_t>& a, const std::vector<int64_t>& b);
 
     /// <summary>
     /// Checks if two vectors are equal, up to a small numerical error in each coordinate.
@@ -109,7 +110,11 @@ namespace testing
     /// <param name="tolerance"> The tolerance. </param>
     ///
     /// <returns> true if equal, false if not. </returns>
+    bool IsEqual(const std::vector<float>& a, const std::vector<float>& b, float tolerance = 1.0e-8);
     bool IsEqual(const std::vector<double>& a, const std::vector<double>& b, double tolerance = 1.0e-8);
+
+    template <typename ValueType1, typename ValueType2>
+    bool IsEqual(const std::vector<std::vector<ValueType1>>& a, const std::vector<std::vector<ValueType2>>& b, double tolerance = 1.0e-8);
 
     /// <summary>
     /// Checks if two bool vectors are equal.
@@ -125,7 +130,8 @@ namespace testing
     ///
     /// <param name="testDescription"> Information describing the test. </param>
     /// <param name="success"> true if the test was a success, false if it failed. </param>
-    void ProcessTest(const std::string& testDescription, bool success);
+    /// <returns> The success value, for convenience </returns>
+    bool ProcessTest(const std::string& testDescription, bool success);
 
     /// <summary> Checks if one of the tests failed. </summary>
     ///

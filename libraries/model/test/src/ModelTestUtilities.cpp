@@ -23,8 +23,8 @@
 // stl
 #include <iostream>
 
-namespace ell
-{
+using namespace ell;
+
 static bool g_isVerbose = false;
 
 VerboseRegion::VerboseRegion(bool verbose)
@@ -48,53 +48,14 @@ bool IsVerbose()
     return g_isVerbose;
 }
 
-void NodePrinter(const model::Node& node)
-{
-    bool isFirstInputPort = true;
-    std::cout << "node_" << node.GetId() << " (" << std::hex << (&node) << std::dec << ") = " << node.GetRuntimeTypeName() << "(";
-    for (const auto& inputPort : node.GetInputPorts())
-    {
-        std::cout << (isFirstInputPort ? "" : ", ");
-        isFirstInputPort = false;
-
-        auto elements = inputPort->GetInputElements();
-        if (elements.NumRanges() > 1)
-        {
-            std::cout << "{";
-        }
-
-        bool isFirstRange = true;
-        for (const auto& range : elements.GetRanges())
-        {
-            std::cout << (isFirstRange ? "" : ", ");
-            isFirstRange = false;
-
-            auto port = range.ReferencedPort();
-            std::cout << "node_" << port->GetNode()->GetId() << "." << port->GetName();
-            if (!range.IsFullPortRange())
-            {
-                auto start = range.GetStartIndex();
-                auto size = range.Size();
-                std::cout << "[" << start << ":" << (start + size) << "]";
-            }
-        }
-
-        if (elements.NumRanges() > 1)
-        {
-            std::cout << "}";
-        }
-    }
-    std::cout << ")" << std::endl;
-};
-
 void PrintModel(const model::Model& model)
 {
-    model.Visit(NodePrinter);
+    model.Print(std::cout);
 }
 
 void PrintModel(const model::Model& model, const model::Node* output)
 {
-    model.Visit(output, NodePrinter);
+    model.PrintSubset(std::cout, output);
 }
 
 model::Model GetSimpleModel()
@@ -123,11 +84,27 @@ model::Model GetComplexModel()
     return g;
 }
 
+void PrintHeader(emitters::IRModuleEmitter& module)
+{
+    if (IsVerbose())
+    {
+        module.WriteToStream(std::cout, emitters::ModuleOutputFormat::cHeader);
+    }
+}
+
+void PrintHeader(model::IRCompiledMap& compiledMap)
+{
+    if (IsVerbose())
+    {
+        compiledMap.WriteCode(std::cout, emitters::ModuleOutputFormat::cHeader);
+    }
+}
+
 void PrintIR(emitters::IRModuleEmitter& module)
 {
     if (IsVerbose())
     {
-        module.DebugDump();
+        module.WriteToStream(std::cout, emitters::ModuleOutputFormat::ir);
     }
 }
 
@@ -157,5 +134,4 @@ void PrintDiagnostics(emitters::IRDiagnosticHandler& handler)
     {
         std::cout << "Diagnostic messages -- none" << std::endl;
     }
-}
 }

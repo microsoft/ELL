@@ -26,6 +26,7 @@
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
 #include "MultiplexerNode.h"
+#include "SourceNode.h"
 #include "UnaryOperationNode.h"
 
 // predictors
@@ -37,6 +38,9 @@
 #include "Archiver.h"
 #include "Files.h"
 #include "JsonArchiver.h"
+
+// stl
+#include <chrono>
 
 namespace ell
 {
@@ -145,6 +149,13 @@ namespace common
         return refinedModel;
     }
 
+    // Placeholder callback
+    template <typename ValueType>
+    bool SourceNode_EmptyCallback(std::vector<ValueType>&)
+    {
+        return false;
+    }
+
     void RegisterNodeTypes(utilities::SerializationContext& context)
     {
         context.GetTypeFactory().AddType<model::Node, model::InputNode<double>>();
@@ -170,11 +181,19 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::DemultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
+    }
+
+    void RegisterMapTypes(utilities::SerializationContext& context)
+    {
+        context.GetTypeFactory().AddType<model::DynamicMap, model::DynamicMap>();
+        context.GetTypeFactory().AddType<model::DynamicMap, model::SteppableMap<std::chrono::steady_clock>>();
+        context.GetTypeFactory().AddType<model::DynamicMap, model::SteppableMap<std::chrono::system_clock>>();
     }
 
     template <typename UnarchiverType>
@@ -188,24 +207,6 @@ namespace common
             model::Model model;
             unarchiver.Unarchive(model);
             return model;
-        }
-        catch (const std::exception&)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file.");
-        }
-    }
-
-    template <typename UnarchiverType>
-    model::DynamicMap LoadArchivedMap(std::istream& stream)
-    {
-        try
-        {
-            utilities::SerializationContext context;
-            RegisterNodeTypes(context);
-            UnarchiverType unarchiver(stream, context);
-            model::DynamicMap map;
-            unarchiver.Unarchive(map);
-            return map;
         }
         catch (const std::exception&)
         {
@@ -276,27 +277,12 @@ namespace common
     //
     // Map
     //
-    model::DynamicMap LoadMap(const std::string& filename)
-    {
-        if (filename == "")
-        {
-            return model::DynamicMap{};
-        }
-
-        if (!utilities::IsFileReadable(filename))
-        {
-            throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound);
-        }
-
-        auto filestream = utilities::OpenIfstream(filename);
-        return LoadArchivedMap<utilities::JsonUnarchiver>(filestream);
-    }
-
-    model::DynamicMap LoadMap(const MapLoadArguments& mapLoadArguments)
+    template <>
+    model::DynamicMap LoadMap<model::DynamicMap, MapLoadArguments::MapType::simpleMap>(const MapLoadArguments& mapLoadArguments)
     {
         if (mapLoadArguments.HasMapFilename())
         {
-            return common::LoadMap(mapLoadArguments.inputMapFilename);
+            return common::LoadMap<model::DynamicMap>(mapLoadArguments.inputMapFilename);
         }
         else if (mapLoadArguments.HasModelFilename())
         {
@@ -351,6 +337,7 @@ namespace common
             model::Model model;
             auto inputNode = model.AddNode<model::InputNode<double>>(mapLoadArguments.defaultInputSize);
             model::PortElements<double> outputElements(inputNode->output);
+
             return { model, { { "input", inputNode } }, { { "output", outputElements } } };
         }
     }

@@ -33,8 +33,11 @@ namespace model
 
         /// <summary> Compiles the steppable model with the given function name </summary>
         /// <param name="map"> The map to be compiled </param>
-        /// <param name="functionName"> The function name of the compiled map </param>
-        IRCompiledMap Compile(SteppableMap<ClockType> map, const std::string& functionName = "step");
+        IRCompiledMap Compile(SteppableMap<ClockType> map);
+
+    protected:
+        virtual void EmitModelAPIFunctions(const DynamicMap& map) override;
+        virtual std::string GetPredictFunctionName() const override;
 
     private:
         void EnsureValidMap(SteppableMap<ClockType>& map);

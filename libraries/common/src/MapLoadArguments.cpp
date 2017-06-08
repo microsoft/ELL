@@ -63,6 +63,14 @@ namespace common
             "d",
             "Default size of input node",
             1);
+
+        parser.AddOption(
+            mapType,
+            "mapType",
+            "m",
+            "Choice of map type (must match input map file): simple, clockStep, sysClockStep",
+            { { "simple", MapType::simpleMap }, { "clockStep", MapType::steadyClockSteppableMap }, { "sysClockStep", MapType::systemClockSteppableMap } },
+            "simple");
     }
 
     model::InputNodeBase* MapLoadArguments::GetInput(model::Model& model) const

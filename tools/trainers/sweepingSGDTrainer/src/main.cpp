@@ -28,21 +28,20 @@
 #include "MapSaveArguments.h"
 #include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
 #include "ParametersEnumerator.h"
 #include "TrainerArguments.h"
 
 // trainers
-#include "EvaluatingIncrementalTrainer.h"
-#include "SGDLinearTrainer.h"
-#include "SweepingIncrementalTrainer.h"
+#include "EvaluatingTrainer.h"
+#include "SGDTrainer.h"
+#include "SweepingTrainer.h"
 
 // evaluators
 #include "BinaryErrorAggregator.h"
 #include "Evaluator.h"
 #include "LossAggregator.h"
 
-// lossFunctions
+// functions
 #include "HingeLoss.h"
 #include "LogLoss.h"
 
@@ -73,13 +72,11 @@ int main(int argc, char* argv[])
         common::ParsedDataLoadArguments dataLoadArguments;
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
-        common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
 
         commandLineParser.AddOptionSet(trainerArguments);
         commandLineParser.AddOptionSet(dataLoadArguments);
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
-        commandLineParser.AddOptionSet(multiEpochTrainerArguments);
 
         // parse command line
         commandLineParser.Parse();
@@ -95,7 +92,7 @@ int main(int argc, char* argv[])
 
         // load map
         mapLoadArguments.defaultInputSize = dataLoadArguments.parsedDataDimension;
-        model::DynamicMap map = common::LoadMap(mapLoadArguments);
+        auto map = common::LoadMap(mapLoadArguments);
 
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
@@ -107,25 +104,26 @@ int main(int argc, char* argv[])
         using PredictorType = predictors::LinearPredictor;
 
         // set up evaluators to only evaluate on the last update of the multi-epoch trainer
-        evaluators::EvaluatorParameters evaluatorParameters{ multiEpochTrainerArguments.numEpochs, false };
+        evaluators::EvaluatorParameters evaluatorParameters{ 1, false };
 
         // create trainers
-        auto generator = common::MakeParametersEnumerator<trainers::SGDLinearTrainerParameters>(regularization);
-        std::vector<trainers::EvaluatingIncrementalTrainer<PredictorType>> evaluatingTrainers;
+        auto generator = common::MakeParametersEnumerator<trainers::SGDTrainerParameters>(regularization);
+        std::vector<trainers::EvaluatingTrainer<PredictorType>> evaluatingTrainers;
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
         for (size_t i = 0; i < regularization.size(); ++i)
         {
-            auto SGDLinearTrainer = common::MakeSGDLinearTrainer(trainerArguments.lossArguments, generator.GenerateParameters(i));
-            evaluators.push_back(common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossArguments));
-            evaluatingTrainers.push_back(trainers::MakeEvaluatingIncrementalTrainer(std::move(SGDLinearTrainer), evaluators.back()));
+            auto SGDTrainer = common::MakeSGDTrainer(trainerArguments.lossFunctionArguments, generator.GenerateParameters(i));
+            evaluators.push_back(common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorParameters, trainerArguments.lossFunctionArguments));
+            evaluatingTrainers.push_back(trainers::MakeEvaluatingTrainer(std::move(SGDTrainer), evaluators.back()));
         }
 
         // create meta trainer
-        auto trainer = trainers::MakeSweepingIncrementalTrainer(std::move(evaluatingTrainers), multiEpochTrainerArguments);
+        auto trainer = trainers::MakeSweepingTrainer(std::move(evaluatingTrainers));
 
         // train
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(mappedDataset.GetAnyDataset());
+        trainer->SetDataset(mappedDataset.GetAnyDataset());
+        trainer->Update();
         predictors::LinearPredictor predictor(trainer->GetPredictor());
         predictor.Resize(mappedDatasetDimension);
 

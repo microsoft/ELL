@@ -115,6 +115,12 @@ namespace emitters
         return _functionStack.top().first;
     }
 
+    IRFunctionEmitter IRModuleEmitter::BeginMainFunction()
+    {
+        return BeginFunction("main", VariableType::Void);
+    }
+
+
     void IRModuleEmitter::EndFunction()
     {
         EndFunction(nullptr);
@@ -148,7 +154,7 @@ namespace emitters
                 }
             }
             currentFunction.ConcatRegions();
-            currentFunction.Complete(GetCompilerParameters().optimize);
+            currentFunction.CompleteFunction(GetCompilerParameters().optimize);
         }
         _emitter.SetCurrentBlock(previousBlock);
     }
@@ -515,11 +521,6 @@ namespace emitters
     // Helpers, standard C Runtime functions, and debug support
     //
 
-    IRFunctionEmitter IRModuleEmitter::AddMain()
-    {
-        return Function("main", VariableType::Void, true);
-    }
-
     void IRModuleEmitter::DeclarePrintf()
     {
         llvm::FunctionType* type = llvm::TypeBuilder<int(char*, ...), false>::get(_emitter.GetContext());
@@ -548,10 +549,10 @@ namespace emitters
         DeclareFunction("ELL_GetSystemClockMilliseconds", VariableType::Double);
     }
 
-    IRFunctionEmitter IRModuleEmitter::AddMainDebug()
+    IRFunctionEmitter IRModuleEmitter::BeginMainDebugFunction()
     {
         DeclarePrintf();
-        return AddMain();
+        return BeginMainFunction();
     }
 
     IRDiagnosticHandler& IRModuleEmitter::GetDiagnosticHandler()
