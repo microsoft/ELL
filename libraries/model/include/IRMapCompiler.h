@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     IRMapCompiler.h (model)
-//  Authors:  Umesh Madan
+//  Authors:  Umesh Madan, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -15,11 +15,11 @@
 #include "EmitterException.h"
 #include "IRBlockRegion.h"
 #include "IRModuleEmitter.h"
-#include "NodeMap.h"
 
 // model
 #include "InputPort.h"
 #include "Node.h"
+#include "NodeMap.h"
 #include "OutputPort.h"
 #include "PortElements.h"
 
@@ -48,53 +48,77 @@ namespace model
         ///
         /// <param name="map"> The map to compile </param>
         /// <param name="functionName"> The name of the function to evaluate the map </param>
-        IRCompiledMap Compile(DynamicMap map, const std::string& functionName = "predict");
+        IRCompiledMap Compile(DynamicMap map);
 
+        /// <summary> Gets the compiler parameters being used by the IR emitter. </summary>
+        ///
+        /// <returns> The CompilerParameters struct used by the IR emitter to control code generation. </returns>
         emitters::CompilerParameters GetCompilerParameters() const { return GetModule().GetCompilerParameters(); }
 
         //
         // Routines useful to Node implementers
         //
 
+        /// <summary> Returns the ModuleEmitter associated with this map. </summary>
+        ///
+        /// <returns> The ModuleEmitter associated with this map. </returns>
         emitters::IRModuleEmitter& GetModule() { return _moduleEmitter; }
+
+        /// <summary> Returns the ModuleEmitter associated with this map. </summary>
+        ///
+        /// <returns> The ModuleEmitter associated with this map. </returns>
         const emitters::IRModuleEmitter& GetModule() const { return _moduleEmitter; }
 
         /// <summary> Ensure that variable for the outport port referenced by this input port has been declared in IR </summary>
-        llvm::Value* EnsurePortEmitted(const model::InputPortBase& port);
+        ///
+        /// <param name="port"> The port to ensure is emitted. </param>
+        /// <returns> The LLVM Value object corresponding to the port. </returns> 
+        llvm::Value* EnsurePortEmitted(const InputPortBase& port);
 
         /// <summary> Ensure that variable for the given port has been declared in IR </summary>
-        llvm::Value* EnsurePortEmitted(const model::OutputPortBase& port);
+        ///
+        /// <param name="port"> The port to ensure is emitted. </param>
+        /// <returns> The LLVM Value object corresponding to the port. </returns> 
+        llvm::Value* EnsurePortEmitted(const OutputPortBase& port);
 
         /// <summary> Ensure that variable for the given port element has been declared in IR </summary>
-        llvm::Value* EnsurePortElementEmitted(const model::PortElementBase& element);
+        ///
+        /// <param name="port"> The port elements to ensure are emitted. </param>
+        /// <returns> The LLVM Value object corresponding to the elements. </returns> 
+        llvm::Value* EnsurePortElementEmitted(const PortElementBase& element);
 
         /// <summary> Load the variable for the outport port referenced by this input port </summary>
-        llvm::Value* LoadPortVariable(const model::InputPortBase& port);
+        ///
+        /// <param name="port"> The port to load into a register. </param>
+        /// <returns> The LLVM Value object corresponding to the port. </returns> 
+        llvm::Value* LoadPortVariable(const InputPortBase& port);
 
-        /// <summary> Ensure that the variable for this outport port element is loaded into a register. This will automatically
-        /// dereference any pointers it needs to. </summary>
-        llvm::Value* LoadPortElementVariable(const model::PortElementBase& element);
-
-        emitters::Variable* GetPortVariable(const model::InputPortBase& port);
-        emitters::Variable* GetPortElementVariable(const PortElementBase& element);
+        /// <summary>
+        /// Ensure that the variable for this outport port element is loaded into a register. This will automatically
+        /// dereference any pointers it needs to.
+        /// </summary>
+        ///
+        /// <param name="port"> The port element to load into a register. </param>
+        /// <returns> The LLVM Value object corresponding to the port element. </returns> 
+        llvm::Value* LoadPortElementVariable(const PortElementBase& element);
 
         /// <summary> Creates a new BlockRegion for the node </summary>
         ///
         /// <param name="node"> The node we're compiling </param>
-        void NewNodeRegion(const model::Node& node) override;
+        void NewNodeRegion(const Node& node) override;
 
         /// <summary> Tries to merge the BlockRegion for the current node into the previous block </summary>
         ///
         /// <param name="node"> The node we're compiling </param>
         /// <returns> `true` if the regions were merged </returns>
-        virtual bool TryMergeNodeRegion(const model::Node& node) override;
+        virtual bool TryMergeNodeRegion(const Node& node) override;
 
         /// <summary> Tries to merge the BlockRegion for the current node into the BlockRegion from another node </summary>
         ///
         /// <param name="dest"> The node we merging into </param>
         /// <param name="src"> The node we're compiling </param>
         /// <returns> `true` if the regions were merged </returns>
-        virtual bool TryMergeNodeRegions(const model::Node& dest, const model::Node& src) override;
+        virtual bool TryMergeNodeRegions(const Node& dest, const Node& src) override;
 
         /// <summary>
         /// Returns the `IRBlockRegion` that computes the given element's value, if
@@ -104,28 +128,44 @@ namespace model
         ///
         /// <param name="element"> The port element whose block we want to merge into. </param>
         /// <returns> The `IRBlockRegion` that computes `element` if that block is mergeable, `nullptr` otherwise. </returns>
-        emitters::IRBlockRegion* GetMergeableNodeRegion(const model::PortElementBase& element);
+        emitters::IRBlockRegion* GetMergeableNodeRegion(const PortElementBase& element);
 
         /// <summary> Get the LLVM context for this compiler </summary>
         ///
         /// <returns> A reference to the LLVM context. </returns>
         llvm::LLVMContext& GetLLVMContext();
 
+        /// <summary> Gets the namespace string used to prefix emitted map-specific runtime functions. </summary>
+        ///
+        /// <returns> The namespace prefix for the emitted module. </returns>
+        std::string GetNamespacePrefix() const;
+
     protected:
-        virtual void OnBeginCompileNode(const model::Node& node) override;
-        virtual void OnEndCompileNode(const model::Node& node) override;
+        virtual void OnBeginCompileModel(const Model& model) override;
+        virtual void OnEndCompileModel(const Model& model) override;
+        virtual void OnBeginCompileNode(const Node& node) override;
+        virtual void OnEndCompileNode(const Node& node) override;
         virtual void PushScope() override;
         virtual void PopScope() override;
         virtual emitters::ModuleEmitter* GetModuleEmitter() override { return &_moduleEmitter; }
         void EnsureValidMap(DynamicMap& map);
+        virtual std::string GetPredictFunctionName() const;
+        virtual void EmitModelAPIFunctions(const DynamicMap& map);
+        emitters::Variable* GetPortVariable(const InputPortBase& port);
+        emitters::Variable* GetPortElementVariable(const PortElementBase& element);
+
+        emitters::IRModuleEmitter _moduleEmitter;
+        // Profiler object for model
+        ModelProfiler _profiler;
 
     private:
         NodeMap<emitters::IRBlockRegion*>& GetCurrentNodeBlocks();
-        const model::Node* GetUniqueParent(const model::Node& node);
+        const Node* GetUniqueParent(const Node& node);
+        bool TryMergeNodeIntoRegion(emitters::IRBlockRegion* pDestination, const Node& src);
 
-        bool TryMergeNodeIntoRegion(emitters::IRBlockRegion* pDestination, const model::Node& src);
-
-        emitters::IRModuleEmitter _moduleEmitter;
+        void EmitGetInputSizeFunction(const DynamicMap& map);
+        void EmitGetOutputSizeFunction(const DynamicMap& map);
+        void EmitGetNumNodesFunction(const DynamicMap& map);
 
         // stack of node regions
         std::vector<NodeMap<emitters::IRBlockRegion*>> _nodeRegions;

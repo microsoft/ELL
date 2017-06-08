@@ -29,6 +29,11 @@ namespace model
         _inputs.push_back(input);
     }
 
+    void Node::AddOutputPort(OutputPortBase* output)
+    {
+        _outputs.push_back(output);
+    }
+
     InputPortBase* Node::GetInputPort(const std::string& portName)
     {
         for (auto port : _inputs)
@@ -75,6 +80,16 @@ namespace model
             }
         }
         return nullptr;
+    }
+
+    OutputPortBase* Node::GetOutputPort(size_t portIndex)
+    {
+        return _outputs[portIndex];
+    }
+
+    const OutputPortBase* Node::GetOutputPort(size_t portIndex) const
+    {
+        return _outputs[portIndex];
     }
 
     Port* Node::GetPort(const std::string& portName)
@@ -146,6 +161,50 @@ namespace model
     bool Node::Refine(ModelTransformer& transformer) const
     {
         Copy(transformer);
+        return false;
+    }
+
+    void Node::Print(std::ostream& os) const
+    {
+        bool isFirstInputPort = true;
+        std::cout << "node_" << GetId() << " (" << std::hex << this << std::dec << ") = " << GetRuntimeTypeName() << "(";
+        for (const auto& inputPort : GetInputPorts())
+        {
+            std::cout << (isFirstInputPort ? "" : ", ");
+            isFirstInputPort = false;
+
+            auto elements = inputPort->GetInputElements();
+            if (elements.NumRanges() > 1)
+            {
+                std::cout << "{";
+            }
+
+            bool isFirstRange = true;
+            for (const auto& range : elements.GetRanges())
+            {
+                std::cout << (isFirstRange ? "" : ", ");
+                isFirstRange = false;
+
+                auto port = range.ReferencedPort();
+                std::cout << "node_" << port->GetNode()->GetId() << "." << port->GetName();
+                if (!range.IsFullPortRange())
+                {
+                    auto start = range.GetStartIndex();
+                    auto size = range.Size();
+                    std::cout << "[" << start << ":" << (start + size) << "]";
+                }
+            }
+
+            if (elements.NumRanges() > 1)
+            {
+                std::cout << "}";
+            }
+        }
+        std::cout << ")" << std::endl;
+    }
+
+    bool Node::HasState() const
+    {
         return false;
     }
 

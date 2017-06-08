@@ -72,7 +72,7 @@ namespace model
         _context = context;
         _model = Model();
         _elementToElementMap.clear();
-        oldModel.Visit(outputNode, [this](const Node& node) { node.InvokeCopy(*this); });
+        oldModel.VisitSubset(outputNode, [this](const Node& node) { node.InvokeCopy(*this); });
         _context = TransformContext();
 
         return std::move(_model);
@@ -83,7 +83,7 @@ namespace model
         _context = context;
         _model = Model();
         _elementToElementMap.clear();
-        oldModel.Visit(outputNodes, [this](const Node& node) { node.InvokeCopy(*this); });
+        oldModel.VisitSubset(outputNodes, [this](const Node& node) { node.InvokeCopy(*this); });
         _context = TransformContext();
 
         return std::move(_model);

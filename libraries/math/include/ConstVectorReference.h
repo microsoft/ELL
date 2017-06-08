@@ -32,7 +32,7 @@ namespace math
         /// <param name="pData"> [in,out] Pointer to the data. </param>
         /// <param name="size"> The size of the vector. </param>
         /// <param name="increment"> The vector increment. </param>
-        UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment);
+        UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment=1);
 
         /// <summary> Gets a const pointer to the underlying data storage. </summary>
         ///

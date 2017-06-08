@@ -84,21 +84,21 @@ void TestLLVMShiftRegister()
     std::vector<double> newData1({ 1.2, 2.2 });
     std::vector<double> newData2({ 3.2, 4.2 });
 
-    auto fn = module.AddMain();
+    auto shiftFunction = module.BeginMainFunction();
     llvm::GlobalVariable* pRegister = module.GlobalArray("g_shiftRegister", data);
     llvm::Value* c1 = module.ConstantArray("c_1", newData1);
     llvm::Value* c2 = module.ConstantArray("c_2", newData2);
 
-    fn.Print("Begin\n");
-    fn.PrintForEach("%f\n", pRegister, data.size());
-    fn.Print("Shift 1\n");
-    fn.ShiftAndUpdate<double>(pRegister, data.size(), newData1.size(), c1);
-    fn.PrintForEach("%f\n", pRegister, data.size());
-    fn.Print("Shift 2\n");
-    fn.ShiftAndUpdate<double>(pRegister, data.size(), newData2.size(), c2);
-    fn.PrintForEach("%f\n", pRegister, data.size());
-    fn.Return();
-    fn.Complete(true);
+    shiftFunction.Print("Begin\n");
+    shiftFunction.PrintForEach("%f\n", pRegister, data.size());
+    shiftFunction.Print("Shift 1\n");
+    shiftFunction.ShiftAndUpdate<double>(pRegister, data.size(), newData1.size(), c1);
+    shiftFunction.PrintForEach("%f\n", pRegister, data.size());
+    shiftFunction.Print("Shift 2\n");
+    shiftFunction.ShiftAndUpdate<double>(pRegister, data.size(), newData2.size(), c2);
+    shiftFunction.PrintForEach("%f\n", pRegister, data.size());
+    shiftFunction.Return();
+    module.EndFunction();
 
     module.DebugDump();
     module.WriteToFile("shift.bc");
@@ -119,7 +119,7 @@ void TestLLVM()
     llvm::GlobalVariable* pTotal = module.Global(VariableType::Double, "g_total");
     llvm::GlobalVariable* pRegisters = module.GlobalArray("g_registers", structType, data.size());
 
-    auto fnMain = module.AddMain();
+    auto fnMain = module.BeginMainFunction();
 
     IRForLoopEmitter testLoop(fnMain);
     testLoop.Begin(data.size());
@@ -182,8 +182,8 @@ void TestLLVM()
     fnMain.Printf({ fnMain.Literal("Total = %f, OtherTotal= %f\n"), fnMain.Load(pTotal), fnMain.Load(pOtherTotal) });
 
     fnMain.Return();
+    module.EndFunction();
 
-    fnMain.Complete(false);
     module.DebugDump();
 
     module.WriteToFile("loop.bc");
@@ -195,7 +195,7 @@ void TestIfElseComplex()
     IRModuleEmitter module("IfElse");
     module.DeclarePrintf();
 
-    auto fn = module.AddMain();
+    auto fn = module.BeginMainFunction();
     auto pMainBlock = fn.GetCurrentBlock();
     fn.Print("Begin IfThen\n");
     // We deliberately create the done block first, so that we have to move blocks around when we do if then
@@ -231,7 +231,7 @@ void TestIfElseComplex()
         fn.Branch(pCondBlock);
     }
 
-    fn.Complete(true);
+    module.EndFunction();
     module.DebugDump();
     module.WriteToFile("ifelse.bc");
 }
@@ -241,7 +241,7 @@ void TestIfElseBlockRegions(bool runJit)
     IRModuleEmitter module("IfElse");
     module.DeclarePrintf();
 
-    auto fn = module.AddMain();
+    auto fn = module.BeginMainFunction();
     auto pMainBlock = fn.GetCurrentBlock();
     fn.Print("Begin IfThen\n");
     IRBlockRegionList regions;
@@ -288,7 +288,7 @@ void TestIfElseBlockRegions(bool runJit)
         fn.Branch(pCondBlock);
     }
 
-    fn.Complete(true);
+    module.EndFunction();
     if (runJit)
     {
         IRExecutionEngine iee(std::move(module));
@@ -335,7 +335,7 @@ void TestLogical()
 
     fn.Verify();
 
-    auto fnMain = module.AddMain();
+    auto fnMain = module.BeginMainFunction();
     // We do this to prevent LLVM from doing constant folding.. so we can debug/see what is happening.
     fnMain.Call("TestLogical", { fnMain.Literal(5), fnMain.Literal(10), fnMain.Literal(15) });
     fnMain.Return();
@@ -391,7 +391,7 @@ void TestMutableConditionForLoop(bool runJit)
     fn.Return();
     module.EndFunction();
 
-    auto fnMain = module.AddMain();
+    auto fnMain = module.BeginMainFunction();
     fnMain.Call("TestMutableConditionForLoop", { fnMain.Literal<double>(0), fnMain.Literal<double>(5), fnMain.Literal<double>(20) });
     fnMain.Return();
 

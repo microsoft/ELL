@@ -30,7 +30,9 @@ namespace ell
 /// <summary> model namespace </summary>
 namespace model
 {
+    // Forward declarations
     class InputNodeBase;
+
     template <typename ValueType>
     class InputNode;
 
@@ -221,6 +223,9 @@ namespace model
         /// <param name="newElements"> The elements in the new model to be mapped from the old model. </param>
         template <typename ValueType>
         void MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements);
+
+        template <typename ValueType>
+        void MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElementsBase& newElements);
 
         /// <summary> Get the context used by the transformer. Called by node implementors </summary>
         ///

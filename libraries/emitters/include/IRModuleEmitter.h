@@ -122,6 +122,11 @@ namespace emitters
         /// <param name="argsTypes"> The argument types for the function. </param>
         IRFunctionEmitter& BeginFunction(const std::string& functionName, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes);
 
+        /// <summary> Emit a "main" function, the entry point to an LLVM program. </summary>
+        ///
+        /// <returns> An IRFunctionEmitter. </returns>
+        IRFunctionEmitter BeginMainFunction();
+
         /// <summary> Ends the current function. </summary>
         void EndFunction();
 
@@ -408,11 +413,6 @@ namespace emitters
         // Helpers, standard C Runtime functions, and debug support
         //
 
-        /// <summary> Emit a "main" function, the entry point to an LLVM program. </summary>
-        ///
-        /// <returns> An IRFunctionEmitter. </returns>
-        IRFunctionEmitter AddMain();
-
         /// <summary>Emit declaration of extern printf. </summary>
         void DeclarePrintf();
 
@@ -429,7 +429,7 @@ namespace emitters
         void DeclareGetClockMilliseconds();
 
         /// <summary> Add a main function into which you will inject debugging code. </summary>
-        IRFunctionEmitter AddMainDebug();
+        IRFunctionEmitter BeginMainDebugFunction();
 
         /// <summary> Get the diagnostic handler. </summary>
         IRDiagnosticHandler& GetDiagnosticHandler();

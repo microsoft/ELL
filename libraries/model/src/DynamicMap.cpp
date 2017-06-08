@@ -60,12 +60,28 @@ namespace model
         FixTransformedIO(transformer);
     }
 
+    DynamicMap& DynamicMap::operator=(DynamicMap other)
+    {
+        swap(*this, other);
+        return *this;
+    }
+
     void DynamicMap::SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const
     {
         node->SetInput(inputValues);
     }
 
     void DynamicMap::SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const
+    {
+        node->SetInput(inputValues);
+    }
+
+    void DynamicMap::SetNodeInput(InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const
+    {
+        node->SetInput(inputValues);
+    }
+
+    void DynamicMap::SetNodeInput(InputNode<float>* node, const std::vector<float>& inputValues) const
     {
         node->SetInput(inputValues);
     }
@@ -85,6 +101,16 @@ namespace model
         return _model.ComputeOutput<int>(outputs);
     }
 
+    std::vector<int64_t> DynamicMap::ComputeInt64Output(const PortElementsBase& outputs) const
+    {
+        return _model.ComputeOutput<int64_t>(outputs);
+    }
+
+    std::vector<float> DynamicMap::ComputeFloatOutput(const PortElementsBase& outputs) const
+    {
+        return _model.ComputeOutput<float>(outputs);
+    }
+
     std::vector<double> DynamicMap::ComputeDoubleOutput(const PortElementsBase& outputs) const
     {
         return _model.ComputeOutput<double>(outputs);
@@ -100,6 +126,18 @@ namespace model
     std::vector<int> DynamicMap::ComputeOutput<int>(const PortElementsBase& elements) const
     {
         return ComputeIntOutput(elements);
+    }
+
+    template <>
+    std::vector<int64_t> DynamicMap::ComputeOutput<int64_t>(const PortElementsBase& elements) const
+    {
+        return ComputeInt64Output(elements);
+    }
+
+    template <>
+    std::vector<float> DynamicMap::ComputeOutput<float>(const PortElementsBase& elements) const
+    {
+        return ComputeFloatOutput(elements);
     }
 
     template <>
@@ -127,6 +165,18 @@ namespace model
         assert(index >= 0 && index <= _outputElements.size() && "Error: Resetting unset output");
         _outputElements[index] = outputElements;
         _outputElementsMap[_outputNames[index]] = outputElements;
+    }
+
+    void swap(DynamicMap& a, DynamicMap& b)
+    {
+        using std::swap;
+        swap(a._model, b._model);
+        swap(a._inputNodes, b._inputNodes);
+        swap(a._inputNames, b._inputNames);
+        swap(a._inputNodeMap, b._inputNodeMap);
+        swap(a._outputElements, b._outputElements);
+        swap(a._outputNames, b._outputNames);
+        swap(a._outputElementsMap, b._outputElementsMap);
     }
 
     std::vector<const Node*> DynamicMap::GetOutputNodes()
@@ -184,9 +234,20 @@ namespace model
         _model = std::move(minimalModel);
     }
 
+    size_t DynamicMap::GetInputSize() const
+    {
+        return GetInput(0)->Size();
+    }
+
     size_t DynamicMap::GetOutputSize() const
     {
         return GetOutput(0).Size();
+    }
+
+    void DynamicMap::Refine(int maxIterations)
+    {
+        TransformContext context;
+        return Refine(context, maxIterations);
     }
 
     void DynamicMap::Refine(const TransformContext& context, int maxIterations)
@@ -199,7 +260,9 @@ namespace model
         ModelTransformer transformer;
         auto refinedModel = transformer.RefineModel(_model, context, maxIterations);
         FixTransformedIO(transformer);
+
         _model = std::move(refinedModel);
+        Prune();
     }
 
     void DynamicMap::Transform(const std::function<void(const Node&, ModelTransformer&)>& transformFunction, const TransformContext& context)

@@ -21,6 +21,7 @@
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <time.h>
 
 namespace ell
 {
@@ -28,12 +29,12 @@ namespace model
 {
     void CompilableNode::CompileNode(MapCompiler& compiler)
     {
-        // TODO: put this somewhere IR-specific
         auto irCompiler = dynamic_cast<IRMapCompiler*>(&compiler);
         if (irCompiler == nullptr)
         {
             throw emitters::EmitterException(emitters::EmitterError::notSupported, "Unknown compiler type");
         }
+
         emitters::IRModuleEmitter& moduleEmitter = irCompiler->GetModule();
         auto& enclosingFunction = moduleEmitter.GetCurrentFunction();
 
@@ -49,19 +50,38 @@ namespace model
             auto functionName = GetCompiledFunctionName();
             if (!moduleEmitter.HasFunction(functionName))
             {
-                compiler.PushScope(); // create a new port variable scope
-                emitters::NamedVariableTypeList args = GetNodeFunctionParameterList(*irCompiler); // returns correct thing
-                auto function = moduleEmitter.BeginFunction(functionName, emitters::VariableType::Void, args);
-                irCompiler->NewNodeRegion(*this);
-                Compile(*irCompiler, function);
-                irCompiler->TryMergeNodeRegion(*this);
-                moduleEmitter.EndFunction();
+                compiler.PushScope();
+                emitters::NamedVariableTypeList args = GetNodeFunctionParameterList(*irCompiler);
+
+                // TODO: combine precompiled-IR case with use-own-function case
+                if (HasPrecompiledIR())
+                {
+                    auto functionCode = GetPrecompiledIR();
+                    moduleEmitter.LoadIR(functionCode);
+                }
+                else if (HasOwnFunction())
+                {
+                    EmitNodeFunction(moduleEmitter);
+                }
+                else
+                {
+                    auto function = moduleEmitter.BeginFunction(functionName, emitters::VariableType::Void, args);
+                    irCompiler->NewNodeRegion(*this);
+                    Compile(*irCompiler, function);
+                    irCompiler->TryMergeNodeRegion(*this);
+                    moduleEmitter.EndFunction();
+                }
                 compiler.PopScope();
             }
 
             // Call function for node
             CallNodeFunction(*irCompiler, enclosingFunction);
         }
+    }
+
+    void CompilableNode::Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    {
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
     bool CompilableNode::ShouldCompileInline() const
@@ -74,7 +94,7 @@ namespace model
                 return true;
             }
 
-            // TODO: Re-enabled compiling nodes with scalar inputs, once issues are worked out`
+            // TODO: Re-enable compiling nodes with scalar inputs, once issues are worked out
             if (inputPort->GetInputElements().Size() == 1) // scalar
             {
                 return true;
@@ -85,24 +105,47 @@ namespace model
 
     std::string CompilableNode::GetCompiledFunctionName() const
     {
+        auto baseName = _nodeFunctionPrefix + GetRuntimeTypeName();
+
         auto accumSizeString = [](const std::string& prefix, const Port* port) { return prefix + "_" + std::to_string(port->Size()); };
         auto inputPortStr = std::accumulate(GetInputPorts().begin(), GetInputPorts().end(), std::string("_in"), accumSizeString);
         auto outputPortStr = std::accumulate(GetOutputPorts().begin(), GetOutputPorts().end(), std::string("_out"), accumSizeString);
-        auto stateId = GetStateIdentifier();
-        auto functionName = GetRuntimeTypeName() + inputPortStr + outputPortStr;
+        auto stateId = GetInternalStateIdentifier();
+        auto functionName = baseName + inputPortStr + outputPortStr;
+
         if (stateId != "")
         {
-            functionName += std::string("_") + GetStateIdentifier();
+            functionName += std::string("_") + GetInternalStateIdentifier();
+        }
+
+        for (auto ch : _badIdentifierChars)
+        {
+            std::replace(functionName.begin(), functionName.end(), ch, '_');
         }
         return functionName;
     }
 
-    bool CompilableNode::HasState() const
+    bool CompilableNode::HasOwnFunction() const
     {
         return false;
     }
 
-    std::string CompilableNode::GetStateIdentifier() const
+    void CompilableNode::EmitNodeFunction(emitters::IRModuleEmitter& module)
+    {
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+    }
+
+    bool CompilableNode::HasPrecompiledIR() const
+    {
+        return false;
+    }
+
+    std::string CompilableNode::GetPrecompiledIR() const
+    {
+        return "";
+    }
+
+    std::string CompilableNode::GetInternalStateIdentifier() const
     {
         if (HasState())
         {
@@ -111,16 +154,6 @@ namespace model
         else
         {
             return "";
-        }
-    }
-
-    void CompilableNode::DeclareNodeFunction(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction)
-    {
-        auto functionName = GetCompiledFunctionName();
-        if (!compiler.GetModule().HasFunction(functionName))
-        {
-            emitters::NamedVariableTypeList args = GetNodeFunctionParameterList(compiler);
-            compiler.GetModule().DeclareFunction(functionName, emitters::VariableType::Void, args);
         }
     }
 
@@ -137,17 +170,15 @@ namespace model
 
             auto var = compiler.AllocateNodeFunctionArgument(module, port->GetInputElement(0), MapCompiler::ArgType::input);
             auto varName = var->EmittedName();
-            if (port->Size() == 1) // scalar
-            {
-                args.emplace_back(varName, varType);
-            }
-            else
-            {
-                args.emplace_back(varName, ptrType);
-            }
+            args.emplace_back(varName, IsScalar(*port) ? varType : ptrType);
         };
 
-        // TODO: add node state
+        // add node state
+        auto stateParams = GetNodeFunctionStateParameterList(compiler);
+        for (const auto& param : stateParams)
+        {
+            args.emplace_back(param);
+        }
 
         for (auto port : GetOutputPorts())
         {
@@ -162,6 +193,11 @@ namespace model
         return args;
     }
 
+    emitters::NamedVariableTypeList CompilableNode::GetNodeFunctionStateParameterList(IRMapCompiler& compiler) const
+    {
+        return {};
+    }
+
     // Get the actual arguments use to call the node function
     std::vector<llvm::Value*> CompilableNode::GetNodeFunctionArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const
     {
@@ -174,7 +210,7 @@ namespace model
 
             assert(port->GetInputElements().NumRanges() == 1); // if we're using an input port as a function argument, we need to preprocess model to ensure it's a full range
             auto inputArg = compiler.EnsurePortEmitted(*port);
-            if (port->Size() == 1)
+            if (IsScalar(*port))
             {
                 auto inputArgType = inputArg->getType();
                 bool needsDereference = inputArgType->isPointerTy(); // This should perhaps be `isPtrOrPtrVectorTy()` or even `isPtrOrPtrVectorTy() || isArrayTy()`
@@ -193,7 +229,12 @@ namespace model
             }
         };
 
-        // TODO: add node state
+        // add node state
+        auto stateArgs = GetNodeFunctionStateArguments(compiler, currentFunction);
+        for (const auto& arg : stateArgs)
+        {
+            args.emplace_back(arg);
+        }
 
         for (auto port : GetOutputPorts())
         {
@@ -203,6 +244,11 @@ namespace model
         };
 
         return args;
+    }
+
+    std::vector<llvm::Value*> CompilableNode::GetNodeFunctionStateArguments(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const
+    {
+        return {};
     }
 
     void CompilableNode::CallNodeFunction(IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction)

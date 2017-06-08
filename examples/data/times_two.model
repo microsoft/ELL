@@ -18,14 +18,14 @@
       "_type": "InputPort<double>",
       "nodeId":       "1005",
       "name": "input1",
-      "type": 1,
+      "type": 2,
       "input":       "1003.output"
     },
     "input2": {
       "_type": "InputPort<double>",
       "nodeId":       "1005",
       "name": "input2",
-      "type": 1,
+      "type": 2,
       "input":       "1004.output"
     },
     "operation": "coordinatewiseMultiply"
@@ -37,7 +37,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1006",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1005.output"
     }
   }]

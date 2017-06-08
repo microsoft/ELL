@@ -13,14 +13,14 @@
       "_type": "InputPort<double>",
       "nodeId":       "1011",
       "name": "input1",
-      "type": 1,
+      "type": 2,
       "input":       "1010.output[0]"
     },
     "input2": {
       "_type": "InputPort<double>",
       "nodeId":       "1011",
       "name": "input2",
-      "type": 1,
+      "type": 2,
       "input":       "1010.output[1]"
     },
     "predicate": "equal"
@@ -32,7 +32,7 @@
       "_type": "InputPort<bool>",
       "nodeId":       "1012",
       "name": "input",
-      "type": 4,
+      "type": 6,
       "input":       "1011.output"
     }
   }]

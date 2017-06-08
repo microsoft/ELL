@@ -13,7 +13,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1076",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1075.output"
     },
     "forest": {

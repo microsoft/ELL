@@ -13,21 +13,21 @@
       "_type": "InputPort<double>",
       "nodeId":       "1017",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1016.output"
     },
     "val": {
       "_type": "OutputPort<double>",
       "nodeId":       "1017",
       "name": "val",
-      "type": 1,
+      "type": 2,
       "size": 1
     },
     "argVal": {
       "_type": "OutputPort<int>",
       "nodeId":       "1017",
       "name": "argVal",
-      "type": 2,
+      "type": 3,
       "size": 1
     }
   }, 
@@ -38,7 +38,7 @@
       "_type": "InputPort<int>",
       "nodeId":       "1018",
       "name": "input",
-      "type": 2,
+      "type": 3,
       "input":       "1017.argVal"
     }
   }]

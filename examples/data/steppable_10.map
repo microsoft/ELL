@@ -15,14 +15,14 @@
         "_type": "InputPort<double>",
         "nodeId":         "1741",
         "name": "input",
-        "type": 1,
+        "type": 2,
         "input":         "1740.output[0:2]"
       },
       "output": {
         "_type": "OutputPort<double>",
         "nodeId":         "1741",
         "name": "output",
-        "type": 1,
+        "type": 2,
         "size": 10
       },
       "outputSize": 10,
@@ -40,14 +40,14 @@
         "_type": "InputPort<double>",
         "nodeId":         "1743",
         "name": "input1",
-        "type": 1,
+        "type": 2,
         "input":         "1741.output[0:10]"
       },
       "input2": {
         "_type": "InputPort<double>",
         "nodeId":         "1743",
         "name": "input2",
-        "type": 1,
+        "type": 2,
         "input":         "1742.output[0:10]"
       },
       "operation": "coordinatewiseMultiply"
@@ -59,7 +59,7 @@
         "_type": "InputPort<double>",
         "nodeId":         "1744",
         "name": "input",
-        "type": 1,
+        "type": 2,
         "input":         "1743.output[0:10]"
       }
     }]

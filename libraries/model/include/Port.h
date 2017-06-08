@@ -30,14 +30,17 @@ namespace model
         enum class PortType
         {
             none = 0,
-            real,
-            integer,
+            smallReal, // == float
+            real, // == double
+            integer, // == int32
+            bigInt, // == int64
             categorical,
             boolean
         };
 
         Port() = default;
         Port(const Port& other) = delete;
+        Port(Port&& other) = default;
         virtual ~Port() = default;
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
@@ -109,33 +112,7 @@ namespace model
     {
         typedef int value_type;
     };
-
-    struct unknown_t
-    {
-    };
-
-    template <>
-    struct PortTypeToValueType<Port::PortType::none>
-    {
-        typedef unknown_t value_type;
-    };
-
-    template <>
-    struct PortTypeToValueType<Port::PortType::real>
-    {
-        typedef double value_type;
-    };
-
-    template <>
-    struct PortTypeToValueType<Port::PortType::integer>
-    {
-        typedef int value_type;
-    };
-
-    template <>
-    struct PortTypeToValueType<Port::PortType::boolean>
-    {
-        typedef bool value_type;
-    };
 }
 }
+
+#include "../tcc/Port.tcc"

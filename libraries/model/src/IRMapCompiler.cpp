@@ -9,6 +9,7 @@
 #include "IRMapCompiler.h"
 #include "CompilableNode.h"
 #include "CompilableNodeUtilities.h"
+#include "IRModelProfiler.h"
 #include "OutputNode.h"
 
 // emitters
@@ -25,7 +26,7 @@ namespace model
     }
 
     IRMapCompiler::IRMapCompiler(const MapCompilerParameters& settings)
-        : MapCompiler(settings), _moduleEmitter(settings.moduleName)
+        : MapCompiler(settings), _moduleEmitter(settings.moduleName), _profiler()
     {
         _moduleEmitter.SetCompilerParameters(settings.compilerSettings);
         _nodeRegions.emplace_back();
@@ -56,6 +57,12 @@ namespace model
                 case model::Port::PortType::integer:
                     outputNode = map.GetModel().AddNode<model::OutputNode<int>>(model::PortElements<int>(out));
                     break;
+                case model::Port::PortType::bigInt:
+                    outputNode = map.GetModel().AddNode<model::OutputNode<int64_t>>(model::PortElements<int64_t>(out));
+                    break;
+                case model::Port::PortType::smallReal:
+                    outputNode = map.GetModel().AddNode<model::OutputNode<float>>(model::PortElements<float>(out));
+                    break;
                 case model::Port::PortType::real:
                     outputNode = map.GetModel().AddNode<model::OutputNode<double>>(model::PortElements<double>(out));
                     break;
@@ -67,17 +74,81 @@ namespace model
         }
     }
 
-    IRCompiledMap IRMapCompiler::Compile(DynamicMap map, const std::string& functionName)
+    std::string IRMapCompiler::GetNamespacePrefix() const
+    {
+        return GetModule().GetModuleName();
+    }
+
+    std::string IRMapCompiler::GetPredictFunctionName() const
+    {
+        return GetMapCompilerParameters().mapFunctionName;
+    }
+
+    IRCompiledMap IRMapCompiler::Compile(DynamicMap map)
     {
         EnsureValidMap(map);
         model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() ? model::NodeAction::compile : model::NodeAction::refine; } };
         map.Refine(context);
 
-        // Now we have the refined map, compile it
-        CompileMap(map, functionName); // base class
+        // Now the model ready for compiling
+        if (GetMapCompilerParameters().profile)
+        {
+            GetModule().AddPreprocessorDefinition(GetNamespacePrefix()+"_PROFILING", "1");
+        }
+        _profiler = { GetModule(), map.GetModel(), GetMapCompilerParameters().profile };
+        _profiler.EmitInitialization();
 
-        auto module = std::make_unique<emitters::IRModuleEmitter>(GetModule().TransferOwnership());
-        return IRCompiledMap(map, functionName, std::move(module));
+        // Now we have the refined map, compile it
+        CompileMap(map, GetPredictFunctionName());
+
+        // Emit runtime model APIs
+        EmitModelAPIFunctions(map);
+
+        // Finish any profiling stuff we need to do and emit functions
+        _profiler.EmitModelProfilerFunctions();
+
+        auto module = std::make_unique<emitters::IRModuleEmitter>(std::move(_moduleEmitter));
+        module->SetTargetTriple(GetCompilerParameters().targetDevice.triple);
+        module->SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
+        return IRCompiledMap(std::move(map), GetMapCompilerParameters().mapFunctionName, std::move(module));
+    }
+
+    void IRMapCompiler::EmitModelAPIFunctions(const DynamicMap& map)
+    {
+        EmitGetInputSizeFunction(map);
+        EmitGetOutputSizeFunction(map);
+        EmitGetNumNodesFunction(map);
+    }
+
+    void IRMapCompiler::EmitGetInputSizeFunction(const DynamicMap& map)
+    {
+        auto& context = _moduleEmitter.GetLLVMContext();
+        auto int32Type = llvm::Type::getInt32Ty(context);
+
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix()+"_GetInputSize", int32Type, {});
+        function.Return(function.Literal(static_cast<int>(map.GetInputSize())));
+        _moduleEmitter.EndFunction();
+    }
+
+    void IRMapCompiler::EmitGetOutputSizeFunction(const DynamicMap& map)
+    {
+        auto& context = _moduleEmitter.GetLLVMContext();
+        auto int32Type = llvm::Type::getInt32Ty(context);
+
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix()+"_GetOutputSize", int32Type, {});
+        function.Return(function.Literal(static_cast<int>(map.GetOutputSize())));
+        _moduleEmitter.EndFunction();
+    }
+
+    void IRMapCompiler::EmitGetNumNodesFunction(const DynamicMap& map)    
+    {
+        auto& context = _moduleEmitter.GetLLVMContext();
+        auto int32Type = llvm::Type::getInt32Ty(context);
+        int numNodes = map.GetModel().Size();
+
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix()+"_GetNumNodes", int32Type, {});
+        function.Return(function.Literal(numNodes));
+        _moduleEmitter.EndFunction();
     }
 
     //
@@ -106,6 +177,23 @@ namespace model
         return GetModule().EnsureEmitted(*pVar);
     }
 
+    void IRMapCompiler::OnBeginCompileModel(const Model& model)
+    {
+        auto& currentFunction = GetModule().GetCurrentFunction();
+        if (currentFunction.GetCurrentRegion() == nullptr) // TODO: put this check in GetCurrentFunction()
+        {
+            currentFunction.AddRegion(currentFunction.GetCurrentBlock());
+        }
+
+        _profiler.StartModel(currentFunction);
+    }
+
+    void IRMapCompiler::OnEndCompileModel(const Model& model)
+    {
+        auto& currentFunction = GetModule().GetCurrentFunction();
+        _profiler.EndModel(currentFunction);
+    }
+
     void IRMapCompiler::OnBeginCompileNode(const Node& node)
     {
         auto& currentFunction = GetModule().GetCurrentFunction();
@@ -113,12 +201,18 @@ namespace model
         {
             currentFunction.AddRegion(currentFunction.GetCurrentBlock());
         }
+
+        _profiler.InitNode(currentFunction, node);
+        _profiler.StartNode(currentFunction, node);
     }
 
     void IRMapCompiler::OnEndCompileNode(const Node& node)
     {
         auto& currentFunction = GetModule().GetCurrentFunction();
         assert(currentFunction.GetCurrentRegion() != nullptr);
+
+        _profiler.EndNode(currentFunction, node);
+
         auto pCurBlock = currentFunction.GetCurrentBlock();
         if (pCurBlock != currentFunction.GetCurrentRegion()->End())
         {

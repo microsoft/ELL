@@ -50,6 +50,11 @@ if(MSVC)
   add_compile_options(/bigobj)
 endif()
 
+# Set options so we don't get visibility warnings with LLVM
+if(NOT WIN32 AND NOT CYGWIN)
+  add_compile_options("-fvisibility-inlines-hidden")
+endif()
+
 # Turn on ctest tests
 enable_testing()
 
@@ -65,7 +70,7 @@ add_subdirectory(libraries)
 add_subdirectory(tools)
 add_subdirectory(scripts)
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/private)
+if(EXISTS ${CMAKE_SOURCE_DIR}/private AND EXISTS ${CMAKE_SOURCE_DIR}/private/CMakeLists.txt)
   add_subdirectory(private)
 endif()
 

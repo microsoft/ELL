@@ -63,7 +63,7 @@ void ProduceMapOutput(const common::MapLoadArguments& mapLoadArguments, ParsedCo
         settings.compilerSettings.optimize = compileArguments.optimize;
 
         MapCompilerType compiler(settings);
-        auto compiledMap = compiler.Compile(map, settings.mapFunctionName);
+        auto compiledMap = compiler.Compile(map);
 
         switch (compileArguments.outputType)
         {

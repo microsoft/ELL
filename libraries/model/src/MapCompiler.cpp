@@ -26,9 +26,17 @@ namespace model
         auto pModuleEmitter = GetModuleEmitter();
 
         emitters::NamedVariableTypeList mainFunctionArguments = AllocateNodeFunctionArguments(map, *pModuleEmitter);
-
         pModuleEmitter->BeginMapPredictFunction(functionName, mainFunctionArguments);
+
+        auto inputSize = map.GetInput(0)->Size();
+        auto outputSize = map.GetOutput(0).Size();
+        std::vector<std::string> comments = {std::string("Input size: ") + std::to_string(inputSize), std::string("Output size: ") + std::to_string(outputSize)};
+        pModuleEmitter->SetFunctionComments(functionName, comments);
+
+        OnBeginCompileModel(map.GetModel());
         CompileNodes(map.GetModel());
+        OnEndCompileModel(map.GetModel());
+
         pModuleEmitter->EndMapPredictFunction();
     }
 
@@ -94,13 +102,15 @@ namespace model
         for (auto inputNode : map.GetInputs())
         {
             auto argVar = AllocateNodeFunctionArgument(module, &(inputNode->GetOutputPort()), ArgType::input);
-            bool isScalar = inputNode->Size() == 1;
+            auto inputSize = inputNode->Size();
+            bool isScalar = inputSize == 1;
             if (isScalar)
             {
                 functionArguments.push_back({ argVar->EmittedName(), argVar->Type() });
             }
             else
             {
+                // TODO: can we use an array type here? 
                 functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
             }
         }
@@ -109,6 +119,8 @@ namespace model
         for (auto outputElements : map.GetOutputs())
         {
             assert(outputElements.NumRanges() == 1);
+
+            // TODO: can we use an array type here?
             auto argVar = AllocateNodeFunctionArgument(module, outputElements.GetRanges()[0].ReferencedPort(), ArgType::output);
             functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
         }

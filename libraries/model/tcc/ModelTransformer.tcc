@@ -80,6 +80,17 @@ namespace model
         }
     }
 
+    template <typename ValueType>
+    void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElementsBase& newElements)
+    {
+        auto size = oldPort.Size();
+        assert(newElements.Size() == size);
+        for (size_t index = 0; index < size; ++index)
+        {
+            _elementToElementMap[{ oldPort, index }] = newElements.GetElement(index);
+        }
+    }
+
     template <typename NodeType, typename... Args>
     NodeType* ModelTransformer::AddNode(Args&&... args)
     {

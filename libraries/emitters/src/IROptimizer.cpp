@@ -61,8 +61,6 @@
 
 
 // TODO: make a string->pass map and a function that takes the above string and generates the passes
-
-
 // TODO: use PassManagerBuilder
 // http://llvm.org/docs/doxygen/html/classllvm_1_1PassManagerBuilder.html 
 
@@ -211,10 +209,11 @@ namespace emitters
         assert(pFunction != nullptr);
         if (!_initialized)
         {
-            _pPasses->doFinalization();
+            _pPasses->doInitialization();
             _initialized = true;
         }
         _pPasses->run(*pFunction);
+        _pPasses->doFinalization();
     }
 
     //
