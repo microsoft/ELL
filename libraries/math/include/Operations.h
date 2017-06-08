@@ -328,7 +328,7 @@ namespace math
         template <typename ElementType>
         static ElementType Norm2Squared(UnorientedConstVectorReference<ElementType> v);
 
-        ///// <summary> Generalized matrix column-vector multiplication, u = s * M * v + t * u. </summary>
+        ///// <summary> Columnwise sum of a matrix. </summary>
         /////
         ///// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
         ///// <typeparam name="layout"> Matrix layout. </typeparam>
