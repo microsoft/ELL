@@ -18,14 +18,14 @@
 #else
 enum class CBLAS_ORDER
 {
-    CblasRowMajor = 101;
-    CblasColMajor = 102;
+    CblasRowMajor = 101,
+    CblasColMajor = 102
 };
 
 enum class CBLAS_TRANSPOSE
 {
-    CblasNoTrans = 111;
-    CblasTrans = 112;
+    CblasNoTrans = 111,
+    CblasTrans = 112
 };
 #endif
 

@@ -1,3 +1,5 @@
+from __future__ import print_function
+import functools
 import ELL
 
 def GetName(node): return node.GetId()
@@ -19,11 +21,12 @@ This means that node indices are one-based.
 
 '''
     def g(i): return i+1, GetName(nodes[i])
-    def f(ans, (i, name)):
+    def f(ans, i_name):
+        i, name = i_name
         ans[name] = i
         return ans
-    temp = map(g, range(len(nodes)))
-    return reduce(f, temp, {})
+    temp = [g(i) for i in range(len(nodes))]
+    return functools.reduce(f, temp, {})
 
 def GetNodesAndIndex(model):
     '''
@@ -55,15 +58,15 @@ def GetAdjacencyList(nodes, index):
             return []
         else: 
             parents = GetNodeGenerator(node.GetParents())
-            return map(GetIndex, parents)
+            return [GetIndex(p) for p in parents]
     def GetDependents(node):
         if node == None: 
             return []
         else: 
             children = GetNodeGenerator(node.GetDependents())
-            return map(GetIndex, children)
-    parentList = map(GetParents, nodes)
-    dependentList = map(GetDependents, nodes)
+            return [GetIndex(c) for c in children]
+    parentList = [GetParents(n) for n in nodes]
+    dependentList = [GetDependents(n) for n in nodes]
     V = len(index)
     # confirm parents and dependents are doubly linked
     # If any there exists a non doubly linked edge
@@ -99,7 +102,7 @@ def processVertex(u, vertices):
     try:
         i = vertices.index(u)
         # we should never get here
-        print "already seen vertex", u
+        print("already seen vertex", u)
     except ValueError:
         # mark the vertex as discovered
         vertices.append(u)
@@ -152,21 +155,21 @@ def testModel(key):
     model = ELL.ELL_Model(key)
     nodes, index = GetNodesAndIndex(model)
     adj = GetAdjacencyList(nodes, index)
-    print key,
+    print(key, end="\t")
     stats = GetGraphStats(adj)
     n = len(stats)
     if n == 0:
-        print "No subgraphs"
+        print("No subgraphs")
     else:
         if n > 1:
-            print "%d subgraphs" % (len(subgraphs))
+            print("%d subgraphs" % (len(subgraphs)))
         elif n == 1:
-            print "One subgraph"
-        print "    Subgraph Vertices Edges Cycles"
+            print("One subgraph")
+        print("    Subgraph Vertices Edges Cycles")
         for i in range(n):
             (V,E) = stats[i]
             C = E - V + 1 # number of cycles
-            print "    %-8d %-8d %-5d %-5d" % (i, V, E, C)
+            print("    %-8d %-8d %-5d %-5d" % (i, V, E, C))
 
 def test():
     keys = ['[1]','[2]','[3]','[tree_0]','[tree_1]','[tree_2]','[tree_3]']

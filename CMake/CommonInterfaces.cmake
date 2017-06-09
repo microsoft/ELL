@@ -107,7 +107,7 @@ macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INT
   else()
     swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
 
-    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common evaluators lossFunctions model nodes predictors trainers utilities emitters)
+    swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} common evaluators functions model nodes predictors trainers utilities emitters)
     set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}ELL)
     add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} ELL_common)
   endif()

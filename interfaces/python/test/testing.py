@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 class Testing(object):
     @staticmethod
     def IsEqualWithinTolerance(a, b, tol):
@@ -24,11 +26,11 @@ class Testing(object):
     def __init__(self):
         self.testFailedFlag = False
     def ProcessTest(self, testDescription, success):
-        print "%s ..." % (testDescription),
+        print("%s ... " % (testDescription), end="")
         if success:
-            print "Passed"
+            print("Passed")
         else:
-            print "Failed"
+            print("Failed")
             self.testFailedFlag = True
     def DidTestFail(self):
         return self.testFailedFlag

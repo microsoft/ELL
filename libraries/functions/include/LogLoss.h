@@ -11,7 +11,6 @@
 // stl
 #include <cstddef> // size_t
 
-
 namespace ell
 {
 namespace functions
@@ -62,9 +61,9 @@ namespace functions
         double ConjugateProx(double sigma, double dual, double label) const;
 
     private:
-        const double _conjugateBoundary = 1.0e-12;
-        const double _conjugateProxDesiredPrecision = 1.0e-6;
-        const size_t _conjugateProxMaxIterations = 20;
+        static constexpr double _conjugateBoundary = 1.0e-12;
+        static constexpr double _conjugateProxDesiredPrecision = 1.0e-6;
+        static constexpr size_t _conjugateProxMaxIterations = 20;
     };
 }
 }

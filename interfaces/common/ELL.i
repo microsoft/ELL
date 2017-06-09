@@ -39,7 +39,7 @@
 #endif
 
 // ELL APIs 
-%include "lossFunctions.i"
+%include "functions.i"
 %include "model.i"
 
 #if defined(SWIGJAVASCRIPT)

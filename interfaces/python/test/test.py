@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 
 sys.path.append('.')
@@ -5,7 +6,7 @@ sys.path.append('./..')
 sys.path.append('./../Release')
 sys.path.append('./../Debug')
 
-import lossfunctions_test
+import functions_test
 import model_test
 import modelbuilder_test
 import common_test
@@ -16,7 +17,7 @@ import linear_test
 import evaluators_test
 
 tests = [   
-    (lossfunctions_test.test, "lossfunctions_test"),
+    (functions_test.test,     "functions_test"),
     (model_test.test,         "model_test"        ),
     (common_test.test,        "common_test"       ),
     (trainers_test.test,      "trainers_test"     ),
@@ -33,13 +34,13 @@ def interface_test():
         try:
             ans = test()
             if ans == 0:
-                print name, "passed"
+                print(name, "passed")
             else:
-                print name, "failed"
+                print(name, "failed")
             rc |= ans
-        except Exception, e:
-            print name, "failed"
-            print "exception:", e
+        except Exception as e:
+            print(name, "failed")
+            print("exception:", e)
             rc = 1
     sys.exit(rc)
 

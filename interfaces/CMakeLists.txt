@@ -24,7 +24,7 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/loadDatasetAsync.i
                      ../common/dataset.i
                      ../common/evaluators.i
-                     ../common/lossFunctions.i
+                     ../common/functions.i
                      ../common/model.i
                      ../common/nodes.i
                      ../common/noncopyable.i
@@ -33,14 +33,14 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/unique_ptr.i
                      ../common/utilities.i)
 
-set (INTERFACE_DEPENDENCIES common data emitters evaluators lossFunctions math trainers model nodes predictors testing trainers utilities)
+set (INTERFACE_DEPENDENCIES common data emitters evaluators functions math trainers model nodes predictors testing trainers utilities)
 
 # Add ELL library include directories
 include_directories(common/include)
 include_directories(../libraries/common/include)
 include_directories(../libraries/data/include)
 include_directories(../libraries/evaluators/include)
-include_directories(../libraries/lossFunctions/include)
+include_directories(../libraries/functions/include)
 include_directories(../libraries/model/include)
 include_directories(../libraries/nodes/include)
 include_directories(../libraries/predictors/include)

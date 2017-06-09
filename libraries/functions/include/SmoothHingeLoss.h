@@ -58,7 +58,7 @@ namespace functions
         double ConjugateProx(double sigma, double dual, double label) const;
 
     private:
-        const double _inverseSmoothness = 1.0;      // _inverseSmoothness=0 reduces to the standard hinge loss. Must be nonnegative. The bigger, the smoother.
+        double _inverseSmoothness = 1.0;      // _inverseSmoothness=0 reduces to the standard hinge loss. Must be nonnegative. The bigger, the smoother.
     };
 }
 }

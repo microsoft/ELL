@@ -1,3 +1,4 @@
+from __future__ import print_function
 import ELL
 
 def GetItems(thing):
@@ -46,14 +47,14 @@ def exampleTest(example):
     diff = numNonZeros - xs.NumNonzeros()
     # Check Norm2 agains our sum of squares
     norm2 = xs.Norm2()
-    print "%7.3f %7.3f %7.3f %d" % (m1, var, norm2 - s2, diff)
+    print("%7.3f %7.3f %7.3f %d" % (m1, var, norm2 - s2, diff))
 
 def work():
     dataset = ELL.GetDataset("../../../../examples/data/testData.txt")
     # Count the number of examples by iteration and print
-    print "Number of Examples:", reduce(lambda a,b:a+1, GetItems(dataset), 0)
+    print("Number of Examples:", reduce(lambda a,b:a+1, GetItems(dataset), 0))
     # Compare this with what the dataset object reports
-    print "NumExamples:", dataset.NumExamples()
+    print("NumExamples:", dataset.NumExamples())
     for example in GetItems(dataset): 
         exampleTest(example)
 

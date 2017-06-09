@@ -13,8 +13,21 @@
 #include "Operations.h"
 
 // BLAS
-// (TODO: ifdef out blas stuff if we don't have BLAS intalled)
+#ifdef USE_BLAS
 #include "cblas.h"
+#else
+enum class CBLAS_ORDER
+{
+    CblasRowMajor = 101,
+    CblasColMajor = 102
+};
+
+enum class CBLAS_TRANSPOSE
+{
+    CblasNoTrans = 111,
+    CblasTrans = 112
+};
+#endif
 
 namespace ell
 {
