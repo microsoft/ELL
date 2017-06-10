@@ -16,13 +16,13 @@
 #ifdef USE_BLAS
 #include "cblas.h"
 #else
-enum class CBLAS_ORDER
+enum CBLAS_ORDER
 {
     CblasRowMajor = 101,
     CblasColMajor = 102
 };
 
-enum class CBLAS_TRANSPOSE
+enum CBLAS_TRANSPOSE
 {
     CblasNoTrans = 111,
     CblasTrans = 112
