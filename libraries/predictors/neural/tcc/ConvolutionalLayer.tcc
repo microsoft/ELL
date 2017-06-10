@@ -22,7 +22,7 @@ namespace neural
         _weights(weights),
         _weightsMatrix(_layerParameters.outputShape[2], convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()),
         _shapedInput(convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding()),
-        _outputMatrix(NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding(), NumOutputChannels())
+        _outputMatrix(NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding())
     {
         if (weights.NumElements() != (_output.NumChannels() * _layerParameters.input.NumChannels() * convolutionalParameters.receptiveField * convolutionalParameters.receptiveField))
         {

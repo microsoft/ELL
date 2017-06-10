@@ -79,7 +79,7 @@ add_subdirectory(examples)
 
 # Add SWIG-generated interfaces
 if(BUILD_INTERFACES)
-  find_package(SWIG 3.0.10)
+  find_package(SWIG 3.0.12)
   if(SWIG_FOUND)
     add_subdirectory(interfaces)
   else()

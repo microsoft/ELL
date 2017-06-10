@@ -11,10 +11,16 @@ if(LLVM_FOUND)
     add_compile_options(${LLVM_COMPILE_OPTIONS})
 endif()
 
-set (INTERFACE_SRC ../common/src/ModelInterface.cpp)
+set (INTERFACE_SRC 
+    ../common/src/ModelInterface.cpp)
 set (INTERFACE_INCLUDE 
+    ../common/include/MathInterface.h
     ../common/include/ModelInterface.h
+    ../common/include/NeuralLayersInterface.h
+    ../common/include/NeuralNetworkPredictorInterface.h
 )
+set (INTERFACE_TCC
+    ../common/tcc/NeuralNetworkPredictorInterface.tcc)
 
 set (INTERFACE_MAIN ../common/ELL.i)
 
@@ -25,11 +31,20 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/dataset.i
                      ../common/evaluators.i
                      ../common/functions.i
+                     ../common/math.i
+                     ../common/math_javascript_post.i
+                     ../common/math_javascript_pre.i
+                     ../common/math_python_post.i
+                     ../common/math_python_pre.i
                      ../common/model.i
                      ../common/nodes.i
                      ../common/noncopyable.i
                      ../common/trainers.i
                      ../common/predictors.i
+                     ../common/predictors_javascript_post.i
+                     ../common/predictors_javascript_pre.i
+                     ../common/predictors_python_post.i
+                     ../common/predictors_python_pre.i
                      ../common/unique_ptr.i
                      ../common/utilities.i)
 
@@ -44,6 +59,7 @@ include_directories(../libraries/functions/include)
 include_directories(../libraries/model/include)
 include_directories(../libraries/nodes/include)
 include_directories(../libraries/predictors/include)
+include_directories(../libraries/predictors/neural/include)
 include_directories(../libraries/trainers/include)
 include_directories(../libraries/utilities/include)
 
@@ -53,4 +69,3 @@ add_subdirectory(python)
 # add_subdirectory(csharp)
 add_subdirectory(javascript)
 add_subdirectory(xml) 
-

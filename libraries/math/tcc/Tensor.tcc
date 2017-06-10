@@ -253,6 +253,13 @@ namespace math
     // 
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    TensorReference<ElementType, dimension0, dimension1, dimension2>::TensorReference(size_t numRows, size_t numColumns, size_t numChannels, ElementType* pData)
+        : ConstTensorRef(Triplet{ numRows, numColumns, numChannels })
+    {
+        _contents.pData = pData;
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ElementType& TensorReference<ElementType, dimension0, dimension1, dimension2>::operator()(size_t row, size_t column, size_t channel)
     {
         return operator()({ row, column, channel });
@@ -334,8 +341,9 @@ namespace math
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(size_t numRows, size_t numColumns, size_t numChannels) 
-        : Tensor(Triplet{ numRows, numColumns, numChannels }) 
+        : TensorRef(Triplet{ numRows, numColumns, numChannels }), _data(numRows * numColumns * numChannels)
     {
+        _contents.pData = _data.data();
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>

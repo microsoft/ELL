@@ -70,14 +70,14 @@ namespace neural
     };
 
     // Typical padding parameters
-    /// <summary> Padding config alias that represents no padding </summary
-    static const PaddingParameters NoPadding{PaddingScheme::zeros, 0};
-    /// <summary> Padding config alias that represents a padding of 1 with 0 as the padding value. </summary
-    static const PaddingParameters OnePaddingWithZeros{PaddingScheme::zeros, 1};
-    /// <summary> Padding config alias that represents a padding of 1 with minimum values as the padding value. </summary
-    static const PaddingParameters OnePaddingWithMinimum{PaddingScheme::min, 1};
-    /// <summary> Padding config alias that represents a padding of 1 with -1 values as the padding value. </summary
-    static const PaddingParameters OnePaddingWithMinusOnes{PaddingScheme::minusOnes, 1};
+    /// <summary> Function to return parameters representing no padding </summary
+    static const PaddingParameters NoPadding() { return {PaddingScheme::zeros, 0}; }
+    /// <summary> Function to return parameters that represent padding the specified pixel width with zeros. </summary
+    static const PaddingParameters ZeroPadding(size_t width) { return {PaddingScheme::zeros, width }; }
+    /// <summary> Function to return parameters that represent padding the specified pixel width with the minimum value. </summary
+    static const PaddingParameters MinPadding(size_t width) { return {PaddingScheme::min, 1}; }
+    /// <summary> Function to return parameters that represent padding the specified pixel width with -1. </summary
+    static const PaddingParameters MinusOnePadding(size_t width) { return {PaddingScheme::minusOnes, 1}; }
 
     /// <summary> Common base class for a layer in a neural network. </summary>
     template <typename ElementType>
@@ -88,7 +88,7 @@ namespace neural
         using VectorType = math::ColumnVector<ElementType>;
         using MatrixType = math::RowMatrix<ElementType>;
         using MatrixReferenceType = math::ConstMatrixReference<ElementType, math::MatrixLayout::rowMajor>;
-        using TensorType = math::ChannelColumnRowTensor<ElementType>;
+        using TensorType = math::Tensor<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using TensorReferenceType = math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using ConstTensorReferenceType = math::ConstTensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using DataVectorType = data::FloatDataVector;

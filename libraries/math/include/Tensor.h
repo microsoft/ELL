@@ -183,7 +183,7 @@ namespace math
 
         /// <summary>
         /// Gets a reference to a slice of the tensor. Note that only four of the six possible slice
-        /// configutations are possible. Namely, dimension 0 must be either the row dimension or the
+        /// configurations are possible. Namely, dimension 0 must be either the row dimension or the
         /// column dimension. In the former case, the outcome will be a column major matrix; in the
         /// latter case it will be row major.
         /// </summary>
@@ -248,6 +248,18 @@ namespace math
     class TensorReference : public ConstTensorReference<ElementType, dimension0, dimension1, dimension2>
     {
     public:
+        /// <summary> Constructs tensor of given shape that uses a pointer to an external buffer as the element data.
+        /// This allows the Tensor to use data provided by some other source, and this Tensor does not
+        /// own the data buffer.
+        /// The buffer has (numRows * numColumns * numChannels) number of elements. </summary>
+        /// </summary>
+        ///
+        /// <param name="numRows"> Number of rows. </param>
+        /// <param name="numColumns"> Number of columns. </param>
+        /// <param name="numChannels"> Number of channels. </param>
+        /// <param name="pData"> A pointer where the elements are stored. </param>
+        TensorReference(size_t numRows, size_t numColumns, size_t numChannels, ElementType* pData);
+
         /// <summary> Element access operator. </summary>
         ///
         /// <param name="row"> The row. </param>

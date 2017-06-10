@@ -4,5 +4,6 @@
 include (CommonInterfaces)
 
 set (INTERFACE_SRC src/ModelInterface.cpp)
+set (INTERFACE_TCC tcc/NeuralNetworkPredictorInterface.tcc)
 
 generate_interface(common ${CMAKE_CURRENT_SOURCE_DIR} "" "" "")

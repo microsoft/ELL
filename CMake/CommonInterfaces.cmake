@@ -5,6 +5,7 @@
 # Variables assumed to have been set in parent scope:
 # INTERFACE_SRC
 # INTERFACE_INCLUDE
+# INTERFACE_TCC
 # INTERFACE_MAIN  (the main .i file)
 # INTERFACE_FILES (the other .i files)
 # INTERFACE_DEPENDENCIES
@@ -16,7 +17,7 @@ macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INT
   string(TOLOWER "${LANGUAGE_NAME}" language)
   
   cmake_minimum_required(VERSION 2.8.11)
-  find_package(SWIG 3.0.10 REQUIRED)
+  find_package(SWIG 3.0.12 REQUIRED)
   include(${SWIG_USE_FILE})
 
   # set compiler SWIG generated cxx compiler flags
@@ -37,7 +38,7 @@ macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INT
 
   if(${language} STREQUAL "common")
     find_file(THIS_FILE_PATH CommonInterfaces.cmake PATHS ${CMAKE_MODULE_PATH})
-    add_custom_target(${module_name} ALL DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
+    add_custom_target(${module_name} ALL DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
 
     # Make interface code be dependent on all libraries
     add_dependencies(${module_name} ${INTERFACE_DEPENDENCIES})
@@ -67,6 +68,10 @@ macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INT
       configure_file(${file} ${file} COPYONLY)
   endforeach()
 
+  foreach(file ${INTERFACE_TCC})
+      configure_file(${file} ${file} COPYONLY)
+  endforeach()
+
   set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-classes -debug-typedef  -debug-template)
   if(${language} STREQUAL "javascript")
     # Note: if compiling against older version of node, we may have to specify the 
@@ -75,9 +80,18 @@ macro(generate_interface LANGUAGE_NAME LANGUAGE_DIR LANGUAGE_LIBRARIES EXTRA_INT
     set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node)
   endif()
 
+  if(${language} STREQUAL "python")
+    set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -py3)
+  endif()
+
+
   set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${EXTRA_INTERFACE})
 
   foreach(file ${INTERFACE_INCLUDE} ${INTERFACE_SRC})
+    set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${file})
+  endforeach()
+
+  foreach(file ${INTERFACE_INCLUDE} ${INTERFACE_TCC})
     set_source_files_properties(${INTERFACE_MAIN} PROPERTIES OBJECT_DEPENDS ${file})
   endforeach()
 

@@ -42,6 +42,20 @@ void TestTensor()
 }
 
 template<typename ElementType>
+void TestTensorReference()
+{
+    std::vector<ElementType> values(24);
+    ElementType value = 0;
+    std::generate(values.begin(), values.end(), [&]() { return value++; });
+
+    math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row> T1(2, 3, 4, values.data());
+    testing::ProcessTest("TensorReference::TensorReference(rows, columns, channels, data)", T1(0, 0, 0) == 0 && T1(0, 0, 1) == 1 && T1(1, 2, 2) == 22 && T1(1, 2, 3) == 23);
+
+    math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row> T2(T1);
+    testing::ProcessTest("TensorReference::TensorReference(otherTensor)", T2(0, 0, 0) == 0 && T2(0, 0, 1) == 1 && T2(1, 2, 2) == 22 && T2(1, 2, 3) == 23);
+}
+
+template<typename ElementType>
 void TestTensorGetSlice()
 {
     math::ColumnRowChannelTensor<ElementType> T1(3, 4, 5);

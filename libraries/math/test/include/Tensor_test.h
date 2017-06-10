@@ -16,6 +16,9 @@ template<typename ElementType, math::Dimension dimension0, math::Dimension dimen
 void TestTensor();
 
 template<typename ElementType>
+void TestTensorReference();
+
+template<typename ElementType>
 void TestTensorGetSlice();
 
 template<typename ElementType>
