@@ -63,6 +63,13 @@ Visual studio will open the solution. Choose either the "Debug" configuration or
 
 In both cases, the project executables will appear in a directory named `ELL/build/bin`.
 
+### Testing ELL
+    
+    cd build
+    ctest --build-config Debug
+
+The ctest tool comes with your cmake installation.  For more info see [ctest](https://cmake.org/cmake/help/v3.9/manual/ctest.1.html).
+
 ### Generating code documentation
 
 The create code documentation, open the `ELL.sln` solution file in Visual Studio, find the project named `doc` in the solution explorer, and build it. The *Doxygen* generated files will appear in `ELL/build/doc`.
