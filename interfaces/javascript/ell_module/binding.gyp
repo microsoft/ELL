@@ -62,6 +62,7 @@
                 '<(include_path_prefix)/libraries/model/include',
                 '<(include_path_prefix)/libraries/nodes/include',
                 '<(include_path_prefix)/libraries/predictors/include',
+                '<(include_path_prefix)/libraries/predictors/neural/include',
                 '<(include_path_prefix)/libraries/trainers/include',
                 '<(include_path_prefix)/libraries/utilities/include',
                 '<(include_path_prefix)/libraries/emitters/include',

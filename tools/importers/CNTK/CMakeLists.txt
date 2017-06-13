@@ -3,8 +3,7 @@
 #
 
 find_package(PythonInterp)
-find_package(PythonLibs)
-if(${PYTHONLIBS_FOUND} AND BUILD_INTERFACES)
+if(${PYTHONINTERP_FOUND} AND BUILD_INTERFACES)
 
 	set(module_name "cntk_importer")
 

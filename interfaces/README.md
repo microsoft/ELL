@@ -6,7 +6,7 @@ This section covers how to generate and test the ELL language bindings, which pr
 
 ## General setup
 
-The language bindings are generated using SWIG. To build them, you need to install SWIG version 3.0.10 or later. SWIG can be downloaded from [here](http://www.swig.org/download.html)
+The language bindings are generated using SWIG. To build them, you need to install SWIG version 3.0.12 or later. SWIG can be downloaded from [here](http://www.swig.org/download.html)
 * Linux:
 ```
 tar zxvf swig-VERSION.tar.gz

@@ -107,3 +107,6 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 #elif SWIGJAVASCRIPT
     %include "predictors_javascript_post.i"
 #endif
+
+// Restore environment
+%rename("%s") ""; // Unignore everything
