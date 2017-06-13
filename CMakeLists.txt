@@ -74,9 +74,6 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/private AND EXISTS ${CMAKE_SOURCE_DIR}/private/CMa
   add_subdirectory(private)
 endif()
 
-# Add examples
-add_subdirectory(examples)
-
 # Add SWIG-generated interfaces
 if(BUILD_INTERFACES)
   find_package(SWIG 3.0.12)
@@ -86,6 +83,9 @@ if(BUILD_INTERFACES)
     message(WARNING "SWIG not found, skipping interface generation.")
   endif()
 endif()
+
+# Add examples (has dependencies on SWIG-generated interfaces)
+add_subdirectory(examples)
 
 # Add project for solution-level documentation
 set (DOC INSTALL-Mac.md

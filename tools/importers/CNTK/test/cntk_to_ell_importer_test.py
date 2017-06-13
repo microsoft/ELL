@@ -7,8 +7,13 @@
 ##  Requires: Python 3.x, cntk-2.0-cp35
 ##
 ####################################################################################################
+import sys
+sys.path.append('./../../../../interfaces/python')
+sys.path.append('./../../../../interfaces/python/Release')
+sys.path.append('./../../../../interfaces/python/Debug')
+
 import ELL
-import sys, getopt, os
+import getopt, os
 import configparser
 import re
 import struct
@@ -22,10 +27,6 @@ from cntk.logging.graph import *
 import traceback
 import inspect
 import unittest
-
-sys.path.append('./../../../../interfaces/python')
-sys.path.append('./../../../../interfaces/python/Release')
-sys.path.append('./../../../../interfaces/python/Debug')
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)

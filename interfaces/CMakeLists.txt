@@ -14,18 +14,24 @@ endif()
 set (INTERFACE_SRC 
     ../common/src/ModelInterface.cpp)
 set (INTERFACE_INCLUDE 
+    ../common/include/CallbackInterface.h
     ../common/include/MathInterface.h
     ../common/include/ModelInterface.h
     ../common/include/NeuralLayersInterface.h
     ../common/include/NeuralNetworkPredictorInterface.h
 )
 set (INTERFACE_TCC
+    ../common/tcc/CallbackInterface.tcc
     ../common/tcc/NeuralNetworkPredictorInterface.tcc)
 
 set (INTERFACE_MAIN ../common/ELL.i)
 
 set (INTERFACE_FILES ../common/common.i
                      ../common/callback.i
+                     ../common/callback_javascript_post.i
+                     ../common/callback_javascript_pre.i
+                     ../common/callback_python_post.i
+                     ../common/callback_python_pre.i
                      ../common/loadModelAsync.i
                      ../common/loadDatasetAsync.i
                      ../common/dataset.i
@@ -46,7 +52,8 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/predictors_python_post.i
                      ../common/predictors_python_pre.i
                      ../common/unique_ptr.i
-                     ../common/utilities.i)
+                     ../common/utilities.i
+                     ../common/vector.i)
 
 set (INTERFACE_DEPENDENCIES common data emitters evaluators functions math trainers model nodes predictors testing trainers utilities)
 

@@ -1,124 +1,43 @@
-#if defined(SWIGJAVASCRIPT)
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     callback.i (common)
+//  Authors:  Piali Choudhury (pialic), Lisa Ong
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Include language specific SWIG definitions that must be declared before the
+// C++ code to be wrapped
+#ifdef SWIGPYTHON
+    %include "callback_python_pre.i"
+#elif SWIGJAVASCRIPT
+    %include "callback_javascript_pre.i"
+#endif
+
+// stl
+%include "vector.i"
+
+// ELL API
 %{
-#include <functional>
+#include "CallbackInterface.h"
 %}
 
-%{
-    //
-    // Callback wrapper types
-    //
-    class CallbackBase
-    {
-    public:
-        CallbackBase(){}
+%feature("director") ell::api::common::CallbackBase;
+%feature("nodirector") ell::api::common::CallbackForwarder;
 
-        CallbackBase(Nan::Callback* callback) : _callback(callback)
-        {};
+%ignore ell::api::common::CallbackForwarder::Invoke(ElementType*);
 
-        Nan::Callback* GetFunction() { return _callback; }
+// C++ code to be wrapped
+%include "CallbackInterface.h"
 
-        void Call()
-        {
-            _callback->Call(0, nullptr);
-        }
+// Template instantiations
+%template(DoubleCallbackBase) ell::api::common::CallbackBase<double>;
+%template(DoubleCallbackForwarder) ell::api::common::CallbackForwarder<double>;
 
-    protected:
-        Nan::Callback* _callback;
-    };
-
-    class Callback : public CallbackBase
-    {
-    public:
-        Callback(){}
-
-        Callback(Nan::Callback* callback) : CallbackBase(callback)
-        {};
-
-        void Call()
-        {
-            _callback->Call(0, nullptr);
-        }
-    };
-
-    class Callback2Int : public CallbackBase
-    {
-    public:
-        Callback2Int() {}
-
-        Callback2Int(Nan::Callback* callback) : CallbackBase(callback) {};
-
-        void Call(int arg1, int arg2)
-        {
-            Nan::HandleScope scope;
-            v8::Handle<v8::Value> args[2];
-            args[0] = Nan::New<v8::Number>(arg1);
-            args[1] = Nan::New<v8::Number>(arg2);
-            _callback->Call(2, args);
-        }
-    };
-
-    class Callback2Int1Double : public CallbackBase
-    {
-    public:
-        Callback2Int1Double() {}
-
-        Callback2Int1Double(Nan::Callback* callback) : CallbackBase(callback) {};
-
-        void Call(int i, int n, double arg)
-        {
-            Nan::HandleScope scope;
-            v8::Handle<v8::Value> args[3];
-            args[0] = Nan::New<v8::Number>(i);
-            args[1] = Nan::New<v8::Number>(n);
-            args[2] = Nan::New<v8::Number>(arg);
-            _callback->Call(3, args);
-        }
-    };
-%}
-
-%typemap(in) Callback
-{
-    if($input->IsFunction())
-    {
-        auto func = new Nan::Callback(v8::Local<v8::Function>::Cast($input));
-        $1 = Callback(func);
-    }
-    else
-    {
-        SWIG_exception_fail(SWIG_ERROR, "$input is not a function");        
-    }
-}
-
-%typemap(in) Callback2Int
-{
-    if($input->IsFunction())
-    {
-        auto func = new Nan::Callback(v8::Local<v8::Function>::Cast($input));
-        $1 = Callback2Int(func);
-    }
-    else
-    {
-        SWIG_exception_fail(SWIG_ERROR, "$input is not a function");        
-    }
-}
-
-%typemap(in) Callback2Int1Double
-{
-    if($input->IsFunction())
-    {
-        auto func = new Nan::Callback(v8::Local<v8::Function>::Cast($input));
-        $1 = Callback2Int1Double(func);
-    }
-    else
-    {
-        SWIG_exception_fail(SWIG_ERROR, "$input is not a function");        
-    }
-}
-
-%typemap(in) v8::Local<v8::Value>
-{
-    $1 = $input;
-}
-
+// Include language specific SWIG definitions that must be declared after the
+// C++ code has been wrapped by SWIG
+#ifdef SWIGPYTHON
+    %include "callback_python_post.i"
+#elif SWIGJAVASCRIPT
+    %include "callback_javascript_post.i"
 #endif

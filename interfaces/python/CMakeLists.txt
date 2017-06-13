@@ -6,9 +6,6 @@ find_package(PythonLibs)
 if(${PYTHONLIBS_FOUND})
   include (CommonInterfaces)
 
-  # Fix link problems when building in Debug mode:
-  add_definitions(-DSWIG_PYTHON_INTERPRETER_NO_DEBUG)
-
   message(STATUS "Using python found at: ${PYTHON_EXECUTABLE}")
   message(STATUS "Using python libraries found at: ${PYTHON_LIBRARY}")
 
