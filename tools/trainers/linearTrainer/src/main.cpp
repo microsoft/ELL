@@ -13,7 +13,6 @@
 #include "Exception.h"
 #include "Files.h"
 #include "OutputStreamImpostor.h"
-#include "RandomEngines.h"
 
 // data
 #include "Dataset.h"
@@ -27,14 +26,11 @@
 #include "MakeEvaluator.h"
 #include "MakeTrainer.h"
 #include "MapLoadArguments.h"
-#include "MapSaveArguments.h"
-#include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
 #include "TrainerArguments.h"
 
 // model
 #include "DynamicMap.h"
-#include "InputNode.h"
 #include "Model.h"
 
 // nodes
@@ -42,17 +38,9 @@
 
 // trainers
 #include "MeanCalculator.h"
-#include "SGDTrainer.h"
-#include "SDCATrainer.h"
 
 // evaluators
-#include "BinaryErrorAggregator.h"
 #include "Evaluator.h"
-#include "LossAggregator.h"
-
-// functions
-#include "HingeLoss.h"
-#include "LogLoss.h"
 
 // predictors
 #include "Normalizer.h"

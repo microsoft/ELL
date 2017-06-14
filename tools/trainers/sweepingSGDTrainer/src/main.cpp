@@ -20,13 +20,10 @@
 #include "AppendNodeToModel.h"
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
-#include "EvaluatorArguments.h"
 #include "LoadModel.h"
 #include "MakeEvaluator.h"
 #include "MakeTrainer.h"
 #include "MapLoadArguments.h"
-#include "MapSaveArguments.h"
-#include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
 #include "ParametersEnumerator.h"
 #include "TrainerArguments.h"
@@ -37,16 +34,9 @@
 #include "SweepingTrainer.h"
 
 // evaluators
-#include "BinaryErrorAggregator.h"
 #include "Evaluator.h"
-#include "LossAggregator.h"
-
-// functions
-#include "HingeLoss.h"
-#include "LogLoss.h"
 
 // model
-#include "InputNode.h"
 #include "Model.h"
 
 // nodes
@@ -56,7 +46,6 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
-#include <tuple>
 
 using namespace ell;
 
