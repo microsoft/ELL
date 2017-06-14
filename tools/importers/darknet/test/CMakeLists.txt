@@ -12,9 +12,9 @@ if(${PYTHONINTERP_FOUND})
 
 	set (test_name ${module_name}_test)
 
-	set (test_src cntk_to_ell_importer_test.py)
+	set (test_src darknet_to_ell_importer_test.py)
 
-	set (test_data xorModel1.dnn)
+	set (test_data unittest.cfg unittest.weights)
 
 	add_custom_target(${test_name} ALL DEPENDS ${test_src} SOURCES ${test_src})
 
