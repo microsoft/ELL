@@ -18,6 +18,7 @@
 
 // math
 #include "Vector.h"
+#include "Operations.h"
 
 // stl
 #include <cmath>

@@ -24,12 +24,12 @@ namespace functions
 
     void L2Regularizer::ConjugateGradient(math::ColumnConstVectorReference<double> v, math::ColumnVectorReference<double> w) const
     {
-        w = v;
+        w.CopyFrom(v);
     }
 
     void L2Regularizer::ConjugateGradient(math::ColumnConstVectorReference<double> v, double d, math::ColumnVectorReference<double> w, double& b) const
     {
-        w = v;
+        w.CopyFrom(v);
         b = d;
     }
 }

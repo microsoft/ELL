@@ -28,7 +28,6 @@ set (include include/BlasWrapper.h
 )
 
 set (tcc tcc/ConstVectorReference.tcc
-         tcc/ConstVectorReferenceOperators.tcc
          tcc/Matrix.tcc
          tcc/Operations.tcc
          tcc/Print.tcc
@@ -37,7 +36,6 @@ set (tcc tcc/ConstVectorReference.tcc
          tcc/TensorOperations.tcc
          tcc/Vector.tcc
          tcc/VectorReference.tcc
-         tcc/VectorReferenceOperators.tcc
 )
 
 set (doc doc/README.md)

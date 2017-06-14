@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "ConstVectorReference.h"
 #include "TransformedConstVectorReference.h"
 
 namespace ell
@@ -28,18 +27,18 @@ namespace math
         /// <summary> Copies values from another vector into this vector. </summary>
         ///
         /// <param name="other"> The other vector. </param>
-        void Set(ConstVectorReference<ElementType, orientation> other);
+        void CopyFrom(ConstVectorReference<ElementType, orientation> other);
 
         /// <summary> Copies values from a transformed vector into this vector. </summary>
         ///
         /// <param name="other"> The transformed vector. </param>
         template <typename TransformationType>
-        void Set(TransformedConstVectorReference<ElementType, orientation, TransformationType> other);
+        void CopyFrom(TransformedConstVectorReference<ElementType, orientation, TransformationType> other);
 
         /// <summary> Gets a pointer to the underlying data storage. </summary>
         ///
         /// <returns> Pointer to the data. </returns>
-        ElementType* GetDataPointer() const { return _pData; }
+        ElementType* GetDataPointer() { return _pData; }
 
         /// <summary> Sets all vector elements to zero. </summary>
         void Reset();
@@ -103,11 +102,6 @@ namespace math
         ///
         /// <param name="other"> The other vector. </param>
         void operator+=(ConstVectorReference<ElementType, orientation> other);
-
-        /// <summary> Copies the values from another vector into this vector. </summary>
-        ///
-        /// <param name="other"> The other vector. </param>
-        void operator=(ConstVectorReference<ElementType, orientation> other);
 
         /// <summary> Adds a transformed vector to this vector. </summary>
         ///

@@ -7,11 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // utilities
-#include "Exception.h"
-
-// utilities
 #include "Debug.h"
 #include "Exception.h"
+
+// stl
+#include <cmath>
 
 namespace ell
 {
@@ -27,6 +27,30 @@ namespace math
         DEBUG_THROW(index >= _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size."));
 
         return _pData[index * _increment];
+    }
+
+    template <typename ElementType>
+    ElementType UnorientedConstVectorReference<ElementType>::Norm0() const
+    {
+        return Aggregate([](ElementType x) { return x != 0 ? 1 : 0; });
+    }
+
+    template <typename ElementType>
+    ElementType UnorientedConstVectorReference<ElementType>::Norm1() const
+    {
+        return Aggregate([](ElementType x) { return std::abs(x); });
+    }
+
+    template <typename ElementType>
+    ElementType UnorientedConstVectorReference<ElementType>::Norm2() const
+    {
+        return std::sqrt(Norm2Squared());
+    }
+
+    template <typename ElementType>
+    ElementType UnorientedConstVectorReference<ElementType>::Norm2Squared() const
+    {
+        return Aggregate([](ElementType x) { return x*x; });
     }
 
     template <typename ElementType>

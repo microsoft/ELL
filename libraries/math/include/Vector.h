@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "ConstVectorReference.h"
 #include "VectorReference.h"
 
 // stl
@@ -102,7 +101,3 @@ namespace math
 }
 }
 #include "../tcc/Vector.tcc"
-
-// The following include Operations.h, which is dependent on the above declarations
-#include "../tcc/ConstVectorReferenceOperators.tcc"
-#include "../tcc/VectorReferenceOperators.tcc"

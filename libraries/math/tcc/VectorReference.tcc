@@ -19,7 +19,7 @@ namespace math
 {
     template <typename ElementType, VectorOrientation orientation>
     template <typename TransformationType>
-    void VectorReference<ElementType, orientation>::Set(TransformedConstVectorReference<ElementType, orientation, TransformationType> other)
+    void VectorReference<ElementType, orientation>::CopyFrom(TransformedConstVectorReference<ElementType, orientation, TransformationType> other)
     {
         const auto& otherVector = other.GetVector();
         auto transformation = other.GetTransformation();
@@ -29,13 +29,46 @@ namespace math
         ElementType* pData = _pData;
         const ElementType* pEnd = pData + _increment * _size;
         const ElementType* pOtherData = otherVector.GetDataPointer();
-        size_t otherIncrement = otherVector.GetIncrement();
+        const size_t otherIncrement = otherVector.GetIncrement();
 
         while (pData < pEnd)
         {
             (*pData) = transformation(*pOtherData);
             pData += _increment;
             pOtherData += otherIncrement;
+        }
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    void VectorReference<ElementType, orientation>::CopyFrom(ConstVectorReference<ElementType, orientation> other)
+    {
+        if (_size != other.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
+        }
+
+        ElementType* pData = _pData;
+        const ElementType* pOtherData = other.GetDataPointer();
+        const size_t otherIncrement = other.GetIncrement();
+        const ElementType* pOtherEnd = pOtherData + otherIncrement * other.Size();
+
+        if(_increment == 1 && otherIncrement == 1)
+        {
+            while (pOtherData < pOtherEnd)
+            {
+                (*pData) = (*pOtherData);
+                ++pData;
+                ++pOtherData;
+            }
+        }
+        else
+        {
+            while (pOtherData < pOtherEnd)
+            {
+                (*pData) = (*pOtherData);
+                pData += _increment;
+                pOtherData += otherIncrement;
+            }
         }
     }
 
@@ -136,7 +169,7 @@ namespace math
         ElementType* pData = _pData;
         const ElementType* pEnd = pData + _increment * _size;
         const ElementType* pOtherData = otherVector.GetDataPointer();
-        size_t otherIncrement = otherVector.GetIncrement();
+        const size_t otherIncrement = otherVector.GetIncrement();
 
         while (pData < pEnd)
         {
@@ -144,6 +177,76 @@ namespace math
             pData += _increment;
             pOtherData += otherIncrement;
         }
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    void VectorReference<ElementType, orientation>::operator+=(ConstVectorReference<ElementType, orientation> other)
+    {
+        if (_size != other.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
+        }
+
+        ElementType* pData = _pData;
+        const ElementType* pEnd = pData + _increment * _size;
+        const ElementType* pOtherData = other.GetDataPointer();
+        const size_t otherIncrement = other.GetIncrement();
+
+        while (pData < pEnd)
+        {
+            (*pData) += (*pOtherData);
+            pData += _increment;
+            pOtherData += otherIncrement;
+        }
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    void VectorReference<ElementType, orientation>::operator-=(ConstVectorReference<ElementType, orientation> other)
+    {
+        if (_size != other.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
+        }
+
+        ElementType* pData = _pData;
+        const ElementType* pEnd = pData + _increment * _size;
+        const ElementType* pOtherData = other.GetDataPointer();
+        const size_t otherIncrement = other.GetIncrement();
+
+        while (pData < pEnd)
+        {
+            (*pData) -= (*pOtherData);
+            pData += _increment;
+            pOtherData += otherIncrement;
+        }
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    void VectorReference<ElementType, orientation>::operator+=(ElementType value)
+    {
+        Transform([value](ElementType x) {return x + value; });
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    void VectorReference<ElementType, orientation>::operator-=(ElementType value)
+    {
+        (*this) += (-value);
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    void VectorReference<ElementType, orientation>::operator*=(ElementType value)
+    {
+        Transform([value](ElementType x) {return x * value; });
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    void VectorReference<ElementType, orientation>::operator/=(ElementType value)
+    {
+        if (value == 0)
+        {
+            throw utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "divide by zero");
+        }
+        (*this) *= (1 / value);
     }
 }
 }

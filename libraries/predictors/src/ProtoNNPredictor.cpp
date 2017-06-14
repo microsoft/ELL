@@ -51,7 +51,7 @@ namespace predictors
         {
             math::ColumnVector<double> prototype(prototypes.GetColumn(i).ToArray());
             prototype -= projectedInput;
-            auto prototypeDistance = math::Operations::Norm2(prototype);
+            auto prototypeDistance = prototype.Norm2();
             auto similarity = std::exp(-1 * gammaVal * gammaVal * prototypeDistance * prototypeDistance);
             similarityToPrototypes[i] = similarity;
         }

@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Exception.h"
-#include "Operations.h"
 
 // utilities
 #include "Debug.h"
@@ -186,6 +185,27 @@ namespace math
     MatrixReference<ElementType, layout>::MatrixReference(size_t numRows, size_t numColumns, ElementType* pData) :
         ConstMatrixReference<ElementType, layout>(numRows, numColumns, pData)
     {
+    }
+
+    template <typename ElementType, MatrixLayout layout>
+    void MatrixReference<ElementType, layout>::CopyFrom(ConstMatrixReference<ElementType, layout> other)
+    {
+        if (NumRows() != other.NumRows() || NumColumns() != other.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Matrix dimensions are not the same.");
+        }
+
+        if (IsContiguous() && other.IsContiguous())
+        {
+            ReferenceAsVector().CopyFrom(other.ReferenceAsVector());
+        }
+        else
+        {
+            for (size_t i = 0; i < other.NumIntervals(); ++i)
+            {
+                GetMajorVector(i).CopyFrom(other.GetMajorVector(i));
+            }
+        }
     }
 
     template <typename ElementType, MatrixLayout layout>

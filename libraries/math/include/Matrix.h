@@ -5,14 +5,12 @@
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma once
 
 #include "Vector.h"
 
 // stl
 #include <cstddef>
-
-#ifndef MATRIX_H
-#define MATRIX_H
 
 namespace ell
 {
@@ -296,10 +294,10 @@ namespace math
         /// <param name="pData"> A pointer where the elements are stored. </param>
         MatrixReference(size_t numRows, size_t numColumns, ElementType* pData);
 
-        /// <summary> Gets a pointer to the underlying data storage. </summary>
+        /// <summary> Copies values from another matrix into this matrix. </summary>
         ///
-        /// <returns> Pointer to the data. </returns>
-        ElementType* GetDataPointer() const { return _pData; }
+        /// <param name="other"> The other matrix. </param>
+        void CopyFrom(ConstMatrixReference<ElementType, layout> other);
 
         /// <summary> Matrix element access operator. </summary>
         ///
@@ -389,8 +387,14 @@ namespace math
         /// <param name="other"> [in,out] The other matrix. </param>
         void Swap(MatrixReference<ElementType, layout>& other);
 
+        /// <summary> Gets a pointer to the underlying data storage. </summary>
+        ///
+        /// <returns> Pointer to the data. </returns>
+        ElementType* GetDataPointer() const { return _pData; }
+
         using RectangularMatrixBase<ElementType>::NumRows;
         using RectangularMatrixBase<ElementType>::NumColumns;
+        using ConstMatrixReference<ElementType, layout>::IsContiguous;
 
     protected:
         friend MatrixReference<ElementType, TransposeMatrixLayout<layout>::value>;
@@ -520,5 +524,3 @@ namespace math
 }
 
 #include "../tcc/Matrix.tcc"
-
-#endif // MATRIX_H
