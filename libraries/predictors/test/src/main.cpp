@@ -595,10 +595,13 @@ void ProtoNNPredictorTest()
     Z(1, 0) = 0.2; Z(1, 1) = 0.4, Z(1, 2) = 0.8;
 
     auto result = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
+    auto resultScore = protonnPredictor.GetPredictionScore(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
 
     size_t R = 1;
+    double score = 1.321484;
 
     testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result, R));
+    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(resultScore, score, 1e-6));
 }
 
 /// Runs all tests

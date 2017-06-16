@@ -107,12 +107,19 @@ namespace predictors
         /// <returns> The number of labels. </returns>
         size_t GetNumLabels() const { return _Z.NumRows(); }
 
-        /// <summary> Returns the output of the predictor for a given example. </summary>
+        /// <summary> Returns the label output of the predictor for a given example. </summary>
         ///
         /// <param name="inputVector"> The data vector. </param>
         ///
         /// <returns> The predicted label. </returns>
         size_t Predict(const DataVectorType& inputVector) const;
+
+        /// <summary> Returns the label score of the predictor for a given example. </summary>
+        ///
+        /// <param name="inputVector"> The data vector. </param>
+        ///
+        /// <returns> The predicted label score. </returns>
+        double GetPredictionScore(const DataVectorType& inputVector) const;
 
         /// <summary> Resets the projection predictor to the zero projection matrix. </summary>
         void Reset();
@@ -138,6 +145,8 @@ namespace predictors
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        math::ColumnVector<double> GetLabelScores(const DataVectorType& inputVector) const;
+
         static void WriteMatrixToArchive(utilities::Archiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> M);
 
         static math::ColumnMatrix<double> ReadMatrixFromArchive(utilities::Unarchiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel);
