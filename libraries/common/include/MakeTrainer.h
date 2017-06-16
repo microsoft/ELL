@@ -10,9 +10,11 @@
 
 #include "ForestTrainerArguments.h"
 #include "TrainerArguments.h"
+#include "ProtoNNTrainerArguments.h"
 
 // predictors
 #include "LinearPredictor.h"
+#include "ProtoNNPredictor.h"
 
 // trainers
 #include "ITrainer.h"
@@ -66,5 +68,7 @@ namespace common
     ///
     /// <returns> A unique_ptr to a forest trainer. </returns>
     std::unique_ptr<trainers::ITrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionArguments& lossFunctionArguments, const ForestTrainerArguments& trainerArguments);
+
+    std::unique_ptr<trainers::ITrainer<predictors::ProtoNNPredictor>> MakeProtoNNTrainer(size_t numExamples, size_t numFeatures, const trainers::ProtoNNTrainerParameters& parameters);
 }
 }

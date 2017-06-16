@@ -34,15 +34,28 @@ set (tcc tcc/EvaluatingTrainer.tcc
          tcc/SGDTrainer.tcc
          tcc/ThresholdFinder.tcc)
 
+set (pr_src protonn/src/ProtoNNTrainer.cpp
+            protonn/src/ProtoNNInit.cpp)
+
+set (pr_include protonn/include/ProtoNNTrainerUtils.h
+                protonn/include/ProtoNNTrainer.h
+                protonn/include/ProtoNNModel.h
+                protonn/include/ProtoNNInit.h)
+
+set (pr_tcc protonn/tcc/ProtoNNTrainerUtils.tcc)
+
 set (doc doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
+source_group("protonn\\include" FILES ${pr_include})
+source_group("protonn\\src" FILES ${pr_src})
+source_group("protonn\\tcc" FILES ${pr_tcc})
 
-add_library(${library_name} ${src} ${include} ${tcc} ${doc})
-target_include_directories(${library_name} PUBLIC include)
+add_library(${library_name} ${src} ${include} ${tcc} ${pr_src} ${pr_include} ${pr_tcc} ${doc})
+target_include_directories(${library_name} PUBLIC include protonn/include)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)

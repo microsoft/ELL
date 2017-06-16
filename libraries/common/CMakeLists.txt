@@ -18,6 +18,7 @@ set (src
   src/ForestTrainerArguments.cpp
   src/RegisterNodeCreators.cpp
   src/TrainerArguments.cpp
+  src/ProtoNNTrainerArguments.cpp
 )
 
 set (include 
@@ -37,6 +38,7 @@ set (include
   include/RegisterNodeCreators.h
   include/ForestTrainerArguments.h
   include/TrainerArguments.h
+  include/ProtoNNTrainerArguments.h
 )
 
 set (tcc 
