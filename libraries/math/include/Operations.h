@@ -50,7 +50,6 @@ namespace math
     template <class DerivedClass>
     struct DerivedOperations : public CommonOperations
     {
-
         /// <summary> Generalized matrix matrix addition, C = s * A + t * B. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>

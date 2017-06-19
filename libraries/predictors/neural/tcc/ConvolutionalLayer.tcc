@@ -24,7 +24,7 @@ namespace neural
         _shapedInput(convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding()),
         _outputMatrix(NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding())
     {
-        if (weights.NumElements() != (_output.NumChannels() * _layerParameters.input.NumChannels() * convolutionalParameters.receptiveField * convolutionalParameters.receptiveField))
+        if (weights.Size() != (_output.NumChannels() * _layerParameters.input.NumChannels() * convolutionalParameters.receptiveField * convolutionalParameters.receptiveField))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "weights dimensions for a convolutional layer should be the size of the receptive field volume * number of filters");
         }

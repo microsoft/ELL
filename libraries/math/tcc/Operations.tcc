@@ -27,17 +27,10 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     void CommonOperations::Add(ElementType s, MatrixReference<ElementType, layout> M)
     {
-        if (M.IsContiguous())
+        for (size_t i = 0; i < M.NumIntervals(); ++i)
         {
-            Add(s, M.ReferenceAsVector());
-        }
-        else
-        {
-            for (size_t i = 0; i < M.NumIntervals(); ++i)
-            {
-                auto interval = M.GetMajorVector(i);
-                Add(s, interval);
-            }
+            auto interval = M.GetMajorVector(i);
+            Add(s, interval);
         }
     }
 
@@ -62,16 +55,9 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, layout> M)
     {
-        if (M.IsContiguous())
+        for (size_t i = 0; i < M.NumIntervals(); ++i)
         {
-            DerivedClass::Multiply(s, M.ReferenceAsVector());
-        }
-        else
-        {
-            for (size_t i = 0; i < M.NumIntervals(); ++i)
-            {
-                DerivedClass::Multiply(s, M.GetMajorVector(i));
-            }
+            DerivedClass::Multiply(s, M.GetMajorVector(i));
         }
     }
 
@@ -103,10 +89,6 @@ namespace math
         if (b == 0)
         {
             DerivedClass::Multiply(s, M);
-        }
-        else if (M.IsContiguous())
-        {
-            MultiplyAdd(s, b, M.ReferenceAsVector());
         }
         else
         {
@@ -214,7 +196,7 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, VectorReference<ElementType, orientation> v)
     {
-        v.Transform([s](ElementType x) { return s*x; });
+        v *= s;
     }
 
     template <typename ElementType>

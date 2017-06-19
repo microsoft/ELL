@@ -19,7 +19,7 @@ namespace predictors
     NeuralNetworkPredictor<ElementType>::NeuralNetworkPredictor(InputLayerReference&& inputLayer, Layers&& layers) :
         _inputLayer(std::move(inputLayer)),
         _layers(std::move(layers)),
-        _output(_layers.back()->GetOutput().NumElements())
+        _output(_layers.back()->GetOutput().Size())
     {
     }
 

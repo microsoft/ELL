@@ -117,6 +117,9 @@ int main()
     TestTensor<float, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
     TestTensor<float, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
 
+    TestCopyFromAndGetSubTensor<double>();
+    TestCopyFromAndGetSubTensor<float>();
+
     TestTensorReference<double>();
     TestTensorReference<float>();
 

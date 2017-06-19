@@ -19,6 +19,9 @@ template<typename ElementType>
 void TestTensorReference();
 
 template<typename ElementType>
+void TestCopyFromAndGetSubTensor();
+
+template<typename ElementType>
 void TestTensorGetSlice();
 
 template<typename ElementType>

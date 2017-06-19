@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Layer.h"
-#include "Print.h"
 
 // stl
 #include <iostream>
@@ -38,7 +37,7 @@ namespace neural
                 output.Fill(-1);
                 break;
             case PaddingScheme::randomZeroAndOnes:
-                output.Generate([] { return (std::rand() % 2); });
+                output.Generate([] { return static_cast<ElementType>(std::rand() % 2); });
                 break;
             case PaddingScheme::alternatingZeroAndOnes:
                 {
@@ -89,7 +88,7 @@ namespace neural
         os << buffer;
 
         const ConstTensorReferenceType output(_output);
-        for (size_t i = 0; (i < numValuesToPrint) && (i < output.NumElements()); i++)
+        for (size_t i = 0; (i < numValuesToPrint) && (i < output.Size()); i++)
         {
             size_t channel = i % output.NumChannels();
             size_t col = i / output.NumChannels();

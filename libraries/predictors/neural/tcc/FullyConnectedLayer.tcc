@@ -19,11 +19,11 @@ namespace neural
     FullyConnectedLayer<ElementType>::FullyConnectedLayer(const LayerParameters& layerParameters, MatrixReferenceType& weights) :
         Layer<ElementType>(layerParameters),
         _weights(weights.NumRows(), weights.NumColumns()),
-        _shapedInput(layerParameters.input.NumElements()),
-        _outputVector(GetOutputMinusPadding().NumElements())
+        _shapedInput(layerParameters.input.Size()),
+        _outputVector(GetOutputMinusPadding().Size())
     {
         _weights = weights;
-        if (_weights.NumRows() != (GetOutputMinusPadding().NumElements()))
+        if (_weights.NumRows() != (GetOutputMinusPadding().Size()))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "weights dimension for a fully connected layer should be the same as number of output nodes times inputs per node");
         }
@@ -32,9 +32,9 @@ namespace neural
     template <typename ElementType>
     FullyConnectedLayer<ElementType>::FullyConnectedLayer(const LayerParameters& layerParameters, ConstTensorReferenceType& weights) :
         Layer<ElementType>(layerParameters),
-        _weights(GetOutputMinusPadding().NumElements(), layerParameters.input.NumElements()),
-        _shapedInput(layerParameters.input.NumElements()),
-        _outputVector(GetOutputMinusPadding().NumElements())
+        _weights(GetOutputMinusPadding().Size(), layerParameters.input.Size()),
+        _shapedInput(layerParameters.input.Size()),
+        _outputVector(GetOutputMinusPadding().Size())
     {
         // Reshape the weights into the _weights matrix
         // Each row is represents an output neuron, each column corresponds to the weight for that input

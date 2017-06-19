@@ -20,6 +20,9 @@
 #include "Dataset.h"
 #include "Example.h"
 
+// math
+#include "Vector.h"
+
 // common
 #include "DataLoadArguments.h"
 #include "DataLoaders.h"
