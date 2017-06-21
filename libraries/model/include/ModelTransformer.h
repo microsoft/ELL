@@ -27,7 +27,6 @@
 
 namespace ell
 {
-/// <summary> model namespace </summary>
 namespace model
 {
     // Forward declarations
@@ -86,6 +85,39 @@ namespace model
         std::vector<NodeActionFunction> _nodeActionFunctions;
     };
 
+    /// <summary> A utility class that maps output ports in a model to elements in a transformed model. </summary>
+    class PortOutputsMap
+    {
+    public:
+        /// <summary> Clears the map </summary>
+        void Clear();
+
+        /// <summary> Checks if the map is empty </summary>
+        bool IsEmpty() const;
+
+        /// <summary> Transforms a set of output port references from the input model space to the output model space. Called by node implementors. </summary>
+        ///
+        /// <param name="elements"> The elements in the input model to transform to the output model space. </param>
+        /// <returns> A `PortElementsBase` object representing the transformed elements in the space of the new model. </returns>
+        PortElementsBase GetCorrespondingPortElements(const PortElementsBase& elements) const;
+
+        /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
+        ///
+        /// <param name="oldPort"> The port in the old model to map to the new model. </param>
+        /// <param name="newElements"> The elements in the new model to be mapped from the old model port. </param>
+        void MapNodeOutput(const OutputPortBase* oldPort, const PortElementsBase& newElements);
+
+        /// <summary> Merges two partial port mappings. Takes a map A->B and a map B->C and creates the map A->C. </summary>
+        ///
+        /// <param name="oldMap"> The port mapping from the original model to an intermediate state. </param>
+        /// <param name="newMap"> The port mapping from the intermediate state to the new model. </param>
+        /// <returns> A new mapping from the original model outputs to the new model outputs. </returns> 
+        static PortOutputsMap ConcatenateMaps(const PortOutputsMap& oldMap, const PortOutputsMap& newMap);
+
+    private:
+        std::unordered_map<const OutputPortBase*, PortElementsBase> _map;
+    };
+
     /// <summary> A class that refines or copies models </summary>
     class ModelTransformer
     {
@@ -136,7 +168,7 @@ namespace model
         /// <param name="maxIterations"> The maximum number of refinement iterations. </param>
         ///
         /// <returns> The refined Model. </returns>
-        Model RefineModel(const Model& model, const TransformContext& context, int maxIterations = 10);
+        Model RefineModel(Model model, const TransformContext& context, int maxIterations = 10);
 
         /// <summary> Transforms the model by applying a transformation function to each node </summary>
         ///
@@ -219,11 +251,8 @@ namespace model
 
         /// <summary> Sets up an old-to-new model output mapping. Called by node implementors </summary>
         ///
-        /// <param name="oldElements"> The elements in the old model to map to the new model. </param>
+        /// <param name="oldPort"> The port in the old model to map to the new model. </param>
         /// <param name="newElements"> The elements in the new model to be mapped from the old model. </param>
-        template <typename ValueType>
-        void MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements);
-
         template <typename ValueType>
         void MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElementsBase& newElements);
 
@@ -238,12 +267,12 @@ namespace model
         template <typename NodeType>
         NodeType* GetCorrespondingInputNodeAs(const NodeType* node);
 
-        // Find a node that isn't compilable (if there are several, it just finds one)
+        // Collect nodes that are't compilable
         std::vector<const Node*> FindUncompilableNodes(const Model& model, const TransformContext& context) const;
 
         Model _model;
         TransformContext _context;
-        std::unordered_map<PortElementBase, PortElementBase> _elementToElementMap;
+        PortOutputsMap _elementsMap;
         bool _isModelCompilable;
     };
 }

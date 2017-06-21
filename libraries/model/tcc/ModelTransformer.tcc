@@ -10,10 +10,13 @@ namespace ell
 {
 namespace model
 {
+    //
+    // ModelTransformer
+    //
     template <typename ValueType>
     PortElements<ValueType> ModelTransformer::TransformPortElements(const PortElements<ValueType>& elements)
     {
-        auto result = TransformPortElements(PortElementsBase(elements));
+        auto result = _elementsMap.GetCorrespondingPortElements(PortElementsBase(elements));
         return PortElements<ValueType>(result);
     }
 
@@ -21,7 +24,7 @@ namespace model
     PortElements<ValueType> ModelTransformer::GetCorrespondingOutputs(const OutputPort<ValueType>& port)
     {
         PortElements<ValueType> elements(port);
-        return GetCorrespondingOutputs(elements);
+        return TransformPortElements(elements);
     }
 
     template <typename ValueType>
@@ -50,45 +53,19 @@ namespace model
     template <typename ValueType>
     void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const OutputPort<ValueType>& newPort)
     {
-        auto size = oldPort.Size();
-        assert(newPort.Size() == size);
-        for (size_t index = 0; index < size; ++index)
-        {
-            _elementToElementMap[{ oldPort, index }] = { newPort, index };
-        }
+        _elementsMap.MapNodeOutput(&oldPort, PortElementsBase{newPort});
     }
 
     template <typename ValueType>
     void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElements<ValueType>& newElements)
     {
-        auto size = oldPort.Size();
-        assert(newElements.Size() == size);
-        for (size_t index = 0; index < size; ++index)
-        {
-            _elementToElementMap[{ oldPort, index }] = newElements.GetElement(index);
-        }
-    }
-
-    template <typename ValueType>
-    void ModelTransformer::MapNodeOutput(const PortElements<ValueType>& oldElements, const PortElements<ValueType>& newElements)
-    {
-        auto size = oldElements.Size();
-        assert(oldElements.Size() == size);
-        for (size_t index = 0; index < size; ++index)
-        {
-            _elementToElementMap[oldElements.GetElement(index)] = newElements.GetElement(index);
-        }
+        _elementsMap.MapNodeOutput(&oldPort, newElements);
     }
 
     template <typename ValueType>
     void ModelTransformer::MapNodeOutput(const OutputPort<ValueType>& oldPort, const PortElementsBase& newElements)
     {
-        auto size = oldPort.Size();
-        assert(newElements.Size() == size);
-        for (size_t index = 0; index < size; ++index)
-        {
-            _elementToElementMap[{ oldPort, index }] = newElements.GetElement(index);
-        }
+        _elementsMap.MapNodeOutput(&oldPort, newElements);
     }
 
     template <typename NodeType, typename... Args>

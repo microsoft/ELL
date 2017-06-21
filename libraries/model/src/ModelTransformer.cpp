@@ -54,13 +54,96 @@ namespace model
     }
 
     //
+    // PortOutputsMap
+    //
+    void PortOutputsMap::Clear()
+    {
+        _map.clear();
+    }
+
+    bool PortOutputsMap::IsEmpty() const
+    {
+        return _map.size() == 0;
+    }
+
+    PortElementsBase PortOutputsMap::GetCorrespondingPortElements(const PortElementsBase& queryElements) const
+    {
+        PortElementsBase result;
+        auto&& queryRanges = queryElements.GetRanges();
+        for (auto&& queryRange : queryRanges)
+        {
+            auto queryRangePort = queryRange.ReferencedPort();
+            assert(queryRangePort != nullptr);
+            auto queryRangeStartIndex = queryRange.GetStartIndex();
+            auto queryRangeSize = queryRange.Size();
+            auto queryRangeEnd = queryRangeStartIndex + queryRangeSize;
+
+            // get elements for port
+            if (_map.find(queryRangePort) == _map.end())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
+            }
+
+            PortElementsBase portElements = _map.at(queryRangePort);
+            size_t targetRangeOffset = 0;
+            auto&& targetRanges = portElements.GetRanges();
+            for (auto&& targetRange : targetRanges)
+            {
+                auto targetRangePort = targetRange.ReferencedPort();
+                auto targetRangeSize = targetRange.Size();
+                auto targetRangeEnd = targetRangeOffset + targetRangeSize;
+
+                bool rangesIntersect = queryRangeEnd > targetRangeOffset && queryRangeStartIndex < targetRangeEnd;
+                if (rangesIntersect)
+                {
+                    // Get relevant subset of targetRange and append it to result;
+                    auto maxBegin = std::max(queryRangeStartIndex, targetRangeOffset);
+                    auto minEnd = std::min(queryRangeEnd, targetRangeEnd);
+                    assert(minEnd <= maxBegin);
+                    auto intersectionSize = minEnd - maxBegin;
+                    queryRangeStartIndex += intersectionSize;
+                    assert(queryRangeSize >= intersectionSize);
+                    queryRangeSize -= intersectionSize;
+                    result.Append(PortRange(*targetRangePort, targetRange.GetStartIndex(), intersectionSize));
+                    
+                    // If we've matched all the elements of the query range, we can break out of this loop
+                    if (queryRangeSize == 0)
+                        break;
+                }
+
+                targetRangeOffset += targetRangeSize;
+            }
+        }
+
+        result.Consolidate();
+        assert(result.Size() == queryElements.Size());
+        return result;
+    }
+
+    void PortOutputsMap::MapNodeOutput(const OutputPortBase* oldPort, const PortElementsBase& newElements)
+    {
+        _map[oldPort] = newElements;
+    }
+
+    PortOutputsMap PortOutputsMap::ConcatenateMaps(const PortOutputsMap& prevMap, const PortOutputsMap& newMap)
+    {
+        PortOutputsMap result;
+        for (const auto& entry : prevMap._map)
+        {
+            auto newMappedValue = newMap.GetCorrespondingPortElements(entry.second);
+            result.MapNodeOutput(entry.first, newMappedValue);
+        }
+        return result;
+    }
+
+    //
     // ModelTransformer implementation
     //
     Model ModelTransformer::CopyModel(const Model& oldModel, const TransformContext& context)
     {
         _context = context;
         _model = Model();
-        _elementToElementMap.clear();
+        _elementsMap.Clear();
         oldModel.Visit([this](const Node& node) { node.InvokeCopy(*this); });
         _context = TransformContext();
 
@@ -71,7 +154,7 @@ namespace model
     {
         _context = context;
         _model = Model();
-        _elementToElementMap.clear();
+        _elementsMap.Clear();
         oldModel.VisitSubset(outputNode, [this](const Node& node) { node.InvokeCopy(*this); });
         _context = TransformContext();
 
@@ -82,14 +165,14 @@ namespace model
     {
         _context = context;
         _model = Model();
-        _elementToElementMap.clear();
+        _elementsMap.Clear();
         oldModel.VisitSubset(outputNodes, [this](const Node& node) { node.InvokeCopy(*this); });
         _context = TransformContext();
 
         return std::move(_model);
     }
 
-    Model ModelTransformer::RefineModel(const Model& oldModel, const TransformContext& context, int maxIterations)
+    Model ModelTransformer::RefineModel(Model oldModel, const TransformContext& context, int maxIterations)
     {
         if (maxIterations <= 0)
         {
@@ -97,21 +180,23 @@ namespace model
         }
 
         _context = context;
-        _model = oldModel; // need to make a copy here
+        _model = std::move(oldModel);
+        _elementsMap.Clear();
 
-        // refine until all nodes are compilable according to context.IsNodeCompilable(), until
+        // Refine until all nodes are compilable according to context.IsNodeCompilable(), until
         // the model is fully refined, or until the maximum number of iterations is reached.
         for (int i = 0; i < maxIterations; ++i)
         {
             Model currentModel = std::move(_model);
             _model = Model();
 
-            auto currentElementToElementMap = std::move(_elementToElementMap);
-            _elementToElementMap.clear();
+            auto previousElementMap = std::move(_elementsMap);
+            _elementsMap = PortOutputsMap();
 
             _isModelCompilable = true;
 
-            // one refinement pass
+            // Do one refinement pass
+            // Note: as a side-effect, _elementsMap may be modified
             bool didRefineAny = false;
             currentModel.Visit([this, &context, &didRefineAny](const Node& node) {
                 bool didRefineNode = false;
@@ -128,15 +213,12 @@ namespace model
                 didRefineAny |= didRefineNode;
             });
 
-            // concatenate new port map onto existing port map
-            if (currentElementToElementMap.size() > 0)
+            if (!previousElementMap.IsEmpty())
             {
-                std::unordered_map<PortElementBase, PortElementBase> newElementToElementMap;
-                for (const auto& entry : currentElementToElementMap)
-                {
-                    newElementToElementMap[entry.first] = _elementToElementMap[entry.second];
-                }
-                _elementToElementMap = newElementToElementMap;
+                // Now we have 2 maps, the previous one mapping A->B, and a new one mapping B->C (in _elementsMap). 
+                // Concatenate them to get a map A->C, and keep it.
+                auto newElementsMap = PortOutputsMap::ConcatenateMaps(previousElementMap, _elementsMap);
+                _elementsMap = newElementsMap;
             }
 
             // check for early end condition
@@ -155,7 +237,7 @@ namespace model
     {
         _context = context;
         _model = Model();
-        _elementToElementMap.clear();
+        _elementsMap.Clear();
         model.Visit([this, transformFunction](const Node& node) { transformFunction(node, *this); });
         _context = TransformContext(); // reset context
         return std::move(_model);
@@ -163,33 +245,17 @@ namespace model
 
     PortElementsBase ModelTransformer::TransformPortElements(const PortElementsBase& elements)
     {
-        auto size = elements.Size();
-        PortElementsBase result;
-        result.Reserve(size);
-        for (size_t index = 0; index < size; ++index)
-        {
-            auto oldElement = elements.GetElement(index);
-            assert(_elementToElementMap.find(oldElement) != _elementToElementMap.end());
-            if (_elementToElementMap.find(oldElement) == _elementToElementMap.end())
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Could not find element in new model.");
-            }
-            auto newElement = _elementToElementMap[oldElement];
-            auto newPort = newElement.ReferencedPort();
-            result.Append({ *newPort, newElement.GetIndex() });
-        }
-        result.Consolidate();
-        return result;
+        return _elementsMap.GetCorrespondingPortElements(elements);
     }
 
     PortElementsBase ModelTransformer::GetCorrespondingOutputs(const OutputPortBase& port)
     {
-        return GetCorrespondingOutputs(PortElementsBase(port));
+        return _elementsMap.GetCorrespondingPortElements(PortElementsBase(port));
     }
 
     PortElementsBase ModelTransformer::GetCorrespondingOutputs(const PortElementsBase& elements)
     {
-        return TransformPortElements(elements);
+        return _elementsMap.GetCorrespondingPortElements(elements);
     }
 
     InputNodeBase* ModelTransformer::GetCorrespondingInputNode(const InputNodeBase* inputNode)

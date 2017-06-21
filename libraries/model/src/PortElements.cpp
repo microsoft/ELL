@@ -219,25 +219,6 @@ namespace model
     }
 
     //
-    // PortElementBase
-    //
-    PortElementBase::PortElementBase(const OutputPortBase& port, size_t index)
-        : _referencedPort(&port), _index(index) {}
-
-    void PortElementsBase::Append(const PortElementsBase& other)
-    {
-        for (const auto& range : other.GetRanges())
-        {
-            AddRange(range);
-        }
-    }
-
-    bool PortElementBase::operator==(const PortElementBase& other) const
-    {
-        return (_referencedPort == other._referencedPort) && (_index == other._index);
-    }
-
-    //
     // PortRange
     //
     PortRange::PortRange(const OutputPortBase& port)
@@ -248,6 +229,9 @@ namespace model
 
     PortRange::PortRange(const OutputPortBase& port, size_t startIndex, size_t numValues)
         : _referencedPort(&port), _startIndex(startIndex), _numValues(numValues), _isFixedSize(true) {}
+
+    PortRange::PortRange(const PortElementBase& element)
+        : _referencedPort(element.ReferencedPort()), _startIndex(element.GetIndex()), _numValues(1), _isFixedSize(true) {}
 
     size_t PortRange::Size() const
     {
@@ -299,6 +283,20 @@ namespace model
     //
     // PortElementsBase
     //
+    //
+    // PortElementBase
+    //
+    PortElementBase::PortElementBase(const OutputPortBase& port, size_t index)
+        : _referencedPort(&port), _index(index) {}
+
+    void PortElementsBase::Append(const PortElementsBase& other)
+    {
+        for (const auto& range : other.GetRanges())
+        {
+            AddRange(range);
+        }
+    }
+
     PortElementsBase::PortElementsBase(const OutputPortBase& port)
     {
         _ranges.emplace_back(port);
@@ -317,10 +315,15 @@ namespace model
         ComputeSize();
     }
 
+    PortElementsBase::PortElementsBase(const PortElementBase& element)
+    {
+        _ranges.push_back(PortRange{ element });
+        _size = 1;
+    }
+
     PortElementsBase::PortElementsBase(const PortRange& range)
     {
-        _ranges.clear();
-        _ranges.push_back(range);
+        _ranges.emplace_back(range);
         _size = range.Size();
     }
 
@@ -328,6 +331,11 @@ namespace model
     {
         _ranges.insert(_ranges.end(), ranges.begin(), ranges.end());
         ComputeSize();
+    }
+
+    bool PortElementBase::operator==(const PortElementBase& other) const
+    {
+        return (_referencedPort == other._referencedPort) && (_index == other._index);
     }
 
     Port::PortType PortElementsBase::GetPortType() const
@@ -347,7 +355,15 @@ namespace model
 
     void PortElementsBase::AddRange(const PortRange& range)
     {
-        _ranges.push_back(range);
+        // Check if range is contiguous with _ranges.back(), and if so, just add range.Size() to ranges.back()
+        if(_ranges.size() > 0 && _ranges.back().IsAdjacent(range))
+        {
+            _ranges.back().Append(range);
+        }
+        else
+        {
+            _ranges.push_back(range);
+        }
         _size += range.Size();
     }
 
