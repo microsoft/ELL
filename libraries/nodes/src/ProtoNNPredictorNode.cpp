@@ -33,12 +33,12 @@ namespace ell
 namespace nodes
 {
     ProtoNNPredictorNode::ProtoNNPredictorNode()
-        : Node({ &_input }, { &_output}), _input(this, {}, inputPortName), _output(this, outputPortName, 1)
+        : Node({ &_input }, { &_outputScore, &_outputLabel }), _input(this, {}, inputPortName), _outputScore(this, outputScorePortName, 0), _outputLabel(this, outputLabelPortName, 1)
     {
     }
 
     ProtoNNPredictorNode::ProtoNNPredictorNode(const model::PortElements<double>& input, const predictors::ProtoNNPredictor& predictor)
-        : Node({ &_input }, { &_output}), _input(this, input, inputPortName), _output(this, outputPortName, 1), _predictor(predictor)
+        : Node({ &_input }, { &_outputScore, &_outputLabel }), _input(this, input, inputPortName), _outputScore(this, outputScorePortName, 1), _outputLabel(this, outputLabelPortName, 1), _predictor(predictor)
     {
         assert(input.Size() == predictor.GetDimension());
     }
@@ -47,7 +47,8 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver[outputPortName] << _output;
+        archiver[outputScorePortName] << _outputScore;
+        archiver[outputLabelPortName] << _outputLabel;
         archiver["predictor"] << _predictor;
     }
 
@@ -55,7 +56,8 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver[outputPortName] >> _output;
+        archiver[outputScorePortName] >> _outputScore;
+        archiver[outputLabelPortName] >> _outputLabel;
         archiver["predictor"] >> _predictor;
     }
 
@@ -63,7 +65,8 @@ namespace nodes
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<ProtoNNPredictorNode>(newPortElements, _predictor);
-        transformer.MapNodeOutput(output, newNode->output);
+        transformer.MapNodeOutput(outputLabel, newNode->outputLabel);
+        transformer.MapNodeOutput(outputScore, newNode->outputScore);
     }
 
     bool ProtoNNPredictorNode::Refine(model::ModelTransformer& transformer) const
@@ -98,7 +101,8 @@ namespace nodes
         auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(similarityOutputs, _predictor.GetLabelEmbeddings());
         auto predictionLabelNode = transformer.AddNode<ArgMaxNode<double>>(labelScoresNode->output);
 
-        transformer.MapNodeOutput(output, predictionLabelNode->argVal);
+        transformer.MapNodeOutput(outputScore, predictionLabelNode->val);
+        transformer.MapNodeOutput(outputLabel, predictionLabelNode->argVal);
 
         return true;
     }
@@ -107,7 +111,10 @@ namespace nodes
     {
         auto inputDataVector = ProtoNNPredictor::DataVectorType(_input.GetIterator());
 
-        _output.SetOutput({ (int)_predictor.Predict(inputDataVector) });
+        predictors::ProtoNNPrediction prediction = _predictor.Predict(inputDataVector);
+
+        _outputScore.SetOutput({ prediction.score });
+        _outputLabel.SetOutput({ (int)prediction.label });
     }
 
     ProtoNNPredictorNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::ProtoNNPredictor& predictor, model::ModelTransformer& transformer)
