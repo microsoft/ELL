@@ -6,44 +6,49 @@ set (library_name data)
 
 set (src src/Dataset.cpp
          src/DataVector.cpp
+         src/DataVectorOperations.cpp
+         src/GeneralizedSparseParsingIterator.cpp
          src/SequentialLineIterator.cpp
-         src/SparseEntryParser.cpp
-         src/Example.cpp)
+         src/TextLine.cpp
+         src/WeightLabel.cpp)
 
 set (include include/AutoDataVector.h
+             include/Dataset.h
+             include/DataVector.h
+             include/DataVectorOperations.h
              include/DenseDataVector.h
              include/Example.h
              include/ExampleIterator.h
-             include/DataVector.h
-             include/DataVectorTransformations.h
-             include/ParsingExampleIterator.h
-             include/Dataset.h
+             include/GeneralizedSparseParsingIterator.h
              include/IndexValue.h
+             include/SingleLineParsingExampleIterator.h
              include/SequentialLineIterator.h
              include/SparseBinaryDataVector.h
              include/SparseDataVector.h
-             include/SparseEntryParser.h
              include/StlIndexValueIterator.h
-             include/SupervisedExampleBuilder.h
              include/TransformedDataVector.h
-             include/TransformingIndexValueIterator.h)
+             include/TransformingIndexValueIterator.h
+             include/TextLine.h
+             include/WeightLabel.h
+             )
 
 set (tcc tcc/AutoDataVector.tcc
          tcc/DataVector.tcc
-         tcc/DataVectorTransformations.tcc
+         tcc/DataVectorOperations.tcc
          tcc/DenseDataVector.tcc
          tcc/Example.tcc
          tcc/ExampleIterator.tcc
-         tcc/ParsingExampleIterator.tcc
          tcc/Dataset.tcc
+         tcc/SingleLineParsingExampleIterator.tcc
          tcc/SparseBinaryDataVector.tcc
          tcc/SparseDataVector.tcc
          tcc/StlIndexValueIterator.tcc
-         tcc/SupervisedExampleBuilder.tcc
+         tcc/TextLine.tcc
          tcc/TransformedDataVector.tcc
          tcc/TransformingIndexValueIterator.tcc)
 
-set (doc doc/README.md)
+set (doc doc/GeneralizedSparseFormat.md
+         doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
@@ -69,11 +74,13 @@ set (test_name ${library_name}_test)
 set (test_src test/src/main.cpp
               test/src/Dataset_test.cpp
               test/src/DataVector_test.cpp
-              test/src/Example_test.cpp)
+              test/src/Example_test.cpp
+              test/src/Parser_test.cpp)
 
 set (test_include test/include/Dataset_test.h
                   test/include/DataVector_test.h
-                  test/include/Example_test.h)
+                  test/include/Example_test.h
+                  test/include/Parser_test.h)
 
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})

@@ -19,11 +19,11 @@ namespace neural
     FullyConnectedLayer<ElementType>::FullyConnectedLayer(const LayerParameters& layerParameters, MatrixReferenceType& weights) :
         Layer<ElementType>(layerParameters),
         _weights(weights.NumRows(), weights.NumColumns()),
-        _shapedInput(layerParameters.input.NumElements()),
-        _outputVector(GetOutputMinusPadding().NumElements())
+        _shapedInput(layerParameters.input.Size()),
+        _outputVector(GetOutputMinusPadding().Size())
     {
         _weights = weights;
-        if (_weights.NumRows() != (GetOutputMinusPadding().NumElements()))
+        if (_weights.NumRows() != (GetOutputMinusPadding().Size()))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "weights dimension for a fully connected layer should be the same as number of output nodes times inputs per node");
         }
@@ -32,29 +32,25 @@ namespace neural
     template <typename ElementType>
     FullyConnectedLayer<ElementType>::FullyConnectedLayer(const LayerParameters& layerParameters, ConstTensorReferenceType& weights) :
         Layer<ElementType>(layerParameters),
-        _weights(GetOutputMinusPadding().NumElements(), layerParameters.input.NumElements()),
-        _shapedInput(layerParameters.input.NumElements()),
-        _outputVector(GetOutputMinusPadding().NumElements())
+        _weights(GetOutputMinusPadding().Size(), layerParameters.input.Size()),
+        _shapedInput(layerParameters.input.Size()),
+        _outputVector(GetOutputMinusPadding().Size())
     {
-        if (_weights.NumRows() != (GetOutputMinusPadding().NumElements()))
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "weights dimension for a fully connected layer should be the same as number of output nodes times inputs per node");
-        }
-
         // Reshape the weights into the _weights matrix
         // Each row is represents an output neuron, each column corresponds to the weight for that input
-        for (size_t i = 0; i < weights.NumRows(); i++)
+        const size_t rowIncrement = layerParameters.input.NumColumns() * layerParameters.input.NumChannels();
+        const size_t columnIncrement = layerParameters.input.NumChannels();
+        for (size_t outRow = 0; outRow < _weights.NumRows(); outRow++)
         {
-            size_t rowOffset = (i % layerParameters.input.NumRows()) * (weights.NumColumns() + weights.NumChannels());
-            for (size_t j = 0; j < weights.NumColumns(); j++)
+            for (size_t i = 0; i < layerParameters.input.NumRows(); i++)
             {
-                size_t columnOffset = j * weights.NumChannels();
-                for (size_t k = 0; k < weights.NumChannels(); k++)
+                for (size_t j = 0; j < layerParameters.input.NumColumns(); j++)
                 {
-                    size_t matrixRow = i / layerParameters.input.NumRows();
-                    size_t matrixColumn = rowOffset + columnOffset + k;
-
-                    _weights(matrixRow, matrixColumn) = weights(i, j, k);
+                    for (size_t k = 0; k < layerParameters.input.NumChannels(); k++)
+                    {
+                        size_t column = (i * rowIncrement) + (j * columnIncrement) + k;
+                        _weights(outRow, column) = weights(outRow * layerParameters.input.NumRows() + i, j, k);
+                    }
                 }
             }
         }

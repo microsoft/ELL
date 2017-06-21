@@ -35,30 +35,42 @@ namespace model
     template <typename ValueType>
     void OutputNode<ValueType>::Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        // Outputs are always long lived - either globals or heap. Currently, we use globals
         assert(GetPortVariableType(input) == GetPortVariableType(output));
 
-        // If the input to this node is a "pure" input port (it only refers to one output port), then we can just
-        // use the input instead.
-        if (IsPureVector(input) && false) // TODO: Re-enable when scalar output port test working
+        auto inputIsInputNode = (dynamic_cast<const InputNodeBase*>(input.GetInputElement(0).ReferencedPort()->GetNode()) != nullptr);
+        // TODO: re-enable this branch when scalar port bug is fixed 
+        if (IsPureVector(input) && input.Size() != 1 && output.Size() != 1 && !inputIsInputNode && false)
         {
             auto pVar = compiler.GetVariableForElement(input.GetInputElement(0));
             compiler.SetVariableForPort(output, pVar);
         }
         else
         {
-            llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+            llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
             if (input.Size() == 1)
             {
                 llvm::Value* pVal = compiler.LoadPortElementVariable(input.GetInputElement(0));
-                function.Store(pResult, pVal);
+                function.Store(pOutput, pVal);
             }
             else
             {
-                for (size_t i = 0; i < input.Size(); ++i)
+                auto inputElements = input.GetInputElements();
+                int rangeStart = 0;
+                for (auto range : inputElements.GetRanges())
                 {
-                    llvm::Value* pVal = compiler.LoadPortElementVariable(input.GetInputElement(i));
-                    function.SetValueAt(pResult, function.Literal((int)i), pVal);
+                    llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
+                    auto forLoop = function.ForLoop();
+                    auto rangeSize = range.Size();
+                    forLoop.Begin(rangeSize);
+                    {
+                        auto i = forLoop.LoadIterationVariable();
+                        auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
+                        auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
+                        llvm::Value* pValue = function.ValueAt(pInput, inputIndex);
+                        function.SetValueAt(pOutput, outputIndex, pValue);
+                    }
+                    forLoop.End();
+                    rangeStart += rangeSize;
                 }
             }
         }

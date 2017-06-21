@@ -37,6 +37,10 @@ namespace emitters
         indexOutOfRange,
         // Function not found
         functionNotFound,
+        // Bad function definition
+        badFunctionDefinition,
+        // function called with incorrect arguments
+        badFunctionArguments,
         // Write to output stream failed
         writeStreamFailed,
         // Parser error
@@ -45,9 +49,9 @@ namespace emitters
         duplicateSymbol,
         // Expected a vector variable, but a scalar was encountered
         vectorVariableExpected,
-        // Expected a scalar inputs, but a vector was encountered
+        // Expected a scalar input, but a vector was encountered
         scalarInputsExpected,
-        // Expected a scalar inputs, but a vector was encountered
+        // Expected a scalar output, but a vector was encountered
         scalarOutputsExpected,
         // Expected vector input of size 2
         binaryInputsExpected,

@@ -20,15 +20,15 @@ namespace emitters
     }
 
     template <typename ValueType>
-    llvm::GlobalVariable* IRModuleEmitter::Constant(const std::string& name, const std::vector<ValueType>& value)
+    llvm::GlobalVariable* IRModuleEmitter::ConstantArray(const std::string& name, const std::vector<ValueType>& value)
     {
-        return Global(name, _emitter.Type(GetVariableType<ValueType>()), _emitter.Literal(value), true);
+        return Global(name, _emitter.ArrayType(GetVariableType<ValueType>(), value.size()), _emitter.Literal(value), true);
     }
 
     template <typename ValueType>
-    llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, const std::vector<ValueType>& value)
+    llvm::GlobalVariable* IRModuleEmitter::GlobalArray(const std::string& name, const std::vector<ValueType>& value)
     {
-        return Global(name, _emitter.Type(GetVariableType<ValueType>()), _emitter.Literal(value), false);
+        return Global(name, _emitter.ArrayType(GetVariableType<ValueType>(), value.size()), _emitter.Literal(value), false);
     }
 
     //
@@ -162,19 +162,19 @@ namespace emitters
     template <typename T>
     llvm::Value* IRModuleEmitter::EmitLiteralVector(LiteralVectorVariable<T>& var)
     {
-        return Constant(var.EmittedName(), var.Data());
+        return ConstantArray(var.EmittedName(), var.Data());
     }
 
     template <typename T>
     llvm::Value* IRModuleEmitter::EmitGlobalVector(VectorVariable<T>& var)
     {
-        return Global(GetVariableType<T>(), var.EmittedName(), var.Dimension());
+        return GlobalArray(GetVariableType<T>(), var.EmittedName(), var.Dimension());
     }
 
     template <typename T>
     llvm::Value* IRModuleEmitter::EmitGlobalVector(InitializedVectorVariable<T>& var)
     {
-        return Global(var.EmittedName(), var.Data());
+        return GlobalArray(var.EmittedName(), var.Data());
     }
 
     template <typename T>

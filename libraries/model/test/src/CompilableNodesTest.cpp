@@ -7,9 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompilableNodesTest.h"
+#include "../clang/DotProductIR.h"
 #include "ModelTestUtilities.h"
 
 // model
+#include "CompiledMap.h"
 #include "DynamicMap.h"
 #include "EmitterException.h"
 #include "EmitterTypes.h"
@@ -29,6 +31,7 @@
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
+#include "IRNode.h"
 #include "MultiplexerNode.h"
 #include "SourceNode.h"
 #include "SumNode.h"
@@ -43,9 +46,9 @@
 #include <ostream>
 #include <string>
 
-namespace ell
-{
-void TestCompileIsEqualModel()
+using namespace ell;
+
+void TestCompileIsEqual()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(2);
@@ -90,7 +93,7 @@ void TestCompilableVectorOutputNode()
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     PrintIR(compiledMap);
-    VerifyCompiledOutput(map, compiledMap, signal, "ScalarOutputNode");
+    VerifyCompiledOutput(map, compiledMap, signal, "VectorOutputNode");
 }
 
 void TestCompilableAccumulatorNode()
@@ -133,6 +136,7 @@ void TestCompilableDotProductNode()
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dotNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -365,13 +369,9 @@ void TestCompilableAccumulatorNodeFunction()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
     auto accumNode1 = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
-
-    // auto outputNode = model.AddNode<model::OutputNode<double>>(accumNode1->output);
-
     auto constNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>{ 1, 2, 3 });
     auto accumNode2 = model.AddNode<nodes::AccumulatorNode<double>>(accumNode1->output);
     auto accumNode3 = model.AddNode<nodes::AccumulatorNode<double>>(constNode->output);
-    auto dotNode1 = model.AddNode<nodes::DotProductNode<double>>(accumNode2->output, accumNode3->output);
     auto dotNode2 = model.AddNode<nodes::DotProductNode<double>>(accumNode2->output, accumNode3->output);
     auto accumNode4 = model.AddNode<nodes::AccumulatorNode<double>>(dotNode2->output);
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ accumNode4->output, dotNode2->output });
@@ -431,4 +431,142 @@ void TestCompilableSourceNode(bool runJit)
         VerifyCompiledOutput(map, compiledMap, timeSignal, "SourceNode");
     }
 }
+
+void TestFloatNode()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<float>>(3);
+    auto accumNode1 = model.AddNode<nodes::AccumulatorNode<float>>(inputNode->output);
+
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", accumNode1->output } });
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.unrollLoops = true;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<float>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNode<float>");
+}
+
+void TestCompilableDotProductNode2(int dimension)
+{
+    model::Model model;
+    std::vector<double> constValue(dimension);
+    for (int index = 0; index < dimension; ++index)
+    {
+        constValue[index] = index + 0.5;
+    }
+    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
+    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(constValue);
+    auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dotNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<double>> signal;
+    for (int index1 = 0; index1 < 8; ++index1)
+    {
+        std::vector<double> x;
+        for (int index2 = 0; index2 < dimension; ++index2)
+        {
+            x.push_back(index2);
+        }
+        signal.push_back(x);
+    }
+
+    VerifyCompiledOutput(map, compiledMap, signal, "DotProductNode");
+}
+
+class BinaryFunctionIRNode : public nodes::IRNode
+{
+public:
+    /// @name Input and Output Ports
+    /// @{
+    static constexpr const char* input1PortName = "input1";
+    static constexpr const char* input2PortName = "input2";
+    static constexpr const char* outputPortName = "output";
+    const model::InputPort<double>& input1 = _input1;
+    const model::InputPort<double>& input2 = _input2;
+    const model::OutputPort<double>& output = _output;
+    /// @}
+
+    BinaryFunctionIRNode(const model::PortElements<double>& in1, const model::PortElements<double>& in2, const std::string& functionName, const std::string& irCode, const emitters::NamedVariableTypeList& otherArgs)
+        : IRNode({ &_input1, &_input2 }, { &_output }, functionName, irCode, otherArgs), _input1(this, in1, input1PortName), _input2(this, in2, input2PortName), _output(this, outputPortName, 1)
+    {
+    }
+
+protected:
+    virtual void Copy(model::ModelTransformer& transformer) const override
+    {
+        auto newInput1 = transformer.TransformPortElements(_input1.GetPortElements());
+        auto newInput2 = transformer.TransformPortElements(_input2.GetPortElements());
+        auto newNode = transformer.AddNode<BinaryFunctionIRNode>(newInput1, newInput2, GetFunctionName(), GetIRCode(), GetExtraArgs());
+        transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    virtual std::vector<llvm::Value*> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override
+    {
+        int inputSize = _input1.Size();
+        assert(inputSize == _input2.Size());
+        return { currentFunction.Literal(inputSize) };
+    }
+
+private:
+    // Inputs
+    model::InputPort<double> _input1;
+    model::InputPort<double> _input2;
+
+    // Output
+    model::OutputPort<double> _output;
+};
+
+void TestIRNode()
+{
+    int dimension = 3;
+    std::vector<double> constValue(dimension);
+    for (int index = 0; index < dimension; ++index)
+    {
+        constValue[index] = index + 0.5;
+    }
+
+    model::Model dotNodeModel;
+    auto inputNode1 = dotNodeModel.AddNode<model::InputNode<double>>(dimension);
+    auto constantNode1 = dotNodeModel.AddNode<nodes::ConstantNode<double>>(constValue);
+    auto dotNode = dotNodeModel.AddNode<nodes::DotProductNode<double>>(inputNode1->output, constantNode1->output);
+    auto dotNodeMap = model::DynamicMap(dotNodeModel, { { "input", inputNode1 } }, { { "output", dotNode->output } });
+
+    model::Model irNodeModel;
+    auto inputNode2 = irNodeModel.AddNode<model::InputNode<double>>(dimension);
+    auto constantNode2 = irNodeModel.AddNode<nodes::ConstantNode<double>>(constValue);
+    std::vector<model::PortElementsBase> inputs{ inputNode2->output, constantNode2->output };
+    emitters::NamedVariableTypeList extraArgs{ { "count", emitters::VariableType::Int32 } };
+
+    // Get the precompiled IR for dot product (defined in the DotProductIR.h file)
+    auto dotProductIR = GetDotProductIR();
+    auto dotProductFunctionName = GetDotProductFunctionName();
+    auto irNode = irNodeModel.AddNode<BinaryFunctionIRNode>(inputNode2->output, constantNode2->output, dotProductFunctionName, dotProductIR, extraArgs);
+    auto irNodeMap = model::DynamicMap(irNodeModel, { { "input", inputNode2 } }, { { "output", *irNode->GetOutputPort(0) } });
+
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(irNodeMap);
+    PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<double>> signal;
+    for (int index1 = 0; index1 < 8; ++index1)
+    {
+        std::vector<double> entry;
+        for (int index2 = 0; index2 < dimension; ++index2)
+        {
+            entry.push_back(index2);
+        }
+        signal.push_back(entry);
+    }
+
+    VerifyCompiledOutput(dotNodeMap, compiledMap, signal, "DotProductNode");
 }

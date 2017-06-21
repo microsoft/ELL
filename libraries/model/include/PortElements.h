@@ -109,6 +109,10 @@ namespace model
     {
     public:
         PortRange() = default;
+        PortRange(const PortRange&) = default;
+        PortRange(PortRange&&) = default;
+        PortRange& operator=(const PortRange& other) = default;
+        PortRange& operator=(PortRange&& other) = default;
 
         /// <summary> Creates a PortRange representing all the values from a given port </summary>
         ///
@@ -217,7 +221,7 @@ namespace model
             /// <returns> true if it succeeds, false if it fails. </returns>
             bool IsValid() { return _ranges.size() > 0; }
 
-            /// <summary> Proceeds to the Next item. </summary>
+            /// <summary> Proceeds to the next item. </summary>
             void Next();
 
             /// <summary> Gets the item the iterator is pointing to. </summary>
@@ -234,11 +238,37 @@ namespace model
         };
 
         PortElementsBase() = default;
+        PortElementsBase(const PortElementsBase& other) = default;
+        PortElementsBase(PortElementsBase&& other) = default;
+        PortElementsBase& operator=(const PortElementsBase& other) = default;
+        PortElementsBase& operator=(PortElementsBase&& other) = default;
 
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="port"> The port to construct this PortElements from. </param>
         PortElementsBase(const OutputPortBase& port);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="port"> The port to construct this PortElements from. </param>
+        /// <param name="startIndex"> The index of the element to start at. </param>
         PortElementsBase(const OutputPortBase& port, size_t startIndex);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="port"> The port to construct this PortElements from. </param>
+        /// <param name="startIndex"> The index of the element to start at. </param>
+        /// <param name="numValues"> The number of elements to use. </param>
         PortElementsBase(const OutputPortBase& port, size_t startIndex, size_t numValues);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="range"> The rage to construct this PortElements from. </param>
         PortElementsBase(const PortRange& range);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="ranges"> The ranges to construct this PortElements from. </param>
         PortElementsBase(const std::vector<PortRange>& ranges);
 
         virtual ~PortElementsBase() = default;
@@ -263,7 +293,7 @@ namespace model
         /// <returns> The number of ranges in this list </returns>
         size_t NumRanges() const { return _ranges.size(); }
 
-        /// <summary> Indicates if this PortElements consists of the entire port's output </summary>
+        /// <summary> Indicates if this PortElements consists of an entire port's output </summary>
         ///
         /// <returns> true if this PortElements spans a single port's entire range </returns>
         bool IsFullPortOutput() const { return _ranges.size() == 1 && _ranges[0].IsFullPortRange(); }
@@ -290,7 +320,7 @@ namespace model
         void Append(const PortElementsBase& other);
 
         /// <summary> Consolidates adjacent ranges </summary>
-        virtual void Consolidate();
+        void Consolidate();
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -327,6 +357,10 @@ namespace model
     {
     public:
         PortElements() = default;
+        PortElements(const PortElements<ValueType>&) = default;
+        PortElements(PortElements<ValueType>&&) = default;
+        PortElements<ValueType>& operator=(const PortElements<ValueType>&) = default;
+        PortElements<ValueType>& operator=(PortElements<ValueType>&&) = default;
 
         /// <summary> Creates a PortElements representing all the values from a given port </summary>
         ///
@@ -494,7 +528,7 @@ namespace model
 
         /// <summary> Returns the dimensionality of the output </summary>
         size_t GetStartIndex() const { return _startIndex; }
-        
+
         /// <summary> Indicates if this range was created with a fixed size </summary>
         ///
         /// <returns> true if this range was created with a fixed size </returns>

@@ -41,17 +41,26 @@ namespace common
     /// <param name="context"> The `SerializationContext` </param>
     void RegisterNodeTypes(utilities::SerializationContext& context);
 
+    /// <summary> Register known map types to a serialization context </summary>
+    ///
+    /// <param name="context"> The `SerializationContext` </param>
+    void RegisterMapTypes(utilities::SerializationContext& context);
+
     /// <summary> Loads a map from a file, or creates a new one if given an empty filename. </summary>
     ///
     /// <param name="filename"> The filename. </param>
     /// <returns> The loaded map. </returns>
-    model::DynamicMap LoadMap(const std::string& filename);
+    template <typename MapType = model::DynamicMap>
+    MapType LoadMap(const std::string& filename);
 
     /// <summary> Loads a map from a `MapLoadArguments` struct. </summary>
     ///
+    /// <typeparam name="MapType"> The type of map to load. </param>
+    /// <typeparam name="MapLoadArguments::MapType"> The MapLoadArguments map type to match. </param>
     /// <param name="mapLoadArguments"> The `MapLoadArguments` struct. </param>
     /// <returns> The loaded map. </returns>
-    model::DynamicMap LoadMap(const MapLoadArguments& mapLoadArguments);
+    template <typename MapType = model::DynamicMap, MapLoadArguments::MapType argMapType = MapLoadArguments::MapType::simpleMap>
+    MapType LoadMap(const MapLoadArguments& mapLoadArguments);
 
     /// <summary> Saves a map to a file. </summary>
     ///
@@ -66,3 +75,5 @@ namespace common
     void SaveMap(const model::DynamicMap& map, std::ostream& outStream);
 }
 }
+
+#include "../tcc/LoadModel.tcc"

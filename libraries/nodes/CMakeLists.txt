@@ -9,27 +9,33 @@ set (include include/AccumulatorNode.h
              include/BinaryPredicateNode.h
              include/ConstantNode.h
              include/DelayNode.h
+             include/DemultiplexerNode.h
              include/DotProductNode.h
              include/DTWDistanceNode.h
              include/ExtremalValueNode.h
-             include/MultiplexerNode.h
              include/ForestPredictorNode.h
+             include/IRNode.h
              include/LinearPredictorNode.h
              include/L2NormNode.h
              include/MovingAverageNode.h
+             include/MatrixMatrixMultiplyNode.h
+             include/MatrixVectorMultiplyNode.h
+             include/MatrixVectorProductNode.h
              include/MovingVarianceNode.h
-             include/DemultiplexerNode.h
+             include/MultiplexerNode.h
              include/SingleElementThresholdNode.h
              include/SumNode.h
              include/TypeCastNode.h
              include/UnaryOperationNode.h
              include/ValueSelectorNode.h
-             include/MatrixVectorProductNode.h
              include/SourceNode.h
              include/ProtoNNPredictorNode.h)
 
 set (src src/ConstantNode.cpp
+         src/IRNode.cpp
          src/LinearPredictorNode.cpp
+         src/MatrixMatrixMultiplyNode.cpp
+         src/MatrixVectorMultiplyNode.cpp
          src/SingleElementThresholdNode.cpp
          src/ProtoNNPredictorNode.cpp)
 
@@ -38,20 +44,20 @@ set (tcc tcc/AccumulatorNode.tcc
          tcc/BinaryPredicateNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
+         tcc/DemultiplexerNode.tcc
          tcc/DotProductNode.tcc
          tcc/DTWDistanceNode.tcc
          tcc/ExtremalValueNode.tcc
          tcc/MultiplexerNode.tcc
          tcc/ForestPredictorNode.tcc
          tcc/L2NormNode.tcc
+         tcc/MatrixVectorProductNode.tcc
          tcc/MovingAverageNode.tcc
          tcc/MovingVarianceNode.tcc
-         tcc/DemultiplexerNode.tcc
          tcc/SumNode.tcc
          tcc/TypeCastNode.tcc
          tcc/UnaryOperationNode.tcc
          tcc/ValueSelectorNode.tcc
-         tcc/MatrixVectorProductNode.tcc
          tcc/SourceNode.tcc)
 
 source_group("include" FILES ${include})
@@ -64,6 +70,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
 target_link_libraries(${library_name} model predictors utilities)
+if(BLAS_FOUND)
+  target_compile_definitions(${library_name} PUBLIC USE_BLAS=1)
+endif()
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 

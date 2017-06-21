@@ -28,7 +28,7 @@ namespace neural
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Size of 'mean' and 'variance' must match");
         }
-        if (_layerParameters.input.NumElements() != GetOutputMinusPadding().NumElements())
+        if (_layerParameters.input.Size() != GetOutputMinusPadding().Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Expected size of input and output tensor (minus padding) to match");
         }

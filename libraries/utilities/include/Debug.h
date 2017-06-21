@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Debug.h (utilities)
 //  Authors:  Ofer Dekel
 //
@@ -10,7 +10,7 @@
 #ifndef NDEBUG
 #define DEBUG_THROW( condition, exception ) if(condition) throw exception
 #else 
-#define DEBUG_THROW
+#define DEBUG_THROW( condition, exception ) 
 #endif
 
 /// <summary> Emits a printf statement for debugging </summary>
@@ -22,7 +22,7 @@
     function.GetModule().DeclarePrintf(); \
     function.Printf({ function.Literal(format), ##__VA_ARGS__ } );
 #else
-#define DEBUG_EMIT_PRINTF
+#define DEBUG_EMIT_PRINTF( function, format, ... )
 #endif
 
 

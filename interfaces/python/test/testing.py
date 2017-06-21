@@ -1,8 +1,12 @@
+from __future__ import print_function
+
+
 class Testing(object):
     @staticmethod
     def IsEqualWithinTolerance(a, b, tol):
         t = a - b
-        return (a-b) < tol and (b-a) < tol
+        return (a - b) < tol and (b - a) < tol
+
     @staticmethod
     def IsEqual(a, b, tol=1.0e-8):
         if type(a) != type(b):
@@ -18,18 +22,20 @@ class Testing(object):
             return True
         else:
             if type(a) is float:
-                return Testing.IsEqualWithinTolerance(a,b,tol)
+                return Testing.IsEqualWithinTolerance(a, b, tol)
             else:
                 return a == b
+
     def __init__(self):
         self.testFailedFlag = False
+
     def ProcessTest(self, testDescription, success):
-        print "%s ..." % (testDescription),
+        print("%s ... " % (testDescription), end="")
         if success:
-            print "Passed"
+            print("Passed")
         else:
-            print "Failed"
+            print("Failed")
             self.testFailedFlag = True
+
     def DidTestFail(self):
         return self.testFailedFlag
-

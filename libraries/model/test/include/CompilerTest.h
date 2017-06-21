@@ -27,19 +27,12 @@
 // stl
 #include <string>
 
-namespace ell
-{
 void SetOutputPathBase(std::string path);
-std::string OutputPath(const char* pRelPath);
-std::string OutputPath(const std::string& relPath);
+std::string OutputPath(std::string relPath);
 
-model::DynamicMap MakeSimpleMap();
+ell::model::DynamicMap MakeSimpleMap();
+ell::model::DynamicMap MakeForestMap();
 
-model::Model MakeForestModel();
-model::DynamicMap MakeForestMap();
-
-void TestSimpleMap(bool optimize);
-void TestCompiledMapMove();
 void TestBinaryVector(bool expanded, bool runJit = false);
 void TestBinaryScalar();
 void TestDotProduct();
@@ -55,5 +48,9 @@ void TestDotProductOutput();
 void TestLinearPredictor();
 void TestForest();
 void TestForestMap();
+
+void TestSimpleMap(bool optimize);
 void TestSteppableMap(bool runJit = false);
-}
+void TestMultiOutputMap();
+void TestMultiOutputMap2();
+void TestCompiledMapMove();

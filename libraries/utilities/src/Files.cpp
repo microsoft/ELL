@@ -96,5 +96,20 @@ namespace utilities
             }
         }
     }
+
+    std::string RemoveFileExtension(std::string filepath)
+    {
+        auto filename = filepath.substr(filepath.find_last_of("/\\") + 1);
+        auto dotPos = filename.find_last_of('.');
+        if (dotPos == std::string::npos)
+        {
+            return filename;
+        }
+        else
+        {
+            auto ext = filename.substr(0, dotPos);
+            return ext;
+        }
+    }
 }
 }

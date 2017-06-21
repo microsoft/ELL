@@ -20,30 +20,30 @@ namespace common
 {
 
     /// <summary> A struct that holds command line arguments that specify the loss function. </summary>
-    struct LossArguments
+    struct LossFunctionArguments
     {
         enum class LossFunction
         {
             squared,
             log,
-            hinge
+            hinge,
+            smoothHinge
         };
 
-        LossFunction lossFunction = LossFunction::squared;
-        double lossFunctionParameter = 0.0;
+        LossFunction lossFunction;
     };
 
     /// <summary> A struct that holds general command line parameters for training algorithms. </summary>
     struct TrainerArguments
     {
         /// <summary> The loss arguments. </summary>
-        LossArguments lossArguments;
+        LossFunctionArguments lossFunctionArguments;
 
-        /// <summary> A random seed. </summary>
-        std::string randomSeedString = "";
+        /// <summary> Number of epochs. </summary>
+        size_t numEpochs;
 
         /// <summary> Generate verbose output. </summary>
-        bool verbose = false;
+        bool verbose;
     };
 
     /// <summary> A version of TrainerArguments that adds its members to the command line parser. </summary>

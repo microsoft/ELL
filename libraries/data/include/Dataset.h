@@ -268,6 +268,15 @@ namespace data
     /// <returns> The ostream. </returns>
     template <typename ExampleType>
     std::ostream& operator<<(std::ostream& os, const Dataset<ExampleType>& dataset);
+
+    /// <summary> Helper function that creates a dataset from an example iterator. </summary>
+    ///
+    /// <typeparam name="ExampleType"> The example type. </typeparam>
+    /// <param name="exampleIterator"> The example iterator. </param>
+    ///
+    /// <returns> A Dataset. </returns>
+    template <typename ExampleType>
+    Dataset<ExampleType> MakeDataset(ExampleIterator<ExampleType> exampleIterator);
 }
 }
 

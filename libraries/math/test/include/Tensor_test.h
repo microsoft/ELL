@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Tensor_test.h (math_test)
 //  Authors:  Ofer Dekel
 //
@@ -14,6 +14,12 @@ using namespace ell;
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensor();
+
+template<typename ElementType>
+void TestTensorReference();
+
+template<typename ElementType>
+void TestCopyFromAndGetSubTensor();
 
 template<typename ElementType>
 void TestTensorGetSlice();

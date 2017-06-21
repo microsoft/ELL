@@ -13,7 +13,6 @@
 #include "Exception.h"
 #include "Files.h"
 #include "OutputStreamImpostor.h"
-#include "RandomEngines.h"
 
 // data
 #include "Dataset.h"
@@ -27,34 +26,21 @@
 #include "MakeEvaluator.h"
 #include "MakeTrainer.h"
 #include "MapLoadArguments.h"
-#include "MapSaveArguments.h"
-#include "ModelLoadArguments.h"
 #include "ModelSaveArguments.h"
-#include "MultiEpochIncrementalTrainerArguments.h"
 #include "TrainerArguments.h"
 
 // model
 #include "DynamicMap.h"
-#include "InputNode.h"
 #include "Model.h"
 
 // nodes
 #include "LinearPredictorNode.h"
 
 // trainers
-#include "EvaluatingIncrementalTrainer.h"
-#include "MultiEpochIncrementalTrainer.h"
-#include "MeanTrainer.h"
-#include "SGDLinearTrainer.h"
+#include "MeanCalculator.h"
 
 // evaluators
-#include "BinaryErrorAggregator.h"
 #include "Evaluator.h"
-#include "LossAggregator.h"
-
-// lossFunctions
-#include "HingeLoss.h"
-#include "LogLoss.h"
 
 // predictors
 #include "Normalizer.h"
@@ -78,7 +64,6 @@ int main(int argc, char* argv[])
         common::ParsedMapLoadArguments mapLoadArguments;
         common::ParsedModelSaveArguments modelSaveArguments;
         common::ParsedTrainerArguments trainerArguments;
-        common::ParsedMultiEpochIncrementalTrainerArguments multiEpochTrainerArguments;
         common::ParsedEvaluatorArguments evaluatorArguments;
 
         commandLineParser.AddOptionSet(linearTrainerArguments);
@@ -86,7 +71,6 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapLoadArguments);
         commandLineParser.AddOptionSet(modelSaveArguments);
         commandLineParser.AddOptionSet(trainerArguments);
-        commandLineParser.AddOptionSet(multiEpochTrainerArguments);
         commandLineParser.AddOptionSet(evaluatorArguments);
 
         // parse command line
@@ -100,26 +84,25 @@ int main(int argc, char* argv[])
 
         // load map
         mapLoadArguments.defaultInputSize = dataLoadArguments.parsedDataDimension;
-        model::DynamicMap map = common::LoadMap(mapLoadArguments);
+        auto map = common::LoadMap(mapLoadArguments);
 
         // load dataset
         if (trainerArguments.verbose) std::cout << "Loading data ..." << std::endl;
-        auto mappedDataset = common::GetMappedDataset(dataLoadArguments, map);
+        auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
+        auto mappedDataset = common::GetMappedDataset(stream, map);
         auto mappedDatasetDimension = map.GetOutput(0).Size();
 
-        // normalize data 
-        if(linearTrainerArguments.normalize)
+        // normalize data
+        if (linearTrainerArguments.normalize)
         {
             if (trainerArguments.verbose) std::cout << "Sparisty-preserving data normalization ..." << std::endl;
 
             // find inverse absolute mean
-            auto absMeanFinder = trainers::MakeSparseMeanTrainer([](data::IndexValue x) { return std::abs(x.value); });
-            absMeanFinder.Update(mappedDataset.GetAnyDataset());
-            math::RowVector<double> scaleVector = absMeanFinder.GetPredictor();
+            auto scaleVector = trainers::CalculateSparseTransformedMean(mappedDataset.GetAnyDataset(), [](data::IndexValue x) { return std::abs(x.value); });
             scaleVector.Transform([](double x) {return x > 0.0 ? 1.0 / x : 0.0; });
 
             // create normalizer
-            auto coordinateTransformation = [&](data::IndexValue x) {return x.value * scaleVector[x.index]; };
+            auto coordinateTransformation = [&](data::IndexValue x) { return x.value * scaleVector[x.index]; };
             auto normalizer = predictors::MakeTransformationNormalizer<data::IterationPolicy::skipZeros>(coordinateTransformation);
 
             // apply normalizer to data
@@ -135,36 +118,39 @@ int main(int argc, char* argv[])
         switch (linearTrainerArguments.algorithm)
         {
         case LinearTrainerArguments::Algorithm::SGD:
-            trainer = common::MakeSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+            trainer = common::MakeSGDTrainer(trainerArguments.lossFunctionArguments, { linearTrainerArguments.regularization, linearTrainerArguments.randomSeedString });
             break;
-        case LinearTrainerArguments::Algorithm::SDSGD:
-            trainer = common::MakeSDSGDLinearTrainer(trainerArguments.lossArguments, { linearTrainerArguments.regularization });
+        case LinearTrainerArguments::Algorithm::SparseDataSGD:
+            trainer = common::MakeSparseDataSGDTrainer(trainerArguments.lossFunctionArguments, { linearTrainerArguments.regularization });
             break;
-        case LinearTrainerArguments::Algorithm::SDCSGD:
+        case LinearTrainerArguments::Algorithm::SparseDataCenteredSGD:
         {
-            auto meanTrainer = trainers::MakeMeanTrainer();
-            meanTrainer.Update(mappedDataset.GetAnyDataset());
-            trainer = common::MakeSDCSGDLinearTrainer(trainerArguments.lossArguments, meanTrainer.GetPredictor(), { linearTrainerArguments.regularization });
+            auto mean = trainers::CalculateMean(mappedDataset.GetAnyDataset());
+            trainer = common::MakeSparseDataCenteredSGDTrainer(trainerArguments.lossFunctionArguments, mean, { linearTrainerArguments.regularization });
+            break;
+        }
+        case LinearTrainerArguments::Algorithm::SDCA:
+        {
+            trainer = common::MakeSDCATrainer(trainerArguments.lossFunctionArguments, { linearTrainerArguments.regularization, linearTrainerArguments.desiredPrecision, linearTrainerArguments.maxEpochs, linearTrainerArguments.permute, linearTrainerArguments.randomSeedString });
             break;
         }
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "unrecognized algorithm type");
         }
 
-        // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
-        if (trainerArguments.verbose)
-        {
-            evaluator = common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossArguments);
-            trainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(trainer), evaluator));
-        }
-
-        // create multi epoch trainer
-        trainer = trainers::MakeMultiEpochIncrementalTrainer(std::move(trainer), multiEpochTrainerArguments);
+        // create an evaluator
+        auto evaluator = common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossFunctionArguments);
 
         // Train the predictor
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
-        trainer->Update(mappedDataset.GetAnyDataset());
+        trainer->SetDataset(mappedDataset.GetAnyDataset());
+        
+        for (size_t epoch = 0; epoch < trainerArguments.numEpochs; ++epoch)
+        {
+            trainer->Update();
+            evaluator->Evaluate(trainer->GetPredictor());
+        }
+        
         predictors::LinearPredictor predictor(trainer->GetPredictor());
         predictor.Resize(mappedDatasetDimension);
 

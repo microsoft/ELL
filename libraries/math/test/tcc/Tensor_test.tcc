@@ -1,12 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Tensor_test.tcc (math_test)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "Print.h"
 
 // math
 #include "TensorOperations.h"
@@ -39,6 +37,68 @@ void TestTensor()
     math::Tensor<ElementType, dimension0, dimension1, dimension2> T1(T);
     math::ChannelColumnRowTensor<ElementType> T2(Tc);
     math::ColumnRowChannelTensor<ElementType> T3(Tc);
+}
+
+template<typename ElementType>
+void TestTensorReference()
+{
+    std::vector<ElementType> values(24);
+    ElementType value = 0;
+    std::generate(values.begin(), values.end(), [&]() { return value++; });
+
+    math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row> T1(2, 3, 4, values.data());
+    testing::ProcessTest("TensorReference::TensorReference(rows, columns, channels, data)", T1(0, 0, 0) == 0 && T1(0, 0, 1) == 1 && T1(1, 2, 2) == 22 && T1(1, 2, 3) == 23);
+
+    math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row> T2(T1);
+    testing::ProcessTest("TensorReference::TensorReference(otherTensor)", T2(0, 0, 0) == 0 && T2(0, 0, 1) == 1 && T2(1, 2, 2) == 22 && T2(1, 2, 3) == 23);
+}
+
+template<typename ElementType>
+void TestCopyFromAndGetSubTensor()
+{
+    // CopyFrom
+    auto A1 = math::ChannelColumnRowTensor<ElementType>{ 
+        { { 10,11,12,13 },{ 14,15,16,17 },{ 18,19,10,11 } },
+        { { 12,13,14,15 },{ 16,17,18,19 },{ 10,11,12,13 } } };
+
+    auto A2 = math::ChannelColumnRowTensor<ElementType>{ 
+        { { 20,21,22,23 },{ 24,25,26,27 },{ 28,29,20,21 } },
+        { { 22,23,24,25 },{ 26,27,28,29 },{ 20,21,22,23 } } };
+
+    auto A3 = math::ColumnRowChannelTensor<ElementType>{
+        { { 30,31,32,33 },{ 34,35,36,37 },{ 38,39,30,31 } },
+        { { 32,33,34,35 },{ 36,37,38,39 },{ 30,31,32,33 } } };
+
+    auto A4 = math::ColumnRowChannelTensor<ElementType>{
+        { { 40,41,42,43 },{ 44,45,46,47 },{ 48,49,40,41 } },
+        { { 42,43,44,45 },{ 46,47,48,49 },{ 40,41,42,43 } } };
+
+    A1.CopyFrom(A2);
+    testing::ProcessTest("Tensor<channel,column,row>::CopyFrom(Tensor<channel,column,row>)", A1 == A2);
+
+    A1.CopyFrom(A3);
+    testing::ProcessTest("Tensor<channel,column,row>::CopyFrom(Tensor<column,row,channel>)", A1 == A3);
+
+    A3.CopyFrom(A2);
+    testing::ProcessTest("Tensor<column,row,channel>::CopyFrom(Tensor<channel,column,row>)", A3 == A2);
+
+    A1.GetSubTensor({ 0,1,1 }, { 2,2,2 }).CopyFrom(A2.GetSubTensor({ 0,0,2 }, { 2,2,2 }));
+    auto R1 = math::ChannelColumnRowTensor<ElementType>{
+        { {30, 31, 32, 33}, {34, 22, 23, 37}, {38, 26, 27, 31} },
+        { {32, 33, 34, 35}, {36, 24, 25, 39}, {30, 28, 29, 33} } };
+    testing::ProcessTest("TensorReference<channel,column,row>::CopyFrom(TensorReference<channel,column,row>)", A1 == R1);
+
+    A1.GetSubTensor({ 0,1,1 }, { 2,2,2 }).CopyFrom(A4.GetSubTensor({ 0,0,2 }, { 2,2,2 }));
+    auto R2 = math::ChannelColumnRowTensor<ElementType>{
+        { {30, 31, 32, 33}, {34, 42, 43, 37}, {38, 46, 47, 31} },
+        { {32, 33, 34, 35}, {36, 44, 45, 39}, {30, 48, 49, 33} } };
+    testing::ProcessTest("TensorReference<channel,column,row>::CopyFrom(TensorReference<column,row,channel>)", A1 == R2);
+
+    A4.GetSubTensor({ 0,1,1 }, { 2,2,2 }).CopyFrom(A2.GetSubTensor({ 0,0,2 }, { 2,2,2 }));
+    auto R3 = math::ChannelColumnRowTensor<ElementType>{
+        { {40, 41, 42, 43}, {44, 22, 23, 47}, {48, 26, 27, 41} },
+        { {42, 43, 44, 45}, {46, 24, 25, 49}, {40, 28, 29, 43} } };
+    testing::ProcessTest("TensorReference<column,row,channel>::CopyFrom(TensorReference<channel,column,row>)", A4 == R3);
 }
 
 template<typename ElementType>
@@ -201,7 +261,7 @@ void TestGetSubTensorAndReferenceAsMatrix()
     testing::ProcessTest("void TestGetSubTensorAndReferenceAsMatrix()", M1 == R1);
 
     // test 2
-    auto rand = []() { return std::rand() % 100; };
+    auto rand = []() { return static_cast<ElementType>(std::rand() % 100); };
     T1.Generate(rand);
 
     auto B1 = T1.GetSubTensor(0, 0, 1, 3, 4, 2);

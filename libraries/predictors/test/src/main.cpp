@@ -134,7 +134,7 @@ void LayerBaseTest()
     TensorType input0(12, 12, 3);
     PaddingParameters paddingParameters2{PaddingScheme::alternatingZeroAndOnes, 1};
     Shape outputShape = { 12,12,6 };
-    LayerParameters layerParameters{ input0, OnePaddingWithZeros, outputShape, paddingParameters2 };
+    LayerParameters layerParameters{ input0, ZeroPadding(1), outputShape, paddingParameters2 };
 
     Layer<ElementType> baseLayer(layerParameters);
     auto layerBaseOutput = baseLayer.GetOutput();
@@ -158,7 +158,7 @@ void ActivationLayerTest()
     activationInput(1, 0, 1) = 3.0;
     activationInput(1, 1, 1) = -4.0;
     Shape activationOutputShape = { 4,4,2 };
-    LayerParameters activationParameters{ activationInput, NoPadding, activationOutputShape, OnePaddingWithZeros };
+    LayerParameters activationParameters{ activationInput, NoPadding(), activationOutputShape, ZeroPadding(1) };
 
     ActivationLayer<ElementType, ReLUActivation> activationLayer(activationParameters);
     activationLayer.Compute();
@@ -184,7 +184,7 @@ void BatchNormalizationLayerTest()
     bnInput(1, 0, 1) = 30;
     bnInput(1, 1, 1) = 50;
     Shape bnOutputShape = { 4,4,2 };
-    LayerParameters bnParameters{ bnInput, NoPadding, bnOutputShape, OnePaddingWithZeros };
+    LayerParameters bnParameters{ bnInput, NoPadding(), bnOutputShape, ZeroPadding(1) };
     VectorType mean({5, 10});
     VectorType variance({4.0, 16.0});
 
@@ -212,7 +212,7 @@ void BiasLayerTest()
     input(1, 0, 1) = 3;
     input(1, 1, 1) = 4;
     Shape outputShape = { 4,4,2 };
-    LayerParameters parameters{ input, NoPadding, outputShape, OnePaddingWithZeros };
+    LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
     VectorType bias({5, 10});
 
     BiasLayer<ElementType> biasLayer(parameters, bias);
@@ -233,7 +233,7 @@ void InputLayerTest()
     // Verify Input
     Shape inputShape = { 2, 2, 2 };
     Shape outputShape = { 4, 4, 2 };
-    typename InputLayer<ElementType>::InputParameters parameters{ inputShape, NoPadding, outputShape, OnePaddingWithZeros, 2.0 };
+    typename InputLayer<ElementType>::InputParameters parameters{ inputShape, NoPadding(), outputShape, ZeroPadding(1), 2.0 };
 
     InputLayer<ElementType> inputLayer(parameters);
     inputLayer.SetInput({ 1, 2, 3, 4, 5, 6, 7, 8 });
@@ -260,7 +260,7 @@ void ScalingLayerTest()
     input(1, 0, 1) = 3;
     input(1, 1, 1) = 4;
     Shape outputShape = { 4,4,2 };
-    LayerParameters parameters{ input, NoPadding, outputShape, OnePaddingWithZeros };
+    LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
     VectorType scales({ 2, 0.5 });
 
     ScalingLayer<ElementType> scalingLayer(parameters, scales);
@@ -285,7 +285,7 @@ void FullyConnectedLayerTest()
     TensorType input(2, 2, 1);
     input.Fill(1);
     Shape outputShape = { 3,5,1 };
-    LayerParameters parameters{ input, NoPadding, outputShape, OnePaddingWithZeros };
+    LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
     MatrixType weights(3, 4);
     weights(0, 0) = 1;
     weights(0, 1) = 1;
@@ -328,7 +328,7 @@ void PoolingLayerTest()
     input(2, 0, 1) = 31;
     input(3, 3, 1) = 41;
     Shape outputShape = { 4, 4, 2 };
-    LayerParameters parameters{ input, NoPadding, outputShape, OnePaddingWithZeros };
+    LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
     PoolingParameters poolingParams{ 2, 2 };
     PoolingLayer<ElementType, MaxPoolingFunction> poolingLayer(parameters, poolingParams);
     poolingLayer.Compute();
@@ -356,7 +356,7 @@ void ConvolutionalLayerTest()
     input(1, 1, 1) = 3;
     input(1, 2, 1) = 2;
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
-    LayerParameters parameters{ input, OnePaddingWithZeros, outputShape, NoPadding };
+    LayerParameters parameters{ input, ZeroPadding(1), outputShape, NoPadding() };
     ConvolutionalParameters convolutionalParams{ 3, 1, ConvolutionMethod::diagonal, 2 };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
@@ -412,7 +412,7 @@ void BinaryConvolutionalLayerTest()
     input(1, 1, 1) = 3;
     input(1, 2, 1) = 2;
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
-    LayerParameters parameters{ input, OnePaddingWithMinusOnes, outputShape, NoPadding };
+    LayerParameters parameters{ input, MinusOnePadding(1), outputShape, NoPadding() };
     BinaryConvolutionalParameters convolutionalParams{3, 1, BinaryConvolutionMethod::gemm};
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
@@ -472,7 +472,7 @@ void SoftmaxLayerTest()
     input(0, 0, 1) = 2;
     input(0, 0, 2) = 3;
     Shape outputShape = { 3,3,3 };
-    LayerParameters parameters{ input, NoPadding, outputShape, OnePaddingWithZeros };
+    LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
 
     SoftmaxLayer<ElementType> softmaxLayer(parameters);
     softmaxLayer.Compute();
@@ -518,7 +518,7 @@ void NeuralNetworkPredictorTest()
     InputParameters inputParams = {{1,1,2}, {PaddingScheme::zeros, 0}, {1,1,2},{PaddingScheme::zeros, 0}, 1};
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
-    LayerParameters layerParameters{inputLayer->GetOutput(), NoPadding, {1,1,3}, NoPadding};
+    LayerParameters layerParameters{inputLayer->GetOutput(), NoPadding(), {1,1,3}, NoPadding()};
     MatrixType weights1(3,2);
     weights1(0, 0) = -0.97461396f;
     weights1(0, 1) = 1.40845299f;
@@ -528,21 +528,21 @@ void NeuralNetworkPredictorTest()
     weights1(2, 1) = -0.99083692f;
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new FullyConnectedLayer<ElementType>(layerParameters, weights1)));
 
-    layerParameters = { layers[0]->GetOutput(), NoPadding,{ 1,1,3 }, NoPadding};
+    layerParameters = { layers[0]->GetOutput(), NoPadding(),{ 1,1,3 }, NoPadding()};
     VectorType bias1({-0.43837756f, -0.90868396f, -0.0323102f});
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
 
-    layerParameters = {layers[1]->GetOutput(), NoPadding,{ 1,1,3 }, NoPadding};
+    layerParameters = {layers[1]->GetOutput(), NoPadding(),{ 1,1,3 }, NoPadding()};
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, ReLUActivation>(layerParameters)));
 
-    layerParameters = {layers[2]->GetOutput(), NoPadding,{ 1,1,1 }, NoPadding };
+    layerParameters = {layers[2]->GetOutput(), NoPadding(),{ 1,1,1 }, NoPadding() };
     MatrixType weights2(1, 3);
     weights2(0, 0) = 1.03084767f;
     weights2(0, 1) = -0.10772263f;
     weights2(0, 2) = 1.04077697f;
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new FullyConnectedLayer<ElementType>(layerParameters, weights2)));
 
-    layerParameters = { layers[3]->GetOutput(), NoPadding,{ 1,1,1 }, NoPadding };
+    layerParameters = { layers[3]->GetOutput(), NoPadding(),{ 1,1,1 }, NoPadding() };
     VectorType bias2({1.40129846e-20f});
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias2)));
 
@@ -594,11 +594,13 @@ void ProtoNNPredictorTest()
     Z(0, 0) = 0.1; Z(0, 1) = 0.3, Z(0, 2) = 0.2;
     Z(1, 0) = 0.2; Z(1, 1) = 0.4, Z(1, 2) = 0.8;
 
-    auto result = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
+    predictors::ProtoNNPrediction result = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
 
-    auto R = 1.0;
+    size_t R = 1;
+    double score = 1.321484;
 
-    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result, R, 1e-8));
+    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result.label, R));
+    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result.score, score, 1e-6));
 }
 
 /// Runs all tests

@@ -73,7 +73,7 @@ namespace nodes
         auto pRMergeableSrc = compiler.GetMergeableNodeRegion(rVal);
 
         emitters::IRIfEmitter ife = function.If();
-        ife.If(emitters::TypedComparison::equals, pSelectorVal, function.Literal(0));
+        ife.If(emitters::TypedComparison::equals, pSelectorVal, function.Literal<SelectorType>(0));
         {
             if (pLMergeableSrc != nullptr)
             {

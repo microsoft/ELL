@@ -45,7 +45,7 @@ Next, use CMake to create a Visual Studio solution. In the repository's root dir
 
 Next, invoke cmake as follows:
 
-    cmake -G "Visual Studio 14 2015 Win64" ..
+    cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..
 
 **Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, along with other files in the `build` directory. 
 
@@ -62,6 +62,13 @@ The other option is to open the solution file in Visual Studio and build it ther
 Visual studio will open the solution. Choose either the "Debug" configuration or the "Release" configuration, and use the shortcut `Ctrl+Shift+B` to build the solution. 
 
 In both cases, the project executables will appear in a directory named `ELL/build/bin`.
+
+### Testing ELL
+    
+    cd build
+    ctest --build-config Debug
+
+The ctest tool comes with your cmake installation.  For more info see [ctest](https://cmake.org/cmake/help/v3.9/manual/ctest.1.html).
 
 ### Generating code documentation
 

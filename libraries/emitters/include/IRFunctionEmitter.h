@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     IRFunctionEmitter.h (emitters)
-//  Authors:  Umesh Madan
+//  Authors:  Umesh Madan, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -32,16 +32,6 @@ namespace emitters
         IRFunctionEmitter& operator=(const IRFunctionEmitter&) = default;
         IRFunctionEmitter& operator=(IRFunctionEmitter&&) = default;
 
-        /// <summary> Complete the function. Optionally also run an optimizer pass on it. </summary>
-        ///
-        /// <param name="optimize"> If true, optimize using default optimizations. </param>
-        void Complete(bool optimize = true);
-
-        /// <summary> Complete the function. Optionally also run an optimizer pass on it. </summary>
-        ///
-        /// <param name="pOptimizer"> If non-null, pointer to an optimizer. </param>
-        void Complete(IRFunctionOptimizer* pOptimizer = nullptr);
-
         /// <summary> Query if this IRFunctionEmitter is valid. </summary>
         ///
         /// <returns> True if valid, false if not. </returns>
@@ -49,6 +39,9 @@ namespace emitters
 
         /// <summary> Verify (as far as possible) if the function's IR is valid. </summary>
         void Verify();
+
+        /// <summary> Gets the name of the function being emitted. </summary>
+        std::string GetFunctionName() { return _name; }
 
         /// <summary> Gets an emitted variable by scope and name. </summary>
         ///
@@ -67,12 +60,28 @@ namespace emitters
         template <typename ValueType>
         llvm::Value* Literal(ValueType value);
 
+        /// <summary> Convenience function for returning a single-bit LLVM boolean true value. </summary>
+        ///
+        /// <returns> An llvm i1 type representing `true`. </returns>
+        llvm::Value* TrueBit() { return _pEmitter->TrueBit(); }
+
+        /// <summary> Convenience function for returning a single-bit LLVM boolean false value. </summary>
+        ///
+        /// <returns> An llvm i1 type representing `false`. </returns>
+        llvm::Value* FalseBit() { return _pEmitter->FalseBit(); }
+
         /// <summary> Emit an instruction to load a function argument. </summary>
         ///
         /// <param name="argument"> The argument. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the function argument. </returns>
         llvm::Value* LoadArgument(llvm::ilist_iterator<llvm::Argument>& argument);
+
+        /// <summary> Emit an instruction to load a function argument. </summary>
+        ///
+        /// <param name="argument"> The argument. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the function argument. </returns>
         llvm::Value* LoadArgument(llvm::Argument& argument);
 
         /// <summary> Emit a cast. </summary>
@@ -163,7 +172,7 @@ namespace emitters
         /// <returns> Pointer to the result of the function call. </returns>
         llvm::Value* Call(llvm::Function* pFunction, std::vector<llvm::Value*> arguments);
 
-        /// <summary> Emit a return void. </summary>
+        /// <summary> Emit a return from a function with no return value. </summary>
         void Return();
 
         /// <summary> Emit a return of a given value. </summary>
@@ -213,6 +222,32 @@ namespace emitters
         /// <param name="pRightValue"> Pointer to the right vector. </param>
         /// <param name="aggregator"> The aggregator function. </param>
         void VectorOperator(TypedOperator type, llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
+
+        /// <summary>
+        /// Emit binary operator over a scalar and a vector. The operator is applied to each
+        /// pair of scalars. Also supply an aggregator function.
+        /// </summary>
+        ///
+        /// <param name="type"> The operator type. </param>
+        /// <param name="size"> The vector size. </param>
+        /// <param name="leftValue"> The scalar value. </param>
+        /// <param name="pRightValue"> The vector of values. </param>
+        /// <param name="aggregator"> The aggregator function. </param>
+        template <typename ValueType>
+        void VectorOperator(TypedOperator type, size_t size, ValueType leftValue, llvm::Value* pRightValue, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
+
+        /// <summary>
+        /// Emit binary operator over a scalar and a vector. The operator is applied to each
+        /// pair of scalars. Also supply an aggregator function.
+        /// </summary>
+        ///
+        /// <param name="type"> The operator type. </param>
+        /// <param name="size"> The vector size. </param>
+        /// <param name="pLeftValue"> The vector of values. </param>
+        /// <param name="rightValue"> The scalar value. </param>
+        /// <param name="aggregator"> The aggregator function. </param>
+        template <typename ValueType>
+        void VectorOperator(TypedOperator type, size_t size, llvm::Value* pLeftValue, ValueType rightValue, std::function<void(llvm::Value*, llvm::Value*)> aggregator);
 
         /// <summary>
         /// Emit binary operator over 2 equal sized vector arguments. The operator is applied to each
@@ -286,6 +321,19 @@ namespace emitters
         llvm::Value* Comparison(TypedComparison type, llvm::Value* pValue, llvm::Value* pTestValue);
 
         //
+        // Select
+        //
+
+        /// <summary> Emit a select instruction. </summary>
+        ///
+        /// <param name="pCmp"> Pointer to the value use as a comparison. </param>
+        /// <param name="pTrueValue"> Pointer to the value to return when the comparison is true. </param>
+        /// <param name="pFalseValue"> Pointer to the value to return when the comparison is false. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the select result. </returns>
+        llvm::Value* Select(llvm::Value* pCmp, llvm::Value* pTrueValue, llvm::Value* pFalseValue);
+
+        //
         // Block management
         //
 
@@ -294,12 +342,22 @@ namespace emitters
         /// <returns> The current block. </returns>
         llvm::BasicBlock* GetCurrentBlock() { return _pEmitter->GetCurrentBlock(); }
 
+        /// <summary> Gets the current insert point that code is being emitted into. </summary>
+        ///
+        /// <returns> The current insert point for new instructions. </returns>
+        llvm::Instruction* GetCurrentInsertPoint() { return _pEmitter->GetCurrentInsertPoint(); }
+
         /// <summary> Set the block that subsequent code will go into. </summary>
         ///
         /// <param name="pBlock"> Pointer to the block. </param>
         ///
         /// <returns> The previous current block. </returns>
         llvm::BasicBlock* SetCurrentBlock(llvm::BasicBlock* pBlock);
+
+        /// <summary> Set the insert point for new code. </summary>
+        ///
+        /// <param name="pos"> The new insert point. </param>
+        void SetCurrentInsertPoint(llvm::Instruction* position);
 
         /// <summary> Emit a new labeled code block and make it current. </summary>
         ///
@@ -420,7 +478,7 @@ namespace emitters
         /// <param name="type"> The variable type. </param>
         ///
         /// <returns> Pointer to the resulting variable. </returns>
-        llvm::Value* Variable(VariableType type);
+        llvm::AllocaInst* Variable(VariableType type);
 
         /// <summary> Emit a named stack variable. </summary>
         ///
@@ -428,18 +486,31 @@ namespace emitters
         /// <param name="name"> The variable name. </param>
         ///
         /// <returns> Pointer to the resulting variable. </returns>
-        llvm::Value* Variable(VariableType type, const std::string& name);
-        
-        // TODO
-        llvm::Value* EmittedVariable(VariableType type, const std::string& name);
+        llvm::AllocaInst* Variable(VariableType type, const std::string& name);
 
-        /// <summary> Emit a stack vector of the given size. </summary>
+        /// <summary> Emit a named stack variable. </summary>
         ///
-        /// <param name="type"> The vector entry type. </param>
-        /// <param name="size"> The vector size. </param>
+        /// <param name="type"> The variable type. </param>
+        /// <param name="name"> The variable name. </param>
         ///
-        /// <returns> Pointer to the vector. </returns>
-        llvm::Value* Variable(VariableType type, int size);
+        /// <returns> Pointer to the resulting variable. </returns>
+        llvm::AllocaInst* Variable(llvm::Type* type, const std::string& name);
+
+        /// <summary> Emit a stack array of the given size. </summary>
+        ///
+        /// <param name="type"> The array entry type. </param>
+        /// <param name="size"> The array size. </param>
+        ///
+        /// <returns> Pointer to the array. </returns>
+        llvm::AllocaInst* Variable(VariableType type, int size);
+
+        /// <summary> Return an emitted stack variable and assign it a name. </summary>
+        ///
+        /// <param name="type"> The variable type. </param>
+        /// <param name="size"> The variable name. </param>
+        ///
+        /// <returns> Pointer to the emitted variable. </returns>
+        llvm::AllocaInst* EmittedVariable(VariableType type, const std::string& name);
 
         ///
         /// Load and Store
@@ -493,65 +564,72 @@ namespace emitters
         /// <returns> Pointer to a value that represents that entry in the array. </returns>
         llvm::Value* PointerOffset(llvm::Value* pPointer, int offset);
 
-        // TODO
+        /// <summary> Get the value at an offset in an array. </summary>
+        ///
+        /// <param name="pPointer"> Pointer to the array. </param>
+        /// <param name="offset"> The offset. </param>
+        ///
+        /// <returns> The value of the entry at the given offset in the array. </returns>
         llvm::Value* ValueAt(llvm::Value* pPointer, llvm::Value* pOffset);
 
-        // TODO
+        /// <summary> Get the value at an offset in an array. </summary>
+        ///
+        /// <param name="pPointer"> Pointer to the array. </param>
+        /// <param name="offset"> The offset. </param>
+        ///
+        /// <returns> The value of the entry at the given offset in the array. </returns>
         llvm::Value* ValueAt(llvm::Value* pPointer, int offset);
 
-        // TODO
+        /// <summary> Get the value stored in a pointer. </summary>
+        ///
+        /// <param name="pPointer"> Pointer to the array. </param>
+        ///
+        /// <returns> The value of the entry at the given offset in the array. </returns>
         llvm::Value* ValueAt(llvm::Value* pPointer);
 
-        // TODO
+        /// <summary> Get the value at an offset in a global array variable. </summary>
+        ///
+        /// <param name="pGlobal"> Pointer to the array. </param>
+        /// <param name="pOffset"> The offset. </param>
+        ///
+        /// <returns> The value of the entry at the given offset in the array. </returns>
         llvm::Value* ValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
 
-        // TODO
+        /// <summary> Get the value at an offset in a global array variable. </summary>
+        ///
+        /// <param name="pGlobal"> Pointer to the array. </param>
+        /// <param name="offset"> The offset. </param>
+        ///
+        /// <returns> The value of the entry at the given offset in the array. </returns>
         llvm::Value* ValueAt(llvm::GlobalVariable* pGlobal, int offset);
 
-        // TODO
+        /// <summary> Get the value stored in a pointer to a global variable. </summary>
+        ///
+        /// <param name="pGlobal"> Pointer to the array. </param>
+        ///
+        /// <returns> The value of the entry at the given offset in the array. </returns>
         llvm::Value* ValueAt(llvm::GlobalVariable* pGlobal);
 
-        // TODO
+        /// <summary> Set an element in an array. </summary>
+        ///
+        /// <param name="pPointer"> Pointer to the array. </param>
+        /// <param name="pOffset"> The offset. </param>
+        /// <param name="pValue"> The value to set. </param>
         llvm::Value* SetValueAt(llvm::Value* pPointer, llvm::Value* pOffset, llvm::Value* pValue);
 
-        // TODO
+        /// <summary> Set an element in an array. </summary>
+        ///
+        /// <param name="pPointer"> Pointer to the array. </param>
+        /// <param name="offset"> The offset. </param>
+        /// <param name="pValue"> The value to set. </param>
         llvm::Value* SetValueAt(llvm::Value* pPointer, int offset, llvm::Value* pValue);
 
-        // TODO
+        /// <summary> Set an element in a global variable array. </summary>
+        ///
+        /// <param name="pGlobal"> Pointer to the array. </param>
+        /// <param name="pOffset"> The offset. </param>
+        /// <param name="pValue"> The value to set. </param>
         llvm::Value* SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pValue);
-
-        // TODO
-        llvm::Value* PtrOffsetA(llvm::Value* pPointer, int offset);
-
-        // TODO
-        llvm::Value* PtrOffsetA(llvm::Value* pPointer, llvm::Value* pOffset, const std::string& name = "");
-
-        // TODO
-        llvm::Value* ValueAtA(llvm::Value* pPointer, int offset);
-
-        // TODO
-        llvm::Value* ValueAtA(llvm::Value* pPointer, llvm::Value* pOffset);
-
-        // TODO
-        llvm::Value* SetValueAtA(llvm::Value* pPointer, int offset, llvm::Value* pValue);
-
-        // TODO
-        llvm::Value* SetValueAtA(llvm::Value* pPointer, llvm::Value* pOffset, llvm::Value* pValue);
-
-        // TODO
-        llvm::Value* PtrOffsetH(llvm::Value* pPointer, int offset);
-
-        // TODO
-        llvm::Value* PtrOffsetH(llvm::Value* pPointer, llvm::Value* pOffset);
-
-        // TODO
-        llvm::Value* ValueAtH(llvm::Value* pPointer, int offset);
-
-        // TODO
-        llvm::Value* ValueAtH(llvm::Value* pPointer, llvm::Value* pOffset);
-
-        // TODO
-        llvm::Value* SetValueAtH(llvm::Value* pPointer, int offset, llvm::Value* pValue);
 
         /// <summary> Emits a pointer to a global. </summary>
         ///
@@ -567,6 +645,14 @@ namespace emitters
         ///
         /// <returns> Pointer to a value that represents that entry in the array. </returns>
         llvm::Value* PointerOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset);
+
+        /// <summary> Emit a pointer to an entry in an array. </summary>
+        ///
+        /// <param name="pArray"> Pointer to the array. </param>
+        /// <param name="offset"> The offset. </param>
+        ///
+        /// <returns> Pointer to a value that represents that entry in the array. </returns>
+        llvm::Value* PointerOffset(llvm::GlobalVariable* pGlobal, int offset);
 
         /// <summary> Emit a pointer to a FIELD in a STRUCT in a global array of Structs. </summary>
         ///
@@ -654,9 +740,27 @@ namespace emitters
         /// <param name="pPointer"> Pointer to the base address of the move operation. </param>
         /// <param name="sourceOffset"> Source address offset. </param>
         /// <param name="destinationOffset"> Destination address offset. </param>
-        /// <param name="size"> Size of the array being moved. </param>
+        /// <param name="count"> Number of elements being moved. </param>
         template <typename ValueType>
-        void MemoryMove(llvm::Value* pPointer, int sourceOffset, int destinationOffset, int size);
+        void MemoryMove(llvm::Value* pPointer, int sourceOffset, int destinationOffset, int count);
+
+        /// <summary> Emits a memcpy call, which copies an array of variables. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type being moved. </typeparam>
+        /// <param name="pSourcePointer"> Pointer to the base address of the source. </param>
+        /// <param name="pDestinationPointer"> Pointer to the base address of the destination. </param>
+        /// <param name="count"> Number of elements being moved. </param>
+        template <typename ValueType>
+        void MemoryCopy(llvm::Value* pSourcePointer, llvm::Value* pDestinationPointer, int count);
+
+        /// <summary> Emits a memcpy call, which copies an array of variables. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type being moved. </typeparam>
+        /// <param name="pSourcePointer"> Pointer to the base address of the source. </param>
+        /// <param name="pDestinationPointer"> Pointer to the base address of the destination. </param>
+        /// <param name="count"> Number of elements being moved. </param>
+        template <typename ValueType>
+        void MemoryCopy(llvm::Value* pSourcePointer, llvm::Value* pDestinationPointer, llvm::Value* count);
 
         /// <summary> Emits a memcpy call, which copies an array of variables. </summary>
         ///
@@ -665,9 +769,36 @@ namespace emitters
         /// <param name="sourceOffset"> Source address offset. </param>
         /// <param name="pDestinationPointer"> Pointer to the base address of the destination. </param>
         /// <param name="destinationOffset"> Destination address offset. </param>
-        /// <param name="size"> Size of the array being moved. </param>
+        /// <param name="count"> Number of elements being moved. </param>
         template <typename ValueType>
-        void MemoryCopy(llvm::Value* pSourcePointer, int sourceOffset, llvm::Value* pDestinationPointer, int destinationOffset, int size);
+        void MemoryCopy(llvm::Value* pSourcePointer, int sourceOffset, llvm::Value* pDestinationPointer, int destinationOffset, int count);
+
+        /// <summary> Emits a memcpy call, which copies an array of variables. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type being moved. </typeparam>
+        /// <param name="pSourcePointer"> Pointer to the base address of the source. </param>
+        /// <param name="sourceOffset"> Source address offset. </param>
+        /// <param name="pDestinationPointer"> Pointer to the base address of the destination. </param>
+        /// <param name="destinationOffset"> Destination address offset. </param>
+        /// <param name="count"> Number of elements being moved. </param>
+        template <typename ValueType>
+        void MemoryCopy(llvm::Value* pSourcePointer, llvm::Value* sourceOffset, llvm::Value* pDestinationPointer, llvm::Value* destinationOffset, llvm::Value* count);
+
+        /// <summary> Emits a memset call, which sets an array of memory to a given byte value. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the array being set. </typeparam>
+        /// <param name="pDestinationPointer"> Pointer to the base address of the destination. </param>
+        /// <param name="destinationOffset"> Destination address offset. </param>
+        /// <param name="value"> The byte value being set. </param>
+        /// <param name="count"> Number of elements being set. </param>
+        template <typename ValueType>
+        void MemorySet(llvm::Value* pDestinationPointer, int destinationOffset, llvm::Value* value, int count);
+
+        /// <summary> Insert arbitrary metadata into generated IR code. </summary>
+        ///
+        /// <param name="tag"> The tag of the metadata to set. </param>
+        /// <param name="content"> The content to insert for the given metadata tag. </param>
+        void InsertMetadata(const std::string& tag, const std::string& content = "");
 
         /// <summary> Emits an ELL_GetXXClockMilliseconds library function. </summary>
         ///
@@ -789,25 +920,66 @@ namespace emitters
         /// <param name="os"> The output stream to write to. </param>
         void WriteToStream(std::ostream& os);
 
-    private:
-        friend class IRModuleEmitter;
-        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction);
-        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments);
+        /// <summary> Get the current LLVM context. </summary>
+        ///
+        /// <returns> The LLVMContext being used. </returns>
+        llvm::LLVMContext& GetLLVMContext();
 
-        void RegisterFunctionArgs(const NamedVariableTypeList& args);
+        /// <summary> Get the low-level IREmitter being used. </summary>
+        ///
+        /// <returns> The low-level IREmitter being used. </returns>
+        IREmitter& GetEmitter();
+
+
+    private:
+        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name);
+        IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const NamedVariableTypeList& arguments, const std::string& name);
+        friend class IRModuleEmitter;
+
+        class EntryBlockScope
+        {
+        public:
+            EntryBlockScope(IRFunctionEmitter& function);
+            ~EntryBlockScope();
+
+        private:
+            IRFunctionEmitter& _function;
+            llvm::BasicBlock* _oldBlock;
+            llvm::TerminatorInst* _termInst;
+        };
+
+        llvm::Value* PtrOffsetA(llvm::Value* pPointer, int offset);
+        llvm::Value* PtrOffsetA(llvm::Value* pPointer, llvm::Value* pOffset, const std::string& name = "");
+        llvm::Value* ValueAtA(llvm::Value* pPointer, int offset);
+        llvm::Value* ValueAtA(llvm::Value* pPointer, llvm::Value* pOffset);
+        llvm::Value* SetValueAtA(llvm::Value* pPointer, int offset, llvm::Value* pValue);
+        llvm::Value* SetValueAtA(llvm::Value* pPointer, llvm::Value* pOffset, llvm::Value* pValue);
+        llvm::Value* PtrOffsetH(llvm::Value* pPointer, int offset);
+        llvm::Value* PtrOffsetH(llvm::Value* pPointer, llvm::Value* pOffset);
+        llvm::Value* ValueAtH(llvm::Value* pPointer, int offset);
+        llvm::Value* ValueAtH(llvm::Value* pPointer, llvm::Value* pOffset);
+        llvm::Value* SetValueAtH(llvm::Value* pPointer, int offset, llvm::Value* pValue);
+
+        llvm::BasicBlock* GetEntryBlock() { return _entryBlock; }
         void SetUpFunction();
+        void RegisterFunctionArgs(const NamedVariableTypeList& args);
+        void CompleteFunction(bool optimize = true);
+        void CompleteFunction(IRFunctionOptimizer& optimizer);
 
         llvm::Function* ResolveFunction(const std::string& name);
         llvm::Module* GetLLVMModule() { return _pFunction->getParent(); }
         friend void swap(IRFunctionEmitter& first, IRFunctionEmitter& second);
 
-        IRVariableTable _locals; // Symbol table - name -> stack variables or function arguments
+        IRVariableTable _locals; // Symbol table: name -> llvm::Value* (stack variables or function arguments)
 
         IRModuleEmitter* _pModuleEmitter = nullptr;
         IREmitter* _pEmitter = nullptr;
         IRBlockRegionList _regions;
         IRBlockRegion* _pCurRegion = nullptr;
         llvm::Function* _pFunction = nullptr;
+        llvm::BasicBlock* _entryBlock = nullptr;
+
+        std::string _name;
     };
 
     //

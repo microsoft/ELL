@@ -15,11 +15,11 @@ namespace common
     void ParsedTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
     {
         parser.AddOption(
-            randomSeedString,
-            "randomSeedString",
-            "rss",
-            "String used to seed the random number generator that permutes the training data",
-            "1234567890");
+            numEpochs,
+            "numEpochs",
+            "ne",
+            "The number of training epochs to perform",
+            1);
 
         parser.AddOption(
             verbose,
@@ -29,19 +29,12 @@ namespace common
             false);
 
         parser.AddOption(
-            lossArguments.lossFunction,
+            lossFunctionArguments.lossFunction,
             "lossFunction",
             "lf",
             "Choice of loss function",
-            { { "squared", LossArguments::LossFunction::squared }, { "hinge", LossArguments::LossFunction::hinge }, { "log", LossArguments::LossFunction::log } },
+            { { "squared", LossFunctionArguments::LossFunction::squared }, { "hinge", LossFunctionArguments::LossFunction::hinge }, { "log", LossFunctionArguments::LossFunction::log }, {"smoothHinge", LossFunctionArguments::LossFunction::smoothHinge} },
             "squared");
-
-        parser.AddOption(
-            lossArguments.lossFunctionParameter,
-            "lossFunctionParameter",
-            "lfp",
-            "Parameter of the loss function",
-            1.0);
     }
 }
 }

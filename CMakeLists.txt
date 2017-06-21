@@ -38,11 +38,21 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Set global compilation flags
+if(NOT WIN32 AND NOT CYGWIN)
+  add_compile_options("-fvisibility-inlines-hidden")
+endif()
+
 # Set Visual Studio-specific options
 if(MSVC)
   add_definitions(-DUNICODE)
   add_compile_options(/MP)
   add_compile_options(/bigobj)
+endif()
+
+# Set options so we don't get visibility warnings with LLVM
+if(NOT WIN32 AND NOT CYGWIN)
+  add_compile_options("-fvisibility-inlines-hidden")
 endif()
 
 # Turn on ctest tests
@@ -60,22 +70,22 @@ add_subdirectory(libraries)
 add_subdirectory(tools)
 add_subdirectory(scripts)
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/private)
+if(EXISTS ${CMAKE_SOURCE_DIR}/private AND EXISTS ${CMAKE_SOURCE_DIR}/private/CMakeLists.txt)
   add_subdirectory(private)
 endif()
 
-# Add examples
-add_subdirectory(examples)
-
 # Add SWIG-generated interfaces
 if(BUILD_INTERFACES)
-  find_package(SWIG 3.0.10)
+  find_package(SWIG 3.0.12)
   if(SWIG_FOUND)
     add_subdirectory(interfaces)
   else()
     message(WARNING "SWIG not found, skipping interface generation.")
   endif()
 endif()
+
+# Add examples (has dependencies on SWIG-generated interfaces)
+add_subdirectory(examples)
 
 # Add project for solution-level documentation
 set (DOC INSTALL-Mac.md

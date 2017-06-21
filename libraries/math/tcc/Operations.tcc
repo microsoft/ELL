@@ -18,32 +18,19 @@ namespace math
     // CommonOperations
     //
 
-    template <typename ElementType>
-    ElementType CommonOperations::Norm0(UnorientedConstVectorReference<ElementType> v)
-    {
-        return v.Aggregate([](ElementType x) { return x != 0 ? 1 : 0; });
-    }
-
     template <typename ElementType, VectorOrientation orientation>
     void CommonOperations::Add(ElementType s, VectorReference<ElementType, orientation> v)
     {
-        v.Transform([s](ElementType x) { return x + s; });
+        v += s;
     }
 
     template <typename ElementType, MatrixLayout layout>
     void CommonOperations::Add(ElementType s, MatrixReference<ElementType, layout> M)
     {
-        if (M.IsContiguous())
+        for (size_t i = 0; i < M.NumIntervals(); ++i)
         {
-            Add(s, M.ReferenceAsVector());
-        }
-        else
-        {
-            for (size_t i = 0; i < M.NumIntervals(); ++i)
-            {
-                auto interval = M.GetMajorVector(i);
-                Add(s, interval);
-            }
+            auto interval = M.GetMajorVector(i);
+            Add(s, interval);
         }
     }
 
@@ -66,40 +53,11 @@ namespace math
 
     template <class DerivedClass>
     template <typename ElementType, MatrixLayout layout>
-    void DerivedOperations<DerivedClass>::Copy(ConstMatrixReference<ElementType, layout> B, MatrixReference<ElementType, layout> A)
-    {
-        if (A.NumRows() != B.NumRows() || A.NumColumns() != B.NumColumns())
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Matrix dimensions are not the same size.");
-        }
-
-        if (A.IsContiguous() && B.IsContiguous())
-        {
-            DerivedClass::Copy(B.ReferenceAsVector(), A.ReferenceAsVector());
-        }
-        else
-        {
-            for (size_t i = 0; i < B.NumIntervals(); ++i)
-            {
-                DerivedClass::Copy(B.GetMajorVector(i), A.GetMajorVector(i));
-            }
-        }
-    }
-
-    template <class DerivedClass>
-    template <typename ElementType, MatrixLayout layout>
     void DerivedOperations<DerivedClass>::Multiply(ElementType s, MatrixReference<ElementType, layout> M)
     {
-        if (M.IsContiguous())
+        for (size_t i = 0; i < M.NumIntervals(); ++i)
         {
-            DerivedClass::Multiply(s, M.ReferenceAsVector());
-        }
-        else
-        {
-            for (size_t i = 0; i < M.NumIntervals(); ++i)
-            {
-                DerivedClass::Multiply(s, M.GetMajorVector(i));
-            }
+            DerivedClass::Multiply(s, M.GetMajorVector(i));
         }
     }
 
@@ -131,10 +89,6 @@ namespace math
         if (b == 0)
         {
             DerivedClass::Multiply(s, M);
-        }
-        else if (M.IsContiguous())
-        {
-            MultiplyAdd(s, b, M.ReferenceAsVector());
         }
         else
         {
@@ -182,45 +136,18 @@ namespace math
     // Native implementations of operations
     //
 
-    template <typename ElementType, VectorOrientation orientation>
-    void OperationsImplementation<ImplementationType::native>::Copy(ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u)
+    template <typename ElementType, MatrixLayout layout>
+    void OperationsImplementation<ImplementationType::native>::ColumnWiseSum(ConstMatrixReference<ElementType, layout> M, VectorReference<ElementType, VectorOrientation::row> u)
     {
-        if (v.Size() != u.Size())
+        if (u.Size() != M.NumColumns())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors u and v are not the same size.");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible result size.");
         }
 
-        ElementType* uData = u.GetDataPointer();
-        const ElementType* vData = v.GetDataPointer();
+        math::RowVector<ElementType> ones(M.NumRows());
+        ones.Fill(1.0);
 
-        if (u.GetIncrement() == 1 && v.GetIncrement() == 1)
-        {
-            // optimized implementation for vectors with trivial increments
-            const ElementType* vEnd = v.GetDataPointer() + v.Size();
-            std::copy(vData, vEnd, uData);
-        }
-        else
-        {
-            const ElementType* vEnd = v.GetDataPointer() + v.GetIncrement() * v.Size();
-            while (vData < vEnd)
-            {
-                (*uData) = (*vData);
-                uData += u.GetIncrement();
-                vData += v.GetIncrement();
-            }
-        }
-    }
-
-    template <typename ElementType>
-    ElementType OperationsImplementation<ImplementationType::native>::Norm1(UnorientedConstVectorReference<ElementType> v)
-    {
-        return v.Aggregate([](ElementType x) { return std::abs(x); });
-    }
-
-    template <typename ElementType>
-    ElementType OperationsImplementation<ImplementationType::native>::Norm2(UnorientedConstVectorReference<ElementType> v)
-    {
-        return std::sqrt(v.Aggregate([](ElementType x) { return x * x; }));
+        DerivedOperations::Multiply(static_cast<ElementType>(1), ones, M, static_cast<ElementType>(0), u);
     }
 
     template <typename ElementType, VectorOrientation orientation>
@@ -269,7 +196,7 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     void OperationsImplementation<ImplementationType::native>::Multiply(ElementType s, VectorReference<ElementType, orientation> v)
     {
-        v.Transform([s](ElementType x) { return s*x; });
+        v *= s;
     }
 
     template <typename ElementType>
@@ -317,22 +244,18 @@ namespace math
     // OpenBLAS wrappers
     //
 
-    template <typename ElementType, VectorOrientation orientation>
-    void OperationsImplementation<ImplementationType::openBlas>::Copy(ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u)
+    template <typename ElementType, MatrixLayout layout>
+    void OperationsImplementation<ImplementationType::openBlas>::ColumnWiseSum(ConstMatrixReference<ElementType, layout> M, VectorReference<ElementType, VectorOrientation::row> u)
     {
-        Blas::Copy(static_cast<int>(u.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()), u.GetDataPointer(), static_cast<int>(u.GetIncrement()));
-    }
+        if (u.Size() != M.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible result size.");
+        }
 
-    template <typename ElementType>
-    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm1(UnorientedConstVectorReference<ElementType> v)
-    {
-        return Blas::Asum(static_cast<int>(v.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
-    }
+        math::RowVector<ElementType> ones(M.NumRows());
+        ones.Fill(1.0);
 
-    template <typename ElementType>
-    ElementType OperationsImplementation<ImplementationType::openBlas>::Norm2(UnorientedConstVectorReference<ElementType> v)
-    {
-        return Blas::Nrm2(static_cast<int>(v.Size()), v.GetDataPointer(), static_cast<int>(v.GetIncrement()));
+        DerivedOperations::Multiply(static_cast<ElementType>(1), ones, M, static_cast<ElementType>(0), u);
     }
 
     template <typename ElementType, VectorOrientation orientation>

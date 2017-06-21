@@ -173,6 +173,9 @@ ClientBin/
 *.dbproj.schemaview
 *.pfx
 *.publishsettings
+*.pyc
+*.pyd
+*.pyo
 node_modules/
 orleans.codegen.cs
 

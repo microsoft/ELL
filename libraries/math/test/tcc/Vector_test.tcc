@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     Vector_test.tcc (math_test)
 //  Authors:  Ofer Dekel
 //
@@ -56,11 +56,11 @@ void TestVectorOperations()
     math::RowVector<ElementType> u{ 0, 1, 0, 2, 0 };
     math::ColumnVector<ElementType> v{ 1, 2, 3, 4, 5 };
 
-    testing::ProcessTest(implementationName + "Operations::Norm0(Vector)", math::Operations::Norm0(u) == 2);
+    testing::ProcessTest(implementationName + "Operations::Norm0(Vector)", u.Norm0() == 2);
 
-    testing::ProcessTest(implementationName + "Operations::Norm1(Vector)", math::Operations::Norm1(u) == 3);
+    testing::ProcessTest(implementationName + "Operations::Norm1(Vector)", u.Norm1() == 3);
 
-    testing::ProcessTest(implementationName + "Operations::Norm2(Vector)", testing::IsEqual(math::Operations::Norm2(u), static_cast<ElementType>(std::sqrt(5))));
+    testing::ProcessTest(implementationName + "Operations::Norm2(Vector)", testing::IsEqual(u.Norm2(), static_cast<ElementType>(std::sqrt(5))));
 
     auto dot = Ops::Dot(u, v);
     testing::ProcessTest(implementationName + "Operations::Dot(Vector, Vector)", dot == 10);
@@ -119,14 +119,14 @@ void TestVectorOperations()
     };
     testing::ProcessTest(implementationName + "Operations::Multiply(VectorReference, scalar)", M == R2);
 
-    testing::ProcessTest(implementationName + "Operations::Norm0(VectorReference)", math::Operations::Norm0(M.GetColumn(1)) == 3);
+    testing::ProcessTest(implementationName + "Operations::Norm0(VectorReference)", M.GetColumn(1).Norm0() == 3);
 
-    testing::ProcessTest(implementationName + "Operations::Norm1(VectorReference)", math::Operations::Norm1(M.GetColumn(1)) == 2 + 9 + 16);
+    testing::ProcessTest(implementationName + "Operations::Norm1(VectorReference)", M.GetColumn(1).Norm1() == 2 + 9 + 16);
 
-    testing::ProcessTest(implementationName + "Operations::Norm2(VectorReference)", testing::IsEqual(math::Operations::Norm2(M.GetColumn(1)), static_cast<ElementType>(std::sqrt(2 * 2 + 9 * 9 + 16 * 16))));
+    testing::ProcessTest(implementationName + "Operations::Norm2(VectorReference)", testing::IsEqual(M.GetColumn(1).Norm2(), static_cast<ElementType>(std::sqrt(2 * 2 + 9 * 9 + 16 * 16))));
 
-    Ops::Copy(math::RowVector<ElementType>{ 1, 1, 1, 1 }, M.GetRow(1));
-    Ops::Copy(math::ColumnVector<ElementType>{ 1, 1, 1 }, M.GetColumn(2));
+    M.GetRow(1).CopyFrom(math::RowVector<ElementType>{ 1, 1, 1, 1 });
+    M.GetColumn(2).CopyFrom(math::ColumnVector<ElementType>{ 1, 1, 1 });
     math::ColumnMatrix<ElementType> R3{
         { 1, 2, 1, 0 },
         { 1, 1, 1, 1 },
@@ -246,12 +246,12 @@ void TestTransformedVectors()
     math::ColumnVector<ElementType> r3{ 6, 10, 0, -2, 6, 6, 6, 6, 6, 6 };
     testing::ProcessTest("Vector::operator+=(abs vector)", u == r3);
 
-    u.Set(math::Abs<ElementType, math::VectorOrientation::column>(v));
+    u.CopyFrom(math::Abs<ElementType, math::VectorOrientation::column>(v));
     math::ColumnVector<ElementType> r4{ 1, 2, 1, 2, 1, 1, 1, 1, 1, 1 };
     testing::ProcessTest("Vector::Set(abs vector)", u == r4);
 
     u.Reset();
     u += math::Square<ElementType, math::VectorOrientation::column>(v);
-    v.Set(math::Sqrt<ElementType, math::VectorOrientation::column>(u));
+    v.CopyFrom(math::Sqrt<ElementType, math::VectorOrientation::column>(u));
     testing::ProcessTest("Vector::Set(square/sqrt)", v == r4);
 }

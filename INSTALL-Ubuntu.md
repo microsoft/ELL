@@ -36,7 +36,7 @@ and look for the version number. If the version number is 3.9 or greater, you ca
 ##### libedit
 Install the BSD editline and history libraries
 
-    sudo apt-get install libedit-dev
+    sudo apt-get install -y libedit-dev
 
 ### Optional Prerequisites (OpenBLAS and Doxygen)
 ELL can optionally take advantage of the optimized linear algebra libraries in [*OpenBlas*](http://www.openblas.net/), and generate code documentation using *Doxygen*. To install these optional dependencies, type

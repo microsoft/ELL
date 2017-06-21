@@ -22,6 +22,7 @@
 #include "LinearPredictorNode.h"
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
+#include "SourceNode.h"
 
 // predictors
 #include "ForestPredictor.h"
@@ -29,6 +30,7 @@
 #include "SingleElementThresholdPredictor.h"
 
 // stl
+#include <sstream>
 #include <string>
 
 namespace ell
@@ -183,5 +185,28 @@ model::Model GenerateRefinedTreeModel(size_t numSplits)
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     return refinedModel;
+}
+
+template <typename ValueType>
+bool SourceNode_EmptyCallback(std::vector<ValueType>&)
+{
+    return false;
+}
+model::SteppableMap<std::chrono::steady_clock> GenerateSteppableMap(size_t dimension, int intervalMs)
+{
+    constexpr size_t timeSignalDimension = 2;
+
+    std::ostringstream compiledCallbackName;
+    compiledCallbackName << "SteppableMap_" << dimension << "_" << intervalMs << "_DataCallback";
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(timeSignalDimension);
+    auto sourceNode = model.AddNode<nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>(inputNode->output, dimension, compiledCallbackName.str());
+    auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
+    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(sourceNode->output, constantTwoNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(timesNode->output);
+
+    auto map = model::SteppableMap<std::chrono::steady_clock>(model, { { "input", inputNode } }, { { "output", outputNode->output } }, model::DurationType(intervalMs));
+    return map;
 }
 }

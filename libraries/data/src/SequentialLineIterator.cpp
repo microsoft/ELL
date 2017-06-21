@@ -15,25 +15,24 @@ namespace ell
 {
 namespace data
 {
-    SequentialLineIterator::SequentialLineIterator(const std::string& filepath, char delim)
-        : _delim(delim)
+    SequentialLineIterator::SequentialLineIterator(std::istream& stream, char delim)
+        : _stream(stream), _delim(delim)
     {
-        _iFStream = utilities::OpenIfstream(filepath);
         Next();
     }
 
     void SequentialLineIterator::Next()
     {
-        auto pNextLine = std::make_shared<std::string>();
-        std::getline(_iFStream, *pNextLine, _delim);
-        if (_iFStream.fail())
+        std::string nextLine;
+        std::getline(_stream, nextLine, _delim);
+
+        if (_stream.fail())
         {
-            _pCurrentLine = nullptr;
+            _isValid = false;
+            return;
         }
-        else
-        {
-            _pCurrentLine = pNextLine;
-        }
+
+        _currentLine = TextLine(std::move(nextLine));
     }
 }
 }

@@ -9,6 +9,7 @@
 #include "DataVector_test.h"
 #include "Dataset_test.h"
 #include "Example_test.h"
+#include "Parser_test.h"
 
 // testing
 #include "testing.h"
@@ -26,6 +27,9 @@ int main()
     IteratorTests();
     ExampleCopyAsTests();
     DatasetCastingTests();
+    DataVectorParseTest();
+    AutoDataVectorParseTest();
+    SingleFileParseTest();
 
     if (testing::DidTestFail())
     {

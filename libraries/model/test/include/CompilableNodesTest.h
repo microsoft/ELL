@@ -8,9 +8,7 @@
 
 #pragma once
 
-namespace ell
-{
-void TestCompileIsEqualModel();
+void TestCompileIsEqual();
 void TestCompilableScalarOutputNode();
 void TestCompilableVectorOutputNode();
 void TestCompilableAccumulatorNode();
@@ -29,4 +27,5 @@ void TestCompilableMultiplexerNode();
 void TestCompilableTypeCastNode();
 void TestCompilableAccumulatorNodeFunction();
 void TestCompilableSourceNode(bool runJit);
-}
+void TestCompilableDotProductNode2(int dimension);
+void TestFloatNode();

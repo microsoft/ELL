@@ -11,10 +11,11 @@
 // data
 #include "AutoDataVector.h"
 #include "DataVector.h"
-#include "DataVectorTransformations.h"
+#include "DataVectorOperations.h"
 #include "DenseDataVector.h"
 #include "SparseBinaryDataVector.h"
 #include "SparseDataVector.h"
+#include "DataVectorOperations.h"
 
 // math
 #include "Vector.h"
@@ -27,6 +28,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <algorithm> // for std::transform
 
 namespace ell
 {
@@ -34,7 +36,7 @@ template <typename DataVectorType>
 void IDataVectorTest()
 {
     DataVectorType u{ { 0, 2 }, { 3, -7 }, { 4, 1 } };
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(2 * 2 + 7 * 7 + 1 * 1)));
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2Squared()", testing::IsEqual(u.Norm2Squared(), 2.0 * 2.0 + 7.0 * 7.0 + 1.0 * 1.0));
 
     math::RowVector<double> w{ 1, 1, 1, 0, -1, 0 };
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w), 1.0));
@@ -61,7 +63,7 @@ template <typename DataVectorType>
 void IDataVectorBinaryTest()
 {
     DataVectorType u{ { 0, 1 }, { 3, 1 }, { 4, 1 } };
-    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2()", testing::IsEqual(u.Norm2(), std::sqrt(3)));
+    testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Norm2Squared()", testing::IsEqual(u.Norm2Squared(), 3.0));
 
     math::RowVector<double> w{ 1, 2, 3, 4, 5, 6 };
     testing::ProcessTest("Testing " + std::string(typeid(DataVectorType).name()) + "::Dot()", testing::IsEqual(u.Dot(w), 1.0 + 4.0 + 5.0));

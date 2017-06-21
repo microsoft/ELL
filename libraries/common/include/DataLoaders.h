@@ -17,36 +17,29 @@
 // model
 #include "DynamicMap.h"
 
-// utilities
-#include "StlContainerIterator.h"
 
 // stl
 #include <string>
+#include <iostream>
 
 namespace ell
 {
 namespace common
 {
-    /// <summary> Gets a data iterator from a data file, based on data load arguments. </summary>
+    /// <summary> Gets a data iterator from an input stream. </summary>
     ///
-    /// <param name="dataLoadArguments"> The data load arguments. </param>
+    /// <param name="stream"> Input stream to load data from. </param>
     ///
     /// <returns> The data iterator. </returns>
-    data::AutoSupervisedExampleIterator GetExampleIterator(const DataLoadArguments& dataLoadArguments);
-
-    /// <summary> Creates a dataset from an example iterator. </summary>
-    ///
-    /// <param name="exampleIterator"> The example iterator. </param>
-    ///
-    /// <returns> The dataset. </returns>
-    data::AutoSupervisedDataset GetDataset(data::AutoSupervisedExampleIterator exampleIterator);
+    data::AutoSupervisedExampleIterator GetExampleIterator(std::istream& stream);
 
     /// <summary> Gets a dataset from data load arguments. </summary>
     ///
-    /// <param name="dataLoadArguments"> The data load arguments. </param>
+    /// <typeparam name="DatasetType"> Dataset type. </typeparam>
+    /// <param name="stream"> Input stream to load data from. </param>
     ///
     /// <returns> The dataset. </returns>
-    data::AutoSupervisedDataset GetDataset(const DataLoadArguments& dataLoadArguments);
+    data::AutoSupervisedDataset GetDataset(std::istream& stream);
 
     /// <summary>
     /// Gets a dataset by loading it from an example iterator and running it through a map.
@@ -61,16 +54,16 @@ namespace common
     data::AutoSupervisedDataset GetMappedDataset(data::AutoSupervisedExampleIterator exampleIterator, const MapType& map);
 
     /// <summary>
-    /// Gets a dataset by loading it according to data load arguments and then running it through a
-    /// map.
+    /// Gets a dataset by loading it from an input stream and then running it through a map.
     /// </summary>
     ///
-    /// <param name="dataLoadArguments"> The data load arguments. </param>
+    /// <typeparam name="DatasetType"> The Dataset type. </typeparam>
+    /// <param name="stream"> Input stream to load data from. </param>
     /// <param name="map"> The map. </param>
     ///
     /// <returns> The dataset. </returns>
     template <typename MapType>
-    data::AutoSupervisedDataset GetMappedDataset(const DataLoadArguments& dataLoadArguments, const MapType& map);
+    data::AutoSupervisedDataset GetMappedDataset(std::istream& stream, const MapType& map);
 }
 }
 

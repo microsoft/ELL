@@ -22,7 +22,7 @@ namespace ell
 namespace emitters
 {
     /// <summary> Metadata about an emitted variable. </summary>
-    struct EmittedVar
+    struct EmittedVariable
     {
         /// <summary> Has this variable been declared already? </summary>
         bool isNew = false;
@@ -34,15 +34,15 @@ namespace emitters
         void Clear();
     };
 
-    /// <summary> Allocator to alloc, free and reuse emitted (physical) variables </summary>
+    /// <summary> Allocator to allocate, free and reuse emitted (physical) variables </summary>
     class EmittedVariableAllocator
     {
     public:
         /// <summary> Alloc a variable </summary>
-        EmittedVar Allocate();
+        EmittedVariable Allocate();
 
         /// <summary> Free a variable </summary>
-        void Free(EmittedVar& var);
+        void Free(EmittedVariable& var);
 
     private:
         utilities::IntegerStack _varStack;
@@ -130,31 +130,25 @@ namespace emitters
         bool IsNew() const { return _emittedVar.isNew; }
 
         /// <summary> Test if the given set of flags are set </summary>
-        bool TestFlags(int flags) const { return (_flags & flags) != 0; }
+        bool TestFlags(int flags) const;
 
         /// <summary> Bind the logical variable to a physical one </summary>
-        void AssignVar(EmittedVar var) { _emittedVar = var; }
+        void AssignVariable(EmittedVariable variable);
 
         /// <summary> Get the physical variable bound to this logical variable </summary>
-        EmittedVar GetAssignedVar() { return _emittedVar; }
+        EmittedVariable GetAssignedVar() { return _emittedVar; }
 
     protected:
         Variable(const VariableType type, const VariableScope scope, int flags = VariableFlags::none);
-        void SetFlags(const VariableFlags flag)
-        {
-            _flags |= (int)flag;
-        }
-        void ClearFlags(const VariableFlags flag)
-        {
-            _flags &= (~((int)flag));
-        }
+        void SetFlags(const VariableFlags flag);
+        void ClearFlags(const VariableFlags flag);
 
     private:
         std::string _emittedName;
         VariableType _type;
         VariableScope _scope;
         int _flags;
-        EmittedVar _emittedVar;
+        EmittedVariable _emittedVar;
     };
 
     /// <summary> Allocator for logical variables </summary>

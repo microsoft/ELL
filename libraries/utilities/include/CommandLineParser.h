@@ -83,7 +83,7 @@ namespace utilities
         /// <param name="description"> The descriptive text that appears when help is requested </param>
         /// <param name="defaultValue"> The default value for the option. The optionValue argument gets set to this if no value is specified on the command line </param>
         template <typename T, typename U>
-        void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, const U& defaultValue);
+        void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, const U& defaultValue, std::string emptyValueString = "true");
 
         /// <summary> Adds a new enumerated-value option to the command-line parser </summary>
         ///
@@ -94,7 +94,7 @@ namespace utilities
         /// <param name="enumValues"> A list of allowed option strings and their values for this option.</param>
         /// <param name="defaultValue"> The default value for this option. The optionValue argument gets set to this if no value is specified on the command line </param>
         template <typename T>
-        void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, std::initializer_list<std::pair<std::string, T>> enumValues, std::string defaultValue);
+        void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, std::initializer_list<std::pair<std::string, T>> enumValues, std::string defaultValue, std::string emptyValueString = "true");
 
         /// <summary> Adds a ParsedArgSet representing a bundle of options to the commandline parser </summary>
         ///
@@ -178,6 +178,7 @@ namespace utilities
             std::string shortName;
             std::string description;
             std::string defaultValueString;
+            std::string emptyValueString; // value to use if no value follows the option
             std::string currentValueString;
             std::vector<std::string> enumValues;
 
@@ -188,7 +189,7 @@ namespace utilities
             {
             }
 
-            OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::function<bool(std::string)> set_value_callback);
+            OptionInfo(std::string name, std::string shortName, std::string description, std::string defaultValue, std::string emptyValueString, std::function<bool(std::string)> set_value_callback);
 
             std::string optionNameString() const;
             size_t optionNameHelpLength() const;
@@ -203,6 +204,7 @@ namespace utilities
         std::vector<PostParseCallback> _postParseCallbacks;
 
         void AddOption(const OptionInfo& info);
+        virtual bool SetOption(std::string option_name); // returns true if we need to reparse
         virtual bool SetOption(std::string option_name, std::string option_val); // returns true if we need to reparse
         bool SetDefaultArgs(const std::set<std::string>& unset_args); // returns true if we need to reparse
     };

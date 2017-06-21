@@ -1,17 +1,18 @@
 #
 # SWIG python interfaces
 #
+find_package(PythonInterp)
 find_package(PythonLibs)
 if(${PYTHONLIBS_FOUND})
   include (CommonInterfaces)
 
-  # Fix link problems when building in Debug mode:
-  add_definitions(-DSWIG_PYTHON_INTERPRETER_NO_DEBUG)
+  message(STATUS "Using python found at: ${PYTHON_EXECUTABLE}")
+  message(STATUS "Using python libraries found at: ${PYTHON_LIBRARY}")
 
-  find_package(PythonLibs REQUIRED)
   include_directories(${PYTHON_INCLUDE_PATH})
 
   generate_interface(python ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "" ${PYTHON_INCLUDE_PATH})
+  set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS})
 
   # tests
   #add_test(NAME python_interface_test

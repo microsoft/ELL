@@ -13,7 +13,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1036",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1035.output"
     },
     "windowSize": 8
@@ -25,7 +25,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1037",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1036.output"
     }
   }, 
@@ -36,7 +36,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1038",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1035.output"
     }
   }, 
@@ -47,7 +47,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1039",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "1038.output"
     },
     "windowSize": 8
@@ -59,14 +59,14 @@
       "_type": "InputPort<double>",
       "nodeId":       "1040",
       "name": "input1",
-      "type": 1,
+      "type": 2,
       "input":       "1037.output"
     },
     "input2": {
       "_type": "InputPort<double>",
       "nodeId":       "1040",
       "name": "input2",
-      "type": 1,
+      "type": 2,
       "input":       "1039.output"
     },
     "operation": "subtract"

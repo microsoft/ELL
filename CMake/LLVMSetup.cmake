@@ -33,11 +33,23 @@ if(LLVMSetup_included)
 endif()
 set(LLVMSetup_included true)
 
+# Function to process the output of llvm-config into a proper CMake list
+function (get_llvm_config_list options output_var)
+    set(output)
+    execute_process(COMMAND "${LLVM_TOOLS_BINARY_DIR}/llvm-config" ${options} OUTPUT_VARIABLE output)
+    string(STRIP ${output} output)
+    string(REPLACE "-l" "" output ${output})
+    separate_arguments(output)
+    set(${output_var} ${output} PARENT_SCOPE)
+endfunction()
+
 # First try to use LLVM's CMake target (see http://llvm.org/releases/3.7.0/docs/CMake.html for documentation)
 find_package(LLVM QUIET CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
 if(LLVM_FOUND)
-    # Find the libraries that correspond to the LLVM components that we wish to use
-    llvm_map_components_to_libnames(LLVM_LIBS all) 
+    # Find the libraries we wish to use
+    get_llvm_config_list("--libs;all" LLVM_LIBS)
+    get_llvm_config_list("--system-libs" LLVM_SYSTEM_LIBS)
+    list(APPEND LLVM_LIBS ${LLVM_SYSTEM_LIBS})
 
     if(NOT WIN32 AND NOT CYGWIN)
         list(APPEND LLVM_COMPILE_OPTIONS "-fvisibility-inlines-hidden")
@@ -202,5 +214,7 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
         add_library(${LIBRARY} STATIC IMPORTED)
         set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_DEBUG ${LLVM_LIBROOT_DEBUG}/${LIBRARY}.lib)
         set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELEASE ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
+        set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_RELWITHDEBINFO ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
+        set_property(TARGET ${LIBRARY} PROPERTY IMPORTED_LOCATION_MINSIZEREL ${LLVM_LIBROOT_RELEASE}/${LIBRARY}.lib)
     endforeach()
 endif()

@@ -319,8 +319,9 @@ namespace model
 
     PortElementsBase::PortElementsBase(const PortRange& range)
     {
+        _ranges.clear();
         _ranges.push_back(range);
-        _size += range.Size();
+        _size = range.Size();
     }
 
     PortElementsBase::PortElementsBase(const std::vector<PortRange>& ranges)

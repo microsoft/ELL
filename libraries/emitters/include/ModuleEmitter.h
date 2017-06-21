@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "TargetDevice.h"
 #include "EmitterTypes.h"
 #include "Variable.h"
 
@@ -23,7 +24,8 @@ namespace emitters
     {
         ir,
         bitcode,
-        assembly
+        assembly,
+        cHeader
     };
 
     /// <summary> Standard compiler switches. </summary>
@@ -31,14 +33,19 @@ namespace emitters
     {
         bool unrollLoops = false;
         bool inlineOperators = true;
+        bool useBlas = false;
+        bool useHalide = false;
         bool optimize = true;
         bool includeDiagnosticInfo = false;
+
+        TargetDevice targetDevice;
     };
 
     /// <summary> Abstract base class for ELL compilers </summary>
     class ModuleEmitter
     {
     public:
+        ModuleEmitter();
         virtual ~ModuleEmitter() = default;
 
         /// <summary> Return the base compiler settings </summary>
@@ -51,14 +58,35 @@ namespace emitters
         /// <param name="parameters"> The settings for the compiler to use </param>
         void SetCompilerParameters(const CompilerParameters& parameters);
 
-        /// <summary> Set a function declaration. Note that BeginTopLevelFunction can't be called from within a function - it completes the currently-being-emitted function </summary>
+        // Note, this differs from IRModuleEmitter::BeginFunction only by return type
+        /// <summary> Set a function declaration. Note that BeginMapPredictFunction can't be called from within a function - it completes the currently-being-emitted function </summary>
         ///
         /// <param name="functionName"> The name of the function to create </param>
         /// <param name="args"> The names and types of the arguments </param>
-        virtual void BeginTopLevelFunction(const std::string& functionName, NamedVariableTypeList& args) = 0;
+        virtual void BeginMapPredictFunction(const std::string& functionName, NamedVariableTypeList& args) = 0;
 
         /// <summary> End the function </summary>
-        virtual void EndTopLevelFunction() = 0;
+        virtual void EndMapPredictFunction() = 0;
+
+        /// <summary> Indicates if the given function has any associated comments </summary>
+        ///
+        /// <param name="functionName"> The name of the function </param>
+        ///
+        /// <returns> `true` if the function has any comments associated with it </returns>
+        virtual bool HasFunctionComments(const std::string& functionName) = 0;
+
+        /// <summary> Get the comments associated with the given function. </summary>
+        ///
+        /// <param name="functionName"> The name of the function. </param>
+        ///
+        /// <returns> The comments for the function, as a vector of strings </returns>
+        virtual std::vector<std::string> GetFunctionComments(const std::string& functionName) = 0;
+        
+        /// <summary> Associates some comment text with the given function. </summary>
+        ///
+        /// <param name="functionName"> The name of the function. </param>
+        /// <param name="comments"> The comments for the function. </param>
+        virtual void SetFunctionComments(const std::string& functionName, const std::vector<std::string>& comments) = 0;
 
         /// <summary> Variable allocator </summary>
         ///
@@ -72,13 +100,13 @@ namespace emitters
         /// <summary> Output the compiled model to the given file, using file extension to determine output format </summary>
         ///
         /// <param name="filePath"> The path of the file to write to </param>
-        void WriteToFile(const std::string& filePath);
+        virtual void WriteToFile(const std::string& filePath);
 
         /// <summary> Output the compiled model to the given file with the given format </summary>
         ///
         /// <param name="filePath"> The path of the file to write to </param>
         /// <param name="format"> The format of the output </param>
-        void WriteToFile(const std::string& filePath, ModuleOutputFormat format);
+        virtual void WriteToFile(const std::string& filePath, ModuleOutputFormat format);
 
         /// <summary> Output the compiled model to an output stream with the given format </summary>
         ///

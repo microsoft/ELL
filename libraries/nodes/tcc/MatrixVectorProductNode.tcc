@@ -9,6 +9,9 @@
 #include "MatrixVectorProductNode.h"
 #include "DotProductNode.h"
 
+// math
+#include "Operations.h"
+
 // utilities
 #include "Exception.h"
 

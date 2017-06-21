@@ -17,7 +17,6 @@
 #include "IntegerList.h"
 
 // stl
-#include <cmath>
 #include <cstddef>
 #include <initializer_list>
 #include <iostream>
@@ -191,8 +190,8 @@ namespace data
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
-        /// <returns> A double. </returns>
-        virtual double Norm2() const override { return std::sqrt(_indexList.Size()); }
+        /// <returns> The squared 2-norm of the vector. </returns>
+        virtual double Norm2Squared() const override { return static_cast<double>(_indexList.Size()); }
 
         /// <summary> Computes the Dot product. </summary>
         ///

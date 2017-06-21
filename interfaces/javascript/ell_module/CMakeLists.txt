@@ -47,7 +47,7 @@ if(NPM_EXECUTABLE)
 
     add_custom_target(${module_name}_install ALL
                     COMMAND ${NPM_EXECUTABLE} install
-                    DEPENDS ELL_javascript common data evaluators lossFunctions math model nodes predictors trainers utilities emitters
+                    DEPENDS ELL_javascript common data evaluators functions math model nodes predictors trainers utilities emitters
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Installing prerequisites"
                     VERBATIM)

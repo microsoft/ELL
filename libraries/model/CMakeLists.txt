@@ -10,17 +10,19 @@ set (src
     src/CompiledMap.cpp
     src/DynamicMap.cpp
     src/InputNode.cpp
+    src/InputPort.cpp
     src/IRCompiledMap.cpp
     src/IRMapCompiler.cpp
     src/MapCompiler.cpp
     src/Model.cpp
     src/ModelBuilder.cpp
+    src/IRModelProfiler.cpp
     src/ModelTransformer.cpp
     src/Node.cpp
     src/OutputNode.cpp
     src/OutputPort.cpp
-    src/PortElements.cpp
     src/Port.cpp
+    src/PortElements.cpp
 )
 
 set (include
@@ -36,14 +38,15 @@ set (include
     include/MapCompiler.h
     include/Model.h
     include/ModelBuilder.h
+    include/IRModelProfiler.h
     include/ModelTransformer.h
     include/Node.h
     include/NodeMap.h
     include/OutputNode.h
     include/OutputPort.h
-    include/PortElements.h
     include/Port.h
     include/SteppableMap.h
+    include/PortElements.h
 )
 
 set (tcc 
@@ -58,6 +61,7 @@ set (tcc
     tcc/NodeMap.tcc
     tcc/OutputNode.tcc
     tcc/OutputPort.tcc
+    tcc/Port.tcc
     tcc/PortElements.tcc
     tcc/SteppableMap.tcc
 )
@@ -123,11 +127,12 @@ add_test(NAME ${test_name} COMMAND ${test_name})
 set (compiler_test_name ${library_name}_compiler_test)
 
 set (compiler_test_src
-    test/src/compiler_test_main.cpp
+    test/src/model_compiler_test_main.cpp
     test/src/CompilableNodesTest.cpp
     test/src/CompilerTest.cpp
     test/src/ModelMaker.cpp
     test/src/ModelTestUtilities.cpp
+    test/src/PerformanceCountersTest.cpp
 )
 
 set (compiler_test_include
@@ -135,6 +140,7 @@ set (compiler_test_include
     test/include/CompilerTest.h
     test/include/ModelMaker.h
     test/include/ModelTestUtilities.h
+    test/include/PerformanceCountersTest.h
 )
 
 set (compiler_test_tcc
@@ -149,6 +155,7 @@ source_group("tcc" FILES ${compiler_test_tcc})
 add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include})
 target_include_directories(${compiler_test_name} PRIVATE test/include)
 target_link_libraries(${compiler_test_name} common model nodes testing utilities)
+copy_shared_libraries(${test_name})
 
 set_property(TARGET ${compiler_test_name} PROPERTY FOLDER "tests")
 

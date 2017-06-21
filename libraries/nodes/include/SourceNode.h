@@ -22,6 +22,8 @@ namespace ell
 {
 namespace nodes
 {
+    // CONSIDER switching from a template parameter to an std::function member, so that the sampling
+    // function can be overwritten post-unachiving (the TypeFactory currently sets a no-op function).
     template <typename ValueType>
     using SamplingFunction = bool (*)(std::vector<ValueType>&);
     using TimeTickType = model::TimeTickType;
@@ -39,6 +41,9 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
+        /// <summary> Default constructor </summary>
+        SourceNode();
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> Port elements for input values (sample time, current time) </param>
@@ -55,7 +60,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "SourceNode"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SourceNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

@@ -2,11 +2,13 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     ELL.i (interfaces)
-//  Authors:  Chuck Jacobs
+//  Authors:  Chuck Jacobs, Byron Changuion
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %module "ELL"
+// Generate decent docstrings from types and method signatures
+%feature("autodoc", "3");
 
 #ifdef SWIGJAVASCRIPT
 %{
@@ -19,27 +21,51 @@
 %}
 #endif
 
-%{
-#ifdef SWIGPYTHON
-  #define SWIG_FILE_WITH_INIT
-  #define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS 
-#endif
-
-#include <vector>
-%}
+%include "vector.i"
 
 #ifndef SWIGXML
 //%include typemaps.i
-%include "std_string.i"
-%include "std_vector.i"
-
-%template(DoubleVector) std::vector<double>;
-%template(DoubleVectorVector) std::vector<std::vector<double>>;
-%template(StringVector) std::vector<std::string>;
+%include "unique_ptr.i"
+%include "exception.i"
 #endif
 
+// Add ELL exception handling
+%exception 
+{
+    try 
+    {
+	    $action
+    } 
+    catch(const ell::utilities::LogicException& e) 
+    {
+	    SWIG_exception(SWIG_RuntimeError, e.GetMessage().c_str());
+    }
+    catch(const ell::utilities::SystemException& e) 
+    {
+	    SWIG_exception(SWIG_SystemError, e.GetMessage().c_str());
+    } 
+    catch(const ell::utilities::NumericException& e) 
+    {
+	    SWIG_exception(SWIG_ValueError, e.GetMessage().c_str());
+    } 
+    catch(const ell::utilities::InputException& e) 
+    {
+	    SWIG_exception(SWIG_ValueError, e.GetMessage().c_str());
+    }
+    catch(const ell::utilities::Exception& e) 
+    {
+	    SWIG_exception(SWIG_RuntimeError, e.GetMessage().c_str());
+    }
+    catch(const std::exception& e)
+    {
+	    SWIG_exception(SWIG_RuntimeError, e.what());
+    }
+}
+
 // ELL APIs 
-%include "lossFunctions.i"
+%include "functions.i"
+%include "math.i"
+%include "predictors.i"
 %include "model.i"
 
 #if defined(SWIGJAVASCRIPT)

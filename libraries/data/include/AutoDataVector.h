@@ -10,6 +10,7 @@
 
 #include "DataVector.h"
 #include "DenseDataVector.h"
+#include "TextLine.h"
 
 // utilities
 #include "Exception.h"
@@ -89,10 +90,10 @@ namespace data
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
         virtual size_t PrefixLength() const override { return _pInternal->PrefixLength(); }
 
-        /// <summary> Computes the 2-norm of the vector (not the squared 2-norm). </summary>
+        /// <summary> Computes the 2-norm of the vector. </summary>
         ///
-        /// <returns> The vector 2-norm. </returns>
-        virtual double Norm2() const override { return _pInternal->Norm2(); }
+        /// <returns> The squared 2-norm of the vector. </returns>
+        virtual double Norm2Squared() const override { return _pInternal->Norm2Squared(); }
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
@@ -116,7 +117,7 @@ namespace data
         /// <param name="vector"> The vector. </param>
         /// <param name="transformation"> A functor that takes an IndexValue and returns a double, which is
         /// applied to each element before it is added to the vector. </param>
-        template<IterationPolicy policy, typename TransformationType>
+        template <IterationPolicy policy, typename TransformationType>
         void AddTransformedTo(math::RowVectorReference<double> vector, TransformationType transformation) const;
 
         /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
@@ -162,7 +163,11 @@ namespace data
         void FindBestRepresentation(DefaultDataVectorType defaultDataVector);
 
         template <typename DataVectorType, utilities::IsSame<DataVectorType, DefaultDataVectorType> Concept = true>
-        void SetInternal(DefaultDataVectorType defaultDataVector);
+        void SetInternal(DefaultDataVectorType defaultDataVector)
+        {
+            // STYLE intentional deviation from project style due to compilation difficulties
+            _pInternal = std::make_unique<DefaultDataVectorType>(std::move(defaultDataVector));
+        }
 
         template <typename DataVectorType, utilities::IsDifferent<DataVectorType, DefaultDataVectorType> Concept = true>
         void SetInternal(DefaultDataVectorType defaultDataVector);
@@ -173,6 +178,20 @@ namespace data
 
     // friendly name
     using AutoDataVector = AutoDataVectorBase<DoubleDataVector>;
+
+    /// <summary> A helper class that constructs AutoDataVectors using a provided IndexValue iterator. </summary>
+    ///
+    /// <typeparam name="IndexValueParsingIterator"> Parsing iterator type. </typeparam>
+    template <typename IndexValueParsingIterator>
+    struct AutoDataVectorParser
+    {
+        /// <summary> Parses a given text line and constructs an AutoDataVector. </summary>
+        ///
+        /// <param name="textLine"> The text line. </param>
+        ///
+        /// <returns> An AutoDataVector. </returns>
+        static AutoDataVector Parse(TextLine& textLine);
+    };
 }
 }
 

@@ -28,14 +28,14 @@
       "_type": "InputPort<double>",
       "nodeId":       "1094",
       "name": "input1",
-      "type": 1,
+      "type": 2,
       "input":       "1092.output[0]"
     },
     "input2": {
       "_type": "InputPort<double>",
       "nodeId":       "1094",
       "name": "input2",
-      "type": 1,
+      "type": 2,
       "input":       "1093.output"
     },
     "predicate": "greater"
@@ -47,7 +47,7 @@
       "_type": "InputPort<bool>",
       "nodeId":       "1098",
       "name": "input",
-      "type": 4,
+      "type": 6,
       "input":       "1094.output[0]"
     }
   }, 
@@ -63,14 +63,14 @@
       "_type": "InputPort<int>",
       "nodeId":       "1104",
       "name": "input1",
-      "type": 2,
+      "type": 3,
       "input":       "1098.output"
     },
     "input2": {
       "_type": "InputPort<int>",
       "nodeId":       "1104",
       "name": "input2",
-      "type": 2,
+      "type": 3,
       "input":       "1103.output"
     },
     "predicate": "equal"
@@ -82,14 +82,14 @@
       "_type": "InputPort<bool>",
       "nodeId":       "1105",
       "name": "elements",
-      "type": 4,
+      "type": 6,
       "input":       "{1099.output, 1097.output[0]}"
     },
     "selector": {
       "_type": "InputPort<bool>",
       "nodeId":       "1105",
       "name": "selector",
-      "type": 4,
+      "type": 6,
       "input":       "1104.output"
     }
   }, 
@@ -105,14 +105,14 @@
       "_type": "InputPort<int>",
       "nodeId":       "1101",
       "name": "input1",
-      "type": 2,
+      "type": 3,
       "input":       "1098.output"
     },
     "input2": {
       "_type": "InputPort<int>",
       "nodeId":       "1101",
       "name": "input2",
-      "type": 2,
+      "type": 3,
       "input":       "1100.output"
     },
     "predicate": "equal"
@@ -124,14 +124,14 @@
       "_type": "InputPort<bool>",
       "nodeId":       "1102",
       "name": "elements",
-      "type": 4,
+      "type": 6,
       "input":       "{1099.output, 1097.output[0]}"
     },
     "selector": {
       "_type": "InputPort<bool>",
       "nodeId":       "1102",
       "name": "selector",
-      "type": 4,
+      "type": 6,
       "input":       "1101.output"
     }
   }, 
@@ -157,14 +157,14 @@
       "_type": "InputPort<double>",
       "nodeId":       "1095",
       "name": "elements",
-      "type": 1,
+      "type": 2,
       "input":       "{1091.output[0], 1090.output[0]}"
     },
     "selector": {
       "_type": "InputPort<bool>",
       "nodeId":       "1095",
       "name": "selector",
-      "type": 4,
+      "type": 6,
       "input":       "1094.output[0]"
     }
   }, 
@@ -175,7 +175,7 @@
       "_type": "InputPort<double>",
       "nodeId":       "1096",
       "name": "input",
-      "type": 1,
+      "type": 2,
       "input":       "{1095.output[0], 1089.output[0]}"
     }
   }]

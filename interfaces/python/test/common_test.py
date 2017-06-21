@@ -1,3 +1,4 @@
+from __future__ import print_function
 import ELL
 
 data = [ 
@@ -18,14 +19,14 @@ extensions = ["json"]
 
 def TestModelSize(key, label):
     model = ELL.ELL_Model(key)
-    print "%s size: %d" % (label, model.Size())
+    print("%s size: %d" % (label, model.Size()))
 
 def TestModelSizes():
     for (key, label, prefix) in data: 
         TestModelSize(key, label)
 
 def TestLoadModel(fileName):
-    print "Loading file %s" % fileName
+    print("Loading file %s" % fileName)
     m = ELL.ELL_LoadModel(fileName)
 
 def TestLoadModels():

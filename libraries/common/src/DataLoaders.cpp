@@ -15,9 +15,12 @@
 
 // data
 #include "Dataset.h"
-#include "ParsingExampleIterator.h"
 #include "SequentialLineIterator.h"
-#include "SparseEntryParser.h"
+
+#include "SingleLineParsingExampleIterator.h"
+#include "AutoDataVector.h"
+#include "WeightLabel.h"
+#include "GeneralizedSparseParsingIterator.h"
 
 // model
 #include "DynamicMap.h"
@@ -30,33 +33,20 @@ namespace ell
 {
 namespace common
 {
-    data::AutoSupervisedExampleIterator GetExampleIterator(const DataLoadArguments& dataLoadArguments)
+    data::AutoSupervisedExampleIterator GetExampleIterator(std::istream& stream)
     {
-        // create parser for sparse vectors (SVMLight format)
-        data::SparseEntryParser sparseEntryParser;
+        data::SequentialLineIterator textLineIterator(stream); 
 
-        // create line iterator - read line by line sequentially
-        data::SequentialLineIterator lineIterator(dataLoadArguments.inputDataFilename);
+        data::LabelParser metadataParser;
 
-        // Create iterator
-        return data::GetParsingExampleIterator(std::move(lineIterator), std::move(sparseEntryParser));
+        data::AutoDataVectorParser<data::GeneralizedSparseParsingIterator> dataVectorParser;
+
+        return data::MakeSingleLineParsingExampleIterator(std::move(textLineIterator), std::move(metadataParser), std::move(dataVectorParser));
     }
 
-    data::AutoSupervisedDataset GetDataset(data::AutoSupervisedExampleIterator exampleIterator)
+    data::AutoSupervisedDataset GetDataset(std::istream& stream)
     {
-        data::AutoSupervisedDataset dataset;
-        while (exampleIterator.IsValid())
-        {
-            dataset.AddExample(exampleIterator.Get());
-            exampleIterator.Next();
-        }
-
-        return dataset;
-    }
-
-    data::AutoSupervisedDataset GetDataset(const DataLoadArguments& dataLoadArguments)
-    {
-        return GetDataset(GetExampleIterator(dataLoadArguments));
+        return data::MakeDataset(GetExampleIterator(stream));
     }
 }
 }

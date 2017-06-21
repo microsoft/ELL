@@ -11,9 +11,6 @@
 // common
 #include "LoadModel.h"
 
-// model
-#include "Model.h"
-
 // utilities
 #include "CommandLineParser.h"
 
@@ -22,7 +19,7 @@
 
 using namespace ell;
 
-void SaveModels(std::string ext)
+void SaveModels(const std::string& ext)
 {
     common::SaveModel(GenerateIdentityModel(3), "identity." + ext);
     common::SaveModel(GenerateTimesTwoModel(3), "times_two." + ext);
@@ -46,6 +43,11 @@ void SaveModels(std::string ext)
     common::SaveModel(GenerateMultiOutModel(3), "multi_out." + ext);
 }
 
+void SaveMaps(const std::string& ext)
+{
+    common::SaveMap(GenerateSteppableMap(10, 50), "steppable_10." + ext);
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -56,6 +58,7 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
         SaveModels("model");
+        SaveMaps("map");
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

@@ -4,33 +4,36 @@
 
 set (library_name trainers)
 
-set (src src/AbsoluteMeanTrainer.cpp
-         src/ForestTrainer.cpp
+set (src src/ForestTrainer.cpp
+         src/KMeansTrainer.cpp
          src/LogitBooster.cpp
-         src/SGDLinearTrainer.cpp
-         src/ThresholdFinder.cpp)
+         src/MeanCalculator.cpp
+         src/SGDTrainer.cpp
+         src/ThresholdFinder.cpp
+)
 
-set (include include/AbsoluteMeanTrainer.h
-             include/EvaluatingIncrementalTrainer.h
+set (include include/EvaluatingTrainer.h
              include/ForestTrainer.h
              include/HistogramForestTrainer.h
              include/ITrainer.h
+             include/KMeansTrainer.h
              include/LogitBooster.h
-             include/MeanTrainer.h
-             include/MultiEpochIncrementalTrainer.h
+             include/MeanCalculator.h
              include/SortingForestTrainer.h
-             include/SweepingIncrementalTrainer.h
-             include/SGDLinearTrainer.h
-             include/ThresholdFinder.h)
+             include/SweepingTrainer.h
+             include/SDCATrainer.h
+             include/SGDTrainer.h
+             include/ThresholdFinder.h
+)
 
-set (tcc tcc/EvaluatingIncrementalTrainer.tcc
+set (tcc tcc/EvaluatingTrainer.tcc
          tcc/ForestTrainer.tcc
          tcc/HistogramForestTrainer.tcc
-         tcc/MeanTrainer.tcc
-         tcc/MultiEpochIncrementalTrainer.tcc
+         tcc/MeanCalculator.tcc
          tcc/SortingForestTrainer.tcc
-         tcc/SweepingIncrementalTrainer.tcc
-         tcc/SGDLinearTrainer.tcc
+         tcc/SweepingTrainer.tcc
+         tcc/SDCATrainer.tcc
+         tcc/SGDTrainer.tcc
          tcc/ThresholdFinder.tcc)
 
 set (doc doc/README.md)
@@ -57,14 +60,12 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 set (test_name ${library_name}_test)
 
 set (test_src test/src/main.cpp)
-set (test_include )
 
 source_group("src" FILES ${test_src})
-source_group("include" FILES ${test_include})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include})
+add_executable(${test_name} ${test_src} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} testing trainers)
+target_link_libraries(${test_name} common testing trainers)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

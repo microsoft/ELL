@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Project:  Embedded Machine Learning Library (EMLL)
+//  Project:  Embedded Learning Library (ELL)
 //  File:     ProtoNNPredictor.cpp (predictors)
 //  Authors:  Suresh Iyengar
 //
@@ -16,25 +16,25 @@ namespace ell
 namespace predictors
 {
     ProtoNNPredictor::ProtoNNPredictor()
-        : _dim(0), _W(0, 0), _B(0, 0), _Z(0, 0), _gamma(0)
+        : _dimension(0), _W(0, 0), _B(0, 0), _Z(0, 0), _gamma(0)
     {
     }
 
-    ProtoNNPredictor::ProtoNNPredictor(size_t dim, size_t projectedDim, size_t numPrototypes, size_t numLabels, double gamma)
-        : _dim(dim), _W(projectedDim, dim), _B(projectedDim, numPrototypes), _Z(numLabels, numPrototypes), _gamma(gamma)
+    ProtoNNPredictor::ProtoNNPredictor(size_t dimension, size_t projectedDimension, size_t numPrototypes, size_t numLabels, double gamma)
+        : _dimension(dimension), _W(projectedDimension, dimension), _B(projectedDimension, numPrototypes), _Z(numLabels, numPrototypes), _gamma(gamma)
     {
     }
 
     void ProtoNNPredictor::Reset()
     {
-        _dim = 0;
+        _dimension = 0;
         _W.Reset();
         _B.Reset();
         _Z.Reset();
         _gamma = 0.0;
     }
 
-    double ProtoNNPredictor::Predict(const DataVectorType& inputVector) const
+    math::ColumnVector<double> ProtoNNPredictor::GetLabelScores(const DataVectorType& inputVector) const
     {
         // Projection
         math::ColumnVector<double> data(inputVector.ToArray());
@@ -51,7 +51,7 @@ namespace predictors
         {
             math::ColumnVector<double> prototype(prototypes.GetColumn(i).ToArray());
             prototype -= projectedInput;
-            auto prototypeDistance = math::Operations::Norm2(prototype);
+            auto prototypeDistance = prototype.Norm2();
             auto similarity = std::exp(-1 * gammaVal * gammaVal * prototypeDistance * prototypeDistance);
             similarityToPrototypes[i] = similarity;
         }
@@ -60,15 +60,23 @@ namespace predictors
         math::ColumnVector<double> labels(GetNumLabels());
         math::Operations::Multiply(1.0, GetLabelEmbeddings(), similarityToPrototypes, 0.0, labels);
 
-        auto maxElement = std::max_element(labels.GetDataPointer(), labels.GetDataPointer() + labels.Size());
-        double maxLabelIndex = maxElement - labels.GetDataPointer();
+        return std::move(labels);
+    }
 
-        return maxLabelIndex;
+    ProtoNNPrediction ProtoNNPredictor::Predict(const DataVectorType& inputVector) const
+    {
+        auto labels = GetLabelScores(inputVector);
+        auto maxElement = std::max_element(labels.GetDataPointer(), labels.GetDataPointer() + labels.Size());
+        auto maxLabelIndex = maxElement - labels.GetDataPointer();
+
+        ProtoNNPrediction prediction{ *maxElement, (size_t)maxLabelIndex };
+
+        return prediction;
     }
 
     void ProtoNNPredictor::WriteToArchive(utilities::Archiver& archiver) const
     {
-        archiver["dim"] << _dim;
+        archiver["dim"] << _dimension;
         archiver["gamma"] << _gamma;
         WriteMatrixToArchive(archiver, "w_rows", "w_columns", "w_data", _W);
         WriteMatrixToArchive(archiver, "b_rows", "b_columns", "b_data", _B);
@@ -77,7 +85,7 @@ namespace predictors
 
     void ProtoNNPredictor::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        archiver["dim"] >> _dim;
+        archiver["dim"] >> _dimension;
         archiver["gamma"] >> _gamma;
         _W = ReadMatrixFromArchive(archiver, "w_rows", "w_columns", "w_data");
         _B = ReadMatrixFromArchive(archiver, "b_rows", "b_columns", "b_data");

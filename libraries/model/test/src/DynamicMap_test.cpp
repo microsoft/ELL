@@ -157,6 +157,7 @@ void TestDynamicMapSerialization()
     // Now read it back in
     utilities::SerializationContext context;
     common::RegisterNodeTypes(context);
+    common::RegisterMapTypes(context);
     std::stringstream inStream(outStream.str());
     utilities::JsonUnarchiver unarchiver(inStream, context);
     model::DynamicMap map2;
@@ -200,9 +201,8 @@ void TestSteppableMapCompute()
 
     // Compute called early
     auto sleepDuration = map.GetWaitTimeForNextCompute();
-    std::cout << "Sleep duration: " << sleepDuration.count() << " msecs" << std::endl;
-    std::this_thread::sleep_for(sleepDuration); // simulate no delay
-
+    std::cout << "GetWaitTimeForNextCompute duration: " << sleepDuration.count() << " msecs" << std::endl;
+    std::this_thread::sleep_for(sleepDuration / 2); // simulate delay < wait time
     resultValues = map.ComputeOutput<double>("doubleOutput");
     testing::ProcessTest("Testing steppable dynamic map compute (early)", testing::IsEqual(resultValues.size(), size_t(0)));
 

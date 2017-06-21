@@ -32,8 +32,11 @@ namespace emitters
     /// <summary> A list of LLVM IR Value* </summary>
     using IRValueList = std::vector<llvm::Value*>;
 
-    /// <summary> Symbol Table that maps Symbol Names to emitted IR Value* </summary>
+    /// <summary> Symbol Table that maps symbol Names to emitted IR Value* </summary>
     using IRVariableTable = SymbolTable<llvm::Value*>;
+    
+    /// <summary> Symbol Table that maps type Names to emitted IR Type* </summary>
+    using IRTypeTable = SymbolTable<llvm::Type*>;
 
     /// <summary> Convert LLVM errors into an ELL styled exception </summary>
     using LLVMException = utilities::ErrorCodeException<std::error_code>;
@@ -112,6 +115,13 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents the Int64 literal. </returns>
         llvm::Constant* Literal(const int64_t value);
 
+        /// <summary> Emit a float literal. </summary>
+        ///
+        /// <param name="value"> The literal value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents the float literal. </returns>
+        llvm::Constant* Literal(const float value);
+
         /// <summary> Emit a double literal. </summary>
         ///
         /// <param name="value"> The literal value. </param>
@@ -148,13 +158,6 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents an array of bytes. </returns>
         llvm::Constant* Literal(const std::vector<uint8_t>& value);
 
-        /// <summary> Emit a literal array of doubles. </summary>
-        ///
-        /// <param name="value"> The literal value. </param>
-        ///
-        /// <returns> Pointer to an llvm::Constant that represents an array of doubles. </returns>
-        llvm::Constant* Literal(const std::vector<double>& value);
-
         /// <summary> Emit a literal array of Int32. </summary>
         ///
         /// <param name="value"> The literal value. </param>
@@ -169,6 +172,20 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents an array of Int64. </returns>
         llvm::Constant* Literal(const std::vector<int64_t>& value);
 
+        /// <summary> Emit a literal array of floats. </summary>
+        ///
+        /// <param name="value"> The literal value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents an array of floats. </returns>
+        llvm::Constant* Literal(const std::vector<float>& value);
+
+        /// <summary> Emit a literal array of doubles. </summary>
+        ///
+        /// <param name="value"> The literal value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents an array of doubles. </returns>
+        llvm::Constant* Literal(const std::vector<double>& value);
+
         /// <summary> Emit a Zero value of the given type. </summary>
         ///
         /// <param name="type"> The type. </param>
@@ -176,15 +193,25 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents the zero. </returns>
         llvm::Constant* Zero(VariableType type);
 
-        /// <summary> Emit a True. </summary>
+        /// <summary> Emit a true value in a byte. </summary>
         ///
         /// <returns> Pointer to an llvm::Constant that represents true. </returns>
         llvm::Constant* True();
 
-        /// <summary> Emit a False. </summary>
+        /// <summary> Emit a false value in a byte. </summary>
         ///
         /// <returns> Pointer to an llvm::Constant that represents false. </returns>
         llvm::Constant* False();
+
+        /// <summary> Emit a true value in a single bit. </summary>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents true. </returns>
+        llvm::Constant* TrueBit();
+
+        /// <summary> Emit a false value in a single bit. </summary>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents false. </returns>
+        llvm::Constant* FalseBit();
 
         /// <summary> Emit a cast operation from one one type to another. </summary>
         ///
@@ -290,6 +317,15 @@ namespace emitters
         /// <returns> Pointer to an llvm::Value that represents the comparison result. </returns>
         llvm::Value* IsFalse(llvm::Value* pValue) { return Comparison(pValue, false); }
 
+        /// <summary> Emit a select instruction. </summary>
+        ///
+        /// <param name="pCmp"> Pointer to the value use as a comparison. </param>
+        /// <param name="pTrueValue"> Pointer to the value to return when the comparison is true. </param>
+        /// <param name="pFalseValue"> Pointer to the value to return when the comparison is false. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the select result. </returns>
+        llvm::Value* Select(llvm::Value* pCmp, llvm::Value* pTrueValue, llvm::Value* pFalseValue);
+
         /// <summary> Emit a declaration for an extern function. </summary>
         ///
         /// <param name="pModule"> The module in which the function is declared. </param>
@@ -336,10 +372,21 @@ namespace emitters
         /// <param name="name"> The function name. </param>
         /// <param name="returnType"> Function return type. </param>
         /// <param name="linkage"> The linkage. </param>
-        /// <param name="pArguments"> Function arguments. </param>
+        /// <param name="arguments"> Function arguments. </param>
         ///
         /// <returns> Pointer to the declared function. </returns>
         llvm::Function* Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const NamedVariableTypeList& arguments);
+        
+        /// <summary> Emits the function declaration and arguments, when beginning a new function. </summary>
+        ///
+        /// <param name="pModule"> The module in which the function is declared. </param>
+        /// <param name="name"> The function name. </param>
+        /// <param name="returnType"> Function return type. </param>
+        /// <param name="linkage"> The linkage. </param>
+        /// <param name="argTypes"> The function argument types. </param>
+        ///
+        /// <returns> Pointer to the declared function. </returns>
+        llvm::Function* Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const std::vector<llvm::Type*>& argTypes);
 
         /// <summary> Emit the beginning of a new code block in the given function. </summary>
         ///
@@ -412,10 +459,20 @@ namespace emitters
         /// <returns> Pointer to the current Block. </returns>
         llvm::BasicBlock* GetCurrentBlock() { return _irBuilder.GetInsertBlock(); }
 
+        /// <summary> Get the current insert point for new instructions. </summary>
+        ///
+        /// <returns> Pointer to the current instruction. </returns>
+        llvm::Instruction* GetCurrentInsertPoint() { return &(*_irBuilder.GetInsertPoint()); }
+
         /// <summary> Sets the current code block, which all emitted instructions are being written to. </summary>
         ///
         /// <param name="pBlock"> Pointer to the block being set to be the current block. </param>
         void SetCurrentBlock(llvm::BasicBlock* pBlock);
+
+        /// <summary> Sets the current insertion point. </summary>
+        ///
+        /// <param name="pos"> Pointer to the instruction to place new instructions after. </param>
+        void SetCurrentInsertPoint(llvm::Instruction* pos);
 
         /// <summary> Emits a call to a given function. </summary>
         ///
@@ -495,6 +552,15 @@ namespace emitters
         /// <returns> Pointer to a value that represents that field. </returns>
         llvm::Value* PointerOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset);
 
+        /// <summary> Emit a pointer to a FIELD in a STRUCT in a local array of Structs. </summary>
+        ///
+        /// <param name="pArray"> Pointer to the array. </param>
+        /// <param name="pOffset"> Pointer to the offset. </param>
+        /// <param name="pFieldOffset"> Pointer to the field offset in the struct. </param>
+        ///
+        /// <returns> Pointer to a value that represents that field. </returns>
+        llvm::Value* PointerOffset(llvm::AllocaInst* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset);
+
         /// <summary> Emits an instruction to load a value referenced by a pointer into a register. </summary>
         ///
         /// <param name="pPointer"> Pointer to the adress being. </param>
@@ -523,7 +589,7 @@ namespace emitters
         /// <param name="type"> The variable type. </param>
         ///
         /// <returns> Pointer to the resulting llvm::AllocaInst. </returns>
-        llvm::AllocaInst* Variable(VariableType type);
+        llvm::AllocaInst* StackAllocate(VariableType type);
 
         /// <summary> Emits instruction to create a named stack variable. </summary>
         ///
@@ -531,7 +597,7 @@ namespace emitters
         /// <param name="name"> The variable name. </param>
         ///
         /// <returns> Pointer to the resulting llvm::AllocaInst. </returns>
-        llvm::AllocaInst* Variable(VariableType type, const std::string& name);
+        llvm::AllocaInst* StackAllocate(VariableType type, const std::string& name);
 
         /// <summary> Emits an instruction to create a named stack variable of some runtime type. </summary>
         ///
@@ -539,7 +605,7 @@ namespace emitters
         /// <param name="name"> The variable name. </param>
         ///
         /// <returns> Pointer to the resulting llvm::AllocaInst. </returns>
-        llvm::AllocaInst* Variable(llvm::Type* pType, const std::string& name);
+        llvm::AllocaInst* StackAllocate(llvm::Type* pType, const std::string& name);
 
         /// <summary> Emits a stack alloc instruction for an array of primitive types. </summary>
         ///
@@ -571,7 +637,7 @@ namespace emitters
         /// <param name="members"> The list of struct members. </param>
         ///
         /// <returns> Pointer to a llvm::StructType that represents the declared struct. </returns>
-        llvm::StructType* Struct(const std::string& name, ValueTypeList& members);
+        llvm::StructType* Struct(const std::string& name, const ValueTypeList& members);
 
         /// <summary> Emits a new module with a given name. </summary>
         ///
@@ -598,17 +664,36 @@ namespace emitters
         /// <returns> Pointer to the resulting llvm::CallInst. </returns>
         llvm::CallInst* MemoryCopy(llvm::Value* pSource, llvm::Value* pDestination, llvm::Value* pCountBytes);
 
+        /// <summary> Emits a memset instruction. </summary>
+        ///
+        /// <param name="pSource"> Pointer to the value that holds the source address. </param>
+        /// <param name="value"> The value to set. </param>
+        /// <param name="pCountBytes"> [in,out] Pointer to the value that holds the byte count. </param>
+        ///
+        /// <returns> Pointer to the resulting llvm::CallInst. </returns>
+        llvm::CallInst* MemorySet(llvm::Value* pDestination, llvm::Value* value, llvm::Value* size);
+
         /// <summary> Gets the underlying LLVMContext. </summary>
         ///
         /// <returns> Reference to the underlying llvm::LLVMContext. </returns>
         llvm::LLVMContext& GetContext() { return _llvmContext; }
 
+        /// <summary> Gets the underlying LLVM IRBuilder used for emitting code. </summary>
+        ///
+        /// <returns> Reference to the underlying LLVM IRBuilder. </returns>
+        llvm::IRBuilder<>& GetIRBuilder() { return _irBuilder; }
+
+        /// <summary> Converts a list of ELL types to LLVM Type* values. </summary>
+        ///
+        /// <param name="types"> The ValueTypeList of ELL types. </param>
+        /// <returns> A std::vector of llvm::Type* values. </returns>
+        std::vector<llvm::Type*> GetLLVMTypes(const ValueTypeList& types);
+
     private:
         llvm::Type* GetVariableType(VariableType type);
         int SizeOf(VariableType type);
         llvm::Constant* Integer(VariableType type, const size_t value);
-        void BindTypes(const ValueTypeList& arguments);
-        void BindArgumentTypes(const NamedVariableTypeList& arguments);
+        std::vector<llvm::Type*> BindArgumentTypes(const NamedVariableTypeList& arguments);
         void BindArgumentNames(llvm::Function* pFunction, const NamedVariableTypeList& arguments);
         llvm::Function* CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pFunctionType);
         llvm::Value* Zero();
@@ -617,9 +702,6 @@ namespace emitters
         llvm::IRBuilder<> _irBuilder; // IRBuilder API
         IRVariableTable _stringLiterals; // String literals are emitted as constants. We have to track them ourselves to prevent dupes.
         llvm::Value* _pZeroLiteral = nullptr;
-
-        // Reusable buffers
-        std::vector<llvm::Type*> _types;
     };
 }
 }
