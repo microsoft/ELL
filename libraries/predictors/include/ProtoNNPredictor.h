@@ -27,6 +27,13 @@ namespace ell
 {
 namespace predictors
 {
+    /// <summary> Output of ProtoNN predictor, contains a prediction score and a label (0-based). </summary>
+    struct ProtoNNPrediction
+    {
+        double score;
+        size_t label;
+    };
+
     /// <summary> A ProtoNN predictor. </summary>
     ///
     class ProtoNNPredictor : public IPredictor<double>, public utilities::IArchivable
@@ -90,7 +97,7 @@ namespace predictors
         /// <summary> Gets the dimension of the ProtoNN predictor. </summary>
         ///
         /// <returns> The dimension. </returns>
-        size_t GetDimension() const { return _dim; }
+        size_t GetDimension() const { return _dimension; }
 
         /// <summary> Gets the projected dimension of the ProtoNN predictor. </summary>
         ///
@@ -111,15 +118,8 @@ namespace predictors
         ///
         /// <param name="inputVector"> The data vector. </param>
         ///
-        /// <returns> The predicted label. </returns>
-        size_t Predict(const DataVectorType& inputVector) const;
-
-        /// <summary> Returns the label score of the predictor for a given example. </summary>
-        ///
-        /// <param name="inputVector"> The data vector. </param>
-        ///
-        /// <returns> The predicted label score. </returns>
-        double GetPredictionScore(const DataVectorType& inputVector) const;
+        /// <returns> The predicted label with its score. </returns>
+        ProtoNNPrediction Predict(const DataVectorType& inputVector) const;
 
         /// <summary> Resets the projection predictor to the zero projection matrix. </summary>
         void Reset();
@@ -151,19 +151,19 @@ namespace predictors
 
         static math::ColumnMatrix<double> ReadMatrixFromArchive(utilities::Unarchiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel);
 
-        /// <summary> Input dimension </summary>
-        size_t _dim;
+        // Input dimension
+        size_t _dimension;
 
-        /// <summary> Projection matrix </summary>
+        // Projection matrix
         math::ColumnMatrix<double> _W;
 
-        /// <summary> Prototypes matrix </summary>
+        // Prototypes matrix
         math::ColumnMatrix<double> _B;
 
-        /// <summary> Label embedding matrix </summary>
+        // Label embedding matrix
         math::ColumnMatrix<double> _Z;
 
-        /// <summary> Gamma constant </summary>
+        // Gamma constant
         double _gamma;
     };
 }
