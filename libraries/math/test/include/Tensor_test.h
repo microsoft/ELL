@@ -39,4 +39,8 @@ void TestTensorVectorMultiply();
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensorVectorMultiplyAdd();
 
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorArchiver();
+
+
 #include "../tcc/Tensor_test.tcc"

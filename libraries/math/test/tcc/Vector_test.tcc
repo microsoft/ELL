@@ -255,3 +255,20 @@ void TestTransformedVectors()
     v.CopyFrom(math::Sqrt<ElementType, math::VectorOrientation::column>(u));
     testing::ProcessTest("Vector::Set(square/sqrt)", v == r4);
 }
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorArchiver()
+{
+    math::Vector<ElementType, orientation> V{ 1, 2, 3, 4, 5, 5, 4, 3, 2, 1 };
+
+    utilities::SerializationContext context;
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+
+    math::VectorArchiver::Write(V, "test", archiver);
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+
+    math::Vector<ElementType, orientation> Va(0);
+    math::VectorArchiver::Read(Va, "test", unarchiver);
+    testing::ProcessTest("void TestVectorArchiver(), write and read vector", Va == V);
+}

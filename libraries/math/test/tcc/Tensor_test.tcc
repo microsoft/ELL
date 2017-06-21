@@ -430,3 +430,23 @@ void TestTensorVectorMultiplyAdd()
     testing::ProcessTest("void TestTensorVectoMultiplyAdd() with subtensor", TR == R3);
 }
 
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorArchiver()
+{
+    math::Tensor<ElementType, dimension0, dimension1, dimension2> T(10, 20, 30);
+
+    T(3, 2, 1) = 2.0;
+    T(4, 3, 2) = 3.0;
+    T(3, 3, 3) = 4.0;
+
+    utilities::SerializationContext context;
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+
+    math::TensorArchiver::Write(T, "test", archiver);
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+
+    math::Tensor<ElementType, dimension0, dimension1, dimension2> Ta(0, 0, 0);
+    math::TensorArchiver::Read(Ta, "test", unarchiver);
+    testing::ProcessTest("void TestTensorArchiver(), write and read tensor", Ta == T);
+}

@@ -465,5 +465,30 @@ namespace math
         RectangularMatrixBase<ElementType>::Swap(other);
         std::swap(_data, other._data);
     }
+
+    template <typename ElementType, MatrixLayout layout>
+    void MatrixArchiver::Write(const Matrix<ElementType, layout>& matrix, const std::string& name, utilities::Archiver& archiver)
+    {
+        archiver[GetRowsName(name)] << matrix.NumRows();
+        archiver[GetColumnsName(name)] << matrix.NumColumns();
+        archiver[GetValuesName(name)] << matrix.ToArray();
+    }
+
+    template <typename ElementType, MatrixLayout layout>
+    void MatrixArchiver::Read(Matrix<ElementType, layout>& matrix, const std::string& name, utilities::Unarchiver& archiver)
+    {
+        size_t rows = 0;
+        size_t columns = 0;
+        std::vector<ElementType> values;
+
+        archiver[GetRowsName(name)] >> rows;
+        archiver[GetColumnsName(name)] >> columns;
+        archiver[GetValuesName(name)] >> values;
+
+        Matrix<ElementType, layout> value(rows, columns, std::move(values));
+
+        matrix = std::move(value);
+    }
+
 }
 }

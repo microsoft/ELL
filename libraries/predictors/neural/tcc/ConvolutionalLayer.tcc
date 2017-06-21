@@ -168,13 +168,31 @@ namespace neural
     template <typename ElementType>
     void ConvolutionalLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        archiver["receptiveField"] << _convolutionalParameters.receptiveField;
+        archiver["stride"] << _convolutionalParameters.stride;
+        archiver["method"] << static_cast<int>(_convolutionalParameters.receptiveField);
+        archiver["numFiltersAtATime"] << static_cast<int>(_convolutionalParameters.numFiltersAtATime);
+        
+        math::MatrixArchiver::Write(_shapedInput, "shapedInput", archiver);
+        math::MatrixArchiver::Write(_weightsMatrix, "weightsMatrix", archiver);
+        math::MatrixArchiver::Write(_outputMatrix, "outputMatrix", archiver);
     }
 
     template <typename ElementType>
     void ConvolutionalLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        archiver["receptiveField"] >> _convolutionalParameters.receptiveField;
+        archiver["stride"] >> _convolutionalParameters.stride;
+        archiver["method"] >> static_cast<int>(_convolutionalParameters.receptiveField);
+        archiver["numFiltersAtATime"] >> static_cast<int>(_convolutionalParameters.numFiltersAtATime);
+
+        math::MatrixArchiver::Read(_shapedInput, "shapedInput", archiver);
+        math::MatrixArchiver::Read(_weightsMatrix, "weightsMatrix", archiver);
+        math::MatrixArchiver::Read(_outputMatrix, "outputMatrix", archiver);
     }
 
 }

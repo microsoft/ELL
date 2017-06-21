@@ -33,6 +33,9 @@ namespace neural
         /// <param name="input"> The input value. </param>
         ElementType Apply(const ElementType input) const;
 
+        /// <summary> Typename used for serialization. </summary>
+        static std::string GetTypeName() { return "LeakyReLUActivation"; }
+
     private:
         ElementType _leakyFactor;
     };

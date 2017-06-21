@@ -19,6 +19,7 @@
 // utilities
 #include "Debug.h"
 #include "Exception.h"
+#include "IArchivable.h"
 
 namespace ell
 {
@@ -600,6 +601,14 @@ namespace math
         /// <param name="numChannels"> Number of channels. </param>
         Tensor(size_t numRows, size_t numColumns, size_t numChannels);
 
+        /// <summary> Constructs a tensor of the given shape with the specified data. </summary>
+        ///
+        /// <param name="numRows"> Number of rows. </param>
+        /// <param name="numColumns"> Number of columns. </param>
+        /// <param name="numChannels"> Number of channels. </param>
+        /// <param name="data"> Vector of data elements that will be moved to this Tensor. </param>
+        Tensor(size_t numRows, size_t numColumns, size_t numChannels, std::vector<ElementType>&& data);
+
         /// <summary> Constructs a the zero tensor of given shape. </summary>
         ///
         /// <param name="shape"> The tensor shape (given in canonical coordinates: rows, columns, channels). </param>
@@ -638,6 +647,11 @@ namespace math
 
         /// @}
 
+        /// <summary> Returns a copy of the contents of the Tensor. </summary>
+        ///
+        /// <returns> A std::vector with a copy of the contents of the Tensor. </returns>
+        std::vector<ElementType> ToArray() const { return _data; }
+
     private:
         // abbreviation
         using ConstTensorRef = ConstTensorReference<ElementType, dimension0, dimension1, dimension2>;
@@ -645,6 +659,43 @@ namespace math
         // the array used to store the tensor
         using ConstTensorRef::_contents;
         std::vector<ElementType> _data;
+    };
+
+    /// <summary> A class that implements helper functions for archiving/unarchiving Tensor instances. </summary>
+    class TensorArchiver
+    {
+    public:
+        /// <summary> Writes a tensor to the archive. </summary>
+        ///
+        /// <typeparam name="ElementType"> Tensor element type. </typeparam>
+        /// <typeparam name="dimension0"> Identity of the tensor dimension that occupies contiguous memory
+        /// (increment of 1). </typeparam>
+        /// <typeparam name="dimension1"> Identity of the tensor dimension with a minor memory increment. </typeparam>
+        /// <typeparam name="dimension2"> Identity of the tensor dimension with a major memory increment. </typeparam>
+        /// <param name="tensor"> The tensor to add to the archiver. </param>
+        /// <param name="name"> The name of the tensor value to store in the archiver. </param>
+        /// <param name="archiver"> The `Archiver` to add the tensor to </param>
+        template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+        static void Write(const Tensor<ElementType, dimension0, dimension1, dimension2>& tensor, const std::string& name, utilities::Archiver& archiver);
+
+        /// <summary> Reads a tensor from the archive. </summary>
+        ///
+        /// <typeparam name="ElementType"> Tensor element type. </typeparam>
+        /// <typeparam name="dimension0"> Identity of the tensor dimension that occupies contiguous memory
+        /// (increment of 1). </typeparam>
+        /// <typeparam name="dimension1"> Identity of the tensor dimension with a minor memory increment. </typeparam>
+        /// <typeparam name="dimension2"> Identity of the tensor dimension with a major memory increment. </typeparam>
+        /// <param name="tensor"> The tensor that will hold the result after it has been read from the archiver. </param>
+        /// <param name="name"> The name of the tensor value in the archiver. </param>
+        /// <param name="archiver"> The `Archiver` to read the tensor from  </param>
+        template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+        static void Read(Tensor<ElementType, dimension0, dimension1, dimension2>& tensor, const std::string& name, utilities::Unarchiver& archiver);
+
+    private:
+        static std::string GetRowsName(const std::string& name) { return name + "_rows"; }
+        static std::string GetColumnsName(const std::string& name) { return name + "_columns"; }
+        static std::string GetChannelsName(const std::string& name) { return name + "_channels"; }
+        static std::string GetValuesName(const std::string& name) { return name + "_values"; }
     };
 
     //

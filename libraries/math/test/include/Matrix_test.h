@@ -17,6 +17,9 @@ void TestMatrix1();
 template <typename ElementType, math::MatrixLayout layout>
 void TestMatrix2();
 
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixArchiver();
+
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
 void TestMatrixCopy();
 

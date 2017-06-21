@@ -81,18 +81,6 @@ namespace neural
 
     }
 
-    template <typename ElementType>
-    void SoftmaxLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
-    {
-        // TODO:
-    }
-
-    template <typename ElementType>
-    void SoftmaxLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
-    {
-        // TODO:
-    }
-
 }
 }
 }

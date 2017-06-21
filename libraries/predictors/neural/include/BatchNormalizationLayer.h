@@ -35,6 +35,9 @@ namespace neural
         /// <param name="variance"> The variance values. </param>
         BatchNormalizationLayer(const LayerParameters& layerParameters, const VectorType& mean, const VectorType& variance);
 
+        /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
+        BatchNormalizationLayer() {}
+
         /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
         void Compute() override;
 
@@ -43,15 +46,25 @@ namespace neural
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::batchNormalization; }
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("BatchNormalizationLayer"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         using Layer<ElementType>::_layerParameters;

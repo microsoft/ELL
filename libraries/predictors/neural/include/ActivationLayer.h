@@ -28,6 +28,9 @@ namespace neural
         /// <param name="layerParameters"> The parameters common to every layer. </param>
         ActivationLayer(const LayerParameters& layerParameters);
 
+        /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
+        ActivationLayer() {}
+
         /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
         void Compute() override;
 
@@ -36,15 +39,15 @@ namespace neural
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::activation; }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
+        /// <summary> Gets the name of this type (for serialization). </summary>
         ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        void WriteToArchive(utilities::Archiver& archiver) const override;
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType, ActivationFunctionType<ElementType>>("ActivationLayer"); }
 
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
+        /// <summary> Gets the name of this type (for serialization). </summary>
         ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     private:
         using Layer<ElementType>::_layerParameters;

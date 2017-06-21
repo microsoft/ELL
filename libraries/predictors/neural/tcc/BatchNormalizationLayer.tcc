@@ -62,13 +62,19 @@ namespace neural
     template <typename ElementType>
     void BatchNormalizationLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        math::VectorArchiver::Write(_multiplicationValues, "multiplicationValues", archiver);
+        math::VectorArchiver::Write(_additionValues, "additionValues", archiver);
     }
 
     template <typename ElementType>
     void BatchNormalizationLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        math::VectorArchiver::Read(_multiplicationValues, "multiplicationValues", archiver);
+        math::VectorArchiver::Read(_additionValues, "additionValues", archiver);
     }
 
 }

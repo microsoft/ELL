@@ -44,6 +44,9 @@ namespace neural
         /// <return> The value when accumulate is called on padding. </return>
         ElementType GetValueAtPadding() const { return 0; }
 
+        /// <summary> Typename used for serialization. </summary>
+        static std::string GetTypeName() { return "MeanPoolingFunction"; }
+
     private:
         ElementType _sum;
         size_t _numValues;

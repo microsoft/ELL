@@ -122,6 +122,27 @@ void TestMatrix2()
     testing::ProcessTest("Matrix::Fill()", M == R2);
 }
 
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixArchiver()
+{
+    math::Matrix<ElementType, layout> M(3, 4);
+    M(0, 0) = 1;
+    M(0, 2) = 4;
+    M(2, 3) = 7;
+
+    utilities::SerializationContext context;
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+
+    math::MatrixArchiver::Write(M, "test", archiver);
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+
+    math::Matrix<ElementType, layout> Ma(0, 0);
+    math::MatrixArchiver::Read(Ma, "test", unarchiver);
+    testing::ProcessTest("MatrixArchiver, write and read matrix", Ma == M);
+
+}
+
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
 void TestMatrixCopy()
 {

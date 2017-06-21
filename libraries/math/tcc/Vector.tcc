@@ -524,5 +524,23 @@ namespace math
         VectorReference<ElementType, orientation>::Swap(other);
         std::swap(_data, other._data);
     }
+
+    template <typename ElementType, VectorOrientation orientation>
+    void VectorArchiver::Write(const Vector<ElementType, orientation>& vector, const std::string& name, utilities::Archiver& archiver)
+    {
+        archiver[name] << vector.ToArray();
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
+    void VectorArchiver::Read(Vector<ElementType, orientation>& vector, const std::string& name, utilities::Unarchiver& archiver)
+    {
+        std::vector<ElementType> values;
+
+        archiver[name] >> values;
+
+        Vector<ElementType, orientation> value(std::move(values));
+
+        vector.Swap(value);
+    }
 }
 }

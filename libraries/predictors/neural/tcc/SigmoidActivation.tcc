@@ -24,12 +24,12 @@ namespace neural
         if (input >= 0.0)
         {
             double exp_value = std::exp(-input);
-            output = 1.0 / (1.0 + exp_value);
+            output = static_cast<ElementType>(1.0 / (1.0 + exp_value));
         }
         else
         {
             double exp_value = std::exp(input);
-            output = exp_value / (1.0 + exp_value);
+            output = static_cast<ElementType>(exp_value / (1.0 + exp_value));
         }
         return output;
     }

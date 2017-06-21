@@ -43,13 +43,17 @@ namespace neural
     template <typename ElementType>
     void BiasLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        math::VectorArchiver::Write(_bias, "bias", archiver);
     }
 
     template <typename ElementType>
     void BiasLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        math::VectorArchiver::Read(_bias, "bias", archiver);
     }
 
 }

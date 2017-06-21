@@ -111,13 +111,39 @@ namespace neural
     template <typename ElementType>
     void Layer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        //TODO: Write the output Tensor and padding configs
+        archiver["inputPaddingScheme"] << static_cast<int>(_layerParameters.inputPaddingParameters.paddingScheme);
+        archiver["inputPaddingSize"] << _layerParameters.inputPaddingParameters.paddingSize;
+
+        archiver["outputShape"] << std::vector<size_t>(_layerParameters.outputShape.begin(), _layerParameters.outputShape.end());
+
+        archiver["outputPaddingScheme"] << static_cast<int>(_layerParameters.outputPaddingParameters.paddingScheme);
+        archiver["outputPaddingSize"] << _layerParameters.outputPaddingParameters.paddingSize;
+
+        math::TensorArchiver::Write(_output, "output", archiver);
     }
 
     template <typename ElementType>
     void Layer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        //TODO: Read the output Tensor and padding configs
+        archiver["inputPaddingScheme"] >> static_cast<int>(_layerParameters.inputPaddingParameters.paddingScheme);
+        archiver["inputPaddingSize"] >> _layerParameters.inputPaddingParameters.paddingSize;
+
+        std::vector<size_t> outputShape;
+        archiver["outputShape"] >> outputShape;
+        std::copy(outputShape.begin(), outputShape.end(), _layerParameters.outputShape.begin());
+
+        archiver["outputPaddingScheme"] >> static_cast<int>(_layerParameters.outputPaddingParameters.paddingScheme);
+        archiver["outputPaddingSize"] >> _layerParameters.outputPaddingParameters.paddingSize;
+
+        math::TensorArchiver::Read(_output, "output", archiver);
+
+        // Set the input reference to the previously restored layer's output. This is saved in the
+        // serialization context
+        LayerSerializationContext<ElementType>& layerContext = dynamic_cast<LayerSerializationContext<ElementType>&>(archiver.GetContext());
+        _layerParameters.input = layerContext.GetPreviousOutputReference();
+
+        // Save the output reference to the serialization context
+        layerContext.SetOutputReference(GetOutput());
     }
 
     template <typename ElementType>

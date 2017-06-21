@@ -94,13 +94,21 @@ namespace neural
     template <typename ElementType>
     void FullyConnectedLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        math::MatrixArchiver::Write(_weights, "weights", archiver);
+        math::VectorArchiver::Write(_shapedInput, "shapedInput", archiver);
+        math::VectorArchiver::Write(_outputVector, "outputVector", archiver);
     }
 
     template <typename ElementType>
     void FullyConnectedLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        math::MatrixArchiver::Read(_weights, "weights", archiver);
+        math::VectorArchiver::Read(_shapedInput, "shapedInput", archiver);
+        math::VectorArchiver::Read(_outputVector, "outputVector", archiver);
     }
 
 }

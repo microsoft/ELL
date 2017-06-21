@@ -565,6 +565,30 @@ void NeuralNetworkPredictorTest()
 
     output = neuralNetwork.Predict(DataVectorType({ 1, 1 }));
     testing::ProcessTest("Testing NeuralNetworkPredictor, Predict of XOR net for 1 1 ", Equals(output[0], 0.0));
+
+    // Verify that we can archive and unarchive the predictor
+    utilities::SerializationContext context;
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+    neuralNetwork.WriteToArchive(archiver);
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+
+    std::string value = strstream.str();
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork2;
+    neuralNetwork2.ReadFromArchive(unarchiver);
+
+    output = neuralNetwork2.Predict(DataVectorType({ 0, 0 }));
+    testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 0 0 ", Equals(output[0], 0.0));
+
+    output = neuralNetwork2.Predict(DataVectorType({ 0, 1 }));
+    testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 0 1 ", Equals(output[0], 1.0));
+
+    output = neuralNetwork2.Predict(DataVectorType({ 1, 0 }));
+    testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 1 0 ", Equals(output[0], 1.0));
+
+    output = neuralNetwork2.Predict(DataVectorType({ 1, 1 }));
+    testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 1 1 ", Equals(output[0], 0.0));
 }
 
 void ProtoNNPredictorTest()

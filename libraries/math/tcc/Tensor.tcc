@@ -482,6 +482,13 @@ namespace math
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(size_t numRows, size_t numColumns, size_t numChannels, std::vector<ElementType>&& data)
+        : TensorRef(Triplet{ numRows, numColumns, numChannels }), _data(std::move(data))
+    {
+        _contents.pData = _data.data();
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(Triplet shape)
         : TensorRef(shape), _data(shape[0] * shape[1] * shape[2])
     {
@@ -556,5 +563,33 @@ namespace math
         TensorRef::Swap(other);
         std::swap(_data, other._data);
     }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    void TensorArchiver::Write(const Tensor<ElementType, dimension0, dimension1, dimension2>& tensor, const std::string& name, utilities::Archiver& archiver)
+    {
+        archiver[GetRowsName(name)] << tensor.NumRows();
+        archiver[GetColumnsName(name)] << tensor.NumColumns();
+        archiver[GetChannelsName(name)] << tensor.NumChannels();
+        archiver[GetValuesName(name)] << tensor.ToArray();
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    void TensorArchiver::Read(Tensor<ElementType, dimension0, dimension1, dimension2>& tensor, const std::string& name, utilities::Unarchiver& archiver)
+    {
+        size_t rows = 0;
+        size_t columns = 0;
+        size_t channels = 0;
+        std::vector<ElementType> values;
+
+        archiver[GetRowsName(name)] >> rows;
+        archiver[GetColumnsName(name)] >> columns;
+        archiver[GetChannelsName(name)] >> channels;
+        archiver[GetValuesName(name)] >> values;
+
+        Tensor<ElementType, dimension0, dimension1, dimension2> value(rows, columns, channels, std::move(values));
+
+        tensor = std::move(value);
+    }
+
 }
 }

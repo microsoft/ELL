@@ -55,13 +55,27 @@ namespace neural
     template <typename ElementType>
     void InputLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        math::TensorArchiver::Write(_data, "data", archiver);
+        if (_scale.Size() > 0)
+            archiver["scale"] << _scale[0];
+        else
+            archiver["scale"] << 1;
     }
 
     template <typename ElementType>
     void InputLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        math::TensorArchiver::Read(_data, "data", archiver);
+        ElementType scale = 1;
+        archiver["scale"] >> scale;
+        _scale.Resize(NumOutputChannels());
+        _scale.Fill(scale);
+
+        _layerParameters.input = _data;
     }
 
 }

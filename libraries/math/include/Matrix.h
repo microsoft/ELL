@@ -9,6 +9,9 @@
 
 #include "Vector.h"
 
+// utilities
+#include "IArchivable.h"
+
 // stl
 #include <cstddef>
 #include <limits>
@@ -614,10 +617,17 @@ namespace math
         /// <returns> A reference to this matrix. </returns>
         Matrix<ElementType, layout>& operator=(Matrix<ElementType, layout> other);
 
+        Matrix<ElementType, layout>& operator=(Matrix<ElementType, layout>&& other) = default;
+
         /// <summary> Swaps the contents of this matrix with the contents of another matrix. </summary>
         ///
         /// <param name="other"> [in,out] The other matrix. </param>
         void Swap(Matrix<ElementType, layout>& other);
+
+        /// <summary> Returns a copy of the contents of the Matrix. </summary>
+        ///
+        /// <returns> A std::vector with a copy of the contents of the Matrix. </returns>
+        std::vector<ElementType> ToArray() const { return _data; }
 
     private:
         using RectangularMatrixBase<ElementType>::_pData;
@@ -625,6 +635,36 @@ namespace math
         using RectangularMatrixBase<ElementType>::_numColumns;
         using RectangularMatrixBase<ElementType>::_increment;
         std::vector<ElementType> _data;
+    };
+
+    /// <summary> A class that implements helper functions for archiving/unarchiving Matrix instances. </summary>
+    class MatrixArchiver
+    {
+    public:
+        /// <summary> Writes a matrix to the archiver. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="layout"> Matrix layout. </typeparam>
+        /// <param name="tensor"> The matrix to add to the archiver. </param>
+        /// <param name="name"> The name of the matrix value to add to the archiver. </param>
+        /// <param name="archiver"> The `Archiver` to add the matrix to </param>
+        template <typename ElementType, MatrixLayout layout>
+        static void Write(const Matrix<ElementType, layout>& matrix, const std::string& name, utilities::Archiver& archiver);
+
+        /// <summary> Reads a matrix from the archiver. </summary>
+        ///
+        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
+        /// <typeparam name="layout"> Matrix layout. </typeparam>
+        /// <param name="tensor"> The matrix that will hold the result after it has been read from the archiver. </param>
+        /// <param name="name"> The name of the matrix value in the archiver. </param>
+        /// <param name="archiver"> The `Archiver` to add the matrix to </param>
+        template <typename ElementType, MatrixLayout layout>
+        static void Read(Matrix<ElementType, layout>& matrix, const std::string& name, utilities::Unarchiver& archiver);
+
+    private:
+        static std::string GetRowsName(const std::string& name) { return name + "_rows"; }
+        static std::string GetColumnsName(const std::string& name) { return name + "_columns"; }
+        static std::string GetValuesName(const std::string& name) { return name + "_values"; }
     };
 
     //

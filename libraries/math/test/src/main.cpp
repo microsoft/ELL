@@ -45,7 +45,12 @@ int main()
 
     TestTransformedVectors<double>();
     TestTransformedVectors<float>();
-    
+
+    TestVectorArchiver<float, math::VectorOrientation::row>();
+    TestVectorArchiver<double, math::VectorOrientation::row>();
+    TestVectorArchiver<float, math::VectorOrientation::column>();
+    TestVectorArchiver<double, math::VectorOrientation::column>();
+
     //
     // Matrix tests
     // 
@@ -59,6 +64,11 @@ int main()
     TestMatrix2<float, math::MatrixLayout::columnMajor>();
     TestMatrix2<double, math::MatrixLayout::rowMajor>();
     TestMatrix2<double, math::MatrixLayout::columnMajor>();
+
+    TestMatrixArchiver<float, math::MatrixLayout::rowMajor>();
+    TestMatrixArchiver<float, math::MatrixLayout::columnMajor>();
+    TestMatrixArchiver<double, math::MatrixLayout::rowMajor>();
+    TestMatrixArchiver<double, math::MatrixLayout::columnMajor>();
 
     TestMatrixReference<int>();
 
@@ -153,6 +163,11 @@ int main()
     TestTensorVectorMultiplyAdd<double, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
     TestTensorVectorMultiplyAdd<float, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
     TestTensorVectorMultiplyAdd<float, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
+
+    TestTensorArchiver<double, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
+    TestTensorArchiver<double, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
+    TestTensorArchiver<float, math::Dimension::column, math::Dimension::row, math::Dimension::channel>();
+    TestTensorArchiver<float, math::Dimension::channel, math::Dimension::column, math::Dimension::row>();
 
     if (testing::DidTestFail())
     {

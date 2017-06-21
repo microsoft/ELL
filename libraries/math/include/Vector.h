@@ -8,6 +8,8 @@
 
 #pragma once
 
+// utilities
+#include "IArchivable.h"
 // stl
 #include <cmath>
 #include <iostream>
@@ -484,7 +486,7 @@ namespace math
     /// <summary> An algebraic vector. </summary>
     ///
     /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> The orientationL row or colMajor. </typeparam>
+    /// <typeparam name="orientation"> The orientation, row or colMajor. </typeparam>
     template <typename ElementType, VectorOrientation orientation>
     class Vector : public VectorReference<ElementType, orientation>
     {
@@ -562,6 +564,31 @@ namespace math
 
         // member variables
         std::vector<ElementType> _data;
+    };
+
+    /// <summary> A class that implements helper functions for archiving/unarchiving Vector instances. </summary>
+    class VectorArchiver
+    {
+    public:
+        /// <summary> Writes a vector to the archiver. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="orientation"> The orientation, row or colMajor. </typeparam>
+        /// <param name="tensor"> The vector to add to the archiver. </param>
+        /// <param name="name"> The name of the vector value to add to the archiver. </param>
+        /// <param name="archiver"> The `Archiver` to add the vector to </param>
+        template <typename ElementType, VectorOrientation orientation>
+        static void Write(const Vector<ElementType, orientation>& vector, const std::string& name, utilities::Archiver& archiver);
+
+        /// <summary> Reads a vector from the archiver. </summary>
+        ///
+        /// <typeparam name="ElementType"> Vector element type. </typeparam>
+        /// <typeparam name="orientation"> The orientation, row or colMajor. </typeparam>
+        /// <param name="tensor"> The vector that will hold the result after it has been read from the archiver. </param>
+        /// <param name="name"> The name of the vector value in the archiver. </param>
+        /// <param name="archiver"> The `Archiver` to add the vector to </param>
+        template <typename ElementType, VectorOrientation orientation>
+        static void Read(Vector<ElementType, orientation>& vector, const std::string& name, utilities::Unarchiver& archiver);
     };
 
     //

@@ -26,8 +26,13 @@
 #include "ConvolutionalLayer.h"
 #include "FullyConnectedLayer.h"
 #include "InputLayer.h"
+#include "LeakyReLUActivation.h"
+#include "MaxPoolingFunction.h"
+#include "MeanPoolingFunction.h"
 #include "PoolingLayer.h"
+#include "ReLUActivation.h"
 #include "ScalingLayer.h"
+#include "SigmoidActivation.h"
 #include "SoftmaxLayer.h"
 
 // utilities
@@ -113,12 +118,16 @@ namespace predictors
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
+        /// <summary> Register known types for nerual network predictors to a serialization context </summary>
+        ///
+        /// <param name="context"> The `SerializationContext` </param>
+        static void RegisterNeuralNetworkPredictorTypes(utilities::SerializationContext& context);
+
     private:
         InputLayerReference _inputLayer;
         Layers _layers;
         mutable std::vector<ElementType> _output;
     };
-
 }
 }
 
