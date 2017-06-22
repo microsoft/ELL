@@ -22,9 +22,11 @@ set (src
     src/IRIfEmitter.cpp
     src/IRLoader.cpp
     src/IRLoopEmitter.cpp
+    src/IRMetadata.cpp
     src/IRModuleEmitter.cpp
     src/IROptimizer.cpp
     src/IRRuntime.cpp
+    src/IRSwigInterfaceWriter.cpp
     src/ModuleEmitter.cpp
     src/Variable.cpp
 )
@@ -45,8 +47,10 @@ set (include
     include/IRLoader.h
     include/IRLoopEmitter.h
     include/IRModuleEmitter.h
+    include/IRMetadata.h
     include/IROptimizer.h
     include/IRRuntime.h
+    include/IRSwigInterfaceWriter.h
     include/LLVMInclude.h
     include/ModuleEmitter.h
     include/ScalarVariable.h

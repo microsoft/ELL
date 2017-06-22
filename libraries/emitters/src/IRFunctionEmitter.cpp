@@ -789,16 +789,10 @@ namespace emitters
 
     void IRFunctionEmitter::InsertMetadata(const std::string& tag, const std::string& content)
     {
-        llvm::Value* instruction = Call("llvm.donothing");
-        if (!llvm::isa<llvm::Instruction>(instruction))
-        {
-            return;
-        }
-
         auto& context = GetLLVMContext();
         llvm::Metadata* metadataElements[] = { llvm::MDString::get(context, content) };
         auto metadataNode = llvm::MDNode::get(context, metadataElements);
-        llvm::cast<llvm::Instruction>(instruction)->setMetadata(tag, metadataNode);
+        _pFunction->setMetadata(tag, metadataNode);
     }
 
     llvm::Value* IRFunctionEmitter::DotProductFloat(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)

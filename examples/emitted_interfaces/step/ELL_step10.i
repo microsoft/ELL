@@ -1,19 +1,21 @@
-// This file will be generated
+//
+// ELL SWIG interface for module ELL_step10
+//
 
 %module(directors="1") ELL_step10
-
-// Generate docstrings from types and method signatures
 %feature("autodoc", "3");
 
-// Common SWIG code
 %include "callback.i"
 %include "macros.i"
 
-// Model-specific SWIG code
+#ifdef SWIGPYTHON
+%rename("%(undercase)s", %$isfunction) "";
+#endif
+
 %{
-#include "ELL_step10.h"
+#include "ELL_step10.i.h"
 %}
 
-WRAP_CALLABLES_AS_CALLBACKS(Step10Predictor, DoubleCallbackBase, double)
+WRAP_CALLABLES_AS_CALLBACKS(ELL_step10Predictor, DoubleCallbackBase, double)
 
-%include "ELL_step10.h"
+%include "ELL_step10.i.h"

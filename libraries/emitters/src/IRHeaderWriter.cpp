@@ -1,13 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     IRHeaderWriter.h (emitters)
+//  File:     IRHeaderWriter.cpp (emitters)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IRHeaderWriter.h"
+
+// emitters
 #include "EmitterException.h"
+#include "IRMetadata.h"
 
 // llvm
 #include "llvm/IR/Attributes.h"
@@ -17,7 +20,9 @@
 #include "llvm/Support/raw_os_ostream.h"
 
 // stl
+#include <sstream>
 #include <string>
+#include <vector>
 
 namespace ell
 {
@@ -25,65 +30,6 @@ namespace emitters
 {
     namespace
     {
-        void WriteLLVMType(std::ostream& os, llvm::Type* t);
-
-        // This heuristic for deciding if a type should be declared in the header file is fragile and temporary.
-        bool ShouldWriteType(const llvm::StructType* t)
-        {
-            if (t->hasName()) // && !t->isLiteral() ?
-            {
-                std::string typeName = t->getName();
-                {
-                    if (typeName == "timespec")
-                    {
-                        return false;
-                    }
-                    if (typeName.find("struct.") == 0 || typeName.find("class.") == 0)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        // This heuristic for deciding if a function should be declared in the header file is fragile and temporary.
-        bool ShouldWriteFunction(const llvm::Function& f)
-        {
-            auto hasName = f.hasName();
-            if (!hasName)
-            {
-                return false;
-            }
-
-            std::string functionName = f.getName();
-            if (functionName.find("_Node__") == 0)
-            {
-                return false;
-            }
-            if (functionName.find("llvm.") == 0)
-            {
-                return false;
-            }
-            if (functionName.find("clock_gettime") == 0)
-            {
-                return false;
-            }
-            if (functionName.find("cblas") == 0)
-            {
-                return false;
-            }
-            if (functionName.find("printf") == 0)
-            {
-                return false;
-            }
-            if (functionName.find("_") == 0)
-            {
-                return false;
-            }
-            return true;
-        }
-
         void WriteStructType(std::ostream& os, llvm::StructType* t)
         {
             if (t->hasName()) // && !t->isLiteral() ?
@@ -132,49 +78,7 @@ namespace emitters
             os << ");";
         }
 
-        void WriteLLVMType(std::ostream& os, llvm::Type* t)
-        {
-            if (t->isStructTy())
-            {
-                WriteStructType(os, llvm::cast<llvm::StructType>(t));
-            }
-            else if (t->isArrayTy())
-            {
-                WriteArrayType(os, llvm::cast<llvm::ArrayType>(t));
-            }
-            else if (t->isPointerTy())
-            {
-                WritePointerType(os, llvm::cast<llvm::PointerType>(t));
-            }
-            else if (t->isIntegerTy())
-            {
-                WriteIntegerType(os, llvm::cast<llvm::IntegerType>(t));
-            }
-            else if (t->isFloatTy())
-            {
-                os << "float";
-            }
-            else if (t->isDoubleTy())
-            {
-                os << "double";
-            }
-            else if (t->isVoidTy())
-            {
-                os << "void";
-            }
-            else if (t->isFunctionTy())
-            {
-                WriteFunctionType(os, llvm::cast<llvm::FunctionType>(t));
-            }
-            else
-            {
-                os << "[[UNKNOWN]]";
-                // look up in table
-                // ???
-            }
-        }
-
-        void WriteLLVMVarDecl(std::ostream& os, llvm::Type* t, std::string name)
+        void WriteLLVMVariableDeclaration(std::ostream& os, llvm::Type* t, std::string name)
         {
             if (t->isArrayTy())
             {
@@ -203,7 +107,7 @@ namespace emitters
                 {
                     os << "    ";
                     std::string fieldName = std::string("param") + std::to_string(index);
-                    WriteLLVMVarDecl(os, fieldType, fieldName);
+                    WriteLLVMVariableDeclaration(os, fieldType, fieldName);
                     os << ";\n";
                     ++index;
                 }
@@ -211,12 +115,12 @@ namespace emitters
             }
         }
 
-        void WriteFunction(std::ostream& os, IRModuleEmitter& moduleEmitter, llvm::Function& f)
+        void WriteFunction(std::ostream& os, IRModuleEmitter& moduleEmitter, llvm::Function& function)
         {
-            auto hasName = f.hasName();
+            auto hasName = function.hasName();
             if (hasName)
             {
-                std::string name = f.getName();
+                std::string name = function.getName();
 
                 // Check if we've added comments for this function
                 if (moduleEmitter.HasFunctionComments(name))
@@ -229,11 +133,11 @@ namespace emitters
                 }
 
                 // Now write the function signature
-                auto returnType = f.getReturnType();
+                auto returnType = function.getReturnType();
                 WriteLLVMType(os, returnType);
                 os << " " << name << "(";
                 bool first = true;
-                for (const auto& arg : f.args())
+                for (const auto& arg : function.args())
                 {
                     if (!first)
                     {
@@ -249,8 +153,51 @@ namespace emitters
                         os << " " << paramName;
                     }
                 }
+
                 os << ");";
             }
+        }
+    }
+
+    void WriteLLVMType(std::ostream& os, llvm::Type* t)
+    {
+        if (t->isStructTy())
+        {
+            WriteStructType(os, llvm::cast<llvm::StructType>(t));
+        }
+        else if (t->isArrayTy())
+        {
+            WriteArrayType(os, llvm::cast<llvm::ArrayType>(t));
+        }
+        else if (t->isPointerTy())
+        {
+            WritePointerType(os, llvm::cast<llvm::PointerType>(t));
+        }
+        else if (t->isIntegerTy())
+        {
+            WriteIntegerType(os, llvm::cast<llvm::IntegerType>(t));
+        }
+        else if (t->isFloatTy())
+        {
+            os << "float";
+        }
+        else if (t->isDoubleTy())
+        {
+            os << "double";
+        }
+        else if (t->isVoidTy())
+        {
+            os << "void";
+        }
+        else if (t->isFunctionTy())
+        {
+            WriteFunctionType(os, llvm::cast<llvm::FunctionType>(t));
+        }
+        else
+        {
+            os << "[[UNKNOWN]]";
+            // look up in table
+            // ???
         }
     }
 
@@ -263,48 +210,67 @@ namespace emitters
         os << "//\n// ELL header for module " << moduleName << "\n//\n\n";
 
         os << "#include <stdint.h>\n\n";
-        os << "#ifdef __cplusplus\n";
-        os << "extern \"C\"{\n";
-        os << "#endif\n";
 
-        // preprocessor definitions
-        auto defines = moduleEmitter.GetPreprocessorDefinitions();
-        if (defines.size() > 0)
         {
-            for (const auto& def : defines)
+            DeclareExternC externC(os);
+
+            // preprocessor definitions
+            auto defines = moduleEmitter.GetPreprocessorDefinitions();
+            if (defines.size() > 0)
             {
-                os << "#define " << def.first << " " << def.second << "\n";
+                for (const auto& def : defines)
+                {
+                    os << "#define " << def.first << " " << def.second << "\n";
+                }
+                os << "\n";
             }
+
+            // First write out type definitions
+            os << "//\n// Types\n//\n\n";
+
+            // Look for the module-level "declare in header" tag
+            if (moduleEmitter.HasMetadata("", c_declareInHeaderTagName))
+            {
+                auto typeNames = GetModuleTagValues(moduleEmitter, c_declareInHeaderTagName);
+                auto structTypes = pModule->getIdentifiedStructTypes();
+                for (const auto& t : structTypes)
+                {
+                    if (t->hasName() && (typeNames.cend() != typeNames.find(t->getName())))
+                    {
+                        WriteStructDefinition(os, t);
+                        os << "\n\n";
+                    }
+                }
+            }
+
             os << "\n";
-        }
-
-        // First write out type definitions
-        os << "//\n// Types\n//\n\n";
-        auto structTypes = pModule->getIdentifiedStructTypes();
-        for (auto t : structTypes)
-        {
-            if (ShouldWriteType(t))
+            os << "//\n// Functions\n//\n\n";
+            // Now write out function signatures
+            auto tagValues = GetFunctionsWithTag(moduleEmitter, c_declareInHeaderTagName);
+            for (auto& tv : tagValues)
             {
-                WriteStructDefinition(os, t);
+                WriteFunction(os, moduleEmitter, *(tv.function));
                 os << "\n\n";
             }
         }
+    }
 
-        os << "\n";
-        os << "//\n// Functions\n//\n\n";
-        // Now write out function signatures
-        for (auto& f : pModule->functions())
-        {
-            if (ShouldWriteFunction(f))
-            {
-                WriteFunction(os, moduleEmitter, f);
-                os << "\n\n";
-            }
-        }
-
+    //
+    // DeclareExternC
+    //
+    DeclareExternC::DeclareExternC(std::ostream& os)
+        : _os(&os)
+    {
         os << "#ifdef __cplusplus\n";
-        os << "} // extern \"C\"\n";
+        os << "extern \"C\"\n{\n";
         os << "#endif\n";
+    }
+
+    DeclareExternC::~DeclareExternC()
+    {
+        *_os << "#ifdef __cplusplus\n";
+        *_os << "} // extern \"C\"\n";
+        *_os << "#endif\n\n";
     }
 }
 }

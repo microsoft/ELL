@@ -93,7 +93,7 @@ namespace model
         // Now the model ready for compiling
         if (GetMapCompilerParameters().profile)
         {
-            GetModule().AddPreprocessorDefinition(GetNamespacePrefix()+"_PROFILING", "1");
+            GetModule().AddPreprocessorDefinition(GetNamespacePrefix() + "_PROFILING", "1");
         }
         _profiler = { GetModule(), map.GetModel(), GetMapCompilerParameters().profile };
         _profiler.EmitInitialization();
@@ -125,7 +125,8 @@ namespace model
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix()+"_GetInputSize", int32Type, {});
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputSize", int32Type, {});
+        function.InsertMetadata(emitters::c_declareInHeaderTagName);
         function.Return(function.Literal(static_cast<int>(map.GetInputSize())));
         _moduleEmitter.EndFunction();
     }
@@ -135,18 +136,20 @@ namespace model
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix()+"_GetOutputSize", int32Type, {});
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputSize", int32Type, {});
+        function.InsertMetadata(emitters::c_declareInHeaderTagName);
         function.Return(function.Literal(static_cast<int>(map.GetOutputSize())));
         _moduleEmitter.EndFunction();
     }
 
-    void IRMapCompiler::EmitGetNumNodesFunction(const DynamicMap& map)    
+    void IRMapCompiler::EmitGetNumNodesFunction(const DynamicMap& map)
     {
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
         int numNodes = map.GetModel().Size();
 
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix()+"_GetNumNodes", int32Type, {});
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetNumNodes", int32Type, {});
+        function.InsertMetadata(emitters::c_declareInHeaderTagName);
         function.Return(function.Literal(numNodes));
         _moduleEmitter.EndFunction();
     }
@@ -184,6 +187,10 @@ namespace model
         {
             currentFunction.AddRegion(currentFunction.GetCurrentBlock());
         }
+
+        // Tag the model function for declaration in the generated headers
+        currentFunction.InsertMetadata(emitters::c_declareInHeaderTagName);
+        currentFunction.InsertMetadata(emitters::c_predictFunctionTagName);
 
         _profiler.StartModel(currentFunction);
     }

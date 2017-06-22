@@ -67,6 +67,9 @@ namespace nodes
         // Callback function
         const emitters::ValueTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
         function.GetModule().DeclareFunction(_samplingFunctionName, emitters::GetVariableType<bool>(), parameters);
+        function.GetModule().InsertMetadata(_samplingFunctionName, emitters::c_declareInHeaderTagName);
+        function.GetModule().InsertMetadata(_samplingFunctionName, emitters::c_callbackFunctionTagName, "SourceNode");
+
         llvm::Function* pSamplingFunction = function.GetModule().GetFunction(_samplingFunctionName);
 
         // Locals

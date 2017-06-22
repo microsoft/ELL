@@ -9,6 +9,7 @@
 #include "IRModelProfiler.h"
 
 // emitters
+#include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 
 // utilities
@@ -180,6 +181,7 @@ namespace model
         };
 
         _nodeInfoType = llvm::StructType::create(context, fields, GetNamespacePrefix() + "_NodeInfo");
+        _module->InsertMetadata("", emitters::c_declareInHeaderTagName, _nodeInfoType->getName());
 
         // NodePerformanceCounters
         fields = {
@@ -188,6 +190,7 @@ namespace model
         };
 
         _performanceCountersType = llvm::StructType::create(context, fields, GetNamespacePrefix() + "_PerformanceCounters");
+        _module->InsertMetadata("", emitters::c_declareInHeaderTagName, _performanceCountersType->getName());
     }
 
     void ModelProfiler::StartModel(emitters::IRFunctionEmitter& function)

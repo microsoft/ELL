@@ -24,6 +24,7 @@ void TestIR()
     TestIfElseBlockRegions(true);
     TestLogical();
     TestMutableConditionForLoop();
+    TestMetadata();
 
     // From IRFunctionTest.h
     TestIRAddFunction();

@@ -57,5 +57,12 @@ namespace utilities
     ///
     /// <returns> The filepath with extension. </returns>
     std::string RemoveFileExtension(std::string filepath);
+
+    /// <summary> Returns the filename from a path. </summary>
+    ///
+    /// <param name="filepath"> The path. </param>
+    ///
+    /// <returns> The filename. </returns>
+    std::string GetFileName(std::string filepath);
 }
 }

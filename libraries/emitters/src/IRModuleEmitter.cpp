@@ -13,6 +13,7 @@
 #include "IRExecutionEngine.h"
 #include "IRHeaderWriter.h"
 #include "IRLoader.h"
+#include "IRSwigInterfaceWriter.h"
 
 // utilities
 #include "Files.h"
@@ -120,7 +121,6 @@ namespace emitters
         return BeginFunction("main", VariableType::Void);
     }
 
-
     void IRModuleEmitter::EndFunction()
     {
         EndFunction(nullptr);
@@ -177,6 +177,78 @@ namespace emitters
     void IRModuleEmitter::SetFunctionComments(const std::string& functionName, const std::vector<std::string>& comments)
     {
         _functionComments[functionName] = comments;
+    }
+
+    std::vector<std::string> IRModuleEmitter::GetMetadata(const std::string& functionName, const std::string& tag)
+    {
+        if (!HasMetadata(functionName, tag))
+        {
+            throw EmitterException(EmitterError::metadataNotFound);
+        }
+
+        std::vector<std::string> values;
+        if (functionName.length() == 0)
+        {
+            // Module metadata
+            const llvm::NamedMDNode* metadata = _pModule->getNamedMetadata(tag);
+            for (const auto& op : metadata->operands())
+            {
+                values.push_back(llvm::cast<llvm::MDString>(op->getOperand(0))->getString());
+            }
+        }
+        else
+        {
+            // Function metadata
+            auto pFunction = GetFunction(functionName);
+            const llvm::MDNode* metadata = pFunction->getMetadata(tag);
+
+            // llvm::Function::setMetadata appears to only support single entries?
+            values.push_back(llvm::cast<llvm::MDString>(metadata->getOperand(0))->getString());
+        }
+        return values;
+    }
+
+    bool IRModuleEmitter::HasMetadata(const std::string& functionName, const std::string& tag)
+    {
+        if (functionName.length() == 0)
+        {
+            // Module metadata
+            return (_pModule->getNamedMetadata(tag) != nullptr);
+        }
+        else
+        {
+            // Function metadata
+            auto pFunction = GetFunction(functionName);
+            if (pFunction == nullptr)
+            {
+                throw EmitterException(EmitterError::functionNotFound);
+            }
+            return (pFunction->getMetadata(tag) != nullptr);
+        }
+    }
+
+    void IRModuleEmitter::InsertMetadata(const std::string& functionName, const std::string& tag, const std::string& value)
+    {
+        llvm::Metadata* metadataElements[] = { llvm::MDString::get(_emitter.GetContext(), value) };
+        auto metadataNode = llvm::MDNode::get(_emitter.GetContext(), metadataElements);
+
+        if (functionName.length() == 0)
+        {
+            // Module metadata
+            auto metadata = _pModule->getOrInsertNamedMetadata(tag);
+            metadata->addOperand(metadataNode);
+        }
+        else
+        {
+            // Function metadata
+            auto pFunction = GetFunction(functionName);
+            if (pFunction == nullptr)
+            {
+                throw EmitterException(EmitterError::functionNotFound);
+            }
+
+            pFunction->setMetadata(tag, metadataNode);
+        }
     }
 
     //
@@ -393,7 +465,36 @@ namespace emitters
     void IRModuleEmitter::WriteToFile(const std::string& filePath, ModuleOutputFormat format)
     {
         MachineCodeOutputOptions options;
-        WriteToFile(filePath, format, options);
+        switch (format)
+        {
+            case ModuleOutputFormat::assembly:
+            case ModuleOutputFormat::bitcode:
+            case ModuleOutputFormat::ir:
+            {
+                WriteToFile(filePath, format, options);
+                break;
+            }
+            case ModuleOutputFormat::cHeader:
+            {
+                auto os = utilities::OpenOfstream(filePath);
+                WriteToStream(os, format, options);
+                break;
+            }
+            case ModuleOutputFormat::swigInterface:
+            {
+                // Write the swig interface file
+                auto headerFilePath = filePath + ".h";
+                auto os = utilities::OpenOfstream(filePath);
+                WriteModuleSwigInterface(os, *this, utilities::GetFileName(headerFilePath));
+
+                // Write the swig header file
+                auto osHeader = utilities::OpenOfstream(headerFilePath);
+                WriteModuleSwigHeader(osHeader, *this);
+                break;
+            }
+            default:
+                throw new EmitterException(EmitterError::notSupported);
+        }
     }
 
     void IRModuleEmitter::WriteToFile(const std::string& filePath, ModuleOutputFormat format, const MachineCodeOutputOptions& options)
@@ -426,6 +527,10 @@ namespace emitters
         if (ModuleOutputFormat::cHeader == format)
         {
             WriteHeader(os);
+        }
+        else if (ModuleOutputFormat::swigInterface == format)
+        {
+            throw new EmitterException(EmitterError::notSupported, "swig only supports WriteToFile");
         }
         else
         {
@@ -660,7 +765,7 @@ namespace emitters
     //
     void IRModuleEmitter::InitializeLLVM()
     {
-        if(g_llvmIsInitialized)
+        if (g_llvmIsInitialized)
         {
             return;
         }

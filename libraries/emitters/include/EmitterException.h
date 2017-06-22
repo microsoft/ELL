@@ -57,6 +57,8 @@ namespace emitters
         binaryInputsExpected,
         // Unknown VariableScope
         variableScopeNotSupported,
+        // Metadata not found
+        metadataNotFound
     };
 
     using EmitterException = utilities::ErrorCodeException<EmitterError>;

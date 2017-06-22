@@ -683,16 +683,20 @@ void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicks
 
         PrintIR(compiledMap);
         compiledMap.GetModule().WriteToFile(OutputPath("step.ll"));
+        compiledMap.GetModule().WriteToFile(OutputPath("step.h"));
+        compiledMap.GetModule().WriteToFile(OutputPath("step.i"));
     }
 }
 
 void TestSteppableMap(bool runJit)
 {
-    TestSteppableMap<std::chrono::steady_clock>(runJit, []() {
+    TestSteppableMap<std::chrono::steady_clock>(runJit, []()
+    {
         std::cout << "Calling ELL_GetSteadyClockMilliseconds()" << std::endl;
         return ELL_GetSteadyClockMilliseconds();
     });
-    TestSteppableMap<std::chrono::system_clock>(runJit, []() {
+    TestSteppableMap<std::chrono::system_clock>(runJit, []()
+    {
         std::cout << "Calling ELL_GetSystemClockMilliseconds()" << std::endl;
         return ELL_GetSystemClockMilliseconds();
     });

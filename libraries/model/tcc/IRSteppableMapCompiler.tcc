@@ -13,14 +13,14 @@ namespace model
     // Function name generators
     static std::string MapFunctionName(const std::string& functionNamePrefix)
     {
-        return functionNamePrefix + "_predict";
+        return functionNamePrefix + "_Predict";
     }
 
     static std::string WaitTimeForNextComputeFunctionName(const std::string& functionNamePrefix)
     {
-        return functionNamePrefix + "_waitTimeForNextCompute";
+        return functionNamePrefix + "_WaitTimeForNextPredict";
     }
-    
+
     template <typename ClockType>
     IRSteppableMapCompiler<ClockType>::IRSteppableMapCompiler()
         : IRSteppableMapCompiler(MapCompilerParameters{})
@@ -72,7 +72,7 @@ namespace model
 
         if (GetMapCompilerParameters().profile)
         {
-            GetModule().AddPreprocessorDefinition(GetNamespacePrefix()+"_PROFILING", "1");
+            GetModule().AddPreprocessorDefinition(GetNamespacePrefix() + "_PROFILING", "1");
         }
         _profiler = { GetModule(), map.GetModel(), GetMapCompilerParameters().profile };
         _profiler.EmitInitialization();
@@ -96,7 +96,7 @@ namespace model
     template <typename ClockType>
     void IRSteppableMapCompiler<ClockType>::EmitModelAPIFunctions(const DynamicMap& map)
     {
-        // Emit basic compiled map API functions 
+        // Emit basic compiled map API functions
         IRMapCompiler::EmitModelAPIFunctions(map);
 
         auto steppableMap = static_cast<const SteppableMap<ClockType>&>(map);
@@ -114,7 +114,6 @@ namespace model
 
         // Emit the WaitTimeForNextCompute function
         EmitWaitTimeForNextComputeFunction(steppableMap, baseName, pLastSampleTicksVar);
-
     }
 
     template <typename ClockType>
@@ -124,6 +123,10 @@ namespace model
         auto function = GetModule().BeginFunction(functionName, emitters::VariableType::Void, args);
         auto arguments = function.Arguments().begin();
         llvm::Argument& output = *(++arguments); // input argument is currently not used because Step generates the time signal
+
+        const size_t outputSize = map.GetOutput(0).Size();
+        function.InsertMetadata(emitters::c_declareInHeaderTagName);
+        function.InsertMetadata(emitters::c_stepFunctionTagName, std::to_string(outputSize));
 
         // Constants
         auto intervalTicks = function.template Literal<TimeTickType>(map.GetIntervalTicks());
@@ -180,6 +183,8 @@ namespace model
     {
         emitters::NamedVariableTypeList args = {}; // no args
         auto function = GetModule().BeginFunction(WaitTimeForNextComputeFunctionName(functionNamePrefix), TimeTickVarType, args);
+        function.InsertMetadata(emitters::c_declareInHeaderTagName);
+        function.InsertMetadata(emitters::c_stepWaitTimeFunctionTagName);
 
         // Constants
         auto intervalTicks = function.template Literal<TimeTickType>(static_cast<TimeTickType>(map.GetIntervalTicks()));

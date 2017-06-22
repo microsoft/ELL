@@ -349,6 +349,29 @@ namespace emitters
         /// <param name="value"> The value to set for the symbol. </param>
         void AddPreprocessorDefinition(const std::string& name, const std::string& value);
 
+        /// <summary> Indicates if the module or given function has the associated metadata. </summary>
+        ///
+        /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        ///
+        /// <returns> `true` if the function has the metadata associated with it. </returns>
+        virtual bool HasMetadata(const std::string& functionName, const std::string& tag) override;
+
+        /// <summary> Gets the metadata associated with the module or given function. </summary>
+        ///
+        /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        ///
+        /// <returns> The metadata values, as a vector of strings. </returns>
+        virtual std::vector<std::string> GetMetadata(const std::string& functionName, const std::string& tag) override;
+
+        /// <summary> Associates metadata with the module or given function. </summary>
+        ///
+        /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        /// <param name="content"> Optional metadata value. </param>
+        virtual void InsertMetadata(const std::string& functionName, const std::string& tag, const std::string& value = "") override;
+
         //
         // Code output / input
         //

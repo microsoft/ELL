@@ -31,8 +31,10 @@
 %include "CallbackInterface.h"
 
 // Template instantiations
+#ifndef SWIGJAVASCRIPT
 %template(DoubleCallbackBase) ell::api::common::CallbackBase<double>;
 %template(DoubleCallbackForwarder) ell::api::common::CallbackForwarder<double>;
+#endif
 
 // Include language specific SWIG definitions that must be declared after the
 // C++ code has been wrapped by SWIG

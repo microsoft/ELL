@@ -14,6 +14,10 @@
 #include "ModelTransformer.h"
 #include "SteppableMap.h"
 
+// emitters
+#include "IRMetadata.h"
+#include "IRModuleEmitter.h"
+
 // stl
 #include <string>
 #include <vector>

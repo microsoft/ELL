@@ -10,59 +10,58 @@ source_filename = "ELL"
 @0 = private unnamed_addr constant [44 x i8] c"sampleTicks = %f, increment = %f, end = %f\0A\00"
 @g_4.1 = internal global double 0.000000e+00
 
-define void @Step10_predict(double* %input0, double* %output0) {
+define void @Step10_Predict(double* %input0, double* %output0) !ell.header.declare !0 !ell.fn.predict !0 {
 entry:
-  br label %Node_1026
+  %0 = alloca i32
+  br label %Node_1031
 
-Node_1026:                                        ; preds = %entry
-  %0 = getelementptr double, double* %input0, i32 0
-  call void @"SourceNode<double>_in_2_out_10"(double* %0, double* getelementptr inbounds ([10 x double], [10 x double]* @g_2, i32 0, i32 0))
-  br label %Node_1028
+Node_1031:                                        ; preds = %entry
+  %1 = getelementptr double, double* %input0, i32 0
+  call void @_Node__SourceNode_double__in_2_out_10(double* %1, double* getelementptr inbounds ([10 x double], [10 x double]* @g_2, i32 0, i32 0))
+  br label %Node_1033
 
-Node_1028:                                        ; preds = %Node_1026
-  call void @"BinaryOperationNode<double>_in_10_10_out_10"(double* getelementptr inbounds ([10 x double], [10 x double]* @g_2, i32 0, i32 0), double* getelementptr inbounds ([10 x double], [10 x double]* @c_0, i32 0, i32 0), double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 0))
-  br label %Node_1030
+Node_1033:                                        ; preds = %Node_1031
+  call void @_Node__BinaryOperationNode_double__in_10_10_out_10(double* getelementptr inbounds ([10 x double], [10 x double]* @g_2, i32 0, i32 0), double* getelementptr inbounds ([10 x double], [10 x double]* @c_0, i32 0, i32 0), double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 0))
+  br label %Node_1035
 
-Node_1030:                                        ; preds = %Node_1028
-  %1 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 0)
-  %2 = getelementptr double, double* %output0, i32 0
-  store double %1, double* %2
-  %3 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 1)
-  %4 = getelementptr double, double* %output0, i32 1
-  store double %3, double* %4
-  %5 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 2)
-  %6 = getelementptr double, double* %output0, i32 2
-  store double %5, double* %6
-  %7 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 3)
-  %8 = getelementptr double, double* %output0, i32 3
-  store double %7, double* %8
-  %9 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 4)
-  %10 = getelementptr double, double* %output0, i32 4
-  store double %9, double* %10
-  %11 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 5)
-  %12 = getelementptr double, double* %output0, i32 5
-  store double %11, double* %12
-  %13 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 6)
-  %14 = getelementptr double, double* %output0, i32 6
-  store double %13, double* %14
-  %15 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 7)
-  %16 = getelementptr double, double* %output0, i32 7
-  store double %15, double* %16
-  %17 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 8)
-  %18 = getelementptr double, double* %output0, i32 8
-  store double %17, double* %18
-  %19 = load double, double* getelementptr inbounds ([10 x double], [10 x double]* @g_3, i32 0, i32 9)
-  %20 = getelementptr double, double* %output0, i32 9
-  store double %19, double* %20
+Node_1035:                                        ; preds = %Node_1033
+  br label %for.init
+
+for.init:                                         ; preds = %Node_1035
+  store i32 0, i32* %0
+  br label %for.cond
+
+for.cond:                                         ; preds = %for.inc, %for.init
+  %2 = load i32, i32* %0
+  %3 = icmp slt i32 %2, 10
+  br i1 %3, label %for.body, label %for.after
+
+for.body:                                         ; preds = %for.cond
+  %4 = load i32, i32* %0
+  %5 = add i32 %4, 0
+  %6 = add i32 %4, 0
+  %7 = getelementptr [10 x double], [10 x double]* @g_3, i32 0, i32 %5
+  %8 = load double, double* %7
+  %9 = getelementptr double, double* %output0, i32 %6
+  store double %8, double* %9
+  br label %for.inc
+
+for.inc:                                          ; preds = %for.body
+  %10 = load i32, i32* %0
+  %11 = add i32 %10, 1
+  store i32 %11, i32* %0
+  br label %for.cond
+
+for.after:                                        ; preds = %for.cond
   ret void
 }
 
-define void @"SourceNode<double>_in_2_out_10"(double* %input1, double* %output1) {
+define void @_Node__SourceNode_double__in_2_out_10(double* %input1, double* %output1) {
 entry:
-  br label %Node_1027
+  br label %Node_1032
 
-Node_1027:                                        ; preds = %entry
-  store double 0x7FAC7D860E6A, double* @g_0
+Node_1032:                                        ; preds = %entry
+  store double 0x7FC4E770AD38, double* @g_0
   %0 = load double, double* @g_0
   %1 = getelementptr double, double* %input1, i32 0
   %2 = load double, double* %1
@@ -71,7 +70,7 @@ Node_1027:                                        ; preds = %entry
   %5 = fcmp one double %2, %0
   br i1 %5, label %if.then, label %if.end
 
-if.then:                                          ; preds = %Node_1027
+if.then:                                          ; preds = %Node_1032
   %6 = call i8 @SteppableMap_10_50_DataCallback(double* getelementptr inbounds ([10 x double], [10 x double]* @g_1, i32 0, i32 0))
   %7 = icmp eq i8 %6, 1
   br i1 %7, label %if.then2, label %if.end3
@@ -95,7 +94,7 @@ if.end3:                                          ; preds = %if.then
 if.after1:                                        ; preds = %if.end3, %if.after4
   br label %if.after
 
-if.end:                                           ; preds = %Node_1027
+if.end:                                           ; preds = %Node_1032
   br label %if.after
 
 if.after:                                         ; preds = %if.end, %if.after1
@@ -133,17 +132,17 @@ if.after:                                         ; preds = %if.end, %if.after1
   ret void
 }
 
-declare i8 @SteppableMap_10_50_DataCallback(double*)
+declare !ell.header.declare !0 !ell.fn.callback !1 i8 @SteppableMap_10_50_DataCallback(double*)
 
-define void @"BinaryOperationNode<double>_in_10_10_out_10"(double* %input2, double* %input3, double* %output2) {
+define void @_Node__BinaryOperationNode_double__in_10_10_out_10(double* %input2, double* %input3, double* %output2) {
 entry:
   %0 = alloca i32
-  br label %Node_1029
+  br label %Node_1034
 
-Node_1029:                                        ; preds = %entry
+Node_1034:                                        ; preds = %entry
   br label %for.init
 
-for.init:                                         ; preds = %Node_1029
+for.init:                                         ; preds = %Node_1034
   store i32 0, i32* %0
   br label %for.cond
 
@@ -173,9 +172,24 @@ for.after:                                        ; preds = %for.cond
   ret void
 }
 
+define i32 @ELL_GetInputSize() !ell.header.declare !0 {
+entry:
+  ret i32 2
+}
+
+define i32 @ELL_GetOutputSize() !ell.header.declare !0 {
+entry:
+  ret i32 10
+}
+
+define i32 @ELL_GetNumNodes() !ell.header.declare !0 {
+entry:
+  ret i32 5
+}
+
 declare double @ELL_GetSteadyClockMilliseconds()
 
-define void @Step10(double* %input4, double* %output3) {
+define void @Step10(double* %input4, double* %output3) !ell.header.declare !0 !ell.fn.step !2 {
 entry:
   %0 = call double @ELL_GetSteadyClockMilliseconds()
   store double 0.000000e+00, double* @g_4
@@ -222,7 +236,7 @@ for.body:                                         ; preds = %for.cond
   %19 = getelementptr double, double* %3, i32 1
   store double %18, double* %19
   %20 = getelementptr double, double* %3, i32 0
-  call void @Step10_predict(double* %20, double* %output3)
+  call void @Step10_Predict(double* %20, double* %output3)
   store double %14, double* @g_4
   %21 = call double @ELL_GetSteadyClockMilliseconds()
   %22 = getelementptr double, double* %4, i32 0
@@ -241,7 +255,7 @@ for.after:                                        ; preds = %for.cond
 
 declare i32 @printf(i8*, ...)
 
-define double @Step10_waitTimeForNextCompute() {
+define double @Step10_WaitTimeForNextPredict() !ell.header.declare !0 !ell.fn.stepWaitTime !0 {
 entry:
   %0 = alloca double
   store double 0.000000e+00, double* %0
@@ -274,3 +288,7 @@ if.after:                                         ; preds = %if.end, %if.after1
   %7 = load double, double* %0
   ret double %7
 }
+
+!0 = !{!""}
+!1 = !{!"SourceNode"}
+!2 = !{!"10"}

@@ -14,6 +14,7 @@
 // emitters
 #include "EmitterException.h"
 #include "IRBlockRegion.h"
+#include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 
 // model

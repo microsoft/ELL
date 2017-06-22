@@ -141,6 +141,14 @@ namespace emitters
         {
             return ModuleOutputFormat::assembly;
         }
+        else if (extension == "h")
+        {
+            return ModuleOutputFormat::cHeader;
+        }
+        else if (extension == "i")
+        {
+            return ModuleOutputFormat::swigInterface;
+        }
         else
         {
             return ModuleOutputFormat::ir; // default

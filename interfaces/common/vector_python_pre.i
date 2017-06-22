@@ -1,0 +1,6 @@
+%{
+#ifdef SWIGPYTHON
+  #define SWIG_FILE_WITH_INIT
+  #define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS 
+#endif
+%}

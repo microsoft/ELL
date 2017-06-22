@@ -111,5 +111,11 @@ namespace utilities
             return ext;
         }
     }
+
+    std::string GetFileName(std::string filepath)
+    {
+        // PORTABILITY should be replaced by C++17 filesystem when available
+        return filepath.substr(filepath.find_last_of("/\\") + 1);
+    }
 }
 }

@@ -16,6 +16,11 @@ In predictors.i
     %rename("%s") PaddingScheme; // Expose PaddingScheme specifically
     %include <Layer.h>
 
+    . . . // add more core %includes for the POD types you want to expose
+
+    // Restore environment once you're done adding the core %includes
+    %rename("%s") ""; // Unignore everything
+
 ## Class conventions
 ### Member variables
 Prefer public class members to manually specifying accessor/getter/setter methods. This allows for easier intellisense and debugging in scripting environments.

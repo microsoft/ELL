@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "TargetDevice.h"
 #include "EmitterTypes.h"
+#include "TargetDevice.h"
 #include "Variable.h"
 
 // stl
@@ -25,7 +25,8 @@ namespace emitters
         ir,
         bitcode,
         assembly,
-        cHeader
+        cHeader,
+        swigInterface
     };
 
     /// <summary> Standard compiler switches. </summary>
@@ -81,12 +82,35 @@ namespace emitters
         ///
         /// <returns> The comments for the function, as a vector of strings </returns>
         virtual std::vector<std::string> GetFunctionComments(const std::string& functionName) = 0;
-        
+
         /// <summary> Associates some comment text with the given function. </summary>
         ///
         /// <param name="functionName"> The name of the function. </param>
         /// <param name="comments"> The comments for the function. </param>
         virtual void SetFunctionComments(const std::string& functionName, const std::vector<std::string>& comments) = 0;
+
+        /// <summary> Indicates if the module or given function has the associated metadata. </summary>
+        ///
+        /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        ///
+        /// <returns> `true` if the function has the metadata associated with it. </returns>
+        virtual bool HasMetadata(const std::string& functionName, const std::string& tag) = 0;
+
+        /// <summary> Gets the metadata associated with the module or given function. </summary>
+        ///
+        /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        ///
+        /// <returns> The metadata values, as a vector of strings. </returns>
+        virtual std::vector<std::string> GetMetadata(const std::string& functionName, const std::string& tag) = 0;
+
+        /// <summary> Associates metadata with the module or given function. </summary>
+        ///
+        /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        /// <param name="content"> Optional metadata content. </param>
+        virtual void InsertMetadata(const std::string& functionName, const std::string& tag, const std::string& value = "") = 0;
 
         /// <summary> Variable allocator </summary>
         ///

@@ -19,15 +19,15 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
         outputType,
         "outputType",
         "o",
-        "Choice of output type: refinedMap, compiledMap, ir, bc, asm",
-        { { "refinedMap", OutputType::refinedMap }, { "compiledMap", OutputType::compiledMap }, { "ir", OutputType::ir }, { "bc", OutputType::bitcode }, { "asm", OutputType::assembly } },
+        "Choice of output type: refinedMap, compiledMap, ir, bc, asm, swig",
+        { { "refinedMap", OutputType::refinedMap }, { "compiledMap", OutputType::compiledMap }, { "ir", OutputType::ir }, { "bc", OutputType::bitcode }, { "asm", OutputType::assembly }, { "swig", OutputType::swigInterface } },
         "ir");
 
     parser.AddOption(
         outputFilename,
         "outputFilename",
         "of",
-        "Path to the output file",
+        "Path to the output file. Required and used as the base filename if the outputType is 'swig'",
         "");
 
     parser.AddOption(
@@ -43,6 +43,13 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
         "cfn",
         "Name for compiled function",
         "predict");
+
+    parser.AddOption(
+        compiledModuleName,
+        "compiledModuleName",
+        "cmn",
+        "Name for compiled module",
+        "ELL");
 
     parser.AddOption(
         maxRefinementIterations,
@@ -64,18 +71,29 @@ utilities::CommandLineParseResult ParsedCompileArguments::PostProcess(const util
 {
     std::vector<std::string> errors;
 
-    // create output stream impostor for code
-    if (outputFilename == "null")
+    if (outputType == OutputType::swigInterface)
     {
-        outputCodeStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
+        if (outputFilename == "null" || outputFilename == "")
+        {
+            errors.push_back("outputFilename required for outputType 'swig'");
+        }
     }
-    else if (outputFilename == "")
+    else
     {
-        outputCodeStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
-    }
-    else // treat argument as filename
-    {
-        outputCodeStream = utilities::OutputStreamImpostor(outputFilename);
+        // create output stream impostor for code
+        if (outputFilename == "null")
+        {
+            outputCodeStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::null);
+        }
+        else if (outputFilename == "")
+        {
+            outputCodeStream = utilities::OutputStreamImpostor(utilities::OutputStreamImpostor::StreamType::cout);
+        }
+        else
+        {
+            // treat argument as filename
+            outputCodeStream = utilities::OutputStreamImpostor(outputFilename);
+        }
     }
 
     return errors;

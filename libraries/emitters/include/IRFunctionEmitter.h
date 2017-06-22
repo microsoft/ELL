@@ -794,7 +794,7 @@ namespace emitters
         template <typename ValueType>
         void MemorySet(llvm::Value* pDestinationPointer, int destinationOffset, llvm::Value* value, int count);
 
-        /// <summary> Insert arbitrary metadata into generated IR code. </summary>
+        /// <summary> Inserts arbitrary function-level metadata into generated IR code. </summary>
         ///
         /// <param name="tag"> The tag of the metadata to set. </param>
         /// <param name="content"> The content to insert for the given metadata tag. </param>
@@ -929,7 +929,6 @@ namespace emitters
         ///
         /// <returns> The low-level IREmitter being used. </returns>
         IREmitter& GetEmitter();
-
 
     private:
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name);

@@ -21,7 +21,6 @@ namespace testing
     ///
     /// <param name="a"> The first value. </param>
     /// <param name="b"> The second value. </param>
-    /// <typeparam name="ValueType"> The type of the values. </typeparam>
     ///
     /// <returns> true if equal, false if not. </returns>
     bool IsEqual(bool a, bool b);
@@ -30,7 +29,6 @@ namespace testing
     ///
     /// <param name="a"> The first value. </param>
     /// <param name="b"> The second value. </param>
-    /// <typeparam name="ValueType"> The type of the values. </typeparam>
     ///
     /// <returns> true if equal, false if not. </returns>
     bool IsEqual(int a, int b);
@@ -39,7 +37,6 @@ namespace testing
     ///
     /// <param name="a"> The first value. </param>
     /// <param name="b"> The second value. </param>
-    /// <typeparam name="ValueType"> The type of the values. </typeparam>
     ///
     /// <returns> true if equal, false if not. </returns>
     bool IsEqual(char a, char b);
@@ -48,7 +45,6 @@ namespace testing
     ///
     /// <param name="a"> The first value. </param>
     /// <param name="b"> The second value. </param>
-    /// <typeparam name="ValueType"> The type of the values. </typeparam>
     ///
     /// <returns> true if equal, false if not. </returns>
     bool IsEqual(size_t a, size_t b);
@@ -57,7 +53,6 @@ namespace testing
     ///
     /// <param name="a"> The first value. </param>
     /// <param name="b"> The second value. </param>
-    /// <typeparam name="ValueType"> The type of the values. </typeparam>
     ///
     /// <returns> true if equal, false if not. </returns>
     bool IsEqual(std::string a, std::string b);
@@ -125,6 +120,16 @@ namespace testing
     ///
     /// <returns> true if equal, false if not. </returns>
     bool IsEqual(const std::vector<bool>& a, const std::vector<bool>& b);
+
+    /// <summary>
+    /// Checks if two string vectors are equal.
+    /// </summary>
+    ///
+    /// <param name="a"> The first vector. </param>
+    /// <param name="b"> The second vector. </param>
+    ///
+    /// <returns> true if equal, false if not. </returns>
+    bool IsEqual(const std::vector<std::string>& a, const std::vector<std::string>& b);
 
     /// <summary> Process the test. </summary>
     ///

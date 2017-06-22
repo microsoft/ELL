@@ -15,6 +15,7 @@ void TestIfElseComplex();
 void TestIfElseBlockRegions(bool runJit = false);
 void TestLogical();
 void TestMutableConditionForLoop();
+void TestMetadata();
 
 void SetOutputPathBase(std::string path);
 std::string OutputPath(const char* pRelPath);

@@ -7,14 +7,14 @@ This section covers how to generate and test the ELL language bindings, which pr
 ## General setup
 
 The language bindings are generated using SWIG. To build them, you need to install SWIG version 3.0.12 or later. SWIG can be downloaded from [here](http://www.swig.org/download.html)
-* Linux:
+* Linux / Mac:
 ```
 tar zxvf swig-VERSION.tar.gz
 cd swig-VERSION/
 ./configure
 make
 sudo make install
-# May be required on some systems (replace VERSION with the actual version on your system)
+# May be required on some Linux systems (replace VERSION with the actual version on your system)
 sudo ln /lib/x86_64-linux-gnu/libpcre.so.VERSION /usr/lib/libpcre.so.1
 ```
 * Windows:
@@ -23,14 +23,15 @@ sudo ln /lib/x86_64-linux-gnu/libpcre.so.VERSION /usr/lib/libpcre.so.1
 
 ## Python
 
-1. Install Python 3, preferably through Anaconda, which works well with Jupyter notebooks and provides a way to manage different python versions. We currently support Python >= 3.6.
-* Linux: Anaconda3-4.3.1-Linux-x86_64
-* Windows: Anaconda3-4.3.1-Windows-x86_64
+1. Install Python 3, preferably through [Miniconda](https://conda.io/miniconda.html), which works well with Jupyter notebooks and provides a way to manage different python versions. ELL SWIG bindings require Python 3.6.
+* Linux: Miniconda3-Linux-x86_64
+* Mac: Miniconda3-latest-MacOSX-x86_64
+* Windows: Miniconda3-latest-Windows-x86_64
 
-2. Configure the Python 3.6 environment using Anaconda
+2. Configure the Python 3.6 environment using Miniconda
 ```
 # Create the environment
-conda create -n py36 python=3.6 anaconda
+conda create -n py36 anaconda python=3
 # Activate the environment
 activate py36
 # ELL requires gcc 5 and above for C++14. Upgrade anaconda's environment to support it.
@@ -41,7 +42,7 @@ conda install libgcc
 mkdir build
 cd build
 cmake -DBUILD_INTERFACES=ON ..
-# Linux
+# Linux / Mac
 make
 # Windows
 cmake --build .

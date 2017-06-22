@@ -27,11 +27,15 @@ struct CompileArguments
         compiledMap,
         ir,
         bitcode,
-        assembly
+        assembly,
+        swigInterface
     };
     OutputType outputType;
 
     /// <summary> The output code file. </summary>
+    /// <remarks>
+    /// Used as the base filename if the outputType is 'swigInterface'
+    /// </remarks>
     std::string outputFilename;
 
     /// <summary> true to optimize. </summary>
@@ -48,6 +52,9 @@ struct CompileArguments
 
     /// <summary> If output type is ASM then we need a target cpu (cortex-m0 or cortex-m4). </summary>
     std::string cpu = "";
+
+    /// <summary> Name of the compiled module. </summary>
+    std::string compiledModuleName;
 };
 
 /// <summary> Parsed command line arguments for the compile executable. </summary>

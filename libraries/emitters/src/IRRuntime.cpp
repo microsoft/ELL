@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IRRuntime.h"
+#include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 
 #include <iostream>
@@ -43,6 +44,8 @@ namespace emitters
                                           { rVectorName, VariableType::DoublePointer },
                                           { resultName, VariableType::DoublePointer } };
         auto function = _module.BeginFunction(functionName, VariableType::Void, argList);
+        function.InsertMetadata(c_declareInHeaderTagName);
+
         auto arguments = function.Arguments().begin();
         llvm::Argument& count = *arguments++;
         llvm::Argument& leftValue = *arguments++;
@@ -63,6 +66,8 @@ namespace emitters
                                           { rVectorName, VariableType::Int32Pointer },
                                           { resultName, VariableType::Int32Pointer } };
         auto function = _module.BeginFunction(functionName, VariableType::Void, argList);
+        function.InsertMetadata(c_declareInHeaderTagName);
+
         auto arguments = function.Arguments().begin();
         llvm::Argument& count = *arguments++;
         llvm::Argument& leftValue = *arguments++;
@@ -173,7 +178,7 @@ namespace emitters
             VariableType::Int32 // incy
         };
 
-        auto pModule = _module.GetLLVMModule();        
+        auto pModule = _module.GetLLVMModule();
         auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
         auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
         return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_sgemv", functionType));
@@ -246,7 +251,7 @@ namespace emitters
             VariableType::Int32 // ldc
         };
 
-        auto pModule = _module.GetLLVMModule();        
+        auto pModule = _module.GetLLVMModule();
         auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
         auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
         return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_dgemm", functionType));

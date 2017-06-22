@@ -1,14 +1,15 @@
 ####################################################################################################
 ##
-##  Project:  Embedded Learning Library (ELL)
-##  File:     cntk_to_ell.py (importers)
-##  Authors:  Byron Changuion
+# Project:  Embedded Learning Library (ELL)
+# File:     cntk_to_ell.py (importers)
+# Authors:  Byron Changuion
 ##
-##  Requires: Python 3.x, cntk-2.0-cp35
+# Requires: Python 3.x, cntk-2.0-cp35
 ##
 ####################################################################################################
 import ELL
-import sys, getopt
+import sys
+import getopt
 import os
 import configparser
 import re
@@ -23,9 +24,10 @@ from cntk.logging.graph import *
 from cntk.layers.typing import *
 import traceback
 
+
 def get_model_layers(root):
     """Returns a list of the high-level layers (.e. function blocks) that make up the CNTK model """
-    stack = [root.root_function] # node
+    stack = [root.root_function]  # node
     layers = []         # final result, list of all relevant layers
     visited = set()
 
@@ -36,7 +38,7 @@ def get_model_layers(root):
             # Function node
             stack = list(node.root_function.inputs) + stack
         except AttributeError:
-            # OutputVariable node. We need process the owner node if this is an output. 
+            # OutputVariable node. We need process the owner node if this is an output.
             try:
                 if node.is_output:
                     stack.insert(0, node.owner)
@@ -49,8 +51,9 @@ def get_model_layers(root):
 
     # CNTK layers are in opposite order to what ELL wants, so reverse the list
     layers.reverse()
-    
+
     return layers
+
 
 def opNameEquals(node, name):
     result = False
@@ -58,6 +61,7 @@ def opNameEquals(node, name):
         result = (node.op_name == name)
 
     return result
+
 
 def findParameterByName(parameters, name, index=0):
     for p in parameters:
@@ -74,17 +78,20 @@ def findParameterByName(parameters, name, index=0):
     # specified index
     return parameters[index]
 
+
 def findNodeByOp(parameters, name):
     for p in parameters:
         if (p.op_name == name):
             return p
     return None
 
+
 def is_softmax_activation(nodes):
     """Returns True is the nodes contain a softmax activation"""
     if (findNodeByOp(nodes, 'SoftMax') != None):
         return True
     return False
+
 
 def get_activation_type(nodes):
     """Returns an ELL.ActivationType from the list of nodes"""
@@ -96,6 +103,7 @@ def get_activation_type(nodes):
         return ELL.ActivationType.leaky
 
     return None
+
 
 def get_float_vector_from_cntk_trainable_parameter(tensorParameter):
     """Returns an ELL.FloatVector from a trainable parameter
@@ -113,6 +121,7 @@ def get_float_vector_from_cntk_trainable_parameter(tensorParameter):
 
     return ELL.FloatVector(orderedWeights)
 
+
 def get_float_vector_from_cntk_array(inputArray):
     """Returns an ELL.FloatTensor from a 4, 3, 2, or 1 dimensional numpy array.
        CNTK has input in filter/parallel, channel, row, column order while
@@ -129,7 +138,8 @@ def get_float_vector_from_cntk_array(inputArray):
                         orderedWeights[i] = inputArray[filter][channel][row][column]
                         i += 1
         # Reshape to (filters * rows, columns, channels)
-        orderedWeights = orderedWeights.reshape(tensorShape[0] * tensorShape[2], tensorShape[3], tensorShape[1])
+        orderedWeights = orderedWeights.reshape(
+            tensorShape[0] * tensorShape[2], tensorShape[3], tensorShape[1])
     elif (len(tensorShape) == 3):
         i = 0
         for row in range(tensorShape[1]):
@@ -138,7 +148,8 @@ def get_float_vector_from_cntk_array(inputArray):
                     orderedWeights[i] = inputArray[channel][row][column]
                     i += 1
         # Reshape to (rows, columns, channels)
-        orderedWeights = orderedWeights.reshape(tensorShape[1], tensorShape[2], tensorShape[0])
+        orderedWeights = orderedWeights.reshape(
+            tensorShape[1], tensorShape[2], tensorShape[0])
     elif (len(tensorShape) == 2):
         i = 0
         for row in range(tensorShape[1]):
@@ -146,7 +157,8 @@ def get_float_vector_from_cntk_array(inputArray):
                 orderedWeights[i] = inputArray[column][row]
                 i += 1
         # Reshape to (rows, 1, channels)
-        orderedWeights = orderedWeights.reshape(tensorShape[1], 1, tensorShape[0])
+        orderedWeights = orderedWeights.reshape(
+            tensorShape[1], 1, tensorShape[0])
     elif (len(tensorShape) == 1):
         i = 0
         for columnValue in inputArray:
@@ -160,7 +172,8 @@ def get_float_vector_from_cntk_array(inputArray):
 
     return np.ravel(orderedWeights)
 
-def get_float_tensor_from_cnntk_dense_weight_parameter(tensorParameter):
+
+def get_float_tensor_from_cntk_dense_weight_parameter(tensorParameter):
     """Returns an ELL.FloatTensor from a trainable parameter
        Note that ELL's ordering is row, column, channel.
        CNTK has them in channel, row, column, filter order.
@@ -174,17 +187,22 @@ def get_float_tensor_from_cnntk_dense_weight_parameter(tensorParameter):
         orderedWeights = tensorValue
         orderedWeights = np.moveaxis(orderedWeights, 0, -1)
         orderedWeights = np.moveaxis(orderedWeights, 2, 0)
-        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(tensorShape[3] * tensorShape[1], tensorShape[2], tensorShape[0])
+        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(
+            tensorShape[3] * tensorShape[1], tensorShape[2], tensorShape[0])
     elif (len(tensorShape) == 3):
         orderedWeights = np.moveaxis(tensorValue, 0, -1)
-        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(tensorShape[1], tensorShape[2], tensorShape[0])
+        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(
+            tensorShape[1], tensorShape[2], tensorShape[0])
     elif (len(tensorShape) == 2):
         orderedWeights = np.moveaxis(tensorValue, 0, -1)
-        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(tensorShape[1], 1, tensorShape[0])
+        orderedWeights = orderedWeights.ravel().astype(
+            np.float).reshape(tensorShape[1], 1, tensorShape[0])
     else:
-        orderedWeights = tensorValue.ravel().astype(np.float).reshape(1, 1, tensorValue.size)
-    
+        orderedWeights = tensorValue.ravel().astype(
+            np.float).reshape(1, 1, tensorValue.size)
+
     return ELL.FloatTensor(orderedWeights)
+
 
 def get_float_tensor_from_cntk_convolutional_weight_parameter(tensorParameter):
     """Returns an ELL.FloatTensor from a trainable parameter
@@ -197,16 +215,21 @@ def get_float_tensor_from_cntk_convolutional_weight_parameter(tensorParameter):
 
     if (len(tensorShape) == 4):
         orderedWeights = np.moveaxis(tensorValue, 1, -1)
-        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(tensorShape[0] * tensorShape[2], tensorShape[3], tensorShape[1])
+        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(
+            tensorShape[0] * tensorShape[2], tensorShape[3], tensorShape[1])
     elif (len(tensorShape) == 3):
         orderedWeights = np.moveaxis(tensorValue, 0, -1)
-        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(tensorShape[1], tensorShape[2], tensorShape[0])
+        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(
+            tensorShape[1], tensorShape[2], tensorShape[0])
     elif (len(tensorShape) == 2):
         orderedWeights = np.moveaxis(tensorValue, 0, -1)
-        orderedWeights = orderedWeights.ravel().astype(np.float).reshape(tensorShape[1], tensorShape[0], 1)
+        orderedWeights = orderedWeights.ravel().astype(
+            np.float).reshape(tensorShape[1], tensorShape[0], 1)
     else:
-        orderedWeights = tensorValue.ravel().astype(np.float).reshape(1, 1, tensorValue.size)
+        orderedWeights = tensorValue.ravel().astype(
+            np.float).reshape(1, 1, tensorValue.size)
     return ELL.FloatTensor(orderedWeights)
+
 
 def process_convolutional_layer(layer, ellLayers):
     if not layer.is_block:
@@ -222,7 +245,8 @@ def process_convolutional_layer(layer, ellLayers):
 
     # Get the hyper-parameters for the convolution.
     # They are on the convolution node inside this block.
-    convolutionNodes = depth_first_search(layer.block_root, lambda x: opNameEquals(x, 'Convolution'))
+    convolutionNodes = depth_first_search(
+        layer.block_root, lambda x: opNameEquals(x, 'Convolution'))
     if len(convolutionNodes) > 0:
         convolutionAttributes = convolutionNodes[0].attributes
         convolutionParameters = layer.parameters
@@ -231,13 +255,18 @@ def process_convolutional_layer(layer, ellLayers):
         weightsShape = weightsParameter.shape
         biasParameter = findParameterByName(convolutionParameters, 'b', 1)
 
-        weightsTensor = get_float_tensor_from_cntk_convolutional_weight_parameter(weightsParameter)
-        biasVector = get_float_vector_from_cntk_trainable_parameter(biasParameter)
+        weightsTensor = get_float_tensor_from_cntk_convolutional_weight_parameter(
+            weightsParameter)
+        biasVector = get_float_vector_from_cntk_trainable_parameter(
+            biasParameter)
 
         # Create the ELL.LayerParameters for the various ELL layers
-        firstLayerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShapeMinusPadding, ELL.NoPadding())
-        middleLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(), layer.ell_outputShapeMinusPadding ,ELL.NoPadding())
-        lastLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(), layer.ell_outputShape, layer.ell_outputPaddingParameters)
+        firstLayerParameters = ELL.LayerParameters(
+            layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShapeMinusPadding, ELL.NoPadding())
+        middleLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(
+        ), layer.ell_outputShapeMinusPadding, ELL.NoPadding())
+        lastLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(
+        ), layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
         layerParameters = firstLayerParameters
 
@@ -250,10 +279,12 @@ def process_convolutional_layer(layer, ellLayers):
         internalNodes = get_model_layers(layer.block_root)
         activationType = get_activation_type(internalNodes)
 
-        convolutionalParameters = ELL.ConvolutionalParameters(receptiveField, stride, convolutionMethod, filterBatchSize)
+        convolutionalParameters = ELL.ConvolutionalParameters(
+            receptiveField, stride, convolutionMethod, filterBatchSize)
 
         # Create the ELL convolutional layer
-        ellLayers.append(ELL.FloatConvolutionalLayer(layerParameters, convolutionalParameters, weightsTensor));
+        ellLayers.append(ELL.FloatConvolutionalLayer(
+            layerParameters, convolutionalParameters, weightsTensor))
 
         # Create the ELL bias layer
         if (is_softmax_activation(internalNodes) or activationType != None):
@@ -272,11 +303,13 @@ def process_convolutional_layer(layer, ellLayers):
                 ellLayers.append(ELL.FloatSoftmaxLayer(layerParameters))
             else:
                 if (activationType != None):
-                    ellLayers.append(ELL.FloatActivationLayer(layerParameters, activationType))
+                    ellLayers.append(ELL.FloatActivationLayer(
+                        layerParameters, activationType))
     else:
         print("Error: Could not find the Convolution function in the Convolution block")
-    
+
     return
+
 
 def process_dense_layer(layer, ellLayers):
     if not layer.is_block:
@@ -292,13 +325,17 @@ def process_dense_layer(layer, ellLayers):
 
     weightsParameter = findParameterByName(layer.parameters, 'W', 0)
     biasParameter = findParameterByName(layer.parameters, 'b', 1)
-    weightsTensor = get_float_tensor_from_cnntk_dense_weight_parameter(weightsParameter)
+    weightsTensor = get_float_tensor_from_cntk_dense_weight_parameter(
+        weightsParameter)
     biasVector = get_float_vector_from_cntk_trainable_parameter(biasParameter)
 
     # Create the ELL.LayerParameters for the various ELL layers
-    firstLayerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShapeMinusPadding, ELL.NoPadding())
-    middleLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(), layer.ell_outputShapeMinusPadding, ELL.NoPadding())
-    lastLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(), layer.ell_outputShape, layer.ell_outputPaddingParameters)
+    firstLayerParameters = ELL.LayerParameters(
+        layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShapeMinusPadding, ELL.NoPadding())
+    middleLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(
+    ), layer.ell_outputShapeMinusPadding, ELL.NoPadding())
+    lastLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(
+    ), layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
     layerParameters = firstLayerParameters
 
@@ -306,7 +343,8 @@ def process_dense_layer(layer, ellLayers):
     activationType = get_activation_type(internalNodes)
 
     # Create the ELL fully connected layer
-    ellLayers.append(ELL.FloatFullyConnectedLayer(layerParameters, weightsTensor));
+    ellLayers.append(ELL.FloatFullyConnectedLayer(
+        layerParameters, weightsTensor))
 
     # Create the ELL bias layer
     if (is_softmax_activation(internalNodes) or activationType != None):
@@ -325,9 +363,11 @@ def process_dense_layer(layer, ellLayers):
             ellLayers.append(ELL.FloatSoftmaxLayer(layerParameters))
         else:
             if (activationType != None):
-                ellLayers.append(ELL.FloatActivationLayer(layerParameters, activationType))
+                ellLayers.append(ELL.FloatActivationLayer(
+                    layerParameters, activationType))
 
     return
+
 
 def process_linear_layer(layer, ellLayers):
 
@@ -341,13 +381,17 @@ def process_linear_layer(layer, ellLayers):
 
     weightsParameter = findParameterByName(layer.parameters, 'W', 0)
     biasParameter = findParameterByName(layer.parameters, 'b', 1)
-    weightsTensor = get_float_tensor_from_cnntk_dense_weight_parameter(weightsParameter)
+    weightsTensor = get_float_tensor_from_cntk_dense_weight_parameter(
+        weightsParameter)
     biasVector = get_float_vector_from_cntk_trainable_parameter(biasParameter)
 
     # Create the ELL.LayerParameters for the various ELL layers
-    firstLayerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShapeMinusPadding, ELL.NoPadding())
-    middleLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(), layer.ell_outputShapeMinusPadding, ELL.NoPadding())
-    lastLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(), layer.ell_outputShape, layer.ell_outputPaddingParameters)
+    firstLayerParameters = ELL.LayerParameters(
+        layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShapeMinusPadding, ELL.NoPadding())
+    middleLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(
+    ), layer.ell_outputShapeMinusPadding, ELL.NoPadding())
+    lastLayerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(
+    ), layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
     layerParameters = firstLayerParameters
 
@@ -355,7 +399,8 @@ def process_linear_layer(layer, ellLayers):
     activationType = get_activation_type(internalNodes)
 
     # Create the ELL fully connected layer
-    ellLayers.append(ELL.FloatFullyConnectedLayer(layerParameters, weightsTensor));
+    ellLayers.append(ELL.FloatFullyConnectedLayer(
+        layerParameters, weightsTensor))
 
     # Create the ELL bias layer
     if (is_softmax_activation(internalNodes) or activationType != None):
@@ -374,28 +419,33 @@ def process_linear_layer(layer, ellLayers):
             ellLayers.append(ELL.FloatSoftmaxLayer(layerParameters))
         else:
             if (activationType != None):
-                ellLayers.append(ELL.FloatActivationLayer(layerParameters, activationType))
+                ellLayers.append(ELL.FloatActivationLayer(
+                    layerParameters, activationType))
 
     return
+
 
 def process_element_times_layer(layer, ellLayers):
     if (len(layer.constants) == 1):
 
         # Create the ELL.LayerParameters for the ELL layer
-        layerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
+        layerParameters = ELL.LayerParameters(
+            layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
         # Create ELL scaling layer
         scaleValue = layer.constants[0].value
         # Workaround: For some reason, np.full is not returning a type that SWIG can parse. So just manually walk the array setting the scalar
-        scaleArray = np.arange(layerParameters.outputShape.channels, dtype=np.float)
-        for i in range(scaleArray.size):  
-            scaleArray[i] = scaleValue    
+        scaleArray = np.arange(
+            layerParameters.outputShape.channels, dtype=np.float)
+        for i in range(scaleArray.size):
+            scaleArray[i] = scaleValue
         scalesVector = ELL.FloatVector(scaleArray)
         ellLayers.append(ELL.FloatScalingLayer(layerParameters, scalesVector))
 
     else:
         printf("Error: Skipping ElementTimes layer due to dimenions of Constants")
     return
+
 
 def process_max_pooling_layer(layer, ellLayers):
 
@@ -404,7 +454,8 @@ def process_max_pooling_layer(layer, ellLayers):
         return
 
     # Create the ELL.LayerParameters for the ELL layer
-    layerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
+    layerParameters = ELL.LayerParameters(
+        layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
     # Fill in the pooling parameters
     attributes = layer.block_root.attributes
@@ -413,11 +464,13 @@ def process_max_pooling_layer(layer, ellLayers):
     stride = attributes['strides'][0]
 
     poolingParameters = ELL.PoolingParameters(poolingSize, stride)
-    
+
     # Create the ELL max pooling layer
-    ellLayers.append(ELL.FloatPoolingLayer(layerParameters, poolingParameters, ELL.PoolingType.max))
+    ellLayers.append(ELL.FloatPoolingLayer(
+        layerParameters, poolingParameters, ELL.PoolingType.max))
 
     return
+
 
 def process_average_pooling_layer(layer, ellLayers):
 
@@ -426,7 +479,8 @@ def process_average_pooling_layer(layer, ellLayers):
         return
 
     # Create the ELL.LayerParameters for the ELL layer
-    layerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
+    layerParameters = ELL.LayerParameters(
+        layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
     # Fill in the pooling parameters
     attributes = layer.block_root.attributes
@@ -435,16 +489,19 @@ def process_average_pooling_layer(layer, ellLayers):
     stride = attributes['strides'][0]
 
     poolingParameters = ELL.PoolingParameters(poolingSize, stride)
-    
+
     # Create the ELL mean pooling layer
-    ellLayers.append(ELL.FloatPoolingLayer(layerParameters, poolingParameters, ELL.PoolingType.mean))
+    ellLayers.append(ELL.FloatPoolingLayer(
+        layerParameters, poolingParameters, ELL.PoolingType.mean))
 
     return
+
 
 def process_pooling_layer(layer, ellLayers):
 
     # Create the ELL.LayerParameters for the ELL layer
-    layerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
+    layerParameters = ELL.LayerParameters(
+        layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
     # Fill in the pooling parameters
     attributes = layer.attributes
@@ -453,43 +510,54 @@ def process_pooling_layer(layer, ellLayers):
     stride = attributes['strides'][0]
 
     poolingParameters = ELL.PoolingParameters(poolingSize, stride)
-    
+
     # Check which pooling layer to create
     if (attributes['poolingType'] == PoolingType_Max):
         # Create the ELL max pooling layer
-        ellLayers.append(ELL.FloatPoolingLayer(layerParameters, poolingParameters, ELL.PoolingType.max))
+        ellLayers.append(ELL.FloatPoolingLayer(
+            layerParameters, poolingParameters, ELL.PoolingType.max))
     else:
         # Create the ELL mean pooling layer
-        ellLayers.append(ELL.FloatPoolingLayer(layerParameters, poolingParameters, ELL.PoolingType.mean))
+        ellLayers.append(ELL.FloatPoolingLayer(
+            layerParameters, poolingParameters, ELL.PoolingType.mean))
 
     return
+
 
 def process_relu_layer(layer, ellLayers):
     # Create the ELL.LayerParameters for the ELL layer
-    layerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
+    layerParameters = ELL.LayerParameters(
+        layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
     # Create the ELL activation layer
-    ellLayers.append(ELL.FloatActivationLayer(layerParameters, ELL.ActivationType.relu))
+    ellLayers.append(ELL.FloatActivationLayer(
+        layerParameters, ELL.ActivationType.relu))
 
     return
+
 
 def process_leakyrelu_layer(layer, ellLayers):
     # Create the ELL.LayerParameters for the ELL layer
-    layerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
+    layerParameters = ELL.LayerParameters(
+        layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
     # Create the ELL activation layer
-    ellLayers.append(ELL.FloatActivationLayer(layerParameters, ELL.ActivationType.leaky))
+    ellLayers.append(ELL.FloatActivationLayer(
+        layerParameters, ELL.ActivationType.leaky))
 
     return
 
+
 def process_softmax_layer(layer, ellLayers):
     # Create the ELL.LayerParameters for the ELL layer
-    layerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
+    layerParameters = ELL.LayerParameters(
+        layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShape, layer.ell_outputPaddingParameters)
 
     # Create the ELL max pooling layer
     ellLayers.append(ELL.FloatSoftmaxLayer(layerParameters))
 
     return
+
 
 def convert_cntk_layers_to_ell_layers(layersToConvert):
     """Walks a list of CNTK layers and returns a list of ELL Layer objects that is used to construct a Neural Network Predictor"""
@@ -522,18 +590,20 @@ def convert_cntk_layers_to_ell_layers(layersToConvert):
 
     return ellLayers
 
+
 def get_input_padding_parameters_for_layer(layer):
     """Returns the ELL.PaddingParameters for a layer's input"""
     paddingScheme = ELL.PaddingScheme.zeros
     padding = 0
 
     if (layer.op_name == 'Convolution'):
-        convolutionNodes = depth_first_search(layer.block_root, lambda x: opNameEquals(x, 'Convolution'))
+        convolutionNodes = depth_first_search(
+            layer.block_root, lambda x: opNameEquals(x, 'Convolution'))
         attributes = convolutionNodes[0].attributes
         weightsParameter = findParameterByName(layer.parameters, 'W', 0)
 
         receptiveField = weightsParameter.shape[2]
-        if ('autoPadding' in attributes):                    
+        if ('autoPadding' in attributes):
             if (attributes['autoPadding'][1] == True):
                 padding = int((receptiveField - 1) / 2)
             else:
@@ -577,6 +647,7 @@ def get_input_padding_parameters_for_layer(layer):
 
     return ELL.PaddingParameters(paddingScheme, padding)
 
+
 def get_shape_for_layer(inputShape):
     """"Returns the ELL.LayerShape corresponding to the output shape with no adjustment for padding"""
 
@@ -593,6 +664,7 @@ def get_shape_for_layer(inputShape):
 
     return ELL.LayerShape(rows, columns, channels)
 
+
 def get_adjusted_shape_for_layer(inputShape, paddingParameters):
     """"Returns the ELL.LayerShape corresponding to the input shape adjusted with padding"""
 
@@ -603,8 +675,8 @@ def get_adjusted_shape_for_layer(inputShape, paddingParameters):
         rows = inputShape[1]
         columns = inputShape[2]
 
-        rows += 2*paddingParameters.paddingSize
-        columns += 2*paddingParameters.paddingSize
+        rows += 2 * paddingParameters.paddingSize
+        columns += 2 * paddingParameters.paddingSize
     elif (len(inputShape) == 1):
         # If the input shape is a vector, make it a tensor with 1 row, 1 column and number of channels equal to the length of the vector
         channels = inputShape[0]
@@ -613,8 +685,10 @@ def get_adjusted_shape_for_layer(inputShape, paddingParameters):
 
     return ELL.LayerShape(rows, columns, channels)
 
+
 def ell_shape_to_string(shape):
     return (str(shape.rows) + "x" + str(shape.columns) + "x" + str(shape.channels))
+
 
 def get_filtered_layers_list(modelLayers):
     """Returns a relevant list of CNTK layers, which have had the following
@@ -635,8 +709,10 @@ def get_filtered_layers_list(modelLayers):
     relevantLayers = []
     for currentLayer in modelLayers:
         if (isinstance(currentLayer, cntk_py.Function)):
-            currentLayer.ell_inputPaddingParameters = get_input_padding_parameters_for_layer(currentLayer)
-            currentLayer.ell_inputShape = get_adjusted_shape_for_layer(currentLayer.arguments[0].shape, currentLayer.ell_inputPaddingParameters)
+            currentLayer.ell_inputPaddingParameters = get_input_padding_parameters_for_layer(
+                currentLayer)
+            currentLayer.ell_inputShape = get_adjusted_shape_for_layer(
+                currentLayer.arguments[0].shape, currentLayer.ell_inputPaddingParameters)
             if (currentLayer.op_name == 'Convolution'):
                 relevantLayers.append(currentLayer)
             elif (currentLayer.op_name == 'Dense'):
@@ -658,7 +734,8 @@ def get_filtered_layers_list(modelLayers):
             elif (currentLayer.op_name == 'Softmax'):
                 relevantLayers.append(currentLayer)
             else:
-                print("\nWill not process", currentLayer.op_name, "- skipping this layer as irrelevant.")
+                print("\nWill not process", currentLayer.op_name,
+                      "- skipping this layer as irrelevant.")
 
     # Go through the layers and set the:
     # - padding parameters for output, based on the next layer's input
@@ -670,18 +747,24 @@ def get_filtered_layers_list(modelLayers):
             # Use the next layer's input characteristics to set the output for this layer
             nextLayer = relevantLayers[i + 1]
 
-            currentLayer.ell_outputPaddingParameters = nextLayer.ell_inputPaddingParameters;
-            currentLayer.ell_outputShape = get_adjusted_shape_for_layer(currentLayer.output.shape, currentLayer.ell_outputPaddingParameters)
-            currentLayer.ell_outputShapeMinusPadding = get_shape_for_layer(currentLayer.output.shape)
+            currentLayer.ell_outputPaddingParameters = nextLayer.ell_inputPaddingParameters
+            currentLayer.ell_outputShape = get_adjusted_shape_for_layer(
+                currentLayer.output.shape, currentLayer.ell_outputPaddingParameters)
+            currentLayer.ell_outputShapeMinusPadding = get_shape_for_layer(
+                currentLayer.output.shape)
         else:
             # This is the last layer, so the output characteristics are known
             currentLayer.ell_outputPaddingParameters = ELL.NoPadding()
-            currentLayer.ell_outputShape = get_adjusted_shape_for_layer(currentLayer.output.shape, ELL.NoPadding())
+            currentLayer.ell_outputShape = get_adjusted_shape_for_layer(
+                currentLayer.output.shape, ELL.NoPadding())
             currentLayer.ell_outputShapeMinusPadding = currentLayer.ell_outputShape
-        print(currentLayer.op_name, ": ", ell_shape_to_string(currentLayer.ell_inputShape), " -> ", ell_shape_to_string(currentLayer.ell_outputShape), "| padding ", currentLayer.ell_inputPaddingParameters.paddingSize)
+        print(currentLayer.op_name, ": ", ell_shape_to_string(currentLayer.ell_inputShape), " -> ",
+              ell_shape_to_string(currentLayer.ell_outputShape), "| padding ", currentLayer.ell_inputPaddingParameters.paddingSize)
     return relevantLayers
 
 # Function to import a CNTK model and output the corresponding ELL neural network predictor
+
+
 def predictor_from_cntk_model(modelFile):
     """Loads a CNTK model and returns an ELL.NeuralNetworkPredictor"""
 

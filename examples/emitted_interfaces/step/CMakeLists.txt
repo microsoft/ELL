@@ -9,7 +9,7 @@ include (CommonInterfaces)
 set(model_name ELL_step10)
 set(common_path ../../../interfaces/common)
 
-include_directories(include
+include_directories(./
   ../../../interfaces/common/include
   ../../../libraries/emitters/include)
 
@@ -18,9 +18,9 @@ generate_compile_model_commands(${model_name} COMPILED_MODEL_OUTPUT COMPILED_MOD
 
 # emit SWIG interfaces (sets SWIG_MODULE_TARGET)
 set(INTERFACE_FILES)
-set(INTERFACE_INCLUDE include/${model_name}.h
+set(INTERFACE_INCLUDE ${model_name}.i.h
   ../../../libraries/emitters/include/ClockInterface.h)
-set(INTERFACE_SRC src/${model_name}.cpp)
+set(INTERFACE_SRC)
 set(INTERFACE_TCC)
 generate_emitted_interface_module(${model_name} ${COMPILED_MODEL_OUTPUT} ${common_path} python SUCCESS SWIG_MODULE_TARGET)
 

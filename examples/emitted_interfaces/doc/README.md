@@ -6,19 +6,32 @@ This section covers how to generate and test the language bindings for emitted E
 
 ## General setup
 
-Requires SWIG and Python 3
-* For instructions on installing SWIG and Python, refer to [this section](../../../interfaces/README.md)
+1. Install SWIG and Python 3
+For instructions on installing SWIG and Python, refer to [this section](../../../interfaces/README.md)
+2. Build ELL, which will produce the ELL compiler and libraries. 
 
 ## Examples
 
 Below is a list of available examples:
 
-* step10 - Demonstrates calling step on a simple times two model, using a callback to supply the 10 input values.
+* step10 - Demonstrates calling step on a simple times two model. Input values are provided either through a data callback (step mode), or to a single prediction call (one-shot prediction mode).
 
 
 ## Python
+1. Generate the python bindings
+Linux / Mac:
+```
+cd step
+sh ./runswig.h
+```
+Windows:
+```
+cd step
+./runswig.cmd
+build the examples/_ELL_step10 project
+```
 
-1. Build the generated python bindings. This will also run llc to compile the LLVM IR into an .o for your developer system.
+2. Build the generated python bindings. This will also run llc to compile the LLVM IR for your developer system.
 
 Linux / Mac:
 ```
@@ -29,7 +42,7 @@ Windows:
 build the examples/_ELL_step10 project
 ```
 
-2. Test the generated python bindings.
+3. Test the generated python bindings.
 
 Linux / Mac:
 ```

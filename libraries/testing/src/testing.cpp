@@ -11,6 +11,7 @@
 
 // stl
 #include <iostream>
+#include <string>
 
 namespace ell
 {
@@ -148,6 +149,11 @@ namespace testing
         return IsVectorEqual(a, b);
     }
 
+    bool IsEqual(const std::vector<std::string>& a, const std::vector<std::string>& b)
+    {
+        return IsVectorEqual(a, b);
+    }
+
     bool IsEqual(const std::vector<float>& a, const std::vector<float>& b, float tolerance)
     {
         return IsVectorApproxEqual(a, b, tolerance);
@@ -173,11 +179,11 @@ namespace testing
     template <typename ValueType1, typename ValueType2>
     bool IsEqual(const std::vector<std::vector<ValueType1>>& a, const std::vector<std::vector<ValueType2>>& b, double tolerance)
     {
-        if(a.size() != b.size())
+        if (a.size() != b.size())
         {
             return false;
         }
-        
+
         for (size_t index = 0; index < a.size(); ++index)
         {
             if (!IsVectorApproxEqual(a[index], b[index], tolerance))

@@ -50,6 +50,7 @@ void ProduceMapOutput(const common::MapLoadArguments& mapLoadArguments, ParsedCo
     {
         model::MapCompilerParameters settings;
         settings.mapFunctionName = compileArguments.compiledFunctionName;
+        settings.moduleName = compileArguments.compiledModuleName;
         settings.compilerSettings.optimize = compileArguments.optimize;
 
         MapCompilerType compiler(settings);
@@ -82,6 +83,10 @@ void ProduceMapOutput(const common::MapLoadArguments& mapLoadArguments, ParsedCo
 
                 compiledMap.WriteCode(compileArguments.outputCodeStream, emitters::ModuleOutputFormat::assembly, compileAssemblyOptions);
             }
+
+            case CompileArguments::OutputType::swigInterface:
+                compiledMap.WriteCode(compileArguments.outputFilename, emitters::ModuleOutputFormat::swigInterface);
+                break;
 
             default:
                 throw emitters::EmitterException(emitters::EmitterError::notSupported);

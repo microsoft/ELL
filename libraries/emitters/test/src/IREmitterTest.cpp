@@ -24,7 +24,9 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <vector>
 
+using namespace ell;
 using namespace ell::emitters;
 
 std::string g_outputBasePath = "";
@@ -124,7 +126,7 @@ void TestLLVM()
     IRForLoopEmitter testLoop(fnMain);
     testLoop.Begin(data.size());
     testLoop.End();
-    
+
     auto vectorResult = fnMain.DotProductFloat(data.size(), fnMain.Pointer(pData), fnMain.Pointer(pData));
     fnMain.Printf({ fnMain.Literal("DOT %f\n"), fnMain.Load(vectorResult) });
 
@@ -363,7 +365,7 @@ void TestMutableConditionForLoop(bool runJit)
     llvm::Argument& start = *args++;
     llvm::Argument& increment = *args++;
     llvm::Argument& end = *args++;
-    
+
     // Initialize the test value to start + increment
     auto pTest = fn.Variable(varType, 1);
     fn.Store(fn.PointerOffset(pTest, 0), fn.Operator(add, &start, &increment));
@@ -411,4 +413,57 @@ void TestMutableConditionForLoop()
 {
     TestMutableConditionForLoop(true);
     TestMutableConditionForLoop(false);
+}
+
+void TestMetadata()
+{
+    IRModuleEmitter module("Metadata");
+
+    // Function-level metadata
+    auto fn = module.BeginFunction("TestMetadata", VariableType::Void);
+    fn.InsertMetadata("hello.fn");
+    fn.InsertMetadata("hello.fn.content", "test content");
+    fn.Return();
+    module.EndFunction();
+    fn.Verify();
+
+    // Module-level metadata
+    module.InsertMetadata("", "hello.world");
+    module.InsertMetadata("", "hello.world.content", "12345");
+    module.InsertMetadata("", "hello.world.content", "67890");
+
+    auto fnMain = module.BeginMainFunction();
+    fnMain.Call("TestMetadata");
+    fnMain.Return();
+    module.DebugDump();
+
+    // Missing metadata
+    testing::ProcessTest("Testing missing module metadata check", testing::IsEqual(module.HasMetadata("", "does.not.exist"), false));
+    testing::ProcessTest("Testing missing function metadata check", testing::IsEqual(module.HasMetadata("TestMetadata", "fn.does.not.exist"), false));
+
+    // Empty metadata
+    std::vector<std::string> actual = module.GetMetadata("", "hello.world");
+    std::vector<std::string> expected{ "" };
+    testing::ProcessTest("Testing empty module metadata check", testing::IsEqual(module.HasMetadata("", "hello.world"), true));
+    testing::ProcessTest("Testing empty module metadata get", testing::IsEqual(actual, expected));
+    actual = module.GetMetadata("TestMetadata", "hello.fn");
+    testing::ProcessTest("Testing empty function metadata check", testing::IsEqual(module.HasMetadata("TestMetadata", "hello.fn"), true));
+    testing::ProcessTest("Testing empty function metadata get", testing::IsEqual(actual, expected));
+
+    // Non-empty metadata
+    actual = module.GetMetadata("", "hello.world.content");
+    expected.clear();
+    expected.push_back("12345");
+    expected.push_back("67890");
+    testing::ProcessTest("Testing non-empty module metadata check", testing::IsEqual(module.HasMetadata("", "hello.world.content"), true));
+    testing::ProcessTest("Testing non-empty module metadata get", testing::IsEqual(actual, expected));
+    actual = module.GetMetadata("TestMetadata", "hello.fn.content");
+    expected.clear();
+    expected.push_back("test content");
+    testing::ProcessTest("Testing non-empty function metadata check", testing::IsEqual(module.HasMetadata("TestMetadata", "hello.fn.content"), true));
+    testing::ProcessTest("Testing non-empty function metadata get", testing::IsEqual(actual, expected));
+
+    // Just for fun - metadata should have no effect
+    IRExecutionEngine jit(std::move(module));
+    jit.RunMain();
 }

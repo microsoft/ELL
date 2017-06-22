@@ -53,7 +53,11 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/predictors_python_pre.i
                      ../common/unique_ptr.i
                      ../common/utilities.i
-                     ../common/vector.i)
+                     ../common/vector.i
+                     ../common/vector_javascript_post.i
+                     ../common/vector_javascript_pre.i
+                     ../common/vector_python_post.i
+                     ../common/vector_python_pre.i)
 
 set (INTERFACE_DEPENDENCIES common data emitters evaluators functions math trainers model nodes predictors testing trainers utilities)
 
