@@ -43,7 +43,7 @@ namespace trainers
 
             for (int i = 0; i < indexes.size(); ++i)
             {
-                math::Operations::Copy(WX.GetColumn(indexes[i]), wx_label.GetColumn(i));
+                wx_label.GetColumn(i).CopyFrom(WX.GetColumn(indexes[i]));
             }
 
             math::ColumnVector<double> label(numLabels);
@@ -56,8 +56,8 @@ namespace trainers
 
             for (int i = 0; i < _numPrototypesPerLabel; ++i)
             {
-                math::Operations::Copy(clusterMeans.GetColumn(i), _B.GetColumn(l * _numPrototypesPerLabel + i));
-                math::Operations::Copy(label, _Z.GetColumn(l * _numPrototypesPerLabel + i));
+                _B.GetColumn(l * _numPrototypesPerLabel + i).CopyFrom(clusterMeans.GetColumn(i));
+                _Z.GetColumn(l * _numPrototypesPerLabel + i).CopyFrom(label);
             }
         }
     }

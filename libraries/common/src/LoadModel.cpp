@@ -26,6 +26,7 @@
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
 #include "MultiplexerNode.h"
+#include "ProtoNNPredictorNode.h"
 #include "SourceNode.h"
 #include "UnaryOperationNode.h"
 
@@ -187,6 +188,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
+        context.GetTypeFactory().AddType <model::Node, nodes::ProtoNNPredictorNode>();
     }
 
     void RegisterMapTypes(utilities::SerializationContext& context)

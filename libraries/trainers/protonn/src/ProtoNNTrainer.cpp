@@ -40,24 +40,24 @@ namespace trainers
     }
 
     ProtoNNTrainer::ProtoNNTrainer(size_t numExamples, size_t dim, const ProtoNNTrainerParameters& parameters)
-        : _dim(dim), _parameters(parameters), _X(dim, numExamples), _Y(parameters.numLabels, numExamples), _protoNNPredictor(dim, parameters.projectedDimesion, parameters.numPrototypesPerLabel * parameters.numLabels, parameters.numLabels, parameters.gamma)
+        : _dimemsion(dim), _parameters(parameters), _X(dim, numExamples), _Y(parameters.numLabels, numExamples), _protoNNPredictor(dim, parameters.projectedDimesion, parameters.numPrototypesPerLabel * parameters.numLabels, parameters.numLabels, parameters.gamma)
     {
     }
 
-	void ProtoNNTrainer::SetDataset(const data::AnyDataset& anyDataset)
+    void ProtoNNTrainer::SetDataset(const data::AnyDataset& anyDataset)
     {
-        math::ColumnMatrix<double> X(_dim, anyDataset.NumExamples());
+        math::ColumnMatrix<double> X(_dimemsion, anyDataset.NumExamples());
         math::ColumnMatrix<double> Y(_parameters.numLabels, anyDataset.NumExamples());
         ProtoNNTrainerUtils::GetDatasetAsMatrix(anyDataset, X, Y);
-        math::Operations::Copy(X, _X);
-        math::Operations::Copy(Y, _Y);
+        _X.CopyFrom(X);
+        _Y.CopyFrom(Y);
     }
 
     void ProtoNNTrainer::Update()
     {
         _parameters.numPrototypes = _parameters.numLabels * _parameters.numPrototypesPerLabel;
 
-        size_t D = _dim;
+        size_t D = _dimemsion;
         size_t d = _parameters.projectedDimesion; // projection dimension
         size_t n = _X.NumColumns();
         size_t m = _parameters.numPrototypes; // number of prototypes
@@ -124,18 +124,22 @@ namespace trainers
             math::ColumnMatrix<double> wxUpdated(W.NumRows(), end - begin);
             auto x = X.GetSubMatrix(0, begin, X.NumRows(), end - begin);
             math::Operations::Multiply<double>(1, W, x, 0, wxUpdated);
-            math::Operations::Copy(wxUpdated, wx);
+            wx.CopyFrom(wxUpdated);
         }
 
         // full(sum(B. ^ 2, 1));
         math::ColumnMatrix<double> bSquare(B.NumRows(), B.NumColumns());
         math::Operations::ElementWiseMultiply(B, B, bSquare);
-        auto bColNormSquare = ProtoNNTrainerUtils::ColumnwiseSum(bSquare);
+
+        math::ColumnMatrix<double> bColNormSquare(1, bSquare.NumColumns());
+        math::Operations::ColumnWiseSum(bSquare, bColNormSquare.GetRow(0));
 
         // full(sum(WX. ^ 2, 1));
         math::ColumnMatrix<double> wxSquare(wx.NumRows(), wx.NumColumns());
         math::Operations::ElementWiseMultiply(wx, wx, wxSquare);
-        auto wxColNormSquare = ProtoNNTrainerUtils::ColumnwiseSum(wxSquare);
+
+        math::ColumnMatrix<double> wxColNormSquare(1, wxSquare.NumColumns());
+        math::Operations::ColumnWiseSum(wxSquare, wxColNormSquare.GetRow(0));
 
         // wxb = (2.0 * gamma * gamma) * WX.transpose() * B;
         math::RowMatrix<double> wxb(wx.NumColumns(), B.NumColumns());
@@ -278,8 +282,8 @@ namespace trainers
 
         math::ColumnMatrix<double> paramS(param.NumRows(), param.NumColumns());
 
-        math::Operations::Copy(param, paramQ);
-        math::Operations::Copy(param, paramS);
+        paramQ.CopyFrom(param);
+        paramS.CopyFrom(param);
 
         int burn_period = 50;
         double lambda = 1;
@@ -321,7 +325,9 @@ namespace trainers
 
             math::ColumnMatrix<double> paramS_new(paramQ_new.NumRows(), paramQ_new.NumColumns());
             math::Operations::Add(1 - alpha, paramQ_new, alpha, paramQ, paramS_new);
-            math::Operations::Copy(paramS_new, paramS); //paramS_new = (1-alpha)*paramQ_new+alpha*paramQ; paramS=paramS_new
+
+            // paramS_new = (1-alpha)*paramQ_new+alpha*paramQ; paramS=paramS_new
+            paramS.CopyFrom(paramS_new);
 
             double runningAvgWeight = ((t - burn_period) > 1) ? (t - burn_period) : 1.0; //runningAvgWeight
             assert(runningAvgWeight >= 0.999999);
@@ -333,12 +339,13 @@ namespace trainers
             //Initializing parameters for next iteration
             lambda = lambda_new;
             paramQ = paramQ_new;
-            math::Operations::Copy(paramS_new, paramS);
-            math::Operations::Copy(paramAvg_new, paramAvg);
+
+            paramS.CopyFrom(paramS_new);
+            paramAvg.CopyFrom(paramAvg_new);
         }
 
-        math::Operations::Copy(paramAvg, param);
-        math::Operations::Copy(paramAvg, paramS);
+        param.CopyFrom(paramAvg);
+        paramS.CopyFrom(paramAvg);
 
         modelMap[parameterIndex]->GetData() = paramS;
     }
@@ -410,7 +417,9 @@ namespace trainers
                     currentGradient = modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, idx1, idx2, recomputeWX[parameterIndex]), gamma, idx1, idx2, _parameters.lossType);
 
                     math::ColumnMatrix<double> thresholdedGradient(parameterMatrix.NumRows(), parameterMatrix.NumColumns());
-                    math::Operations::Copy(currentGradient, thresholdedGradient);
+
+                    thresholdedGradient.CopyFrom(currentGradient);
+
                     ProtoNNTrainerUtils::HardThresholding(thresholdedGradient, sparsity[parameterIndex]);
 
                     auto coeff = smallPerturbation * safe_div(ProtoNNTrainerUtils::MaxAbsoluteElement(parameterMatrix), ProtoNNTrainerUtils::MaxAbsoluteElement(currentGradient));
@@ -536,7 +545,9 @@ namespace trainers
         // T = D .* T
         math::Operations::ElementWiseMultiply(T, D, T);
 
-        auto colMult = ProtoNNTrainerUtils::ColumnwiseSum(T.Transpose());
+        math::ColumnMatrix<double> colMult(1, T.NumRows());
+        math::Operations::ColumnWiseSum(T.Transpose(), colMult.GetRow(0));
+
         auto xSub = X.GetSubMatrix(0, begin, X.NumRows(), end - begin);
         math::ColumnMatrix<double> wxScaled(W.NumRows(), end - begin);
         math::Operations::Multiply<double>(1.0, W, xSub, 0, wxScaled);
@@ -657,10 +668,12 @@ namespace trainers
 
         // gradient_paramS = B (initialized gradient_paramS to prototypes)
         math::ColumnMatrix<double> gradient(B.NumRows(), B.NumColumns());
-        math::Operations::Copy(B, gradient);
+
+        gradient.CopyFrom(B);
 
         // sum(T, 1)
-        auto colMult = ProtoNNTrainerUtils::ColumnwiseSum(T);
+        math::ColumnMatrix<double> colMult(1, T.NumColumns());
+        math::Operations::ColumnWiseSum(T, colMult.GetRow(0));
 
         // gradient_paramS = gradient_paramS .* sum(T, 1)
         for (size_t j = 0; j < gradient.NumColumns(); j++) {

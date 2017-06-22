@@ -69,6 +69,13 @@ namespace common
     /// <returns> A unique_ptr to a forest trainer. </returns>
     std::unique_ptr<trainers::ITrainer<predictors::SimpleForestPredictor>> MakeForestTrainer(const LossFunctionArguments& lossFunctionArguments, const ForestTrainerArguments& trainerArguments);
 
+    /// <summary> Makes a protoNN trainer. </summary>
+    ///
+    /// <param name="numExamples"> number of examples. </param>
+    /// <param name="numFeatures"> number of features. </param>
+    /// <param name="parameters"> trainer arguments. </param>
+    ///
+    /// <returns> A unique_ptr to a protoNN trainer. </returns>
     std::unique_ptr<trainers::ITrainer<predictors::ProtoNNPredictor>> MakeProtoNNTrainer(size_t numExamples, size_t numFeatures, const trainers::ProtoNNTrainerParameters& parameters);
 }
 }

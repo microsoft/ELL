@@ -1,3 +1,4 @@
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
@@ -64,7 +65,7 @@ namespace trainers
         virtual const predictors::ProtoNNPredictor& GetPredictor() const { return std::move(_protoNNPredictor); }
 
     private:
-        // <summary> The Similarity Kernel.
+        // The Similarity Kernel.
         math::ColumnMatrix<double> SimilarityKernel(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, const size_t begin, const size_t end, bool recomputeWX = false) const;
 
         // The Similarity Kernel.

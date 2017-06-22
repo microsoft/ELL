@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ProtoNNTrainer.h (trainers)
+//  File:     ProtoNNTrainerUtils.h (trainers)
 //  Authors:  Suresh Iyengar
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,9 +27,6 @@ namespace trainers
     {
     public:
         static void ProtoNNTrainerUtils::GetDatasetAsMatrix(const data::AutoSupervisedDataset& anyDataset, math::MatrixReference<double, math::MatrixLayout::columnMajor> X, math::MatrixReference<double, math::MatrixLayout::columnMajor> Y);
-
-        template <typename math::MatrixLayout Layout>
-        static math::RowMatrix<double> ColumnwiseSum(math::ConstMatrixReference<double, Layout> A);
 
         template <typename math::MatrixLayout Layout>
         static math::Matrix<double, Layout> MatrixExp(math::ConstMatrixReference<double, Layout> A);

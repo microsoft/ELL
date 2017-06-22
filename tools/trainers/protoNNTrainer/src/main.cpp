@@ -44,7 +44,7 @@
 #include "ProtoNNPredictor.h"
 
 // nodes
-//#include "ProtoNNPredictorNode.h"
+#include "ProtoNNPredictorNode.h"
 
 // stl
 #include <iostream>
@@ -93,49 +93,56 @@ int main(int argc, char* argv[])
         auto mappedDataset = common::GetMappedDataset(stream, map);
         auto mappedDatasetDimension = map.GetOutput(0).Size();
 
-        //auto dataset = common::GetDataset(dataLoadArguments);
-
         // create protonn trainer
         auto trainer = common::MakeProtoNNTrainer(mappedDataset.NumExamples(), mappedDataset.NumFeatures(), protoNNTrainerArguments);
 
         // predictor type
         using PredictorType = predictors::ProtoNNPredictor;
 
-        // in verbose mode, create an evaluator and wrap the sgd trainer with an evaluatingTrainer
-        std::shared_ptr<evaluators::IEvaluator<PredictorType>> evaluator = nullptr;
-        if (protoNNTrainerArguments.verbose)
-        {
-            evaluator = common::MakeEvaluator<PredictorType>(mappedDataset.GetAnyDataset(), evaluatorArguments, trainerArguments.lossFunctionArguments);
-            //trainer = std::make_unique<trainers::EvaluatingIncrementalTrainer<PredictorType>>(trainers::MakeEvaluatingIncrementalTrainer(std::move(trainer), evaluator));
-        }
-
         // Train the predictor
         if (protoNNTrainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->SetDataset(mappedDataset.GetAnyDataset(0, mappedDataset.NumExamples()));
         trainer->Update();
 
-        // TODO: current evaluator compares double values, need one more overload for label comparison which are unsigned ints
-        //evaluator->Evaluate(trainer->GetPredictor());
-
         predictors::ProtoNNPredictor predictor(trainer->GetPredictor());
-        // Print loss and errors
+
         if (protoNNTrainerArguments.verbose)
         {
             std::cout << "Finished training.\n";
 
             // print evaluation
-            std::cout << "Training error\n";
-            //evaluator->Print(std::cout);
+            std::cout << "Training accuracy\n";
+            {
+                auto accuracy = 0.0;
+                auto truePositive = 0.0;
+                auto exampleIterator = mappedDataset.GetExampleIterator();
+                while (exampleIterator.IsValid())
+                {
+                    // get the Next example
+                    const auto& example = exampleIterator.Get();
+                    double label = example.GetMetadata().label;
+                    const auto& dataVector = example.GetDataVector().ToArray();
+                    auto prediction = predictor.Predict(dataVector);
+
+                    if (prediction.label == label)
+                        truePositive += 1;
+
+                    exampleIterator.Next();
+                }
+
+                accuracy = truePositive / mappedDataset.NumExamples();
+                std::cout << "\nAccuracy: " << accuracy << std::endl;
+            }
+
             std::cout << std::endl;
         }
 
-        // TODO: Serialization of protonn node
         // Save predictor model
         if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
-            //auto model = common::AppendNodeToModel<nodes::ProtoNNPredictorNode, PredictorType>(map, predictor);
-            //common::SaveModel(model, modelSaveArguments.outputModelFilename);
+            auto model = common::AppendNodeToModel<nodes::ProtoNNPredictorNode, PredictorType>(map, predictor);
+            common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

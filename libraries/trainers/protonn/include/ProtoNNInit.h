@@ -56,12 +56,10 @@ namespace trainers
 
 		size_t _numPrototypesPerLabel;
 
-		/// <summary> Returns the underlying projection matrix. </summary>
-		///
+		// Returns the underlying projection matrix.
 		math::ColumnMatrix<double> _B;
 
-		/// <summary> Returns the underlying projection matrix. </summary>
-		///
+		// Returns the underlying projection matrix.
 		math::ColumnMatrix<double> _Z;
 	};
 }

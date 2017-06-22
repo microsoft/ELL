@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ProtoNNTrainer.h (trainers)
+//  File:     ProtoNNTrainerUtils.h (trainers)
 //  Authors:  Suresh Iyengar
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,19 +49,6 @@ namespace trainers
             colIdx += 1;
             exampleIterator.Next();
         }
-    }
-
-    // TODO: shift to math library
-    template <typename math::MatrixLayout Layout>
-    math::RowMatrix<double> ProtoNNTrainerUtils::ColumnwiseSum(math::ConstMatrixReference<double, Layout> A)
-    {
-        math::RowMatrix<double> R(1, A.NumColumns());
-        math::RowMatrix<double> ones(1, A.NumRows());
-        ones.Fill(1.0);
-
-        math::Operations::Multiply(1.0, ones, A, 0.0, R);
-
-        return std::move(R);
     }
 
     template <typename math::MatrixLayout Layout>
