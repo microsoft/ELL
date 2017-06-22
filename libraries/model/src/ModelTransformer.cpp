@@ -99,7 +99,7 @@ namespace model
                     // Get relevant subset of targetRange and append it to result;
                     auto maxBegin = std::max(queryRangeStartIndex, targetRangeOffset);
                     auto minEnd = std::min(queryRangeEnd, targetRangeEnd);
-                    assert(minEnd <= maxBegin);
+                    assert(minEnd >= maxBegin);
                     auto intersectionSize = minEnd - maxBegin;
                     queryRangeStartIndex += intersectionSize;
                     assert(queryRangeSize >= intersectionSize);
