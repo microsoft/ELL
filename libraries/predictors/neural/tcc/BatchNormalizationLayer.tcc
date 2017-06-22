@@ -28,7 +28,7 @@ namespace neural
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Size of 'mean' and 'variance' must match");
         }
-        if (_layerParameters.input.NumElements() != GetOutputMinusPadding().NumElements())
+        if (_layerParameters.input.Size() != GetOutputMinusPadding().Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Expected size of input and output tensor (minus padding) to match");
         }
@@ -62,13 +62,19 @@ namespace neural
     template <typename ElementType>
     void BatchNormalizationLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        math::VectorArchiver::Write(_multiplicationValues, "multiplicationValues", archiver);
+        math::VectorArchiver::Write(_additionValues, "additionValues", archiver);
     }
 
     template <typename ElementType>
     void BatchNormalizationLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        math::VectorArchiver::Read(_multiplicationValues, "multiplicationValues", archiver);
+        math::VectorArchiver::Read(_additionValues, "additionValues", archiver);
     }
 
 }

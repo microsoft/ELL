@@ -24,7 +24,7 @@ namespace neural
         _shapedInput(convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding()),
         _outputMatrix(NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding())
     {
-        if (weights.NumElements() != (_output.NumChannels() * _layerParameters.input.NumChannels() * convolutionalParameters.receptiveField * convolutionalParameters.receptiveField))
+        if (weights.Size() != (_output.NumChannels() * _layerParameters.input.NumChannels() * convolutionalParameters.receptiveField * convolutionalParameters.receptiveField))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "weights dimensions for a convolutional layer should be the size of the receptive field volume * number of filters");
         }
@@ -168,13 +168,31 @@ namespace neural
     template <typename ElementType>
     void ConvolutionalLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        archiver["receptiveField"] << _convolutionalParameters.receptiveField;
+        archiver["stride"] << _convolutionalParameters.stride;
+        archiver["method"] << static_cast<int>(_convolutionalParameters.receptiveField);
+        archiver["numFiltersAtATime"] << static_cast<int>(_convolutionalParameters.numFiltersAtATime);
+        
+        math::MatrixArchiver::Write(_shapedInput, "shapedInput", archiver);
+        math::MatrixArchiver::Write(_weightsMatrix, "weightsMatrix", archiver);
+        math::MatrixArchiver::Write(_outputMatrix, "outputMatrix", archiver);
     }
 
     template <typename ElementType>
     void ConvolutionalLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        archiver["receptiveField"] >> _convolutionalParameters.receptiveField;
+        archiver["stride"] >> _convolutionalParameters.stride;
+        archiver["method"] >> static_cast<int>(_convolutionalParameters.receptiveField);
+        archiver["numFiltersAtATime"] >> static_cast<int>(_convolutionalParameters.numFiltersAtATime);
+
+        math::MatrixArchiver::Read(_shapedInput, "shapedInput", archiver);
+        math::MatrixArchiver::Read(_weightsMatrix, "weightsMatrix", archiver);
+        math::MatrixArchiver::Read(_outputMatrix, "outputMatrix", archiver);
     }
 
 }

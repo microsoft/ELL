@@ -7,6 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "KMeansTrainer.h"
 
+// math
+#include "Operations.h"
+
 // stl
 #include <cassert>
 #include <cmath>
@@ -44,7 +47,7 @@ namespace trainers
         size_t K = _numClusters;
         size_t choice = rand() % N;
 
-        math::Operations::Copy(X.GetColumn(choice), _means.GetColumn(0));
+        _means.GetColumn(0).CopyFrom(X.GetColumn(choice));
 
         math::ColumnVector<double> minimumDistance(X.NumColumns());
         for (int k = 1; k < _numClusters; ++k)
@@ -55,7 +58,7 @@ namespace trainers
 
             if (k == 1)
             {
-                math::Operations::Copy(distanceToPreviousMean, minimumDistance);
+                minimumDistance.CopyFrom(distanceToPreviousMean);
             }
             else
             {
@@ -65,7 +68,7 @@ namespace trainers
             }
 
             choice = weightedSample(minimumDistance);
-            math::Operations::Copy(X.GetColumn(choice), _means.GetColumn(k));
+            _means.GetColumn(k).CopyFrom(X.GetColumn(choice));
         }
     }
 
@@ -142,7 +145,7 @@ namespace trainers
             clusterSum.GetColumn(i) /= numPointsPerCluster[i];
         }
 
-        math::Operations::Copy(clusterSum, _means);
+        _means.CopyFrom(clusterSum);
     }
 
     size_t KMeansTrainer::weightedSample(math::ColumnVector<double> weights)

@@ -122,6 +122,27 @@ void TestMatrix2()
     testing::ProcessTest("Matrix::Fill()", M == R2);
 }
 
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixArchiver()
+{
+    math::Matrix<ElementType, layout> M(3, 4);
+    M(0, 0) = 1;
+    M(0, 2) = 4;
+    M(2, 3) = 7;
+
+    utilities::SerializationContext context;
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+
+    math::MatrixArchiver::Write(M, "test", archiver);
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+
+    math::Matrix<ElementType, layout> Ma(0, 0);
+    math::MatrixArchiver::Read(Ma, "test", unarchiver);
+    testing::ProcessTest("MatrixArchiver, write and read matrix", Ma == M);
+
+}
+
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
 void TestMatrixCopy()
 {
@@ -245,8 +266,8 @@ void TestMatrixOperations()
         { 4, 8 },
         { 1, 3 }
     };
-    Ops::Copy(R2, M);
-    testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R2);
+    M.CopyFrom(R2);
+    testing::ProcessTest(implementationName + "CopyFrom", M == R2);
 
     math::Matrix<ElementType, layout> D{
         { 10, 1, 9, 1 },
@@ -311,21 +332,21 @@ void TestContiguousMatrixOperations()
         { 2, 3 },
         { 4, 5 }
     };
-    Ops::Copy(A1, M);
-    testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == A1);
+    M.CopyFrom(A1);
+    testing::ProcessTest(implementationName + "CopyFrom", M == A1);
 
     math::Matrix<ElementType, layout> A2{
         { 1 },
         { 3 }
     };
 
-    Ops::Copy(A2, M.GetSubMatrix(1, 0, 2, 1));
+    M.GetSubMatrix(1, 0, 2, 1).CopyFrom(A2);
     math::Matrix<ElementType, math::MatrixLayout::columnMajor> R4{
         { 0, 1 },
         { 1, 3 },
         { 3, 5 }
     };
-    testing::ProcessTest(implementationName + "Operations::Copy(MatrixReference, MatrixReference)", M == R4);
+    testing::ProcessTest(implementationName + "CopyFrom", M == R4);
 
     Ops::Multiply(static_cast<ElementType>(2.0), M);
     math::Matrix<ElementType, math::MatrixLayout::columnMajor> R5{
@@ -387,8 +408,8 @@ void TestConstMatrixReference()
 
     auto R = N.GetSubMatrix(1, 1, 3, 2);
     auto S = R.Transpose();
-    testing::ProcessTest("ConstMatrixReference testing GetRow", math::Operations::Norm1(S.GetRow(0)) == 3 + 8 + 2);
-    testing::ProcessTest("ConstMatrixReference testing GetRow", math::Operations::Norm1(S.GetRow(1)) == 5 + 1 + 4);
+    testing::ProcessTest("ConstMatrixReference testing GetRow", S.GetRow(0).Norm1() == 3 + 8 + 2);
+    testing::ProcessTest("ConstMatrixReference testing GetRow", S.GetRow(1).Norm1() == 5 + 1 + 4);
 }
 
 template <typename ElementType, math::ImplementationType Implementation>

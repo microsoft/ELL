@@ -5,15 +5,13 @@
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma once
 
 #include "Matrix.h"
 #include "Vector.h"
 #ifdef USE_BLAS
 #include "BlasWrapper.h"
 #endif
-
-#ifndef MATH_OPERATIONS_H
-#define MATH_OPERATIONS_H
 
 // stl
 #include <string>
@@ -25,13 +23,6 @@ namespace math
     /// <summary> Native implementations of static vector/matrix operations that are not implemented in BLAS. </summary>
     struct CommonOperations
     {
-        /// <summary> Computes the 0-norm of a vector. </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <returns> The 0-norm. </returns>
-        template <typename ElementType>
-        static ElementType Norm0(UnorientedConstVectorReference<ElementType> v);
-
         /// <summary> Adds a scalar to a vector, v += s. </summary>
         ///
         /// <typeparam name="ElementType"> Vector element type. </typeparam>
@@ -59,15 +50,6 @@ namespace math
     template <class DerivedClass>
     struct DerivedOperations : public CommonOperations
     {
-        /// <summary> Copy values from one matrix to another, A = B. </summary>
-        ///
-        /// <typeparam name="ElementType"> Matrix element type. </typeparam>
-        /// <typeparam name="orientation"> Matrix layout. </typeparam>
-        /// <param name="u"> A const reference to a matrix whose values will be copied. </param>
-        /// <param name="v"> [in,out] Reference to a matrix whose values will be overwritten. </param>
-        template <typename ElementType, MatrixLayout layout>
-        static void Copy(ConstMatrixReference<ElementType, layout> B, MatrixReference<ElementType, layout> A);
-
         /// <summary> Generalized matrix matrix addition, C = s * A + t * B. </summary>
         ///
         /// <typeparam name="ElementType"> Matrix element type. </typeparam>
@@ -163,9 +145,7 @@ namespace math
     template <>
     struct OperationsImplementation<ImplementationType::native> : public DerivedOperations<OperationsImplementation<ImplementationType::native>>
     {
-        using CommonOperations::Norm0;
         using CommonOperations::Add;
-        using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Copy;
         using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Add;
         using DerivedOperations<OperationsImplementation<ImplementationType::native>>::Multiply;
         using DerivedOperations<OperationsImplementation<ImplementationType::native>>::MultiplyAdd;
@@ -174,36 +154,6 @@ namespace math
         ///
         /// <returns> The implementation name. </returns>
         static std::string GetImplementationName() { return "Native"; }
-
-        /// <summary> Copy values from one vector to another, u = v. </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="orientation"> Vector orientation. </typeparam>
-        /// <param name="v"> A const reference to a vector whose values will be copied. </param>
-        /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
-        template <typename ElementType, VectorOrientation orientation>
-        static void Copy(ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u);
-
-        /// <summary> Computes the 1-norm of a vector. </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <returns> The 1-norm. </returns>
-        template <typename ElementType>
-        static ElementType Norm1(UnorientedConstVectorReference<ElementType> v);
-
-        /// <summary> Computes the 2-norm of a vector (not the squared 2-norm). </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <returns> The 2-norm. </returns>
-        template <typename ElementType>
-        static ElementType Norm2(UnorientedConstVectorReference<ElementType> v);
-
-        /// <summary> Computes the squared 2-norm of a vector (not the squared 2-norm). </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <returns> The squared 2-norm. </returns>
-        template <typename ElementType>
-        static ElementType Norm2Squared(UnorientedConstVectorReference<ElementType> v);
 
         ///// <summary> Columnwise sum of a matrix. </summary>
         /////
@@ -286,9 +236,7 @@ namespace math
     template <>
     struct OperationsImplementation<ImplementationType::openBlas> : public DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>
     {
-        using CommonOperations::Norm0;
         using CommonOperations::Add;
-        using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Copy;
         using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Add;
         using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::Multiply;
         using DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>::MultiplyAdd;
@@ -297,36 +245,6 @@ namespace math
         ///
         /// <returns> The implementation name. </returns>
         static std::string GetImplementationName() { return "Blas"; }
-
-        /// <summary> Copy values from one vector to another, u = v. </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <typeparam name="orientation"> Vector orientation. </typeparam>
-        /// <param name="v"> A const reference to a vector whose values will be copied. </param>
-        /// <param name="u"> Reference to a vector whose values will be overwritten. </param>
-        template <typename ElementType, VectorOrientation orientation>
-        static void Copy(ConstVectorReference<ElementType, orientation> v, VectorReference<ElementType, orientation> u);
-
-        /// <summary> Computes the 1-norm of a vector. </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <returns> The 1-norm. </returns>
-        template <typename ElementType>
-        static ElementType Norm1(UnorientedConstVectorReference<ElementType> v);
-
-        /// <summary> Computes the 2-norm of a vector (not the squared 2-norm). </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <returns> The 2-norm. </returns>
-        template <typename ElementType>
-        static ElementType Norm2(UnorientedConstVectorReference<ElementType> v);
-
-        /// <summary> Computes the squared 2-norm of a vector (not the squared 2-norm). </summary>
-        ///
-        /// <typeparam name="ElementType"> Vector element type. </typeparam>
-        /// <returns> The squared 2-norm. </returns>
-        template <typename ElementType>
-        static ElementType Norm2Squared(UnorientedConstVectorReference<ElementType> v);
 
         ///// <summary> Columnwise sum of a matrix. </summary>
         /////
@@ -430,5 +348,3 @@ namespace math
 }
 
 #include "../tcc/Operations.tcc"
-
-#endif // MATH_OPERATIONS_H

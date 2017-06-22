@@ -19,7 +19,7 @@ namespace predictors
     NeuralNetworkPredictor<ElementType>::NeuralNetworkPredictor(InputLayerReference&& inputLayer, Layers&& layers) :
         _inputLayer(std::move(inputLayer)),
         _layers(std::move(layers)),
-        _output(_layers.back()->GetOutput().NumElements())
+        _output(_layers.back()->GetOutput().Size())
     {
     }
 
@@ -88,14 +88,53 @@ namespace predictors
     template <typename ElementType>
     void NeuralNetworkPredictor<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        //archiver["layers"] << _layers;
+        archiver["inputLayer"] << _inputLayer.get();
+
+        std::vector<const neural::Layer<ElementType>*> layerElements;
+        for (size_t i = 0; i < _layers.size(); i++)
+        {
+            layerElements.emplace_back(_layers[i].get());
+        }
+        archiver["layers"] << layerElements;
+        archiver["output"] << _output;
     }
 
     template <typename ElementType>
     void NeuralNetworkPredictor<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        //archiver["layers"] >> _layers;
+        RegisterNeuralNetworkPredictorTypes(archiver.GetContext());
+        neural::LayerSerializationContext<ElementType> layerContext(archiver.GetContext());
+        archiver.PushContext(layerContext);
+
+        archiver["inputLayer"] >> _inputLayer;
+
+        std::vector<const neural::Layer<ElementType>*> layerElements;
+        archiver["layers"] >> layerElements;
+        _layers.resize(layerElements.size());
+        for (size_t i = 0; i < layerElements.size(); i++)
+        {
+            _layers[i].reset((neural::Layer<ElementType>*)layerElements[i]);
+        }
+        archiver["output"] >> _output;
     }
 
+    template <typename ElementType>
+    void NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(utilities::SerializationContext& context)
+    {
+        using namespace ell::predictors::neural;
+        context.GetTypeFactory().AddType<neural::InputLayer<ElementType>, neural::InputLayer<ElementType>>(); 
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType, LeakyReLUActivation>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType, ReLUActivation>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<ElementType, SigmoidActivation>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::BatchNormalizationLayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::BiasLayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::BinaryConvolutionalLayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ConvolutionalLayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::FullyConnectedLayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::PoolingLayer<ElementType, MaxPoolingFunction>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::PoolingLayer<ElementType, MeanPoolingFunction>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ScalingLayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::SoftmaxLayer<ElementType>>();
+    }
 }
 }

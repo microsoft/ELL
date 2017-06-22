@@ -28,14 +28,16 @@ set (include include/AccumulatorNode.h
              include/TypeCastNode.h
              include/UnaryOperationNode.h
              include/ValueSelectorNode.h
-             include/SourceNode.h)
+             include/SourceNode.h
+             include/ProtoNNPredictorNode.h)
 
 set (src src/ConstantNode.cpp
          src/IRNode.cpp
          src/LinearPredictorNode.cpp
          src/MatrixMatrixMultiplyNode.cpp
          src/MatrixVectorMultiplyNode.cpp
-         src/SingleElementThresholdNode.cpp)
+         src/SingleElementThresholdNode.cpp
+         src/ProtoNNPredictorNode.cpp)
 
 set (tcc tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc

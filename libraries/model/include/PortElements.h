@@ -114,6 +114,11 @@ namespace model
         PortRange& operator=(const PortRange& other) = default;
         PortRange& operator=(PortRange&& other) = default;
 
+        /// <summary> Creates a PortRange representing a single PortElement value </summary>
+        ///
+        /// <param name="element"> The element to take a value from </param>
+        PortRange(const PortElementBase& element);
+
         /// <summary> Creates a PortRange representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
@@ -243,30 +248,35 @@ namespace model
         PortElementsBase& operator=(const PortElementsBase& other) = default;
         PortElementsBase& operator=(PortElementsBase&& other) = default;
 
-        /// <summary> Constructor </summary>
+        /// <summary> Creates a PortElementsBase representing a single element </summary>
+        ///
+        /// <param name="element"> The element to construct this PortElements from. </param>
+        PortElementsBase(const PortElementBase& element);
+
+        /// <summary> Creates a PortElementsBase representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to construct this PortElements from. </param>
         PortElementsBase(const OutputPortBase& port);
 
-        /// <summary> Constructor </summary>
+        /// <summary> Creates a PortElementsBase representing a single value from a given port </summary>
         ///
         /// <param name="port"> The port to construct this PortElements from. </param>
         /// <param name="startIndex"> The index of the element to start at. </param>
         PortElementsBase(const OutputPortBase& port, size_t startIndex);
 
-        /// <summary> Constructor </summary>
+        /// <summary> Creates a PortElementsBase representing a range of values from a given port </summary>
         ///
         /// <param name="port"> The port to construct this PortElements from. </param>
         /// <param name="startIndex"> The index of the element to start at. </param>
         /// <param name="numValues"> The number of elements to use. </param>
         PortElementsBase(const OutputPortBase& port, size_t startIndex, size_t numValues);
 
-        /// <summary> Constructor </summary>
+        /// <summary> Creates a PortElementsBase representing a contiguous range of elements </summary>
         ///
         /// <param name="range"> The rage to construct this PortElements from. </param>
         PortElementsBase(const PortRange& range);
 
-        /// <summary> Constructor </summary>
+        /// <summary> Creates a PortElementsBase representing an arbitrary set of contiguous ranges of elements </summary>
         ///
         /// <param name="ranges"> The ranges to construct this PortElements from. </param>
         PortElementsBase(const std::vector<PortRange>& ranges);
@@ -362,6 +372,11 @@ namespace model
         PortElements<ValueType>& operator=(const PortElements<ValueType>&) = default;
         PortElements<ValueType>& operator=(PortElements<ValueType>&&) = default;
 
+        /// <summary> Creates a PortElements representing a single element from a given port </summary>
+        ///
+        /// <param name="element"> The element </param>
+        PortElements(const PortElement<ValueType>& element);
+
         /// <summary> Creates a PortElements representing all the values from a given port </summary>
         ///
         /// <param name="port"> The port to take values from </param>
@@ -379,11 +394,6 @@ namespace model
         /// <param name="startIndex"> The index of the first value to take </param>
         /// <param name="numValues"> The number of values to take </param>
         PortElements(const OutputPort<ValueType>& port, size_t startIndex, size_t numValues);
-
-        /// <summary> Creates a PortElements representing a single element from a given port </summary>
-        ///
-        /// <param name="element"> The element </param>
-        PortElements(const PortElement<ValueType>& element);
 
         /// <summary> Creates a PortElements by concatenating a set of PortElement objects together </summary>
         ///

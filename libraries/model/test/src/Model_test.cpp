@@ -228,7 +228,8 @@ void TestCopyModel()
     std::cout << "---------" << std::endl;
     PrintModel(newModel);
 
-    std::cout << "\n\n" << std::endl;
+    std::cout << "\n\n"
+              << std::endl;
 }
 
 // Define new node that splits its outputs when refined
@@ -273,7 +274,7 @@ public:
         model::PortElements<ValueType> elem2(newNode2->output);
         model::PortElements<ValueType> newOutput({ elem1, elem2 });
 
-        transformer.MapNodeOutput({ output }, newOutput);
+        transformer.MapNodeOutput(output, newOutput);
         return true;
     }
 

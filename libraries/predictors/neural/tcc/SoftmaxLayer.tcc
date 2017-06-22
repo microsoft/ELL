@@ -22,7 +22,7 @@ namespace neural
     SoftmaxLayer<ElementType>::SoftmaxLayer(const LayerParameters& layerParameters) :
         Layer<ElementType>(layerParameters)
     {
-        if (_layerParameters.input.NumElements() != GetOutputMinusPadding().NumElements())
+        if (_layerParameters.input.Size() != GetOutputMinusPadding().Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Expected size of input and output tensor (minus padding) to match");
         }
@@ -79,18 +79,6 @@ namespace neural
             }
         }
 
-    }
-
-    template <typename ElementType>
-    void SoftmaxLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
-    {
-        // TODO:
-    }
-
-    template <typename ElementType>
-    void SoftmaxLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
-    {
-        // TODO:
     }
 
 }

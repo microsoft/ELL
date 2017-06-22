@@ -40,6 +40,8 @@ namespace neural
         /// <return> The value when accumulate is called on padding. </return>
         ElementType GetValueAtPadding() const { return -std::numeric_limits<ElementType>::max(); }
 
+        /// <summary> Typename used for serialization. </summary>
+        static std::string GetTypeName() { return "MaxPoolingFunction"; }
     private:
         ElementType _max;
     };

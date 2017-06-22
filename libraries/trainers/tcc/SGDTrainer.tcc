@@ -135,7 +135,7 @@ namespace trainers
     {
         const double lambda = _parameters.regularization;
         _lastPredictor.Resize(_v.Size());
-        _lastPredictor.GetWeights().Set((-1 / (lambda * _t)) * _v);
+        _lastPredictor.GetWeights().CopyFrom((-1 / (lambda * _t)) * _v);
         _lastPredictor.GetBias() = -_a / (lambda * _t);
         return _lastPredictor;
     }
@@ -145,7 +145,7 @@ namespace trainers
     {
         const double lambda = _parameters.regularization;
         _averagedPredictor.Resize(_v.Size());
-        _averagedPredictor.GetWeights().Set(-_h / (lambda * _t) * _v);
+        _averagedPredictor.GetWeights().CopyFrom(-_h / (lambda * _t) * _v);
         _averagedPredictor.GetWeights() += 1 / (lambda * _t) * _u;
         _averagedPredictor.GetBias() = -_c / (lambda * _t);
         return _averagedPredictor;
@@ -226,7 +226,7 @@ namespace trainers
     {
         const double lambda = _parameters.regularization;
         _lastPredictor.Resize(_v.Size());
-        _lastPredictor.GetWeights().Set((-1 / (lambda * _t)) * _v);
+        _lastPredictor.GetWeights().CopyFrom((-1 / (lambda * _t)) * _v);
         _lastPredictor.GetBias() = -_a / (lambda * _t);
         return _lastPredictor;
     }
@@ -237,7 +237,7 @@ namespace trainers
         const double lambda = _parameters.regularization;
         const double coeff = 1.0 / (lambda * _t);
         _averagedPredictor.Resize(_v.Size());
-        _averagedPredictor.GetWeights().Set(-_h * coeff * _v);
+        _averagedPredictor.GetWeights().CopyFrom(-_h * coeff * _v);
         _averagedPredictor.GetWeights() += coeff * _u;
         _averagedPredictor.GetWeights() += _c * coeff * _center.Transpose();
 

@@ -34,13 +34,17 @@ namespace neural
     template <typename ElementType>
     void ScalingLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        math::VectorArchiver::Write(_scales, "scales", archiver);
     }
 
     template <typename ElementType>
     void ScalingLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        math::VectorArchiver::Read(_scales, "scales", archiver);
     }
 
 }

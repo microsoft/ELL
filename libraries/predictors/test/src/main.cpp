@@ -565,6 +565,30 @@ void NeuralNetworkPredictorTest()
 
     output = neuralNetwork.Predict(DataVectorType({ 1, 1 }));
     testing::ProcessTest("Testing NeuralNetworkPredictor, Predict of XOR net for 1 1 ", Equals(output[0], 0.0));
+
+    // Verify that we can archive and unarchive the predictor
+    utilities::SerializationContext context;
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+    neuralNetwork.WriteToArchive(archiver);
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+
+    std::string value = strstream.str();
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork2;
+    neuralNetwork2.ReadFromArchive(unarchiver);
+
+    output = neuralNetwork2.Predict(DataVectorType({ 0, 0 }));
+    testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 0 0 ", Equals(output[0], 0.0));
+
+    output = neuralNetwork2.Predict(DataVectorType({ 0, 1 }));
+    testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 0 1 ", Equals(output[0], 1.0));
+
+    output = neuralNetwork2.Predict(DataVectorType({ 1, 0 }));
+    testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 1 0 ", Equals(output[0], 1.0));
+
+    output = neuralNetwork2.Predict(DataVectorType({ 1, 1 }));
+    testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 1 1 ", Equals(output[0], 0.0));
 }
 
 void ProtoNNPredictorTest()
@@ -594,11 +618,13 @@ void ProtoNNPredictorTest()
     Z(0, 0) = 0.1; Z(0, 1) = 0.3, Z(0, 2) = 0.2;
     Z(1, 0) = 0.2; Z(1, 1) = 0.4, Z(1, 2) = 0.8;
 
-    auto result = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
+    predictors::ProtoNNPrediction result = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
 
     size_t R = 1;
+    double score = 1.321484;
 
-    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result, R));
+    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result.label, R));
+    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result.score, score, 1e-6));
 }
 
 /// Runs all tests

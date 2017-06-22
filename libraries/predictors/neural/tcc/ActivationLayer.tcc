@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActivationLayer.h"
-
 // stl
 #include <algorithm>
 
@@ -47,18 +45,6 @@ namespace neural
                 flattenedOutput(i, j) = _activation.Apply(value);
             }
         }
-    }
-
-    template <typename ElementType, template <typename> class ActivationFunctionType>
-    void ActivationLayer<ElementType, ActivationFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
-    {
-        // TODO:
-    }
-
-    template <typename ElementType, template <typename> class ActivationFunctionType>
-    void ActivationLayer<ElementType, ActivationFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
-    {
-        // TODO:
     }
 
 }

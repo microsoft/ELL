@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Layer.h"
-#include "Print.h"
 
 // stl
 #include <iostream>
@@ -38,7 +37,7 @@ namespace neural
                 output.Fill(-1);
                 break;
             case PaddingScheme::randomZeroAndOnes:
-                output.Generate([] { return (std::rand() % 2); });
+                output.Generate([] { return static_cast<ElementType>(std::rand() % 2); });
                 break;
             case PaddingScheme::alternatingZeroAndOnes:
                 {
@@ -89,7 +88,7 @@ namespace neural
         os << buffer;
 
         const ConstTensorReferenceType output(_output);
-        for (size_t i = 0; (i < numValuesToPrint) && (i < output.NumElements()); i++)
+        for (size_t i = 0; (i < numValuesToPrint) && (i < output.Size()); i++)
         {
             size_t channel = i % output.NumChannels();
             size_t col = i / output.NumChannels();
@@ -112,13 +111,39 @@ namespace neural
     template <typename ElementType>
     void Layer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        //TODO: Write the output Tensor and padding configs
+        archiver["inputPaddingScheme"] << static_cast<int>(_layerParameters.inputPaddingParameters.paddingScheme);
+        archiver["inputPaddingSize"] << _layerParameters.inputPaddingParameters.paddingSize;
+
+        archiver["outputShape"] << std::vector<size_t>(_layerParameters.outputShape.begin(), _layerParameters.outputShape.end());
+
+        archiver["outputPaddingScheme"] << static_cast<int>(_layerParameters.outputPaddingParameters.paddingScheme);
+        archiver["outputPaddingSize"] << _layerParameters.outputPaddingParameters.paddingSize;
+
+        math::TensorArchiver::Write(_output, "output", archiver);
     }
 
     template <typename ElementType>
     void Layer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        //TODO: Read the output Tensor and padding configs
+        archiver["inputPaddingScheme"] >> static_cast<int>(_layerParameters.inputPaddingParameters.paddingScheme);
+        archiver["inputPaddingSize"] >> _layerParameters.inputPaddingParameters.paddingSize;
+
+        std::vector<size_t> outputShape;
+        archiver["outputShape"] >> outputShape;
+        std::copy(outputShape.begin(), outputShape.end(), _layerParameters.outputShape.begin());
+
+        archiver["outputPaddingScheme"] >> static_cast<int>(_layerParameters.outputPaddingParameters.paddingScheme);
+        archiver["outputPaddingSize"] >> _layerParameters.outputPaddingParameters.paddingSize;
+
+        math::TensorArchiver::Read(_output, "output", archiver);
+
+        // Set the input reference to the previously restored layer's output. This is saved in the
+        // serialization context
+        LayerSerializationContext<ElementType>& layerContext = dynamic_cast<LayerSerializationContext<ElementType>&>(archiver.GetContext());
+        _layerParameters.input = layerContext.GetPreviousOutputReference();
+
+        // Save the output reference to the serialization context
+        layerContext.SetOutputReference(GetOutput());
     }
 
     template <typename ElementType>

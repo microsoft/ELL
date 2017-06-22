@@ -28,6 +28,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <algorithm> // for std::transform
 
 namespace ell
 {

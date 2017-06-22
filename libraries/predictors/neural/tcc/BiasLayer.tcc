@@ -20,7 +20,7 @@ namespace neural
         Layer<ElementType>(layerParameters),
         _bias(bias)
     {        
-        if (_layerParameters.input.NumElements() != GetOutputMinusPadding().NumElements())
+        if (_layerParameters.input.Size() != GetOutputMinusPadding().Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Expected size of input and output tensor (minus padding) to match");
         }
@@ -43,13 +43,17 @@ namespace neural
     template <typename ElementType>
     void BiasLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        math::VectorArchiver::Write(_bias, "bias", archiver);
     }
 
     template <typename ElementType>
     void BiasLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        math::VectorArchiver::Read(_bias, "bias", archiver);
     }
 
 }

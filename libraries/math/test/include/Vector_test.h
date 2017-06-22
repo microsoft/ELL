@@ -30,4 +30,7 @@ void TestElementwiseTransform();
 template<typename ElementType>
 void TestTransformedVectors();
 
+template<typename ElementType>
+void TestVectorArchiver();
+
 #include "../tcc/Vector_test.tcc"

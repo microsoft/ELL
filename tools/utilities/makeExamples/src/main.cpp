@@ -11,14 +11,10 @@
 // common
 #include "LoadModel.h"
 
-// model
-#include "Model.h"
-
 // utilities
 #include "CommandLineParser.h"
 
 // stl
-#include <chrono>
 #include <iostream>
 
 using namespace ell;

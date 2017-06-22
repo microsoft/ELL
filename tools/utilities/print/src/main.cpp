@@ -16,17 +16,13 @@
 // utilities
 #include "CommandLineParser.h"
 #include "Exception.h"
-#include "Files.h"
 #include "OutputStreamImpostor.h"
 
 // model
 #include "Model.h"
 
 // stl
-#include <fstream>
 #include <iostream>
-#include <memory>
-#include <stdexcept>
 
 using namespace ell;
 

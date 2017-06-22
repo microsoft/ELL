@@ -73,13 +73,19 @@ namespace neural
     template <typename ElementType, template <typename> class PoolingFunctionType>
     void PoolingLayer<ElementType, PoolingFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        // TODO:
+        Layer<ElementType>::WriteToArchive(archiver);
+
+        archiver["poolingSize"] << _poolingParameters.poolingSize;
+        archiver["stride"] << _poolingParameters.stride;
     }
 
     template <typename ElementType, template <typename> class PoolingFunctionType>
     void PoolingLayer<ElementType, PoolingFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        // TODO:
+        Layer<ElementType>::ReadFromArchive(archiver);
+
+        archiver["poolingSize"] >> _poolingParameters.poolingSize;
+        archiver["stride"] >> _poolingParameters.stride;
     }
 
 }

@@ -20,7 +20,8 @@
 #include "Dataset.h"
 #include "Example.h"
 
-
+// math
+#include "Vector.h"
 
 // common
 #include "DataLoadArguments.h"
@@ -28,20 +29,15 @@
 #include "DataSaveArguments.h"
 #include "LoadModel.h"
 #include "MapLoadArguments.h"
-#include "MapSaveArguments.h"
 
 // model
 #include "DynamicMap.h"
-#include "InputNode.h"
-#include "Model.h"
 #include "OutputNode.h"
 
 // stl
 #include <iostream>
-#include <memory>
 #include <stdexcept>
 #include <string>
-#include <tuple>
 
 using namespace ell;
 

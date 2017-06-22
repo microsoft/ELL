@@ -65,6 +65,9 @@ namespace neural
         /// <param name="weights"> The set of weights to apply. </param>
         ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, ConstTensorReferenceType& weights);
 
+        /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
+        ConvolutionalLayer() : _weights(math::Triplet{0, 0, 0}), _shapedInput(0, 0), _weightsMatrix(0, 0), _outputMatrix(0 ,0){}
+
         /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
         void Compute() override;
 
@@ -73,15 +76,25 @@ namespace neural
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::convolution; }
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("ConvolutionalLayer"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         // Fills a matrix (backed by the array outputMatrix) where the columns the set of input values corresponding to a filter, stretched into a vector.

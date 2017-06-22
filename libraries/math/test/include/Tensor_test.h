@@ -19,6 +19,9 @@ template<typename ElementType>
 void TestTensorReference();
 
 template<typename ElementType>
+void TestCopyFromAndGetSubTensor();
+
+template<typename ElementType>
 void TestTensorGetSlice();
 
 template<typename ElementType>
@@ -35,5 +38,9 @@ void TestTensorVectorMultiply();
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensorVectorMultiplyAdd();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorArchiver();
+
 
 #include "../tcc/Tensor_test.tcc"

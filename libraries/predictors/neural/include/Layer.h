@@ -81,7 +81,7 @@ namespace neural
 
     /// <summary> Common base class for a layer in a neural network. </summary>
     template <typename ElementType>
-    class Layer
+    class Layer : public utilities::IArchivable
     {
     public:
         using Shape = math::Triplet;
@@ -111,6 +111,9 @@ namespace neural
         /// <summary> Initializes this class with the required information regarding inputs and outputs. </summary>
         /// <param name="layerParameters"> The parameters for this layer. </param>
         Layer(const LayerParameters& layerParameters);
+
+        /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
+        Layer() : _layerParameters{math::Triplet{0, 0, 0}, NoPadding(), {0, 0, 0}, NoPadding()}, _output(math::Triplet{0, 0, 0}) {}
 
         /// <summary> Returns a reference to the output tensor. </summary>
         ///
@@ -148,6 +151,16 @@ namespace neural
         /// <param name="maxValuesToPrint"> The maximum number of values from the layer output to include in the info sent to the output stream </param>
         virtual void Print(std::ostream& os, size_t maxValuesToPrint = 100) const;
 
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("Layer"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
@@ -183,6 +196,39 @@ namespace neural
         TensorType _output;
     };
 
+    /// <summary> A serialization context used during layer deserialization. Wraps an existing `SerializationContext`
+    /// and adds access to the layer being constructed. </summary>
+    template <typename ElementType>    
+    class LayerSerializationContext : public utilities::SerializationContext
+    {
+        using ConstTensorReferenceType = typename Layer<ElementType>::ConstTensorReferenceType;
+    public:
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="previousContext"> The `SerializationContext` to wrap </param>
+        LayerSerializationContext(utilities::SerializationContext& previousContext) : _previousContext(previousContext), _outputReference(math::Triplet{0, 0, 0}) {}
+
+        virtual ~LayerSerializationContext() {}
+
+        /// <summary> Gets the type factory associated with this context. </summary>
+        ///
+        /// <returns> The type factory associated with this context. </returns>
+        virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _previousContext.GetTypeFactory(); }
+
+        /// <summary> Sets the output reference to be saved in the context.
+        ///
+        /// <param name="outputReference"> The output reference to save, typically from the layer that has just been deserialized. </param>
+        void SetOutputReference(ConstTensorReferenceType outputReference) { _outputReference = outputReference; }
+
+        /// <summary> Returns the previously saved output reference. </summary>
+        ///
+        /// <returns> The outputReference stored in this context, typically from the previously deserialized layer. </returns>
+        ConstTensorReferenceType GetPreviousOutputReference() { return _outputReference; }
+
+    private:
+        utilities::SerializationContext& _previousContext;
+        ConstTensorReferenceType _outputReference;
+    };
 }
 }
 }
