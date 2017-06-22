@@ -43,6 +43,7 @@ int main()
         TestSimpleForestPredictorNodeRefine();
         TestDemultiplexerNodeRefine();
         TestMatrixVectorProductRefine();
+        TestProtoNNPredictorNode();
     }
     catch (const utilities::Exception& exception)
     {

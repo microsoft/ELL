@@ -29,4 +29,5 @@ void TestLinearPredictorNodeRefine();
 void TestSimpleForestPredictorNodeRefine();
 void TestDemultiplexerNodeRefine();
 void TestMatrixVectorProductRefine();
+void TestProtoNNPredictorNode();
 }
