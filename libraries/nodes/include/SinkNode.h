@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     SourceNode.h (nodes)
+//  File:     SinkNode.h (nodes)
 //  Authors:  Lisa Ong
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,11 +14,8 @@
 #include "ModelTransformer.h"
 #include "SteppableMap.h"
 
-// emitters
-#include "IRMetadata.h"
-#include "IRModuleEmitter.h"
-
 // stl
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -26,39 +23,36 @@ namespace ell
 {
 namespace nodes
 {
-    // CONSIDER switching from a template parameter to an std::function member, so that the sampling
-    // function can be overwritten post-unachiving (the TypeFactory currently sets a no-op function).
+    /// <summary> A function that the SinkNode calls to deliver data to user code. </summary>
     template <typename ValueType>
-    using SamplingFunction = bool (*)(std::vector<ValueType>&);
-    using TimeTickType = model::TimeTickType;
+    using SinkFunction = std::function<void(const std::vector<ValueType>&)>;
 
-    /// <summary> A node that provides a source of data through a sampling function callback. </summary>
-    template <typename ValueType, SamplingFunction<ValueType>>
-    class SourceNode : public model::CompilableNode
+    template <typename ValueType>
+    class SinkNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
-        const model::InputPort<TimeTickType>& input = _input;
-        const model::OutputPort<ValueType>& output = _output;
+        const model::InputPort<ValueType>& input = _input;
+        const model::OutputPort<bool>& output = _output;
         /// @}
 
         /// <summary> Default constructor </summary>
-        SourceNode();
+        SinkNode();
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="input"> Port elements for input values (sample time, current time) </param>
-        /// <param name="outputSize"> Output size </param>
-        /// <param name="samplingFunctionName"> Optional sampling function name to be emitted </param>
-        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, const std::string& samplingFunctionName = "SourceNode_SamplingFunction");
+        /// <param name="input"> Port elements for input values </param>
+        /// <param name="sink"> The sink function that will receive output values </param>
+        /// <param name="sinkFunctionName"> The optional sink function name to be emitted </param>
+        SinkNode(const model::PortElements<ValueType>& input, SinkFunction<ValueType> sink, const std::string& sinkFunctionName = "SinkNode_OutputFunction");
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SourceNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SinkNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -80,25 +74,22 @@ namespace nodes
         /// <param name="transformer"> The `ModelTransformer` receiving the copy  </param>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-        /// <summary> Interpolates the buffered sample to match the new time. </summary>
-        ///
-        /// <param name="originalTime"> Original time for the buffered sample </param>
-        /// <param name="newTime"> New time for the buffered sample </param>
-        virtual void Interpolate(TimeTickType originalTime, TimeTickType newTime) const;
-
     protected:
         virtual void Compute() const override;
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
-    private:
-        model::InputPort<TimeTickType> _input;
-        model::OutputPort<ValueType> _output;
-        std::string _samplingFunctionName;
+        // Evaluates whether the input meets the filter criteria,
+        // and should be forwarded to the sink function.
+        virtual bool EvaluateInput() const;
 
-        mutable std::vector<ValueType> _bufferedSample;
-        mutable TimeTickType _bufferedSampleTime;
+    private:
+        model::InputPort<ValueType> _input;
+        model::OutputPort<bool> _output;
+
+        std::string _sinkFunctionName;
+        SinkFunction<ValueType> _sink;
     };
 }
 }
 
-#include "../tcc/SourceNode.tcc"
+#include "../tcc/SinkNode.tcc"

@@ -25,9 +25,10 @@
 #include "MovingVarianceNode.h"
 #include "NeuralNetworkLayerNode.h"
 #include "NeuralNetworkPredictorNode.h"
+#include "ProtoNNPredictorNode.h"
+#include "SinkNode.h"
 #include "SourceNode.h"
 #include "UnaryOperationNode.h"
-#include "ProtoNNPredictorNode.h"
 
 // model
 #include "InputNode.h"
@@ -368,6 +369,25 @@ void TestSourceNodeCompute()
     }
 }
 
+void TestSinkNodeCompute()
+{
+    const std::vector<std::vector<double>> data = { { 12 }, { 10 }, { 8 }, { 6 }, { 4 }, { 2 } };
+    std::vector<std::vector<double>> results;
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(1);
+    auto sinkNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, [&results](const std::vector<double>& values) {
+        results.push_back(values);
+    });
+
+    for (const auto& inputValue : data)
+    {
+        inputNode->SetInput(inputValue);
+        model.ComputeOutput(sinkNode->output);
+    }
+    testing::ProcessTest("Testing SinkNode output", testing::IsEqual(data, results));
+}
+
 //
 // Neural network layer nodes
 //
@@ -686,22 +706,48 @@ void TestProtoNNPredictorNode()
 
     // projectedDim * dim
     auto W = protonnPredictor.GetProjectionMatrix().GetReference();
-    W(0, 0) = 0.4; W(0, 1) = 0.5; W(0, 2) = 0.1; W(0, 3) = 0.1; W(0, 4) = 0.1;
-    W(1, 0) = 0.1; W(1, 1) = 0.4; W(1, 2) = 0.8; W(1, 3) = 0.2; W(1, 4) = 0.5;
-    W(2, 0) = 0.2; W(2, 1) = 0.1; W(2, 2) = 0.7; W(2, 3) = 0.3; W(2, 4) = 0.4;
-    W(3, 0) = 0.3; W(3, 1) = 0.3; W(3, 2) = 0.2; W(3, 3) = 0.5; W(3, 4) = 0.2;
+    W(0, 0) = 0.4;
+    W(0, 1) = 0.5;
+    W(0, 2) = 0.1;
+    W(0, 3) = 0.1;
+    W(0, 4) = 0.1;
+    W(1, 0) = 0.1;
+    W(1, 1) = 0.4;
+    W(1, 2) = 0.8;
+    W(1, 3) = 0.2;
+    W(1, 4) = 0.5;
+    W(2, 0) = 0.2;
+    W(2, 1) = 0.1;
+    W(2, 2) = 0.7;
+    W(2, 3) = 0.3;
+    W(2, 4) = 0.4;
+    W(3, 0) = 0.3;
+    W(3, 1) = 0.3;
+    W(3, 2) = 0.2;
+    W(3, 3) = 0.5;
+    W(3, 4) = 0.2;
 
     // projectedDim * numPrototypes
     auto B = protonnPredictor.GetPrototypes().GetReference();
-    B(0, 0) = 0.1; B(0, 1) = 0.2; B(0, 2) = 0.3;
-    B(1, 0) = 0.8; B(1, 1) = 0.7; B(1, 2) = 0.6;
-    B(2, 0) = 0.4; B(2, 1) = 0.6; B(2, 2) = 0.2;
-    B(3, 0) = 0.2; B(3, 1) = 0.1; B(3, 2) = 0.3;
+    B(0, 0) = 0.1;
+    B(0, 1) = 0.2;
+    B(0, 2) = 0.3;
+    B(1, 0) = 0.8;
+    B(1, 1) = 0.7;
+    B(1, 2) = 0.6;
+    B(2, 0) = 0.4;
+    B(2, 1) = 0.6;
+    B(2, 2) = 0.2;
+    B(3, 0) = 0.2;
+    B(3, 1) = 0.1;
+    B(3, 2) = 0.3;
 
     // numLabels * numPrototypes
     auto Z = protonnPredictor.GetLabelEmbeddings().GetReference();
-    Z(0, 0) = 0.1; Z(0, 1) = 0.3, Z(0, 2) = 0.2;
-    Z(1, 0) = 0.2; Z(1, 1) = 0.4, Z(1, 2) = 0.8;
+    Z(0, 0) = 0.1;
+    Z(0, 1) = 0.3, Z(0, 2) = 0.2;
+    Z(1, 0) = 0.2;
+    Z(1, 1) = 0.4, Z(1, 2) = 0.8;
 
     std::vector<double> input = { 0.2, 0.5, 0.6, 0.8, 0.1 };
 

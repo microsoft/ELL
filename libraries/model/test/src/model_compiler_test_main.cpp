@@ -69,8 +69,8 @@ void TestIRCompiler()
     TestCompilableMultiplexerNode();
     TestCompilableTypeCastNode();
     TestCompilableAccumulatorNodeFunction();
-    TestCompilableSourceNode(false);
-    // TestCompilableSourceNode(true); // Fails on Windows
+    TestCompilableSinkNode();
+    TestCompilableSourceNode();
     TestCompilableAccumulatorNodeFunction(); 
 
     TestPerformanceCounters();

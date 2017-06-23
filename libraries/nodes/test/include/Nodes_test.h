@@ -20,6 +20,7 @@ void TestLinearPredictorNodeCompute();
 void TestDemultiplexerNodeCompute();
 void TestDTWDistanceNodeCompute();
 void TestSourceNodeCompute();
+void TestSinkNodeCompute();
 
 // Neural layer nodes
 void TestBiasLayerNode();

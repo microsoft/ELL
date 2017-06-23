@@ -36,6 +36,7 @@
 #include "IRNode.h"
 #include "MultiplexerNode.h"
 #include "NeuralNetworkPredictorNode.h"
+#include "SinkNode.h"
 #include "SourceNode.h"
 #include "SumNode.h"
 #include "TypeCastNode.h"
@@ -410,15 +411,6 @@ void TestCompilableAccumulatorNodeFunction()
 // Now test nodes that compile with callback(s)
 //
 InputCallbackTester<double> g_tester;
-InputCallbackTester<double> g_testerCompiled;
-
-// C callback (called by emitted model)
-extern "C" {
-bool CompiledSourceNode_InputCallback(double* input)
-{
-    return g_testerCompiled.InputCallback(input);
-}
-}
 
 // C++ callback (called by runtime model)
 bool SourceNode_InputCallback(std::vector<double>& input)
@@ -426,11 +418,10 @@ bool SourceNode_InputCallback(std::vector<double>& input)
     return g_tester.InputCallback(input);
 }
 
-void TestCompilableSourceNode(bool runJit)
+void TestCompilableSourceNode()
 {
     const std::vector<std::vector<double>> data = { { 1, 2, 3 }, { 2, 4, 6 }, { 3, 6, 9 }, { 4, 8, 12 }, { 5, 10, 15 } };
     g_tester.Initialize(data);
-    g_testerCompiled.Initialize(data);
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
@@ -440,13 +431,24 @@ void TestCompilableSourceNode(bool runJit)
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
+}
 
-    if (runJit)
-    {
-        // compare output
-        std::vector<std::vector<model::TimeTickType>> timeSignal = { { 10, 15 }, { 20, 20 }, { 30, 45 }, { 40, 60 }, { 50, 120 } };
-        VerifyCompiledOutput(map, compiledMap, timeSignal, "SourceNode");
-    }
+void TestCompilableSinkNode(size_t inputSize)
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputSize);
+    auto testNode = model.AddNode<nodes::SinkNode<double>>(
+        inputNode->output, [](const std::vector<double>&) {}, "CompiledSinkNode_OutputCallback");
+
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+}
+
+void TestCompilableSinkNode()
+{
+    TestCompilableSinkNode(1);
+    TestCompilableSinkNode(100);
 }
 
 void TestFloatNode()

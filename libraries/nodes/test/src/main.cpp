@@ -37,6 +37,7 @@ int main()
         TestDemultiplexerNodeCompute();
         TestDTWDistanceNodeCompute();
         TestSourceNodeCompute();
+        TestSinkNodeCompute();
 
         TestBiasLayerNode();
         TestBatchNormalizationLayerNode();

@@ -19,13 +19,6 @@ namespace nodes
 
     template <typename ValueType, SamplingFunction<ValueType> getSample>
     SourceNode<ValueType, getSample>::SourceNode(
-        const model::PortElements<TimeTickType>& input, size_t outputSize)
-        : SourceNode(input, outputSize, "SourceNode_SamplingFunction")
-    {
-    }
-
-    template <typename ValueType, SamplingFunction<ValueType> getSample>
-    SourceNode<ValueType, getSample>::SourceNode(
         const model::PortElements<TimeTickType>& input, size_t outputSize, const std::string& samplingFunctionName)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputSize), _samplingFunctionName(samplingFunctionName)
     {
@@ -116,7 +109,6 @@ namespace nodes
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
-        archiver["outputSize"] << _output.Size();
         archiver["samplingFunctionName"] << _samplingFunctionName;
     }
 
@@ -126,9 +118,6 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
-        size_t size;
-        archiver["outputSize"] >> size;
-        _output.SetSize(size);
         archiver["samplingFunctionName"] >> _samplingFunctionName;
     }
 

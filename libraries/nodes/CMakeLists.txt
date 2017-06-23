@@ -30,6 +30,7 @@ set (include include/AccumulatorNode.h
              include/NeuralNetworkPredictorNode.h
              include/ProtoNNPredictorNode.h
              include/SingleElementThresholdNode.h
+             include/SinkNode.h
              include/SourceNode.h
              include/SumNode.h
              include/TypeCastNode.h
@@ -66,6 +67,7 @@ set (tcc tcc/AccumulatorNode.tcc
          tcc/MultiplexerNode.tcc
          tcc/NeuralNetworkLayerNode.tcc
          tcc/NeuralNetworkPredictorNode.tcc         
+         tcc/SinkNode.tcc
          tcc/SourceNode.tcc
          tcc/SumNode.tcc
          tcc/TypeCastNode.tcc
