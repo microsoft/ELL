@@ -66,11 +66,15 @@ set (tcc
     tcc/SteppableMap.tcc
 )
 
+set (doc doc/CompileAsFunction.md
+         doc/README.md)
+
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
+source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include} ${tcc} ${doc})
 target_include_directories(${library_name} PUBLIC include)
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)

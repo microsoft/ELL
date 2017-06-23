@@ -19,6 +19,14 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 * On [Ubuntu Linux](INSTALL-Ubuntu.md)
 * On [Mac OS X](INSTALL-Mac.md)
 
+## Additional Documentation
+
+* [Design overview of `data` library](./libraries/data/doc/README.md)
+* [Design overview of `math` library](./libraries/math/doc/README.md)
+* [Design overview of `model` and `nodes` libraries](./libraries/model/doc/README.md)
+* [Definition of the generalized sparse data format](./libraries/data/doc/GeneralizedSparseFormat.md)
+* [Description of the training algorithms implemented in `trainers`](./libraries/trainers/doc/README.md)
+
 
 
 

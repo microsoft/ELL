@@ -36,7 +36,7 @@ source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 source_group("doc" FILES ${doc})
 
-add_library(${library_name} ${src} ${include} ${tcc})
+add_library(${library_name} ${src} ${include} ${tcc} ${doc})
 target_include_directories(${library_name} PUBLIC include ${BLAS_INCLUDE_DIRS})
 target_link_libraries(${library_name} utilities ${BLAS_LIBS})
 
