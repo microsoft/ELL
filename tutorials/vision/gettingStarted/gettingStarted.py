@@ -51,16 +51,16 @@ def get_ell_predictor(modelConfig):
     """Imports a model and returns an ELL.Predictor."""
     predictor = None
     if (modelConfig.import_from == ImportFrom.darknet):
-        # Import a pretrained CNTK model
+        # Import a pretrained Darknet model
         predictor = darknet_to_ell.predictor_from_darknet_model(modelConfig.model_files[0], modelConfig.model_files[1])
     else:
-        # Import a pretrained Darknet model
+        # Import a pretrained CNTK model
         predictor = cntk_to_ell.predictor_from_cntk_model(modelConfig.model_files[0])
     return predictor
 
 def get_top_5(predictions, labels, threshold):
     """Return at most the top 5 predictions as a list of tuples that meet the threshold."""
-    top5 = np.array(predictions).argsort()[-5:]
+    top5 = np.array(predictions).argsort()[::-1][:5]
     
     result = []
     for element in top5:

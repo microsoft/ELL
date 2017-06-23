@@ -51,6 +51,9 @@ def parse_cfg(filename):
             layer['out_w'] = int(layer['width'])
             layer['out_c'] = int(layer['channels'])
         elif layer['type'] == 'crop':
+            layer['c'] = network[i-1]['out_c']
+            layer['h'] = network[i-1]['out_h']
+            layer['w'] = network[i-1]['out_w']
             layer['out_h'] = layer['crop_height']
             layer['out_w'] = layer['crop_width']
             layer['out_c'] = network[i-1]['out_c']
@@ -78,9 +81,10 @@ def parse_cfg(filename):
             layer['w'] = network[i-1]['out_w']
             layer['c'] = network[i-1]['out_c']
             layer['inputs'] = int(layer['h']) * int(layer['w']) * int(layer['c'])
-            layer['out_w'] = layer['output']
+            layer['out_w'] = 1
             layer['out_h'] = 1
-            layer['out_c'] = 1
+            layer['out_c'] = int(layer['output'])
+            print("connected: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'])
         elif layer['type'] == 'maxpool':
             if 'padding' not in layer:
                 layer['padding'] = int((int(layer['size']) - 1) / 2)
@@ -110,15 +114,19 @@ def parse_cfg(filename):
             layer['out_c'] = layer['c']
             layer['out_h'] = layer['h']
             layer['out_w'] = layer['w']
-            print("softmax: 1 x 1 x", layer['c'], '-> 1 x 1 x ', layer['out_c'])
+            print("softmax: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'])
         elif layer['type'] == 'region':
             layer['c'] = network[i-1]['out_c']
             layer['h'] = network[i-1]['out_h']
             layer['w'] = network[i-1]['out_w']
         else:
+            layer['c'] = network[i-1]['out_c']
+            layer['h'] = network[i-1]['out_h']
+            layer['w'] = network[i-1]['out_w']
             layer['out_c'] = network[i-1]['out_c']
             layer['out_h'] = network[i-1]['out_h']
             layer['out_w'] = network[i-1]['out_w']
+
 
     # Do another pass, setting input/output shape and outpadding to next layer's padding
     # Set the ELL padding scheme and shape parameters
@@ -178,8 +186,8 @@ def get_weights_tensor(weightsShape, values):
         orderedWeights = np.rollaxis(weights, 1, 4)
         orderedWeights = orderedWeights.reshape((orderedWeights.shape[0] * orderedWeights.shape[1], orderedWeights.shape[2], orderedWeights.shape[3]))
     elif (len(weights.shape) == 2):
-        orderedWeights = weights
-        orderedWeights = orderedWeights.reshape((weightsShape.shape[0], weightsShape.shape[1], 1))
+        orderedWeights = values
+        orderedWeights = orderedWeights.reshape((weightsShape.shape[0], 1, weightsShape.shape[1]))
     else:
         orderedWeights = weights
         orderedWeights = orderedWeights.reshape((1, 1, weightsShape[0]))
@@ -293,22 +301,27 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
     if ('order' in layer):
         convolution_order = 	layer['order']
 
+    applyBatchNormalization = False
+    if ('batch_normalize' in layer) and ('dontloadscales' not in layer):
+        applyBatchNormalization = True
+    activationType = get_activation_type(layer)
+    biasIsLast = (activationType is None) and applyBatchNormalization
+
     if (convolution_order == 'cnba'):
         # This ordering is convolution followed by batch norm, bias then activation
-        if ('batch_normalize' in layer) and ('dontloadscales' not in layer):
+        if (applyBatchNormalization):
             layers += process_batch_normalization_layer(layer, False, mean_vals, variance_vals, scale_vals)
-        layers.append(get_bias_layer(layer, False, bias_vals))
-        layers.append(get_activation_layer(layer, True))
+        layers.append(get_bias_layer(layer, biasIsLast, bias_vals))
+        if (activationType is not None):
+            layers.append(get_activation_layer(layer, True))
     else:
         # This ordering is convolution followed by bias, activation then batch norm
-        layers.append(get_bias_layer(layer, False, bias_vals))
-        applyBatchNormalization = False;
-        if ('batch_normalize' in layer) and ('dontloadscales' not in layer):
-            applyBatchNormalization = True
-
-        layers.append(get_activation_layer(layer, not applyBatchNormalization))
+        layers.append(get_bias_layer(layer, biasIsLast, bias_vals))
+        if (activationType is not None):
+            layers.append(get_activation_layer(layer, not applyBatchNormalization))
         if (applyBatchNormalization):
             layers += process_batch_normalization_layer(layer, True, mean_vals, variance_vals, scale_vals)
+
     return layers
 
 def get_pooling_layer(layer, poolingType):
@@ -335,18 +348,40 @@ def process_fully_connected_layer(layer, weightsData):
     layers = []
 
     # Create Fully Connected
-    layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
+    activationType = get_activation_type(layer)
+    if (activationType is None):
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
+    else:
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
+
+    bias_vals = []
+    for i in range(int(layer['output'])):
+        bias_vals.append(struct.unpack('f', weightsData.read(4)))
+    bias_vals = np.array(bias_vals, dtype=np.float)
+        
     weight_vals = []
     num_weights = int(layer['output'])*int(layer['inputs'])
     for i in range(num_weights):
         weight_vals.append(struct.unpack('f', weightsData.read(4)))
     weight_vals = np.array(weight_vals, dtype=np.float)
-    weightsTensor = get_weights_tensor((layer['out_c'] * layer['out_h'] * layer['out_w'], layer['c'], layer['h'], layer['w']), weight_vals)
+
+    orderedWeights = weight_vals.reshape(layer['c'], layer['h'], layer['w'], (layer['out_h'] * layer['out_w'] * layer['out_c']))
+    orderedWeights = np.moveaxis(orderedWeights, 0, 2)
+    orderedWeights = np.moveaxis(orderedWeights,-1, 0)
+    orderedWeights = orderedWeights.reshape((layer['out_h'] * layer['out_w'] * layer['out_c'] * layer['h'], layer['w'], layer['c']))
+
+    weightsTensor = ELL.FloatTensor(orderedWeights)
 
     layers.append(ELL.FloatFullyConnectedLayer(layerParameters, weightsTensor))
 
-    # Create ActivationLayer
-    layers.append(get_activation_layer(layer, True))
+    if (activationType is not None):
+        # Create BiasLayer
+        layers.append(get_bias_layer(layer, False, bias_vals))
+        # Create ActivationLayer
+        layers.append(get_activation_layer(layer, True))
+    else:
+        # Create BiasLayer
+        layers.append(get_bias_layer(layer, True, bias_vals))
 
     return layers
 
