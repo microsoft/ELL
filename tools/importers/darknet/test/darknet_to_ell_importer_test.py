@@ -42,7 +42,7 @@ import darknet_to_ell
 class DarknetModelTestCase(unittest.TestCase):
     def test_darknet_model(self):
         # Create synthetic input data
-        input1 = np.arange(28 * 28, dtype=np.float_).reshape(28, 28, 1) / 255
+        input1 = np.arange(28 * 28, dtype=np.float).reshape(28, 28, 1) / 255
         # Create an ELL predictor from the darknet model files
         predictor = darknet_to_ell.predictor_from_darknet_model(
             'unittest.cfg', 'unittest.weights')

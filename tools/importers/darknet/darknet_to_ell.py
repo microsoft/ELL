@@ -110,6 +110,7 @@ def parse_cfg(filename):
             layer['out_c'] = layer['c']
             layer['out_h'] = layer['h']
             layer['out_w'] = layer['w']
+            print("softmax: 1 x 1 x", layer['c'], '-> 1 x 1 x ', layer['out_c'])
         elif layer['type'] == 'region':
             layer['c'] = network[i-1]['out_c']
             layer['h'] = network[i-1]['out_h']
@@ -126,7 +127,10 @@ def parse_cfg(filename):
 
         if 'padding' not in layer:
             layer['inputPadding'] = 0
-            layer['inputPaddingScheme'] = ELL.PaddingScheme.zeros
+            if layer['type'] == 'maxpool':
+                layer['inputPaddingScheme'] = ELL.PaddingScheme.min
+            else:
+                layer['inputPaddingScheme'] = ELL.PaddingScheme.zeros
         else:
             layer['inputPadding'] = int(layer['padding'])
             if layer['type'] == 'maxpool':
@@ -167,7 +171,7 @@ def create_layer_parameters(inputShape, inputPadding, inputPaddingScheme, output
 def get_weights_tensor(weightsShape, values):
     """Returns an ELL tensor from Darknet weights. The weights are re-ordered
        to rows, columns, channels"""
-    weights = np.array(values, dtype=np.float_).reshape(weightsShape)
+    weights = np.array(values, dtype=np.float).reshape(weightsShape)
     if (len(weights.shape) == 3):
         orderedWeights = np.rollaxis(weights, 0, 3)
     elif (len(weights.shape) == 4):
@@ -249,7 +253,7 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
     bias_vals = []
     for i in range(int(layer['filters'])):
         bias_vals.append(struct.unpack('f', bin_data.read(4)))
-    bias_vals = np.array(bias_vals, dtype=np.float_)
+    bias_vals = np.array(bias_vals, dtype=np.float)
     # now we need to check if these weights have batch normalization data
     scale_vals = []
     mean_vals = []
@@ -261,15 +265,15 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
             mean_vals.append(struct.unpack('f'   , bin_data.read(4)))
         for i in range(int(layer['filters'])):
             variance_vals.append(struct.unpack('f', bin_data.read(4)))
-    scale_vals = np.array(scale_vals, dtype=np.float_)
-    mean_vals = np.array(mean_vals, dtype=np.float_)
-    variance_vals = np.array(variance_vals, dtype=np.float_)
+    scale_vals = np.array(scale_vals, dtype=np.float)
+    mean_vals = np.array(mean_vals, dtype=np.float)
+    variance_vals = np.array(variance_vals, dtype=np.float)
     # now we can load the convolutional weights
     weight_vals = []
     num_weights = int(layer['size'])*int(layer['size'])*int(layer['c'])*int(layer['filters'])
     for i in range(num_weights):
         weight_vals.append(struct.unpack('f', bin_data.read(4)))
-    weight_vals = np.array(weight_vals, dtype=np.float_)
+    weight_vals = np.array(weight_vals, dtype=np.float)
 
 
     layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
@@ -336,7 +340,7 @@ def process_fully_connected_layer(layer, weightsData):
     num_weights = int(layer['output'])*int(layer['inputs'])
     for i in range(num_weights):
         weight_vals.append(struct.unpack('f', weightsData.read(4)))
-    weight_vals = np.array(weight_vals, dtype=np.float_)
+    weight_vals = np.array(weight_vals, dtype=np.float)
     weightsTensor = get_weights_tensor((layer['out_c'] * layer['out_h'] * layer['out_w'], layer['c'], layer['h'], layer['w']), weight_vals)
 
     layers.append(ELL.FloatFullyConnectedLayer(layerParameters, weightsTensor))

@@ -87,6 +87,9 @@ endif()
 # Add examples (has dependencies on SWIG-generated interfaces)
 add_subdirectory(examples)
 
+# Add tutorials (has dependencies on SWIG-generated interfaces)
+add_subdirectory(tutorials)
+
 # Add project for solution-level documentation
 set (DOC INSTALL-Mac.md
          INSTALL-Ubuntu.md

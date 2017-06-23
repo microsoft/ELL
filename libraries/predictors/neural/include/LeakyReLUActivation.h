@@ -26,7 +26,7 @@ namespace neural
         /// </summary>
         ///
         /// <param name="leakyFactor"> The value to multiply the input by if it is less than zero. </param>
-        LeakyReLUActivation(ElementType leakyFactor = static_cast<ElementType>(0.01)) : _leakyFactor(leakyFactor) {}
+        LeakyReLUActivation(ElementType leakyFactor = static_cast<ElementType>(0.1)) : _leakyFactor(leakyFactor) {}
 
         /// <summary> Sets the output as a function of the input. </summary>
         ///
