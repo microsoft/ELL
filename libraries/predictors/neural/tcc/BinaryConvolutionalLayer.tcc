@@ -6,8 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "BinaryConvolutionalLayer.h"
-
+// TODO: let's make a popcount function that does the right thing
 #if defined(_MSC_VER)
     #define POPCOUNT64 __popcnt64 
 #else

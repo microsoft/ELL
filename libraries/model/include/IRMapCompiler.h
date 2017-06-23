@@ -131,9 +131,9 @@ namespace model
         /// <returns> The `IRBlockRegion` that computes `element` if that block is mergeable, `nullptr` otherwise. </returns>
         emitters::IRBlockRegion* GetMergeableNodeRegion(const PortElementBase& element);
 
-        /// <summary> Get the LLVM context for this compiler </summary>
+        /// <summary> Gets a reference to the underlying llvm context. </summary>
         ///
-        /// <returns> A reference to the LLVM context. </returns>
+        /// <returns> Reference to the underlying llvm context. </returns>
         llvm::LLVMContext& GetLLVMContext();
 
         /// <summary> Gets the namespace string used to prefix emitted map-specific runtime functions. </summary>

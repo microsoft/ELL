@@ -408,7 +408,7 @@ namespace model
 
         auto modelPerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_modelPerformanceCountersArray, { function.Literal(0), function.Literal(0) });
 
-        // Print some stuff
+        // Print some statistics
         auto countPtr = irBuilder.CreateInBoundsGEP(modelPerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
         auto totalTimePtr = irBuilder.CreateInBoundsGEP(modelPerformanceCountersPtr, { function.Literal(0), function.Literal(1) });
         function.Printf("Total time: %f ms\tcount: %d\n", { function.Load(totalTimePtr), function.Load(countPtr) });

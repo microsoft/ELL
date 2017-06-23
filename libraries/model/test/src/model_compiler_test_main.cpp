@@ -19,7 +19,10 @@ using namespace ell::emitters;
 
 void TestIRCompiler()
 {
-    // VerboseRegion region;
+    // VerboseRegion region;    
+    TestFloatNode();
+    TestCompilableDotProductNode2(3);
+    TestCompilableDotProductNode2(4);
 
     TestFloatNode();
     TestCompilableDotProductNode2(3);
@@ -73,6 +76,16 @@ void TestIRCompiler()
     TestPerformanceCounters();
     TestCompilableDotProductNode2(3); // uses IR
     TestCompilableDotProductNode2(4); // uses IR
+
+    // Neural net nodes
+    TestBiasLayerNode();
+    TestBiasLayerNode(0, 1);
+    TestBiasLayerNode(0, 2);
+ 
+    TestBatchNormalizationLayerNode();
+    // TestBatchNormalizationLayerNode(0, 1);
+    // TestBatchNormalizationLayerNode(0, 2);
+    // TestNeuralNetworkPredictorNode();
 }
 
 int main(int argc, char* argv[])

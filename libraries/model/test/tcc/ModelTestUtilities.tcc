@@ -63,6 +63,28 @@ void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMa
 }
 
 template <typename InputType, typename OutputType>
+void VerifyMapOutput(const model::DynamicMap& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name)
+{
+    bool ok = true;
+    // compare output
+    for(int index = 0; index < signal.size(); ++index)
+    {
+        auto&& input = signal[index];
+        auto&& output = expectedOutput[index];
+        map.SetInputValue(0, input);
+        auto computedResult = map.ComputeOutput<OutputType>(0);
+
+        ok = ok && testing::IsEqual(output, computedResult);
+
+        if (IsVerbose())
+        {
+            std::cout << computedResult << " \t" << output << std::endl;
+        }
+    }
+    testing::ProcessTest(std::string("Testing map " + name + " compute"), ok);
+}
+
+template <typename InputType, typename OutputType>
 void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
     bool ok = true;

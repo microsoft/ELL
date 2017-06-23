@@ -89,13 +89,13 @@ namespace model
         /// <returns> A pointer to the port </returns>
         const OutputPortBase* GetOutputPort(const std::string& portName) const;
 
-        /// <summary> Returns the named output port </summary>
+        /// <summary> Returns an output port by index </summary>
         ///
         /// <param name="portIndex"> The index of the port </param>
         /// <returns> A pointer to the port </returns>
         OutputPortBase* GetOutputPort(size_t portIndex);
 
-        /// <summary> Returns the named output port </summary>
+        /// <summary> Returns an output port by index </summary>
         ///
         /// <param name="portIndex"> The index of the port </param>
         /// <returns> A pointer to the port </returns>

@@ -8,8 +8,6 @@
 
 #pragma once
 
-namespace ell
-{
 void TestL2NormNodeCompute();
 void TestAccumulatorNodeCompute();
 void TestDelayNodeCompute();
@@ -23,6 +21,11 @@ void TestDemultiplexerNodeCompute();
 void TestDTWDistanceNodeCompute();
 void TestSourceNodeCompute();
 
+// Neural layer nodes
+void TestBiasLayerNode();
+void TestBatchNormalizationLayerNode();
+void TestNeuralNetworkPredictorNode();
+
 // Refinement
 void TestMovingAverageNodeRefine();
 void TestLinearPredictorNodeRefine();
@@ -30,4 +33,3 @@ void TestSimpleForestPredictorNodeRefine();
 void TestDemultiplexerNodeRefine();
 void TestMatrixVectorProductRefine();
 void TestProtoNNPredictorNode();
-}

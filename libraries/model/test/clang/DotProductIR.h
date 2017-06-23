@@ -27,13 +27,13 @@ define void @_Node__DotProduct(double*, double*, i32, double*) #0 {
   store i32 0, i32* %10, align 4
   br label %11
 
-; <label>:11:                                     ; preds = %29, %4
+; <label>:11                                      ; preds = %29, %4
   %12 = load i32, i32* %10, align 4
   %13 = load i32, i32* %7, align 4
   %14 = icmp slt i32 %12, %13
   br i1 %14, label %15, label %32
 
-; <label>:15:                                     ; preds = %11
+; <label>:15                                      ; preds = %11
   %16 = load i32, i32* %10, align 4
   %17 = sext i32 %16 to i64
   %18 = load double*, double** %5, align 8
@@ -50,13 +50,13 @@ define void @_Node__DotProduct(double*, double*, i32, double*) #0 {
   store double %28, double* %9, align 8
   br label %29
 
-; <label>:29:                                     ; preds = %15
+; <label>:29                                      ; preds = %15
   %30 = load i32, i32* %10, align 4
   %31 = add nsw i32 %30, 1
   store i32 %31, i32* %10, align 4
   br label %11
 
-; <label>:32:                                     ; preds = %11
+; <label>:32                                      ; preds = %11
   %33 = load double, double* %9, align 8
   %34 = load double*, double** %8, align 8
   %35 = getelementptr inbounds double, double* %34, i64 0
@@ -64,12 +64,12 @@ define void @_Node__DotProduct(double*, double*, i32, double*) #0 {
   ret void
 }
 
-attributes #0 = { nounwind ssp uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+fxsr,+mmx,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #0 = { nounwind ssp uwtable "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+fxsr,+mmx,+sse,+sse2,+sse3,+sse4.1,+ssse3" "unsafe-fp-math"="false" "use-soft-float"="false" }
 
 !llvm.module.flags = !{!0}
 !llvm.ident = !{!1}
 
 !0 = !{i32 1, !"PIC Level", i32 2}
-!1 = !{!"Apple LLVM version 8.1.0 (clang-802.0.42)"}
+!1 = !{!"Apple LLVM version 8.0.0 (clang-800.0.42.1)"}
 )xx";
 }

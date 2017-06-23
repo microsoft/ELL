@@ -30,14 +30,6 @@ struct NodeInfo
 {
     const char* nodeName;
     const char* nodeType;
-
-    // TODO:
-    // list of input port info
-    // list of output port info
-    // list of dependent nodes
-    // list of nodes we depend on
-    // list of functions we call
-    // other params (input/output sizes, state, etc.)
 };
 
 /// <summary> A struct that holds summary information about a node's runtime performance </summary>
@@ -223,7 +215,7 @@ namespace model
         // Performance counter emitters for nodes
         std::map<const Node*, NodePerformanceEmitter> _nodePerformanceCounters;
 
-        // Aggregate perf counter emitters for node types
+        // Aggregate performance counter emitters for node types
         std::map<std::string, NodePerformanceEmitter> _nodeTypePerformanceCounters;
     };
 }

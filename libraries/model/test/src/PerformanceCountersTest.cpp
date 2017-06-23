@@ -53,13 +53,10 @@ std::vector<double> GenerateMatrixValues(size_t m, size_t n)
 void TestPerformanceCounters()
 {
     model::Model model;
-    int m = 200;
-    int k = 500;
-    int n = 300; // (m x k) x (k x n) ==> (m x n)
-    // int m = 2;
-    // int k = 5;
-    // int n = 3; // (m x k) x (k x n) ==> (m x n)
-    int numIter = 10;
+    int m = 20;
+    int k = 50;
+    int n = 30; // (m x k) x (k x n) ==> (m x n)
+    int numIter = 4;
 
     std::vector<std::vector<double>> matrix1Series;
     for (int index = 0; index < numIter; ++index)
@@ -138,6 +135,6 @@ void TestPerformanceCounters()
         auto nodeInfo = compiledMap1.GetNodeInfo(nodeIndex);
         auto nodeStats = compiledMap1.GetNodePerformanceCounters(nodeIndex);
         std::cout << "Node [" << nodeIndex << "]: " << nodeInfo->nodeName << " = " << nodeInfo->nodeType << std::endl;
-        testing::ProcessTest("ModelProfiler GetNodePerformanceCounters", nodeStats->count == 10);
+        testing::ProcessTest("ModelProfiler GetNodePerformanceCounters", nodeStats->count == numIter);
     }
 }

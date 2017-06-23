@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <cstring>
+
 void TestCompileIsEqual();
 void TestCompilableScalarOutputNode();
 void TestCompilableVectorOutputNode();
@@ -29,3 +31,7 @@ void TestCompilableAccumulatorNodeFunction();
 void TestCompilableSourceNode(bool runJit);
 void TestCompilableDotProductNode2(int dimension);
 void TestFloatNode();
+
+void TestBiasLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
+void TestBatchNormalizationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
+void TestNeuralNetworkPredictorNode();

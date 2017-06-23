@@ -5,8 +5,11 @@
 set (library_name nodes)
 
 set (include include/AccumulatorNode.h
+             include/BatchNormalizationLayerNode.h
+             include/BiasLayerNode.h
              include/BinaryOperationNode.h
              include/BinaryPredicateNode.h
+             include/BroadcastFunctionNode.h
              include/ConstantNode.h
              include/DelayNode.h
              include/DemultiplexerNode.h
@@ -23,42 +26,51 @@ set (include include/AccumulatorNode.h
              include/MatrixVectorProductNode.h
              include/MovingVarianceNode.h
              include/MultiplexerNode.h
+             include/NeuralNetworkLayerNode.h
+             include/NeuralNetworkPredictorNode.h
+             include/ProtoNNPredictorNode.h
              include/SingleElementThresholdNode.h
+             include/SourceNode.h
              include/SumNode.h
              include/TypeCastNode.h
              include/UnaryOperationNode.h
-             include/ValueSelectorNode.h
-             include/SourceNode.h
-             include/ProtoNNPredictorNode.h)
+             include/ValueSelectorNode.h)
 
-set (src src/ConstantNode.cpp
+set (src src/BatchNormalizationLayerNode.cpp
+         src/BiasLayerNode.cpp
+         src/BroadcastFunctionNode.cpp
+         src/ConstantNode.cpp
          src/IRNode.cpp
          src/LinearPredictorNode.cpp
          src/MatrixMatrixMultiplyNode.cpp
          src/MatrixVectorMultiplyNode.cpp
-         src/SingleElementThresholdNode.cpp
-         src/ProtoNNPredictorNode.cpp)
+         src/ProtoNNPredictorNode.cpp
+         src/NeuralNetworkPredictorNode.cpp
+         src/SingleElementThresholdNode.cpp)
 
 set (tcc tcc/AccumulatorNode.tcc
          tcc/BinaryOperationNode.tcc
          tcc/BinaryPredicateNode.tcc
+         tcc/BroadcastFunctionNode.tcc
          tcc/ConstantNode.tcc
          tcc/DelayNode.tcc
          tcc/DemultiplexerNode.tcc
          tcc/DotProductNode.tcc
          tcc/DTWDistanceNode.tcc
          tcc/ExtremalValueNode.tcc
-         tcc/MultiplexerNode.tcc
          tcc/ForestPredictorNode.tcc
          tcc/L2NormNode.tcc
          tcc/MatrixVectorProductNode.tcc
          tcc/MovingAverageNode.tcc
          tcc/MovingVarianceNode.tcc
+         tcc/MultiplexerNode.tcc
+         tcc/NeuralNetworkLayerNode.tcc
+         tcc/NeuralNetworkPredictorNode.tcc         
+         tcc/SourceNode.tcc
          tcc/SumNode.tcc
          tcc/TypeCastNode.tcc
          tcc/UnaryOperationNode.tcc
-         tcc/ValueSelectorNode.tcc
-         tcc/SourceNode.tcc)
+         tcc/ValueSelectorNode.tcc)
 
 source_group("include" FILES ${include})
 source_group("src" FILES ${src})

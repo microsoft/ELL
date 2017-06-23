@@ -13,10 +13,15 @@
 #include "ModelTransformer.h"
 #include "Node.h"
 
+// nodes
+#include "BatchNormalizationLayerNode.h"
+#include "BiasLayerNode.h"
+
 // predictors
 #include "NeuralNetworkPredictor.h"
 
 // stl
+#include <functional>
 #include <string>
 
 namespace ell
@@ -24,7 +29,7 @@ namespace ell
 namespace nodes
 {
     /// <summary> A node that represents a neural network. </summary>
-    template <typename ValueType = double>
+    template <typename ValueType>
     class NeuralNetworkPredictorNode : public model::Node
     {
     public:
@@ -36,8 +41,8 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
-        using Predictor = typename predictors::NeuralNetworkPredictor<ValueType>;
-        using LayerType = typename predictors::NeuralNetworkPredictor<ValueType>::LayerType;
+        using PredictorType = typename predictors::NeuralNetworkPredictor<ValueType>;
+        using Layer = typename predictors::neural::Layer<ValueType>;
 
         /// <summary> Default Constructor </summary>
         NeuralNetworkPredictorNode();
@@ -46,8 +51,7 @@ namespace nodes
         ///
         /// <param name="input"> The signal to predict from </param>
         /// <param name="predictor"> The predictor to use when making the prediction. </param>
-        NeuralNetworkPredictorNode(const model::PortElements<ValueType>& input, Predictor&& predictor);
-        NeuralNetworkPredictorNode(const model::PortElements<ValueType>& input, const Predictor& predictor);
+        NeuralNetworkPredictorNode(const model::PortElements<ValueType>& input, const PredictorType& predictor);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -77,7 +81,7 @@ namespace nodes
         virtual bool Refine(model::ModelTransformer& transformer) const override;
 
     private:
-        model::Node* AddLayerNode(model::ModelTransformer& transformer, LayerType& layer, const model::PortElements<ValueType>& layerInputs) const;
+        model::Node* AddLayerNode(model::ModelTransformer& transformer, Layer& layer, const model::PortElements<ValueType>& layerInputs) const;
 
         // Input
         model::InputPort<ValueType> _input;
@@ -85,8 +89,8 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
 
-        // The predictor
-        Predictor _predictor; // Maybe use a shared or unique pointer here, to facilitate moving or copying
+        // Pointer to the predictor
+        const PredictorType* _predictor; // Maybe use a shared or unique pointer here, to facilitate moving or copying
     };
 }
 }

@@ -10,6 +10,7 @@
 
 #include "IRModelProfiler.h"
 #include "Node.h"
+#include "IRModelProfiler.h"
 
 // emitters
 #include "EmitterTypes.h"
@@ -38,7 +39,7 @@ namespace model
         /// <summary> Compile the node with the given compiler </summary>
         ///
         /// <param name="compiler"> The compiler to use when compiling the node </param>
-        void CompileNode(MapCompiler& compiler); // TODO: call this something different from the virtual Compile functions. Call them "CompileContents" or something
+        void CompileNode(MapCompiler& compiler);
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
         virtual bool IsCompilable() const { return true; }
@@ -48,7 +49,7 @@ namespace model
             : Node(inputs, outputs) {}
         virtual ~CompilableNode() = default;
 
-        // Virtual Compile function necessary to override in subclasses
+        // Compile function necessary to override in subclasses
         virtual void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 
         //

@@ -64,6 +64,9 @@ void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledM
 template <typename InputType>
 void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name);
 
+template <typename InputType, typename OutputType>
+void VerifyMapOutput(const model::DynamicMap& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name);
+
 void PrintDiagnostics(emitters::IRDiagnosticHandler& handler);
 
 template <typename InputType>

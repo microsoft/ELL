@@ -75,5 +75,3 @@
 // Interface ELL Load Model Async
 // %include loadModelAsync.i
 #endif
-
-

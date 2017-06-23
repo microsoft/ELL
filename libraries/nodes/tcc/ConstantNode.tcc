@@ -15,7 +15,7 @@ namespace nodes
     // Default constructor
     template <typename ValueType>
     ConstantNode<ValueType>::ConstantNode()
-        : CompilableNode({}, { &_output }), _output(this, outputPortName, 1){};
+        : CompilableNode({}, { &_output }), _output(this, outputPortName, 0){};
 
     // Constructor for a scalar constant
     template <typename ValueType>

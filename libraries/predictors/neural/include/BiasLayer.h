@@ -43,6 +43,11 @@ namespace neural
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::bias; }
 
+        /// <summary> Gets the bias. </summary>
+        ///
+        /// <returns> The bias. </returns>
+        VectorType GetBias() const { return _bias; }
+        
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>

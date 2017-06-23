@@ -31,7 +31,6 @@ namespace predictors
 {
 namespace neural
 {
-
     /// <summary> Enum that represents the type of neural network layer. </summary>
     enum class LayerType : int
     {
@@ -71,13 +70,18 @@ namespace neural
 
     // Typical padding parameters
     /// <summary> Function to return parameters representing no padding </summary
-    static const PaddingParameters NoPadding() { return {PaddingScheme::zeros, 0}; }
+    static PaddingParameters NoPadding() { return {PaddingScheme::zeros, 0}; }
+
     /// <summary> Function to return parameters that represent padding the specified pixel width with zeros. </summary
-    static const PaddingParameters ZeroPadding(size_t width) { return {PaddingScheme::zeros, width }; }
+    static PaddingParameters ZeroPadding(size_t width) { return {PaddingScheme::zeros, width }; }
+
     /// <summary> Function to return parameters that represent padding the specified pixel width with the minimum value. </summary
-    static const PaddingParameters MinPadding(size_t width) { return {PaddingScheme::min, 1}; }
+    static const PaddingParameters MinPadding(size_t width) { return {PaddingScheme::min, width}; }
     /// <summary> Function to return parameters that represent padding the specified pixel width with -1. </summary
-    static const PaddingParameters MinusOnePadding(size_t width) { return {PaddingScheme::minusOnes, 1}; }
+    static const PaddingParameters MinusOnePadding(size_t width) { return {PaddingScheme::minusOnes, width}; }
+    
+    /// <summary> Helper function to determine if a PaddingParameters struct represents no padding </summary>
+    static bool HasPadding(const PaddingParameters& padding) { return padding.paddingSize != 0; }
 
     /// <summary> Common base class for a layer in a neural network. </summary>
     template <typename ElementType>
@@ -96,12 +100,15 @@ namespace neural
         /// <summary> Parameters common to all layers, specifying info related to input and output of the layer. </summary>
         struct LayerParameters
         {
-            /// <summary> Reference to the input tensor.. </summary>
+            /// <summary> Reference to the input tensor. Its size includes the padding.</summary>
             ConstTensorReferenceType input;
+
             /// <summary> The padding requirements for the input. </summary>
             PaddingParameters inputPaddingParameters;
+
             /// <summary> The extents of the tensor in canonical row, column, channel order. This size includes padding. </summary>
             Shape outputShape;
+
             /// <summary> The padding requirements for the output. </summary>
             PaddingParameters outputPaddingParameters;
         };
@@ -109,6 +116,7 @@ namespace neural
         virtual ~Layer() = default;
 
         /// <summary> Initializes this class with the required information regarding inputs and outputs. </summary>
+        ///
         /// <param name="layerParameters"> The parameters for this layer. </param>
         Layer(const LayerParameters& layerParameters);
 
@@ -118,17 +126,23 @@ namespace neural
         /// <summary> Returns a reference to the output tensor. </summary>
         ///
         /// <returns> Reference to the output tensor. </returns>
-        ConstTensorReferenceType GetOutput() { return _output; }
+        ConstTensorReferenceType GetOutput() const { return _output; }
 
         /// <summary> Returns shape of the input tensor. </summary>
         ///
         /// <returns> Shape of the input tensor. </returns>
-        virtual Shape GetInputShape() { return _layerParameters.input.GetShape(); }
+        virtual Shape GetInputShape() const { return _layerParameters.input.GetShape(); }
 
         /// <summary> Returns shape of the output tensor. </summary>
         ///
         /// <returns> Shape of the output tensor. </returns>
-        virtual Shape GetOutputShape() { return _layerParameters.outputShape; };
+        virtual Shape GetOutputShape() const { return _layerParameters.outputShape; };
+
+        /// <summary> Indicates if a layer is a specific type. </summary>
+        ///
+        /// <returns> `true` if the layer is of the queried layer type. </returns>
+        template <class LayerType>
+        bool IsA() const { return dynamic_cast<LayerType*>(this) != nullptr; }
 
         /// <summary> Used to get a layer as a specific type. </summary>
         ///
@@ -145,6 +159,16 @@ namespace neural
         /// <returns> An enum indicating the layer type. </returns>
         virtual LayerType GetLayerType() const { return LayerType::base; };
 
+        /// <summary> Returns the layer parameters. </summary>
+        ///
+        /// <returns> The layer parameters. </returns>
+        LayerParameters& GetLayerParameters() { return _layerParameters; }
+
+        /// <summary> Returns the layer parameters. </summary>
+        ///
+        /// <returns> The layer parameters. </returns>
+        const LayerParameters& GetLayerParameters() const { return _layerParameters; }
+        
         /// <summary> Prints diagnostic info about the layer to the  output stream. </summary> 
         ///
         /// <param name="os"> The stream that receives the formated output (e.g. std::out) </param>
@@ -164,12 +188,12 @@ namespace neural
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver);
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
 

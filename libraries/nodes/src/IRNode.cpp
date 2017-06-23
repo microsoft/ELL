@@ -50,7 +50,7 @@ namespace nodes
 
     void IRNode::Compute() const
     {
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "IRNode::Compute not implemented");
     };
 
     void IRNode::WriteToArchive(utilities::Archiver& archiver) const

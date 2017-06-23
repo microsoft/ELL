@@ -70,6 +70,11 @@ namespace neural
         /// <returns> The output tensor. </returns>
         TensorType& GetInput() { return _data; }
 
+        /// <summary> Gets a const reference to the input. </summary>
+        ///
+        /// <returns> The output tensor. </returns>
+        const TensorType& GetInput() const { return _data; }
+
         /// <summary> Feeds the input forward through the layer. </summary>
         void Compute() override;
 

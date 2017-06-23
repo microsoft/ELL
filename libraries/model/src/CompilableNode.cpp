@@ -83,7 +83,7 @@ namespace model
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
-
+    
     bool CompilableNode::ShouldCompileInline() const
     {
         // Make sure all inputs have only pure ports
@@ -122,6 +122,7 @@ namespace model
         {
             std::replace(functionName.begin(), functionName.end(), ch, '_');
         }
+
         return functionName;
     }
 

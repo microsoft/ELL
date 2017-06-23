@@ -66,6 +66,16 @@ namespace neural
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
+        /// <summary> Returns the value to scale the output by. </summary>
+        ///
+        /// <returns> The value to scale the output by. </returns>
+        const VectorType& GetScale() const { return _multiplicationValues; }
+
+        /// <summary> Returns the value to offset the output by. </summary>
+        ///
+        /// <returns> The value to offset the output by. </returns>
+        const VectorType& GetBias() const { return _additionValues; }
+
     private:
         using Layer<ElementType>::_layerParameters;
         using Layer<ElementType>::_output;

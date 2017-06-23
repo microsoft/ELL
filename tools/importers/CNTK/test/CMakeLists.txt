@@ -20,12 +20,13 @@ if(${PYTHONINTERP_FOUND})
 
 	set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
-	#copy files
-	foreach(PY_FILE ${test_src})
-		configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
+	# copy files
+	foreach(PYTHON_FILE ${test_src})
+		configure_file(${PYTHON_FILE} ${PYTHON_FILE} COPYONLY)
 	endforeach()
-	foreach(PY_FILE ${test_data})
-		configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
+
+	foreach(PYTHON_FILE ${test_data})
+		configure_file(${PYTHON_FILE} ${PYTHON_FILE} COPYONLY)
 	endforeach()
 
 	add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} -m unittest ${test_src})

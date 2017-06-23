@@ -35,9 +35,6 @@ namespace ell
 {
 namespace nodes
 {
-    // TODO: Maybe IRNode is templated on its input and output types?
-    // TODO: Maybe we have an IRNodeFactory that you init with (name, IR, inputs/outputs/extra args) and create new nodes from it?
-
     /// <summary> 
     /// A base class for nodes that emit pregenerated LLVM IR code 
     ///
@@ -108,7 +105,6 @@ namespace nodes
         const emitters::NamedVariableTypeList& GetExtraArgs() const { return _extraArgs; }
 
     private:
-        // TODO: Only keep 1 copy of IR... compiler should ensure it's only emitted once
         std::string _functionName;
         std::string _irCode;
         emitters::NamedVariableTypeList _extraArgs;

@@ -98,6 +98,12 @@ namespace math
         ///
         /// <param name="shape"> The tensor shape (always given in canonical coordinates: row, column, channel). </param>
         ConstTensorReference(Triplet shape);
+        
+        /// <summary> Constructs an instance of ConstTensorReference. </summary>
+        ///
+        /// <param name="shape"> The tensor shape (always given in canonical coordinates: row, column, channel). </param>
+        /// <param name="pData"> A pointer to the data to reference. </param>
+        ConstTensorReference(Triplet shape, ElementType* pData);
 
         /// <summary> Element access operator. </summary>
         ///
@@ -274,6 +280,11 @@ namespace math
         void Swap(ConstTensorReference<ElementType, dimension0, dimension1, dimension2>& other);
 
         /// @}
+
+        /// <summary> Returns a copy of the contents of the Tensor. </summary>
+        ///
+        /// <returns> A std::vector with a copy of the contents of the Tensor. </returns>
+        std::vector<ElementType> ToArray() const;
 
     protected:
         // other protected member functions
@@ -593,6 +604,9 @@ namespace math
         using TensorRef::operator-=;
         using TensorRef::operator*=;
         using TensorRef::operator/=;
+
+        /// <summary> Constructs an empty tensor. </summary>
+        Tensor();
 
         /// <summary> Constructs a the zero tensor of given shape. </summary>
         ///

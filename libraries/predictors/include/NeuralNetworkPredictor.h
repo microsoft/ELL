@@ -54,11 +54,13 @@ namespace predictors
     public:
         /// <summary> Type of the input vector expected by this predictor type. </summary>
         using DataVectorType = typename neural::Layer<ElementType>::DataVectorType;
+
         /// <summary> Dimensions of the input and output tensors. </summary>
         using Shape = typename neural::Layer<ElementType>::Shape;
 
         /// <summary> A unique_ptr to the input layer for this predictor. </summary>
         using InputLayerReference = std::unique_ptr<neural::InputLayer<ElementType>>;
+        
         /// <summary> A vector of layers. </summary>
         using Layers = std::vector<std::unique_ptr<neural::Layer<ElementType>>>;
 
@@ -74,7 +76,7 @@ namespace predictors
         /// <summary> Returns the underlying layers. </summary>
         ///
         /// <returns> The underlying vector of layers. </returns>
-        const Layers& GetLayers() { return _layers; }
+        const Layers& GetLayers() const { return _layers; }
 
         /// <summary> Sets the underlying layers. </summary>
         ///

@@ -24,6 +24,8 @@
 
 // nodes
 #include "AccumulatorNode.h"
+#include "BatchNormalizationLayerNode.h"
+#include "BiasLayerNode.h"
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
 #include "ConstantNode.h"
@@ -33,10 +35,17 @@
 #include "ExtremalValueNode.h"
 #include "IRNode.h"
 #include "MultiplexerNode.h"
+#include "NeuralNetworkPredictorNode.h"
 #include "SourceNode.h"
 #include "SumNode.h"
 #include "TypeCastNode.h"
 #include "UnaryOperationNode.h"
+
+// predictors
+#include "BatchNormalizationLayer.h"
+#include "BiasLayer.h"
+#include "InputLayer.h"
+#include "NeuralNetworkPredictor.h"
 
 // testing
 #include "testing.h"
@@ -47,6 +56,14 @@
 #include <string>
 
 using namespace ell;
+
+namespace
+{
+size_t GetShapeSize(const math::Triplet& shape)
+{
+    return shape[0] * shape[1] * shape[2];
+}
+}
 
 void TestCompileIsEqual()
 {
@@ -569,4 +586,159 @@ void TestIRNode()
     }
 
     VerifyCompiledOutput(dotNodeMap, compiledMap, signal, "DotProductNode");
+}
+
+void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using LayerType = predictors::neural::BiasLayer<double>;
+
+    using LayerParameters = typename LayerType::LayerParameters;
+    using TensorType = typename LayerType::TensorType;
+    using TensorReferenceType = typename LayerType::TensorReferenceType;
+    using Shape = typename LayerType::Shape;
+    using VectorType = typename LayerType::VectorType;
+
+    // Set up bias layer
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+
+    input(0, 0, 0) = 1;
+    input(0, 1, 0) = 2;
+    input(1, 0, 1) = 3;
+    input(1, 1, 1) = 4;
+
+    auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
+    auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
+    Shape outputShape = { { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 } };
+    LayerParameters parameters{ inputWithPadding, inputPadding, outputShape, outputPadding };
+    VectorType bias({ 10, 100 });
+
+    predictors::neural::BiasLayer<double> biasLayer(parameters, bias);
+    biasLayer.Compute();
+    auto output = biasLayer.GetOutput();
+    testing::ProcessTest("Testing BiasLayer, values",
+                         testing::IsEqual(output(outputPaddingSize, outputPaddingSize, 0), 11.0) &&
+                             testing::IsEqual(output(outputPaddingSize, outputPaddingSize + 1, 0), 12.0) &&
+                             testing::IsEqual(output(outputPaddingSize + 1, outputPaddingSize, 1), 103.0) &&
+                             testing::IsEqual(output(outputPaddingSize + 1, outputPaddingSize + 1, 1), 104.0));
+    if (outputPaddingSize == 1)
+        testing::ProcessTest("Testing BiasLayer, padding", output(0, 0, 0) == 0 && output(0, 1, 0) == 0 && output(2, 3, 1) == 0 && output(3, 3, 1) == 0);
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto biasNode = model.AddNode<nodes::BiasLayerNode<double>>(inputNode->output, biasLayer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", biasNode->output } });
+
+    std::vector<std::vector<double>> signal = { inputWithPadding.ToArray() };
+    std::vector<std::vector<double>> expectedOutput = { output.ToArray() };
+    VerifyMapOutput(map, signal, expectedOutput, biasNode->GetRuntimeTypeName());
+
+    model::MapCompilerParameters settings;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+
+    // compare output
+    VerifyCompiledOutput(map, compiledMap, signal, biasNode->GetRuntimeTypeName());
+}
+
+void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using LayerType = predictors::neural::BatchNormalizationLayer<double>;
+
+    using LayerParameters = typename LayerType::LayerParameters;
+    using TensorType = typename LayerType::TensorType;
+    using TensorReferenceType = typename LayerType::TensorReferenceType;
+    using Shape = typename LayerType::Shape;
+    using VectorType = typename LayerType::VectorType;
+
+    // Verify BatchNormalizationLayer
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    input(0, 0, 0) = 11;
+    input(0, 1, 0) = 7;
+    input(1, 0, 1) = 30;
+    input(1, 1, 1) = 50;
+
+    auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
+    auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
+    Shape outputShape = { { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 } };
+    LayerParameters bnParameters{ input, inputPadding, outputShape, outputPadding };
+    VectorType mean({ 5, 10 });
+    VectorType variance({ 4.0, 16.0 });
+
+    predictors::neural::BatchNormalizationLayer<double> bnLayer(bnParameters, mean, variance);
+    bnLayer.Compute();
+    auto output = bnLayer.GetOutput();
+    double eps = 1e-5;
+    testing::ProcessTest("Testing BatchNormalizationLayer, values",
+                         testing::IsEqual(output(outputPaddingSize, outputPaddingSize, 0), 3.0, eps) &&
+                             testing::IsEqual(output(outputPaddingSize, outputPaddingSize + 1, 0), 1.0, eps) &&
+                             testing::IsEqual(output(outputPaddingSize + 1, outputPaddingSize, 1), 5.0, eps) &&
+                             testing::IsEqual(output(outputPaddingSize + 1, outputPaddingSize + 1, 1), 10.0, eps));
+    if (outputPaddingSize == 1)
+        testing::ProcessTest("Testing BatchNormalizationLayer, padding", output(0, 0, 0) == 0 && output(0, 1, 0) == 0 && output(2, 3, 1) == 0 && output(3, 3, 1) == 0);
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(input.Size());
+    auto bnNode = model.AddNode<nodes::BatchNormalizationLayerNode<double>>(inputNode->output, bnLayer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", bnNode->output } });
+
+    std::vector<std::vector<double>> signal = { inputWithPadding.ToArray() };
+    std::vector<std::vector<double>> expectedOutput = { output.ToArray() };
+    VerifyMapOutput(map, signal, expectedOutput, bnNode->GetRuntimeTypeName());
+
+    model::MapCompilerParameters settings;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+
+    // compare output
+    VerifyCompiledOutput(map, compiledMap, signal, bnNode->GetRuntimeTypeName());
+}
+
+void TestNeuralNetworkPredictorNode()
+{
+    using ElementType = double;
+    using InputParameters = typename predictors::neural::InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename predictors::neural::Layer<ElementType>::LayerParameters;
+    using TensorType = typename predictors::neural::Layer<ElementType>::TensorType;
+    using Shape = typename predictors::neural::Layer<ElementType>::Shape;
+    using VectorType = typename predictors::neural::Layer<ElementType>::VectorType;
+    using MatrixType = typename predictors::neural::Layer<ElementType>::MatrixType;
+    using DataVectorType = typename predictors::NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    typename predictors::NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename predictors::NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    InputParameters inputParams = { { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, 1 };
+    inputLayer = std::make_unique<predictors::neural::InputLayer<ElementType>>(inputParams);
+
+    LayerParameters layerParameters = { inputLayer->GetOutput(), predictors::neural::NoPadding(), { 1, 1, 3 }, predictors::neural::NoPadding() };
+    layerParameters = { inputLayer->GetOutput(), predictors::neural::NoPadding(), { 1, 1, 3 }, predictors::neural::NoPadding() };
+    VectorType bias1({ -0.43837756f, -0.90868396f, -0.0323102f });
+    layers.push_back(std::unique_ptr<predictors::neural::Layer<ElementType>>(new predictors::neural::BiasLayer<ElementType>(layerParameters, bias1)));
+    predictors::NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+
+    std::vector<ElementType> input = { 0, 1, 2 };
+    auto output = neuralNetwork.Predict(DataVectorType(input));
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
+    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName());
 }

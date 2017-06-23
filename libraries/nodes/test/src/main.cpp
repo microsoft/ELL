@@ -38,6 +38,10 @@ int main()
         TestDTWDistanceNodeCompute();
         TestSourceNodeCompute();
 
+        TestBiasLayerNode();
+        TestBatchNormalizationLayerNode();
+        TestNeuralNetworkPredictorNode();
+
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();
         TestSimpleForestPredictorNodeRefine();

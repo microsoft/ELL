@@ -211,7 +211,7 @@ void BiasLayerTest()
     input(0, 1, 0) = 2;
     input(1, 0, 1) = 3;
     input(1, 1, 1) = 4;
-    Shape outputShape = { 4,4,2 };
+    Shape outputShape = { 4, 4, 2 };
     LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
     VectorType bias({5, 10});
 
