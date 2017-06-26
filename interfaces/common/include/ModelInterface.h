@@ -139,8 +139,8 @@ public:
     std::string GetId();
     ELL_NodeIterator GetParents();
     ELL_NodeIterator GetDependents();
-    ELL_OutputPort GetOutputPort(std::string& portName);
-    ELL_InputPort GetInputPort(std::string portName);
+    ELL_OutputPort GetOutputPort(const std::string& portName);
+    ELL_InputPort GetInputPort(const std::string& portName);
     ELL_Port GetPort(const std::string& portName);
     ELL_OutputPortIterator GetOutputPorts();
     ELL_InputPortIterator GetInputPorts();

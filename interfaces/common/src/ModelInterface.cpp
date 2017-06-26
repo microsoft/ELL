@@ -71,6 +71,10 @@ void ELL_InputPortIterator::Next()
 
 ELL_InputPort ELL_InputPortIterator::Get()
 {
+    if (!IsValid())
+    {
+        throw std::out_of_range("invalid iterator");
+    }
     return ELL_InputPort(_ports[_i]);
 }
 
@@ -96,6 +100,10 @@ void ELL_OutputPortIterator::Next()
 
 ELL_OutputPort ELL_OutputPortIterator::Get()
 {
+    if (!IsValid())
+    {
+        throw std::out_of_range("invalid iterator");
+    }
     return ELL_OutputPort(_ports[_i]);
 }
 
@@ -137,6 +145,10 @@ ELL_Node ELL_NodeIterator::Get()
 {
     if (_isVector)
     {
+        if (_i >= _nodes.size())
+        {
+            throw std::out_of_range("invalid iterator");
+        }
         return ELL_Node(_nodes[_i]);
     }
     else
@@ -182,19 +194,25 @@ ELL_NodeIterator ELL_Node::GetDependents()
     return ELL_NodeIterator(_node->GetDependentNodes());
 }
 
-ELL_OutputPort ELL_Node::GetOutputPort(std::string& portName)
+ELL_OutputPort ELL_Node::GetOutputPort(const std::string& portName)
 {
-    return ELL_OutputPort(_node->GetOutputPort(portName));
+    auto port = _node->GetOutputPort(portName);
+    if (port == nullptr) { throw std::invalid_argument("no port named '" + portName + "'"); }
+    return ELL_OutputPort(port);
 }
 
-ELL_InputPort ELL_Node::GetInputPort(std::string portName)
+ELL_InputPort ELL_Node::GetInputPort(const std::string& portName)
 {
-    return ELL_InputPort(_node->GetInputPort(portName));
+    auto port = _node->GetInputPort(portName);
+    if (port == nullptr) { throw std::invalid_argument("no port named '" + portName + "'"); }
+    return ELL_InputPort(port);
 }
 
 ELL_Port ELL_Node::GetPort(const std::string& portName)
 {
-    return ELL_Port(_node->GetPort(portName));
+    auto port = _node->GetPort(portName);
+    if (port == nullptr) { throw std::invalid_argument("no port named '" + portName + "'"); }
+    return ELL_Port(port);
 }
 
 ELL_OutputPortIterator ELL_Node::GetOutputPorts()
@@ -234,7 +252,9 @@ int ELL_PortElement::GetType()
 
 ELL_OutputPort ELL_PortElement::ReferencedPort()
 {
-    return ELL_OutputPort(_port.ReferencedPort());
+    auto port = _port.ReferencedPort();
+    if (port == nullptr) { throw std::exception("no referenced port"); }
+    return ELL_OutputPort(port);
 }
 
 //
@@ -259,6 +279,10 @@ int ELL_PortElements::GetType() const
 
 ELL_PortElement ELL_PortElements::GetElement(int index) const
 {
+    if (index < 0 || index >= Size()) 
+    {
+        throw std::invalid_argument("index out of range");
+    }
     return ELL_PortElement(_elements.GetElement(index));
 }
 
@@ -383,7 +407,7 @@ size_t ELL_Model::Size()
 
 ELL_NodeIterator ELL_Model::GetNodes()
 {
-    ell::model::NodeIterator iter = _model->GetNodeIterator();
+    auto iter = _model->GetNodeIterator();
     return ELL_NodeIterator(iter);
 }
 
@@ -418,7 +442,7 @@ ELL_ModelBuilder::ELL_ModelBuilder()
 
 ELL_Node ELL_ModelBuilder::AddNode(ELL_Model model, const std::string& nodeType, const std::vector<std::string>& args)
 {
-    const ell::model::Node* newNode = _modelBuilder.AddNode(model.GetModel(), nodeType, args);
+    auto newNode = _modelBuilder.AddNode(model.GetModel(), nodeType, args);
     return ELL_Node(newNode);
 }
 
