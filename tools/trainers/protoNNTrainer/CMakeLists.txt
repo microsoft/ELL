@@ -29,14 +29,3 @@ set_property(TARGET ${PROJ_NAME} PROPERTY FOLDER "tools/trainers")
 
 # copy executable to build/bin directory
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
-
-# tests
-set (TEST_NAME ${PROJ_NAME}_test_1)
-add_test(NAME ${TEST_NAME}
-         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -v)
-
-set (TEST_NAME ${PROJ_NAME}_test_2)
-add_test(NAME ${TEST_NAME}
-         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-         COMMAND ${PROJ_NAME} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd auto -v)
