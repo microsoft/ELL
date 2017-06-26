@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "TrainerUtils.h"
+#include "ProtoNNTrainerUtils.h"
 
 // data
 #include "Dataset.h"
@@ -43,8 +43,8 @@ namespace trainers
                 X(j, colIdx) = dataVector[j];
             }
 
-            Y(label, colIdx) = 1;
-            Y(1 - label, colIdx) = 0;
+            Y((size_t)label, colIdx) = 1;
+            Y(1 - (size_t)label, colIdx) = 0;
 
             colIdx += 1;
             exampleIterator.Next();

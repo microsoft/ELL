@@ -42,4 +42,4 @@ namespace trainers
 }
 }
 
-#include "../tcc/TrainerUtils.tcc"
+#include "../tcc/ProtoNNTrainerUtils.tcc"
