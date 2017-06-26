@@ -253,7 +253,7 @@ int ELL_PortElement::GetType()
 ELL_OutputPort ELL_PortElement::ReferencedPort()
 {
     auto port = _port.ReferencedPort();
-    if (port == nullptr) { throw std::exception("no referenced port"); }
+    if (port == nullptr) { throw std::runtime_error("no referenced port"); }
     return ELL_OutputPort(port);
 }
 
