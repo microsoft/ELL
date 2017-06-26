@@ -26,7 +26,7 @@ namespace trainers
     class ProtoNNTrainerUtils
     {
     public:
-        static void ProtoNNTrainerUtils::GetDatasetAsMatrix(const data::AutoSupervisedDataset& anyDataset, math::MatrixReference<double, math::MatrixLayout::columnMajor> X, math::MatrixReference<double, math::MatrixLayout::columnMajor> Y);
+        static void GetDatasetAsMatrix(const data::AutoSupervisedDataset& anyDataset, math::MatrixReference<double, math::MatrixLayout::columnMajor> X, math::MatrixReference<double, math::MatrixLayout::columnMajor> Y);
 
         template <typename math::MatrixLayout Layout>
         static math::Matrix<double, Layout> MatrixExp(math::ConstMatrixReference<double, Layout> A);
