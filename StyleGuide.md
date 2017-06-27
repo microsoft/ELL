@@ -30,7 +30,7 @@ Names should be descriptive and self-evident, rather than terse. Use whole words
 
 * use "Num" as abbreviation for "Number"
 
-Classes, structs, and enum classes:
+Classes, structs, enum classes:
 use PascalCase, e.g., `class MyClass {};`
 
 use camelCase for name of enum values e.g., `enum MyEnum { valueOne, valueTwo };`
@@ -44,6 +44,8 @@ Exceptions to this rule are:
 * member functions that returns the size of an object, which can simply be `Size()`
 * type conversion functions, which can start with `To`, e.g., `ToString()`
 * functions that return the number of elements in a collection, which can start with `Num`, e.g. `NumVariables()`
+
+Method and Function arguments: camelCase: e.g., `int GetValue(int rowIndex, int columnIndex);`
 
 Member variables:
 Use `_` (underscore) followed by camelCase, e.g., `_myMemberVariable`

@@ -97,7 +97,12 @@ int main(int argc, char* argv[])
     catch (const utilities::Exception& exception)
     {
         std::cerr << "ERROR, got ELL exception. Message: " << exception.GetMessage() << std::endl;
-        throw;
+        return 1;
+    }
+    catch (const std::exception& exception)
+    {
+        std::cerr << "ERROR, got ELL unhandled exception. Message: " << exception.what() << std::endl;
+        return 1;
     }
 
     if (testing::DidTestFail())

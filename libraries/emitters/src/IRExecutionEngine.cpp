@@ -19,6 +19,13 @@ namespace ell
 {
 namespace emitters
 {
+
+    void FatalErrorHandler(void *userData, const std::string& reason, bool genCrashDiag)
+    {
+        std::string msg = "llvm fatal error: " + reason;
+        throw emitters::EmitterException(emitters::EmitterError::unexpected, msg);
+    }
+
     IRExecutionEngine::IRExecutionEngine(IRModuleEmitter&& module)
         : IRExecutionEngine(module.TransferOwnership())
     {
@@ -31,6 +38,13 @@ namespace emitters
 
         _pBuilder = std::make_unique<llvm::EngineBuilder>(std::move(pModule));
         _pBuilder->setEngineKind(llvm::EngineKind::JIT).setUseOrcMCJITReplacement(false);
+
+        static bool installed = false;
+        if (!installed) {
+            installed = true;
+            llvm::remove_fatal_error_handler();
+            llvm::install_fatal_error_handler(&FatalErrorHandler, nullptr);
+        }
     }
 
     void IRExecutionEngine::SelectTarget(const llvm::Triple& targetTriple, const std::string& cpuArchitecture, const std::string& cpuName, const std::vector<std::string>& attributes)
