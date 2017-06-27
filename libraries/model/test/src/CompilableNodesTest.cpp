@@ -411,6 +411,17 @@ void TestCompilableAccumulatorNodeFunction()
 // Now test nodes that compile with callback(s)
 //
 InputCallbackTester<double> g_tester;
+InputCallbackTester<double> g_testerCompiled;
+
+// C callback (called by emitted model)
+extern "C"
+{
+bool CompiledSourceNode_InputCallback(double* input)
+{
+    return g_testerCompiled.InputCallback(input);
+}
+}
+TESTING_FORCE_DEFINE_SYMBOL(CompiledSourceNode_InputCallback, bool, double*);
 
 // C++ callback (called by runtime model)
 bool SourceNode_InputCallback(std::vector<double>& input)
@@ -418,10 +429,11 @@ bool SourceNode_InputCallback(std::vector<double>& input)
     return g_tester.InputCallback(input);
 }
 
-void TestCompilableSourceNode()
+void TestCompilableSourceNode(bool runJit)
 {
     const std::vector<std::vector<double>> data = { { 1, 2, 3 }, { 2, 4, 6 }, { 3, 6, 9 }, { 4, 8, 12 }, { 5, 10, 15 } };
     g_tester.Initialize(data);
+    g_testerCompiled.Initialize(data);
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
@@ -431,10 +443,35 @@ void TestCompilableSourceNode()
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
+
+    if (runJit)
+    {
+        // compare output
+        std::vector<std::vector<model::TimeTickType>> timeSignal = { { 10, 15 }, { 20, 20 }, { 30, 45 }, { 40, 60 }, { 50, 120 } };
+        VerifyCompiledOutput(map, compiledMap, timeSignal, "SourceNode");
+    }
 }
 
-void TestCompilableSinkNode(size_t inputSize)
+// C callback (called by emitted model)
+extern "C"
 {
+size_t g_sinkOutputSize = 1;
+std::vector<double> outputValues;
+void CompiledSinkNode_OutputCallback(double* output)
+{
+    if (IsVerbose())
+    {
+        std::cout << "\tOutputCallback\n";
+    }
+    outputValues.assign(output, output + g_sinkOutputSize);
+}
+}
+TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback, void, double*);
+
+void TestCompilableSinkNode(size_t inputSize, bool runJit)
+{
+    g_sinkOutputSize = inputSize;
+
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputSize);
     auto testNode = model.AddNode<nodes::SinkNode<double>>(
@@ -443,12 +480,25 @@ void TestCompilableSinkNode(size_t inputSize)
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
+
+    if (runJit)
+    {
+        // compare output
+        std::vector<std::vector<double>> input = { {} };
+        for (size_t i = 0; i < inputSize; ++i)
+        {
+            input[0].push_back(i * 10);
+        }
+        outputValues.clear();
+        VerifyCompiledOutput(map, compiledMap, input, "SinkNode");
+        testing::ProcessTest("Testing callback values", testing::IsEqual(outputValues, input[0]));
+    }
 }
 
-void TestCompilableSinkNode()
+void TestCompilableSinkNode(bool runJit)
 {
-    TestCompilableSinkNode(1);
-    TestCompilableSinkNode(100);
+    TestCompilableSinkNode(1, runJit);
+    TestCompilableSinkNode(100, runJit);
 }
 
 void TestFloatNode()

@@ -19,9 +19,17 @@ namespace nodes
 
     template <typename ValueType, SamplingFunction<ValueType> getSample>
     SourceNode<ValueType, getSample>::SourceNode(
+        const model::PortElements<TimeTickType>& input, size_t outputSize)
+        : SourceNode(input, outputSize, "SourceNode_SamplingFunction")
+    {
+    }
+
+    template <typename ValueType, SamplingFunction<ValueType> getSample>
+    SourceNode<ValueType, getSample>::SourceNode(
         const model::PortElements<TimeTickType>& input, size_t outputSize, const std::string& samplingFunctionName)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputSize), _samplingFunctionName(samplingFunctionName)
     {
+        _bufferedSample.resize(outputSize);
     }
 
     template <typename ValueType, SamplingFunction<ValueType> getSample>
@@ -72,6 +80,8 @@ namespace nodes
         // If the requested sample time is different from cached, invoke the callback and optionally interpolate.
         auto if1 = function.If(emitters::GetComparison<TimeTickType>(emitters::BinaryPredicateType::notEqual), sampleTime, bufferedSampleTime);
         {
+            DEBUG_EMIT_PRINTF(function, _samplingFunctionName + "\n");
+
             auto result = function.Call(pSamplingFunction, { function.PointerOffset(pBufferedSample, 0) });
             auto if2 = function.If(emitters::TypedComparison::equals, result, function.Literal(true));
             {
@@ -85,12 +95,17 @@ namespace nodes
         }
         if1.End();
 
-        // EFFICIENCY can we avoid looping over each sample?
-        for (size_t i = 0; i < output.Size(); ++i)
+        // Set sample values to the output
+        if (!IsScalar(output) && !compiler.GetCompilerParameters().unrollLoops)
         {
-            auto sample = function.ValueAt(pBufferedSample, i);
-            function.SetValueAt(pResult, function.Literal((int)i), sample);
+            SetOutputValuesLoop(compiler, function, pBufferedSample);
         }
+        else
+        {
+            SetOutputValuesExpanded(compiler, function, pBufferedSample);
+        }
+
+        // Update the cached sample time
         function.Store(pBufferedSampleTime, sampleTime);
     }
 
@@ -125,6 +140,35 @@ namespace nodes
     void SourceNode<ValueType, getSample>::Interpolate(TimeTickType /*originalTime*/, TimeTickType /*newTime*/) const
     {
         // Default to pass-through (derived classes will override).
+    }
+
+    template <typename ValueType, SamplingFunction<ValueType> getSample>
+    void SourceNode<ValueType, getSample>::SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample)
+    {
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+
+        auto numValues = output.Size();
+        auto forLoop = function.ForLoop();
+        forLoop.Begin(0, numValues, 1);
+        {
+            auto i = forLoop.LoadIterationVariable();
+            auto value = function.ValueAt(sample, i);
+            function.SetValueAt(pOutput, i, value);
+        }
+        forLoop.End();
+    }
+
+    template <typename ValueType, SamplingFunction<ValueType> getSample>
+    void SourceNode<ValueType, getSample>::SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample)
+    {
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+
+        auto numValues = output.Size();
+        for (size_t i = 0; i < numValues; ++i)
+        {
+            auto value = function.ValueAt(sample, i);
+            function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
+        }
     }
 }
 }

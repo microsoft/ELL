@@ -19,7 +19,7 @@ using namespace ell::emitters;
 
 void TestIRCompiler()
 {
-    // VerboseRegion region;    
+    // VerboseRegion region;
     TestFloatNode();
     TestCompilableDotProductNode2(3);
     TestCompilableDotProductNode2(4);
@@ -28,7 +28,7 @@ void TestIRCompiler()
     TestCompilableDotProductNode2(3);
     TestCompilableDotProductNode2(4);
 
-    TestCompileIsEqual();    
+    TestCompileIsEqual();
     TestSimpleMap(false);
     TestSimpleMap(true);
     TestCompiledMapMove();
@@ -47,8 +47,8 @@ void TestIRCompiler()
     TestSlidingAverage();
     TestDotProductOutput();
     TestSteppableMap(false);
-    // TestSteppableMap(true); // Fails on Windows
-    // TestMultiplexer(); // FAILS -- crash 
+    TestSteppableMap(true);
+    // TestMultiplexer(); // FAILS -- crash
     // TestLinearPredictor(); // FAILS -- crash
     // TestForest(); // FAILS -- crash
 
@@ -69,9 +69,11 @@ void TestIRCompiler()
     TestCompilableMultiplexerNode();
     TestCompilableTypeCastNode();
     TestCompilableAccumulatorNodeFunction();
-    TestCompilableSinkNode();
-    TestCompilableSourceNode();
-    TestCompilableAccumulatorNodeFunction(); 
+    TestCompilableSourceNode(false);
+    TestCompilableSourceNode(true);
+    TestCompilableSinkNode(false);
+    TestCompilableSinkNode(true);
+    TestCompilableAccumulatorNodeFunction();
 
     TestPerformanceCounters();
     TestCompilableDotProductNode2(3); // uses IR
@@ -81,7 +83,7 @@ void TestIRCompiler()
     TestBiasLayerNode();
     TestBiasLayerNode(0, 1);
     TestBiasLayerNode(0, 2);
- 
+
     TestBatchNormalizationLayerNode();
     // TestBatchNormalizationLayerNode(0, 1);
     // TestBatchNormalizationLayerNode(0, 2);

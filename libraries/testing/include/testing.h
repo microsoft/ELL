@@ -144,3 +144,14 @@ namespace testing
     bool DidTestFail();
 }
 }
+
+// Forces a symbol to be defined so that LLVM jit can find it
+#if defined(_WIN32)
+#if defined(_WIN64)
+#define TESTING_FORCE_DEFINE_SYMBOL(x, returnType, ...) __pragma(comment(linker, "/export:" #x))
+#else
+#define TESTING_FORCE_DEFINE_SYMBOL(x, returnType, ...) __pragma(comment(linker, "/export:_" #x))
+#endif
+#else
+#define TESTING_FORCE_DEFINE_SYMBOL(x, returnType, ...) returnType (*__##x##_fp)(__VA_ARGS__) = &x;
+#endif

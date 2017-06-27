@@ -22,6 +22,7 @@
 #include "LinearPredictorNode.h"
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
+#include "SinkNode.h"
 #include "SourceNode.h"
 
 // predictors
@@ -196,15 +197,19 @@ model::SteppableMap<std::chrono::steady_clock> GenerateSteppableMap(size_t dimen
 {
     constexpr size_t timeSignalDimension = 2;
 
-    std::ostringstream compiledCallbackName;
-    compiledCallbackName << "SteppableMap_" << dimension << "_" << intervalMs << "_DataCallback";
+    std::ostringstream dataCallbackName;
+    dataCallbackName << "SteppableMap_" << dimension << "_" << intervalMs << "_DataCallback";
+
+    std::ostringstream resultsCallbackName;
+    resultsCallbackName << "SteppableMap_" << dimension << "_" << intervalMs << "_ResultsCallback";
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(timeSignalDimension);
-    auto sourceNode = model.AddNode<nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>(inputNode->output, dimension, compiledCallbackName.str());
+    auto sourceNode = model.AddNode<nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>(inputNode->output, dimension, dataCallbackName.str());
     auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
     auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(sourceNode->output, constantTwoNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-    auto outputNode = model.AddNode<model::OutputNode<double>>(timesNode->output);
+    auto sinkNode = model.AddNode<nodes::SinkNode<double>>(timesNode->output, [](const std::vector<double>&) {}, resultsCallbackName.str());
+    auto outputNode = model.AddNode<model::OutputNode<double>>(sinkNode->output);
 
     auto map = model::SteppableMap<std::chrono::steady_clock>(model, { { "input", inputNode } }, { { "output", outputNode->output } }, model::DurationType(intervalMs));
     return map;

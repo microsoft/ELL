@@ -2,6 +2,9 @@
 # Generates the swig python3 wrappers in a sub folder called "output"
 # Pre-requisites: swig in the path (e.g. /usr/local/bin/swig)
 
+# Generate example map
+../../../build/bin/makeExamples -o map
+
 # Generate model IR
 ../../../build/bin/compile -imap ELL_step10.map -cfn Step10 -m clockStep -of ELL_step10.ll
 

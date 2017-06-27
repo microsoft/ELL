@@ -52,8 +52,14 @@ namespace nodes
         ///
         /// <param name="input"> Port elements for input values (sample time, current time) </param>
         /// <param name="outputSize"> Output size </param>
-        /// <param name="samplingFunctionName"> Optional sampling function name to be emitted </param>
-        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, const std::string& samplingFunctionName = "SourceNode_SamplingFunction");
+        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="input"> Port elements for input values (sample time, current time) </param>
+        /// <param name="outputSize"> Output size </param>
+        /// <param name="samplingFunctionName"> Sampling function name to be emitted (defaults to "SourceNode_SamplingFunction") </param>
+        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, const std::string& samplingFunctionName);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -76,8 +82,6 @@ namespace nodes
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        ///
-        /// <param name="transformer"> The `ModelTransformer` receiving the copy  </param>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Interpolates the buffered sample to match the new time. </summary>
@@ -89,6 +93,10 @@ namespace nodes
     protected:
         virtual void Compute() const override;
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+
+    private:
+        void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
+        void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, llvm::Value* sample);
 
     private:
         model::InputPort<TimeTickType> _input;

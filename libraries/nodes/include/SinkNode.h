@@ -14,6 +14,9 @@
 #include "ModelTransformer.h"
 #include "SteppableMap.h"
 
+// emitters
+#include "IRMetadata.h"
+
 // stl
 #include <functional>
 #include <string>
@@ -36,7 +39,7 @@ namespace nodes
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& input = _input;
-        const model::OutputPort<bool>& output = _output;
+        const model::OutputPort<ValueType>& output = _output;
         /// @}
 
         /// <summary> Default constructor </summary>
@@ -83,8 +86,12 @@ namespace nodes
         virtual bool EvaluateInput() const;
 
     private:
+        void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+        void SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+
+    private:
         model::InputPort<ValueType> _input;
-        model::OutputPort<bool> _output;
+        model::OutputPort<ValueType> _output;
 
         std::string _sinkFunctionName;
         SinkFunction<ValueType> _sink;

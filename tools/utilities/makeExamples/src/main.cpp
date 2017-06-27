@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GenerateModels.h"
+#include "ModelGenerateArguments.h"
 
 // common
 #include "LoadModel.h"
@@ -45,20 +46,33 @@ void SaveModels(const std::string& ext)
 
 void SaveMaps(const std::string& ext)
 {
-    common::SaveMap(GenerateSteppableMap(10, 50), "steppable_10." + ext);
+    common::SaveMap(GenerateSteppableMap(10, 50), "ELL_step10." + ext);
 }
 
 int main(int argc, char* argv[])
 {
     try
     {
+        ParsedModelGenerateArguments arguments;
+
         // create a command line parser
         utilities::CommandLineParser commandLineParser(argc, argv);
 
+        // add arguments to the command line parser
+        commandLineParser.AddOptionSet(arguments);
+
         // parse command line
         commandLineParser.Parse();
-        SaveModels("model");
-        SaveMaps("map");
+
+        if (ModelGenerateArguments::OutputType::map == arguments.outputType)
+        {
+            SaveMaps("map");
+        }
+        else
+        {
+            // Default to generating models
+            SaveModels("model");
+        }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

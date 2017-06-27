@@ -28,8 +28,8 @@ void TestCompilableBinaryPredicateNode();
 void TestCompilableMultiplexerNode();
 void TestCompilableTypeCastNode();
 void TestCompilableAccumulatorNodeFunction();
-void TestCompilableSinkNode();
-void TestCompilableSourceNode();
+void TestCompilableSourceNode(bool runJit);
+void TestCompilableSinkNode(bool runJit);
 void TestCompilableDotProductNode2(int dimension);
 void TestFloatNode();
 

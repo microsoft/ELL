@@ -145,7 +145,10 @@ template <typename InputType>
 bool InputCallbackTester<InputType>::InputCallback(std::vector<InputType>& input)
 {
     input = *cur;
-    std::cout << "    InputCallback(vector), input[0]: " << input[0] << std::endl;
+    if (IsVerbose())
+    {
+        std::cout << "    InputCallback(vector), input[0]: " << input[0] << "\n";
+    }
 
     if (++cur == end)
     {
@@ -158,7 +161,10 @@ template <typename InputType>
 bool InputCallbackTester<InputType>::InputCallback(InputType* input)
 {
     std::copy((*cur).begin(), (*cur).end(), input);
-    std::cout << "    InputCallback(C array), input[0]: " << input[0] << std::endl;
+    if (IsVerbose())
+    {
+        std::cout << "    InputCallback(C array), input[0]: " << input[0] << "\n";
+    }
 
     if (++cur == end)
     {

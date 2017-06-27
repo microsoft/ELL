@@ -22,7 +22,7 @@ namespace nodes
 
     template <typename ValueType>
     SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, SinkFunction<ValueType> sink, const std::string& sinkFunctionName)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _sink(std::move(sink)), _sinkFunctionName(sinkFunctionName)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _sink(std::move(sink)), _sinkFunctionName(sinkFunctionName)
     {
     }
 
@@ -36,15 +36,16 @@ namespace nodes
         {
             _sink(_input.GetValue());
         }
-        _output.SetOutput({ result });
+        _output.SetOutput(_input.GetValue());
     }
 
     template <typename ValueType>
     void SinkNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
+        // EvaluateInput defaults to 'pass through' in base implementation, which means
+        // we always call the sink function
         if (IsScalar(input))
         {
             // Callback signature: void SinkFunction(ValueType t)
@@ -52,7 +53,8 @@ namespace nodes
             function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
 
             llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
-            // TODO: tag metadata on pSinkFunction
+            DEBUG_EMIT_PRINTF(function, pSinkFunction->getName());
+            DEBUG_EMIT_PRINTF(function, "\n");
 
             function.Call(pSinkFunction, { pInput });
         }
@@ -63,13 +65,24 @@ namespace nodes
             function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
 
             llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
-            // TODO: tag metadata on pSinkFunction
+            DEBUG_EMIT_PRINTF(function, _sinkFunctionName + "\n");
 
             function.Call(pSinkFunction, { function.PointerOffset(pInput, function.Literal(0)) });
         }
 
-        // EvaluateInput defaults to 'pass through' in base implementation
-        function.SetValueAt(pResult, function.Literal(0), function.Literal(true));
+        // Tag the sink function as a callback that is emitted in headers
+        function.GetModule().InsertMetadata(_sinkFunctionName, emitters::c_declareInHeaderTagName);
+        function.GetModule().InsertMetadata(_sinkFunctionName, emitters::c_callbackFunctionTagName, "SinkNode");
+
+        // Set output values as well, useful when user code is in a non-event-driven mode
+        if (!IsScalar(output) && !compiler.GetCompilerParameters().unrollLoops)
+        {
+            SetOutputValuesLoop(compiler, function);
+        }
+        else
+        {
+            SetOutputValuesExpanded(compiler, function);
+        }
     }
 
     template <typename ValueType>
@@ -102,6 +115,41 @@ namespace nodes
     {
         // Default pass through (derived classes will override).
         return true;
+    }
+
+    template <typename ValueType>
+    void SinkNode<ValueType>::SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    {
+        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+
+        auto numInputs = input.Size();
+        assert(numInputs == output.Size());
+
+        auto forLoop = function.ForLoop();
+        forLoop.Begin(0, numInputs, 1);
+        {
+            auto i = forLoop.LoadIterationVariable();
+            auto value = function.ValueAt(pInput, i);
+            function.SetValueAt(pOutput, i, value);
+        }
+        forLoop.End();
+    }
+
+    template <typename ValueType>
+    void SinkNode<ValueType>::SetOutputValuesExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    {
+        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+
+        auto numInputs = input.Size();
+        assert(numInputs == output.Size());
+
+        for (size_t i = 0; i < numInputs; ++i)
+        {
+            llvm::Value* value = compiler.LoadPortElementVariable(input.GetInputElement(i));
+            function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
+        }
     }
 }
 }

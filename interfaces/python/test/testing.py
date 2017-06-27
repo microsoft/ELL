@@ -9,7 +9,10 @@ class Testing(object):
 
     @staticmethod
     def IsEqual(a, b, tol=1.0e-8):
-        if type(a) != type(b):
+        if 'swig' in str(type(a)):
+            if str(type(a)) != str(type(b)):
+                return False
+        elif type(a) != type(b):
             return False
         if type(a) is list:
             if len(a) != len(b):
@@ -17,7 +20,16 @@ class Testing(object):
             if len(a) == 0:
                 return True
             for i in range(len(a)):
-                if a[i] != b[i]:
+                if not Testing.IsEqual(a[i], b[i]):
+                    return False
+            return True
+        elif 'Vector' in str(type(a)):
+            if a.size() != b.size():
+                return False
+            if a.size() == 0:
+                return True
+            for i in range(a.size()):
+                if not Testing.IsEqual(a[i], b[i]):
                     return False
             return True
         else:

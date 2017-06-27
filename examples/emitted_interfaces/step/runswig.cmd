@@ -2,6 +2,9 @@ rem Script to run swig standalone without CMake on Windows
 rem Generates the swig python 3 wrappers in a sub folder called "output"
 rem Pre-requisites: swig.exe in the PATH environment variable
 
+rem Generate example map
+..\..\..\build\bin\Debug\makeExamples.exe -o map
+
 rem Generate model IR
 ..\..\..\build\bin\Debug\compile.exe -imap ELL_step10.map -cfn Step10 -m clockStep -of ELL_step10.ll
 

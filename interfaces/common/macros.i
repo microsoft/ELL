@@ -99,33 +99,6 @@
 
 #endif
 
-// Macro for wrapping language-specific callables so that they can act like callbacks
-#if defined(SWIGPYTHON)
-%define WRAP_CALLABLES_AS_CALLBACKS(Class, CallbackClass, ElementType)
-    %pythonprepend Class::GetInstance(ell::api::common::CallbackBase<ElementType>&, std::vector<ElementType>&) %{
-        class CallableWrapper(CallbackClass):
-            def __init__(self, f):
-                super(CallableWrapper, self).__init__()
-                self.f_ = f
-            def Run(self, data):
-                return self.f_(data)
-
-        if not isinstance(callback, CallbackClass) and callable(callback):
-            wrapper = CallableWrapper(callback)
-            wrapper.__disown__() # caller to deref wrapper in its dtor
-            callback = wrapper
-        else:
-            callback.__disown__() # caller to deref callback in its dtor
-    %}
-%enddef
-
-#else
-
-%define WRAP_CALLABLES_AS_CALLBACKS(Class, CallbackClass, ElementType)
-%enddef
-
-#endif
-
 // Macro for enabling types to be constructed from numpy arrays
 #if defined(SWIGPYTHON)
 %define CONSTRUCTABLE_WITH_NUMPY(TypeName)

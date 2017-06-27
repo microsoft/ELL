@@ -27,6 +27,7 @@
 #include "MovingVarianceNode.h"
 #include "MultiplexerNode.h"
 #include "ProtoNNPredictorNode.h"
+#include "SinkNode.h"
 #include "SourceNode.h"
 #include "UnaryOperationNode.h"
 
@@ -182,13 +183,14 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::DemultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestPredictorNode>();
         context.GetTypeFactory().AddType<model::Node, nodes::SingleElementThresholdNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<double>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<bool, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<double>>();
-        context.GetTypeFactory().AddType <model::Node, nodes::ProtoNNPredictorNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ProtoNNPredictorNode>();
     }
 
     void RegisterMapTypes(utilities::SerializationContext& context)

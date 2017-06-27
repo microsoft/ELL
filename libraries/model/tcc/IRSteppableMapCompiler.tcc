@@ -21,6 +21,11 @@ namespace model
         return functionNamePrefix + "_WaitTimeForNextPredict";
     }
 
+    static std::string GetIntervalFunctionName(const std::string& functionNamePrefix)
+    {
+        return functionNamePrefix + "_GetInterval";
+    }
+
     template <typename ClockType>
     IRSteppableMapCompiler<ClockType>::IRSteppableMapCompiler()
         : IRSteppableMapCompiler(MapCompilerParameters{})
@@ -112,8 +117,9 @@ namespace model
         auto baseName = GetMapCompilerParameters().mapFunctionName;
         EmitStepFunction(steppableMap, baseName, pLastSampleTicksVar);
 
-        // Emit the WaitTimeForNextCompute function
+        // Emit the time functions
         EmitWaitTimeForNextComputeFunction(steppableMap, baseName, pLastSampleTicksVar);
+        EmitGetIntervalFunction(steppableMap, baseName);
     }
 
     template <typename ClockType>
@@ -184,7 +190,7 @@ namespace model
         emitters::NamedVariableTypeList args = {}; // no args
         auto function = GetModule().BeginFunction(WaitTimeForNextComputeFunctionName(functionNamePrefix), TimeTickVarType, args);
         function.InsertMetadata(emitters::c_declareInHeaderTagName);
-        function.InsertMetadata(emitters::c_stepWaitTimeFunctionTagName);
+        function.InsertMetadata(emitters::c_stepTimeFunctionTagName, "WaitTimeForNextStep");
 
         // Constants
         auto intervalTicks = function.template Literal<TimeTickType>(static_cast<TimeTickType>(map.GetIntervalTicks()));
@@ -213,6 +219,22 @@ namespace model
             if2.End();
         }
         if1.End();
+
+        GetModule().EndFunction(function.Load(pResult));
+    }
+
+    template <typename ClockType>
+    void IRSteppableMapCompiler<ClockType>::EmitGetIntervalFunction(SteppableMap<ClockType>& map, const std::string& functionNamePrefix)
+    {
+        emitters::NamedVariableTypeList args = {}; // no args
+        auto function = GetModule().BeginFunction(GetIntervalFunctionName(functionNamePrefix), TimeTickVarType, args);
+        function.InsertMetadata(emitters::c_declareInHeaderTagName);
+        function.InsertMetadata(emitters::c_stepTimeFunctionTagName, "GetInterval");
+
+        auto intervalTicks = function.template Literal<TimeTickType>(static_cast<TimeTickType>(map.GetIntervalTicks()));
+
+        llvm::Value* pResult = function.Variable(TimeTickVarType);
+        function.Store(pResult, intervalTicks);
 
         GetModule().EndFunction(function.Load(pResult));
     }

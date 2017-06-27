@@ -13,6 +13,9 @@
 #include "IRHeaderWriter.h"
 #include "IRMetadata.h"
 
+// utilities
+#include "Debug.h"
+
 // stl
 #include <sstream>
 #include <string>
@@ -97,80 +100,98 @@ namespace emitters
             llvm::Function* _function;
         };
 
-        // Base class for writing callback SWIG interfaces
-        class CallbackWriterBase
+        struct CallbackSignature
         {
-        public:
-            CallbackWriterBase(IRModuleEmitter& moduleEmitter, llvm::Function& callbackFunction)
-                : _moduleEmitter(&moduleEmitter), _function(&callbackFunction)
+            CallbackSignature(llvm::Function& f)
             {
-                _functionName = _function->getName();
+                functionName = f.getName();
 
                 // Callbacks have a pointer parameter and a return (which can be void)
                 {
                     std::ostringstream os;
-                    auto& argument = *(callbackFunction.args().begin());
-                    WriteLLVMType(os, argument.getType()->getPointerElementType());
-                    _valueType = os.str();
+                    auto& argument = *(f.args().begin());
+                    auto type = argument.getType();
+                    if (type->isPointerTy())
+                    {
+                        inputIsScalar = false;
+                        WriteLLVMType(os, argument.getType()->getPointerElementType());
+                    }
+                    else
+                    {
+                        inputIsScalar = true;
+                        WriteLLVMType(os, argument.getType());
+                    }
+                    inputType = os.str();
                 }
 
                 {
                     std::ostringstream os;
-                    WriteLLVMType(os, callbackFunction.getReturnType());
-                    _returnType = os.str();
+                    WriteLLVMType(os, f.getReturnType());
+                    returnType = os.str();
                 }
 
-                _className = _valueType + "CallbackBase";
-                _className[0] = toupper(_className[0]); // pascal case
+                className = inputType + "CallbackBase";
+                className[0] = toupper(className[0]); // pascal case
             }
 
-            virtual ~CallbackWriterBase() = default;
-
-        protected:
-            //
-            // Callback writer methods
-            //
-            virtual void WriteCallbackFunction(std::ostream& os) const = 0;
-
-            void WriteCallbackSwigCode(std::ostream& os) const
-            {
-                os << "WRAP_CALLABLES_AS_CALLBACKS(" << _forwarderClassName << ", "
-                   << _className << ", " << _valueType << ")\n\n";
-            }
-
-            //
-            // Forwarder writer methods
-            //
-            virtual void WriteForwarderClassHeader(std::ostream& os) const = 0;
-            virtual void WriteForwarderClassBody(std::ostream& os) const = 0;
-            virtual void WriteForwarderClassInstance(std::ostream& os) const = 0;
-
-            std::string _valueType;
-            std::string _returnType;
-            std::string _functionName;
-
-            std::string _className;
-            std::string _forwarderClassName;
-
-            llvm::Function* _function;
-            IRModuleEmitter* _moduleEmitter;
+            std::string functionName;
+            std::string className;
+            std::string inputType;
+            std::string returnType;
+            bool inputIsScalar;
         };
 
-        // Writes SWIG interfaces for SourceNode
-        class SourceNodeInterfaceWriter : public CallbackWriterBase
+        struct TimeFunctionSignature
         {
-        public:
-            SourceNodeInterfaceWriter(IRModuleEmitter& moduleEmitter, llvm::Function& callbackFunction)
-                : CallbackWriterBase(moduleEmitter, callbackFunction)
+            TimeFunctionSignature(llvm::Function& f, const std::string& apiName)
+                : apiName(apiName), functionName(f.getName())
             {
-                InitStepFunctionInfo();
-                InitWaitTimeFunctionInfo();
-
-                std::string moduleName = moduleEmitter.GetLLVMModule()->getName();
-                _forwarderClassName = moduleName + "Predictor";
+                // Time functions have no parameters and a non-void return
+                std::ostringstream os;
+                WriteLLVMType(os, f.getReturnType());
+                returnType = os.str();
             }
 
-            virtual ~SourceNodeInterfaceWriter() = default;
+            std::string apiName;
+            std::string functionName;
+            std::string returnType;
+        };
+
+        // Writes SWIG interfaces for predictors with step support
+        class SteppablePredictorInterfaceWriter
+        {
+        public:
+            SteppablePredictorInterfaceWriter(IRModuleEmitter& moduleEmitter, const std::vector<FunctionTagValues>& callbacks)
+                : _moduleEmitter(&moduleEmitter)
+            {
+                InitStepFunctionInfo();
+                InitTimeFunctionsInfo();
+
+                std::string moduleName = moduleEmitter.GetLLVMModule()->getName();
+                _className = moduleName + "Predictor";
+
+                for (const auto& c : callbacks)
+                {
+                    if (c.values.size())
+                    {
+                        if (c.values[0] == "SourceNode")
+                        {
+                            _inputCallbacks.push_back(CallbackSignature(*c.function));
+                        }
+                        else if (c.values[0] == "SinkNode")
+                        {
+                            _outputCallbacks.push_back(CallbackSignature(*c.function));
+                        }
+                    }
+                }
+
+                // Eventually we'd support multiple sources and sinks.
+                // For now, assert that we're only going to look at the first ones of each.
+                DEBUG_THROW(_inputCallbacks.size() > 1, EmitterException(EmitterError::badFunctionDefinition, "At most one input callback function will be generated"));
+                DEBUG_THROW(_outputCallbacks.size() > 1, EmitterException(EmitterError::badFunctionDefinition, "At most one output callback function will be generated"));
+            }
+
+            virtual ~SteppablePredictorInterfaceWriter() = default;
 
         public:
             void WriteSwigCode(std::ostream& os)
@@ -190,7 +211,15 @@ namespace emitters
                     // Callback C definition
                     {
                         DeclareExternC externC(os);
-                        WriteCallbackFunction(os);
+                        for (const auto& cs : _inputCallbacks)
+                        {
+                            WriteCallbackFunction(os, cs, false);
+                        }
+
+                        for (const auto& cs : _outputCallbacks)
+                        {
+                            WriteCallbackFunction(os, cs, true);
+                        }
                     }
 
                     // Wrapper class definition
@@ -198,116 +227,265 @@ namespace emitters
                 }
             }
 
-        protected:
+        private:
             //
-            // Callback writer methods
+            // Callback writers
             //
-            virtual void WriteCallbackFunction(std::ostream& os) const override
+            void WriteCallbackFunction(std::ostream& os, const CallbackSignature& cs, bool isOutputCallback) const
             {
-                os << _returnType << " " << _functionName << " (" << _valueType << "* buffer)\n{\n";
-                os << "    return static_cast<" << _returnType << ">(_predictor.Invoke(buffer));\n";
+                std::string inputType = cs.inputType;
+                std::string predictorFunction = (isOutputCallback) ? "InvokeOutput" : "InvokeInput";
+
+                if (!cs.inputIsScalar)
+                {
+                    // Emitted function takes a pointer input, fix the parameter signature accordingly
+                    inputType.append("*");
+                }
+                else
+                {
+                    // Detect internal logic errors (i.e. only output callbacks can have scalar inputs)
+                    assert(isOutputCallback);
+                }
+
+                os << cs.returnType << " " << cs.functionName << " (" << inputType << " input)\n{\n";
+                if (cs.returnType == "void")
+                {
+                    os << "    _predictor." << predictorFunction << "(input);\n";
+                }
+                else
+                {
+                    os << "    return static_cast<" << cs.returnType << ">("
+                       << "_predictor." << predictorFunction << "(input));\n";
+                }
                 os << "}\n";
             }
 
-            //
-            // Forwarder writer methods
-            //
-            virtual void WriteForwarderClassHeader(std::ostream& os) const override
+            void WriteCallbackSwigCode(std::ostream& os) const
             {
-                os << "class " << _forwarderClassName << " : public ell::api::common::CallbackForwarder<" << _valueType << ">\n";
+                std::vector<std::string> parameters;
+
+                // Note: assumes at most 1 input and output callback (see debug throw in the constructor)
+                if (_inputCallbacks.size() > 0)
+                {
+                    parameters.push_back(_inputCallbacks[0].className);
+                    parameters.push_back(_inputCallbacks[0].inputType);
+                }
+
+                if (_outputCallbacks.size() > 0)
+                {
+                    parameters.push_back(_outputCallbacks[0].className);
+                    parameters.push_back(_outputCallbacks[0].inputType);
+                }
+
+                if (parameters.size() > 0)
+                {
+                    os << "WRAP_CALLABLES_AS_CALLBACKS(" << _className << ", ";
+                    WriteCommaSeparatedList(os, parameters);
+                    os << ")\n\n";
+                }
+            }
+
+            void WriteCallbackParameterList(std::ostream& os) const
+            {
+                std::vector<std::string> parameters;
+
+                // Note: assumes at most 1 input and output callback (see debug throw in the constructor)
+                if (_inputCallbacks.size() > 0)
+                {
+                    parameters.push_back("ell::api::CallbackBase<" + _inputCallbacks[0].inputType + ">& inputCallback");
+                    parameters.push_back("std::vector<" + _inputCallbacks[0].inputType + ">& inputBuffer");
+                }
+
+                if (_outputCallbacks.size() > 0)
+                {
+                    parameters.push_back("ell::api::CallbackBase<" + _outputCallbacks[0].inputType + ">& outputCallback");
+                }
+
+                WriteCommaSeparatedList(os, parameters);
+            }
+
+            void WriteCallbackVariableList(std::ostream& os) const
+            {
+                std::vector<std::string> list;
+
+                // Note: assumes at most 1 input and output callback (see debug throw in the constructor)
+                if (_inputCallbacks.size() > 0)
+                {
+                    list.push_back("inputCallback");
+                    list.push_back("inputBuffer");
+                }
+
+                if (_outputCallbacks.size() > 0)
+                {
+                    list.push_back("outputCallback");
+                    list.push_back("_outputSize");
+                }
+
+                WriteCommaSeparatedList(os, list);
+            }
+
+            void WriteCallbackValueTypeList(std::ostream& os) const
+            {
+                std::vector<std::string> list;
+
+                // Note: assumes at most 1 input and output callback (see debug throw in the constructor)
+                if (_inputCallbacks.size() > 0)
+                {
+                    list.push_back(_inputCallbacks[0].inputType);
+                }
+
+                if (_outputCallbacks.size() > 0)
+                {
+                    list.push_back(_outputCallbacks[0].inputType);
+                }
+
+                WriteCommaSeparatedList(os, list);
+            }
+
+            //
+            // Time functions
+            //
+            void WriteTimeFunctionsHeader(std::ostream& os) const
+            {
+                for (const auto& tf : _timeFunctions)
+                {
+                    os << "    " << tf.returnType << " " << tf.apiName << "();\n";
+                }
+            }
+
+            void WriteTimeFunctionsCode(std::ostream& os) const
+            {
+                for (const auto& tf : _timeFunctions)
+                {
+                    os << tf.returnType << " " << _className << "::" << tf.apiName << "()\n";
+                    os << "{\n";
+                    os << "    return " << tf.functionName << "();\n";
+                    os << "}\n\n";
+                }
+            }
+
+            //
+            // Forwarder class writers
+            //
+            void WriteForwarderClassHeader(std::ostream& os) const
+            {
+                os << "class " << _className << " : public ell::api::CallbackForwarder<";
+                WriteCallbackValueTypeList(os);
+                os << ">\n";
                 os << "{\npublic:\n";
+
                 // Constructor
-                os << "    " << _forwarderClassName << "() = default;\n";
+                os << "    " << _className << "() = default;\n";
+
                 // Destructor
-                os << "    virtual ~" << _forwarderClassName << "() = default;\n";
+                os << "    virtual ~" << _className << "() = default;\n";
+
                 // Step
                 os << "    std::vector<" << _stepOutputType << "> Step();\n";
-                // WaitTimeForNextStep
-                os << "    " << _waitTimeReturnType << " WaitTimeForNextStep();\n";
+
+                // Time functions
+                WriteTimeFunctionsHeader(os);
+
                 // GetInstance
-                os << "    static " << _forwarderClassName << "& GetInstance(ell::api::common::CallbackBase<"
-                   << _valueType << ">& callback, std::vector<" << _valueType << ">& buffer);\n\n";
+                os << "    static " << _className << "& GetInstance(";
+                WriteCallbackParameterList(os);
+                os << ");\n\n";
+
                 os << "private:\n";
-                os << "    static constexpr size_t inputSize = " << _stepInputSize << ";\n";
-                os << "    static constexpr size_t outputSize = " << _stepOutputSize << ";\n";
-                os << "    " << _stepInputType << " _input[inputSize];\n";
-                os << "    " << _stepOutputType << " _output[outputSize];\n";
+                os << "    static constexpr size_t _inputSize = " << _stepInputSize << ";\n";
+                os << "    static constexpr size_t _outputSize = " << _stepOutputSize << ";\n";
+                os << "    " << _stepInputType << " _input[_inputSize];\n";
+                os << "    " << _stepOutputType << " _output[_outputSize];\n";
                 os << "};\n\n";
             }
 
-            virtual void WriteForwarderClassBody(std::ostream& os) const override
+            void WriteForwarderClassBody(std::ostream& os) const
             {
                 // Step
-                os << "std::vector<" << _stepOutputType << "> " << _forwarderClassName << "::Step()\n";
+                os << "std::vector<" << _stepOutputType << "> " << _className << "::Step()\n";
                 os << "{\n";
                 os << "    " << _stepFunctionName << "(_input, _output);\n";
-                os << "    return std::vector<" << _stepOutputType << ">(_output, _output + outputSize);\n";
+                os << "    return std::vector<" << _stepOutputType << ">(_output, _output + _outputSize);\n";
                 os << "}\n\n";
 
-                // WaitTimeForNextStep
-                os << _waitTimeReturnType << " " << _forwarderClassName << "::WaitTimeForNextStep()\n";
-                os << "{\n";
-                os << "    return " << _waitTimeFunctionName << "();\n";
-                os << "}\n\n";
+                // Time functions
+                WriteTimeFunctionsCode(os);
 
                 // GetInstance
-                os << _forwarderClassName << "& " << _forwarderClassName << "::GetInstance(ell::api::common::CallbackBase<"
-                   << _stepInputType << ">& callback, std::vector<" << _stepInputType << ">& buffer)\n";
-                os << "{\n";
-                os << "    _predictor.InitializeOnce(callback, buffer);\n";
+                os << _className << "& " << _className << "::GetInstance(";
+                WriteCallbackParameterList(os);
+                os << ")\n{\n";
+                os << "    _predictor.InitializeOnce(";
+                WriteCallbackVariableList(os);
+                os << ");\n";
                 os << "    return _predictor;\n";
                 os << "}\n\n";
             }
 
-            virtual void WriteForwarderClassInstance(std::ostream& os) const override
+            void WriteForwarderClassInstance(std::ostream& os) const
             {
-                os << "static " << _forwarderClassName << " _predictor;\n";
+                os << "static " << _className << " _predictor;\n";
             }
 
-        private:
+            //
+            // Initializers
+            //
             void InitStepFunctionInfo()
             {
                 auto functions = GetFunctionsWithTag(*_moduleEmitter, c_stepFunctionTagName);
-                if (functions.size() != 1)
-                {
-                    throw EmitterException(EmitterError::badFunctionDefinition, "One and only one Step function must be emitted");
-                }
+                DEBUG_THROW(functions.size() > 1, EmitterException(EmitterError::badFunctionDefinition, "At most one Step function may be emitted"));
 
-                auto stepFunction = functions[0];
-                llvm::Function* f = stepFunction.function;
-                _stepFunctionName = f->getName();
-                _stepOutputSize = std::stoul(stepFunction.values[0]);
-
-                // Step functions have two pointer arguments
-                auto it = f->args().begin();
+                if (functions.size() > 0)
                 {
-                    std::ostringstream os;
-                    WriteLLVMType(os, (*it).getType()->getPointerElementType());
-                    _stepInputType = os.str();
-                }
+                    auto stepFunction = functions[0];
+                    llvm::Function* f = stepFunction.function;
+                    _stepFunctionName = f->getName();
+                    _stepOutputSize = std::stoul(stepFunction.values[0]);
 
-                {
-                    std::ostringstream os;
-                    WriteLLVMType(os, (*(++it)).getType()->getPointerElementType());
-                    _stepOutputType = os.str();
+                    // Step functions have two pointer arguments
+                    auto it = f->args().begin();
+                    {
+                        std::ostringstream os;
+                        WriteLLVMType(os, (*it).getType()->getPointerElementType());
+                        _stepInputType = os.str();
+                    }
+
+                    {
+                        std::ostringstream os;
+                        WriteLLVMType(os, (*(++it)).getType()->getPointerElementType());
+                        _stepOutputType = os.str();
+                    }
                 }
             }
 
-            void InitWaitTimeFunctionInfo()
+            void InitTimeFunctionsInfo()
             {
-                auto functions = GetFunctionsWithTag(*_moduleEmitter, c_stepWaitTimeFunctionTagName);
-                if (functions.size() != 1)
+                auto functions = GetFunctionsWithTag(*_moduleEmitter, c_stepTimeFunctionTagName);
+
+                for (const auto& f : functions)
                 {
-                    throw EmitterException(EmitterError::badFunctionDefinition, "One and only one WaitTime function must be emitted");
+                    if (f.values.size() > 0)
+                    {
+                        _timeFunctions.push_back(TimeFunctionSignature(*f.function, f.values[0]));
+                    }
                 }
+            }
 
-                llvm::Function* f = functions[0].function;
-                _waitTimeFunctionName = f->getName();
-
-                // WaitTime functions only return
-                std::ostringstream os;
-                WriteLLVMType(os, f->getReturnType());
-                _waitTimeReturnType = os.str();
+            //
+            // Utilities
+            //
+            void WriteCommaSeparatedList(std::ostream& os, const std::vector<std::string>& list) const
+            {
+                bool first = true;
+                for (const auto& item : list)
+                {
+                    if (!first)
+                    {
+                        os << ", ";
+                    }
+                    os << item;
+                    first = false;
+                }
             }
 
             // Step
@@ -317,9 +495,16 @@ namespace emitters
             const size_t _stepInputSize = 2; // time signal
             size_t _stepOutputSize;
 
-            // GetWaitTime
-            std::string _waitTimeFunctionName;
-            std::string _waitTimeReturnType;
+            // Callbacks
+            std::vector<CallbackSignature> _outputCallbacks;
+            std::vector<CallbackSignature> _inputCallbacks;
+
+            // Time functions
+            std::vector<TimeFunctionSignature> _timeFunctions;
+
+            // The name of the class we are emitting
+            std::string _className;
+            IRModuleEmitter* _moduleEmitter;
         };
 
         void WriteCommonSwigCode(std::ostream& os, IRModuleEmitter& moduleEmitter)
@@ -335,7 +520,6 @@ namespace emitters
 
             // Common SWIG code
             os << "%include \"callback.i\"\n";
-            os << "%include \"macros.i\"\n\n";
 
             // Language-specific SWIG code
             os << "#ifdef SWIGPYTHON\n";
@@ -352,13 +536,10 @@ namespace emitters
 
             // Module callback macros
             auto callbacks = GetFunctionsWithTag(moduleEmitter, c_callbackFunctionTagName);
-            for (const auto& c : callbacks)
+            if (callbacks.size() > 0)
             {
-                if (c.values.size() > 0 && c.values[0] == "SourceNode")
-                {
-                    SourceNodeInterfaceWriter writer(moduleEmitter, *(c.function));
-                    writer.WriteSwigCode(os);
-                }
+                SteppablePredictorInterfaceWriter writer(moduleEmitter, callbacks);
+                writer.WriteSwigCode(os);
             }
 
             os << "%include \"" << headerName << "\"\n";
@@ -398,13 +579,10 @@ namespace emitters
         }
 
         // Callbacks
-        for (const auto& c : callbacks)
+        if (callbacks.size() > 0)
         {
-            if (c.values.size() > 0 && c.values[0] == "SourceNode")
-            {
-                SourceNodeInterfaceWriter writer(moduleEmitter, *(c.function));
-                writer.WriteHeaderCode(os);
-            }
+            SteppablePredictorInterfaceWriter writer(moduleEmitter, callbacks);
+            writer.WriteHeaderCode(os);
         }
     }
 

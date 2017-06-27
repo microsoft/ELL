@@ -10,7 +10,6 @@
 #include "IPredictor.h"
 
 // math
-#include "Vector.h"
 #include "Tensor.h"
 #include "TensorOperations.h"
 
@@ -70,16 +69,16 @@ namespace neural
 
     // Typical padding parameters
     /// <summary> Function to return parameters representing no padding </summary
-    static PaddingParameters NoPadding() { return {PaddingScheme::zeros, 0}; }
+    static PaddingParameters NoPadding() { return { PaddingScheme::zeros, 0 }; }
 
     /// <summary> Function to return parameters that represent padding the specified pixel width with zeros. </summary
-    static PaddingParameters ZeroPadding(size_t width) { return {PaddingScheme::zeros, width }; }
+    static PaddingParameters ZeroPadding(size_t width) { return { PaddingScheme::zeros, width }; }
 
     /// <summary> Function to return parameters that represent padding the specified pixel width with the minimum value. </summary
-    static const PaddingParameters MinPadding(size_t width) { return {PaddingScheme::min, width}; }
+    static const PaddingParameters MinPadding(size_t width) { return { PaddingScheme::min, width }; }
     /// <summary> Function to return parameters that represent padding the specified pixel width with -1. </summary
-    static const PaddingParameters MinusOnePadding(size_t width) { return {PaddingScheme::minusOnes, width}; }
-    
+    static const PaddingParameters MinusOnePadding(size_t width) { return { PaddingScheme::minusOnes, width }; }
+
     /// <summary> Helper function to determine if a PaddingParameters struct represents no padding </summary>
     static bool HasPadding(const PaddingParameters& padding) { return padding.paddingSize != 0; }
 
@@ -121,7 +120,8 @@ namespace neural
         Layer(const LayerParameters& layerParameters);
 
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
-        Layer() : _layerParameters{math::Triplet{0, 0, 0}, NoPadding(), {0, 0, 0}, NoPadding()}, _output(math::Triplet{0, 0, 0}) {}
+        Layer()
+            : _layerParameters{ math::Triplet{ 0, 0, 0 }, NoPadding(), { 0, 0, 0 }, NoPadding() }, _output(math::Triplet{ 0, 0, 0 }) {}
 
         /// <summary> Returns a reference to the output tensor. </summary>
         ///
@@ -142,17 +142,23 @@ namespace neural
         ///
         /// <returns> `true` if the layer is of the queried layer type. </returns>
         template <class LayerType>
-        bool IsA() const { return dynamic_cast<LayerType*>(this) != nullptr; }
+        bool IsA() const
+        {
+            return dynamic_cast<LayerType*>(this) != nullptr;
+        }
 
         /// <summary> Used to get a layer as a specific type. </summary>
         ///
         /// <returns> Reference to the layer as a specific layer type. </returns>
         template <class LayerType>
-        LayerType& As() { return *(dynamic_cast<LayerType*>(this)); }
+        LayerType& As()
+        {
+            return *(dynamic_cast<LayerType*>(this));
+        }
 
         /// <summary> Computes the output of the layer via a forward feed of the configured input.
         ///           This is a no-op for this layer type. </summary>
-        virtual void Compute() {};
+        virtual void Compute(){};
 
         /// <summary> Indicates the kind of layer. </summary>
         ///
@@ -168,8 +174,8 @@ namespace neural
         ///
         /// <returns> The layer parameters. </returns>
         const LayerParameters& GetLayerParameters() const { return _layerParameters; }
-        
-        /// <summary> Prints diagnostic info about the layer to the  output stream. </summary> 
+
+        /// <summary> Prints diagnostic info about the layer to the  output stream. </summary>
         ///
         /// <param name="os"> The stream that receives the formated output (e.g. std::out) </param>
         /// <param name="maxValuesToPrint"> The maximum number of values from the layer output to include in the info sent to the output stream </param>
@@ -196,7 +202,6 @@ namespace neural
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
-
         /// <summary> Returns a read/write reference to the sub tensor of the output that does not contain padding. </summary>
         ///
         /// <returns> Read/write reference to the output tensor. </returns>
@@ -222,15 +227,17 @@ namespace neural
 
     /// <summary> A serialization context used during layer deserialization. Wraps an existing `SerializationContext`
     /// and adds access to the layer being constructed. </summary>
-    template <typename ElementType>    
+    template <typename ElementType>
     class LayerSerializationContext : public utilities::SerializationContext
     {
         using ConstTensorReferenceType = typename Layer<ElementType>::ConstTensorReferenceType;
+
     public:
         /// <summary> Constructor </summary>
         ///
         /// <param name="previousContext"> The `SerializationContext` to wrap </param>
-        LayerSerializationContext(utilities::SerializationContext& previousContext) : _previousContext(previousContext), _outputReference(math::Triplet{0, 0, 0}) {}
+        LayerSerializationContext(utilities::SerializationContext& previousContext)
+            : _previousContext(previousContext), _outputReference(math::Triplet{ 0, 0, 0 }) {}
 
         virtual ~LayerSerializationContext() {}
 

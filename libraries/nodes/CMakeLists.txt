@@ -72,7 +72,8 @@ set (tcc tcc/AccumulatorNode.tcc
          tcc/SumNode.tcc
          tcc/TypeCastNode.tcc
          tcc/UnaryOperationNode.tcc
-         tcc/ValueSelectorNode.tcc)
+         tcc/ValueSelectorNode.tcc
+         tcc/SourceNode.tcc)
 
 source_group("include" FILES ${include})
 source_group("src" FILES ${src})

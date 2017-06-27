@@ -125,6 +125,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
       add_custom_target(${module_name} ALL 
           DEPENDS ${generated_sources})
     else()
+      set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_SRC} ${INTERFACE_INCLUDE})
       swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
 
       swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} ${INTERFACE_LIBRARIES} common evaluators functions model nodes predictors trainers utilities emitters)
@@ -218,6 +219,7 @@ macro(generate_compile_model_commands MODEL_NAME SUCCESS)
 
   add_custom_command(
     OUTPUT ${COMPILED_MODEL_OUTPUT}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${MODEL_NAME}.ll
     COMMAND ${LLVM_TOOLS_BINARY_DIR}/llc ${CMAKE_CURRENT_SOURCE_DIR}/${MODEL_NAME}.ll -o ${MODEL_NAME}.o -filetype=obj -relocation-model=pic
     COMMENT "Compiling ${MODEL_NAME}.ll to ${COMPILED_MODEL_OUTPUT}")
 

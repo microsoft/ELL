@@ -43,6 +43,7 @@ namespace model
         void EnsureValidMap(SteppableMap<ClockType>& map);
         void EmitStepFunction(SteppableMap<ClockType>& map, const std::string& functionName, emitters::Variable* pLastSampleTicksVar);
         void EmitWaitTimeForNextComputeFunction(SteppableMap<ClockType>& map, const std::string& functionNamePrefix, emitters::Variable* pLastSampleTicksVar);
+        void EmitGetIntervalFunction(SteppableMap<ClockType>& map, const std::string& functionNamePrefix);
         llvm::Value* CallClockFunction(emitters::IRFunctionEmitter& function);
     };
 

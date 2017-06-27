@@ -6,8 +6,6 @@
 %feature("autodoc", "3");
 
 %include "callback.i"
-%include "macros.i"
-
 #ifdef SWIGPYTHON
 %rename("%(undercase)s", %$isfunction) "";
 #endif
@@ -16,6 +14,6 @@
 #include "ELL_step10.i.h"
 %}
 
-WRAP_CALLABLES_AS_CALLBACKS(ELL_step10Predictor, DoubleCallbackBase, double)
+WRAP_CALLABLES_AS_CALLBACKS(ELL_step10Predictor, DoubleCallbackBase, double, DoubleCallbackBase, double)
 
 %include "ELL_step10.i.h"

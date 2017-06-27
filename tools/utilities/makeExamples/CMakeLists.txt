@@ -6,9 +6,11 @@
 set (tool_name makeExamples)
 
 set (src src/main.cpp
+         src/ModelGenerateArguments.cpp
          src/GenerateModels.cpp)
 
-set (include include/GenerateModels.h)
+set (include include/GenerateModels.h
+             include/ModelGenerateArguments.h)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})

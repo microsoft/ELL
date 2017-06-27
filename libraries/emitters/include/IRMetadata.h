@@ -31,8 +31,11 @@ namespace emitters
     /// <summary> Indicates the Step function, with the value set to the output count. </summary>
     static const std::string c_stepFunctionTagName = "ell.fn.step";
 
-    /// <summary> Indicates the WaitTimeForNextCompute function. </summary>
-    static const std::string c_stepWaitTimeFunctionTagName = "ell.fn.stepWaitTime";
+    /// <summary> Indicates the time functions associated with Step, such as GetInterval(). </summary>
+    /// <remarks>
+    /// Set the value to the API name of the function.
+    /// </remarks>
+    static const std::string c_stepTimeFunctionTagName = "ell.fn.stepTime";
 
     /// <summary> Indicates that a function or type should be declared in a generated header. </summary>
     /// <remarks>
