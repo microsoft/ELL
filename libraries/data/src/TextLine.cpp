@@ -19,7 +19,7 @@ namespace data
     {
     }
 
-    const char TextLine::Peek(size_t increment) const 
+    char TextLine::Peek(size_t increment) const 
     { 
         return *(_currentChar + increment); 
     }

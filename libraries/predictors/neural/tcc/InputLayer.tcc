@@ -15,8 +15,8 @@ namespace neural
 
     template <typename ElementType>
     InputLayer<ElementType>::InputLayer(const InputParameters& inputParameters) : 
-        Layer<ElementType>(LayerParameters{TensorType(1, 1, 1), inputParameters.inputPaddingParameters, inputParameters.outputShape, inputParameters.outputPaddingParameters}), _data(inputParameters.inputShape),
-        _scale(NumOutputChannels())
+        Layer<ElementType>(LayerParameters{TensorType(1, 1, 1), inputParameters.inputPaddingParameters, inputParameters.outputShape, inputParameters.outputPaddingParameters}), 
+        _scale(NumOutputChannels()), _data(inputParameters.inputShape)
     { 
         _layerParameters.input = _data; 
         _scale.Fill(inputParameters.scale);

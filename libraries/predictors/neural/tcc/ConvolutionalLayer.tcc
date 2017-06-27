@@ -18,8 +18,8 @@ namespace neural
         Layer<ElementType>(layerParameters),
         _convolutionalParameters(convolutionalParameters),
         _weights(weights),
-        _weightsMatrix(_layerParameters.outputShape[2], convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()),
         _shapedInput(convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding()),
+        _weightsMatrix(_layerParameters.outputShape[2], convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()),
         _outputMatrix(NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding())
     {
         if (weights.Size() != (_output.NumChannels() * _layerParameters.input.NumChannels() * convolutionalParameters.receptiveField * convolutionalParameters.receptiveField))

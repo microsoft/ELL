@@ -43,7 +43,7 @@ namespace data
         /// <param name="offset"> The offset relative to the cursor. </param>
         ///
         /// <returns> The character at the specified position. </returns>
-        const char Peek(size_t offset = 0) const;
+        char Peek(size_t offset = 0) const;
 
         /// <summary> Query if the cursor is at he end of the content. Specifically, it could be at the end of the string, or pointing to an end-of-string comment. </summary>
         ///

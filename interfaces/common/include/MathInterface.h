@@ -27,7 +27,7 @@ namespace math
     {
     public:
         Tensor(const std::vector<ElementType>& data, size_t rows, size_t columns, size_t channels) :
-            data(data), rows(rows), columns(columns), channels(channels)
+            rows(rows), columns(columns), channels(channels), data(data)
         {
 
         }

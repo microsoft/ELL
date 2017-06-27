@@ -12,7 +12,7 @@ namespace data
 {
     template <typename IteratorType>
     StlIndexValueIterator<IterationPolicy::skipZeros, IteratorType>::StlIndexValueIterator(const IteratorType& begin, const IteratorType& end, size_t size)
-        : _current(begin), _end(end), _index(0), _size(size)
+        : _current(begin), _end(end), _size(size), _index(0)
     {
         SkipZeros();
     }

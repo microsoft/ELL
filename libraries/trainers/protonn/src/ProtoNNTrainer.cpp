@@ -168,7 +168,7 @@ namespace trainers
         // similarityMatrix = exp(D)
         similarityMatrix = ProtoNNTrainerUtils::MatrixExp(distance);
 
-        return std::move(similarityMatrix);
+        return similarityMatrix;
     }
 
     math::ColumnMatrix<double> ProtoNNTrainer::SimilarityKernel(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, math::MatrixReference<double, math::MatrixLayout::columnMajor> WX, const double gamma, bool recomputeWX) const
@@ -608,7 +608,7 @@ namespace trainers
             break;
         }
 
-        return std::move(gradient);
+        return gradient;
     }
 
     math::ColumnMatrix<double> Param_Z::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossType lossType)

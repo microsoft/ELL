@@ -165,7 +165,7 @@ namespace neural
                 size_t shapedInputOffset = i * NumOutputColumnsMinusPadding();
                 for (size_t j = 0; j < output.NumColumns(); ++j)
                 {
-                    for (int k = 0; k < output.NumChannels(); ++k)
+                    for (size_t k = 0; k < output.NumChannels(); ++k)
                     {
                         ElementType sum = 0;
 

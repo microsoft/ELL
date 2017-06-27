@@ -156,8 +156,8 @@ namespace neural
     public:
         BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ell::api::math::Tensor<ElementType>& weightsTensor) :
             Layer<ElementType>(layerParameters),
-            convolutionalParameters(convolutionalParameters),
-            weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels)
+            weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels),
+            convolutionalParameters(convolutionalParameters)
         {}
 
         LayerType GetLayerType() const override { return LayerType::binaryConvolution; }
@@ -216,8 +216,8 @@ namespace neural
     public:
         PoolingLayer(const LayerParameters& layerParameters, const PoolingParameters& poolingParameters,  PoolingType poolingType) :
             Layer<ElementType>(layerParameters),
-            poolingParameters(poolingParameters),
-            poolingType(poolingType)
+            poolingType(poolingType),
+            poolingParameters(poolingParameters)
         {}
 
         LayerType GetLayerType() const override { return LayerType::pooling; }

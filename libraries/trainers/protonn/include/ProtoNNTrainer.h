@@ -62,7 +62,7 @@ namespace trainers
         /// <summary> Returns The ProtoNN predictor. </summary>
         ///
         /// <returns> A shared pointer to the current predictor. </returns>
-        virtual const predictors::ProtoNNPredictor& GetPredictor() const { return std::move(_protoNNPredictor); }
+        virtual const predictors::ProtoNNPredictor& GetPredictor() const override { return _protoNNPredictor; }
 
     private:
         // The Similarity Kernel.

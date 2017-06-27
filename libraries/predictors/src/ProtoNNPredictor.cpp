@@ -60,7 +60,7 @@ namespace predictors
         math::ColumnVector<double> labels(GetNumLabels());
         math::Operations::Multiply(1.0, GetLabelEmbeddings(), similarityToPrototypes, 0.0, labels);
 
-        return std::move(labels);
+        return labels;
     }
 
     ProtoNNPrediction ProtoNNPredictor::Predict(const DataVectorType& inputVector) const
@@ -109,7 +109,7 @@ namespace predictors
         archiver[colLabel] >> w_columns;
         std::vector<double> temp;
         archiver[dataLabel] >> temp;
-        return std::move(math::ColumnMatrix<double>(w_rows, w_columns, temp));
+        return math::ColumnMatrix<double>(w_rows, w_columns, temp);
     }
 }
 }

@@ -65,7 +65,7 @@ namespace trainers
             }
         }
 
-        return std::move(R);
+        return R;
     }
 
     template <typename math::MatrixLayout Layout>
@@ -82,7 +82,7 @@ namespace trainers
         }
 
         norm = sqrt(norm);
-        return std::move(norm);
+        return norm;
     }
 
     template <typename math::MatrixLayout Layout>
