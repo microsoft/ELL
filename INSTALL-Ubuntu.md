@@ -38,6 +38,10 @@ Install the BSD editline and history libraries
 
     sudo apt-get install -y libedit-dev
 
+#### zlib
+
+    sudo apt-get install zlibc zlib1g zlib1g-dev
+
 ### Optional Prerequisites (OpenBLAS and Doxygen)
 ELL can optionally take advantage of the optimized linear algebra libraries in [*OpenBlas*](http://www.openblas.net/), and generate code documentation using *Doxygen*. To install these optional dependencies, type
 

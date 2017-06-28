@@ -122,9 +122,14 @@ namespace emitters
         return _pEmitter->Cast(pValue, valueType);
     }
 
-    llvm::Value* IRFunctionEmitter::CastFloatToInt(llvm::Value* pValue)
+    llvm::Value* IRFunctionEmitter::CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned)
     {
-        return _pEmitter->CastFloatToInt(pValue, VariableType::Int32);
+        return _pEmitter->CastIntToFloat(pValue, destinationType, isSigned);
+    }
+
+    llvm::Value* IRFunctionEmitter::CastFloatToInt(llvm::Value* pValue, VariableType destinationType)
+    {
+        return _pEmitter->CastFloatToInt(pValue, destinationType);
     }
 
     llvm::Value* IRFunctionEmitter::CastBoolToByte(llvm::Value* pValue)

@@ -86,6 +86,7 @@ namespace emitters
 
     private:
         void EnsureEngine();
+        void EnsureClockGetTime();
 
         std::unique_ptr<llvm::EngineBuilder> _pBuilder;
         std::unique_ptr<llvm::ExecutionEngine> _pEngine;

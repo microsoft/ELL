@@ -102,12 +102,22 @@ namespace emitters
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         llvm::Value* Cast(llvm::Value* pValue, VariableType valueType);
 
+        /// <summary> Emit a cast from int to float. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="destinationType"> Output type (float or double). </param>
+        /// <param name="isSigned"> true if the value is signed. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        llvm::Value* CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned);
+
         /// <summary> Emit a cast from float to int. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="destinationType"> Output type (int32 or int64). </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        llvm::Value* CastFloatToInt(llvm::Value* pValue);
+        llvm::Value* CastFloatToInt(llvm::Value* pValue, VariableType destinationType = VariableType::Int32);
 
         /// <summary> Emit a cast from bool to byte. </summary>
         ///
