@@ -34,4 +34,5 @@ if(${PYTHONINTERP_FOUND})
   add_test(NAME ${test_name}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMAND ${PYTHON_EXECUTABLE} test.py)
+  set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 endif()

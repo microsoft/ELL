@@ -113,5 +113,4 @@ if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
     add_test(NAME ${test_name}
             COMMAND ${NODE_EXECUTABLE} TestCompiler.js
             WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/test/js )
-
 endif()

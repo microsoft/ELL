@@ -64,6 +64,11 @@ include(LLVMSetup)
 include(CopySharedLibraries)
 include(AddPrecompiledHeader)
 
+# Print helpful message if LLVM not found on Windows
+if(NOT LLVM_FOUND AND WIN32)
+  message(WARNING "LLVM not found. Run the following command from the main project directory:\n    nuget.exe restore external/packages.config -PackagesDirectory external")
+endif()
+
 # Include cmake projects for libraries and executables
 add_subdirectory(libraries)
 add_subdirectory(tools)
@@ -96,6 +101,7 @@ set (DOC INSTALL-Mac.md
          README.md
          StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
+set_property(TARGET documentation PROPERTY FOLDER "documentation")
 
 # Generate doxygen documentation
 if(BUILD_DOC)
@@ -121,6 +127,7 @@ if(BUILD_DOC)
       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
       COMMENT "Building Doxygen documentation" VERBATIM
       SOURCES Doxyfile)
+    set_property(TARGET doc PROPERTY FOLDER "documentation")
   else()
     message(WARNING "Doxygen processor not found")
   endif()
