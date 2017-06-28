@@ -127,6 +127,12 @@
                     {
                         'link_settings': {
                         },
+                        'cflags': [
+                            '-Wno-missing-braces'
+                        ],
+                        'cflags_cc': [
+                            '-Wno-missing-braces'
+                        ],
                         'cflags_cc!': [
                             '-fno-rtti',
                             '-fno-exceptions'
@@ -139,6 +145,7 @@
                                 '-std=c++14',
                                 '-stdlib=libc++',
                                 '-v',
+                                '-Wno-missing-braces'
                             ],
                             'OTHER_LDFLAGS': [
                                 '-stdlib=libc++'

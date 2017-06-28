@@ -25,7 +25,7 @@ namespace math
 
     template <typename ElementType>
     RectangularMatrixBase<ElementType>::RectangularMatrixBase(size_t numRows, size_t numColumns, size_t increment, ElementType* pData)
-        : _numRows(numRows), _numColumns(numColumns), _pData(pData), _increment(increment)
+        : _pData(pData), _numRows(numRows), _numColumns(numColumns), _increment(increment)
     {
     }
 

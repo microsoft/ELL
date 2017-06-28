@@ -176,8 +176,8 @@ namespace neural
     public:
         ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, const ell::api::math::Tensor<ElementType>& weightsTensor) :
             Layer<ElementType>(layerParameters),
-            convolutionalParameters(convolutionalParameters),
-            weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels)
+            weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels),
+            convolutionalParameters(convolutionalParameters)
         {}
 
         LayerType GetLayerType() const override { return LayerType::convolution; }
