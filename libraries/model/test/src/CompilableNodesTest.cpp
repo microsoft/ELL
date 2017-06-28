@@ -473,28 +473,30 @@ void TestCompilableSourceNode(bool runJit)
 // C callback (called by emitted model)
 extern "C"
 {
-size_t g_sinkOutputSize = 1;
+size_t g_sinkOutputSize = 0;
 std::vector<double> outputValues;
-void CompiledSinkNode_OutputCallback(double* output)
+void CompiledSinkNode_OutputCallback_Scalar(double output)
 {
-    if (IsVerbose())
-    {
-        std::cout << "\tOutputCallback\n";
-    }
-    outputValues.assign(output, output + g_sinkOutputSize);
+    assert(g_sinkOutputSize == 1);
+    outputValues.push_back(output);
 }
-}
-TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback, void, double*);
+TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Scalar, void, double);
 
-void TestCompilableSinkNode(size_t inputSize, bool runJit)
+void CompiledSinkNode_OutputCallback_Vector(double* output)
+{
+    assert(g_sinkOutputSize > 1);
+    outputValues.assign(output, output + g_sinkOutputSize); // assign reallocates as needed
+}
+}
+TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Vector, void, double*);
+
+void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionName, bool runJit)
 {
     g_sinkOutputSize = inputSize;
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputSize);
-    auto testNode = model.AddNode<nodes::SinkNode<double>>(
-        inputNode->output, [](const std::vector<double>&) {}, "CompiledSinkNode_OutputCallback");
-
+    auto testNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, [](const std::vector<double>&) {}, sinkFunctionName);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
@@ -509,14 +511,16 @@ void TestCompilableSinkNode(size_t inputSize, bool runJit)
         }
         outputValues.clear();
         VerifyCompiledOutput(map, compiledMap, input, "SinkNode");
+
+        // Verify that sink callbacks are actually called
         testing::ProcessTest("Testing callback values", testing::IsEqual(outputValues, input[0]));
     }
 }
 
 void TestCompilableSinkNode(bool runJit)
 {
-    TestCompilableSinkNode(1, runJit);
-    TestCompilableSinkNode(100, runJit);
+    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar", runJit);
+    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector", runJit);
 }
 
 void TestFloatNode()

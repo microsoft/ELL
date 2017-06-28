@@ -53,8 +53,7 @@ namespace nodes
             function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
 
             llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
-            DEBUG_EMIT_PRINTF(function, pSinkFunction->getName());
-            DEBUG_EMIT_PRINTF(function, "\n");
+            DEBUG_EMIT_PRINTF(function, _sinkFunctionName + "\n");
 
             function.Call(pSinkFunction, { pInput });
         }
@@ -75,7 +74,7 @@ namespace nodes
         function.GetModule().InsertMetadata(_sinkFunctionName, emitters::c_callbackFunctionTagName, "SinkNode");
 
         // Set output values as well, useful when user code is in a non-event-driven mode
-        if (!IsScalar(output) && !compiler.GetCompilerParameters().unrollLoops)
+        if (!IsScalar(input) && !compiler.GetCompilerParameters().unrollLoops)
         {
             SetOutputValuesLoop(compiler, function);
         }
