@@ -8,8 +8,12 @@ The instructions below assume that ELL was obtained from `github.com/Microsoft/E
 
 ### Prerequisites
 
-##### Visual Studio 2015 update 3 with C++ compiler
-Make sure you have *Microsoft Visual Studio 2015 update 3* installed with the C++ compiler. A free version is available at <https://www.visualstudio.com/vs/community/>. Note that the C++ compiler installation is not enabled by default, so you must select the custom installation option and manually check the C++ checkbox.
+##### Visual Studio 2015 update 3 with C++ compiler, or Visual Studio 2017
+###### Visual Studio 2015 update 3
+If using *Microsoft Visual Studio 2015 update 3*, make sure the C++ compiler is installed. Note that the C++ compiler installation is not enabled by default, so you must select the custom installation option and manually check the C++ checkbox.
+###### Visual Studio 2017
+A free version is available at <https://www.visualstudio.com/vs/community/>. Select the following Workloads during install:
+* `Desktop Development with C++`
 
 ##### CMake
 ELL uses the [*CMake*](https://cmake.org/) build system. You can download and install it from <https://cmake.org/download/>.
@@ -29,7 +33,13 @@ By default, CMake will try to determine the correct version of the OpenBLAS libr
 type. If you want to override the automatic choice, you can tell CMake which version to use by setting the `DPROCESSOR_HINT`
 cache variable when you initially call CMake.
 
+For Visual Studio 2015:
+
     cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..
+
+For Visual Studio 2017:
+
+    cmake -G "Visual Studio 15 2017 Win64" -DPROCESSOR_HINT=haswell ..
 
 Or, if you have already run CMake to set up the build environment, you can just set the variable:
 
