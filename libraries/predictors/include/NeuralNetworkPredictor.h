@@ -59,17 +59,18 @@ namespace predictors
         using Shape = typename neural::Layer<ElementType>::Shape;
 
         /// <summary> A unique_ptr to the input layer for this predictor. </summary>
-        using InputLayerReference = std::unique_ptr<neural::InputLayer<ElementType>>;
+        using InputLayerReference = std::shared_ptr<neural::InputLayer<ElementType>>;
         
         /// <summary> A vector of layers. </summary>
-        using Layers = std::vector<std::unique_ptr<neural::Layer<ElementType>>>;
+        using Layers = std::vector<std::shared_ptr<neural::Layer<ElementType>>>;
 
         NeuralNetworkPredictor() = default;
+        NeuralNetworkPredictor(const NeuralNetworkPredictor&) = default;
 
         /// <summary> Constructs an instance of NerualNetworkPredictor. </summary>
         ///
         /// <param name="inputLayer"> The input layer for this network. </param>
-        /// <param name="layers"> The substative layers comprising this network. The first layer
+        /// <param name="layers"> The substantive layers comprising this network. The first layer
         /// in this vector receives its input from the input layer. </param>
         NeuralNetworkPredictor(InputLayerReference&& inputLayer, Layers&& layers);
 
@@ -103,7 +104,7 @@ namespace predictors
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "NeuralPredictor2"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("NeuralNetworkPredictor"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -120,7 +121,7 @@ namespace predictors
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        /// <summary> Register known types for nerual network predictors to a serialization context </summary>
+        /// <summary> Register known types for neural network predictors to a serialization context </summary>
         ///
         /// <param name="context"> The `SerializationContext` </param>
         static void RegisterNeuralNetworkPredictorTypes(utilities::SerializationContext& context);

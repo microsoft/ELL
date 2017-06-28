@@ -567,6 +567,7 @@ void NeuralNetworkPredictorTest()
 
     // Verify that we can archive and unarchive the predictor
     utilities::SerializationContext context;
+    NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(context);
     std::stringstream strstream;
     utilities::JsonArchiver archiver(strstream);
     neuralNetwork.WriteToArchive(archiver);

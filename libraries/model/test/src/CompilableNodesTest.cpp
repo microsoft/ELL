@@ -69,6 +69,9 @@
 // testing
 #include "testing.h"
 
+// common
+#include "LoadModel.h" // for RegisterNodeTypes
+
 // stl
 #include <iostream>
 #include <ostream>
@@ -725,6 +728,17 @@ void TestNeuralNetworkPredictorNode()
     // compare output
     std::vector<std::vector<double>> signal = { input };
     VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName());
+
+    // Test archiving
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+
+    archiver << map;
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+    model::DynamicMap unarchivedMap;
+    unarchiver >> unarchivedMap;
 }
 
 void TestNeuralNetworkPredictorNode2()

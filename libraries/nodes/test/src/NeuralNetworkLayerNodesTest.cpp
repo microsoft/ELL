@@ -44,6 +44,9 @@
 // testing
 #include "testing.h"
 
+// common
+#include "LoadModel.h" // for RegisterNodeTypes
+
 // stl
 #include <cmath>
 #include <iostream>
@@ -98,6 +101,10 @@ void TestNeuralNetworkPredictorNode()
     std::vector<ElementType> input = { 0, 1, 2 };
     auto output = neuralNetwork.Predict(DataVectorType(input));
 
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
@@ -106,6 +113,14 @@ void TestNeuralNetworkPredictorNode()
     inputNode->SetInput(input);
     auto modelOutput = model.ComputeOutput(predictorNode->output);
     testing::ProcessTest("Testing BatchNormalizationLayerNode compute", testing::IsEqual(modelOutput, output));
+
+    // Archive the model
+    archiver << model;
+
+    // Unarchive the model
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+    model::Model model2;
+    unarchiver >> model2;
 }
 
 //

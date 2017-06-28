@@ -102,11 +102,12 @@ namespace predictors
     template <typename ElementType>
     void NeuralNetworkPredictor<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        RegisterNeuralNetworkPredictorTypes(archiver.GetContext());
         neural::LayerSerializationContext<ElementType> layerContext(archiver.GetContext());
         archiver.PushContext(layerContext);
 
-        archiver["inputLayer"] >> _inputLayer;
+        std::unique_ptr<neural::InputLayer<ElementType>> inputLayer;
+        archiver["inputLayer"] >> inputLayer;
+        _inputLayer = std::move(inputLayer);
 
         std::vector<const neural::Layer<ElementType>*> layerElements;
         archiver["layers"] >> layerElements;
@@ -116,6 +117,8 @@ namespace predictors
             _layers[i].reset((neural::Layer<ElementType>*)layerElements[i]);
         }
         archiver["output"] >> _output;
+
+        archiver.PopContext();
     }
 
     template <typename ElementType>
@@ -135,6 +138,7 @@ namespace predictors
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::PoolingLayer<ElementType, MeanPoolingFunction>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ScalingLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::SoftmaxLayer<ElementType>>();
+        context.GetTypeFactory().AddType<NeuralNetworkPredictor<ElementType>, NeuralNetworkPredictor<ElementType>>();
     }
 }
 }

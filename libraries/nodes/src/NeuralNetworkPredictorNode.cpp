@@ -35,15 +35,15 @@ namespace nodes
 
     template <typename ValueType>
     NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0), _predictor(nullptr)
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
     {
     }
 
     template <typename ValueType>
     NeuralNetworkPredictorNode<ValueType>::NeuralNetworkPredictorNode(const model::PortElements<ValueType>& input, const PredictorType& predictor)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, GetShapeSize(predictor.GetOutputShape())), _predictor(&predictor)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, GetShapeSize(predictor.GetOutputShape())), _predictor(predictor)
     {
-        assert(input.Size() == GetShapeSize(_predictor->GetInputShape()));
+        assert(input.Size() == GetShapeSize(_predictor.GetInputShape()));
     }
 
     template <typename ValueType>
@@ -51,22 +51,31 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver["predictor"] << *_predictor;
+
+        //std::vector<const NeuralNetworkPredictorNode::PredictorType*> elements(1);
+        //elements[0] = _predictor.get();
+        //archiver["predictor"] << elements;
+        archiver["predictor"] << _predictor;
     }
 
     template <typename ValueType>
     void NeuralNetworkPredictorNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
+        PredictorType::RegisterNeuralNetworkPredictorTypes(archiver.GetContext());
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        // archiver["predictor"] >> *_predictor; 
+        //std::vector<const NeuralNetworkPredictorNode::PredictorType*> elements;
+        //archiver["predictor"] >> elements;
+        //_predictor.reset((NeuralNetworkPredictorNode::PredictorType*)elements[0]);
+        
+        archiver["predictor"] >> _predictor;
     }
 
     template <typename ValueType>
     void NeuralNetworkPredictorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInputElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<NeuralNetworkPredictorNode>(newInputElements, *_predictor);
+        auto newNode = transformer.AddNode<NeuralNetworkPredictorNode>(newInputElements, _predictor);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -78,7 +87,7 @@ namespace nodes
         size_t prevOutputSize = _input.Size();
         auto layerInputs = newInputElements;
         Node* lastNode = nullptr;
-        for (const auto& layer : _predictor->GetLayers())
+        for (const auto& layer : _predictor.GetLayers())
         {
             auto numInputs = GetShapeSize(layer->GetInputShape());
             assert(prevOutputSize == GetShapeSize(layer->GetInputShape()));
@@ -96,7 +105,7 @@ namespace nodes
     void NeuralNetworkPredictorNode<ValueType>::Compute() const
     {
         auto inputDataVector = typename PredictorType::DataVectorType(_input.GetIterator());
-        _output.SetOutput({ _predictor->Predict(inputDataVector) });
+        _output.SetOutput({ _predictor.Predict(inputDataVector) });
     }
 
     // explicit specialization for float, double

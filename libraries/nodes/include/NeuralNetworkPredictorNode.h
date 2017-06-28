@@ -107,7 +107,7 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         // Pointer to the predictor
-        const PredictorType* _predictor; // Maybe use a shared or unique pointer here, to facilitate moving or copying
+        PredictorType _predictor;
     };
 }
 }
