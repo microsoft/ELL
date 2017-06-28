@@ -23,7 +23,6 @@ endif()
 # cmake -DMyOption=ON|OFF buildDirectory
 # (so if we're running cmake from a 'build' directory inside the main directory, do this:
 #      cmake -DBUILD_DOCS=OFF ..  )
-option(BUILD_INTERFACES "Build SWIG interfaces" OFF)
 option(BUILD_DOC "Build Doxygen documentation" ON)
 
 set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
@@ -68,21 +67,21 @@ include(AddPrecompiledHeader)
 # Include cmake projects for libraries and executables
 add_subdirectory(libraries)
 add_subdirectory(tools)
-add_subdirectory(scripts)
+add_subdirectory(scripts EXCLUDE_FROM_ALL)
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/private AND EXISTS ${CMAKE_SOURCE_DIR}/private/CMakeLists.txt)
   add_subdirectory(private)
 endif()
 
 # Add SWIG-generated interfaces
-if(BUILD_INTERFACES)
-  find_package(SWIG 3.0.12)
-  if(SWIG_FOUND)
-    add_subdirectory(interfaces)
-  else()
-    message(WARNING "SWIG not found, skipping interface generation.")
-  endif()
+find_package(SWIG 3.0.12)
+if(NOT SWIG_FOUND)
+  message(WARNING "SWIG not found, interfaces and projects that depend on them will not build properly. \
+                  They are not part of the default make targets, so can be skipped. \
+                  If you want to build interfaces (such as the Python bindings), follow the instructions in INSTALL-XXXXX.md file to install SWIG.\
+                  Then delete the CMakeCache.txt file from your build directory run the cmake command again.")
 endif()
+add_subdirectory(interfaces)
 
 # Add examples (has dependencies on SWIG-generated interfaces)
 add_subdirectory(examples)

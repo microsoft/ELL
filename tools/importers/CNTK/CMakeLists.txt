@@ -3,13 +3,15 @@
 #
 
 find_package(PythonInterp)
-if(${PYTHONINTERP_FOUND} AND BUILD_INTERFACES)
+find_package(PythonLibs)
+if(${PYTHONLIBS_FOUND})
+	find_package(PythonInterp)
 
 	set(module_name "cntk_importer")
 
 	set(importer_src cntk_to_ell.py)
 
-	add_custom_target(${module_name} ALL DEPENDS SOURCES ${importer_src})
+	add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
 
 	set_property(TARGET ${module_name} PROPERTY FOLDER "tools/importers")
 	#copy files

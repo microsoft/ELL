@@ -7,35 +7,37 @@
 # Requires: Python 3.x, cntk-2.0-cp35
 #
 ####################################################################################################
-import sys
-sys.path.append('./../../../../interfaces/python')
-sys.path.append('./../../../../interfaces/python/Release')
-sys.path.append('./../../../../interfaces/python/Debug')
+from __future__ import print_function
 
-import ELL
-import getopt
-import os
-import configparser
-import re
-import struct
-from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
-import numpy as np
-from cntk.ops import *
-from cntk.initializer import glorot_uniform, he_normal
-from cntk import load_model
-import cntk.layers.blocks
-from cntk.logging.graph import *
-import traceback
-import inspect
-import unittest
+# Try to import CNTK and ELL. If either don't exist it means they have not being built,
+# so don't run the tests.
+SkipTests = False
+try:
+    import unittest
+    import sys
+    sys.path.append('./..')
+    sys.path.append('./../../../../interfaces/python')
+    sys.path.append('./../../../../interfaces/python/Release')
+    sys.path.append('./../../../../interfaces/python/Debug')
 
-currentdir = os.path.dirname(os.path.abspath(
-    inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
-
-import cntk_to_ell
-
+    import ELL
+    import cntk_to_ell    
+    from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
+    from cntk.ops import *
+    from cntk.initializer import glorot_uniform, he_normal
+    from cntk import load_model
+    import cntk.layers.blocks
+    from cntk.logging.graph import *
+    import getopt
+    import os
+    import configparser
+    import re
+    import struct
+    import numpy as np
+    import traceback
+    import inspect
+except Exception:
+     SkipTests = True
 
 def dump(obj):
     for attr in dir(obj):
@@ -47,6 +49,10 @@ def dump(obj):
 
 
 class CntkLayersTestCase(unittest.TestCase):
+    def setUp(self):
+            if SkipTests:
+                self.skipTest('Module not tested, CNTK or ELL module missing')
+
     def test_dense_layer(self):
         # Test a model with a single CNTK Dense layer against the equivalent ELL predictor
         # This verifies that the import functions reshape and reorder values appropriately and
@@ -180,6 +186,10 @@ class CntkLayersTestCase(unittest.TestCase):
 
 
 class CntkXorModelTestCase(unittest.TestCase):
+    def setUp(self):
+            if SkipTests:
+                self.skipTest('Module not tested, CNTK or ELL module missing')
+
     def test_simple_xor_model(self):
         predictor = cntk_to_ell.predictor_from_cntk_model('xorModel1.dnn')
         result = predictor.Predict([0, 0])
@@ -198,4 +208,5 @@ class CntkXorModelTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    if not SkipTests:
+        unittest.main()

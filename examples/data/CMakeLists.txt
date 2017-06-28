@@ -24,7 +24,7 @@ set (MODEL_FILES
 set_source_files_properties(${MODEL_FILES} PROPERTIES GENERATED TRUE)
 
 set (DATA_FILES ${MODEL_FILES} testData.txt tinyTestData.txt)
-add_custom_target(datafiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
+add_custom_target(datafiles DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
 add_dependencies(datafiles makeExamples)
 
 # copy example data

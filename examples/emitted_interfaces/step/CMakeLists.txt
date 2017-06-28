@@ -36,10 +36,12 @@ if(SUCCESS)
   configure_file(../../../interfaces/python/test/testing.py python/testing.py COPYONLY)  
   configure_file(python/step_test.py python/step_test.py COPYONLY)
 
-  add_test(NAME ${model_name}_python_test
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/python
-    COMMAND ${PYTHON_EXECUTABLE} step_test.py)
-
+  find_package(PythonInterp 3.5 QUIET)
+  if(${PYTHONINTERP_FOUND})  
+    add_test(NAME ${model_name}_python_test
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/python
+      COMMAND ${PYTHON_EXECUTABLE} step_test.py)
+  endif()
 else()
   message(WARNING "Couldn't generate python interfaces for ${model_name}.")
 endif()

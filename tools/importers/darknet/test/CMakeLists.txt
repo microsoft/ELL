@@ -6,7 +6,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(PYTHON_EXECUTABLE python)
 endif()
 
-find_package(PythonInterp)
+find_package(PythonInterp 3.5 QUIET)
 if(${PYTHONINTERP_FOUND})
 	# test project
 
@@ -16,7 +16,8 @@ if(${PYTHONINTERP_FOUND})
 
 	set (test_data unittest.cfg unittest.weights)
 
-	add_custom_target(${test_name} ALL DEPENDS ${test_src} SOURCES ${test_src})
+	add_custom_target(${test_name} DEPENDS ${test_src} SOURCES ${test_src})
+    add_dependencies(${test_name} _ELL_python)
 
 	set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 

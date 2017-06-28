@@ -8,6 +8,7 @@
 
 // TODO: let's make a popcount function that does the right thing
 #if defined(_MSC_VER)
+#include <intrin.h>
 #define POPCOUNT64 __popcnt64
 #else
 #define POPCOUNT64 __builtin_popcountl

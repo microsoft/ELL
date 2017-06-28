@@ -41,11 +41,11 @@ conda install libgcc
 ```
 mkdir build
 cd build
-cmake -DBUILD_INTERFACES=ON ..
+cmake ..
 # Linux / Mac
-make
+make _ELL_python
 # Windows
-cmake --build .
+cmake --build . --target _ELL_python
 ```
 4. Test the python bindings, which are located in build/interfaces/python/test:
 ```

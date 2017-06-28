@@ -4,13 +4,13 @@
 
 find_package(PythonInterp)
 find_package(PythonLibs)
-if(${PYTHONLIBS_FOUND} AND BUILD_INTERFACES)
+if(${PYTHONLIBS_FOUND})
 
 	set(module_name "darknet_importer")
 
 	set(importer_src darknet_to_ell.py)
 
-	add_custom_target(${module_name} ALL DEPENDS SOURCES ${importer_src})
+	add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
 
 	set_property(TARGET ${module_name} PROPERTY FOLDER "tools/importers")
 	#copy files

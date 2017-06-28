@@ -40,22 +40,25 @@ if(NPM_EXECUTABLE)
         set (MODULE_BUILD_COMMAND build:linux)
     endif()
 
-    add_custom_target(${module_name}_files ALL
+    add_custom_target(${module_name}_files
         DEPENDS ${module_files} ell_module_d_ts
         COMMENT "Copying module files"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    set_property(TARGET ${module_name}_files PROPERTY FOLDER "interfaces")
 
-    add_custom_target(${module_name}_install ALL
+    add_custom_target(${module_name}_install
                     COMMAND ${NPM_EXECUTABLE} install
                     DEPENDS ELL_javascript common data evaluators functions math model nodes predictors trainers utilities emitters
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Installing prerequisites"
                     VERBATIM)
+    set_property(TARGET ${module_name}_install PROPERTY FOLDER "interfaces")
 
-    add_custom_target(${module_name} ALL
+    add_custom_target(${module_name}
         COMMAND ${NPM_EXECUTABLE} run ${MODULE_BUILD_COMMAND}
         COMMENT "Building module"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces")
 
     add_dependencies(${module_name} ${module_name}_files ${module_name}_install ELL_xml)
 

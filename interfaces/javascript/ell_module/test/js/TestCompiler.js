@@ -8,9 +8,18 @@ global.app_require =
   return require(__dirname + '/' + name);
 }
 
-var tap = require('tap');
-const ELL = require('ell');
-console.log('Loaded ELL');
+var tap;
+var ELL;
+
+try {
+  tap = require('tap');
+  ELL = require('ell');
+  console.log('Loaded ELL');
+}
+catch (e) {
+  console.log('ELL not loaded, skipping test')
+  process.exit();
+}
 
 // `array` is a list of lists (a javascript jagged array)
 function ToELLVector(array) {

@@ -7,28 +7,31 @@
 # Requires: Python 3.x
 ##
 ####################################################################################################
-import sys
-import getopt
-import os
-import configparser
-import re
-import struct
-import numpy as np
-import traceback
-import inspect
-import unittest
+from __future__ import print_function
 
-sys.path.append('./../../../../interfaces/python')
-sys.path.append('./../../../../interfaces/python/Release')
-sys.path.append('./../../../../interfaces/python/Debug')
-import ELL
+# Try to import ELL. If it doesn't exist it means it has not been built,
+# so don't run the tests.
+SkipTests = False
+try:
+    import sys
+    sys.path.append('./..')
+    sys.path.append('./../../../../interfaces/python')
+    sys.path.append('./../../../../interfaces/python/Release')
+    sys.path.append('./../../../../interfaces/python/Debug')
+    import unittest
+    import getopt
+    import os
+    import configparser
+    import re
+    import struct
+    import traceback
+    import inspect
+    import numpy as np
+    import ELL
+    import darknet_to_ell
+except Exception:
+    SkipTests = True
 
-currentdir = os.path.dirname(os.path.abspath(
-    inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
-
-import darknet_to_ell
 
 # Load a test darknet model and verify its output.
 # The unit test model verifies the most common darknet layers:
@@ -37,9 +40,11 @@ import darknet_to_ell
 # - avgpool
 # - fully connected
 # - softmax
-
-
 class DarknetModelTestCase(unittest.TestCase):
+    def setUp(self):
+            if SkipTests:
+                self.skipTest('Module not tested, ELL module missing')
+
     def test_darknet_model(self):
         # Create synthetic input data
         input1 = np.arange(28 * 28, dtype=np.float).reshape(28, 28, 1) / 255
@@ -50,8 +55,8 @@ class DarknetModelTestCase(unittest.TestCase):
         # Feed the input through the model
         result1 = predictor.Predict(input1.ravel())
         # Verify its what we expect
-        expectedResult1 = [0.08592157065868378, 0.08800867199897766, 0.08507226407527924, 0.11691804975271225, 0.09915791451931000,
-                           0.08514316380023956, 0.08144238591194153, 0.08417271077632904, 0.08590476959943771, 0.18825851380825043]
+        expectedResult1 = [0.09134083986282349, 0.09748589247465134, 0.09064911305904388, 0.13794259727001190, 0.16832095384597778,
+                           0.08976214379072190, 0.06458559632301330, 0.07894224673509598, 0.12377665191888809, 0.05719388648867607]
         np.testing.assert_array_almost_equal(
             result1, expectedResult1, 5, 'prediction of first input does not match expected results!')
 
@@ -59,8 +64,8 @@ class DarknetModelTestCase(unittest.TestCase):
         input2 = np.flipud(input1)
         result2 = predictor.Predict(input2.ravel())
         # Verify its what we expect
-        expectedResult2 = [0.08536843955516815, 0.08800827711820602, 0.08450024574995041, 0.17433108389377594, 0.08736364543437958,
-                           0.08676918596029282, 0.08128042519092560, 0.08372557163238525, 0.08511145412921906, 0.14354163408279420]
+        expectedResult2 = [0.08052270114421844, 0.08739096671342850, 0.08180813491344452, 0.24630726873874664, 0.12944690883159637,
+                           0.08548084646463394, 0.06091265007853508, 0.07173667103052139, 0.11159289628267288, 0.04480091854929924]
         np.testing.assert_array_almost_equal(
             result2, expectedResult2, 5, 'prediction of second input does not match expected results!')
 
@@ -68,4 +73,5 @@ class DarknetModelTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    if not SkipTests:
+        unittest.main()

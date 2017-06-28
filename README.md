@@ -19,6 +19,9 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 * On [Ubuntu Linux](INSTALL-Ubuntu.md)
 * On [Mac OS X](INSTALL-Mac.md)
 
+## Tutorials
+A good place to start is the [tutorial](./tutorials/vision/gettingStarted/README.md) in the tutorials/vision/gettingStarted folder.
+
 ## Additional Documentation
 
 * [Design overview of `data` library](./libraries/data/doc/README.md)

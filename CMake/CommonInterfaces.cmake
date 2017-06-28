@@ -2,6 +2,12 @@
 # CMake macros to create swig-generated language wrappers for Embedded Learning Library
 #
 
+# NOTE: Interfaces are not part of the ALL target, they must be built explicitly.
+# On Windows, this can be done by right-clicking on the specific language wrapper
+# project and choosing *Build*. e.g. _Ell_Python project.
+# On Linux and Mac, this can be done by call *make* on the specific language wrapper e.g.
+# make _Ell_python
+
 #
 # Common macro to create swig-generated language wrappers
 #
@@ -21,8 +27,17 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
   string(TOLOWER "${LANGUAGE_NAME}" language)
   
   cmake_minimum_required(VERSION 2.8.11)
-  find_package(SWIG 3.0.12 REQUIRED)
-  include(${SWIG_USE_FILE})
+  find_package(SWIG 3.0.12)
+  if(SWIG_FOUND)
+    include(${SWIG_USE_FILE})
+  else()
+    # Patch up values that SWIG would normally generate
+    if (${language} STREQUAL "python")
+      set(SWIG_MODULE_${MODULE_NAME}_REAL_NAME _${MODULE_NAME})
+    else()
+      set(SWIG_MODULE_${MODULE_NAME}_REAL_NAME ${MODULE_NAME})
+    endif()
+  endif()
 
   # set compiler SWIG generated cxx compiler flags
   set(CMAKE_CXX_FLAGS ${SWIG_CXX_COMPILER_FLAGS})
@@ -42,7 +57,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
 
   if(${language} STREQUAL "common")
     find_file(THIS_FILE_PATH CommonInterfaces.cmake PATHS ${CMAKE_MODULE_PATH})
-    add_custom_target(${module_name} ALL DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
+    add_custom_target(${module_name} DEPENDS ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${INTERFACE_MAIN} ${INTERFACE_FILES} SOURCES ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC} ${INTERFACE_MAIN} ${INTERFACE_FILES} ${THIS_FILE_PATH})
 
     # Make interface code be dependent on all libraries
     add_dependencies(${module_name} ${INTERFACE_DEPENDENCIES})
@@ -116,23 +131,29 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
     endif()
 
     if( ((${language} STREQUAL "xml") OR (${language} STREQUAL "javascript")))
-      SWIG_MODULE_INITIALIZE(${module_name} ${language})
-      set(generated_sources)
-      foreach(i_file ${INTERFACE_MAIN})
-          SWIG_ADD_SOURCE_TO_MODULE(${module_name} generated_source ${i_file})
-          list(APPEND generated_sources "${generated_source}")
-      endforeach()
-      add_custom_target(${module_name} ALL 
-          DEPENDS ${generated_sources})
-    else()
-      set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_SRC} ${INTERFACE_INCLUDE})
-      swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
 
-      swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} ${INTERFACE_LIBRARIES} common evaluators functions model nodes predictors trainers utilities emitters)
+      if(SWIG_FOUND)
+        SWIG_MODULE_INITIALIZE(${module_name} ${language})
+        set(generated_sources)
+        foreach(i_file ${INTERFACE_MAIN})
+            SWIG_ADD_SOURCE_TO_MODULE(${module_name} generated_source ${i_file})
+            list(APPEND generated_sources "${generated_source}")
+        endforeach()
+      endif()
+      add_custom_target(${module_name} 
+        DEPENDS ${generated_sources})
+    else()
+      if(SWIG_FOUND)
+        swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
+        swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} ${INTERFACE_LIBRARIES} common evaluators functions model nodes predictors trainers utilities emitters)
+      else()
+        add_custom_target(${PREPEND_TARGET}${module_name} 
+          DEPENDS ${generated_sources})
+      endif()
       set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}${TARGET_NAME})
+      set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES EXCLUDE_FROM_ALL TRUE)
       add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} ELL_common)
     endif()
-
   endif()
 
   set_property(TARGET ${PREPEND_TARGET}${module_name} PROPERTY FOLDER "interfaces") 
@@ -223,9 +244,9 @@ macro(generate_compile_model_commands MODEL_NAME SUCCESS)
     COMMAND ${LLVM_TOOLS_BINARY_DIR}/llc ${CMAKE_CURRENT_SOURCE_DIR}/${MODEL_NAME}.ll -o ${MODEL_NAME}.o -filetype=obj -relocation-model=pic
     COMMENT "Compiling ${MODEL_NAME}.ll to ${COMPILED_MODEL_OUTPUT}")
 
-  add_custom_target(${COMPILED_MODEL_TARGET} ALL DEPENDS ${COMPILED_MODEL_OUTPUT})
+  add_custom_target(${COMPILED_MODEL_TARGET} DEPENDS ${COMPILED_MODEL_OUTPUT})
+  add_dependencies(${COMPILED_MODEL_TARGET} _ELL_python)
   set_source_files_properties(${COMPILED_MODEL_OUTPUT} PROPERTIES GENERATED TRUE)
 
   set (SUCCESS TRUE)
 endmacro()
-

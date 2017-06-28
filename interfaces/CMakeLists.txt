@@ -59,7 +59,7 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/vector_python_post.i
                      ../common/vector_python_pre.i)
 
-set (INTERFACE_DEPENDENCIES common data emitters evaluators functions math trainers model nodes predictors testing trainers utilities)
+set (INTERFACE_DEPENDENCIES common data emitters evaluators functions math trainers model nodes predictors trainers utilities)
 
 # Add ELL library include directories
 include_directories(common/include)
@@ -77,6 +77,6 @@ include_directories(../libraries/utilities/include)
 add_subdirectory(common)
 add_subdirectory(python)
 # add_subdirectory(R) # currently doesn't compile
-# add_subdirectory(csharp)
-add_subdirectory(javascript)
-add_subdirectory(xml) 
+# add_subdirectory(csharp EXCLUDE_FROM_ALL)
+add_subdirectory(javascript EXCLUDE_FROM_ALL)
+add_subdirectory(xml EXCLUDE_FROM_ALL)

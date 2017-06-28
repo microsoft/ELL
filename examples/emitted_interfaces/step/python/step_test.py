@@ -9,20 +9,23 @@
 ####################################################################################################
 import sys
 
-sys.path.append('.')
-sys.path.append('./..')
-sys.path.append('./../Release')
-sys.path.append('./../Debug')
-
-from testing import Testing
-
-# import the emitted model
-import ELL_step10 as model
-
-source_callback_count = 0
-sink_callback_count = 0
-sink_result = model.DoubleVector(10)
-
+SkipTests = False
+try:
+    sys.path.append('.')
+    sys.path.append('./..')
+    sys.path.append('./../Release')
+    sys.path.append('./../Debug')
+    from testing import Testing
+    # import the emitted model
+    import ELL_step10 as model
+    source_callback_count = 0
+    sink_callback_count = 0
+    sink_result = model.DoubleVector(10)
+except Exception:
+    SkipTests = True
+    source_callback_count = 0
+    sink_callback_count = 0
+    sink_result = []
 
 # source callback for data
 def data_callback(data):
@@ -80,7 +83,6 @@ def test_emitted_model(testing):
     testing.ProcessTest("Testing one-shot result values",
                         testing.IsEqual(oneshot_result, expected))
 
-
 def test():
     testing = Testing()
     test_emitted_model(testing)
@@ -91,4 +93,5 @@ def test():
 
 
 if __name__ == '__main__':
-    test()
+    if not SkipTests:
+        test()

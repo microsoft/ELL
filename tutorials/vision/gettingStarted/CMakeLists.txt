@@ -3,7 +3,8 @@
 #
 set (TUTORIAL_NAME GettingStarted)
 set (PYTHON_TUTORIALS gettingStarted.py README.md cntkVgg16ImageNetLabels.txt darknetImageNetLabels.txt)
-add_custom_target(${TUTORIAL_NAME} ALL DEPENDS ${PYTHON_TUTORIALS} SOURCES ${PYTHON_TUTORIALS})
+add_custom_target(${TUTORIAL_NAME} DEPENDS ${PYTHON_TUTORIALS} SOURCES ${PYTHON_TUTORIALS})
+add_dependencies(${TUTORIAL_NAME} _ELL_python)
 
 set_property(TARGET ${TUTORIAL_NAME} PROPERTY FOLDER "tutorials//vision")
 
