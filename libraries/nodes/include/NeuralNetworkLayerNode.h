@@ -15,6 +15,9 @@
 #include "ModelTransformer.h"
 #include "Node.h"
 
+// nodes
+#include "PortMemoryLayout.h"
+
 // predictors
 #include "Layer.h"
 
@@ -26,10 +29,8 @@ namespace ell
 {
 namespace nodes
 {
-    //
-    // Base class for neural network layer nodes
-    //
-    template<typename ValueType>
+    /// <summary> Base class for neural network layer nodes. </summary
+    template <typename ValueType>
     class NeuralNetworkLayerNodeBase : public model::CompilableNode
     {
     public:
@@ -55,20 +56,47 @@ namespace nodes
         model::OutputPort<ValueType> _output;
     };
 
-    template<typename DerivedType, typename LayerType, typename ValueType>
+    /// <summary> Base class for neural network layer nodes. </summary
+    template <typename DerivedType, typename LayerType, typename ValueType>
     class NeuralNetworkLayerNode : public NeuralNetworkLayerNodeBase<ValueType>
     {
     public:
         using NodeLayerType = LayerType;
 
-        NeuralNetworkLayerNode();
-        NeuralNetworkLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer);
-
+        /// @name Input and Output Ports
+        /// @{
+        using NeuralNetworkLayerNodeBase<ValueType>::inputPortName; // "input"
+        using NeuralNetworkLayerNodeBase<ValueType>::outputPortName; // "output"
         using NeuralNetworkLayerNodeBase<ValueType>::input;
         using NeuralNetworkLayerNodeBase<ValueType>::output;
+        /// @}
+
+        /// <summary> Default constructor. </summary>
+        NeuralNetworkLayerNode();
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="input"> The input to the layer (typically the output of the previous layer). </param>
+        /// <param name="layer"> The neural network layer to wrap. </param>
+        NeuralNetworkLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer);
+
+        /// <summary> Gets the layer being wrapped </summary>
+        const LayerType& GetLayer() const { return _layer; }
+        
+        /// <summary> Gets information about the input memory layout </summary>
+        PortMemoryLayout& GetInputMemoryLayout() { return _inputLayout; }
+        
+        /// <summary> Gets information about the input memory layout </summary>
+        const PortMemoryLayout& GetInputMemoryLayout() const { return _inputLayout; }
+        
+        /// <summary> Gets information about the output memory layout </summary>
+        const PortMemoryLayout& GetOutputMemoryLayout() const { return _outputLayout; }
+
+        /// <summary> Gets information about the output memory layout </summary>
+        PortMemoryLayout& GetOutputMemoryLayout() { return _outputLayout; }
 
     protected:
-        static size_t GetShapeSize(const math::Triplet& shape);
+        size_t NumInputDimensions() const { return _inputLayout.size.size(); }
         virtual void Copy(model::ModelTransformer& transformer) const override;
         virtual void Compute() const override;
         using NeuralNetworkLayerNodeBase<ValueType>::_input;
@@ -76,10 +104,14 @@ namespace nodes
 
         mutable typename LayerType::TensorType _inputTensor;
         mutable LayerType _layer; // mutable to get around Compute being non-const
+
+    private:
+        PortMemoryLayout _inputLayout;
+        PortMemoryLayout _outputLayout;
     };
 
     // helper:
-    template<typename LayerType>
+    template <typename LayerType>
     typename LayerType::LayerParameters GetLayerNodeParameters(const typename LayerType::TensorType& inputTensor, const typename LayerType::LayerParameters& layerParameters);
 }
 }

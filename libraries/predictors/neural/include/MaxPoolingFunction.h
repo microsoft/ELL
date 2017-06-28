@@ -42,6 +42,7 @@ namespace neural
 
         /// <summary> Typename used for serialization. </summary>
         static std::string GetTypeName() { return "MaxPoolingFunction"; }
+
     private:
         ElementType _max;
     };

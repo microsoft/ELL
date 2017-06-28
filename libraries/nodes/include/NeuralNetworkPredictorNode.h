@@ -14,11 +14,28 @@
 #include "Node.h"
 
 // nodes
+#include "ActivationLayerNode.h"
 #include "BatchNormalizationLayerNode.h"
 #include "BiasLayerNode.h"
+#include "BinaryConvolutionalLayerNode.h"
+#include "ConvolutionalLayerNode.h"
+#include "FullyConnectedLayerNode.h"
+#include "PoolingLayerNode.h"
+#include "ScalingLayerNode.h"
+#include "SoftmaxLayerNode.h"
 
 // predictors
 #include "NeuralNetworkPredictor.h"
+
+// activation and pooling functions
+#include "LeakyReLUActivation.h"
+#include "MaxPoolingFunction.h"
+#include "MeanPoolingFunction.h"
+#include "ReLUActivation.h"
+#include "SigmoidActivation.h"
+
+// utilities
+#include "TypeName.h"
 
 // stl
 #include <functional>
@@ -56,7 +73,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "NeuralNetworkPredictorNode"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("NeuralNetworkPredictorNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

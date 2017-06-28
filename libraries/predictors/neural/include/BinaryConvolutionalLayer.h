@@ -76,6 +76,26 @@ namespace neural
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::binaryConvolution; }
 
+        /// <summary> Get the parameters used to control convolution. </summary>
+        ///
+        /// <returns> A ConvolutionalParameters struct. </returns>
+        const BinaryConvolutionalParameters& GetConvolutionalParameters() const { return _convolutionalParameters; }
+
+        /// <summary> Get the weights for the convolution filters. </summary>
+        ///
+        /// <returns> The weights, packed into a Tensor. </returns>
+        const MatrixType& GetRealFilterWeights() const { return _realValuedWeightsMatrix; }
+
+        /// <summary> Get the weights for the convolution filters, packed as bits. </summary>
+        ///
+        /// <returns> The weights, packed as bits. </returns>
+        const std::vector<std::vector<uint64_t>> GetCompressedFilterWeights() const { return _binarizedWeights; }
+
+        /// <summary> Get the means for the convolution filters. </summary>
+        ///
+        /// <returns> The means of the convolution filters. </returns>
+        const std::vector<ElementType>& GetFilterMeans() const { return _filterMeans; }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -96,6 +116,7 @@ namespace neural
         /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
+
     private:
         // Fills a vector of vectors where each row is the set of input values corresponding to a filter, stretched into a vector.
         // The number of vectors is equal to the number of locations that the filter is slid over the input tensor.
@@ -110,8 +131,8 @@ namespace neural
 
         BinaryConvolutionalParameters _convolutionalParameters;
         constexpr static size_t _binaryElementSize = 64;
-        std::vector<std::vector<uint64_t>> _binarizedWeights;
         std::vector<std::vector<uint64_t>> _binarizedShapedInput;
+        std::vector<std::vector<uint64_t>> _binarizedWeights;
         std::vector<ElementType> _filterMeans;
 
         MatrixType _realValuedShapedInput;

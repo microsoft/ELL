@@ -33,8 +33,7 @@
 // stl
 #include <tuple>
 
-namespace ell
-{
+using namespace ell;
 
 namespace
 {
@@ -172,7 +171,7 @@ void TestBinaryOpNodeGetArgumentTypes()
 }
 
 //
-// AddNode(string, vector<Variant>), where variants have the correct type
+// The following tests check AddNode(string, vector<Variant>), where variants have the correct type
 //
 
 // InputNode
@@ -285,5 +284,4 @@ void TestVariantAddInputNodesParsedArgs()
     testing::ProcessTest("AddNode(OutputNode<int>, string)", intOutputNode != nullptr);
 
     testing::ProcessTest("Model size", model.Size() == 4);
-}
 }

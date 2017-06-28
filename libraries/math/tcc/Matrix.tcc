@@ -66,6 +66,12 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout layout>
+    std::vector<ElementType> ConstMatrixReference<ElementType, layout>::ToArray() const
+    {
+        return { _pData, _pData + GetDataSize() };
+    }
+
+    template <typename ElementType, MatrixLayout layout>
     void ConstMatrixReference<ElementType, layout>::Swap(ConstMatrixReference<ElementType, layout>& other)
     {
         RectangularMatrixBase<ElementType>::Swap(other);
@@ -157,7 +163,7 @@ namespace math
         return ConstVectorReference<ElementType, VectorOrientation::column>(_pData, size, _increment + 1);
     }
 
-    template<typename ElementType, MatrixLayout layout>
+    template <typename ElementType, MatrixLayout layout>
     ConstVectorReference<ElementType, VectorOrientation::column> ConstMatrixReference<ElementType, layout>::ReferenceAsVector() const
     {
         DEBUG_THROW(_increment != _intervalSize, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only flatten a matrix when its memory is contiguous"));
@@ -196,13 +202,14 @@ namespace math
         }
         else
         {
-            for (size_t i = 1; i < maxRows-2; ++i)
+            for (size_t i = 1; i < maxRows - 2; ++i)
             {
                 stream << ",\n";
                 Print(M.GetRow(i), stream, indent + 2, maxElementsPerRow);
             }
-            stream << ",\n" << std::string(indent + 2, ' ') << "...,\n";
-            Print(M.GetRow(M.NumRows()-1), stream, indent + 2, maxElementsPerRow);
+            stream << ",\n"
+                   << std::string(indent + 2, ' ') << "...,\n";
+            Print(M.GetRow(M.NumRows() - 1), stream, indent + 2, maxElementsPerRow);
         }
         stream << " }\n";
     }
@@ -327,7 +334,7 @@ namespace math
         return VectorReference<ElementType, VectorOrientation::column>(_pData, size, _increment + 1);
     }
 
-    template<typename ElementType, MatrixLayout layout>
+    template <typename ElementType, MatrixLayout layout>
     VectorReference<ElementType, VectorOrientation::column> MatrixReference<ElementType, layout>::ReferenceAsVector()
     {
         DEBUG_THROW(_increment != _intervalSize, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only flatten a matrix when its memory is contiguous"));
@@ -335,25 +342,25 @@ namespace math
         return VectorReference<ElementType, VectorOrientation::column>(_pData, _numRows * _numColumns, 1);
     }
 
-    template<typename ElementType, MatrixLayout layout>
+    template <typename ElementType, MatrixLayout layout>
     void MatrixReference<ElementType, layout>::operator+=(ElementType value)
     {
-        Transform([value](ElementType x) {return x + value; });
+        Transform([value](ElementType x) { return x + value; });
     }
 
-    template<typename ElementType, MatrixLayout layout>
+    template <typename ElementType, MatrixLayout layout>
     void MatrixReference<ElementType, layout>::operator-=(ElementType value)
     {
         (*this) += (-value);
     }
 
-    template<typename ElementType, MatrixLayout layout>
+    template <typename ElementType, MatrixLayout layout>
     void MatrixReference<ElementType, layout>::operator*=(ElementType value)
     {
-        Transform([value](ElementType x) {return x * value; });
+        Transform([value](ElementType x) { return x * value; });
     }
 
-    template<typename ElementType, MatrixLayout layout>
+    template <typename ElementType, MatrixLayout layout>
     void MatrixReference<ElementType, layout>::operator/=(ElementType value)
     {
         if (value == 0)
@@ -489,6 +496,5 @@ namespace math
 
         matrix = std::move(value);
     }
-
 }
 }

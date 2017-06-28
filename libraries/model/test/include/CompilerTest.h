@@ -8,21 +8,7 @@
 
 #pragma once
 
-// model
-#include "InputNode.h"
-#include "MapCompiler.h"
-#include "OutputNode.h"
-
-// nodes
-#include "AccumulatorNode.h"
-#include "BinaryOperationNode.h"
-#include "BinaryPredicateNode.h"
-#include "ConstantNode.h"
-#include "DelayNode.h"
-#include "DotProductNode.h"
-#include "MultiplexerNode.h"
-#include "SumNode.h"
-#include "UnaryOperationNode.h"
+#include "DynamicMap.h"
 
 // stl
 #include <string>

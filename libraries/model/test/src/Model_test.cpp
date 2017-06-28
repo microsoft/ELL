@@ -35,8 +35,7 @@
 #include <iostream>
 #include <unordered_map>
 
-namespace ell
-{
+using namespace ell;
 
 void TestStaticModel()
 {
@@ -348,5 +347,4 @@ void TestCustomRefine()
     context2.AddNodeActionFunction([](const model::Node& node) { return dynamic_cast<const nodes::DotProductNode<double>*>(&node) == nullptr ? model::NodeAction::abstain : model::NodeAction::compile; });
     auto model2 = transformer.RefineModel(model, context2);
     testing::ProcessTest("testing custom refine function", model1.Size() == 4 && model2.Size() == 3);
-}
 }

@@ -23,24 +23,6 @@ namespace nodes
     template <typename ValueType>
     bool BiasLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        const auto& layerParameters = this->_layer.GetLayerParameters();
-
-        // Calculate input dimension parameters
-        const size_t inputPaddingSize = layerParameters.inputPaddingParameters.paddingSize;
-        auto inputShape = this->_layer.GetInputShape();
-        std::vector<size_t> inputStride{ inputShape.begin(), inputShape.end() };
-        std::vector<size_t> inputOffset = { inputPaddingSize, inputPaddingSize, 0 };
-        std::vector<size_t> inputSize = inputStride;
-        for (int dimensionIndex = 0; dimensionIndex < inputOffset.size(); ++dimensionIndex)
-        {
-            inputSize[dimensionIndex] -= 2 * inputOffset[dimensionIndex];
-        }
-
-        const size_t outputPaddingSize = layerParameters.outputPaddingParameters.paddingSize;
-        auto outputShape = this->_layer.GetOutputShape();
-        std::vector<size_t> outputStride{ outputShape.begin(), outputShape.end() };
-        std::vector<size_t> outputOffset = { outputPaddingSize, outputPaddingSize, 0 };
-
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
         auto scaleValuesNode = transformer.AddNode<ConstantNode<ValueType>>(); // nothing
         auto biasValues = this->_layer.GetBias().ToArray();
@@ -48,14 +30,11 @@ namespace nodes
 
         const size_t dimension = 2;
         auto computeNode = transformer.AddNode<BroadcastLinearFunctionNode<ValueType>>(newInput,
-                                                                                       inputStride,
-                                                                                       inputOffset,
-                                                                                       inputSize,
+                                                                                       this->GetInputMemoryLayout(),
                                                                                        scaleValuesNode->output,
                                                                                        biasValuesNode->output,
                                                                                        dimension,
-                                                                                       outputStride,
-                                                                                       outputOffset);
+                                                                                       this->GetOutputMemoryLayout());
         transformer.MapNodeOutput(this->output, computeNode->output);
         return true;
     }

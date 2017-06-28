@@ -32,17 +32,14 @@ namespace nodes
     {
         model::Node* node = nullptr;
 
-        // node = TryAddLayerNode<predictors::neural::ActivationLayer<predictors::neural::LeakyReLUActivation>, ActivationLayerNode<predictors::neural::LeakyReLUActivation, ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::LeakyReLUActivation>, ActivationLayerNode<ValueType, predictors::neural::LeakyReLUActivation>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
-        // node = TryAddLayerNode<predictors::neural::ActivationLayer<predictors::neural::ReLUActivation>, ActivationLayerNode<predictors::neural::ReLUActivation, ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::ReLUActivation>, ActivationLayerNode<ValueType, predictors::neural::ReLUActivation>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
-        // node = TryAddLayerNode<predictors::neural::ActivationLayer<predictors::neural::SigmoidActivation>, ActivationLayerNode<predictors::neural::SigmoidActivation, ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
-
-        // node = TryAddLayerNode<predictors::neural::ActivationLayer<predictors::neural::SoftMaxActivation>, ActivationLayerNode<predictors::neural::SoftMaxActivation, ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::SigmoidActivation>, ActivationLayerNode<ValueType, predictors::neural::SigmoidActivation>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
         node = TryAddLayerNode<predictors::neural::BatchNormalizationLayer<ValueType>, BatchNormalizationLayerNode<ValueType>>(transformer, layer, layerInputs);
         if (node != nullptr) return node;
@@ -50,28 +47,28 @@ namespace nodes
         node = TryAddLayerNode<predictors::neural::BiasLayer<ValueType>, BiasLayerNode<ValueType>>(transformer, layer, layerInputs);
         if (node != nullptr) return node;
 
-        // node = TryAddLayerNode<predictors::neural::BinaryConvolutionalLayer, BinaryConvolutionalLayerNode<ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::BinaryConvolutionalLayer<ValueType>, BinaryConvolutionalLayerNode<ValueType>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
-        // node = TryAddLayerNode<predictors::neural::ConvolutionalLayer, ConvolutionalLayerNode<ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::ConvolutionalLayer<ValueType>, ConvolutionalLayerNode<ValueType>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
-        // node = TryAddLayerNode<predictors::neural::FullyConnectedLayer, FullyConnectedLayerNode<ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::FullyConnectedLayer<ValueType>, FullyConnectedLayerNode<ValueType>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
-        // node = TryAddLayerNode<predictors::neural::InputLayer, InputLayerNode<ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::PoolingLayer<ValueType, predictors::neural::MaxPoolingFunction>, PoolingLayerNode<ValueType, predictors::neural::MaxPoolingFunction>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
-        // node = TryAddLayerNode<predictors::neural::PoolingLayer<predictors::neural::MaxPoolingFunction>, PoolingLayerNode<predictors::neural::MaxPoolingFunction, ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::PoolingLayer<ValueType, predictors::neural::MeanPoolingFunction>, PoolingLayerNode<ValueType, predictors::neural::MeanPoolingFunction>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
-        // node = TryAddLayerNode<predictors::neural::PoolingLayer<predictors::neural::MeanPoolingFunction>, PoolingLayerNode<predictors::neural::MeanPoolingFunction, ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::ScalingLayer<ValueType>, ScalingLayerNode<ValueType>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
-        // node = TryAddLayerNode<predictors::neural::ScalingLayer, ScalingLayerNode<ValueType>>(transformer, layer, layerInputs);
-        // if (node != nullptr) return node;
+        node = TryAddLayerNode<predictors::neural::SoftmaxLayer<ValueType>, SoftmaxLayerNode<ValueType>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
 
-        //assert(false && "Unknown layer type in refine");
+        assert(false && "Unknown layer type in refine");
         return nullptr;
     }
 }

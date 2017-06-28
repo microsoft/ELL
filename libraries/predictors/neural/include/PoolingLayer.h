@@ -36,6 +36,7 @@ namespace neural
     class PoolingLayer : public Layer<ElementType>
     {
     public:
+        using PoolingFunction = PoolingFunctionType<ElementType>;
         using LayerParameters = typename Layer<ElementType>::LayerParameters;
         using Layer<ElementType>::GetOutputMinusPadding;
         
@@ -56,6 +57,11 @@ namespace neural
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::pooling; }
 
+        /// <summary> Gets the pooling parameters. </summary>
+        ///
+        /// <returns> The pooling parameters struct. </returns>
+        const PoolingParameters& GetPoolingParameters() const { return _poolingParameters; }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -65,7 +71,7 @@ namespace neural
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
+        
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>

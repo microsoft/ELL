@@ -7,10 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Model.h"
-
-namespace ell
-{
 void TestNodeIterator();
 void TestStaticModel();
 void TestNodeIterator();
@@ -23,4 +19,3 @@ void TestCopyModel();
 
 void TestRefineSplitOutputs();
 void TestCustomRefine();
-}

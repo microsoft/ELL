@@ -22,11 +22,6 @@ void TestDTWDistanceNodeCompute();
 void TestSourceNodeCompute();
 void TestSinkNodeCompute();
 
-// Neural layer nodes
-void TestBiasLayerNode();
-void TestBatchNormalizationLayerNode();
-void TestNeuralNetworkPredictorNode();
-
 // Refinement
 void TestMovingAverageNodeRefine();
 void TestLinearPredictorNodeRefine();

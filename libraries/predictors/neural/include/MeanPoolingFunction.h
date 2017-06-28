@@ -8,10 +8,8 @@
 
 #pragma once
 
-// size_t
-#include <cstddef>
-
 // STL
+#include <cstddef> // size_t
 #include <limits>
 
 namespace ell
@@ -25,7 +23,6 @@ namespace neural
     class MeanPoolingFunction
     {
     public:
-
         /// <summary> Instantiates an instance of this function with all accumulation data cleared. </summary>
         MeanPoolingFunction();
 

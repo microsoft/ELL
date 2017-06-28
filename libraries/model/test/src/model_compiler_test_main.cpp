@@ -24,10 +24,6 @@ void TestIRCompiler()
     TestCompilableDotProductNode2(3);
     TestCompilableDotProductNode2(4);
 
-    TestFloatNode();
-    TestCompilableDotProductNode2(3);
-    TestCompilableDotProductNode2(4);
-
     TestCompileIsEqual();
     TestSimpleMap(false);
     TestSimpleMap(true);
@@ -78,16 +74,68 @@ void TestIRCompiler()
     TestPerformanceCounters();
     TestCompilableDotProductNode2(3); // uses IR
     TestCompilableDotProductNode2(4); // uses IR
-
+    
+    //
     // Neural net nodes
+    //
+    TestNeuralNetworkPredictorNode();
+    TestNeuralNetworkPredictorNode2();
+
+    TestReLUActivationLayerNode();
+    TestReLUActivationLayerNode(0, 1);
+    TestReLUActivationLayerNode(0, 2);
+    // TestReLUActivationLayerNode(1, 0); // Input padding not supported (yet)
+
+    TestLeakyReLUActivationLayerNode();
+    TestLeakyReLUActivationLayerNode(0, 1);
+    TestLeakyReLUActivationLayerNode(0, 2);
+
+    TestSigmoidActivationLayerNode();
+    TestSigmoidActivationLayerNode(0, 1);
+    TestSigmoidActivationLayerNode(0, 2);
+
+    TestBatchNormalizationLayerNode();
+    TestBatchNormalizationLayerNode(0, 1);
+    TestBatchNormalizationLayerNode(0, 2);
+    // TestBatchNormalizationLayerNode(1, 0); // Input padding not supported (yet)
+
     TestBiasLayerNode();
     TestBiasLayerNode(0, 1);
     TestBiasLayerNode(0, 2);
+    // TestBiasLayerNode(1, 0); // Input padding not supported (yet)
 
-    TestBatchNormalizationLayerNode();
-    // TestBatchNormalizationLayerNode(0, 1);
-    // TestBatchNormalizationLayerNode(0, 2);
-    // TestNeuralNetworkPredictorNode();
+    TestBinaryConvolutionalLayerNode();
+
+    TestConvolutionalLayerNode(ConvolutionType::GEMM);
+    // TestConvolutionalLayerNode(ConvolutionType::GEMM, 2, 0);
+    // TestConvolutionalLayerNode(ConvolutionType::GEMM, 1, 1); // Convolutional layer output padding not supported
+
+    TestConvolutionalLayerNode(ConvolutionType::Diagonal); // Input padding must be set correctly (to floor(filterWidth/2))
+
+    TestFullyConnectedLayerNode();
+    // TestFullyConnectedLayerNode(0, 1); // Fully-connected layer nodes can't have padding (yet)
+    // TestFullyConnectedLayerNode(0, 2); // Fully-connected layer nodes can't have padding (yet)
+    // TestFullyConnectedLayerNode(1, 1); // Fully-connected layer nodes can't have padding (yet)
+
+    TestMaxPoolingLayerNode();
+    TestMaxPoolingLayerNode(0, 1);
+    TestMaxPoolingLayerNode(0, 2);
+    //    TestMaxPoolingLayerNode(1, 0); // Input padding not supported (yet)
+
+    TestMeanPoolingLayerNode();
+    TestMeanPoolingLayerNode(0, 1);
+    TestMeanPoolingLayerNode(0, 2);
+    //    TestMeanPoolingLayerNode(1, 0); // Input padding not supported (yet)
+
+    TestScalingLayerNode();
+    TestScalingLayerNode(0, 1);
+    TestScalingLayerNode(0, 2);
+    // TestScalingLayerNode(1, 0); // Input padding not supported (yet)
+
+    TestSoftmaxLayerNode();
+    TestSoftmaxLayerNode(0, 1);
+    TestSoftmaxLayerNode(0, 2);
+    // TestSoftmaxLayerNode(1, 0); // Input padding not supported (yet)
 }
 
 int main(int argc, char* argv[])

@@ -23,8 +23,8 @@
 #include "SumNode.h"
 #include "UnaryOperationNode.h"
 
-namespace ell
-{
+using namespace ell;
+
 class ModelMaker
 {
 public:
@@ -86,6 +86,5 @@ private:
     model::Model _model;
     std::string _name;
 };
-}
 
 #include "../tcc/ModelMaker.tcc"

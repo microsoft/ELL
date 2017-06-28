@@ -8,8 +8,8 @@
 
 #include "ModelMaker.h"
 
-namespace ell
-{
+using namespace ell;
+
 ModelMaker::ModelMaker()
 {
 }
@@ -22,5 +22,4 @@ ModelMaker::ModelMaker(const ModelMaker& src)
 ModelMaker::ModelMaker(ModelMaker&& src)
     : _model(std::move(src._model))
 {
-}
 }

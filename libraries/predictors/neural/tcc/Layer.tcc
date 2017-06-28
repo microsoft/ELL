@@ -29,6 +29,22 @@ namespace neural
     }
 
     template <typename ElementType>
+    typename Layer<ElementType>::Shape Layer<ElementType>::GetInputShapeWithPadding() const
+    {
+        auto&& inputShape = _layerParameters.input.GetShape(); 
+        auto paddingSize = _layerParameters.inputPaddingParameters.paddingSize;
+        return { inputShape[0]+2*paddingSize, inputShape[1]+2*paddingSize, inputShape[2] }; 
+    }
+
+    template <typename ElementType>
+    typename Layer<ElementType>::Shape Layer<ElementType>::GetOutputShapeMinusPadding() const
+    {
+        auto&& outputShape = _layerParameters.outputShape; 
+        auto paddingSize = _layerParameters.outputPaddingParameters.paddingSize;
+        return { outputShape[0]-2*paddingSize, outputShape[1]-2*paddingSize, outputShape[2] };
+    }
+
+    template <typename ElementType>
     void Layer<ElementType>::InitializeOutputValues(TensorType& output, PaddingParameters outputPaddingParameters)
     {
         switch (outputPaddingParameters.paddingScheme)

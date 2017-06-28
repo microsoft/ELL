@@ -42,6 +42,11 @@ namespace neural
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::scaling; }
 
+        /// <summary> Gets the scaling values. </summary>
+        ///
+        /// <returns> The scaling values. </returns>
+        VectorType GetScale() const { return _scales; }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>

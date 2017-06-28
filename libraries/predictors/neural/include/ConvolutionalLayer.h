@@ -63,7 +63,7 @@ namespace neural
         /// <param name="layerParameters"> The parameters common to every layer. </param>
         /// <param name="convolutionalParameters"> The hyperparameters for this convolutional layer. </param>
         /// <param name="weights"> The set of weights to apply. </param>
-        ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, ConstTensorReferenceType& weights);
+        ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, TensorType weights);
 
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
         ConvolutionalLayer() : _weights(math::Triplet{0, 0, 0}), _shapedInput(0, 0), _weightsMatrix(0, 0), _outputMatrix(0 ,0){}
@@ -75,6 +75,21 @@ namespace neural
         ///
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::convolution; }
+
+        /// <summary> Get the parameters used to control convolution. </summary>
+        ///
+        /// <returns> A ConvolutionalParameters struct. </returns>
+        const ConvolutionalParameters& GetConvolutionalParameters() const { return _convolutionalParameters; }
+
+        /// <summary> Get the weights for the convolution filters. </summary>
+        ///
+        /// <returns> The weights, packed into a Tensor. </returns>
+        const TensorType& GetWeights() const { return _weights; }
+
+        /// <summary> Get the weights for the convolution filters. </summary>
+        ///
+        /// <returns> The weights, packed into a Matrix. </returns>
+        const MatrixType& GetWeightsMatrix() const { return _weightsMatrix; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

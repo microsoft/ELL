@@ -53,6 +53,7 @@ namespace utilities
         virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
 
         virtual bool ArchiveAsPrimitive() const { return false; }
+        
     protected:
         friend class Archiver;
         friend class Unarchiver;

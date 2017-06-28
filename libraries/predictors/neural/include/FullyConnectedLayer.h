@@ -59,6 +59,11 @@ namespace neural
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::fullyConnected; }
 
+        /// <summary> Gets the weights </summary>
+        ///
+        /// <returns> A matrix with the weights for this layer </returns>
+        const MatrixType& GetWeights() const;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>

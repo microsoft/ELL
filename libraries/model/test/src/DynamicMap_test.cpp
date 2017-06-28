@@ -42,11 +42,11 @@
 #include <thread>
 #include <tuple>
 
+using namespace ell;
+
 //
 // Test code for dynamic map class
 //
-namespace ell
-{
 
 // Returns a model with 1 3-dimensional double input and 1 2-dimensional double output
 void TestDynamicMapCreate()
@@ -214,5 +214,4 @@ void TestSteppableMapCompute()
     resultValues = map.ComputeOutput<double>("doubleOutput");
     testing::ProcessTest("Testing steppable dynamic map compute (late)", testing::IsEqual(resultValues.size(), size_t(2)));
     std::cout << "Results count: " << resultValues.size() << std::endl;
-}
 }

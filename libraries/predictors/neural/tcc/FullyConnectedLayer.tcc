@@ -90,6 +90,12 @@ namespace neural
     }
 
     template <typename ElementType>
+    const typename FullyConnectedLayer<ElementType>::MatrixType& FullyConnectedLayer<ElementType>::GetWeights() const
+    {
+        return _weights;
+    }
+
+    template <typename ElementType>
     void FullyConnectedLayer<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Layer<ElementType>::WriteToArchive(archiver);

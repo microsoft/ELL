@@ -24,6 +24,7 @@
 
 // nodes
 #include "AccumulatorNode.h"
+#include "ActivationLayerNode.h"
 #include "BatchNormalizationLayerNode.h"
 #include "BiasLayerNode.h"
 #include "BinaryOperationNode.h"
@@ -33,20 +34,37 @@
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
+#include "FullyConnectedLayerNode.h"
 #include "IRNode.h"
 #include "MultiplexerNode.h"
 #include "NeuralNetworkPredictorNode.h"
+#include "PoolingLayerNode.h"
 #include "SinkNode.h"
+#include "SoftmaxLayerNode.h"
 #include "SourceNode.h"
 #include "SumNode.h"
 #include "TypeCastNode.h"
 #include "UnaryOperationNode.h"
 
 // predictors
+#include "NeuralNetworkPredictor.h"
+
+// predictors/neural
+#include "ActivationLayer.h"
 #include "BatchNormalizationLayer.h"
 #include "BiasLayer.h"
+#include "BinaryConvolutionalLayer.h"
+#include "ConvolutionalLayer.h"
+#include "FullyConnectedLayer.h"
 #include "InputLayer.h"
-#include "NeuralNetworkPredictor.h"
+#include "LeakyReLUActivation.h"
+#include "MaxPoolingFunction.h"
+#include "MeanPoolingFunction.h"
+#include "PoolingLayer.h"
+#include "ReLUActivation.h"
+#include "ScalingLayer.h"
+#include "SigmoidActivation.h"
+#include "SoftmaxLayer.h"
 
 // testing
 #include "testing.h"
@@ -111,7 +129,7 @@ void TestCompilableVectorOutputNode()
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     PrintIR(compiledMap);
-    VerifyCompiledOutput(map, compiledMap, signal, "VectorOutputNode");
+    VerifyCompiledOutput(map, compiledMap, signal, "vector OutputNode");
 }
 
 void TestCompilableAccumulatorNode()
@@ -251,7 +269,7 @@ void TestCompilableMulticlassDTW()
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    VerifyCompiledOutput(map, compiledMap, signal, "MulticlassDTW");
+    VerifyCompiledOutput(map, compiledMap, signal, "Multiclass DTW");
 }
 
 void TestCompilableScalarSumNode()
@@ -293,7 +311,7 @@ void TestCompilableUnaryOperationNode()
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    VerifyCompiledOutput(map, compiledMap, signal, "UnaryOpNode");
+    VerifyCompiledOutput(map, compiledMap, signal, "UnaryOperationNode");
 }
 
 void TestCompilableBinaryOperationNode()
@@ -308,7 +326,7 @@ void TestCompilableBinaryOperationNode()
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    VerifyCompiledOutput(map, compiledMap, signal, "BinaryOpNode");
+    VerifyCompiledOutput(map, compiledMap, signal, "BinaryOperationNode");
 }
 
 // Problem: memory corruption for BinaryPredicateNode (probably because of bool foolishness)
@@ -404,7 +422,7 @@ void TestCompilableAccumulatorNodeFunction()
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNodeAsFunction");
+    VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNode as function");
 }
 
 //
@@ -640,115 +658,26 @@ void TestIRNode()
     VerifyCompiledOutput(dotNodeMap, compiledMap, signal, "DotProductNode");
 }
 
-void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+//
+// Neural network layer nodes
+//
+
+// Helper function
+template<typename ElementType>
+void VerifyLayerMap(const ell::model::DynamicMap& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
 {
-    using LayerType = predictors::neural::BiasLayer<double>;
-
-    using LayerParameters = typename LayerType::LayerParameters;
-    using TensorType = typename LayerType::TensorType;
-    using TensorReferenceType = typename LayerType::TensorReferenceType;
-    using Shape = typename LayerType::Shape;
-    using VectorType = typename LayerType::VectorType;
-
-    // Set up bias layer
-    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
-    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
-
-    input(0, 0, 0) = 1;
-    input(0, 1, 0) = 2;
-    input(1, 0, 1) = 3;
-    input(1, 1, 1) = 4;
-
-    auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
-    auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
-    Shape outputShape = { { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 } };
-    LayerParameters parameters{ inputWithPadding, inputPadding, outputShape, outputPadding };
-    VectorType bias({ 10, 100 });
-
-    predictors::neural::BiasLayer<double> biasLayer(parameters, bias);
-    biasLayer.Compute();
-    auto output = biasLayer.GetOutput();
-    testing::ProcessTest("Testing BiasLayer, values",
-                         testing::IsEqual(output(outputPaddingSize, outputPaddingSize, 0), 11.0) &&
-                             testing::IsEqual(output(outputPaddingSize, outputPaddingSize + 1, 0), 12.0) &&
-                             testing::IsEqual(output(outputPaddingSize + 1, outputPaddingSize, 1), 103.0) &&
-                             testing::IsEqual(output(outputPaddingSize + 1, outputPaddingSize + 1, 1), 104.0));
-    if (outputPaddingSize == 1)
-        testing::ProcessTest("Testing BiasLayer, padding", output(0, 0, 0) == 0 && output(0, 1, 0) == 0 && output(2, 3, 1) == 0 && output(3, 3, 1) == 0);
-
-    // Create model
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto biasNode = model.AddNode<nodes::BiasLayerNode<double>>(inputNode->output, biasLayer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", biasNode->output } });
-
     std::vector<std::vector<double>> signal = { inputWithPadding.ToArray() };
     std::vector<std::vector<double>> expectedOutput = { output.ToArray() };
-    VerifyMapOutput(map, signal, expectedOutput, biasNode->GetRuntimeTypeName());
+    VerifyMapOutput(map, signal, expectedOutput, computeNode->GetRuntimeTypeName());
 
     model::MapCompilerParameters settings;
+    settings.compilerSettings.useBlas = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
     // PrintIR(compiledMap);
 
     // compare output
-    VerifyCompiledOutput(map, compiledMap, signal, biasNode->GetRuntimeTypeName());
-}
-
-void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
-{
-    using LayerType = predictors::neural::BatchNormalizationLayer<double>;
-
-    using LayerParameters = typename LayerType::LayerParameters;
-    using TensorType = typename LayerType::TensorType;
-    using TensorReferenceType = typename LayerType::TensorReferenceType;
-    using Shape = typename LayerType::Shape;
-    using VectorType = typename LayerType::VectorType;
-
-    // Verify BatchNormalizationLayer
-    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
-    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
-    input(0, 0, 0) = 11;
-    input(0, 1, 0) = 7;
-    input(1, 0, 1) = 30;
-    input(1, 1, 1) = 50;
-
-    auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
-    auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
-    Shape outputShape = { { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 } };
-    LayerParameters bnParameters{ input, inputPadding, outputShape, outputPadding };
-    VectorType mean({ 5, 10 });
-    VectorType variance({ 4.0, 16.0 });
-
-    predictors::neural::BatchNormalizationLayer<double> bnLayer(bnParameters, mean, variance);
-    bnLayer.Compute();
-    auto output = bnLayer.GetOutput();
-    double eps = 1e-5;
-    testing::ProcessTest("Testing BatchNormalizationLayer, values",
-                         testing::IsEqual(output(outputPaddingSize, outputPaddingSize, 0), 3.0, eps) &&
-                             testing::IsEqual(output(outputPaddingSize, outputPaddingSize + 1, 0), 1.0, eps) &&
-                             testing::IsEqual(output(outputPaddingSize + 1, outputPaddingSize, 1), 5.0, eps) &&
-                             testing::IsEqual(output(outputPaddingSize + 1, outputPaddingSize + 1, 1), 10.0, eps));
-    if (outputPaddingSize == 1)
-        testing::ProcessTest("Testing BatchNormalizationLayer, padding", output(0, 0, 0) == 0 && output(0, 1, 0) == 0 && output(2, 3, 1) == 0 && output(3, 3, 1) == 0);
-
-    // Create model
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(input.Size());
-    auto bnNode = model.AddNode<nodes::BatchNormalizationLayerNode<double>>(inputNode->output, bnLayer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", bnNode->output } });
-
-    std::vector<std::vector<double>> signal = { inputWithPadding.ToArray() };
-    std::vector<std::vector<double>> expectedOutput = { output.ToArray() };
-    VerifyMapOutput(map, signal, expectedOutput, bnNode->GetRuntimeTypeName());
-
-    model::MapCompilerParameters settings;
-    model::IRMapCompiler compiler(settings);
-    auto compiledMap = compiler.Compile(map);
-    // PrintIR(compiledMap);
-
-    // compare output
-    VerifyCompiledOutput(map, compiledMap, signal, bnNode->GetRuntimeTypeName());
+    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
 }
 
 void TestNeuralNetworkPredictorNode()
@@ -766,11 +695,10 @@ void TestNeuralNetworkPredictorNode()
     typename predictors::NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename predictors::NeuralNetworkPredictor<ElementType>::Layers layers;
 
-    InputParameters inputParams = { { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, 1 };
+    InputParameters inputParams { { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, 1 };
     inputLayer = std::make_unique<predictors::neural::InputLayer<ElementType>>(inputParams);
 
-    LayerParameters layerParameters = { inputLayer->GetOutput(), predictors::neural::NoPadding(), { 1, 1, 3 }, predictors::neural::NoPadding() };
-    layerParameters = { inputLayer->GetOutput(), predictors::neural::NoPadding(), { 1, 1, 3 }, predictors::neural::NoPadding() };
+    LayerParameters layerParameters { inputLayer->GetOutput(), predictors::neural::NoPadding(), { 1, 1, 3 }, predictors::neural::NoPadding() };
     VectorType bias1({ -0.43837756f, -0.90868396f, -0.0323102f });
     layers.push_back(std::unique_ptr<predictors::neural::Layer<ElementType>>(new predictors::neural::BiasLayer<ElementType>(layerParameters, bias1)));
     predictors::NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
@@ -793,4 +721,508 @@ void TestNeuralNetworkPredictorNode()
     // compare output
     std::vector<std::vector<double>> signal = { input };
     VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName());
+}
+
+void TestNeuralNetworkPredictorNode2()
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using InputParameters = typename InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    // Build an XOR net from previously trained values.
+    typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    InputParameters inputParams = {{1,1,2}, {PaddingScheme::zeros, 0}, {1,1,2},{PaddingScheme::zeros, 0}, 1};
+    inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
+
+    LayerParameters layerParameters{inputLayer->GetOutput(), NoPadding(), {1,1,3}, NoPadding()};
+    MatrixType weights1(3,2);
+    weights1(0, 0) = -0.97461396f;
+    weights1(0, 1) = 1.40845299f;
+    weights1(1, 0) = -0.14135513f;
+    weights1(1, 1) = -0.54136097f;
+    weights1(2, 0) = 0.99313086f;
+    weights1(2, 1) = -0.99083692f;
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new FullyConnectedLayer<ElementType>(layerParameters, weights1)));
+
+    layerParameters = { layers[0]->GetOutput(), NoPadding(),{ 1,1,3 }, NoPadding()};
+    VectorType bias1({-0.43837756f, -0.90868396f, -0.0323102f});
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
+
+    layerParameters = {layers[1]->GetOutput(), NoPadding(),{ 1,1,3 }, NoPadding()};
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, ReLUActivation>(layerParameters)));
+
+    layerParameters = {layers[2]->GetOutput(), NoPadding(),{ 1,1,1 }, NoPadding() };
+    MatrixType weights2(1, 3);
+    weights2(0, 0) = 1.03084767f;
+    weights2(0, 1) = -0.10772263f;
+    weights2(0, 2) = 1.04077697f;
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new FullyConnectedLayer<ElementType>(layerParameters, weights2)));
+
+    layerParameters = { layers[3]->GetOutput(), NoPadding(),{ 1,1,1 }, NoPadding() };
+    VectorType bias2({1.40129846e-20f});
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias2)));
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+    std::vector<ElementType> input = { 0, 1 };
+    auto output = neuralNetwork.Predict(DataVectorType(input));
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
+    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName());
+}
+
+template<template<typename> class ActivationFunction>
+void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using ElementType = double;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+    const double eps = 1e-6;
+
+    // Build a model
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    input(0, 0, 0) = 1.0;
+    input(0, 1, 0) = -2.0;
+    input(1, 0, 1) = 3.0;
+    input(1, 1, 1) = -4.0;
+    Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
+    LayerParameters layerParameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+
+    ActivationLayer<ElementType, ActivationFunction> layer(layerParameters);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::ActivationLayerNode<double, ActivationFunction>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    TestActivationLayerNode<ell::predictors::neural::ReLUActivation>(inputPaddingSize, outputPaddingSize);
+}
+
+void TestLeakyReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    TestActivationLayerNode<ell::predictors::neural::LeakyReLUActivation>(inputPaddingSize, outputPaddingSize);
+}
+
+void TestSigmoidActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    TestActivationLayerNode<ell::predictors::neural::SigmoidActivation>(inputPaddingSize, outputPaddingSize);
+}
+
+void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using ElementType = double;
+    using LayerType = predictors::neural::BatchNormalizationLayer<double>;
+    using LayerParameters = typename LayerType::LayerParameters;
+    using TensorType = typename LayerType::TensorType;
+    using TensorReferenceType = typename LayerType::TensorReferenceType;
+    using Shape = typename LayerType::Shape;
+    using VectorType = typename LayerType::VectorType;
+
+    // Build a model
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    input(0, 0, 0) = 11;
+    input(0, 1, 0) = 7;
+    input(1, 0, 1) = 30;
+    input(1, 1, 1) = 50;
+
+    auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
+    auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
+    Shape outputShape = { { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 } };
+    LayerParameters layerParameters{ input, inputPadding, outputShape, outputPadding };
+    VectorType mean({ 5, 10 });
+    VectorType variance({ 4.0, 16.0 });
+
+    predictors::neural::BatchNormalizationLayer<double> layer(layerParameters, mean, variance);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::BatchNormalizationLayerNode<double>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using ElementType = double;
+    using LayerType = predictors::neural::BiasLayer<double>;
+    using LayerParameters = typename LayerType::LayerParameters;
+    using TensorType = typename LayerType::TensorType;
+    using TensorReferenceType = typename LayerType::TensorReferenceType;
+    using Shape = typename LayerType::Shape;
+    using VectorType = typename LayerType::VectorType;
+
+    // Set up bias layer
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+
+    input(0, 0, 0) = 1;
+    input(0, 1, 0) = 2;
+    input(1, 0, 1) = 3;
+    input(1, 1, 1) = 4;
+
+    auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
+    auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
+    Shape outputShape = { { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 } };
+    LayerParameters parameters{ inputWithPadding, inputPadding, outputShape, outputPadding };
+    VectorType bias({ 10, 100 });
+
+    predictors::neural::BiasLayer<double> layer(parameters, bias);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::BiasLayerNode<double>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using ElementType = double;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+
+    // Verify BinaryConvolutionalLayer with bitwise method
+    TensorType inputWithPadding(1 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetReference(); // For convolutional nodes, input includes padding
+    input.Fill(-1);
+    input(1, 1, 0) = 2;
+    input(1, 2, 0) = 1;
+    input(1, 1, 1) = 3;
+    input(1, 2, 1) = 2;
+    Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
+    LayerParameters parameters{ input, MinusOnePadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise };
+    TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
+    // clang-format off
+    std::vector<ElementType> weightsVector{   // RowMajor then depth order
+        1, 3, 2, 3, 1, 1, 2, 3, 1,
+        2, 4, 1, 3, 1, 2, 1, 4, 2,
+        1, 2, 1, 2, 3, 2, 1, 2, 1,
+        0, 3, 2, 3, 1, 2, 1, 0, 2 };
+    // clang-format on
+    size_t vectorIndex = 0;
+    for (size_t f = 0; f < outputShape[2]; f++)
+    {
+        for (size_t k = 0; k < input.NumChannels(); k++)
+        {
+            for (size_t i = 0; i < convolutionalParams.receptiveField; i++)
+            {
+                for (size_t j = 0; j < convolutionalParams.receptiveField; j++)
+                {
+                    weights(f * convolutionalParams.receptiveField + i, j, k) = weightsVector[vectorIndex++];
+                }
+            }
+        }
+    }
+
+    BinaryConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise), values", Equals(output(0, 0, 0), -20.5555553) && Equals(output(0, 0, 1), -9.66666603) && Equals(output(0, 1, 0), -20.5555553) && Equals(output(0, 1, 1), -9.66666603));
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::BinaryConvolutionalLayerNode<double>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using ElementType = double;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+
+    assert(inputPaddingSize == 1);
+    TensorType inputWithPadding(1 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetReference(); // For convolutional nodes, input includes padding
+    inputWithPadding.Fill(0);
+    input(1, 1, 0) = 2;
+    input(1, 2, 0) = 1;
+    input(1, 1, 1) = 3;
+    input(1, 2, 1) = 2;
+    Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 }; 
+
+    std::cout << "output shape: " << outputShape[0] << ", " << outputShape[1] << ", " << outputShape[2] << std::endl;
+
+    LayerParameters parameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    auto convolutionMethod = (convolutionType == ConvolutionType::Diagonal) ? ConvolutionMethod::diagonal : ConvolutionMethod::columnwise;
+    ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 2 }; // 2 == batch size
+    TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
+    // clang-format off
+    std::vector<ElementType> weightsVector{   // RowMajor then depth order
+        1, 3, 2, 3, 1, 1, 2, 3, 1,
+        2, 4, 1, 3, 1, 2, 1, 4, 2,
+        1, 2, 1, 2, 3, 2, 1, 2, 1,
+        0, 3, 2, 3, 1, 2, 1, 0, 2 };
+    // clang-format on
+    size_t vectorIndex = 0;
+    for (size_t f = 0; f < outputShape[2]; f++)
+    {
+        for (size_t k = 0; k < input.NumChannels(); k++)
+        {
+            for (size_t i = 0; i < convolutionalParams.receptiveField; i++)
+            {
+                for (size_t j = 0; j < convolutionalParams.receptiveField; j++)
+                {
+                    weights(f * convolutionalParams.receptiveField + i, j, k) = weightsVector[vectorIndex++];
+                }
+            }
+        }
+    }
+
+    //
+    // Verify ConvolutionalLayerNode
+    //
+    ConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
+    layer.Compute();
+    auto output = layer.GetOutput();
+    ElementType eps = 1e-6;
+    ElementType v1 = 10;
+    ElementType v2 = 15;
+    ElementType v3 = 18;
+    ElementType v4 = 18;
+    testing::ProcessTest("Testing ConvolutionalLayer, values",
+                         testing::IsEqual(output(0, 0, 0), v1, eps) &&
+                             testing::IsEqual(output(0, 0, 1), v2, eps) &&
+                             testing::IsEqual(output(0, 1, 0), v3, eps) &&
+                             testing::IsEqual(output(0, 1, 1), v4, eps));
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::ConvolutionalLayerNode<double>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using ElementType = double;
+    using LayerType = predictors::neural::FullyConnectedLayer<double>;
+    using LayerParameters = typename LayerType::LayerParameters;
+    using TensorType = typename LayerType::TensorType;
+    using TensorReferenceType = typename LayerType::TensorReferenceType;
+    using MatrixType = typename LayerType::MatrixType;
+    using Shape = typename LayerType::Shape;
+    using VectorType = typename LayerType::VectorType;
+
+    // Set up layer
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    input(0, 0, 0) = 1;
+    input(0, 1, 0) = 2;
+    input(1, 0, 1) = 3;
+    input(1, 1, 1) = 4;
+
+    auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
+    auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
+    Shape outputShape = { { 4 + 2 * outputPaddingSize, 1 + 2 * outputPaddingSize, 1 } };
+    LayerParameters parameters{ inputWithPadding, inputPadding, outputShape, outputPadding };
+    MatrixType weights(4, 8);
+    for (int index = 0; index < 8; index++)
+        weights(1, index) = static_cast<double>(index);
+    for (int index = 0; index < 8; index++)
+        weights(2, index) = static_cast<double>(7 - index);
+    for (int index = 0; index < 8; index++)
+        weights(3, index) = 1.0;
+
+    LayerType layer(parameters, weights);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::FullyConnectedLayerNode<double>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+template<template<typename> class PoolingFunction>
+void TestPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using ElementType = double;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+    const double eps = 1e-6;
+
+    // Build a model
+    const size_t inRows = 8;
+    const size_t inCols = 8;
+    const size_t outRows = 6;
+    const size_t outCols = 6;
+    const size_t numDims = 2;
+    const size_t poolingSize = 3;
+    const size_t poolingStride = 1;
+
+    TensorType inputWithPadding(inRows + 2 * inputPaddingSize, inCols + 2 * inputPaddingSize, numDims);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, inRows, inCols, numDims);
+    input(1, 1, 0) = 1.0;
+    input(1, 2, 0) = 2.0;
+    input(2, 1, 1) = 3.0;
+    input(2, 2, 1) = 4.0;
+
+    Shape outputShape = { outRows + 2 * outputPaddingSize, outCols + 2 * outputPaddingSize, numDims };
+    LayerParameters layerParameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    PoolingParameters poolingParameters{ poolingSize, poolingStride };
+    PoolingLayer<ElementType, PoolingFunction> layer(layerParameters, poolingParameters);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::PoolingLayerNode<double, PoolingFunction>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestMaxPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    TestPoolingLayerNode<ell::predictors::neural::MaxPoolingFunction>(inputPaddingSize, outputPaddingSize);
+}
+
+void TestMeanPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    TestPoolingLayerNode<ell::predictors::neural::MeanPoolingFunction>(inputPaddingSize, outputPaddingSize);
+}
+
+void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using LayerType = predictors::neural::ScalingLayer<ElementType>;
+    using LayerParameters = typename LayerType::LayerParameters;
+    using TensorType = typename LayerType::TensorType;
+    using TensorReferenceType = typename LayerType::TensorReferenceType;
+    using MatrixType = typename LayerType::MatrixType;
+    using Shape = typename LayerType::Shape;
+    using VectorType = typename LayerType::VectorType;
+    const ElementType eps = 1e-6;
+
+    // Set up scaling layer
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    input(0, 0, 0) = 1;
+    input(0, 1, 0) = 2;
+    input(1, 0, 1) = 3;
+    input(1, 1, 1) = 4;
+    Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
+    LayerParameters layerParameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    VectorType scale({ 5, 10 });
+
+    LayerType layer(layerParameters, scale);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::ScalingLayerNode<ElementType>>(inputNode->output, layer);
+
+    inputNode->SetInput(input.ToArray());
+    auto modelOutput = model.ComputeOutput(computeNode->output);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using LayerType = predictors::neural::SoftmaxLayer<ElementType>;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+    const ElementType eps = 1e-6;
+
+    // Build a model
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    input(0, 0, 0) = 1.0;
+    input(0, 1, 0) = -2.0;
+    input(1, 0, 1) = 3.0;
+    input(1, 1, 1) = -4.0;
+    Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
+    LayerParameters layerParameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    LayerType layer(layerParameters);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::SoftmaxLayerNode<ElementType>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }

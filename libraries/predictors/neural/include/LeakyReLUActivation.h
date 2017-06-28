@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "Layer.h"
-
 namespace ell
 {
 namespace predictors
@@ -32,6 +30,11 @@ namespace neural
         ///
         /// <param name="input"> The input value. </param>
         ElementType Apply(const ElementType input) const;
+
+        /// <summary> Gets the leaky factor parameter. </summary>
+        ///
+        /// <returns> The leaky factor parameter. </returns>
+        ElementType GetLeakyFactor() const { return _leakyFactor; }
 
         /// <summary> Typename used for serialization. </summary>
         static std::string GetTypeName() { return "LeakyReLUActivation"; }

@@ -23,8 +23,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace ell
-{
+using namespace ell;
 
 //
 // Helpers
@@ -91,5 +90,4 @@ void TestParsePortElements()
 
     elements = model::ParsePortElementsProxy("123.bar[3:5]");
     testing::ProcessTest("Testing PortElementProxy::Parse", elements.GetRanges()[0].Size() == 2);
-}
 }

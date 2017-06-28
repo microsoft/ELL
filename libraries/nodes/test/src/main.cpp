@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "NeuralNetworkLayerNodesTest.h"
 #include "Nodes_test.h"
 
 // testing
@@ -25,6 +26,9 @@ int main()
 {
     try
     {
+        //
+        // Compute tests
+        //
         TestL2NormNodeCompute();
         TestAccumulatorNodeCompute();
         TestDelayNodeCompute();
@@ -43,6 +47,21 @@ int main()
         TestBatchNormalizationLayerNode();
         TestNeuralNetworkPredictorNode();
 
+        // Neural nets
+        TestNeuralNetworkPredictorNode();
+        TestActivationLayerNode();
+        TestBatchNormalizationLayerNode();
+        TestBiasLayerNode();
+        TestBinaryConvolutionalLayerNode();
+        TestConvolutionalLayerNode();
+        TestFullyConnectedLayerNode();
+        TestPoolingLayerNode();
+        TestScalingLayerNode();
+        TestSoftmaxLayerNode();
+
+        //
+        // Refine tests
+        //
         TestMovingAverageNodeRefine();
         TestLinearPredictorNodeRefine();
         TestSimpleForestPredictorNodeRefine();

@@ -6,6 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 namespace ell
 {
 namespace predictors
@@ -14,15 +16,15 @@ namespace neural
 {
 
     template <typename ElementType>
-    ConvolutionalLayer<ElementType>::ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, ConstTensorReferenceType& weights) :
+    ConvolutionalLayer<ElementType>::ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, TensorType weights) :
         Layer<ElementType>(layerParameters),
         _convolutionalParameters(convolutionalParameters),
-        _weights(weights),
+        _weights(std::move(weights)),
         _shapedInput(convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding()),
         _weightsMatrix(_layerParameters.outputShape[2], convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()),
         _outputMatrix(NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding())
     {
-        if (weights.Size() != (_output.NumChannels() * _layerParameters.input.NumChannels() * convolutionalParameters.receptiveField * convolutionalParameters.receptiveField))
+        if (_weights.Size() != (_output.NumChannels() * _layerParameters.input.NumChannels() * convolutionalParameters.receptiveField * convolutionalParameters.receptiveField))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "weights dimensions for a convolutional layer should be the size of the receptive field volume * number of filters");
         }
@@ -36,9 +38,11 @@ namespace neural
                 _convolutionalParameters.method = ConvolutionMethod::columnwise;
             }
         }
-        else
+
+        if (_convolutionalParameters.method == ConvolutionMethod::columnwise)
         {
-            // Reshaped the weights
+            // Use the columnwise method
+            // Reshape the weights
             auto flattened = _weights.ReferenceAsMatrix();
             for (size_t startRow = 0; startRow < flattened.NumRows() / convolutionalParameters.receptiveField; startRow++)
             {
@@ -98,17 +102,17 @@ namespace neural
             const size_t numConvolutions = (inputMatrix.NumColumns() - kt) / depth + 1;
             const size_t numFiltersAtAtime = _convolutionalParameters.numFiltersAtATime;
             const size_t numFilters = _layerParameters.outputShape[2];
+            auto weightsMatrix = _weights.ReferenceAsMatrix().Transpose();
 
             for (size_t j = 0; j < numConvolutions; j++)
             {
+                // Get the sub matrix for Vj
+                auto Vj = inputMatrix.GetSubMatrix(0, j * depth, inputMatrix.NumRows(), kt);
+
                 for (size_t filterStart = 0; filterStart < numFilters; filterStart += numFiltersAtAtime)
                 {
                     size_t numFiltersToUse = std::min(numFiltersAtAtime, numFilters - filterStart);
 
-                    // Get the sub matrix for Vj
-                    auto Vj = inputMatrix.GetSubMatrix(0, j * depth, inputMatrix.NumRows(), kt);
-
-                    auto weightsMatrix = _weights.ReferenceAsMatrix().Transpose();
                     auto Wl = weightsMatrix.GetSubMatrix(0, filterStart * _convolutionalParameters.receptiveField, weightsMatrix.NumRows(), numFiltersToUse * _convolutionalParameters.receptiveField);
 
                     MatrixType A(Vj.NumRows(), _convolutionalParameters.receptiveField * numFiltersToUse);

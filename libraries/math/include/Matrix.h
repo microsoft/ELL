@@ -64,7 +64,7 @@ namespace math
     /// <summary> Helper class to obtain the transpose of a MatrixLayout </summary>
     ///
     /// Usage: auto transposedLayout = TransposeMatrixLayout<layout>::value
-    
+
     template <MatrixLayout>
     struct TransposeMatrixLayout;
 
@@ -172,6 +172,11 @@ namespace math
         /// <returns> Const pointer to the data. </returns>
         const ElementType* GetDataPointer() const { return _pData; }
 
+        /// <summary> Gets the size of the storage. </summary>
+        ///
+        /// <returns> The size of the storage. </returns>
+        size_t GetDataSize() const { return _increment * _numIntervals; }
+
         /// <summary> Gets the matrix layout. </summary>
         ///
         /// <returns> The matrix layout. </returns>
@@ -191,6 +196,11 @@ namespace math
         ///
         /// <returns> True if contiguous, false if not. </returns>
         bool IsContiguous() const { return (_increment == _intervalSize); }
+
+        /// <summary> Returns a copy of the contents of the Matrix. </summary>
+        ///
+        /// <returns> A std::vector with a copy of the contents of the Matrix. </returns>
+        std::vector<ElementType> ToArray() const;
 
         /// <summary> Swaps the contents of this matrix with the contents of another matrix. </summary>
         ///
@@ -292,14 +302,14 @@ namespace math
         /// <summary> Gets a reference to the matrix transpose. </summary>
         ///
         /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const->ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value>;
+        auto Transpose() const -> ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value>;
 
         /// <summary> Returns a vew of this matrix as a vector reference (requires the matrix to be contiguous). </summary>
         ///
         /// <returns> A ConstVectorReference. </returns>
         ConstVectorReference<ElementType, VectorOrientation::column> ReferenceAsVector() const;
 
-        /// @} 
+        /// @}
 
     protected:
         friend class ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value>;

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "Layer.h"
-
 namespace ell
 {
 namespace predictors

@@ -76,6 +76,7 @@ namespace neural
 
     /// <summary> Function to return parameters that represent padding the specified pixel width with the minimum value. </summary
     static const PaddingParameters MinPadding(size_t width) { return { PaddingScheme::min, width }; }
+
     /// <summary> Function to return parameters that represent padding the specified pixel width with -1. </summary
     static const PaddingParameters MinusOnePadding(size_t width) { return { PaddingScheme::minusOnes, width }; }
 
@@ -99,7 +100,7 @@ namespace neural
         /// <summary> Parameters common to all layers, specifying info related to input and output of the layer. </summary>
         struct LayerParameters
         {
-            /// <summary> Reference to the input tensor. Its size includes the padding.</summary>
+            /// <summary> Reference to the input tensor. Its size does not include the padding.</summary>
             ConstTensorReferenceType input;
 
             /// <summary> The padding requirements for the input. </summary>
@@ -128,15 +129,25 @@ namespace neural
         /// <returns> Reference to the output tensor. </returns>
         ConstTensorReferenceType GetOutput() const { return _output; }
 
-        /// <summary> Returns shape of the input tensor. </summary>
+        /// <summary> Returns shape of the active part of the input tensor. </summary>
         ///
         /// <returns> Shape of the input tensor. </returns>
         virtual Shape GetInputShape() const { return _layerParameters.input.GetShape(); }
 
-        /// <summary> Returns shape of the output tensor. </summary>
+        /// <summary> Returns shape of the input tensor with padding added. </summary>
+        ///
+        /// <returns> Shape of the input tensor. </returns>
+        virtual Shape GetInputShapeWithPadding() const;
+
+        /// <summary> Returns shape of the output tensor, with padding added. </summary>
         ///
         /// <returns> Shape of the output tensor. </returns>
         virtual Shape GetOutputShape() const { return _layerParameters.outputShape; };
+
+        /// <summary> Returns shape of the active area of the output tensor. </summary>
+        ///
+        /// <returns> Shape of the output tensor. </returns>
+        virtual Shape GetOutputShapeMinusPadding() const;
 
         /// <summary> Indicates if a layer is a specific type. </summary>
         ///

@@ -481,7 +481,6 @@ void SoftmaxLayerTest()
     testing::ProcessTest("Testing SoftmaxLayer, padding", output(0, 0, 0) == 0 && output(0, 1, 0) == 0 && output(2, 2, 0) == 0 && output(2, 2, 1) == 0);
 }
 
-
 template <typename ElementType>
 void NeuralNetworkPredictorTest()
 {

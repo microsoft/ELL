@@ -7,8 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-namespace ell
-{
 // Test passthrough to Model::AddNode
 void TestTemplateAddNode();
 
@@ -29,4 +27,3 @@ void TestVariantAddInputNodesConvertableArgs();
 
 // Test ModelBuilder::AddNode(string, vector<string>)
 void TestVariantAddInputNodesParsedArgs();
-}

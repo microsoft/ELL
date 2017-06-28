@@ -20,6 +20,7 @@ namespace neural
     class ActivationLayer : public Layer<ElementType>
     {
     public:
+        using ActivationFunction = ActivationFunctionType<ElementType>;
         using LayerParameters = typename Layer<ElementType>::LayerParameters;
         using Layer<ElementType>::GetOutputMinusPadding;
 
@@ -38,6 +39,11 @@ namespace neural
         ///
         /// <returns> An enum indicating the layer type. </returns>
         LayerType GetLayerType() const override { return LayerType::activation; }
+
+        /// <summary> Gets the activation function. </summary>
+        ///
+        /// <returns> A const reference to the activation function. </returns>
+        const ActivationFunctionType<ElementType>& GetActivationFunction() const { return _activation; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

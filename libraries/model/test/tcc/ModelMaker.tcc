@@ -6,8 +6,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace ell
-{
+using namespace ell;
+
 template <typename T>
 model::InputNode<T>* ModelMaker::Inputs(size_t count)
 {
@@ -127,5 +127,4 @@ model::OutputPort<T>* ModelMaker::GetOutputPort(model::Node* pNode, size_t portI
 {
     auto pPort = pNode->GetOutputPorts()[portIndex];
     return static_cast<model::OutputPort<T>*>(pPort);
-}
 }
