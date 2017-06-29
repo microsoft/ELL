@@ -5,7 +5,7 @@
 Joseph calls his project `Darknet`, which sounds spooky, but his models are harmless, and really quite fast. 
 
 We have provided a Python script that can load those Darknet models.
-See the *darknet_to_ell* Python module (found in tools/importers/Darknet)
+See the *darknet_to_ell* Python module (found in the `tools/importers/darknet` directory)
 
 After building ELL and the ELL Python Language Bindings you will find the following folder in your build output.
 So from your conda environment go into that directory:
@@ -34,12 +34,12 @@ In this file you will see all sorts of fun classes from dog breeds to birds, fir
 Ok, so now you can run the following Python script to load up this model and test it out with the ELL Reference Implementation.
 This will run on your PC (not on the Raspberry Pi yet), just to test if everything is working:
 
-    Python darknetDemo.py
+    python darknetDemo.py
 
 Note: if you have more than one video camera on your PC and you want to switch to a different one you can change the camera index by
 passing a command line argument to the script as follows:
 
-    Python darknetDemo.py 1
+    python darknetDemo.py 1
 
 You should see some output like this while it is loading the model:
 

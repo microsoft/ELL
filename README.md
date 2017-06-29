@@ -1,7 +1,7 @@
 # Embedded Learning Library
 
 
-The Embedded Learning Library (ELL) allows you to build and deploy machine-learned pipelines onto embedded platforms, like Raspberry Pis, Arduinos, Micro:bits, and other microcontrollers. The deployed machine learning model runs on the device, disconnected from the cloud. Our APIs can be used either from C++ or Python. 
+The Embedded Learning Library (ELL) allows you to build and deploy machine-learned pipelines onto embedded platforms, like Raspberry Pis, Arduinos, micro:bits, and other microcontrollers. The deployed machine learning model runs on the device, disconnected from the cloud. Our APIs can be used either from C++ or Python. 
 
 This project has been developed by a team of researchers at Microsoft Research. It's a work in progress, and we expect it to change rapidly, including breaking API changes. Despite this code churn, we welcome you to try it and give us feedback! 
 

@@ -1,14 +1,14 @@
 # Design guide for building ELL interfaces
 
-ELL interface classes are the public Api used by higher-level languages to interact with ELL. [*SWIG*](http://swig.org/) is used to generate projections of these interface classes to other languages such as Python, JavaScript, C# and so on.
+ELL interface classes are the public API used by higher-level languages to interact with ELL. [*SWIG*](http://swig.org/) is used to generate projections of these interface classes to other languages such as Python, JavaScript, C# and so on.
 
 The following is a set of design guidelines for implementing ELL interfaces, so that:
-- The Api classes are convenient to use from other languages
-- We maximize code re-use between core code and Api, and minimize the gap between Api classes and their underlying counterparts 
+- The API classes are convenient to use from other languages
+- We maximize code re-use between core code and API, and minimize the gap between API classes and their underlying counterparts 
 - We minimize friction between C++, SWIG and the target language
 
 ## Shared types
-Often, POD types (plain old datatypes) and enums from the core need to be projected into the Api. To do so, pull in the required header from core, but tell SWIG to ignore all classes except the one you want e.g.
+Often, POD types (plain old datatypes) and enums from the core need to be projected into the API. To do so, pull in the required header from core, but tell SWIG to ignore all classes except the one you want e.g.
 
 In predictors.i
 
@@ -32,7 +32,7 @@ Sometimes a POD type is inconvenient to use as-is from a scripting language, usu
 
 In predictors_python_post.i
 
-    // Additional C++ code to make Api more natural for Python callers
+    // Additional C++ code to make API more natural for Python callers
     %extend LayerShape
     {  
         LayerShape(size_t rows, size_t columns, size_t channels) 
@@ -109,7 +109,7 @@ For documenting generated code, you can add/prepend docstring comments e.g.
     %}
 
 ## Return types
-Generally, prefer to return value types or new objects, not references. Reason is that the Api caller can manage the results, including object lifetime, themselves. If you return a reference like:std::vector<float>& foo() {…}, then when callers do something like 
+Generally, prefer to return value types or new objects, not references. The reason is that the API caller can manage the results, including object lifetime, themselves. If you return a reference like:std::vector<float>& foo() {…}, then when callers do something like 
 
     this:result = foo()
     do_something(result)

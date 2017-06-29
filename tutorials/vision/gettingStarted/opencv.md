@@ -1,6 +1,6 @@
-## Open CV
+## OpenCV
 
-The easiest way to install Open CV is with your `conda` environment. 
+The easiest way to install OpenCV is with your `conda` environment. 
 So if you chose to use `miniconda` or `anaconda` then you can simply do this
 from your activated py36 environment:
 
