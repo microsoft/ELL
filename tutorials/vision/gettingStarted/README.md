@@ -1,4 +1,10 @@
-# Tutorial for getting started with computer vision in ELL
+# Getting Started with Computer Vision
+
+For this tutorial, you'll need a Raspberry Pi with a web cam and a screen. After completing these instructions, you can point your Pi's web cam at a variety of objects, and the deployed software will print a label for whatever object appears on camera. For example, we pointed our Pi's cam at a cup of coffee on our desk and saw this on the Pi's screen:
+
+![coffee mug](coffeemug.jpg)
+
+This tutorial shows you how to import a pre-trained image recognition model, compile it for the Raspberry Pi, and write the code that runs the image recognizer and prints the labels.
 
 In this tutorial we will load a pre-trained Convolutional Neural Net (CNN).
 We will then connect your video camera using Open CV and do some almost realtime image recognition of dogs, birds and all kinds of
