@@ -1,28 +1,41 @@
 # Tutorial for getting started with computer vision in ELL
 
-## Prerequisites
-In order to use one of these importers, be sure to first install the ELL python bindings.
-- If you do not already have the ELL python bindings installed, follow the instructions in [Interfaces](../../../interfaces/README.MD) to build them.
+In this tutorial we will load a pre-trained Convolutional Neural Net (CNN).
+We will then connect your video camera using Open CV and do some almost realtime image recognition of dogs, birds and all kinds of
+fun stuff.  We will then get that working on a Raspberry Pi using the ELL model compiler.
+Here's an example of what the result will look like:
 
-The Python tutorials will reference this module and the necessary importers (mentioned below) by relative path.
+![screenshot](Screenshot.png)
+
+## Prerequisites
+
+First we will use `Python 3.6` for this tutorial and you will need to build the 
+[ELL Pythong Language Bindings](../../../interfaces/README.MD), so please follow those instructions first.
+We `highly recommend` using the miniconda or full anaconda python environment because it comes with many
+handy tools like `curl` which we will use later on.
+
+You will also need a simple web cam or a pi cam.  If you don't have one handy we will show you how to load
+static images or .mp4 videos and process those instead.
+
+You will also need [Open CV](http://opencv.org/) which is used to read images from your camera, and convert
+them to [NumPy](https://docs.scipy.org/doc/numpy-dev/user/quickstart.html) arrays so that ELL can process them.
+There are download instructions on the opencv website, but we also created a simple [Open CV setup](opencv.md) page for you.
+
+`Note`: You will need to build ELL `after` you install Python, so that the `CMake` step picks up on the fact that you have Python
+3.6 installed.  If you did not do that, then please go back to the ELL build instructions and repeat those steps.
+
+Lastly, we will also need `NumPy` which you can install using conda as follows:
+
+    conda install numpy
 
 ### Downloading a pre-trained model
-The easiest way to get started is to import a pre-trained image classifier. ELL supports importing from:
-* [CNTK](https://www.microsoft.com/en-us/cognitive-toolkit/) via the *cntk_to_ell* Python module (found in tools/importers/CNTK)
-* [Darknet](https://pjreddie.com/darknet/) via the *darknet_to_ell* Python module (found in tools/importers/Darknet)
 
-For this tutorial, start by downloading the Darknet reference model from [here](https://pjreddie.com/darknet/imagenet/#reference), using your browser.
-Or you can download directly using the following commandline:
+Now you can choose to use two different routes for pre-trained models, and so the tutorial forks at this point,
+please pick one of the following:
 
-    curl -O https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg
-    curl -O https://pjreddie.com/media/files/darknet.weights
+ * [Microsoft Cognitive Toolkit](cntk.md)
+ * [Darknet](darknet.md)
+
+### Other
 
 A list of other useful models, from both CNTK and Darknet, can be found in the [PretrainedModels](./PretrainedModels.md) section.
-
-#### Class Labels
-Each model should have a text file specifying a list of class labels that correspond to the model prediction output.
-
-This tutorial app reads in the labels as a .txt file. Two files are provided as examples, one for the VGG16 CNTK model mentioned in [Pre-trained CNTK models](), and the other for the Darknet reference model mentioned in [Pre-trained Darknet models]().
-
-## Step by Step guide to running the tutorial
-todo
