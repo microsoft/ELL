@@ -499,6 +499,13 @@ namespace math
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(size_t numRows, size_t numColumns, size_t numChannels, const std::vector<ElementType>& data)
+        : TensorRef(Triplet{ numRows, numColumns, numChannels }), _data(data)
+    {
+        _contents.pData = _data.data();
+    }
+
+    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     Tensor<ElementType, dimension0, dimension1, dimension2>::Tensor(size_t numRows, size_t numColumns, size_t numChannels, std::vector<ElementType>&& data)
         : TensorRef(Triplet{ numRows, numColumns, numChannels }), _data(std::move(data))
     {

@@ -286,6 +286,11 @@ namespace math
         /// <returns> A std::vector with a copy of the contents of the Tensor. </returns>
         std::vector<ElementType> ToArray() const;
 
+        /// <summary> Gets a const pointer to the underlying data storage. </summary>
+        ///
+        /// <returns> Const pointer to the data. </returns>
+        const ElementType* GetDataPointer() const { return _contents.pData; }
+
     protected:
         // other protected member functions
         ConstTensorReference(TensorContents<ElementType> contents);
@@ -620,6 +625,14 @@ namespace math
         /// <param name="numRows"> Number of rows. </param>
         /// <param name="numColumns"> Number of columns. </param>
         /// <param name="numChannels"> Number of channels. </param>
+        /// <param name="data"> Vector of data elements that will be copied to this Tensor. </param>
+        Tensor(size_t numRows, size_t numColumns, size_t numChannels, const std::vector<ElementType>& data);
+
+        /// <summary> Constructs a tensor of the given shape with the specified data. </summary>
+        ///
+        /// <param name="numRows"> Number of rows. </param>
+        /// <param name="numColumns"> Number of columns. </param>
+        /// <param name="numChannels"> Number of channels. </param>
         /// <param name="data"> Vector of data elements that will be moved to this Tensor. </param>
         Tensor(size_t numRows, size_t numColumns, size_t numChannels, std::vector<ElementType>&& data);
 
@@ -667,6 +680,8 @@ namespace math
         std::vector<ElementType> ToArray() const { return _data; }
 
     private:
+        Tensor(size_t numRows, size_t numColumns, size_t numChannels, ElementType* pData) : TensorReference<ElementType, dimension0, dimension1, dimension2>(numRows, numColumns, numChannels, pData) {};
+
         // abbreviation
         using ConstTensorRef = ConstTensorReference<ElementType, dimension0, dimension1, dimension2>;
         

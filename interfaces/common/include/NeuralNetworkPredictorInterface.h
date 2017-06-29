@@ -56,7 +56,7 @@ namespace predictors
         static auto& LayerAs(Layer* layer);
 #endif
 
-        void AddLayer(Layer* layer, const std::unique_ptr<UnderlyingInputLayer>& underlyingInputLayer, UnderlyingLayers& underlyingLayers);
+        static void AddLayer(Layer* layer, const std::unique_ptr<UnderlyingInputLayer>& underlyingInputLayer, UnderlyingLayers& underlyingLayers);
 
         std::shared_ptr<UnderlyingPredictor> _predictor;
     };

@@ -24,6 +24,11 @@ namespace neural
         _weightsMatrix(_layerParameters.outputShape[2], convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()),
         _outputMatrix(NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding())
     {
+        if(_weights.GetDataPointer() == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "weights tensor has null data field");
+        }
+
         if (_weights.Size() != (_output.NumChannels() * _layerParameters.input.NumChannels() * convolutionalParameters.receptiveField * convolutionalParameters.receptiveField))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "weights dimensions for a convolutional layer should be the size of the receptive field volume * number of filters");
@@ -49,7 +54,6 @@ namespace neural
                 for (size_t row = 0; row < convolutionalParameters.receptiveField; row++)
                 {
                     auto weightsVector = flattened.GetMajorVector(startRow * convolutionalParameters.receptiveField + row);
-
                     for (size_t i = 0; i < weightsVector.Size(); i++)
                     {
                         const size_t columnOffset = row * weightsVector.Size();

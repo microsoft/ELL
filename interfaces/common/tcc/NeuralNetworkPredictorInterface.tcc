@@ -101,6 +101,14 @@ namespace predictors
     template <typename DerivedLayer>
     auto& NeuralNetworkPredictor<ElementType>::LayerAs(Layer* layer)
     {
+        if(layer == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Trying to cast null layer");            
+        }
+        if(!layer->template Is<DerivedLayer>())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Bad layer type cast");            
+        }
         return layer->template As<DerivedLayer>();
     }
 
@@ -109,8 +117,7 @@ namespace predictors
     {
         using UnderlyingLayer = typename ell::predictors::neural::Layer<ElementType>;
         using UnderlyingLayerParameters = typename ell::predictors::neural::Layer<ElementType>::LayerParameters;
-        using ConstTensorReferenceType = typename underlying::Layer<ElementType>::ConstTensorReferenceType;
-        using TensorReferenceType = typename underlying::Layer<ElementType>::TensorReferenceType;
+        using TensorType = typename underlying::Layer<ElementType>::TensorType;
         if (layer != nullptr)
         {
             // Set the layer parameters. Note that if this is the first layer, we set the input reference to the output of the InputLayer.
@@ -125,7 +132,6 @@ namespace predictors
 
             // Instantiate the specific layer type
             underlying::LayerType layerType = layer->GetLayerType();
-
             switch (layerType)
             {
                 case (underlying::LayerType::activation):
@@ -160,21 +166,21 @@ namespace predictors
                 case (underlying::LayerType::binaryConvolution):
                     {
                         auto& apiLayer = LayerAs<api::BinaryConvolutionalLayer<ElementType>>(layer);
-                        TensorReferenceType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data.data());
+                        TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
                         underlyingLayers.push_back(std::make_unique<underlying::BinaryConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
                     }
                     break;
                 case (underlying::LayerType::convolution):
                     {
                         auto& apiLayer = LayerAs<api::ConvolutionalLayer<ElementType>>(layer);
-                        TensorReferenceType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data.data());
+                        TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
                         underlyingLayers.push_back(std::make_unique<underlying::ConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
                     }
                     break;
                 case (underlying::LayerType::fullyConnected):
                     {
                         auto& apiLayer = LayerAs<api::FullyConnectedLayer<ElementType>>(layer);
-                        TensorReferenceType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data.data());
+                        TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
                         underlyingLayers.push_back(std::make_unique<underlying::FullyConnectedLayer<ElementType>>(parameters, weights));
                     }
                     break;
@@ -204,6 +210,7 @@ namespace predictors
                     }
                     break;
                 default:
+                    throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Encountered unknown layer type in neural network predictor");
                     break;
             }
         }

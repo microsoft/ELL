@@ -89,6 +89,9 @@ namespace neural
         template <class LayerType>
         LayerType& As() { return *(dynamic_cast<LayerType*>(this)); }
 
+        template <class LayerType>
+        bool Is() { return dynamic_cast<LayerType*>(this) != nullptr; }
+
         const LayerParameters parameters;
     };
 
