@@ -1,6 +1,6 @@
 # Generalized Sparse Data Format
 
-The Generalizaed Sparse (GS) data format is a textual representation of real-valued vectors. Vector elements are separated by whitespace and can be formatted in three different ways:
+The Generalized Sparse (GS) data format is a textual representation of real-valued data vectors. Vector elements are separated by whitespace and can be formatted in three different ways:
 
 * Absolute index value format
 * Relative index value format
@@ -41,17 +41,17 @@ or as
 ## Comments
 Comments can appear at the end of each line after either `#` or `//`.
 
-## Example of incorrectly formatted strings
+## Examples of incorrectly formatted strings
 
-* double valued index `1.0:10 2:20`
-* bad character in index `1X:10 2:20`
-* bad character in value `1:10X 2:20`
-* extra whitespace `+ 1:10 2:20`
-* extra whitespace `1 :10 2:20`
-* extra whitespace `1: 10 2:20`
-* missing whitespace `1:102:20`
-* nonincreasing index `2:10 2:20`
-* nonincreasing index `10 +0:20`
-* nonincreasing index `10 10 1:20`
-* bad comment `10 10 1:20 / comment`
+* index is not an integer:`1.0:10 2:20`
+* index is not an integer: `1X:10 2:20`
+* value is not a valid double: `1:10X 2:20`
+* extra whitespace: `+ 1:10 2:20`
+* extra whitespace: `1 :10 2:20`
+* extra whitespace: `1: 10 2:20`
+* missing whitespace: `1:102:20`
+* nonincreasing index: `2:10 2:20`
+* nonincreasing index: `10 +0:20`
+* nonincreasing index: `10 10 1:20`
+* bad comment: `10 10 1:20 / comment`
 

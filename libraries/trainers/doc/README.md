@@ -11,12 +11,12 @@ Linear trainers output biased linear predictors by minimizing a regularized empi
 * `SDCATrainer`: Implements the "Stochastic Dual Coordinate Ascent" algorithm. The loss function can be any smooth convex function that implement the `Conjugate` and `ConjugateProx` functions. The regularizer can be any smooth convex function that implements `Conjugate` and `ConjugateGradient`.
 
 ## Decision Forest Trainers
-* `SortingForestTrainer`
-* `HistogramForestTrainer`
+* `SortingForestTrainer`: A decision forest trainer that sorts the training data by each feature when determining the optimal split. This trainer is only suitable for small datasets. 
+* `HistogramForestTrainer`: A decision forest trainer that doesn't sort the training data, and instead finds the optimal split using a histogram of each feature. 
 
-## Data Statistics Trainers
+## Data Statistics Calculators
 These simple algorithms have the same API as trainers and calculate simple statistics from the dataset.
-* `MeanTrainer`: Applies an arbitrary transformation to each coordinate (e.g., absolute value) and computes the mean of the transformed data vectors in the dataset. 
+* `MeanCalculator`: Applies an arbitrary transformation to each coordinate (e.g., absolute value) and computes the mean of the transformed data vectors in the dataset. 
 
 ## Utility Trainers
 Utility trainers wrap other training algorithms and add some auxilliary functionality to them.
