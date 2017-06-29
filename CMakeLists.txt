@@ -72,7 +72,6 @@ endif()
 # Include cmake projects for libraries and executables
 add_subdirectory(libraries)
 add_subdirectory(tools)
-add_subdirectory(scripts EXCLUDE_FROM_ALL)
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/private AND EXISTS ${CMAKE_SOURCE_DIR}/private/CMakeLists.txt)
   add_subdirectory(private)

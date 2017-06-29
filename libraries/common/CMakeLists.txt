@@ -59,7 +59,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(${library_name} PRIVATE -fPIC)
 endif()
 target_link_libraries(${library_name} data utilities functions model nodes predictors evaluators trainers)
-# add_precompiled_header(${library_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
@@ -93,7 +92,6 @@ add_executable(${test_name} ${test_src} ${test_include} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
 target_link_libraries(${test_name} common data testing utilities functions predictors trainers model nodes)
 copy_shared_libraries(${test_name})
-# add_precompiled_header(${test_name} "stdafx.h" "${CMAKE_SOURCE_DIR}/windows/stdafx.cpp")
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
