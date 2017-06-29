@@ -135,6 +135,8 @@ namespace nodes
         using BaseType::output;
         /// @}
 
+        ActivationLayerNode() = default;
+
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> </param>

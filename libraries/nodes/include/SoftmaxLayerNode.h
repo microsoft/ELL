@@ -43,6 +43,8 @@ namespace nodes
         using BaseType::output;
         /// @}
 
+        SoftmaxLayerNode() = default;
+        
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> </param>

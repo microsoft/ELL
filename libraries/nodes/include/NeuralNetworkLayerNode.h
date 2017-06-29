@@ -95,6 +95,16 @@ namespace nodes
         /// <summary> Gets information about the output memory layout </summary>
         PortMemoryLayout& GetOutputMemoryLayout() { return _outputLayout; }
 
+        /// <summary> Adds an object's properties to an `Archiver` </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+
+        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
+        ///
+        /// <param name="archiver"> The `Archiver` to get state from </param>
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
     protected:
         size_t NumInputDimensions() const { return _inputLayout.size.size(); }
         virtual void Copy(model::ModelTransformer& transformer) const override;

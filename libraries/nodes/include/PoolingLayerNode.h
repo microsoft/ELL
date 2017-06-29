@@ -43,6 +43,8 @@ namespace nodes
         using BaseType::output;
         /// @}
 
+        PoolingLayerNode() = default;
+        
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> The input to the layer. </param>

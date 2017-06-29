@@ -12,7 +12,6 @@
 
 // utilities
 #include "IArchivable.h"
-#include "IArchivable.h"
 
 // stl
 #include <memory>

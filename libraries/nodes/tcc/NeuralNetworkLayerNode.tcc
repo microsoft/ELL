@@ -87,6 +87,28 @@ namespace nodes
     }
 
     template <typename DerivedType, typename LayerType, typename ValueType>
+    void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        NeuralNetworkLayerNodeBase<ValueType>::WriteToArchive(archiver);
+        math::TensorArchiver::Write(_inputTensor, "inputTensor", archiver);
+        archiver["layer"] << _layer;
+        archiver["inputLayout"] << _inputLayout;
+        archiver["outputLayout"] << _outputLayout;
+    }
+
+    template <typename DerivedType, typename LayerType, typename ValueType>
+    void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        NeuralNetworkLayerNodeBase<ValueType>::ReadFromArchive(archiver);
+        math::TensorArchiver::Read(_inputTensor, "inputTensor", archiver);
+        archiver["layer"] >> _layer;
+        _inputTensor = typename LayerType::TensorType(_layer.GetInputShape());
+        _layer.GetLayerParameters().input = _inputTensor;
+        archiver["inputLayout"] >> _inputLayout;
+        archiver["outputLayout"] >> _outputLayout;
+    }
+
+    template <typename DerivedType, typename LayerType, typename ValueType>
     void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());

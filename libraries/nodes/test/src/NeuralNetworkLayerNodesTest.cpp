@@ -71,12 +71,12 @@ size_t GetShapeSize(const math::Triplet& shape)
 //
 // Neural network predictor node
 //
-void TestNeuralNetworkPredictorNode()
+template <typename ElementType>
+ell::predictors::NeuralNetworkPredictor<ElementType> CreateNeuralNetworkPredictor()
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
 
-    using ElementType = double;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -97,14 +97,23 @@ void TestNeuralNetworkPredictorNode()
     VectorType bias1({ -0.43837756f, -0.90868396f, -0.0323102f });
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+    return neuralNetwork;
+}
+
+void TestNeuralNetworkPredictorNode()
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Get a net
+    NeuralNetworkPredictor<ElementType> neuralNetwork = CreateNeuralNetworkPredictor<ElementType>();
 
     std::vector<ElementType> input = { 0, 1, 2 };
     auto output = neuralNetwork.Predict(DataVectorType(input));
 
-    utilities::SerializationContext context;
-    common::RegisterNodeTypes(context);
-    std::stringstream strstream;
-    utilities::JsonArchiver archiver(strstream);
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
@@ -112,7 +121,35 @@ void TestNeuralNetworkPredictorNode()
 
     inputNode->SetInput(input);
     auto modelOutput = model.ComputeOutput(predictorNode->output);
-    testing::ProcessTest("Testing BatchNormalizationLayerNode compute", testing::IsEqual(modelOutput, output));
+    testing::ProcessTest("Testing NeuralNetworkPredictorNode compute", testing::IsEqual(modelOutput, output));
+}
+
+void TestArchiveNeuralNetworkPredictorNode()
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Get a net
+    NeuralNetworkPredictor<ElementType> neuralNetwork = CreateNeuralNetworkPredictor<ElementType>();
+
+    std::vector<ElementType> input = { 0, 1, 2 };
+    auto output = neuralNetwork.Predict(DataVectorType(input));
+
+    // Create model
+    model::Model model;
+    {
+        auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
+        auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
+    }
+    auto numNodes = model.Size();
+
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
 
     // Archive the model
     archiver << model;
@@ -121,6 +158,68 @@ void TestNeuralNetworkPredictorNode()
     utilities::JsonUnarchiver unarchiver(strstream, context);
     model::Model model2;
     unarchiver >> model2;
+
+    testing::ProcessTest("Testing NeuralNetworkPredictorNode archive (model size)", testing::IsEqual(model2.Size(), numNodes));
+
+    auto inputNodes = model2.GetNodesByType<model::InputNode<ElementType>>();
+    auto predictorNodes = model2.GetNodesByType<nodes::NeuralNetworkPredictorNode<ElementType>>();
+    testing::ProcessTest("Testing NeuralNetworkPredictorNode archive (input node)", testing::IsEqual((int)inputNodes.size(), 1));
+    testing::ProcessTest("Testing NeuralNetworkPredictorNode archive (predictor node)", testing::IsEqual((int)predictorNodes.size(), 1));
+
+    auto inputNode2 = inputNodes[0];
+    inputNode2->SetInput(input);
+    auto predictorNode2 = predictorNodes[0];
+    auto modelOutput = model.ComputeOutput(predictorNode2->output);
+
+    const double eps = 1e-6;
+    testing::ProcessTest("Testing NeuralNetworkPredictorNode archive (compute)", testing::IsEqual(modelOutput, output, eps));
+}
+
+void TestArchiveNeuralNetworkLayerNodes()
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Get a net
+    NeuralNetworkPredictor<ElementType> neuralNetwork = CreateNeuralNetworkPredictor<ElementType>();
+
+    std::vector<ElementType> input = { 0, 1, 2 };
+    auto output = neuralNetwork.Predict(DataVectorType(input));
+
+    // Create a model
+    model::Model model;
+    {
+        auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
+        auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
+    }
+    auto numNodes = model.Size();
+
+    // Refine the model
+    model::TransformContext transformContext;
+    model::ModelTransformer transformer;
+    auto refinedModel = transformer.RefineModel(model, transformContext, 1);
+
+    // Archive the model
+    utilities::SerializationContext context;
+    common::RegisterNodeTypes(context);
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+
+    archiver << refinedModel;
+
+    // Unarchive the model
+    NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(context);
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+    model::Model model2;
+    unarchiver >> model2;
+
+    testing::ProcessTest("Testing NeuralNetworkLayerNodes archive (model size)", testing::IsEqual(model2.Size(), numNodes));
+
+    auto inputNodes = model2.GetNodesByType<model::InputNode<ElementType>>();
+    testing::ProcessTest("Testing NeuralNetworkLayerNodes archive (input node)", testing::IsEqual((int)inputNodes.size(), 1));
 }
 
 //

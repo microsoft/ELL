@@ -59,6 +59,9 @@ int main()
         TestScalingLayerNode();
         TestSoftmaxLayerNode();
 
+        TestArchiveNeuralNetworkPredictorNode();
+        TestArchiveNeuralNetworkLayerNodes();
+
         //
         // Refine tests
         //

@@ -229,6 +229,8 @@ namespace emitters
     //
     // Typecast
     //
+
+    // bool -> ?
     template <>
     llvm::Value* IREmitter::CastValue<bool, bool>(llvm::Value* pValue)
     {
@@ -242,11 +244,24 @@ namespace emitters
     }
 
     template <>
+    llvm::Value* IREmitter::CastValue<bool, int64_t>(llvm::Value* pValue)
+    {
+        return CastInt(pValue, VariableType::Int64, false);
+    }
+
+    template <>
+    llvm::Value* IREmitter::CastValue<bool, float>(llvm::Value* pValue)
+    {
+        return CastIntToFloat(pValue, VariableType::Float, false);
+    }
+
+    template <>
     llvm::Value* IREmitter::CastValue<bool, double>(llvm::Value* pValue)
     {
         return CastIntToFloat(pValue, VariableType::Double, false);
     }
 
+    // int -> ?
     template <>
     llvm::Value* IREmitter::CastValue<int, bool>(llvm::Value* pValue)
     {
@@ -260,9 +275,9 @@ namespace emitters
     }
 
     template <>
-    llvm::Value* IREmitter::CastValue<int64_t, int>(llvm::Value* pValue)
+    llvm::Value* IREmitter::CastValue<int, int64_t>(llvm::Value* pValue)
     {
-        return CastInt(pValue, VariableType::Int32, true);
+        return CastInt(pValue, VariableType::Int64, true);
     }
 
     template <>
@@ -277,6 +292,25 @@ namespace emitters
         return CastIntToFloat(pValue, VariableType::Double, true);
     }
 
+    // int64_t -> ?
+    template <>
+    llvm::Value* IREmitter::CastValue<int64_t, bool>(llvm::Value* pValue)
+    {
+        return CastInt(pValue, VariableType::Byte, true);
+    }
+
+    template <>
+    llvm::Value* IREmitter::CastValue<int64_t, int>(llvm::Value* pValue)
+    {
+        return CastInt(pValue, VariableType::Int32, true);
+    }
+
+    template <>
+    llvm::Value* IREmitter::CastValue<int64_t, int64_t>(llvm::Value* pValue)
+    {
+        return CastInt(pValue, VariableType::Int64, true);
+    }
+
     template <>
     llvm::Value* IREmitter::CastValue<int64_t, float>(llvm::Value* pValue)
     {
@@ -289,12 +323,38 @@ namespace emitters
         return CastIntToFloat(pValue, VariableType::Double, true);
     }
 
+    // float -> ?
     template <>
     llvm::Value* IREmitter::CastValue<float, bool>(llvm::Value* pValue)
     {
         return CastFloatToInt(pValue, VariableType::Byte);
     }
 
+    template <>
+    llvm::Value* IREmitter::CastValue<float, int>(llvm::Value* pValue)
+    {
+        return CastFloatToInt(pValue, VariableType::Int32);
+    }
+
+    template <>
+    llvm::Value* IREmitter::CastValue<float, int64_t>(llvm::Value* pValue)
+    {
+        return CastFloatToInt(pValue, VariableType::Int64);
+    }
+
+    template <>
+    llvm::Value* IREmitter::CastValue<float, float>(llvm::Value* pValue)
+    {
+        return _irBuilder.CreateFPCast(pValue, Type(VariableType::Float));
+    }
+
+    template <>
+    llvm::Value* IREmitter::CastValue<float, double>(llvm::Value* pValue)
+    {
+        return _irBuilder.CreateFPCast(pValue, Type(VariableType::Double));
+    }
+
+    // double -> ?
     template <>
     llvm::Value* IREmitter::CastValue<double, bool>(llvm::Value* pValue)
     {
@@ -305,6 +365,18 @@ namespace emitters
     llvm::Value* IREmitter::CastValue<double, int>(llvm::Value* pValue)
     {
         return CastFloatToInt(pValue, VariableType::Int32);
+    }
+
+    template <>
+    llvm::Value* IREmitter::CastValue<double, int64_t>(llvm::Value* pValue)
+    {
+        return CastFloatToInt(pValue, VariableType::Int64);
+    }
+
+    template <>
+    llvm::Value* IREmitter::CastValue<double, float>(llvm::Value* pValue)
+    {
+        return _irBuilder.CreateFPCast(pValue, Type(VariableType::Float));
     }
 
     template <>

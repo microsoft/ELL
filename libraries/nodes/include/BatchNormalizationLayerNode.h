@@ -41,6 +41,8 @@ namespace nodes
         using BaseType::output;
         /// @}
 
+        BatchNormalizationLayerNode() = default;
+        
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> </param>

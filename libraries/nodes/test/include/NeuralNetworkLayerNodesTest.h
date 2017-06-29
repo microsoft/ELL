@@ -12,6 +12,8 @@
 // Full network
 //
 void TestNeuralNetworkPredictorNode();
+void TestArchiveNeuralNetworkPredictorNode();
+void TestArchiveNeuralNetworkLayerNodes();
 
 //
 // Layer nodes

@@ -42,6 +42,8 @@ namespace nodes
         using BaseType::output;
         /// @}
 
+        ConvolutionalLayerNode() = default;
+        
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> </param>

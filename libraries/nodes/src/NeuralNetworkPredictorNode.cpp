@@ -51,10 +51,6 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-
-        //std::vector<const NeuralNetworkPredictorNode::PredictorType*> elements(1);
-        //elements[0] = _predictor.get();
-        //archiver["predictor"] << elements;
         archiver["predictor"] << _predictor;
     }
 
@@ -64,10 +60,6 @@ namespace nodes
         PredictorType::RegisterNeuralNetworkPredictorTypes(archiver.GetContext());
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        //std::vector<const NeuralNetworkPredictorNode::PredictorType*> elements;
-        //archiver["predictor"] >> elements;
-        //_predictor.reset((NeuralNetworkPredictorNode::PredictorType*)elements[0]);
-        
         archiver["predictor"] >> _predictor;
     }
 

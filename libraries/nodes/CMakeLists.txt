@@ -58,6 +58,7 @@ set (src src/ActivationLayerNode.cpp
          src/LinearPredictorNode.cpp
          src/MatrixMatrixMultiplyNode.cpp
          src/MatrixVectorMultiplyNode.cpp
+         src/PortMemoryLayout.cpp
          src/ProtoNNPredictorNode.cpp
          src/NeuralNetworkPredictorNode.cpp
          src/PoolingLayerNode.cpp
