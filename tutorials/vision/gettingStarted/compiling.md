@@ -10,7 +10,7 @@ for Raspberry Pi.
 
 *Important* Make sure you have already built ELL in the Release configuration, so that you have the ELL compilation tools ready.
 
-The steps below use a darknet model as an example.   
+The steps below use a darknet model as an example.
 
 First, we compile the model to LLVM intermediate representation (IR). 
 

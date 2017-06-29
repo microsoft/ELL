@@ -8,7 +8,7 @@ the version that matches your Python environment:
     pip install https://cntk.ai/PythonWheel/CPU-Only/cntk-2.0-cp36-cp36m-win_amd64.whl
 
 We have provided a Python script that can load CNTK models.
-See the `cntk_to_ell` Python module (found in the `tools/importers/CNTK` directory)
+See the *cntk_to_ell* Python module (found in tools/importers/cntk)
 
 After building ELL and the ELL Python Language Bindings you will find the following folder in your build output.
 So from your conda environment go into that directory:

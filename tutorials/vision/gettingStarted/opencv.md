@@ -1,7 +1,7 @@
 ## OpenCV
 
-The easiest way to install OpenCV is with your `conda` environment. 
-So if you chose to use `miniconda` or `anaconda` then you can simply do this
+The easiest way to install Open CV is with your *conda* environment. 
+So if you chose to use *miniconda* or *anaconda* then you can simply do this
 from your activated py36 environment:
 
     conda install -c conda-forge opencv
@@ -19,17 +19,16 @@ and get blazing fast performance.
 
 Be sure to enable Python3 build of opencv by doing the following:
 
-````
-mkdir build
-cd build
+    mkdir build
+    cd build
 
-set PYTHON3_EXECUTABLE=d:\Continuum\Anaconda2.7\envs\py35\python.exe
-set PYTHON3_INCLUDE_DIR=d:\Continuum\Anaconda2.7\envs\py35\include
-set PYTHON3_LIBRARY=d:\Continuum\Anaconda2.7\envs\py35\libs\python35.lib
-set PYTHON3_NUMPY_INCLUDE_DIRS=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages\numpy\core\include
-set PYTHON3_PACKAGES_PATH=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages
+    set PYTHON3_EXECUTABLE=d:\Continuum\Anaconda2.7\envs\py35\python.exe
+    set PYTHON3_INCLUDE_DIR=d:\Continuum\Anaconda2.7\envs\py35\include
+    set PYTHON3_LIBRARY=d:\Continuum\Anaconda2.7\envs\py35\libs\python35.lib
+    set PYTHON3_NUMPY_INCLUDE_DIRS=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages\numpy\core\include
+    set PYTHON3_PACKAGES_PATH=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages
 
-cmake  -G "Visual Studio 14 2015 Win64" -D CMAKE_BUILD_TYPE=Release -D WITH_CUDA=1  -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF ..
-if ERRORLEVEL 1 goto :eof
-cmake --build . --config Release
-````
+    cmake  -G "Visual Studio 14 2015 Win64" -D CMAKE_BUILD_TYPE=Release -D WITH_CUDA=1  -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF ..
+    if ERRORLEVEL 1 goto :eof
+    cmake --build . --config Release
+

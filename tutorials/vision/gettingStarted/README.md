@@ -9,16 +9,14 @@ This tutorial shows you how to import a pre-trained image recognition model, com
 In this tutorial we will load a pre-trained Convolutional Neural Net (CNN).
 We will then connect your video camera using OpenCV and do some almost real-time image recognition of dogs, birds and all kinds of
 fun stuff.  We will then get that working on a Raspberry Pi using the ELL model compiler.
-Here's an example of what the result will look like:
 
-![screenshot](Screenshot.png)
 
 ## Prerequisites
 
-First we will use `Python 3.6` for this tutorial and you will need to build the 
-[ELL Python Language Bindings](../../../interfaces/README.MD), so please follow those instructions first.
-We _highly recommend_ using the miniconda or full anaconda python environment because it comes with many
-handy tools like `curl` which we will use later on.
+First we will use *Python 3.6* for this tutorial and you will need to build the 
+[ELL Python Language Bindings](../../../interfaces/README.md), so please follow those instructions first.
+We *highly recommend* using the miniconda or full anaconda python environment because it comes with many
+handy tools like *curl* which we will use later on.
 
 You will also need a simple web cam or a Pi cam.  If you don't have one handy we will show you how to load
 static images or .mp4 videos and process those instead.
@@ -27,10 +25,10 @@ You will also need [OpenCV](http://opencv.org/) which is used to read images fro
 them to [NumPy](https://docs.scipy.org/doc/numpy-dev/user/quickstart.html) arrays so that ELL can process them.
 There are download instructions on the opencv website, but we also created a simple [OpenCV setup](opencv.md) page for you.
 
-_Note_: You will need to build ELL _after_ you install Python, so that the `CMake` step picks up on the fact that you have Python
+*Note*: You will need to build ELL *after* you install Python, so that the *CMake* step picks up on the fact that you have Python
 3.6 installed.  If you did not do that, then please go back to the ELL build instructions and repeat those steps.
 
-Lastly, we will also need `NumPy` which you can install using conda as follows:
+Lastly, we will also need *NumPy* which you can install using conda as follows:
 
     conda install numpy
 

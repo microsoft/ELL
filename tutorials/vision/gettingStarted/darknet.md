@@ -2,7 +2,7 @@
 # Darknet
 
 [Joseph Redmon](https://pjreddie.com/darknet/) has published some CNN models on his website.
-Joseph calls his project `Darknet`, which sounds spooky, but his models are harmless, and really quite fast. 
+Joseph calls his project *Darknet*, which sounds spooky, but his models are harmless, and really quite fast. 
 
 We have provided a Python script that can load those Darknet models.
 See the *darknet_to_ell* Python module (found in the `tools/importers/darknet` directory)
