@@ -13,24 +13,24 @@ fun stuff.  We will then get that working on a Raspberry Pi using the ELL model 
 
 ## Prerequisites
 
-First we will use *Python 3.6* for this tutorial and you will need to build the 
-[ELL Python Language Bindings](../../../interfaces/README.md), so please follow those instructions first.
-We *highly recommend* using the miniconda or full anaconda python environment because it comes with many
-handy tools like *curl* which we will use later on.
+1. We will use `Python 3.6` for this tutorial.
+We highly recommend using the miniconda or full anaconda python environment because it comes with many
+handy tools like `curl` which we will use later on.
 
-You will also need a simple web cam or a Pi cam.  If you don't have one handy we will show you how to load
+2. You will also need a simple web cam or a pi cam.  If you don't have one handy, we will show you how to load
 static images or .mp4 videos and process those instead.
 
-You will also need [OpenCV](http://opencv.org/) which is used to read images from your camera, and convert
-them to [NumPy](https://docs.scipy.org/doc/numpy-dev/user/quickstart.html) arrays so that ELL can process them.
-There are download instructions on the opencv website, but we also created a simple [OpenCV setup](opencv.md) page for you.
+3. To read images from the camera, you will need [Open CV](http://opencv.org/). There are download instructions on the opencv website, but we also created a simple [Open CV setup](opencv.md) page for you.
 
-*Note*: You will need to build ELL *after* you install Python, so that the *CMake* step picks up on the fact that you have Python
-3.6 installed.  If you did not do that, then please go back to the ELL build instructions and repeat those steps.
+4. You also need  [NumPy](https://docs.scipy.org/doc/numpy-dev/user/quickstart.html) since ELL  processes images as NumPy arrays. `NumPy` can install using conda as follows:
 
-Lastly, we will also need *NumPy* which you can install using conda as follows:
-
+    ~~~~
     conda install numpy
+    ~~~~
+
+5. You will need to build ELL and the 
+[ELL Python Language Bindings](../../../interfaces/README.MD). (You will need to build ELL after you install Python, so that the `CMake` step picks up on the fact that you have Python
+3.6 installed.)
 
 ### Downloading a pre-trained model
 
