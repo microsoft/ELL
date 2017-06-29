@@ -85,6 +85,8 @@ else()
             if(processor_family EQUAL 6)
                 if(processor_model EQUAL 60 OR processor_model EQUAL 63 OR processor_model EQUAL 69 OR processor_model EQUAL 70)
                     set(processor_generation "haswell")
+                elseif(processor_model EQUAL 79)
+                    set(processor_generation "haswell")  # technically this is broadwell, but it is compatible with haswell.
                 elseif(processor_model EQUAL 42 OR processor_model EQUAL 45)
                     set(processor_generation "sandybridge")
                 elseif(processor_model EQUAL 42 OR processor_model EQUAL 78)
