@@ -68,4 +68,4 @@ classification labels at the top, like this:
 
 ## Compilation
 
-Ok, now on to [compiling](Compiling.md) the model for Raspberry Pi.
+Ok, now on to [compiling](compiling.md) the model for Raspberry Pi.
