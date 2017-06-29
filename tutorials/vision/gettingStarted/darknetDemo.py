@@ -22,10 +22,13 @@ def main():
         sys.exit(1)
 
     # Pick the model you want to work with
-    helper = mh.ModelHelper(["darknet.cfg", "darknet.weights"], "darknetImageNetLabels.txt")
+    helper = mh.ModelHelper("darknetReference", ["darknet.cfg", "darknet.weights"], "darknetImageNetLabels.txt")
 
     # Import the model
     model = get_ell_predictor(helper)
+
+    # Save the model
+    helper.save_ell_predictor_to_file(model, "darknetReference.map", intervalMs = 100)
 
     camera = 0
     if (len(sys.argv) > 1):

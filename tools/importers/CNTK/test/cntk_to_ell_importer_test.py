@@ -19,9 +19,11 @@ try:
     sys.path.append('./../../../../interfaces/python')
     sys.path.append('./../../../../interfaces/python/Release')
     sys.path.append('./../../../../interfaces/python/Debug')
+    sys.path.append('./../../../../interfaces/python/utilities')
 
     import ELL
-    import cntk_to_ell    
+    import ell_utilities
+    import cntk_to_ell
     from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
     from cntk.ops import *
     from cntk.initializer import glorot_uniform, he_normal
@@ -37,7 +39,8 @@ try:
     import traceback
     import inspect
 except Exception:
-     SkipTests = True
+    SkipTests = True
+
 
 def dump(obj):
     for attr in dir(obj):
@@ -50,8 +53,8 @@ def dump(obj):
 
 class CntkLayersTestCase(unittest.TestCase):
     def setUp(self):
-            if SkipTests:
-                self.skipTest('Module not tested, CNTK or ELL module missing')
+        if SkipTests:
+            self.skipTest('Module not tested, CNTK or ELL module missing')
 
     def test_dense_layer(self):
         # Test a model with a single CNTK Dense layer against the equivalent ELL predictor
@@ -187,8 +190,8 @@ class CntkLayersTestCase(unittest.TestCase):
 
 class CntkXorModelTestCase(unittest.TestCase):
     def setUp(self):
-            if SkipTests:
-                self.skipTest('Module not tested, CNTK or ELL module missing')
+        if SkipTests:
+            self.skipTest('Module not tested, CNTK or ELL module missing')
 
     def test_simple_xor_model(self):
         predictor = cntk_to_ell.predictor_from_cntk_model('xorModel1.dnn')
@@ -204,6 +207,16 @@ class CntkXorModelTestCase(unittest.TestCase):
         result = predictor.Predict([1, 1])
         self.assertAlmostEqual(
             result[0], 0, msg='incorrect prediction for [1, 1]')
+
+        # create a map and save to file
+        ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
+        ell_map.Save("xor_test.map")
+
+        # create a steppable map and save to file
+        ell_steppable_map = ell_utilities.ell_steppable_map_from_float_predictor(
+            predictor, 100, "XorInputCallback", "XorOutputCallback")
+        ell_steppable_map.Save("xor_steppable_test.map")
+
         return
 
 

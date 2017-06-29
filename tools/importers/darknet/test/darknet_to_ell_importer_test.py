@@ -18,6 +18,7 @@ try:
     sys.path.append('./../../../../interfaces/python')
     sys.path.append('./../../../../interfaces/python/Release')
     sys.path.append('./../../../../interfaces/python/Debug')
+    sys.path.append('./../../../../interfaces/python/utilities')
     import unittest
     import getopt
     import os
@@ -28,6 +29,7 @@ try:
     import inspect
     import numpy as np
     import ELL
+    import ell_utilities
     import darknet_to_ell
 except Exception:
     SkipTests = True
@@ -68,6 +70,15 @@ class DarknetModelTestCase(unittest.TestCase):
                            0.08548084646463394, 0.06091265007853508, 0.07173667103052139, 0.11159289628267288, 0.04480091854929924]
         np.testing.assert_array_almost_equal(
             result2, expectedResult2, 5, 'prediction of second input does not match expected results!')
+
+        # create a map and save to file
+        ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
+        ell_map.Save("darknet_test.map")
+
+        # create a steppable map and save to file
+        ell_steppable_map = ell_utilities.ell_steppable_map_from_float_predictor(
+            predictor, 100, "DarknetTestInputCallback", "DarknetTestOutputCallback")
+        ell_steppable_map.Save("darknet_steppable_test.map")
 
         return
 

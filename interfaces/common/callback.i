@@ -35,6 +35,8 @@
 #ifndef SWIGJAVASCRIPT
 %template(DoubleCallbackBase) ell::api::CallbackBase<double>;
 %template(DoubleDoubleCallbackForwarder) ell::api::CallbackForwarder<double, double>;
+%template(FloatCallbackBase) ell::api::CallbackBase<float>;
+%template(FloatFloatCallbackForwarder) ell::api::CallbackForwarder<float, float>;
 #endif
 
 // Include language specific SWIG definitions that must be declared after the

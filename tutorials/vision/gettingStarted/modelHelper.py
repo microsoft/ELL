@@ -1,10 +1,12 @@
 import cv2
 import numpy as np
+import ell_utilities
 
 # Class to hold info about the model that the app needs to call the model and display result correctly
 class ModelHelper:
-    def __init__(self, modelFiles, labelsFile, inputHeightAndWidth = (224, 224), scaleFactor = 1/255, threshold = 0.25):
+    def __init__(self, modelName, modelFiles, labelsFile, inputHeightAndWidth = (224, 224), scaleFactor = 1/255, threshold = 0.25):
         """ Helper class to store information about the model we want to use.
+        modelName - string name of the model
         modelFiles - list of strings containing darknet .cfg filename and darknet .weights filename, or CNTK model file name.
         labelsFile - string name of labels that correspond to the predictions output of the model
         inputHeightAndWidth - a list of two values giving the rows and columns of the input image for the model e.g. (224, 224)
@@ -12,6 +14,7 @@ class ModelHelper:
                       to be represented as a value between 0.0 and 1.0, which is the same as multiplying it by 1/255.
         threshold - specifies a prediction threshold. We will ignore prediction values less than this
         """
+        self.model_name = modelName
         self.model_files = modelFiles
         self.labels_file = labelsFile
         self.inputHeightAndWidth = inputHeightAndWidth
@@ -69,4 +72,14 @@ class ModelHelper:
         cv2.rectangle(image, (0, 0), (image.shape[1], 40), (50, 200, 50), cv2.FILLED)
         cv2.putText(image, label, (10,25), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 2, 8)
         return
-        
+    
+    def save_ell_predictor_to_file(self, predictor, filePath, intervalMs = 0):
+        """Saves an ELL predictor to file so that it can be compiled to run on a device, with an optional stepInterval in milliseconds"""
+        name = self.model_name
+        if (intervalMs > 0):
+            ell_map = ell_utilities.ell_steppable_map_from_float_predictor(
+                predictor, intervalMs, name + "InputCallback", name + "OutputCallback")
+            ell_map.Save(filePath)
+        else:
+            ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
+            ell_map.Save(filePath)

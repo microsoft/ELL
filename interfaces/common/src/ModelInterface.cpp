@@ -18,15 +18,29 @@
 // utilities
 #include "JsonArchiver.h"
 
+// model
+#include "InputNode.h"
+#include "OutputNode.h"
+#include "DynamicMap.h"
+#include "SteppableMap.h"
+
+// nodes
+#include "NeuralNetworkPredictorNode.h"
+#include "SinkNode.h"
+#include "SourceNode.h"
+
+// stl
+#include <chrono>
+
 namespace ELL_API
 {
 
 //
 // ELL_Port
 //
-int ELL_Port::GetOutputType()
+ELL_PortType ELL_Port::GetOutputType()
 {
-    return (int)(_port->GetType());
+    return static_cast<ELL_PortType>(_port->GetType());
 }
 
 #ifndef SWIG
@@ -53,7 +67,7 @@ std::string ELL_Port::GetRuntimeTypeName()
 
 int ELL_Port::Size()
 {
-    return (int)_port->Size();
+    return static_cast<int>(_port->Size());
 }
 
 //
@@ -197,21 +211,30 @@ ELL_NodeIterator ELL_Node::GetDependents()
 ELL_OutputPort ELL_Node::GetOutputPort(const std::string& portName)
 {
     auto port = _node->GetOutputPort(portName);
-    if (port == nullptr) { throw std::invalid_argument("no port named '" + portName + "'"); }
+    if (port == nullptr)
+    {
+        throw std::invalid_argument("no port named '" + portName + "'");
+    }
     return ELL_OutputPort(port);
 }
 
 ELL_InputPort ELL_Node::GetInputPort(const std::string& portName)
 {
     auto port = _node->GetInputPort(portName);
-    if (port == nullptr) { throw std::invalid_argument("no port named '" + portName + "'"); }
+    if (port == nullptr)
+    {
+        throw std::invalid_argument("no port named '" + portName + "'");
+    }
     return ELL_InputPort(port);
 }
 
 ELL_Port ELL_Node::GetPort(const std::string& portName)
 {
     auto port = _node->GetPort(portName);
-    if (port == nullptr) { throw std::invalid_argument("no port named '" + portName + "'"); }
+    if (port == nullptr)
+    {
+        throw std::invalid_argument("no port named '" + portName + "'");
+    }
     return ELL_Port(port);
 }
 
@@ -231,6 +254,68 @@ std::string ELL_Node::GetRuntimeTypeName()
 }
 
 //
+// ELL_InputNode
+//
+ELL_InputNode::ELL_InputNode(const ELL_InputNode& node)
+    : ELL_Node(node.GetNode())
+{
+    if (dynamic_cast<const ell::model::InputNodeBase*>(node.GetNode()) == nullptr)
+    {
+        throw std::invalid_argument("Error: not an InputNode");
+    }
+}
+
+ELL_InputNode::ELL_InputNode(ELL_Node node)
+    : ELL_Node(node.GetNode())
+{
+    if (dynamic_cast<const ell::model::InputNodeBase*>(node.GetNode()) == nullptr)
+    {
+        throw std::invalid_argument("Error: not an InputNode");
+    }
+}
+
+ELL_InputNode::ELL_InputNode(const ell::model::InputNodeBase* other)
+    : ELL_Node(other)
+{
+}
+
+const ell::model::InputNodeBase* ELL_InputNode::GetInputNode() const
+{
+    return dynamic_cast<const ell::model::InputNodeBase*>(GetNode());
+}
+
+//
+// ELL_OutputNode
+//
+ELL_OutputNode::ELL_OutputNode(const ELL_OutputNode& node)
+    : ELL_Node(node.GetNode())
+{
+    if (dynamic_cast<const ell::model::OutputNodeBase*>(node.GetNode()) == nullptr)
+    {
+        throw std::invalid_argument("Error: not an OutputNode");
+    }
+}
+
+ELL_OutputNode::ELL_OutputNode(ELL_Node node)
+    : ELL_Node(node.GetNode())
+{
+    if (dynamic_cast<const ell::model::OutputNodeBase*>(node.GetNode()) == nullptr)
+    {
+        throw std::invalid_argument("Error: not an OutputNode");
+    }
+}
+
+ELL_OutputNode::ELL_OutputNode(const ell::model::OutputNodeBase* other)
+    : ELL_Node(other)
+{
+}
+
+const ell::model::OutputNodeBase* ELL_OutputNode::GetOutputNode() const
+{
+    return dynamic_cast<const ell::model::OutputNodeBase*>(GetNode());
+}
+
+//
 // ELL_PortElement
 //
 #ifndef SWIG
@@ -242,44 +327,50 @@ ELL_PortElement::ELL_PortElement(const ell::model::PortElementBase& other)
 
 int ELL_PortElement::GetIndex()
 {
-    return (int)(_port.GetIndex());
+    return static_cast<int>(_port.GetIndex());
 }
 
-int ELL_PortElement::GetType()
+ELL_PortType ELL_PortElement::GetType()
 {
-    return (int)(_port.GetPortType());
+    return static_cast<ELL_PortType>(_port.GetPortType());
 }
 
 ELL_OutputPort ELL_PortElement::ReferencedPort()
 {
     auto port = _port.ReferencedPort();
-    if (port == nullptr) { throw std::runtime_error("no referenced port"); }
+    if (port == nullptr)
+    {
+        throw std::runtime_error("no referenced port");
+    }
     return ELL_OutputPort(port);
 }
 
 //
 // ELL_PortElements
 //
-#ifndef SWIG
 ELL_PortElements::ELL_PortElements(const ell::model::PortElementsBase& other)
     : _elements(other)
 {
 }
-#endif
+
+ELL_PortElements::ELL_PortElements(const ELL_OutputPort& port)
+    : _elements(port.GetPort())
+{
+}
 
 int ELL_PortElements::Size() const
 {
     return _elements.Size();
 }
 
-int ELL_PortElements::GetType() const
+ELL_PortType ELL_PortElements::GetType() const
 {
-    return static_cast<int>(_elements.GetPortType());
+    return static_cast<ELL_PortType>(_elements.GetPortType());
 }
 
 ELL_PortElement ELL_PortElements::GetElement(int index) const
 {
-    if (index < 0 || index >= Size()) 
+    if (index < 0 || index >= Size())
     {
         throw std::invalid_argument("index out of range");
     }
@@ -297,9 +388,9 @@ ELL_InputPort::ELL_InputPort(const ell::model::InputPortBase* other)
 }
 #endif
 
-int ELL_InputPort::GetOutputType()
+ELL_PortType ELL_InputPort::GetOutputType()
 {
-    return (int)(_port->GetType());
+    return static_cast<ELL_PortType>(_port->GetType());
 }
 
 ELL_Node ELL_InputPort::GetNode()
@@ -347,9 +438,9 @@ bool ELL_OutputPort::IsReferenced() const
     return _port->IsReferenced();
 }
 
-int ELL_OutputPort::GetOutputType()
+ELL_PortType ELL_OutputPort::GetOutputType()
 {
-    return (int)(_port->GetType());
+    return static_cast<ELL_PortType>(_port->GetType());
 }
 
 std::vector<double> ELL_OutputPort::GetDoubleOutput()
@@ -446,22 +537,216 @@ ELL_Node ELL_ModelBuilder::AddNode(ELL_Model model, const std::string& nodeType,
     return ELL_Node(newNode);
 }
 
-//
-// ELL_TransformContext
-//
+ELL_Node ELL_ModelBuilder::AddDoubleNeuralNetworkPredictorNode(ELL_Model model, ELL_PortElements input, ell::api::predictors::NeuralNetworkPredictor<double> predictor)
+{
+    return AddNeuralNetworkPredictorNode<double>(model, input, predictor);
+}
+
+ELL_Node ELL_ModelBuilder::AddFloatNeuralNetworkPredictorNode(ELL_Model model, ELL_PortElements input, ell::api::predictors::NeuralNetworkPredictor<float> predictor)
+{
+    return AddNeuralNetworkPredictorNode<float>(model, input, predictor);
+}
+
+template <typename ElementType>
+ELL_Node ELL_ModelBuilder::AddNeuralNetworkPredictorNode(ELL_Model model, ELL_PortElements input, ell::api::predictors::NeuralNetworkPredictor<ElementType> predictor)
+{
+    auto elements = ell::model::PortElements<ElementType>(input.GetPortElements());
+    auto newNode = model.GetModel().AddNode<ell::nodes::NeuralNetworkPredictorNode<ElementType>>(elements, predictor.GetPredictor());
+    return ELL_Node(newNode);
+}
+
+ELL_Node ELL_ModelBuilder::AddInputNode(ELL_Model model, int size, ELL_PortType type)
+{
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+        case ELL_PortType::boolean:
+            newNode = model.GetModel().AddNode<ell::model::InputNode<bool>>(size);
+            break;
+        case ELL_PortType::integer:
+            newNode = model.GetModel().AddNode<ell::model::InputNode<int>>(size);
+            break;
+        case ELL_PortType::real:
+            newNode = model.GetModel().AddNode<ell::model::InputNode<double>>(size);
+            break;
+        case ELL_PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::model::InputNode<float>>(size);
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create node");
+    }
+    return ELL_Node(newNode);
+}
+
+ELL_Node ELL_ModelBuilder::AddOutputNode(ELL_Model model, ELL_PortElements input)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+        case ELL_PortType::boolean:
+            newNode = model.GetModel().AddNode<ell::model::OutputNode<bool>>(ell::model::PortElements<bool>(elements));
+            break;
+        case ELL_PortType::integer:
+            newNode = model.GetModel().AddNode<ell::model::OutputNode<int>>(ell::model::PortElements<int>(elements));
+            break;
+        case ELL_PortType::real:
+            newNode = model.GetModel().AddNode<ell::model::OutputNode<double>>(ell::model::PortElements<double>(elements));
+            break;
+        case ELL_PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements));
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create node");
+    }
+    return ELL_Node(newNode);
+}
+
+ELL_Node ELL_ModelBuilder::AddSinkNode(ELL_Model model, ELL_PortElements input, const std::string& sinkFunctionName)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+        case ELL_PortType::real:
+            newNode = model.GetModel().AddNode<ell::nodes::SinkNode<double>>(
+                ell::model::PortElements<double>(elements), [](const std::vector<double>&) {}, sinkFunctionName);
+            break;
+        case ELL_PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::nodes::SinkNode<float>>(
+                ell::model::PortElements<float>(elements), [](const std::vector<float>&) {}, sinkFunctionName);
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create node");
+    }
+    return ELL_Node(newNode);
+}
+
+// This will go away once SourceNode is refactored to remove the callback template parameter
+template <typename ElementType>
+bool SourceNode_EmptyCallback(std::vector<ElementType>&)
+{
+    return false;
+}
+
+ELL_Node ELL_ModelBuilder::AddSourceNode(ELL_Model model, ELL_PortElements input, ELL_PortType outputType, 
+    int outputSize, const std::string& sourceFunctionName)
+{
+    auto inputType = input.GetType();
+    if (inputType != ELL_PortType::real)
+    {
+        throw std::invalid_argument("Only ELL_PortType::real is supported for time signal input");
+    }
+ 
+    using TimeTickType = double;
+    auto inputElements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (outputType)
+    {
+        case ELL_PortType::real:
+            newNode = model.GetModel().AddNode<ell::nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>(
+                ell::model::PortElements<TimeTickType>(inputElements), outputSize, sourceFunctionName);
+            break;
+        case ELL_PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::nodes::SourceNode<float, &SourceNode_EmptyCallback<float>>>(
+                ell::model::PortElements<TimeTickType>(inputElements), outputSize, sourceFunctionName);
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create node");
+    }
+    return ELL_Node(newNode);
+}
 
 //
-// ELL_DynamicMap
+// ELL_Map
 //
-std::vector<double> ELL_DynamicMap::Compute(const std::vector<double>& inputData)
+ELL_Map::ELL_Map(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements output)
 {
-    _map->SetInputValue(0, inputData);
-    return _map->ComputeOutput<double>(0);
+    std::vector<std::pair<std::string, ell::model::InputNodeBase*>> inputs = { std::pair<std::string, ell::model::InputNodeBase*>{ "input", const_cast<ell::model::InputNodeBase*>(inputNode.GetInputNode()) } };
+    auto outputs = std::vector<std::pair<std::string, ell::model::PortElementsBase>>{ { "output", output.GetPortElements() } };
+    _map = std::make_shared<ell::model::DynamicMap>(model.GetModel(), inputs, outputs);
+}
+
+std::vector<double> ELL_Map::ComputeDouble(const std::vector<double>& inputData)
+{
+    return _map->Compute<double>(inputData);
+}
+
+std::vector<float> ELL_Map::ComputeFloat(const std::vector<float>& inputData)
+{
+    return _map->Compute<float>(inputData);
+}
+
+void ELL_Map::Save(const std::string& filePath) const
+{
+    ell::common::SaveMap(*_map, filePath);
+}
+
+//
+// ELL_SteppableMap
+//
+ELL_SteppableMap::ELL_SteppableMap(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements output, ELL_ClockType clockType, int millisecondInterval) : _clockType(clockType)
+{
+    std::vector<std::pair<std::string, ell::model::InputNodeBase*>> inputs = { std::pair<std::string, ell::model::InputNodeBase*>{ "input", const_cast<ell::model::InputNodeBase*>(inputNode.GetInputNode()) } };
+    auto outputs = std::vector<std::pair<std::string, ell::model::PortElementsBase>>{ { "output", output.GetPortElements() } };
+    auto duration = ell::model::DurationType(millisecondInterval);
+
+    switch (clockType)
+    {
+        case ELL_ClockType::steadyClock:
+            _map = std::make_shared<ell::model::SteppableMap<std::chrono::steady_clock>>(model.GetModel(), inputs, outputs, duration);
+            break;
+        case ELL_ClockType::systemClock:
+            _map = std::make_shared<ell::model::SteppableMap<std::chrono::system_clock>>(model.GetModel(), inputs, outputs, duration);
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create map");
+    }
+}
+
+void ELL_SteppableMap::Save(const std::string& filePath) const
+{
+    switch (_clockType)
+    {
+        case ELL_ClockType::steadyClock:
+        {
+            auto map = std::dynamic_pointer_cast<const ell::model::SteppableMap<std::chrono::steady_clock>>(_map);
+            assert(map != nullptr); // coding error
+            ell::common::SaveMap(*map, filePath);
+            break;
+        }
+        case ELL_ClockType::systemClock:
+        {
+            auto map = std::dynamic_pointer_cast<const ell::model::SteppableMap<std::chrono::system_clock>>(_map);
+            assert(map != nullptr); // coding error
+            ell::common::SaveMap(*map, filePath);
+            break;
+        }
+        default:
+            assert(false); // coding error
+    }
 }
 
 //
 // ELL_CompiledMap
 //
+ELL_CompiledMap::ELL_CompiledMap(ell::model::IRCompiledMap map)
+{
+    _map = std::make_shared<ell::model::IRCompiledMap>(std::move(map));
+}
+
+std::vector<double> ELL_CompiledMap::ComputeDouble(const std::vector<double>& inputData)
+{
+    return _map->Compute<double>(inputData);
+}
+
+std::vector<float> ELL_CompiledMap::ComputeFloat(const std::vector<float>& inputData)
+{
+    return _map->Compute<float>(inputData);
+}
+
 std::string ELL_CompiledMap::GetCodeString()
 {
     std::stringstream s;
@@ -472,13 +757,6 @@ std::string ELL_CompiledMap::GetCodeString()
     return s.str();
 }
 
-std::vector<double> ELL_CompiledMap::Compute(const std::vector<double>& inputData)
-{
-    _map->SetInputValue(0, inputData);
-    return _map->ComputeOutput<double>(0);
-}
-
-//
 //
 // Functions
 //

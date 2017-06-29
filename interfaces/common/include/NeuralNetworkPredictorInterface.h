@@ -17,6 +17,7 @@
 #include <vector>
 
 // apis
+#include "MathInterface.h"
 #include "NeuralLayersInterface.h"
 #endif
 
@@ -42,6 +43,12 @@ namespace predictors
 
         NeuralNetworkPredictor(const std::vector<Layer*>& layers);
         std::vector<ElementType> Predict(const std::vector<double>& input);
+        neural::LayerShape GetInputShape() const;
+        neural::LayerShape GetOutputShape() const;
+
+#ifndef SWIG
+        const UnderlyingPredictor& GetPredictor() const;
+#endif
 
     private:
 #ifndef SWIG

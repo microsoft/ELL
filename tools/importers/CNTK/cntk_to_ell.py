@@ -1,11 +1,11 @@
 ####################################################################################################
-##
+#
 # Project:  Embedded Learning Library (ELL)
 # File:     cntk_to_ell.py (importers)
 # Authors:  Byron Changuion
-##
+#
 # Requires: Python 3.x, cntk-2.0-cp35
-##
+#
 ####################################################################################################
 import ELL
 import sys
@@ -761,8 +761,6 @@ def get_filtered_layers_list(modelLayers):
         print(currentLayer.op_name, ": ", ell_shape_to_string(currentLayer.ell_inputShape), " -> ",
               ell_shape_to_string(currentLayer.ell_outputShape), "| padding ", currentLayer.ell_inputPaddingParameters.paddingSize)
     return relevantLayers
-
-# Function to import a CNTK model and output the corresponding ELL neural network predictor
 
 
 def predictor_from_cntk_model(modelFile):

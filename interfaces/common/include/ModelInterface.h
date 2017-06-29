@@ -21,6 +21,9 @@
 #include "Port.h"
 #include "PortElements.h"
 
+// apis
+#include "NeuralNetworkPredictorInterface.h"
+
 // stl
 #include <memory>
 #include <sstream>
@@ -35,41 +38,59 @@ namespace ELL_API
 //
 // Forward declarations
 //
+class ELL_CompiledMap;
+class ELL_DynamicMap;
+class ELL_InputPort;
 class ELL_Node;
 class ELL_NodeIterator;
-class ELL_InputPort;
 class ELL_OutputPort;
+class ELL_SteppableMap;
 
 //
-// ELL_Port 
+// ELL_ClockType
 //
+enum class ELL_ClockType
+{
+    steadyClock,
+    systemClock
+};
 
+//
+// ELL_PortType
+//
+enum class ELL_PortType
+{
+    none = (int)ell::model::Port::PortType::none,
+    smallReal = (int)ell::model::Port::PortType::smallReal, // == float
+    real = (int)ell::model::Port::PortType::real, // == double
+    integer = (int)ell::model::Port::PortType::integer, // == int32
+    bigInt = (int)ell::model::Port::PortType::bigInt, // == int64
+    categorical = (int)ell::model::Port::PortType::categorical,
+    boolean = (int)ell::model::Port::PortType::boolean
+};
+
+//
+// ELL_Port
+//
 class ELL_Port
 {
 public:
-    enum class Type
-    {
-        none,
-        real,
-        integer,
-        categorical,
-        boolean
-    };
     ELL_Port() = default;
     ELL_Node GetNode();
     std::string GetName();
     std::string GetRuntimeTypeName();
-    int GetOutputType();
+    ELL_PortType GetOutputType();
     int Size();
 #ifndef SWIG
     ELL_Port(const ell::model::Port* other);
+    const ell::model::Port& GetPort() const { return *_port; }
 #endif
 private:
     const ell::model::Port* _port = nullptr;
 };
 
 //
-// ELL_InputPortIterator 
+// ELL_InputPortIterator
 //
 
 class ELL_InputPortIterator
@@ -88,7 +109,7 @@ private:
 };
 
 //
-// ELL_OutputPortIterator 
+// ELL_OutputPortIterator
 //
 
 class ELL_OutputPortIterator
@@ -107,7 +128,7 @@ private:
 };
 
 //
-// ELL_NodeIterator 
+// ELL_NodeIterator
 //
 class ELL_NodeIterator
 {
@@ -128,7 +149,7 @@ private:
 };
 
 //
-// ELL_Node 
+// ELL_Node
 //
 
 class ELL_Node
@@ -147,13 +168,50 @@ public:
     std::string GetRuntimeTypeName();
 #ifndef SWIG
     ELL_Node(const ell::model::Node* other);
+    const ell::model::Node* GetNode() const { return _node; }
 #endif
 private:
     const ell::model::Node* _node = nullptr;
 };
 
 //
-// ELL_PortElement 
+// ELL_InputNode
+//
+
+class ELL_InputNode : public ELL_Node
+{
+public:
+    ELL_InputNode(const ELL_InputNode& node);
+    ELL_InputNode(ELL_Node node);
+    using ELL_Node::GetInputPort;
+    using ELL_Node::GetOutputPort;
+#ifndef SWIG
+    ELL_InputNode() = default;
+    ELL_InputNode(const ell::model::InputNodeBase* other);
+    const ell::model::InputNodeBase* GetInputNode() const;
+#endif
+};
+
+//
+// ELL_OutputNode
+//
+
+class ELL_OutputNode : public ELL_Node
+{
+public:
+    ELL_OutputNode(const ELL_OutputNode& node);
+    ELL_OutputNode(ELL_Node node);
+    using ELL_Node::GetInputPort;
+    using ELL_Node::GetOutputPort;
+#ifndef SWIG
+    ELL_OutputNode() = default;
+    ELL_OutputNode(const ell::model::OutputNodeBase* other);
+    const ell::model::OutputNodeBase* GetOutputNode() const;
+#endif
+};
+
+//
+// ELL_PortElement
 //
 
 class ELL_PortElement
@@ -161,7 +219,7 @@ class ELL_PortElement
 public:
     ELL_PortElement() = default;
     int GetIndex();
-    int GetType();
+    ELL_PortType GetType();
     ELL_OutputPort ReferencedPort();
 
 #ifndef SWIG
@@ -172,26 +230,28 @@ private:
 };
 
 //
-// ELL_PortElements 
+// ELL_PortElements
 //
 
 class ELL_PortElements
 {
 public:
     ELL_PortElements() = default;
+    ELL_PortElements(const ELL_OutputPort& port);
     int Size() const;
-    int GetType() const;
+    ELL_PortType GetType() const;
     ELL_PortElement GetElement(int index) const;
 
 #ifndef SWIG
     ELL_PortElements(const ell::model::PortElementsBase& other);
+    const ell::model::PortElementsBase& GetPortElements() { return _elements; }
 #endif
 private:
     ell::model::PortElementsBase _elements;
 };
 
 //
-// ELL_InputPort 
+// ELL_InputPort
 //
 
 class ELL_InputPort
@@ -201,19 +261,20 @@ public:
     int Size();
     ELL_Node GetNode();
     std::string GetName();
-    int GetOutputType();
+    ELL_PortType GetOutputType();
     std::string GetRuntimeTypeName();
     ELL_NodeIterator GetParentNodes();
     ELL_PortElements GetInputElements();
 #ifndef SWIG
     ELL_InputPort(const ell::model::InputPortBase* other);
+    const ell::model::InputPortBase& GetPort() const { return *_port; }
 #endif
 private:
     const ell::model::InputPortBase* _port = nullptr;
 };
 
 //
-// ELL_OutputPort 
+// ELL_OutputPort
 //
 class ELL_OutputPort
 {
@@ -222,20 +283,21 @@ public:
     int Size();
     ELL_Node GetNode();
     std::string GetName();
-    int GetOutputType();
+    ELL_PortType GetOutputType();
     void ReferencePort();
     bool IsReferenced() const;
     std::vector<double> GetDoubleOutput();
     double GetDoubleOutput(int index);
 #ifndef SWIG
     ELL_OutputPort(const ell::model::OutputPortBase* other);
+    const ell::model::OutputPortBase& GetPort() const { return *_port; }
 #endif
 private:
     const ell::model::OutputPortBase* _port = nullptr;
 };
 
 //
-// ELL_Model 
+// ELL_Model
 //
 class ELL_Model
 {
@@ -256,20 +318,36 @@ private:
 };
 
 //
-// ELL_ModelBuilder 
+// ELL_ModelBuilder
 //
 class ELL_ModelBuilder
 {
 public:
     ELL_ModelBuilder();
+
+    // Generic AddNode method
     ELL_Node AddNode(ELL_Model model, const std::string& nodeType, const std::vector<std::string>& args);
 
+    // Specific methods per node type
+    ELL_Node AddDoubleNeuralNetworkPredictorNode(ELL_Model model, ELL_PortElements input, ell::api::predictors::NeuralNetworkPredictor<double> predictor);
+    ELL_Node AddFloatNeuralNetworkPredictorNode(ELL_Model model, ELL_PortElements input, ell::api::predictors::NeuralNetworkPredictor<float> predictor);
+
+    ELL_Node AddInputNode(ELL_Model model, int size, ELL_PortType type);
+    ELL_Node AddOutputNode(ELL_Model model, ELL_PortElements input);
+    ELL_Node AddSinkNode(ELL_Model model, ELL_PortElements input, const std::string& sinkFunctionName);
+    ELL_Node AddSourceNode(ELL_Model model, ELL_PortElements input, ELL_PortType outputType, int outputSize, const std::string& sourceFunctionName);
+
 private:
+#ifndef SWIG
+    template <typename ElementType>
+    ELL_Node AddNeuralNetworkPredictorNode(ELL_Model model, ELL_PortElements input, ell::api::predictors::NeuralNetworkPredictor<ElementType> predictor);
+#endif
+
     ell::model::ModelBuilder _modelBuilder;
 };
 
 //
-// ELL_TransformContext 
+// ELL_TransformContext
 //
 class ELL_TransformContext
 {
@@ -282,25 +360,52 @@ private:
 };
 
 //
-// ELL_DynamicMap 
+// ELL_Map
 //
-class ELL_DynamicMap
+class ELL_Map
 {
 public:
-    std::vector<double> Compute(const std::vector<double>& inputData);
+    ELL_Map(const ELL_Map& other) = default;
+    ELL_Map(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements output);
+    std::vector<double> ComputeDouble(const std::vector<double>& inputData);
+    std::vector<float> ComputeFloat(const std::vector<float>& inputData);
+    void Save(const std::string& filePath) const;
 
 private:
     std::shared_ptr<ell::model::DynamicMap> _map;
 };
 
 //
-// ELL_CompiledMap 
+// ELL_SteppableMap
+//
+class ELL_SteppableMap
+{
+public:
+    ELL_SteppableMap(const ELL_SteppableMap& other) = default;
+    ELL_SteppableMap(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements output, ELL_ClockType clockType, int millisecondInterval);
+    void Save(const std::string& filePath) const;
+
+private:
+    std::shared_ptr<ell::model::DynamicMap> _map;
+    ELL_ClockType _clockType;
+};
+
+//
+// ELL_CompiledMap
 //
 class ELL_CompiledMap
 {
 public:
+    ELL_CompiledMap(const ELL_CompiledMap& other) = default;
+
     std::string GetCodeString();
-    std::vector<double> Compute(const std::vector<double>& inputData);
+    std::vector<double> ComputeDouble(const std::vector<double>& inputData);
+    std::vector<float> ComputeFloat(const std::vector<float>& inputData);
+
+#ifndef SWIG
+    ELL_CompiledMap() = default;
+    ELL_CompiledMap(ell::model::IRCompiledMap map);
+#endif
 
 private:
     std::shared_ptr<ell::model::IRCompiledMap> _map;

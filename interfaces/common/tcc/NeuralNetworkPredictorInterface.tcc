@@ -84,6 +84,20 @@ namespace predictors
     }
 
     template <typename ElementType>
+    neural::LayerShape NeuralNetworkPredictor<ElementType>::GetInputShape() const
+    {
+        auto shape = _predictor->GetInputShape();
+        return neural::LayerShape{shape[0], shape[1], shape[2]};
+    }
+
+    template <typename ElementType>
+    neural::LayerShape NeuralNetworkPredictor<ElementType>::GetOutputShape() const
+    {
+        auto shape = _predictor->GetOutputShape();
+        return neural::LayerShape{shape[0], shape[1], shape[2]};
+    }
+
+    template <typename ElementType>
     template <typename DerivedLayer>
     auto& NeuralNetworkPredictor<ElementType>::LayerAs(Layer* layer)
     {
@@ -198,6 +212,14 @@ namespace predictors
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Encountered null layer in neural network predictor");
         }
     }
+
+#ifndef SWIG
+    template <typename ElementType>
+    const ell::predictors::NeuralNetworkPredictor<ElementType>& NeuralNetworkPredictor<ElementType>::GetPredictor() const
+    {
+        return *_predictor;
+    }
+#endif
 
 }
 }

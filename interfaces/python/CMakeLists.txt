@@ -12,6 +12,8 @@ else()
   set(PYTHON_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 endif() # PYTHONLIBS_FOUND
 
+add_subdirectory(utilities)
+
 include (CommonInterfaces)
 
 include_directories(${PYTHON_INCLUDE_PATH})

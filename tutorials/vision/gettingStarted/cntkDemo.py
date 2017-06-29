@@ -19,10 +19,13 @@ def main():
         
     # ModelConfig for VGG16 model from CNTK Model Gallery
     # Follow the instructions in README.md to download the model if you intend to use it.
-    helper = mh.ModelHelper(["VGG16_ImageNet_Caffe.model"], "cntkVgg16ImageNetLabels.txt", scaleFactor=1.0)
+    helper = mh.ModelHelper("VGG16ImageNet", ["VGG16_ImageNet_Caffe.model"], "cntkVgg16ImageNetLabels.txt", scaleFactor=1.0)
 
     # Import the model
     model = get_ell_predictor(helper)
+
+    # Save the model
+    helper.save_ell_predictor_to_file(model, "vgg16ImageNet.map", intervalMs = 100)
 
     camera = 0
     if (len(sys.argv) > 1):

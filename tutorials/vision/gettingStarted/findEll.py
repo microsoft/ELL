@@ -5,7 +5,7 @@ import os
 currentPath = os.path.dirname(os.path.abspath(__file__))
 os.chdir(currentPath)  # make sure we are in this directory.
 
-buildDir = "./../../../build"
+buildDir = "./../../../../build"
 ellPyPath = buildDir + "/interfaces/python/ELL.py"
 if (not os.path.exists(ellPyPath)):
     # see if user is in the source directory
@@ -22,8 +22,10 @@ if (not os.path.exists(releasePath)):
     sys.exit(1)    
 
 sys.path.append(buildDir + '/interfaces/python')
+sys.path.append(buildDir + '/interfaces/python/utilities')
 sys.path.append(buildDir + '/interfaces/python/Release')
 sys.path.append(buildDir + '/tools/importers/CNTK')
 sys.path.append(buildDir + '/tools/importers/Darknet')
 
 import ELL
+import ell_utilities

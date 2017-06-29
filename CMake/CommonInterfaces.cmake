@@ -144,8 +144,10 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
         DEPENDS ${generated_sources})
     else()
       if(SWIG_FOUND)
+        set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_SRC} ${INTERFACE_INCLUDE})
         swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
         swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} ${INTERFACE_LIBRARIES} common evaluators functions model nodes predictors trainers utilities emitters)
+
       else()
         add_custom_target(${PREPEND_TARGET}${module_name} 
           DEPENDS ${generated_sources})
