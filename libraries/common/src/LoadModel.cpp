@@ -28,6 +28,7 @@
 #include "MultiplexerNode.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "ProtoNNPredictorNode.h"
+#include "ReorderDataNode.h"
 #include "SinkNode.h"
 #include "SourceNode.h"
 #include "UnaryOperationNode.h"
@@ -234,6 +235,9 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::NeuralNetworkPredictorNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ProtoNNPredictorNode>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleForestPredictorNode>();
 

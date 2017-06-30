@@ -36,6 +36,7 @@ namespace nodes
     public:
         static constexpr size_t Dimension = 3;
 
+        DataShape() = default;
         DataShape(const std::array<size_t, Dimension>& extent);
         DataShape(const std::array<size_t, Dimension>& extent, const std::array<size_t, Dimension>& padding);
         DataShape(const std::array<size_t, Dimension>& extent, const std::array<size_t, Dimension>& padding, const std::array<size_t, Dimension>& order);

@@ -195,12 +195,12 @@ void TestArchiveNeuralNetworkLayerNodes()
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
         auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
     }
-    auto numNodes = model.Size();
 
     // Refine the model
     model::TransformContext transformContext;
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, transformContext, 1);
+    auto numNodes = refinedModel.Size();
 
     // Archive the model
     utilities::SerializationContext context;

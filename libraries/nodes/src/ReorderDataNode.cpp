@@ -127,8 +127,8 @@ namespace nodes
     void DataShape::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["extent"] << std::vector<size_t>{_extent.begin(), _extent.end()};
-        archiver["stride"] << std::vector<size_t>{_stride.begin(), _extent.end()};
-        archiver["offset"] << std::vector<size_t>{_offset.begin(), _extent.end()};
+        archiver["stride"] << std::vector<size_t>{_stride.begin(), _stride.end()};
+        archiver["offset"] << std::vector<size_t>{_offset.begin(), _offset.end()};
         archiver["size"] << _totalSize;
     }
 
