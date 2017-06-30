@@ -370,7 +370,7 @@ public:
     std::vector<double> ComputeDouble(const std::vector<double>& inputData);
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);
     void Save(const std::string& filePath) const;
-
+    
 private:
     std::shared_ptr<ell::model::DynamicMap> _map;
 };

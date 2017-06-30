@@ -74,6 +74,11 @@ namespace predictors
         /// in this vector receives its input from the input layer. </param>
         NeuralNetworkPredictor(InputLayerReference&& inputLayer, Layers&& layers);
 
+        /// <summary> Returns the input layer. </summary>
+        ///
+        /// <returns> The underlying input layer. </returns>
+        const neural::InputLayer<ElementType>& GetInputLayer() const { return *_inputLayer; }
+
         /// <summary> Returns the underlying layers. </summary>
         ///
         /// <returns> The underlying vector of layers. </returns>

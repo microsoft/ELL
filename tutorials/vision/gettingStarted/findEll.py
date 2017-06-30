@@ -16,10 +16,11 @@ if (not os.path.exists(ellPyPath)):
     print("Could not find '" + ellPyPath + "', did you follow the ELL Python Binding build instructions?")
     sys.exit(1)    
 
-releasePath = buildDir + "/interfaces/python/Release"
-if (not os.path.exists(releasePath)):
-    print("Could not find '" + releasePath + "', did you build the Release configuration as per the README instructions?")
-    sys.exit(1)    
+if sys.platform == 'win32':
+    releasePath = buildDir + "/interfaces/python/Release"
+    if (not os.path.exists(releasePath)):
+        print("Could not find '" + releasePath + "', did you build the Release configuration as per the README instructions?")
+
 
 sys.path.append(buildDir + '/interfaces/python')
 sys.path.append(buildDir + '/interfaces/python/utilities')

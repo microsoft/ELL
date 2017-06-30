@@ -8,6 +8,7 @@
 
 #include "NeuralNetworkPredictorNode.h"
 #include "ConstantNode.h"
+#include "ReorderDataNode.h"
 
 // data
 #include "DenseDataVector.h"
@@ -76,8 +77,17 @@ namespace nodes
     {
         auto newInputElements = transformer.TransformPortElements(_input.GetPortElements());
 
-        size_t prevOutputSize = _input.Size();
-        auto layerInputs = newInputElements;
+        const auto& inputLayer = _predictor.GetInputLayer();
+        auto inputShape = inputLayer.GetInputShape();
+        auto outputPadding = inputLayer.GetLayerParameters().outputPaddingParameters;
+        auto padding = outputPadding.paddingSize;
+
+        DataShape inputNodeInputShape({ inputShape[0], inputShape[1], inputShape[2] });
+        DataShape inputNodeOutputShape({ inputShape[0] + padding, inputShape[1] + padding, inputShape[2] }, { padding, padding, 0 });
+        auto padedInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInputElements, inputNodeInputShape, inputNodeOutputShape);
+
+        size_t prevOutputSize = GetShapeSize(inputLayer.GetOutputShape());
+        auto layerInputs = model::PortElements<ValueType>(padedInputNode->output);
         Node* lastNode = nullptr;
         for (const auto& layer : _predictor.GetLayers())
         {

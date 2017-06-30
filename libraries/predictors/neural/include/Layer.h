@@ -153,19 +153,13 @@ namespace neural
         ///
         /// <returns> `true` if the layer is of the queried layer type. </returns>
         template <class LayerType>
-        bool IsA() const
-        {
-            return dynamic_cast<LayerType*>(this) != nullptr;
-        }
+        bool IsA() const { return dynamic_cast<LayerType*>(this) != nullptr; }
 
         /// <summary> Used to get a layer as a specific type. </summary>
         ///
         /// <returns> Reference to the layer as a specific layer type. </returns>
         template <class LayerType>
-        LayerType& As()
-        {
-            return *(dynamic_cast<LayerType*>(this));
-        }
+        LayerType& As() { return *(dynamic_cast<LayerType*>(this)); }
 
         /// <summary> Computes the output of the layer via a forward feed of the configured input.
         ///           This is a no-op for this layer type. </summary>
