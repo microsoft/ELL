@@ -20,9 +20,9 @@ namespace neural
         Layer<ElementType>(layerParameters),
         _convolutionalParameters(convolutionalParameters),
         _weights(std::move(weights)),
-        _shapedInput(convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding()),
-        _weightsMatrix(_layerParameters.outputShape[2], convolutionalParameters.receptiveField * convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()),
-        _outputMatrix(NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding())
+        _shapedInput { _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding() },
+        _weightsMatrix(_layerParameters.outputShape[2], _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()),
+        _outputMatrix{ NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding() }
     {
         if(_weights.GetDataPointer() == nullptr)
         {
@@ -44,24 +44,7 @@ namespace neural
             }
         }
 
-        if (_convolutionalParameters.method == ConvolutionMethod::columnwise)
-        {
-            // Use the columnwise method
-            // Reshape the weights
-            auto flattened = _weights.ReferenceAsMatrix();
-            for (size_t startRow = 0; startRow < flattened.NumRows() / convolutionalParameters.receptiveField; startRow++)
-            {
-                for (size_t row = 0; row < convolutionalParameters.receptiveField; row++)
-                {
-                    auto weightsVector = flattened.GetMajorVector(startRow * convolutionalParameters.receptiveField + row);
-                    for (size_t i = 0; i < weightsVector.Size(); i++)
-                    {
-                        const size_t columnOffset = row * weightsVector.Size();
-                        _weightsMatrix(startRow, columnOffset + i) = weightsVector[i];
-                    }
-                }
-            }
-        }
+        ComputeWeightsMatrix();
     }
 
     template <typename ElementType>
@@ -178,12 +161,10 @@ namespace neural
 
         archiver["receptiveField"] << _convolutionalParameters.receptiveField;
         archiver["stride"] << _convolutionalParameters.stride;
-        archiver["method"] << static_cast<int>(_convolutionalParameters.receptiveField);
+        archiver["method"] << static_cast<int>(_convolutionalParameters.method);
         archiver["numFiltersAtATime"] << static_cast<int>(_convolutionalParameters.numFiltersAtATime);
         
-        math::MatrixArchiver::Write(_shapedInput, "shapedInput", archiver);
-        math::MatrixArchiver::Write(_weightsMatrix, "weightsMatrix", archiver);
-        math::MatrixArchiver::Write(_outputMatrix, "outputMatrix", archiver);
+        math::TensorArchiver::Write(_weights, "weights", archiver);
     }
 
     template <typename ElementType>
@@ -193,14 +174,48 @@ namespace neural
 
         archiver["receptiveField"] >> _convolutionalParameters.receptiveField;
         archiver["stride"] >> _convolutionalParameters.stride;
-        archiver["method"] >> static_cast<int>(_convolutionalParameters.receptiveField);
-        archiver["numFiltersAtATime"] >> static_cast<int>(_convolutionalParameters.numFiltersAtATime);
+        int method;
+        archiver["method"] >> method;
+        _convolutionalParameters.method = static_cast<ConvolutionMethod>(method);
+        int numFilters;
+        archiver["numFiltersAtATime"] >> numFilters;
+        _convolutionalParameters.numFiltersAtATime = static_cast<size_t>(numFilters);
 
-        math::MatrixArchiver::Read(_shapedInput, "shapedInput", archiver);
-        math::MatrixArchiver::Read(_weightsMatrix, "weightsMatrix", archiver);
-        math::MatrixArchiver::Read(_outputMatrix, "outputMatrix", archiver);
+        math::TensorArchiver::Read(_weights, "weights", archiver);
+        ComputeWeightsMatrix();
+        InitializeIOMatrices();
     }
 
+    template <typename ElementType>
+    void ConvolutionalLayer<ElementType>::ComputeWeightsMatrix()
+    {
+        _weightsMatrix = {_layerParameters.outputShape[2], _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()};
+        if (_convolutionalParameters.method == ConvolutionMethod::columnwise)
+        {
+            // Use the columnwise method
+            // Reshape the weights
+            auto flattened = _weights.ReferenceAsMatrix();
+            for (size_t startRow = 0; startRow < flattened.NumRows() / _convolutionalParameters.receptiveField; startRow++)
+            {
+                for (size_t row = 0; row < _convolutionalParameters.receptiveField; row++)
+                {
+                    auto weightsVector = flattened.GetMajorVector(startRow * _convolutionalParameters.receptiveField + row);
+                    for (size_t i = 0; i < weightsVector.Size(); i++)
+                    {
+                        const size_t columnOffset = row * weightsVector.Size();
+                        _weightsMatrix(startRow, columnOffset + i) = weightsVector[i];
+                    }
+                }
+            }
+        }
+    }
+
+    template <typename ElementType>
+    void ConvolutionalLayer<ElementType>::InitializeIOMatrices()
+    {
+        _shapedInput = { _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding() };
+        _outputMatrix =  { NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding() };
+    }
 }
 }
 }

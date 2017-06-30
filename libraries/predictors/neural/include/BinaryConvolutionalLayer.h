@@ -126,6 +126,9 @@ namespace neural
         // The number of columns is equal to the number of locations that a filter is slide over the input tensor.
         void ReceptiveFieldToColumns(ConstTensorReferenceType input, MatrixType& shapedInput);
 
+        void ComputeWeightsMatrix();
+        void InitializeIOMatrices();
+
         using Layer<ElementType>::_layerParameters;
         using Layer<ElementType>::_output;
 

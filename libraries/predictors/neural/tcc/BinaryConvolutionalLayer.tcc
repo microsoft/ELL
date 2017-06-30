@@ -301,9 +301,7 @@ namespace neural
         archiver["binarizedShapedInput_values"] << temp;
         archiver["filterMeans"] << _filterMeans;
 
-        math::MatrixArchiver::Write(_realValuedShapedInput, "realValuedShapedInput", archiver);
         math::MatrixArchiver::Write(_realValuedWeightsMatrix, "realValuedWeightsMatrix", archiver);
-        math::MatrixArchiver::Write(_realValuedOutputMatrix, "realValuedOutputMatrix", archiver);
     }
 
     template <typename ElementType>
@@ -313,7 +311,9 @@ namespace neural
 
         archiver["receptiveField"] >> _convolutionalParameters.receptiveField;
         archiver["stride"] >> _convolutionalParameters.stride;
-        archiver["method"] >> static_cast<int>(_convolutionalParameters.receptiveField);
+        int method;
+        archiver["method"] >> method;
+        _convolutionalParameters.method = static_cast<BinaryConvolutionMethod>(method);
 
         size_t numVectors = 0;
         std::vector<uint64_t> temp;
@@ -343,9 +343,15 @@ namespace neural
         }
         archiver["filterMeans"] >> _filterMeans;
 
-        math::MatrixArchiver::Read(_realValuedShapedInput, "realValuedShapedInput", archiver);
         math::MatrixArchiver::Read(_realValuedWeightsMatrix, "realValuedWeightsMatrix", archiver);
-        math::MatrixArchiver::Read(_realValuedOutputMatrix, "realValuedOutputMatrix", archiver);
+        InitializeIOMatrices();
+    }
+
+    template <typename ElementType>
+    void BinaryConvolutionalLayer<ElementType>::InitializeIOMatrices()
+    {
+        _realValuedShapedInput = { _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding() };
+        _realValuedOutputMatrix = { NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding() };
     }
 }
 }

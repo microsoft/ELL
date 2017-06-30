@@ -115,6 +115,8 @@ namespace neural
         // Fills a matrix (backed by the array outputMatrix) where the columns the set of input values corresponding to a filter, stretched into a vector.
         // The number of columns is equal to the number of locations that a filter is slide over the input tensor.
         void ReceptiveFieldToColumns(ConstTensorReferenceType input, MatrixType& shapedInput);
+        void ComputeWeightsMatrix();
+        void InitializeIOMatrices();
 
         using Layer<ElementType>::_layerParameters;
         using Layer<ElementType>::_output;
