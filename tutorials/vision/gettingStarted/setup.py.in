@@ -1,0 +1,15 @@
+# setup.py
+import distutils
+from distutils.core import setup, Extension
+
+# Replace the extension name, sources and extra_objects with the names that match your model 
+${ELL_model}=Extension('_${ELL_model}',
+    sources=['${ELL_model}.i'],
+    swig_opts=['-modern', '-c++', '-py3', '-Fmicrosoft', '-I${CMAKE_SOURCE_DIR}/interfaces/common', '-I${CMAKE_SOURCE_DIR}/interfaces/common/include', '-I${CMAKE_SOURCE_DIR}/libraries/emitters/include'],
+    include_dirs=['${CMAKE_SOURCE_DIR}/interfaces/common', '${CMAKE_SOURCE_DIR}/interfaces/common/include', '${CMAKE_SOURCE_DIR}/libraries/emitters/include'],
+    extra_objects=['${ELL_model}.${OBJECT_EXTENSION}']
+    )
+
+setup(name = "${ELL_model} model from ELL",
+      version = "0.0.1",
+      ext_modules = [${ELL_model}])

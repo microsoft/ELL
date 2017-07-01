@@ -92,4 +92,27 @@ classification labels at the top, like this:
 
 ## Compilation
 
-Ok, now on to [compiling](compiling.md) the model for Raspberry Pi.
+Ok, now on to compiling. A sample script for the the CNTK VGG16 ImageNet model was created for you. 
+
+On Windows, run 
+
+    compile_vgg16ImageNet.cmd
+
+On Linux, run
+
+    ./compile_vggImageNet.sh
+
+This script will:
+
+* Compile the model from ELL, emitting LLV IR
+* Compiling the LLVM IR, generating model object file
+* Generate SWIG interface (for Python bindings)
+* Running disutils setup to compile and link model + SWIG wrappers into a Python module, and install package locally
+
+The compiled model can now also be accessed from Python. To create a compiled model for the Raspberry Pi, copy the files in this directory over and run the compile script on the Pi.
+
+To test it out, run the compiled model demo app:
+
+    python compiledCntkDemo.py
+    
+
