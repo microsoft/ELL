@@ -44,7 +44,7 @@ function (get_llvm_config_list options output_var)
 endfunction()
 
 # First try to use LLVM's CMake target (see http://llvm.org/releases/3.7.0/docs/CMake.html for documentation)
-find_package(LLVM 3.9 PATHS /usr/local/opt)
+find_package(LLVM 3.9 PATHS /usr/local/opt QUIET)
 
 if(LLVM_FOUND)
     # Find the libraries we wish to use

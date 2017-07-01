@@ -15,6 +15,7 @@ endif()
 
 set (TUTORIAL_NAME GettingStarted)
 set (PYTHON_TUTORIALS
+    coffeemug.jpg
     compiledCntkDemo.py
     compiledDarknetDemo.py
     cntk.md
@@ -48,5 +49,6 @@ foreach(MODEL_IN ${SAMPLE_MODELS})
     set(ELL_model ${MODEL_IN})
     configure_file(setup.py.in ${MODEL_IN}_setup.py)
     configure_file(compileModel.cmd.in compile_${MODEL_IN}.cmd)
+    configure_file(compileModel.sh.in compile_${MODEL_IN}.sh)
 endforeach()
 

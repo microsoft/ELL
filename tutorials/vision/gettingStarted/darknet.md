@@ -68,15 +68,15 @@ classification labels at the top, like this:
 
 ## Compilation
 
-Ok, now on to compiling. A sample script for the the Darknet Referencet model was created for you. 
+Ok, now on to compiling. A sample script for the the Darknet Reference model was created for you. 
 
 On Windows, run 
 
     compile_darknetReference.cmd
 
-On Linux, run
+On Linux / Mac, run
 
-    ./compile_darknetReference.sh
+    sh compile_darknetReference.sh
 
 This script will:
 

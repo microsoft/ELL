@@ -100,11 +100,11 @@ On Windows, run
 
 On Linux, run
 
-    ./compile_vggImageNet.sh
+    sh compile_vggImageNet.sh
 
 This script will:
 
-* Compile the model from ELL, emitting LLV IR
+* Compile the model from ELL, emitting LLVM IR
 * Compiling the LLVM IR, generating model object file
 * Generate SWIG interface (for Python bindings)
 * Running disutils setup to compile and link model + SWIG wrappers into a Python module, and install package locally
