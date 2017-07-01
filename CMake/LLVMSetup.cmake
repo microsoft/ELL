@@ -44,7 +44,8 @@ function (get_llvm_config_list options output_var)
 endfunction()
 
 # First try to use LLVM's CMake target (see http://llvm.org/releases/3.7.0/docs/CMake.html for documentation)
-find_package(LLVM QUIET CONFIG PATHS /usr/local/opt/llvm /usr/local/opt/llvm/lib/cmake/llvm )
+find_package(LLVM 3.9 PATHS /usr/local/opt)
+
 if(LLVM_FOUND)
     # Find the libraries we wish to use
     get_llvm_config_list("--libs;all" LLVM_LIBS)
@@ -71,7 +72,7 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
 
     if(NOT EXISTS ${LLVM_INCLUDEROOT})
         set(LLVM_FOUND FALSE)
-        return() 
+        return()
     endif()
     set(LLVM_FOUND TRUE)
 
@@ -79,9 +80,9 @@ elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try insta
     set(LLVM_INCLUDE_DIRS ${LLVM_INCLUDEROOT})
     set(LLVM_LIBRARY_DIRS ${LLVM_LIBROOT_RELEASE})
     set(LLVM_TOOLS_BINARY_DIR ${LLVM_PACKAGE_DIR}/build/native/tools)
-        
+
     set(LLVM_DEFINITIONS /D_SCL_SECURE_NO_WARNINGS)
-    # Warnings that must be disabled. See LLVM documentation. 
+    # Warnings that must be disabled. See LLVM documentation.
     set(LLVM_COMPILE_OPTIONS /wd4141 /wd4146 /wd4180 /wd4244 /wd4258 /wd4267 /wd4291 /wd4345 /wd4351 /wd4355 /wd4456 /wd4457 /wd4458 /wd4459 /wd4503 /wd4624 /wd4722 /wd4800 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702 /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4805 /wd4204 /wd4577 /wd4091 /wd4592 /wd4319 /wd4324 /wd4996)
 
     # Required to compile against LLVM libraries. See LLVM documentation
