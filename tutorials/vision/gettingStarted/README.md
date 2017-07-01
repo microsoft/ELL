@@ -29,7 +29,7 @@ static images or .mp4 videos and process those instead.
     ~~~~
 
 5. You will need to build ELL and the 
-[ELL Python Language Bindings](../../../interfaces/README.MD). (You will need to build ELL after you install Python, so that the `CMake` step picks up on the fact that you have Python
+[ELL Python Language Bindings](../../../interfaces/README.md). (You will need to build ELL after you install Python, so that the `CMake` step picks up on the fact that you have Python
 3.6 installed.)
 
 ### Downloading a pre-trained model
