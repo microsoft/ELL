@@ -28,5 +28,16 @@ sys.path.append(buildDir + '/interfaces/python/Release')
 sys.path.append(buildDir + '/tools/importers/CNTK')
 sys.path.append(buildDir + '/tools/importers/Darknet')
 
-import ELL
-import ell_utilities
+try:
+    __import__("ELL")
+    __import__("ell_utilities")
+except:
+    print("====================================================================")
+    print("ELL module is not loading")
+    print("It is possible that you need to add LibOpenBLAS to your system path (See Install-*.md) from root of this repo")
+    if sys.platform == 'win32':
+        print("We have Intel versions here: " + os.path.abspath(buildDir + '/../external/OpenBLASLibs.0.2.19.2/build/native/x64/'))
+        print("You need to use the one that matches your computer chip model")
+        print("   'haswell' works for haswell and broadwell chips")
+        print("   'sandybridge' works for sandy bridge and ivy bridge chips")
+    print("====================================================================")

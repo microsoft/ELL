@@ -78,13 +78,16 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/private AND EXISTS ${CMAKE_SOURCE_DIR}/private/CMa
 endif()
 
 # Add SWIG-generated interfaces
-find_package(SWIG 3.0.12)
+
+include (CommonInterfaces)
+
 if(NOT SWIG_FOUND)
-  message(WARNING "SWIG not found, interfaces and projects that depend on them will not build properly. \
-                  They are not part of the default make targets, so can be skipped. \
-                  If you want to build interfaces (such as the Python bindings), follow the instructions in INSTALL-XXXXX.md file to install SWIG.\
-                  Then delete the CMakeCache.txt file from your build directory run the cmake command again.")
+    message(WARNING "SWIG not found, interfaces and projects that depend on them will not build properly. \
+                    They are not part of the default make targets, so can be skipped. \
+                    If you want to build interfaces (such as the Python bindings), follow the instructions in INSTALL-XXXXX.md file to install SWIG.\
+                    Then delete the CMakeCache.txt file from your build directory run the cmake command again.")
 endif()
+
 add_subdirectory(interfaces)
 
 # Add examples (has dependencies on SWIG-generated interfaces)

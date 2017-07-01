@@ -4,9 +4,22 @@
 
 # NOTE: Interfaces are not part of the ALL target, they must be built explicitly.
 # On Windows, this can be done by right-clicking on the specific language wrapper
-# project and choosing *Build*. e.g. _Ell_Python project.
+# project and choosing *Build*. e.g. _ELL_python project.
 # On Linux and Mac, this can be done by call *make* on the specific language wrapper e.g.
-# make _Ell_python
+# make _ELL_python
+
+cmake_minimum_required(VERSION 2.8.11)
+
+if (WIN32 AND NOT SWIG_FOUND) 
+  if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../external/swigwintools.3.0.12/tools/swigwin-3.0.12/swig.exe")
+    set(SWIG_DIR "${CMAKE_CURRENT_LIST_DIR}/../external/swigwintools.3.0.12/tools/swigwin-3.0.12")
+    set(SWIG_EXECUTABLE "${SWIG_DIR}/swig.exe")
+    set(SWIG_VERSION "3.0.12")
+    set(SWIG_FOUND TRUE)
+  endif()
+endif()
+    
+find_package(SWIG 3.0.12)
 
 #
 # Common macro to create swig-generated language wrappers
@@ -26,8 +39,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
 
   string(TOLOWER "${LANGUAGE_NAME}" language)
   
-  cmake_minimum_required(VERSION 2.8.11)
-  find_package(SWIG 3.0.12)
+
   if(SWIG_FOUND)
     include(${SWIG_USE_FILE})
   else()
