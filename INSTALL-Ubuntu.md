@@ -20,6 +20,14 @@ Next, you will need *gcc* and [*CMake*](https://cmake.org/). They are often inst
 
     sudo apt-get install -y gcc cmake
 
+The current version on Ubuntu is 3.7.2, but build may require version 3.9 (which is currently in rc5). To get version 3.9.x 
+    
+    wget https://cmake.org/files/v3.9/cmake-3.9.0-rc5.tar.gz
+    tar zxvf cmake-3.9.0-rc5.tar.gz && cd cmake-3.9.0-rc5
+    ./bootstrap
+    make
+    sudo make install
+
 ##### LLVM
 You will also need the dev version of [*LLVM-3.9*](http://llvm.org/). At the time of writing this document, `apt-get` doesn't yet have the required version of LLVM. To check this, type
 
