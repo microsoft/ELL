@@ -20,7 +20,9 @@ Next, you will need *gcc* and [*CMake*](https://cmake.org/). They are often inst
 
     sudo apt-get install -y gcc cmake
 
-The current version on Ubuntu is 3.7.2, but build may require version 3.9 (which is currently in rc5). To get version 3.9.x 
+The current version of CMake on Ubuntu 16.04 is 3.5.1, which appears to build just fine. 
+
+On Ubuntu 17.04, CMake is version 3.7.2, but build may require version 3.9 (which is currently in rc5). To get version 3.9.x 
     
     wget https://cmake.org/files/v3.9/cmake-3.9.0-rc5.tar.gz
     tar zxvf cmake-3.9.0-rc5.tar.gz && cd cmake-3.9.0-rc5
