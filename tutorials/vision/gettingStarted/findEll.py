@@ -26,7 +26,7 @@ sys.path.append(buildDir + '/interfaces/python')
 sys.path.append(buildDir + '/interfaces/python/utilities')
 sys.path.append(buildDir + '/interfaces/python/Release')
 sys.path.append(buildDir + '/tools/importers/CNTK')
-sys.path.append(buildDir + '/tools/importers/Darknet')
+sys.path.append(buildDir + '/tools/importers/darknet')
 
 try:
     __import__("ELL")
