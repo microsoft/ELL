@@ -581,7 +581,7 @@ namespace emitters
         //
         llvm::LLVMContext& _llvmContext; // LLVM global context
         IREmitter _emitter;
-        std::stack<std::pair<IRFunctionEmitter, llvm::BasicBlock*>> _functionStack; // contains the block we were emitting code into when we paused to emit a new function
+        std::stack<std::pair<IRFunctionEmitter, llvm::IRBuilder<>::InsertPoint>> _functionStack; // contains the location we were emitting code into when we paused to emit a new function
 
         IRVariableTable _literals; // Symbol table - name to literals
         IRVariableTable _globals; // Symbol table - name to global variables

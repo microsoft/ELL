@@ -462,12 +462,17 @@ namespace emitters
         /// <summary> Get the current insert point for new instructions. </summary>
         ///
         /// <returns> Pointer to the current instruction. </returns>
-        llvm::Instruction* GetCurrentInsertPoint() { return &(*_irBuilder.GetInsertPoint()); }
+        llvm::IRBuilder<>::InsertPoint GetCurrentInsertPoint() { return _irBuilder.saveIP(); }
 
         /// <summary> Sets the current code block, which all emitted instructions are being written to. </summary>
         ///
         /// <param name="pBlock"> Pointer to the block being set to be the current block. </param>
         void SetCurrentBlock(llvm::BasicBlock* pBlock);
+
+        /// <summary> Sets the current insertion point. </summary>
+        ///
+        /// <param name="pos"> Pointer to the instruction to place new instructions after. </param>
+        void SetCurrentInsertPoint(llvm::IRBuilder<>::InsertPoint pos);
 
         /// <summary> Sets the current insertion point. </summary>
         ///

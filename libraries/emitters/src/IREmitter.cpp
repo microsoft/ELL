@@ -688,13 +688,14 @@ namespace emitters
         }
     }
 
+    void IREmitter::SetCurrentInsertPoint(llvm::IRBuilder<>::InsertPoint pos)
+    {
+        _irBuilder.restoreIP(pos);
+    }
+
     void IREmitter::SetCurrentInsertPoint(llvm::Instruction* pos)
     {
-        // assert(pos != nullptr);
-        if (pos != nullptr)
-        {
-            _irBuilder.SetInsertPoint(pos);
-        }
+        _irBuilder.SetInsertPoint(pos);
     }
 
     //

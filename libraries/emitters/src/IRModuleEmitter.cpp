@@ -82,37 +82,37 @@ namespace emitters
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType)
     {
-        auto currentBlock = _emitter.GetCurrentBlock();
+        auto currentPos = _emitter.GetCurrentInsertPoint();
         // assert(currentBlock != nullptr);
         IRFunctionEmitter newFunction = Function(functionName, returnType, ValueTypeList{}, true);
-        _functionStack.emplace(newFunction, currentBlock);
+        _functionStack.emplace(newFunction, currentPos);
         return _functionStack.top().first;
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, const ValueTypeList& args)
     {
-        auto currentBlock = _emitter.GetCurrentBlock();
+        auto currentPos = _emitter.GetCurrentInsertPoint();
         // assert(currentBlock != nullptr);
         IRFunctionEmitter newFunction = Function(functionName, returnType, args, true);
-        _functionStack.emplace(newFunction, currentBlock);
+        _functionStack.emplace(newFunction, currentPos);
         return _functionStack.top().first;
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, const NamedVariableTypeList& args)
     {
-        auto currentBlock = _emitter.GetCurrentBlock();
+        auto currentPos = _emitter.GetCurrentInsertPoint();
         // assert(currentBlock != nullptr);
         IRFunctionEmitter newFunction = Function(functionName, returnType, args, true);
-        _functionStack.emplace(newFunction, currentBlock);
+        _functionStack.emplace(newFunction, currentPos);
         return _functionStack.top().first;
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes)
     {
-        auto currentBlock = _emitter.GetCurrentBlock();
+        auto currentPos = _emitter.GetCurrentInsertPoint();
         // assert(currentBlock != nullptr);
         IRFunctionEmitter newFunction = Function(functionName, returnType, argTypes, true);
-        _functionStack.emplace(newFunction, currentBlock);
+        _functionStack.emplace(newFunction, currentPos);
         return _functionStack.top().first;
     }
 
@@ -137,7 +137,7 @@ namespace emitters
         _functionStack.pop();
 
         auto currentFunction = currentFunctionInfo.first;
-        auto previousBlock = currentFunctionInfo.second;
+        auto previousPos = currentFunctionInfo.second;
         if (currentFunction.GetFunction() != nullptr)
         {
             // only put a return here if this block doesn't already have one
@@ -156,7 +156,7 @@ namespace emitters
             currentFunction.ConcatRegions();
             currentFunction.CompleteFunction(GetCompilerParameters().optimize);
         }
-        _emitter.SetCurrentBlock(previousBlock);
+        _emitter.SetCurrentInsertPoint(previousPos);
     }
 
     IRFunctionEmitter& IRModuleEmitter::GetCurrentFunction()

@@ -355,7 +355,7 @@ namespace emitters
         /// <summary> Gets the current insert point that code is being emitted into. </summary>
         ///
         /// <returns> The current insert point for new instructions. </returns>
-        llvm::Instruction* GetCurrentInsertPoint() { return _pEmitter->GetCurrentInsertPoint(); }
+        llvm::IRBuilder<>::InsertPoint GetCurrentInsertPoint() { return _pEmitter->GetCurrentInsertPoint(); }
 
         /// <summary> Set the block that subsequent code will go into. </summary>
         ///
@@ -363,6 +363,11 @@ namespace emitters
         ///
         /// <returns> The previous current block. </returns>
         llvm::BasicBlock* SetCurrentBlock(llvm::BasicBlock* pBlock);
+
+        /// <summary> Set the insert point for new code. </summary>
+        ///
+        /// <param name="pos"> The new insert point. </param>
+        void SetCurrentInsertPoint(llvm::IRBuilder<>::InsertPoint position);
 
         /// <summary> Set the insert point for new code. </summary>
         ///
@@ -953,7 +958,7 @@ namespace emitters
 
         private:
             IRFunctionEmitter& _function;
-            llvm::BasicBlock* _oldBlock;
+            llvm::IRBuilder<>::InsertPoint _oldPos;
             llvm::TerminatorInst* _termInst;
         };
 

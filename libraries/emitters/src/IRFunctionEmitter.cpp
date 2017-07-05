@@ -391,6 +391,11 @@ namespace emitters
         return pCurrentBlock;
     }
 
+    void IRFunctionEmitter::SetCurrentInsertPoint(llvm::IRBuilder<>::InsertPoint position)
+    {
+        _pEmitter->SetCurrentInsertPoint(position);
+    }
+
     void IRFunctionEmitter::SetCurrentInsertPoint(llvm::Instruction* position)
     {
         _pEmitter->SetCurrentInsertPoint(position);
@@ -492,12 +497,12 @@ namespace emitters
         : _function(function)
     {
         // Save current position
-        _oldBlock = function.GetCurrentBlock();
+        _oldPos = function.GetCurrentInsertPoint();
 
         auto entryBlock = function.GetEntryBlock();
         auto termInst = entryBlock->getTerminator();
         // If the function entry block contains a terminator, set the insert point
-        // to be just before the terminator. Otherwise, set the insert point
+        // to be just _before_ the terminator. Otherwise, set the insert point
         // to be in the entry block.
         if (termInst != nullptr)
         {
@@ -511,7 +516,7 @@ namespace emitters
 
     IRFunctionEmitter::EntryBlockScope::~EntryBlockScope()
     {
-        _function.SetCurrentBlock(_oldBlock);
+        _function.SetCurrentInsertPoint(_oldPos);
     }
 
     llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type)
