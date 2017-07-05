@@ -8,7 +8,7 @@
 
 #pragma once
 
-// OpenBlas
+// OpenBLAS
 #include "cblas.h"
 
 // stl

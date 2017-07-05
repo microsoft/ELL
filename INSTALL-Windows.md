@@ -19,7 +19,7 @@ A free version is available at <https://www.visualstudio.com/vs/community/>. Sel
 ELL uses the [*CMake*](https://cmake.org/) build system. You can download and install it from <https://cmake.org/download/>.
 
 ##### LLVM (as well as OpenBLAS and Doxygen)
-ELL depends on the [*LLVM*](http://llvm.org/) compiler framework. Optionally, it can take advantage of the fast linear algebra libraries in [*OpenBlas*](http://www.openblas.net/) and generate documentation using *Doxygen*. An easy way to get the prebuilt 64-bit version of LLVM and the optional dependencies is to use the [*NuGet*](https://www.nuget.org/) package manager (version 3.5 or newer). The relevant NuGet packages are specified in a config file in the `ELL/external` directory.  We recommend using the NuGet command line tool (NuGet CLI), which can be obtained by following the instructions at <https://docs.nuget.org/ndocs/guides/install-nuget>. After downloading NuGet CLI, change to the repository's root directory (`ELL`):
+ELL depends on the [*LLVM*](http://llvm.org/) compiler framework. Optionally, it can take advantage of the fast linear algebra libraries in [*OpenBLAS*](http://www.openblas.net/) and generate documentation using *Doxygen*. An easy way to get the prebuilt 64-bit version of LLVM and the optional dependencies is to use the [*NuGet*](https://www.nuget.org/) package manager (version 3.5 or newer). The relevant NuGet packages are specified in a config file in the `ELL/external` directory.  We recommend using the NuGet command line tool (NuGet CLI), which can be obtained by following the instructions at <https://docs.nuget.org/ndocs/guides/install-nuget>. After downloading NuGet CLI, change to the repository's root directory (`ELL`):
 
     cd ELL
 
@@ -30,7 +30,7 @@ and invoke the command
 NuGet will download the prerequisites into the `ELL/external` directory.
 
 By default, CMake will try to determine the correct version of the OpenBLAS library to use for your processor
-type. If you want to override the automatic choice, you can tell CMake which version to use by setting the `DPROCESSOR_HINT`
+type. If you want to override the automatic choice, you can tell CMake which version to use by setting the `PROCESSOR_HINT`
 cache variable when you initially call CMake.
 
 For Visual Studio 2015:

@@ -20,7 +20,7 @@ handy tools like `curl` which we will use later on.
 2. You will also need a simple web cam or a pi cam.  If you don't have one handy, we will show you how to load
 static images or .mp4 videos and process those instead.
 
-3. To read images from the camera, you will need [Open CV](http://opencv.org/). There are download instructions on the opencv website, but we also created a simple [Open CV setup](opencv.md) page for you.
+3. To read images from the camera, you will need [OpenCV](http://opencv.org/). There are download instructions on the opencv website, but we also created a simple [OpenCV setup](opencv.md) page for you.
 
 4. You also need  [NumPy](https://docs.scipy.org/doc/numpy-dev/user/quickstart.html) since ELL  processes images as NumPy arrays. `NumPy` can install using conda as follows:
 
@@ -29,7 +29,7 @@ static images or .mp4 videos and process those instead.
     ~~~~
 
 5. You will need to build ELL and the 
-[ELL Python Language Bindings](../../../interfaces/README.MD). (You will need to build ELL after you install Python, so that the `CMake` step picks up on the fact that you have Python
+[ELL Python Language Bindings](../../../interfaces/README.md). (You will need to build ELL after you install Python, so that the `CMake` step picks up on the fact that you have Python
 3.6 installed.)
 
 ### Downloading a pre-trained model

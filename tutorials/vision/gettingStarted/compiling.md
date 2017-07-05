@@ -3,7 +3,7 @@
 ELL provides a very cool neural net model compiler that can target a specific platform and produce optimized
 code for that platform.  This helps to make your models run faster on low end hardware.
 
-So we will take the models we loaded, either from [darknet](darknet.md) or [cntk](cntk.md) and compile them
+So we will take the models we loaded, either from [Darknet](darknet.md) or [CNTK](cntk.md) and compile them
 for Raspberry Pi.
 
 *Important* Before proceeding, first run the demo python script for the model of your choice (cntkDemo.py or darknetDemo.py). Besides loading the models, each script will convert the neural net to a .map file that represents the model in ELL's format. Depending on the neural network, the file can get quite large.

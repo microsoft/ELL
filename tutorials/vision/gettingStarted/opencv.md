@@ -1,6 +1,6 @@
 ## OpenCV
 
-The easiest way to install Open CV is with your *conda* environment. 
+The easiest way to install OpenCV is with your *conda* environment. 
 So if you chose to use *miniconda* or *anaconda* then you can simply do this
 from your activated py36 environment:
 
@@ -14,7 +14,7 @@ On Linux there are some good instructions here: [Installing OpenCV 3.2.0 for Pyt
 ### Super Advanced Users
 
 If you want to optimize OpenCV for your particular graphics card and get CUDA optimization, you can
-clone the opencv git repo, install the NVidia CUDA toolkit, then build the open cv sources yourself
+clone the opencv git repo, install the NVidia CUDA toolkit, then build the OpenCV sources yourself
 and get blazing fast performance.  
 
 Be sure to enable Python3 build of opencv by doing the following:

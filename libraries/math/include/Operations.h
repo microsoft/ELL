@@ -231,7 +231,7 @@ namespace math
     };
 
 #ifdef USE_BLAS
-    /// OpenBlas implementation of vector and matrix operations. Function arguments follow the following
+    /// OpenBLAS implementation of vector and matrix operations. Function arguments follow the following
     /// naming conventions: r,s,t represent scalars; u,v,w represent vectors; M,A,B represent matrices.
     template <>
     struct OperationsImplementation<ImplementationType::openBlas> : public DerivedOperations<OperationsImplementation<ImplementationType::openBlas>>

@@ -39,7 +39,7 @@ If you already have *LLVM* installed, ensure that you have version 3.9.
 
 ### Optional Dependencies (OpenBLAS and Doxygen)
 By default, ELL will use the *BLAS* linear algebra libraries built into the operating system, but it
-can optionally take advantage of the optimized linear algebra libraries in [*OpenBlas*](http://www.openblas.net/).
+can optionally take advantage of the optimized linear algebra libraries in [*OpenBLAS*](http://www.openblas.net/).
 ELL can also generate code documentation using *Doxygen*. To install these optional dependencies, type
 
     brew install homebrew/science/openblas
