@@ -13,7 +13,6 @@ The language bindings are generated using SWIG. To build them, you need to insta
 wget http://www.swig.org/download.htmlhttp://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
 tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12.tar
 ./configure --without-pcre && make && sudo make install
-
 ```
 * Windows:
 On windows we have already included a [Nuget package](https://www.nuget.org/packages/swigwintools/3.0.12) for swig in the initial setup, so you should be good to go!

@@ -28,7 +28,7 @@ def main():
     model = get_ell_predictor(helper)
 
     # Save the model
-    helper.save_ell_predictor_to_file(model, "darknetReference.map", intervalMs = 0)
+    helper.save_ell_predictor_to_file(model, "darknetReference.map")
 
     camera = 0
     if (len(sys.argv) > 1):

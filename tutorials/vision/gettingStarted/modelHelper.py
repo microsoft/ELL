@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
-import ell_utilities
 import time
 
 # Class to hold info about the model that the app needs to call the model and display result correctly
+
+
 class ModelHelper:
-    def __init__(self, modelName, modelFiles, labelsFile, inputHeightAndWidth = (224, 224), scaleFactor = 1/255, threshold = 0.25):
+    def __init__(self, modelName, modelFiles, labelsFile, inputHeightAndWidth=(224, 224), scaleFactor=1 / 255, threshold=0.25):
         """ Helper class to store information about the model we want to use.
         modelName - string name of the model
         modelFiles - list of strings containing darknet .cfg filename and darknet .weights filename, or CNTK model file name.
@@ -34,16 +35,17 @@ class ModelHelper:
 
     def get_top_n(self, predictions, N):
         """Return at most the top 5 predictions as a list of tuples that meet the threashold."""
-        topN = np.zeros([N,2])
+        topN = np.zeros([N, 2])
         for p in range(len(predictions)):
             for t in range(len(topN)):
                 if predictions[p] > topN[t][0]:
                     topN[t] = [predictions[p], p]
-                    break    
+                    break
         result = []
         for element in topN:
             if (element[0] > self.threshold):
-                result.append((self.labels[int(element[1])], round(element[0],2)))
+                result.append(
+                    (self.labels[int(element[1])], round(element[0], 2)))
         return result
 
     def resize_image(self, image, newSize):
@@ -54,7 +56,7 @@ class ModelHelper:
             colStart = int((image.shape[0] - image.shape[1]) / 2)
             colEnd = image.shape[1]
         else:
-            rowStart = int( (image.shape[1] - image.shape[0]) / 2)
+            rowStart = int((image.shape[1] - image.shape[0]) / 2)
             rowEnd = image.shape[0]
             colStart = 0
             colEnd = image.shape[0]
@@ -70,14 +72,18 @@ class ModelHelper:
         resized = resized * self.scaleFactor
         resized = resized.astype(np.float).ravel()
         return resized
-        
+
     def draw_label(self, image, label):
         """Helper to draw text onto an image"""
-        cv2.rectangle(image, (0, 0), (image.shape[1], 40), (50, 200, 50), cv2.FILLED)
-        cv2.putText(image, label, (10,25), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 2, 8)
+        cv2.rectangle(
+            image, (0, 0), (image.shape[1], 40), (50, 200, 50), cv2.FILLED)
+        cv2.putText(image, label, (10, 25),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 2, 8)
         return
-    
-    def save_ell_predictor_to_file(self, predictor, filePath, intervalMs = 0):
+
+    def save_ell_predictor_to_file(self, predictor, filePath, intervalMs=0):
+        import ell_utilities
+
         """Saves an ELL predictor to file so that it can be compiled to run on a device, with an optional stepInterval in milliseconds"""
         name = self.model_name
         if (intervalMs > 0):
@@ -98,9 +104,11 @@ class ModelHelper:
                 self.start = now
 
         label = "fps " + str(self.fps)
-        labelSize, baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+        labelSize, baseline = cv2.getTextSize(
+            label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
         width = image.shape[1]
         height = image.shape[0]
         pos = (width - labelSize[0] - 5, height - labelSize[1] - 1)
-        cv2.putText(image, label, pos, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 128), 2, 8)
+        cv2.putText(image, label, pos, cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, (0, 0, 128), 2, 8)
         self.frame_count = self.frame_count + 1

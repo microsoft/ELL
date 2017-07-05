@@ -3,8 +3,11 @@ import os
 import numpy as np
 import cv2
 
-import findEll
 import modelHelper as mh
+
+# Import the compiled model wrapper
+sys.path.append('build')
+sys.path.append('build/Release')
 import darknetReference as model
 
 def main():
