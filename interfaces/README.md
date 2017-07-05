@@ -33,10 +33,12 @@ Note: you can also use the full [Anaconda](https://www.continuum.io/downloads) i
 ```
 # Create the environment
 conda create -n py36 anaconda python=3
-# Activate the environment
+# Activate the environment Linux / Mac:
+source activate py36
+# Activate the environment Windows:
 activate py36
 # ELL requires gcc 5 and above for C++14. Upgrade anaconda's environment to support it.
-conda install libgcc 
+conda install libgcc
 ```
 3. Generate the python bindings. In the repository root directory from within the py36 anaconda environment:
 ```
@@ -44,7 +46,7 @@ mkdir build
 cd build
 cmake ..
 # Linux / Mac
-make _ELL_python 
+make _ELL_python
 # Windows
 cmake --build . --target _ELL_python --config Release
 ```
