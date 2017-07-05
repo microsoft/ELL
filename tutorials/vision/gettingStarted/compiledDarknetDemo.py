@@ -21,6 +21,8 @@ def main():
 
     # Pick the model you want to work with
     helper = mh.ModelHelper("darknetReference", ["darknet.cfg", "darknet.weights"], "darknetImageNetLabels.txt")
+    
+    lastPrediction = ""
 
     while (True):
         # grab a frame
@@ -39,11 +41,14 @@ def main():
 
         # Turn the top5 into a text string to display
         text = "".join([str(element[0]) + "(" + str(int(100*element[1])) + "%)  " for element in top5])
-        print(text)
+        if (text != lastPrediction):
+            print(text)
+            lastPrediction = text
 
         # Draw the text on the frame
         frameToShow = frame
         helper.draw_label(frameToShow, text)
+        helper.draw_fps(frameToShow)
 
         # Show the new frame
         cv2.imshow('frame', frameToShow)

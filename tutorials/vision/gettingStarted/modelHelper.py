@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import ell_utilities
+import time
 
 # Class to hold info about the model that the app needs to call the model and display result correctly
 class ModelHelper:
@@ -21,6 +22,9 @@ class ModelHelper:
         self.scaleFactor = scaleFactor
         self.threshold = threshold
         self.labels = self.load_labels(self.labels_file)
+        self.start = time.clock()
+        self.frame_count = 0
+        self.fps = 0
 
     def load_labels(self, fileName):
         labels = []
@@ -83,3 +87,20 @@ class ModelHelper:
         else:
             ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
             ell_map.Save(filePath)
+
+    def draw_fps(self, image):
+        now = time.clock()
+        if (self.frame_count > 0):
+            diff = now - self.start
+            if (diff >= 1):
+                self.fps = self.frame_count
+                self.frame_count = 0
+                self.start = now
+
+        label = "fps " + str(self.fps)
+        labelSize, baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+        width = image.shape[1]
+        height = image.shape[0]
+        pos = (width - labelSize[0] - 5, height - labelSize[1] - 1)
+        cv2.putText(image, label, pos, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 128), 2, 8)
+        self.frame_count = self.frame_count + 1

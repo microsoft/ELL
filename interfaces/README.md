@@ -14,8 +14,6 @@ wget http://www.swig.org/download.htmlhttp://prdownloads.sourceforge.net/swig/sw
 tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12.tar
 ./configure --without-pcre && make && sudo make install
 
-# May be required on some Linux systems (replace VERSION with the actual version on your system)
-sudo ln /lib/x86_64-linux-gnu/libpcre.so.VERSION /usr/lib/libpcre.so.1
 ```
 * Windows:
 On windows we have already included a [Nuget package](https://www.nuget.org/packages/swigwintools/3.0.12) for swig in the initial setup, so you should be good to go!

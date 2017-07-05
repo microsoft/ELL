@@ -10,13 +10,13 @@ mkdir build
 if ERRORLEVEL 1 goto :nodelete
 
 cd build
-cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..
+cmake -G "Visual Studio 14 2015 Win64" ..
 if ERRORLEVEL 1 goto :nocmake
 
-cmake --build . --config RelWithDebInfo
+cmake --build . --config Release
 if ERRORLEVEL 1 goto :builderror
 
-cmake --build . --target _ELL_python --config RelWithDebInfo
+cmake --build . --target _ELL_python --config Release
 
 goto :eof
 

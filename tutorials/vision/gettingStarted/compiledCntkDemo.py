@@ -42,6 +42,7 @@ def main():
         # Draw the text on the frame
         frameToShow = frame
         helper.draw_label(frameToShow, text)
+        helper.draw_fps(frameToShow)
 
         # Show the new frame
         cv2.imshow('frame', frameToShow)

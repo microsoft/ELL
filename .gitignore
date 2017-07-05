@@ -247,6 +247,13 @@ yotta_modules/
 yotta_targets/
 LaunchXslt/bin/**
 LaunchXslt/obj/**
-/tutorials/vision/gettingStarted/darknet.weights
-/tutorials/vision/gettingStarted/darknet.cfg
-/tutorials/vision/gettingStarted/darknetReference.map
+/linux
+/tutorials/vision/gettingStarted/*.weights
+/tutorials/vision/gettingStarted/*.cfg
+/tutorials/vision/gettingStarted/*.map
+/tutorials/vision/gettingStarted/*.lib
+/tutorials/vision/gettingStarted/*.exp
+/tutorials/vision/gettingStarted/darknetReference.py
+/tutorials/vision/gettingStarted/*.ll
+/tutorials/vision/gettingStarted/*.i.h
+/tutorials/vision/gettingStarted/*.i
