@@ -337,13 +337,23 @@ namespace utilities
         bool didFindOne = false;
         for (const auto& valName : val_names)
         {
-            if (valName.find(str) != std::string::npos)
+            bool matches = false;
+            if (str == "")
+            {
+                // find always finds "", so we need to be more precise here
+                matches = (valName == "");
+            }
+            else if (valName.find(str) != std::string::npos)
+            {
+                matches = true;
+            }
+            if (matches)
             {
                 if (didFindOne)
                 {
+                    // duplicate match, so it is ambiguous.
                     return false;
                 }
-
                 resultString = valName;
                 didFindOne = true;
             }

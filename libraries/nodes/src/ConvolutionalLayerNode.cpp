@@ -12,6 +12,23 @@
 #include "ReorderDataNode.h"
 #include "ReshapeImageNode.h"
 
+// BLAS
+#ifdef USE_BLAS
+#include "cblas.h"
+#else
+enum CBLAS_ORDER
+{
+    CblasRowMajor = 101,
+    CblasColMajor = 102
+};
+
+enum CBLAS_TRANSPOSE
+{
+    CblasNoTrans = 111,
+    CblasTrans = 112
+};
+#endif
+
 namespace ell
 {
 namespace nodes

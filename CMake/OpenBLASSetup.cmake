@@ -62,9 +62,12 @@ else()
 
         # Known registry ID (family, model) settings for various CPU types
         #
-        # Haswell: Family 6, model 60, 63, 69, 70
+        # Haswell: Family 6, model 60, 63, 69
+        # Broadwell: Family 6, Model 70, 79 (compatible with Haswell)
+        # Kobylake: Family 6, Model 78 (compatible with Haswell)
         # Sandybridge: Family 6, model 42, 45
-        # Skylake: Family 6, model 78
+        # Ivybridge: Family 6, model 58 (compatible with Sandybridge)
+        # Skylake: Family 6, model 42
 
         # We can set up a mapping from a detected processor generation to the version of
         # the OpenBLAS libraries to use with the set_processor_mapping macro. For instance,
@@ -73,7 +76,7 @@ else()
         # set_processor_mapping("skylake" "haswell")
 
         # Determine CPU type
-        set(supported_processors "haswell") # The list of processor-specific versions of OpenBLAS available in the package
+        list(APPEND supported_processors "haswell" "sandybridge") # The list of processor-specific versions of OpenBLAS available in the package
 
         get_filename_component(processor_id "[HKEY_LOCAL_MACHINE\\Hardware\\Description\\System\\CentralProcessor\\0;Identifier]" ABSOLUTE)
         string(REGEX REPLACE ".* Family ([0-9]+) .*" "\\1" processor_family "${processor_id}")
@@ -87,10 +90,14 @@ else()
                     set(processor_generation "haswell")
                 elseif(processor_model EQUAL 79)
                     set(processor_generation "haswell")  # technically this is broadwell, but it is compatible with haswell.
+                elseif (processor_model EQUAL 78)
+                    set(processor_generation "haswell") # technically this is Koby Lake, but it is compatible with haswell.
                 elseif(processor_model EQUAL 42 OR processor_model EQUAL 45)
                     set(processor_generation "sandybridge")
-                elseif(processor_model EQUAL 42 OR processor_model EQUAL 78)
-                    set(processor_generation "skylake")
+                elseif(processor_model EQUAL 58)
+                    set(processor_generation "sandybridge") # actually ivybridge, but it is compatible with sandybridge
+                elseif(processor_model EQUAL 42)
+                    set(processor_generation "sandybridge") # actually skylake, but it is compatible with sandybridge
                 else()
                     set(processor_generation "unknown")
                 endif()
