@@ -5,11 +5,8 @@ rem Pre-requisites: swig.exe in the PATH environment variable
 rem Generate example map
 ..\..\..\build\bin\Debug\makeExamples.exe -o map
 
-rem Generate model IR
-..\..\..\build\bin\Debug\compile.exe -imap ELL_step10.map -cfn Step10 -m clockStep -of ELL_step10.ll
-
-rem Generate swig interface and header
-..\..\..\build\bin\Debug\compile.exe -imap ELL_step10.map -cmn ELL_step10 -cfn Step10 -m clockStep -o swig -of ELL_step10.i
+rem Generate model IR, header, and SWIG interfaces
+..\..\..\build\bin\Debug\compile.exe -imap ELL_step10.map -cfn Step10 -m clockStep --ir --header --swig --blas
 
 rem Run swig
 mkdir output

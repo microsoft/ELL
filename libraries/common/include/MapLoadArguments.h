@@ -67,6 +67,11 @@ namespace common
         /// <returns> true if the arguments specify a map file or a model file. </returns>
         bool HasInputFilename() const { return HasMapFilename() || HasModelFilename(); }
 
+        /// <summary> Get the input model or map filename, if defined.. </summary>
+        ///
+        /// <returns> The input model or map filename specified by the user. If none are specified, returns the empty string. </returns>
+        std::string GetInputFilename() const;
+
         /// <summary> Get the input node for the loaded model, given the input definition string. </summary>
         ///
         /// <param name="model"> The model as specified by the input model filename </param>

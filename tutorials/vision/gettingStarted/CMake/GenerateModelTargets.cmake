@@ -35,12 +35,11 @@ function(generate_ell_model_compile_target model_name arch_name target_name demo
     # run commands to generate model files and invoke SWIG
 
     # ELL's compile tool
-    set(compile_options)
+    set(compile_options --blas)
     add_custom_command(
         OUTPUT ${compiled_output}
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map
-        COMMAND compile -imap ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map -cfn ${model_name} -of ${target_path}/${model_name}.ll ${compile_options}
-        COMMAND compile -imap ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map -cfn ${model_name} -cmn ${model_name} -o swig -of ${target_path}/${model_name}.i ${compile_options}
+        COMMAND compile -imap ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map -cfn ${model_name} -cmn ${model_name} -od ${target_path} --ir --swig ${compile_options}
         COMMENT "Generating ${compiled_output}")
 
     # llc

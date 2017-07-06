@@ -263,6 +263,37 @@ namespace utilities
         return needsReparse;
     }
 
+    void CommandLineParser::AddOption(std::string& option, std::string name, std::string shortName, std::string description, std::initializer_list<std::string> enumValues, std::string defaultValue, std::string emptyValueString)
+    {
+        // transform initializer list into useful things that will stick around
+        std::vector<std::string> valueNameStrings;
+        std::vector<std::pair<std::string, std::string>> valueNamesTable;
+        for (auto v : enumValues)
+        {
+            valueNameStrings.push_back(v);
+            valueNamesTable.push_back({ v, v });
+        }
+
+        auto callback = [&option, this, name, valueNamesTable](std::string optionVal) {
+            std::string optionString;
+            bool didParse = ParseVal(optionVal, valueNamesTable, option, optionString);
+            if (didParse)
+            {
+                _options[name].currentValueString = optionString;
+                return true;
+            }
+            else
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::badStringFormat, "Could not parse value for option " + name);
+                return false;
+            }
+        };
+
+        OptionInfo info(name, shortName, description, defaultValue, emptyValueString, callback);
+        info.enumValues = valueNameStrings;
+        AddOption(info);
+    }
+
     bool CommandLineParser::HasOption(std::string option)
     {
         return _options.find(option) != _options.end();

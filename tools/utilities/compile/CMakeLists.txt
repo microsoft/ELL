@@ -39,9 +39,9 @@ set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
 set (test_name ${tool_name}_test1)
 add_test(NAME ${test_name}
         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-        COMMAND ${tool_name} -imf ${CMAKE_SOURCE_DIR}/examples/data/identity.model -of identity.asm)
+        COMMAND ${tool_name} -imf ${CMAKE_SOURCE_DIR}/examples/data/identity.model --ir)
 
 set (test_name ${tool_name}_test2)
 add_test(NAME ${test_name}
         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
-        COMMAND ${tool_name} -imf ${CMAKE_SOURCE_DIR}/examples/data/is_equal.model -of is_equal.ll)
+        COMMAND ${tool_name} -imf ${CMAKE_SOURCE_DIR}/examples/data/is_equal.model --ir)

@@ -470,6 +470,7 @@ namespace emitters
             case ModuleOutputFormat::assembly:
             case ModuleOutputFormat::bitcode:
             case ModuleOutputFormat::ir:
+            case ModuleOutputFormat::objectCode:
             {
                 WriteToFile(filePath, format, options);
                 break;
@@ -499,7 +500,7 @@ namespace emitters
 
     void IRModuleEmitter::WriteToFile(const std::string& filePath, ModuleOutputFormat format, const MachineCodeOutputOptions& options)
     {
-        auto openFlags = (ModuleOutputFormat::ir == format) ? llvm::sys::fs::F_None : llvm::sys::fs::F_Text;
+        auto openFlags = (ModuleOutputFormat::bitcode == format || ModuleOutputFormat::objectCode == format) ? llvm::sys::fs::F_None : llvm::sys::fs::F_Text;
         std::error_code error;
         llvm::tool_output_file out(filePath, error, openFlags);
         if (error)
@@ -572,6 +573,11 @@ namespace emitters
         {
             // TODO: fuse or replace options with compiler options
             GenerateMachineCode(os, *this, OutputFileType::CGFT_AssemblyFile, options);
+        }
+        else if (ModuleOutputFormat::objectCode == format)
+        {
+            // TODO: fuse or replace options with compiler options
+            GenerateMachineCode(os, *this, OutputFileType::CGFT_ObjectFile, options);
         }
         else
         {

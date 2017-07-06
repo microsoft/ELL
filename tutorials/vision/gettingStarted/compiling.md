@@ -244,17 +244,11 @@ Next we need to be able to find the ELL compiler which lives here:
 ```
 set PATH=%PATH%;%ELL_ROOT%\build\bin\Release
 ```
-Now run this to compile the darknet model to LLVM intermediate representation (IR).
+Now run this to compile the darknet model to LLVM intermediate representation (IR) and to generate the Python wrapper code for the model:
 ```
-compile -imap darknetReference.map -cfn darknetReference -of darknetReference.ll
+compile -imap darknetReference.map -cfn darknetReference -cmn darknetReference --ir --swig
 ```
 *Note:* this may take a minute or more.
-
-We need to also generate the Python wrapper code for the model:
-```
-compile -imap darknetReference.map -cfn darknetReference -cmn darknetReference -o swig -of darknetReference.i
-```
-*Note:* this may also take a minute or more.
 
 Next we need to run SWIG to generate the C++ Python wrappers.  If you installed SWIG manually then it is probably
 already in your PATH, if not then you will find it here (on Windows):

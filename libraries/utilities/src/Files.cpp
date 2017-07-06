@@ -117,5 +117,11 @@ namespace utilities
         // PORTABILITY should be replaced by C++17 filesystem when available
         return filepath.substr(filepath.find_last_of("/\\") + 1);
     }
+
+    std::string JoinPaths(std::string path1, std::string path2)
+    {
+        // PORTABILITY should be replaced by C++17 filesystem when available
+        return path1 + "/" + path2;
+    }
 }
 }

@@ -25,6 +25,7 @@ namespace emitters
         ir,
         bitcode,
         assembly,
+        objectCode,
         cHeader,
         swigInterface
     };
@@ -35,7 +36,6 @@ namespace emitters
         bool unrollLoops = false;
         bool inlineOperators = true;
         bool useBlas = false;
-        bool useHalide = false;
         bool optimize = true;
         bool includeDiagnosticInfo = false;
 

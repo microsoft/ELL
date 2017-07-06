@@ -96,6 +96,16 @@ namespace utilities
         template <typename T>
         void AddOption(T& optionValue, std::string name, std::string shortName, std::string description, std::initializer_list<std::pair<std::string, T>> enumValues, std::string defaultValue, std::string emptyValueString = "true");
 
+        /// <summary> Adds a new enumerated-value option to the command-line parser with a string option type </summary>
+        ///
+        /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param>
+        /// <param name="name"> The long name for the option. The option will be specified by '--' plus the long name (e.g., '--help') </param>
+        /// <param name="shortName"> [optional] The short name for the option. The option will be secified by '-' plus the short name (e.g., '-h') </param>
+        /// <param name="description"> The descriptive text that appears when help is requested </param>
+        /// <param name="enumValues"> A list of allowed option strings.</param>
+        /// <param name="defaultValue"> The default value for this option. The optionValue argument gets set to this if no value is specified on the command line </param>
+        void AddOption(std::string& optionValue, std::string name, std::string shortName, std::string description, std::initializer_list<std::string> enumValues, std::string defaultValue, std::string emptyValueString = "");
+
         /// <summary> Adds a ParsedArgSet representing a bundle of options to the commandline parser </summary>
         ///
         /// <param name="options"> The ParsedArgSet containing the options </param>

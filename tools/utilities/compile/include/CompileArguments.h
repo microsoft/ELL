@@ -17,44 +17,46 @@
 
 namespace ell
 {
+/// <summary> Default sentinel value that instructs the compiler to choose the # of bits to use. </summary>
+constexpr int NumBitsDefault = 0;
+
 /// <summary> Command line arguments for the compile executable. </summary>
 struct CompileArguments
 {
-    /// <summary> The output type to generate. </summary>
-    enum class OutputType
-    {
-        refinedMap,
-        compiledMap,
-        ir,
-        bitcode,
-        assembly,
-        swigInterface
-    };
-    OutputType outputType;
-
-    /// <summary> The output code file. </summary>
-    /// <remarks>
-    /// Used as the base filename if the outputType is 'swigInterface'
-    /// </remarks>
-    std::string outputFilename;
-
-    /// <summary> true to optimize. </summary>
-    bool optimize = false;
-
-    /// <summary> Name of the compiled function. </summary>
-    std::string compiledFunctionName;
-
-    /// <summary> The maximum number of refinement outputTypes. </summary>
-    int maxRefinementIterations = 0;
-
-    /// <summary> An output stream for the output data file. </summary>
-    utilities::OutputStreamImpostor outputCodeStream;
-
-    /// <summary> If output type is ASM then we need a target cpu (cortex-m0 or cortex-m4). </summary>
-    std::string cpu = "";
-
-    /// <summary> Name of the compiled module. </summary>
+    // output options
+    bool outputHeader = false;
+    bool outputIr = false;
+    bool outputBitcode = false;
+    bool outputAssembly = false;
+    bool outputObjectCode = false;
+    bool outputSwigInterface = false;
+    bool outputRefinedMap = false;
+    bool outputCompiledMap = false;
+    std::string compiledFunctionName; // defaults to output filename
     std::string compiledModuleName;
+    std::string outputDirectory;
+    bool verbose = false;
+
+    // model-generation options
+    int maxRefinementIterations = 0;
+    bool profile = false;
+
+    // compilation options
+    bool optimize = true;
+    bool useBlas = false;
+    bool foldLinearOperations = true;
+
+    // target machine options
+    // known target names: host, mac, linux, windows, arm, arm64, ios
+    std::string target = "";
+
+    // These can override default setting for a target
+    std::string cpu = "";
+    int numBits = NumBitsDefault;
+    std::string targetTriple = "";
+    std::string targetArchitecture = "";
+    std::string targetFeatures = "";
+    std::string targetDataLayout = "";
 };
 
 /// <summary> Parsed command line arguments for the compile executable. </summary>
@@ -64,12 +66,5 @@ struct ParsedCompileArguments : public CompileArguments, public utilities::Parse
     ///
     /// <param name="parser"> [in,out] The parser. </param>
     virtual void AddArgs(utilities::CommandLineParser& parser) override;
-
-    /// <summary> Check the parsed arguments. </summary>
-    ///
-    /// <param name="parser"> The parser. </param>
-    ///
-    /// <returns> An utilities::CommandLineParseResult. </returns>
-    virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
 };
 }

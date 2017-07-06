@@ -5,11 +5,8 @@
 # Generate example map
 ../../../build/bin/makeExamples -o map
 
-# Generate model IR
-../../../build/bin/compile -imap ELL_step10.map -cfn Step10 -m clockStep -of ELL_step10.ll
-
-# Generate swig interface and header
-../../../build/bin/compile -imap ELL_step10.map -cmn ELL_step10 -cfn Step10 -m clockStep -o swig -of ELL_step10.i
+# Generate model IR, header, and SWIG interfaces
+../../../build/bin/compile -imap ELL_step10.map -cfn Step10 -m clockStep --ir --header --swig --blas
 
 # Run swig
 mkdir -p output

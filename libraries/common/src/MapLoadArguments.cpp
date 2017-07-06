@@ -73,6 +73,22 @@ namespace common
             "simple");
     }
 
+    std::string MapLoadArguments::GetInputFilename() const
+    {
+        if (HasMapFilename())
+        {
+            return inputMapFilename;
+        }
+        else if (HasModelFilename())
+        {
+            return inputModelFilename;
+        }
+        else
+        {
+            return "";
+        }
+    }
+
     model::InputNodeBase* MapLoadArguments::GetInput(model::Model& model) const
     {
         // name of input node

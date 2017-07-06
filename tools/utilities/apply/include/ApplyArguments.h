@@ -26,7 +26,7 @@ struct ApplyArguments
     bool summarize = false;
 };
 
-/// <summary> Parsed command line arguments for the compile executable. </summary>
+/// <summary> Parsed command line arguments for the apply executable. </summary>
 struct ParsedApplyArguments : public ApplyArguments, public utilities::ParsedArgSet
 {
     /// <summary> Adds the arguments to the command line parser. </summary>

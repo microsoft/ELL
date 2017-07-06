@@ -77,8 +77,6 @@ void TestPerformanceCounters()
     model::IRMapCompiler compiler1(settings);
     auto compiledMap1 = compiler1.Compile(map);
 
-    // compiledMap1.WriteCode(std::cout, emitters::ModuleOutputFormat::ir);
-
     // Create second map
     settings.profile = true;
     settings.compilerSettings.useBlas = true;

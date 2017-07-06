@@ -108,7 +108,13 @@ namespace emitters
         }
         else
         {
-            if (_parameters.targetDevice.cpu == "cortex-m4")
+            if (_parameters.targetDevice.cpu == "cortex-m0")
+            {
+                _parameters.targetDevice.triple = "armv6m-unknown-none-eabi";
+                _parameters.targetDevice.features = "+armv6-m,+v6m";
+                _parameters.targetDevice.architecture = "thumb";
+            }
+            else if (_parameters.targetDevice.cpu == "cortex-m4")
             {
                 _parameters.targetDevice.triple = "arm-none-eabi";
                 _parameters.targetDevice.features = "+armv7e-m,+v7,soft-float";
@@ -140,6 +146,10 @@ namespace emitters
         else if (extension == "s" || extension == "asm")
         {
             return ModuleOutputFormat::assembly;
+        }
+        else if (extension == "s" || extension == "asm")
+        {
+            return ModuleOutputFormat::objectCode;
         }
         else if (extension == "h")
         {
