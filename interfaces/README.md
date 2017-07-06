@@ -11,7 +11,7 @@ The language bindings are generated using SWIG. To build them, you need to insta
 * Linux / Mac:
 ```
 wget http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
-tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12.tar
+tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12
 ./configure --without-pcre && make && sudo make install
 
 # May be required on some Linux systems (replace VERSION with the actual version on your system)
