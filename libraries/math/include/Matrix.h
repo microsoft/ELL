@@ -104,16 +104,17 @@ namespace math
         MatrixBase(size_t numRows, size_t numColumns, ElementType* pData = nullptr);
 
     protected:
+        void Swap(MatrixBase<ElementType, MatrixLayout::columnMajor>& other);
         using RectangularMatrixBase<ElementType>::_numRows;
         using RectangularMatrixBase<ElementType>::_numColumns;
         using RectangularMatrixBase<ElementType>::_increment;
 
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::column;
 
-        const size_t _numIntervals = _numColumns;
-        const size_t _intervalSize = _numRows;
+        const size_t& _numIntervals = _numColumns;
+        const size_t& _intervalSize = _numRows;
         static constexpr size_t _rowIncrement = 1;
-        const size_t _columnIncrement = _increment;
+        const size_t& _columnIncrement = _increment;
     };
 
     /// <summary> Base class for row major rectangular dense matrices. </summary>
@@ -133,15 +134,17 @@ namespace math
         MatrixBase(size_t numRows, size_t numColumns, ElementType* pData = nullptr);
 
     protected:
+        void Swap(MatrixBase<ElementType, MatrixLayout::rowMajor>& other);
+
         using RectangularMatrixBase<ElementType>::_numRows;
         using RectangularMatrixBase<ElementType>::_numColumns;
         using RectangularMatrixBase<ElementType>::_increment;
 
         static constexpr VectorOrientation _intervalOrientation = VectorOrientation::row;
 
-        const size_t _numIntervals = _numRows;
-        const size_t _intervalSize = _numColumns;
-        const size_t _rowIncrement = _increment;
+        const size_t& _numIntervals = _numRows;
+        const size_t& _intervalSize = _numColumns;
+        const size_t& _rowIncrement = _increment;
         static constexpr size_t _columnIncrement = 1;
     };
 

@@ -32,16 +32,18 @@ namespace math
     template <typename ElementType>
     void RectangularMatrixBase<ElementType>::Swap(RectangularMatrixBase<ElementType>& other)
     {
-        std::swap(_pData, other._pData);
-        std::swap(_numRows, other._numRows);
-        std::swap(_numColumns, other._numColumns);
-        std::swap(_increment, other._increment);
+        using std::swap;
+        swap(_pData, other._pData);
+        swap(_numRows, other._numRows);
+        swap(_numColumns, other._numColumns);
+        swap(_increment, other._increment);
     }
 
     //
     // MatrixBase
     //
 
+    // Row-major
     template <typename ElementType>
     MatrixBase<ElementType, MatrixLayout::rowMajor>::MatrixBase(size_t numRows, size_t numColumns, ElementType* pData)
         : RectangularMatrixBase<ElementType>(numRows, numColumns, numColumns, pData)
@@ -49,9 +51,22 @@ namespace math
     }
 
     template <typename ElementType>
+    void MatrixBase<ElementType, MatrixLayout::rowMajor>::Swap(MatrixBase<ElementType, MatrixLayout::rowMajor>& other)
+    {
+        RectangularMatrixBase<ElementType>::Swap(other);
+    }
+
+    // Column-major
+    template <typename ElementType>
     MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(size_t numRows, size_t numColumns, ElementType* pData)
         : RectangularMatrixBase<ElementType>(numRows, numColumns, numRows, pData)
     {
+    }
+
+    template <typename ElementType>
+    void MatrixBase<ElementType, MatrixLayout::columnMajor>::Swap(MatrixBase<ElementType, MatrixLayout::columnMajor>& other)
+    {
+        RectangularMatrixBase<ElementType>::Swap(other);
     }
 
     //
@@ -74,7 +89,7 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     void ConstMatrixReference<ElementType, layout>::Swap(ConstMatrixReference<ElementType, layout>& other)
     {
-        RectangularMatrixBase<ElementType>::Swap(other);
+        MatrixBase<ElementType, layout>::Swap(other);
     }
 
     template <typename ElementType, MatrixLayout layout>
@@ -469,7 +484,7 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     void Matrix<ElementType, layout>::Swap(Matrix<ElementType, layout>& other)
     {
-        RectangularMatrixBase<ElementType>::Swap(other);
+        MatrixReference<ElementType, layout>::Swap(other);
         std::swap(_data, other._data);
     }
 

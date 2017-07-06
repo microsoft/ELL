@@ -21,15 +21,29 @@
 #include "Exception.h"
 #include "IArchivable.h"
 
+// stl
+#include <array>
+#include <initializer_list>
+#include <ostream>
+#include <tuple>
+#include <vector>
+
 namespace ell
 {
 namespace math
 {
     /// <summary> Enum that represents the dimensions of a tensor. </summary>
-    enum class Dimension{ row, column, channel };
+    enum class Dimension { row, column, channel };
 
     // abbreviations
     using Triplet = std::array<size_t, 3>;
+
+    /// <summary> Helper functions for TensorLayout definition </summary>
+    template <Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    constexpr int IndexOfDimension(Dimension dimension)
+    {
+        return dimension == dimension0 ? 0 : (dimension == dimension1 ? 1 : (dimension == dimension2 ? 2 : -1));
+    }
 
     /// <summary>
     /// Forward declaration of TensorLayout. This class helps the tensor move back and forth from canonical coordinates (row, column, channel)
@@ -40,33 +54,16 @@ namespace math
     /// (increment of 1). </typeparam>
     /// <typeparam name="dimension1"> Identity of the tensor dimension with a minor memory increment. </typeparam>
     /// <typeparam name="dimension2"> Identity of the tensor dimension with a major memory increment. </typeparam>
-    template<Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    struct TensorLayout; 
-
-    /// <summary>
-    /// Specialization to column/row/channel memory layout. This means that channels are stored
-    /// one after the other and each channel is stored as a row-major matrix.
-    /// </summary>
-    template<>
-    struct TensorLayout<Dimension::column, Dimension::row, Dimension::channel>
+    template <Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    struct TensorLayout
     {
-        static Triplet CanonicalToLayout(Triplet canonical) { return{ canonical[1], canonical[0], canonical[2] }; }
-        static const size_t rowPosition = 1;
-        static const size_t columnPosition = 0;
-        static const size_t channelPosition = 2;
-    };
-
-    /// <summary>
-    /// Specialization to channel/column/row memory layout. For example, if the tensor represents an
-    /// RGB image, the entries will be stored as R_00, G_00, B_00, R_01, G_01, B_01, ...
-    /// </summary>
-    template<>
-    struct TensorLayout<Dimension::channel, Dimension::column, Dimension::row>
-    {
-        static Triplet CanonicalToLayout(Triplet canonical) { return{ canonical[2], canonical[1], canonical[0] }; }
-        static const size_t rowPosition = 2;
-        static const size_t columnPosition = 1;
-        static const size_t channelPosition = 0;
+        static Triplet CanonicalToLayout(Triplet canonical) { return{ canonical[rowPosition], canonical[columnPosition], canonical[channelPosition] }; }
+        static const size_t rowPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::row);
+        static const size_t columnPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::column);
+        static const size_t channelPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::channel);
+        static_assert(rowPosition != -1, "Invalid layout");
+        static_assert(columnPosition != -1, "Invalid layout");
+        static_assert(channelPosition != -1, "Invalid layout");
     };
 
     /// <summary> Helper struct that incudes all of the TensorReference internals. </summary>
@@ -730,9 +727,18 @@ namespace math
     //
     // friendly names
     //
+
+    /// <summary>
+    /// Specialization to channel/column/row memory layout. For example, if the tensor represents an
+    /// RGB image, the entries will be stored as R_00, G_00, B_00, R_01, G_01, B_01, ...
+    /// </summary>
     template <typename ElementType>
     using ChannelColumnRowTensor = Tensor<ElementType, Dimension::channel, Dimension::column, Dimension::row>;
 
+    /// <summary>
+    /// Specialization to column/row/channel memory layout. This means that channels are stored
+    /// one after the other and each channel is stored as a row-major matrix.
+    /// </summary>
     template <typename ElementType>
     using ColumnRowChannelTensor = Tensor<ElementType, Dimension::column, Dimension::row, Dimension::channel>;
 }
