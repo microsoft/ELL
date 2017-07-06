@@ -100,13 +100,13 @@ Open a command prompt and navigate to the `build\tutorials\vision\gettingStarted
 Visual Studio 2015:
 ```
 mkdir build && cd build
-cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..
+cmake -G "Visual Studio 14 2015 Win64" ..
 ```
 
 Visual Studio 2017:
 ```
 mkdir build && cd build
-cmake -G "Visual Studio 15 2017 Win64" -DPROCESSOR_HINT=haswell ..
+cmake -G "Visual Studio 15 2017 Win64" ..
 ```
 
 To build the project, you can either run this from the command line:
@@ -204,9 +204,6 @@ To run the demo, you will need:
     ```
     (py34) pi@raspberrypi:~ $ conda install -c microsoft-ell opencv
     ```
-
-    compile -imap darknetReference.map -cfn darknetReference -of darknetReference.ll
-
 
 ##### Building the compiled Darknet module
 

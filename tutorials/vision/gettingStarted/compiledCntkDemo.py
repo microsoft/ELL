@@ -8,7 +8,7 @@ import modelHelper as mh
 # Import the compiled model wrapper
 sys.path.append('build')
 sys.path.append('build/Release')
-import VGG16ImageNet as model
+import vgg16ImageNet as model
 
 def main():
     # python somehow needs to know about the data vector type, so we provide it
@@ -34,7 +34,10 @@ def main():
         data = helper.prepare_image_for_predictor(frame)
 
         # Get the compiled model to classify the image, by returning a list of probabilities for the classes it can detect
-        predictions = model.VGG16ImageNet(data)
+        model.vgg_16image_net(data, results)
+
+        # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
+        # each with the text label and the prediction score.
         top5 = helper.get_top_n(results, 5)
 
         # Turn the top5 into a text string to display

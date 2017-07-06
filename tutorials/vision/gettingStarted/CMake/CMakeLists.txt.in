@@ -16,8 +16,8 @@
 #
 #   Windows 64 bit:
 #     mkdir build && cd build
-#     VS 2015: cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..
-#     VS 2017: cmake -G "Visual Studio 15 2017 Win64" -DPROCESSOR_HINT=haswell ..
+#     VS 2015: cmake -G "Visual Studio 14 2015 Win64" ..
+#     VS 2017: cmake -G "Visual Studio 15 2017 Win64" ..
 #     Build the generated .sln in Release, or run cmake --build . --config=Release
 #
 
@@ -29,6 +29,10 @@ project(@ELL_model@)
 set(module_prefix)
 
 # dependencies
+if(WIN32)
+    # path to the OpenBLAS Nuget
+    set(PACKAGE_ROOT "${CMAKE_SOURCE_DIR}/../../../../../external")
+endif()
 include(OpenBLASSetup.cmake)
 
 find_package(PythonInterp 3.4)
