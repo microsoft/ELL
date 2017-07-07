@@ -10,21 +10,23 @@ sys.path.append('build')
 sys.path.append('build/Release')
 import darknetReference as model
 
+
 def main():
     # python somehow needs to know about the data vector type, so we provide it
-    buffer = model.FloatVector(224*224*3)
+    buffer = model.FloatVector(224 * 224 * 3)
     results = model.FloatVector(1000)
 
     camera = 0
     if (len(sys.argv) > 1):
-        camera = int(sys.argv[1]) 
+        camera = int(sys.argv[1])
 
     # Start video capture device
     cap = cv2.VideoCapture(camera)
 
     # Pick the model you want to work with
-    helper = mh.ModelHelper("darknetReference", ["darknet.cfg", "darknet.weights"], "darknetImageNetLabels.txt")
-    
+    helper = mh.ModelHelper("darknetReference", [
+                            "darknet.cfg", "darknet.weights"], "darknetImageNetLabels.txt")
+
     lastPrediction = ""
 
     while (True):
@@ -36,14 +38,15 @@ def main():
         data = helper.prepare_image_for_predictor(frame)
 
         # Get the compiled model to classify the image, by returning a list of probabilities for the classes it can detect
-        model.darknet_reference_darknet_reference(data, results)
+        model.darknet_reference_predict(data, results)
 
         # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
         # each with the text label and the prediction score.
         top5 = helper.get_top_n(results, 5)
 
         # Turn the top5 into a text string to display
-        text = "".join([str(element[0]) + "(" + str(int(100*element[1])) + "%)  " for element in top5])
+        text = "".join(
+            [str(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])
         if (text != lastPrediction):
             print(text)
             lastPrediction = text
@@ -59,6 +62,7 @@ def main():
         # Wait for Esc key
         if cv2.waitKey(1) & 0xFF == 27:
             break
+
 
 if __name__ == "__main__":
     main()

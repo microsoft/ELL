@@ -39,7 +39,7 @@ function(generate_ell_model_compile_target model_name arch_name target_name demo
     add_custom_command(
         OUTPUT ${compiled_output}
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map
-        COMMAND compile -imap ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map -cfn ${model_name} -cmn ${model_name} -od ${target_path} --ir --swig ${compile_options}
+        COMMAND compile -imap ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map -cfn predict -cmn ${model_name} -od ${target_path} --ir --swig ${compile_options}
         COMMENT "Generating ${compiled_output}")
 
     # llc
