@@ -29,20 +29,11 @@ With the above background, let's get started. The compilation workflow is simila
 
 ### Stage 1: Generating the model code
 
-First, re-run CMake. This will detect that the model files e.g. `darknetReference.map` are now present, and will create targets for creating the necessary files for compiling on various device targets. 
+#### Generating the .map file
 
-From the command window, in the `ELL\build` folder:
-```
-cmake ..
-```
-If the targets are generated, you should see these messages in the command window output:
-```
--- Generated target compiled_darknetReference_host
--- Generated target compiled_darknetReference_pi3
-```
-If you don't see messages similar to the above, CMake could not find the .map file under `build\tutorials\vision\gettingStarted`. Maybe try re-running darknetDemo.py successfully again.
+In order to generate code for a given model, we need ELL's representation of the model in a .map file. The demo Python scripts generate these files when they load the model for validation.
 
-If you had ELL.sln open, Visual Studio will prompted you to reload the solution. Otherwise, open ELL.sln from the `build` folder.  In Solution Explorer, look under `tutorials`, `vision`, and then `compiled`, and you should see new projects for the compiled models on the host (Windows/Linux/Mac) and Raspberry Pi 3.
+For instance, if you run `python darknetDemo.py` and it is able to load the Darknet reference model, the script will also save a `darknetReference.map` file in the same path.
 
 *Note: The Darknet reference model is fairly small, we recommend you start with this first.  The build should take only a few minutes. For larger models (such as VGG16), the build can take a lot longer because of the size (we are working on ways to make this better).*
 

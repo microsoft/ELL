@@ -14,6 +14,8 @@ function(generate_ell_model_compile_target model_name arch_name target_name demo
     # arch processing
     if(arch_name STREQUAL "pi3") # Raspberry Pi 3
         set(llc_options -O3 -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53 -relocation-model=pic)
+    elseif(arch_name STREQUAL "pi0") # Raspberry Pi Zero
+        set(llc_options -O3 -mtriple=arm-linux-gnueabihf -relocation-model=pic)
     else() # host
         set(llc_options -O3 -relocation-model=pic)
     endif()
@@ -84,6 +86,7 @@ function(generate_ell_model_compile_target model_name arch_name target_name demo
     add_custom_target(${target_name} DEPENDS ${target_output})
     set_source_files_properties(${target_output} PROPERTIES GENERATED TRUE)
     set_property(TARGET ${target_name} PROPERTY EXCLUDE_FROM_ALL TRUE)
+    set_property(TARGET ${target_name} PROPERTY FOLDER "tutorials/vision/compiled")
 
     message(STATUS "Generated target ${target_name}")
 endfunction()

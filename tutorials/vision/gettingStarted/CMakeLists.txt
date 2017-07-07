@@ -58,16 +58,16 @@ foreach(sample_model ${sample_models})
 
     set(demo_files ${demo_in} ${labels_in})
 
-    # Generate the demo model targets if the .map files are present
-    if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${model_in}.map)
-        # host
-        set(target_name compiled_${model_in}_host)
-        generate_ell_model_compile_target(${model_in} host ${target_name} "${demo_files}")
-        set_property(TARGET ${target_name} PROPERTY FOLDER "tutorials/vision/compiled")
+    # generate the demo model targets
+    # host
+    set(target_name compiled_${model_in}_host)
+    generate_ell_model_compile_target(${model_in} host ${target_name} "${demo_files}")
 
-        # Raspberry Pi 3
-        set(target_name compiled_${model_in}_pi3)
-        generate_ell_model_compile_target(${model_in} pi3 ${target_name} "${demo_files}")
-        set_property(TARGET ${target_name} PROPERTY FOLDER "tutorials/vision/compiled")
-    endif()
+    # Raspberry Pi 3
+    set(target_name compiled_${model_in}_pi3)
+    generate_ell_model_compile_target(${model_in} pi3 ${target_name} "${demo_files}")
+
+    # Raspberry Pi Zero
+    set(target_name compiled_${model_in}_pi0)
+    generate_ell_model_compile_target(${model_in} pi0 ${target_name} "${demo_files}")
 endforeach()
