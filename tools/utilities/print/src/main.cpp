@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PrintArguments.h"
+#include "PrintGraph.h"
 #include "PrintModel.h"
 
 // common
@@ -41,11 +42,27 @@ int main(int argc, char* argv[])
         commandLineParser.Parse();
 
         // open model file
-        auto model = common::LoadModel(modelLoadArguments.inputModelFile);
+        model::Model model;
+        try
+        {
+            model = common::LoadModel(modelLoadArguments.inputModelFile);
+        }
+        catch (const utilities::Exception&)
+        {
+            auto map = common::LoadMap(modelLoadArguments.inputModelFile);
+            model = map.GetModel();
+        }
 
         // print model
         utilities::OutputStreamImpostor out = printArguments.outputStream;
-        PrintModel(model, out);
+        if (printArguments.outputFormat == "dgml")
+        {
+            PrintGraph(model, out);
+        }
+        else
+        {
+            PrintModel(model, out);
+        }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

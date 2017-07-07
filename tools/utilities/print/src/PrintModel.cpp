@@ -13,9 +13,10 @@
 #include "OutputStreamImpostor.h"
 
 // model
-#include "Model.h"
-#include "Node.h"
 #include "InputPort.h"
+#include "Model.h"
+#include "NeuralNetworkPredictorNode.h"
+#include "Node.h"
 
 #include <iostream>
 
@@ -69,6 +70,25 @@ void PrintNode(const model::Node& node, std::ostream& out)
     }
 
     out << ")" << std::endl;
+
+    // model Visit doesn't look inside this node...
+    if (nodeType == "NeuralNetworkPredictorNode<float>")
+    {
+        const ell::nodes::NeuralNetworkPredictorNode<float>& predictorNode = dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<float>&>(node);
+        auto predictor = predictorNode.GetPredictor();
+        auto layers = predictor.GetLayers();
+        int layerId = 0;
+        for (auto ptr = layers.begin(), end = layers.end(); ptr != end; ptr++)
+        {
+            std::shared_ptr<ell::predictors::neural::Layer<float>> layer = *ptr;
+            auto shape = layer->GetLayerParameters().outputShape;
+            std::string layerName = layer->GetRuntimeTypeName();
+            out << "    layer_" << layerId << " = " << layerName << "(";
+            out << "shape=[" << std::to_string(shape[0]) << "," << std::to_string(shape[1]) << "," << std::to_string(shape[2]) << "]";
+            out << ")" << std::endl;
+            layerId++;
+        }
+    }
 }
 
 void PrintModel(const model::Model& model, std::ostream& out)

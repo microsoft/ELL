@@ -21,6 +21,7 @@ namespace ell
 struct PrintArguments
 {
     std::string outputFilename;
+    std::string outputFormat;
     utilities::OutputStreamImpostor outputStream;
 };
 

@@ -6,10 +6,13 @@
 set (tool_name print)
 
 set (src src/PrintArguments.cpp
+         src/PrintGraph.cpp
          src/PrintModel.cpp
          src/main.cpp)
 
-set (include include/PrintArguments.h
+set (include include/DgmlGraph.h
+             include/PrintArguments.h
+             include/PrintGraph.h
              include/PrintModel.h)
 
 source_group("src" FILES ${src})

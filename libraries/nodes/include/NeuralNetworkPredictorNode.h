@@ -93,6 +93,9 @@ namespace nodes
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+        /// <summary>Returns the underlying predictor for debugging purposes only</summary>
+        const PredictorType GetPredictor() const { return _predictor; }
+
     protected:
         virtual void Compute() const override;
         virtual bool Refine(model::ModelTransformer& transformer) const override;
