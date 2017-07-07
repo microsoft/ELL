@@ -56,6 +56,10 @@ if(${PYTHONLIBS_FOUND})
         set_property(TARGET ${module_prefix}@ELL_model@ PROPERTY PREFIX "")
     endif()
 
+    if(APPLE)
+        set_property(TARGET ${module_prefix}@ELL_model@ PROPERTY SUFFIX ".so")
+    endif()
+
     target_include_directories(${module_prefix}@ELL_model@ PRIVATE include ${PYTHON_INCLUDE_PATH} ${BLAS_INCLUDE_DIRS})
     target_link_libraries(${module_prefix}@ELL_model@ PRIVATE ${PYTHON_LIBRARIES} ${BLAS_LIBS})
 else()
