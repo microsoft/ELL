@@ -34,7 +34,7 @@ def main():
         data = helper.prepare_image_for_predictor(frame)
 
         # Get the compiled model to classify the image, by returning a list of probabilities for the classes it can detect
-        model.vgg_16image_net(data, results)
+        model.vgg_16image_net_vgg_16image_net(data, results)
 
         # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
         # each with the text label and the prediction score.

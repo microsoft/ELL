@@ -36,7 +36,7 @@ def main():
         data = helper.prepare_image_for_predictor(frame)
 
         # Get the compiled model to classify the image, by returning a list of probabilities for the classes it can detect
-        model.darknet_reference(data, results)
+        model.darknet_reference_darknet_reference(data, results)
 
         # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
         # each with the text label and the prediction score.
