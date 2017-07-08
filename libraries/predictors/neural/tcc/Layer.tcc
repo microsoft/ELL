@@ -29,11 +29,15 @@ namespace neural
     }
 
     template <typename ElementType>
-    typename Layer<ElementType>::Shape Layer<ElementType>::GetInputShapeWithPadding() const
+    typename Layer<ElementType>::Shape Layer<ElementType>::GetInputShapeMinusPadding() const
     {
         auto&& inputShape = _layerParameters.input.GetShape(); 
         auto paddingSize = _layerParameters.inputPaddingParameters.paddingSize;
-        return { inputShape[0]+2*paddingSize, inputShape[1]+2*paddingSize, inputShape[2] }; 
+        if(inputShape[0] < 2*paddingSize || inputShape[1] < 2*paddingSize)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Input size not large enough to accomodate padding");
+        }       
+        return { inputShape[0]-2*paddingSize, inputShape[1]-2*paddingSize, inputShape[2] };
     }
 
     template <typename ElementType>
@@ -41,6 +45,10 @@ namespace neural
     {
         auto&& outputShape = _layerParameters.outputShape; 
         auto paddingSize = _layerParameters.outputPaddingParameters.paddingSize;
+        if(outputShape[0] < 2*paddingSize || outputShape[1] < 2*paddingSize)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Output size not large enough to accomodate padding");
+        }
         return { outputShape[0]-2*paddingSize, outputShape[1]-2*paddingSize, outputShape[2] };
     }
 
@@ -191,7 +199,6 @@ namespace neural
             }
         }
     }
-
 }
 }
 }

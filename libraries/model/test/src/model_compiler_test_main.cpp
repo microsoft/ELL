@@ -20,6 +20,7 @@ using namespace ell::emitters;
 void TestIRCompiler()
 {
     // VerboseRegion region;
+
     TestFloatNode();
     TestCompilableDotProductNode2(3);
     TestCompilableDotProductNode2(4);
@@ -78,8 +79,13 @@ void TestIRCompiler()
     //
     // Neural net nodes
     //
-    TestNeuralNetworkPredictorNode();
+    TestNeuralNetworkPredictorNode1();
     TestNeuralNetworkPredictorNode2();
+    TestNeuralNetworkPredictorNode3();
+    TestNeuralNetworkPredictorNode4();
+
+    TestInputLayerNode(0);
+    TestInputLayerNode(1);
 
     TestReLUActivationLayerNode();
     TestReLUActivationLayerNode(0, 1);

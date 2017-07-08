@@ -129,15 +129,15 @@ namespace neural
         /// <returns> Reference to the output tensor. </returns>
         ConstTensorReferenceType GetOutput() const { return _output; }
 
-        /// <summary> Returns shape of the active part of the input tensor. </summary>
+        /// <summary> Returns shape of the input tensor, with padding added. </summary>
         ///
         /// <returns> Shape of the input tensor. </returns>
         virtual Shape GetInputShape() const { return _layerParameters.input.GetShape(); }
 
-        /// <summary> Returns shape of the input tensor with padding added. </summary>
+        /// <summary> Returns shape of the active area of the input tensor. </summary>
         ///
         /// <returns> Shape of the input tensor. </returns>
-        virtual Shape GetInputShapeWithPadding() const;
+        virtual Shape GetInputShapeMinusPadding() const;
 
         /// <summary> Returns shape of the output tensor, with padding added. </summary>
         ///
@@ -214,8 +214,10 @@ namespace neural
 
         /// <summary> Returns number of output rows minus padding. </summary>
         size_t NumOutputRowsMinusPadding() const { return _output.NumRows() - 2 * _layerParameters.outputPaddingParameters.paddingSize; }
+        
         /// <summary> Returns number of output columns minus padding. </summary>
         size_t NumOutputColumnsMinusPadding() const { return _output.NumColumns() - 2 * _layerParameters.outputPaddingParameters.paddingSize; }
+        
         /// <summary> Returns number of output channels. </summary>
         size_t NumOutputChannels() const { return _output.NumChannels(); };
 

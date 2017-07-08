@@ -17,8 +17,8 @@ namespace neural
     BiasLayer<ElementType>::BiasLayer(const LayerParameters& layerParameters, const VectorType& bias) :
         Layer<ElementType>(layerParameters),
         _bias(bias)
-    {        
-        if (_layerParameters.input.Size() != GetOutputMinusPadding().Size())
+    {
+        if (this->GetInputShape() != this->GetOutputShapeMinusPadding())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Expected size of input and output tensor (minus padding) to match");
         }

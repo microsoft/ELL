@@ -37,11 +37,14 @@ void TestFloatNode();
 //
 // NN layer nodes
 //
-void TestNeuralNetworkPredictorNode();
+void TestNeuralNetworkPredictorNode1();
 void TestNeuralNetworkPredictorNode2();
+void TestNeuralNetworkPredictorNode3();
+void TestNeuralNetworkPredictorNode4();
 
 enum class ConvolutionType { GEMM, Diagonal};
 
+void TestInputLayerNode(size_t outputPadding = 0);
 void TestReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestLeakyReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestSigmoidActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);

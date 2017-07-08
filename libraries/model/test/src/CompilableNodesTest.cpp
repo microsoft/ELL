@@ -435,7 +435,7 @@ InputCallbackTester<double> g_tester;
 InputCallbackTester<double> g_testerCompiled;
 
 // C callback (called by emitted model)
-extern "C"
+extern "C" 
 {
 bool CompiledSourceNode_InputCallback(double* input)
 {
@@ -474,8 +474,7 @@ void TestCompilableSourceNode(bool runJit)
 }
 
 // C callback (called by emitted model)
-extern "C"
-{
+extern "C" {
 size_t g_sinkOutputSize = 0;
 std::vector<double> outputValues;
 void CompiledSinkNode_OutputCallback_Scalar(double output)
@@ -687,7 +686,7 @@ void VerifyLayerMap(const ell::model::DynamicMap& map, const ell::model::Node* c
     VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
 }
 
-void TestNeuralNetworkPredictorNode()
+void TestNeuralNetworkPredictorNode1()
 {
     using ElementType = double;
     using InputParameters = typename predictors::neural::InputLayer<ElementType>::InputParameters;
@@ -702,10 +701,10 @@ void TestNeuralNetworkPredictorNode()
     typename predictors::NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename predictors::NeuralNetworkPredictor<ElementType>::Layers layers;
 
-    InputParameters inputParams { { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, 1 };
+    InputParameters inputParams{ { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, { 1, 1, 3 }, { predictors::neural::PaddingScheme::zeros, 0 }, 1 };
     inputLayer = std::make_unique<predictors::neural::InputLayer<ElementType>>(inputParams);
 
-    LayerParameters layerParameters { inputLayer->GetOutput(), predictors::neural::NoPadding(), { 1, 1, 3 }, predictors::neural::NoPadding() };
+    LayerParameters layerParameters{ inputLayer->GetOutput(), predictors::neural::NoPadding(), { 1, 1, 3 }, predictors::neural::NoPadding() };
     VectorType bias1({ -0.43837756f, -0.90868396f, -0.0323102f });
     layers.push_back(std::unique_ptr<predictors::neural::Layer<ElementType>>(new predictors::neural::BiasLayer<ElementType>(layerParameters, bias1)));
     predictors::NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
@@ -727,7 +726,7 @@ void TestNeuralNetworkPredictorNode()
 
     // compare output
     std::vector<std::vector<double>> signal = { input };
-    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName());
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_1");
 
     // Test archiving
     utilities::SerializationContext context;
@@ -760,11 +759,11 @@ void TestNeuralNetworkPredictorNode2()
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
 
-    InputParameters inputParams = {{1,1,2}, {PaddingScheme::zeros, 0}, {1,1,2},{PaddingScheme::zeros, 0}, 1};
+    InputParameters inputParams = { { 1, 1, 2 }, { PaddingScheme::zeros, 0 }, { 1, 1, 2 }, { PaddingScheme::zeros, 0 }, 1 };
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
-    LayerParameters layerParameters{inputLayer->GetOutput(), NoPadding(), {1,1,3}, NoPadding()};
-    MatrixType weights1(3,2);
+    LayerParameters layerParameters{ inputLayer->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
+    MatrixType weights1(3, 2);
     weights1(0, 0) = -0.97461396f;
     weights1(0, 1) = 1.40845299f;
     weights1(1, 0) = -0.14135513f;
@@ -773,22 +772,22 @@ void TestNeuralNetworkPredictorNode2()
     weights1(2, 1) = -0.99083692f;
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new FullyConnectedLayer<ElementType>(layerParameters, weights1)));
 
-    layerParameters = { layers[0]->GetOutput(), NoPadding(),{ 1,1,3 }, NoPadding()};
-    VectorType bias1({-0.43837756f, -0.90868396f, -0.0323102f});
+    layerParameters = { layers[0]->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
+    VectorType bias1({ -0.43837756f, -0.90868396f, -0.0323102f });
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
 
-    layerParameters = {layers[1]->GetOutput(), NoPadding(),{ 1,1,3 }, NoPadding()};
+    layerParameters = { layers[1]->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, ReLUActivation>(layerParameters)));
 
-    layerParameters = {layers[2]->GetOutput(), NoPadding(),{ 1,1,1 }, NoPadding() };
+    layerParameters = { layers[2]->GetOutput(), NoPadding(), { 1, 1, 1 }, NoPadding() };
     MatrixType weights2(1, 3);
     weights2(0, 0) = 1.03084767f;
     weights2(0, 1) = -0.10772263f;
     weights2(0, 2) = 1.04077697f;
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new FullyConnectedLayer<ElementType>(layerParameters, weights2)));
 
-    layerParameters = { layers[3]->GetOutput(), NoPadding(),{ 1,1,1 }, NoPadding() };
-    VectorType bias2({1.40129846e-20f});
+    layerParameters = { layers[3]->GetOutput(), NoPadding(), { 1, 1, 1 }, NoPadding() };
+    VectorType bias2({ 1.40129846e-20f });
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias2)));
 
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
@@ -809,7 +808,207 @@ void TestNeuralNetworkPredictorNode2()
 
     // compare output
     std::vector<std::vector<double>> signal = { input };
-    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName());
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_2");
+}
+
+template<typename ElementType>
+void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, int startValue = 0)
+{
+    int val = 0;
+    tensor.Generate([&val]() { return val++; });
+}
+
+template<typename ElementType>
+void FillVector(ell::math::ColumnVector<ElementType>& vector, int startValue = 0)
+{
+    int val = 0;
+    vector.Generate([&val]() { return val++; });
+}
+
+void TestNeuralNetworkPredictorNode3()
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using InputParameters = typename InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    InputParameters inputParams = { { 3, 3, 3 }, { PaddingScheme::zeros, 0 }, { 5, 5, 3 }, { PaddingScheme::zeros, 1 }, 1 };
+    inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
+
+    LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, 1 }, { 3, 3, 8 }, NoPadding() };
+    auto convolutionMethod = ConvolutionMethod::columnwise;
+    ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 1 };
+    TensorType convWeights1(8 * 3, 3, 3);
+    FillTensor(convWeights1);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+    std::vector<ElementType> input(3 * 3 * 3);
+    int val = 0;
+    std::generate(input.begin(), input.end(), [&val]() { return val++; });
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
+    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_3");
+}
+
+void TestNeuralNetworkPredictorNode4()
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using InputParameters = typename InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    // Input Layer
+    InputParameters inputParams = { { 3, 3, 3 }, { PaddingScheme::zeros, 0 }, { 5, 5, 3 }, { PaddingScheme::zeros, 1 }, 1 };
+    inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
+
+    // ConvolutionalLayer
+    LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, 1 }, { 3, 3, 8 }, NoPadding() };
+    auto convolutionMethod = ConvolutionMethod::columnwise;
+    ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 1 };
+    TensorType convWeights1(8 * 3, 3, 3);
+    FillTensor(convWeights1, -10);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));
+
+    // BiasLayer
+    layerParameters = { layers[0]->GetOutput(), NoPadding(), { 3, 3, 8 }, NoPadding() };
+    VectorType bias1(layerParameters.outputShape[2]);
+    FillVector(bias1);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
+
+    // ActivationLayer
+    layerParameters = { layers[1]->GetOutput(), NoPadding(), { 3, 3, 8 }, NoPadding() };
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, ReLUActivation>(layerParameters)));
+
+    // BatchNormalizationLayer
+    layerParameters = { layers[2]->GetOutput(), NoPadding(), { 3, 3, 8 }, NoPadding() };
+    VectorType mean(layerParameters.outputShape[2]);
+    VectorType variance(layerParameters.outputShape[2]);
+    FillVector(mean);
+    FillVector(variance);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance)));
+
+    // ScalingLayer
+    layerParameters = { layers[3]->GetOutput(), NoPadding(), { 5, 5, 8 }, { PaddingScheme::zeros, 1 } };
+    VectorType scales(layerParameters.outputShape[2]);
+    FillVector(scales, -3);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scales)));
+
+    // Max PoolingLayer
+    layerParameters = { layers[4]->GetOutput(), { PaddingScheme::zeros, 1 }, { 2, 2, 8 }, NoPadding() };
+    PoolingParameters poolingParameters{ 2, 1 };
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new PoolingLayer<ElementType, MaxPoolingFunction>(layerParameters, poolingParameters)));
+
+    // Mean PoolingLayer
+    layerParameters = { layers[5]->GetOutput(), NoPadding(), { 1, 1, 8 }, NoPadding() };
+    PoolingParameters poolingParameters2{ 2, 2 };
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new PoolingLayer<ElementType, MeanPoolingFunction>(layerParameters, poolingParameters2)));
+
+    // Create the predictor
+    NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+    std::vector<ElementType> input(3 * 3 * 3);
+    int val = 0;
+    std::generate(input.begin(), input.end(), [&val]() { return val++; });
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
+    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_4");
+}
+
+void TestInputLayerNode(size_t outputPadding)
+{
+    using ElementType = double;
+    using InputParameters = typename predictors::neural::InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename predictors::neural::Layer<ElementType>::LayerParameters;
+    using TensorType = typename predictors::neural::Layer<ElementType>::TensorType;
+    using Shape = typename predictors::neural::Layer<ElementType>::Shape;
+    using VectorType = typename predictors::neural::Layer<ElementType>::VectorType;
+    using MatrixType = typename predictors::neural::Layer<ElementType>::MatrixType;
+    using DataVectorType = typename predictors::NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    typename predictors::NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename predictors::NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    // Input layer
+    InputParameters inputParams{ { 1, 1, 3 }, predictors::neural::NoPadding(), { 2 * outputPadding + 1, 2 * outputPadding + 1, 3 }, predictors::neural::ZeroPadding(outputPadding), 1.0 };
+    inputLayer = std::make_unique<predictors::neural::InputLayer<ElementType>>(inputParams);
+
+    // Pooling layer
+    auto&& x = inputLayer->GetOutputMinusPadding();
+    const size_t poolingSize = 3;
+    const size_t poolingStride = 1;
+
+    LayerParameters layerParameters{ inputLayer->GetOutput(), predictors::neural::ZeroPadding(outputPadding), { 1, 1, 3 }, predictors::neural::NoPadding() };
+    predictors::neural::PoolingParameters poolingParameters{ poolingSize, poolingStride };
+    layers.push_back(std::unique_ptr<predictors::neural::Layer<ElementType>>(new predictors::neural::PoolingLayer<ElementType, predictors::neural::MaxPoolingFunction>(layerParameters, poolingParameters)));
+    predictors::NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+
+    std::vector<ElementType> input = { 0, 1, 2 };
+    auto output = neuralNetwork.Predict(DataVectorType(input));
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
+    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+
+    // compare output
+    std::vector<std::vector<ElementType>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, "InputLayer");
 }
 
 template<template<typename> class ActivationFunction>
@@ -1016,9 +1215,7 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     input(1, 2, 0) = 1;
     input(1, 1, 1) = 3;
     input(1, 2, 1) = 2;
-    Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 }; 
-
-    std::cout << "output shape: " << outputShape[0] << ", " << outputShape[1] << ", " << outputShape[2] << std::endl;
+    Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
 
     LayerParameters parameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
     auto convolutionMethod = (convolutionType == ConvolutionType::Diagonal) ? ConvolutionMethod::diagonal : ConvolutionMethod::columnwise;
@@ -1162,7 +1359,7 @@ void TestPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
 void TestMaxPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    TestPoolingLayerNode<ell::predictors::neural::MaxPoolingFunction>(inputPaddingSize, outputPaddingSize);
+    TestPoolingLayerNode<predictors::neural::MaxPoolingFunction>(inputPaddingSize, outputPaddingSize);
 }
 
 void TestMeanPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)

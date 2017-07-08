@@ -159,16 +159,13 @@ namespace nodes
         auto&& inputSize = inputLayout.size;
         auto&& inputStride = inputLayout.stride;
         auto&& inputOffset = inputLayout.offset;
-        auto&& inputSizeWithPadding = this->GetLayer().GetInputShapeWithPadding();
 
         auto&& outputLayout = this->GetOutputMemoryLayout();
         auto&& outputSize = outputLayout.size;
         auto&& outputStride = outputLayout.stride;
         auto&& outputOffset = outputLayout.offset;
-        auto&& outputSizeWithPadding = this->GetLayer().GetOutputShape();
 
         // Calculate cumulative increment for each dimension
-        // TODO: include these in the memory layout struct
         Shape inputIncrement = GetCumulativeIncrement(inputStride);
         Shape outputIncrement = GetCumulativeIncrement(outputStride);
 
@@ -254,7 +251,6 @@ namespace nodes
                     // outputLocationOffset is the offset to the output entry
                     llvm::Value* inputLocationOffset = channelInputOffset;
                     llvm::Value* outputLocationOffset = channelOutputOffset;
-
 
                     // Now loop over the input window
                     //

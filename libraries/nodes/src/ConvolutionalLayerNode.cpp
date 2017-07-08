@@ -125,14 +125,6 @@ namespace nodes
     ConvolutionalLayerNode<ValueType>::ConvolutionalLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ConvolutionalLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<ConvolutionalLayerNode<ValueType>, predictors::neural::ConvolutionalLayer<ValueType>, ValueType>(input, layer)
     {
-        // For convolutional layers, the input size _includes_ padding, for some reason. We need to undo that here:
-        auto& inputLayout = this->GetInputMemoryLayout();
-        auto numDimensions = this->NumInputDimensions();
-        for (int index = 0; index < numDimensions; ++index)
-        {
-            inputLayout.size[index] -= 2 * inputLayout.offset[index];
-            inputLayout.stride[index] -= 2 * inputLayout.offset[index];
-        }
     }
 
     template <typename ValueType>

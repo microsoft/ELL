@@ -59,13 +59,16 @@ namespace nodes
 
         // Calculate input dimension parameters
         size_t inputPaddingSize = layerParameters.inputPaddingParameters.paddingSize;
-        auto inputShapeArray = this->GetLayer().GetInputShapeWithPadding();
-
+        auto inputShapeArray = this->GetLayer().GetInputShape();
         Shape inputStride{ inputShapeArray.begin(), inputShapeArray.end() };
         Shape inputOffset{ inputPaddingSize, inputPaddingSize, 0 };
         Shape inputSize(inputStride.size());
         for (int dimensionIndex = 0; dimensionIndex < inputOffset.size(); ++dimensionIndex)
         {
+            if(inputStride[dimensionIndex] < (2 * inputOffset[dimensionIndex]))
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Input size not large enough to accomodate padding");
+            }
             inputSize[dimensionIndex] = inputStride[dimensionIndex] - (2 * inputOffset[dimensionIndex]);
         }
 
@@ -79,7 +82,10 @@ namespace nodes
         Shape outputSize(outputStride.size());
         for (int dimensionIndex = 0; dimensionIndex < outputOffset.size(); ++dimensionIndex)
         {
-            assert(outputStride[dimensionIndex] >= (2 * outputOffset[dimensionIndex]));
+            if(outputStride[dimensionIndex] < (2 * outputOffset[dimensionIndex]))
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Output size not large enough to accomodate padding");
+            }
             outputSize[dimensionIndex] = outputStride[dimensionIndex] - (2 * outputOffset[dimensionIndex]);
         }
 

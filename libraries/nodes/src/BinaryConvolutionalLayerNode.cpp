@@ -64,11 +64,6 @@ namespace nodes
             const auto columnStride = inputLayout.stride[1];
             const auto channelStride = inputLayout.stride[2];
 
-            // channel, row, column order
-            // auto index1 = function.Operator(times, valueChannel, function.Literal<int>(rowStride * columnStride));
-            // auto index2 = function.Operator(times, valueRow, function.Literal<int>(columnStride));
-            // auto index = function.Operator(plus, index1, function.Operator(plus, index2, valueColumn));
-
             // row, column, channel order
             auto index1 = function.Operator(times, valueRow, function.Literal<int>(columnStride * channelStride));
             auto index2 = function.Operator(times, valueColumn, function.Literal<int>(channelStride));
@@ -277,14 +272,6 @@ namespace nodes
     BinaryConvolutionalLayerNode<ValueType>::BinaryConvolutionalLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::BinaryConvolutionalLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<BinaryConvolutionalLayerNode<ValueType>, predictors::neural::BinaryConvolutionalLayer<ValueType>, ValueType>(input, layer)
     {
-        // For convolutional layers, the input size _includes_ padding, for some reason. We need to undo that here:
-        auto& inputLayout = this->GetInputMemoryLayout();
-        auto numDimensions = this->NumInputDimensions();
-        for (int index = 0; index < numDimensions; ++index)
-        {
-            inputLayout.size[index] -= 2 * inputLayout.offset[index];
-            inputLayout.stride[index] -= 2 * inputLayout.offset[index];
-        }
     }
 
     template<typename ValueType> // TODO: PackedBitsType
