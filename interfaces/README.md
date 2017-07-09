@@ -8,13 +8,18 @@ This section covers how to generate and test the ELL language bindings, which pr
 
 The language bindings are generated using SWIG. To build them, you need to install SWIG version 3.0.12 or later. 
 
-* Linux / Mac:
+* Linux:
 ```
-wget http://www.swig.org/download.htmlhttp://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
+wget http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
 tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12.tar
 ./configure --without-pcre && make && sudo make install
 ```
-* Windows:
+* Mac
+```
+brew install swig
+```
+
+* Windows: 
 On windows we have already included a [Nuget package](https://www.nuget.org/packages/swigwintools/3.0.12) for swig in the initial setup, so you should be good to go!
 
 ## Python
@@ -32,16 +37,20 @@ Note: you can also use the full [Anaconda](https://www.continuum.io/downloads) i
 conda create -n py36 anaconda python=3
 # Activate the environment
 activate py36
-# ELL requires gcc 5 and above for C++14. Upgrade anaconda's environment to support it.
+
+# On Linux, ELL requires gcc 5 and above for C++14. Upgrade anaconda's environment to support it.
 conda install libgcc 
 ```
+
 3. Generate the python bindings. In the repository root directory from within the py36 anaconda environment:
 ```
 mkdir build
 cd build
 cmake ..
+
 # Linux / Mac
 make _ELL_python 
+
 # Windows
 cmake --build . --target _ELL_python --config Release
 ```

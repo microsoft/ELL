@@ -33,6 +33,7 @@ try:
         (modelbuilder_test.test,  "modelbuilder_test")
     ]
 except ImportError:
+     print("Import failed")
      SkipTests = True
 
 def interface_test():
