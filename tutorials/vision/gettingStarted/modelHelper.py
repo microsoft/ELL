@@ -48,18 +48,20 @@ class ModelHelper:
                     (self.labels[int(element[1])], round(element[0], 2)))
         return result
 
-    def resize_image(self, image, newSize):
+    def resize_image(self, image):
+        newSize = self.inputHeightAndWidth
+        # Shape: [rows, cols, channels]
         """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order, with each pixel multiplied by the configured scaleFactor."""
-        if (image.shape[0] > image.shape[1]):
-            rowStart = 0
-            rowEnd = image.shape[1]
-            colStart = int((image.shape[0] - image.shape[1]) / 2)
-            colEnd = image.shape[1]
-        else:
-            rowStart = int((image.shape[1] - image.shape[0]) / 2)
-            rowEnd = image.shape[0]
+        if (image.shape[0] > image.shape[1]): # Tall (more rows than cols)
+            rowStart = int((image.shape[0] - image.shape[1]) / 2)
+            rowEnd = rowStart + image.shape[1]
             colStart = 0
-            colEnd = image.shape[0]
+            colEnd = image.shape[1]
+        else: # Wide (more cols than rows)
+            rowStart = 0
+            rowEnd = image.shape[0]
+            colStart = int((image.shape[1] - image.shape[0]) / 2)
+            colEnd = colStart + image.shape[0]
 
         cropped = image[rowStart:rowEnd, colStart:colEnd]
         resized = cv2.resize(cropped, newSize)
@@ -67,7 +69,7 @@ class ModelHelper:
 
     def prepare_image_for_predictor(self, image):
         """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order, with each pixel multiplied by the configured scaleFactor."""
-        resized = self.resize_image(image, self.inputHeightAndWidth)
+        resized = self.resize_image(image)
         resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
         resized = resized * self.scaleFactor
         resized = resized.astype(np.float).ravel()
