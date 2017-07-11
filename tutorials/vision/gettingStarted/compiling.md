@@ -31,7 +31,8 @@ With the above background, let's get started. The compilation workflow is simila
 
 Please choose your build platform:
 
-- [Compiling on Windows](compiling-WINDOWS.md)
-- [Compiling on Linux](compiling-LINUX.md)
+- [Compiling on Windows](compiling-Windows.md)
+- [Compiling on Linux](compiling-Linux.md)
+- [Compiling for Raspberry Pi](compiling-Pi3.md)
 
     

@@ -15,14 +15,17 @@ endif()
 
 set (TUTORIAL_NAME GettingStarted)
 set (PYTHON_TUTORIALS
-    coffeemug.jpg
-    compiledCntkDemo.py
-    compiledDarknetDemo.py
     cntk.md
     cntkDemo.py
     cntkVgg16ImageNetLabels.txt
     coffeemug.jpg
+    compiledCntkDemo.py
+    compiledDarknetDemo.py
+    compiling-Linux.md
+    compiling-Windows.md
+    compiling-Pi3.md
     compiling.md
+    compilingAdvanced.md
     darknet.md
     darknetDemo.py
     darknetImageNetLabels.txt
