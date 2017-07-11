@@ -15,12 +15,14 @@ We recommend using the `apt-get` package manager to download and install prerequ
 
     sudo apt-get -y update
 
-##### GCC and CMake
+#### GCC and CMake
 Next, you will need *gcc* and [*CMake*](https://cmake.org/). They are often installed by default on Ubuntu systems, but to confirm type
 
     sudo apt-get install -y gcc cmake
 
-##### LLVM
+ELL requires gcc 5 and above for C++14 support.
+
+#### LLVM
 You will also need the dev version of [*LLVM-3.9*](http://llvm.org/). At the time of writing this document, `apt-get` doesn't yet have the required version of LLVM. To check this, type
 
     apt-cache show llvm-dev
@@ -33,7 +35,7 @@ and look for the version number. If the version number is 3.9 or greater, you ca
     sudo apt-get -y update
     sudo apt-get install -y llvm-3.9-dev
 
-##### libedit
+#### libedit
 Install the BSD editline and history libraries
 
     sudo apt-get install -y libedit-dev
@@ -41,6 +43,32 @@ Install the BSD editline and history libraries
 #### zlib
 
     sudo apt-get install zlibc zlib1g zlib1g-dev
+
+#### SWIG
+
+The language bindings for Python are generated using SWIG. To build them, you need to install SWIG version 3.0.12 or later. 
+
+```
+wget http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
+tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12.tar
+./configure --without-pcre && make && sudo make install
+```
+
+#### Python
+
+The tutorials require Python 3.6, we recommend you use [Miniconda](https://conda.io/miniconda.html), which works well with Jupyter notebooks and provides a way to manage different Python versions.   Note: you can also use the full [Anaconda](https://www.continuum.io/downloads) if you already have that installed.
+
+If you build ELL from a `conda` Python 3.6 environment then the Python language bindings will be built and you can run the
+tutorials.
+
+To configure the Python 3.6 environment using Miniconda:
+```
+# Create the environment
+conda create -n py36 anaconda python=3
+# Activate the environment
+source activate py36
+```
+Now you have an activated `conda` Python 3.6 environment, and if you build ELL from this environment then the Python language bindings will be built and you can run the tutorials.
 
 ### Optional Prerequisites (OpenBLAS and Doxygen)
 ELL can optionally take advantage of the optimized linear algebra libraries in [*OpenBLAS*](http://www.openblas.net/), and generate code documentation using *Doxygen*. To install these optional dependencies, type
@@ -59,9 +87,13 @@ Then, invoke cmake:
 
 **Important:** don't forget the two dots (..) at the end of the command! 
 
-Finally, build ELL by typing 
+Now you can build ELL by typing:
 
     make
+
+and lastly, so you can run the tutorials, the following will build the Python language bindings for ELL:
+
+    make _ELL_python 
 
 The generated executables will appear in a directory named `ELL/build/bin`.
 

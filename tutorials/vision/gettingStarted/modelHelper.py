@@ -85,13 +85,17 @@ class ModelHelper:
     def init_image_source(self):
         # Start video capture device or load static image
         if self.camera is not None:
-            self.captureDevice = cv2.VideoCapture(camera)
+            self.captureDevice = cv2.VideoCapture(self.camera)
         elif self.imageFilename:
             self.frame = cv2.imread(self.imageFilename)
+            if (type(self.frame) == type(None)):
+                raise Exception('image from %s failed to load' % (self.imageFilename))
 
     def get_next_frame(self):
         if self.captureDevice is not None:
-            self.frame = captureDevice.read()
+            ret, self.frame = self.captureDevice.read()
+            if (not ret):
+                raise Exception('your captureDevice is not returning images')
         return self.frame
         
     def resize_image(self, image, newSize):
@@ -125,7 +129,7 @@ class ModelHelper:
         cv2.rectangle(
             image, (0, 0), (image.shape[1], 40), (50, 200, 50), cv2.FILLED)
         cv2.putText(image, label, (10, 25),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 2, 8)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
         return
 
     def draw_fps(self, image):
@@ -133,16 +137,16 @@ class ModelHelper:
         if (self.frame_count > 0):
             diff = now - self.start
             if (diff >= 1):
-                self.fps = self.frame_count
+                self.fps = round(self.frame_count / diff, 1)
                 self.frame_count = 0
                 self.start = now
 
         label = "fps " + str(self.fps)
         labelSize, baseline = cv2.getTextSize(
-            label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+            label, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)
         width = image.shape[1]
         height = image.shape[0]
-        pos = (width - labelSize[0] - 5, height - labelSize[1] - 1)
+        pos = (width - labelSize[0] - 5, labelSize[1]+5)
         cv2.putText(image, label, pos, cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (0, 0, 128), 2, 8)
+                    0.4, (0, 0, 128), 1, cv2.LINE_AA)
         self.frame_count = self.frame_count + 1

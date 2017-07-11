@@ -35,9 +35,34 @@ but you must make sure the command-line version of the *Xcode* tools are availab
 
 If you already have *LLVM* installed, ensure that you have version 3.9.
 
-**CMake assumes that the binary files for llvm are located in /usr/local/opt (The standard brew location)**
+**CMake assumes that the binary files for LLVM are located in /usr/local/opt (The standard brew location)**
+
+### SWIG
+
+The language bindings for Python are generated using SWIG. To build them, you need to install SWIG version 3.0.12 or later. 
+
+```
+brew install swig
+```
+
+### Python
+
+The tutorials require P`ython 3.6, we recommend you use [Miniconda](https://conda.io/miniconda.html), which works well with Jupyter notebooks and provides a way to manage different Python versions.   Note: you can also use the full [Anaconda](https://www.continuum.io/downloads) if you already have that installed.
+
+If you build ELL from a `conda` Python 3.6 environment then the Python language bindings will be built and you can run the
+tutorials.
+
+To configure the Python 3.6 environment using Miniconda:
+```
+# Create the environment
+conda create -n py36 anaconda python=3
+# Activate the environment
+source activate py36
+```
+Now you have an activated `conda` Python 3.6 environment, and if you build ELL from this environment then the Python language bindings will be built and you can run the tutorials.
 
 ### Optional Dependencies (OpenBLAS and Doxygen)
+
 By default, ELL will use the *BLAS* linear algebra libraries built into the operating system, but it
 can optionally take advantage of the optimized linear algebra libraries in [*OpenBLAS*](http://www.openblas.net/).
 ELL can also generate code documentation using *Doxygen*. To install these optional dependencies, type
@@ -57,9 +82,13 @@ Then, invoke cmake:
 
 **Important:** don't forget the two dots (..) at the end of the command!
 
-Finally, build ELL by typing
+Now you can build ELL by typing:
 
     make
+
+and lastly, so you can run the tutorials, the following will build the Python language bindings for ELL:
+
+    make _ELL_python 
 
 The generated executables will appear in a directory named `ELL/build/bin`.
 

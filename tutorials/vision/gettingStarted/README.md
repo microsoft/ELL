@@ -28,9 +28,7 @@ static images or .mp4 videos and process those instead.
     conda install numpy
     ~~~~
 
-5. You will need to build ELL and the 
-[ELL Python Language Bindings](../../../interfaces/README.md). (You will need to build ELL after you install Python, so that the `CMake` step picks up on the fact that you have Python
-3.6 installed.)
+5. You will need to be sure you built the ELL Python Language Bindings as per the ELL INSTALL-xxx.md instructions at the root of this git repo.  You will need to build ELL after you install Python (or activate your conda environment), so that the `CMake` step picks up on the fact that you have Python 3.6 installed.
 
 ### Downloading a pre-trained model
 

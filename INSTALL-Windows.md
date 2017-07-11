@@ -8,18 +8,33 @@ The instructions below assume that ELL was obtained from `github.com/Microsoft/E
 
 ### Prerequisites
 
-##### Visual Studio 2015 update 3 with C++ compiler, or Visual Studio 2017
-###### Visual Studio 2015 update 3
+#### Visual Studio 2015 update 3 with C++ compiler, or Visual Studio 2017
+##### Visual Studio 2015 update 3
 If using *Microsoft Visual Studio 2015 update 3*, make sure the C++ compiler is installed. Note that the C++ compiler installation is not enabled by default, so you must select the custom installation option and manually check the C++ checkbox.
-###### Visual Studio 2017
+##### Visual Studio 2017
 A free version is available at <https://www.visualstudio.com/vs/community/>. Select the following Workloads during install:
 * `Desktop Development with C++`
 
-##### CMake
+#### CMake
 ELL uses the [*CMake*](https://cmake.org/) build system. You can download and install it from <https://cmake.org/download/>.
 
-##### LLVM (as well as OpenBLAS and Doxygen)
+#### LLVM (as well as OpenBLAS and Doxygen)
 ELL depends on the [*LLVM*](http://llvm.org/) compiler framework. Optionally, it can take advantage of the fast linear algebra libraries in [*OpenBLAS*](http://www.openblas.net/) and generate documentation using *Doxygen*. An easy way to get the prebuilt 64-bit version of LLVM and the optional dependencies is to use the [*NuGet*](https://www.nuget.org/) package manager (version 3.5 or newer). The relevant NuGet packages are specified in a config file in the `ELL/external` directory.  We recommend using the NuGet command line tool (NuGet CLI), which can be obtained by following the instructions at <https://docs.nuget.org/ndocs/guides/install-nuget>. After downloading NuGet CLI, change to the repository's root directory (`ELL`):
+
+#### Python
+
+The tutorials require Python 3.6, we recommend you use [Miniconda](https://conda.io/miniconda.html), which works well with Jupyter notebooks and provides a way to manage different Python versions.   Note: you can also use the full [Anaconda](https://www.continuum.io/downloads) if you already have that installed.
+
+To configure the Python 3.6 environment using Miniconda:
+```
+# Create the environment
+conda create -n py36 anaconda python=3
+# Activate the environment
+activate py36
+```
+Now you have an activated `conda` Python 3.6 environment, and if you build ELL from this environment then the Python language bindings will be built and you can run the tutorials.
+
+#### Nuget Packages
 
     cd ELL
 
@@ -29,10 +44,15 @@ and invoke the command
 
 NuGet will download the prerequisites into the `ELL/external` directory.
 
-By default, CMake will try to determine the correct version of the OpenBLAS library to use for your processor
-type. If you want to override the automatic choice, you can tell CMake which version to use by setting the `PROCESSOR_HINT`
-cache variable when you initially call CMake.
+### Building ELL
 
+Next, use CMake to create a Visual Studio solution. In the repository's root directory (`ELL`), create a `build` subdirectory and change to that directory:
+
+    mkdir build
+    cd build
+
+Next, invoke cmake as follows:
+    
 For Visual Studio 2015:
 
     cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..
@@ -41,44 +61,33 @@ For Visual Studio 2017:
 
     cmake -G "Visual Studio 15 2017 Win64" -DPROCESSOR_HINT=haswell ..
 
-Or, if you have already run CMake to set up the build environment, you can just set the variable:
-
-    cmake -DPROCESSOR_HINT=haswell ..
-
-Currently, the only supported option for this variable is `haswell`.
-
-### Building ELL
-Next, use CMake to create a Visual Studio solution. In the repository's root directory (`ELL`), create a `build` subdirectory and change to that directory:
-
-    mkdir build
-    cd build
-
-Next, invoke cmake as follows:
-
-    cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..
+By default, CMake will try to determine the correct version of the OpenBLAS library to use for your processor
+type. If you want to override the automatic choice, you can tell CMake which version to use by setting the `PROCESSOR_HINT`
+variable.
 
 **Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, along with other files in the `build` directory. 
 
-There are two alternative ways to build the library. One option is to build everything from the command line, by typing 
+Now you can build ELL by typing:
 
-    cmake --build .
+    cmake --build . --config Release
 
-**Important** don't forget the dot (.) at the end of the command!
+And lastly, so you can run the tutorials, the following will build the Python language bindings for ELL:
 
-The other option is to open the solution file in Visual Studio and build it there. To do this, type:
+    cmake --build . --target _ELL_python --config Release 
 
-    ELL.sln
-
-Visual studio will open the solution. Choose either the "Debug" configuration or the "Release" configuration, and use the shortcut `Ctrl+Shift+B` to build the solution. 
+*Note:* you can also open the `ELL.sln` Visual Studio Solution and build it from there, which is how we normally do our development work on ELL.
+Choose either the "Debug" configuration or the "Release" configuration, and use the shortcut `Ctrl+Shift+B` to build the solution. 
 
 In both cases, the project executables will appear in a directory named `ELL/build/bin`.
 
 ### Testing ELL
     
     cd build
-    ctest --build-config Debug
+    ctest --build-config Release
 
 The ctest tool comes with your cmake installation.  For more info see [ctest](https://cmake.org/cmake/help/v3.9/manual/ctest.1.html).
+
+If tests fail you can add the `-VV` option to get verbose output from each test which can help narrow down the problem.
 
 ### Generating code documentation
 
