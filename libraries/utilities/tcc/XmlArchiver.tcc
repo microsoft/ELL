@@ -130,7 +130,7 @@ namespace utilities
     //
     // Deserialization
     //
-    template <typename ValueType, IsFundamental<ValueType> concept>
+    template <typename ValueType, IsIntegral<ValueType> concept>
     void XmlUnarchiver::ReadScalar(const char* name, ValueType& value)
     {
         auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName<ValueType>());
@@ -145,8 +145,27 @@ namespace utilities
 
         // read value
         auto valueToken = _tokenizer.ReadNextToken();
-        std::stringstream valueStream(valueToken);
-        valueStream >> value;
+        value = static_cast<ValueType>(std::stoll(valueToken));
+
+        _tokenizer.MatchTokens({ "'", "/", ">" });
+    }
+
+    template <typename ValueType, IsFloatingPoint<ValueType> concept>
+    void XmlUnarchiver::ReadScalar(const char* name, ValueType& value)
+    {
+        auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName<ValueType>());
+        bool hasName = name != std::string("");
+
+        _tokenizer.MatchTokens({ "<", typeName });
+        if (hasName)
+        {
+            _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
+        }
+        _tokenizer.MatchTokens({ "value", "=", "'" });
+
+        // read value
+        auto valueToken = _tokenizer.ReadNextToken();
+        value = static_cast<ValueType>(std::stod(valueToken));
 
         _tokenizer.MatchTokens({ "'", "/", ">" });
     }

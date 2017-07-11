@@ -8,12 +8,16 @@
 
 #include "Tokenizer.h"
 #include "Exception.h"
+#include "Files.h"
 
 // stl
 #include <cassert>
 #include <cctype>
 #include <iostream>
 #include <sstream>
+
+// Note: BUFFER_SIZE must be larger than the largest readable token 
+#define BUFFER_SIZE 1024*1024
 
 namespace ell
 {
@@ -22,29 +26,39 @@ namespace utilities
     //
     // Tokenizer
     //
+    Tokenizer::Tokenizer(std::istream& inputStream, const std::string tokenStartChars)
+        : _in(inputStream), _tokenStartChars(tokenStartChars)
+    {
+        // Initially, start with an empty buffer
+        _currentPosition = _textBuffer.begin();
+        _tokenStart = _textBuffer.begin();
+        _bufferEnd = _textBuffer.end();
+    }
+
     std::string Tokenizer::ReadNextToken()
     {
-        const char escapeChar = '\\';
-
-        if (_peekedTokens.size() > 0)
+        if (!_peekedTokens.empty())
         {
-            auto temp = _peekedTokens.back();
-            _peekedTokens.pop_back();
+            auto temp = _peekedTokens.top();
+            _peekedTokens.pop();
             return temp;
         }
-        std::stringstream tokenStream;
+
+        const char escapeChar = '\\';
+        std::string token;
 
         // eat whitespace and add first char
-        while (_in)
+        while (IsValid())
         {
-            auto ch = _in.get();
+            auto ch = GetNextCharacter();
             if (ch == EOF)
             {
-                return tokenStream.str();
+                _tokenStart = _currentPosition;
+                return token;
             }
             else if (!std::isspace(ch))
             {
-                tokenStream << (char)ch;
+                token.push_back((char)ch);
                 bool isParsingString = _currentStringDelimiter != '\0';
                 bool isStringDelimiter = _stringDelimiters.find(ch) != std::string::npos;
                 if (isParsingString) // we're in the middle of parsing a string: probably because we just read in a quotation mark last time
@@ -53,11 +67,12 @@ namespace utilities
                     {
                         assert(_currentStringDelimiter == ch);
                         _currentStringDelimiter = '\0';
-                        return tokenStream.str(); // return the end-delimiter
+                        _tokenStart = _currentPosition;
+                        return token; // return the end-delimiter
                     }
                     else
                     {
-                        // we're good, keep eating characters from the string and adding them to the token
+                        // we're good -- keep eating characters from the string and adding them to the token
                         break;
                     }
                 }
@@ -71,18 +86,19 @@ namespace utilities
                     }
                     else
                     {
-                        return tokenStream.str(); // we did hit a token-stop char. Return it.
+                        _tokenStart = _currentPosition;
+                        return token; // we did hit a token-stop char. Return it.
                     }
                 }
             }
         }
-        // At this point, the first char of a token will be in the tokenStream
+        // At this point, the first char of a token will be in the token string
 
         // If we're in read-string mode, read until we get an unescaped string delimiter that matches the current string delimiter
         bool prevEscaped = false;
-        while (_in)
+        while (IsValid())
         {
-            auto ch = _in.get();
+            auto ch = GetNextCharacter();
             if (ch == EOF)
             {
                 break;
@@ -95,26 +111,32 @@ namespace utilities
                     // only break if we're done reading a string
                     if (ch == _currentStringDelimiter)
                     {
-                        _in.unget();
+                        UngetCharacter();
                         break;
                     }
                 }
             }
             else if (std::isspace(ch) || _tokenStartChars.find(ch) != std::string::npos) // not in read-string mode, break on token or space
             {
-                _in.unget();
+                UngetCharacter();
                 break;
             }
 
-            tokenStream << (char)ch;
+            token.push_back((char)ch);
             prevEscaped = !prevEscaped && ch == escapeChar;
         }
 
-        return tokenStream.str();
+        _tokenStart = _currentPosition;
+        return token;
     }
 
     std::string Tokenizer::PeekNextToken()
     {
+        if (!_peekedTokens.empty())
+        {
+            return _peekedTokens.top();
+        }
+
         auto token = ReadNextToken();
         PutBackToken(token);
         return token;
@@ -122,7 +144,7 @@ namespace utilities
 
     void Tokenizer::PutBackToken(std::string token)
     {
-        _peekedTokens.push_back(token);
+        _peekedTokens.push(token);
     }
 
     void Tokenizer::PrintTokens()
@@ -141,8 +163,6 @@ namespace utilities
         auto nextToken = ReadNextToken();
         if (nextToken != token)
         {
-            std::cout << "Failed to match token " << token << ", got: " << nextToken << std::endl;
-            assert(false);
             throw InputException(InputExceptionErrors::badStringFormat, std::string{ "Failed to match token " } + token + ", got: " + nextToken);
         }
     }
@@ -153,6 +173,62 @@ namespace utilities
         {
             MatchToken(token);
         }
+    }
+
+    bool Tokenizer::IsValid()
+    {
+        bool inIsValid = (bool)_in;
+        return (bool)_in || _textBuffer.size() > 0 || _peekedTokens.size() > 0;
+    }
+
+    int Tokenizer::GetNextCharacter()
+    {
+        if (_currentPosition == _bufferEnd)
+        {
+            ReadData();
+        }
+        
+        if(_currentPosition == _bufferEnd)
+        {
+            return EOF;
+        }
+
+        auto result = *_currentPosition;
+        ++_currentPosition;
+        return result;
+    }
+
+    void Tokenizer::UngetCharacter()
+    {
+        assert(_currentPosition != _textBuffer.begin());
+        --_currentPosition;
+    }
+
+    void Tokenizer::ReadData()
+    {
+        // Allocate textBuffer if it's empty
+        auto oldLength = _bufferEnd - _tokenStart;
+        auto oldOffset = _currentPosition - _tokenStart;
+        if(_textBuffer.size() == 0)
+        {
+            _textBuffer.resize(BUFFER_SIZE, '\0');
+            _bufferEnd = _textBuffer.end();
+        }
+        else
+        {
+            // move data from currentPosition to end to the beginning of the buffer
+            std::copy(_tokenStart, _bufferEnd, _textBuffer.begin());
+        }
+
+        auto newPtr = _textBuffer.data() + oldLength;
+        auto maxLength = _textBuffer.size() - oldLength;
+
+        // read into buffer
+        _in.read(newPtr, maxLength);
+        auto amountRead = _in.gcount();
+        _bufferEnd = _textBuffer.begin() + oldLength + amountRead;
+        _tokenStart = _textBuffer.begin();
+        _currentPosition = _tokenStart + oldOffset;
     }
 }
 }

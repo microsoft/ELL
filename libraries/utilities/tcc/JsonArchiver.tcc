@@ -118,7 +118,7 @@ namespace utilities
     //
     // Deserialization
     //
-    template <typename ValueType, IsFundamental<ValueType> concept>
+    template <typename ValueType, IsIntegral<ValueType> concept>
     void JsonUnarchiver::ReadScalar(const char* name, ValueType& value)
     {
         bool hasName = name != std::string("");
@@ -129,8 +129,30 @@ namespace utilities
 
         // read string
         auto valueToken = _tokenizer.ReadNextToken();
-        std::stringstream valueStream(valueToken);
-        valueStream >> value;
+        value = static_cast<ValueType>(std::stoll(valueToken));
+
+        // eat a comma if it exists
+        if (hasName)
+        {
+            if (_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken();
+            }
+        }
+    }
+
+    template <typename ValueType, IsFloatingPoint<ValueType> concept>
+    void JsonUnarchiver::ReadScalar(const char* name, ValueType& value)
+    {
+        bool hasName = name != std::string("");
+        if (hasName)
+        {
+            MatchFieldName(name);
+        }
+
+        // read string
+        auto valueToken = _tokenizer.ReadNextToken();
+        value = static_cast<ValueType>(std::stod(valueToken));
 
         // eat a comma if it exists
         if (hasName)

@@ -39,7 +39,7 @@ namespace utilities
     using IsNotFundamental = typename std::enable_if_t<!std::is_fundamental<std::decay_t<ValueType>>::value, int>;
 
     template <typename ValueType>
-    using IsIntegral = typename std::enable_if_t<std::is_integral<std::decay_t<ValueType>>::value && !std::is_same<std::decay_t<ValueType>, bool>::value && !std::is_same<std::decay_t<ValueType>, char>::value, bool>;
+    using IsIntegral = typename std::enable_if_t<std::is_integral<std::decay_t<ValueType>>::value, bool>;
 
     template <typename ValueType>
     using IsFloatingPoint = typename std::enable_if_t<std::is_floating_point<std::decay_t<ValueType>>::value, bool>;

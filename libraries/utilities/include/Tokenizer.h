@@ -11,6 +11,7 @@
 // stl
 #include <initializer_list>
 #include <istream>
+#include <stack>
 #include <string>
 #include <vector>
 
@@ -26,14 +27,7 @@ namespace utilities
         ///
         /// <param name=inputStream> Stream to read from </param>
         /// <param name=tokenStartChars> Set of characters that indicate the beginning of a new token. </param>
-        Tokenizer(std::istream& inputStream, const std::string tokenStartChars)
-            : _in(inputStream), _tokenStartChars(tokenStartChars) {}
-
-        /// <summary> Constructor </summary>
-        ///
-        /// <param name=filename> Filename to read from </param>
-        /// <param name=tokenStartChars> Set of characters that indicate the beginning of a new token. </param>
-        Tokenizer(std::string filename, const std::string tokenStartChars);
+        Tokenizer(std::istream& inputStream, const std::string tokenStartChars);
 
         /// <summary> Gets the next token from the input stream. </summary>
         ///
@@ -49,7 +43,7 @@ namespace utilities
         ///
         /// <param name="token"> The token to match. </param>
         void MatchToken(std::string token);
-        
+
         /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
         ///
         /// <param name="token"> The token to match. </param>
@@ -68,7 +62,17 @@ namespace utilities
         std::string _tokenStartChars;
         std::string _stringDelimiters = "'\"";
 
-        std::vector<std::string> _peekedTokens;
+        bool IsValid();
+        int GetNextCharacter();
+        void UngetCharacter();
+        void ReadData();
+
+        std::vector<char> _textBuffer;
+        std::vector<char>::iterator _tokenStart;
+        std::vector<char>::iterator _currentPosition;
+        std::vector<char>::iterator _bufferEnd;
+
+        std::stack<std::string> _peekedTokens;
 
         char _currentStringDelimiter = '\0'; // '\0' if we're not currently parsing a string
     };

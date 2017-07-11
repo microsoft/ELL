@@ -147,7 +147,10 @@ namespace utilities
         virtual void UnarchiveObjectAsPrimitive(const char* name, IArchivable& value) override;
 
     private:
-        template <typename ValueType, IsFundamental<ValueType> concept = 0>
+        template <typename ValueType, IsIntegral<ValueType> concept = 0>
+        void ReadScalar(const char* name, ValueType& value);
+
+        template <typename ValueType, IsFloatingPoint<ValueType> concept = 0>
         void ReadScalar(const char* name, ValueType& value);
 
         void ReadScalar(const char* name, std::string& value);
