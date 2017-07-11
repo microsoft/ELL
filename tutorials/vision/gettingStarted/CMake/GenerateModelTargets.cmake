@@ -14,17 +14,20 @@ function(generate_ell_model_compile_target model_name arch_name target_name demo
     # arch processing
     if(arch_name STREQUAL "pi3") # Raspberry Pi 3
         set(llc_options -O3 -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53 -relocation-model=pic)
+        set(compile_target_name "pi3")
     elseif(arch_name STREQUAL "pi0") # Raspberry Pi Zero
         set(llc_options -O3 -mtriple=arm-linux-gnueabihf -relocation-model=pic)
+        set(compile_target_name "pi0")
     else() # host
         set(llc_options -O3 -relocation-model=pic)
+        set(compile_target_name "host")
     endif()
 
     # cmake target and output
     set(target_path ${CMAKE_CURRENT_BINARY_DIR}/compiled_${model_name}_${arch_name})
 
     set(compiled_output
-        ${target_path}/${model_name}.ll
+        ${target_path}/${model_name}.bc
         ${target_path}/${model_name}.i
         ${target_path}/${model_name}.i.h)
     set(llc_output ${target_path}/${model_name}.${OBJECT_EXTENSION})
@@ -37,21 +40,21 @@ function(generate_ell_model_compile_target model_name arch_name target_name demo
     # run commands to generate model files and invoke SWIG
 
     # ELL's compile tool
-    set(compile_options --blas)
+    set(compile_options --blas --target ${compile_target_name})
     add_custom_command(
         OUTPUT ${compiled_output}
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map
-        COMMAND compile -imap ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map -cfn predict -cmn ${model_name} -od ${target_path} --ir --swig ${compile_options}
+        COMMAND compile -imap ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map -cfn predict -cmn ${model_name} -od ${target_path} --bitcode --swig ${compile_options}
         COMMENT "Generating ${compiled_output}")
 
     # llc
     add_custom_command(
         OUTPUT ${llc_output}
-        DEPENDS ${target_path}/${model_name}.ll
+        DEPENDS ${target_path}/${model_name}.bc
         COMMAND ${CMAKE_COMMAND} -E make_directory ${target_path}
-        COMMAND ${LLC_EXECUTABLE} ${target_path}/${model_name}.ll -o ${target_path}/${model_name}.${OBJECT_EXTENSION} -filetype=obj ${llc_options}
-        COMMAND ${CMAKE_COMMAND} -E remove ${target_path}/${model_name}.ll
-        COMMENT "Compiling ${model_name}.ll to ${llc_output} for ${arch_name}")
+        COMMAND ${LLC_EXECUTABLE} ${target_path}/${model_name}.bc -o ${target_path}/${model_name}.${OBJECT_EXTENSION} -filetype=obj ${llc_options}
+        COMMAND ${CMAKE_COMMAND} -E remove ${target_path}/${model_name}.bc
+        COMMENT "Compiling ${model_name}.bc to ${llc_output} for ${arch_name}")
 
     # swig
     set(ell_root ${CMAKE_CURRENT_SOURCE_DIR}/../../../)

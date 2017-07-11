@@ -82,23 +82,31 @@ namespace utilities
     template <typename T>
     bool CommandLineParser::ParseVal(std::string str, std::vector<std::pair<std::string, T>> valNames, T& result, std::string& resultString)
     {
-        bool didFindOne = false;
+        bool foundPartialMatch = false;
         for (const auto& valNamePair : valNames)
         {
+            // Exact match
+            if(valNamePair.first == str)
+            {
+                result = valNamePair.second;
+                return true;
+            }
+
+            // Partial match
             if (valNamePair.first.find(str) == 0)
             {
-                if (didFindOne)
+                // More than one partial match -- fail
+                if (foundPartialMatch)
                 {
                     return false;
                 }
-
                 resultString = valNamePair.first;
                 result = valNamePair.second;
-                didFindOne = true;
+                foundPartialMatch = true;
             }
         }
 
-        return didFindOne;
+        return foundPartialMatch;
     }
 
     template <typename T>
