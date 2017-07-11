@@ -12,14 +12,14 @@ def get_ell_predictor(modelConfig):
     return cntk_to_ell.predictor_from_cntk_model(modelConfig.model_files[0])
 
 def main():
-
+    # Check for model file
     if (not os.path.exists('VGG16_ImageNet_Caffe.model')):
         print("Please download the 'VGG16_ImageNet_Caffe.model' file, see README.md")
         sys.exit(1)
         
     # ModelConfig for VGG16 model from CNTK Model Gallery
     # Follow the instructions in README.md to download the model if you intend to use it.
-    helper = mh.ModelHelper("VGG16ImageNet", ["VGG16_ImageNet_Caffe.model"], "cntkVgg16ImageNetLabels.txt", scaleFactor=1.0)
+    helper = mh.ModelHelper(sys.argv, "VGG16ImageNet", ["VGG16_ImageNet_Caffe.model"], "cntkVgg16ImageNetLabels.txt", scaleFactor=1.0)
 
     # Import the model
     model = get_ell_predictor(helper)
@@ -27,16 +27,14 @@ def main():
     # Save the model
     helper.save_ell_predictor_to_file(model, "vgg16ImageNet.map")
 
-    camera = 0
-    if (len(sys.argv) > 1):
-        camera = int(sys.argv[1]) 
+    # Initialize image source
+    helper.init_image_source()
 
-    # Start video capture device
-    cap = cv2.VideoCapture(camera)
+    last_prediction = ""
 
     while (True):
         # Grab next frame
-        ret, frame = cap.read()
+        frame = helper.get_next_frame()
 
         # Prepare the image to send to the model.
         # This involves scaling to the required input dimension and re-ordering from BGR to RGB
@@ -51,6 +49,10 @@ def main():
 
         # Turn the top5 into a text string to display
         text = "".join([str(element[0]) + "(" + str(int(100*element[1])) + "%)  " for element in top5])
+
+        if (text != lastPrediction):
+            print(text)
+            lastPrediction = text
 
         # Draw the text on the frame
         frameToShow = frame

@@ -97,3 +97,9 @@ Run the compiled demo script from the `compiled_darknetReference_pi3` folder and
 (py34) pi@raspberrypi:~ $ cd compiled_darknetReference_pi3
 (py34) pi@raspberrypi:~ $ python compiledDarknetDemo.py
 ```
+
+As with the non-compiled demo, you can optionally specify a camera number or image filename when you run the demo:
+```
+    python compiledDarknetDemo.py 1
+    python compiledDarknetDemo.py impala.jpg
+```

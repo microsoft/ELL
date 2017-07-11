@@ -62,6 +62,12 @@ To test the newly-built model, you will need the same pre-requisites as the demo
     python compiledDarknetDemo.py
 ```
 
+As with the non-compiled demo, you can optionally specify a camera number or image filename when you run the demo:
+```
+    python compiledDarknetDemo.py 1
+    python compiledDarknetDemo.py impala.jpg
+```
+
 ### Raspberry Pi 3
 
 If the above test worked, then  you are ready to get things running on [Raspberry Pi 3](compiling-Pi3.md) by following very similar steps.

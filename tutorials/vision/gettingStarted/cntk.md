@@ -25,24 +25,32 @@ If your conda environment doesn't have curl just run this:
 
 ## Class Labels
 
-You will notice we have already provided the following file which contains a list of class labels that correspond to the model prediction output.
+You will notice we have already provided the following file which contains a list of class labels that correspond 
+to the model prediction output.
 
     cntkVgg16ImageNetLabels.txt
 
-In this file you will see all sorts of fun classes from dog breeds to birds, fire truck, school bus, and many more.  It has 1000 classes it can predict.
+In this file you will see all sorts of fun classes from dog breeds to birds, fire truck, school bus, and many more.
+It has 1000 classes it can predict.
 
 
 ## Reference Implementation
 
-Ok, so now you can run the following Python script to load up this model and test it out with the ELL Reference Implementation.
-This will run on your PC (not on the Raspberry Pi yet), just to test if everything is working:
+Ok, so now you can run the following Python script to load up this model and test it out with the ELL Reference 
+Implementation. This will run on your PC (not on the Raspberry Pi yet), just to test if everything is working:
 
-    Python cntkDemo.py
+    python cntkDemo.py
 
-Note: if you have more than one video camera on your PC and you want to switch to a different one you can change the camera index by
-passing a command line argument to the script as follows:
+Note: if you have more than one video camera on your PC and you want to switch to a different one you can change 
+the camera index by passing a command line argument to the script as follows:
 
-    Python cntkDemo.py 1
+    python cntkDemo.py 1
+
+Note: if you don't have a video camera, you can run the model on an image file by specifying the filename in place 
+of the camera index. The script should handle any image format readable by OpenCV (currently, Windows bitmap (.bmp, .dib), 
+JPEG (.jpeg, .jpg, .jpe), JPEG 2000 (.jp2), PNG (.png), Sun raster (.sr, .ras), and TIFF (.tiff, .tif)).
+
+    python cntkDemo.py impala.jpg
 
 You will see a bunch of output like this while it loads up the model:
 

@@ -12,7 +12,7 @@ def get_ell_predictor(helper):
     return darknet_to_ell.predictor_from_darknet_model(helper.model_files[0], helper.model_files[1])
 
 def main():
-
+    # Check for model files
     if (not os.path.exists('darknet.cfg')):
         print("Please download the 'darknet.cfg' file, see README.md")
         sys.exit(1)
@@ -22,7 +22,7 @@ def main():
         sys.exit(1)
 
     # Pick the model you want to work with
-    helper = mh.ModelHelper("darknetReference", ["darknet.cfg", "darknet.weights"], "darknetImageNetLabels.txt")
+    helper = mh.ModelHelper(sys.argv, "darknetReference", ["darknet.cfg", "darknet.weights"], "darknetImageNetLabels.txt")
 
     # Import the model
     model = get_ell_predictor(helper)
@@ -30,16 +30,14 @@ def main():
     # Save the model
     helper.save_ell_predictor_to_file(model, "darknetReference.map")
 
-    camera = 0
-    if (len(sys.argv) > 1):
-        camera = int(sys.argv[1]) 
-
-    # Start video capture device
-    cap = cv2.VideoCapture(camera)
+    # Initialize image source
+    helper.init_image_source()
+    
+    lastPrediction = ""
 
     while (True):
         # Grab next frame
-        ret, frame = cap.read()
+        frame = helper.get_next_frame()
 
         # Prepare the image to send to the model.
         # This involves scaling to the required input dimension and re-ordering from BGR to RGB
@@ -54,6 +52,10 @@ def main():
 
         # Turn the top5 into a text string to display
         text = "".join([str(element[0]) + "(" + str(int(100*element[1])) + "%)  " for element in top5])
+
+        if (text != lastPrediction):
+            print(text)
+            lastPrediction = text
 
         # Draw the text on the frame
         frameToShow = frame

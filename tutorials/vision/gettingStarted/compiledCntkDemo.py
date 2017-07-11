@@ -10,26 +10,23 @@ sys.path.append('build')
 sys.path.append('build/Release')
 import vgg16ImageNet as model
 
-
 def main():
     # python somehow needs to know about the data vector type, so we provide it
     buffer = model.FloatVector(224 * 224 * 3)
     results = model.FloatVector(1000)
 
-    camera = 0
-    if (len(sys.argv) > 1):
-        camera = int(sys.argv[1])
-
-    # Start video capture device
-    cap = cv2.VideoCapture(camera)
-
     # Pick the model characteristics we are working with
-    helper = mh.ModelHelper("VGG16ImageNet", [
+    helper = mh.ModelHelper(sys.argv, "VGG16ImageNet", [
                             "VGG16_ImageNet_Caffe.model"], "cntkVgg16ImageNetLabels.txt", scaleFactor=1.0)
 
+    # Initialize image source
+    helper.init_image_source()
+
+    lastPrediction = ""
+
     while (True):
-        # grab a frame
-        ret, frame = cap.read()
+        # Grab next frame
+        frame = helper.get_next_frame()
 
         # Prepare the image to send to the model.
         # This involves scaling to the required input dimension and re-ordering from BGR to RGB
@@ -45,7 +42,10 @@ def main():
         # Turn the top5 into a text string to display
         text = "".join(
             [str(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])
-        print(text)
+
+        if (text != lastPrediction):
+            print(text)
+            lastPrediction = text
 
         # Draw the text on the frame
         frameToShow = frame

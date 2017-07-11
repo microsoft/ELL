@@ -41,6 +41,10 @@ passing a command line argument to the script as follows:
 
     python darknetDemo.py 1
 
+Note: if you don't have a video camera, you can run the model on an image file by specifying the filename in place of the camera index.
+
+    python darknetDemo.py impala.jpg
+
 You should see some output like this while it is loading the model:
 
     (py35) D:\temp\ELL\tutorials\vision\gettingStarted>python darknet.py 1

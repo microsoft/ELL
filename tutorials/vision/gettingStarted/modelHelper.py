@@ -4,17 +4,17 @@ import time
 
 # Class to hold info about the model that the app needs to call the model and display result correctly
 
-
 class ModelHelper:
-    def __init__(self, modelName, modelFiles, labelsFile, inputHeightAndWidth=(224, 224), scaleFactor=1 / 255, threshold=0.25):
+    def __init__(self, argv, modelName, modelFiles, labelsFile, inputHeightAndWidth=(224, 224), scaleFactor=1 / 255, threshold=0.25):
         """ Helper class to store information about the model we want to use.
-        modelName - string name of the model
+        argv       - arguments passed in from the command line
+        modelName  - string name of the model
         modelFiles - list of strings containing darknet .cfg filename and darknet .weights filename, or CNTK model file name.
         labelsFile - string name of labels that correspond to the predictions output of the model
         inputHeightAndWidth - a list of two values giving the rows and columns of the input image for the model e.g. (224, 224)
         scaleFactor - each input pixel may need to be scaled. It is common for models to require an 8-bit pixel
                       to be represented as a value between 0.0 and 1.0, which is the same as multiplying it by 1/255.
-        threshold - specifies a prediction threshold. We will ignore prediction values less than this
+        threshold   - specifies a prediction threshold. We will ignore prediction values less than this
         """
         self.model_name = modelName
         self.model_files = modelFiles
@@ -26,6 +26,23 @@ class ModelHelper:
         self.start = time.clock()
         self.frame_count = 0
         self.fps = 0
+        self.camera = None
+        self.imageFilename = None
+        self.captureDevice = None
+        self.frame = None
+        self.parse_arguments(argv)
+    
+    def parse_arguments(self, argv):
+        # Parse arguments
+        self.camera = 0
+        self.imageFilename = None
+        if len(argv) > 1:
+            arg1 = argv[1]
+            if arg1.isdigit():
+                self.camera = int(argv[1]) 
+            else:
+                self.imageFilename = argv[1]
+                self.camera = None
 
     def load_labels(self, fileName):
         labels = []
@@ -48,8 +65,36 @@ class ModelHelper:
                     (self.labels[int(element[1])], round(element[0], 2)))
         return result
 
-    def resize_image(self, image):
-        newSize = self.inputHeightAndWidth
+    def get_predictor_map(self, predictor, intervalMs):
+        """Creates an ELL map from an ELL predictor"""
+        import ell_utilities
+
+        name = self.model_name
+        if (intervalMs > 0):
+            ell_map = ell_utilities.ell_steppable_map_from_float_predictor(
+                predictor, intervalMs, name + "InputCallback", name + "OutputCallback")
+        else:
+            ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
+        return ell_map
+        
+    def save_ell_predictor_to_file(self, predictor, filePath, intervalMs=0):
+        """Saves an ELL predictor to file so that it can be compiled to run on a device, with an optional stepInterval in milliseconds"""
+        ell_map = self.get_predictor_map(predictor, intervalMs)
+        ell_map.Save(filePath)
+
+    def init_image_source(self):
+        # Start video capture device or load static image
+        if self.camera is not None:
+            self.captureDevice = cv2.VideoCapture(camera)
+        elif self.imageFilename:
+            self.frame = cv2.imread(self.imageFilename)
+
+    def get_next_frame(self):
+        if self.captureDevice is not None:
+            self.frame = captureDevice.read()
+        return self.frame
+        
+    def resize_image(self, image, newSize):
         # Shape: [rows, cols, channels]
         """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order, with each pixel multiplied by the configured scaleFactor."""
         if (image.shape[0] > image.shape[1]): # Tall (more rows than cols)
@@ -66,10 +111,10 @@ class ModelHelper:
         cropped = image[rowStart:rowEnd, colStart:colEnd]
         resized = cv2.resize(cropped, newSize)
         return resized
-
+    
     def prepare_image_for_predictor(self, image):
         """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order, with each pixel multiplied by the configured scaleFactor."""
-        resized = self.resize_image(image)
+        resized = self.resize_image(image, self.inputHeightAndWidth)
         resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
         resized = resized * self.scaleFactor
         resized = resized.astype(np.float).ravel()
@@ -82,19 +127,6 @@ class ModelHelper:
         cv2.putText(image, label, (10, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 2, 8)
         return
-
-    def save_ell_predictor_to_file(self, predictor, filePath, intervalMs=0):
-        import ell_utilities
-
-        """Saves an ELL predictor to file so that it can be compiled to run on a device, with an optional stepInterval in milliseconds"""
-        name = self.model_name
-        if (intervalMs > 0):
-            ell_map = ell_utilities.ell_steppable_map_from_float_predictor(
-                predictor, intervalMs, name + "InputCallback", name + "OutputCallback")
-            ell_map.Save(filePath)
-        else:
-            ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
-            ell_map.Save(filePath)
 
     def draw_fps(self, image):
         now = time.clock()
