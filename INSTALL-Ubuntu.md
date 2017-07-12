@@ -43,6 +43,13 @@ Install the BSD editline and history libraries
 #### zlib
 
     sudo apt-get install zlibc zlib1g zlib1g-dev
+    
+#### swig
+The build requires SWIG version 3.0.12 or higher to be installed. At the time of writing, apt-get has version 3.0.10. To install the appropriate version, type
+
+    wget http://www.swig.org/download.html http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
+    tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12
+    ./configure --without-pcre && make && sudo make install
 
 #### SWIG
 
