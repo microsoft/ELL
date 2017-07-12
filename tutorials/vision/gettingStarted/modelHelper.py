@@ -96,7 +96,9 @@ class ModelHelper:
             ret, self.frame = self.captureDevice.read()
             if (not ret):
                 raise Exception('your captureDevice is not returning images')
-        return self.frame
+            return self.frame
+        else:
+            return np.copy(self.frame)
         
     def resize_image(self, image, newSize):
         # Shape: [rows, cols, channels]
