@@ -66,11 +66,23 @@ foreach(sample_model ${sample_models})
     set(target_name compiled_${model_in}_host)
     generate_ell_model_compile_target(${model_in} host ${target_name} "${demo_files}")
 
+    # host with profiling
+    set(target_name compiled_${model_in}_host_profile)
+    generate_ell_model_compile_target(${model_in} host ${target_name} "${demo_files}" --profile)
+
     # Raspberry Pi 3
     set(target_name compiled_${model_in}_pi3)
     generate_ell_model_compile_target(${model_in} pi3 ${target_name} "${demo_files}")
 
+    # Raspberry Pi 3 with profiling
+    set(target_name compiled_${model_in}_pi3_profile)
+    generate_ell_model_compile_target(${model_in} pi3 ${target_name} "${demo_files}" --profile)
+
     # Raspberry Pi Zero
     set(target_name compiled_${model_in}_pi0)
     generate_ell_model_compile_target(${model_in} pi0 ${target_name} "${demo_files}")
+
+    # arm64 Linux
+    set(target_name compiled_${model_in}_aarch64)
+    generate_ell_model_compile_target(${model_in} aarch64 ${target_name} "${demo_files}")
 endforeach()

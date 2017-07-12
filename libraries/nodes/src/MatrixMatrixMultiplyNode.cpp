@@ -61,13 +61,13 @@ namespace nodes
                 function.Literal(k),
                 function.Literal(static_cast<ValueType>(1.0)), // alpha
                 A,
-                function.Literal(lda),
+                function.Literal(lda), // lda
                 B,
                 function.Literal(ldb), // ldb
                 function.Literal(static_cast<ValueType>(0.0)), // beta
                 C, // C (output)
-                function.Literal(ldc)
-            }; // ldc
+                function.Literal(ldc) // ldc
+            };
             function.Call(gemm, args);
         }
 

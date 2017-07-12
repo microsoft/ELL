@@ -130,9 +130,8 @@ namespace model
         auto arguments = function.Arguments().begin();
         llvm::Argument& output = *(++arguments); // input argument is currently not used because Step generates the time signal
 
-        const size_t outputSize = map.GetOutput(0).Size();
-        function.InsertMetadata(emitters::c_declareInHeaderTagName);
-        function.InsertMetadata(emitters::c_stepFunctionTagName, std::to_string(outputSize));
+        function.IncludeInHeader();
+        function.IncludeInStepInterface(map.GetOutput(0).Size());
 
         // Constants
         auto intervalTicks = function.template Literal<TimeTickType>(map.GetIntervalTicks());
@@ -189,8 +188,8 @@ namespace model
     {
         emitters::NamedVariableTypeList args = {}; // no args
         auto function = GetModule().BeginFunction(WaitTimeForNextComputeFunctionName(functionNamePrefix), TimeTickVarType, args);
-        function.InsertMetadata(emitters::c_declareInHeaderTagName);
-        function.InsertMetadata(emitters::c_stepTimeFunctionTagName, "WaitTimeForNextStep");
+        function.IncludeInHeader();
+        function.IncludeInStepTimeInterface("WaitTimeForNextStep");
 
         // Constants
         auto intervalTicks = function.template Literal<TimeTickType>(static_cast<TimeTickType>(map.GetIntervalTicks()));
@@ -228,8 +227,8 @@ namespace model
     {
         emitters::NamedVariableTypeList args = {}; // no args
         auto function = GetModule().BeginFunction(GetIntervalFunctionName(functionNamePrefix), TimeTickVarType, args);
-        function.InsertMetadata(emitters::c_declareInHeaderTagName);
-        function.InsertMetadata(emitters::c_stepTimeFunctionTagName, "GetInterval");
+        function.IncludeInHeader();
+        function.IncludeInStepTimeInterface("GetInterval");
 
         auto intervalTicks = function.template Literal<TimeTickType>(static_cast<TimeTickType>(map.GetIntervalTicks()));
 

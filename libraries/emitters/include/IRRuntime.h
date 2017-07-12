@@ -61,7 +61,7 @@ namespace emitters
         //
         // Dot product
         //
-        
+
         /// <summary> Get the dot product function </summary>
         template <typename ValueType>
         llvm::Function* GetDotProductFunction();
@@ -97,6 +97,8 @@ namespace emitters
         llvm::Function* GetSGEMMFunction();
         llvm::Function* GetDGEMVFunction();
         llvm::Function* GetDGEMMFunction();
+
+        llvm::Function* ResolveCurrentTimeFunction(llvm::StructType* timespecType);
 
         IRModuleEmitter& _module;
 

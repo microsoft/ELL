@@ -370,6 +370,7 @@ namespace emitters
         /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
         /// <param name="tag"> The metadata tag. </param>
         /// <param name="content"> Optional metadata value. </param>
+        /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
         virtual void InsertMetadata(const std::string& functionName, const std::string& tag, const std::string& value = "") override;
 
         //
@@ -494,6 +495,26 @@ namespace emitters
         ///
         /// <returns> Reference to the underlying llvm context. </returns>
         llvm::LLVMContext& GetLLVMContext() { return _llvmContext; }
+
+        //
+        // Metadata
+        //
+
+        /// <summary> Tags a function to be declared in a C/C++ header. </summary>
+        ///
+        /// <param name="functionName"> The function name. </param>
+        void IncludeInHeader(const std::string& functionName);
+
+        /// <summary> Tags a type to be declared in a C/C++ header. </summary>
+        ///
+        /// <param name="typeName"> The name of the type. </param>
+        void IncludeTypeInHeader(const std::string& typeName);
+
+        /// <summary> Tags a callback function to be included in the SWIG interface. </summary>
+        ///
+        /// <param name="functionName"> The function name. </param>
+        /// <param name="nodeName"> The node name. </param>
+        void IncludeInCallbackInterface(const std::string& functionName, const std::string& nodeName);
 
     private:
         friend class IRFunctionEmitter;

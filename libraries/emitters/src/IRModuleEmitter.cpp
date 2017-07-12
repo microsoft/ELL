@@ -13,6 +13,7 @@
 #include "IRExecutionEngine.h"
 #include "IRHeaderWriter.h"
 #include "IRLoader.h"
+#include "IRMetadata.h"
 #include "IRSwigInterfaceWriter.h"
 
 // utilities
@@ -700,6 +701,25 @@ namespace emitters
     void IRModuleEmitter::AddPreprocessorDefinition(const std::string& name, const std::string& value)
     {
         _preprocessorDefinitions.emplace_back(name, value);
+    }
+
+    //
+    // Metadata
+    //
+
+    void IRModuleEmitter::IncludeInHeader(const std::string& functionName)
+    {
+        InsertMetadata(functionName, c_declareInHeaderTagName);
+    }
+
+    void IRModuleEmitter::IncludeTypeInHeader(const std::string& typeName)
+    {
+        InsertMetadata("", c_declareInHeaderTagName, typeName);
+    }
+
+    void IRModuleEmitter::IncludeInCallbackInterface(const std::string& functionName, const std::string& nodeName)
+    {
+        InsertMetadata(functionName, c_callbackFunctionTagName, nodeName);
     }
 
     //

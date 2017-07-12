@@ -11,6 +11,7 @@
 #include "IRBlockRegion.h"
 #include "IREmitter.h"
 #include "IRModuleEmitter.h"
+#include "IRMetadata.h"
 
 // stl
 #include <chrono>
@@ -892,6 +893,39 @@ namespace emitters
     IREmitter& IRFunctionEmitter::GetEmitter()
     {
         return *_pEmitter;
+    }
+
+    //
+    // Metadata
+    //
+    void IRFunctionEmitter::IncludeInHeader()
+    {
+        InsertMetadata(c_declareInHeaderTagName);
+    }
+
+    void IRFunctionEmitter::IncludeInPredictInterface()
+    {
+        InsertMetadata(c_predictFunctionTagName);
+    }
+
+    void IRFunctionEmitter::IncludeInProfilingInterface()
+    {
+        InsertMetadata(c_profilingFunctionTagName);
+    }
+
+    void IRFunctionEmitter::IncludeInCallbackInterface()
+    {
+        InsertMetadata(c_callbackFunctionTagName);
+    }
+
+    void IRFunctionEmitter::IncludeInStepInterface(size_t outputSize)
+    {
+        InsertMetadata(c_stepFunctionTagName, std::to_string(outputSize));
+    }
+
+    void IRFunctionEmitter::IncludeInStepTimeInterface(const std::string& functionName)
+    {
+        InsertMetadata(c_stepTimeFunctionTagName, functionName);
     }
 
     //

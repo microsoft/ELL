@@ -70,8 +70,8 @@ namespace nodes
         }
 
         // Tag the sink function as a callback that is emitted in headers
-        function.GetModule().InsertMetadata(_sinkFunctionName, emitters::c_declareInHeaderTagName);
-        function.GetModule().InsertMetadata(_sinkFunctionName, emitters::c_callbackFunctionTagName, "SinkNode");
+        function.GetModule().IncludeInHeader(_sinkFunctionName);
+        function.GetModule().IncludeInCallbackInterface(_sinkFunctionName, "SinkNode");
 
         // Set output values as well, useful when user code is in a non-event-driven mode
         if (!IsScalar(input) && !compiler.GetCompilerParameters().unrollLoops)

@@ -22,6 +22,13 @@ namespace emitters
     /// <param name="moduleEmitter"> The `IRModuleEmitter` containing the module to write </param>
     void WriteModuleHeader(std::ostream& os, IRModuleEmitter& moduleEmitter);
 
+    /// <summary> Writes the declaration for a function </summary>
+    ///
+    /// <param name="os"> The output stream to write to. </param>
+    /// <param name="moduleEmitter"> The `IRModuleEmitter` containing the module to write </param>
+    /// <param name="type"> Pointer to the llvm function. </param>
+    void WriteFunctionDeclaration(std::ostream& os, IRModuleEmitter& moduleEmitter, llvm::Function& function);
+
     /// <summary> Writes an LLVM type. </summary>
     ///
     /// <param name="os"> The output stream to write to. </param>

@@ -44,7 +44,7 @@ namespace emitters
                                           { rVectorName, VariableType::DoublePointer },
                                           { resultName, VariableType::DoublePointer } };
         auto function = _module.BeginFunction(functionName, VariableType::Void, argList);
-        function.InsertMetadata(c_declareInHeaderTagName);
+        function.IncludeInHeader();
 
         auto arguments = function.Arguments().begin();
         llvm::Argument& count = *arguments++;
@@ -66,7 +66,7 @@ namespace emitters
                                           { rVectorName, VariableType::Int32Pointer },
                                           { resultName, VariableType::Int32Pointer } };
         auto function = _module.BeginFunction(functionName, VariableType::Void, argList);
-        function.InsertMetadata(c_declareInHeaderTagName);
+        function.IncludeInHeader();
 
         auto arguments = function.Arguments().begin();
         llvm::Argument& count = *arguments++;
@@ -77,6 +77,104 @@ namespace emitters
         function.Return();
         _module.EndFunction();
         return function.GetFunction();
+    }
+
+    llvm::Function* IRRuntime::ResolveCurrentTimeFunction(llvm::StructType* timespecType)
+    {
+        llvm::Function* function = nullptr;
+
+        if (_module.GetCompilerParameters().targetDevice.IsWindows())
+        {
+            // We normally assume there is a system function "clock_gettime" that provides high resolution times for profiling the emitted model.
+            // But this function doesn't exist on Windows.  So on Windows we implement this function to call the Win32 QueryPerformanceCounter API.
+            // Like this:
+            //
+            //    int clock_gettime(int32_t clk_id, struct timespec *tp) {
+            //        LARGE_INTEGER lp;
+            //        LARGE_INTEGER freq;
+            //        // this timer is in 100 nanosecond intervals.
+            //        QueryPerformanceCounter(&lp);
+            //        QueryPerformanceFrequency(&freq);
+            //        double seconds = (double)lp.QuadPart / (double)freq.QuadPart;
+            //        int32_t sec = (int32_t)seconds;
+            //        tp->tv_nsec = (int32_t)((seconds - sec) * 10000000);
+            //        tp->tv_sec = sec;
+            //        return 0;
+            //    }
+
+            auto& context = _module.GetLLVMContext();
+            auto int32Type = llvm::Type::getInt32Ty(context);
+            auto int64Type = llvm::Type::getInt64Ty(context);
+            auto doubleType = llvm::Type::getDoubleTy(context);
+
+            auto tmFieldType = timespecType->getElementType(0);
+            const VariableType tmFieldVarType = tmFieldType == int64Type ? VariableType::Int64 : VariableType::Int32;
+
+            auto zero = llvm::ConstantInt::get(int32Type, 0);
+            auto hundredNanoSeconds = llvm::ConstantFP::get(doubleType, 10000000.0);
+
+            llvm::FunctionType* qpcProto = llvm::FunctionType::get(int32Type, { int64Type->getPointerTo() }, false);
+            _module.DeclareFunction("QueryPerformanceCounter", qpcProto);
+            auto qpcFunction = _module.GetFunction("QueryPerformanceCounter");
+            _module.DeclareFunction("QueryPerformanceFrequency", qpcProto);
+            auto qpfFunction = _module.GetFunction("QueryPerformanceFrequency");
+
+            std::vector<llvm::Type*> args;
+            args.push_back(int32Type);
+            auto timeSpecPointerType = timespecType->getPointerTo();
+            args.push_back(timeSpecPointerType);
+            IRFunctionEmitter& emitter = _module.BeginFunction("clock_gettime", int32Type, args);
+            function = emitter.GetFunction();
+
+            // Get pointer to the timespec argument.
+            auto iterator = function->arg_begin();
+            iterator++; // get second argument
+            auto timeSpecArg = &*iterator; // Get the timespec.
+
+            // get access to the tv_sec and nano fields of the time struct argument.
+            auto irBuilder = emitter.GetEmitter().GetIRBuilder();
+            auto secondsPtr = irBuilder.CreateInBoundsGEP(timespecType, timeSpecArg, { emitter.Literal(0), emitter.Literal(0) });
+            auto nanoPtr = irBuilder.CreateInBoundsGEP(timespecType, timeSpecArg, { emitter.Literal(0), emitter.Literal(1) });
+
+            auto timeVar = emitter.Variable(int64Type, "time");
+            auto freqVar = emitter.Variable(int64Type, "freq");
+
+            // QueryPerformanceCounter(&lp);
+            emitter.Call(qpcFunction, { timeVar });
+            // QueryPerformanceFrequency(&freq);
+            emitter.Call(qpfFunction, { freqVar });
+
+            auto timeDouble = emitter.CastIntToFloat(emitter.Load(timeVar), VariableType::Double, true);
+            auto freqDouble = emitter.CastIntToFloat(emitter.Load(freqVar), VariableType::Double, true);
+            // double seconds = (double)time.QuadPart / (double)freq.QuadPart;
+            auto seconds = emitter.Operator(TypedOperator::divideFloat, timeDouble, freqDouble);
+
+            // int32_t sec = (int64_t)seconds;
+            auto intSeconds = emitter.CastFloatToInt(seconds, VariableType::Int64);
+            auto floatSeconds = emitter.CastIntToFloat(intSeconds, VariableType::Double, true);
+
+            //  tp->tv_nsec = (int32_t)((seconds - sec) * 10000000);
+            auto remainder = emitter.Operator(TypedOperator::subtractFloat, seconds, floatSeconds);
+            auto nanoseconds = emitter.Operator(TypedOperator::multiplyFloat, remainder, hundredNanoSeconds);
+
+            // STYLE matching casing style of timespec struct members
+            auto tv_nsec = emitter.CastFloatToInt(nanoseconds, tmFieldVarType);
+            emitter.Store(nanoPtr, tv_nsec);
+
+            // tp->tv_sec = sec;
+            // STYLE matching casing style of timespec struct members
+            auto tv_sec = emitter.CastFloatToInt(floatSeconds, tmFieldVarType);
+            emitter.Store(secondsPtr, tv_sec);
+
+            emitter.Return(zero);
+            _module.EndFunction();
+        }
+        else
+        {
+            function = _module.GetFunction("clock_gettime");
+        }
+
+        return function;
     }
 
     llvm::Function* IRRuntime::GetCurrentTimeFunction()
@@ -103,7 +201,7 @@ namespace emitters
             _module.DeclareFunction("clock_gettime", gettimeType);
 
             // make struct
-            auto getTimeFunction = _module.GetFunction("clock_gettime");
+            auto getTimeFunction = ResolveCurrentTimeFunction(timespecType);
             if (getTimeFunction != nullptr)
             {
                 auto functionName = GetNamespacePrefix() + "_" + getTimeFunctionName;
@@ -132,7 +230,7 @@ namespace emitters
             }
             else
             {
-                // emit bogus function? throw?
+                throw EmitterException(EmitterError::functionNotFound);
             }
         }
         return _pGetCurrentTimeFunction;

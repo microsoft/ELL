@@ -126,7 +126,7 @@ namespace model
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputSize", int32Type, {});
-        function.InsertMetadata(emitters::c_declareInHeaderTagName);
+        function.IncludeInHeader();
         function.Return(function.Literal(static_cast<int>(map.GetInputSize())));
         _moduleEmitter.EndFunction();
     }
@@ -137,7 +137,7 @@ namespace model
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputSize", int32Type, {});
-        function.InsertMetadata(emitters::c_declareInHeaderTagName);
+        function.IncludeInHeader();
         function.Return(function.Literal(static_cast<int>(map.GetOutputSize())));
         _moduleEmitter.EndFunction();
     }
@@ -149,7 +149,7 @@ namespace model
         int numNodes = map.GetModel().Size();
 
         auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetNumNodes", int32Type, {});
-        function.InsertMetadata(emitters::c_declareInHeaderTagName);
+        function.IncludeInHeader();
         function.Return(function.Literal(numNodes));
         _moduleEmitter.EndFunction();
     }
@@ -189,8 +189,8 @@ namespace model
         }
 
         // Tag the model function for declaration in the generated headers
-        currentFunction.InsertMetadata(emitters::c_declareInHeaderTagName);
-        currentFunction.InsertMetadata(emitters::c_predictFunctionTagName);
+        currentFunction.IncludeInHeader();
+        currentFunction.IncludeInPredictInterface();
 
         _profiler.StartModel(currentFunction);
     }

@@ -3,7 +3,22 @@
 #
 
 # Creates a target to compile an ELL model for an architecture
+#
+# Arguments:
+#   model_name - filename of the model .map file without the extension
+#   arch_name - architecture
+#   target_name - CMake target name
+#   demo_files - list of files used by the demo
+#
+# Optional Arguments (place after required arguments):
+#   extra_compile_options - [optional] extra options to provide to ELL's compile tool 
 function(generate_ell_model_compile_target model_name arch_name target_name demo_files)
+
+    # process optional arguments
+    set(compile_options)
+    if(${ARGC} GREATER 4)
+        list(APPEND compile_options ${ARGV4})
+    endif()
 
     find_program(LLC_EXECUTABLE llc HINTS ${LLVM_TOOLS_BINARY_DIR})
     if(NOT LLC_EXECUTABLE)
@@ -18,13 +33,16 @@ function(generate_ell_model_compile_target model_name arch_name target_name demo
     elseif(arch_name STREQUAL "pi0") # Raspberry Pi Zero
         set(llc_options -O3 -mtriple=arm-linux-gnueabihf -relocation-model=pic)
         set(compile_target_name "pi0")
+    elseif(arch_name STREQUAL "aarch64") # arm64 Linux
+        set(llc_options -O3 -mtriple=aarch64-unknown-linux-gnu -relocation-model=pic)
+        set(compile_target_name "aarch64")
     else() # host
         set(llc_options -O3 -relocation-model=pic)
         set(compile_target_name "host")
     endif()
 
     # cmake target and output
-    set(target_path ${CMAKE_CURRENT_BINARY_DIR}/compiled_${model_name}_${arch_name})
+    set(target_path ${CMAKE_CURRENT_BINARY_DIR}/${target_name})
 
     set(compiled_output
         ${target_path}/${model_name}.bc
@@ -40,7 +58,7 @@ function(generate_ell_model_compile_target model_name arch_name target_name demo
     # run commands to generate model files and invoke SWIG
 
     # ELL's compile tool
-    set(compile_options --blas --target ${compile_target_name})
+    list(APPEND compile_options --blas --target ${compile_target_name})
     add_custom_command(
         OUTPUT ${compiled_output}
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${model_name}.map

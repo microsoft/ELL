@@ -59,6 +59,13 @@ def main():
         if cv2.waitKey(1) & 0xFF == 27:
             break
 
+    # print profiling info if model is compiled with profiling on
+    if hasattr(model, "darknet_reference_print_model_profiling_info"):
+        print("model statistics:")
+        model.darknet_reference_print_model_profiling_info()
+    if hasattr(model, "darknet_reference_print_node_profiling_info"):
+        print("node statistics:")
+        model.darknet_reference_print_node_profiling_info()
 
 if __name__ == "__main__":
     main()

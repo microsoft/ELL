@@ -59,6 +59,13 @@ def main():
         if cv2.waitKey(1) & 0xFF == 27:
             break
 
+    # print profiling info if model is compiled with profiling on
+    if hasattr(model, "vgg_16image_net_print_model_profiling_info"):
+        print("model statistics:")
+        model.vgg_16image_net_print_model_profiling_info()
+    if hasattr(model, "vgg_16image_net_print_node_profiling_info"):
+        print("node statistics:")
+        model.vgg_16image_net_print_node_profiling_info()
 
 if __name__ == "__main__":
     main()

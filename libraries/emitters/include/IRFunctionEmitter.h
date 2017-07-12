@@ -813,6 +813,7 @@ namespace emitters
         ///
         /// <param name="tag"> The tag of the metadata to set. </param>
         /// <param name="content"> The content to insert for the given metadata tag. </param>
+        /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
         void InsertMetadata(const std::string& tag, const std::string& content = "");
 
         /// <summary> Emits an ELL_GetXXClockMilliseconds library function. </summary>
@@ -923,6 +924,16 @@ namespace emitters
         /// <summary> Adds an`IRBlockRegion` to the region list and sets it as the current region </summary>
         IRBlockRegion* AddRegion(llvm::BasicBlock* pBlock);
 
+        /// <summary> Get the current LLVM context. </summary>
+        ///
+        /// <returns> The LLVMContext being used. </returns>
+        llvm::LLVMContext& GetLLVMContext();
+
+        /// <summary> Get the low-level IREmitter being used. </summary>
+        ///
+        /// <returns> The low-level IREmitter being used. </returns>
+        IREmitter& GetEmitter();
+
         //
         // Serialization
         //
@@ -935,15 +946,31 @@ namespace emitters
         /// <param name="os"> The output stream to write to. </param>
         void WriteToStream(std::ostream& os);
 
-        /// <summary> Get the current LLVM context. </summary>
-        ///
-        /// <returns> The LLVMContext being used. </returns>
-        llvm::LLVMContext& GetLLVMContext();
+        //
+        // Metadata
+        //
 
-        /// <summary> Get the low-level IREmitter being used. </summary>
+        /// <summary> Tags a function to be declared in a C/C++ header. </summary>
+        void IncludeInHeader();
+
+        /// <summary> Tags the predict function to be included in the SWIG interface. </summary>
+        void IncludeInPredictInterface();
+
+        /// <summary> Tags a profiling function to be included in the SWIG interface. </summary>
+        void IncludeInProfilingInterface();
+
+        /// <summary> Tags a callback function to be included in the SWIG interface. </summary>
+        void IncludeInCallbackInterface();
+
+        /// <summary> Tags the step function to be included in the SWIG interface. </summary>
         ///
-        /// <returns> The low-level IREmitter being used. </returns>
-        IREmitter& GetEmitter();
+        /// <param name="outputSize"> The output size. </param>
+        void IncludeInStepInterface(size_t outputSize);
+
+        /// <summary> Tags a step time function, such as GetInterval(), to be included in the SWIG interface. </summary>
+        ///
+        /// <param name="functionName"> The function name. </param>
+        void IncludeInStepTimeInterface(const std::string& functionName);
 
     private:
         IRFunctionEmitter(IRModuleEmitter* pModule, IREmitter* pEmitter, llvm::Function* pFunction, const std::string& name);

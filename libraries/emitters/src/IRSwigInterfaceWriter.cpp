@@ -555,6 +555,7 @@ namespace emitters
 
         auto predicts = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
         auto callbacks = GetFunctionsWithTag(moduleEmitter, c_callbackFunctionTagName);
+        auto profilers = GetFunctionsWithTag(moduleEmitter, c_profilingFunctionTagName);
 
         // Dependencies
         {
@@ -583,6 +584,13 @@ namespace emitters
         {
             SteppablePredictorInterfaceWriter writer(moduleEmitter, callbacks);
             writer.WriteHeaderCode(os);
+        }
+
+        // Profiling functions
+        for (const auto& p : profilers)
+        {
+            WriteFunctionDeclaration(os, moduleEmitter, *(p.function));
+            os << "\n\n";
         }
     }
 

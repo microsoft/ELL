@@ -66,10 +66,9 @@ To run the demo, you will need:
 
 2. Demo pre-requisites:
 
-   * Install NumPy and OpenBLAS:
+   * Install NumPy:
     ```
     (py34) pi@raspberrypi:~ $ conda install numpy
-    (py34) pi@raspberrypi:~ $ conda install openblas
     ```
    * Install the OpenCV arm7l package from the `microsoft-ell` channel:
     ```

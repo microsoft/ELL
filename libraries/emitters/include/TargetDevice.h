@@ -25,6 +25,9 @@ namespace emitters
         std::string cpu = "";
         std::string features = "";
         size_t numBits = 0;
+
+        /// <summary> Indicates if the target device is a Windows system </summary>
+        bool IsWindows() const;
     };
 }
 }

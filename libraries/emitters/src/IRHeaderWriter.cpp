@@ -114,49 +114,6 @@ namespace emitters
                 os << "};";
             }
         }
-
-        void WriteFunction(std::ostream& os, IRModuleEmitter& moduleEmitter, llvm::Function& function)
-        {
-            auto hasName = function.hasName();
-            if (hasName)
-            {
-                std::string name = function.getName();
-
-                // Check if we've added comments for this function
-                if (moduleEmitter.HasFunctionComments(name))
-                {
-                    auto comments = moduleEmitter.GetFunctionComments(name);
-                    for (auto comment : comments)
-                    {
-                        os << "// " << comment << "\n";
-                    }
-                }
-
-                // Now write the function signature
-                auto returnType = function.getReturnType();
-                WriteLLVMType(os, returnType);
-                os << " " << name << "(";
-                bool first = true;
-                for (const auto& arg : function.args())
-                {
-                    if (!first)
-                    {
-                        os << ", ";
-                    }
-                    first = false;
-                    WriteLLVMType(os, arg.getType());
-
-                    bool hasParamName = false;
-                    if (hasParamName)
-                    {
-                        auto paramName = "param";
-                        os << " " << paramName;
-                    }
-                }
-
-                os << ");";
-            }
-        }
     }
 
     void WriteLLVMType(std::ostream& os, llvm::Type* t)
@@ -198,6 +155,49 @@ namespace emitters
             os << "[[UNKNOWN]]";
             // look up in table
             // ???
+        }
+    }
+
+    void WriteFunctionDeclaration(std::ostream& os, IRModuleEmitter& moduleEmitter, llvm::Function& function)
+    {
+        auto hasName = function.hasName();
+        if (hasName)
+        {
+            std::string name = function.getName();
+
+            // Check if we've added comments for this function
+            if (moduleEmitter.HasFunctionComments(name))
+            {
+                auto comments = moduleEmitter.GetFunctionComments(name);
+                for (auto comment : comments)
+                {
+                    os << "// " << comment << "\n";
+                }
+            }
+
+            // Now write the function signature
+            auto returnType = function.getReturnType();
+            WriteLLVMType(os, returnType);
+            os << " " << name << "(";
+            bool first = true;
+            for (const auto& arg : function.args())
+            {
+                if (!first)
+                {
+                    os << ", ";
+                }
+                first = false;
+                WriteLLVMType(os, arg.getType());
+
+                bool hasParamName = false;
+                if (hasParamName)
+                {
+                    auto paramName = "param";
+                    os << " " << paramName;
+                }
+            }
+
+            os << ");";
         }
     }
 
@@ -249,7 +249,7 @@ namespace emitters
             auto tagValues = GetFunctionsWithTag(moduleEmitter, c_declareInHeaderTagName);
             for (auto& tv : tagValues)
             {
-                WriteFunction(os, moduleEmitter, *(tv.function));
+                WriteFunctionDeclaration(os, moduleEmitter, *(tv.function));
                 os << "\n\n";
             }
         }

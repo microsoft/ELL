@@ -43,6 +43,7 @@ namespace nodes
         void EmitMatrixMatrixMultiplyBlas(emitters::IRFunctionEmitter& function, bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
         {
             llvm::Function* gemm = function.GetModule().GetRuntime().GetGEMMFunction<ValueType>();
+
             emitters::IRValueList args{
                 function.Literal(CBLAS_ORDER::CblasRowMajor), // order
                 function.Literal(transposeA ? CBLAS_TRANSPOSE::CblasTrans : CBLAS_TRANSPOSE::CblasNoTrans), // transposeA
@@ -52,13 +53,13 @@ namespace nodes
                 function.Literal(k),
                 function.Literal(static_cast<ValueType>(1.0)), // alpha
                 A,
-                function.Literal(lda),
+                function.Literal(lda), // lda
                 B,
                 function.Literal(ldb), // ldb
                 function.Literal(static_cast<ValueType>(0.0)), // beta
                 C, // C (output)
-                function.Literal(ldc)
-            }; // ldc
+                function.Literal(ldc) // ldc
+            };
             function.Call(gemm, args);
         }
 

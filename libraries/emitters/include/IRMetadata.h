@@ -22,27 +22,33 @@ namespace emitters
     // Metadata tags
     //
 
-    /// <summary> Indicates that a function is a callback. </summary>
+    /// <summary> Indicates that a function is a callback that should be wrapped by SWIG. </summary>
     static const std::string c_callbackFunctionTagName = "ell.fn.callback";
 
-    /// <summary> Indicates the Predict function. </summary>
-    static const std::string c_predictFunctionTagName = "ell.fn.predict";
-
-    /// <summary> Indicates the Step function, with the value set to the output count. </summary>
-    static const std::string c_stepFunctionTagName = "ell.fn.step";
-
-    /// <summary> Indicates the time functions associated with Step, such as GetInterval(). </summary>
-    /// <remarks>
-    /// Set the value to the API name of the function.
-    /// </remarks>
-    static const std::string c_stepTimeFunctionTagName = "ell.fn.stepTime";
-
-    /// <summary> Indicates that a function or type should be declared in a generated header. </summary>
+    /// <summary> Indicates that a function or type should be declared in the generated C/C++ header. </summary>
     /// <remarks>
     /// For functions, set a function-level tag with an empty value.
     /// For types, set a module-level tag, using the type name as the value.
     /// </remarks>
     static const std::string c_declareInHeaderTagName = "ell.header.declare";
+
+    /// <summary> Indicates the Predict function that should be wrapped by SWIG. </summary>
+    static const std::string c_predictFunctionTagName = "ell.fn.predict";
+
+    /// <summary> Indicates a profiling function that should be wrapped by SWIG. </summary>
+    static const std::string c_profilingFunctionTagName = "ell.fn.profiling";
+
+    /// <summary> Indicates the Step function that should be wrapped by SWIG. </summary>
+    /// <remarks>
+    /// Set the value to the output element count.
+    /// </remarks>
+    static const std::string c_stepFunctionTagName = "ell.fn.step";
+
+    /// <summary> Indicates the time functions associated with Step, such as GetInterval(), that should be wrapped by SWIG. </summary>
+    /// <remarks>
+    /// Set the value to the API name of the function.
+    /// </remarks>
+    static const std::string c_stepTimeFunctionTagName = "ell.fn.stepTime";
 
     //
     // Utilities for reading metadata (that wrap IRModuleEmitter)

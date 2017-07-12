@@ -28,6 +28,7 @@ set (src
     src/IRRuntime.cpp
     src/IRSwigInterfaceWriter.cpp
     src/ModuleEmitter.cpp
+    src/TargetDevice.cpp
     src/Variable.cpp
 )
 

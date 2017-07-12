@@ -181,7 +181,7 @@ namespace model
         };
 
         _nodeInfoType = llvm::StructType::create(context, fields, GetNamespacePrefix() + "_NodeInfo");
-        _module->InsertMetadata("", emitters::c_declareInHeaderTagName, _nodeInfoType->getName());
+        _module->IncludeTypeInHeader(_nodeInfoType->getName());
 
         // NodePerformanceCounters
         fields = {
@@ -190,7 +190,7 @@ namespace model
         };
 
         _performanceCountersType = llvm::StructType::create(context, fields, GetNamespacePrefix() + "_PerformanceCounters");
-        _module->InsertMetadata("", emitters::c_declareInHeaderTagName, _performanceCountersType->getName());
+        _module->IncludeTypeInHeader(_performanceCountersType->getName());
     }
 
     void ModelProfiler::StartModel(emitters::IRFunctionEmitter& function)
@@ -311,6 +311,8 @@ namespace model
         auto& irBuilder = emitter.GetIRBuilder();
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetModelPerformanceCounters", _performanceCountersType->getPointerTo(), {});
+        function.IncludeInHeader();
+
         auto performanceCountersPtr = irBuilder.CreateInBoundsGEP(_modelPerformanceCountersArray, { function.Literal(0), function.Literal(0) });
         function.Return(performanceCountersPtr);
         _module->EndFunction();
@@ -323,6 +325,8 @@ namespace model
         int numNodes = _nodeTypePerformanceCounters.size();
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNumNodeTypes", int32Type, {});
+        function.IncludeInHeader();
+
         function.Return(function.Literal(numNodes));
         _module->EndFunction();
     }
@@ -337,6 +341,8 @@ namespace model
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeInfo", _nodeInfoType->getPointerTo(), { int32Type });
+        function.IncludeInHeader();
+
         auto args = function.Arguments();
         auto nodeIndex = &(*args.begin());
         auto nodeInfoPtr = irBuilder.CreateInBoundsGEP(_nodeInfoArray, { function.Literal(0), nodeIndex });
@@ -354,6 +360,8 @@ namespace model
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeTypeInfo", _nodeInfoType->getPointerTo(), { int32Type });
+        function.IncludeInHeader();
+
         auto args = function.Arguments();
         auto nodeIndex = &(*args.begin());
         auto nodeInfoPtr = irBuilder.CreateInBoundsGEP(_nodeTypeInfoArray, { function.Literal(0), nodeIndex });
@@ -371,6 +379,8 @@ namespace model
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodePerformanceCounters", _performanceCountersType->getPointerTo(), { int32Type });
+        function.IncludeInHeader();
+
         auto args = function.Arguments();
         auto nodeIndex = &(*args.begin());
         auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodePerformanceCountersArray, { function.Literal(0), nodeIndex });
@@ -388,6 +398,8 @@ namespace model
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeTypePerformanceCounters", _performanceCountersType->getPointerTo(), { int32Type });
+        function.IncludeInHeader();
+
         auto args = function.Arguments();
         auto nodeIndex = &(*args.begin());
         auto nodePerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_nodeTypePerformanceCountersArray, { function.Literal(0), nodeIndex });
@@ -405,6 +417,8 @@ namespace model
 
         auto voidType = llvm::Type::getVoidTy(context);
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_PrintModelProfilingInfo", voidType, {});
+        function.IncludeInHeader();
+        function.IncludeInProfilingInterface();
 
         auto modelPerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_modelPerformanceCountersArray, { function.Literal(0), function.Literal(0) });
 
@@ -421,9 +435,11 @@ namespace model
         auto& emitter = _module->GetIREmitter();
         auto& context = _module->GetLLVMContext();
         auto voidType = llvm::Type::getVoidTy(context);
+        auto& irBuilder = emitter.GetIRBuilder();
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_ResetModelProfilingInfo", voidType, {});
-        auto& irBuilder = emitter.GetIRBuilder();
+        function.IncludeInHeader();
+        function.IncludeInProfilingInterface();
 
         auto modelPerformanceCountersPtr = irBuilder.CreateInBoundsGEP(_modelPerformanceCountersArray, { function.Literal(0), function.Literal(0) });
 
@@ -445,6 +461,8 @@ namespace model
 
         auto voidType = llvm::Type::getVoidTy(context);
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_PrintNodeProfilingInfo", voidType, {});
+        function.IncludeInHeader();
+        function.IncludeInProfilingInterface();
 
         auto loop = function.ForLoop();
         loop.Begin(numEmittedNodes);
@@ -475,6 +493,8 @@ namespace model
 
         auto voidType = llvm::Type::getVoidTy(context);
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_PrintNodeTypeProfilingInfo", voidType, {});
+        function.IncludeInHeader();
+        function.IncludeInProfilingInterface();
 
         auto loop = function.ForLoop();
         loop.Begin(numEmittedNodeTypes);
@@ -504,6 +524,8 @@ namespace model
         auto voidType = llvm::Type::getVoidTy(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_ResetNodeProfilingInfo", voidType, {});
+        function.IncludeInHeader();
+        function.IncludeInProfilingInterface();
         auto& irBuilder = emitter.GetIRBuilder();
 
         auto nodeLoop = function.ForLoop();
@@ -531,6 +553,8 @@ namespace model
         auto voidType = llvm::Type::getVoidTy(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_ResetNodeTypeProfilingInfo", voidType, {});
+        function.IncludeInHeader();
+        function.IncludeInProfilingInterface();
         auto& irBuilder = emitter.GetIRBuilder();
 
         auto loop = function.ForLoop();
