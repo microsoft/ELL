@@ -32,7 +32,7 @@ def main():
 
     last_prediction = ""
 
-    while (True):
+    while (not helper.done()):
         # Grab next frame
         frame = helper.get_next_frame()
 
@@ -62,9 +62,6 @@ def main():
         # Show the new frame
         cv2.imshow('frame', frameToShow)
 
-        # Wait for Esc key
-        if cv2.waitKey(1) & 0xFF == 27:
-            break
 
 if __name__ == "__main__":
     main()

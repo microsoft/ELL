@@ -50,7 +50,7 @@ The language bindings for Python are generated using SWIG. To build them, you ne
 
 ```
 wget http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
-tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12.tar
+tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12
 ./configure --without-pcre && make && sudo make install
 ```
 

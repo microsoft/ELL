@@ -23,7 +23,7 @@ class ModelHelper:
         self.scaleFactor = scaleFactor
         self.threshold = threshold
         self.labels = self.load_labels(self.labels_file)
-        self.start = time.clock()
+        self.start = time.time()
         self.frame_count = 0
         self.fps = 0
         self.camera = None
@@ -93,7 +93,9 @@ class ModelHelper:
 
     def get_next_frame(self):
         if self.captureDevice is not None:
-            ret, self.frame = self.captureDevice.read()
+            # if predictor is too slow frames get buffered, this is designed to flush that buffer
+            for i in range(self.get_wait()):
+                ret, self.frame = self.captureDevice.read()
             if (not ret):
                 raise Exception('your captureDevice is not returning images')
             return self.frame
@@ -135,7 +137,7 @@ class ModelHelper:
         return
 
     def draw_fps(self, image):
-        now = time.clock()
+        now = time.time()
         if (self.frame_count > 0):
             diff = now - self.start
             if (diff >= 1):
@@ -152,3 +154,20 @@ class ModelHelper:
         cv2.putText(image, label, pos, cv2.FONT_HERSHEY_SIMPLEX,
                     0.4, (0, 0, 128), 1, cv2.LINE_AA)
         self.frame_count = self.frame_count + 1
+    
+    def get_wait(self):
+        speed = self.fps
+        if (speed == 0): 
+            speed = 1
+        if (speed > 1):
+            return 1
+        return 3
+
+    def done(self):        
+        # on slow devices this helps let the images to show up on screen
+        result = False
+        for i in range(self.get_wait()):
+            if cv2.waitKey(1) & 0xFF == 27:
+                result = True
+                break
+        return result

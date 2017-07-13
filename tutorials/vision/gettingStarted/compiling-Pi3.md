@@ -57,8 +57,10 @@ To run the demo, you will need:
     ```
     pi@raspberrypi:~ $ wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
     pi@raspberrypi:~ $ chmod +x Miniconda3-latest-Linux-armv7l.sh
-    pi@raspberrypi:~ $ ./Miniconda3-latest-Linux-armv71.sh
-    <Follow prompts to install, we recommend [yes] for adding Miniconda3 to the PATH>
+    pi@raspberrypi:~ $ ./Miniconda3-latest-Linux-armv7l.sh
+    ```
+    Follow prompts to install, we recommend [yes] for adding Miniconda3 to the PATH.
+    ```
     pi@raspberrypi:~ $ source ~/.bashsrc # if you selected [yes] to add to the PATH
     pi@raspberrypi:~ $ conda create --name py34 python=3
     pi@raspberrypi:~ $ source activate py34
