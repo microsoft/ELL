@@ -5,6 +5,10 @@ import cv2
 
 import modelHelper as mh
 
+# note: to run this in headless mode on a Linux machine run the following from your terminal window
+# export DISPLAY=:0
+# then add the '-save' argument to get tagged frames to be saved to disk.
+
 # Import the compiled model wrapper
 sys.path.append('build')
 sys.path.append('build/Release')
@@ -49,12 +53,12 @@ def main():
 
         # Draw the text on the frame
         frameToShow = frame
+        
         helper.draw_label(frameToShow, text)
         helper.draw_fps(frameToShow)
 
         # Show the new frame
-        cv2.imshow('frame', frameToShow)
-
+        helper.show_image(frameToShow)
 
     # print profiling info if model is compiled with profiling on
     if hasattr(model, "vgg_16image_net_print_model_profiling_info"):

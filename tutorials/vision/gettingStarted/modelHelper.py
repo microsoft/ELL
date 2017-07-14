@@ -30,19 +30,31 @@ class ModelHelper:
         self.imageFilename = None
         self.captureDevice = None
         self.frame = None
+        self.has_temp_sensor = None
+        self.save_images = None
+        # now parse the arguments
         self.parse_arguments(argv)
     
     def parse_arguments(self, argv):
         # Parse arguments
         self.camera = 0
         self.imageFilename = None
-        if len(argv) > 1:
-            arg1 = argv[1]
-            if arg1.isdigit():
-                self.camera = int(argv[1]) 
+        for i in range(1,len(argv)):            
+            arg1 = argv[i]
+            if (arg1 == "-save"):
+                self.save_images = 1
+            elif arg1.isdigit():
+                self.camera = int(arg1) 
             else:
-                self.imageFilename = argv[1]
+                self.imageFilename = arg1
                 self.camera = None
+
+    def show_image(self, frameToShow):          
+        cv2.imshow('frame', frameToShow)
+        if (not self.save_images is None):
+            name = 'frame' + str(self.save_images) + ".png"
+            cv2.imwrite(name, frameToShow)
+            self.save_images = self.save_images + 1
 
     def load_labels(self, fileName):
         labels = []
@@ -170,4 +182,18 @@ class ModelHelper:
             if cv2.waitKey(1) & 0xFF == 27:
                 result = True
                 break
+        if (self.get_cpu_temp() >= 80):
+            print("The CPU is getting too hot, so we are terminating now :-)")
+            return True
         return result
+
+    def get_cpu_temp(self):
+        temp = 0
+        if (self.has_temp_sensor == None) :
+            try:
+                with open("/sys/class/thermal/thermal_zone0/temp") as f:
+                    line  = f.readline()
+                    temp = float(line) / 1000
+            except:
+                self.has_temp_sensor = False
+        return temp

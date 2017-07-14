@@ -60,7 +60,7 @@ def main():
         helper.draw_fps(frameToShow)
 
         # Show the new frame
-        cv2.imshow('frame', frameToShow)
+        helper.show_image(frameToShow)
 
 
 if __name__ == "__main__":
