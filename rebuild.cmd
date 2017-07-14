@@ -1,4 +1,5 @@
 @echo off
+cd %~dp0
 
 REM find which supported VS version is installed (14, or 15)
 set VSVersion=14
@@ -12,6 +13,8 @@ for %%a in (14 15) do (
 
 if "%VSVersion%" == "15" set CMakeGenerator=Visual Studio 15 2017 Win64
 echo Found VS version %CMakeGenerator%
+
+external\nuget\nuget.exe restore external/packages.config -PackagesDirectory external
 
 if not EXIST build goto :mkbuild
 
