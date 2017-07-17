@@ -216,13 +216,21 @@ namespace utilities
             return true;
         }
 
-        // int, float, enum <--> int, float, enum  (maybe not enum<-->float)
+        // int, float, enum, bool <--> int, float, enum, bool  (maybe not enum<-->float)
 
         // fundamental -> int
-        template <typename InputValueType, typename OutputValueType, IsFundamental<InputValueType> = true, IsIntegral<OutputValueType> = true>
+        template <typename InputValueType, typename OutputValueType, IsFundamental<InputValueType> = true, IsNonBooleanIntegral<OutputValueType> = true>
         bool TryConvertValueHelper(const InputValueType& inValue, OutputValueType& outValue, int)
         {
             outValue = static_cast<OutputValueType>(inValue);
+            return true;
+        }
+
+        // fundamental -> bool
+        template <typename InputValueType, typename OutputValueType, IsFundamental<InputValueType> = true, IsBoolean<OutputValueType> = true>
+        bool TryConvertValueHelper(const InputValueType& inValue, OutputValueType& outValue, int)
+        {
+            outValue = static_cast<OutputValueType>(inValue != 0);
             return true;
         }
 
