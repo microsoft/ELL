@@ -44,7 +44,7 @@ and invoke the command
 
 NuGet will download the prerequisites into the `ELL/external` directory.
 
-### Building ELL
+### Building Visual Studio Solution using CMake
 
 Next, use CMake to create a Visual Studio solution. In the repository's root directory (`ELL`), create a `build` subdirectory and change to that directory:
 
@@ -61,11 +61,32 @@ For Visual Studio 2017:
 
     cmake -G "Visual Studio 15 2017 Win64" -DPROCESSOR_HINT=haswell ..
 
+
+**Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, along with other files in the `build` directory. 
+
+### Adding OpenBLAS to your PATH environment
+
 By default, CMake will try to determine the correct version of the OpenBLAS library to use for your processor
 type. If you want to override the automatic choice, you can tell CMake which version to use by setting the `PROCESSOR_HINT`
 variable.
 
-**Important:** don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, along with other files in the `build` directory. 
+The tutorials will need to be able to find OpenBLAS just installed by nuget.
+The above CMake operation has already located the right version to use and you should see some CMake output like this:
+````
+-- Processor family: 6, model: 79
+-- Using OpenBLAS compiled for haswell
+-- Using BLAS include path: 
+D:/git/ELL/external/OpenBLASLibs.0.2.19.3/build/native/x64/haswell/include
+-- Using BLAS library: D:/git/ELL/external/OpenBLASLibs.0.2.19.3/build/native/x64/haswell/lib/libopenblas.dll.a
+````
+In this example the output is telling you to use the `haswell` version of OpenBLAS, so you should add the following to your system PATH environment variable:
+````
+set PATH=%PATH%;D:\git\ELL\external\OpenBLASLibs.0.2.19.3\build\native\x64\haswell\bin
+````
+Of course, don't just copy the above directly, you should use the correct paths to your git repo.
+
+### Building ELL
+
 
 Now you can build ELL by typing:
 

@@ -182,18 +182,4 @@ class ModelHelper:
             if cv2.waitKey(1) & 0xFF == 27:
                 result = True
                 break
-        if (self.get_cpu_temp() >= 80):
-            print("The CPU is getting too hot, so we are terminating now :-)")
-            return True
         return result
-
-    def get_cpu_temp(self):
-        temp = 0
-        if (self.has_temp_sensor == None) :
-            try:
-                with open("/sys/class/thermal/thermal_zone0/temp") as f:
-                    line  = f.readline()
-                    temp = float(line) / 1000
-            except:
-                self.has_temp_sensor = False
-        return temp
