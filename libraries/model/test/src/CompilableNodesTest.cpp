@@ -920,7 +920,7 @@ void TestNeuralNetworkPredictorNode4()
     VectorType variance(layerParameters.outputShape[2]);
     FillVector(mean);
     FillVector(variance);
-    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance)));
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance, 1.0e-6f, EpsilonSummand::SqrtVariance)));
 
     // ScalingLayer
     layerParameters = { layers[3]->GetOutput(), NoPadding(), { 5, 5, 8 }, { PaddingScheme::zeros, 1 } };
@@ -1085,7 +1085,7 @@ void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddi
     VectorType mean({ 5, 10 });
     VectorType variance({ 4.0, 16.0 });
 
-    predictors::neural::BatchNormalizationLayer<double> layer(layerParameters, mean, variance);
+    predictors::neural::BatchNormalizationLayer<double> layer(layerParameters, mean, variance, 1.0e-6f, predictors::neural::EpsilonSummand::SqrtVariance);
     layer.Compute();
     auto output = layer.GetOutput();
 

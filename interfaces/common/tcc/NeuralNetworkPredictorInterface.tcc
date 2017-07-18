@@ -12,10 +12,10 @@
 
 // neural predictor
 #include "LeakyReLUActivation.h"
-#include "ReLUActivation.h"
-#include "SigmoidActivation.h"
 #include "MaxPoolingFunction.h"
 #include "MeanPoolingFunction.h"
+#include "ReLUActivation.h"
+#include "SigmoidActivation.h"
 
 // utilities
 #include "JsonArchiver.h"
@@ -30,6 +30,7 @@ namespace api
 {
 namespace predictors
 {
+
     namespace underlying = ell::predictors::neural;
     namespace api = ell::api::predictors::neural;
     //////////////////////////////////////////////////////////////////////////
@@ -42,13 +43,13 @@ namespace predictors
         {
             auto& parameters = layers.front()->parameters;
             // Construct the input layer
-            UnderlyingInputParameters inputParameters = 
-                { 
-                    {parameters.inputShape.rows - (2 * parameters.inputPaddingParameters.paddingSize), parameters.inputShape.columns - (2 * parameters.inputPaddingParameters.paddingSize), parameters.inputShape.channels},
-                    underlying::NoPadding(),
-                    {parameters.inputShape.rows, parameters.inputShape.columns, parameters.inputShape.channels },
-                    parameters.inputPaddingParameters,
-                    1.0
+            UnderlyingInputParameters inputParameters =
+                {
+                  { parameters.inputShape.rows - (2 * parameters.inputPaddingParameters.paddingSize), parameters.inputShape.columns - (2 * parameters.inputPaddingParameters.paddingSize), parameters.inputShape.channels },
+                  underlying::NoPadding(),
+                  { parameters.inputShape.rows, parameters.inputShape.columns, parameters.inputShape.channels },
+                  parameters.inputPaddingParameters,
+                  1.0
                 };
             auto inputLayer = std::make_unique<underlying::InputLayer<ElementType>>(inputParameters);
 
@@ -93,27 +94,27 @@ namespace predictors
     neural::LayerShape NeuralNetworkPredictor<ElementType>::GetInputShape() const
     {
         auto shape = _predictor->GetInputShape();
-        return neural::LayerShape{shape[0], shape[1], shape[2]};
+        return neural::LayerShape{ shape[0], shape[1], shape[2] };
     }
 
     template <typename ElementType>
     neural::LayerShape NeuralNetworkPredictor<ElementType>::GetOutputShape() const
     {
         auto shape = _predictor->GetOutputShape();
-        return neural::LayerShape{shape[0], shape[1], shape[2]};
+        return neural::LayerShape{ shape[0], shape[1], shape[2] };
     }
 
     template <typename ElementType>
     template <typename DerivedLayer>
     auto& NeuralNetworkPredictor<ElementType>::LayerAs(Layer* layer)
     {
-        if(layer == nullptr)
+        if (layer == nullptr)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Trying to cast null layer");            
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Trying to cast null layer");
         }
-        if(!layer->template Is<DerivedLayer>())
+        if (!layer->template Is<DerivedLayer>())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Bad layer type cast");            
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Bad layer type cast");
         }
         return layer->template As<DerivedLayer>();
     }
@@ -128,93 +129,94 @@ namespace predictors
         {
             // Set the layer parameters. Note that if this is the first layer, we set the input reference to the output of the InputLayer.
             // Otherwise, we set it to the output of the last layer.
-            UnderlyingLayerParameters parameters = 
-            {
-                ((underlyingLayers.size() > 0) ? underlyingLayers.back()->GetOutput() : underlyingInputLayer->GetOutput()),
-                layer->parameters.inputPaddingParameters,
-                {layer->parameters.outputShape.rows, layer->parameters.outputShape.columns, layer->parameters.outputShape.channels},
-                layer->parameters.outputPaddingParameters,
-            };
+            UnderlyingLayerParameters parameters =
+                {
+                  ((underlyingLayers.size() > 0) ? underlyingLayers.back()->GetOutput() : underlyingInputLayer->GetOutput()),
+                  layer->parameters.inputPaddingParameters,
+                  { layer->parameters.outputShape.rows, layer->parameters.outputShape.columns, layer->parameters.outputShape.channels },
+                  layer->parameters.outputPaddingParameters,
+                };
 
             // Instantiate the specific layer type
             underlying::LayerType layerType = layer->GetLayerType();
             switch (layerType)
             {
                 case (underlying::LayerType::activation):
+                {
+                    auto& apiLayer = LayerAs<api::ActivationLayer<ElementType>>(layer);
+                    if (apiLayer.activation == api::ActivationType::leaky)
                     {
-                        auto& apiLayer = LayerAs<api::ActivationLayer<ElementType>>(layer);
-                        if (apiLayer.activation == api::ActivationType::leaky)
-                        {
-                            underlyingLayers.push_back(std::make_unique<underlying::ActivationLayer<ElementType, underlying::LeakyReLUActivation>>(parameters));
-                        }
-                        else if (apiLayer.activation == api::ActivationType::relu)
-                        {
-                            underlyingLayers.push_back(std::make_unique<underlying::ActivationLayer<ElementType, underlying::ReLUActivation>>(parameters));
-                        }
-                        else
-                        {
-                            underlyingLayers.push_back(std::make_unique<underlying::ActivationLayer<ElementType, underlying::SigmoidActivation>>(parameters));
-                        }
+                        underlyingLayers.push_back(std::make_unique<underlying::ActivationLayer<ElementType, underlying::LeakyReLUActivation>>(parameters));
                     }
-                    break;
+                    else if (apiLayer.activation == api::ActivationType::relu)
+                    {
+                        underlyingLayers.push_back(std::make_unique<underlying::ActivationLayer<ElementType, underlying::ReLUActivation>>(parameters));
+                    }
+                    else
+                    {
+                        underlyingLayers.push_back(std::make_unique<underlying::ActivationLayer<ElementType, underlying::SigmoidActivation>>(parameters));
+                    }
+                }
+                break;
                 case (underlying::LayerType::batchNormalization):
-                    {
-                        auto& apiLayer = LayerAs<api::BatchNormalizationLayer<ElementType>>(layer);
-                        underlyingLayers.push_back(std::make_unique<underlying::BatchNormalizationLayer<ElementType>>(parameters, apiLayer.mean, apiLayer.variance));
-                    }
-                    break;
+                {
+                    auto& apiLayer = LayerAs<api::BatchNormalizationLayer<ElementType>>(layer);
+                    auto epsilonSummand = (apiLayer.epsilonSummand == api::EpsilonSummand::variance) ? underlying::EpsilonSummand::Variance : underlying::EpsilonSummand::SqrtVariance;
+                    underlyingLayers.push_back(std::make_unique<underlying::BatchNormalizationLayer<ElementType>>(parameters, apiLayer.mean, apiLayer.variance, apiLayer.epsilon, epsilonSummand));
+                }
+                break;
                 case (underlying::LayerType::bias):
-                    {
-                        auto& apiLayer = LayerAs<api::BiasLayer<ElementType>>(layer);
-                        underlyingLayers.push_back(std::make_unique<underlying::BiasLayer<ElementType>>(parameters, apiLayer.bias));
-                    }
-                    break;
+                {
+                    auto& apiLayer = LayerAs<api::BiasLayer<ElementType>>(layer);
+                    underlyingLayers.push_back(std::make_unique<underlying::BiasLayer<ElementType>>(parameters, apiLayer.bias));
+                }
+                break;
                 case (underlying::LayerType::binaryConvolution):
-                    {
-                        auto& apiLayer = LayerAs<api::BinaryConvolutionalLayer<ElementType>>(layer);
-                        TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
-                        underlyingLayers.push_back(std::make_unique<underlying::BinaryConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
-                    }
-                    break;
+                {
+                    auto& apiLayer = LayerAs<api::BinaryConvolutionalLayer<ElementType>>(layer);
+                    TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
+                    underlyingLayers.push_back(std::make_unique<underlying::BinaryConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
+                }
+                break;
                 case (underlying::LayerType::convolution):
-                    {
-                        auto& apiLayer = LayerAs<api::ConvolutionalLayer<ElementType>>(layer);
-                        TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
-                        underlyingLayers.push_back(std::make_unique<underlying::ConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
-                    }
-                    break;
+                {
+                    auto& apiLayer = LayerAs<api::ConvolutionalLayer<ElementType>>(layer);
+                    TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
+                    underlyingLayers.push_back(std::make_unique<underlying::ConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
+                }
+                break;
                 case (underlying::LayerType::fullyConnected):
-                    {
-                        auto& apiLayer = LayerAs<api::FullyConnectedLayer<ElementType>>(layer);
-                        TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
-                        underlyingLayers.push_back(std::make_unique<underlying::FullyConnectedLayer<ElementType>>(parameters, weights));
-                    }
-                    break;
+                {
+                    auto& apiLayer = LayerAs<api::FullyConnectedLayer<ElementType>>(layer);
+                    TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
+                    underlyingLayers.push_back(std::make_unique<underlying::FullyConnectedLayer<ElementType>>(parameters, weights));
+                }
+                break;
                 case (underlying::LayerType::pooling):
+                {
+                    auto& apiLayer = LayerAs<api::PoolingLayer<ElementType>>(layer);
+                    if (apiLayer.poolingType == api::PoolingType::max)
                     {
-                        auto& apiLayer = LayerAs<api::PoolingLayer<ElementType>>(layer);
-                        if (apiLayer.poolingType == api::PoolingType::max)
-                        {
-                            underlyingLayers.push_back(std::make_unique<underlying::PoolingLayer<ElementType, underlying::MaxPoolingFunction>>(parameters, apiLayer.poolingParameters));
-                        }
-                        else
-                        {
-                            underlyingLayers.push_back(std::make_unique<underlying::PoolingLayer<ElementType, underlying::MeanPoolingFunction>>(parameters, apiLayer.poolingParameters));
-                        }
+                        underlyingLayers.push_back(std::make_unique<underlying::PoolingLayer<ElementType, underlying::MaxPoolingFunction>>(parameters, apiLayer.poolingParameters));
                     }
-                    break;
+                    else
+                    {
+                        underlyingLayers.push_back(std::make_unique<underlying::PoolingLayer<ElementType, underlying::MeanPoolingFunction>>(parameters, apiLayer.poolingParameters));
+                    }
+                }
+                break;
                 case (underlying::LayerType::scaling):
-                    {
-                        auto& apiLayer = LayerAs<api::ScalingLayer<ElementType>>(layer);
-                        underlyingLayers.push_back(std::make_unique<underlying::ScalingLayer<ElementType>>(parameters, apiLayer.scales));
-                    }
-                    break;
+                {
+                    auto& apiLayer = LayerAs<api::ScalingLayer<ElementType>>(layer);
+                    underlyingLayers.push_back(std::make_unique<underlying::ScalingLayer<ElementType>>(parameters, apiLayer.scales));
+                }
+                break;
                 case (underlying::LayerType::softmax):
-                    {
-                        auto& apiLayer = LayerAs<api::SoftmaxLayer<ElementType>>(layer);
-                        underlyingLayers.push_back(std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters));
-                    }
-                    break;
+                {
+                    auto& apiLayer = LayerAs<api::SoftmaxLayer<ElementType>>(layer);
+                    underlyingLayers.push_back(std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters));
+                }
+                break;
                 default:
                     throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Encountered unknown layer type in neural network predictor");
                     break;
@@ -233,7 +235,6 @@ namespace predictors
         return *_predictor;
     }
 #endif
-
 }
 }
 }

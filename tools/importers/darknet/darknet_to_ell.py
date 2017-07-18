@@ -206,7 +206,7 @@ def process_batch_normalization_layer(layer, apply_padding, mean_vals, variance_
     meanVector = ELL.FloatVector(mean_vals.ravel())
     varianceVector = ELL.FloatVector(variance_vals.ravel())
 
-    layers.append(ELL.FloatBatchNormalizationLayer(layerParameters, meanVector, varianceVector))
+    layers.append(ELL.FloatBatchNormalizationLayer(layerParameters, meanVector, varianceVector, 1e-6, ELL.EpsilonSummand_sqrtVariance))
 
     # Create Scaling Layer
     if (apply_padding):

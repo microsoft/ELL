@@ -187,6 +187,66 @@ class CntkLayersTestCase(unittest.TestCase):
 
         return
 
+    def test_batch_normalization_layer(self):
+        # Test a model with a single CNTK BatchNormalization layer against the equivalent ELL predictor
+        # This verifies that the import functions reshape and reorder values appropriately and
+        # that the equivalent ELL layer produces comparable output
+
+        # Create a BatchNormalization CNTK layer
+        batchNorm = BatchNormalization(map_rank=1)
+
+        # Input order for CNTK is channels, rows, columns
+        x = input((16, 10, 10))
+        cntkModel = batchNorm(x)
+
+        # Create a test set of scales and biases to use for both CNTK and ELL layers
+        scaleValues = np.linspace(0.1, 0.5, num=16, dtype=np.float_)
+        batchNorm.parameters[0].value = scaleValues
+        scaleVector = ELL.FloatVector(scaleValues)
+
+        biasValues = np.linspace(1, 2, num=16, dtype=np.float_)
+        batchNorm.parameters[1].value = biasValues
+        biasVector = ELL.FloatVector(biasValues)
+
+        # CNTK's BatchNormalization does not support overriding the running mean and variance,
+        # so we use zeros, which are the default values
+        meanVector = ELL.FloatVector(16)
+        varianceVector = ELL.FloatVector(16)
+
+        # Create the equivalent ELL predictor
+        layers = []
+        layerParameters = ELL.LayerParameters(ELL.LayerShape(10, 10, 16),  # Input order for ELL is rows, columns, channels
+                                              ELL.NoPadding(),
+                                              ELL.LayerShape(10, 10, 16),
+                                              ELL.NoPadding())
+
+        # CNTK BatchNorm = ELL's BatchNorm + Scaling + Bias
+        # 1e-5 is the default epsilon for CNTK's BatchNormalization Layer
+        epsilon = 1e-5
+        layers.append(ELL.FloatBatchNormalizationLayer(
+            layerParameters, meanVector, varianceVector, epsilon, ELL.EpsilonSummand_variance))
+        layers.append(ELL.FloatScalingLayer(layerParameters, scaleVector))
+        layers.append(ELL.FloatBiasLayer(layerParameters, biasVector))
+
+        predictor = ELL.FloatNeuralNetworkPredictor(layers)
+
+        # Compare the results
+        inputValues = np.linspace(
+            -5, 5, num=16 * 10 * 10, dtype=np.float32).reshape(16, 10, 10)
+        cntkResults = cntkModel(inputValues)
+
+        orderedCntkResults = cntk_to_ell.get_float_vector_from_cntk_array(
+            cntkResults)  # Note that cntk inserts an extra dimension of 1 in the front
+        orderedInputValues = cntk_to_ell.get_float_vector_from_cntk_array(
+            inputValues)
+        ellResults = predictor.Predict(orderedInputValues)
+
+        # Compare them (precision is 1 less decimal place from epsilon)
+        np.testing.assert_array_almost_equal(
+            orderedCntkResults, ellResults, 4, 'results for BatchNormalization layer do not match!')
+
+        return
+
 
 class CntkXorModelTestCase(unittest.TestCase):
     def setUp(self):

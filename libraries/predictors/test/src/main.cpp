@@ -7,11 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ForestPredictor.h"
-#include "NeuralNetworkPredictor.h"
-#include "ReLUActivation.h"
 #include "LeakyReLUActivation.h"
 #include "MaxPoolingFunction.h"
+#include "NeuralNetworkPredictor.h"
 #include "ProtoNNPredictor.h"
+#include "ReLUActivation.h"
 
 // testing
 #include "testing.h"
@@ -105,7 +105,7 @@ void ActivationTest()
             }
         }
     }
-    testing::ProcessTest("Testing ReLUActivation", T1(0, 0, 0) == 1.0 && T1(0,1,0) == 0 && T1(1,0,1) == 3.0 && T1(1,1,1) == 0);
+    testing::ProcessTest("Testing ReLUActivation", T1(0, 0, 0) == 1.0 && T1(0, 1, 0) == 0 && T1(1, 0, 1) == 3.0 && T1(1, 1, 1) == 0);
 
     auto leakyRelu = LeakyReLUActivation<ElementType>(static_cast<ElementType>(0.1));
     for (size_t i = 0; i < T0.NumRows(); ++i)
@@ -132,8 +132,8 @@ void LayerBaseTest()
 
     // Verify LayerBase
     TensorType input0(12, 12, 3);
-    PaddingParameters paddingParameters2{PaddingScheme::alternatingZeroAndOnes, 1};
-    Shape outputShape = { 12,12,6 };
+    PaddingParameters paddingParameters2{ PaddingScheme::alternatingZeroAndOnes, 1 };
+    Shape outputShape = { 12, 12, 6 };
     LayerParameters layerParameters{ input0, ZeroPadding(1), outputShape, paddingParameters2 };
 
     Layer<ElementType> baseLayer(layerParameters);
@@ -157,7 +157,7 @@ void ActivationLayerTest()
     activationInput(0, 1, 0) = -2.0;
     activationInput(1, 0, 1) = 3.0;
     activationInput(1, 1, 1) = -4.0;
-    Shape activationOutputShape = { 4,4,2 };
+    Shape activationOutputShape = { 4, 4, 2 };
     LayerParameters activationParameters{ activationInput, NoPadding(), activationOutputShape, ZeroPadding(1) };
 
     ActivationLayer<ElementType, ReLUActivation> activationLayer(activationParameters);
@@ -183,12 +183,12 @@ void BatchNormalizationLayerTest()
     bnInput(0, 1, 0) = 7;
     bnInput(1, 0, 1) = 30;
     bnInput(1, 1, 1) = 50;
-    Shape bnOutputShape = { 4,4,2 };
+    Shape bnOutputShape = { 4, 4, 2 };
     LayerParameters bnParameters{ bnInput, NoPadding(), bnOutputShape, ZeroPadding(1) };
-    VectorType mean({5, 10});
-    VectorType variance({4.0, 16.0});
+    VectorType mean({ 5, 10 });
+    VectorType variance({ 4.0, 16.0 });
 
-    BatchNormalizationLayer<ElementType> bnLayer(bnParameters, mean, variance);
+    BatchNormalizationLayer<ElementType> bnLayer(bnParameters, mean, variance, 1.0e-6f, EpsilonSummand::SqrtVariance);
     bnLayer.Compute();
     auto output1 = bnLayer.GetOutput();
     testing::ProcessTest("Testing BatchNormailzationLayer, values", Equals(output1(1, 1, 0), 3.0) && Equals(output1(1, 2, 0), 1.0) && Equals(output1(2, 1, 1), 5.0) && Equals(output1(2, 2, 1), 10.0));
@@ -213,7 +213,7 @@ void BiasLayerTest()
     input(1, 1, 1) = 4;
     Shape outputShape = { 4, 4, 2 };
     LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
-    VectorType bias({5, 10});
+    VectorType bias({ 5, 10 });
 
     BiasLayer<ElementType> biasLayer(parameters, bias);
     biasLayer.Compute();
@@ -259,7 +259,7 @@ void ScalingLayerTest()
     input(0, 1, 0) = 2;
     input(1, 0, 1) = 3;
     input(1, 1, 1) = 4;
-    Shape outputShape = { 4,4,2 };
+    Shape outputShape = { 4, 4, 2 };
     LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
     VectorType scales({ 2, 0.5 });
 
@@ -284,7 +284,7 @@ void FullyConnectedLayerTest()
     // Verify FullyConnectedLayer
     TensorType input(2, 2, 1);
     input.Fill(1);
-    Shape outputShape = { 3,5,1 };
+    Shape outputShape = { 3, 5, 1 };
     LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
     MatrixType weights(3, 4);
     weights(0, 0) = 1;
@@ -359,11 +359,13 @@ void ConvolutionalLayerTest()
     LayerParameters parameters{ input, ZeroPadding(1), outputShape, NoPadding() };
     ConvolutionalParameters convolutionalParams{ 3, 1, ConvolutionMethod::diagonal, 2 };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
+    // clang-format off
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
         1, 3, 2, 3, 1, 1, 2, 3, 1,
         2, 4, 1, 3, 1, 2, 1, 4, 2,
         1, 2, 1, 2, 3, 2, 1, 2, 1,
         0, 3, 2, 3, 1, 2, 1, 0, 2 };
+    // clang-format on
     size_t vectorIndex = 0;
     for (size_t f = 0; f < outputShape[2]; f++)
     {
@@ -413,13 +415,15 @@ void BinaryConvolutionalLayerTest()
     input(1, 2, 1) = 2;
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
     LayerParameters parameters{ input, MinusOnePadding(1), outputShape, NoPadding() };
-    BinaryConvolutionalParameters convolutionalParams{3, 1, BinaryConvolutionMethod::gemm};
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
-    std::vector<ElementType> weightsVector{   // RowMajor then depth order
+    // clang-format off
+    std::vector<ElementType> weightsVector{ // RowMajor then depth order
         1, 3, 2, 3, 1, 1, 2, 3, 1,
         2, 4, 1, 3, 1, 2, 1, 4, 2,
         1, 2, 1, 2, 3, 2, 1, 2, 1,
         0, 3, 2, 3, 1, 2, 1, 0, 2 };
+    // clang-format on
     size_t vectorIndex = 0;
     for (size_t f = 0; f < outputShape[2]; f++)
     {
@@ -471,7 +475,7 @@ void SoftmaxLayerTest()
     input(0, 0, 0) = 1;
     input(0, 0, 1) = 2;
     input(0, 0, 2) = 3;
-    Shape outputShape = { 3,3,3 };
+    Shape outputShape = { 3, 3, 3 };
     LayerParameters parameters{ input, NoPadding(), outputShape, ZeroPadding(1) };
 
     SoftmaxLayer<ElementType> softmaxLayer(parameters);
@@ -514,11 +518,11 @@ void NeuralNetworkPredictorTest()
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
 
-    InputParameters inputParams = {{1,1,2}, {PaddingScheme::zeros, 0}, {1,1,2},{PaddingScheme::zeros, 0}, 1};
+    InputParameters inputParams = { { 1, 1, 2 }, { PaddingScheme::zeros, 0 }, { 1, 1, 2 }, { PaddingScheme::zeros, 0 }, 1 };
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
-    LayerParameters layerParameters{inputLayer->GetOutput(), NoPadding(), {1,1,3}, NoPadding()};
-    MatrixType weights1(3,2);
+    LayerParameters layerParameters{ inputLayer->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
+    MatrixType weights1(3, 2);
     weights1(0, 0) = -0.97461396f;
     weights1(0, 1) = 1.40845299f;
     weights1(1, 0) = -0.14135513f;
@@ -527,22 +531,22 @@ void NeuralNetworkPredictorTest()
     weights1(2, 1) = -0.99083692f;
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new FullyConnectedLayer<ElementType>(layerParameters, weights1)));
 
-    layerParameters = { layers[0]->GetOutput(), NoPadding(),{ 1,1,3 }, NoPadding()};
-    VectorType bias1({-0.43837756f, -0.90868396f, -0.0323102f});
+    layerParameters = { layers[0]->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
+    VectorType bias1({ -0.43837756f, -0.90868396f, -0.0323102f });
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
 
-    layerParameters = {layers[1]->GetOutput(), NoPadding(),{ 1,1,3 }, NoPadding()};
+    layerParameters = { layers[1]->GetOutput(), NoPadding(), { 1, 1, 3 }, NoPadding() };
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, ReLUActivation>(layerParameters)));
 
-    layerParameters = {layers[2]->GetOutput(), NoPadding(),{ 1,1,1 }, NoPadding() };
+    layerParameters = { layers[2]->GetOutput(), NoPadding(), { 1, 1, 1 }, NoPadding() };
     MatrixType weights2(1, 3);
     weights2(0, 0) = 1.03084767f;
     weights2(0, 1) = -0.10772263f;
     weights2(0, 2) = 1.04077697f;
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new FullyConnectedLayer<ElementType>(layerParameters, weights2)));
 
-    layerParameters = { layers[3]->GetOutput(), NoPadding(),{ 1,1,1 }, NoPadding() };
-    VectorType bias2({1.40129846e-20f});
+    layerParameters = { layers[3]->GetOutput(), NoPadding(), { 1, 1, 1 }, NoPadding() };
+    VectorType bias2({ 1.40129846e-20f });
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias2)));
 
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
@@ -553,7 +557,7 @@ void NeuralNetworkPredictorTest()
     // - the operations in each layer are working correctly
     // - the feed forward logic is working correctly
 
-    output = neuralNetwork.Predict(DataVectorType({0, 0}));
+    output = neuralNetwork.Predict(DataVectorType({ 0, 0 }));
     testing::ProcessTest("Testing NeuralNetworkPredictor, Predict of XOR net for 0 0 ", Equals(output[0], 0.0));
 
     output = neuralNetwork.Predict(DataVectorType({ 0, 1 }));
@@ -601,22 +605,28 @@ void ProtoNNPredictorTest()
 
     // projectedDim * dim
     auto W = protonnPredictor.GetProjectionMatrix().GetReference();
+    // clang-format off
     W(0, 0) = 0.4; W(0, 1) = 0.5; W(0, 2) = 0.1; W(0, 3) = 0.1; W(0, 4) = 0.1;
     W(1, 0) = 0.1; W(1, 1) = 0.4; W(1, 2) = 0.8; W(1, 3) = 0.2; W(1, 4) = 0.5;
     W(2, 0) = 0.2; W(2, 1) = 0.1; W(2, 2) = 0.7; W(2, 3) = 0.3; W(2, 4) = 0.4;
     W(3, 0) = 0.3; W(3, 1) = 0.3; W(3, 2) = 0.2; W(3, 3) = 0.5; W(3, 4) = 0.2;
+    // clang-format on
 
     // projectedDim * numPrototypes
     auto B = protonnPredictor.GetPrototypes().GetReference();
+    // clang-format off
     B(0, 0) = 0.1; B(0, 1) = 0.2; B(0, 2) = 0.3;
     B(1, 0) = 0.8; B(1, 1) = 0.7; B(1, 2) = 0.6;
     B(2, 0) = 0.4; B(2, 1) = 0.6; B(2, 2) = 0.2;
     B(3, 0) = 0.2; B(3, 1) = 0.1; B(3, 2) = 0.3;
+    // clang-format on
 
     // numLabels * numPrototypes
     auto Z = protonnPredictor.GetLabelEmbeddings().GetReference();
+    // clang-format off
     Z(0, 0) = 0.1; Z(0, 1) = 0.3, Z(0, 2) = 0.2;
     Z(1, 0) = 0.2; Z(1, 1) = 0.4, Z(1, 2) = 0.8;
+    // clang-format on
 
     predictors::ProtoNNPrediction result = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
 

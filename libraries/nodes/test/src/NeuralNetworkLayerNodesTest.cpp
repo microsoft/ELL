@@ -281,7 +281,7 @@ void TestBatchNormalizationLayerNode()
     VectorType mean({ 5, 10 });
     VectorType variance({ 4.0, 16.0 });
 
-    predictors::neural::BatchNormalizationLayer<double> bnLayer(bnParameters, mean, variance);
+    predictors::neural::BatchNormalizationLayer<double> bnLayer(bnParameters, mean, variance, 1.0e-6f, predictors::neural::EpsilonSummand::SqrtVariance);
     bnLayer.Compute();
     auto output = bnLayer.GetOutput();
 

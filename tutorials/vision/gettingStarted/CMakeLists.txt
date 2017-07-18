@@ -16,6 +16,7 @@ endif()
 set (TUTORIAL_NAME GettingStarted)
 set (PYTHON_TUTORIALS
     cntk.md
+    cntkBinarizedDemo.py
     cntkDemo.py
     cntkVgg16ImageNetLabels.txt
     coffeemug.jpg

@@ -15,12 +15,9 @@ namespace predictors
 {
 namespace neural
 {
-
     template <typename ElementType>
-    BatchNormalizationLayer<ElementType>::BatchNormalizationLayer(const LayerParameters& layerParameters, const VectorType& mean, const VectorType& variance) :
-        Layer<ElementType>(layerParameters),
-        _multiplicationValues(mean.Size()),
-        _additionValues(variance.Size())
+    BatchNormalizationLayer<ElementType>::BatchNormalizationLayer(const LayerParameters& layerParameters, const VectorType& mean, const VectorType& variance, ElementType epsilon, EpsilonSummand EpsilonSummand)
+        : Layer<ElementType>(layerParameters), _multiplicationValues(mean.Size()), _additionValues(variance.Size()), _epsilon(epsilon), _epsilonSummand(EpsilonSummand)
     {
         if (mean.Size() != variance.Size())
         {
@@ -37,10 +34,13 @@ namespace neural
 
         // Batch norm is: outputValue = (inputValue - mean) / (sqrt(variance) + _epsilon)
         // To turn this into one MultiplyAdd operation, we can rearrange it to:
-        // outputValue = inputValue * (1/(sqrt(variance) + _epsilon)) + (-mean * 1/(sqrt(variance) + _epsilon)) 
+        // EpsilonSummand::Variance:
+        //   outputValue = inputValue * (1/(sqrt(variance + _epsilon))) + (-mean * 1/(sqrt(variance + _epsilon)))
+        // EpsilonSummand::SqrtVariance:
+        //   outputValue = inputValue * (1/(sqrt(variance) + _epsilon)) + (-mean * 1/(sqrt(variance) + _epsilon))
         for (size_t i = 0; i < _additionValues.Size(); i++)
         {
-            ElementType varianceFactor = (1 / (std::sqrt(variance[i]) + _epsilon));
+            ElementType varianceFactor = (_epsilonSummand == EpsilonSummand::Variance) ? (1 / (std::sqrt(variance[i] + _epsilon))) : (1 / (std::sqrt(variance[i]) + _epsilon));
 
             _multiplicationValues[i] = varianceFactor;
             _additionValues[i] = -mean[i] * varianceFactor;
@@ -64,6 +64,9 @@ namespace neural
 
         math::VectorArchiver::Write(_multiplicationValues, "multiplicationValues", archiver);
         math::VectorArchiver::Write(_additionValues, "additionValues", archiver);
+
+        archiver["epsilon"] << _epsilon;
+        archiver["epsilonSummand"] << static_cast<int>(_epsilonSummand);
     }
 
     template <typename ElementType>
@@ -73,9 +76,13 @@ namespace neural
 
         math::VectorArchiver::Read(_multiplicationValues, "multiplicationValues", archiver);
         math::VectorArchiver::Read(_additionValues, "additionValues", archiver);
+
+        archiver["epsilon"] >> _epsilon;
+
+        int value;
+        archiver["epsilonSummand"] >> value;
+        _epsilonSummand = static_cast<EpsilonSummand>(value);
     }
-
 }
 }
 }
-

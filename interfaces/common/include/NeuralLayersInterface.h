@@ -11,6 +11,7 @@
 
 // neural network
 #include "Layer.h"
+
 #include "ActivationLayer.h"
 #include "BatchNormalizationLayer.h"
 #include "BiasLayer.h"
@@ -22,9 +23,9 @@
 #include "ScalingLayer.h"
 
 // stl
+#include <array>
 #include <string>
 #include <vector>
-#include <array>
 
 #endif
 
@@ -32,12 +33,12 @@
 // const from the underlying code side.
 #ifdef SWIG
 #define API_READONLY(statement) \
-    %immutable;         \
+    %immutable;                 \
     statement;                  \
     %mutable
 #else
 #define API_READONLY(statement) \
-    statement;               
+    statement;
 #endif
 
 namespace ell
@@ -81,16 +82,23 @@ namespace neural
     class Layer
     {
     public:
-        Layer(const LayerParameters& layerParameters) : parameters(layerParameters){}
+        Layer(const LayerParameters& layerParameters)
+            : parameters(layerParameters) {}
         virtual ~Layer() {}
 
         virtual LayerType GetLayerType() const = 0;
 
         template <class LayerType>
-        LayerType& As() { return *(dynamic_cast<LayerType*>(this)); }
+        LayerType& As()
+        {
+            return *(dynamic_cast<LayerType*>(this));
+        }
 
         template <class LayerType>
-        bool Is() { return dynamic_cast<LayerType*>(this) != nullptr; }
+        bool Is()
+        {
+            return dynamic_cast<LayerType*>(this) != nullptr;
+        }
 
         const LayerParameters parameters;
     };
@@ -107,10 +115,10 @@ namespace neural
     class ActivationLayer : public Layer<ElementType>
     {
     public:
-        ActivationLayer(const LayerParameters& layerParameters, ActivationType activation) :
-            Layer<ElementType>(layerParameters),
-            activation(activation)
-        {}
+        ActivationLayer(const LayerParameters& layerParameters, ActivationType activation)
+            : Layer<ElementType>(layerParameters), activation(activation)
+        {
+        }
 
         LayerType GetLayerType() const override { return LayerType::activation; }
 
@@ -118,20 +126,27 @@ namespace neural
     };
 
     // Api projection for BatchNormalizationLayer
+    enum class EpsilonSummand : int
+    {
+        variance,
+        sqrtVariance
+    };
+
     template <typename ElementType>
     class BatchNormalizationLayer : public Layer<ElementType>
     {
     public:
-        BatchNormalizationLayer(const LayerParameters& layerParameters, const std::vector<ElementType>& mean, const std::vector<ElementType>& variance) :
-            Layer<ElementType>(layerParameters),
-            mean(mean),
-            variance(variance)
-        {}
+        BatchNormalizationLayer(const LayerParameters& layerParameters, const std::vector<ElementType>& mean, const std::vector<ElementType>& variance, ElementType epsilon, EpsilonSummand epsilonSummand)
+            : Layer<ElementType>(layerParameters), mean(mean), variance(variance), epsilon(epsilon), epsilonSummand(epsilonSummand)
+        {
+        }
 
         LayerType GetLayerType() const override { return LayerType::batchNormalization; }
 
         const std::vector<ElementType> mean;
         const std::vector<ElementType> variance;
+        const ElementType epsilon;
+        const EpsilonSummand epsilonSummand;
     };
 
     // Api projection for BiasLayer
@@ -139,10 +154,10 @@ namespace neural
     class BiasLayer : public Layer<ElementType>
     {
     public:
-        BiasLayer(const LayerParameters& layerParameters, const std::vector<ElementType>& bias) :
-            Layer<ElementType>(layerParameters),
-            bias(bias)
-        {}
+        BiasLayer(const LayerParameters& layerParameters, const std::vector<ElementType>& bias)
+            : Layer<ElementType>(layerParameters), bias(bias)
+        {
+        }
 
         LayerType GetLayerType() const override { return LayerType::bias; }
 
@@ -157,11 +172,10 @@ namespace neural
     class BinaryConvolutionalLayer : public Layer<ElementType>
     {
     public:
-        BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ell::api::math::Tensor<ElementType>& weightsTensor) :
-            Layer<ElementType>(layerParameters),
-            weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels),
-            convolutionalParameters(convolutionalParameters)
-        {}
+        BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ell::api::math::Tensor<ElementType>& weightsTensor)
+            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels), convolutionalParameters(convolutionalParameters)
+        {
+        }
 
         LayerType GetLayerType() const override { return LayerType::binaryConvolution; }
 
@@ -173,15 +187,14 @@ namespace neural
     using ConvolutionMethod = ell::predictors::neural::ConvolutionMethod;
     using ConvolutionalParameters = ell::predictors::neural::ConvolutionalParameters;
 
-    template <typename ElementType> 
+    template <typename ElementType>
     class ConvolutionalLayer : public Layer<ElementType>
     {
     public:
-        ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, const ell::api::math::Tensor<ElementType>& weightsTensor) :
-            Layer<ElementType>(layerParameters),
-            weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels),
-            convolutionalParameters(convolutionalParameters)
-        {}
+        ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, const ell::api::math::Tensor<ElementType>& weightsTensor)
+            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels), convolutionalParameters(convolutionalParameters)
+        {
+        }
 
         LayerType GetLayerType() const override { return LayerType::convolution; }
 
@@ -194,10 +207,10 @@ namespace neural
     class FullyConnectedLayer : public Layer<ElementType>
     {
     public:
-        FullyConnectedLayer(const LayerParameters& layerParameters, const ell::api::math::Tensor<ElementType>& weightsTensor) :
-            Layer<ElementType>(layerParameters),
-            weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels)
-        {}
+        FullyConnectedLayer(const LayerParameters& layerParameters, const ell::api::math::Tensor<ElementType>& weightsTensor)
+            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels)
+        {
+        }
 
         LayerType GetLayerType() const override { return LayerType::fullyConnected; }
 
@@ -217,11 +230,10 @@ namespace neural
     class PoolingLayer : public Layer<ElementType>
     {
     public:
-        PoolingLayer(const LayerParameters& layerParameters, const PoolingParameters& poolingParameters,  PoolingType poolingType) :
-            Layer<ElementType>(layerParameters),
-            poolingType(poolingType),
-            poolingParameters(poolingParameters)
-        {}
+        PoolingLayer(const LayerParameters& layerParameters, const PoolingParameters& poolingParameters, PoolingType poolingType)
+            : Layer<ElementType>(layerParameters), poolingType(poolingType), poolingParameters(poolingParameters)
+        {
+        }
 
         LayerType GetLayerType() const override { return LayerType::pooling; }
 
@@ -234,9 +246,10 @@ namespace neural
     class SoftmaxLayer : public Layer<ElementType>
     {
     public:
-        SoftmaxLayer(const LayerParameters& layerParameters) :
-            Layer<ElementType>(layerParameters)
-        {}
+        SoftmaxLayer(const LayerParameters& layerParameters)
+            : Layer<ElementType>(layerParameters)
+        {
+        }
 
         LayerType GetLayerType() const override { return LayerType::softmax; }
     };
@@ -246,16 +259,15 @@ namespace neural
     class ScalingLayer : public Layer<ElementType>
     {
     public:
-        ScalingLayer(const LayerParameters& layerParameters, const std::vector<ElementType>& scales) :
-            Layer<ElementType>(layerParameters),
-            scales(scales)
-        {}
+        ScalingLayer(const LayerParameters& layerParameters, const std::vector<ElementType>& scales)
+            : Layer<ElementType>(layerParameters), scales(scales)
+        {
+        }
 
         LayerType GetLayerType() const override { return LayerType::scaling; }
 
         const std::vector<ElementType> scales;
     };
-
 }
 }
 }

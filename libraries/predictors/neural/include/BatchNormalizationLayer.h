@@ -15,6 +15,13 @@ namespace predictors
 {
 namespace neural
 {
+    /// <summary> Indicates what term the epsilon will be added to in the denominator. </summary>
+    enum class EpsilonSummand : int
+    {
+        Variance,
+        SqrtVariance
+    };
+
     /// <summary> A layer in a neural network that applies batch normalization to the input. </summary>
     template <typename ElementType>
     class BatchNormalizationLayer : public Layer<ElementType>
@@ -27,13 +34,15 @@ namespace neural
         using Layer<ElementType>::NumOutputColumnsMinusPadding;
         using Layer<ElementType>::NumOutputChannels;
         using Layer<ElementType>::AssignValues;
-        
+
         /// <summary> Instantiates an instance of a batch normalization layer. </summary>
         ///
         /// <param name="layerParameters"> The parameters common to every layer. </param>
         /// <param name="mean"> The mean values. </param>
         /// <param name="variance"> The variance values. </param>
-        BatchNormalizationLayer(const LayerParameters& layerParameters, const VectorType& mean, const VectorType& variance);
+        /// <param name="epsilon"> The epsilon added to the denominator to avoid division by zero. </param>
+        /// <param name="EpsilonSummand"> Which component will the epsilon will be applied to the denominator. </param>
+        BatchNormalizationLayer(const LayerParameters& layerParameters, const VectorType& mean, const VectorType& variance, ElementType epsilon, EpsilonSummand EpsilonSummand);
 
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
         BatchNormalizationLayer() {}
@@ -82,9 +91,9 @@ namespace neural
 
         VectorType _multiplicationValues;
         VectorType _additionValues;
-        const ElementType _epsilon = 1.0e-6f; // To ensure non-zero division, this is added to denominator
+        ElementType _epsilon; // To ensure non-zero division, this is added to denominator
+        EpsilonSummand _epsilonSummand;
     };
-
 }
 }
 }
