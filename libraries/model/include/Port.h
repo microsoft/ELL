@@ -112,6 +112,9 @@ namespace model
     {
         typedef int value_type;
     };
+
+    template <Port::PortType portType>
+    using ValueType = typename PortTypeToValueType<portType>::value_type;
 }
 }
 

@@ -244,6 +244,16 @@ namespace model
         return GetOutput(0).Size();
     }
 
+    Port::PortType DynamicMap::GetInputType() const
+    {
+        return GetInput()->GetOutputType();
+    }
+
+    Port::PortType DynamicMap::GetOutputType() const
+    {
+        return GetOutput().GetPortType();
+    }
+
     void DynamicMap::Refine(int maxIterations)
     {
         TransformContext context;

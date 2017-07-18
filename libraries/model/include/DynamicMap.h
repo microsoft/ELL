@@ -94,6 +94,26 @@ namespace model
         /// <returns> The dimensionality of the map's output port </returns>
         size_t GetOutputSize() const;
 
+        /// <summary> Returns the type of the map's input </summary>
+        ///
+        /// <reutrns> The type of the map's input </summary>
+        Port::PortType GetInputType() const;
+        
+        /// <summary> Returns the type of the map's output </summary>
+        ///
+        /// <reutrns> The type of the map's output </summary>
+        Port::PortType GetOutputType() const;
+
+        /// <summary> Returns the map's input node </summary>
+        ///
+        /// <returns> The input node </returns>
+        InputNodeBase* GetInput() const { return GetInput(0); }
+
+        /// <summary> Returns the map's output PortElementsBase </summary>
+        ///
+        /// <returns> The output </returns>
+        PortElementsBase GetOutput() const { return GetOutput(0); }
+
         /// <summary> Refines the model wrapped by this map. </summary>
         ///
         /// <param name="maxIterations"> The maximum number of refinement iterations. </param>

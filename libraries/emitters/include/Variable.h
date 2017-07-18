@@ -159,11 +159,31 @@ namespace emitters
         template <typename VarType, typename... Args>
         VarType* AddVariable(Args&&... args);
 
-        /// <summary> Add a scalar </summary>
+        /// <summary> Add a scalar, initialized to zero </summary>
         Variable* AddScalarVariable(VariableScope scope, VariableType type);
 
-        /// <summary> Add a vector </summary>
+        /// <summary> Add a scalar, initialized to zero </summary>
+        template <typename ElementType>
+        Variable* AddScalarVariable(VariableScope scope);
+
+        /// <summary> Add a scalar, initialized to a given value </summary>
+        template <typename ElementType>
+        Variable* AddScalarVariable(VariableScope scope, ElementType value);
+
+        /// <summary> Add a vector, initialized to zero </summary>
         Variable* AddVectorVariable(VariableScope scope, VariableType type, int size);
+
+        /// <summary> Add a vector, initialized to zero </summary>
+        template <typename ElementType>
+        Variable* AddVectorVariable(VariableScope scope, int size);
+
+        /// <summary> Add a vector, with all elements initialized to a given value </summary>
+        template <typename ElementType>
+        Variable* AddVectorVariable(VariableScope scope, int size, ElementType value);
+
+        /// <summary> Add a vector, initialized to a given vector </summary>
+        template <typename ElementType>
+        Variable* AddVectorVariable(VariableScope scope, const std::vector<ElementType>& values);
 
         /// <summary> Add a reference to vector element </summary>
         Variable* AddVectorElementVariable(VariableType type, Variable& src, int offset);

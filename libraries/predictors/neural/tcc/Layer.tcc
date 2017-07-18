@@ -19,7 +19,30 @@ namespace predictors
 {
 namespace neural
 {
+    template <typename ValueType>
+    ValueType GetPaddingValue(PaddingScheme paddingScheme)
+    {
+        switch (paddingScheme)
+        {
+            case PaddingScheme::zeros:
+                return static_cast<ValueType>(0);
+            case PaddingScheme::minusOnes:
+                return static_cast<ValueType>(-1);
+            case PaddingScheme::alternatingZeroAndOnes:
+                return static_cast<ValueType>(0);
+            case PaddingScheme::randomZeroAndOnes:
+                return static_cast<ValueType>(0);
+            case PaddingScheme::min:
+                return -std::numeric_limits<ValueType>::max();
+            case PaddingScheme::max:
+                return std::numeric_limits<ValueType>::max();
+        }
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid PaddingScheme");
+    }
 
+    //
+    // Layer
+    //
     template <typename ElementType>
     Layer<ElementType>::Layer(const LayerParameters& layerParameters) :
         _layerParameters(layerParameters),

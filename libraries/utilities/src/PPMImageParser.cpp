@@ -67,12 +67,14 @@ namespace utilities
         return ParsePPMStream<ValueType>(inStream);
     }
 
+    template Image<int> ParsePPMStream(std::istream& in);
+    template Image<int64_t> ParsePPMStream(std::istream& in);
     template Image<float> ParsePPMStream(std::istream& in);
-
     template Image<double> ParsePPMStream(std::istream& in);
 
+    template Image<int> ParsePPMFile(const std::string& filename);
+    template Image<int64_t> ParsePPMFile(const std::string& filename);
     template Image<float> ParsePPMFile(const std::string& filename);
-
     template Image<double> ParsePPMFile(const std::string& filename);
 }
 }

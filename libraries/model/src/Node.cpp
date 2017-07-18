@@ -167,40 +167,40 @@ namespace model
     void Node::Print(std::ostream& os) const
     {
         bool isFirstInputPort = true;
-        std::cout << "node_" << GetId() << " (" << std::hex << this << std::dec << ") = " << GetRuntimeTypeName() << "(";
+        os << "node_" << GetId() << " (" << std::hex << this << std::dec << ") = " << GetRuntimeTypeName() << "(";
         for (const auto& inputPort : GetInputPorts())
         {
-            std::cout << (isFirstInputPort ? "" : ", ");
+            os << (isFirstInputPort ? "" : ", ");
             isFirstInputPort = false;
 
             auto elements = inputPort->GetInputElements();
             if (elements.NumRanges() > 1)
             {
-                std::cout << "{";
+                os << "{";
             }
 
             bool isFirstRange = true;
             for (const auto& range : elements.GetRanges())
             {
-                std::cout << (isFirstRange ? "" : ", ");
+                os << (isFirstRange ? "" : ", ");
                 isFirstRange = false;
 
                 auto port = range.ReferencedPort();
-                std::cout << "node_" << port->GetNode()->GetId() << "." << port->GetName();
+                os << "node_" << port->GetNode()->GetId() << "." << port->GetName();
                 if (!range.IsFullPortRange())
                 {
                     auto start = range.GetStartIndex();
                     auto size = range.Size();
-                    std::cout << "[" << start << ":" << (start + size) << "]";
+                    os << "[" << start << ":" << (start + size) << "]";
                 }
             }
 
             if (elements.NumRanges() > 1)
             {
-                std::cout << "}";
+                os << "}";
             }
         }
-        std::cout << ")" << std::endl;
+        os << ")" << std::endl;
     }
 
     bool Node::HasState() const

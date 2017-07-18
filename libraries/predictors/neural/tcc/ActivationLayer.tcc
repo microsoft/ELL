@@ -33,20 +33,18 @@ namespace neural
         auto output = GetOutputMinusPadding();
         auto input = _layerParameters.input;
 
-        auto flattenedInput = input.ReferenceAsMatrix();
-        auto flattenedOutput = output.ReferenceAsMatrix();
-
-        for (size_t i = 0; i < flattenedInput.NumRows(); i++)
+        for (size_t i = 0; i < input.NumRows(); i++)
         {
-            auto rowVector = flattenedInput.GetMajorVector(i);
-            for (size_t j = 0; j < rowVector.Size(); j++)
+            for (size_t j = 0; j < input.NumColumns(); j++)
             {
-                ElementType value = flattenedInput(i, j);
-                flattenedOutput(i, j) = _activation.Apply(value);
+                for (size_t k = 0; k < input.NumChannels(); k++)
+                {
+                    ElementType value = input(i, j, k);
+                    output(i, j, k) = _activation.Apply(value);
+                }
             }
         }
     }
-
 }
 }
 }

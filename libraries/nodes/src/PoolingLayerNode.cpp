@@ -173,6 +173,7 @@ namespace nodes
 
         // Calculate input dimension parameters
         size_t inputPaddingSize = layerParameters.inputPaddingParameters.paddingSize;
+        size_t outputPaddingSize = layerParameters.outputPaddingParameters.paddingSize;
 
         int inputDepth = inputSize[2];
         int inputColumns = inputSize[1];
@@ -194,7 +195,10 @@ namespace nodes
         int paddingColumnOffset = -inputPaddingSize;
         int paddingRowOffset = -inputPaddingSize;
 
-        bool canSkipBoundsCheck = (inputPaddingSize <= inputOffset[0]) && (outputColumns * stride + poolingSize <= inputColumns) && (outputRows * stride + poolingSize <= inputRows);
+        // If the incoming memory is larger enough that our pooling windows never exceed its bounds, we can skip the bounds check (and assume the extra memory contains the correct padding value)
+        bool canSkipBoundsCheck = (inputPaddingSize <= inputOffset[0]) &&
+                                  ((outputColumns - 1) * stride + 1 + (poolingSize / 2) <= (inputColumns + 2 * inputPaddingSize)) &&
+                                  ((outputRows - 1) * stride + 1 + (poolingSize / 2) <= (inputRows + 2 * inputPaddingSize));
 
         // TODO: add prologue / epilogue for padded / out-of-bounds values
 

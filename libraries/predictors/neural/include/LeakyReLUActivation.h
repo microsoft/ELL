@@ -8,6 +8,9 @@
 
 #pragma once
 
+// utilities
+#include "Exception.h"
+
 namespace ell
 {
 namespace predictors

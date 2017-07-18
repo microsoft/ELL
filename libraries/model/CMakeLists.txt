@@ -54,7 +54,9 @@ set (tcc
     tcc/InputNode.tcc
     tcc/InputPort.tcc
     tcc/IRCompiledMap.tcc
+    tcc/IRMapCompiler.tcc
     tcc/IRSteppableMapCompiler.tcc
+    tcc/MapCompiler.tcc
     tcc/Model.tcc
     tcc/ModelBuilder.tcc
     tcc/ModelTransformer.tcc

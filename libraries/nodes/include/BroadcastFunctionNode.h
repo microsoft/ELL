@@ -36,7 +36,6 @@ namespace ell
 {
 namespace nodes
 {
-
     /// <summary>
     ///
     /// Broadcast function nodes perform elementwise operations on a multidimensional array (the "primary input"), and one or more vectors (the "secondary inputs").
@@ -227,10 +226,10 @@ namespace nodes
     public:
         /// <summary> Returns the size of the primary input. </summary>
         virtual int GetPrimaryInputSize() const = 0;
-        
+
         /// <summary> Returns the size of the secondary inputs. </summary>
         virtual int GetSecondaryInputSize() const = 0;
-        
+
         /// <summary> Returns the number of secondary input ports. </summary>
         virtual int NumSecondaryInputs() const = 0;
 
@@ -241,7 +240,8 @@ namespace nodes
                               const PortMemoryLayout& inputLayout, size_t broadcastDimension,
                               const std::vector<model::OutputPortBase*>& outputs,
                               const PortMemoryLayout& outputLayout,
-                              FunctionType function);
+                              FunctionType function,
+                              ValueType padding = 0);
 
         const PortMemoryLayout& GetInputLayout() const { return _inputLayout; }
         const PortMemoryLayout& GetOutputLayout() const { return _outputLayout; }
@@ -259,12 +259,18 @@ namespace nodes
         void ComputeDimensionLoop(size_t dimension, std::vector<ValueType>& output, size_t prevInputDimensionOffset, size_t prevOutputDimensionOffset, std::vector<ValueType>& secondaryValues) const;
         void EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs, llvm::Value* output, llvm::Value* prevInputDimensionOffset, llvm::Value* prevOutputDimensionOffset, std::vector<llvm::Value*>& secondaryValues) const;
 
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+        ValueType GetOutputPadding() const { return _paddingValue; }
+
     private:
         PortMemoryLayout _inputLayout;
         PortMemoryLayout _outputLayout;
         size_t _broadcastDimension = 0;
 
         FunctionType _function;
+        ValueType _paddingValue;
     };
 
     //
@@ -285,11 +291,13 @@ namespace nodes
         BroadcastUnaryFunctionNode();
 
         BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
-                                   const PortMemoryLayout& outputLayout);
+                                   const PortMemoryLayout& outputLayout,
+                                   ValueType padding = 0);
 
         BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                    const PortMemoryLayout& outputLayout,
-                                   FunctionType function);
+                                   FunctionType function,
+                                   ValueType padding = 0);
 
         virtual int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
         virtual int GetSecondaryInputSize() const override { return 0; }
@@ -306,7 +314,6 @@ namespace nodes
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-
         using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetOutputLayout;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetBroadcastDimension;
@@ -354,11 +361,13 @@ namespace nodes
         BroadcastBinaryFunctionNode();
         BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                     const model::PortElements<ValueType>& secondaryInput, size_t secondaryInputDimension,
-                                    const PortMemoryLayout& outputLayout);
+                                    const PortMemoryLayout& outputLayout,
+                                    ValueType padding = 0);
         BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                     const model::PortElements<ValueType>& secondaryInput, size_t secondaryInputDimension,
                                     const PortMemoryLayout& outputLayout,
-                                    FunctionType function);
+                                    FunctionType function,
+                                    ValueType padding = 0);
 
         virtual int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
         virtual int GetSecondaryInputSize() const override { return _secondaryInput.Size(); }
@@ -425,11 +434,13 @@ namespace nodes
         BroadcastTernaryFunctionNode();
         BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                      const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t secondaryInputDimension,
-                                     const PortMemoryLayout& outputLayout);
+                                     const PortMemoryLayout& outputLayout,
+                                     ValueType padding = 0);
         BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                      const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t secondaryInputDimension,
                                      const PortMemoryLayout& outputLayout,
-                                     FunctionType function);
+                                     FunctionType function,
+                                     ValueType padding = 0);
 
         virtual int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
         virtual int GetSecondaryInputSize() const override { return std::max(_secondaryInput1.Size(), _secondaryInput2.Size()); }
@@ -490,7 +501,8 @@ namespace nodes
         BroadcastLinearFunctionNode();
         BroadcastLinearFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                     const model::PortElements<ValueType>& scaleInput, const model::PortElements<ValueType>& biasInput, size_t secondaryInputDimension,
-                                    const PortMemoryLayout& outputLayout);
+                                    const PortMemoryLayout& outputLayout,
+                                    ValueType padding = 0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

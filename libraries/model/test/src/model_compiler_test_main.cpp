@@ -112,7 +112,9 @@ void TestIRCompiler()
 
     TestBinaryConvolutionalLayerNode();
 
-    TestConvolutionalLayerNode(ConvolutionType::GEMM);
+    // TestConvolutionalLayerNode(ConvolutionType::GEMM);
+    TestConvolutionalLayerNode(ConvolutionType::GEMM, 1, 0);
+    TestConvolutionalLayerNode2(ConvolutionType::GEMM, 1, 0);
     // TestConvolutionalLayerNode(ConvolutionType::GEMM, 2, 0);
     // TestConvolutionalLayerNode(ConvolutionType::GEMM, 1, 1); // Convolutional layer output padding not supported
 
@@ -126,12 +128,14 @@ void TestIRCompiler()
     TestMaxPoolingLayerNode();
     TestMaxPoolingLayerNode(0, 1);
     TestMaxPoolingLayerNode(0, 2);
-    //    TestMaxPoolingLayerNode(1, 0); // Input padding not supported (yet)
+    TestMaxPoolingLayerNode(1, 0);
+    TestMaxPoolingLayerNode(2, 1);
 
     TestMeanPoolingLayerNode();
     TestMeanPoolingLayerNode(0, 1);
     TestMeanPoolingLayerNode(0, 2);
-    //    TestMeanPoolingLayerNode(1, 0); // Input padding not supported (yet)
+    TestMeanPoolingLayerNode(1, 0);
+    TestMeanPoolingLayerNode(2, 1);
 
     TestScalingLayerNode();
     TestScalingLayerNode(0, 1);

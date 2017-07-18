@@ -52,6 +52,7 @@ void TestBatchNormalizationLayerNode(size_t inputPadding = 0, size_t outputPaddi
 void TestBiasLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestBinaryConvolutionalLayerNode(size_t inputPadding = 1, size_t outputPadding = 0);
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
+void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
 void TestFullyConnectedLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestMaxPoolingLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestMeanPoolingLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);

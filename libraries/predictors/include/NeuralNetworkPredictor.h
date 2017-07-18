@@ -79,6 +79,11 @@ namespace predictors
         /// <returns> The underlying input layer. </returns>
         const neural::InputLayer<ElementType>& GetInputLayer() const { return *_inputLayer; }
 
+        /// <summary> Returns the number of underlying layers. </summary>
+        ///
+        /// <returns> The underlying vector of layers. </returns>
+        size_t NumLayers() const { return _layers.size(); }
+
         /// <summary> Returns the underlying layers. </summary>
         ///
         /// <returns> The underlying vector of layers. </returns>

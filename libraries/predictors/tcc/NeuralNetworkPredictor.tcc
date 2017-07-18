@@ -103,6 +103,7 @@ namespace predictors
     void NeuralNetworkPredictor<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         neural::LayerSerializationContext<ElementType> layerContext(archiver.GetContext());
+        RegisterNeuralNetworkPredictorTypes(layerContext);
         archiver.PushContext(layerContext);
 
         std::unique_ptr<neural::InputLayer<ElementType>> inputLayer;

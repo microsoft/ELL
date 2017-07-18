@@ -33,6 +33,12 @@ namespace utilities
             _running = false;
         }
 
+        void Reset()
+        {
+            _start = std::chrono::system_clock::now();
+            _end = _start;
+        }
+
         std::chrono::milliseconds::rep Elapsed()
         {
             if (_running)

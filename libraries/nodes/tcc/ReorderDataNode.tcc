@@ -28,8 +28,8 @@ namespace nodes
     }
 
     template <typename ValueType>
-    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const DataShape& inputShape, const DataShape& outputShape)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputShape.GetMemorySize()), _inputShape(inputShape), _outputShape(outputShape)
+    ReorderDataNode<ValueType>::ReorderDataNode(const model::PortElements<ValueType>& input, const DataShape& inputShape, const DataShape& outputShape, ValueType paddingValue)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputShape.GetMemorySize()), _inputShape(inputShape), _outputShape(outputShape), _paddingValue(paddingValue)
     {
     }
 
@@ -45,7 +45,7 @@ namespace nodes
     void ReorderDataNode<ValueType>::Compute() const
     {
         int outputSize = _outputShape.GetMemorySize();
-        std::vector<ValueType> output(outputSize);
+        std::vector<ValueType> output(outputSize, _paddingValue);
 
         // loop over output
         for (int z = 0; z < _outputShape.GetExtent(2); ++z)
@@ -75,7 +75,7 @@ namespace nodes
     void ReorderDataNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output, _paddingValue);
 
         int outputSize = _outputShape.GetMemorySize();
         auto zLoop = function.ForLoop();
@@ -116,6 +116,7 @@ namespace nodes
         archiver[inputPortName] << _input;
         archiver["inputShape"] << _inputShape;
         archiver["outputShape"] << _outputShape;
+        archiver["paddingValue"] << _paddingValue;
     }
 
     template <typename ValueType>
@@ -125,6 +126,7 @@ namespace nodes
         archiver[inputPortName] >> _input;
         archiver["inputShape"] >> _inputShape;
         archiver["outputShape"] >> _outputShape;
+        archiver["paddingValue"] >> _paddingValue;
     }
 
 } // nodes

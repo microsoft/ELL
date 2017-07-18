@@ -15,6 +15,7 @@
 #include "Variable.h"
 
 // model
+#include "CompilableNodeUtilities.h"
 #include "DynamicMap.h"
 #include "Model.h"
 #include "Node.h"
@@ -102,6 +103,11 @@ namespace model
         emitters::Variable* AllocatePortVariable(const OutputPortBase& port);
         emitters::Variable* GetOrAllocatePortVariable(const OutputPortBase& port);
 
+        template<typename ValueType>
+        emitters::Variable* AllocatePortVariable(const OutputPortBase& port, ValueType initialValue);
+        template<typename ValueType>
+        emitters::Variable* GetOrAllocatePortVariable(const OutputPortBase& port, ValueType initialValue);
+
         /// <summary>
         /// Allocate variables for the map function arguments, based on the input and output nodes.
         /// </summary>
@@ -138,3 +144,5 @@ namespace model
     };
 }
 }
+
+#include "../tcc/MapCompiler.tcc"

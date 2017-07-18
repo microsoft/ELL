@@ -118,7 +118,7 @@ namespace nodes
 
     template <typename ValueType, typename FunctionType>
     BroadcastFunctionNode<ValueType, FunctionType>::BroadcastFunctionNode(const std::vector<model::InputPortBase*>& inputs, const std::vector<model::OutputPortBase*>& outputs)
-        : CompilableNode(inputs, outputs)
+        : CompilableNode(inputs, outputs), _paddingValue(0)
     {
     }
 
@@ -127,9 +127,10 @@ namespace nodes
                                                                           const PortMemoryLayout& inputLayout, size_t broadcastDimension,
                                                                           const std::vector<model::OutputPortBase*>& outputs,
                                                                           const PortMemoryLayout& outputLayout,
-                                                                          FunctionType function)
-        : CompilableNode(inputs, outputs), _inputLayout(inputLayout), _outputLayout(outputLayout), _broadcastDimension(broadcastDimension), _function(function)
-    {
+                                                                          FunctionType function,
+                                                                          ValueType paddingValue)
+        : CompilableNode(inputs, outputs), _inputLayout(inputLayout), _outputLayout(outputLayout), _broadcastDimension(broadcastDimension), _function(function), _paddingValue(paddingValue)
+    {        
     }
 
     template <typename ValueType, typename FunctionType>
@@ -308,6 +309,20 @@ namespace nodes
         loop.End();
     }
 
+    template <typename ValueType, typename FunctionType>
+    void BroadcastFunctionNode<ValueType, FunctionType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        model::CompilableNode::WriteToArchive(archiver);
+        archiver["paddingValue"] << _paddingValue;
+    }
+
+    template <typename ValueType, typename FunctionType>
+    void BroadcastFunctionNode<ValueType, FunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        model::CompilableNode::ReadFromArchive(archiver);
+        archiver["paddingValue"] >> _paddingValue;
+    }
+
     //
     // BroadcastUnaryFunctionNode
     //
@@ -319,16 +334,18 @@ namespace nodes
 
     template <typename ValueType, typename FunctionType>
     BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
-                                                                                    const PortMemoryLayout& outputLayout)
-        : BroadcastUnaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout, outputLayout, FunctionType{})
+                                                                                    const PortMemoryLayout& outputLayout,
+                                                                                    ValueType paddingValue)
+        : BroadcastUnaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout, outputLayout, FunctionType{}, paddingValue)
     {
     }
 
     template <typename ValueType, typename FunctionType>
     BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                                                                     const PortMemoryLayout& outputLayout,
-                                                                                    FunctionType function)
-        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, inputLayout, 0, { &_output }, outputLayout, function)
+                                                                                    FunctionType function,
+                                                                                    ValueType paddingValue)
+        : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, inputLayout, 0, { &_output }, outputLayout, function, paddingValue)
         , _primaryInput(this, primaryInput, primaryInputPortName)
         , _output(this, outputPortName, NumElements(outputLayout.stride))
     {
@@ -375,7 +392,7 @@ namespace nodes
         auto primaryInputSize = primaryInput.Size();
 
         llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(output, this->GetOutputPadding());
 
         // Call recursive function to emit nested loops
         // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
@@ -420,10 +437,11 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                                                                       const model::PortElements<ValueType>& secondaryInput, size_t dimension,
-                                                                                      const PortMemoryLayout& outputLayout)
+                                                                                      const PortMemoryLayout& outputLayout,
+                                                                                      ValueType paddingValue)
         : BroadcastBinaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout,
                                                                secondaryInput, dimension,
-                                                               outputLayout, FunctionType{})
+                                                               outputLayout, FunctionType{}, paddingValue)
     {
     }
 
@@ -431,9 +449,9 @@ namespace nodes
     BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                                                                       const model::PortElements<ValueType>& secondaryInput, size_t dimension,
                                                                                       const PortMemoryLayout& outputLayout,
-                                                                                      FunctionType function)
+                                                                                      FunctionType function, ValueType paddingValue)
         : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput }, inputLayout, dimension,
-                                                         { &_output }, outputLayout, function)
+                                                         { &_output }, outputLayout, function, paddingValue)
         , _primaryInput(this, primaryInput, primaryInputPortName)
         , _secondaryInput(this, secondaryInput, secondaryInputPortName)
         , _output(this, outputPortName, NumElements(outputLayout.stride))
@@ -492,7 +510,7 @@ namespace nodes
 
         llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
         llvm::Value* pSecondaryInput = compiler.EnsurePortEmitted(secondaryInput);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(output, this->GetOutputPadding());
 
         // Call recursive function to emit nested loops
         // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
@@ -539,10 +557,11 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                                                                         const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t dimension,
-                                                                                        const PortMemoryLayout& outputLayout)
+                                                                                        const PortMemoryLayout& outputLayout,
+                                                                                        ValueType paddingValue)
         : BroadcastTernaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout,
                                                                 secondaryInput1, secondaryInput2, dimension,
-                                                                outputLayout, FunctionType{})
+                                                                outputLayout, FunctionType{}, paddingValue)
     {
     }
 
@@ -550,9 +569,10 @@ namespace nodes
     BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                                                                         const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t dimension,
                                                                                         const PortMemoryLayout& outputLayout,
-                                                                                        FunctionType function)
+                                                                                        FunctionType function,
+                                                                                        ValueType paddingValue)
         : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput1, &_secondaryInput2 }, inputLayout, dimension,
-                                                         { &_output }, outputLayout, function)
+                                                         { &_output }, outputLayout, function, paddingValue)
         , _primaryInput(this, primaryInput, primaryInputPortName)
         , _secondaryInput1(this, secondaryInput1, secondaryInput1PortName)
         , _secondaryInput2(this, secondaryInput2, secondaryInput2PortName)
@@ -633,7 +653,7 @@ namespace nodes
         llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
         llvm::Value* pSecondaryInput1 = hasInput1 ? compiler.EnsurePortEmitted(secondaryInput1) : nullptr;
         llvm::Value* pSecondaryInput2 = hasInput2 ? compiler.EnsurePortEmitted(secondaryInput2) : nullptr;
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(output, this->GetOutputPadding());
 
         // Call recursive function to emit nested loops
         // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
@@ -690,10 +710,11 @@ namespace nodes
     template <typename ValueType>
     BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
                                                                         const model::PortElements<ValueType>& scaleInput, const model::PortElements<ValueType>& biasInput, size_t dimension,
-                                                                        const PortMemoryLayout& outputLayout)
+                                                                        const PortMemoryLayout& outputLayout,
+                                                                        ValueType paddingValue)
         : BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>(primaryInput, inputLayout,
                                                                                       scaleInput, biasInput, dimension,
-                                                                                      outputLayout)
+                                                                                      outputLayout, paddingValue)
     {
     }
 

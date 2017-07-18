@@ -10,12 +10,19 @@
 // interfaces
 #include "NeuralNetworkPredictorInterface.h"
 
-// nerual predictor
+// neural predictor
 #include "LeakyReLUActivation.h"
 #include "ReLUActivation.h"
 #include "SigmoidActivation.h"
 #include "MaxPoolingFunction.h"
 #include "MeanPoolingFunction.h"
+
+// utilities
+#include "JsonArchiver.h"
+#include "Files.h"
+
+// stl
+#include <ostream>
 
 namespace ell
 {
@@ -23,7 +30,6 @@ namespace api
 {
 namespace predictors
 {
-
     namespace underlying = ell::predictors::neural;
     namespace api = ell::api::predictors::neural;
     //////////////////////////////////////////////////////////////////////////

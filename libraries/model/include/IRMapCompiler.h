@@ -82,6 +82,15 @@ namespace model
         /// <returns> The LLVM Value object corresponding to the port. </returns> 
         llvm::Value* EnsurePortEmitted(const OutputPortBase& port);
 
+        /// <summary> Ensure that variable for the given port has been declared in IR </summary>
+        ///
+        /// <param name="port"> The port to ensure is emitted. </param>
+        /// <param name="initialValue"> The value to initialize the output buffer with. </param>
+        ///
+        /// <returns> The LLVM Value object corresponding to the port. </returns> 
+        template <typename ValueType>
+        llvm::Value* EnsurePortEmitted(const OutputPortBase& port, ValueType initialValue);
+
         /// <summary> Ensure that variable for the given port element has been declared in IR </summary>
         ///
         /// <param name="port"> The port elements to ensure are emitted. </param>
@@ -173,3 +182,5 @@ namespace model
     };
 }
 }
+
+#include "../tcc/IRMapCompiler.tcc"

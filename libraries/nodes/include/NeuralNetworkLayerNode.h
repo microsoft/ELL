@@ -42,6 +42,18 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
+        /// <summary> Gets information about the input memory layout </summary>
+        virtual PortMemoryLayout& GetInputMemoryLayout() = 0;
+
+        /// <summary> Gets information about the input memory layout </summary>
+        virtual const PortMemoryLayout& GetInputMemoryLayout() const = 0;
+
+        /// <summary> Gets information about the output memory layout </summary>
+        virtual const PortMemoryLayout& GetOutputMemoryLayout() const = 0;
+
+        /// <summary> Gets information about the output memory layout </summary>
+        virtual PortMemoryLayout& GetOutputMemoryLayout() = 0;
+
     protected:
         NeuralNetworkLayerNodeBase();
         NeuralNetworkLayerNodeBase(const model::PortElements<ValueType>& input, size_t outputSize);
@@ -82,18 +94,18 @@ namespace nodes
 
         /// <summary> Gets the layer being wrapped </summary>
         const LayerType& GetLayer() const { return _layer; }
-        
+
         /// <summary> Gets information about the input memory layout </summary>
-        PortMemoryLayout& GetInputMemoryLayout() { return _inputLayout; }
-        
+        virtual PortMemoryLayout& GetInputMemoryLayout() override { return _inputLayout; }
+
         /// <summary> Gets information about the input memory layout </summary>
-        const PortMemoryLayout& GetInputMemoryLayout() const { return _inputLayout; }
-        
-        /// <summary> Gets information about the output memory layout </summary>
-        const PortMemoryLayout& GetOutputMemoryLayout() const { return _outputLayout; }
+        virtual const PortMemoryLayout& GetInputMemoryLayout() const override { return _inputLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
-        PortMemoryLayout& GetOutputMemoryLayout() { return _outputLayout; }
+        virtual const PortMemoryLayout& GetOutputMemoryLayout() const override { return _outputLayout; }
+
+        /// <summary> Gets information about the output memory layout </summary>
+        virtual PortMemoryLayout& GetOutputMemoryLayout() override { return _outputLayout; }
 
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///

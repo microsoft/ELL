@@ -99,7 +99,8 @@ namespace nodes
         /// <param name="input"> The input to reorder. </param>
         /// <param name="inputShape"> A description of the input memory shape. </param>
         /// <param name="outputShape"> A description of the desired output memory shape. </param>
-        ReorderDataNode(const model::PortElements<ValueType>& input, const DataShape& inputShape, const DataShape& outputShape);
+        /// <param name="paddingValue"> The value to use for output padding, if output shape is larger than input shape. </param>
+        ReorderDataNode(const model::PortElements<ValueType>& input, const DataShape& inputShape, const DataShape& outputShape, ValueType paddingValue = 0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -128,6 +129,7 @@ namespace nodes
 
         DataShape _inputShape;
         DataShape _outputShape;
+        ValueType _paddingValue;
     };
 }
 }

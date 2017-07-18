@@ -83,6 +83,10 @@ namespace neural
     /// <summary> Helper function to determine if a PaddingParameters struct represents no padding </summary>
     static bool HasPadding(const PaddingParameters& padding) { return padding.paddingSize != 0; }
 
+    /// <summary> Get the padding value to fill with </summary>
+    template <typename ValueType>
+    ValueType GetPaddingValue(PaddingScheme paddingScheme);
+
     /// <summary> Common base class for a layer in a neural network. </summary>
     template <typename ElementType>
     class Layer : public utilities::IArchivable
@@ -207,6 +211,11 @@ namespace neural
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
+        /// <summary> Returns a reference to the output tensor. </summary>
+        ///
+        /// <returns> Reference to the output tensor. </returns>
+        TensorReferenceType GetOutputTensor() { return _output; }
+
         /// <summary> Returns a read/write reference to the sub tensor of the output that does not contain padding. </summary>
         ///
         /// <returns> Read/write reference to the output tensor. </returns>

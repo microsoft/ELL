@@ -129,7 +129,7 @@ namespace nodes
         auto inputTensor = typename LayerType::ConstTensorReferenceType{ _inputTensor.GetShape(), inputVector.data() };
         _inputTensor.CopyFrom(inputTensor);
         _layer.Compute();
-        auto&& outputTensor = _layer.GetOutput();
+        const auto& outputTensor = _layer.GetOutput();
         _output.SetOutput(outputTensor.ToArray());
     }
 
