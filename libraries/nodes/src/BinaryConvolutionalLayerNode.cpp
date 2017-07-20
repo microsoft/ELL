@@ -11,6 +11,7 @@
 
 // stl
 #include <algorithm>
+#include <numeric>
 
 namespace ell
 {
