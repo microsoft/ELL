@@ -9,6 +9,9 @@
 #include "BinaryConvolutionalLayerNode.h"
 #include "ConstantNode.h"
 
+// stl
+#include <algorithm>
+
 namespace ell
 {
 namespace nodes
@@ -46,7 +49,12 @@ namespace nodes
             return inputDepth * filterSize * filterSize;
         }
 
-        template<typename PackedBitsType>
+        size_t GetMemorySize(const PortMemoryLayout& memoryLayout)
+        {
+            return std::accumulate(memoryLayout.stride.begin(), memoryLayout.stride.end(), 1, std::multiplies<size_t>());
+        }
+
+        template <typename PackedBitsType>
         size_t GetPackedFilterSize(const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters, const PortMemoryLayout& inputMemoryLayout, const PortMemoryLayout& outputMemoryLayout)
         {
             const size_t numOutputPixels = outputMemoryLayout.size[0] * outputMemoryLayout.size[1];
@@ -73,7 +81,7 @@ namespace nodes
         }
 
         // TODO: adapt this to work with more generally strided data
-        template<typename ValueType>
+        template <typename ValueType>
         llvm::Function* EmitGetValueFromPaddedVolumeFunction(emitters::IRModuleEmitter& moduleEmitter)
         {
             assert(false && "Not implemented");
@@ -140,7 +148,7 @@ namespace nodes
             return function.GetFunction();
         }
 
-        template<typename ValueType>
+        template <typename ValueType>
         llvm::Value* GetValueFromPaddedVolume(emitters::IRFunctionEmitter& function,
                                               llvm::Value* inputVolume,
                                               const PortMemoryLayout& inputLayout,
@@ -168,7 +176,7 @@ namespace nodes
             return GetValueFromVolume(function, inputVolume, inputLayout, convParams, inputRow, inputCol, inputChannel);
         }
 
-        template<typename ValueType>
+        template <typename ValueType>
         void LoadRow(emitters::IRFunctionEmitter& function,
                      llvm::Value* inputVolume,
                      const PortMemoryLayout& inputLayout,
@@ -216,7 +224,7 @@ namespace nodes
             rowLoop.End();
         }
 
-        template<typename ValueType, typename PackedBitsType>
+        template <typename ValueType, typename PackedBitsType>
         void CompressRow(emitters::IRFunctionEmitter& function, llvm::Value* realRow, llvm::Value* packedOutput, int numValues)
         {
             int storedElementSize = sizeof(PackedBitsType);
@@ -268,13 +276,13 @@ namespace nodes
     //
     // BinaryConvolutionalLayerNode
     //
-    template<typename ValueType>
+    template <typename ValueType>
     BinaryConvolutionalLayerNode<ValueType>::BinaryConvolutionalLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::BinaryConvolutionalLayer<ValueType>& layer)
         : NeuralNetworkLayerNode<BinaryConvolutionalLayerNode<ValueType>, predictors::neural::BinaryConvolutionalLayer<ValueType>, ValueType>(input, layer)
     {
     }
 
-    template<typename ValueType> // TODO: PackedBitsType
+    template <typename ValueType> // TODO: PackedBitsType
     std::vector<int64_t> BinaryConvolutionalLayerNode<ValueType>::GetCompressedFilterWeights() const
     {
         std::vector<int64_t> result;
@@ -286,13 +294,13 @@ namespace nodes
         return result;
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     std::vector<ValueType> BinaryConvolutionalLayerNode<ValueType>::GetFilterMeans() const
     {
         return this->GetLayer().GetFilterMeans();
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     bool BinaryConvolutionalLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
@@ -337,13 +345,13 @@ namespace nodes
     // BinarizeAndReshapeImageNode
     //
 
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::BinarizeAndReshapeImageNode()
         : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
     {
     }
 
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::BinarizeAndReshapeImageNode(const model::PortElements<ValueType>& input,
                                                                                         const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                                                                         const PortMemoryLayout& inputMemoryLayout,
@@ -352,7 +360,7 @@ namespace nodes
     {
     }
 
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     void BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
@@ -360,14 +368,14 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     void BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::Compute() const
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
     // TODO: Fix this to deal with convParams.stride != 1
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     void BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         function.GetModule().DeclarePrintf();
@@ -414,24 +422,24 @@ namespace nodes
     //
     // BinaryXnorNode
     //
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode()
         : CompilableNode({ &_input, &_filterWeights, &_filterMeans }, { &_output }), _input(this, {}, inputPortName), _filterWeights(this, {}, filterWeightsPortName), _filterMeans(this, {}, filterMeansPortName), _output(this, outputPortName, 0)
     {
     }
 
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode(const model::PortElements<PackedBitsType>& input,
                                                               const model::PortElements<PackedBitsType>& compressedFilterWeights,
                                                               const model::PortElements<ValueType>& filterMeans,
                                                               const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                                               const PortMemoryLayout& inputMemoryLayout,
                                                               const PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, inputPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, outputPortName, GetFilterVolumeSize(convolutionalParameters, inputMemoryLayout)), _convolutionalParameters(convolutionalParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
+        : CompilableNode({ &_input, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, inputPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, outputPortName, GetMemorySize(outputMemoryLayout)), _convolutionalParameters(convolutionalParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
     {
     }
 
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     void BinaryXnorNode<ValueType, PackedBitsType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
@@ -441,19 +449,15 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     void BinaryXnorNode<ValueType, PackedBitsType>::Compute() const
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
-    template<typename ValueType, typename PackedBitsType>
+    template <typename ValueType, typename PackedBitsType>
     void BinaryXnorNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        function.GetModule().DeclarePrintf();
-
-        const auto intType = emitters::GetVariableType<int>();
-        const auto valueType = emitters::GetVariableType<ValueType>();
         const auto packedBitsType = emitters::GetVariableType<PackedBitsType>();
         llvm::Function* popcountFunction = compiler.GetModule().GetIntrinsic(llvm::Intrinsic::ctpop, { packedBitsType });
 
@@ -462,48 +466,77 @@ namespace nodes
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
+        // Input / output memory layouts
+        const auto& inputLayout = this->GetInputMemoryLayout();
+        const auto& inputSize = inputLayout.size;
+        const auto& inputStride = inputLayout.stride;
+        const auto& inputOffset = inputLayout.offset;
+
+        const auto& outputLayout = this->GetOutputMemoryLayout();
+        const auto& outputSize = outputLayout.size;
+        const auto& outputStride = outputLayout.stride;
+        const auto& outputOffset = outputLayout.offset;
+
+        // Get cumulative increment for each dimension
+        Shape inputIncrement = inputLayout.GetCumulativeIncrement();
+        Shape outputIncrement = outputLayout.GetCumulativeIncrement();
+
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         const auto storedElementSize = sizeof(PackedBitsType);
         const auto storedElementNumBits = 8 * storedElementSize;
         const auto numBits = storedElementNumBits; // function.GetModule().GetCompilerParameters().numBits; // for Xnor, use 32 bits in 32-bit environment
         const auto elementSize = numBits / 8;
         assert(elementSize <= storedElementSize);
-        const auto numChannels = _inputMemoryLayout.size[2];
-        auto convParams = _convolutionalParameters;
-        const auto filterWidth = convParams.receptiveField;
-        const auto fieldVolumeSize = filterWidth * filterWidth * numChannels; // = size*size*numChannels
-        const auto outputHeight = _outputMemoryLayout.size[0];
-        const auto outputWidth = _outputMemoryLayout.size[1];
-        const auto numFilters = _outputMemoryLayout.size[2];
+        const auto filterWidth = _convolutionalParameters.receptiveField;
+        const auto numInputChannels = inputSize[2];
+        const auto fieldVolumeSize = filterWidth * filterWidth * numInputChannels; // = size*size*numInputChannels
+        const auto outputRows = outputSize[0];
+        const auto outputColumns = outputSize[1];
+        const auto numFilters = outputSize[2];
         const auto numStoredBlocksPerFilter = (fieldVolumeSize - 1) / storedElementNumBits + 1;
         const auto packedRowSize = numStoredBlocksPerFilter; // numStoredBlocksPerFilter * (storedElementSize / elementSize);
         assert(packedRowSize != 0);
 
-        // compute and accumulate xnor counts
-        const auto filterDrop = fieldVolumeSize % numBits;
-        const auto filterAdjust = numBits - filterDrop;
+        // Create constants for dimension names just to remove magic numbers from code below
+        const int rowDimension = 0;
+        const int columnDimension = 1;
+        const int channelDimension = 2;
+
+        const auto partialBlockSize = fieldVolumeSize % numBits;
+        
+        // Compute and accumulate xnor counts
         auto rowLoop = function.ForLoop();
-        rowLoop.Begin(outputHeight);
+        rowLoop.Begin(outputRows);
         {
-            auto outRow = rowLoop.LoadIterationVariable();
-            auto outputRowOffset = function.Operator(times, outRow, function.Literal<int>(packedRowSize * outputWidth));
-            auto colLoop = function.ForLoop();
-            colLoop.Begin(outputWidth);
+            auto outputRowIndex = rowLoop.LoadIterationVariable();
+            llvm::Value* rowOutputInternalOffset = function.Operator(plus, outputRowIndex, function.Literal<int>(outputOffset[rowDimension]));
+            llvm::Value* rowOutputOffset = function.Operator(times, rowOutputInternalOffset, function.Literal<int>(outputIncrement[rowDimension]));
+
+            auto columnLoop = function.ForLoop();
+            columnLoop.Begin(outputColumns);
             {
-                auto outCol = colLoop.LoadIterationVariable();
-                auto inputRow = function.Operator(plus, function.Operator(times, outRow, function.Literal<int>(outputWidth)), outCol);
+                auto outputColumnIndex = columnLoop.LoadIterationVariable();
+                llvm::Value* columnOutputInternalOffset = function.Operator(plus, outputColumnIndex, function.Literal<int>(outputOffset[columnDimension]));
+                auto scaledColumnOutputOffset = function.Operator(times, columnOutputInternalOffset, function.Literal<int>(outputIncrement[columnDimension]));
+                auto columnOutputOffset = function.Operator(plus, rowOutputOffset, scaledColumnOutputOffset);
+
+                auto inputRow = function.Operator(plus, function.Operator(times, outputRowIndex, function.Literal<int>(outputColumns)), outputColumnIndex);
                 auto inputBegin = function.Operator(times, inputRow, function.Literal<int>(numStoredBlocksPerFilter));
-                auto outputColOffset = function.Operator(plus, outputRowOffset, function.Operator(times, outCol, function.Literal<int>(numFilters)));
                 auto channelLoop = function.ForLoop();
-                channelLoop.Begin(numFilters);
+                channelLoop.Begin(numFilters); // filters are the output channels, so numFilters is the # of output channels 
                 {
-                    auto outChannel = channelLoop.LoadIterationVariable();
-                    llvm::Value* filterMean = function.ValueAt(pFilterMeans, outChannel);
-                    auto filterBegin = function.Operator(times, outChannel, function.Literal<int>(numStoredBlocksPerFilter));
+                    auto outputChannelIndex = channelLoop.LoadIterationVariable();
+                    llvm::Value* channelOutputInternalOffset = function.Operator(plus, outputChannelIndex, function.Literal<int>(outputOffset[channelDimension]));
+                    auto scaledChannelOutputOffset = function.Operator(times, channelOutputInternalOffset, function.Literal<int>(outputIncrement[channelDimension]));
+                    auto channelOutputOffset = function.Operator(plus, columnOutputOffset, scaledChannelOutputOffset);
+
+                    llvm::Value* filterMean = function.ValueAt(pFilterMeans, outputChannelIndex);
+                    auto filterBegin = function.Operator(times, outputChannelIndex, function.Literal<int>(numStoredBlocksPerFilter));
 
                     llvm::Value* sumVar = function.Variable(packedBitsType, "accum");
                     function.Store(sumVar, function.Literal<PackedBitsType>(0));
-
+                    llvm::Value* outputLocationOffset = channelOutputOffset;
+                    
                     // TODO: vectorize this (?)
                     auto blockLoop = function.ForLoop();
                     blockLoop.Begin(packedRowSize);
@@ -523,20 +556,18 @@ namespace nodes
                     auto scaledSum = function.Operator(plus, function.Operator(times, function.Literal<int>(-2), sumInt), function.Literal<int>(numBits * packedRowSize));
                     auto sumFloat = function.CastValue<int, ValueType>(scaledSum);
 
-
                     llvm::Value* adjustedSum = sumFloat;
-                    if (filterDrop != 0)
+                    if (partialBlockSize != 0)
                     {
+                        const auto filterAdjust = numBits - partialBlockSize;
                         adjustedSum = function.Operator(minusFloat, sumFloat, function.Literal<ValueType>(filterAdjust));
                     }
                     auto scaledOutput = function.Operator(timesFloat, adjustedSum, filterMean);
-                    // auto outIndex = function.Operator(plus, function.Operator(times, outRow, function.Literal<int>(numOutputCols)), outCol);
-                    auto outIndex = function.Operator(plus, outputColOffset, outChannel);
-                    function.SetValueAt(pOutput, outIndex, scaledOutput);
+                    function.SetValueAt(pOutput, outputLocationOffset, scaledOutput);
                 }
                 channelLoop.End();
             }
-            colLoop.End();
+            columnLoop.End();
         }
         rowLoop.End();
     }

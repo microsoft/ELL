@@ -1160,11 +1160,12 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
     BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
+    // Weights size: f x k x k x d = 2*3*3*2 = 36
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
-        1, 3, 2, 3, 1, 1, 2, 3, 1,
-        2, 4, 1, 3, 1, 2, 1, 4, 2,
-        1, 2, 1, 2, 3, 2, 1, 2, 1,
-        0, 3, 2, 3, 1, 2, 1, 0, 2 };
+        1, -3, 2, -3, 1, -1, 2, 3, -1,
+        2, 4, -1, 3, -1, 2, -1, 4, 2,
+        1, 2, 1, -2, 3, -2, 1, -2, 1,
+        0, 3, 2, 3, -1, 2, -1, 0, -2 };
     // clang-format on
     size_t vectorIndex = 0;
     for (size_t f = 0; f < outputShape[2]; f++)
@@ -1186,6 +1187,69 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
     auto output = layer.GetOutput();
 
     // testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise), values", Equals(output(0, 0, 0), -20.5555553) && Equals(output(0, 0, 1), -9.66666603) && Equals(output(0, 1, 0), -20.5555553) && Equals(output(0, 1, 1), -9.66666603));
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::BinaryConvolutionalLayerNode<double>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestBinaryConvolutionalLayerNode2(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using ElementType = double;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+
+    const size_t numRows = 4;
+    const size_t numCols = 4;
+    const size_t numChannels = 2;
+    const size_t numFilters = 2;
+
+    assert(inputPaddingSize == 1);
+    TensorType inputWithPadding(numRows + 2 * inputPaddingSize, numCols + 2 * inputPaddingSize, numChannels);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, numRows, numCols, numChannels);
+    inputWithPadding.Fill(0);
+    for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
+    {
+        for (size_t colIndex = 0; colIndex < numCols; ++colIndex)
+        {
+            for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
+            {
+                input(rowIndex, colIndex, channelIndex) = 1.25 * (rowIndex - (numRows/2)) + 0.75 * (colIndex-(numCols/2)) + (.0125 * channelIndex);
+            }
+        }
+    }
+    Shape outputShape = { numRows + 2 * outputPaddingSize, numCols + 2 * outputPaddingSize, numFilters };
+
+    LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise };
+    TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, input.NumChannels());
+    weights.Fill(1.0);
+    for (size_t rowIndex = 0; rowIndex < convolutionalParams.receptiveField * numFilters; ++rowIndex)
+    {
+        for (size_t colIndex = 0; colIndex < convolutionalParams.receptiveField; ++colIndex)
+        {
+            for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
+            {
+                weights(rowIndex, colIndex, channelIndex) = 1.5 * rowIndex + 3.3 * colIndex + 0.15 * channelIndex;
+            }
+        }
+    }
+
+    //
+    // Verify BinaryConvolutionalLayerNode
+    //
+    BinaryConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());

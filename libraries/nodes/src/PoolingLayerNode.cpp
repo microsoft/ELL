@@ -17,22 +17,6 @@ namespace ell
 {
 namespace nodes
 {
-    namespace
-    {
-        Shape GetCumulativeIncrement(const Shape& extents)
-        {
-            int numDimensions = extents.size();
-            Shape result(numDimensions);
-            int prevScale = 1;
-            for (int index = numDimensions - 1; index >= 0; --index)
-            {
-                result[index] = prevScale;
-                prevScale = prevScale * extents[index];
-            }
-            return result;
-        }
-    }
-
     template <typename ValueType>
     class MaxPoolingFunction
     {
@@ -154,20 +138,20 @@ namespace nodes
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
-        // compile-time params
-        auto&& inputLayout = this->GetInputMemoryLayout();
-        auto&& inputSize = inputLayout.size;
-        auto&& inputStride = inputLayout.stride;
-        auto&& inputOffset = inputLayout.offset;
+        // Input / output memory layouts
+        const auto& inputLayout = this->GetInputMemoryLayout();
+        const auto& inputSize = inputLayout.size;
+        const auto& inputStride = inputLayout.stride;
+        const auto& inputOffset = inputLayout.offset;
 
-        auto&& outputLayout = this->GetOutputMemoryLayout();
-        auto&& outputSize = outputLayout.size;
-        auto&& outputStride = outputLayout.stride;
-        auto&& outputOffset = outputLayout.offset;
+        const auto& outputLayout = this->GetOutputMemoryLayout();
+        const auto& outputSize = outputLayout.size;
+        const auto& outputStride = outputLayout.stride;
+        const auto& outputOffset = outputLayout.offset;
 
         // Calculate cumulative increment for each dimension
-        Shape inputIncrement = GetCumulativeIncrement(inputStride);
-        Shape outputIncrement = GetCumulativeIncrement(outputStride);
+        Shape inputIncrement = inputLayout.GetCumulativeIncrement();
+        Shape outputIncrement = outputLayout.GetCumulativeIncrement();
 
         const auto& layerParameters = this->GetLayer().GetLayerParameters();
 

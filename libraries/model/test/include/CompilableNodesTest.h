@@ -51,6 +51,7 @@ void TestSigmoidActivationLayerNode(size_t inputPadding = 0, size_t outputPaddin
 void TestBatchNormalizationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestBiasLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestBinaryConvolutionalLayerNode(size_t inputPadding = 1, size_t outputPadding = 0);
+void TestBinaryConvolutionalLayerNode2(size_t inputPadding = 1, size_t outputPadding = 0);
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
 void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
 void TestFullyConnectedLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);

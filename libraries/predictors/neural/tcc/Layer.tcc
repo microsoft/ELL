@@ -9,7 +9,7 @@
 #include "Layer.h"
 
 // stl
-#include <iostream>
+#include <ostream>
 #include <limits>
 #include <type_traits>
 

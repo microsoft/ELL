@@ -175,7 +175,7 @@ namespace nodes
 
             // weights: numFilters x fieldVolumeSize == m x k
             // ShapedInput: fieldVolumeSize x outputRows == k x n
-            // Matrix multiply output:
+            // Matrix multiply output: numFilters x outputRows = m x n
             auto reshapeNode = transformer.AddNode<ReshapeImageNode<ValueType>>(newInput, inputLayout, convParams, outputImageWidth, outputImageHeight);
             auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, reshapeNode->output, ldb, false, ldc);
             auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape);

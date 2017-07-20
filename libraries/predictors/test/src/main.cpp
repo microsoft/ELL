@@ -595,6 +595,111 @@ void NeuralNetworkPredictorTest()
     testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 1 1 ", Equals(output[0], 0.0));
 }
 
+template<typename ElementType>
+void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, int startValue = 0)
+{
+    int val = 0;
+    tensor.Generate([&val]() { return val++; });
+}
+
+template<typename ElementType>
+void FillVector(ell::math::ColumnVector<ElementType>& vector, int startValue = 0)
+{
+    int val = 0;
+    vector.Generate([&val]() { return val++; });
+}
+
+template <typename ElementType>
+void ConvolutionalArchiveTest()
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using InputParameters = typename InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    InputParameters inputParams = { { 3, 3, 3 }, { PaddingScheme::zeros, 0 }, { 5, 5, 3 }, { PaddingScheme::zeros, 1 }, 1 };
+    inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
+
+    LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, 1 }, { 3, 3, 8 }, NoPadding() };
+    auto convolutionMethod = ConvolutionMethod::columnwise;
+    ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 1 };
+    TensorType convWeights1(8 * 3, 3, 3);
+    FillTensor(convWeights1);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+    std::vector<double> input(3 * 3 * 3);
+    int val = 0;
+    std::generate(input.begin(), input.end(), [&val]() { return val++; });
+
+    utilities::SerializationContext context;
+    NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(context);
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+    neuralNetwork.WriteToArchive(archiver);
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork2;
+    neuralNetwork2.ReadFromArchive(unarchiver);
+    auto output = neuralNetwork.Predict(DataVectorType(input));
+    auto output2 = neuralNetwork2.Predict(DataVectorType(input));
+    testing::ProcessTest("Testing Convolutional predictor from archive", testing::IsEqual(output, output2));
+}
+
+template <typename ElementType>
+void BinaryConvolutionalArchiveTest()
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using InputParameters = typename InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    InputParameters inputParams = { { 3, 3, 3 }, { PaddingScheme::zeros, 0 }, { 5, 5, 3 }, { PaddingScheme::zeros, 1 }, 1 };
+    inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
+
+    LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, 1 }, { 3, 3, 8 }, NoPadding() };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise};
+    TensorType convWeights1(8 * 3, 3, 3);
+    FillTensor(convWeights1);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BinaryConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+    std::vector<double> input(3 * 3 * 3);
+    int val = 0;
+    std::generate(input.begin(), input.end(), [&val]() { return val++; });
+
+    utilities::SerializationContext context;
+    NeuralNetworkPredictor<ElementType>::RegisterNeuralNetworkPredictorTypes(context);
+    std::stringstream strstream;
+    utilities::JsonArchiver archiver(strstream);
+    neuralNetwork.WriteToArchive(archiver);
+    utilities::JsonUnarchiver unarchiver(strstream, context);
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork2;
+    neuralNetwork2.ReadFromArchive(unarchiver);
+    auto output = neuralNetwork.Predict(DataVectorType(input));
+    auto output2 = neuralNetwork2.Predict(DataVectorType(input));
+    testing::ProcessTest("Testing Binary convolutional predictor from archive", testing::IsEqual(output, output2));   
+}
+
 void ProtoNNPredictorTest()
 {
     using ExampleType = predictors::ProtoNNPredictor::DataVectorType;
@@ -644,6 +749,9 @@ int main()
     ForestPredictorTest();
     NeuralNetworkPredictorTest<float>();
     NeuralNetworkPredictorTest<double>();
+    ConvolutionalArchiveTest<float>();
+    BinaryConvolutionalArchiveTest<float>();
+
     ProtoNNPredictorTest();
 
     if (testing::DidTestFail())

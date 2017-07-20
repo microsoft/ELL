@@ -44,6 +44,19 @@ namespace nodes
         /// <param name="offset"> The offset into memory to the active area of the memory region. </param>
         PortMemoryLayout(const Shape& size, const Shape& stride, const Shape& offset);
 
+        /// <summary> Returns the number of dimensions in this memory layout </summary>
+        ///
+        /// <returns> The number of dimensions </summary>
+        size_t NumDimensions() const { return size.size(); }
+         
+        /// <summary>
+        /// Gets the cumulative increments for each dimension. This is the distance in memory
+        /// between two entries that are adjacent in that dimension.
+        /// </summary>
+        ///
+        /// <returns> A `Shape` object containing the cumulative increment in each dimension </returns>
+        Shape GetCumulativeIncrement() const;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -54,14 +67,8 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+    protected:
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
     };
 

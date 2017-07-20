@@ -17,6 +17,19 @@ namespace nodes
     {
     }
 
+    Shape PortMemoryLayout::GetCumulativeIncrement() const
+    {
+        const auto numDimensions = NumDimensions();
+        Shape result(numDimensions);
+        int prevScale = 1;
+        for (int index = numDimensions - 1; index >= 0; --index)
+        {
+            result[index] = prevScale;
+            prevScale = prevScale * stride[index];
+        }
+        return result;
+    }
+
     void PortMemoryLayout::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["size"] << size;
