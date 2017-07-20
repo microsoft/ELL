@@ -98,7 +98,7 @@ class ModelHelper:
     def init_image_source(self):
         # Start video capture device or load static image
         if self.camera is not None:
-            stream = FrameStream(VideoCaptureSource(self.camera), clear=True)
+            stream = FrameStream(VideoCaptureSource(self.camera), mostRecentOnly=True)
         elif self.imageFilenames:
             stream = FrameStream(FileCaptureSource(self.imageFilenames))
         self.captureThread = stream.start()
@@ -181,26 +181,26 @@ class VideoCaptureSource:
     def __init__(self, path):
         self.stream = cv2.VideoCapture(path)
 
-    def getImage(self):
-            (grabbed, frame) = self.stream.read()
-            return (grabbed, frame)
+    def get_image(self):
+        (grabbed, frame) = self.stream.read()
+        return (grabbed, frame)
 
 class FileCaptureSource:
     def __init__(self, path):
-            self.images = itertools.cycle(path)
+        self.images = itertools.cycle(path)
 
-    def getImage(self):
-            imageFile = next(self.images)
-            frame = cv2.imread(imageFile)
-            if (type(frame) == type(None)):
-                raise Exception('image from %s failed to load' % (imageFile))
-            return (1, frame)
+    def get_image(self):
+        imageFile = next(self.images)
+        frame = cv2.imread(imageFile)
+        if (type(frame) == type(None)):
+            raise Exception('image from %s failed to load' % (imageFile))
+        return (1, frame)
 
 class FrameStream:
-    def __init__(self, source, queueSize=128, clear=False):
+    def __init__(self, source, queueSize=128, mostRecentOnly=False):
         self.stream = source
         self.stop_event = threading.Event()
-        self.clear = clear
+        self.mostRecentOnly = mostRecentOnly
         self.frameQueue = queue.Queue(maxsize=queueSize)
 
     def start(self):
@@ -215,13 +215,13 @@ class FrameStream:
                 return
  
             if not self.frameQueue.full():
-                (grabbed, frame) = self.stream.getImage()
+                (grabbed, frame) = self.stream.get_image()
  
                 if not grabbed:
                     self.stop()
                     return
 
-                while (self.clear and not self.frameQueue.empty()):
+                while (self.mostRecentOnly and not self.frameQueue.empty()):
                     self.frameQueue.get()
  
                 self.frameQueue.put(frame)
