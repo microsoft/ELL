@@ -16,8 +16,8 @@ namespace predictors
 namespace neural
 {
     template <typename ElementType>
-    BatchNormalizationLayer<ElementType>::BatchNormalizationLayer(const LayerParameters& layerParameters, const VectorType& mean, const VectorType& variance, ElementType epsilon, EpsilonSummand EpsilonSummand)
-        : Layer<ElementType>(layerParameters), _multiplicationValues(mean.Size()), _additionValues(variance.Size()), _epsilon(epsilon), _epsilonSummand(EpsilonSummand)
+    BatchNormalizationLayer<ElementType>::BatchNormalizationLayer(const LayerParameters& layerParameters, const VectorType& mean, const VectorType& variance, ElementType epsilon, EpsilonSummand epsilonSummand)
+        : Layer<ElementType>(layerParameters), _multiplicationValues(mean.Size()), _additionValues(variance.Size()), _epsilon(epsilon), _epsilonSummand(epsilonSummand)
     {
         if (mean.Size() != variance.Size())
         {
