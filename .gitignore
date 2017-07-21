@@ -257,3 +257,6 @@ LaunchXslt/obj/**
 /tutorials/vision/gettingStarted/*.ll
 /tutorials/vision/gettingStarted/*.i.h
 /tutorials/vision/gettingStarted/*.i
+/_site/
+/.sass-cache/
+Gemfile.lock
