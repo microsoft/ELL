@@ -165,8 +165,6 @@ namespace neural
 
         archiver["outputPaddingScheme"] << static_cast<int>(_layerParameters.outputPaddingParameters.paddingScheme);
         archiver["outputPaddingSize"] << _layerParameters.outputPaddingParameters.paddingSize;
-
-        math::TensorArchiver::Write(_output, "output", archiver);
     }
 
     template <typename ElementType>
@@ -186,7 +184,7 @@ namespace neural
         _layerParameters.outputPaddingParameters.paddingScheme = static_cast<PaddingScheme>(outputPaddingScheme);
         archiver["outputPaddingSize"] >> _layerParameters.outputPaddingParameters.paddingSize;
 
-        math::TensorArchiver::Read(_output, "output", archiver);
+        _output = TensorType(_layerParameters.outputShape);
 
         LayerSerializationContext<ElementType>* layerContext = dynamic_cast<LayerSerializationContext<ElementType>*>(&archiver.GetContext());
         if(layerContext != nullptr)

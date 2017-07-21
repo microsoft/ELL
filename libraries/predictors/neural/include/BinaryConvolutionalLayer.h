@@ -63,7 +63,7 @@ namespace neural
         /// <param name="layerParameters"> The parameters common to every layer. </param>
         /// <param name="convolutionalParameters"> The hyperparameters for this convolutional layer. </param>
         /// <param name="weights"> The set of weights to apply. </param>
-        BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, ConstTensorReferenceType& weights);
+        BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ConstTensorReferenceType& weights);
 
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
         BinaryConvolutionalLayer() : _realValuedShapedInput(0, 0), _realValuedWeightsMatrix(0, 0), _realValuedOutputMatrix(0, 0) {}
@@ -106,16 +106,9 @@ namespace neural
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+    protected:
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
 
     private:
         // Fills a vector of vectors where each row is the set of input values corresponding to a filter, stretched into a vector.
@@ -126,14 +119,15 @@ namespace neural
         // The number of columns is equal to the number of locations that a filter is slide over the input tensor.
         void ReceptiveFieldToColumns(ConstTensorReferenceType input, MatrixType& shapedInput);
 
-        void ComputeWeightsMatrix();
+        void ComputeWeightsMatrices(const ConstTensorReferenceType& weights);
+        void ComputeRealValuedWeightsMatrix();
         void InitializeIOMatrices();
 
         using Layer<ElementType>::_layerParameters;
         using Layer<ElementType>::_output;
 
-        BinaryConvolutionalParameters _convolutionalParameters;
         constexpr static size_t _binaryElementSize = 64;
+        BinaryConvolutionalParameters _convolutionalParameters;
         std::vector<std::vector<uint64_t>> _binarizedShapedInput;
         std::vector<std::vector<uint64_t>> _binarizedWeights;
         std::vector<ElementType> _filterMeans;
@@ -142,7 +136,6 @@ namespace neural
         MatrixType _realValuedWeightsMatrix;
         MatrixType _realValuedOutputMatrix;
     };
-
 }
 }
 }

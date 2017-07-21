@@ -87,7 +87,8 @@ namespace utilities
         invalidArgument,
         nullReference,
         sizeMismatch,
-        typeMismatch
+        typeMismatch,
+        versionMismatch
     };
 
     enum class DataFormatErrors

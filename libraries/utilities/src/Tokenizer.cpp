@@ -158,12 +158,34 @@ namespace utilities
         }
     }
 
-    void Tokenizer::MatchToken(std::string token)
+    bool Tokenizer::TryMatchToken(std::string token)
     {
-        auto nextToken = ReadNextToken();
+        auto nextToken = PeekNextToken();
         if (nextToken != token)
         {
-            throw InputException(InputExceptionErrors::badStringFormat, std::string{ "Failed to match token " } + token + ", got: " + nextToken);
+            return false;
+        }
+        ReadNextToken();
+        return true;
+    }
+
+    bool Tokenizer::TryMatchToken(std::string token, std::string& readToken)
+    {
+        readToken = PeekNextToken();
+        if (readToken != token)
+        {
+            return false;
+        }
+        ReadNextToken();
+        return true;
+    }
+
+    void Tokenizer::MatchToken(std::string token)
+    {
+        std::string readToken;
+        if (!TryMatchToken(token, readToken))
+        {
+            throw InputException(InputExceptionErrors::badStringFormat, std::string{ "Failed to match token " } + token + ", got: " + readToken);
         }
     }
 

@@ -44,7 +44,6 @@ namespace neural
 
         math::VectorArchiver::Read(_scales, "scales", archiver);
     }
-
 }
 }
 }

@@ -1,21 +1,26 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1718",
     "size": 3
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1720",
     "values": [10, 10, 10]
   }, 
   {
     "_type": "BinaryOperationNode<double>",
+    "_version": "0",
     "id":     "1722",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1722",
       "name": "input1",
       "type": 2,
@@ -23,6 +28,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1722",
       "name": "input2",
       "type": 2,
@@ -32,14 +38,17 @@
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1719",
     "values": [2, 2, 2]
   }, 
   {
     "_type": "BinaryOperationNode<double>",
+    "_version": "0",
     "id":     "1721",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1721",
       "name": "input1",
       "type": 2,
@@ -47,6 +56,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1721",
       "name": "input2",
       "type": 2,
@@ -56,9 +66,11 @@
   }, 
   {
     "_type": "OutputNode<double>",
+    "_version": "0",
     "id":     "1723",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1723",
       "name": "input",
       "type": 2,

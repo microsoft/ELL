@@ -1,16 +1,20 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1047",
     "size": 3
   }, 
   {
     "_type": "MovingAverageNode<double>",
+    "_version": "0",
     "id":     "1048",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1048",
       "name": "input",
       "type": 2,
@@ -20,9 +24,11 @@
   }, 
   {
     "_type": "BinaryOperationNode<double>",
+    "_version": "0",
     "id":     "1049",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1049",
       "name": "input1",
       "type": 2,
@@ -30,6 +36,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1049",
       "name": "input2",
       "type": 2,
@@ -39,9 +46,11 @@
   }, 
   {
     "_type": "DelayNode<double>",
+    "_version": "0",
     "id":     "1050",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1050",
       "name": "input",
       "type": 2,
@@ -51,9 +60,11 @@
   }, 
   {
     "_type": "DotProductNode<double>",
+    "_version": "0",
     "id":     "1052",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1052",
       "name": "input1",
       "type": 2,
@@ -61,6 +72,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1052",
       "name": "input2",
       "type": 2,
@@ -69,9 +81,11 @@
   }, 
   {
     "_type": "DelayNode<double>",
+    "_version": "0",
     "id":     "1051",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1051",
       "name": "input",
       "type": 2,
@@ -81,9 +95,11 @@
   }, 
   {
     "_type": "DotProductNode<double>",
+    "_version": "0",
     "id":     "1053",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1053",
       "name": "input1",
       "type": 2,
@@ -91,6 +107,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1053",
       "name": "input2",
       "type": 2,
@@ -99,9 +116,11 @@
   }, 
   {
     "_type": "BinaryOperationNode<double>",
+    "_version": "0",
     "id":     "1054",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1054",
       "name": "input1",
       "type": 2,
@@ -109,6 +128,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1054",
       "name": "input2",
       "type": 2,

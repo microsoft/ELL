@@ -142,7 +142,7 @@ namespace utilities
         virtual void EndUnarchiveArrayItem(const std::string& typeName) override;
         virtual void EndUnarchiveArray(const char* name, const std::string& typeName) override;
 
-        virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName) override;
+        virtual ArchivedObjectInfo BeginUnarchiveObject(const char* name, const std::string& typeName) override;
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName) override;
 
         virtual void EndUnarchiving() override;

@@ -177,16 +177,6 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
         /// <summary> Equality operator. </summary>
         ///
         /// <returns> true if this range is equivalent to other. </returns>
@@ -202,6 +192,10 @@ namespace model
         ///
         /// <param name="other"> The other range </param>
         void Append(const PortRange& other);
+
+    protected:
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         const OutputPortBase* _referencedPort = nullptr;
@@ -342,19 +336,11 @@ namespace model
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
     protected:
         void ComputeSize();
         void AddRange(const PortRange& range);
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         std::vector<PortRange> _ranges;
@@ -544,14 +530,8 @@ namespace model
         /// <returns> true if this range was created with a fixed size </returns>
         bool IsFixedSize() const { return _isFixedSize; }
 
-        /// <summary> Adds an object to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the object to </param>
+    protected:
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
@@ -598,14 +578,8 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         static std::string GetTypeName() { return "PortElementProxy"; }
 
-        /// <summary> Adds an object to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the object to </param>
+    protected:
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:

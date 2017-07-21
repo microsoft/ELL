@@ -1,16 +1,20 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1000",
     "size": 3
   }, 
   {
     "_type": "OutputNode<double>",
+    "_version": "0",
     "id":     "1001",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1001",
       "name": "input",
       "type": 2,

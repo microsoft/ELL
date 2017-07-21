@@ -35,14 +35,14 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> 
-    /// A base class for nodes that emit pregenerated LLVM IR code 
+    /// <summary>
+    /// A base class for nodes that emit pregenerated LLVM IR code
     ///
     /// In order to create a new concrete IR node, subclass `IRNode` and implement the following:
     /// - constructor -- must call protected constructor to set up mapping to real ports
     /// - Copy method
     /// - if the node has extra arguments, need to implement GetNodeFunctionStateArguments()
-    /// 
+    ///
     /// </summary>
     class IRNode : public model::CompilableNode
     {
@@ -61,16 +61,6 @@ namespace nodes
         ///
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
-
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         ///
@@ -103,6 +93,8 @@ namespace nodes
         emitters::NamedVariableTypeList GetInputTypes();
         emitters::NamedVariableTypeList GetOutputTypes();
         const emitters::NamedVariableTypeList& GetExtraArgs() const { return _extraArgs; }
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         std::string _functionName;

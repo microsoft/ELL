@@ -16,6 +16,16 @@ namespace ell
 {
 namespace utilities
 {
+    bool operator==(const ArchiveVersion& a, const ArchiveVersion& b)
+    {
+        return a.versionNumber == b.versionNumber;
+    }
+
+    bool operator!=(const ArchiveVersion& a, const ArchiveVersion& b)
+    {
+        return !(a == b);
+    }
+
     //
     // PropertyArchiver class
     //
@@ -52,6 +62,11 @@ namespace utilities
         // nothing
     }
 
+    ArchiveVersion Archiver::GetArchiveVersion(const IArchivable& value) const
+    {
+        return value.GetArchiveVersion();
+    }
+
     //
     // PropertyArchiver class
     //
@@ -79,14 +94,20 @@ namespace utilities
 
     void Unarchiver::UnarchiveValue(const char* name, IArchivable& value)
     {
-        auto typeName = BeginUnarchiveObject(name, GetArchivedTypeName(value));
+        auto objInfo = BeginUnarchiveObject(name, GetArchivedTypeName(value));
+        // Check for matching version
+        if (objInfo.version != value.GetArchiveVersion())
+        {
+            throw InputException(InputExceptionErrors::versionMismatch, "Attempting to read incompatible version");
+        }
+        auto typeName = objInfo.type;
         UnarchiveObject(name, value);
         EndUnarchiveObject(name, typeName);
     }
 
-    std::string Unarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
+    ArchivedObjectInfo Unarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
-        return typeName;
+        return { typeName, 0 };
     }
 
     void Unarchiver::UnarchiveObject(const char* name, IArchivable& value)

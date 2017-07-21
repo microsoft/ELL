@@ -195,16 +195,15 @@ namespace model
         /// <param name="outputNode"> The node to be computed. </param>
         void PrintSubset(std::ostream& os, const Node* outputNode) const;
 
-    protected:
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
+        /// <summary> Gets the current archive format version. </summary>
         ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        /// <returns> The current archive format version. </summary>
+        static utilities::ArchiveVersion GetCurrentArchiveVersion();
 
-        /// <summary> Reads from a Unarchiver. </summary>
-        ///
-        /// <param name="archiver"> The archiver. </param>
-        /// <param name="context"> The serialization context. </param>
+    protected:
+        // Serialization-related methods
+        virtual utilities::ArchiveVersion GetArchiveVersion() const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:

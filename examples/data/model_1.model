@@ -1,16 +1,20 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1021",
     "size": 3
   }, 
   {
     "_type": "MovingVarianceNode<double>",
+    "_version": "0",
     "id":     "1025",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1025",
       "name": "input",
       "type": 2,
@@ -20,9 +24,11 @@
   }, 
   {
     "_type": "MovingAverageNode<double>",
+    "_version": "0",
     "id":     "1024",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1024",
       "name": "input",
       "type": 2,
@@ -32,9 +38,11 @@
   }, 
   {
     "_type": "MovingVarianceNode<double>",
+    "_version": "0",
     "id":     "1023",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1023",
       "name": "input",
       "type": 2,
@@ -44,9 +52,11 @@
   }, 
   {
     "_type": "MovingAverageNode<double>",
+    "_version": "0",
     "id":     "1022",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1022",
       "name": "input",
       "type": 2,
@@ -56,9 +66,11 @@
   }, 
   {
     "_type": "LinearPredictorNode",
+    "_version": "0",
     "id":     "1026",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1026",
       "name": "input",
       "type": 2,
@@ -66,6 +78,7 @@
     },
     "weightedElements": {
       "_type": "OutputPort<double>",
+      "_version": "0",
       "nodeId":       "1026",
       "name": "weightedElements",
       "type": 2,
@@ -73,6 +86,7 @@
     },
     "predictor": {
       "_type": "LinearPredictor",
+      "_version": "0",
       "w": [0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1],
       "b": 0
     }

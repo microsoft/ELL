@@ -1,31 +1,38 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "ConstantNode<bool>",
+    "_version": "0",
     "id":     "1097",
     "values": [true]
   }, 
   {
     "_type": "ConstantNode<bool>",
+    "_version": "0",
     "id":     "1099",
     "values": [false]
   }, 
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1092",
     "size": 3
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1093",
     "values": [0]
   }, 
   {
     "_type": "BinaryPredicateNode<double>",
+    "_version": "0",
     "id":     "1094",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1094",
       "name": "input1",
       "type": 2,
@@ -33,6 +40,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1094",
       "name": "input2",
       "type": 2,
@@ -42,9 +50,11 @@
   }, 
   {
     "_type": "TypeCastNode<bool,int>",
+    "_version": "0",
     "id":     "1098",
     "input": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1098",
       "name": "input",
       "type": 6,
@@ -53,14 +63,17 @@
   }, 
   {
     "_type": "ConstantNode<int>",
+    "_version": "0",
     "id":     "1103",
     "values": [1]
   }, 
   {
     "_type": "BinaryPredicateNode<int>",
+    "_version": "0",
     "id":     "1104",
     "input1": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1104",
       "name": "input1",
       "type": 3,
@@ -68,6 +81,7 @@
     },
     "input2": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1104",
       "name": "input2",
       "type": 3,
@@ -77,9 +91,11 @@
   }, 
   {
     "_type": "MultiplexerNode<bool,bool>",
+    "_version": "0",
     "id":     "1105",
     "elements": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1105",
       "name": "elements",
       "type": 6,
@@ -87,6 +103,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1105",
       "name": "selector",
       "type": 6,
@@ -95,14 +112,17 @@
   }, 
   {
     "_type": "ConstantNode<int>",
+    "_version": "0",
     "id":     "1100",
     "values": [0]
   }, 
   {
     "_type": "BinaryPredicateNode<int>",
+    "_version": "0",
     "id":     "1101",
     "input1": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1101",
       "name": "input1",
       "type": 3,
@@ -110,6 +130,7 @@
     },
     "input2": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1101",
       "name": "input2",
       "type": 3,
@@ -119,9 +140,11 @@
   }, 
   {
     "_type": "MultiplexerNode<bool,bool>",
+    "_version": "0",
     "id":     "1102",
     "elements": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1102",
       "name": "elements",
       "type": 6,
@@ -129,6 +152,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1102",
       "name": "selector",
       "type": 6,
@@ -137,24 +161,29 @@
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1089",
     "values": [0]
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1090",
     "values": [1]
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1091",
     "values": [-1]
   }, 
   {
     "_type": "MultiplexerNode<double,bool>",
+    "_version": "0",
     "id":     "1095",
     "elements": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1095",
       "name": "elements",
       "type": 2,
@@ -162,6 +191,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1095",
       "name": "selector",
       "type": 6,
@@ -170,9 +200,11 @@
   }, 
   {
     "_type": "SumNode<double>",
+    "_version": "0",
     "id":     "1096",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1096",
       "name": "input",
       "type": 2,

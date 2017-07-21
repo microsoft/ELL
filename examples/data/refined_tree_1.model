@@ -1,31 +1,38 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "ConstantNode<bool>",
+    "_version": "0",
     "id":     "1167",
     "values": [true]
   }, 
   {
     "_type": "ConstantNode<bool>",
+    "_version": "0",
     "id":     "1169",
     "values": [false]
   }, 
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1151",
     "size": 3
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1163",
     "values": [0]
   }, 
   {
     "_type": "BinaryPredicateNode<double>",
+    "_version": "0",
     "id":     "1164",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1164",
       "name": "input1",
       "type": 2,
@@ -33,6 +40,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1164",
       "name": "input2",
       "type": 2,
@@ -42,9 +50,11 @@
   }, 
   {
     "_type": "TypeCastNode<bool,int>",
+    "_version": "0",
     "id":     "1168",
     "input": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1168",
       "name": "input",
       "type": 6,
@@ -53,14 +63,17 @@
   }, 
   {
     "_type": "ConstantNode<int>",
+    "_version": "0",
     "id":     "1170",
     "values": [0]
   }, 
   {
     "_type": "BinaryPredicateNode<int>",
+    "_version": "0",
     "id":     "1171",
     "input1": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1171",
       "name": "input1",
       "type": 3,
@@ -68,6 +81,7 @@
     },
     "input2": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1171",
       "name": "input2",
       "type": 3,
@@ -77,9 +91,11 @@
   }, 
   {
     "_type": "MultiplexerNode<bool,bool>",
+    "_version": "0",
     "id":     "1172",
     "elements": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1172",
       "name": "elements",
       "type": 6,
@@ -87,6 +103,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1172",
       "name": "selector",
       "type": 6,
@@ -95,19 +112,23 @@
   }, 
   {
     "_type": "ConstantNode<bool>",
+    "_version": "0",
     "id":     "1185",
     "values": [false]
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1159",
     "values": [0]
   }, 
   {
     "_type": "BinaryPredicateNode<double>",
+    "_version": "0",
     "id":     "1160",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1160",
       "name": "input1",
       "type": 2,
@@ -115,6 +136,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1160",
       "name": "input2",
       "type": 2,
@@ -124,9 +146,11 @@
   }, 
   {
     "_type": "TypeCastNode<bool,int>",
+    "_version": "0",
     "id":     "1184",
     "input": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1184",
       "name": "input",
       "type": 6,
@@ -135,14 +159,17 @@
   }, 
   {
     "_type": "ConstantNode<int>",
+    "_version": "0",
     "id":     "1189",
     "values": [1]
   }, 
   {
     "_type": "BinaryPredicateNode<int>",
+    "_version": "0",
     "id":     "1190",
     "input1": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1190",
       "name": "input1",
       "type": 3,
@@ -150,6 +177,7 @@
     },
     "input2": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1190",
       "name": "input2",
       "type": 3,
@@ -159,9 +187,11 @@
   }, 
   {
     "_type": "MultiplexerNode<bool,bool>",
+    "_version": "0",
     "id":     "1191",
     "elements": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1191",
       "name": "elements",
       "type": 6,
@@ -169,6 +199,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1191",
       "name": "selector",
       "type": 6,
@@ -177,14 +208,17 @@
   }, 
   {
     "_type": "ConstantNode<int>",
+    "_version": "0",
     "id":     "1186",
     "values": [0]
   }, 
   {
     "_type": "BinaryPredicateNode<int>",
+    "_version": "0",
     "id":     "1187",
     "input1": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1187",
       "name": "input1",
       "type": 3,
@@ -192,6 +226,7 @@
     },
     "input2": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1187",
       "name": "input2",
       "type": 3,
@@ -201,9 +236,11 @@
   }, 
   {
     "_type": "MultiplexerNode<bool,bool>",
+    "_version": "0",
     "id":     "1188",
     "elements": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1188",
       "name": "elements",
       "type": 6,
@@ -211,6 +248,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1188",
       "name": "selector",
       "type": 6,
@@ -219,14 +257,17 @@
   }, 
   {
     "_type": "ConstantNode<int>",
+    "_version": "0",
     "id":     "1173",
     "values": [1]
   }, 
   {
     "_type": "BinaryPredicateNode<int>",
+    "_version": "0",
     "id":     "1174",
     "input1": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1174",
       "name": "input1",
       "type": 3,
@@ -234,6 +275,7 @@
     },
     "input2": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1174",
       "name": "input2",
       "type": 3,
@@ -243,9 +285,11 @@
   }, 
   {
     "_type": "MultiplexerNode<bool,bool>",
+    "_version": "0",
     "id":     "1175",
     "elements": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1175",
       "name": "elements",
       "type": 6,
@@ -253,6 +297,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1175",
       "name": "selector",
       "type": 6,
@@ -261,19 +306,23 @@
   }, 
   {
     "_type": "ConstantNode<bool>",
+    "_version": "0",
     "id":     "1177",
     "values": [false]
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1152",
     "values": [0]
   }, 
   {
     "_type": "BinaryPredicateNode<double>",
+    "_version": "0",
     "id":     "1153",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1153",
       "name": "input1",
       "type": 2,
@@ -281,6 +330,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1153",
       "name": "input2",
       "type": 2,
@@ -290,9 +340,11 @@
   }, 
   {
     "_type": "TypeCastNode<bool,int>",
+    "_version": "0",
     "id":     "1176",
     "input": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1176",
       "name": "input",
       "type": 6,
@@ -301,14 +353,17 @@
   }, 
   {
     "_type": "ConstantNode<int>",
+    "_version": "0",
     "id":     "1181",
     "values": [1]
   }, 
   {
     "_type": "BinaryPredicateNode<int>",
+    "_version": "0",
     "id":     "1182",
     "input1": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1182",
       "name": "input1",
       "type": 3,
@@ -316,6 +371,7 @@
     },
     "input2": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1182",
       "name": "input2",
       "type": 3,
@@ -325,9 +381,11 @@
   }, 
   {
     "_type": "MultiplexerNode<bool,bool>",
+    "_version": "0",
     "id":     "1183",
     "elements": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1183",
       "name": "elements",
       "type": 6,
@@ -335,6 +393,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1183",
       "name": "selector",
       "type": 6,
@@ -343,14 +402,17 @@
   }, 
   {
     "_type": "ConstantNode<int>",
+    "_version": "0",
     "id":     "1178",
     "values": [0]
   }, 
   {
     "_type": "BinaryPredicateNode<int>",
+    "_version": "0",
     "id":     "1179",
     "input1": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1179",
       "name": "input1",
       "type": 3,
@@ -358,6 +420,7 @@
     },
     "input2": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1179",
       "name": "input2",
       "type": 3,
@@ -367,9 +430,11 @@
   }, 
   {
     "_type": "MultiplexerNode<bool,bool>",
+    "_version": "0",
     "id":     "1180",
     "elements": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1180",
       "name": "elements",
       "type": 6,
@@ -377,6 +442,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1180",
       "name": "selector",
       "type": 6,
@@ -385,29 +451,35 @@
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1147",
     "values": [0]
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1148",
     "values": [1]
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1149",
     "values": [1]
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1150",
     "values": [-1]
   }, 
   {
     "_type": "MultiplexerNode<double,bool>",
+    "_version": "0",
     "id":     "1154",
     "elements": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1154",
       "name": "elements",
       "type": 2,
@@ -415,6 +487,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1154",
       "name": "selector",
       "type": 6,
@@ -423,9 +496,11 @@
   }, 
   {
     "_type": "BinaryOperationNode<double>",
+    "_version": "0",
     "id":     "1155",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1155",
       "name": "input1",
       "type": 2,
@@ -433,6 +508,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1155",
       "name": "input2",
       "type": 2,
@@ -442,24 +518,29 @@
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1156",
     "values": [-1]
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1157",
     "values": [1]
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1158",
     "values": [-1]
   }, 
   {
     "_type": "MultiplexerNode<double,bool>",
+    "_version": "0",
     "id":     "1161",
     "elements": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1161",
       "name": "elements",
       "type": 2,
@@ -467,6 +548,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1161",
       "name": "selector",
       "type": 6,
@@ -475,9 +557,11 @@
   }, 
   {
     "_type": "BinaryOperationNode<double>",
+    "_version": "0",
     "id":     "1162",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1162",
       "name": "input1",
       "type": 2,
@@ -485,6 +569,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1162",
       "name": "input2",
       "type": 2,
@@ -494,9 +579,11 @@
   }, 
   {
     "_type": "MultiplexerNode<double,bool>",
+    "_version": "0",
     "id":     "1165",
     "elements": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1165",
       "name": "elements",
       "type": 2,
@@ -504,6 +591,7 @@
     },
     "selector": {
       "_type": "InputPort<bool>",
+      "_version": "0",
       "nodeId":       "1165",
       "name": "selector",
       "type": 6,
@@ -512,9 +600,11 @@
   }, 
   {
     "_type": "SumNode<double>",
+    "_version": "0",
     "id":     "1166",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1166",
       "name": "input",
       "type": 2,

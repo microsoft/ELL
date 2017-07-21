@@ -127,16 +127,6 @@ namespace model
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "Node"; }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const = 0;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) = 0;
-
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
         virtual bool IsCompilable() const { return false; }
 
@@ -162,6 +152,11 @@ namespace model
 
         void AddInputPort(InputPortBase* input);
         void AddOutputPort(OutputPortBase* output);
+
+        // We're supplying a base implementation from WriteToArchive and ReadFromArchive, but also
+        // declaring them as abstract so that subclasses need to implement this themselves.
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override = 0; 
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override = 0;
 
     private:
         friend class Model;

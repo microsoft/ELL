@@ -159,7 +159,8 @@ namespace utilities
     void Unarchiver::UnarchiveItem(const char* name, std::unique_ptr<ValueType>& value)
     {
         auto baseTypeName = GetArchivedTypeName<ValueType>();
-        auto encodedTypeName = BeginUnarchiveObject(name, baseTypeName);
+        auto objInfo = BeginUnarchiveObject(name, baseTypeName);
+        auto encodedTypeName = objInfo.type;
         std::unique_ptr<ValueType> newPtr = GetContext().GetTypeFactory().Construct<ValueType>(encodedTypeName);
         UnarchiveObject(name, *newPtr);
         EndUnarchiveObject(name, encodedTypeName);

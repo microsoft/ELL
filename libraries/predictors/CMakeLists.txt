@@ -82,13 +82,27 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
 set (test_name ${library_name}_test)
 
-set (test_src test/src/main.cpp)
-set (test_include )
+set (test_src 
+  test/src/main.cpp
+  test/src/ForestPredictorTests.cpp
+  test/src/ProtoNNPredictorTests.cpp
+  )
+
+set (test_include
+  test/include/ForestPredictorTests.h
+  test/include/ProtoNNPredictorTests.h
+  test/include/NeuralNetworkPredictorTests.h
+)
+
+set (test_tcc
+  test/tcc/NeuralNetworkPredictorTests.tcc
+)
 
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
+source_group("tcc" FILES ${test_tcc})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include} ${tcc} ${neural_include} ${neural_tcc})
+add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include} ${tcc} ${neural_include} ${neural_tcc})
 target_include_directories(${test_name} PRIVATE test/include)
 
 target_link_libraries(${test_name} data predictors testing)

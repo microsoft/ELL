@@ -57,28 +57,22 @@ namespace utilities
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(Unarchiver& archiver) override;
-
         /// <summary> Stream output </summary>
         friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id);
 
         /// <summary> String conversion </summary>
         friend std::string to_string(const UniqueId& id);
 
+    protected:
+        virtual void WriteToArchive(Archiver& archiver) const override;
+        virtual void ReadFromArchive(Unarchiver& archiver) override;
+
     private:
         friend std::hash<UniqueId>;
         std::string _id = "0";
         static size_t _nextId;
     };
-    
+
     std::string to_string(const UniqueId& id);
 }
 }

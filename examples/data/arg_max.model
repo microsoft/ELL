@@ -1,16 +1,20 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1016",
     "size": 3
   }, 
   {
     "_type": "ArgMaxNode<double>",
+    "_version": "0",
     "id":     "1017",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1017",
       "name": "input",
       "type": 2,
@@ -18,6 +22,7 @@
     },
     "val": {
       "_type": "OutputPort<double>",
+      "_version": "0",
       "nodeId":       "1017",
       "name": "val",
       "type": 2,
@@ -25,6 +30,7 @@
     },
     "argVal": {
       "_type": "OutputPort<int>",
+      "_version": "0",
       "nodeId":       "1017",
       "name": "argVal",
       "type": 3,
@@ -33,9 +39,11 @@
   }, 
   {
     "_type": "OutputNode<int>",
+    "_version": "0",
     "id":     "1018",
     "input": {
       "_type": "InputPort<int>",
+      "_version": "0",
       "nodeId":       "1018",
       "name": "input",
       "type": 3,

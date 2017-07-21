@@ -45,16 +45,6 @@ namespace predictors
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
         /// <summary> Gets the index of the element used to define the rule. </summary>
         ///
         /// <returns> The element index. </returns>
@@ -82,6 +72,10 @@ namespace predictors
         /// <param name="os"> The output stream. </param>
         ///  <param name="tabs"> The number of tabs. </param>
         void PrintLine(std::ostream& os, size_t tabs = 0) const;
+
+    protected:
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         size_t _index;

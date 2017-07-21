@@ -131,21 +131,15 @@ namespace predictors
             /// <returns> The name of this type. </returns>
             virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-            /// <summary> Adds an object's properties to an `Archiver` </summary>
-            ///
-            /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-            virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-            /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-            ///
-            /// <param name="archiver"> The `Archiver` to get state from </param>
-            virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
             /// <summary> Prints a human readable description of the edge, indented by a given number of tabs - used for debugging. </summary>
             ///
             /// <param name="os"> [in,out] Stream to write data to. </param>
             /// <param name="tabs"> The tabs. </param>
             void PrintLine(std::ostream& os, size_t tabs = 0) const;
+
+        protected:
+            virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+            virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
@@ -191,14 +185,8 @@ namespace predictors
             /// <returns> The name of this type. </returns>
             virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-            /// <summary> Adds an object's properties to an `Archiver` </summary>
-            ///
-            /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
+        protected:
             virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-            /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-            ///
-            /// <param name="archiver"> The `Archiver` to get state from </param>
             virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         private:
@@ -343,16 +331,6 @@ namespace predictors
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
     protected:
         //
         // protected member functions
@@ -362,6 +340,9 @@ namespace predictors
         size_t AddInteriorNode(const SplitAction& splitAction);
 
         void VisitEdgePathToLeaf(const DataVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const;
+
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         //
         //  member variables

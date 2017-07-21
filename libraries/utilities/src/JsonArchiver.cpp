@@ -70,7 +70,8 @@ namespace utilities
         }
 
         _out << "{\n";
-        _out << indent << "  \"_type\": \"" << GetArchivedTypeName(value) << "\",\n";
+        WriteObjectType(value);
+        WriteObjectVersion(value);
         IncrementIndent();
     }
 
@@ -141,6 +142,19 @@ namespace utilities
         SetEndOfLine(",\n");
     }
 
+    void JsonArchiver::WriteObjectType(const IArchivable& value)
+    {
+        auto indent = GetCurrentIndent();
+        _out << indent << "  \"_type\": \"" << GetArchivedTypeName(value) << "\",\n";
+    }
+
+    void JsonArchiver::WriteObjectVersion(const IArchivable& value)
+    {
+        auto indent = GetCurrentIndent();
+        auto version = GetArchiveVersion(value);
+        _out << indent << "  \"_version\": \"" << version.versionNumber << "\",\n";
+    }
+
     void JsonArchiver::Indent()
     {
         _out << GetCurrentIndent();
@@ -189,29 +203,42 @@ namespace utilities
     }
 
     // IArchivable
-    std::string JsonUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
+    ArchivedObjectInfo JsonUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
         if (hasName)
         {
             MatchFieldName(name);
         }
-        
+
         _tokenizer.MatchToken("{");
+
         MatchFieldName("_type");
         _tokenizer.MatchToken("\"");
         auto encodedTypeName = _tokenizer.ReadNextToken();
         assert(encodedTypeName != "");
         _tokenizer.MatchToken("\"");
 
+        int version = 0;
         if (_tokenizer.PeekNextToken() == ",")
         {
-            _tokenizer.ReadNextToken();
+            _tokenizer.ReadNextToken(); // eat the comma
+
+            MatchFieldName("_version");
+            _tokenizer.MatchToken("\"");
+            auto versionString = _tokenizer.ReadNextToken();
+            // parse it
+            version = std::stoi(versionString);
+            _tokenizer.MatchToken("\"");
+            if (_tokenizer.PeekNextToken() == ",")
+            {
+                _tokenizer.ReadNextToken(); // eat the comma
+            }
         }
-        return encodedTypeName;
+        return { encodedTypeName, version };
     }
 
-    void JsonUnarchiver::UnarchiveObjectAsPrimitive(const char* name, IArchivable& value) 
+    void JsonUnarchiver::UnarchiveObjectAsPrimitive(const char* name, IArchivable& value)
     {
         bool hasName = name != std::string("");
         if (hasName)
@@ -312,15 +339,31 @@ namespace utilities
         }
     }
 
-    void JsonUnarchiver::MatchFieldName(const char* key)
+    bool JsonUnarchiver::TryMatchFieldName(const char* key)
     {
-        _tokenizer.MatchToken("\"");
-        auto s = _tokenizer.ReadNextToken();
+        bool ok = _tokenizer.TryMatchToken("\"");
+        if (!ok)
+        {
+            return false;
+        }
+
+        auto s = _tokenizer.PeekNextToken();
         if (s != key)
         {
-            throw InputException(InputExceptionErrors::badStringFormat, std::string{ "Failed to match name " } + key + ", got: " + s);
+            return false;
         }
+        _tokenizer.ReadNextToken();
+
         _tokenizer.MatchTokens({ "\"", ":" });
+        return true;
+    }
+
+    void JsonUnarchiver::MatchFieldName(const char* key)
+    {
+        if (!TryMatchFieldName(key))
+        {
+            throw InputException(InputExceptionErrors::badStringFormat, std::string{ "Failed to match field " } + key);
+        }
     }
 
     //

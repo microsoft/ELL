@@ -87,15 +87,19 @@ namespace utilities
         template <typename ValueType, IsIArchivable<ValueType> concept = 0>
         void WriteArray(const char* name, const std::vector<ValueType>& array);
 
-        std::ostream& _out;
-        int _indent = 0;
-        std::string _endOfPreviousLine;
+        // Utility functions
+        void WriteObjectType(const IArchivable& value);
+        void WriteObjectVersion(const IArchivable& value);
         void IncrementIndent() { ++_indent; }
         void DecrementIndent() { --_indent; }
         std::string GetCurrentIndent() { return std::string(2 * _indent, ' '); }
         void Indent();
         void FinishPreviousLine();
         void SetEndOfLine(std::string endOfLine);
+
+        std::ostream& _out;
+        int _indent = 0;
+        std::string _endOfPreviousLine;
     };
 
     /// <summary> An unarchiver that reads data encoded in JSON-formatted text. </summary>
@@ -142,7 +146,7 @@ namespace utilities
         virtual void EndUnarchiveArrayItem(const std::string& typeName) override;
         virtual void EndUnarchiveArray(const char* name, const std::string& typeName) override;
 
-        virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName) override;
+        virtual ArchivedObjectInfo BeginUnarchiveObject(const char* name, const std::string& typeName) override;
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName) override;
         virtual void UnarchiveObjectAsPrimitive(const char* name, IArchivable& value) override;
 
@@ -160,6 +164,7 @@ namespace utilities
 
         void ReadArray(const char* name, std::vector<std::string>& array);
 
+        bool TryMatchFieldName(const char* name);
         void MatchFieldName(const char* name);
 
         std::string _endOfPreviousLine;

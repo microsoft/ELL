@@ -53,10 +53,15 @@ namespace utilities
         virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
 
         virtual bool ArchiveAsPrimitive() const { return false; }
-        
+
     protected:
         friend class Archiver;
         friend class Unarchiver;
+
+        /// <summary> Gets the archive version of the object. </summary>
+        ///
+        /// <returns> The archive version of the object. </summary>
+        virtual ArchiveVersion GetArchiveVersion() const { return { 0 }; }
 
         /// <summary> Writes the object to an archiver. </summary>
         ///

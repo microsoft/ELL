@@ -1,21 +1,26 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1003",
     "size": 3
   }, 
   {
     "_type": "ConstantNode<double>",
+    "_version": "0",
     "id":     "1004",
     "values": [2, 2, 2]
   }, 
   {
     "_type": "BinaryOperationNode<double>",
+    "_version": "0",
     "id":     "1005",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1005",
       "name": "input1",
       "type": 2,
@@ -23,6 +28,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1005",
       "name": "input2",
       "type": 2,
@@ -32,9 +38,11 @@
   }, 
   {
     "_type": "OutputNode<double>",
+    "_version": "0",
     "id":     "1006",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1006",
       "name": "input",
       "type": 2,

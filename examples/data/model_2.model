@@ -1,16 +1,20 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1035",
     "size": 3
   }, 
   {
     "_type": "MovingAverageNode<double>",
+    "_version": "0",
     "id":     "1036",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1036",
       "name": "input",
       "type": 2,
@@ -20,9 +24,11 @@
   }, 
   {
     "_type": "L2NormNode<double>",
+    "_version": "0",
     "id":     "1037",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1037",
       "name": "input",
       "type": 2,
@@ -31,9 +37,11 @@
   }, 
   {
     "_type": "L2NormNode<double>",
+    "_version": "0",
     "id":     "1038",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1038",
       "name": "input",
       "type": 2,
@@ -42,9 +50,11 @@
   }, 
   {
     "_type": "MovingAverageNode<double>",
+    "_version": "0",
     "id":     "1039",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1039",
       "name": "input",
       "type": 2,
@@ -54,9 +64,11 @@
   }, 
   {
     "_type": "BinaryOperationNode<double>",
+    "_version": "0",
     "id":     "1040",
     "input1": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1040",
       "name": "input1",
       "type": 2,
@@ -64,6 +76,7 @@
     },
     "input2": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1040",
       "name": "input2",
       "type": 2,

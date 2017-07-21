@@ -199,7 +199,7 @@ namespace utilities
     }
 
     // IArchivable
-    std::string XmlUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
+    ArchivedObjectInfo XmlUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
         bool hasName = name != std::string("");
         auto rawTypeName = typeName;
@@ -212,7 +212,7 @@ namespace utilities
             _tokenizer.MatchTokens({ "name", "=", "'", name, "'" });
         }
         _tokenizer.MatchToken(">");
-        return readTypeName;
+        return {readTypeName, 0};
     }
 
     void XmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)

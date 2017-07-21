@@ -121,20 +121,20 @@ namespace predictors
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Adds an object's properties to an `Archiver` </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-
-        /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
-        ///
-        /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-
         /// <summary> Register known types for neural network predictors to a serialization context </summary>
         ///
         /// <param name="context"> The `SerializationContext` </param>
         static void RegisterNeuralNetworkPredictorTypes(utilities::SerializationContext& context);
+
+        /// <summary> Gets the current archive format version. </summary>
+        ///
+        /// <returns> The current archive format version. </summary>
+        static utilities::ArchiveVersion GetCurrentArchiveVersion();
+
+    protected:
+        virtual utilities::ArchiveVersion GetArchiveVersion() const override;
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         InputLayerReference _inputLayer;

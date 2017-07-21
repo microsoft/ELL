@@ -42,6 +42,17 @@ namespace utilities
         /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
         ///
         /// <param name="token"> The token to match. </param>
+        bool TryMatchToken(std::string token);
+        
+        /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
+        ///
+        /// <param name="token"> The token to match. </param>
+        /// <param name="readToek"> The token actually read. </param>
+        bool TryMatchToken(std::string token, std::string& readToken);
+        
+        /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>
+        ///
+        /// <param name="token"> The token to match. </param>
         void MatchToken(std::string token);
 
         /// <summary> Matches the next token from the input stream. Throws an exception if token doesn't match. </summary>

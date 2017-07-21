@@ -356,7 +356,7 @@ namespace model
     void PortElementsBase::AddRange(const PortRange& range)
     {
         // Check if range is contiguous with _ranges.back(), and if so, just add range.Size() to ranges.back()
-        if(_ranges.size() > 0 && _ranges.back().IsAdjacent(range))
+        if (_ranges.size() > 0 && _ranges.back().IsAdjacent(range))
         {
             _ranges.back().Append(range);
         }

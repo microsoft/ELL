@@ -64,6 +64,22 @@ namespace utilities
         GenericTypeFactory _typeFactory;
     };
 
+    /// <summary> Type to represent archive versions </summary>
+    struct ArchiveVersion
+    {
+        int versionNumber; // 0 == None
+    };
+
+    bool operator==(const ArchiveVersion& a, const ArchiveVersion& b);
+    bool operator!=(const ArchiveVersion& a, const ArchiveVersion& b);
+
+    /// <summary> Info struct for archived objects </summary>
+    struct ArchivedObjectInfo
+    {
+        std::string type;
+        ArchiveVersion version;
+    };
+
 /// <summary> Macros to make repetitive boilerplate code in archiver implementations easier to implement. </summary>
 #define DECLARE_ARCHIVE_VALUE_BASE(type) virtual void ArchiveValue(const char* name, type value, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_ARCHIVE_ARRAY_BASE(type) virtual void ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
@@ -217,6 +233,8 @@ namespace utilities
 
         virtual void EndArchiving() {}
 
+        ArchiveVersion GetArchiveVersion(const IArchivable& value) const;
+
     private:
         template <typename ValueType, IsNotVector<ValueType> concept = 0>
         void ArchiveItem(const char* name, ValueType&& value);
@@ -344,7 +362,7 @@ namespace utilities
         virtual void EndUnarchiveArray(const char* name, const std::string& typeName);
 
         // Extra functions needed for deserializing IArchivable objects.
-        virtual std::string BeginUnarchiveObject(const char* name, const std::string& typeName);
+        virtual ArchivedObjectInfo BeginUnarchiveObject(const char* name, const std::string& typeName);
         virtual void UnarchiveObject(const char* name, IArchivable& value);
         virtual void EndUnarchiveObject(const char* name, const std::string& typeName);
         virtual void UnarchiveObjectAsPrimitive(const char* name, IArchivable& value);

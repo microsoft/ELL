@@ -18,6 +18,14 @@ namespace ell
 {
 namespace model
 {
+    namespace
+    {
+        //
+        // Current Model archive format version
+        //
+        const int c_currentModelArchiveVersion = 1;
+    }
+
     //
     // Model
     //
@@ -50,6 +58,16 @@ namespace model
     NodeIterator Model::GetNodeIterator(const std::vector<const Node*>& outputNodes) const
     {
         return NodeIterator(this, outputNodes);
+    }
+
+    utilities::ArchiveVersion Model::GetCurrentArchiveVersion()
+    {
+        return { c_currentModelArchiveVersion };
+    }
+
+    utilities::ArchiveVersion Model::GetArchiveVersion() const
+    {
+        return GetCurrentArchiveVersion();
     }
 
     void Model::WriteToArchive(utilities::Archiver& archiver) const

@@ -1,16 +1,20 @@
 {
   "_type": "Model",
+  "_version": "1",
   "nodes": [
   {
     "_type": "InputNode<double>",
+    "_version": "0",
     "id":     "1069",
     "size": 3
   }, 
   {
     "_type": "ForestPredictorNode<SingleElementThresholdPredictor,ConstantPredictor>",
+    "_version": "0",
     "id":     "1070",
     "input": {
       "_type": "InputPort<double>",
+      "_version": "0",
       "nodeId":       "1070",
       "name": "input",
       "type": 2,
@@ -18,27 +22,34 @@
     },
     "forest": {
       "_type": "ForestPredictor<SingleElementThresholdPredictor,ConstantPredictor>",
+      "_version": "0",
       "interiorNodes": [
       {
         "_type": "InteriorNode",
+        "_version": "0",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
+          "_version": "0",
           "index": 0,
           "threshold": 0
         },
         "outgoingEdges": [
         {
           "_type": "Edge",
+          "_version": "0",
           "predictor": {
             "_type": "ConstantPredictor",
+            "_version": "0",
             "value": -1
           },
           "targetNodeIndex": 1
         }, 
         {
           "_type": "Edge",
+          "_version": "0",
           "predictor": {
             "_type": "ConstantPredictor",
+            "_version": "0",
             "value": 1
           },
           "targetNodeIndex": 2
@@ -47,24 +58,30 @@
       }, 
       {
         "_type": "InteriorNode",
+        "_version": "0",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
+          "_version": "0",
           "index": 0,
           "threshold": 0
         },
         "outgoingEdges": [
         {
           "_type": "Edge",
+          "_version": "0",
           "predictor": {
             "_type": "ConstantPredictor",
+            "_version": "0",
             "value": -1
           },
           "targetNodeIndex": 0
         }, 
         {
           "_type": "Edge",
+          "_version": "0",
           "predictor": {
             "_type": "ConstantPredictor",
+            "_version": "0",
             "value": 1
           },
           "targetNodeIndex": 0
@@ -73,24 +90,30 @@
       }, 
       {
         "_type": "InteriorNode",
+        "_version": "0",
         "splitRule": {
           "_type": "SingleElementThresholdPredictor",
+          "_version": "0",
           "index": 0,
           "threshold": 0
         },
         "outgoingEdges": [
         {
           "_type": "Edge",
+          "_version": "0",
           "predictor": {
             "_type": "ConstantPredictor",
+            "_version": "0",
             "value": -1
           },
           "targetNodeIndex": 0
         }, 
         {
           "_type": "Edge",
+          "_version": "0",
           "predictor": {
             "_type": "ConstantPredictor",
+            "_version": "0",
             "value": 1
           },
           "targetNodeIndex": 0
