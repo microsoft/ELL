@@ -10,6 +10,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <vector>
 
 class DgmlNode
 {
@@ -25,6 +26,39 @@ public:
     }
 };
 
+class DgmlStyleSetter
+{
+public:
+    std::string Property;
+    std::string Value;
+    std::string Expression;
+};
+
+class DgmlStyleCondition
+{
+public:
+    std::string Expression;
+};
+
+class DgmlStyle
+{
+public:
+    std::string TargetType;
+    std::string GroupLabel;
+    std::string ValueLabel;
+    DgmlStyleCondition Condition;
+    std::vector<DgmlStyleSetter> Setters;
+};
+
+class DgmlProperty
+{
+public:
+    std::string Id;
+    std::string Label;
+    std::string Description;
+    std::string DataType;
+};
+
 class DgmlLink
 {
 public:
@@ -36,8 +70,19 @@ class DgmlGraph
 {
     std::map<std::string, DgmlNode> nodes;
     std::map<std::string, DgmlLink> links;
+    std::vector<DgmlStyle> styles;
+    std::vector<DgmlProperty> properties;
 
 public:
+    void AddStyle(DgmlStyle style)
+    {
+        styles.push_back(style);
+    }
+    void AddProperty(DgmlProperty prop)
+    {
+        properties.push_back(prop);
+    }
+
     DgmlNode& GetOrCreateGroup(const std::string& id, const std::string& label)
     {
         if (nodes.find(id) == nodes.end())
@@ -45,6 +90,14 @@ public:
             nodes[id] = DgmlNode{ id, label, true };
         }
         return nodes[id];
+    }
+    DgmlNode* GetNode(const std::string& id)
+    {
+        if (nodes.find(id) == nodes.end())
+        {
+            return nullptr;
+        }
+        return &nodes[id];
     }
     DgmlNode& GetOrCreateNode(const std::string& id, const std::string& label)
     {
@@ -63,7 +116,7 @@ public:
         }
         return links[key];
     }
-    void replaceAll(std::string& str, const std::string& from, const std::string& to)
+    static void ReplaceAll(std::string& str, const std::string& from, const std::string& to)
     {
         if (from.empty())
             return;
@@ -83,14 +136,14 @@ public:
     std::string EscapeAttribute(const std::string& value)
     {
         std::string result(value);
-        replaceAll(result, "&", "&amp;");
-        replaceAll(result, "<", "&lt;");
-        replaceAll(result, ">", "&gt;");
+        ReplaceAll(result, "&", "&amp;");
+        ReplaceAll(result, "<", "&lt;");
+        ReplaceAll(result, ">", "&gt;");
+        ReplaceAll(result, "'", "&apos;");
         return result;
     }
     void Save(std::ostream& fout)
     {
-
         fout << "<DirectedGraph xmlns='http://schemas.microsoft.com/vs/2009/dgml'>" << std::endl;
         fout << "  <Nodes>" << std::endl;
         for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
@@ -121,6 +174,47 @@ public:
             fout << "/>" << std::endl;
         }
         fout << "  </Links>" << std::endl;
+
+        fout << "  <Properties>" << std::endl;
+        for (auto ptr = properties.begin(), end = properties.end(); ptr != end; ptr++)
+        {
+            DgmlProperty p = *ptr;
+            fout << "    <Property Id='" << EscapeAttribute(p.Id) << "' Label='" << EscapeAttribute(p.Label) << "' Description='" << EscapeAttribute(p.Description) << 
+                "' DataType='" << EscapeAttribute(p.DataType) << "'/>" << std::endl;
+        }
+
+        fout << "  </Properties>" << std::endl;
+
+        fout << "  <Styles>" << std::endl;
+
+        for (auto ptr = styles.begin(), end = styles.end(); ptr != end; ptr++)
+        {
+            DgmlStyle style = *ptr;
+            fout << "    <Style TargetType='" << EscapeAttribute(style.TargetType) << "' GroupLabel='" << EscapeAttribute(style.GroupLabel) << "' ValueLabel='" << EscapeAttribute(style.ValueLabel) << "'";
+            fout << ">" << std::endl;
+
+            if (style.Condition.Expression != "")
+            {
+                fout << "        <Condition Expression='" << EscapeAttribute(style.Condition.Expression) << "'/>" << std::endl;
+            }
+
+            for (auto s = style.Setters.begin(), e = style.Setters.end(); s != e; s++)
+            {
+                DgmlStyleSetter setter = *s;
+                fout << "        <Setter Property='" << EscapeAttribute(setter.Property) << "'";
+                if (setter.Expression != "") {
+                    fout << " Expression='" << EscapeAttribute(setter.Expression) << "'/>" << std::endl;
+                } 
+                else 
+                {
+                    fout << " Value='" << EscapeAttribute(setter.Value) << "'/>" << std::endl;
+                }
+            }
+
+            fout << "    </Style>" << std::endl;
+        }
+        fout << "  </Styles>" << std::endl;
+
         fout << "</DirectedGraph>" << std::endl;
     }
 };

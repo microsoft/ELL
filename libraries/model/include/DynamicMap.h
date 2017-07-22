@@ -278,6 +278,8 @@ namespace model
         /// <param name="b"> The other map to swap. </param>
         friend void swap(DynamicMap& a, DynamicMap& b);
 
+        void Prune(); // prune away unused parts of internal model
+
     protected:
         template <typename DataVectorType, typename ElementsType, data::IsDataVector<DataVectorType> Concept = true>
         void SetInputValue(InputNodeBase* node, const DataVectorType& inputValues) const;
@@ -296,7 +298,6 @@ namespace model
 
         void AddInput(const std::string& inputName, InputNodeBase* inputNode);
         void AddOutput(const std::string& outputName, PortElementsBase outputElements);
-        void Prune(); // prune away unused parts of internal model
 
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
@@ -325,6 +326,7 @@ namespace model
         std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
 
         std::vector<const Node*> GetOutputNodes();
+        std::vector<const Node*> GetDebugSinkNodes();
         void FixTransformedIO(ModelTransformer& transformer);
     };
 

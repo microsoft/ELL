@@ -19,7 +19,6 @@ namespace ell
 {
 namespace emitters
 {
-
     void FatalErrorHandler(void* userData, const std::string& reason, bool genCrashDiag)
     {
         std::string msg = "llvm fatal error: " + reason;
@@ -79,6 +78,12 @@ namespace emitters
             throw EmitterException(EmitterError::functionNotFound);
         }
         return functionAddress;
+    }
+
+    void IRExecutionEngine::DefineFunction(llvm::Function* func, uint64_t address)
+    {
+        EnsureEngine();
+        _pEngine->addGlobalMapping(func, (void*)address);
     }
 
     DynamicFunction IRExecutionEngine::GetMain()

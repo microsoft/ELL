@@ -21,6 +21,7 @@
 #include "Node.h"
 #include "OutputPort.h"
 #include "PortElements.h"
+#include "ModelTransformer.h"
 
 // stl
 #include <stack>
@@ -38,7 +39,6 @@ namespace model
         bool inlineNodes = false;
         bool fuseLinearFunctionNodes = false;
         bool profile = false;
-
         emitters::CompilerParameters compilerSettings;
     };
 

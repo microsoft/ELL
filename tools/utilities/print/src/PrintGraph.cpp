@@ -57,8 +57,8 @@ void PrintGraph(const model::Model& model, std::ostream& out)
                 const model::Node* upstream = *ptr;
                 if (upstream != nullptr)
                 {
-                    DgmlNode& upstreamNode = graph.GetOrCreateNode(to_string(upstream->GetId()), upstream->GetRuntimeTypeName());
-                    graph.GetOrCreateLink(upstreamNode, childNode, "dependson");
+                    DgmlNode& nextNode = graph.GetOrCreateNode(to_string(upstream->GetId()), upstream->GetRuntimeTypeName());
+                    graph.GetOrCreateLink(childNode, nextNode, "");
                 }
             }
         }

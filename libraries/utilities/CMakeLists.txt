@@ -35,6 +35,7 @@ set (include include/AbstractInvoker.h
              include/ConformingVector.h
              include/CStringParser.h
              include/Debug.h
+			 include/DgmlGraph.h
              include/Exception.h
              include/Files.h
              include/Format.h

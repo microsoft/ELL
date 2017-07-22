@@ -173,6 +173,8 @@ namespace model
         /// <summary> Reset the performance counters for all the node types to zero. </summary>
         void ResetNodeTypeProfilingInfo();
 
+        void FinishJitting() const;
+
     protected:
         virtual void SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) const override;
         virtual void SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const override;
@@ -211,6 +213,7 @@ namespace model
         mutable std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
 
         // Only one of the entries in each of these tuples is active, depending on the input and output types of the map
+        mutable bool _computeFunctionDefined;
         mutable std::tuple<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<int64_t>, ComputeFunction<float>, ComputeFunction<double>> _computeInputFunction;
         mutable std::tuple<utilities::ConformingVector<bool>, utilities::ConformingVector<int>, utilities::ConformingVector<int64_t>, utilities::ConformingVector<float>, utilities::ConformingVector<double>> _cachedOutput;
     };

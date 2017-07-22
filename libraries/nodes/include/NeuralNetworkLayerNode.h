@@ -54,6 +54,8 @@ namespace nodes
         /// <summary> Gets information about the output memory layout </summary>
         virtual PortMemoryLayout& GetOutputMemoryLayout() = 0;
 
+        size_t GetOutputSize() const { return _output.Size(); }
+
     protected:
         NeuralNetworkLayerNodeBase();
         NeuralNetworkLayerNodeBase(const model::PortElements<ValueType>& input, size_t outputSize);

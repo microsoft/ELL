@@ -140,14 +140,16 @@ namespace model
         /// <param name="os"> The stream to write data to. </param>
         void Print(std::ostream& os) const;
 
+        /// <summary> Computes the output of this node and stores it in the output ports </summary>
+        virtual void Compute() const = 0;
+
     protected:
         Node(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(ModelTransformer& transformer) const;
 
-        /// <summary> Computes the output of this node and stores it in the output ports </summary>
-        virtual void Compute() const = 0;
+
         virtual bool HasState() const;
 
         void AddInputPort(InputPortBase* input);

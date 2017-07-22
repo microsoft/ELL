@@ -69,6 +69,12 @@ namespace emitters
         /// <returns> The function address. </returns>
         uint64_t ResolveFunctionAddress(const std::string& name);
 
+        /// <summary> Set the address of a named function. </summary>
+        ///
+        /// <param name="func"> The function being defined. </param>
+        /// <param name="address"> The address of the function being defined. </param>
+        void DefineFunction(llvm::Function* func, uint64_t address);
+
         /// <summary>
         /// Return a main function that takes no arguments - if one exists. Returns nullptr if not found.
         /// </summary>

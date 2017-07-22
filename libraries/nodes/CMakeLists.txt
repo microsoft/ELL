@@ -14,6 +14,7 @@ set (include include/AccumulatorNode.h
              include/BroadcastFunctionNode.h
              include/ConstantNode.h
              include/ConvolutionalLayerNode.h
+             include/DebugSinkNode.h
              include/DelayNode.h
              include/DemultiplexerNode.h
              include/DotProductNode.h
@@ -72,6 +73,7 @@ set (tcc tcc/AccumulatorNode.tcc
          tcc/BinaryPredicateNode.tcc
          tcc/BroadcastFunctionNode.tcc
          tcc/ConstantNode.tcc
+         tcc/DebugSinkNode.tcc
          tcc/DelayNode.tcc
          tcc/DemultiplexerNode.tcc
          tcc/DotProductNode.tcc

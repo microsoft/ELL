@@ -15,6 +15,7 @@
 #include <ios>
 #include <locale>
 #include <memory>
+#include <sys/stat.h>
 
 namespace ell
 {
@@ -76,6 +77,27 @@ namespace utilities
         return false;
     }
 
+    bool FileExists(std::string filepath)
+    {
+        struct stat buf;
+        if (stat(filepath.c_str(), &buf) != -1) 
+        {
+            return (buf.st_mode & S_IFDIR) == 0;
+        }
+        return false;
+    }
+
+    bool DirectoryExists(std::string path)
+    {
+        struct stat buf;
+        if (stat(path.c_str(), &buf) != -1) 
+        {
+            return (buf.st_mode & S_IFDIR) == S_IFDIR;
+        }
+        return false;
+    }
+
+
     std::string GetFileExtension(std::string filepath, bool toLowercase)
     {
         auto dotPos = filepath.find_last_of('.');
@@ -111,17 +133,32 @@ namespace utilities
             return ext;
         }
     }
-
+    
     std::string GetFileName(std::string filepath)
     {
         // PORTABILITY should be replaced by C++17 filesystem when available
         return filepath.substr(filepath.find_last_of("/\\") + 1);
     }
 
+    std::string GetDirectoryPath(std::string filepath)
+    {
+        size_t pos = filepath.find_last_of("/\\");
+        if (pos == std::string::npos)
+        {
+            return "";
+        }
+        auto path = filepath.substr(0, pos);
+        return path;
+    }
+
     std::string JoinPaths(std::string path1, std::string path2)
     {
         // PORTABILITY should be replaced by C++17 filesystem when available
+#ifdef WIN32
+        return path1 + "\\" + path2;
+#else
         return path1 + "/" + path2;
+#endif
     }
 }
 }

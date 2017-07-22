@@ -30,19 +30,30 @@ namespace utilities
     /// <returns> The stream. </returns>
     std::ofstream OpenOfstream(std::string filepath);
 
-    /// <summary> Returns true if the file exists and can be for reading. </summary>
+    /// <summary> Returns true if the file exists and can be opened for reading. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> true if the file exists and is readable. </returns>
     bool IsFileReadable(std::string filepath);
 
-    /// <summary> Returns true if the file exists and can be for writing. </summary>
+    /// <summary> Returns true if the file exists and can be opened for writing. </summary>
     ///
     /// <param name="filepath"> The path. </param>
     ///
     /// <returns> true if the file exists and is readable. </returns>
     bool IsFileWritable(std::string filepath);
+
+
+    /// <summary> Use this method to check if file exists. This might be necessary instead of
+    /// IsFileReadable in cases where you know file is a locked executable and you just want
+    /// to know if it exists and you don't intend to open it.
+    /// </summary>
+    ///
+    /// <param name="filepath"> The path. </param>
+    ///
+    /// <returns> true if the file exists. </returns>
+    bool FileExists(std::string filepath);
 
     /// <summary> Returns the file extension, optionally converted to lower-case. </summary>
     ///
@@ -64,6 +75,20 @@ namespace utilities
     ///
     /// <returns> The filename. </returns>
     std::string GetFileName(std::string filepath);
+
+    /// <summary> Returns the directory name minus the file name from a path. </summary>
+    ///
+    /// <param name="filepath"> The path. </param>
+    ///
+    /// <returns> The path to the file. </returns>
+    std::string GetDirectoryPath(std::string filepath);
+
+    /// <summary> Returns true if the given directory exists. </summary>
+    ///
+    /// <param name="path"> The path. </param>
+    ///
+    /// <returns> The path to the directory. </returns>
+    bool DirectoryExists(std::string path);
 
     /// <summary> Returns the filename from a path. </summary>
     ///

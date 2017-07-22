@@ -194,6 +194,33 @@ namespace model
         return { outputNodes.begin(), outputNodes.end() };
     }
 
+    std::vector<const Node*> DynamicMap::GetDebugSinkNodes()
+    {
+        // gather SinkNodes
+        std::unordered_set<const Node*> sinkNodes;
+        _model.Visit([&](const Node& node) {
+            if (node.GetRuntimeTypeName().find("DebugSinkNode") != std::string::npos) {
+                auto parents = node.GetParentNodes();
+                for (auto ptr = parents.begin(), end = parents.end(); ptr != end; ptr++)
+                {
+                    const Node* parent = *ptr;
+                    auto dependents = parent->GetDependentNodes();
+                    for (auto ptr2 = dependents.begin(), end2 = dependents.end(); ptr2 != end2; ptr2++)
+                    {
+                        const Node* dep = *ptr2;
+                        if (dep != &node) {
+                            // then we want to keep this DebugSinkNode, it should not get pruned.
+                            sinkNodes.insert(&node);
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+        return{ sinkNodes.begin(), sinkNodes.end() };
+    }
+
+
     void DynamicMap::FixTransformedIO(ModelTransformer& transformer)
     {
         for (auto& inputNode : _inputNodes)
@@ -229,6 +256,8 @@ namespace model
         ModelTransformer transformer;
 
         auto outputNodeVec = GetOutputNodes();
+        auto sinkNodes = GetDebugSinkNodes();
+        outputNodeVec.insert(outputNodeVec.end(), sinkNodes.begin(), sinkNodes.end());
         auto minimalModel = transformer.CopyModel(_model, outputNodeVec, context);
         FixTransformedIO(transformer);
         _model = std::move(minimalModel);

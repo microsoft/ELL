@@ -23,7 +23,7 @@ source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 
 # create executable in build\bin
-set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
+set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin) 
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 
 add_executable(${tool_name} ${src} ${include} ${tcc})
