@@ -1,7 +1,7 @@
 # Setup
 title:        Embedded Learning Library
 tagline:      The Embedded Learning Library (ELL) allows you to build and deploy machine-learned pipelines onto embedded platforms
-baseurl:      "/ell"
+baseurl:      "/ELL"
 
 # About/contact
 author:

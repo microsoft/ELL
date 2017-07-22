@@ -10,7 +10,7 @@ This project has been developed by a team of researchers at Microsoft Research. 
 A good place to start is the [tutorial](tutorials/vision/gettingStarted/README.md),
 which allows you to do image recognition on a Raspberry Pi with a web cam, disconnected from the cloud. The  software you deploy to the Pi will recognize a variety of common objects on camera and print a label for the recognized object on the Pi's screen. 
 
-![coffee mug](/ell/images/coffeemug.jpg)
+![coffee mug](/ELL/images/coffeemug.jpg)
 
 ## License
   
@@ -22,9 +22,9 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 ## Build and Installation Instructions
 
-* On [Windows](/ell/install-windows)
-* On [Ubuntu Linux](/ell/install-ubuntu)
-* On [Mac OS X](/ell/install-mac)
+* On [Windows](/ELL/install-windows)
+* On [Ubuntu Linux](/ELL/install-ubuntu)
+* On [Mac OS X](/ELL/install-mac)
 
 ## Additional Documentation
 

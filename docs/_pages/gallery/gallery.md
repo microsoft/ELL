@@ -6,4 +6,4 @@ permalink: /gallery/
 
 This is a gallery.
 
-[binary](/ell/gallery/binary)
+[binary](/ELL/gallery/binary)
