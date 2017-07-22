@@ -7,7 +7,7 @@ The Embedded Learning Library (ELL) allows you to build and deploy machine-learn
 
 This project has been developed by a team of researchers at Microsoft Research. It's a work in progress, and we expect it to change rapidly, including breaking API changes. Despite this code churn, we welcome you to try it and give us feedback! 
 
-A good place to start is the [tutorial](tutorials/vision/gettingStarted/README.md),
+A good place to start is the [tutorial](https://github.com/Microsoft/ELL/blob/master/tutorials/vision/gettingStarted/README.md),
 which allows you to do image recognition on a Raspberry Pi with a web cam, disconnected from the cloud. The  software you deploy to the Pi will recognize a variety of common objects on camera and print a label for the recognized object on the Pi's screen. 
 
 ![coffee mug](/ELL/images/coffeemug.jpg)
