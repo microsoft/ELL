@@ -336,11 +336,10 @@ namespace math
 
         while (data < end)
         {
-            *data = generator();
+            *data = static_cast<ElementType>(generator());
             data += _increment;
         }
     }
-
 
     template <typename ElementType, VectorOrientation orientation>
     template <typename TransformationType>

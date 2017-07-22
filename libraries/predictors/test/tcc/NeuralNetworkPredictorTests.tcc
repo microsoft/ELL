@@ -132,7 +132,7 @@ void BatchNormalizationLayerTest()
     VectorType mean({ 5, 10 });
     VectorType variance({ 4.0, 16.0 });
 
-    BatchNormalizationLayer<ElementType> bnLayer(bnParameters, mean, variance, 1e-6, EpsilonSummand::SqrtVariance);
+    BatchNormalizationLayer<ElementType> bnLayer(bnParameters, mean, variance, static_cast<ElementType>(1e-6), EpsilonSummand::SqrtVariance);
     bnLayer.Compute();
     auto output1 = bnLayer.GetOutput();
     testing::ProcessTest("Testing BatchNormailzationLayer, values", Equals(output1(1, 1, 0), 3.0) && Equals(output1(1, 2, 0), 1.0) && Equals(output1(2, 1, 1), 5.0) && Equals(output1(2, 2, 1), 10.0));

@@ -278,16 +278,16 @@ namespace neural
 
         archiver["receptiveField"] << _convolutionalParameters.receptiveField;
         archiver["stride"] << _convolutionalParameters.stride;
-        archiver["method"] << static_cast<int>(_convolutionalParameters.receptiveField);
+        archiver["method"] << static_cast<int>(_convolutionalParameters.method);
 
         // Compute binarized weights
-        int numRows = _realValuedWeightsMatrix.NumRows();
-        int numCols = _realValuedWeightsMatrix.NumColumns();
+        size_t numRows = _realValuedWeightsMatrix.NumRows();
+        size_t numCols = _realValuedWeightsMatrix.NumColumns();
         std::vector<std::vector<uint64_t>> binarizedWeights(numRows);
-        for(int rowIndex = 0; rowIndex < numRows; ++rowIndex)
+        for(size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
         {
             binarizedWeights[rowIndex].resize(binarizedFilterVolumeSize, 0);
-            for(int colIndex = 0; colIndex < numCols; ++colIndex)
+            for(size_t colIndex = 0; colIndex < numCols; ++colIndex)
             {
                 size_t block = colIndex / _binaryElementSize;
                 int bit = colIndex % _binaryElementSize;
