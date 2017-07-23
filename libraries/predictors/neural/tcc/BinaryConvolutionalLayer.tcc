@@ -20,7 +20,6 @@ namespace predictors
 {
 namespace neural
 {
-
     template <typename ElementType>
     BinaryConvolutionalLayer<ElementType>::BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ConstTensorReferenceType& weights)
         : Layer<ElementType>(layerParameters), _convolutionalParameters(convolutionalParameters), _realValuedWeightsMatrix(0, 0), _realValuedShapedInput(0, 0), _realValuedOutputMatrix(0, 0)
@@ -70,15 +69,21 @@ namespace neural
                     filterWeights[columnOffset + i] = value;
                 }
             }
-            
-            // set the mean
+
             ElementType mean = sum / static_cast<ElementType>(filterWeights.size());
             _filterMeans[startRow] = mean;
 
-            // Set the weights matrix based on the weights value and mean
+            // initialize the mean according to the binary weights scale
+            ElementType scale(1.0); 
+            if (_convolutionalParameters.weightsScale == BinaryWeightsScale::mean)
+            {
+                scale = mean;
+            }
+
             for (size_t i = 0; i < filterWeights.size(); ++i)
             {
-                _realValuedWeightsMatrix(startRow, i) = (filterWeights[i] > 0) ? mean : -mean;
+                // Set the weights matrix based on the weights value and mean
+                _realValuedWeightsMatrix(startRow, i) = (filterWeights[i] > 0) ? scale : -scale;
             }
 
             // Binarize and pack the weights
@@ -157,7 +162,7 @@ namespace neural
                 size_t shapedInputOffset = i * NumOutputColumnsMinusPadding();
                 for (size_t j = 0; j < output.NumColumns(); ++j)
                 {
-                    for (int k = 0; k < output.NumChannels(); ++k)
+                    for (size_t k = 0; k < output.NumChannels(); ++k)
                     {
                         ElementType sum = 0;
 
@@ -171,13 +176,20 @@ namespace neural
                             uint64_t xor_product = fValue ^ iValue;
                             sum += (2.0f * POPCOUNT64(xor_product) - _binaryElementSize);
                         }
+
+                        ElementType scale(1.0); 
+                        if (_convolutionalParameters.weightsScale == BinaryWeightsScale::mean)
+                        {
+                            scale = _filterMeans[k];
+                        }
+
                         if (filterDrop == 0)
                         {
-                            output(i, j, k) = (-_filterMeans[k] * sum);
+                            output(i, j, k) = (-scale * sum);
                         }
                         else
                         {
-                            output(i, j, k) = (-_filterMeans[k] * (sum + filterAdjust));
+                            output(i, j, k) = (-scale * (sum + filterAdjust));
                         }
                     }
                 }
@@ -238,16 +250,20 @@ namespace neural
     template <typename ElementType>
     void BinaryConvolutionalLayer<ElementType>::ReceptiveFieldToColumns(ConstTensorReferenceType input, MatrixType& shapedInput)
     {
-        size_t fieldVolumeSize = _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels();
-        size_t outIndex = 0;
-        size_t convolutionalHeight = NumOutputRowsMinusPadding();
-        size_t convolutionalWidth = NumOutputColumnsMinusPadding();
+        const size_t fieldVolumeSize = _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels();
+        const size_t convolutionalHeight = NumOutputRowsMinusPadding();
+        const size_t convolutionalWidth = NumOutputColumnsMinusPadding();
+
+        // Used for determining the indices of padded inputs (if any)
+        const size_t inputPaddingSize = _layerParameters.inputPaddingParameters.paddingSize;
+        const size_t inputRowPaddingRightIndex = _layerParameters.input.NumRows() - 2 * inputPaddingSize;
+        const size_t inputColumnPaddingRightIndex = _layerParameters.input.NumColumns() - 2 * inputPaddingSize;
 
         for (size_t f = 0; f < fieldVolumeSize; ++f)
         {
-            size_t fieldDepth = f % _layerParameters.input.NumChannels();
-            size_t fieldColumn = (f / _layerParameters.input.NumChannels()) % _convolutionalParameters.receptiveField;
-            size_t fieldRow = (f / _layerParameters.input.NumChannels()) / _convolutionalParameters.receptiveField;
+            const size_t fieldDepth = f % _layerParameters.input.NumChannels();
+            const size_t fieldColumn = (f / _layerParameters.input.NumChannels()) % _convolutionalParameters.receptiveField;
+            const size_t fieldRow = (f / _layerParameters.input.NumChannels()) / _convolutionalParameters.receptiveField;
 
             size_t rowOffset = 0;
             for (size_t h = 0; h < convolutionalHeight; ++h)
@@ -255,11 +271,23 @@ namespace neural
                 size_t colOffset = 0;
                 for (size_t w = 0; w < convolutionalWidth; ++w)
                 {
-                    size_t input_row = rowOffset + fieldRow;
-                    size_t input_col = colOffset + fieldColumn;
+                    size_t inputRow = rowOffset + fieldRow;
+                    size_t inputCol = colOffset + fieldColumn;
 
-                    ElementType value = input(input_row, input_col, fieldDepth);
-                    shapedInput(f, h * convolutionalWidth + w) = (value > 0) ? 1.0f : -1.0f;
+                    ElementType value = input(inputRow, inputCol, fieldDepth);
+
+                    // Don't binarize zero-padded input when weights are not scaled
+                    if (_convolutionalParameters.weightsScale == BinaryWeightsScale::none &&
+                        inputPaddingSize > 0 && value == static_cast<ElementType>(0.0) &&
+                        (inputRow < inputPaddingSize || inputRow >= inputRowPaddingRightIndex ||
+                         inputCol < inputPaddingSize || inputCol >= inputColumnPaddingRightIndex))
+                    {
+                        shapedInput(f, h * convolutionalWidth + w) = value;
+                    }
+                    else
+                    {
+                        shapedInput(f, h * convolutionalWidth + w) = (value > 0) ? 1.0f : -1.0f;
+                    }
 
                     colOffset += _convolutionalParameters.stride;
                 }
@@ -279,15 +307,16 @@ namespace neural
         archiver["receptiveField"] << _convolutionalParameters.receptiveField;
         archiver["stride"] << _convolutionalParameters.stride;
         archiver["method"] << static_cast<int>(_convolutionalParameters.method);
+        archiver["weightsScale"] << static_cast<int>(_convolutionalParameters.weightsScale);
 
         // Compute binarized weights
         size_t numRows = _realValuedWeightsMatrix.NumRows();
         size_t numCols = _realValuedWeightsMatrix.NumColumns();
         std::vector<std::vector<uint64_t>> binarizedWeights(numRows);
-        for(size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
+        for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
         {
             binarizedWeights[rowIndex].resize(binarizedFilterVolumeSize, 0);
-            for(size_t colIndex = 0; colIndex < numCols; ++colIndex)
+            for (size_t colIndex = 0; colIndex < numCols; ++colIndex)
             {
                 size_t block = colIndex / _binaryElementSize;
                 int bit = colIndex % _binaryElementSize;
@@ -319,6 +348,9 @@ namespace neural
         int method;
         archiver["method"] >> method;
         _convolutionalParameters.method = static_cast<BinaryConvolutionMethod>(method);
+        int weightsScale;
+        archiver["weightsScale"] >> weightsScale;
+        _convolutionalParameters.weightsScale = static_cast<BinaryWeightsScale>(weightsScale);
 
         size_t numVectors = 0;
         std::vector<uint64_t> temp;
@@ -346,20 +378,27 @@ namespace neural
         const auto filterWidth = _convolutionalParameters.receptiveField;
         const auto numWeightsColumns = filterWidth * filterWidth * _layerParameters.input.NumChannels();
         const size_t binarizedFilterVolumeSize = (numWeightsColumns - 1) / _binaryElementSize + 1;
-        
+
         _realValuedWeightsMatrix = { NumOutputChannels(), numWeightsColumns };
-        for(int rowIndex = 0; rowIndex < _binarizedWeights.size(); ++rowIndex)
+        for (int rowIndex = 0; rowIndex < _binarizedWeights.size(); ++rowIndex)
         {
             int colIndex = 0;
             assert(binarizedFilterVolumeSize == _binarizedWeights[rowIndex].size());
-            for(int blockIndex = 0; blockIndex < binarizedFilterVolumeSize; blockIndex++)
+            for (int blockIndex = 0; blockIndex < binarizedFilterVolumeSize; blockIndex++)
             {
                 const auto bits = _binarizedWeights[rowIndex][blockIndex];
                 const auto filterMean = _filterMeans[rowIndex];
-                for(int bitIndex = 0; bitIndex < _binaryElementSize && colIndex < numWeightsColumns; ++bitIndex, ++colIndex)
+
+                ElementType scale(1.0); 
+                if (_convolutionalParameters.weightsScale == BinaryWeightsScale::mean)
+                {
+                    scale = filterMean;
+                }
+                
+                for (int bitIndex = 0; bitIndex < _binaryElementSize && colIndex < numWeightsColumns; ++bitIndex, ++colIndex)
                 {
                     const auto bitVal = (bits >> bitIndex) & 0x01;
-                    _realValuedWeightsMatrix(rowIndex, colIndex) = bitVal == 0 ? -filterMean : filterMean;
+                    _realValuedWeightsMatrix(rowIndex, colIndex) = bitVal == 0 ? -scale : scale;
                 }
             }
         }

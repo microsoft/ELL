@@ -24,12 +24,12 @@ try:
     import ELL
     import ell_utilities
     import cntk_to_ell
-    from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
-    from cntk.ops import *
+    import lib.cntk_converters as cntk_converters
     from cntk.initializer import glorot_uniform, he_normal
-    from cntk import load_model
+    from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
     import cntk.layers.blocks
-    from cntk.logging.graph import *
+    from cntk.ops import *
+    from custom_functions import BinaryConvolution, CustomSign
     import getopt
     import os
     import configparser
@@ -74,7 +74,7 @@ class CntkLayersTestCase(unittest.TestCase):
         denseLayer.parameters[0].value = weightValues
 
         # create an ELL Tensor from the cntk weights, which re-orders the weights and produces an appropriately dimensioned tensor
-        weightTensor = cntk_to_ell.get_float_tensor_from_cntk_dense_weight_parameter(
+        weightTensor = cntk_converters.get_float_tensor_from_cntk_dense_weight_parameter(
             denseLayer.parameters[0])
 
         # Create the equivalent ELL predictor
@@ -88,10 +88,10 @@ class CntkLayersTestCase(unittest.TestCase):
 
         # Get the results for both
         inputValues = np.arange(24, dtype=np.float32).reshape(2, 3, 4)
-        orderedInputValues = cntk_to_ell.get_float_vector_from_cntk_array(
+        orderedInputValues = cntk_converters.get_float_vector_from_cntk_array(
             inputValues)
         cntkResults = cntkModel(inputValues)
-        orderedCntkResults = cntk_to_ell.get_float_vector_from_cntk_array(
+        orderedCntkResults = cntk_converters.get_float_vector_from_cntk_array(
             cntkResults)
         ellResults = predictor.Predict(orderedInputValues)
 
@@ -126,9 +126,9 @@ class CntkLayersTestCase(unittest.TestCase):
         # Get the results for both
         inputValues = np.arange(432, dtype=np.float32).reshape(3, 12, 12)
         cntkResults = cntkModel(inputValues)
-        orderedCntkResults = cntk_to_ell.get_float_vector_from_cntk_array(
+        orderedCntkResults = cntk_converters.get_float_vector_from_cntk_array(
             cntkResults)  # Note that cntk inserts an extra dimension of 1 in the front
-        orderedInputValues = cntk_to_ell.get_float_vector_from_cntk_array(
+        orderedInputValues = cntk_converters.get_float_vector_from_cntk_array(
             inputValues)
         ellResults = predictor.Predict(orderedInputValues)
 
@@ -157,7 +157,7 @@ class CntkLayersTestCase(unittest.TestCase):
         convolutionLayer.parameters[0].value = weightValues
 
         # create an ELL Tensor from the cntk weights, which re-orders the weights and produces an appropriately dimensioned tensor
-        weightTensor = cntk_to_ell.get_float_tensor_from_cntk_convolutional_weight_parameter(
+        weightTensor = cntk_converters.get_float_tensor_from_cntk_convolutional_weight_parameter(
             convolutionLayer.parameters[0])
 
         # Create the equivalent ELL predictor
@@ -175,9 +175,9 @@ class CntkLayersTestCase(unittest.TestCase):
         # Get the results for both
         inputValues = np.arange(24, dtype=np.float32).reshape(2, 3, 4)
         cntkResults = cntkModel(inputValues)
-        orderedCntkResults = cntk_to_ell.get_float_vector_from_cntk_array(
+        orderedCntkResults = cntk_converters.get_float_vector_from_cntk_array(
             cntkResults)
-        orderedInputValues = cntk_to_ell.get_float_vector_from_cntk_array(
+        orderedInputValues = cntk_converters.get_float_vector_from_cntk_array(
             inputValues)
         ellResults = predictor.Predict(orderedInputValues)
 
@@ -185,6 +185,58 @@ class CntkLayersTestCase(unittest.TestCase):
         np.testing.assert_array_equal(
             orderedCntkResults, ellResults, 'results for Convolution layer do not match!')
 
+        return
+
+    def test_binary_convolution_layer(self):
+        # Test a model with a single CNTK Binary Convolution layer against the equivalent ELL predictor
+        # This verifies that the import functions reshape and reorder values appropriately and
+        # that the equivalent ELL layer produces comparable output
+
+        # Create a test set of weights to use for both CNTK and ELL layers
+        # CNTK has these in filters, channels, rows, columns order
+        weightValues = np.linspace(-10, 10, num=5 * 2 *
+                                   3 * 3, dtype=np.float32).reshape(5, 2, 3, 3)
+
+        # create an ELL Tensor from the cntk weights, which re-orders the weights and produces an appropriately dimensioned tensor
+        weightTensor = cntk_converters.get_float_tensor_from_cntk_convolutional_weight_value_shape(
+            weightValues, weightValues.shape)
+
+        # Create a Binary Convolution CNTK layer with no bias, no activation, stride 1
+        x = input((2, 3, 4))  # Input order for CNTK is channels, rows, columns
+        cntkModel = CustomSign(x)
+
+        cntkModel = BinaryConvolution((3, 4), num_filters=5, channels=2, init=weightValues,
+                                      pad=True, bias=False, init_bias=0, activation=False)(cntkModel)
+
+        # Create the equivalent ELL predictor
+        layerParameters = ELL.LayerParameters(ELL.LayerShape(3 + 2, 4 + 2, 2),  # Input order for ELL is rows, columns, channels. Account for padding.
+                                              ELL.ZeroPadding(1),
+                                              ELL.LayerShape(3, 4, 5),
+                                              ELL.NoPadding())
+
+        # TODO: bitwise not yet functional for padded inputs
+        convolutionalParameters = ELL.BinaryConvolutionalParameters(
+            3, 1, ELL.BinaryConvolutionMethod.gemm, ELL.BinaryWeightsScale.none)
+
+        layer = ELL.FloatBinaryConvolutionalLayer(
+            layerParameters, convolutionalParameters, weightTensor)
+
+        predictor = ELL.FloatNeuralNetworkPredictor([layer])
+
+        # Get the results for both
+        inputValues = np.linspace(-50, 50, num=2 *
+                                  3 * 4, dtype=np.float32).reshape(2, 3, 4)
+        cntkResults = cntkModel(inputValues)
+        orderedCntkResults = cntk_converters.get_float_vector_from_cntk_array(
+            cntkResults)
+
+        orderedInputValues = cntk_converters.get_float_vector_from_cntk_array(
+            inputValues)
+        ellResults = predictor.Predict(orderedInputValues)
+
+        # Compare the results
+        np.testing.assert_array_equal(
+            orderedCntkResults, ellResults, 'results for Binary Convolution layer do not match!')
         return
 
     def test_batch_normalization_layer(self):
@@ -235,9 +287,9 @@ class CntkLayersTestCase(unittest.TestCase):
             -5, 5, num=16 * 10 * 10, dtype=np.float32).reshape(16, 10, 10)
         cntkResults = cntkModel(inputValues)
 
-        orderedCntkResults = cntk_to_ell.get_float_vector_from_cntk_array(
+        orderedCntkResults = cntk_converters.get_float_vector_from_cntk_array(
             cntkResults)  # Note that cntk inserts an extra dimension of 1 in the front
-        orderedInputValues = cntk_to_ell.get_float_vector_from_cntk_array(
+        orderedInputValues = cntk_converters.get_float_vector_from_cntk_array(
             inputValues)
         ellResults = predictor.Predict(orderedInputValues)
 

@@ -341,7 +341,7 @@ void ConvolutionalLayerTest()
 }
 
 template <typename ElementType>
-void BinaryConvolutionalLayerGemmTest()
+void BinaryConvolutionalLayerGemmTest(ell::predictors::neural::BinaryWeightsScale scale)
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
@@ -360,7 +360,7 @@ void BinaryConvolutionalLayerGemmTest()
     input(1, 2, 1) = 2;
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
     LayerParameters parameters{ input.GetReference(), MinusOnePadding(1), outputShape, NoPadding() };
-    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm, scale };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
@@ -387,7 +387,14 @@ void BinaryConvolutionalLayerGemmTest()
     BinaryConvolutionalLayer<ElementType> convolutionalLayer(parameters, convolutionalParams, weights);
     convolutionalLayer.Compute();
     auto output = convolutionalLayer.GetOutput();
-    testing::ProcessTest("Testing BinaryConvolutionalLayer (gemm), values", Equals(output(0, 0, 0), -20.5555553) && Equals(output(0, 0, 1), -9.66666603) && Equals(output(0, 1, 0), -20.5555553) && Equals(output(0, 1, 1), -9.66666603));
+    if (scale == ell::predictors::neural::BinaryWeightsScale::none)
+    {
+        testing::ProcessTest("Testing BinaryConvolutionalLayer (gemm) (no scaling), values", Equals(output(0, 0, 0), 4.0) && Equals(output(0, 0, 1), 4.0) && Equals(output(0, 1, 0), 4.0) && Equals(output(0, 1, 1), 4.0));
+    }
+    else
+    {
+        testing::ProcessTest("Testing BinaryConvolutionalLayer (gemm) (no scaling), values", Equals(output(0, 0, 0), -20.5555553) && Equals(output(0, 0, 1), -9.66666603) && Equals(output(0, 1, 0), -20.5555553) && Equals(output(0, 1, 1), -9.66666603));
+    }
 
     // Verify that we can archive and unarchive the layer
     // Put the layer in a network so we can archive it
@@ -411,11 +418,25 @@ void BinaryConvolutionalLayerGemmTest()
     unarchiver >> archivedNetwork;
 
     auto archivedOutput = neuralNetwork.Predict(DataVectorType{ 2, 1, 3, 2 });
-    testing::ProcessTest("Testing archived BinaryConvolutionalLayer (gemm), values", Equals(archivedOutput[0], -20.5555553) && Equals(archivedOutput[1], -9.66666603) && Equals(archivedOutput[2], -20.5555553) && Equals(archivedOutput[3], -9.66666603));
+    if (scale == ell::predictors::neural::BinaryWeightsScale::none)
+    {
+        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (gemm) (no scaling), values", Equals(archivedOutput[0], 4.0) && Equals(archivedOutput[1], 4.0) && Equals(archivedOutput[2], 4.0) && Equals(archivedOutput[3], 4.0));
+    }
+    else
+    {
+        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (gemm) (mean scaling), values", Equals(archivedOutput[0], -20.5555553) && Equals(archivedOutput[1], -9.66666603) && Equals(archivedOutput[2], -20.5555553) && Equals(archivedOutput[3], -9.66666603));
+    }
 }
 
 template <typename ElementType>
-void BinaryConvolutionalLayerBitwiseTest()
+void BinaryConvolutionalLayerGemmTest()
+{
+    BinaryConvolutionalLayerGemmTest<ElementType>(ell::predictors::neural::BinaryWeightsScale::mean);
+    BinaryConvolutionalLayerGemmTest<ElementType>(ell::predictors::neural::BinaryWeightsScale::none);
+}
+
+template <typename ElementType>
+void BinaryConvolutionalLayerBitwiseTest(ell::predictors::neural::BinaryWeightsScale scale)
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
@@ -434,7 +455,7 @@ void BinaryConvolutionalLayerBitwiseTest()
     input(1, 2, 1) = 2;
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
     LayerParameters parameters{ input.GetReference(), MinusOnePadding(1), outputShape, NoPadding() };
-    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm, scale };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
@@ -470,7 +491,14 @@ void BinaryConvolutionalLayerBitwiseTest()
     BinaryConvolutionalLayer<ElementType> convolutionalLayer(parameters, convolutionalParams, weights);
     convolutionalLayer.Compute();
     auto output = convolutionalLayer.GetOutput();
-    testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise), values", Equals(output(0, 0, 0), -20.5555553) && Equals(output(0, 0, 1), -9.66666603) && Equals(output(0, 1, 0), -20.5555553) && Equals(output(0, 1, 1), -9.66666603));
+    if (scale == ell::predictors::neural::BinaryWeightsScale::none)
+    {
+        testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise) (mean scaling), values", Equals(output(0, 0, 0), -10) && Equals(output(0, 0, 1), -6.0) && Equals(output(0, 1, 0), -10.0) && Equals(output(0, 1, 1), -6.0));
+    }
+    else
+    {
+        testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise) (mean scaling), values", Equals(output(0, 0, 0), -20.5555553) && Equals(output(0, 0, 1), -9.66666603) && Equals(output(0, 1, 0), -20.5555553) && Equals(output(0, 1, 1), -9.66666603));
+    }
 
     // Put the layer in a network so we can archive it
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
@@ -493,7 +521,21 @@ void BinaryConvolutionalLayerBitwiseTest()
     unarchiver >> archivedNetwork;
 
     auto archivedOutput = neuralNetwork.Predict(DataVectorType{ 2, 1, 3, 2 });
-    testing::ProcessTest("Testing archived BinaryConvolutionalLayer (bitwise), values", Equals(archivedOutput[0], -20.5555553) && Equals(archivedOutput[1], -9.66666603) && Equals(archivedOutput[2], -20.5555553) && Equals(archivedOutput[3], -9.66666603));
+    if (scale == ell::predictors::neural::BinaryWeightsScale::none)
+    {
+        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (bitwise) (no scaling), values", Equals(archivedOutput[0], -10.0) && Equals(archivedOutput[1], -6.0) && Equals(archivedOutput[2], -10.0) && Equals(archivedOutput[3], -6.0));
+    }
+    else
+    {
+        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (bitwise) (mean scaling), values", Equals(archivedOutput[0], -20.5555553) && Equals(archivedOutput[1], -9.66666603) && Equals(archivedOutput[2], -20.5555553) && Equals(archivedOutput[3], -9.66666603));
+    }
+}
+
+template <typename ElementType>
+void BinaryConvolutionalLayerBitwiseTest()
+{
+    BinaryConvolutionalLayerBitwiseTest<ElementType>(ell::predictors::neural::BinaryWeightsScale::mean);
+    BinaryConvolutionalLayerBitwiseTest<ElementType>(ell::predictors::neural::BinaryWeightsScale::none);
 }
 
 template <typename ElementType>
@@ -693,7 +735,7 @@ void BinaryConvolutionalArchiveTest()
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
     LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, 1 }, { 3, 3, 8 }, NoPadding() };
-    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise, BinaryWeightsScale::mean };
     TensorType convWeights1(8 * 3, 3, 3);
     FillTensor(convWeights1);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BinaryConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));

@@ -456,7 +456,7 @@ void TestBinaryConvolutionalLayerNode()
     input(1, 2, 1) = 2;
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
     LayerParameters parameters{ input, MinusOnePadding(1), outputShape, NoPadding() };
-    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm, BinaryWeightsScale::mean };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
     std::vector<ElementType> weightsVector{   // RowMajor then depth order

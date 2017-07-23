@@ -295,7 +295,7 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
         layers.append(ELL.FloatConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
     else:
         # Create the ELL binary convolutional layer
-        convolutionalParameters = ELL.BinaryConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ELL.BinaryConvolutionMethod.bitwise)
+        convolutionalParameters = ELL.BinaryConvolutionalParameters(int(layer["size"]), int(layer["stride"]), ELL.BinaryConvolutionMethod.bitwise, ELL.BinaryWeightsScale.mean)
         layers.append(ELL.FloatBinaryConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
 
     # Override global ordering with layer-specific ordering

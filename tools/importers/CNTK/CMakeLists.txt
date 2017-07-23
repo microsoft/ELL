@@ -9,7 +9,10 @@ if(${PYTHONLIBS_FOUND})
 
     set(module_name "cntk_importer")
 
-    set(importer_src cntk_to_ell.py custom_functions.py)
+    set(importer_src cntk_to_ell.py
+        lib/cntk_converters.py
+        lib/cntk_layers.py
+        custom_functions.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
 

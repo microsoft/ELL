@@ -32,10 +32,11 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
         size: size of the padding on both sides of row and column dimensions
 %}
 %feature("docstring") BinaryConvolutionalParameters::BinaryConvolutionalParameters %{
-    BinaryConvolutionalParameters(field, stride, binaryConvolutionMethod)
+    BinaryConvolutionalParameters(field, stride, binaryConvolutionMethod, binaryWeightsScale)
         field: size of the receptive field in row and column dimensions
         stride: size of stride in row and column dimensions
         binaryConvolutionMethod: one of BinaryConvolutionMethod values
+        binaryWeightsScale: scale to apply to the binarized weights
 %}
 %feature("docstring") ConvolutionalParameters::ConvolutionalParameters %{
     ConvolutionalParameters(field, stride, convolutionMethod, filterBatchSize)

@@ -1157,7 +1157,7 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
     input(0, 1, 1) = 2;
     Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
     LayerParameters parameters{ inputWithPadding, MinusOnePadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise, BinaryWeightsScale::mean };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
     // Weights size: f x k x k x d = 2*3*3*2 = 36
@@ -1229,7 +1229,7 @@ void TestBinaryConvolutionalLayerNode2(size_t inputPaddingSize, size_t outputPad
     Shape outputShape = { numRows + 2 * outputPaddingSize, numCols + 2 * outputPaddingSize, numFilters };
 
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise, BinaryWeightsScale::mean };
     TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, input.NumChannels());
     weights.Fill(1.0);
     for (size_t rowIndex = 0; rowIndex < convolutionalParams.receptiveField * numFilters; ++rowIndex)

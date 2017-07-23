@@ -329,3 +329,54 @@ def CustomMultibitKernel(input, bit_map, mean_bits=None):
             bit_map = np.asarray(bit_map)
     assert (bit_map.shape == input.shape)
     return user_function(MultibitKernel(input, bit_map))
+
+
+def BinaryConvolution(filter_shape,
+                      num_filters=1,
+                      channels=1,
+                      init=glorot_uniform(),
+                      pad=False,
+                      strides=1,
+                      bit_map=None,
+                      bias=True,
+                      init_bias=0,
+                      activation=False,
+                      init_activation=glorot_uniform(),
+                      op_name='BinaryConvolution',
+                      name=''):
+    """ Instantiates a binary convolution layer
+        arguments:
+            filter_shape: tuple indicating filter size
+            num_filters: number of filters to use 
+            channels: number of incoming channels
+            init: initialization to use for weights
+            pad: set to True apply padding on rows and columns
+            strides: number of strides
+            bit_map: if a tensor, the bit_map used for binarization, if an int, the uniform bit_width to binarize to
+            bias: set to True to apply bias
+            init_bias: initialization to use for bias
+            activation: set to True to apply activation
+            init_activation: initialization to use for activation
+            op_name: operation name
+            name: name of the function instance in the network
+    """
+    kernel_shape = (num_filters, channels) + filter_shape
+    W = parameter(shape=kernel_shape, init=init, name="W")
+    W = CustomSign(W)
+    if bit_map:
+        W = CustomMultibit(W, bit_map)
+
+    bias_shape = (num_filters, 1, 1)
+    b = parameter(shape=bias_shape, init=init_bias, name="b")
+
+    def convolve(x):
+        r = convolution(W, x, auto_padding=[
+                        False, pad, pad], strides=[strides])
+        if bias:
+            r = r + b
+        if activation:
+            # apply learnable param relu
+            P = parameter(shape=r.shape, init=init_activation, name="prelu")
+            r = param_relu(P, r)
+        return r
+    return convolve

@@ -19,14 +19,22 @@ namespace predictors
 {
 namespace neural
 {
-
     /// <summary> The method for performing binary convolutions. </summary>
     enum class BinaryConvolutionMethod : int
     {
-        /// <summary> Perform the binary convolution as a real-valued GEMM operation (e.g. values are -1.0 and 1.0). </summary>
+        /// <summary> Perform the binary convolution as a real-valued GEMM operation (e.g. values are -mean and mean). </summary>
         gemm = 0,
         /// <summary> Perform binary convolution as bitwise operations. </summary>
-        bitwise = 1
+        bitwise = 1,
+    };
+
+    /// <summary> The scale to apply to the binarized weights. </summary>
+    enum class BinaryWeightsScale : int
+    {
+        /// <summary> Perform no scaling of the binarized weights. </summary>
+        none = 0,
+        /// <summary> Scale the binarized weights by their mean. </summary>
+        mean = 1,
     };
 
     /// <summary> Specifies the hyper parameters of the convolutional layer. </summary>
@@ -40,6 +48,9 @@ namespace neural
 
         /// <summary> Method for doing convolution. </summary>
         BinaryConvolutionMethod method;
+
+        /// <summary The scaling to apply to the binarized weights </summary>
+        BinaryWeightsScale weightsScale;
     };
 
     /// <summary> A layer in a neural network that implements a binarized convolutional layer, where operations will occur

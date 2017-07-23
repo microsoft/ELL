@@ -50,9 +50,9 @@ namespace neural
 
     %extend BinaryConvolutionalParameters
     {  
-        BinaryConvolutionalParameters(size_t receptiveField, size_t stride, BinaryConvolutionMethod binaryConvolutionMethod)
+        BinaryConvolutionalParameters(size_t receptiveField, size_t stride, BinaryConvolutionMethod binaryConvolutionMethod, BinaryWeightsScale weightScale)
         {
-            return new ell::predictors::neural::BinaryConvolutionalParameters{receptiveField, stride, binaryConvolutionMethod};
+            return new ell::predictors::neural::BinaryConvolutionalParameters{receptiveField, stride, binaryConvolutionMethod, weightScale};
         }
     };
 
@@ -152,6 +152,15 @@ class BinaryConvolutionMethod:
 # Remove flat defines so callers only see the class above
 del BinaryConvolutionMethod_gemm
 del BinaryConvolutionMethod_bitwise
+
+# Python friendly class for BinaryWeightsScale
+class BinaryWeightsScale:
+    none = BinaryWeightsScale_none
+    mean = BinaryWeightsScale_mean
+
+# Remove flat defines so callers only see the class above
+del BinaryWeightsScale_none
+del BinaryWeightsScale_mean
 
 # Python friendly class for ConvolutionMethod
 class ConvolutionMethod:

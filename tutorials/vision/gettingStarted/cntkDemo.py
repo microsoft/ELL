@@ -30,7 +30,7 @@ def main():
     # Initialize image source
     helper.init_image_source()
 
-    last_prediction = ""
+    lastPrediction = ""
 
     while (not helper.done()):
         # Grab next frame
