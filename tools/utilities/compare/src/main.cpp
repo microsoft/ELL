@@ -48,6 +48,11 @@ int main(int argc, char* argv[])
 
         {
             std::ofstream reportStream(reportFileName, std::ios::out);
+            reportStream << "# Comparison Results" << std::endl;
+            reportStream << "**model**: " << compareArguments.inputMapFile << std::endl;
+            reportStream << std::endl;
+            reportStream << "**image**: " << compareArguments.inputTestFile << std::endl;
+            reportStream << std::endl;
             comparison.WriteReport(reportStream);
         }
         // output annotated graph showing where differences occurred in the model between compiled and reference implementation.

@@ -38,10 +38,9 @@ void ModelComparison::SetupReferenceMap(model::DynamicMap& map)
     _addingReference = true;
     // keep a copy of the uncompiled map so we can run the reference implementation later.
     _referenceMap = map;
-    _referenceMap.Prune();
 
-    //std::cout << "========== refining reference map ============================" << std::endl;
-    // now do the same thing that compiler.Compile does when debug = true.
+    // refine 1 level deep to get the layer nodes so we can inject the DebugSinkNodes between each layer of the neural net.
+    // this causes AddDebugOutputNode to be called where we save the some information about each DebugSinkNodes created.
     _referenceMap.Refine(1);
     model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() ? model::NodeAction::compile : model::NodeAction::refine; } };
     _referenceMap.Transform(DebugTransformer, context);
@@ -63,7 +62,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
     settings.profile = false;
     settings.compilerSettings.targetDevice.deviceName = "host";
 
-    // refine 1 level deep to get the layer nodes so we can inject the DebugSinkNodes between each layer of the neural net.
+    // now repeat the refine step again, this time when AddDebugOutputNode is called we save the compiled Node information.
     model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() ? model::NodeAction::compile : model::NodeAction::refine; } };
     reference.Refine(context, 1);
     reference.Transform(DebugTransformer, context);
@@ -129,6 +128,8 @@ void ModelComparison::SaveOutput(std::string name, std::vector<float> reference,
     }
 
     std::ofstream data(fullPath + fileSafeId + ".csv");
+    data << "reference,compiled" << std::endl;
+        
     for (size_t i = 0, length = (size_t)fmin(reference.size(), compiled.size()); i < length; i++)
     {
         data << reference[i] << "," << compiled[i] << std::endl;
@@ -142,7 +143,7 @@ size_t ModelComparison::GetOutputSize(const std::string& id)
 
 void ModelComparison::WriteReport(std::ostream& outputStream)
 {
-    std::cout << "comparing..." << std::endl;
+    std::cout << "writing report..." << std::endl;
     WriteRow(outputStream, "", "Overall", _outputReference, _outputCompiled, nullptr);
 
     for (auto ptr = _layers.begin(), end = _layers.end(); ptr != end; ptr++)
@@ -192,17 +193,18 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
     VectorStats refStats(reference);
     VectorStats compiledStats(compiled);
     float diff = VectorStats::Diff(reference, compiled);
-    if (!_hasMinMax) 
-    {
-        _minError = _maxError = diff;
-        _hasMinMax = true;
+    if (c != nullptr) {
+        if (!_hasMinMax)
+        {
+            _minError = _maxError = diff;
+            _hasMinMax = true;
+        }
+        else
+        {
+            _minError = fmin(_minError, diff);
+            _maxError = fmax(_maxError, diff);
+        }
     }
-    else
-    {
-        _minError = fmin(_minError, diff);
-        _maxError = fmax(_maxError, diff);
-    }
-
     outputStream << "````" << std::endl;
     if (c != nullptr)
     {
@@ -229,13 +231,23 @@ void ModelComparison::AddStyles()
 {
     /*
     // show a red gradient based on how much error was found.
-    <Style TargetType="Node" GroupLabel="Error" ValueLabel="Gradient">
-      <Condition Expression="Error &gt; 0" />
-      <Setter Property="Background" Expression="Color.FromRgb(180 * Math.Max(1, (80 - Coverage) / 30), 180, 0)" />
+    <Style TargetType='Node' GroupLabel='Error' ValueLabel='Gradient'>
+        <Condition Expression='Error &gt; 0'/>
+        <Setter Property='Background' Expression='Color.FromRgb(55 + 200 * ( Error + min) / range, 0, 0)'/>
     </Style>
     */
-    
-    double range = _maxError - _minError;
+    double min = _minError;
+    double max = _maxError;
+    double range = max - min;
+    std::string expr = "Error";
+    if (range > 2550)
+    {
+        // take the log of the range 
+        min = log(1 + min);
+        max = log(1 + max);
+        range = max - min;
+        expr = "Math.Log(Error)";
+    }
 
     DgmlProperty p;
     p.Id = "Error";
@@ -251,7 +263,7 @@ void ModelComparison::AddStyles()
     es.Condition.Expression = "Error > 0";
     DgmlStyleSetter red;
     red.Property = "Background";
-    red.Expression = "Color.FromRgb(55 + 200 * ( Error + " + std::to_string(_minError) + ") / " + std::to_string(range) + ", 0, 0)";
+    red.Expression = "Color.FromRgb(55 + 200 * (" + expr + " + " + std::to_string(min) + ") / " + std::to_string(range) + ", 0, 0)";
     es.Setters.push_back(red);
 
     // add nice styles to show the errors.
