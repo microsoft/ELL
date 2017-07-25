@@ -90,6 +90,8 @@ namespace nodes
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
 
+        virtual bool HasState() const override { return true; } // stored state: input layout, output shape, conv params
+
     private:
         // Input
         model::InputPort<ValueType> _input;

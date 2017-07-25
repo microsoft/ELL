@@ -76,6 +76,7 @@ namespace nodes
     protected:
         virtual void Compute() const override;
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        virtual bool HasState() const override { return false; }
         llvm::Function* GetOperator(model::IRMapCompiler& compiler) const;
         void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);

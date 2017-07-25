@@ -190,7 +190,7 @@ namespace nodes
 
     template <typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
-    {
+    {  
         llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
         llvm::Value* pInput2 = compiler.EnsurePortEmitted(input2);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);

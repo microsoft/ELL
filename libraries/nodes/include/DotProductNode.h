@@ -82,6 +82,7 @@ namespace nodes
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        virtual bool HasState() const override { return false; }
 
     private:
         void CompileDotProductLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);

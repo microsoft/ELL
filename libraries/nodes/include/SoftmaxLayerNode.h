@@ -66,9 +66,9 @@ namespace nodes
 
     protected:
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        using BaseType::HasState;
 
         static size_t NumElements(const Shape& size);
-        virtual bool HasState() const override { return true; }
 
     private:
         // Helper for generating nested loops to visit all input/output values

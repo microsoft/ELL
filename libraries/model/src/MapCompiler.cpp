@@ -30,7 +30,7 @@ namespace model
 
         auto inputSize = map.GetInput(0)->Size();
         auto outputSize = map.GetOutput(0).Size();
-        std::vector<std::string> comments = {std::string("Input size: ") + std::to_string(inputSize), std::string("Output size: ") + std::to_string(outputSize)};
+        std::vector<std::string> comments = { std::string("Input size: ") + std::to_string(inputSize), std::string("Output size: ") + std::to_string(outputSize) };
         pModuleEmitter->SetFunctionComments(functionName, comments);
 
         OnBeginCompileModel(map.GetModel());
@@ -110,7 +110,7 @@ namespace model
             }
             else
             {
-                // TODO: can we use an array type here? 
+                // TODO: can we use an array type here?
                 functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
             }
         }

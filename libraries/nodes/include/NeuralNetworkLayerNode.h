@@ -109,7 +109,6 @@ namespace nodes
         /// <summary> Gets information about the output memory layout </summary>
         virtual PortMemoryLayout& GetOutputMemoryLayout() override { return _outputLayout; }
 
-
     protected:
         size_t NumInputDimensions() const { return _inputLayout.size.size(); }
         virtual void Copy(model::ModelTransformer& transformer) const override;
@@ -122,6 +121,7 @@ namespace nodes
 
         mutable typename LayerType::TensorType _inputTensor;
         mutable LayerType _layer; // mutable to get around Compute being non-const
+        virtual bool HasState() const override { return true; } // stored state: inputLayout, outputLayout
 
     private:
         PortMemoryLayout _inputLayout;

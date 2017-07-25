@@ -119,6 +119,7 @@ namespace nodes
 
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        virtual bool HasState() const override { return true; } // stored state: inputShape, outputShape, paddingValue
 
     private:
         // Input

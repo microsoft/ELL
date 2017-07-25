@@ -40,6 +40,7 @@ namespace model
     protected:
         OutputNodeBase(InputPortBase& input, OutputPortBase& output);
         virtual bool ShouldCompileInline() const override { return true; }
+        virtual bool HasState() const override { return false; }
 
     private:
         InputPortBase& _inputBase;

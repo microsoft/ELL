@@ -149,8 +149,7 @@ namespace model
         /// <summary> Refines this node in the model being constructed by the transformer </summary>
         virtual bool Refine(ModelTransformer& transformer) const;
 
-
-        virtual bool HasState() const;
+        virtual bool HasState() const { return true; }
 
         void AddInputPort(InputPortBase* input);
         void AddOutputPort(OutputPortBase* output);

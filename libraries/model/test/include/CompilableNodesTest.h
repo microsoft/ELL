@@ -41,6 +41,7 @@ void TestNeuralNetworkPredictorNode1();
 void TestNeuralNetworkPredictorNode2();
 void TestNeuralNetworkPredictorNode3();
 void TestNeuralNetworkPredictorNode4();
+void TestNeuralNetworkPredictorNode5();
 
 enum class ConvolutionType { GEMM, Diagonal};
 

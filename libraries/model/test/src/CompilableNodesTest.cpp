@@ -10,6 +10,9 @@
 #include "../clang/DotProductIR.h"
 #include "ModelTestUtilities.h"
 
+// common
+#include "LoadModel.h" // for RegisterNodeTypes
+
 // model
 #include "CompiledMap.h"
 #include "DynamicMap.h"
@@ -69,10 +72,11 @@
 // testing
 #include "testing.h"
 
-// common
-#include "LoadModel.h" // for RegisterNodeTypes
+// utilities
+#include "RandomEngines.h"
 
 // stl
+#include <algorithm>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -84,6 +88,75 @@ namespace
 size_t GetShapeSize(const math::Triplet& shape)
 {
     return shape[0] * shape[1] * shape[2];
+}
+
+template<typename ValueType>
+class Uniform
+{
+public:
+    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
+        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal-minVal) {}
+
+    ValueType operator()()
+    {
+        double uniform = static_cast<double>(_rng()) / _range;
+        return static_cast<ValueType>((uniform * _outputRange) + _minOutput);
+    }
+
+private:
+    std::default_random_engine _rng;
+    double _range;
+    ValueType _minOutput;
+    ValueType _outputRange;
+};
+
+template<typename ElementType>
+void FillRandomVector(std::vector<ElementType>& vector, ElementType min=-1, ElementType max=1)
+{
+    Uniform<ElementType> rand(min, max);
+    std::generate(vector.begin(), vector.end(), rand);
+}
+
+template<typename ElementType>
+void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min=-1, ElementType max=1)
+{
+    Uniform<ElementType> rand(min, max);
+    vector.Generate(rand);
+}
+
+template<typename ElementType>
+void FillRandomTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType min=-1, ElementType max=1)
+{
+    Uniform<ElementType> rand(min, max);
+    tensor.Generate(rand);
+}
+
+template<typename ElementType>
+void FillVector(std::vector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
+{
+    ElementType val = 0;
+    std::generate(vector.begin(), vector.end(), [&val]() { return val++; });
+}
+
+template<typename ElementType>
+void FillVector(ell::math::ColumnVector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
+{
+    ElementType val = 0;
+    vector.Generate([&val]() { return val++; });
+}
+
+template<typename ElementType>
+void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
+{
+    ElementType val = 0;
+    tensor.Generate([&val]() { return val++; });
+}
+
+template<typename ElementType>
+void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
+{
+    ElementType val = 0;
+    tensor.Generate([&val]() { return val++; });
 }
 }
 
@@ -668,7 +741,7 @@ void TestIRNode()
 //
 
 // Helper function
-template <typename ElementType>
+template<typename ElementType>
 void VerifyLayerMap(const ell::model::DynamicMap& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
 {
     std::vector<std::vector<double>> signal = { inputWithPadding.ToArray() };
@@ -810,20 +883,6 @@ void TestNeuralNetworkPredictorNode2()
     VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_2");
 }
 
-template <typename ElementType>
-void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, int startValue = 0)
-{
-    int val = 0;
-    tensor.Generate([&val]() { return val++; });
-}
-
-template <typename ElementType>
-void FillVector(ell::math::ColumnVector<ElementType>& vector, int startValue = 0)
-{
-    int val = 0;
-    vector.Generate([&val]() { return val++; });
-}
-
 void TestNeuralNetworkPredictorNode3()
 {
     using namespace ell::predictors;
@@ -854,8 +913,7 @@ void TestNeuralNetworkPredictorNode3()
 
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
     std::vector<ElementType> input(3 * 3 * 3);
-    int val = 0;
-    std::generate(input.begin(), input.end(), [&val]() { return val++; });
+    FillVector(input);
 
     // Create model
     model::Model model;
@@ -901,7 +959,7 @@ void TestNeuralNetworkPredictorNode4()
     auto convolutionMethod = ConvolutionMethod::columnwise;
     ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 1 };
     TensorType convWeights1(8 * 3, 3, 3);
-    FillTensor(convWeights1, -10);
+    FillTensor(convWeights1, -10.0);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));
 
     // BiasLayer
@@ -925,7 +983,7 @@ void TestNeuralNetworkPredictorNode4()
     // ScalingLayer
     layerParameters = { layers[3]->GetOutput(), NoPadding(), { 5, 5, 8 }, { PaddingScheme::zeros, 1 } };
     VectorType scales(layerParameters.outputShape[2]);
-    FillVector(scales, -3);
+    FillVector(scales, -3.0);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scales)));
 
     // Max PoolingLayer
@@ -941,8 +999,7 @@ void TestNeuralNetworkPredictorNode4()
     // Create the predictor
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
     std::vector<ElementType> input(3 * 3 * 3);
-    int val = 0;
-    std::generate(input.begin(), input.end(), [&val]() { return val++; });
+    FillVector(input);
 
     // Create model
     model::Model model;
@@ -959,6 +1016,184 @@ void TestNeuralNetworkPredictorNode4()
     // compare output
     std::vector<std::vector<double>> signal = { input };
     VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_4");
+}
+
+// tinyYolo prefix test
+void TestNeuralNetworkPredictorNode5()
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+
+    using ElementType = double;
+    using InputParameters = typename InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net (a prefix of darknet's tinyYolo)
+
+    typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    auto convolutionMethod = ConvolutionMethod::columnwise;
+    const Shape inputSize = { 224, 224, 3 };
+    const Shape paddedInputSize = { 226, 226, 3 };
+
+    // Input Layer
+    InputParameters inputParams{ inputSize, NoPadding(), paddedInputSize, ZeroPadding(1), 1.0 };
+    inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
+
+    // layer_0 = ConvolutionalLayer<float>(shape=[224,224,16])
+    // ConvolutionalLayer
+    LayerParameters layerParameters{ inputLayer->GetOutput(), ZeroPadding(1), { 224, 224, 16 }, NoPadding() };
+    ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 1 };
+    TensorType convWeights(16 * 3, 3, 3);
+    FillRandomTensor(convWeights);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights)));
+
+    // layer_1 = BatchNormalizationLayer<float>(shape=[224,224,16])
+    // BatchNormalizationLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 224, 224, 16 }, NoPadding() };
+    VectorType mean(layerParameters.outputShape[2]);
+    VectorType variance(layerParameters.outputShape[2]);
+    FillRandomVector(mean);
+    FillRandomVector(variance, 0.125, 1.0);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance, 1.0e-6f, EpsilonSummand::SqrtVariance)));
+
+    // layer_2 = ScalingLayer<float>(shape=[224,224,16])
+    // ScalingLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 224, 224, 16 }, NoPadding() };
+    VectorType scales(layerParameters.outputShape[2]);
+    FillRandomVector(scales);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scales)));
+
+    // layer_3 = BiasLayer<float>(shape=[224,224,16])
+    // BiasLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 224, 224, 16 }, NoPadding() };
+    VectorType bias(layerParameters.outputShape[2]);
+    FillRandomVector(bias);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, scales)));
+
+    // layer_4 = ActivationLayer<float,LeakyReLUActivation>(shape=[224,224,16])
+    // ActivationLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 224, 224, 16 }, NoPadding() };
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, LeakyReLUActivation>(layerParameters)));
+
+    // layer_5 = PoolingLayer<float,MaxPoolingFunction>(shape=[114,114,16])
+    // Max PoolingLayer
+    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { 114, 114, 16 }, ZeroPadding(1) };
+    PoolingParameters poolingParameters{ 2, 2 };
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new PoolingLayer<ElementType, MaxPoolingFunction>(layerParameters, poolingParameters)));
+
+    // layer_6 = ConvolutionalLayer<float>(shape=[112,112,32])
+    // ConvolutionalLayer
+    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { 112, 112, 32 }, NoPadding() };
+    convolutionalParams = { 3, 1, convolutionMethod, 1 };
+    convWeights = { 32 * 3, 3, 16 };
+    FillRandomTensor(convWeights);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights)));
+
+    // layer_7 = BatchNormalizationLayer<float>(shape=[112,112,32])
+    // BatchNormalizationLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 112, 112, 32 }, NoPadding() };
+    mean = VectorType(layerParameters.outputShape[2]);
+    variance = VectorType(layerParameters.outputShape[2]);
+    FillRandomVector(mean);
+    FillRandomVector(variance, 0.125, 1.0);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance, 1.0e-4f, EpsilonSummand::SqrtVariance)));
+
+    // layer_8 = ScalingLayer<float>(shape=[112,112,32])
+    // ScalingLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 112, 112, 32 }, NoPadding() };
+    scales = VectorType(layerParameters.outputShape[2]);
+    FillRandomVector(scales);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scales)));
+
+    // layer_9 = BiasLayer<float>(shape=[112,112,32])
+    // BiasLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 112, 112, 32 }, NoPadding() };
+    bias = VectorType(layerParameters.outputShape[2]);
+    FillRandomVector(bias);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, scales)));
+
+    // layer_10 = ActivationLayer<float,LeakyReLUActivation>(shape=[112,112,32])
+    // ActivationLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 112, 112, 32 }, NoPadding() };
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, LeakyReLUActivation>(layerParameters)));
+
+    // layer_11 = PoolingLayer<float,MaxPoolingFunction>(shape=[56,56,32])
+    // Max PoolingLayer
+    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { 58, 58, 32 }, ZeroPadding(1) };
+    poolingParameters = { 2, 2 }; 
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new PoolingLayer<ElementType, MaxPoolingFunction>(layerParameters, poolingParameters)));
+
+    // layer_12 = ConvolutionalLayer<float>(shape=[56,56,16])
+    // ConvolutionalLayer
+    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { 56, 56, 16 }, NoPadding() };
+    convolutionalParams = { 3, 1, convolutionMethod, 1 };
+    convWeights = { 16 * 3, 3, 32 };
+    FillRandomTensor(convWeights);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights)));
+
+    // layer_13 = BatchNormalizationLayer<float>(shape=[56,56,16])
+    // BatchNormalizationLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 56, 56, 16 }, NoPadding() };
+    mean = VectorType(layerParameters.outputShape[2]);
+    variance = VectorType(layerParameters.outputShape[2]);
+    FillRandomVector(mean);
+    FillRandomVector(variance, 0.125, 1.0);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance, 1.0e-6f, EpsilonSummand::SqrtVariance)));
+
+    // layer_14 = ScalingLayer<float>(shape=[56,56,16])
+    // ScalingLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 56, 56, 16 }, NoPadding() };
+    scales = VectorType(layerParameters.outputShape[2]);
+    FillRandomVector(scales);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scales)));
+
+    // layer_15 = BiasLayer<float>(shape=[56,56,16])
+    // BiasLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 56, 56, 16 }, NoPadding() };
+    bias = VectorType(layerParameters.outputShape[2]);
+    FillRandomVector(bias);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, scales)));
+
+    // layer_16 = ActivationLayer<float,LeakyReLUActivation>(shape=[58,58,16])
+    // ActivationLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { 58, 58, 16 }, ZeroPadding(1) };
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ActivationLayer<ElementType, LeakyReLUActivation>(layerParameters)));
+
+    // layer_17 = ConvolutionalLayer<float>(shape=[56,56,128])
+    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { 56, 56, 128 }, NoPadding() };
+    convolutionalParams = { 3, 1, convolutionMethod, 1 };
+    convWeights = { 128 * 3, 3, 16 };
+    FillRandomTensor(convWeights);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights)));
+
+    // Create the predictor
+    NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+    std::vector<ElementType> input(inputSize[0] * inputSize[1] * inputSize[2]);
+    FillRandomVector(input);
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
+    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+
+    // compare output
+    double epsilon = 0.1;
+    std::vector<std::vector<double>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_5", epsilon);
 }
 
 void TestInputLayerNode(size_t outputPadding)
@@ -1010,7 +1245,7 @@ void TestInputLayerNode(size_t outputPadding)
     VerifyCompiledOutput(map, compiledMap, signal, "InputLayer");
 }
 
-template <template <typename> class ActivationFunction>
+template<template<typename> class ActivationFunction>
 void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
     using namespace ell::predictors;
@@ -1041,7 +1276,6 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::ActivationLayerNode<double, ActivationFunction>>(inputNode->output, layer);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
-
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
@@ -1222,7 +1456,7 @@ void TestBinaryConvolutionalLayerNode2(size_t inputPaddingSize, size_t outputPad
         {
             for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
             {
-                input(rowIndex, colIndex, channelIndex) = 1.25 * (rowIndex - (numRows/2)) + 0.75 * (colIndex-(numCols/2)) + (.0125 * channelIndex);
+                input(rowIndex, colIndex, channelIndex) = 1.25 * (rowIndex - (numRows / 2)) + 0.75 * (colIndex - (numCols / 2)) + (.0125 * channelIndex);
             }
         }
     }
@@ -1348,17 +1582,21 @@ void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPa
     const size_t numChannels = 16;
     const size_t numFilters = 128;
 
+    auto rng = utilities::GetRandomEngine("123");
+    auto rand = [&rng]() { return (double)rng() / (double)(rng.max() - rng.min()); };
+
     assert(inputPaddingSize == 1);
     TensorType inputWithPadding(numRows + 2 * inputPaddingSize, numCols + 2 * inputPaddingSize, numChannels);
-    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, numRows, numCols, numChannels);
     inputWithPadding.Fill(0);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, numRows, numCols, numChannels);
     for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
     {
         for (size_t colIndex = 0; colIndex < numCols; ++colIndex)
         {
             for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
             {
-                input(rowIndex, colIndex, channelIndex) = 1.25 * rowIndex + 0.75 * colIndex + channelIndex;
+                // input(rowIndex, colIndex, channelIndex) = 1.25 * rowIndex + 0.75 * colIndex + channelIndex;
+                input(rowIndex, colIndex, channelIndex) = rand() - 0.5;
             }
         }
     }
@@ -1375,7 +1613,8 @@ void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPa
         {
             for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
             {
-                weights(rowIndex, colIndex, channelIndex) = 1.5 * rowIndex + 3.3 * colIndex + 0.15 * channelIndex;
+                // weights(rowIndex, colIndex, channelIndex) = 1.5 * rowIndex + 3.3 * colIndex + 0.15 * channelIndex;
+                weights(rowIndex, colIndex, channelIndex) = rand() - 0.5;
             }
         }
     }
@@ -1440,7 +1679,7 @@ void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSi
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
-template <template <typename> class PoolingFunction>
+template<template<typename> class PoolingFunction>
 void TestPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
     using namespace ell::predictors;

@@ -84,8 +84,8 @@ namespace nodes
         if (padding != 0)
         {
             // If the input layer includes padding on its output, add a ReorderDataNode to take care of it.
-            DataShape inputNodeInputShape({ inputShape[0], inputShape[1], inputShape[2] }, { 0, 0, 0 }, { 2, 1, 0 });
-            DataShape inputNodeOutputShape({ inputShape[0], inputShape[1], inputShape[2] }, { padding, padding, 0 }, { 2, 1, 0 });
+            DataShape inputNodeInputShape({ inputShape[2], inputShape[1], inputShape[0] }, { 0, 0, 0 });
+            DataShape inputNodeOutputShape({ inputShape[2], inputShape[1], inputShape[0] }, { 0, padding, padding });
             auto paddedInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInputElements, inputNodeInputShape, inputNodeOutputShape, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
             newInputElements = paddedInputNode->output;
         }

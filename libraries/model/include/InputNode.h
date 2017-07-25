@@ -49,13 +49,14 @@ namespace model
     protected:
         InputNodeBase(OutputPortBase& output);
         virtual bool ShouldCompileInline() const override { return true; }
+        virtual bool HasState() const override { return false; }
 
     private:
         OutputPortBase& _outputBase;
     };
 
     /// <summary> A node that represents an input to the system. </summary>
-    template <typename ValueType>
+    template<typename ValueType>
     class InputNode : public InputNodeBase
     {
     public:

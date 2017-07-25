@@ -139,6 +139,7 @@ namespace nodes
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
+        virtual bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
 
     private:

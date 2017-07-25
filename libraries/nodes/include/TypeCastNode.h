@@ -66,6 +66,7 @@ namespace nodes
         virtual bool ShouldCompileInline() const override { return true; }
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        virtual bool HasState() const override { return false; }
 
         model::InputPort<InputValueType> _input;
         model::OutputPort<OutputValueType> _output;

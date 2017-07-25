@@ -65,7 +65,6 @@ namespace nodes
 
     protected:
         virtual bool Refine(model::ModelTransformer& transformer) const override;
-        virtual bool HasState() const override { return true; }
 
     private:
         std::vector<int64_t> GetCompressedFilterWeights() const;
@@ -196,7 +195,7 @@ namespace nodes
         virtual void Copy(model::ModelTransformer& transformer) const override;
         void Compute() const override;
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        virtual bool HasState() const override { return true; }
+        virtual bool HasState() const override { return true; } // stored state: convolutional parameters and input/output memory layouts
 
         virtual void WriteToArchive(utilities::Archiver& archiver) const override
         {

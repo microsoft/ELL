@@ -249,7 +249,7 @@ namespace nodes
         size_t NumPrimaryInputDimensions() const { return _inputLayout.size.size(); }
 
         static size_t NumElements(const Shape& size);
-        virtual bool HasState() const override { return true; }
+        virtual bool HasState() const override { return true; } // stored state: function, broadcast dimension, and padding value
 
         virtual const model::InputPort<ValueType>& GetPrimaryInput() const = 0;
         virtual const model::InputPort<ValueType>* GetSecondaryInput(int index) const = 0;

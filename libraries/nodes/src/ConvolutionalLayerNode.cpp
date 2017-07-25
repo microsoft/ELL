@@ -157,7 +157,6 @@ namespace nodes
         {
             // GEMM method
             const auto& weights = this->GetLayer().GetWeightsMatrix();
-            const auto shapedInputSize = fieldVolumeSize * outputRows;
             const auto m = weights.NumRows();
             const auto n = outputRows;
             const auto k = weights.NumColumns();
@@ -170,8 +169,8 @@ namespace nodes
 
             // TODO: take output padding into account
             assert(outputPadding == 0 && "Convolutional node output padding not supported yet");
-            nodes::DataShape outputShape({ static_cast<size_t>(outputImageWidth), static_cast<size_t>(outputImageHeight), numFilters });
-            nodes::DataShape transposedOutputShape({ static_cast<size_t>(outputImageWidth), static_cast<size_t>(outputImageHeight), numFilters }, { 0, 0, 0 }, { 2, 0, 1 });
+            nodes::DataShape outputShape({ static_cast<size_t>(outputImageHeight), static_cast<size_t>(outputImageWidth), numFilters });
+            nodes::DataShape transposedOutputShape({ static_cast<size_t>(outputImageHeight), static_cast<size_t>(outputImageWidth), numFilters }, { 0, 0, 0 }, { 2, 0, 1 });
 
             // weights: numFilters x fieldVolumeSize == m x k
             // ShapedInput: fieldVolumeSize x outputRows == k x n
@@ -180,7 +179,7 @@ namespace nodes
             auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weightsNode->output, m, n, k, lda, false, reshapeNode->output, ldb, false, ldc);
             auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputShape, transposedOutputShape);
 
-            transformer.MapNodeOutput(this->output, reorderOutputNode->output);
+           transformer.MapNodeOutput(this->output, reorderOutputNode->output);
         }
         else // diagonal method
         {

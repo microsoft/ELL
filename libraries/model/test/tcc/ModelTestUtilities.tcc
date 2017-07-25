@@ -8,7 +8,53 @@
 
 using namespace ell;
 
-template <typename T>
+template<typename ValueType>
+ValueType LargestDifference(const std::vector<ValueType>& a, const std::vector<ValueType>& b)
+{
+    ValueType largestDifference = 0;
+    auto size = a.size();
+    for (int index = 0; index < size; ++index)
+    {
+        auto difference = a[index] - b[index];
+        if (std::fabs(difference) > std::fabs(largestDifference))
+        {
+            largestDifference = difference;
+        }
+    }
+    return largestDifference;
+}
+
+template<typename ValueType>
+bool IsEqual(const ValueType& a, const ValueType& b, double epsilon = 1e-6)
+{
+    return testing::IsEqual(a, b);
+}
+
+template<>
+inline bool IsEqual(const float& a, const float& b, double epsilon)
+{
+    return testing::IsEqual(a, b, static_cast<float>(epsilon));
+}
+
+template<>
+inline bool IsEqual(const double& a, const double& b, double epsilon)
+{
+    return testing::IsEqual(a, b, epsilon);
+}
+
+template<>
+inline bool IsEqual(const std::vector<float>& a, const std::vector<float>& b, double epsilon)
+{
+    return testing::IsEqual(a, b, static_cast<float>(epsilon));
+}
+
+template<>
+inline bool IsEqual(const std::vector<double>& a, const std::vector<double>& b, double epsilon)
+{
+    return testing::IsEqual(a, b, epsilon);
+}
+
+template<typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
 {
     out << "[";
@@ -22,7 +68,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
     return out;
 }
 
-template <typename InputType, typename OutputType>
+template<typename InputType, typename OutputType>
 void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
     if (!IsVerbose())
@@ -39,7 +85,7 @@ void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMa
     }
 }
 
-template <typename InputType>
+template<typename InputType>
 void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
     switch (map.GetOutput(0).GetPortType())
@@ -64,19 +110,19 @@ void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMa
     }
 }
 
-template <typename InputType, typename OutputType>
+template<typename InputType, typename OutputType>
 void VerifyMapOutput(const model::DynamicMap& map, std::vector<std::vector<InputType>>& signal, std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name)
 {
     bool ok = true;
     // compare output
-    for(int index = 0; index < signal.size(); ++index)
+    for (size_t index = 0; index < signal.size(); ++index)
     {
         auto&& input = signal[index];
         auto&& output = expectedOutput[index];
         map.SetInputValue(0, input);
         auto computedResult = map.ComputeOutput<OutputType>(0);
 
-        ok = ok && testing::IsEqual(output, computedResult);
+        ok = ok && IsEqual(output, computedResult);
 
         if (IsVerbose())
         {
@@ -86,8 +132,8 @@ void VerifyMapOutput(const model::DynamicMap& map, std::vector<std::vector<Input
     testing::ProcessTest(std::string("Testing map " + name + " compute"), ok);
 }
 
-template <typename InputType, typename OutputType>
-void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name)
+template<typename InputType, typename OutputType>
+void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
 {
     bool ok = true;
     // compare output
@@ -98,42 +144,46 @@ void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledM
 
         compiledMap.SetInputValue(0, input);
         auto compiledResult = compiledMap.ComputeOutput<OutputType>(0);
-        ok = ok && testing::IsEqual(computedResult, compiledResult);
+        ok = ok && IsEqual(computedResult, compiledResult, static_cast<OutputType>(epsilon));
 
         if (IsVerbose())
         {
             std::cout << computedResult << " \t" << compiledResult << std::endl;
+            if (!ok)
+            {
+                std::cout << "Largest difference: " << LargestDifference(computedResult, compiledResult) << ", epsilon: " << epsilon << std::endl;
+            }
         }
     }
     testing::ProcessTest(std::string("Testing compiled " + name + " compute"), ok);
 }
 
-template <typename InputType>
-void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name)
+template<typename InputType>
+void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
 {
     switch (map.GetOutput(0).GetPortType())
     {
         case model::Port::PortType::boolean:
-            VerifyCompiledOutput<InputType, bool>(map, compiledMap, signal, name);
+            VerifyCompiledOutput<InputType, bool>(map, compiledMap, signal, name, epsilon);
             break;
         case model::Port::PortType::integer:
-            VerifyCompiledOutput<InputType, int>(map, compiledMap, signal, name);
+            VerifyCompiledOutput<InputType, int>(map, compiledMap, signal, name, epsilon);
             break;
         case model::Port::PortType::bigInt:
-            VerifyCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name);
+            VerifyCompiledOutput<InputType, int64_t>(map, compiledMap, signal, name, epsilon);
             break;
         case model::Port::PortType::smallReal:
-            VerifyCompiledOutput<InputType, float>(map, compiledMap, signal, name);
+            VerifyCompiledOutput<InputType, float>(map, compiledMap, signal, name, epsilon);
             break;
         case model::Port::PortType::real:
-            VerifyCompiledOutput<InputType, double>(map, compiledMap, signal, name);
+            VerifyCompiledOutput<InputType, double>(map, compiledMap, signal, name, epsilon);
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
     }
 }
 
-template <typename InputType>
+template<typename InputType>
 void InputCallbackTester<InputType>::Initialize(const std::vector<std::vector<InputType>>& input)
 {
     begin = input.begin();
@@ -143,7 +193,7 @@ void InputCallbackTester<InputType>::Initialize(const std::vector<std::vector<In
     cur = begin;
 }
 
-template <typename InputType>
+template<typename InputType>
 bool InputCallbackTester<InputType>::InputCallback(std::vector<InputType>& input)
 {
     input = *cur;
@@ -159,7 +209,7 @@ bool InputCallbackTester<InputType>::InputCallback(std::vector<InputType>& input
     return true;
 }
 
-template <typename InputType>
+template<typename InputType>
 bool InputCallbackTester<InputType>::InputCallback(InputType* input)
 {
     std::copy((*cur).begin(), (*cur).end(), input);

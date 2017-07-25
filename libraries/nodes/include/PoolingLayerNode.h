@@ -66,6 +66,7 @@ namespace nodes
 
     protected:
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        using BaseType::HasState;
     };
 }
 }

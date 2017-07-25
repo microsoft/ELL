@@ -203,11 +203,6 @@ namespace model
         os << ")" << std::endl;
     }
 
-    bool Node::HasState() const
-    {
-        return false;
-    }
-
     void Node::WriteToArchive(utilities::Archiver& archiver) const
     {
         archiver["id"] << _id;

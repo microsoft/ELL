@@ -77,6 +77,7 @@ namespace nodes
 
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        virtual bool HasState() const override { return true; } // stored state: callback function name
 
     private:
         void SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);

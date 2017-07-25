@@ -69,6 +69,7 @@ namespace nodes
             virtual void Compute() const override;
             virtual void WriteToArchive(utilities::Archiver& archiver) const override;
             virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+            virtual bool HasState() const override { return true; }
 
         private:
             // Inputs
