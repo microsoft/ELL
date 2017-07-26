@@ -186,7 +186,7 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
         return;
     }
 
-    SaveOutput("Compare_" + name, _outputReference, _outputCompiled);
+    SaveOutput("Compare_" + name, reference, compiled);
 
     outputStream << "## " << name << std::endl;
 
@@ -277,27 +277,39 @@ void ModelComparison::AddLayer(const char* label, const float* output)
     std::vector<float> data(size, *output);
     if (_runningCompiled)
     {
+        bool found = false;
         for (auto ptr = _layers.begin(), end = _layers.end(); ptr != end; ptr++)
         {
             LayerCaptureData* c = *ptr;
             std::string compiledId = _nodeMap[c->ReferenceNodeLabel];
             if (compiledId == id)
             {
+                found = true;
                 c->Compiled = data;
                 break;
             }
         }
+        if (!found) 
+        {
+            std::cout << "### Error: could not find LayerCaptureData for compiled layer " << id << std::endl;
+        }
     }
     else
     {
+        bool found = false;
         for (auto ptr = _layers.begin(), end = _layers.end(); ptr != end; ptr++)
         {
             LayerCaptureData* c = *ptr;
             if (c->ReferenceNodeLabel == id)
             {
                 c->Reference = data;
+                found = true;
                 break;
             }
+        }
+        if (!found)
+        {
+            std::cout << "### Error: could not find LayerCaptureData for reference layer " << id << std::endl;
         }
     }
 }
@@ -367,7 +379,8 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
     std::string label = layerNode->GetRuntimeTypeName() + "(" + to_string(layerNode->GetId()) + ")";
 
     size_t size = layerNode->GetOutputSize();
-    _outputSizes[label] = size;
+    //std::cout << "layer " << label << " has output size " << std::to_string(size) << std::endl;
+     _outputSizes[label] = size;
 
     //std::cout << "adding debug sink node " << label << ", intput size = " << size << std::endl;
 
