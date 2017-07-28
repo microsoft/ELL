@@ -421,10 +421,10 @@ void TestConvolutionalLayerNode()
     auto output2 = layer2.GetOutput();
 
     testing::ProcessTest("Testing ConvolutionalLayer (regular), values",
-                         testing::IsEqual(output2(0, 0, 0), v1, eps) &&
-                             testing::IsEqual(output2(0, 0, 1), v2, eps) &&
-                             testing::IsEqual(output2(0, 1, 0), v3, eps) &&
-                             testing::IsEqual(output2(0, 1, 1), v4, eps));
+                         (testing::IsEqual(output2(0, 0, 0), v1, eps) &&
+                          testing::IsEqual(output2(0, 0, 1), v2, eps) &&
+                          testing::IsEqual(output2(0, 1, 0), v3, eps) &&
+                          testing::IsEqual(output2(0, 1, 1), v4, eps)));
     // Create model
     model::Model model2;
     auto inputNode2 = model2.AddNode<model::InputNode<double>>(input.Size());
@@ -483,12 +483,12 @@ void TestBinaryConvolutionalLayerNode()
     BinaryConvolutionalLayer<ElementType> layer1(parameters, convolutionalParams, weights);
     layer1.Compute();
     auto output1 = layer1.GetOutput();
-    ElementType eps = 1e-6;
+    ElementType eps = 1e-5;
     testing::ProcessTest("Testing BinaryConvolutionalLayer (gemm), values",
-                         testing::IsEqual(output1(0, 0, 0), -20.5555553, eps) &&
-                             testing::IsEqual(output1(0, 0, 1), -9.66666603, eps) &&
-                             testing::IsEqual(output1(0, 1, 0), -20.5555553, eps) &&
-                             testing::IsEqual(output1(0, 1, 1), -9.66666603, eps));
+                         (testing::IsEqual(output1(0, 0, 0), -20.55556, eps) &&
+                          testing::IsEqual(output1(0, 0, 1), -9.66667, eps) &&
+                          testing::IsEqual(output1(0, 1, 0), -20.55556, eps) &&
+                          testing::IsEqual(output1(0, 1, 1), -9.66667, eps)));
 
     // Create model
     model::Model model1;
@@ -515,10 +515,10 @@ void TestBinaryConvolutionalLayerNode()
     auto output2 = layer2.GetOutput();
 
     testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise), values",
-                         (testing::IsEqual(output2(0, 0, 0), -20.5555553, eps) &&
-                          testing::IsEqual(output2(0, 0, 1), -9.66666603, eps) &&
-                          testing::IsEqual(output2(0, 1, 0), -20.5555553, eps) &&
-                          testing::IsEqual(output2(0, 1, 1), -9.66666603, eps)));
+                         (testing::IsEqual(output2(0, 0, 0), 8.22222, eps) &&
+                          testing::IsEqual(output2(0, 0, 1), 6.44444, eps) &&
+                          testing::IsEqual(output2(0, 1, 0), 8.22222, eps) &&
+                          testing::IsEqual(output2(0, 1, 1), 6.44444, eps)));
 
     // Create model
     model::Model model2;

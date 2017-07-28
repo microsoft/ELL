@@ -14,6 +14,7 @@
 #include "LeakyReLUActivation.h"
 #include "MaxPoolingFunction.h"
 #include "MeanPoolingFunction.h"
+#include "ParametricReLUActivation.h"
 #include "ReLUActivation.h"
 #include "SigmoidActivation.h"
 
@@ -151,6 +152,13 @@ namespace predictors
                     else if (apiLayer.activation == api::ActivationType::relu)
                     {
                         underlyingLayers.push_back(std::make_unique<underlying::ActivationLayer<ElementType, underlying::ReLUActivation>>(parameters));
+                    }
+                    else if (apiLayer.activation == api::ActivationType::prelu)
+                    {
+                        auto& preluApiLayer = LayerAs<api::PReLUActivationLayer<ElementType>>(layer);
+                        TensorType alpha(preluApiLayer.alpha.rows, preluApiLayer.alpha.columns, preluApiLayer.alpha.channels, preluApiLayer.alpha.data);
+                        underlying::ParametricReLUActivation<ElementType> prelu(alpha);
+                        underlyingLayers.push_back(std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu));
                     }
                     else
                     {

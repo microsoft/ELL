@@ -109,6 +109,7 @@ namespace neural
         relu,
         leaky,
         sigmoid,
+        prelu
     };
 
     template <typename ElementType>
@@ -123,6 +124,19 @@ namespace neural
         LayerType GetLayerType() const override { return LayerType::activation; }
 
         const ActivationType activation;
+    };
+
+    // Api projection for PReLUActivationLayer
+    template <typename ElementType>
+    class PReLUActivationLayer : public ActivationLayer<ElementType>
+    {
+    public:
+        PReLUActivationLayer(const LayerParameters& layerParameters, const ell::api::math::Tensor<ElementType>& alphaTensor)
+            : ActivationLayer<ElementType>(layerParameters, ActivationType::prelu), alpha(alphaTensor)
+        {
+        }
+
+        API_READONLY(ell::api::math::Tensor<ElementType> alpha);
     };
 
     // Api projection for BatchNormalizationLayer

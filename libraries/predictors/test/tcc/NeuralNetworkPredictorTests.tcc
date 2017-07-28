@@ -9,6 +9,7 @@
 #include "LeakyReLUActivation.h"
 #include "MaxPoolingFunction.h"
 #include "NeuralNetworkPredictor.h"
+#include "ParametricReLUActivation.h"
 #include "ReLUActivation.h"
 
 // testing
@@ -31,10 +32,10 @@ void ActivationTest()
     using TensorType = typename Layer<ElementType>::TensorType;
 
     TensorType T0(2, 2, 2);
-    T0(0, 0, 0) = 1.0;
-    T0(0, 1, 0) = -2.0;
-    T0(1, 0, 1) = 3.0;
-    T0(1, 1, 1) = -4.0;
+    T0(0, 0, 0) = static_cast<ElementType>(1.0);
+    T0(0, 1, 0) = static_cast<ElementType>(-2.0);
+    T0(1, 0, 1) = static_cast<ElementType>(3.0);
+    T0(1, 1, 1) = static_cast<ElementType>(-4.0);
 
     TensorType T1(2, 2, 2);
 
@@ -45,7 +46,7 @@ void ActivationTest()
         {
             for (size_t k = 0; k < T0.NumChannels(); ++k)
             {
-                T1(i, j, k) = relu.Apply(T0(i, j, k));
+                T1(i, j, k) = relu.Apply(T0(i, j, k), { i, j, k });
             }
         }
     }
@@ -58,11 +59,43 @@ void ActivationTest()
         {
             for (size_t k = 0; k < T0.NumChannels(); ++k)
             {
-                T1(i, j, k) = leakyRelu.Apply(T0(i, j, k));
+                T1(i, j, k) = leakyRelu.Apply(T0(i, j, k), { i, j, k });
             }
         }
     }
     testing::ProcessTest("Testing LeakyReLUActivation", Equals(T1(0, 0, 0), 1.0) && Equals(T1(0, 1, 0), -0.2) && Equals(T1(1, 0, 1), 3.0) && Equals(T1(1, 1, 1), -0.4));
+
+    TensorType alpha(2, 2, 2);
+    alpha(0, 0, 0) = static_cast<ElementType>(0.1);
+    alpha(0, 1, 0) = static_cast<ElementType>(0.2);
+    alpha(1, 0, 1) = static_cast<ElementType>(0.3);
+    alpha(1, 1, 1) = static_cast<ElementType>(0.4);
+
+    auto parametricRelu = ParametricReLUActivation<ElementType>(alpha);
+    for (size_t i = 0; i < T0.NumRows(); ++i)
+    {
+        for (size_t j = 0; j < T0.NumColumns(); ++j)
+        {
+            for (size_t k = 0; k < T0.NumChannels(); ++k)
+            {
+                T1(i, j, k) = parametricRelu.Apply(T0(i, j, k), { i, j, k });
+            }
+        }
+    }
+    testing::ProcessTest("Testing ParametricReLUActivation", Equals(T1(0, 0, 0), 1.0) && Equals(T1(0, 1, 0), -0.4) && Equals(T1(1, 0, 1), 3.0) && Equals(T1(1, 1, 1), -1.6));
+
+    auto sigmoid = SigmoidActivation<ElementType>();
+    for (size_t i = 0; i < T0.NumRows(); ++i)
+    {
+        for (size_t j = 0; j < T0.NumColumns(); ++j)
+        {
+            for (size_t k = 0; k < T0.NumChannels(); ++k)
+            {
+                T1(i, j, k) = sigmoid.Apply(T0(i, j, k), { i, j, k });
+            }
+        }
+    }
+    testing::ProcessTest("Testing SigmoidActivation", Equals(T1(0, 0, 0), 0.73106) && Equals(T1(0, 1, 0), 0.11920) && Equals(T1(1, 0, 1), 0.95257) && Equals(T1(1, 1, 1), 0.017986));
 }
 
 template <typename ElementType>
@@ -359,7 +392,7 @@ void BinaryConvolutionalLayerGemmTest(ell::predictors::neural::BinaryWeightsScal
     input(1, 1, 1) = 3;
     input(1, 2, 1) = 2;
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
-    LayerParameters parameters{ input.GetReference(), MinusOnePadding(1), outputShape, NoPadding() };
+    LayerParameters parameters{ input.GetReference(), ZeroPadding(1), outputShape, NoPadding() };
     BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm, scale };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
@@ -393,7 +426,7 @@ void BinaryConvolutionalLayerGemmTest(ell::predictors::neural::BinaryWeightsScal
     }
     else
     {
-        testing::ProcessTest("Testing BinaryConvolutionalLayer (gemm) (no scaling), values", Equals(output(0, 0, 0), -20.5555553) && Equals(output(0, 0, 1), -9.66666603) && Equals(output(0, 1, 0), -20.5555553) && Equals(output(0, 1, 1), -9.66666603));
+        testing::ProcessTest("Testing BinaryConvolutionalLayer (gemm) (no scaling), values", Equals(output(0, 0, 0), 8.22222) && Equals(output(0, 0, 1), 6.44444) && Equals(output(0, 1, 0), 8.22222) && Equals(output(0, 1, 1), 6.44444));
     }
 
     // Verify that we can archive and unarchive the layer
@@ -424,7 +457,7 @@ void BinaryConvolutionalLayerGemmTest(ell::predictors::neural::BinaryWeightsScal
     }
     else
     {
-        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (gemm) (mean scaling), values", Equals(archivedOutput[0], -20.5555553) && Equals(archivedOutput[1], -9.66666603) && Equals(archivedOutput[2], -20.5555553) && Equals(archivedOutput[3], -9.66666603));
+        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (gemm) (mean scaling), values", Equals(archivedOutput[0], 8.22222) && Equals(archivedOutput[1], 6.44444) && Equals(archivedOutput[2], 8.22222) && Equals(archivedOutput[3], 6.44444));
     }
 }
 
@@ -493,11 +526,11 @@ void BinaryConvolutionalLayerBitwiseTest(ell::predictors::neural::BinaryWeightsS
     auto output = convolutionalLayer.GetOutput();
     if (scale == ell::predictors::neural::BinaryWeightsScale::none)
     {
-        testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise) (mean scaling), values", Equals(output(0, 0, 0), -10) && Equals(output(0, 0, 1), -6.0) && Equals(output(0, 1, 0), -10.0) && Equals(output(0, 1, 1), -6.0));
+        testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise) (mean scaling), values", Equals(output(0, 0, 0), 4.0) && Equals(output(0, 0, 1), 4.0) && Equals(output(0, 1, 0), 4.0) && Equals(output(0, 1, 1), 4.0));
     }
     else
     {
-        testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise) (mean scaling), values", Equals(output(0, 0, 0), -20.5555553) && Equals(output(0, 0, 1), -9.66666603) && Equals(output(0, 1, 0), -20.5555553) && Equals(output(0, 1, 1), -9.66666603));
+        testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise) (no scaling), values", Equals(output(0, 0, 0), 8.22222) && Equals(output(0, 0, 1), 6.44444) && Equals(output(0, 1, 0), 8.22222) && Equals(output(0, 1, 1), 6.44444));
     }
 
     // Put the layer in a network so we can archive it
@@ -523,11 +556,11 @@ void BinaryConvolutionalLayerBitwiseTest(ell::predictors::neural::BinaryWeightsS
     auto archivedOutput = neuralNetwork.Predict(DataVectorType{ 2, 1, 3, 2 });
     if (scale == ell::predictors::neural::BinaryWeightsScale::none)
     {
-        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (bitwise) (no scaling), values", Equals(archivedOutput[0], -10.0) && Equals(archivedOutput[1], -6.0) && Equals(archivedOutput[2], -10.0) && Equals(archivedOutput[3], -6.0));
+        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (bitwise) (no scaling), values", Equals(archivedOutput[0], 4.0) && Equals(archivedOutput[1], 4.0) && Equals(archivedOutput[2], 4.0) && Equals(archivedOutput[3], 4.0));
     }
     else
     {
-        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (bitwise) (mean scaling), values", Equals(archivedOutput[0], -20.5555553) && Equals(archivedOutput[1], -9.66666603) && Equals(archivedOutput[2], -20.5555553) && Equals(archivedOutput[3], -9.66666603));
+        testing::ProcessTest("Testing archived BinaryConvolutionalLayer (gemm) (mean scaling), values", Equals(archivedOutput[0], 8.22222) && Equals(archivedOutput[1], 6.44444) && Equals(archivedOutput[2], 8.22222) && Equals(archivedOutput[3], 6.44444));
     }
 }
 

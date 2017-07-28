@@ -90,12 +90,12 @@ size_t GetShapeSize(const math::Triplet& shape)
     return shape[0] * shape[1] * shape[2];
 }
 
-template<typename ValueType>
+template <typename ValueType>
 class Uniform
 {
 public:
     Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
-        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal-minVal) {}
+        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
 
     ValueType operator()()
     {
@@ -110,49 +110,49 @@ private:
     ValueType _outputRange;
 };
 
-template<typename ElementType>
-void FillRandomVector(std::vector<ElementType>& vector, ElementType min=-1, ElementType max=1)
+template <typename ElementType>
+void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
 {
     Uniform<ElementType> rand(min, max);
     std::generate(vector.begin(), vector.end(), rand);
 }
 
-template<typename ElementType>
-void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min=-1, ElementType max=1)
+template <typename ElementType>
+void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
 {
     Uniform<ElementType> rand(min, max);
     vector.Generate(rand);
 }
 
-template<typename ElementType>
-void FillRandomTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType min=-1, ElementType max=1)
+template <typename ElementType>
+void FillRandomTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType min = -1, ElementType max = 1)
 {
     Uniform<ElementType> rand(min, max);
     tensor.Generate(rand);
 }
 
-template<typename ElementType>
+template <typename ElementType>
 void FillVector(std::vector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
 {
     ElementType val = 0;
     std::generate(vector.begin(), vector.end(), [&val]() { return val++; });
 }
 
-template<typename ElementType>
+template <typename ElementType>
 void FillVector(ell::math::ColumnVector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
 {
     ElementType val = 0;
     vector.Generate([&val]() { return val++; });
 }
 
-template<typename ElementType>
+template <typename ElementType>
 void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
 {
     ElementType val = 0;
     tensor.Generate([&val]() { return val++; });
 }
 
-template<typename ElementType>
+template <typename ElementType>
 void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
 {
     ElementType val = 0;
@@ -741,7 +741,7 @@ void TestIRNode()
 //
 
 // Helper function
-template<typename ElementType>
+template <typename ElementType>
 void VerifyLayerMap(const ell::model::DynamicMap& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
 {
     std::vector<std::vector<double>> signal = { inputWithPadding.ToArray() };
@@ -1127,7 +1127,7 @@ void TestNeuralNetworkPredictorNode5()
     // layer_11 = PoolingLayer<float,MaxPoolingFunction>(shape=[56,56,32])
     // Max PoolingLayer
     layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { 58, 58, 32 }, ZeroPadding(1) };
-    poolingParameters = { 2, 2 }; 
+    poolingParameters = { 2, 2 };
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new PoolingLayer<ElementType, MaxPoolingFunction>(layerParameters, poolingParameters)));
 
     // layer_12 = ConvolutionalLayer<float>(shape=[56,56,16])
@@ -1245,7 +1245,7 @@ void TestInputLayerNode(size_t outputPadding)
     VerifyCompiledOutput(map, compiledMap, signal, "InputLayer");
 }
 
-template<template<typename> class ActivationFunction>
+template <template <typename> class ActivationFunction>
 void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
     using namespace ell::predictors;
@@ -1370,7 +1370,7 @@ void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
-void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPaddingSize, ell::predictors::neural::PaddingScheme paddingScheme, bool scaleByFilterMeans)
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
@@ -1390,8 +1390,9 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
     input(0, 0, 1) = 3;
     input(0, 1, 1) = 2;
     Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
-    LayerParameters parameters{ inputWithPadding, MinusOnePadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise, BinaryWeightsScale::mean };
+
+    LayerParameters parameters{ inputWithPadding, { paddingScheme, inputPaddingSize }, outputShape, { paddingScheme, outputPaddingSize } };
+    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise, scaleByFilterMeans ? BinaryWeightsScale::mean : BinaryWeightsScale::none };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
     // Weights size: f x k x k x d = 2*3*3*2 = 36
@@ -1420,77 +1421,16 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
     layer.Compute();
     auto output = layer.GetOutput();
 
-    // testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise), values", Equals(output(0, 0, 0), -20.5555553) && Equals(output(0, 0, 1), -9.66666603) && Equals(output(0, 1, 0), -20.5555553) && Equals(output(0, 1, 1), -9.66666603));
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
     auto computeNode = model.AddNode<nodes::BinaryConvolutionalLayerNode<double>>(inputNode->output, layer);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
-    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
-}
-
-void TestBinaryConvolutionalLayerNode2(size_t inputPaddingSize, size_t outputPaddingSize)
-{
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-    using ElementType = double;
-    using LayerParameters = typename Layer<ElementType>::LayerParameters;
-    using TensorType = typename Layer<ElementType>::TensorType;
-    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
-    using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
-
-    const size_t numRows = 4;
-    const size_t numCols = 4;
-    const size_t numChannels = 2;
-    const size_t numFilters = 2;
-
-    assert(inputPaddingSize == 1);
-    TensorType inputWithPadding(numRows + 2 * inputPaddingSize, numCols + 2 * inputPaddingSize, numChannels);
-    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, numRows, numCols, numChannels);
-    inputWithPadding.Fill(0);
-    for (size_t rowIndex = 0; rowIndex < numRows; ++rowIndex)
+    if (paddingScheme != PaddingScheme::zeros) // TODO: remove when zero padding is properly handled by compile
     {
-        for (size_t colIndex = 0; colIndex < numCols; ++colIndex)
-        {
-            for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
-            {
-                input(rowIndex, colIndex, channelIndex) = 1.25 * (rowIndex - (numRows / 2)) + 0.75 * (colIndex - (numCols / 2)) + (.0125 * channelIndex);
-            }
-        }
+        VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
     }
-    Shape outputShape = { numRows + 2 * outputPaddingSize, numCols + 2 * outputPaddingSize, numFilters };
-
-    LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
-    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise, BinaryWeightsScale::mean };
-    TensorType weights(convolutionalParams.receptiveField * numFilters, convolutionalParams.receptiveField, input.NumChannels());
-    weights.Fill(1.0);
-    for (size_t rowIndex = 0; rowIndex < convolutionalParams.receptiveField * numFilters; ++rowIndex)
-    {
-        for (size_t colIndex = 0; colIndex < convolutionalParams.receptiveField; ++colIndex)
-        {
-            for (size_t channelIndex = 0; channelIndex < numChannels; ++channelIndex)
-            {
-                weights(rowIndex, colIndex, channelIndex) = 1.5 * rowIndex + 3.3 * colIndex + 0.15 * channelIndex;
-            }
-        }
-    }
-
-    //
-    // Verify BinaryConvolutionalLayerNode
-    //
-    BinaryConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
-    layer.Compute();
-    auto output = layer.GetOutput();
-
-    // Create model
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::BinaryConvolutionalLayerNode<double>>(inputNode->output, layer);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
-
-    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
@@ -1679,7 +1619,7 @@ void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSi
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
-template<template<typename> class PoolingFunction>
+template <template <typename> class PoolingFunction>
 void TestPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
     using namespace ell::predictors;

@@ -6,9 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// stl
-#include <algorithm>
-
 namespace ell
 {
 namespace predictors
@@ -18,6 +15,19 @@ namespace neural
     template <typename ElementType, template <typename> class ActivationFunctionType>
     ActivationLayer<ElementType, ActivationFunctionType>::ActivationLayer(const LayerParameters& layerParameters) :
         Layer<ElementType>(layerParameters)
+    {
+        ValidateDimensions();
+    }
+
+    template <typename ElementType, template <typename> class ActivationFunctionType>
+    ActivationLayer<ElementType, ActivationFunctionType>::ActivationLayer(const LayerParameters& layerParameters, ActivationFunctionType<ElementType> activation) :
+        Layer<ElementType>(layerParameters), _activation(std::move(activation))
+    {
+        ValidateDimensions();
+    }
+
+    template <typename ElementType, template <typename> class ActivationFunctionType>
+    void ActivationLayer<ElementType, ActivationFunctionType>::ValidateDimensions()
     {
         auto output = GetOutputMinusPadding();
         auto& input = _layerParameters.input;
@@ -40,7 +50,7 @@ namespace neural
                 for (size_t k = 0; k < input.NumChannels(); k++)
                 {
                     ElementType value = input(i, j, k);
-                    output(i, j, k) = _activation.Apply(value);
+                    output(i, j, k) = _activation.Apply(value, {i, j, k});
                 }
             }
         }

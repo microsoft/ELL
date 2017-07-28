@@ -107,6 +107,11 @@ namespace neural
         /// <returns> The means of the convolution filters. </returns>
         const std::vector<ElementType>& GetFilterMeans() const { return _filterMeans; }
 
+        /// <summary> Get the input padding masks, packed as bits. </summary>
+        ///
+        /// <returns> The padding masks, packed as bits. </returns>
+        const std::vector<std::vector<uint64_t>> GetCompressedInputPaddingMasks() const { return _shapedInputPaddingMask; }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -130,8 +135,15 @@ namespace neural
         // The number of columns is equal to the number of locations that a filter is slide over the input tensor.
         void ReceptiveFieldToColumns(ConstTensorReferenceType input, MatrixType& shapedInput);
 
+        // Returns whether input zero padding is enabled
+        bool HasInputZeroPadding() const;
+
+        // Returns whether the row, column indices correspond to input zero padding
+        bool IsInputZeroPadding(size_t row, size_t column) const;
+
         void ComputeWeightsMatrices(const ConstTensorReferenceType& weights);
         void ComputeRealValuedWeightsMatrix();
+        void ComputeShapedInputPaddingMask();
         void InitializeIOMatrices();
 
         using Layer<ElementType>::_layerParameters;
@@ -141,6 +153,7 @@ namespace neural
         BinaryConvolutionalParameters _convolutionalParameters;
         std::vector<std::vector<uint64_t>> _binarizedShapedInput;
         std::vector<std::vector<uint64_t>> _binarizedWeights;
+        std::vector<std::vector<uint64_t>> _shapedInputPaddingMask;
         std::vector<ElementType> _filterMeans;
 
         MatrixType _realValuedShapedInput;

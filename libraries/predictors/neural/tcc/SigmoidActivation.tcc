@@ -16,7 +16,7 @@ namespace predictors
 namespace neural
 {
     template <typename ElementType>
-    ElementType SigmoidActivation<ElementType>::Apply(const ElementType input) const
+    ElementType SigmoidActivation<ElementType>::Apply(const ElementType input, const math::Triplet& /*index*/) const
     {
         ElementType output;
         if (input >= 0.0)

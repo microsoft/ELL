@@ -35,6 +35,7 @@ set (neural_include neural/include/ActivationLayer.h
                     neural/include/LeakyReLUActivation.h
                     neural/include/MaxPoolingFunction.h
                     neural/include/MeanPoolingFunction.h
+                    neural/include/ParametricReLUActivation.h
                     neural/include/PoolingLayer.h
                     neural/include/ReLUActivation.h
                     neural/include/ScalingLayer.h
@@ -54,6 +55,7 @@ set (neural_tcc neural/tcc/ActivationLayer.tcc
                 neural/tcc/LeakyReLUActivation.tcc
                 neural/tcc/MaxPoolingFunction.tcc
                 neural/tcc/MeanPoolingFunction.tcc
+                neural/tcc/ParametricReLUActivation.tcc
                 neural/tcc/PoolingLayer.tcc
                 neural/tcc/ReLUActivation.tcc
                 neural/tcc/ScalingLayer.tcc

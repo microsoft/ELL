@@ -29,6 +29,12 @@ namespace neural
         /// <param name="layerParameters"> The parameters common to every layer. </param>
         ActivationLayer(const LayerParameters& layerParameters);
 
+        /// <summary> Instantiates an instance of an activation layer. </summary>
+        ///
+        /// <param name="layerParameters"> The parameters common to every layer. </param>
+        /// <param name="activationFunction"> The activation function. </param>
+        ActivationLayer(const LayerParameters& layerParameters, ActivationFunctionType<ElementType> activation);
+
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
         ActivationLayer() {}
 
@@ -56,6 +62,8 @@ namespace neural
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     private:
+        void ValidateDimensions();
+
         using Layer<ElementType>::_layerParameters;
         using Layer<ElementType>::_output;
 

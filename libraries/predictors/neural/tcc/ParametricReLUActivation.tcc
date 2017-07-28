@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     LeakyReLUActivation.tcc (neural)
-//  Authors:  Byron Changuion
+//  File:     ParametricReLUActivation.tcc (neural)
+//  Authors:  Lisa Ong
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -13,11 +13,10 @@ namespace predictors
 namespace neural
 {
     template <typename ElementType>
-    ElementType LeakyReLUActivation<ElementType>::Apply(const ElementType input, const math::Triplet& /*index*/) const
+    ElementType ParametricReLUActivation<ElementType>::Apply(const ElementType input, const math::Triplet& index) const
     {
-        return (( input > 0) ? input : _leakyFactor * input);
+        return (( input > 0) ? input : _alpha(index) * input);
     }
-
 }
 }
 }

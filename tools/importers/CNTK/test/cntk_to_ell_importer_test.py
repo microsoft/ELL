@@ -27,6 +27,7 @@ try:
     import lib.cntk_converters as cntk_converters
     from cntk.initializer import glorot_uniform, he_normal
     from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
+    from cntk import constant, param_relu
     import cntk.layers.blocks
     from cntk.ops import *
     from custom_functions import BinaryConvolution, CustomSign
@@ -214,9 +215,8 @@ class CntkLayersTestCase(unittest.TestCase):
                                               ELL.LayerShape(3, 4, 5),
                                               ELL.NoPadding())
 
-        # TODO: bitwise not yet functional for padded inputs
         convolutionalParameters = ELL.BinaryConvolutionalParameters(
-            3, 1, ELL.BinaryConvolutionMethod.gemm, ELL.BinaryWeightsScale.none)
+            3, 1, ELL.BinaryConvolutionMethod.bitwise, ELL.BinaryWeightsScale.none)
 
         layer = ELL.FloatBinaryConvolutionalLayer(
             layerParameters, convolutionalParameters, weightTensor)
@@ -282,7 +282,6 @@ class CntkLayersTestCase(unittest.TestCase):
 
         predictor = ELL.FloatNeuralNetworkPredictor(layers)
 
-        # Compare the results
         inputValues = np.linspace(
             -5, 5, num=16 * 10 * 10, dtype=np.float32).reshape(16, 10, 10)
         cntkResults = cntkModel(inputValues)
@@ -293,9 +292,52 @@ class CntkLayersTestCase(unittest.TestCase):
             inputValues)
         ellResults = predictor.Predict(orderedInputValues)
 
-        # Compare them (precision is 1 less decimal place from epsilon)
+        # Compare the results (precision is 1 less decimal place from epsilon)
         np.testing.assert_array_almost_equal(
             orderedCntkResults, ellResults, 4, 'results for BatchNormalization layer do not match!')
+
+        return
+
+    def test_prelu_activation_layer(self):
+        # Test a model with a single CNTK PReLU activation layer against the equivalent ELL predictor
+        # This verifies that the import functions reshape and reorder values appropriately and
+        # that the equivalent ELL layer produces comparable output
+
+        # Create a test set of alpha parameters to use for both CNTK and ELL layers
+        # Input order for CNTK is channels, rows, columns
+        alphaValues = np.linspace(
+            1, 2, num=16 * 10 * 10, dtype=np.float32).reshape(16, 10, 10)
+
+        # create an ELL Tensor from the alpha parameters, which re-orders and produces an appropriately dimensioned tensor
+        alphaTensor = cntk_converters.get_float_tensor_from_cntk_convolutional_weight_value_shape(
+            alphaValues, alphaValues.shape)
+
+        inputValues = np.linspace(
+            -5, 5, num=16 * 10 * 10, dtype=np.float32).reshape(16, 10, 10)
+
+        # Evaluate a PReLU CNTK layer
+        x = input((16, 10, 10))
+        p = parameter(shape=x.shape, init=alphaValues, name="prelu")
+        cntkModel = param_relu(p, x)
+
+        # Create the equivalent ELL predictor
+        layerParameters = ELL.LayerParameters(ELL.LayerShape(10, 10, 16),  # Input order for ELL is rows, columns, channels
+                                              ELL.NoPadding(),
+                                              ELL.LayerShape(10, 10, 16),
+                                              ELL.NoPadding())
+        layer = ELL.FloatPReLUActivationLayer(layerParameters, alphaTensor)
+        predictor = ELL.FloatNeuralNetworkPredictor([layer])
+
+        cntkResults = cntkModel(inputValues)
+        orderedCntkResults = cntk_converters.get_float_vector_from_cntk_array(
+            cntkResults)
+        orderedInputValues = cntk_converters.get_float_vector_from_cntk_array(
+            inputValues)
+        ellResults = predictor.Predict(orderedInputValues)
+
+        # Compare the results
+        np.testing.assert_array_equal(
+            orderedCntkResults, ellResults, 'results for PReLU Activation layer do not match!')
 
         return
 

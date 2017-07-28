@@ -8,6 +8,9 @@
 
 #pragma once
 
+// predictors
+#include <Layer.h>
+
 // stl
 #include <cstring> // size_t
 
@@ -43,7 +46,11 @@ void TestNeuralNetworkPredictorNode3();
 void TestNeuralNetworkPredictorNode4();
 void TestNeuralNetworkPredictorNode5();
 
-enum class ConvolutionType { GEMM, Diagonal};
+enum class ConvolutionType
+{
+    GEMM,
+    Diagonal
+};
 
 void TestInputLayerNode(size_t outputPadding = 0);
 void TestReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
@@ -51,8 +58,7 @@ void TestLeakyReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadd
 void TestSigmoidActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestBatchNormalizationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestBiasLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
-void TestBinaryConvolutionalLayerNode(size_t inputPadding = 1, size_t outputPadding = 0);
-void TestBinaryConvolutionalLayerNode2(size_t inputPadding = 1, size_t outputPadding = 0);
+void TestBinaryConvolutionalLayerNode(size_t inputPadding = 1, size_t outputPadding = 0, ell::predictors::neural::PaddingScheme = ell::predictors::neural::PaddingScheme::zeros, bool scaleByFilterMeans = true);
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
 void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
 void TestFullyConnectedLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);

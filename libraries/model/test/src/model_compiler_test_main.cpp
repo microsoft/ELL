@@ -16,6 +16,7 @@
 
 using namespace ell;
 using namespace ell::emitters;
+using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
@@ -111,6 +112,9 @@ void TestIRCompiler()
     // TestBiasLayerNode(1, 0); // Input padding not supported (yet)
 
     TestBinaryConvolutionalLayerNode();
+    TestBinaryConvolutionalLayerNode(1, 0, PaddingScheme::zeros, true);
+    TestBinaryConvolutionalLayerNode(1, 0, PaddingScheme::minusOnes, false);
+    TestBinaryConvolutionalLayerNode(1, 0, PaddingScheme::minusOnes, true);
 
     // TestConvolutionalLayerNode(ConvolutionType::GEMM);
     TestConvolutionalLayerNode(ConvolutionType::GEMM, 1, 0);

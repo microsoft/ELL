@@ -361,22 +361,22 @@ def BinaryConvolution(filter_shape,
             name: name of the function instance in the network
     """
     kernel_shape = (num_filters, channels) + filter_shape
-    W = parameter(shape=kernel_shape, init=init, name="W")
+    W = C.parameter(shape=kernel_shape, init=init, name="W")
     W = CustomSign(W)
     if bit_map:
         W = CustomMultibit(W, bit_map)
 
     bias_shape = (num_filters, 1, 1)
-    b = parameter(shape=bias_shape, init=init_bias, name="b")
+    b = C.parameter(shape=bias_shape, init=init_bias, name="b")
 
     def convolve(x):
-        r = convolution(W, x, auto_padding=[
-                        False, pad, pad], strides=[strides])
+        r = C.convolution(W, x, auto_padding=[
+            False, pad, pad], strides=[strides])
         if bias:
             r = r + b
         if activation:
             # apply learnable param relu
             P = parameter(shape=r.shape, init=init_activation, name="prelu")
-            r = param_relu(P, r)
+            r = C.param_relu(P, r)
         return r
     return convolve

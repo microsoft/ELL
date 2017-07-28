@@ -21,12 +21,14 @@ from cntk.logging.graph import *
 
 import lib.cntk_converters as converters
 
+
 def op_name_equals(node, name):
     result = False
     if hasattr(node, 'op_name'):
         result = (node.op_name == name)
 
     return result
+
 
 def find_parameter_by_name(parameters, name, index=0):
     for p in parameters:
@@ -43,11 +45,13 @@ def find_parameter_by_name(parameters, name, index=0):
     # specified index
     return parameters[index]
 
+
 def find_node_by_op_name(parameters, name):
     for p in parameters:
         if (p.op_name == name):
             return p
     return None
+
 
 def get_activation_type(nodes):
     """Returns an ELL.ActivationType from the list of nodes"""
@@ -60,6 +64,7 @@ def get_activation_type(nodes):
 
     return None
 
+
 def ell_activation_type_to_string(type):
     """Returns the string representation of an ELL.ActivationType"""
     if (type == ELL.ActivationType.relu):
@@ -71,9 +76,11 @@ def ell_activation_type_to_string(type):
 
     return ""
 
+
 def ell_shape_to_string(shape):
     """Returns the string representation of an ELL.LayerShape"""
     return (str(shape.rows) + "x" + str(shape.columns) + "x" + str(shape.channels))
+
 
 def get_model_layers(root):
     """Returns a list of the high-level layers (i.e. function blocks) that make up the CNTK model """
@@ -123,7 +130,8 @@ class BaseLayer:
             self.layer.ell_inputShape = BaseLayer.get_adjusted_shape(
                 self.input_shape, self.layer.ell_inputPaddingParameters)
         else:
-            raise RuntimeError("Could not initialize input_shape") # coding error
+            raise RuntimeError(
+                "Could not initialize input_shape")  # coding error
 
     @staticmethod
     def get_shape(inputShape):
@@ -176,7 +184,7 @@ class BaseLayer:
     def set_output_characteristics(self, nextLayer):
         """Sets the output characteristics based on the next layer"""
 
-        if (nextLayer is not None):            
+        if (nextLayer is not None):
             self.layer.ell_outputPaddingParameters = nextLayer.layer.ell_inputPaddingParameters
             self.layer.ell_outputShape = BaseLayer.get_adjusted_shape(
                 self.layer.output.shape, self.layer.ell_outputPaddingParameters)
@@ -206,24 +214,23 @@ class BaseLayer:
             label += "(binarized)"
 
         print(label, ": ", ell_shape_to_string(self.layer.ell_inputShape), " -> ",
-            ell_shape_to_string(self.layer.ell_outputShape),
-            "| input padding", self.layer.ell_inputPaddingParameters.paddingSize,
-            " output padding", self.layer.ell_outputPaddingParameters.paddingSize)
+              ell_shape_to_string(self.layer.ell_outputShape),
+              "| input padding", self.layer.ell_inputPaddingParameters.paddingSize,
+              " output padding", self.layer.ell_outputPaddingParameters.paddingSize)
 
 
 class DenseLayer(BaseLayer):
     """Logic for converting a CNTK Dense layer to ELL"""
 
     def __init__(self, layer):
+        if not layer.is_block:
+            raise ValueError("Dense node is not a block node")
+
         self.op_name = 'Dense'
         super().__init__(layer)
 
     def process(self, ellLayers):
         """Appends the ELL equivalent of the current layer to ellLayers."""
-
-        if not self.layer.is_block:
-            print("Error: Dense node is not a block node")
-            return
 
         # Note that a single CNTK Dense function block is equivalent to the following 3 ELL layers:
         # - FullyConnectedLayer
@@ -233,7 +240,8 @@ class DenseLayer(BaseLayer):
         # Therefore, make sure the output padding characteristics of the last layer reflect the next layer's
         # padding requirements.
 
-        weightsParameter = find_parameter_by_name(self.layer.parameters, 'W', 0)
+        weightsParameter = find_parameter_by_name(
+            self.layer.parameters, 'W', 0)
         biasParameter = find_parameter_by_name(self.layer.parameters, 'b', 1)
         weightsTensor = converters.get_float_tensor_from_cntk_dense_weight_parameter(
             weightsParameter)
@@ -287,8 +295,10 @@ class ConvolutionLayer(BaseLayer):
         # initialize weights and input characteristics
         if layer.is_block:
             self.input_parameter = layer.arguments[0]
-            self.weights_parameter = find_parameter_by_name(layer.parameters, 'W', 0)
-            self.bias_parameter = find_parameter_by_name(layer.parameters, 'b', 1)
+            self.weights_parameter = find_parameter_by_name(
+                layer.parameters, 'W', 0)
+            self.bias_parameter = find_parameter_by_name(
+                layer.parameters, 'b', 1)
 
             # Get the hyper-parameters for the convolution.
             # They are on the convolution node inside this block.
@@ -310,7 +320,8 @@ class ConvolutionLayer(BaseLayer):
                 self.input_parameter = layer.inputs[1]
                 weights_input = layer.inputs[0]
 
-            self.weights_parameter = find_parameter_by_name(weights_input.owner.parameters, 'filter')
+            self.weights_parameter = find_parameter_by_name(
+                weights_input.owner.parameters, 'filter')
             self.attributes = layer.attributes
 
             # Determine the binarization method used for weights based on the
@@ -320,11 +331,11 @@ class ConvolutionLayer(BaseLayer):
             # don't change across models.
             function_name = weights_input.owner.name
             if function_name == 'Sign':
-                # TODO: bitwise not yet functional for padded inputs
-                self.convolution_method = ELL.BinaryConvolutionMethod.gemm
+                self.convolution_method = ELL.BinaryConvolutionMethod.bitwise
                 self.weights_scale = ELL.BinaryWeightsScale.none
             else:
-                raise ValueError("Error: unrecognized binarization function: " + function_name)
+                raise ValueError(
+                    "Error: unrecognized binarization function: " + function_name)
 
         self.input_shape = self.input_parameter.shape
 
@@ -466,9 +477,9 @@ class ConvolutionLayer(BaseLayer):
                     label += "(" + ell_activation_type_to_string(activation_type) + ")"
 
         print(label, ": ", ell_shape_to_string(self.layer.ell_inputShape), " -> ",
-            ell_shape_to_string(self.layer.ell_outputShape),
-            "| input padding", self.layer.ell_inputPaddingParameters.paddingSize,
-            " output padding", self.layer.ell_outputPaddingParameters.paddingSize)
+              ell_shape_to_string(self.layer.ell_outputShape),
+              "| input padding", self.layer.ell_inputPaddingParameters.paddingSize,
+              " output padding", self.layer.ell_outputPaddingParameters.paddingSize)
 
 
 class LinearLayer(BaseLayer):
@@ -489,7 +500,8 @@ class LinearLayer(BaseLayer):
         # Therefore, make sure the output padding characteristics of the last layer reflect the next layer's
         # padding requirements.
 
-        weightsParameter = find_parameter_by_name(self.layer.parameters, 'W', 0)
+        weightsParameter = find_parameter_by_name(
+            self.layer.parameters, 'W', 0)
         biasParameter = find_parameter_by_name(self.layer.parameters, 'b', 1)
         weightsTensor = converters.get_float_tensor_from_cntk_dense_weight_parameter(
             weightsParameter)
@@ -538,31 +550,30 @@ class ElementTimesLayer(BaseLayer):
     """Logic for converting a CNTK ElementTimes layer to ELL"""
 
     def __init__(self, layer):
+        if (len(layer.constants) != 1):
+            raise ValueError(
+                "Skipping ElementTimes layer due to dimensions of Constants")
+
         self.op_name = 'ElementTimes'
         super().__init__(layer)
 
     def process(self, ellLayers):
         """Appends the ELL representation of the current layer to ellLayers."""
 
-        if (len(self.layer.constants) == 1):
+        # Create the ELL.LayerParameters for the ELL layer
+        layerParameters = ELL.LayerParameters(
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
 
-            # Create the ELL.LayerParameters for the ELL layer
-            layerParameters = ELL.LayerParameters(
-                self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
-
-            # Create ELL scaling layer
-            scaleValue = self.layer.constants[0].value
-            # Workaround: For some reason, np.full is not returning a type that SWIG can parse. So just manually walk the array setting the scalar
-            scaleArray = np.arange(
-                layerParameters.outputShape.channels, dtype=np.float)
-            for i in range(scaleArray.size):
-                scaleArray[i] = scaleValue
-            scalesVector = ELL.FloatVector(scaleArray)
-            ellLayers.append(ELL.FloatScalingLayer(
-                layerParameters, scalesVector))
-
-        else:
-            print("Error: Skipping ElementTimes layer due to dimensions of Constants")
+        # Create ELL scaling layer
+        scaleValue = self.layer.constants[0].value
+        # Workaround: For some reason, np.full is not returning a type that SWIG can parse. So just manually walk the array setting the scalar
+        scaleArray = np.arange(
+            layerParameters.outputShape.channels, dtype=np.float)
+        for i in range(scaleArray.size):
+            scaleArray[i] = scaleValue
+        scalesVector = ELL.FloatVector(scaleArray)
+        ellLayers.append(ELL.FloatScalingLayer(
+            layerParameters, scalesVector))
 
 
 class BasePoolingLayer(BaseLayer):
@@ -580,7 +591,8 @@ class BasePoolingLayer(BaseLayer):
 
         if ('autoPadding' in self.attributes):
             if (self.attributes['autoPadding'][0] == True):
-                padding = int((self.attributes['poolingWindowShape'][0] - 1) / 2)
+                padding = int(
+                    (self.attributes['poolingWindowShape'][0] - 1) / 2)
             else:
                 padding = self.attributes['upperPad'][0]
         else:
@@ -645,7 +657,7 @@ class PoolingLayer(BasePoolingLayer):
         else:
             self.padding_scheme = ELL.PaddingScheme.zeros
             self.pooling_type = ELL.PoolingType.mean
-            
+
         super().__init__(layer)
 
 
@@ -697,19 +709,19 @@ class PReLULayer(BaseLayer):
     def process(self, ellLayers):
         """Appends the ELL representation of the current layer to ellLayers."""
 
-        preluParameter = find_parameter_by_name(self.layer.parameters, 'prelu', 0)
+        preluParameter = find_parameter_by_name(
+            self.layer.parameters, 'prelu', 0)
 
-        # TODO
-        # preluVector = converters.get_float_vector_from_cntk_trainable_parameter(
-        #    preluParameter)
+        preluTensor = converters.get_float_tensor_from_cntk_convolutional_weight_parameter(
+            preluParameter)
 
         # Create the ELL.LayerParameters for the ELL layer
-        #layerParameters = ELL.LayerParameters(
-        #    self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
+        layerParameters = ELL.LayerParameters(
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
 
-        # Create the ELL activation layer
-        #ellLayers.append(ELL.FloatActivationLayer(
-        #    layerParameters, ELL.ActivationType.leaky))
+        # Create the ELL PReLU activation layer
+        ellLayers.append(ELL.FloatPReLUActivationLayer(
+            layerParameters, preluTensor))
 
 
 class SoftmaxLayer(BaseLayer):
@@ -736,6 +748,7 @@ class SoftmaxLayer(BaseLayer):
             return True
         return False
 
+
 class BatchNormalizationLayer(BaseLayer):
     """Logic for converting a CNTK BatchNormalization layer to ELL"""
 
@@ -754,8 +767,10 @@ class BatchNormalizationLayer(BaseLayer):
         # Therefore, make sure the output padding characteristics of the last layer reflect the next layer's
         # padding requirements.
 
-        scaleParameter = find_parameter_by_name(self.layer.parameters, 'scale', 0)
-        biasParameter = find_parameter_by_name(self.layer.parameters, 'bias', 1)
+        scaleParameter = find_parameter_by_name(
+            self.layer.parameters, 'scale', 0)
+        biasParameter = find_parameter_by_name(
+            self.layer.parameters, 'bias', 1)
         meanParameter = find_parameter_by_name(
             self.layer.constants, 'aggregate_mean', 0)
         varianceParameter = find_parameter_by_name(
@@ -793,9 +808,9 @@ class BiasLayer(BaseLayer):
     """Logic for converting a CNTK Plus layer to ELL"""
 
     def __init__(self, layer):
-        # Only accept Plus functions that act as bias layers (one and only one parameter)
         if len(layer.parameters) != 1:
-            raise ValueError        
+            raise ValueError(
+                "Only processing Plus functions that act as bias layers")
 
         self.op_name = 'Plus'
         super().__init__(layer)
@@ -846,12 +861,11 @@ class LayerFactory():
                 return SoftmaxLayer(cntkLayer)
             else:
                 print("\nWill not process", cntkLayer.op_name,
-                    "- skipping this layer as irrelevant.")
-        except (ValueError, AttributeError):
+                      "- skipping this layer as irrelevant.")
+        except (ValueError, AttributeError) as e:
             # raised if a layer contains invalid characteristics
-            print("\nCould not process", cntkLayer.op_name,
-                "- skipping this layer as irrelevant.")
-            
+            print("\Will not process", cntkLayer.op_name, "-", str(e))
+
         return None
 
     @staticmethod
@@ -859,6 +873,7 @@ class LayerFactory():
         return ((len(cntkLayer.arguments) > 0 and len(cntkLayer.arguments[0].shape) > 0) or
                 # special case for Binary Convolution
                 (cntkLayer.op_name == "Convolution" and len(cntkLayer.inputs) > 0 and len(cntkLayer.inputs[0].shape) > 0))
+
 
 def get_filtered_layers_list(modelLayers):
     """Returns a relevant list of CNTK layers and layer objects
@@ -874,7 +889,7 @@ def get_filtered_layers_list(modelLayers):
                     relevantLayers.append(layerObject)
             else:
                 print("\nWill not process", currentLayer.op_name,
-                    "- empty input shape.")
+                      "- empty input shape.")
 
     # Go through the layers and set the output characteristics:
     # - padding parameters for output, based on the next layer's input
@@ -892,6 +907,7 @@ def get_filtered_layers_list(modelLayers):
 
         currentLayer.print_summary()
     return relevantLayers
+
 
 def convert_cntk_layers_to_ell_layers(layersToConvert):
     """Walks a list of CNTK layers and returns a list of ELL Layer objects that is used to construct a Neural Network Predictor"""

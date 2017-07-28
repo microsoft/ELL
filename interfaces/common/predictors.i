@@ -73,7 +73,7 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 %include <ConvolutionalLayer.h>
 %include <PoolingLayer.h>
 
-// Template instaniations
+// Template instantiations
 %template(FloatLayer) ell::api::predictors::neural::Layer<float>;
 %template(FloatActivationLayer) ell::api::predictors::neural::ActivationLayer<float>;
 %template(FloatBatchNormalizationLayer) ell::api::predictors::neural::BatchNormalizationLayer<float>;
@@ -82,6 +82,7 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 %template(FloatConvolutionalLayer) ell::api::predictors::neural::ConvolutionalLayer<float>;
 %template(FloatFullyConnectedLayer) ell::api::predictors::neural::FullyConnectedLayer<float>;
 %template(FloatPoolingLayer) ell::api::predictors::neural::PoolingLayer<float>;
+%template(FloatPReLUActivationLayer) ell::api::predictors::neural::PReLUActivationLayer<float>;
 %template(FloatScalingLayer) ell::api::predictors::neural::ScalingLayer<float>;
 %template(FloatSoftmaxLayer) ell::api::predictors::neural::SoftmaxLayer<float>;
 %template(FloatLayerVector) std::vector<ell::api::predictors::neural::Layer<float>*>;
@@ -95,6 +96,7 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 %template(DoubleConvolutionalLayer) ell::api::predictors::neural::ConvolutionalLayer<double>;
 %template(DoubleFullyConnectedLayer) ell::api::predictors::neural::FullyConnectedLayer<double>;
 %template(DoublePoolingLayer) ell::api::predictors::neural::PoolingLayer<double>;
+%template(DoublePReLUActivationLayer) ell::api::predictors::neural::PReLUActivationLayer<double>;
 %template(DoubleScalingLayer) ell::api::predictors::neural::ScalingLayer<double>;
 %template(DoubleSoftmaxLayer) ell::api::predictors::neural::SoftmaxLayer<double>;
 %template(DoubleLayerVector) std::vector<ell::api::predictors::neural::Layer<double>*>;

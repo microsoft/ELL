@@ -8,6 +8,9 @@
 
 #pragma once
 
+// math
+#include "Tensor.h"
+
 namespace ell
 {
 namespace predictors
@@ -22,7 +25,10 @@ namespace neural
         /// <summary> Sets the output as a function of the input. </summary>
         ///
         /// <param name="input"> The input value. </param>
-        ElementType Apply(const ElementType input) const;
+        /// <param name="index"> The input index. </param>
+        ///
+        /// <returns> The computed output. </param>
+        ElementType Apply(const ElementType input, const math::Triplet& index) const;
 
         /// <summary> Typename used for serialization. </summary>
         static std::string GetTypeName() { return "SigmoidActivation"; }

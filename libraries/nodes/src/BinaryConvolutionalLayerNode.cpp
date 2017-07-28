@@ -40,6 +40,9 @@ namespace nodes
         const auto greaterThanOrEqual = emitters::TypedComparison::greaterThanOrEquals;
         const auto greaterThanFloat = emitters::TypedComparison::greaterThanFloat;
 
+        // convolution parameters
+        const auto scaleOutputByFilterMeans = ell::predictors::neural::BinaryWeightsScale::mean;
+
         //
         // Functions
         //
@@ -301,6 +304,18 @@ namespace nodes
         return this->GetLayer().GetFilterMeans();
     }
 
+    template <typename ValueType> // TODO: PackedBitsType
+    std::vector<int64_t> BinaryConvolutionalLayerNode<ValueType>::GetCompressedInputPaddingMasks() const
+    {
+        std::vector<int64_t> result;
+        auto&& masks = this->GetLayer().GetCompressedInputPaddingMasks();
+        for (auto&& m : masks)
+        {
+            result.insert(result.end(), m.begin(), m.end());
+        }
+        return result;
+    }
+
     template <typename ValueType>
     bool BinaryConvolutionalLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
@@ -323,15 +338,18 @@ namespace nodes
 
         auto compressedFilterWeights = GetCompressedFilterWeights();
         auto filterMeans = GetFilterMeans();
+        auto compressedPaddingMasks = GetCompressedInputPaddingMasks();
 
         using PackedBitsType = int64_t;
         auto reshapeNode = transformer.AddNode<BinarizeAndReshapeImageNode<ValueType, PackedBitsType>>(newInput,
                                                                                                        convParams,
                                                                                                        inputLayout,
                                                                                                        outputLayout);
+        auto paddingMasksNode = transformer.AddNode<ConstantNode<PackedBitsType>>(compressedPaddingMasks);
         auto filterWeightsNode = transformer.AddNode<ConstantNode<PackedBitsType>>(compressedFilterWeights);
         auto filterMeansNode = transformer.AddNode<ConstantNode<ValueType>>(filterMeans);
         auto xnorNode = transformer.AddNode<BinaryXnorNode<ValueType, PackedBitsType>>(reshapeNode->output,
+                                                                                       paddingMasksNode->output,
                                                                                        filterWeightsNode->output,
                                                                                        filterMeansNode->output,
                                                                                        convParams,
@@ -425,18 +443,19 @@ namespace nodes
     //
     template <typename ValueType, typename PackedBitsType>
     BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode()
-        : CompilableNode({ &_input, &_filterWeights, &_filterMeans }, { &_output }), _input(this, {}, inputPortName), _filterWeights(this, {}, filterWeightsPortName), _filterMeans(this, {}, filterMeansPortName), _output(this, outputPortName, 0)
+        : CompilableNode({ &_input, &_inputPaddingMasks, &_filterWeights, &_filterMeans }, { &_output }), _input(this, {}, inputPortName), _inputPaddingMasks(this, {}, inputPaddingMasksPortName), _filterWeights(this, {}, filterWeightsPortName), _filterMeans(this, {}, filterMeansPortName), _output(this, outputPortName, 0)
     {
     }
 
     template <typename ValueType, typename PackedBitsType>
     BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode(const model::PortElements<PackedBitsType>& input,
+                                                              const model::PortElements<PackedBitsType>& compressedInputPaddingMasks,
                                                               const model::PortElements<PackedBitsType>& compressedFilterWeights,
                                                               const model::PortElements<ValueType>& filterMeans,
                                                               const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                                               const PortMemoryLayout& inputMemoryLayout,
                                                               const PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, inputPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, outputPortName, GetMemorySize(outputMemoryLayout)), _convolutionalParameters(convolutionalParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
+        : CompilableNode({ &_input, &_inputPaddingMasks, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, inputPortName), _inputPaddingMasks(this, compressedInputPaddingMasks, inputPaddingMasksPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, outputPortName, GetMemorySize(outputMemoryLayout)), _convolutionalParameters(convolutionalParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
     {
     }
 
@@ -444,9 +463,10 @@ namespace nodes
     void BinaryXnorNode<ValueType, PackedBitsType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
+        auto newInputPaddingMasks = transformer.TransformPortElements(_inputPaddingMasks.GetPortElements());
         auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
         auto newFilterMeans = transformer.TransformPortElements(_filterMeans.GetPortElements());
-        auto newNode = transformer.AddNode<BinaryXnorNode>(newInput, newFilterWeights, newFilterMeans, _convolutionalParameters, _inputMemoryLayout, _outputMemoryLayout);
+        auto newNode = transformer.AddNode<BinaryXnorNode>(newInput, newInputPaddingMasks, newFilterWeights, newFilterMeans, _convolutionalParameters, _inputMemoryLayout, _outputMemoryLayout);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -464,6 +484,7 @@ namespace nodes
 
         llvm::Value* pFilterWeights = compiler.EnsurePortEmitted(filterWeights);
         llvm::Value* pFilterMeans = compiler.EnsurePortEmitted(filterMeans);
+        llvm::Value* pInputPaddingMask = compiler.EnsurePortEmitted(inputPaddingMasks);
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
@@ -504,7 +525,7 @@ namespace nodes
         const int channelDimension = 2;
 
         const auto partialBlockSize = fieldVolumeSize % numBits;
-        
+
         // Compute and accumulate xnor counts
         auto rowLoop = function.ForLoop();
         rowLoop.Begin(outputRows);
@@ -524,20 +545,19 @@ namespace nodes
                 auto inputRow = function.Operator(plus, function.Operator(times, outputRowIndex, function.Literal<int>(outputColumns)), outputColumnIndex);
                 auto inputBegin = function.Operator(times, inputRow, function.Literal<int>(numStoredBlocksPerFilter));
                 auto channelLoop = function.ForLoop();
-                channelLoop.Begin(numFilters); // filters are the output channels, so numFilters is the # of output channels 
+                channelLoop.Begin(numFilters); // filters are the output channels, so numFilters is the # of output channels
                 {
                     auto outputChannelIndex = channelLoop.LoadIterationVariable();
                     llvm::Value* channelOutputInternalOffset = function.Operator(plus, outputChannelIndex, function.Literal<int>(outputOffset[channelDimension]));
                     auto scaledChannelOutputOffset = function.Operator(times, channelOutputInternalOffset, function.Literal<int>(outputIncrement[channelDimension]));
                     auto channelOutputOffset = function.Operator(plus, columnOutputOffset, scaledChannelOutputOffset);
 
-                    llvm::Value* filterMean = function.ValueAt(pFilterMeans, outputChannelIndex);
                     auto filterBegin = function.Operator(times, outputChannelIndex, function.Literal<int>(numStoredBlocksPerFilter));
 
                     llvm::Value* sumVar = function.Variable(packedBitsType, "accum");
                     function.Store(sumVar, function.Literal<PackedBitsType>(0));
                     llvm::Value* outputLocationOffset = channelOutputOffset;
-                    
+
                     // TODO: vectorize this (?)
                     auto blockLoop = function.ForLoop();
                     blockLoop.Begin(packedRowSize);
@@ -549,6 +569,9 @@ namespace nodes
                         auto filterIndex = function.Operator(plus, filterBegin, blockIndex);
                         auto filterVal = function.ValueAt(pFilterWeights, filterIndex);
                         auto xorVal = function.Operator(emitters::TypedOperator::logicalXor, filterVal, inputVal);
+
+                        // TODO: apply pInputPaddingMask logic if zero padding is used
+
                         auto count = function.Call(popcountFunction, { xorVal });
                         function.Store(sumVar, function.Operator(plus, count, function.Load(sumVar)));
                     }
@@ -563,8 +586,19 @@ namespace nodes
                         const auto filterAdjust = numBits - partialBlockSize;
                         adjustedSum = function.Operator(minusFloat, sumFloat, function.Literal<ValueType>(filterAdjust));
                     }
-                    auto scaledOutput = function.Operator(timesFloat, adjustedSum, filterMean);
-                    function.SetValueAt(pOutput, outputLocationOffset, scaledOutput);
+
+                    if (_convolutionalParameters.weightsScale == scaleOutputByFilterMeans)
+                    {
+                        // Scale output by the filters mean
+                        llvm::Value* filterMean = function.ValueAt(pFilterMeans, outputChannelIndex);
+                        auto scaledOutput = function.Operator(timesFloat, adjustedSum, filterMean);
+                        function.SetValueAt(pOutput, outputLocationOffset, scaledOutput);
+                    }
+                    else
+                    {
+                        // No output scaling
+                        function.SetValueAt(pOutput, outputLocationOffset, adjustedSum);
+                    }
                 }
                 channelLoop.End();
             }
