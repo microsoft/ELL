@@ -450,6 +450,21 @@ def process_linear_layer(layer, ellLayers):
 
     return
 
+def process_plus_layer(layer,ellLayers):
+    biasParameter = findParameterByName(layer.parameters, 'b', 0)
+    biasVector = get_float_vector_from_cntk_trainable_parameter(biasParameter)
+    layerParameters = ELL.LayerParameters(layer.ell_outputShapeMinusPadding, ELL.NoPadding(
+    ), layer.ell_outputShape, layer.ell_outputPaddingParameters)
+    ellLayers.append(ELL.FloatBiasLayer(layerParameters, biasVector))
+    return
+
+def process_times_layer(layer,ellLayers):
+    weightsParameter = findParameterByName(layer.parameters, 'W', 0)
+    weightsTensor = get_float_tensor_from_cntk_dense_weight_parameter(weightsParameter)
+    layerParameters = ELL.LayerParameters(layer.ell_inputShape, layer.ell_inputPaddingParameters, layer.ell_outputShapeMinusPadding, ELL.NoPadding())
+    ellLayers.append(ELL.FloatFullyConnectedLayer(layerParameters, weightsTensor))
+    return
+
 
 def process_element_times_layer(layer, ellLayers):
     if (len(layer.constants) == 1):
@@ -655,6 +670,10 @@ def convert_cntk_layers_to_ell_layers(layersToConvert):
             process_softmax_layer(cntkLayer, ellLayers)
         elif (cntkLayer.op_name == 'BatchNormalization'):
             process_batch_normalization_layer(cntkLayer, ellLayers)
+        elif (cntkLayer.op_name == 'Times'):
+            process_times_layer(cntkLayer, ellLayers)
+        elif (cntkLayer.op_name == 'Plus'):
+            process_plus_layer(cntkLayer, ellLayers)
     print("\n...Finished constructing ELL layers.")
 
     return ellLayers
@@ -683,7 +702,7 @@ def get_input_padding_parameters_for_layer(layer):
                 padding = attributes['upperPad'][0]
         else:
             padding = attributes['upperPad'][0]
-            
+
     elif (layer.op_name == 'MaxPooling'):
         paddingScheme = ELL.PaddingScheme.min
         attributes = layer.block_root.attributes
@@ -792,7 +811,7 @@ def get_filtered_layers_list(modelLayers):
 
             if (currentLayer.op_name == 'Convolution'):
                 inputParameter, weightsParameter, binarized = get_convolutional_layer_info(currentLayer)
-                currentLayer.ell_inputShape = get_adjusted_shape_for_layer(inputParameter.shape, currentLayer.ell_inputPaddingParameters)                    
+                currentLayer.ell_inputShape = get_adjusted_shape_for_layer(inputParameter.shape, currentLayer.ell_inputPaddingParameters)
                 relevantLayers.append(currentLayer)
                 currentLayer.ell_binarized = binarized
 
@@ -805,14 +824,16 @@ def get_filtered_layers_list(modelLayers):
                 (currentLayer.op_name == 'ReLU') or
                 (currentLayer.op_name == 'LeakyReLU') or
                 (currentLayer.op_name == 'Softmax') or
-                (currentLayer.op_name == 'BatchNormalization')
+                (currentLayer.op_name == 'BatchNormalization') or
+		        (currentLayer.op_name == 'Times') or
+		        (currentLayer.op_name == 'Plus')
             ):
                 if (len(currentLayer.arguments) > 0 and len(currentLayer.arguments[0].shape) > 0):
                     currentLayer.ell_inputShape = get_adjusted_shape_for_layer(
-                        currentLayer.arguments[0].shape, currentLayer.ell_inputPaddingParameters)                    
+                        currentLayer.arguments[0].shape, currentLayer.ell_inputPaddingParameters)
                     relevantLayers.append(currentLayer)
                 else:
-                    print("\nWill not process", currentLayer.op_name, "with no inputs or input shape - skipping this layer as irrelevant.")                    
+                    print("\nWill not process", currentLayer.op_name, "with no inputs or input shape - skipping this layer as irrelevant.")
             else:
                 print("\nWill not process", currentLayer.op_name, "- skipping this layer as irrelevant.")
 
