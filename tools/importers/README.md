@@ -10,7 +10,7 @@ In order to use one of these importers, be sure to first install the ELL python 
   - Backing native modules for ELL Python APIs. `_ELL.so` on Linux and Mac, or `_ELL.pyd` on Windows
 
 ## CNTK to ELL
-The `cntk_to_ell.py` file contains a simple importer for previously trained CNTK models. You can create an ELL Neural Network Predictor from Python using the `predictor_from_cntk_model` function e.g.
+The [CNTK](CNTK/doc/README.md) folder contains a simple importer for previously trained CNTK models. You can create an ELL Neural Network Predictor from Python using the `predictor_from_cntk_model` function e.g.
 
         from cntk_to_ell import predictor_from_cntk_model
         predictor = predictor_from_cntk_model('myCntkModel.dnn')

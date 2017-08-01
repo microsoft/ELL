@@ -106,6 +106,21 @@ class pySign(UserFunction):
                                 self.inputs[0].dynamic_axes)]
 
 
+def bit_map_as_numpy_array(bit_map, input):
+    """Converts a bit_map (integer or array) into a numpy array"""
+
+    result = None
+    if (type(bit_map) == int):
+        length = C.reshape(input, (-1))
+        result = [bit_map] * length.shape[0]
+        result = np.asarray(result)
+        result = result.reshape(input.shape)
+    else:
+        result = np.asarray(bit_map)
+    assert (result.shape == input.shape)
+    return result
+
+
 class MultibitKernel(UserFunction):
     """ Similar to CustomSign, Multibit binarizes an input using straight through estimator gradients. However, Multibit also supports a
         bit_map argument that specifies how many bits to binarize to. Bit_map is a tensor the shape of the input that has a bit value for
@@ -205,7 +220,12 @@ class MultibitKernel(UserFunction):
 
     @staticmethod
     def deserialize(inputs, name, state):
-        return MultibitKernel(inputs[0], inputs[1], name)
+        if (len(inputs) == 1):
+            bit_map = 1  # TODO: need a way to get this from the model
+        else:
+            bit_map = inputs[1]
+        bit_map = bit_map_as_numpy_array(bit_map, inputs[0])
+        return MultibitKernel(inputs[0], bit_map, name)
 
 
 class Multibit(UserFunction):
@@ -285,6 +305,11 @@ class Multibit(UserFunction):
 
     @staticmethod
     def deserialize(inputs, name, state):
+        if (len(inputs) == 1):
+            bit_map = 1  # TODO: need a way to get this from the model
+        else:
+            bit_map = inputs[1]
+        bit_map = bit_map_as_numpy_array(bit_map, inputs[0])
         return Multibit(inputs[0], inputs[1], name)
 
 
@@ -334,49 +359,65 @@ def CustomMultibitKernel(input, bit_map, mean_bits=None):
 def BinaryConvolution(filter_shape,
                       num_filters=1,
                       channels=1,
-                      init=glorot_uniform(),
+                      init=C.glorot_uniform(),
                       pad=False,
                       strides=1,
-                      bit_map=None,
                       bias=True,
                       init_bias=0,
-                      activation=False,
+                      activation=True,
                       init_activation=glorot_uniform(),
-                      op_name='BinaryConvolution',
-                      name=''):
-    """ Instantiates a binary convolution layer
+                      bit_map=None,
+                      frac_map=None,
+                      onebits=0,
+                      twobits=0,
+                      threebits=0,
+                      fourbits=0,
+                      op_name='BinConvolution', name=''):
+    """ The definition for a binary convolution layer
         arguments:
             filter_shape: tuple indicating filter size
             num_filters: number of filters to use 
             channels: number of incoming channels
-            init: initialization to use for weights
+            init: type of initialization to use for weights
             pad: set to True apply padding on rows and columns
             strides: number of strides
-            bit_map: if a tensor, the bit_map used for binarization, if an int, the uniform bit_width to binarize to
             bias: set to True to apply bias
             init_bias: initialization to use for bias
             activation: set to True to apply activation
             init_activation: initialization to use for activation
-            op_name: operation name
+            bit_map: if a tensor, the bit_map used for binarization, if an int, the uniform bit_width to binarize to
+            frac_map: boolean indicating whether to generate a bit_map with varying bit_widths
+            onebits: fraction of values to be binarized to 1 bit
+            twobits: fraction of values to be binarized to 2 bits
+            threebits: fraction of values to be binarized to 3 bits
+            fourbits: fraction of values to be binarized to 4 bits
             name: name of the function instance in the network
     """
     kernel_shape = (num_filters, channels) + filter_shape
-    W = C.parameter(shape=kernel_shape, init=init, name="W")
+    bias_shape = (num_filters, 1, 1)
+
+    W = C.parameter(shape=kernel_shape, init=init, name="filter")
     W = CustomSign(W)
+
     if bit_map:
         W = CustomMultibit(W, bit_map)
+    elif frac_map:
+        bit_map = bitmap_gen(kernel_shape, onebits,
+                             twobits, threebits, fourbits)
+        W = CustomMultibit(W, bit_map)
 
-    bias_shape = (num_filters, 1, 1)
-    b = C.parameter(shape=bias_shape, init=init_bias, name="b")
+    b = C.parameter(shape=bias_shape, init=init_bias)
 
     def convolve(x):
         r = C.convolution(W, x, auto_padding=[
-            False, pad, pad], strides=[strides])
+                          False, pad, pad], strides=[strides])
+        r.name = name
+
         if bias:
             r = r + b
         if activation:
             # apply learnable param relu
-            P = parameter(shape=r.shape, init=init_activation, name="prelu")
+            P = C.parameter(shape=r.shape, init=init_activation, name="prelu")
             r = C.param_relu(P, r)
         return r
     return convolve

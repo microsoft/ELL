@@ -1,7 +1,7 @@
 ####################################################################################################
 #
 # Project:  Embedded Learning Library (ELL)
-# File:     converters.py (importers)
+# File:     cntk_converters.py (importers)
 # Authors:  Byron Changuion
 #
 # Requires: Python 3.x, cntk-2.0-cp35
@@ -12,6 +12,14 @@
 
 import ELL
 import numpy as np
+
+def get_float_vector_from_constant(constant, size):
+    # Workaround: For some reason, np.full is not returning a type that SWIG can parse. So just manually walk the array setting the scalar
+    array = np.zeros(size, dtype=np.float)
+    for i in range(array.size):
+        array[i] = constant
+    return ELL.FloatVector(array)
+
 
 def get_float_vector_from_cntk_trainable_parameter(tensorParameter):
     """Returns an ELL.FloatVector from a trainable parameter
@@ -73,7 +81,7 @@ def get_float_vector_from_cntk_array(inputArray):
             orderedWeights[i] = columnValue
             i += 1
         # Reshape to (1, 1, channels)
-        orderedWeights = orderedWeights.reshape(1, 1, tensorValue.size)
+        orderedWeights = orderedWeights.reshape(1, 1, inputArray.size)
     else:
         print("Error: Input array has incorrect dimensions")
         return None

@@ -8,11 +8,13 @@
 #
 ####################################################################################################
 import ELL
+import ell_utilities
 import numpy as np
 from cntk import load_model
 
 # Importer
 import lib.cntk_layers as cntk_layers
+import lib.cntk_utilities as cntk_utilities
 
 
 def predictor_from_cntk_model(modelFile):
@@ -23,7 +25,7 @@ def predictor_from_cntk_model(modelFile):
     print("\nFinished loading.")
 
     print("Pre-processing...")
-    modelLayers = cntk_layers.get_model_layers(z)
+    modelLayers = cntk_utilities.get_model_layers(z)
 
     # Get the relevant CNTK layers that we will convert to ELL
     layersToConvert = cntk_layers.get_filtered_layers_list(modelLayers)
@@ -33,7 +35,8 @@ def predictor_from_cntk_model(modelFile):
 
     try:
         # Create a list of ELL layers from the CNTK layers
-        ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(layersToConvert)
+        ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(
+            layersToConvert)
         # Create an ELL neural network predictor from the layers
         predictor = ELL.FloatNeuralNetworkPredictor(ellLayers)
 

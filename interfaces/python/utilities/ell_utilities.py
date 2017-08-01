@@ -11,6 +11,7 @@ import ELL
 import sys
 import traceback
 
+
 def ell_map_from_float_predictor(predictor):
     """Wraps an ELL.FloatNeuralNetworkPredictor into an ELL.Map"""
 

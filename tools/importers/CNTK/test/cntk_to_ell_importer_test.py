@@ -25,6 +25,8 @@ try:
     import ell_utilities
     import cntk_to_ell
     import lib.cntk_converters as cntk_converters
+    import lib.cntk_layers as cntk_layers
+    import lib.cntk_utilities as cntk_utilities
     from cntk.initializer import glorot_uniform, he_normal
     from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
     from cntk import constant, param_relu
@@ -50,6 +52,118 @@ def dump(obj):
         except:
             print("error:")
     return
+
+def BatchNormalizationTester(map_rank=1,
+                             init_scale=1,
+                             init_bias=0,
+                             normalization_time_constant=5000,
+                             blend_time_constant=0,
+                             epsilon=0.00001,
+                             use_cntk_engine=True,
+                             norm_shape=(),
+                             init_mean=None,
+                             init_variance=None,
+                             name=''):
+    """ Instantiates a batch normalization layer for testing purposes,
+        where mean and variance can be set.
+    """
+    # parameters bound to this Function
+    scale = parameter(shape=norm_shape, init=init_scale, name='scale')
+    bias = parameter(shape=norm_shape, init=init_bias, name='bias')
+    run_mean = constant(shape=norm_shape, value=init_mean,
+                        name='aggregate_mean')
+    run_variance = constant(
+        shape=norm_shape, value=init_variance, name='aggregate_variance')
+    run_count = constant(0, shape=(), name='aggregate_count')
+
+    # expression
+    def batch_normalize(x):
+        return batch_normalization(x, scale, bias, run_mean, run_variance, running_count=run_count,
+                                   spatial=map_rank == 1, normalization_time_constant=normalization_time_constant,
+                                   blend_time_constant=blend_time_constant, epsilon=epsilon,
+                                   use_cudnn_engine=not use_cntk_engine)
+
+    return batch_normalize
+
+def compare_predictor_output(modelFile, labels, modelTestInput, maxLayers=None):
+    """Compares an ELL.NeuralNetworkPredictor against its equivalent CNTK model.
+
+    Parameters:
+    modelFile -- path to the CNTK model file
+    labels -- array of labels
+    modelTestInput -- input data in row, column, channel ordering
+    maxLayers -- integer to indicate how many layers to run before stopping.
+                Setting to None will run all layers and compare against the original model.
+
+    """
+
+    def get_predictions(predictions, labels, topN=5):
+        idx = (-predictions).argsort()[:topN]
+        labels_topN = [labels[i] for i in idx]
+        return labels_topN
+
+    z = load_model(modelFile)
+    modelLayers = cntk_utilities.get_model_layers(z)
+
+    # Get the relevant CNTK layers that we will convert to ELL
+    layersToConvert = cntk_layers.get_filtered_layers_list(
+        modelLayers, maxLayers)
+
+    if len(layersToConvert) == 0:
+        raise RuntimeError("No layers are converted, nothing to test")
+
+    # Create a list of ELL layers from the relevant CNTK layers
+    print("\nCreating ELL predictor...")
+    ellLayers = cntk_layers.convert_cntk_layers_to_ell_layers(
+        layersToConvert)
+
+    # Create an ELL neural network predictor from the relevant CNTK layers
+    predictor = ELL.FloatNeuralNetworkPredictor(ellLayers)
+
+    ellTestInput = modelTestInput.ravel()  # rows, columns, channels
+    ellResults = predictor.Predict(ellTestInput)
+
+    # rows, columns, channels => channels, rows, columns
+    cntkTestInput = np.moveaxis(modelTestInput, -1, 0).astype(np.float32)
+    cntkTestInput = np.ascontiguousarray(cntkTestInput)
+
+    # Get the equivalent CNTK model
+    if (maxLayers is None):
+        print("\nRunning original CNTK model...")
+
+        _, out = z.forward(
+            {z.arguments[0]: [cntkTestInput], z.arguments[1]: [list(range(len(labels)))]})
+        for output in z.outputs:
+            if (output.shape == (len(labels),)):
+                out = out[output]
+        out = out[0]
+
+        # For the full model, we compare predictions instead of layers
+        cntkPredictions = get_predictions(out, labels)
+        ellPredictions = get_predictions(np.array(ellResults), labels)
+        np.testing.assert_array_equal(
+            cntkPredictions, ellPredictions, 'predictions do not match!')
+    else:
+        print("\nRunning partial CNTK model...")
+
+        if (layersToConvert[-1].layer.op_name == 'CrossEntropyWithSoftmax' and len(layersToConvert) > 2):
+            # ugly hack for CrossEntropyWithSoftmax
+            from cntk.ops import softmax
+            zz = as_composite(layersToConvert[-2].layer)
+            zz = softmax(zz)
+        else:
+            zz = as_composite(layersToConvert[-1].layer)
+        print(zz)
+
+        # Uncomment to plot the partial model
+        # cntk_utilities.plot_model(zz, output_file="cntk_partial.png")
+
+        out = zz(cntkTestInput)
+        orderedCntkModelResults = cntk_converters.get_float_vector_from_cntk_array(
+            out)
+
+        np.testing.assert_array_almost_equal(
+            orderedCntkModelResults, ellResults, 4, 'results do not match!')
 
 
 class CntkLayersTestCase(unittest.TestCase):
@@ -244,26 +358,32 @@ class CntkLayersTestCase(unittest.TestCase):
         # This verifies that the import functions reshape and reorder values appropriately and
         # that the equivalent ELL layer produces comparable output
 
+        # Create a test set of scales and biases to use for both CNTK and ELL layers
+        scaleValues = np.linspace(0.1, 0.5, num=16, dtype=np.float32)
+        scaleVector = cntk_converters.get_float_vector_from_cntk_array(
+            scaleValues)
+
+        biasValues = np.linspace(1, 2, num=16, dtype=np.float32)
+        biasVector = cntk_converters.get_float_vector_from_cntk_array(
+            biasValues)
+
+        meanValues = np.linspace(-0.5, 0.5, num=16, dtype=np.float32)
+        meanVector = cntk_converters.get_float_vector_from_cntk_array(
+            meanValues)
+
+        varianceValues = np.linspace(-1, 1, num=16, dtype=np.float32)
+        varianceVector = cntk_converters.get_float_vector_from_cntk_array(
+            varianceValues)
+
         # Create a BatchNormalization CNTK layer
-        batchNorm = BatchNormalization(map_rank=1)
+        # CNTK's BatchNormalization layer does not support setting the running mean and variance,
+        # so we use a wrapper function around the batch_normalization op
+        batchNorm = BatchNormalizationTester(init_scale=scaleValues, norm_shape=scaleValues.shape,
+                                             init_bias=biasValues, init_mean=meanValues, init_variance=varianceValues)
 
         # Input order for CNTK is channels, rows, columns
         x = input((16, 10, 10))
         cntkModel = batchNorm(x)
-
-        # Create a test set of scales and biases to use for both CNTK and ELL layers
-        scaleValues = np.linspace(0.1, 0.5, num=16, dtype=np.float_)
-        batchNorm.parameters[0].value = scaleValues
-        scaleVector = ELL.FloatVector(scaleValues)
-
-        biasValues = np.linspace(1, 2, num=16, dtype=np.float_)
-        batchNorm.parameters[1].value = biasValues
-        biasVector = ELL.FloatVector(biasValues)
-
-        # CNTK's BatchNormalization does not support overriding the running mean and variance,
-        # so we use zeros, which are the default values
-        meanVector = ELL.FloatVector(16)
-        varianceVector = ELL.FloatVector(16)
 
         # Create the equivalent ELL predictor
         layers = []
@@ -373,6 +493,32 @@ class CntkXorModelTestCase(unittest.TestCase):
 
         return
 
+
+class CntkBinarizedModelTestCase(unittest.TestCase):
+    def setUp(self):
+        if SkipTests:
+            self.skipTest('Module not tested, CNTK or ELL module missing')
+
+        # TODO: get a smaller model so that these can be checked in
+        if (not os.path.exists('cntkDarknetBinarized.model') or
+            not os.path.exists('cntkDarknetBinarizedImageNetLabels.txt')):
+            self.skipTest('Model files are missing, skipping test')
+
+        self.labels = open("cntkDarknetBinarizedImageNetLabels.txt").readlines()
+        self.model_file = "cntkDarknetBinarized.model"
+
+
+    def test_binarized_model(self):
+
+        rgb = np.array([174, 198, 207])
+        data = np.repeat(rgb, 227 * 227).reshape(227, 227, 3).astype(np.float)
+
+        compare_predictor_output(self.model_file,
+            self.labels, data, maxLayers=40)
+
+        compare_predictor_output(self.model_file,
+            self.labels, data)
+        return
 
 if __name__ == '__main__':
     if not SkipTests:

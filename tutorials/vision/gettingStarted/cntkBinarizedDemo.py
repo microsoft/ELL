@@ -5,6 +5,7 @@ import cv2
 
 import findEll
 import cntk_to_ell
+import ell_utilities
 import modelHelper as mh
 
 
@@ -22,7 +23,8 @@ def main():
     # ModelConfig for Darknet Binarized model from ELL Model Gallery
     # Follow the instructions in README.md to download the model if you intend to use it.
     helper = mh.ModelHelper(sys.argv, "CntkDarknetBinarized", [
-                            "cntkDarknetBinarized.model"], "darknetImageNetLabels.txt")
+                            "cntkDarknetBinarized.model"], "cntkDarknetBinarizedImageNetLabels.txt",
+                            inputHeightAndWidth=(227, 227), threshold=-0.01, binarized=True)
 
     # Import the model
     model = get_ell_predictor(helper)
@@ -41,7 +43,11 @@ def main():
 
         # Prepare the image to send to the model.
         # This involves scaling to the required input dimension and re-ordering from BGR to RGB
-        data = helper.prepare_image_for_predictor(frame)
+        data = cv2.resize(frame, helper.inputHeightAndWidth)
+        data = np.asarray(data, dtype=np.float32)
+        data = np.ascontiguousarray(data)
+        data = data.astype(np.float)
+        data = data.ravel()
 
         # Get the model to classify the image, by returning a list of probabilities for the classes it can detect
         predictions = model.Predict(data)

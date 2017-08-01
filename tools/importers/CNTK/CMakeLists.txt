@@ -12,6 +12,7 @@ if(${PYTHONLIBS_FOUND})
     set(importer_src cntk_to_ell.py
         lib/cntk_converters.py
         lib/cntk_layers.py
+        lib/cntk_utilities.py
         custom_functions.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
