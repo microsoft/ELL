@@ -80,12 +80,13 @@ namespace nodes
     bool EuclideanDistanceNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto pointsMatrix = _w;
 
         auto normNode1 = transformer.AddNode<L2NormNode<double>>(newPortElements);
         auto squareNormNode1 = transformer.AddNode<BinaryOperationNode<double>>(normNode1->output, normNode1->output, emitters::BinaryOperationType::coordinatewiseMultiply);
 
+        auto pointsMatrix = _w;
         auto productNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(newPortElements, pointsMatrix);
+
         std::vector<double> multiplier(_w.NumRows(), -2.0);
         auto multiplierNode = transformer.AddNode<ConstantNode<ValueType>>(multiplier);
         auto productNodeScaled = transformer.AddNode<BinaryOperationNode<double>>(productNode->output, multiplierNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);

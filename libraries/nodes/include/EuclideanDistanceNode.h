@@ -23,9 +23,9 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> A node that represents a Euclidean distance. </summary>
+    /// <summary> A node that represents Euclidean distances of input vector to a set of vectors stacked as a row matrix. </summary>
     ///
-    /// <typeparam name="ValueType"> The Matrix element type. </typeparam>
+    /// <typeparam name="ValueType"> The Matrix element and input type. </typeparam>
     /// <typeparam name="layout"> The Matrix layout. </typeparam>
     ///
     template <typename ValueType, math::MatrixLayout layout>
@@ -78,11 +78,11 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
 
-        // Projection matrix
+        // Points matrix
         math::Matrix<ValueType, layout> _w;
     };
 
-    /// <summary> Adds a Matrix vector product node to a model transformer. </summary>
+    /// <summary> Adds a Euclidean node to a model transformer. </summary>
     ///
     /// <typeparam name="ValueType"> The Matrix element type. </typeparam>
     /// <typeparam name="layout"> The Matrix layout. </typeparam>
