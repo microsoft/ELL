@@ -1,0 +1,18 @@
+package:
+  name: ell
+  version: !!str 0.0.1
+
+source:
+  path: .
+
+requirements:
+  build:
+  - python
+  run:
+  - python
+  - numpy
+  - requests
+
+about:
+  home: https://github.com/Microsoft/ELL
+  license: MIT License

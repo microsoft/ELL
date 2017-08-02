@@ -684,6 +684,22 @@ void ELL_Map::Save(const std::string& filePath) const
     ell::common::SaveMap(*_map, filePath);
 }
 
+void ELL_Map::Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName, const std::string& filePath) const
+{
+	ell::model::MapCompilerParameters settings;
+	settings.moduleName = moduleName;
+	settings.mapFunctionName = functionName;
+	settings.compilerSettings.targetDevice.deviceName = targetDevice;
+
+	ell::model::IRMapCompiler compiler(settings);
+	auto compiledMap = compiler.Compile(*_map);
+
+	auto dir = ell::utilities::GetDirectory(filePath);
+	auto baseFilename = ell::utilities::JoinPaths(dir, ell::utilities::RemoveFileExtension(filePath));
+	compiledMap.WriteCode(baseFilename + ".ll", ell::emitters::ModuleOutputFormat::ir);
+	compiledMap.WriteCode(baseFilename + ".i", ell::emitters::ModuleOutputFormat::swigInterface);
+}
+
 //
 // ELL_SteppableMap
 //

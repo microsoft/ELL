@@ -118,6 +118,13 @@ namespace utilities
         return filepath.substr(filepath.find_last_of("/\\") + 1);
     }
 
+	std::string GetDirectory(std::string filepath)
+	{
+		// PORTABILITY should be replaced by C++17 filesystem when available
+		auto idx = filepath.find_last_of("/\\");
+		return idx >= 0 ? filepath.substr(0, idx) : filepath;
+	}
+
     std::string JoinPaths(std::string path1, std::string path2)
     {
         // PORTABILITY should be replaced by C++17 filesystem when available
