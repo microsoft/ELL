@@ -53,6 +53,7 @@ def dump(obj):
             print("error:")
     return
 
+
 def BatchNormalizationTester(map_rank=1,
                              init_scale=1,
                              init_bias=0,
@@ -84,6 +85,7 @@ def BatchNormalizationTester(map_rank=1,
                                    use_cudnn_engine=not use_cntk_engine)
 
     return batch_normalize
+
 
 def compare_predictor_output(modelFile, labels, modelTestInput, maxLayers=None):
     """Compares an ELL.NeuralNetworkPredictor against its equivalent CNTK model.
@@ -501,12 +503,12 @@ class CntkBinarizedModelTestCase(unittest.TestCase):
 
         # TODO: get a smaller model so that these can be checked in
         if (not os.path.exists('cntkDarknetBinarized.model') or
-            not os.path.exists('cntkDarknetBinarizedImageNetLabels.txt')):
+                not os.path.exists('cntkDarknetBinarizedImageNetLabels.txt')):
             self.skipTest('Model files are missing, skipping test')
 
-        self.labels = open("cntkDarknetBinarizedImageNetLabels.txt").readlines()
+        self.labels = open(
+            "cntkDarknetBinarizedImageNetLabels.txt").readlines()
         self.model_file = "cntkDarknetBinarized.model"
-
 
     def test_binarized_model(self):
 
@@ -514,11 +516,12 @@ class CntkBinarizedModelTestCase(unittest.TestCase):
         data = np.repeat(rgb, 227 * 227).reshape(227, 227, 3).astype(np.float)
 
         compare_predictor_output(self.model_file,
-            self.labels, data, maxLayers=40)
+                                 self.labels, data, maxLayers=38)
 
         compare_predictor_output(self.model_file,
-            self.labels, data)
+                                 self.labels, data)
         return
+
 
 if __name__ == '__main__':
     if not SkipTests:

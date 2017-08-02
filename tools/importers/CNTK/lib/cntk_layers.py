@@ -145,7 +145,7 @@ class DenseLayer(BaseLayer):
 
             # Special case: if this is softmax activation, create an ELL Softmax layer.
             # Else, insert an ELL ActivationLayer
-            if(utilities.is_softmax_activation(internalNodes)):
+            if (utilities.is_softmax_activation(internalNodes)):
                 ellLayers.append(ELL.FloatSoftmaxLayer(layerParameters))
             else:
                 if (activationType != None):
@@ -531,22 +531,23 @@ class AveragePoolingLayer(BasePoolingLayer):
         super().__init__(layer)
 
 
-class PoolingLayer(BasePoolingLayer):
+class PoolingLayer(BaseLayer):
     """Logic for converting a CNTK Pooling layer to ELL"""
 
     def __init__(self, layer):
         self.op_name = 'Pooling'
-
         super().__init__(layer)
 
-        if (self.attributes['poolingType'] == PoolingType_Max):
-            self.actual_layer = AveragePoolingLayer(layer)
-        else:
+        if (layer.attributes['poolingType'] == PoolingType_Max):
             self.actual_layer = MaxPoolingLayer(layer)
+        else:
+            self.actual_layer = AveragePoolingLayer(layer)
+
+    def __repr__(self):
+        return self.actual_layer.__repr__()
 
     def process(self, ellLayers):
         """Appends the ELL representation of the current layer to ellLayers."""
-
         self.actual_layer.process(ellLayers)
 
 
@@ -631,7 +632,7 @@ class SoftmaxLayer(BaseLayer):
             layerParameters = ELL.LayerParameters(
                 self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
 
-        # Create the ELL max pooling layer
+        # Create the ELL softmax layer
         ellLayers.append(ELL.FloatSoftmaxLayer(layerParameters))
 
 
@@ -741,7 +742,8 @@ class NegativeBiasLayer(BaseLayer):
             self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
 
         bias = -1.0 * self.layer.constants[0].value
-        biasVector = converters.get_float_vector_from_constant(bias, layerParameters.outputShape.channels)
+        biasVector = converters.get_float_vector_from_constant(
+            bias, layerParameters.outputShape.channels)
 
         # Create the ELL bias layer
         ellLayers.append(ELL.FloatBiasLayer(layerParameters, biasVector))
