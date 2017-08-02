@@ -70,6 +70,7 @@ int main()
         TestSimpleForestPredictorNodeRefine();
         TestDemultiplexerNodeRefine();
         TestMatrixVectorProductRefine();
+        TestEuclideanDistanceNodeRefine();
         TestProtoNNPredictorNode();
     }
     catch (const utilities::Exception& exception)

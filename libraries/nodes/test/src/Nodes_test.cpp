@@ -17,6 +17,7 @@
 #include "DTWDistanceNode.h"
 #include "DelayNode.h"
 #include "DemultiplexerNode.h"
+#include "EuclideanDistanceNode.h"
 #include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
@@ -579,6 +580,39 @@ void TestMatrixVectorProductRefine()
     auto computeOutput = model.ComputeOutput(matrixVectorProductNode->output);
 
     testing::ProcessTest("Testing matrix vector product node refine", testing::IsEqual(refinedOutput, computeOutput));
+}
+
+void TestEuclideanDistanceNodeRefine()
+{
+    math::RowMatrix<double> w(2, 3);
+    w(0, 0) = 1.0;
+    w(0, 1) = 0.2;
+    w(0, 2) = 0.3;
+    w(1, 0) = 0.3;
+    w(1, 1) = 0.7;
+    w(1, 2) = 0.5;
+
+    std::vector<double> input = { 1, 2, 3 };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(input.size());
+
+    inputNode->SetInput(input);
+
+    auto euclideanDistanceNode = model.AddNode<nodes::EuclideanDistanceNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, w);
+
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ euclideanDistanceNode->output });
+
+    refinedInputNode->SetInput(input);
+
+    auto refinedOutput = refinedModel.ComputeOutput(refinedOutputElements);
+    auto computeOutput = model.ComputeOutput(euclideanDistanceNode->output);
+
+    testing::ProcessTest("Testing Euclidean distance node refine", testing::IsEqual(refinedOutput, computeOutput));
 }
 
 void TestProtoNNPredictorNode()
