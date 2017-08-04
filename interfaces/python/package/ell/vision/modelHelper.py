@@ -99,12 +99,10 @@ class ModelHelper:
             ell_map = ell_map_from_float_predictor(predictor)
         return ell_map
 
-    def compile(self, predictor, platform, path, modulename = None, functionname = "predict"):
-        if modulename == None:
-            import os.path
-            modulename = os.path.basename(path)
+    def compile(self, predictor, platform, path):
+        path += '/model'
         prediction_function = self.create_function(predictor)
-        prediction_function.Compile(platform, modulename, functionname, path)
+        prediction_function.Compile(platform, 'model', 'predict', path)
         from ..util.commands import run_llc, run_swig
         run_swig(path + '.i')
         run_llc(path + '.ll')

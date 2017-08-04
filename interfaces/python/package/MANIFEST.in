@@ -1,1 +1,1 @@
-include ell/Release/*
+recursive-include ell/Release *

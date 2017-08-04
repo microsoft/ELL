@@ -60,6 +60,7 @@ class RaspberryPi(_CommandMagic):
         user = opts['user']
         ip = opts['ip']
         path = opts['path']
+        path += '/model'
         pipath = opts['pipath']
         dir = os.path.basename(path)
         actuationpy = self.save_cell(cell, 'actuation.py')
@@ -70,15 +71,29 @@ class RaspberryPi(_CommandMagic):
         def remote_copy(files, pipath):
             run('pscp -q -pw ' + self.password + ' ' + ' '.join(files) + ' ' + user + '@' + ip + ':' + pipath)
 
-        feedback('Copying files')
+        feedback('Copying files...')
+        remote_command('rm -r -f ' + pipath)
         remote_command('mkdir -p ' + pipath)
+        pkgdir = os.path.dirname(__file__)
         files = [
+            # build files
+            pkgdir + '/Release/deploy/CMakeLists.txt',
+            pkgdir + '/Release/deploy/OpenBLASSetup.cmake',
+            # python code
+            pkgdir + '/vision/modelHelper.py',
             actuationpy,
-            path + '.o',
+            # native code
             path + 'PYTHON_wrap.cxx',
             path + 'PYTHON_wrap.h',
+            pkgdir + '/Release/deploy/CallbackInterface.h',
+            pkgdir + '/Release/deploy/ClockInterface.h',
+            pkgdir + '/Release/deploy/CallbackInterface.tcc',
+            path + '.i.h',
+            path + '.o',
         ]
         remote_copy(files, pipath)
+        feedback('Building...')
+        remote_command('"mkdir build & cd build & cmake .. & make"')
         feedback('Done')
 
 
