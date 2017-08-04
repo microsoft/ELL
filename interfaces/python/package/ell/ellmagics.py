@@ -1,4 +1,4 @@
-from IPython.core.magic import Magics, magics_class, cell_magic
+from IPython.core.magic import Magics, magics_class, cell_magic, line_magic
 import tempfile
 import os
 from .util.commands import run, print as feedback
@@ -51,51 +51,54 @@ class Arduino(_CommandMagic):
 class RaspberryPi(_CommandMagic):
     password = None
 
-    @cell_magic
-    def raspberry_pi(self, line, cell):
+    def open_remote(self):
+        self.client = paramiko.SSHClient()
+        self.client.load_system_host_keys()
+        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.client.connect(self.ip, username=self.user, password=self.password)
+
+    def remote_command(self, command):
+        feedback(command)
+        stdin, stdout, stderr = self.client.exec_command(command)
+        for line in stdout:
+            feedback(line.strip('\n'))
+        for line in stderr:
+            feedback(line.strip('\n'))
+
+    def remote_copy(self, files, pipath):
+        with self.client.open_sftp() as sftp:
+            for file in files:
+                feedback('sftp ' + file)
+                lastpct = 0
+                def progress(sofar, total):
+                    nonlocal lastpct
+                    pct = sofar / total * 100
+                    delta = pct - lastpct
+                    if delta > 10 and delta < 90:
+                        feedback("{:.0f}%".format(pct))
+                        lastpct = pct
+                sftp.put(file, pipath + '/' + os.path.basename(file), callback=progress)
+
+    @line_magic
+    def rpi_deploy(self, line):
         opts, args = self.parse_options(line, '', 'user=', 'ip=', 'path=', 'pipath=')
 
         if not self.password:
             import getpass
             self.password = getpass.getpass(prompt='Password on the Raspberry Pi ')
 
-        user = opts['user']
-        ip = opts['ip']
-        path = opts['path']
-        path += '/model'
-        pipath = opts['pipath']
-        dir = os.path.basename(path)
-        actuationpy = self.save_cell(cell, 'actuation.py')
+        self.user = opts['user']
+        self.ip = opts['ip']
+        self.path = opts['path']
+        self.path += '/model'
+        self.pipath = opts['pipath']
+        dir = os.path.basename(self.path)
 
-        client = paramiko.SSHClient()
-        client.load_system_host_keys()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(ip, username=user, password=self.password)
-
-        def remote_command(command):
-            nonlocal client
-            feedback(command)
-            stdin, stdout, stderr = client.exec_command(command)
-            for line in stdout:
-                feedback(line.strip('\n'))
-
-        def remote_copy(files, pipath):
-            with client.open_sftp() as sftp:
-                for file in files:
-                    feedback('sftp ' + file)
-                    lastpct = 0
-                    def progress(sofar, total):
-                        nonlocal lastpct
-                        pct = sofar / total * 100
-                        delta = pct - lastpct
-                        if delta > 10 and delta < 90:
-                            feedback("{:.0f}%".format(pct))
-                            lastpct = pct
-                    sftp.put(file, pipath + '/' + os.path.basename(file), callback=progress)
+        self.open_remote()
 
         feedback('Copying files...')
-        remote_command('rm -r -f ' + pipath)
-        remote_command('mkdir -p ' + pipath)
+        self.remote_command('rm -r -f ' + self.pipath)
+        self.remote_command('mkdir -p ' + self.pipath)
         pkgdir = os.path.dirname(__file__)
         files = [
             # build files
@@ -103,23 +106,37 @@ class RaspberryPi(_CommandMagic):
             pkgdir + '/Release/deploy/OpenBLASSetup.cmake',
             # python code
             pkgdir + '/vision/modelHelper.py',
-            path + '.py',
-            actuationpy,
+            self.path + '.py',
             # native code
-            path + 'PYTHON_wrap.cxx',
-            path + 'PYTHON_wrap.h',
+            self.path + 'PYTHON_wrap.cxx',
+            self.path + 'PYTHON_wrap.h',
             pkgdir + '/Release/deploy/CallbackInterface.h',
             pkgdir + '/Release/deploy/ClockInterface.h',
             pkgdir + '/Release/deploy/CallbackInterface.tcc',
-            path + '.i.h',
-            path + '.o',
+            self.path + '.i.h',
+            self.path + '.o',
         ]
-        remote_copy(files, pipath)
+        self.remote_copy(files, self.pipath)
         feedback('Building...')
-        remote_command('cd ' + pipath + '; mkdir build; cd build; cmake ..; make')
-        feedback('Done')
+        self.remote_command('cd ' + self.pipath + '; mkdir build; cd build; cmake ..; make')
+        feedback('Launching...')
+        self.remote_command('python3 ' + self.pipath + '/actuation.py')
 
-        client.close()
+        self.client.close()
+
+
+
+    @cell_magic
+    def rpi_run(self, line, cell):
+        self.open_remote()
+
+        actuationpy = self.save_cell(cell, 'actuation.py')
+        self.remote_copy([actuationpy], self.pipath)
+
+        self.remote_command('python3 ' + self.pipath + '/actuation.py')
+
+
+
 
 
 def init_magics():
