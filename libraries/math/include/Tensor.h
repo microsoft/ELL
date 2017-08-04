@@ -12,7 +12,6 @@
 
 // stl
 #include <cmath>
-#include <iostream>
 #include <vector>
 #include <array>
 
@@ -24,7 +23,6 @@
 // stl
 #include <array>
 #include <initializer_list>
-#include <ostream>
 #include <tuple>
 #include <vector>
 
@@ -46,7 +44,7 @@ namespace math
     }
 
     /// <summary>
-    /// Forward declaration of TensorLayout. This class helps the tensor move back and forth from canonical coordinates (row, column, channel)
+    /// Forward declaration of TensorLayout. This class helps the tensor move back and forth from logical coordinates (row, column, channel)
     /// to the layout coordinates (which depend on how the tensor is layed out in memory)
     /// </summary>
     ///
@@ -57,7 +55,7 @@ namespace math
     template <Dimension dimension0, Dimension dimension1, Dimension dimension2>
     struct TensorLayout
     {
-        static Triplet CanonicalToLayout(Triplet canonical) { return{ canonical[rowPosition], canonical[columnPosition], canonical[channelPosition] }; }
+        static Triplet ShapeToLayout(Triplet shape) { return{ shape[rowPosition], shape[columnPosition], shape[channelPosition] }; }
         static const size_t rowPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::row);
         static const size_t columnPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::column);
         static const size_t channelPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::channel);
@@ -77,6 +75,10 @@ namespace math
         ElementType* pData;
     };
 
+    /// <summary> TensorSlicer is a helper class in lieu of the ability to specialize the GetSlice() function </summary>
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, Dimension rowDimension, Dimension columnDimension>
+    struct TensorSlicer;
+
     /// <summary>
     /// A const reference to a tensor. This class implements all the operations that do not modify tensor
     /// elements. A ConstTensorReference does not own its own memory.
@@ -93,12 +95,12 @@ namespace math
     public:
         /// <summary> Constructs an instance of ConstTensorReference. </summary>
         ///
-        /// <param name="shape"> The tensor shape (always given in canonical coordinates: row, column, channel). </param>
+        /// <param name="shape"> The tensor shape (always given in logical coordinates: row, column, channel). </param>
         ConstTensorReference(Triplet shape);
         
         /// <summary> Constructs an instance of ConstTensorReference. </summary>
         ///
-        /// <param name="shape"> The tensor shape (always given in canonical coordinates: row, column, channel). </param>
+        /// <param name="shape"> The tensor shape (always given in logical coordinates: row, column, channel). </param>
         /// <param name="pData"> A pointer to the data to reference. </param>
         ConstTensorReference(Triplet shape, ElementType* pData);
 
@@ -143,9 +145,9 @@ namespace math
         /// <returns> The layout shape. </returns>
         Triplet GetLayout() const { return _contents.layout; }
 
-        /// <summary> Gets the three dimenions of the tensor in canonical order (row, column, channel). </summary>
+        /// <summary> Gets the three dimenions of the tensor in logical order (row, column, channel). </summary>
         ///
-        /// <returns> The shape of the dimensions in canonical order. </returns>
+        /// <returns> The shape of the Tensor. </returns>
         Triplet GetShape() const { return {NumRows(), NumColumns(), NumChannels()}; }
 
         /// <summary>
@@ -218,7 +220,7 @@ namespace math
         /// <summary> Gets a const reference to a subtensor (a block). </summary>
         ///
         /// <param name="firstCoordinate"> The first coordinate of the block. </param>
-        /// <param name="shape"> The shape of the block (always given in canonical coordinates: row, column, channel). </param>
+        /// <param name="shape"> The shape of the block (always given in logical coordinates: row, column, channel). </param>
         ///
         /// <returns> The resulting ConstTensorReference. </returns>
         ConstTensorReference<ElementType, dimension0, dimension1, dimension2> GetSubTensor(Triplet firstCoordinate, Triplet shape) const;
@@ -237,19 +239,14 @@ namespace math
         ///
         /// <returns> The resulting slice. </returns>
         template<Dimension rowDimension, Dimension columnDimension>
-        auto GetSlice(size_t index) const;
-
-        /// <summary> Gets a constant reference to this tensor. </summary>
-        ///
-        /// <returns> A constant tensor reference. </returns>
-        ConstTensorReference GetConstTensorReference() const { return *this; }
+        auto GetSlice(size_t index) const -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::ConstSliceType;
 
         /// <summary> Gets a slice of the tensor with repsect to its primary dimensions. </summary>
         ///
         /// <param name="index"> Slice index. </param>
         ///
         /// <returns> The primary slice. </returns>
-        auto GetPrimarySlice(size_t index) const;
+        auto GetPrimarySlice(size_t index) const -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::ConstSliceType;
 
         /// <summary> Flattens a tensor into a row vector. Works only when the tensor dimensions are full </summary>
         ///
@@ -325,27 +322,7 @@ namespace math
     ///
     /// <returns> The number slices. </returns>
     template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    auto GetConstSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T, size_t index);
-
-    /// <summary> Prints a tensor in initializer list format. </summary>
-    ///
-    /// <typeparam name="ElementType"> Tensor element type. </typeparam>
-    /// <typeparam name="dimension0"> Tensor first dimension. </typeparam>
-    /// <typeparam name="dimension1"> Tensor second dimension. </typeparam>
-    /// <typeparam name="dimension2"> Tensor third dimension. </typeparam>
-    /// <param name="T"> The tensor. </param>
-    /// <param name="stream"> [in,out] The output stream. </param>
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    void Print(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T, std::ostream& stream);
-
-    /// <summary> Prints a tensor in initializer list format. </summary>
-    ///
-    /// <param name="stream"> [in,out] The output stream. </param>
-    /// <param name="v"> The const tensor reference to print. </param>
-    ///
-    /// <returns> Reference to the output stream. </returns>
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    std::ostream& operator<<(std::ostream& stream, ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T);
+    auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T, size_t index);
 
     /// <summary>
     /// A reference to a tensor. This class implements all the operations that modify tensor
@@ -487,7 +464,7 @@ namespace math
         /// <summary> Gets a reference to a subtensor (a block). </summary>
         ///
         /// <param name="firstCoordinate"> The first coordinate of the block. </param>
-        /// <param name="shape"> The shape of the block (always given in canonical coordinates: row, column, channel). </param>
+        /// <param name="shape"> The shape of the block (always given in logical coordinates: row, column, channel). </param>
         ///
         /// <returns> The resulting TensorReference. </returns>
         TensorReference<ElementType, dimension0, dimension1, dimension2> GetSubTensor(Triplet firstCoordinate, Triplet shape);
@@ -506,14 +483,14 @@ namespace math
         ///
         /// <returns> The resulting slice. </returns>
         template<Dimension rowDimension, Dimension columnDimension>
-        auto GetSlice(size_t index);
+        auto GetSlice(size_t index) -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::SliceType;
 
         /// <summary> Gets a slice of the tensor with repsect to its primary dimensions. </summary>
         ///
         /// <param name="index"> Slice index. </param>
         ///
         /// <returns> The primary slice. </returns>
-        auto GetPrimarySlice(size_t index);
+        auto GetPrimarySlice(size_t index) -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::SliceType;
 
         /// <summary> Flattens a tensor into a row vector. Works only when the tensor dimensions are full
         /// (namely, not a subtensor). </summary>
@@ -635,7 +612,7 @@ namespace math
 
         /// <summary> Constructs a the zero tensor of given shape. </summary>
         ///
-        /// <param name="shape"> The tensor shape (given in canonical coordinates: rows, columns, channels). </param>
+        /// <param name="shape"> The tensor shape (given in logical coordinates: rows, columns, channels). </param>
         Tensor(Triplet shape);
 
         /// <summary> Copy Constructor. </summary>
@@ -649,7 +626,7 @@ namespace math
         template<Dimension otherDimension0, Dimension otherDimension1, Dimension otherDimension2>
         Tensor(ConstTensorReference<ElementType, otherDimension0, otherDimension1, otherDimension2> other);
 
-        /// <summary> Constructs a tensor from a triply nested initializer list, given in canonical order. </summary>
+        /// <summary> Constructs a tensor from a triply nested initializer list, given in logical order (row, column, channel). </summary>
         ///
         /// <param name="list"> A triply nested initalizer list. </param>
         Tensor(std::initializer_list<std::initializer_list<std::initializer_list<ElementType>>> list);

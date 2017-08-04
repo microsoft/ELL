@@ -20,6 +20,11 @@ namespace math
 {
     namespace Blas
     {
+        /// <summary> Sets the number of threads. </summary>
+        ///
+        /// <param name="numThreads"> The number of threads. </param>
+        void SetNumThreads(int numThreads);
+
         /// @{
         /// <summary> Wraps the BLAS COPY function, which copies a vector. </summary>
         /// <param name="n"> The size of each of the arrays that store the vectors. </param>

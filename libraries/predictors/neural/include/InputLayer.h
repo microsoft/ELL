@@ -43,7 +43,7 @@ namespace neural
             Shape inputShape;
             /// <summary> The padding requirements for the input. </summary>
             PaddingParameters inputPaddingParameters;
-            /// <summary> The extents of the tensor in canonical row, column, channel order. This size includes padding. </summary>
+            /// <summary> The extents of the tensor in logical order (row, column, channel). This size includes padding. </summary>
             Shape outputShape;
             /// <summary> The padding requirements for the output. </summary>
             PaddingParameters outputPaddingParameters;

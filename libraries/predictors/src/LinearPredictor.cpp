@@ -12,6 +12,9 @@
 // stl
 #include <memory>
 
+// math
+#include "VectorOperations.h"
+
 namespace ell
 {
 namespace predictors

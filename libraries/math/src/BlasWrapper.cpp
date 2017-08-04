@@ -9,6 +9,10 @@
 
 #if USE_BLAS
 #include "BlasWrapper.h"
+#include "cblas.h"
+
+// stl
+#include <thread> // for hardware_concurrency()
 
 namespace ell
 {
@@ -16,6 +20,17 @@ namespace math
 {
     namespace Blas
     {
+        void SetNumThreads(int numThreads)
+        {
+            if (numThreads == 0)
+            {
+                numThreads = std::thread::hardware_concurrency();
+            }
+#ifdef OPENBLAS_CONST
+            openblas_set_num_threads(numThreads);
+#endif
+        }
+
         void Copy(int n, const float* x, int incx, float* y, int incy)
         {
             cblas_scopy(n, x, incx, y, incy);

@@ -22,7 +22,7 @@ namespace neural
 {
     template <typename ElementType>
     BinaryConvolutionalLayer<ElementType>::BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ConstTensorReferenceType& weights)
-        : Layer<ElementType>(layerParameters), _convolutionalParameters(convolutionalParameters), _realValuedWeightsMatrix(0, 0), _realValuedShapedInput(0, 0), _realValuedOutputMatrix(0, 0)
+        : Layer<ElementType>(layerParameters), _convolutionalParameters(convolutionalParameters), _realValuedWeightsMatrix(0, 0), _realValuedShapedInputMatrix(0, 0), _realValuedOutputMatrix(0, 0)
     {
         if (weights.GetDataPointer() == nullptr)
         {
@@ -107,7 +107,7 @@ namespace neural
         const auto filterWidth = _convolutionalParameters.receptiveField;
         const auto outputShape = NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding();
 
-        _realValuedShapedInput = { filterWidth * filterWidth * _layerParameters.input.NumChannels(), outputShape };
+        _realValuedShapedInputMatrix = { filterWidth * filterWidth * _layerParameters.input.NumChannels(), outputShape };
         _realValuedOutputMatrix = { NumOutputChannels(), outputShape };
 
         _binarizedShapedInput.resize(outputShape);
@@ -131,10 +131,10 @@ namespace neural
         if (_convolutionalParameters.method == BinaryConvolutionMethod::gemm)
         {
             // Re-shape input.
-            ReceptiveFieldToColumns(input, _realValuedShapedInput);
+            ReceptiveFieldToColumns(input, _realValuedShapedInputMatrix);
 
             // Multiply reshaped input and weights.
-            math::Operations::Multiply(static_cast<ElementType>(1.0), _realValuedWeightsMatrix, _realValuedShapedInput, static_cast<ElementType>(0.0), _realValuedOutputMatrix);
+            math::Multiply(static_cast<ElementType>(1.0), _realValuedWeightsMatrix, _realValuedShapedInputMatrix, static_cast<ElementType>(0.0), _realValuedOutputMatrix);
 
             // Re-shape the output into the output tensor
             for (size_t i = 0; i < output.NumRows(); ++i)

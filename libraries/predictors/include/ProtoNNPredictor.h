@@ -11,7 +11,7 @@
 #include "IPredictor.h"
 
 // math
-#include "Operations.h"
+#include "Matrix.h"
 
 // datasets
 #include "AutoDataVector.h"

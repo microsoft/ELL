@@ -10,9 +10,6 @@
 #include "Debug.h"
 #include "Exception.h"
 
-// stl
-#include <algorithm> // for std::generate
-
 namespace ell
 {
 namespace math
@@ -149,44 +146,6 @@ namespace math
 
         return ConstVectorReference<ElementType, orientation>(_pData + offset * _increment, size, _increment);
     }
-
-    template <typename ElementType, VectorOrientation orientation>
-    void Print(ConstVectorReference<ElementType, orientation> v, std::ostream& stream, size_t indent, size_t maxElements)
-    {
-        DEBUG_THROW(maxElements < 3, utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "cannot specify maxElements below 3."));
-
-        stream << std::string(indent, ' ');
-        if (v.Size() == 0)
-        {
-            stream << "{ }";
-        }
-        else if (v.Size() <= maxElements)
-        {
-            stream << "{ " << v[0];
-            for (size_t i = 1; i < v.Size(); ++i)
-            {
-                stream << ", " << v[i];
-            }
-            stream << " }";
-        }
-        else 
-        {
-            stream << "{ " << v[0];
-            for (size_t i = 1; i < maxElements-2; ++i)
-            {
-                stream << ", " << v[i];
-            }
-            stream << ", ..., " << v[v.Size() - 1] << " }";
-        }
-    }
-
-    template <typename ElementType, VectorOrientation orientation>
-    std::ostream& operator<<(std::ostream& stream, ConstVectorReference<ElementType, orientation> v)
-    {
-        Print(v, stream);
-        return stream;
-    }
-
     //
     // TransformedConstVectorReference
     // 
@@ -201,31 +160,6 @@ namespace math
     TransformedConstVectorReference<ElementType, orientation, TransformationType> TransformVector(ConstVectorReference<ElementType, orientation> vector, TransformationType transformation)
     {
         return TransformedConstVectorReference<ElementType, orientation, TransformationType>(vector, transformation);
-    }
-
-    template <typename ElementType, VectorOrientation orientation>
-    auto operator*(double scalar, ConstVectorReference<ElementType, orientation> vector)
-    {
-        ElementType typedScalar = static_cast<ElementType>(scalar);
-        return TransformVector(vector, [typedScalar](ElementType x) { return typedScalar * x; });
-    }
-
-    template <typename ElementType, VectorOrientation orientation>
-    auto Square(ConstVectorReference<ElementType, orientation> vector)
-    {
-        return TransformVector(vector, [](ElementType x) { return x * x; });
-    }
-
-    template <typename ElementType, VectorOrientation orientation>
-    auto Sqrt(ConstVectorReference<ElementType, orientation> vector)
-    {
-        return TransformVector(vector, [](ElementType x) { return std::sqrt(x); });
-    }
-
-    template <typename ElementType, VectorOrientation orientation>
-    auto Abs(ConstVectorReference<ElementType, orientation> vector)
-    {
-        return TransformVector(vector, [](ElementType x) { return std::abs(x); });
     }
 
     //
@@ -433,34 +367,6 @@ namespace math
             pData += _increment;
             pOtherData += otherIncrement;
         }
-    }
-
-    template <typename ElementType, VectorOrientation orientation>
-    void VectorReference<ElementType, orientation>::operator+=(ElementType value)
-    {
-        Transform([value](ElementType x) {return x + value; });
-    }
-
-    template <typename ElementType, VectorOrientation orientation>
-    void VectorReference<ElementType, orientation>::operator-=(ElementType value)
-    {
-        (*this) += (-value);
-    }
-
-    template <typename ElementType, VectorOrientation orientation>
-    void VectorReference<ElementType, orientation>::operator*=(ElementType value)
-    {
-        Transform([value](ElementType x) {return x * value; });
-    }
-
-    template <typename ElementType, VectorOrientation orientation>
-    void VectorReference<ElementType, orientation>::operator/=(ElementType value)
-    {
-        if (value == 0)
-        {
-            throw utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "divide by zero");
-        }
-        (*this) *= (1 / value);
     }
 
     //

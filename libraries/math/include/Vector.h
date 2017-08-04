@@ -12,7 +12,6 @@
 #include "IArchivable.h"
 // stl
 #include <cmath>
-#include <iostream>
 #include <vector>
 #include <limits>
 
@@ -31,22 +30,20 @@ namespace math
     ///
     /// <typeparam name="orientation"> The vector orientation. </typeparam>
     template <VectorOrientation orientation>
-    class VectorBase;
+    struct VectorBase;
 
     /// <summary> Base class for row vectors. </summary>
     template <>
-    class VectorBase<VectorOrientation::row>
+    struct VectorBase<VectorOrientation::row>
     {
-    protected:
         static constexpr VectorOrientation orientation = VectorOrientation::row;
         static constexpr VectorOrientation transposeOrientation = VectorOrientation::column;
     };
 
     /// <summary> Base class for column vectors. </summary>
     template <>
-    class VectorBase<VectorOrientation::column>
+    struct VectorBase<VectorOrientation::column>
     {
-    protected:
         static constexpr VectorOrientation orientation = VectorOrientation::column;
         static constexpr VectorOrientation transposeOrientation = VectorOrientation::row;
     };
@@ -183,12 +180,22 @@ namespace math
         /// <returns> true if the vectors are considered equivalent. </returns>
         bool operator==(const ConstVectorReference<ElementType, orientation>& other) const;
 
+        /// <summary> Equality operator for vectors with different orientation - always false. </summary>
+        ///
+        /// <returns> Always false. </returns>
+        bool operator==(const ConstVectorReference<ElementType, VectorBase<orientation>::transposeOrientation>&) const { return false; }
+
         /// <summary> Inequality operator. </summary>
         ///
         /// <param name="other"> The other vector. </param>
         ///
         /// <returns> true if the vectors are not considered equivalent. </returns>
         bool operator!=(const ConstVectorReference<ElementType, orientation>& other) const;
+
+        /// <summary> Inequality operator for vectors with different orientation - always true. </summary>
+        ///
+        /// <returns> Always true. </returns>
+        bool operator!=(const ConstVectorReference<ElementType, VectorBase<orientation>::transposeOrientation>&) const { return true; }
 
         /// @}
 
@@ -225,26 +232,6 @@ namespace math
         using UnorientedConstVectorReference<ElementType>::_increment;
     };
 
-    /// <summary> Prints a vector in initializer list format. </summary>
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> Vector orientation. </typeparam>
-    /// <param name="v"> The vector. </param>
-    /// <param name="stream"> [in,out] The output stream. </param>
-    /// <param name="indent"> (Optional) How many tabs to print before the tensor. </param>
-    /// <param name="maxElements"> (Optional) The maximal number of elements to print. </param>
-    template <typename ElementType, VectorOrientation orientation>
-    void Print(ConstVectorReference<ElementType, orientation> v, std::ostream& stream, size_t indent = 0, size_t maxElements = std::numeric_limits<size_t>::max());
-
-    /// <summary> Prints a vector in initializer list format. </summary>
-    ///
-    /// <param name="stream"> [in,out] The output stream. </param>
-    /// <param name="v"> The const vector reference to print. </param>
-    ///
-    /// <returns> Reference to the output stream. </returns>
-    template <typename ElementType, VectorOrientation orientation>
-    std::ostream& operator<<(std::ostream& stream, ConstVectorReference<ElementType, orientation> v);
-
     /// <summary> A class that represents a transformed constant vector. </summary>
     ///
     /// <typeparam name="ElementType"> Vector element type. </typeparam>
@@ -260,9 +247,9 @@ namespace math
         /// <param name="transform"> The transformation. </param>
         TransformedConstVectorReference(ConstVectorReference<ElementType, orientation> vector, TransformationType transformation);
 
-        /// <summary> Gets the scalar. </summary>
+        /// <summary> Gets the transformation. </summary>
         ///
-        /// <returns> The scalar. </returns>
+        /// <returns> The transformation. </returns>
         const TransformationType GetTransformation() { return _transformation; }
 
         /// <summary> Gets the vector reference. </summary>
@@ -287,46 +274,6 @@ namespace math
     template <typename ElementType, VectorOrientation orientation, typename TransformationType>
     TransformedConstVectorReference<ElementType, orientation, TransformationType> TransformVector(ConstVectorReference<ElementType, orientation> vector, TransformationType transformation);
 
-    /// <summary> Multiplication operator for scalar and vector. </summary>
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> The orientation. </typeparam>
-    /// <param name="scalar"> The scalar. </param>
-    /// <param name="vector"> The vector. </param>
-    ///
-    /// <returns> The TransformedConstVectorReference that results from the operation. </returns>
-    template <typename ElementType, VectorOrientation orientation>
-    auto operator*(double scalar, ConstVectorReference<ElementType, orientation> vector);
-
-    /// <summary> Elementwise square operation on a vector. </summary>
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> The orientation. </typeparam>
-    /// <param name="vector"> The vector. </param>
-    ///
-    /// <returns> The TransformedConstVectorReference generated from the vector and a elementwise square operation. </returns>
-    template <typename ElementType, VectorOrientation orientation>
-    auto Square(ConstVectorReference<ElementType, orientation> vector);
-
-    /// <summary> Elementwise square-root operation on a vector. </summary>
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> The orientation. </typeparam>
-    /// <param name="vector"> The vector. </param>
-    ///
-    /// <returns> The TransformedConstVectorReference generated from the vector and a elementwise square-root operation. </returns>
-    template <typename ElementType, VectorOrientation orientation>
-    auto Sqrt(ConstVectorReference<ElementType, orientation> vector);
-
-    /// <summary> Elementwise absolute value operation on a vector. </summary>
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> The orientation. </typeparam>
-    /// <param name="vector"> The vector. </param>
-    ///
-    /// <returns> The TransformedConstVectorReference generated from the vector and a elementwise absolute value operation. </returns>
-    template <typename ElementType, VectorOrientation orientation>
-    auto Abs(ConstVectorReference<ElementType, orientation> vector);
 
     /// <summary> A reference to a non-constant algebraic vector. </summary>
     ///
@@ -455,26 +402,6 @@ namespace math
         /// <param name="other"> The other vector. </param>
         void operator-=(ConstVectorReference<ElementType, orientation> other);
 
-        /// <summary> Adds a constant value to this vector. </summary>
-        ///
-        /// <param name="other"> The constant value. </param>
-        void operator+=(ElementType value);
-
-        /// <summary> Subtracts a constant value from this vector. </summary>
-        ///
-        /// <param name="other"> The constant value. </param>
-        void operator-=(ElementType value);
-
-        /// <summary> Multiplies this vector by a constant value. </summary>
-        ///
-        /// <param name="other"> The constant value. </param>
-        void operator*=(ElementType value);
-
-        /// <summary> Divides each element of this vector by a constant value. </summary>
-        ///
-        /// <param name="other"> The constant value. </param>
-        void operator/=(ElementType value);
-
         /// @}
 
     protected:
@@ -511,10 +438,6 @@ namespace math
         using VectorReference<ElementType, orientation>::Fill;
         using VectorReference<ElementType, orientation>::Generate;
         using VectorReference<ElementType, orientation>::Transform;
-        using VectorReference<ElementType, orientation>::operator+=;
-        using VectorReference<ElementType, orientation>::operator-=;
-        using VectorReference<ElementType, orientation>::operator*=;
-        using VectorReference<ElementType, orientation>::operator/=;
 
         /// <summary> Constructs an all-zeros vector of a given size. </summary>
         ///
@@ -608,10 +531,10 @@ namespace math
     using RowVectorReference = VectorReference<ElementType, VectorOrientation::row>;
 
     template <typename ElementType>
-    using ColumnConstVectorReference = ConstVectorReference<ElementType, VectorOrientation::column>;
+    using ConstColumnVectorReference = ConstVectorReference<ElementType, VectorOrientation::column>;
 
     template <typename ElementType>
-    using RowConstVectorReference = ConstVectorReference<ElementType, VectorOrientation::row>;
+    using ConstRowVectorReference = ConstVectorReference<ElementType, VectorOrientation::row>;
 }
 }
 

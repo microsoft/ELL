@@ -18,7 +18,7 @@
 
 // math
 #include "Vector.h"
-#include "Operations.h"
+#include "VectorOperations.h"
 
 // stl
 #include <cmath>
@@ -160,11 +160,11 @@ void LossConjugateTest(LossType loss, Range dualRange, Range labelRange, Range c
 
 // Test if Fenchel-Young holds at given points
 template<typename RegularizerType>
-void RegularizerConjugateTest(RegularizerType regularizer, math::ColumnConstVectorReference<double> p, math::ColumnConstVectorReference<double> d)
+void RegularizerConjugateTest(RegularizerType regularizer, math::ConstColumnVectorReference<double> p, math::ConstColumnVectorReference<double> d)
 {
     const double epsilon = 1.0e-8;
     double fenchelYoung = regularizer(p) + regularizer.Conjugate(d);
-    double dot = math::Operations::Dot(p,d);
+    double dot = math::Dot(p,d);
     testing::ProcessTest("Testing " + std::string(typeid(RegularizerType).name()) + "::Conjugate()", dot < fenchelYoung + epsilon);
 }
 

@@ -77,7 +77,7 @@ namespace neural
         BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ConstTensorReferenceType& weights);
 
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
-        BinaryConvolutionalLayer() : _realValuedShapedInput(0, 0), _realValuedWeightsMatrix(0, 0), _realValuedOutputMatrix(0, 0) {}
+        BinaryConvolutionalLayer() : _realValuedShapedInputMatrix(0, 0), _realValuedWeightsMatrix(0, 0), _realValuedOutputMatrix(0, 0) {}
 
         /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
         void Compute() override;
@@ -156,7 +156,7 @@ namespace neural
         std::vector<std::vector<uint64_t>> _shapedInputPaddingMask;
         std::vector<ElementType> _filterMeans;
 
-        MatrixType _realValuedShapedInput;
+        MatrixType _realValuedShapedInputMatrix;
         MatrixType _realValuedWeightsMatrix;
         MatrixType _realValuedOutputMatrix;
     };

@@ -8,6 +8,9 @@
 
 #include "ProtoNNPredictor.h"
 
+// math
+#include "MatrixOperations.h"
+
 // stl
 #include <memory>
 
@@ -39,7 +42,7 @@ namespace predictors
         // Projection
         math::ColumnVector<double> data(inputVector.ToArray());
         math::ColumnVector<double> projectedInput(GetProjectedDimension());
-        math::Operations::Multiply(1.0, _W, data, 0.0, projectedInput);
+        math::Multiply(1.0, _W, data, 0.0, projectedInput);
 
         // Similarity to each prototype
         auto numPrototypes = GetNumPrototypes();
@@ -58,7 +61,7 @@ namespace predictors
 
         // Get the prediction label
         math::ColumnVector<double> labels(GetNumLabels());
-        math::Operations::Multiply(1.0, GetLabelEmbeddings(), similarityToPrototypes, 0.0, labels);
+        math::Multiply(1.0, GetLabelEmbeddings(), similarityToPrototypes, 0.0, labels);
 
         return labels;
     }

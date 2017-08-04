@@ -13,34 +13,96 @@
 using namespace ell;
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
-void TestTensor();
+void TestTensorIndexer();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorSize();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorNumRows();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorNumColumns();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorNumChannels();
 
 template<typename ElementType>
-void TestTensorReference();
+void TestTensorGetLayout();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorGetShape();
 
 template<typename ElementType>
-void TestCopyFromAndGetSubTensor();
+void TestTensorNumSlices();
+
+template<typename ElementType>
+void TestTensorNumPrimarySlices();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorIsEqual();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorEqualityOperator();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorInequalityOoperator();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorGetConstReference();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorGetSubTensor();
 
 template<typename ElementType>
 void TestTensorGetSlice();
 
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorGetPrimarySlice();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorReferenceAsVector();
+
 template<typename ElementType>
 void TestTensorReferenceAsMatrix();
 
-template<typename ElementType>
-void TestGetSubTensorAndReferenceAsMatrix();
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorCopyFrom();
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
-void TestTensorVectorAdd();
+void TestTensorReset();
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
-void TestTensorVectorMultiply();
+void TestTensorFill();
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
-void TestTensorVectorMultiplyAdd();
+void TestTensorGenerate();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorTransform();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorPlusEqualsOperator();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorMinusEqualsOperator();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorTimesEqualsOperator();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorDivideEqualsOperator();
 
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensorArchiver();
 
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorVectorAdd();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2, math::ImplementationType implementation>
+void TestTensorVectorMultiply();
+
+template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
+void TestTensorVectorMultiplyAdd();
 
 #include "../tcc/Tensor_test.tcc"

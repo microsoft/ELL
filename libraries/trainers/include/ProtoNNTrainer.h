@@ -18,6 +18,9 @@
 // parameters
 #include "ProtoNNModel.h"
 
+// math
+#include "Matrix.h"
+
 // data
 #include "Dataset.h"
 #include "Example.h"
@@ -27,8 +30,6 @@
 #include <memory>
 #include <map>
 
-// Matrix
-#include <Matrix.h>
 
 namespace ell
 {

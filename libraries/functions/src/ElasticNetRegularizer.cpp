@@ -19,12 +19,12 @@ namespace functions
     {
     }
 
-    double ElasticNetRegularizer::operator()(math::ColumnConstVectorReference<double> v, double b) const
+    double ElasticNetRegularizer::operator()(math::ConstColumnVectorReference<double> v, double b) const
     {
         return 0.5 * (v.Norm2Squared() + b*b) + _ratioL1L2 * (v.Norm1() + std::abs(b));
     }
 
-    double ElasticNetRegularizer::Conjugate(math::ColumnConstVectorReference<double> v, double d) const
+    double ElasticNetRegularizer::Conjugate(math::ConstColumnVectorReference<double> v, double d) const
     {
         double dot = 0;
         double norm2Squared = 0;
@@ -73,7 +73,7 @@ namespace functions
         return dot - (0.5 * norm2Squared + _ratioL1L2 * norm1);
     }
 
-    void ElasticNetRegularizer::ConjugateGradient(math::ColumnConstVectorReference<double> v, math::ColumnVectorReference<double> w) const
+    void ElasticNetRegularizer::ConjugateGradient(math::ConstColumnVectorReference<double> v, math::ColumnVectorReference<double> w) const
     {
         for (size_t j = 0; j < v.Size(); ++j)
         {
@@ -94,7 +94,7 @@ namespace functions
         }
     }
 
-    void ElasticNetRegularizer::ConjugateGradient(math::ColumnConstVectorReference<double> v, double d, math::ColumnVectorReference<double> w, double& b) const
+    void ElasticNetRegularizer::ConjugateGradient(math::ConstColumnVectorReference<double> v, double d, math::ColumnVectorReference<double> w, double& b) const
     {
         ConjugateGradient(v, w);
         b = d - _ratioL1L2;

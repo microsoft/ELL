@@ -10,7 +10,7 @@
 
 // math
 #include "Matrix.h"
-#include "Operations.h"
+#include "MatrixOperations.h"
 
 // BLAS
 #ifdef USE_BLAS
@@ -174,7 +174,7 @@ namespace nodes
         math::RowMatrixReference<ValueType> outputMatrixRef(_m, _n, outputMatrixValues.data());
 
         // TODO: transpose if necessary
-        math::Operations::Multiply(static_cast<ValueType>(1.0), inputMatrix1Ref, inputMatrix2Ref, static_cast<ValueType>(0.0), outputMatrixRef);
+        math::Multiply(static_cast<ValueType>(1.0), inputMatrix1Ref, inputMatrix2Ref, static_cast<ValueType>(0.0), outputMatrixRef);
 
         _output.SetOutput(outputMatrixValues);
     };

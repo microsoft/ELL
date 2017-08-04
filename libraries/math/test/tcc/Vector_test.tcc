@@ -10,166 +10,92 @@
 #include "testing.h"
 
 // stl
-#include <random>
+#include <sstream>
 
-template <typename ElementType, math::VectorOrientation orientation>
-void TestVector()
+// math
+#include "VectorOperations.h"
+
+template <typename ElementType>
+void TestVectorIndexer()
 {
-    math::Vector<ElementType, orientation> v(10);
-    v.Fill(2);
-    math::Vector<ElementType, orientation> r0{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
-    testing::ProcessTest("Vector::Fill", v == r0);
-
-    v.Reset();
-    math::Vector<ElementType, orientation> r1{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    testing::ProcessTest("Vector::Reset", v == r1);
-
-    v[3] = 7;
-    v[7] = 9;
-    math::Vector<ElementType, orientation> r2{ 0, 0, 0, 7, 0, 0, 0, 9, 0, 0 };
-    testing::ProcessTest("Vector::operator[]", v == r2);
-
-    auto w = v.GetSubVector(1, 3);
-    w.Fill(3);
-    math::Vector<ElementType, orientation> r3{ 0, 3, 3, 3, 0, 0, 0, 9, 0, 0 };
-    testing::ProcessTest("VectorReference::Fill", v == r3);
-
-    auto u = v.GetSubVector(3, 2);
-    u.Reset();
-    math::Vector<ElementType, orientation> r4{ 0, 3, 3, 0, 0, 0, 0, 9, 0, 0 };
-    testing::ProcessTest("VectorReference::Reset", v == r4);
-
-    // just checking compilation
-    std::default_random_engine rng;
-    std::normal_distribution<ElementType> normal(0, 1.0);
-    auto generator = [&]() { return normal(rng); };
-    v.Generate(generator);
-    u.Generate(generator);
-}
-
-template <typename ElementType, math::ImplementationType implementation>
-void TestVectorOperations()
-{
-    auto implementationName = math::OperationsImplementation<implementation>::GetImplementationName();
-    using Ops = math::OperationsImplementation<implementation>;
-
-    math::RowVector<ElementType> u{ 0, 1, 0, 2, 0 };
-    math::ColumnVector<ElementType> v{ 1, 2, 3, 4, 5 };
-
-    testing::ProcessTest(implementationName + "Operations::Norm0(Vector)", u.Norm0() == 2);
-
-    testing::ProcessTest(implementationName + "Operations::Norm1(Vector)", u.Norm1() == 3);
-
-    testing::ProcessTest(implementationName + "Operations::Norm2(Vector)", testing::IsEqual(u.Norm2(), static_cast<ElementType>(std::sqrt(5))));
-
-    auto dot = Ops::Dot(u, v);
-    testing::ProcessTest(implementationName + "Operations::Dot(Vector, Vector)", dot == 10);
-
-    dot = Ops::Dot(v.Transpose(), u);
-    testing::ProcessTest(implementationName + "Operations::Dot(VectorReference, Vector)", dot == 10);
-
-    ElementType r;
-    Ops::Multiply(u, v, r);
-    testing::ProcessTest(implementationName + "Operations::Multiply(Vector, Vector, scalar)", r == 10);
-
-    Ops::Multiply(v.Transpose(), u.Transpose(), r);
-    testing::ProcessTest(implementationName + "Operations::Multiply(Vector, Vector, scalar)", r == 10);
-
-    Ops::Add(static_cast<ElementType>(1), v);
-    math::ColumnVector<ElementType> r0{ 2, 3, 4, 5, 6 };
-    testing::ProcessTest(implementationName + "Operations::Add(scalar, Vector)", v == r0);
-
-    Ops::Multiply(static_cast<ElementType>(0), v);
-    math::ColumnVector<ElementType> r1{ 0, 0, 0, 0, 0 };
-    testing::ProcessTest(implementationName + "Operations::Multiply(scalar, Vector)", v == r1);
-
-    math::ColumnMatrix<ElementType> M{
-        { 1, 2, 4, 0 },
-        { 0, 2, 4, 3 },
-        { 0, 8, 5, 6 }
-    };
-    auto N = M.GetSubMatrix(1, 0, 2, 3);
-    auto w = N.GetRow(0);
+    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
+    auto u = v.GetSubVector(2, 2);
+    
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+    math::ColumnMatrix<ElementType> N(M);
+    auto w = M.GetRow(1);
     auto z = N.GetRow(1);
 
-    dot = Ops::Dot(w, z);
-    testing::ProcessTest(implementationName + "Operations::Dot(VectorReference, VectorReference)", dot == 36);
-
-    Ops::Add(static_cast<ElementType>(1), w);
-    math::ColumnMatrix<ElementType> R0{
-        { 1, 2, 4, 0 },
-        { 1, 3, 5, 3 },
-        { 0, 8, 5, 6 }
-    };
-    testing::ProcessTest(implementationName + "Operations::Add(scalar, VectorReference)", M == R0);
-
-    Ops::Add(static_cast<ElementType>(2), r0.GetSubVector(0, 3), w.Transpose());
-    math::ColumnMatrix<ElementType> R1{
-        { 1, 2, 4, 0 },
-        { 5, 9, 13, 3 },
-        { 0, 8, 5, 6 }
-    };
-    testing::ProcessTest(implementationName + "Operations::Add(scalar, VectorReference, VectorReference)", M == R1);
-
-    math::Operations::Multiply(static_cast<ElementType>(2), z);
-    math::ColumnMatrix<ElementType> R2{
-        { 1, 2, 4, 0 },
-        { 5, 9, 13, 3 },
-        { 0, 16, 10, 6 }
-    };
-    testing::ProcessTest(implementationName + "Operations::Multiply(VectorReference, scalar)", M == R2);
-
-    testing::ProcessTest(implementationName + "Operations::Norm0(VectorReference)", M.GetColumn(1).Norm0() == 3);
-
-    testing::ProcessTest(implementationName + "Operations::Norm1(VectorReference)", M.GetColumn(1).Norm1() == 2 + 9 + 16);
-
-    testing::ProcessTest(implementationName + "Operations::Norm2(VectorReference)", testing::IsEqual(M.GetColumn(1).Norm2(), static_cast<ElementType>(std::sqrt(2 * 2 + 9 * 9 + 16 * 16))));
-
-    M.GetRow(1).CopyFrom(math::RowVector<ElementType>{ 1, 1, 1, 1 });
-    M.GetColumn(2).CopyFrom(math::ColumnVector<ElementType>{ 1, 1, 1 });
-    math::ColumnMatrix<ElementType> R3{
-        { 1, 2, 1, 0 },
-        { 1, 1, 1, 1 },
-        { 0, 16, 1, 6 }
-    };
-    testing::ProcessTest(implementationName + "Operations::Copy(VectorReference, VectorReference)", M == R3);
+    testing::ProcessTest("Vector::Operator[]", v[0] == 1 && v[1] == 2 && v[6] == 7 && u[0] == 3 && u[1] == 4 && w[0] == 4 && w[1] == 5 && w[2] == 6 && z[0] == 4 && z[1] == 5 && z[2] == 6);
 }
 
 template <typename ElementType>
-void TestElementWiseOperations()
+void TestVectorSize()
 {
-    using Ops = math::DerivedOperations<ElementType>;
+    math::RowVector<ElementType> u{};
+    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
+    auto w = v.GetSubVector(2, 3);
 
-    math::RowVector<ElementType> u{ 0, 1, 2, 2, 10 };
-    math::ColumnVector<ElementType> v{ 1, 2, 3, 4, 5 };
-    math::ColumnVector<ElementType> r{ 0, 2, 6, 8, 50 };
+    testing::ProcessTest("Vector::Size", v.Size() == 7 && u.Size() == 0 && w.Size() == 3);
+}
 
-    math::ColumnVector<ElementType> t(u.Size());
-    Ops::ElementWiseMultiply(u, v, t);
-    testing::ProcessTest("Operations::VectorElementwise(VectorReference, VectorReference)", t == r);
+template <typename ElementType>
+void TestVectorGetDataPointer()
+{
+    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
+    auto u = v.GetSubVector(2, 2);
 
-    math::ColumnMatrix<ElementType> A{
-        { 1, 2, 4 },
-        { 3, 1, 5 },
-        { 8, 2, 3 }
-    };
+    testing::ProcessTest("Vector::GetDataPointer", &(v[0]) == v.GetDataPointer() && v.GetDataPointer() + 2 == u.GetDataPointer());
+}
 
-    math::RowMatrix<ElementType> B{
-        { 2, 7, 4 },
-        { 1, 9, 3 },
-        { 3, 10, 2 }
-    };
+template <typename ElementType>
+void TestVectorGetIncrement()
+{
+    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
+    auto u = v.GetSubVector(2, 2);
+    
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+    math::ColumnMatrix<ElementType> N(M);
+    auto w = M.GetRow(1);
+    auto z = N.GetRow(1);
+    
+    testing::ProcessTest("Vector::GetIncrement", v.GetIncrement() == 1 && u.GetIncrement() == 1 && w.GetIncrement() == 1 && z.GetIncrement() == 3);
+}
 
-    math::ColumnMatrix<ElementType> R{
-        { 2, 14, 16 },
-        { 3, 9, 15 },
-        { 24, 20, 6 }
-    };
+template <typename ElementType>
+void TestVectorNorm0()
+{
+    math::RowVector<ElementType> x{ 0, 1, 0, -2, 0 };
+    auto v = x.GetSubVector(2, 2);
 
-    math::ColumnMatrix<ElementType> C(A.NumRows(), B.NumColumns());
-    Ops::ElementWiseMultiply(A, B, C);
+    testing::ProcessTest("Vector::Norm0", x.Norm0() == 2 && v.Norm0() == 1);
+}
 
-    testing::ProcessTest("Operations::ElementWiseMultiply(MatrixReference, MatrixReference)", C == R);
+template <typename ElementType>
+void TestVectorNorm1()
+{
+    math::RowVector<ElementType> x{ 0, 1, 0, -2, 0 };
+    auto v = x.GetSubVector(2, 2);
+
+    testing::ProcessTest("Vector::Norm1", x.Norm1() == 3 && v.Norm2() == 2);
+}
+
+template <typename ElementType>
+void TestVectorNorm2()
+{
+    math::RowVector<ElementType> x{ 0, 1, 0, -2, 0 };
+    auto v = x.GetSubVector(2, 2);
+
+    testing::ProcessTest("Vector::Norm2", testing::IsEqual(x.Norm2(), static_cast<ElementType>(std::sqrt(5))) && v.Norm2() == 2);
+}
+
+template <typename ElementType>
+void TestVectorNorm2Squared()
+{
+    math::RowVector<ElementType> x{ 0, 1, 0, -2, 0 };
+    auto v = x.GetSubVector(2, 2);
+
+    testing::ProcessTest("Vector::Norm2Squared", x.Norm2Squared() == 5 && v.Norm2Squared() == 4);
 }
 
 template <typename ElementType>
@@ -179,81 +105,377 @@ void TestVectorToArray()
     std::vector<ElementType> r1{ 15, 25, 23, 33 };
 
     math::RowVector<ElementType> p(r0);
-    testing::ProcessTest("Testing vector reference to array for a row vector", p.ToArray() == r0);
-
     math::ColumnVector<ElementType> q(r1);
-    testing::ProcessTest("Testing vector reference to array for a column vector", q.ToArray() == r1);
 
     math::Matrix<ElementType, math::MatrixLayout::rowMajor> A{
         { 41, 47, 53, 59 },
         { 40, 45, 56, 61 },
         { 15, 25, 23, 33 },
     };
-
     std::vector<ElementType> r(A.GetRow(0).ToArray());
-    testing::ProcessTest("Testing vector reference to array for a row matrix", r == r0);
-
     std::vector<ElementType> s(A.GetRow(2).ToArray());
-    testing::ProcessTest("Testing vector reference to array for a row matrix", s == r1);
 
     math::Matrix<ElementType, math::MatrixLayout::columnMajor> B(A);
-
     std::vector<ElementType> t(B.GetRow(0).ToArray());
-    testing::ProcessTest("Testing vector reference to array for a column matrix", t == r0);
-
     std::vector<ElementType> u(B.GetRow(2).ToArray());
-    testing::ProcessTest("Testing vector reference to array for a column matrix", u == r1);
+
+    testing::ProcessTest("Vector::ToArray", p.ToArray() == r0 && q.ToArray() == r1 && r == r0 && s == r1 && t == r0 && u == r1);
 }
 
-template<typename ElementType>
-void TestElementwiseTransform()
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorEqualityOperator()
 {
-    math::ColumnVector<ElementType> v{ 2, 2, -1, 2, 2, 2, 2, 2, -2, -2 };
-    auto u = v.GetSubVector(1, 4);
-    u.Transform([](ElementType x) { return static_cast<ElementType>(-3) * x; });
+    math::Vector<ElementType, orientation> u{ 1,2,3,4,5 };
+    math::Vector<ElementType, orientation> v{ 1,2,3,4,5 };
 
-    math::ColumnVector<ElementType> r0{ 2, -6, 3, -6, -6, 2, 2, 2, -2, -2 };
-    testing::ProcessTest("Vector::Transform(Linear)", v == r0);
-
-    v.Transform([](ElementType x) { return std::abs(x); });
-    math::ColumnVector<ElementType> r1{ 2, 6, 3, 6, 6, 2, 2, 2, 2, 2 };
-    testing::ProcessTest("Vector::Transform(Abs)", v == r1);
-
-    v.Transform([](ElementType x) { return x*x; });
-    v.Transform([](ElementType x) { return std::sqrt(x); });
-    testing::ProcessTest("Vector::Transform(Square/SquareRoot)", v == r1);
+    testing::ProcessTest("Vector::operator==", u == v);
 }
 
-template<typename ElementType>
-void TestTransformedVectors()
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorInequalityOperator()
 {
-    math::ColumnVector<ElementType> u(10);
+    math::Vector<ElementType, orientation> u{ 1,2,3,4,5 };
+    math::Vector<ElementType, orientation> v{ 1,2,3,4,5 };
+    math::Vector<ElementType, orientation> w{ -1,2,3,4,5 };
+    math::Vector<ElementType, orientation> z{ 1,2,3,4 };
 
-    u += 1.0;
-    math::ColumnVector<ElementType> r0{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    testing::ProcessTest("Vector::operator+=(scalar)", u == r0);
+    testing::ProcessTest("Vector::operator!=", u != w && u != v.Transpose() && u != z);
+}
 
-    u *= 2.0;
-    math::ColumnVector<ElementType> r1{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
-    testing::ProcessTest("Vector::operator*=(scalar)", u == r1);
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorGetConstReference()
+{
+    math::Vector<ElementType, orientation> u{ 1,2,3,4,5 };
+    auto v = u.GetConstReference();
 
-    math::ColumnVector<ElementType> v{ 1, 2, -1, -2, 1, 1, 1, 1, 1, 1 };
-    u += 3.0 * v;
-    math::ColumnVector<ElementType> r2{ 5, 8, -1, -4, 5, 5, 5, 5, 5, 5 };
-    testing::ProcessTest("Vector::operator+=(transformed vector)", u == r2);
+    testing::ProcessTest("Vector::GetConstReference", u == v);
+}
 
-    u += math::Abs<ElementType, math::VectorOrientation::column>(v);
-    math::ColumnVector<ElementType> r3{ 6, 10, 0, -2, 6, 6, 6, 6, 6, 6 };
-    testing::ProcessTest("Vector::operator+=(abs vector)", u == r3);
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorGetSubVector()
+{
+    math::Vector<ElementType, orientation> u{ 1,2,3,4,5 };
+    auto v = u.GetSubVector(2, 2);
 
-    u.CopyFrom(math::Abs<ElementType, math::VectorOrientation::column>(v));
-    math::ColumnVector<ElementType> r4{ 1, 2, 1, 2, 1, 1, 1, 1, 1, 1 };
-    testing::ProcessTest("Vector::Set(abs vector)", u == r4);
+    math::Matrix<ElementType, math::MatrixLayout::rowMajor> A{
+        { 41, 47, 53, 59 },
+        { 40, 45, 56, 61 },
+        { 15, 25, 23, 33 },
+    };
+    auto w = A.GetColumn(2);
+    auto z = w.GetSubVector(1, 2);
 
-    u.Reset();
-    u += math::Square<ElementType, math::VectorOrientation::column>(v);
-    v.CopyFrom(math::Sqrt<ElementType, math::VectorOrientation::column>(u));
-    testing::ProcessTest("Vector::Set(square/sqrt)", v == r4);
+    testing::ProcessTest("Vector::GetSubVector", v[0] == 3 && v[1] == 4 && z[0] == 56 && z[1] == 23);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorTranspose()
+{
+    math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
+    auto u = v.Transpose();
+    math::Vector<ElementType, math::VectorBase<orientation>::transposeOrientation> w{ 1,2,3,4,5,6,7 };
+
+    auto x = v.GetSubVector(2,3).Transpose();
+    math::Vector<ElementType, math::VectorBase<orientation>::transposeOrientation> z{ 3,4,5 };
+
+    testing::ProcessTest("Vector::Transpose", u == w && x == z);
+}
+
+template <typename ElementType>
+void TestVectorSwap()
+{
+    math::RowVector<ElementType> v{ 1,2,3,4,5,6,7 };
+    math::RowVector<ElementType> u{ -1,-2,-3,-4,-5,-6,-7 };
+    math::RowVector<ElementType> s{ -1,-2,-3,-4,-5,-6,-7 };
+    math::RowVector<ElementType> t{ 1,2,3,4,5,6,7 };
+    v.Swap(u);
+
+    testing::ProcessTest("Vector::Swap", v == s && u == t);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorCopyFrom()
+{
+    math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
+    math::Vector<ElementType, orientation> u(7);
+    u.CopyFrom(v);
+
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+    math::ColumnVector<ElementType> x{ 11,12,13 };
+    M.GetColumn(1).CopyFrom(x);
+    math::RowMatrix<ElementType> R{ { 1, 11, 3 },{ 4,12,6 },{ 7,13,9 } };
+
+    testing::ProcessTest("Vector::CopyFrom", u == v && M == R);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorReset()
+{
+    math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
+    v.GetSubVector(1, 2).Reset();
+    math::Vector<ElementType, orientation> r{ 1,0,0,4,5,6,7 };
+
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+    M.GetColumn(1).Reset();
+    M.GetRow(1).Reset();
+    math::RowMatrix<ElementType> R{ { 1, 0, 3 },{ 0, 0, 0 },{ 7, 0, 9 } };
+
+    testing::ProcessTest("Vector::Reset", v == r && M == R);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorFill()
+{
+    math::Vector<ElementType, orientation> v(10);
+    v.Fill(2);
+    math::Vector<ElementType, orientation> r{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+    M.GetColumn(1).Fill(-1);
+    M.GetRow(1).Fill(1);
+    math::RowMatrix<ElementType> R{ { 1, -1, 3 },{ 1, 1, 1 },{ 7, -1, 9 } };
+
+    testing::ProcessTest("Vector::Fill", v == r && M == R);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorGenerate()
+{
+    math::Vector<ElementType, orientation> v{ 1, 2, 3, 4, 5, 6, 7 };
+    v.GetSubVector(1, 2).Generate([]()->ElementType {return -1; });
+    math::Vector<ElementType, orientation> r{ 1, -1, -1, 4, 5, 6, 7 };
+
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+    M.GetColumn(1).Generate([]()->ElementType {return -1.0; });
+    M.GetRow(1).Generate([]()->ElementType {return 1.0; });
+    math::RowMatrix<ElementType> R{ { 1, -1, 3 },{ 1, 1, 1 },{ 7, -1, 9 } };
+
+    testing::ProcessTest("Vector::Generate", v == r && M == R);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorTransform()
+{
+    math::Vector<ElementType, orientation> v{ 1,2,3,4,5,6,7 };
+    v.Transform([](ElementType value) {return value * 2; });
+    math::Vector<ElementType, orientation> u{ 2,4,6,8,10,12,14 };
+    math::RowMatrix<ElementType> M{ { 1, 2, 3 },{ 4,5,6 },{ 7,8,9 } };
+    M.GetColumn(1).Transform([](ElementType value) {return value * 2; });
+    math::ColumnVector<ElementType> w{ 4,10,16 };
+
+    testing::ProcessTest("Vector::Transform", v == u && M.GetColumn(1) == w);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorResize()
+{
+    math::Vector<ElementType, orientation> v{ 1, 2, 3, 4, 5, 6, 7 };
+    v.Resize(3);
+    math::Vector<ElementType, orientation> r{ 1, 2, 3 };
+
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5, 6, 7 };
+    u.Resize(10);
+    math::Vector<ElementType, orientation> s{ 1, 2, 3, 4, 5, 6, 7, 0, 0, 0 };
+
+    testing::ProcessTest("Vector::Resize", v.Size() == 3 && v == r && u == s);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorPrint()
+{
+    std::stringstream stream;
+    math::Vector<ElementType, orientation> u{ 0, 2, 0, 4, 0, 0, 0 };
+    math::Print(u, stream);
+    auto x = stream.str();
+
+    testing::ProcessTest("Print(Vector)", stream.str() == "{ 0, 2, 0, 4, 0, 0, 0 }");
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestScalarVectorMultiply()
+{
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> v{ 2, 0, -1, 0, 1 };
+    u += 2 * v;
+    math::Vector<ElementType, orientation> r{ 5, 2, 1, 4, 7 };
+
+    testing::ProcessTest("scalar * Vector", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorSquare()
+{
+    math::Vector<ElementType, orientation> u(5);
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    u += Square(v);
+    math::Vector<ElementType, orientation> r{ 1, 1, 4, 4, 9 };
+
+    testing::ProcessTest("Square(Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorSqrt()
+{
+    math::Vector<ElementType, orientation> u(5);
+    math::Vector<ElementType, orientation> v{ 1, 1, 4, 4, 9 };
+    u += Sqrt(v);
+    math::Vector<ElementType, orientation> r{ 1, 1, 2, 2, 3 };
+
+    testing::ProcessTest("Sqrt(Vector)", testing::IsEqual(u.ToArray(), r.ToArray()));
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorAbs()
+{
+    math::Vector<ElementType, orientation> u(5);
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    u += Abs(v);
+    math::Vector<ElementType, orientation> r{ 1, 1, 2, 2, 3 };
+
+    testing::ProcessTest("Abs(Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorScalarAdd()
+{
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    math::Add(static_cast<ElementType>(-2.0), v);
+    math::Vector<ElementType, orientation> r{ -1, -3, 0, -4, 1 };
+
+    testing::ProcessTest("Add(scalar, Vector)", v == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorPlusEqualsOperator()
+{
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    v += -2;
+    math::Vector<ElementType, orientation> r{ -1, -3, 0, -4, 1 };
+
+    testing::ProcessTest("Add(scalar, Vector)", v == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorMinusEqualsOperator()
+{
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    v -= 2;
+    math::Vector<ElementType, orientation> r{ -1, -3, 0, -4, 1 };
+
+    testing::ProcessTest("Add(scalar, Vector)", v == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorVectorAdd()
+{
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    math::Add(static_cast<ElementType>(-2.0), v, u);
+    math::Vector<ElementType, orientation> r{ -1, 4, -1, 8, -1 };
+
+    testing::ProcessTest("Add(scalar, Vector, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorVectorAddImplementation()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+    using Ops = math::Internal::VectorOperations<implementation>;
+
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    Ops::Add(static_cast<ElementType>(-2.0), v, u);
+    math::Vector<ElementType, orientation> r{ -1, 4, -1, 8, -1 };
+    
+    testing::ProcessTest(implementationName + "::Add(scalar, Vector, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorScalarMultiply()
+{
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    math::Multiply(static_cast<ElementType>(-2.0), v);
+    math::Vector<ElementType, orientation> r{ -2, 2, -4, 4, -6 };
+
+    testing::ProcessTest("Multiply(scalar, Vector)", v == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScalarMultiplyImplementation()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+    using Ops = math::Internal::VectorOperations<implementation>;
+
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    Ops::Multiply(static_cast<ElementType>(-2.0), v);
+    math::Vector<ElementType, orientation> r{ -2, 2, -4, 4, -6 };
+
+    testing::ProcessTest(implementationName + "::Multiply(scalar, Vector)", v == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorTimesEqualsOperator()
+{
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    v *= -2;
+    math::Vector<ElementType, orientation> r{ -2, 2, -4, 4, -6 };
+
+    testing::ProcessTest("Vector::operator*=", v == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorDivideEqualsOperator()
+{
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    v /= -0.5;
+    math::Vector<ElementType, orientation> r{ -2, 2, -4, 4, -6 };
+
+    testing::ProcessTest("Vector::operator/=", v == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorScalarMultiplyAdd()
+{
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    math::MultiplyAdd(static_cast<ElementType>(2.0), static_cast<ElementType>(1.0), v);
+    math::Vector<ElementType, orientation> r{ 3, -1, 5, -3, 7 };
+
+    testing::ProcessTest("MultiplyAdd(scalar, Vector)", v == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorElementwiseMultiply()
+{
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> v{ 2, 0, -1, 0, 1 };
+    math::Vector<ElementType, orientation> w(5);
+    math::ElementwiseMultiply(u, v, w);
+    math::Vector<ElementType, orientation> r{ 2, 0, -3, 0, 5 };
+
+    testing::ProcessTest("ElementwiseMultiply(Vector, Vector)", w == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorVectorDot()
+{
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    auto dot = math::Dot(u, v);
+
+    testing::ProcessTest("Dot(Vector, Vector)", dot == 12);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorVectorDotImplementation()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+    using Ops = math::Internal::VectorOperations<implementation>;
+
+    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
+    auto dot = math::Internal::VectorOperations<implementation>::Dot(u, v);
+
+    testing::ProcessTest(implementationName + "::Dot(Vector, Vector)", dot == 12);
 }
 
 template <typename ElementType, math::VectorOrientation orientation>
@@ -270,5 +492,6 @@ void TestVectorArchiver()
 
     math::Vector<ElementType, orientation> Va(0);
     math::VectorArchiver::Read(Va, "test", unarchiver);
-    testing::ProcessTest("void TestVectorArchiver(), write and read vector", Va == V);
+
+    testing::ProcessTest("VectorArchiver", Va == V);
 }

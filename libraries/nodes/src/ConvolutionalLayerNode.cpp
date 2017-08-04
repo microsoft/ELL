@@ -291,7 +291,7 @@ namespace nodes
                 auto Wl = weightsMatrix.GetSubMatrix(0, filterStart * filterWidth, weightsMatrix.NumRows(), numFiltersToUse * filterWidth);
                 math::RowMatrixReference<ValueType> A(Vj.NumRows(), Wl.NumColumns(), scratch.data());
 
-                math::Operations::Multiply(static_cast<ValueType>(1.0), Vj, Wl, static_cast<ValueType>(0.0), A);
+                math::Multiply(static_cast<ValueType>(1.0), Vj, Wl, static_cast<ValueType>(0.0), A);
 
                 for (size_t l = 0; l < numFiltersToUse; l++)
                 {

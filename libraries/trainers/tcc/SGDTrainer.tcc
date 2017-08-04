@@ -15,6 +15,9 @@
 #include "Dataset.h"
 #include "DataVectorOperations.h"
 
+// math
+#include "VectorOperations.h"
+
 namespace ell
 {
 namespace trainers

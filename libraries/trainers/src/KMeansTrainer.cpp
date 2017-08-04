@@ -8,7 +8,8 @@
 #include "KMeansTrainer.h"
 
 // math
-#include "Operations.h"
+#include "MatrixOperations.h"
+#include "VectorOperations.h"
 
 // stl
 #include <cassert>
@@ -80,35 +81,35 @@ namespace trainers
         auto k = means.NumColumns();
 
         math::ColumnMatrix<double> xSq(X.NumRows(), n);
-        math::Operations::ElementWiseMultiply(X, X, xSq);
+        math::ElementwiseMultiply(X, X, xSq);
 
         math::ColumnMatrix<double> muSq(means.NumRows(), k);
-        math::Operations::ElementWiseMultiply(means, means, muSq);
+        math::ElementwiseMultiply(means, means, muSq);
 
         math::ColumnMatrix<double> xSqNorm(1, xSq.NumColumns());
-        math::Operations::ColumnWiseSum(xSq, xSqNorm.GetRow(0));
+        math::ColumnwiseSum(xSq, xSqNorm.GetRow(0));
 
         math::ColumnMatrix<double> muSqNorm(1, muSq.NumColumns());
-        math::Operations::ColumnWiseSum(muSq, muSqNorm.GetRow(0));
+        math::ColumnwiseSum(muSq, muSqNorm.GetRow(0));
 
         math::RowMatrix<double> onesMultiplier(k, 1);
         onesMultiplier.Fill(1.0);
         math::RowMatrix<double> distFactor1(k, n);
-        math::Operations::Multiply(1.0, onesMultiplier, xSqNorm, 0.0, distFactor1);
+        math::Multiply(1.0, onesMultiplier, xSqNorm, 0.0, distFactor1);
 
         math::ColumnMatrix<double> onesMultiplier1 = math::ColumnMatrix<double>(n, 1);
         onesMultiplier1.Fill(1.0);
         math::ColumnMatrix<double> distFactor2(n, k);
-        math::Operations::Multiply(1.0, onesMultiplier1, muSqNorm, 0.0, distFactor2);
+        math::Multiply(1.0, onesMultiplier1, muSqNorm, 0.0, distFactor2);
 
         math::RowMatrix<double> muX(n, k);
-        math::Operations::Multiply(1.0, X.Transpose(), means, 1.0, muX);
+        math::Multiply(1.0, X.Transpose(), means, 1.0, muX);
 
         math::ColumnMatrix<double> tempD(n, k);
-        math::Operations::Add(1.0, distFactor1.Transpose(), -2.0, muX, tempD);
+        math::Add(1.0, distFactor1.Transpose(), -2.0, muX, tempD);
 
         math::ColumnMatrix<double> distance(n, k);
-        math::Operations::Add(1.0, tempD, 1.0, distFactor2, distance);
+        math::Add(1.0, tempD, 1.0, distFactor2, distance);
 
         return distance;
     }

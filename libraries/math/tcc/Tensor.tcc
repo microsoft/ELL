@@ -25,6 +25,7 @@ namespace math
     struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>
     {
         using SliceType = MatrixReference<ElementType, MatrixLayout::columnMajor>;
+        using ConstSliceType = ConstMatrixReference<ElementType, MatrixLayout::columnMajor>;
 
         static size_t NumSlices(const TensorContents<ElementType>& contents)
         {
@@ -43,6 +44,7 @@ namespace math
     struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension2>
     {
         using SliceType = MatrixReference<ElementType, MatrixLayout::columnMajor>;
+        using ConstSliceType = ConstMatrixReference<ElementType, MatrixLayout::columnMajor>;
 
         static size_t NumSlices(const TensorContents<ElementType>& contents)
         {
@@ -61,6 +63,7 @@ namespace math
     struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension1, dimension0>
     {
         using SliceType = MatrixReference<ElementType, MatrixLayout::rowMajor>;
+        using ConstSliceType = ConstMatrixReference<ElementType, MatrixLayout::rowMajor>;
 
         static size_t NumSlices(const TensorContents<ElementType>& contents)
         {
@@ -79,6 +82,7 @@ namespace math
     struct TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension2, dimension0>
     {
         using SliceType = MatrixReference<ElementType, MatrixLayout::rowMajor>;
+        using ConstSliceType = ConstMatrixReference<ElementType, MatrixLayout::rowMajor>;
 
         static size_t NumSlices(const TensorContents<ElementType>& contents)
         {
@@ -105,7 +109,7 @@ namespace math
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ConstTensorReference(Triplet shape, ElementType* pData)
     {
-        _contents.layout = TensorLayoutT::CanonicalToLayout(shape);
+        _contents.layout = TensorLayoutT::ShapeToLayout(shape);
         _contents.increments[0] = _contents.layout[0];
         _contents.increments[1] = _contents.layout[0] * _contents.layout[1];
         _contents.pData = pData;
@@ -194,18 +198,18 @@ namespace math
     {
         DEBUG_THROW(firstCoordinate[0]+shape[0] > NumRows() || firstCoordinate[1]+shape[1] > NumColumns() || firstCoordinate[2]+shape[2] > NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subtensor exceeds tensor dimensions."));
 
-        return ConstTensorReference({ TensorLayoutT::CanonicalToLayout(shape), _contents.increments, _contents.pData + this->GetOffset(firstCoordinate) });
+        return ConstTensorReference({ TensorLayoutT::ShapeToLayout(shape), _contents.increments, _contents.pData + this->GetOffset(firstCoordinate) });
     }
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     template <Dimension rowDimension, Dimension columnDimension>
-    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index) const
+    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index) const -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::ConstSliceType
     {
         return TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::GetSlice(_contents, index);
     }
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index) const
+    auto ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index) const -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::ConstSliceType
     {
         return TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::GetSlice(_contents, index);
     }
@@ -247,7 +251,7 @@ namespace math
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     size_t ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::GetOffset(Triplet coordinate) const
     {
-        auto layoutCoordinate = TensorLayoutT::CanonicalToLayout(coordinate);
+        auto layoutCoordinate = TensorLayoutT::ShapeToLayout(coordinate);
         DEBUG_THROW(layoutCoordinate[0] >= _contents.layout[0] || layoutCoordinate[1] >= _contents.layout[1] || layoutCoordinate[2] >= _contents.layout[2], utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds tensor dimensions."));
         return layoutCoordinate[0] + layoutCoordinate[1] * _contents.increments[0] + layoutCoordinate[2] * _contents.increments[1];
     }
@@ -259,53 +263,9 @@ namespace math
     }
 
     template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    auto GetConstSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T, size_t index)
+    auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T, size_t index)
     {
         return T.template GetSlice<rowDimension, columnDimension>(index);
-    }
-
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    void Print(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T, std::ostream& stream, size_t row, size_t column)
-    {
-        stream << "{" << T(row, column, 0);
-        for (size_t k = 1; k < T.NumChannels(); ++k)
-        {
-            stream << ", " << T(row, column, k);
-        }
-        stream << "}";
-    }
-
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    void Print(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T, std::ostream& stream, size_t row)
-    {
-        stream << "{ ";
-        Print(T, stream, row, 0);
-        for (size_t j = 1; j < T.NumColumns(); ++j)
-        {
-            stream << ", ";
-            Print(T, stream, row, j);
-        }
-        stream << " }";
-    }
-
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    void Print(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T, std::ostream& stream)
-    {
-        stream << "{ ";
-        Print(T, stream, 0);
-        for (size_t i = 1; i < T.NumRows(); ++i)
-        {
-            stream << ",\n  ";
-            Print(T, stream, i);
-        }
-        stream << " }\n";
-    }
-
-    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    std::ostream& operator<<(std::ostream& stream, ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T)
-    {
-        Print(T, stream);
-        return stream;
     }
 
     //
@@ -347,7 +307,8 @@ namespace math
 
         for (size_t i = 0; i < NumPrimarySlices(); ++i) 
         {
-            GetPrimarySlice(i).CopyFrom(other.GetPrimarySlice(i));
+            auto slice = other.GetPrimarySlice(i);
+            GetPrimarySlice(i).CopyFrom(slice);
         }
     }
 
@@ -360,7 +321,7 @@ namespace math
 
         for (size_t i = 0; i < NumSlices<dimension0, dimension1>(*this); ++i)
         {
-            GetSlice<dimension0, dimension1>(i).CopyFrom(GetConstSlice<dimension0, dimension1>(other, i));
+            GetSlice<dimension0, dimension1>(i).CopyFrom(GetSlice<dimension0, dimension1>(other, i));
         }
     }
 
@@ -374,7 +335,7 @@ namespace math
 
         for (size_t i = 0; i < math::NumSlices<dimension0, otherDimension0>(*this); ++i)
         {
-            GetSlice<dimension0, otherDimension0>(i).CopyFrom(GetConstSlice<dimension0, otherDimension0>(other, i));
+            GetSlice<dimension0, otherDimension0>(i).CopyFrom(GetSlice<dimension0, otherDimension0>(other, i));
         }
     }
 
@@ -421,18 +382,18 @@ namespace math
     {
         DEBUG_THROW(firstCoordinate[0] + shape[0] > this->NumRows() || firstCoordinate[1] + shape[1] > this->NumColumns() || firstCoordinate[2] + shape[2] > this->NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subtensor exceeds tensor dimensions."));
 
-        return TensorReference({ TensorLayoutT::CanonicalToLayout(shape), _contents.increments, _contents.pData + this->GetOffset(firstCoordinate) });
+        return TensorReference({ TensorLayoutT::ShapeToLayout(shape), _contents.increments, _contents.pData + this->GetOffset(firstCoordinate) });
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     template<Dimension rowDimension, Dimension columnDimension>
-    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index)
+    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetSlice(size_t index) -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::SliceType
     {
         return TensorSlicer<ElementType, dimension0, dimension1, dimension2, rowDimension, columnDimension>::GetSlice(_contents, index);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index)
+    auto TensorReference<ElementType, dimension0, dimension1, dimension2>::GetPrimarySlice(size_t index) -> typename TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::SliceType
     {
         return TensorSlicer<ElementType, dimension0, dimension1, dimension2, dimension0, dimension1>::GetSlice(_contents, index);
     }
@@ -462,7 +423,7 @@ namespace math
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     void TensorReference<ElementType, dimension0, dimension1, dimension2>::operator-=(ElementType value)
     {
-        (*this) += (-value);
+        Transform([value](ElementType x) {return x - value; });
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
@@ -478,7 +439,7 @@ namespace math
         {
             throw utilities::NumericException(utilities::NumericExceptionErrors::divideByZero, "divide by zero");
         }
-        (*this) *= (1 / value);
+        Transform([value](ElementType x) {return x / value; });
     }
 
     //

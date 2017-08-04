@@ -10,7 +10,7 @@
 
 // math
 #include "Matrix.h"
-#include "Operations.h"
+#include "MatrixOperations.h"
 
 // BLAS
 #ifdef USE_BLAS
@@ -139,7 +139,7 @@ namespace nodes
         math::ColumnVectorReference<ValueType> inputVectorRef(inputVectorValues.data(), _n);
         math::ColumnVectorReference<ValueType> outputVectorRef(outputVectorValues.data(), _m);
 
-        math::Operations::Multiply(static_cast<ValueType>(1.0), inputMatrixRef, inputVectorRef, static_cast<ValueType>(0.0), outputVectorRef);
+        math::Multiply(static_cast<ValueType>(1.0), inputMatrixRef, inputVectorRef, static_cast<ValueType>(0.0), outputVectorRef);
 
         _output.SetOutput(outputVectorValues);
     };

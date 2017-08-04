@@ -63,7 +63,7 @@ namespace nodes
         auto m = weights.NumRows();
         auto n = weights.NumColumns();
         auto lda = weights.GetIncrement();
-        auto weightsValues = std::vector<ValueType>{ weights.GetDataPointer(), weights.GetDataPointer() + weights.GetDataSize() };
+        auto weightsValues = weights.ToArray();
         auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(weightsValues);
         auto matrixMultiplyNode = transformer.AddNode<MatrixVectorMultiplyNode<ValueType>>(weightsNode->output, m, n, lda, newInput);
 

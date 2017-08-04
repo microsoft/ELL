@@ -22,6 +22,8 @@
 
 // math
 #include "Vector.h"
+#include "VectorOperations.h"
+
 
 // common
 #include "DataLoadArguments.h"

@@ -56,7 +56,7 @@ namespace predictors
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        const math::ColumnConstVectorReference<double>& GetWeights() const { return _w; }
+        const math::ConstColumnVectorReference<double>& GetWeights() const { return _w; }
 
         /// <summary> Returns the underlying bias. </summary>
         ///

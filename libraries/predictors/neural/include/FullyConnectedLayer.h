@@ -38,14 +38,14 @@ namespace neural
         ///
         /// <param name="layerParameters"> The parameters common to every layer. </param>
         /// <param name="weights"> The weights to apply as a matrix in rowMajor order, where number of rows equals output neurons
-        /// and columns represent input (in canonical Tensor order).  </param>
+        /// and columns represent input (in logical Tensor order: row, column, channel).  </param>
         FullyConnectedLayer(const LayerParameters& layerParameters, MatrixReferenceType& weights);
 
         /// <summary> Instantiates an instance of a fully connected layer. </summary>
         ///
         /// <param name="layerParameters"> The parameters common to every layer. </param>
         /// <param name="weights"> The weights to apply as stacked Tensors. Each sub-tensor Tensor is the same size as the input,
-        /// and the number of tensors stacked (in row dimension) equals the number of outputs in canonical Tensor order.  </param>
+        /// and the number of tensors stacked (in row dimension) equals the number of outputs in logical Tensor order (row, column, channel).  </param>
         FullyConnectedLayer(const LayerParameters& layerParameters, ConstTensorReferenceType& weights);
 
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>

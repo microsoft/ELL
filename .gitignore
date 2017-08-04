@@ -240,6 +240,7 @@ swig/
 dist/
 build/
 build_*/
+build-*/
 
 interfaces/javascript/ell_module/CMakeFiles/
 interfaces/javascript/ell_module/test/js/Testing/

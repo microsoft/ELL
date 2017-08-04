@@ -10,7 +10,7 @@
 #include "DotProductNode.h"
 
 // math
-#include "Operations.h"
+#include "MatrixOperations.h"
 
 // utilities
 #include "Exception.h"
@@ -110,7 +110,7 @@ namespace nodes
         math::ColumnVector<ValueType> result(_w.NumRows());
 
         // result = _w * data
-        math::Operations::Multiply(1.0, _w, input, 0.0, result);
+        math::Multiply(1.0, _w, input, 0.0, result);
 
         _output.SetOutput({ result.ToArray() });
     }
