@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 import time
+import threading
+import queue
+import itertools
 
 # Class to hold info about the model that the app needs to call the model and display result correctly
 
@@ -27,10 +30,8 @@ class ModelHelper:
         self.frame_count = 0
         self.fps = 0
         self.camera = None
-        self.imageFilename = None
-        self.captureDevice = None
-        self.frame = None
-        self.has_temp_sensor = None
+        self.imageFilenames = None
+        self.captureThread = None
         self.save_images = None
         # now parse the arguments
         self.parse_arguments(argv)
@@ -38,7 +39,7 @@ class ModelHelper:
     def parse_arguments(self, argv):
         # Parse arguments
         self.camera = 0
-        self.imageFilename = None
+        self.imageFilenames = []
         for i in range(1,len(argv)):            
             arg1 = argv[i]
             if (arg1 == "-save"):
@@ -46,7 +47,7 @@ class ModelHelper:
             elif arg1.isdigit():
                 self.camera = int(arg1) 
             else:
-                self.imageFilename = arg1
+                self.imageFilenames.append(arg1)
                 self.camera = None
 
     def show_image(self, frameToShow):          
@@ -97,22 +98,14 @@ class ModelHelper:
     def init_image_source(self):
         # Start video capture device or load static image
         if self.camera is not None:
-            self.captureDevice = cv2.VideoCapture(self.camera)
-        elif self.imageFilename:
-            self.frame = cv2.imread(self.imageFilename)
-            if (type(self.frame) == type(None)):
-                raise Exception('image from %s failed to load' % (self.imageFilename))
+            stream = FrameStream(VideoCaptureSource(self.camera), mostRecentOnly=True)
+        elif self.imageFilenames:
+            stream = FrameStream(FileCaptureSource(self.imageFilenames))
+        self.captureThread = stream.start()
 
     def get_next_frame(self):
-        if self.captureDevice is not None:
-            # if predictor is too slow frames get buffered, this is designed to flush that buffer
-            for i in range(self.get_wait()):
-                ret, self.frame = self.captureDevice.read()
-            if (not ret):
-                raise Exception('your captureDevice is not returning images')
-            return self.frame
-        else:
-            return np.copy(self.frame)
+        frame = self.captureThread.next_frame()
+        return frame;
         
     def resize_image(self, image, newSize):
         # Shape: [rows, cols, channels]
@@ -183,3 +176,58 @@ class ModelHelper:
                 result = True
                 break
         return result
+
+class VideoCaptureSource:
+    def __init__(self, path):
+        self.stream = cv2.VideoCapture(path)
+
+    def get_image(self):
+        (grabbed, frame) = self.stream.read()
+        return (grabbed, frame)
+
+class FileCaptureSource:
+    def __init__(self, path):
+        self.images = itertools.cycle(path)
+
+    def get_image(self):
+        imageFile = next(self.images)
+        frame = cv2.imread(imageFile)
+        if (type(frame) == type(None)):
+            raise Exception('image from %s failed to load' % (imageFile))
+        return (1, frame)
+
+class FrameStream:
+    def __init__(self, source, queueSize=128, mostRecentOnly=False):
+        self.stream = source
+        self.stop_event = threading.Event()
+        self.mostRecentOnly = mostRecentOnly
+        self.frameQueue = queue.Queue(maxsize=queueSize)
+
+    def start(self):
+        t = threading.Thread(target=self.read_frames_from_source)
+        t.daemon = True
+        t.start()
+        return self
+    
+    def read_frames_from_source(self):
+        while True:
+            if self.stop_event.is_set():
+                return
+ 
+            if not self.frameQueue.full():
+                (grabbed, frame) = self.stream.get_image()
+ 
+                if not grabbed:
+                    self.stop()
+                    return
+
+                while (self.mostRecentOnly and not self.frameQueue.empty()):
+                    self.frameQueue.get()
+ 
+                self.frameQueue.put(frame)
+
+    def next_frame(self):
+        return self.frameQueue.get()
+
+    def stop(self):
+        self.stop_event.set()
