@@ -1,8 +1,7 @@
 from IPython.core.magic import Magics, magics_class, cell_magic
 import tempfile
-from subprocess import Popen, PIPE
 import os
-from .util.commands import run
+from .util.commands import run, print as feedback
 
 _arduino_exe_dir = 'C:\\Program Files (x86)\\Arduino'
 _arduino_exe = 'arduino_debug.exe'
@@ -52,14 +51,35 @@ class RaspberryPi(_CommandMagic):
 
     @cell_magic
     def raspberry_pi(self, line, cell):
-        opts, args = self.parse_options(line, '', 'user=', 'ip=')
+        opts, args = self.parse_options(line, '', 'user=', 'ip=', 'path=', 'pipath=')
 
         if not self.password:
             import getpass
             self.password = getpass.getpass(prompt='Password on the Raspberry Pi ')
 
-        pycode = self.save_cell(cell, 'actuation.py')
-        run("pscp -pw " + self.password + ' ' + pycode + " " + opts['user'] + '@' + opts['ip'] + ':' + os.path.basename(pycode))
+        user = opts['user']
+        ip = opts['ip']
+        path = opts['path']
+        pipath = opts['pipath']
+        dir = os.path.basename(path)
+        actuationpy = self.save_cell(cell, 'actuation.py')
+
+        def remote_command(command):
+            run('plink -t -pw ' + self.password + ' -ssh ' + user + '@' + ip + ' ' + command)
+
+        def remote_copy(files, pipath):
+            run('pscp -q -pw ' + self.password + ' ' + ' '.join(files) + ' ' + user + '@' + ip + ':' + pipath)
+
+        feedback('Copying files')
+        remote_command('mkdir -p ' + pipath)
+        files = [
+            actuationpy,
+            path + '.o',
+            path + 'PYTHON_wrap.cxx',
+            path + 'PYTHON_wrap.h',
+        ]
+        remote_copy(files, pipath)
+        feedback('Done')
 
 
 def init_magics():

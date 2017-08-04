@@ -3,6 +3,9 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'Release'))
 
+def package_dir():
+    return os.path.join(os.path.dirname(__file__))
+
 from .ellmagics import init_magics
 init_magics()
 

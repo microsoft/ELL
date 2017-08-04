@@ -4,6 +4,16 @@ import time
 
 # Class to hold info about the model that the app needs to call the model and display result correctly
 
+class Platform:
+    MAC = 'mac'
+    LINUX = 'linux'
+    WINDOWS = 'windows'
+    PI3 = 'pi3'
+    PI3_64 = 'pi3_64'
+    AARCH64 = 'aarch64'
+    IOS = 'ios'
+
+
 class ModelHelper:
     def __init__(self, argv, modelName, modelFiles, labelsFile, inputHeightAndWidth=(224, 224), scaleFactor=1 / 255, threshold=0.25):
         """ Helper class to store information about the model we want to use.
