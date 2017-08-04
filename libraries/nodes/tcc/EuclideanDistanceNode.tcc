@@ -25,15 +25,15 @@ namespace nodes
 {
     template <typename ValueType, math::MatrixLayout layout>
     EuclideanDistanceNode<ValueType, layout>::EuclideanDistanceNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _w(0, 0)
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _v(0, 0)
     {
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    EuclideanDistanceNode<ValueType, layout>::EuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& w)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, w.NumRows()), _w(w)
+    EuclideanDistanceNode<ValueType, layout>::EuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, v.NumRows()), _v(v)
     {
-        assert(input.Size() == w.NumColumns());
+        assert(input.Size() == v.NumColumns());
     }
 
     template <typename ValueType, math::MatrixLayout layout>
@@ -41,11 +41,11 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
 
-        archiver["w_rows"] << _w.NumRows();
-        archiver["w_columns"] << _w.NumColumns();
+        archiver["v_rows"] << _v.NumRows();
+        archiver["v_columns"] << _v.NumColumns();
         std::vector<double> temp;
-        temp.assign(_w.GetDataPointer(), _w.GetDataPointer() + (size_t)(_w.NumRows() * _w.NumColumns()));
-        archiver["w"] << temp;
+        temp.assign(_v.GetDataPointer(), _v.GetDataPointer() + (size_t)(_v.NumRows() * _v.NumColumns()));
+        archiver["v"] << temp;
 
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
@@ -56,13 +56,13 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
 
-        size_t w_rows = 0;
-        size_t w_columns = 0;
-        archiver["w_rows"] >> w_rows;
-        archiver["w_columns"] >> w_columns;
+        size_t v_rows = 0;
+        size_t v_columns = 0;
+        archiver["v_rows"] >> v_rows;
+        archiver["v_columns"] >> v_columns;
         std::vector<double> temp;
-        archiver["w"] >> temp;
-        _w = math::Matrix<ValueType, layout>(w_rows, w_columns, temp);
+        archiver["v"] >> temp;
+        _v = math::Matrix<ValueType, layout>(v_rows, v_columns, temp);
 
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
@@ -72,7 +72,7 @@ namespace nodes
     void EuclideanDistanceNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<EuclideanDistanceNode<ValueType, layout>>(newPortElements, _w);
+        auto newNode = transformer.AddNode<EuclideanDistanceNode<ValueType, layout>>(newPortElements, _v);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -84,21 +84,21 @@ namespace nodes
         auto normNode1 = transformer.AddNode<L2NormNode<double>>(newPortElements);
         auto squareNormNode1 = transformer.AddNode<BinaryOperationNode<double>>(normNode1->output, normNode1->output, emitters::BinaryOperationType::coordinatewiseMultiply);
 
-        auto pointsMatrix = _w;
-        auto productNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(newPortElements, pointsMatrix);
+        auto vectors = _v;
+        auto productNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(newPortElements, vectors);
 
-        std::vector<double> multiplier(_w.NumRows(), -2.0);
+        std::vector<double> multiplier(_v.NumRows(), -2.0);
         auto multiplierNode = transformer.AddNode<ConstantNode<ValueType>>(multiplier);
         auto productNodeScaled = transformer.AddNode<BinaryOperationNode<double>>(productNode->output, multiplierNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
 
         model::PortElements<ValueType> normNode1Outputs;
         model::PortElements<ValueType> normNode2Outputs;
 
-        for (size_t r = 0; r < _w.NumRows(); r++)
+        for (size_t r = 0; r < _v.NumRows(); r++)
         {
             normNode1Outputs.Append(squareNormNode1->output);
 
-            auto matrixRow = pointsMatrix.GetRow(r);
+            auto matrixRow = vectors.GetRow(r);
             auto pointNode = transformer.AddNode<ConstantNode<ValueType>>(matrixRow.ToArray());
             auto normNode2 = transformer.AddNode<L2NormNode<double>>(pointNode->output);
             auto squareNormNode2 = transformer.AddNode<BinaryOperationNode<double>>(normNode2->output, normNode2->output, emitters::BinaryOperationType::coordinatewiseMultiply);
@@ -106,7 +106,9 @@ namespace nodes
         }
 
         auto distNode1 = transformer.AddNode<BinaryOperationNode<double>>(normNode1Outputs, productNodeScaled->output, emitters::BinaryOperationType::add);
-        auto distNode = transformer.AddNode<BinaryOperationNode<double>>(normNode2Outputs, distNode1->output, emitters::BinaryOperationType::add);
+        auto distNodeSq = transformer.AddNode<BinaryOperationNode<double>>(normNode2Outputs, distNode1->output, emitters::BinaryOperationType::add);
+
+        auto distNode = transformer.AddNode<UnaryOperationNode<double>>(distNodeSq->output, emitters::UnaryOperationType::sqrt);
 
         transformer.MapNodeOutput(output, distNode->output);
 
@@ -122,25 +124,26 @@ namespace nodes
             input[index] = _input[index];
         }
 
-        math::ColumnVector<ValueType> result(_w.NumRows());
+        math::ColumnVector<ValueType> result(_v.NumRows());
 
         auto norm1sq = input.Norm2Squared();
 
-        // result = _w * input
-        math::Operations::Multiply(-2.0, _w, input, 0.0, result);
+        // result = _v * input
+        math::Operations::Multiply(-2.0, _v, input, 0.0, result);
 
-        for (size_t r = 0; r < _w.NumRows(); r++)
+        for (size_t r = 0; r < _v.NumRows(); r++)
         {
-            result[r] += norm1sq + _w.GetRow(r).Norm2Squared();
+            result[r] += norm1sq + _v.GetRow(r).Norm2Squared();
+            result[r] = std::sqrt(result[r]);
         }
 
         _output.SetOutput({ result.ToArray() });
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    EuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> w, model::ModelTransformer& transformer)
+    EuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> v, model::ModelTransformer& transformer)
     {
-        return transformer.AddNode<EuclideanDistanceNode>(input, w);
+        return transformer.AddNode<EuclideanDistanceNode>(input, v);
     }
 }
 }

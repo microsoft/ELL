@@ -584,13 +584,13 @@ void TestMatrixVectorProductRefine()
 
 void TestEuclideanDistanceNodeRefine()
 {
-    math::RowMatrix<double> w(2, 3);
-    w(0, 0) = 1.0;
-    w(0, 1) = 0.2;
-    w(0, 2) = 0.3;
-    w(1, 0) = 0.3;
-    w(1, 1) = 0.7;
-    w(1, 2) = 0.5;
+    math::RowMatrix<double> v(2, 3);
+    v(0, 0) = 1.0;
+    v(0, 1) = 0.2;
+    v(0, 2) = 0.3;
+    v(1, 0) = 0.3;
+    v(1, 1) = 0.7;
+    v(1, 2) = 0.5;
 
     std::vector<double> input = { 1, 2, 3 };
 
@@ -599,7 +599,7 @@ void TestEuclideanDistanceNodeRefine()
 
     inputNode->SetInput(input);
 
-    auto euclideanDistanceNode = model.AddNode<nodes::EuclideanDistanceNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, w);
+    auto euclideanDistanceNode = model.AddNode<nodes::EuclideanDistanceNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, v);
 
     model::TransformContext context;
     model::ModelTransformer transformer;
