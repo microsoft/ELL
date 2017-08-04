@@ -2,6 +2,8 @@ from IPython.core.magic import Magics, magics_class, cell_magic
 import tempfile
 import os
 from .util.commands import run, print as feedback
+import paramiko
+
 
 _arduino_exe_dir = 'C:\\Program Files (x86)\\Arduino'
 _arduino_exe = 'arduino_debug.exe'
@@ -65,11 +67,31 @@ class RaspberryPi(_CommandMagic):
         dir = os.path.basename(path)
         actuationpy = self.save_cell(cell, 'actuation.py')
 
+        client = paramiko.SSHClient()
+        client.load_system_host_keys()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(ip, username=user, password=self.password)
+
         def remote_command(command):
-            run('plink -t -pw ' + self.password + ' -ssh ' + user + '@' + ip + ' ' + command)
+            nonlocal client
+            feedback(command)
+            stdin, stdout, stderr = client.exec_command(command)
+            for line in stdout:
+                feedback(line.strip('\n'))
 
         def remote_copy(files, pipath):
-            run('pscp -q -pw ' + self.password + ' ' + ' '.join(files) + ' ' + user + '@' + ip + ':' + pipath)
+            with client.open_sftp() as sftp:
+                for file in files:
+                    feedback('sftp ' + file)
+                    lastpct = 0
+                    def progress(sofar, total):
+                        nonlocal lastpct
+                        pct = sofar / total * 100
+                        delta = pct - lastpct
+                        if delta > 10 and delta < 90:
+                            feedback("{:.0f}%".format(pct))
+                            lastpct = pct
+                    sftp.put(file, pipath + '/' + os.path.basename(file), callback=progress)
 
         feedback('Copying files...')
         remote_command('rm -r -f ' + pipath)
@@ -81,6 +103,7 @@ class RaspberryPi(_CommandMagic):
             pkgdir + '/Release/deploy/OpenBLASSetup.cmake',
             # python code
             pkgdir + '/vision/modelHelper.py',
+            path + '.py',
             actuationpy,
             # native code
             path + 'PYTHON_wrap.cxx',
@@ -93,8 +116,10 @@ class RaspberryPi(_CommandMagic):
         ]
         remote_copy(files, pipath)
         feedback('Building...')
-        remote_command('"mkdir build & cd build & cmake .. & make"')
+        remote_command('cd ' + pipath + '; mkdir build; cd build; cmake ..; make')
         feedback('Done')
+
+        client.close()
 
 
 def init_magics():
