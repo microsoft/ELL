@@ -87,43 +87,45 @@ class RaspberryPi(_CommandMagic):
             import getpass
             self.password = getpass.getpass(prompt='Password on the Raspberry Pi ')
 
-        self.user = opts['user']
-        self.ip = opts['ip']
-        self.path = opts['path']
-        self.path += '/model'
-        self.pipath = opts['pipath']
-        dir = os.path.basename(self.path)
+        try:
+            self.user = opts['user']
+            self.ip = opts['ip']
+            self.path = opts['path']
+            self.path += '/model'
+            self.pipath = opts['pipath']
+            dir = os.path.basename(self.path)
 
-        self.open_remote()
+            self.open_remote()
 
-        feedback('Copying files...')
-        self.remote_command('rm -r -f ' + self.pipath)
-        self.remote_command('mkdir -p ' + self.pipath)
-        pkgdir = os.path.dirname(__file__)
-        files = [
-            # build files
-            pkgdir + '/Release/deploy/CMakeLists.txt',
-            pkgdir + '/Release/deploy/OpenBLASSetup.cmake',
-            # python code
-            pkgdir + '/vision/modelHelper.py',
-            self.path + '.py',
-            # native code
-            self.path + 'PYTHON_wrap.cxx',
-            self.path + 'PYTHON_wrap.h',
-            pkgdir + '/Release/deploy/CallbackInterface.h',
-            pkgdir + '/Release/deploy/ClockInterface.h',
-            pkgdir + '/Release/deploy/CallbackInterface.tcc',
-            self.path + '.i.h',
-            self.path + '.o',
-        ]
-        self.remote_copy(files, self.pipath)
-        feedback('Building...')
-        self.remote_command('cd ' + self.pipath + '; mkdir build; cd build; cmake ..; make')
-        feedback('Launching...')
-        self.remote_command('python3 ' + self.pipath + '/actuation.py')
+            feedback('Copying files...')
+            self.remote_command('rm -r -f ' + self.pipath)
+            self.remote_command('mkdir -p ' + self.pipath)
+            pkgdir = os.path.dirname(__file__)
+            files = [
+                # build files
+                pkgdir + '/Release/deploy/CMakeLists.txt',
+                pkgdir + '/Release/deploy/OpenBLASSetup.cmake',
+                # python code
+                pkgdir + '/vision/modelHelper.py',
+                self.path + '.py',
+                # native code
+                self.path + 'PYTHON_wrap.cxx',
+                self.path + 'PYTHON_wrap.h',
+                pkgdir + '/Release/deploy/CallbackInterface.h',
+                pkgdir + '/Release/deploy/ClockInterface.h',
+                pkgdir + '/Release/deploy/CallbackInterface.tcc',
+                self.path + '.i.h',
+                self.path + '.o',
+            ]
+            self.remote_copy(files, self.pipath)
+            feedback('Building...')
+            self.remote_command('cd ' + self.pipath + '; mkdir build; cd build; cmake ..; make')
 
-        self.client.close()
-
+            feedback('Done')
+            self.client.close()
+        except paramiko.AuthenticationException:
+            feedback('Authentication failed. Wrong password? Evaluate the cell to try again')
+            self.password = None
 
 
     @cell_magic
@@ -133,7 +135,7 @@ class RaspberryPi(_CommandMagic):
         actuationpy = self.save_cell(cell, 'actuation.py')
         self.remote_copy([actuationpy], self.pipath)
 
-        self.remote_command('python3 ' + self.pipath + '/actuation.py')
+        self.remote_command('cd ' + self.pipath + '; /home/pi/miniconda3/bin/python3 actuation.py')
 
 
 
