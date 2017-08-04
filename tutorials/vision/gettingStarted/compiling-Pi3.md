@@ -61,7 +61,7 @@ To run the demo, you will need:
     ```
     Follow prompts to install, we recommend [yes] for adding Miniconda3 to the PATH.
     ```
-    pi@raspberrypi:~ $ source ~/.bashsrc # if you selected [yes] to add to the PATH
+    pi@raspberrypi:~ $ source ~/.bashrc # if you selected [yes] to add to the PATH
     pi@raspberrypi:~ $ conda create --name py34 python=3
     pi@raspberrypi:~ $ source activate py34
     ```
