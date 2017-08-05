@@ -59,7 +59,7 @@ class RaspberryPi(_CommandMagic):
 
     def remote_command(self, command):
         feedback(command)
-        stdin, stdout, stderr = self.client.exec_command(command)
+        stdin, stdout, stderr = self.client.exec_command(command, bufsize=0)
         for line in stdout:
             feedback(line.strip('\n'))
         for line in stderr:
@@ -111,6 +111,7 @@ class RaspberryPi(_CommandMagic):
                 # native code
                 self.path + 'PYTHON_wrap.cxx',
                 self.path + 'PYTHON_wrap.h',
+                pkgdir + '/Release/deploy/darknetImageNetLabels.txt',
                 pkgdir + '/Release/deploy/CallbackInterface.h',
                 pkgdir + '/Release/deploy/ClockInterface.h',
                 pkgdir + '/Release/deploy/CallbackInterface.tcc',
