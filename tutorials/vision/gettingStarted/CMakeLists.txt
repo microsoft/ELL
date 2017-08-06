@@ -22,6 +22,7 @@ set (PYTHON_TUTORIALS
     cntkVgg16ImageNetLabels.txt
     coffeemug.jpg
     compiledCntkDemo.py
+    compiledCntkBinarizedDemo.py
     compiledDarknetDemo.py
     compiling-Linux.md
     compiling-Windows.md
@@ -53,7 +54,8 @@ include(GenerateModelTargets)
 
 set(sample_models
     "vgg16ImageNet compiledCntkDemo.py cntkVgg16ImageNetLabels.txt"
-    "darknetReference compiledDarknetDemo.py darknetImageNetLabels.txt")
+    "darknetReference compiledDarknetDemo.py darknetImageNetLabels.txt"
+    "cntkDarknetBinarized compiledCntkBinarizedDemo.py cntkDarknetBinarizedImageNetLabels.txt")
 
 foreach(sample_model ${sample_models})
     separate_arguments(sample_model)

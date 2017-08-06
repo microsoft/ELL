@@ -55,6 +55,7 @@ enum class ConvolutionType
 void TestInputLayerNode(size_t outputPadding = 0);
 void TestReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestLeakyReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
+void TestParametricReLUActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestSigmoidActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestBatchNormalizationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestBiasLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);

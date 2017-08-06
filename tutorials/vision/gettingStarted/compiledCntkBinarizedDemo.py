@@ -3,41 +3,33 @@ import os
 import numpy as np
 import cv2
 
-import findEll
-import cntk_to_ell
-import ell_utilities
 import modelHelper as mh
 
+# note: to run this in headless mode on a Linux machine run the following from your terminal window
+# export DISPLAY=:0
+# then add the '-save' argument to get tagged frames to be saved to disk.
 
-def get_ell_predictor(modelConfig):
-    """Imports a model and returns an ELL.Predictor."""
-    return cntk_to_ell.predictor_from_cntk_model(modelConfig.model_files[0])
-
+# Import the compiled model wrapper
+sys.path.append('build')
+sys.path.append('build/Release')
+import cntkDarknetBinarized as model
 
 def main():
-    # Check for model file
-    if (not os.path.exists('cntkDarknetBinarized.model')):
-        print("Please download the 'cntkDarknetBinarized.model' file, see README.md")
-        sys.exit(1)
+    # python somehow needs to know about the data vector type, so we provide it
+    buffer = model.FloatVector(227 * 227 * 3)
+    results = model.FloatVector(1000)
 
-    # ModelConfig for Darknet Binarized model from ELL Model Gallery
-    # Follow the instructions in README.md to download the model if you intend to use it.
+    # Pick the model characteristics we are working with
     helper = mh.ModelHelper(sys.argv, "CntkDarknetBinarized", [
                             "cntkDarknetBinarized.model"], "cntkDarknetBinarizedImageNetLabels.txt",
                             inputHeightAndWidth=(227, 227), threshold=-0.01)
-
-    # Import the model
-    model = get_ell_predictor(helper)
-
-    # Save the model
-    helper.save_ell_predictor_to_file(model, "cntkDarknetBinarized.map")
 
     # Initialize image source
     helper.init_image_source()
 
     lastPrediction = ""
 
-    while (True):
+    while (not helper.done()):
         # Grab next frame
         frame = helper.get_next_frame()
 
@@ -49,12 +41,12 @@ def main():
         data = data.astype(np.float)
         data = data.ravel()
 
-        # Get the model to classify the image, by returning a list of probabilities for the classes it can detect
-        predictions = model.Predict(data)
+        # Get the compiled model to classify the image, by returning a list of probabilities for the classes it can detect
+        model.cntk_darknet_binarized_predict(data, results)
 
         # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
         # each with the text label and the prediction score.
-        top5 = helper.get_top_n(predictions, 5)
+        top5 = helper.get_top_n(results, 5)
 
         # Turn the top5 into a text string to display
         text = "".join(
@@ -66,16 +58,20 @@ def main():
 
         # Draw the text on the frame
         frameToShow = frame
+        
         helper.draw_label(frameToShow, text)
         helper.draw_fps(frameToShow)
 
         # Show the new frame
-        cv2.imshow('frame', frameToShow)
+        helper.show_image(frameToShow)
 
-        # Wait for Esc key
-        if cv2.waitKey(1) & 0xFF == 27:
-            break
-
+    # print profiling info if model is compiled with profiling on
+    if hasattr(model, "cntk_darknet_binarized_print_model_profiling_info"):
+        print("model statistics:")
+        model.cntk_darknet_binarized_print_model_profiling_info()
+    if hasattr(model, "cntk_darknet_binarized_print_node_profiling_info"):
+        print("node statistics:")
+        model.cntk_darknet_binarized_print_node_profiling_info()
 
 if __name__ == "__main__":
     main()

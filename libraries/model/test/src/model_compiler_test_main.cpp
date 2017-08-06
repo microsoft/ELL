@@ -97,6 +97,10 @@ void TestIRCompiler()
     TestLeakyReLUActivationLayerNode(0, 1);
     TestLeakyReLUActivationLayerNode(0, 2);
 
+    TestParametricReLUActivationLayerNode();
+    TestParametricReLUActivationLayerNode(0, 1);
+    TestParametricReLUActivationLayerNode(0, 2);
+
     TestSigmoidActivationLayerNode();
     TestSigmoidActivationLayerNode(0, 1);
     TestSigmoidActivationLayerNode(0, 2);

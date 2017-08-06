@@ -68,8 +68,6 @@ namespace nodes
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         using BaseType::HasState;
 
-        static size_t NumElements(const Shape& size);
-
     private:
         // Helper for generating nested loops to visit all input/output values
         template <typename FunctionType>

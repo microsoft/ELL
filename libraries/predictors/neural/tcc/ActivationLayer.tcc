@@ -50,10 +50,24 @@ namespace neural
                 for (size_t k = 0; k < input.NumChannels(); k++)
                 {
                     ElementType value = input(i, j, k);
-                    output(i, j, k) = _activation.Apply(value, {i, j, k});
+                    output(i, j, k) = _activation.Apply(value, math::Triplet{i, j, k});
                 }
             }
         }
+    }
+
+    template <typename ElementType, template <typename> class ActivationFunctionType>
+    void ActivationLayer<ElementType, ActivationFunctionType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        Layer<ElementType>::WriteToArchive(archiver);
+        _activation.WriteToArchive(archiver);
+    }
+
+    template <typename ElementType, template <typename> class ActivationFunctionType>
+    void ActivationLayer<ElementType, ActivationFunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        Layer<ElementType>::ReadFromArchive(archiver);
+        _activation.ReadFromArchive(archiver);
     }
 }
 }

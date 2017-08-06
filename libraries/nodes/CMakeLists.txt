@@ -9,6 +9,7 @@ set (include include/AccumulatorNode.h
              include/BatchNormalizationLayerNode.h
              include/BiasLayerNode.h
              include/BinaryConvolutionalLayerNode.h
+             include/BinaryFunctionNode.h
              include/BinaryOperationNode.h
              include/BinaryPredicateNode.h
              include/BroadcastFunctionNode.h
@@ -69,6 +70,7 @@ set (src src/ActivationLayerNode.cpp
          src/SoftmaxLayerNode.cpp)
 
 set (tcc tcc/AccumulatorNode.tcc
+         tcc/BinaryFunctionNode.tcc
          tcc/BinaryOperationNode.tcc
          tcc/BinaryPredicateNode.tcc
          tcc/BroadcastFunctionNode.tcc

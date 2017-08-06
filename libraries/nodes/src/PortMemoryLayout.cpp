@@ -43,5 +43,15 @@ namespace nodes
         archiver["stride"] >> stride;
         archiver["offset"] >> offset;
     }
+
+    size_t NumElements(const Shape& size)
+    {
+        size_t result = 1;
+        for (auto s : size)
+        {
+            result *= s;
+        }
+        return result;
+    }
 }
 }

@@ -48,6 +48,16 @@ namespace neural
         /// <summary> Typename used for serialization. </summary>
         static std::string GetTypeName() { return "LeakyReLUActivation"; }
 
+        /// <summary> Archives this object. </summary>
+        ///
+        /// <param name="archiver"> The archiver. </param>
+        void WriteToArchive(utilities::Archiver& /*archiver*/) const {};
+
+        /// <summary> Unarchives this object. </summary>
+        ///
+        /// <param name="archiver"> The unarchiver. </param>
+        void ReadFromArchive(utilities::Unarchiver& /*archiver*/) {};
+
     private:
         ElementType _leakyFactor;
     };

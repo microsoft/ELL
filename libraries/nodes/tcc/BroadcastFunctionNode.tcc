@@ -133,17 +133,6 @@ namespace nodes
     {        
     }
 
-    template <typename ValueType, typename FunctionType>
-    size_t BroadcastFunctionNode<ValueType, FunctionType>::NumElements(const Shape& size)
-    {
-        size_t result = 1;
-        for (auto s : size)
-        {
-            result *= s;
-        }
-        return result;
-    }
-
     //
     // Arbitrary-depth nested loops are generated recursively. The EmitComputeDimensionLoop
     // function emits `numDimensions` nested loops of the form:

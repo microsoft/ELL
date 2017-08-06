@@ -26,7 +26,16 @@ namespace nodes
     ///
     /// <param name="shape1"> The first shape. </param>
     /// <param name="shape2"> The other shape. </param>
+    ///
+    /// <return> true if the shapes are equal </return>
     bool ShapesEqual(const Shape& shape1, const Shape& shape2);
+
+    /// <summary> Returns the number of elements in a given shape. </summary>
+    ///
+    /// <param name="shape"> The shape. </param>
+    ///
+    /// <return> Number of elements in the shape </return>
+    size_t NumElements(const Shape& shape);
 
     /// <summary> A struct representing the memory layout of port data. </summary>
     struct PortMemoryLayout : public utilities::IArchivable

@@ -29,6 +29,7 @@
 #include "LeakyReLUActivation.h"
 #include "MaxPoolingFunction.h"
 #include "MeanPoolingFunction.h"
+#include "ParametricReLUActivation.h"
 #include "PoolingLayer.h"
 #include "ReLUActivation.h"
 #include "ScalingLayer.h"

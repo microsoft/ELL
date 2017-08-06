@@ -83,6 +83,9 @@ namespace neural
     /// <summary> Helper function to determine if a PaddingParameters struct represents no padding </summary>
     static bool HasPadding(const PaddingParameters& padding) { return padding.paddingSize != 0; }
 
+    /// <summary> Helper function to determine if a PaddingParameters struct represents zero padding </summary>
+    static bool HasPadding(const PaddingParameters& padding, PaddingScheme scheme) { return HasPadding(padding) && (padding.paddingScheme == scheme); }
+
     /// <summary> Get the padding value to fill with </summary>
     template <typename ValueType>
     ValueType GetPaddingValue(PaddingScheme paddingScheme);
@@ -217,10 +220,10 @@ namespace neural
 
         /// <summary> Returns number of output rows minus padding. </summary>
         size_t NumOutputRowsMinusPadding() const { return _output.NumRows() - 2 * _layerParameters.outputPaddingParameters.paddingSize; }
-        
+
         /// <summary> Returns number of output columns minus padding. </summary>
         size_t NumOutputColumnsMinusPadding() const { return _output.NumColumns() - 2 * _layerParameters.outputPaddingParameters.paddingSize; }
-        
+
         /// <summary> Returns number of output channels. </summary>
         size_t NumOutputChannels() const { return _output.NumChannels(); };
 

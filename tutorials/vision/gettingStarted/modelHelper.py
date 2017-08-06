@@ -6,7 +6,7 @@ import time
 
 
 class ModelHelper:
-    def __init__(self, argv, modelName, modelFiles, labelsFile, inputHeightAndWidth=(224, 224), scaleFactor=1 / 255, threshold=0.25, binarized=False):
+    def __init__(self, argv, modelName, modelFiles, labelsFile, inputHeightAndWidth=(224, 224), scaleFactor=1 / 255, threshold=0.25):
         """ Helper class to store information about the model we want to use.
         argv       - arguments passed in from the command line
         modelName  - string name of the model
@@ -16,7 +16,6 @@ class ModelHelper:
         scaleFactor - each input pixel may need to be scaled. It is common for models to require an 8-bit pixel
                       to be represented as a value between 0.0 and 1.0, which is the same as multiplying it by 1/255.
         threshold   - specifies a prediction threshold. We will ignore prediction values less than this
-        binarized   - whether the model is binarized
         """
         self.model_name = modelName
         self.model_files = modelFiles
@@ -24,7 +23,6 @@ class ModelHelper:
         self.inputHeightAndWidth = inputHeightAndWidth
         self.scaleFactor = scaleFactor
         self.threshold = threshold
-        self.binarized = binarized
         self.labels = self.load_labels(self.labels_file)
         self.start = time.time()
         self.frame_count = 0
@@ -68,7 +66,7 @@ class ModelHelper:
     def get_top_n(self, predictions, N):
         """Return at most the top 5 predictions as a list of tuples that meet the threshold."""
         topN = np.zeros([N, 2])
-            
+
         for p in range(len(predictions)):
             for t in range(len(topN)):
                 if predictions[p] > topN[t][0]:
@@ -188,4 +186,3 @@ class ModelHelper:
                 result = True
                 break
         return result
-

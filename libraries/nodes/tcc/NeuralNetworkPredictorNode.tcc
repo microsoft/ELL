@@ -35,6 +35,9 @@ namespace nodes
         node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::LeakyReLUActivation>, ActivationLayerNode<ValueType, predictors::neural::LeakyReLUActivation>>(transformer, layer, layerInputs);
         if (node != nullptr) return node;
 
+        node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::ParametricReLUActivation>, ParametricReLUActivationLayerNode<ValueType>>(transformer, layer, layerInputs);
+        if (node != nullptr) return node;
+
         node = TryAddLayerNode<predictors::neural::ActivationLayer<ValueType, predictors::neural::ReLUActivation>, ActivationLayerNode<ValueType, predictors::neural::ReLUActivation>>(transformer, layer, layerInputs);
         if (node != nullptr) return node;
 

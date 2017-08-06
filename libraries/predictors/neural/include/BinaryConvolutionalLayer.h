@@ -89,7 +89,7 @@ namespace neural
 
         /// <summary> Get the parameters used to control convolution. </summary>
         ///
-        /// <returns> A ConvolutionalParameters struct. </returns>
+        /// <returns> A BinaryConvolutionalParameters struct. </returns>
         const BinaryConvolutionalParameters& GetConvolutionalParameters() const { return _convolutionalParameters; }
 
         /// <summary> Get the weights for the convolution filters. </summary>

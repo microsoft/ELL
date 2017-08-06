@@ -170,6 +170,7 @@ namespace nodes
         /// <param name="filterWeights"> The packed binary weights for the convolutional filters. </param>
         /// <param name="filterMeans"> The real-valued means of the convolutional filters. </param>
         /// <param name="convolutionalParameters"> The convolutional parameters. </param>
+        /// <param name="inputPaddingParameters"> The input padding parameters. </param>
         /// <param name="inputMemoryLayout"> The layout of the input data. </param>
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         BinaryXnorNode(const model::PortElements<PackedBitsType>& input,
@@ -177,6 +178,7 @@ namespace nodes
                        const model::PortElements<PackedBitsType>& filterWeights,
                        const model::PortElements<ValueType>& filterMeans,
                        const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
+                       const predictors::neural::PaddingParameters& inputPaddingParameters,
                        const PortMemoryLayout& inputMemoryLayout,
                        const PortMemoryLayout& outputMemoryLayout);
 
@@ -223,6 +225,7 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         predictors::neural::BinaryConvolutionalParameters _convolutionalParameters;
+        predictors::neural::PaddingParameters _inputPaddingParameters;
         PortMemoryLayout _inputMemoryLayout;
         PortMemoryLayout _outputMemoryLayout;
     };

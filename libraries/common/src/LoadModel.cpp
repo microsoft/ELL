@@ -297,6 +297,8 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::LeakyReLUActivation>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<float, ell::predictors::neural::SigmoidActivation>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<double, ell::predictors::neural::SigmoidActivation>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ParametricReLUActivationLayerNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ParametricReLUActivationLayerNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BatchNormalizationLayerNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BatchNormalizationLayerNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BiasLayerNode<float>>();

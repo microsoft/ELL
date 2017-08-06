@@ -318,8 +318,7 @@ namespace neural
     template <typename ElementType>
     bool BinaryConvolutionalLayer<ElementType>::HasInputZeroPadding() const
     {
-        return HasPadding(_layerParameters.inputPaddingParameters) &&
-               _layerParameters.inputPaddingParameters.paddingScheme == PaddingScheme::zeros;
+        return HasPadding(_layerParameters.inputPaddingParameters, PaddingScheme::zeros);
     }
 
     template <typename ElementType>

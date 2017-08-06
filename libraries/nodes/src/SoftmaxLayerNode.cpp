@@ -287,17 +287,6 @@ namespace nodes
         loop.End();
     }
 
-    template <typename ValueType>
-    size_t SoftmaxLayerNode<ValueType>::NumElements(const Shape& size)
-    {
-        size_t result = 1;
-        for (auto s : size)
-        {
-            result *= s;
-        }
-        return result;
-    }
-
     // Explicit specialization
     template class SoftmaxLayerNode<float>;
     template class SoftmaxLayerNode<double>;

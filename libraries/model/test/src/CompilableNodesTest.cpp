@@ -63,6 +63,7 @@
 #include "LeakyReLUActivation.h"
 #include "MaxPoolingFunction.h"
 #include "MeanPoolingFunction.h"
+#include "ParametricReLUActivation.h"
 #include "PoolingLayer.h"
 #include "ReLUActivation.h"
 #include "ScalingLayer.h"
@@ -1273,8 +1274,8 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
     // Create model
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::ActivationLayerNode<double, ActivationFunction>>(inputNode->output, layer);
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::ActivationLayerNode<ElementType, ActivationFunction>>(inputNode->output, layer);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
@@ -1292,6 +1293,47 @@ void TestLeakyReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPadd
 void TestSigmoidActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
     TestActivationLayerNode<ell::predictors::neural::SigmoidActivation>(inputPaddingSize, outputPaddingSize);
+}
+
+void TestParametricReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using ElementType = double;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+    const double eps = 1e-6;
+
+    // Build a model
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    input(0, 0, 0) = 1.0;
+    input(0, 1, 0) = -2.0;
+    input(1, 0, 1) = 3.0;
+    input(1, 1, 1) = -4.0;
+    Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
+    LayerParameters layerParameters{ input, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+
+    TensorType alphaWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType alpha = alphaWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    alpha(0, 0, 0) = 0.1;
+    alpha(0, 1, 0) = 0.2;
+    alpha(1, 0, 1) = 0.3;
+    alpha(1, 1, 1) = 0.4;
+
+    ParametricReLUActivation<ElementType> prelu(alphaWithPadding);
+    ActivationLayer<ElementType, ParametricReLUActivation> layer(layerParameters, prelu);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::ParametricReLUActivationLayerNode<ElementType>>(inputNode->output, layer);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
@@ -1427,10 +1469,7 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
     auto computeNode = model.AddNode<nodes::BinaryConvolutionalLayerNode<double>>(inputNode->output, layer);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
-    if (paddingScheme != PaddingScheme::zeros) // TODO: remove when zero padding is properly handled by compile
-    {
-        VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
-    }
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)

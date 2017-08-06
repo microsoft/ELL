@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ActivationLayerNode.h"
+#include "BinaryFunctionNode.h"
 #include "ConstantNode.h"
 
 // predictors
@@ -116,12 +117,39 @@ namespace nodes
     }
 
     //
+    // Parametric ReLU activation function
+    //
+    template <typename ValueType>
+    ValueType ParametricReLUActivationFunction<ValueType>::Compute(ValueType x, ValueType a) const
+    {
+        return ((x > 0) ? x : a * x);
+    }
+
+    template <typename ValueType>
+    llvm::Value* ParametricReLUActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* a) const
+    {
+        // ((x[i] > 0) ? x[i] : a[i] * x[i])
+        llvm::Value* result = function.Variable(emitters::GetVariableType<ValueType>(), "result");
+        auto ifEmitter = function.If();
+        ifEmitter.If(emitters::GetComparison<ValueType>(emitters::BinaryPredicateType::greater), x, function.Literal<ValueType>(0));
+        {
+            function.Store(result, x);
+        }
+        ifEmitter.Else();
+        {
+            function.Store(result, function.Operator(emitters::GetMultiplyForValueType<ValueType>(), x, a));
+        }
+        ifEmitter.End();
+        return function.Load(result);
+    }
+
+    //
     // ActivationLayerNode
     //
 
     template <typename ValueType, template <typename> class ActivationFunctionType>
     ActivationLayerNode<ValueType, ActivationFunctionType>::ActivationLayerNode(const model::PortElements<ValueType>& input, const predictors::neural::ActivationLayer<ValueType, ActivationFunctionType>& layer)
-        : NeuralNetworkLayerNode<ActivationLayerNode<ValueType, ActivationFunctionType>, predictors::neural::ActivationLayer<ValueType, ActivationFunctionType>, ValueType>(input, layer)
+        : BaseType(input, layer)
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
         auto&& outputLayout = this->GetOutputMemoryLayout();
@@ -146,6 +174,44 @@ namespace nodes
         return true;
     }
 
+    //
+    // ParametricReLUActivationLayerNode
+    //
+
+    template <typename ValueType>
+    ParametricReLUActivationLayerNode<ValueType>::ParametricReLUActivationLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer)
+        : BaseType(input, layer)
+    {
+        auto&& inputLayout = this->GetInputMemoryLayout();
+        auto&& outputLayout = this->GetOutputMemoryLayout();
+        if (!ShapesEqual(inputLayout.size, outputLayout.size))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active area sizes don't match");
+        }
+    }
+
+    template <typename ValueType>
+    bool ParametricReLUActivationLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
+    {
+        using ActivationFunction = ParametricReLUActivationFunction<ValueType>;
+        auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
+
+        auto predictorActivationFunction = this->GetLayer().GetActivationFunction();
+        auto alphaValues = predictorActivationFunction.GetAlpha().ToArray();
+        auto alphaValuesNode = transformer.AddNode<ConstantNode<ValueType>>(alphaValues);
+
+        // PReLU is a coordinate-wise operation
+        auto computeNode = transformer.AddNode<BinaryFunctionNode<ValueType, ActivationFunction>>(
+            newInput,
+            alphaValuesNode->output,
+            this->GetInputMemoryLayout(),
+            this->GetOutputMemoryLayout(),
+            ActivationFunction{});
+
+        transformer.MapNodeOutput(this->output, computeNode->output);
+        return true;
+    }
+
     // Explicit specialization
     template class ReLUActivationFunction<float>;
     template class ReLUActivationFunction<double>;
@@ -153,12 +219,17 @@ namespace nodes
     template class LeakyReLUActivationFunction<double>;
     template class SigmoidActivationFunction<float>;
     template class SigmoidActivationFunction<double>;
-
     template class ActivationLayerNode<float, ell::predictors::neural::ReLUActivation>;
     template class ActivationLayerNode<double, ell::predictors::neural::ReLUActivation>;
     template class ActivationLayerNode<float, ell::predictors::neural::LeakyReLUActivation>;
     template class ActivationLayerNode<double, ell::predictors::neural::LeakyReLUActivation>;
     template class ActivationLayerNode<float, ell::predictors::neural::SigmoidActivation>;
     template class ActivationLayerNode<double, ell::predictors::neural::SigmoidActivation>;
+
+    template class ParametricReLUActivationFunction<float>;
+    template class ParametricReLUActivationFunction<double>;
+    template class ParametricReLUActivationLayerNode<float>;
+    template class ParametricReLUActivationLayerNode<double>;
+
 } // nodes
 } // ell
