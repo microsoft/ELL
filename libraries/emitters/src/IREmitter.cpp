@@ -95,6 +95,11 @@ namespace emitters
         }
     }
 
+    llvm::PointerType* IREmitter::PointerType(VariableType type)
+    {
+        return Type(type)->getPointerTo();
+    }
+
     llvm::ArrayType* IREmitter::ArrayType(VariableType type, size_t size)
     {
         return llvm::ArrayType::get(Type(type), size);
@@ -224,6 +229,12 @@ namespace emitters
     llvm::Constant* IREmitter::FalseBit()
     {
         return llvm::ConstantInt::getFalse(_llvmContext);
+    }
+
+    
+    llvm::ConstantPointerNull* IREmitter::NullPointer(llvm::PointerType* pointerType)
+    {
+        return llvm::ConstantPointerNull::get(pointerType);
     }
 
     //

@@ -71,6 +71,18 @@ namespace model
         /// <returns> A pointer to the port </returns>
         const InputPortBase* GetInputPort(const std::string& portName) const;
 
+        /// <summary> Returns an input port by index </summary>
+        ///
+        /// <param name="portIndex"> The index of the port </param>
+        /// <returns> A pointer to the port </returns>
+        InputPortBase* GetInputPort(size_t portIndex);
+
+        /// <summary> Returns an input port by index </summary>
+        ///
+        /// <param name="portIndex"> The index of the port </param>
+        /// <returns> A pointer to the port </returns>
+        const InputPortBase* GetInputPort(size_t portIndex) const;
+
         /// <summary> Returns the output "ports" for this node </summary>
         ///
         /// <returns> The output "ports" for this node </returns>

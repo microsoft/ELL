@@ -153,6 +153,16 @@ namespace utilities
 
     std::string JoinPaths(std::string path1, std::string path2)
     {
+        if (path1 == "")
+        {
+            return path2;
+        }
+        
+        if (path2 == "")
+        {
+            return path1;
+        }
+
         // PORTABILITY should be replaced by C++17 filesystem when available
 #ifdef WIN32
         return path1 + "\\" + path2;

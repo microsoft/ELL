@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <vector>
 
 class VectorStats

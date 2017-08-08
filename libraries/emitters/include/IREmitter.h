@@ -60,6 +60,13 @@ namespace emitters
         /// <returns> Pointer to an llvm::Type object that corresponds to the given VariableType. </returns>
         llvm::Type* Type(VariableType type);
 
+        /// <summary> Get the LLVM Type information for a pointer to a VariableType. </summary>
+        ///
+        /// <param name="type"> The VariableType. </param>
+        ///
+        /// <returns> Pointer to an llvm::Type object that corresponds to a pointer to the given VariableType. </returns>
+        llvm::PointerType* PointerType(VariableType type);
+
         /// <summary>
         /// Get the LLVM Type Information for an ARRAY of VariableType, with a given size.
         /// </summary>
@@ -186,6 +193,14 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents an array of doubles. </returns>
         llvm::Constant* Literal(const std::vector<double>& value);
 
+        /// <summary> Emit a literal pointer value. </summary>
+        ///
+        /// <param name="value"> The pointer value. </param>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents an pointer. </returns>
+        template <typename ValueType>
+        llvm::Constant* Pointer(ValueType* ptr);
+
         /// <summary> Emit a Zero value of the given type. </summary>
         ///
         /// <param name="type"> The type. </param>
@@ -207,6 +222,13 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::Constant that represents true. </returns>
         llvm::Constant* TrueBit();
+
+        /// <summary> Emit a null pointer constant. </summary>
+        ///
+        /// <param name="pointerType"> The llvm type of the pointer to return. </param>
+        ///
+        /// <returns> Pointer to an llvm::ConstantPointerNull that represents a null pointer of the given pointer type. </returns>
+        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType);
 
         /// <summary> Emit a false value in a single bit. </summary>
         ///
@@ -710,3 +732,5 @@ namespace emitters
     };
 }
 }
+
+#include "../tcc/IREmitter.tcc"

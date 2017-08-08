@@ -157,6 +157,18 @@ namespace emitters
     }
 
     template <>
+    VariableType GetVariableType<void>()
+    {
+        return VariableType::Void;
+    }
+
+    template <>
+    VariableType GetVariableType<void*>()
+    {
+        return VariableType::VoidPointer;
+    }
+
+    template <>
     VariableType GetVariableType<char>()
     {
         return VariableType::Char8;

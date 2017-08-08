@@ -28,6 +28,11 @@ namespace nodes
 {
     // CONSIDER switching from a template parameter to an std::function member, so that the sampling
     // function can be overwritten post-unachiving (the TypeFactory currently sets a no-op function).
+    ///
+    /// In device-side compiled code, the function signature should be:
+    /// ```
+    /// void SamplingFunction(ValueType* data)
+    /// ```
     template <typename ValueType>
     using SamplingFunction = bool (*)(std::vector<ValueType>&);
     using TimeTickType = model::TimeTickType;

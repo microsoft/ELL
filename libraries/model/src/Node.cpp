@@ -58,6 +58,16 @@ namespace model
         return nullptr;
     }
 
+    InputPortBase* Node::GetInputPort(size_t portIndex)
+    {
+        return _inputs[portIndex];
+    }
+
+    const InputPortBase* Node::GetInputPort(size_t portIndex) const
+    {
+        return _inputs[portIndex];
+    }
+
     OutputPortBase* Node::GetOutputPort(const std::string& portName)
     {
         for (auto port : _outputs)

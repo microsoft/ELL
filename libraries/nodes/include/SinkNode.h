@@ -27,6 +27,11 @@ namespace ell
 namespace nodes
 {
     /// <summary> A function that the SinkNode calls to deliver data to user code. </summary>
+    ///
+    /// In device-side compiled code, the function signature should be:
+    /// ```
+    /// void SinkFunction(ValueType* data)
+    /// ```
     template <typename ValueType>
     using SinkFunction = std::function<void(const std::vector<ValueType>&)>;
 

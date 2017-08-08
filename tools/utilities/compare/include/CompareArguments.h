@@ -19,12 +19,21 @@
 
 namespace ell
 {
-/// <summary> Arguments for print. </summary>
+/// <summary> Command-line arguments for the compare tool. </summary>
 struct CompareArguments
 {
+    // input options
     std::string inputMapFile;
     std::string inputTestFile;
-    std::string outputDirectory;
+
+    // output options
+    std::string outputDirectory = "";
+    bool writeReport = false;
+    bool writeGraph = false;
+
+    // compilation parameters
+    bool optimize = true;
+    bool useBlas = false;
 };
 
 /// <summary> Arguments for parsed print. </summary>
@@ -34,12 +43,5 @@ struct ParsedCompareArguments : public CompareArguments, public utilities::Parse
     ///
     /// <param name="parser"> [in,out] The parser. </param>
     virtual void AddArgs(utilities::CommandLineParser& parser);
-
-    /// <summary> Check arguments. </summary>
-    ///
-    /// <param name="parser"> The parser. </param>
-    ///
-    /// <returns> An utilities::CommandLineParseResult. </returns>
-    virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
 };
 }

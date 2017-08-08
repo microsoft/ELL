@@ -16,6 +16,12 @@ namespace emitters
         return _pEmitter->Literal(value);
     }
 
+    template <typename ValueType>
+    llvm::Value* IRFunctionEmitter::Pointer(ValueType* value)
+    {
+        return _pEmitter->Pointer(value);
+    }
+
     template <typename InputType, typename OutputType>
     llvm::Value* IRFunctionEmitter::CastValue(llvm::Value* pValue)
     {

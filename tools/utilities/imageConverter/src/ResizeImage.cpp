@@ -11,6 +11,7 @@ std::vector<float> ResizeImage(std::string& fileName, int rows, int cols)
 {
     std::stringstream stream;
     stream << R"xx(
+from __future__ import print_function
 import sys
 import numpy as np
 import cv2
@@ -48,6 +49,8 @@ def main() :
     rows = int(sys.argv[2])
     cols = int(sys.argv[3])
     image = cv2.imread(file)
+    if image is None:
+        print("Error reading image {}".format(file))
     resized = prepare_image_for_predictor(image, (rows, cols))
     save_raw(file + '.dat', resized)
 

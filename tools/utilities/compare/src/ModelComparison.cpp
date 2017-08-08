@@ -1,4 +1,3 @@
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
@@ -6,26 +5,132 @@
 //  Authors:  Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "ModelComparison.h"
-#include "DgmlGraph.h"
+#include "CompareUtils.h"
 #include "VectorStats.h"
+
+// emitters
+#include "EmitterTypes.h"
+
+// utilities
+#include "DgmlGraph.h"
+#include "Files.h"
+
+// stl
 #include <sstream>
 #include <string>
 
-void DebugTransformer(const ell::model::Node& node, ell::model::ModelTransformer& transformer);
-ModelComparison* ModelComparison::_instance = nullptr;
-
 extern "C" {
-void DebugOutput(char* label, float* output)
+void DebugOutput(char* label, float* output, void* userData)
 {
-    ModelComparison::GetInstance()->AddLayer(label, output);
+    ModelComparison* self = static_cast<ModelComparison*>(userData);
+    self->AddLayer(label, output);
 }
 }
 
+//
+// Utility functions
+//
+
+template <typename ValueType>
+bool IsDebugSinkNode(const model::Node& node)
+{
+    auto sinkNode = dynamic_cast<const nodes::DebugSinkNode<ValueType>*>(&node);
+    return sinkNode != nullptr;
+}
+
+bool IsDebugSinkNode(const model::Node& node)
+{
+    return IsDebugSinkNode<bool>(node) || IsDebugSinkNode<int>(node) || IsDebugSinkNode<float>(node) || IsDebugSinkNode<double>(node);
+}
+
+template <typename ValueType>
+std::string GetDebugSinkNodeLabel(const model::Node& node)
+{
+    const auto& sinkNode = dynamic_cast<const nodes::DebugSinkNode<ValueType>&>(node);
+    return sinkNode.GetLabel();
+}
+
+std::string GetDebugSinkNodeLabel(const model::Node& node)
+{
+    if (IsDebugSinkNode<bool>(node))
+    {
+        return GetDebugSinkNodeLabel<bool>(node);
+    }
+    else if (IsDebugSinkNode<int>(node))
+    {
+        return GetDebugSinkNodeLabel<int>(node);
+    }
+    else if (IsDebugSinkNode<float>(node))
+    {
+        return GetDebugSinkNodeLabel<float>(node);
+    }
+    else if (IsDebugSinkNode<double>(node))
+    {
+        return GetDebugSinkNodeLabel<double>(node);
+    }
+    return "";
+}
+
+template <typename InputType, typename OutputType>
+std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<float>& input)
+{
+    std::vector<InputType> typedInput(input.begin(), input.end());
+    auto result = map.Compute<InputType>(typedInput);
+    return {result.begin(), result.end()};
+}
+
+template <typename InputType>
+std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<float>& input)
+{
+    switch (map.GetOutputType())
+    {
+        case model::Port::PortType::smallReal:
+            return GetMapOutput<InputType, float>(map, input);
+            break;
+        case model::Port::PortType::real:
+            return GetMapOutput<InputType, double>(map, input);
+            break;
+        case model::Port::PortType::integer:
+            return GetMapOutput<InputType, int>(map, input);
+            break;
+        case model::Port::PortType::bigInt:
+            return GetMapOutput<InputType, int64_t>(map, input);
+            break;
+        default:
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported output type");
+    }
+}
+
+std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<float>& input)
+{
+    switch (map.GetInputType())
+    {
+        case model::Port::PortType::smallReal:
+            return GetMapOutput<float>(map, input);
+            break;
+        case model::Port::PortType::real:
+            return GetMapOutput<double>(map, input);
+            break;
+        case model::Port::PortType::integer:
+            return GetMapOutput<int>(map, input);
+            break;
+        case model::Port::PortType::bigInt:
+            // model::ValueType<model::Port::PortType::bigInt>>
+            return GetMapOutput<int64_t>(map, input);
+            break;
+        default:
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported input type");
+    }
+}
+
+//
+// ModelComparison implementation
+//
 ModelComparison::ModelComparison(std::string outputDirectory)
 {
     _outputDirectory = outputDirectory;
-    _instance = this;
     _runningCompiled = false;
     _addingReference = false;
     _minError = 0;
@@ -33,48 +138,77 @@ ModelComparison::ModelComparison(std::string outputDirectory)
     _hasMinMax = false;
 }
 
-void ModelComparison::SetupReferenceMap(model::DynamicMap& map)
+void ModelComparison::SetUpReferenceMap(model::DynamicMap& map)
 {
     _addingReference = true;
+
     // keep a copy of the uncompiled map so we can run the reference implementation later.
     _referenceMap = map;
 
-    // refine 1 level deep to get the layer nodes so we can inject the DebugSinkNodes between each layer of the neural net.
+    // Refine to get the layer nodes so we can inject the DebugSinkNodes between each layer of the neural net.
     // this causes AddDebugOutputNode to be called where we save the some information about each DebugSinkNodes created.
-    _referenceMap.Refine(1);
-    model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() ? model::NodeAction::compile : model::NodeAction::refine; } };
-    _referenceMap.Transform(DebugTransformer, context);
+    auto refineLayerFunc = [](const model::Node& node) {
+        return IsNeuralNetworkPredictorNode(&node) ? model::NodeAction::refine : model::NodeAction::compile;
+    };
+    model::TransformContext refineContext(refineLayerFunc);
+    _referenceMap.Refine(refineContext);
+
+    // Now add the debug sink nodes
+    model::TransformContext addSinkNodeContext;
+    auto transformFunc = [this](const ell::model::Node& node, ell::model::ModelTransformer& transformer) {
+        node.Copy(transformer);
+
+        if (IsNeuralNetworkLayerNode(&node))
+        {
+            AddDebugOutputNode(transformer, node);
+        }
+    };
+    _referenceMap.Transform(transformFunc, addSinkNodeContext);
 }
 
-void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference)
+void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize)
 {
-    SetupReferenceMap(reference);
+    SetUpReferenceMap(reference);
     _addingReference = false;
 
     // Ok, now compile the model with debug set to true so we can get the DebugOutput
     // function calls to compare compiled model with reference implementation.
 
     model::MapCompilerParameters settings;
-    settings.moduleName = "ELL";
-    settings.mapFunctionName = "ELL_Predict";
-    settings.compilerSettings.useBlas = true;
-    settings.compilerSettings.optimize = false;
+    settings.compilerSettings.useBlas = useBlas;
+    settings.compilerSettings.optimize = optimize;
     settings.profile = false;
     settings.compilerSettings.targetDevice.deviceName = "host";
 
     // now repeat the refine step again, this time when AddDebugOutputNode is called we save the compiled Node information.
-    model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() ? model::NodeAction::compile : model::NodeAction::refine; } };
-    reference.Refine(context, 1);
-    reference.Transform(DebugTransformer, context);
+    auto refineLayerFunc = [](const model::Node& node) {
+        return IsNeuralNetworkPredictorNode(&node) ? model::NodeAction::refine : model::NodeAction::compile;
+    };
+    model::TransformContext refineContext(refineLayerFunc);
+    reference.Refine(refineContext);
+
+    // Now add the debug sink nodes
+    model::TransformContext context;
+    auto transformFunc = [this](const ell::model::Node& node, ell::model::ModelTransformer& transformer) {
+        node.Copy(transformer);
+
+        if (IsNeuralNetworkLayerNode(&node))
+        {
+            AddDebugOutputNode(transformer, node);
+        }
+    };
+
+    reference.Transform(transformFunc, context);
 
     model::IRMapCompiler compiler(settings);
-    // grab a pointer to the module before TransferOwnership nulls it out.
+    
+    // Grab a pointer to the module before TransferOwnership nulls it out.
     llvm::Module* module = compiler.GetModule().GetLLVMModule();
     std::cout << "compiling..." << std::endl;
 
     model::IRCompiledMap compiledMap = compiler.Compile(reference);
 
-    // windows can not do automatic resolution of symbols, so it won't find my DebugOutput function above unless I help it here.
+    // Windows can not do automatic resolution of symbols, so it won't find the DebugOutput function above unless I help it here.
     auto func = module->getFunction("DebugOutput");
     compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uint64_t>(&DebugOutput));
 
@@ -86,17 +220,18 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
     // build the graph
     CreateGraph(compiledMap.GetModel());
 
+    // Compute reference output
     _runningCompiled = false;
-    _outputReference = _referenceMap.Compute<float>(input);
-
-    // gather the reference model DebugNodeSinks
+    _outputReference = GetMapOutput(_referenceMap, input);
+    
+    // Gather the reference model DebugNodeSinks
     std::vector<const ell::model::Node*> referenceNodes;
-    for (size_t i = 0, length = _layers.size(); i < length; i++)
+    for (size_t i = 0, length = _layerOutputData.size(); i < length; i++)
     {
-        LayerCaptureData* c = _layers[i];
-        if (c->referenceDebugNode != nullptr)
+        LayerCaptureData& layerData = _layerOutputData[i];
+        if (layerData.referenceDebugNode != nullptr)
         {
-            referenceNodes.push_back(c->referenceDebugNode);
+            referenceNodes.push_back(layerData.referenceDebugNode);
         }
     }
 
@@ -105,59 +240,54 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
     auto compute = [](const model::Node& node) { node.Compute(); };
     _referenceMap.GetModel().VisitSubset(referenceNodes, compute);
 
+    // Compute compiled output
     _runningCompiled = true;
-
-    // compute compiled output
-    _outputCompiled = compiledMap.Compute<float>(input);
+    _outputCompiled = GetMapOutput(compiledMap, input);
 }
 
-void ModelComparison::SaveOutput(std::string name, std::vector<float> reference, std::vector<float> compiled)
+void ModelComparison::SaveOutput(std::string name, const std::vector<float>& reference, const std::vector<float>& compiled)
 {
     std::string fileSafeId = name;
     DgmlGraph::ReplaceAll(fileSafeId, "<", "_");
     DgmlGraph::ReplaceAll(fileSafeId, ">", "_");
 
-    std::string fullPath = _outputDirectory;
-    if (fullPath != "")
-    {
-#ifdef WIN32
-        fullPath += "\\";
-#else
-        fullPath += "/";
-#endif
-    }
+    auto fullPath = utilities::JoinPaths(_outputDirectory, fileSafeId + ".csv");
+    std::ofstream data(fullPath);
+    data << "reference,compiled\n";
 
-    std::ofstream data(fullPath + fileSafeId + ".csv");
-    data << "reference,compiled" << std::endl;
-        
     for (size_t i = 0, length = (size_t)fmin(reference.size(), compiled.size()); i < length; i++)
     {
-        data << reference[i] << "," << compiled[i] << std::endl;
+        data << reference[i] << "," << compiled[i] << "\n";
     }
 }
 
-size_t ModelComparison::GetOutputSize(const std::string& id)
+size_t ModelComparison::GetOutputSize(const std::string& nodeId)
 {
-    return _outputSizes[id];
+    return _outputSizes[nodeId];
 }
 
-void ModelComparison::WriteReport(std::ostream& outputStream)
+void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelName, std::string testDataName)
 {
     std::cout << "writing report..." << std::endl;
-    WriteRow(outputStream, "", "Overall", _outputReference, _outputCompiled, nullptr);
 
-    for (auto ptr = _layers.begin(), end = _layers.end(); ptr != end; ptr++)
+    outputStream << "# Comparison Results" << std::endl;
+    outputStream << "**model**: " << modelName << std::endl;
+    outputStream << std::endl;
+    outputStream << "**image**: " << testDataName << std::endl;
+    outputStream << std::endl;
+
+    WriteRow(outputStream, "", "Overall", _outputReference, _outputCompiled, nullptr);
+    for(auto& layerData: _layerOutputData)
     {
-        LayerCaptureData* c = *ptr;
-        if (c->CompiledNodeLabel != "")
+        if (layerData.compiledNodeLabel != "")
         {
-            std::string id = c->CompiledNodeId;
-            std::string label = c->CompiledNodeLabel;
-            WriteRow(outputStream, id, label, c->Reference, c->Compiled, c);
+            std::string id = layerData.compiledNodeId;
+            std::string label = layerData.compiledNodeLabel;
+            WriteRow(outputStream, id, label, layerData.referenceData, layerData.compiledData, &layerData);
         }
         else
         {
-            //std::cout << "Compiled data missing for reference node " << c.ReferenceNodeLabel << std::endl;
+            //std::cout << "Compiled data missing for reference node " << layerData.referenceNodeLabel << std::endl;
         }
     }
 }
@@ -178,7 +308,7 @@ std::string to_string(std::vector<size_t> shape)
     return ss.str();
 }
 
-void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::string name, std::vector<float>& reference, std::vector<float>& compiled, LayerCaptureData* c)
+void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::string name, const std::vector<float>& reference, const std::vector<float>& compiled, LayerCaptureData* layerData)
 {
     if (compiled.size() == 0)
     {
@@ -193,7 +323,8 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
     VectorStats refStats(reference);
     VectorStats compiledStats(compiled);
     float diff = VectorStats::Diff(reference, compiled);
-    if (c != nullptr) {
+    if (layerData != nullptr)
+    {
         if (!_hasMinMax)
         {
             _minError = _maxError = diff;
@@ -206,9 +337,9 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
         }
     }
     outputStream << "````" << std::endl;
-    if (c != nullptr)
+    if (layerData != nullptr)
     {
-        outputStream << "size=" << to_string(c->size) << ", stride=" << to_string(c->stride) << ", offset=" << to_string(c->offset) << std::endl;
+        outputStream << "size=" << to_string(layerData->size) << ", stride=" << to_string(layerData->stride) << ", offset=" << to_string(layerData->offset) << std::endl;
     }
     outputStream << "reference: min=" << refStats.Min() << ", max=" << refStats.Max() << ", mean=" << refStats.Mean() << ", stddev=" << refStats.StdDev() << ", var=" << refStats.Variance() << std::endl;
     outputStream << "compiled : min=" << compiledStats.Min() << ", max=" << refStats.Max() << ", mean=" << refStats.Mean() << ", stddev=" << refStats.StdDev() << ", var=" << refStats.Variance() << std::endl;
@@ -242,7 +373,7 @@ void ModelComparison::AddStyles()
     std::string expr = "Error";
     if (range > 2550)
     {
-        // take the log of the range 
+        // take the log of the range
         min = log(1 + min);
         max = log(1 + max);
         range = max - min;
@@ -270,26 +401,26 @@ void ModelComparison::AddStyles()
     _graph.AddStyle(es);
 }
 
-void ModelComparison::AddLayer(const char* label, const float* output)
+template <typename ValueType>
+void ModelComparison::AddLayer(const char* label, const ValueType* output)
 {
     std::string id(label);
     size_t size = GetOutputSize(id);
-    std::vector<float> data(size, *output);
+    std::vector<ValueType> data(size, *output);
     if (_runningCompiled)
     {
         bool found = false;
-        for (auto ptr = _layers.begin(), end = _layers.end(); ptr != end; ptr++)
+        for(auto& layerData: _layerOutputData)
         {
-            LayerCaptureData* c = *ptr;
-            std::string compiledId = _nodeMap[c->ReferenceNodeLabel];
+            std::string compiledId = _nodeMap[layerData.referenceNodeLabel];
             if (compiledId == id)
             {
                 found = true;
-                c->Compiled = data;
+                layerData.compiledData = { data.begin(), data.end() };
                 break;
             }
         }
-        if (!found) 
+        if (!found)
         {
             std::cout << "### Error: could not find LayerCaptureData for compiled layer " << id << std::endl;
         }
@@ -297,12 +428,11 @@ void ModelComparison::AddLayer(const char* label, const float* output)
     else
     {
         bool found = false;
-        for (auto ptr = _layers.begin(), end = _layers.end(); ptr != end; ptr++)
+        for(auto& layerData: _layerOutputData)
         {
-            LayerCaptureData* c = *ptr;
-            if (c->ReferenceNodeLabel == id)
+            if (layerData.referenceNodeLabel == id)
             {
-                c->Reference = data;
+                layerData.referenceData = { data.begin(), data.end() };
                 found = true;
                 break;
             }
@@ -316,28 +446,24 @@ void ModelComparison::AddLayer(const char* label, const float* output)
 
 void ModelComparison::CreateGraph(const model::Model& model)
 {
-    this->model = &model;
-
     // Create DGML graph of model
     model.Visit([&](const model::Node& node) {
         std::string typeName = node.GetRuntimeTypeName();
-        if (typeName == "DebugSinkNode<float>")
+        if (IsDebugSinkNode(node))
         {
-            // during the process of compilation the DynamicMap Model is cloned a few times which
+            // During the process of compilation the DynamicMap Model is cloned a few times which
             // causes the node id's to change, so this creates a map from the original id to the new id
-            const nodes::DebugSinkNode<float>& debugNode = dynamic_cast<const nodes::DebugSinkNode<float>&>(node);
-            auto oldLabel = debugNode.GetLabel();
-            int start = oldLabel.find("(");
-            start++;
+            auto oldLabel = GetDebugSinkNodeLabel(node);
+
+            int start = oldLabel.find("(") + 1;
             int end = oldLabel.find(")");
             auto oldId = oldLabel.substr(start, end - start);
-            for (auto parentNode : debugNode.GetInputPort("input")->GetParentNodes())
+            for (auto parentNode : node.GetInputPort(0)->GetParentNodes())
             {
                 std::string newId = to_string(parentNode->GetId());
                 std::string newType = parentNode->GetRuntimeTypeName();
                 _nodeMap[oldId] = newId;
             }
-
         }
         else
         {
@@ -351,10 +477,10 @@ void ModelComparison::CreateGraph(const model::Model& model)
                     // the link points from childNode to nextNode implying a flow of data from childNode to nextNode which
                     // is what we want because nextNode is "dependent on" childNode, meaning it consumes the output from
                     // childNode, so the data is flowing from childNode to the nextNode.
-                    std::string id = to_string(upstream->GetId());
-                    std::string typeName = upstream->GetRuntimeTypeName();
-                    if (typeName != "DebugSinkNode<float>")
+                    if(!IsDebugSinkNode(*upstream))
                     {
+                        std::string id = to_string(upstream->GetId());
+                        std::string typeName = upstream->GetRuntimeTypeName();
                         DgmlNode& nextNode = _graph.GetOrCreateNode(id, typeName);
                         _graph.GetOrCreateLink(childNode, nextNode, "");
                     }
@@ -371,7 +497,24 @@ void ModelComparison::SaveGraph(std::ostream& stm)
     _graph.Save(stm);
 }
 
-void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, const nodes::NeuralNetworkLayerNodeBase<float>* layerNode)
+void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, const model::Node& node)
+{
+    auto floatLayerNode = dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<float>*>(&node);
+    if (floatLayerNode != nullptr)
+    {
+        AddDebugOutputNode(transformer, floatLayerNode);
+        return;
+    }
+
+    auto doubleLayerNode = dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<double>*>(&node);
+    if (doubleLayerNode != nullptr)
+    {
+        AddDebugOutputNode(transformer, doubleLayerNode);
+    }
+}
+
+template <typename ValueType>
+void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, const nodes::NeuralNetworkLayerNodeBase<ValueType>* layerNode)
 {
     // todo: add additional argument to the sink function telling user which layer this is...
     std::string sinkFunctionName = "DebugOutput";
@@ -379,60 +522,43 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
     std::string label = layerNode->GetRuntimeTypeName() + "(" + to_string(layerNode->GetId()) + ")";
 
     size_t size = layerNode->GetOutputSize();
-    //std::cout << "layer " << label << " has output size " << std::to_string(size) << std::endl;
-     _outputSizes[label] = size;
+    _outputSizes[label] = size;
 
-    //std::cout << "adding debug sink node " << label << ", intput size = " << size << std::endl;
+    auto sinkFunction = [this](const std::string& label, const std::vector<ValueType>& output, void* userData) {
+        AddLayer(label.c_str(), &output[0]);
+    };
 
-    auto newNode = transformer.AddNode<ell::nodes::DebugSinkNode<float>>(
-        newPortElements, [&](const std::string& label, const std::vector<float>& output) {
-            AddLayer(label.c_str(), &output[0]);
-        },
+    auto newNode = transformer.AddNode<ell::nodes::DebugSinkNode<ValueType>>(
+        newPortElements,
+        sinkFunction,
         label,
+        static_cast<void*>(this),
         sinkFunctionName);
 
     if (_addingReference)
     {
-        LayerCaptureData* c = new LayerCaptureData();
-        c->compiledDebugNode = nullptr;
-        c->referenceDebugNode = dynamic_cast<const ell::nodes::DebugSinkNode<float>*>(newNode);
-        c->ReferenceNodeLabel = label;
-        _layers.push_back(c);
+        LayerCaptureData layerData;
+        layerData.compiledDebugNode = nullptr;
+        layerData.referenceDebugNode = newNode;
+        layerData.referenceNodeLabel = label;
+        _layerOutputData.emplace_back(std::move(layerData));
         _nextIndex = 0;
     }
-    else
+    else // adding compiled
     {
         int i = _nextIndex++;
-        if (i < _layers.size())
+        if (i < _layerOutputData.size())
         {
-            LayerCaptureData* c = _layers[i];
-            c->compiledDebugNode = dynamic_cast<const ell::nodes::DebugSinkNode<float>*>(newNode);
+            LayerCaptureData& layerData = _layerOutputData[i];
+            layerData.compiledDebugNode = newNode;
             auto memLayout = layerNode->GetInputMemoryLayout();
-            c->size = memLayout.size;
-            c->stride = memLayout.stride;
-            c->offset = memLayout.offset;
-            c->CompiledNodeId = to_string(layerNode->GetId());
-            c->CompiledNodeLabel = label;
-            _nodeMap[c->referenceDebugNode->GetLabel()] = label;
+            layerData.size = memLayout.size;
+            layerData.stride = memLayout.stride;
+            layerData.offset = memLayout.offset;
+            layerData.compiledNodeId = to_string(layerNode->GetId());
+            layerData.compiledNodeLabel = label;
+            auto referenceLabel = GetSinkNodeLabel(layerData.referenceDebugNode);
+            _nodeMap[referenceLabel] = label;
         }
-    }
-}
-
-uint64_t FunctionResolver(const std::string& name)
-{
-    if (name == "DebugOutput")
-    {
-        return reinterpret_cast<uint64_t>(&DebugOutput);
-    }
-    return 0;
-}
-
-void DebugTransformer(const ell::model::Node& node, ell::model::ModelTransformer& transformer)
-{
-    node.Copy(transformer);
-    const nodes::NeuralNetworkLayerNodeBase<float>* layerNode = dynamic_cast<const nodes::NeuralNetworkLayerNodeBase<float>*>(&node);
-    if (layerNode != nullptr)
-    {
-        ModelComparison::GetInstance()->AddDebugOutputNode(transformer, layerNode);
     }
 }

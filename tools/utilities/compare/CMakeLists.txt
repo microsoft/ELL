@@ -5,15 +5,22 @@
 # define project
 set (tool_name compare)
 
-set (src src/CompareArguments.cpp
-     src/main.cpp
-     src/ModelComparison.cpp)
+set (src 
+  src/CompareArguments.cpp
+  src/CompareUtils.cpp
+  src/main.cpp
+  src/ModelComparison.cpp
+)
 
-set (include include/CompareArguments.h
-     include/ModelComparison.h
-     include/VectorStats.h)
-			 
+set (include
+  include/CompareArguments.h
+  include/CompareUtils.h
+  include/ModelComparison.h
+  include/VectorStats.h
+)
+    
 set (tcc 
+  tcc/CompareUtils.tcc
   tcc/VectorStats.tcc
 )
 

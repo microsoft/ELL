@@ -60,6 +60,15 @@ namespace emitters
         template <typename ValueType>
         llvm::Value* Literal(ValueType value);
 
+        /// <summary> Emit a literal pointer into the function. </summary>
+        ///
+        /// <typeparam name="ValueType"> Type of pointer to emit. </param>
+        /// <param name="value"> The value of the pointer. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the literal. </returns>
+        template <typename ValueType>
+        llvm::Value* Pointer(ValueType* value);
+
         /// <summary> Convenience function for returning a single-bit LLVM boolean true value. </summary>
         ///
         /// <returns> An llvm i1 type representing `true`. </returns>
@@ -69,6 +78,13 @@ namespace emitters
         ///
         /// <returns> An llvm i1 type representing `false`. </returns>
         llvm::Value* FalseBit() { return _pEmitter->FalseBit(); }
+
+        /// <summary> Convenience function for returning a null pointer constant. </summary>
+        ///
+        /// <param name="pointerType"> The llvm type of the pointer to return. </param>
+        ///
+        /// <returns> Pointer to an llvm::ConstantPointerNull that represents a null pointer of the given pointer type. </returns>
+        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType) { return _pEmitter->NullPointer(pointerType); }
 
         /// <summary> Emit an instruction to load a function argument. </summary>
         ///
