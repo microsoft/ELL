@@ -25,3 +25,9 @@ set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/trainers")
 
 # copy executable to build/bin directory
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
+
+# tests
+set (test_name ${tool_name}_test_0)
+add_test(NAME ${test_name}
+         WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
+         COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/protonnTestData.txt -dd auto -sw 1 -sb 1 -sz 1 -pd 10 -l 2 -mp 5 -v --evaluationFrequency 1 -plf L2)
