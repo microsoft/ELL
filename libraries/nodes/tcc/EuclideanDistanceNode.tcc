@@ -10,7 +10,7 @@
 #include "DotProductNode.h"
 
 // math
-#include "Operations.h"
+#include "MatrixOperations.h"
 
 // utilities
 #include "Exception.h"
@@ -118,7 +118,7 @@ namespace nodes
         auto norm1sq = input.Norm2Squared();
 
         // result = -2 * _v * input
-        math::Operations::Multiply(-2.0, _v, input, 0.0, result);
+        math::Multiply(-2.0, _v, input, 0.0, result);
 
         for (size_t r = 0; r < _v.NumRows(); r++)
         {
