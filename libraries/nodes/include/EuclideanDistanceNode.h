@@ -45,14 +45,15 @@ namespace nodes
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="input"> The signal to predict from </param>
-        /// <param name="predictor"> The projection matrix </param>
-        EuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& w);
+        /// <param name="input"> The input vector </param>
+        /// <param name="v"> The set of vectors to compute the distance from stacked into a row matrix</param>
+        EuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "EuclideanDistanceNode"; }
+        // static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, layout>("EuclideanDistanceNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

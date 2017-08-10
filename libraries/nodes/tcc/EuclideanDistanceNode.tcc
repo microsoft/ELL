@@ -41,12 +41,7 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
 
-        archiver["v_rows"] << _v.NumRows();
-        archiver["v_columns"] << _v.NumColumns();
-        std::vector<double> temp;
-        temp.assign(_v.GetDataPointer(), _v.GetDataPointer() + (size_t)(_v.NumRows() * _v.NumColumns()));
-        archiver["v"] << temp;
-
+        math::MatrixArchiver::Write(_v, "v", archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
     }
@@ -56,14 +51,7 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
 
-        size_t v_rows = 0;
-        size_t v_columns = 0;
-        archiver["v_rows"] >> v_rows;
-        archiver["v_columns"] >> v_columns;
-        std::vector<double> temp;
-        archiver["v"] >> temp;
-        _v = math::Matrix<ValueType, layout>(v_rows, v_columns, temp);
-
+        math::MatrixArchiver::Read(_v, "v", archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
     }
@@ -76,6 +64,7 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
+    // We compute the distance (P - V)^2 as P^2 - 2 * P * V + V^2 where P is the input point and V is the set of vectors
     template <typename ValueType, math::MatrixLayout layout>
     bool EuclideanDistanceNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
     {
@@ -128,7 +117,7 @@ namespace nodes
 
         auto norm1sq = input.Norm2Squared();
 
-        // result = _v * input
+        // result = -2 * _v * input
         math::Operations::Multiply(-2.0, _v, input, 0.0, result);
 
         for (size_t r = 0; r < _v.NumRows(); r++)

@@ -42,6 +42,7 @@ int main()
         TestDTWDistanceNodeCompute();
         TestSourceNodeCompute();
         TestSinkNodeCompute();
+        TestEuclideanDistanceNodeCompute();
 
         TestBiasLayerNode();
         TestBatchNormalizationLayerNode();
