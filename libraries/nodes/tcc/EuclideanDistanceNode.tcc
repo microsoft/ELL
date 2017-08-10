@@ -8,6 +8,10 @@
 
 #include "EuclideanDistanceNode.h"
 #include "DotProductNode.h"
+#include "L2NormNode.h"
+#include "BinaryOperationNode.h"
+#include "MatrixVectorProductNode.h"
+#include "UnaryOperationNode.h"
 
 // math
 #include "MatrixOperations.h"
