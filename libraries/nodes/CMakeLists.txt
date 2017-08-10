@@ -21,6 +21,7 @@ set (include include/AccumulatorNode.h
              include/DotProductNode.h
              include/DTWDistanceNode.h
              include/ExtremalValueNode.h
+             include/EuclideanDistanceNode.h
              include/ForestPredictorNode.h
              include/FullyConnectedLayerNode.h
              include/IRNode.h
@@ -81,6 +82,7 @@ set (tcc tcc/AccumulatorNode.tcc
          tcc/DotProductNode.tcc
          tcc/DTWDistanceNode.tcc
          tcc/ExtremalValueNode.tcc
+         tcc/EuclideanDistanceNode.tcc
          tcc/ForestPredictorNode.tcc
          tcc/L2NormNode.tcc
          tcc/MatrixVectorProductNode.tcc

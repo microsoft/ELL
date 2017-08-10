@@ -42,6 +42,7 @@ int main()
         TestDTWDistanceNodeCompute();
         TestSourceNodeCompute();
         TestSinkNodeCompute();
+        TestEuclideanDistanceNodeCompute();
 
         TestBiasLayerNode();
         TestBatchNormalizationLayerNode();
@@ -70,6 +71,7 @@ int main()
         TestSimpleForestPredictorNodeRefine();
         TestDemultiplexerNodeRefine();
         TestMatrixVectorProductRefine();
+        TestEuclideanDistanceNodeRefine();
         TestProtoNNPredictorNode();
     }
     catch (const utilities::Exception& exception)

@@ -21,6 +21,7 @@ void TestDemultiplexerNodeCompute();
 void TestDTWDistanceNodeCompute();
 void TestSourceNodeCompute();
 void TestSinkNodeCompute();
+void TestEuclideanDistanceNodeCompute();
 
 // Refinement
 void TestMovingAverageNodeRefine();
@@ -28,4 +29,5 @@ void TestLinearPredictorNodeRefine();
 void TestSimpleForestPredictorNodeRefine();
 void TestDemultiplexerNodeRefine();
 void TestMatrixVectorProductRefine();
+void TestEuclideanDistanceNodeRefine();
 void TestProtoNNPredictorNode();
