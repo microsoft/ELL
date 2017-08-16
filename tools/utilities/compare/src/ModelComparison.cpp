@@ -255,7 +255,7 @@ void ModelComparison::SaveOutput(std::string name, const std::vector<float>& ref
     std::ofstream data(fullPath);
     data << "reference,compiled\n";
 
-    for (size_t i = 0, length = (size_t)fmin(reference.size(), compiled.size()); i < length; i++)
+    for (size_t i = 0, len1 = reference.size(), len2 = compiled.size(); i < len1 && i < len2; i++)
     {
         data << reference[i] << "," << compiled[i] << "\n";
     }
@@ -406,7 +406,7 @@ void ModelComparison::AddLayer(const char* label, const ValueType* output)
 {
     std::string id(label);
     size_t size = GetOutputSize(id);
-    std::vector<ValueType> data(size, *output);
+    std::vector<float> data(output, output + size);
     if (_runningCompiled)
     {
         bool found = false;
@@ -551,7 +551,7 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
         {
             LayerCaptureData& layerData = _layerOutputData[i];
             layerData.compiledDebugNode = newNode;
-            auto memLayout = layerNode->GetInputMemoryLayout();
+            auto memLayout = layerNode->GetOutputMemoryLayout();
             layerData.size = memLayout.size;
             layerData.stride = memLayout.stride;
             layerData.offset = memLayout.offset;
