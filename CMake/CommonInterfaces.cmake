@@ -18,6 +18,11 @@ if (WIN32 AND NOT SWIG_FOUND)
     set(SWIG_FOUND TRUE)
   endif()
 endif()
+
+set(GLOBAL_BIN_DIR "${CMAKE_BINARY_DIR}/bin")
+if(WIN32)
+set(GLOBAL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/release")
+endif()
     
 find_package(SWIG 3.0.12)
 

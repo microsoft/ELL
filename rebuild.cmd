@@ -1,25 +1,50 @@
 @echo off
+Setlocal EnableDelayedExpansion 
+
 cd %~dp0
 
-REM find which supported VS version is installed (14, or 15)
-set VSVersion=14
-set CMakeGenerator=Visual Studio 14 2015 Win64
-for %%a in (14 15) do (  
-  reg query HKLM\SOFTWARE\Microsoft\VisualStudio\%%a.0\Setup\VS\community /reg:32 > %TEMP%\VSSetupInfo.txt 2>&1
-  for /f "usebackq tokens=1,2,3* delims= " %%i in (%TEMP%\VSSetupInfo.txt) do (
-    if "%%i"=="ProductDir" set VSVersion=%%a
+if EXIST external\nuget.exe goto :restore
+curl --output external\nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+if ERRORLEVEL 1 goto :nocurl
+ 
+:restore
+external\nuget restore external/packages.config -PackagesDirectory external
+if ERRORLEVEL 1 goto :norestore
+
+REM find which supported VS version is installed
+set Vs14=
+set Vs15=
+
+if "%1"=="14" set Vs14=1 && goto :step2
+if "%1"=="15" set Vs15=1 && goto :step2
+
+set InstallationVersion=
+for /f "usebackq tokens=1* delims=: " %%i in (`external\vswhere.2.1.3\tools\vswhere.exe -legacy`) do (
+  if /i "%%i"=="installationVersion" (
+    set VERSION=%%j
+    set VER=!VERSION:~0,2!
+    if "!VER!"=="14" set Vs14=1
+    if "!VER!"=="15" set Vs15=1
   )
 )
 
-if "%VSVersion%" == "15" set CMakeGenerator=Visual Studio 15 2017 Win64
-echo Found VS version %CMakeGenerator%
+if "!Vs14! and !Vs15!" == "0 and 0" goto :NoCompatibleVsInstall
+:step2
+set CMakeGenerator=Visual Studio 14 2015 Win64
 
-external\nuget\nuget.exe restore external/packages.config -PackagesDirectory external
+if "!Vs14! and !Vs15!" == "1 and 1" (
+    set /p id="Use VS 2017 ? "
+    if /i "!id!"=="y" set CMakeGenerator=Visual Studio 15 2017 Win64
+    if /i "!id!"=="yes" set CMakeGenerator=Visual Studio 15 2017 
+)
 
+echo Using VS version %CMakeGenerator%
 if not EXIST build goto :mkbuild
 
-rd /s /q build
+if EXIST build rd /s /q build && sleep 1
+if EXIST build rd /s /q build && sleep 1
 if ERRORLEVEL 1 goto :nodelete
+sleep 1
 
 :mkbuild
 mkdir build
@@ -45,3 +70,16 @@ echo cmake step failed
 goto :eof
 
 :builderror
+goto :eof
+
+:nocurl
+echo is curl installed?  If you are using anaconda, try "conda install curl"
+goto :eof
+
+:norestore
+echo nuget restore failed
+goto :eof
+
+:NoCompatibleVsInstall
+echo Could not find VS 2015 or 2017 installation
+goto :eof

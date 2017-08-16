@@ -3,7 +3,7 @@ import os
 import numpy as np
 import cv2
 
-import findEll
+import find_ell
 import cntk_to_ell
 import ell_utilities
 import modelHelper as mh

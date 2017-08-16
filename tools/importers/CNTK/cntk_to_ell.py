@@ -7,6 +7,8 @@
 # Requires: Python 3.x, cntk-2.0-cp35
 #
 ####################################################################################################
+
+import find_ell
 import ELL
 import ell_utilities
 import numpy as np

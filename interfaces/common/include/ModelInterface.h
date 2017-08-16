@@ -367,9 +367,11 @@ class ELL_Map
 public:
     ELL_Map(const ELL_Map& other) = default;
     ELL_Map(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements output);
+    ELL_Map(const std::string& filename);
     std::vector<double> ComputeDouble(const std::vector<double>& inputData);
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);
-    void Save(const std::string& filePath) const;
+    void Save(const std::string& filename) const;
+    void Load(const std::string& filename);
     
 private:
     std::shared_ptr<ell::model::DynamicMap> _map;

@@ -1,34 +1,32 @@
+####################################################################################################
+##
+##  Project:  Embedded Learning Library (ELL)
+##  File:     referenceTest.py
+##  Authors:  Chris Lovett
+##
+##  Requires: Python 3.x
+##
+####################################################################################################
+
 import sys
 import os
 import numpy as np
 import cv2
+import demoHelper as d
 
-import find_ell
-import darknet_to_ell
-import modelHelper as mh
+# note: to run this in headless mode on a Linux machine run the following from your terminal window
+# export DISPLAY=:0
+# then add the '-save' argument to get tagged frames to be saved to disk.
 
-def main():
-    # Check for model files
-    if (not os.path.exists('darknet.cfg')):
-        print("Please download the 'darknet.cfg' file, see README.md")
-        sys.exit(1)
-        
-    if (not os.path.exists('darknet.weights')):
-        print("Please download the 'darknet.weights' file, see README.md")
-        sys.exit(1)
-
-    # Pick the model you want to work with
-    helper = mh.ModelHelper(sys.argv, "darknetReference", ["darknet.cfg", "darknet.weights"], "darknetImageNetLabels.txt")
-
-    # Import the model
-    model = darknet_to_ell.predictor_from_darknet_model(helper.model_files[0], helper.model_files[1])
-
-    # Save the model
-    helper.save_ell_predictor_to_file(model, "darknetReference.map")
+def main(args):
+    helper = d.DemoHelper()
+    if (not helper.parse_arguments(args)):
+        helper.print_usage()
+        return
 
     # Initialize image source
     helper.init_image_source()
-    
+
     lastPrediction = ""
 
     while (not helper.done()):
@@ -40,7 +38,7 @@ def main():
         data = helper.prepare_image_for_predictor(frame)
 
         # Get the model to classify the image, by returning a list of probabilities for the classes it can detect
-        predictions = model.Predict(data)
+        predictions = helper.predict(data)
 
         # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
         # each with the text label and the prediction score.
@@ -49,8 +47,10 @@ def main():
         # Turn the top5 into a text string to display
         text = "".join([str(element[0]) + "(" + str(int(100*element[1])) + "%)  " for element in top5])
 
+        save = False
         if (text != lastPrediction):
             print(text)
+            save = True
             lastPrediction = text
 
         # Draw the text on the frame
@@ -59,8 +59,7 @@ def main():
         helper.draw_fps(frameToShow)
 
         # Show the new frame
-        helper.show_image(frameToShow)
-
+        helper.show_image(frameToShow, save)
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)

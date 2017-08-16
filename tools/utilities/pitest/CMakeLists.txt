@@ -6,22 +6,20 @@ find_package(PythonInterp)
 find_package(PythonLibs)
 if(${PYTHONLIBS_FOUND})
 
-    set(module_name "darknet_importer")
+    set(module_name "pitest")
 
-    set(importer_src darknet_to_ell.py
-        darknet_import.py
-        ../../utilities/pythonlibs/find_ell.py)
+    set(importer_src drivetest.py runtest.sh schoolbus.png
+        ../pythonlibs/find_ell.py )
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
 
-    set_property(TARGET ${module_name} PROPERTY FOLDER "tools/importers")
+    set_property(TARGET ${module_name} PROPERTY FOLDER "tools/utilities")
     #copy files
     foreach(PY_FILE ${importer_src})
         configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
     endforeach()
 
     # this one is special
-    configure_file(../../utilities/pythonlibs/find_ell.py find_ell.py COPYONLY)
+    configure_file(../pythonlibs/find_ell.py find_ell.py COPYONLY)
 
-    add_subdirectory(test)
 endif()  # PYTHONLIBS_FOUND
