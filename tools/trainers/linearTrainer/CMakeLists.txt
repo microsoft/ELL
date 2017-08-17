@@ -32,53 +32,64 @@ set (test_name ${tool_name}_test_0)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/tinyTestData.txt -dd 3 -r 0.01 --outputModelFilename linearTrainer_model_1.model -v -ne 20 --lossFunction log)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_1)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt --inputModelFile ${CMAKE_SOURCE_DIR}/examples/data/model_3.model --modelInputs 1024 --modelOutputs 1031.output -dd 3 -r 0.01 --outputModelFilename linearTrainer_model_3.model -v -ne 20 --lossFunction log)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_2)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.001 -a SGD)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_3)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.001 -a SGD)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_4)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SGD)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_5)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.001 -a SparseDataSGD)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_6)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.001 -a SparseDataSGD)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_7)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SparseDataSGD)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_8)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf log -v -ne 30 -r 0.01 -a SparseDataCenteredSGD)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_9)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf hinge -v -ne 30 -r 0.01 -a SparseDataCenteredSGD)
+set_test_library_path(${test_name})
 
 set (test_name ${tool_name}_test_10)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} --inputDataFilename ${CMAKE_SOURCE_DIR}/examples/data/testData.txt -dd 3 -lf squared -v -ne 30 -r 1 -a SparseDataCenteredSGD)
+set_test_library_path(${test_name})

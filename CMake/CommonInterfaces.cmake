@@ -171,13 +171,14 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
       set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}${TARGET_NAME})
       set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES EXCLUDE_FROM_ALL TRUE)
       add_dependencies(${SWIG_MODULE_${module_name}_REAL_NAME} ELL_common)
+      copy_shared_libraries(${PREPEND_TARGET}${module_name})
     endif()
   endif()
 
   set_property(TARGET ${PREPEND_TARGET}${module_name} PROPERTY FOLDER "interfaces") 
   set(SWIG_MODULE_TARGET ${SWIG_MODULE_${module_name}_REAL_NAME})
 
-endmacro()
+endmacro() # generate_interface_module
 
 #
 # Macro to create swig-generated language wrappers for host models

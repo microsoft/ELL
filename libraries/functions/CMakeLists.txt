@@ -51,3 +51,4 @@ target_link_libraries(${test_name} functions testing utilities math)
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${test_name} COMMAND ${test_name})
+set_test_library_path(${test_name})

@@ -28,3 +28,4 @@ set (test_name ${tool_name}_test)
 add_test(NAME ${test_name}
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${tool_name} -idf ${CMAKE_SOURCE_DIR}/examples/data/tinyTestData.txt -dd auto -omf null -v)
+set_test_library_path(${test_name})

@@ -8,11 +8,14 @@
 ##
 ####################################################################################################
 
+import sys
 import os
+sys.path.append(os.path.join('..', '..', 'utilities', 'pythonlibs'))
+
 import configparser
 import re
 import struct
-import sys, getopt
+import getopt
 import numpy as np
 import find_ell
 import ELL

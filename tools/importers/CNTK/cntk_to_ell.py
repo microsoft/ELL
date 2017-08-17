@@ -8,7 +8,11 @@
 #
 ####################################################################################################
 
+import sys
+import os
+sys.path.append(os.path.join('..', '..', 'utilities', 'pythonlibs'))
 import find_ell
+
 import ELL
 import ell_utilities
 import numpy as np

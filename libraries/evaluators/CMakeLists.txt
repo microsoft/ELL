@@ -52,3 +52,4 @@ set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 add_test(NAME ${test_name} 
          WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
          COMMAND ${test_name})
+set_test_library_path(${test_name})
