@@ -41,10 +41,13 @@ if "!Vs14! and !Vs15!" == "1 and 1" (
 echo Using VS version %CMakeGenerator%
 if not EXIST build goto :mkbuild
 
-if EXIST build rd /s /q build && timeout 1
-if EXIST build rd /s /q build && timeout 1
-if ERRORLEVEL 1 goto :nodelete
-sleep 1
+set retry=10
+
+:retry
+set /A retry=!retry!-1
+if "!retry!"=="0" goto :nodelete
+if EXIST build rd /s /q build && external\sleep 2 
+if EXIST build :retry
 
 :mkbuild
 mkdir build
