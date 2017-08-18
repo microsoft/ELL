@@ -74,6 +74,7 @@ kramdown:
     coderay_bold_every:        10
     coderay_css:               style
 
+sass:
+    sass_dir: _sass
 
-include: ['_pages']
 
