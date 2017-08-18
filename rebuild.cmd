@@ -47,7 +47,7 @@ set retry=10
 set /A retry=!retry!-1
 if "!retry!"=="0" goto :nodelete
 if EXIST build rd /s /q build && external\sleep 2 
-if EXIST build :retry
+if EXIST build goto :retry
 
 :mkbuild
 mkdir build
