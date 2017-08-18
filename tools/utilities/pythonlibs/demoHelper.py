@@ -5,6 +5,7 @@ import numpy as np
 import time
 import json
 
+script_path = os.path.dirname(os.path.abspath(__file__))
 # Helper class that interfaces with opencv and provides handy conversion from opencv to ELL buffers and 
 # rendering utilties
 
@@ -99,7 +100,6 @@ class DemoHelper:
             self.import_compiled_model()
         else:
             # this is the "interpreted" model route, so we need the ELL runtime.
-            script_path = os.path.dirname(os.path.abspath(__file__))
             sys.path.append(script_path)
             print("### Loading ELL modules...")
             __import__("find_ell")
@@ -124,8 +124,8 @@ class DemoHelper:
             raise Exception("you don't have a 'build' directory, have you compiled this project yet?")
 
         # Import the compiled model wrapper
-        sys.path.append('build')
-        sys.path.append('build/Release')
+        sys.path.append(os.path.join(script_path, 'build'))
+        sys.path.append(os.path.join(script_path, 'build/Release'))
         try:
             self.compiled = __import__(name)
             size = int(self.config['output_rows']) * self.config['output_columns'] * self.config['output_channels']

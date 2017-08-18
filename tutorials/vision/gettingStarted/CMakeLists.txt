@@ -32,7 +32,6 @@ set (PYTHON_TUTORIALS
     darknet.md
     darknetDemo.py
     darknetImageNetLabels.txt
-    ../../../tools/utilities/pythonlibs/find_ell.py
     modelHelper.py
     opencv.md
     PretrainedModels.md
@@ -47,9 +46,6 @@ set_property(TARGET ${TUTORIAL_NAME} PROPERTY FOLDER "tutorials/vision")
 foreach(PY_FILE ${PYTHON_TUTORIALS})
     configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
 endforeach()
-
-# have to treat this one differently since it is a relative path
-configure_file(../../../tools/utilities/pythonlibs/find_ell.py find_ell.py COPYONLY)
 
 # creates compile targets for the sample models
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")

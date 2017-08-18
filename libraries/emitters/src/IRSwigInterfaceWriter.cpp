@@ -520,11 +520,6 @@ namespace emitters
 
             // Common SWIG code
             os << "%include \"callback.i\"\n";
-
-            // Language-specific SWIG code
-            os << "#ifdef SWIGPYTHON\n";
-            os << "%rename(\"%(undercase)s\", %$isfunction) \"\";\n";
-            os << "#endif\n\n";
         }
 
         void WriteModuleSwigCode(std::ostream& os, IRModuleEmitter& moduleEmitter, const std::string& headerName)

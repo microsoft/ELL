@@ -12,6 +12,18 @@ import os
 
 __this_file_directory = os.path.dirname(os.path.abspath(__file__))
 
+# find the ELL build directory relative to this file
+def find_ell_build():
+    build_dir = ""
+    head,tail = os.path.split(__this_file_directory)
+    while (tail != ""):
+        test = os.path.join(head,"build")
+        if (os.path.isdir(test)):
+            build_dir = test
+            break
+        head,tail = os.path.split(head)
+    return build_dir
+
 def __is_ell_py_dir(path):
     ell_py_path = os.path.join(path, "ELL.py")
     return os.path.isfile(ell_py_path)

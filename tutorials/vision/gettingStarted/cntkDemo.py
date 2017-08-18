@@ -2,7 +2,7 @@ import sys
 import os
 import numpy as np
 import cv2
-
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../tools/utilities/pythonlibs'))
 import find_ell
 import cntk_to_ell
 import modelHelper as mh

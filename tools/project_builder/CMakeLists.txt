@@ -17,8 +17,8 @@ endif()
 
 set (module_name builder)
 set (builder_src
-    ../utilities/pythonlibs/find_ell.py
-    make_python_project.py
+    templates/CMakeLists.python.txt.in
+    wrap.py
     README.md)
 
 add_custom_target(${module_name} DEPENDS ${builder_src} SOURCES ${builder_src})
@@ -29,16 +29,13 @@ foreach(PY_FILE ${builder_src})
     configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
 endforeach()
 
-# this one is special
-configure_file(../utilities/pythonlibs/find_ell.py find_ell.py COPYONLY)
-
 find_program(LLC_EXECUTABLE llc HINTS ${LLVM_TOOLS_BINARY_DIR})
 if(NOT LLC_EXECUTABLE)
     message(ERROR "LLVM not found, please check that LLVM is installed.")
     return()
 endif()
 
-set (OUTPUT_DIR ${CMAKE_BINARY_DIR}/tools/project_builder)
+set (OUTPUT_DIR ${CMAKE_BINARY_DIR}/tools)
 
 set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile.exe\" }")
 file(WRITE "${OUTPUT_DIR}/tools.json" ${JSON})

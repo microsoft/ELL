@@ -16,9 +16,6 @@ endif()
 
 set (TUTORIAL_NAME compute)
 set (PYTHON_TUTORIALS
-    ../../../tools/utilities/pythonlibs/demo.py
-    ../../../tools/utilities/pythonlibs/demoHelper.py
-    ../../../tools/utilities/pythonlibs/find_ell.py
     README.md
     zebra.png)
 
@@ -27,8 +24,6 @@ add_dependencies(${TUTORIAL_NAME} _ELL_python ell_python_utilities)
 set_property(TARGET ${TUTORIAL_NAME} PROPERTY FOLDER "tutorials/vision")
 
 # copy tutorial files
-configure_file(../../../tools/utilities/pythonlibs/demo.py demo.py COPYONLY)
-configure_file(../../../tools/utilities/pythonlibs/demoHelper.py demoHelper.py COPYONLY)
-configure_file(../../../tools/utilities/pythonlibs/find_ell.py find_ell.py COPYONLY)
-configure_file(README.md README.md COPYONLY)
-configure_file(zebra.png zebra.png COPYONLY)
+foreach(PY_FILE ${PYTHON_TUTORIALS})
+    configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
+endforeach()

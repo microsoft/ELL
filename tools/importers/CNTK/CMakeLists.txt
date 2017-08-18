@@ -14,8 +14,7 @@ if(${PYTHONLIBS_FOUND})
         lib/cntk_converters.py
         lib/cntk_layers.py
         lib/cntk_utilities.py
-        custom_functions.py
-        ../../utilities/pythonlibs/find_ell.py)
+        custom_functions.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
 
@@ -25,9 +24,6 @@ if(${PYTHONLIBS_FOUND})
     foreach(PY_FILE ${importer_src})
         configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
     endforeach()
-
-    # this one is special
-    configure_file(../../utilities/pythonlibs/find_ell.py find_ell.py COPYONLY)
 
     add_subdirectory(test)
 endif()  # PYTHONLIBS_FOUND

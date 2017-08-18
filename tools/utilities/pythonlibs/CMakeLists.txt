@@ -8,7 +8,7 @@ if(${PYTHONLIBS_FOUND})
 
     set(module_name "pythonlibs")
 
-    set(importer_src demo.py demoHelper.py find_ell.py)
+    set(importer_src buildtools.py demo.py demoHelper.py downloader.py find_ell.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
 

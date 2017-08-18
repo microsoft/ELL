@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
 import time
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../tools/utilities/pythonlibs'))
+import find_ell
 
 # Class to hold info about the model that the app needs to call the model and display result correctly
 

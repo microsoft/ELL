@@ -9,11 +9,14 @@
 ####################################################################################################
 import os
 import sys
+current_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current_path, '../pythonlibs'))
 import find_ell
 import subprocess
 import json
 import operator
 from shutil import copyfile
+from shutil import rmtree
 from urllib import request
 import paramiko
 
@@ -31,7 +34,8 @@ class DriveTest:
         self.password = "raspberry"
         self.ssh = None
         self.created_dirs = []
-        self.make_path(self.pitest_dir)
+        if (not os.path.isdir(self.pitest_dir)):
+            os.makedirs(self.pitest_dir)
 
     def print_usage(self):
         print("Usage: drivetest.py ipaddress [outdir]")
@@ -39,13 +43,6 @@ class DriveTest:
         print("raspberry pi ip address using ssh and scp, then executes the test.  The test measures the accuracy")
         print("and performance of the model and it writes these results to a test_results.json data file")
         
-    def make_path(self, path):
-        if (not os.path.isdir(path)):
-            parent, leaf = os.path.split(path)
-            if (not leaf == ""):
-                self.make_path(parent)
-            os.mkdir(path)
-
     def parse_command_line(self, argv):
         if (len(argv) == 1):
             return False
@@ -64,7 +61,8 @@ class DriveTest:
 
     def copy_files(self, list, folder):
         target_dir = os.path.join(self.pitest_dir, folder)
-        self.make_path(target_dir)
+        if (not os.path.isdir(target_dir)):
+            os.makedirs(target_dir)
         for path  in list:
             if (not os.path.isfile(path)):
                 raise Exception("expected file not found: " + path)
@@ -78,16 +76,22 @@ class DriveTest:
             outfile.writelines(infile.readlines())
 
     def get_bash_files(self):
-        self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/schoolbus.png")], "pi3")
+        # copy demo files needed to run the test
+        self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/schoolbus.png"),        
+                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demo.py"),
+                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py") ], "pi3") 
         self.normalize_newlines(os.path.join(self.ell_root, "tools/utilities/pitest/runtest.sh"), 
                             os.path.join(self.pitest_dir, "pi3", "runtest.sh"))
+        bitcode = os.path.join(self.output_dir, "darknet.bc")
+        if (os.path.isfile(bitcode)):
+            os.remove(bitcode) # don't need to copy this one over and it is big!
 
     def get_darknet(self):
         self.config_file = os.path.join(self.pitest_dir, "darknet.cfg")
         self.weights_file = os.path.join(self.pitest_dir, "darknet.weights")
-        if (not os.path.isfile(self.config_file)):
+        if (not os.path.isfile(self.config_file) or not os.path.isfile(self.weights_file)):
+            print("downloading darknet model...")
             self.download("https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg", self.config_file)
-        if (not os.path.isfile(self.weights_file)):
             self.download("https://pjreddie.com/media/files/darknet.weights", self.weights_file)
         
         self.copy_files( [ os.path.join(self.ell_root, "tutorials/vision/gettingStarted/darknetImageNetLabels.txt") ], "")
@@ -95,7 +99,7 @@ class DriveTest:
     def import_darknet(self):
         self.ell_model = os.path.join(self.pitest_dir, "darknet.ellmodel")
         if (not os.path.isfile(self.ell_model)):
-            sys.path.append(os.path.join(self.build_root, 'tools/importers/darknet'))
+            sys.path.append(os.path.join(current_path, '../../importers/darknet'))
             darknet_importer = __import__("darknet_import")
             importer = darknet_importer.DarknetImporter()
             importer.parse_command_line(["", self.config_file, self.weights_file])
@@ -105,12 +109,13 @@ class DriveTest:
     def make_project(self):
         labels_file = os.path.join(self.pitest_dir, "darknetImageNetLabels.txt")
         json_file = os.path.join(self.pitest_dir, "darknet_config.json")
-        if (not os.path.isdir(self.output_dir)):
-            sys.path.append(os.path.join(self.build_root, 'tools/project_builder'))
-            mpp = __import__("make_python_project")
-            builder = mpp.ModuleBuilder()
-            builder.parse_command_line(["", json_file, labels_file, self.ell_model, "-target", "pi3", "-outdir", self.output_dir])
-            builder.run()
+        if (os.path.isdir(self.output_dir)):
+            rmtree(self.output_dir)
+        sys.path.append(os.path.join(current_path, '../../project_builder'))
+        mpp = __import__("wrap")
+        builder = mpp.ModuleBuilder()
+        builder.parse_command_line(["", json_file, labels_file, self.ell_model, "-target", "pi3", "-outdir", self.output_dir])
+        builder.run()
 
     def connect_ssh(self):
         self.ssh = paramiko.SSHClient()

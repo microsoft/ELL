@@ -9,8 +9,7 @@ if(${PYTHONLIBS_FOUND})
     set(module_name "darknet_importer")
 
     set(importer_src darknet_to_ell.py
-        darknet_import.py
-        ../../utilities/pythonlibs/find_ell.py)
+        darknet_import.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
 
@@ -19,9 +18,6 @@ if(${PYTHONLIBS_FOUND})
     foreach(PY_FILE ${importer_src})
         configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
     endforeach()
-
-    # this one is special
-    configure_file(../../utilities/pythonlibs/find_ell.py find_ell.py COPYONLY)
 
     add_subdirectory(test)
 endif()  # PYTHONLIBS_FOUND
