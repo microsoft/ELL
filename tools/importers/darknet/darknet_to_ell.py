@@ -10,8 +10,7 @@
 
 import sys
 import os
-sys.path.append(os.path.join('..', '..', 'utilities', 'pythonlibs'))
-
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import configparser
 import re
 import struct

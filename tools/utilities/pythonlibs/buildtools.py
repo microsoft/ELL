@@ -1,3 +1,12 @@
+####################################################################################################
+##
+##  Project:  Embedded Learning Library (ELL)
+##  File:     buildtools.py
+##  Authors:  Chris Lovett
+##
+##  Requires: Python 3.x
+##
+####################################################################################################
 import subprocess
 import os
 import json
@@ -7,29 +16,36 @@ class EllBuildTools:
         self.verbose = verbose
         self.ell_root = ell_root
         self.build_root = os.path.join(self.ell_root, "build")
-        if (not os.path.isdir(self.build_root)):
+        self.compiler = None
+        self.swigexe = None
+        self.llcexe = None
+        self.blas = None
+        if not os.path.isdir(self.build_root):
             raise Exception("Could not find '%s', please make sure to build the ELL project first" % (self.build_root))
         self.find_tools()
 
     def find_tools(self):
         jsonPath = os.path.join(self.build_root, "tools/tools.json")
-        if (not os.path.isfile(jsonPath)):
+        if not os.path.isfile(jsonPath):
             raise Exception("Could not find build output: " + jsonPath)
 
         with open(jsonPath) as f:
             self.tools = json.loads(f.read())
 
         self.compiler = self.tools['compile']
-        if (self.compiler == ""):
+        if self.compiler == "":
             raise Exception("tools.json is missing compiler info")
 
         self.swigexe = self.tools['swig']
-        if (self.swigexe == ""):
+        if self.swigexe == "":
             raise Exception("tools.json is missing swig info")
 
         self.llcexe = self.tools['llc']
-        if (self.llcexe == ""):
+        if self.llcexe == "":
             raise Exception("tools.json is missing llc info")
+        
+        if ("blas" in self.tools):
+            self.blas = self.tools['blas']  # this one can be empty.
 
     def run(self, command, print_output=True):
         if (self.verbose):
@@ -45,7 +61,7 @@ class EllBuildTools:
             if print_output or verbose:
                 print(line.strip("\n"))
         proc.wait()
-        if (not proc.returncode == 0):
+        if not proc.returncode == 0:
             raise Exception(command[0] + " failed: " + output)        
         return output
 
@@ -55,9 +71,9 @@ class EllBuildTools:
             '-' + language,
             '-c++',
             '-Fmicrosoft']
-        if (language == "python"):
+        if language == "python":
             args = args + ["-py3"]
-        if (language == "javascript"):
+        if language == "javascript":
             args = args + ["-v8"]
         args = args + ['-outdir', output_dir,
             '-I' + os.path.join(self.ell_root, 'interfaces/common'),
@@ -72,11 +88,11 @@ class EllBuildTools:
     def get_llc_options(self, target):        
         common = ["-filetype=obj", "-O3"]
         # arch processing
-        if (target == "pi3"): # Raspberry Pi 3
+        if target == "pi3": # Raspberry Pi 3
             return common + ["-mtriple=armv7-linux-gnueabihf", "-mcpu=cortex-a53", "-relocation-model=pic"]
-        elif (target == "pi0"): # Raspberry Pi Zero
+        elif target == "pi0": # Raspberry Pi Zero
             return common + ["-mtriple=arm-linux-gnueabihf", "-relocation-model=pic"]
-        elif (target == "aarch64"): # arm64 Linux
+        elif target == "aarch64": # arm64 Linux
             return common + ["-mtriple=aarch64-unknown-linux-gnu", "-relocation-model=pic"]
         else: # host
             return common + ["-relocation-model=pic"]
@@ -99,10 +115,12 @@ class EllBuildTools:
                 "-cmn", model_name, 
                 "--bitcode", 
                 "--swig", 
-                "--blas", 
                 "--target", target, 
                 "-od", output_dir,
                 ]
+        if target != "host" or (not self.blas is None and self.blas != ""):
+            args.append("--blas")
+            args.append("true")
         print("compiling model...")
         self.run(args)
     

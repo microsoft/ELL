@@ -41,19 +41,11 @@ def __get_ell_py_dir():
 
     return None
 
-try:
-    ell_py_dir = __get_ell_py_dir()
-    if ell_py_dir is None:
-        print("Could not find '" + ell_py_dir + "', did you follow the ELL Python Binding build instructions?")
-        sys.exit(1)
-    sys.path.append(ell_py_dir)
-    import ELL
-    import ell_utilities
-except:
-    errorType, value, traceback = sys.exc_info()
-    print("### Exception: " + str(errorType))
-    print(str(value))
-    print("====================================================================")
-    print("ELL module is not loading")
-    print("It is possible that you need to add LibOpenBLAS to your system path (See Install-*.md) from root of this repo.")
+
+ell_py_dir = __get_ell_py_dir()
+if ell_py_dir is None:
+    print("Could not find ELL.py, did you follow the ELL Python Binding build instructions?")
     sys.exit(1)
+sys.path.append(ell_py_dir)
+import ELL
+import ell_utilities

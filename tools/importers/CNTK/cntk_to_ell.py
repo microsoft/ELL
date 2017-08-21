@@ -10,9 +10,8 @@
 
 import sys
 import os
-sys.path.append(os.path.join('..', '..', 'utilities', 'pythonlibs'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 import find_ell
-
 import ELL
 import ell_utilities
 import numpy as np

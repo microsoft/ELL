@@ -1,7 +1,7 @@
 ####################################################################################################
 ##
 ##  Project:  Embedded Learning Library (ELL)
-##  File:     drive_test.py
+##  File:     drivetest.py
 ##  Authors:  Chris Lovett
 ##
 ##  Requires: Python 3.x
@@ -111,7 +111,7 @@ class DriveTest:
         json_file = os.path.join(self.pitest_dir, "darknet_config.json")
         if (os.path.isdir(self.output_dir)):
             rmtree(self.output_dir)
-        sys.path.append(os.path.join(current_path, '../../project_builder'))
+        sys.path.append(os.path.join(current_path, '../../wrap'))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
         builder.parse_command_line(["", json_file, labels_file, self.ell_model, "-target", "pi3", "-outdir", self.output_dir])

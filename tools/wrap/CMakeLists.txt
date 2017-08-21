@@ -22,7 +22,7 @@ set (builder_src
     README.md)
 
 add_custom_target(${module_name} DEPENDS ${builder_src} SOURCES ${builder_src})
-set_property(TARGET ${module_name} PROPERTY FOLDER "tools/project_builder")
+set_property(TARGET ${module_name} PROPERTY FOLDER "tools/wrap")
 
 # copy tutorial files
 foreach(PY_FILE ${builder_src})
@@ -37,5 +37,5 @@ endif()
 
 set (OUTPUT_DIR ${CMAKE_BINARY_DIR}/tools)
 
-set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile.exe\" }")
+set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile.exe\", \"blas\": \"${BLAS_LIBS}\" }")
 file(WRITE "${OUTPUT_DIR}/tools.json" ${JSON})
