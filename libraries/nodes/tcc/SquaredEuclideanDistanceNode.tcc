@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     EuclidianDistanceNode.tcc (nodes)
+//  File:     SquaredEuclideanDistanceNode.tcc (nodes)
 //  Authors:  Suresh Iyengar
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "EuclideanDistanceNode.h"
+#include "SquaredEuclideanDistanceNode.h"
 #include "DotProductNode.h"
 #include "L2NormNode.h"
 #include "BinaryOperationNode.h"
@@ -28,20 +28,20 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, math::MatrixLayout layout>
-    EuclideanDistanceNode<ValueType, layout>::EuclideanDistanceNode()
+	SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode()
         : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _v(0, 0)
     {
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    EuclideanDistanceNode<ValueType, layout>::EuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v)
+	SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v)
         : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, v.NumRows()), _v(v)
     {
         assert(input.Size() == v.NumColumns());
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    void EuclideanDistanceNode<ValueType, layout>::WriteToArchive(utilities::Archiver& archiver) const
+    void SquaredEuclideanDistanceNode<ValueType, layout>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
 
@@ -51,7 +51,7 @@ namespace nodes
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    void EuclideanDistanceNode<ValueType, layout>::ReadFromArchive(utilities::Unarchiver& archiver)
+    void SquaredEuclideanDistanceNode<ValueType, layout>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
 
@@ -61,16 +61,16 @@ namespace nodes
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    void EuclideanDistanceNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
+    void SquaredEuclideanDistanceNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<EuclideanDistanceNode<ValueType, layout>>(newPortElements, _v);
+        auto newNode = transformer.AddNode<SquaredEuclideanDistanceNode<ValueType, layout>>(newPortElements, _v);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     // We compute the distance (P - V)^2 as P^2 - 2 * P * V + V^2 where P is the input point and V is the set of vectors
     template <typename ValueType, math::MatrixLayout layout>
-    bool EuclideanDistanceNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
+    bool SquaredEuclideanDistanceNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
 
@@ -98,18 +98,16 @@ namespace nodes
             normNode2Outputs.Append(squareNormNode2->output);
         }
 
-        auto distNode1 = transformer.AddNode<BinaryOperationNode<double>>(normNode1Outputs, productNodeScaled->output, emitters::BinaryOperationType::add);
-        auto distNodeSq = transformer.AddNode<BinaryOperationNode<double>>(normNode2Outputs, distNode1->output, emitters::BinaryOperationType::add);
+        auto distanceNode = transformer.AddNode<BinaryOperationNode<double>>(normNode1Outputs, productNodeScaled->output, emitters::BinaryOperationType::add);
+        auto squareDistanceNode = transformer.AddNode<BinaryOperationNode<double>>(normNode2Outputs, distanceNode->output, emitters::BinaryOperationType::add);
 
-        auto distNode = transformer.AddNode<UnaryOperationNode<double>>(distNodeSq->output, emitters::UnaryOperationType::sqrt);
-
-        transformer.MapNodeOutput(output, distNode->output);
+        transformer.MapNodeOutput(output, squareDistanceNode->output);
 
         return true;
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    void EuclideanDistanceNode<ValueType, layout>::Compute() const
+    void SquaredEuclideanDistanceNode<ValueType, layout>::Compute() const
     {
         math::ColumnVector<ValueType> input(_input.Size());
         for (size_t index = 0; index < _input.Size(); ++index)
@@ -127,16 +125,15 @@ namespace nodes
         for (size_t r = 0; r < _v.NumRows(); r++)
         {
             result[r] += norm1sq + _v.GetRow(r).Norm2Squared();
-            result[r] = std::sqrt(result[r]);
         }
 
         _output.SetOutput({ result.ToArray() });
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    EuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> v, model::ModelTransformer& transformer)
+	SquaredEuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> v, model::ModelTransformer& transformer)
     {
-        return transformer.AddNode<EuclideanDistanceNode>(input, v);
+        return transformer.AddNode<SquaredEuclideanDistanceNode>(input, v);
     }
 }
 }
