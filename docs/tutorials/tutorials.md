@@ -14,3 +14,4 @@ permalink: /tutorials/
 # Computer Vision
 
 * [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/)
+* [Fun with Dogs and Cats](/ELL/tutorials/Fun-with-Dogs-and-Cats/)

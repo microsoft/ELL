@@ -75,11 +75,11 @@ cp ../../tools/utilities/pitest/schoolbus.png pi3
 Windows: copy ..\..\tools\utilities\pitest\schoolbus.png pi3
 ````
 
-You should now have a pi3 folder that is ready to copy to your raspberry pi.  You can do that using the 'scp' tool.  On Windows you can use [WinSCP](https://winscp.net/eng/index.php).
+You should now have a pi3 folder that is ready to copy to your Raspberry Pi.  You can do that using the 'scp' tool.  On Windows you can use [WinSCP](https://winscp.net/eng/index.php).
 
 ### SSH into Raspberry Pi
 
-No log into your Raspberry Pi, either remotely using SSH or directly if you have keyboard and screen attached.
+Now log into your Raspberry Pi, either remotely using SSH or directly if you have keyboard and screen attached.
 
 Find the 'pi3' folder you just copied over using scp or winscp and run the following:
 
@@ -116,7 +116,7 @@ And if you have a display connected you should see something like this:
 If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
 
 ````
-python demo.py 
+python demo.py config.json categories.txt
 ````
 
 You will see the same kind of window appear only this time it is showing the video stream.
