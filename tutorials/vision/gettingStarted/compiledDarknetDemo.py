@@ -15,8 +15,6 @@ sys.path.append('build/Release')
 import darknetReference as model
 
 def main():
-    # python somehow needs to know about the data vector type, so we provide it
-    buffer = model.FloatVector(224 * 224 * 3)
     results = model.FloatVector(1000)
 
     # Pick the model you want to work with

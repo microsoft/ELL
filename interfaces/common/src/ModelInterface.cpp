@@ -23,6 +23,7 @@
 #include "OutputNode.h"
 #include "DynamicMap.h"
 #include "SteppableMap.h"
+#include "MapLoadArguments.h"
 
 // nodes
 #include "NeuralNetworkPredictorNode.h"
@@ -669,6 +670,11 @@ ELL_Map::ELL_Map(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements outp
     _map = std::make_shared<ell::model::DynamicMap>(model.GetModel(), inputs, outputs);
 }
 
+ELL_Map::ELL_Map(const std::string& filename)
+{
+    Load(filename);
+}
+
 std::vector<double> ELL_Map::ComputeDouble(const std::vector<double>& inputData)
 {
     return _map->Compute<double>(inputData);
@@ -679,9 +685,16 @@ std::vector<float> ELL_Map::ComputeFloat(const std::vector<float>& inputData)
     return _map->Compute<float>(inputData);
 }
 
-void ELL_Map::Save(const std::string& filePath) const
+void ELL_Map::Load(const std::string& filename)
 {
-    ell::common::SaveMap(*_map, filePath);
+    ell::common::MapLoadArguments args;
+    args.inputMapFilename = filename;
+    _map = std::make_shared<ell::model::DynamicMap>(ell::common::LoadMap(args));
+}
+
+void ELL_Map::Save(const std::string& filename) const
+{
+    ell::common::SaveMap(*_map, filename);
 }
 
 //
@@ -706,7 +719,7 @@ ELL_SteppableMap::ELL_SteppableMap(ELL_Model model, ELL_InputNode inputNode, ELL
     }
 }
 
-void ELL_SteppableMap::Save(const std::string& filePath) const
+void ELL_SteppableMap::Save(const std::string& filename) const
 {
     switch (_clockType)
     {
@@ -714,14 +727,14 @@ void ELL_SteppableMap::Save(const std::string& filePath) const
         {
             auto map = std::dynamic_pointer_cast<const ell::model::SteppableMap<std::chrono::steady_clock>>(_map);
             assert(map != nullptr); // coding error
-            ell::common::SaveMap(*map, filePath);
+            ell::common::SaveMap(*map, filename);
             break;
         }
         case ELL_ClockType::systemClock:
         {
             auto map = std::dynamic_pointer_cast<const ell::model::SteppableMap<std::chrono::system_clock>>(_map);
             assert(map != nullptr); // coding error
-            ell::common::SaveMap(*map, filePath);
+            ell::common::SaveMap(*map, filename);
             break;
         }
         default:

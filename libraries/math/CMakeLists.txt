@@ -83,6 +83,7 @@ copy_shared_libraries(${test_name})
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${test_name} COMMAND ${test_name})
+set_test_library_path(${test_name})
 
 #
 # math profile
@@ -108,3 +109,4 @@ copy_shared_libraries(${profile_name})
 set_property(TARGET ${profile_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${profile_name} COMMAND ${profile_name} CONFIGURATION Release)
+set_test_library_path(${profile_name})

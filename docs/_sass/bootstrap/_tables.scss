@@ -5,6 +5,9 @@
 
 table {
   background-color: $table-bg;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border:1px solid $table-border-color;
 }
 caption {
   padding-top: $table-cell-padding;
@@ -14,6 +17,14 @@ caption {
 }
 th {
   text-align: left;
+  border:1px solid $table-border-color;
+  padding: $table-cell-padding;
+  background-color: $table-header-background-color;
+  color: $table-header-color;
+}
+td {  
+  border:1px solid $table-border-color;
+  padding: $table-cell-padding;
 }
 
 
@@ -110,7 +121,7 @@ th {
 //
 // Default zebra-stripe styles (alternating gray and transparent backgrounds)
 
-.table-striped {
+table {
   > tbody > tr:nth-of-type(odd) {
     background-color: $table-bg-accent;
   }

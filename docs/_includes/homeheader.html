@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,16 +12,13 @@
 
     <title>{{site.data.global.title }}</title>
 
-    <base href="{{site.baseurl}}/"/>
+    <base href="{{site.baseurl}}/" />
 
     <!-- Bootstrap core CSS -->
-    <link href="{{site.baseurl}}/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{site.baseurl}}/css/bootstrap.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{{site.baseurl}}/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="{{site.baseurl}}/css/jumbotron.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -31,8 +29,8 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
-  
+</head>
+
 <body class="{{ post.title | downcase | replace:' ','-' | replace:',','' | strip_html }}{% if page.category %} category-{{ page.category }}{% endif %}{% if page.layout-class %} layout-{{ page.layout-class }}{% endif %}">
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -49,22 +47,20 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
                     {% for item in site.data.nav.main %}
-                        <li>
-                            <a href="{{ item.url }}">{{ item.text }}</a>
-                        </li>
+                    <li>
+                        <a href="{{ item.url }}">{{ item.text }}</a>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->  
-    <div class="jumbotron" style="background-image: url(&#039;https://www.microsoft.com/en-us/research/wp-content/uploads/2016/04/HeroLargePremonition.jpg&#039;)"
-            >
-        <img src"{{site.baseurl}}/images/banner.png" class=""/>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron" style="background-image:url(background.jpg);background-position:0px 35px;background-size:400px;">
         <div class="container">
             <h1 style="color:white">{{ site.data.global.title }}</h1>
-            <p style="color:white">{{ site.data.global.description }}</p>
+            <p style="color:black">{{ site.data.global.description }}</p>
         </div>
     </div>
 

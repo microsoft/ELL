@@ -10,6 +10,7 @@ if(${PYTHONLIBS_FOUND})
     set(module_name "cntk_importer")
 
     set(importer_src cntk_to_ell.py
+        cntk_import.py
         lib/cntk_converters.py
         lib/cntk_layers.py
         lib/cntk_utilities.py

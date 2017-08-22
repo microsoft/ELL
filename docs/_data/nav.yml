@@ -1,4 +1,5 @@
 main:
+    #- { url: '/ELL/', text: 'Home' }   
+    - { url: '/ELL/tutorials/', text: 'Tutorials' }
     - { url: '/ELL/gallery/', text: 'Gallery' }
-    - { url: '/ELL/', text: 'About' }
-    - { url: 'https://github.com/microsoft/ELL', text: 'GitHub' } 
+    - { url: 'https://github.com/microsoft/ELL', text: 'Code' } 

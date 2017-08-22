@@ -14,7 +14,7 @@
     <base href="{{site.baseurl}}/"/>
 
     <!-- Bootstrap core CSS -->
-    <link href="{{site.baseurl}}/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{site.baseurl}}/css/bootstrap.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{{site.baseurl}}/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
@@ -29,6 +29,7 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
   </head>
   
 <body class="{{ post.title | downcase | replace:' ','-' | replace:',','' | strip_html }}{% if page.category %} category-{{ page.category }}{% endif %}{% if page.layout-class %} layout-{{ page.layout-class }}{% endif %}">
@@ -60,5 +61,4 @@
 <br/>
 <br/>
 <br/>
-
     <div class="container">

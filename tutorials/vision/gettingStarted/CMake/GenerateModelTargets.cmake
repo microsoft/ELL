@@ -102,6 +102,7 @@ function(generate_ell_model_compile_target model_name arch_name target_name demo
         configure_file(${demo_file} ${target_path}/${demo_file})
     endforeach()
     configure_file(modelHelper.py ${target_path}/modelHelper.py)
+    configure_file(${ell_root}/tools/utilities/pythonlibs/find_ell.py ${target_path}/find_ell.py)
 
     # create our custom target that kicks everything off
     add_custom_target(${target_name} DEPENDS ${target_output})

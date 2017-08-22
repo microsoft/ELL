@@ -35,6 +35,10 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/loadModelAsync.i
                      ../common/loadDatasetAsync.i
                      ../common/dataset.i
+                     ../common/ELL_javascript_post.i
+                     ../common/ELL_javascript_pre.i
+                     ../common/ELL_python_post.i
+                     ../common/ELL_python_pre.i
                      ../common/evaluators.i
                      ../common/functions.i
                      ../common/math.i

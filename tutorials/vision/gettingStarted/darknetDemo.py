@@ -2,14 +2,10 @@ import sys
 import os
 import numpy as np
 import cv2
-
-import findEll
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../tools/utilities/pythonlibs'))
+import find_ell
 import darknet_to_ell
 import modelHelper as mh
-
-def get_ell_predictor(helper):
-    """Imports a model and returns an ELL.Predictor."""
-    return darknet_to_ell.predictor_from_darknet_model(helper.model_files[0], helper.model_files[1])
 
 def main():
     # Check for model files
@@ -25,7 +21,7 @@ def main():
     helper = mh.ModelHelper(sys.argv, "darknetReference", ["darknet.cfg", "darknet.weights"], "darknetImageNetLabels.txt")
 
     # Import the model
-    model = get_ell_predictor(helper)
+    model = darknet_to_ell.predictor_from_darknet_model(helper.model_files[0], helper.model_files[1])
 
     # Save the model
     helper.save_ell_predictor_to_file(model, "darknetReference.map")

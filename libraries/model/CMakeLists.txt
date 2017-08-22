@@ -126,6 +126,7 @@ copy_shared_libraries(${test_name})
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${test_name} COMMAND ${test_name})
+set_test_library_path(${test_name})
 
 #
 # compiler-specific tests
@@ -161,9 +162,10 @@ source_group("tcc" FILES ${compiler_test_tcc})
 add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include})
 target_include_directories(${compiler_test_name} PRIVATE test/include)
 target_link_libraries(${compiler_test_name} common model nodes testing utilities)
-copy_shared_libraries(${test_name})
+copy_shared_libraries(${compiler_test_name})
 
 set_property(TARGET ${compiler_test_name} PROPERTY FOLDER "tests")
 
 add_test(NAME ${compiler_test_name} COMMAND ${compiler_test_name})
+set_test_library_path(${compiler_test_name})
 

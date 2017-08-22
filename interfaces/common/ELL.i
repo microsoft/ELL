@@ -6,6 +6,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Include language specific SWIG definitions that must be declared before the
+// C++ code to be wrapped
+#ifdef SWIGPYTHON
+    %include "ELL_python_pre.i"
+#elif SWIGJAVASCRIPT
+    %include "ELL_javascript_pre.i"
+#endif
+
 %module "ELL"
 // Generate decent docstrings from types and method signatures
 %feature("autodoc", "3");
@@ -74,4 +82,12 @@
 
 // Interface ELL Load Model Async
 // %include loadModelAsync.i
+#endif
+
+// Include language specific SWIG definitions that must be declared after the
+// C++ code has been wrapped by SWIG
+#ifdef SWIGPYTHON
+    %include "ELL_python_post.i"
+#elif SWIGJAVASCRIPT
+    %include "ELL_javascript_post.i"
 #endif

@@ -8,7 +8,8 @@ if(${PYTHONLIBS_FOUND})
 
     set(module_name "darknet_importer")
 
-    set(importer_src darknet_to_ell.py)
+    set(importer_src darknet_to_ell.py
+        darknet_import.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
 

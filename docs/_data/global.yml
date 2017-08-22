@@ -1,10 +1,8 @@
 # Site Settings
-title: 'Embedded Learning Library'
-description: 'An Open-Source Machine Learning Library by Microsoft'
-#url: 'http://microsoft.github.io/ELL' # the base hostname & protocol for your site
+title: 'Embedded Learning Library (ELL)'
+description: 'An Open Source Library for Embedded AI and Machine Learning from Microsoft'
 footer_text: '&copy; 2017 Microsoft Corporation'
 
 # Admin Settings
 admin_name: 'Chris Lovett'
 admin_email: 'clovett@microsoft.com'
-

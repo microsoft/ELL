@@ -32,7 +32,6 @@ set (PYTHON_TUTORIALS
     darknet.md
     darknetDemo.py
     darknetImageNetLabels.txt
-    findEll.py
     modelHelper.py
     opencv.md
     PretrainedModels.md
