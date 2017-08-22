@@ -88,16 +88,13 @@ namespace nodes
         // Distance to each prototype
         auto distanceNode = transformer.AddNode<EuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInputNode->output, prototypes.Transpose());
 
-        model::PortElements<double> similarityOutputs;
-
         // Similarity to each prototype
-        auto squareSimilarityDistNode = transformer.AddNode<BinaryOperationNode<double>>(distanceNode->output, distanceNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-        auto scaledSimilarityDistNode = transformer.AddNode<BinaryOperationNode<double>>(squareSimilarityDistNode->output, gammaNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-        auto similarityMultiplier = transformer.AddNode<UnaryOperationNode<double>>(scaledSimilarityDistNode->output, emitters::UnaryOperationType::exp);
-        similarityOutputs.Append(similarityMultiplier->output);
+        auto squareDistanceNode = transformer.AddNode<BinaryOperationNode<double>>(distanceNode->output, distanceNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
+        auto scaledDistanceNode = transformer.AddNode<BinaryOperationNode<double>>(squareDistanceNode->output, gammaNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
+        auto expDistanceNode = transformer.AddNode<UnaryOperationNode<double>>(scaledDistanceNode->output, emitters::UnaryOperationType::exp);
 
         // Get the prediction label
-        auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(similarityOutputs, _predictor.GetLabelEmbeddings());
+        auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(expDistanceNode->output, _predictor.GetLabelEmbeddings());
         auto predictionLabelNode = transformer.AddNode<ArgMaxNode<double>>(labelScoresNode->output);
 
         transformer.MapNodeOutput(outputScore, predictionLabelNode->val);
