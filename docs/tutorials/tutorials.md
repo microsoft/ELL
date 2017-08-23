@@ -13,5 +13,7 @@ permalink: /tutorials/
 
 # Computer Vision
 
+* [Installing and building ELL](/ELL/Installing-and-building-ELL/)
 * [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/)
 * [Fun with Dogs and Cats](/ELL/tutorials/Fun-with-Dogs-and-Cats/)
+* [Importing new models](/ELL/tutorials/Importing-new-models/)

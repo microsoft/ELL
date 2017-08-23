@@ -1,6 +1,9 @@
 # Embedded Learning Library (ELL) style guide
 This is the C++ coding style guide for the ELL project.
 
+For Python coding we are using [PEP 8](https://www.python.org/dev/peps/pep-0008/).
+
+
 ## File names and extensions
 Header files use the extension ".h". Source code files use the extension ".cpp" if they are compiled into a .lib or .exe, and ".tcc" if they contain templated source code.
 Each file should typically contain a single class and its name should match the class name.

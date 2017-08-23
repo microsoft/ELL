@@ -1,3 +1,9 @@
+---
+layout: default
+title: Installing ELL on Windows
+permalink: /Installing-and-building-ELL/INSTALL-Windows/
+---
+
 # Building a 64-bit version of the Embedded Learning Library (ELL) on Windows
 
 ### Cloning the ELL repository
@@ -8,33 +14,25 @@ The instructions below assume that ELL was obtained from `github.com/Microsoft/E
 
 ### Prerequisites
 
-#### Visual Studio 2015 update 3 with C++ compiler, or Visual Studio 2017
-##### Visual Studio 2015 update 3
+#### Visual Studio 2015 update 3
 If using *Microsoft Visual Studio 2015 update 3*, make sure the C++ compiler is installed. Note that the C++ compiler installation is not enabled by default, so you must select the custom installation option and manually check the C++ checkbox.
-##### Visual Studio 2017
+
+#### Visual Studio 2017
 A free version is available at <https://www.visualstudio.com/vs/community/>. Select the following Workloads during install:
 * `Desktop Development with C++`
 
-#### CMake
+### CMake 3.5 or newer
 ELL uses the [*CMake*](https://cmake.org/) build system. You can download and install it from <https://cmake.org/download/>.
 
-#### LLVM (as well as OpenBLAS and Doxygen)
+### LLVM (as well as OpenBLAS and Doxygen)
 ELL depends on the [*LLVM*](http://llvm.org/) compiler framework. Optionally, it can take advantage of the fast linear algebra libraries in [*OpenBLAS*](http://www.openblas.net/) and generate documentation using *Doxygen*. An easy way to get the prebuilt 64-bit version of LLVM and the optional dependencies is to use the [*NuGet*](https://www.nuget.org/) package manager (version 3.5 or newer). The relevant NuGet packages are specified in a config file in the `ELL/external` directory.  We recommend using the NuGet command line tool (NuGet CLI), which can be obtained by following the instructions at <https://docs.nuget.org/ndocs/guides/install-nuget>. After downloading NuGet CLI, change to the repository's root directory (`ELL`):
 
-#### Python
+### Activate Conda Environment
 
-The tutorials require Python 3.6, we recommend you use [Miniconda](https://conda.io/miniconda.html), which works well with Jupyter notebooks and provides a way to manage different Python versions.   Note: you can also use the full [Anaconda](https://www.continuum.io/downloads) if you already have that installed.
+The following commandline instructions assume you are using your activated Python 3.6 conda environment command prompt window.  
+See [Python setup instructions](/ELL/Installing-and-building-ELL/).
 
-To configure the Python 3.6 environment using Miniconda:
-```
-# Create the environment
-conda create -n py36 anaconda python=3
-# Activate the environment
-activate py36
-```
-Now you have an activated `conda` Python 3.6 environment, and if you build ELL from this environment then the Python language bindings will be built and you can run the tutorials.
-
-#### Nuget Packages
+### Nuget Packages
 
     cd ELL
 
@@ -50,7 +48,7 @@ Next, use CMake to create a Visual Studio solution. In the repository's root dir
 
     mkdir build
     cd build
-
+    
 Next, invoke cmake as follows:
     
 For Visual Studio 2015:
@@ -86,7 +84,6 @@ set PATH=%PATH%;D:\git\ELL\external\OpenBLASLibs.0.2.19.3\build\native\x64\haswe
 Of course, don't just copy the above directly, you should use the correct paths to your git repo.
 
 ### Building ELL
-
 
 Now you can build ELL by typing:
 

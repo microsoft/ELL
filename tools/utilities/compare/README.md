@@ -20,6 +20,30 @@ view the compiled Node graph, with annotated Error properties on each node.  It 
 contains a style that will map the error values to different levels of red so you 
 can easily see where the trouble spots are.
 
+**Usage**: compare [options]
+
+    Input options
+            --inputMapFile (-imap) []   Path to the input *.map file
+            --inputTestFile (-itf) []   Path to the input test file containing image to process
+    Output options
+            --outputDirectory (-od) []  Location of output files (default cwd)
+            --report [true]             Generate markdown report
+            --graph [true]              Write DGML graph
+    Code-generation options
+            --optimize (-opt) [true]    Optimize output code
+            --blas [false]              Emit code that calls BLAS
+            --help (-h) [false]         Print help and exit
+
+### Visualize Results
+
+Once a report is generated you can also visualize the results using the
+following tool that lives in the ELL/tools/utilities/compare/src folder.
+
+    visualizeReport.py reportFileName
+
+If you provide the report.md file in the path to your report output directory you will see a series of images showing layer by layer comparisons.
+
+
 ### Details
 
 The way this tool works is to inject DebugSinkNodes between each NeuralNetworkLayer of the

@@ -10,6 +10,7 @@ set (src
   src/CompareUtils.cpp
   src/main.cpp
   src/ModelComparison.cpp
+  src/visualizeReport.py
 )
 
 set (include
