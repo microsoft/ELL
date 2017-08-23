@@ -56,7 +56,7 @@ class ModuleBuilder:
         i = 1
         while (i < len(argv)):
             arg = argv[i]
-            if (arg[0] == "-" or arg[0] == "/"):
+            if (arg[0] == "-"):
                 option = arg[1:]
                 if (option.lower() == "target"):
                     i = i + 1
@@ -115,7 +115,10 @@ class ModuleBuilder:
         self.tcc.append(os.path.join(self.ell_root, "interfaces/common/tcc/CallbackInterface.tcc"))
 
     def copy_files(self, list, folder):
-        target_dir = os.path.join(self.output_dir, folder)
+        if (folder == ""):
+            target_dir = self.output_dir
+        else:
+            target_dir = os.path.join(self.output_dir, folder)
         if (not os.path.isdir(target_dir)):
             os.mkdir(target_dir)
         for path  in list:

@@ -230,7 +230,7 @@ namespace math
             }
         }
 
-#ifdef USE_BLAS
+#if defined(USE_BLAS)
         //
         // OpenBLAS implementations of operations
         //
@@ -264,21 +264,7 @@ namespace math
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix and vectors sizes.");
             }
 
-            // map layout to CBLAS_ORDER
-            CBLAS_ORDER order;
-            switch (matrix.GetLayout())
-            {
-            case MatrixLayout::rowMajor:
-                order = CBLAS_ORDER::CblasRowMajor;
-                break;
-            case MatrixLayout::columnMajor:
-                order = CBLAS_ORDER::CblasColMajor;
-                break;
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "layout not supported");
-            }
-
-            Blas::Gemv(order, CBLAS_TRANSPOSE::CblasNoTrans, static_cast<int>(matrix.NumRows()), static_cast<int>(matrix.NumColumns()), scalarA, matrix.GetDataPointer(), static_cast<int>(matrix.GetIncrement()), vectorA.GetDataPointer(), static_cast<int>(vectorA.GetIncrement()), scalarB, vectorB.GetDataPointer(), static_cast<int>(vectorB.GetIncrement()));
+            Blas::Gemv(matrix.GetLayout(), MatrixTranspose::noTranspose, static_cast<int>(matrix.NumRows()), static_cast<int>(matrix.NumColumns()), scalarA, matrix.GetDataPointer(), static_cast<int>(matrix.GetIncrement()), vectorA.GetDataPointer(), static_cast<int>(vectorA.GetIncrement()), scalarB, vectorB.GetDataPointer(), static_cast<int>(vectorB.GetIncrement()));
         }
 
         template <typename ElementType, MatrixLayout layout>
@@ -295,27 +281,14 @@ namespace math
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes.");
             }
 
-            // map layout to CBLAS_ORDER
-            CBLAS_ORDER order;
-            switch (matrixA.GetLayout())
-            {
-            case MatrixLayout::rowMajor:
-                order = CBLAS_ORDER::CblasRowMajor;
-                break;
-            case MatrixLayout::columnMajor:
-                order = CBLAS_ORDER::CblasColMajor;
-                break;
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "layout not supported");
-            }
-
-            CBLAS_TRANSPOSE transposeB = CBLAS_TRANSPOSE::CblasNoTrans;
+            MatrixLayout order = matrixA.GetLayout();
+            MatrixTranspose transposeB = MatrixTranspose::noTranspose;
             if (matrixA.GetLayout() != matrixB.GetLayout())
             {
-                transposeB = CBLAS_TRANSPOSE::CblasTrans;
+                transposeB = MatrixTranspose::transpose;
             }
 
-            Blas::Gemm(order, CBLAS_TRANSPOSE::CblasNoTrans, transposeB, static_cast<int>(matrixA.NumRows()), static_cast<int>(matrixB.NumColumns()), static_cast<int>(matrixA.NumColumns()), scalarA,
+            Blas::Gemm(order, MatrixTranspose::noTranspose, transposeB, static_cast<int>(matrixA.NumRows()), static_cast<int>(matrixB.NumColumns()), static_cast<int>(matrixA.NumColumns()), scalarA,
                 matrixA.GetDataPointer(), static_cast<int>(matrixA.GetIncrement()), matrixB.GetDataPointer(), static_cast<int>(matrixB.GetIncrement()), scalarB,
                 matrixC.GetDataPointer(), static_cast<int>(matrixC.GetIncrement()));
         }

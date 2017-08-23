@@ -118,9 +118,9 @@ class EllBuildTools:
                 "--target", target, 
                 "-od", output_dir,
                 ]
-        if target != "host" or (not self.blas is None and self.blas != ""):
-            args.append("--blas")
-            args.append("true")
+        args.append("--blas")
+        hasBlas = target != "host" or (self.blas is not None and self.blas != "")
+        args.append(str(hasBlas).lower())
         print("compiling model...")
         self.run(args)
     

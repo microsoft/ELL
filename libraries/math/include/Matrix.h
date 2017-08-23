@@ -63,11 +63,26 @@ namespace math
         size_t _increment;
     };
 
-    /// <summary> Enum of possible matrix layouts. </summary>
+
+    /// <summary> Enum of possible matrix layouts. 
+    /// This is a standalone definition separate from OpenBlas' cblas.h so that the ELL
+    /// code base can compile without OpenBlas. Use GetCBlasMatrixOrder if you need to 
+    /// map these values back to OpenBlas' definition of CBLAS_ORDER.
+    /// </summary>
     enum class MatrixLayout
     {
         columnMajor,
         rowMajor
+    };
+
+    /// <summary> Enum of possible matrix transposes.
+    /// This is a standalone definition separate from OpenBlas' cblas.h so that the ELL
+    /// code base can compile without OpenBlas. Use GetCBlasMatrixTranspose if you need to 
+    /// map these values back to OpenBlas' definition of CBLAS_TRANSPOSE.</summary> 
+    enum class MatrixTranspose
+    {
+        noTranspose,
+        transpose
     };
 
     /// <summary> Helper class to obtain the transpose of a MatrixLayout </summary>
