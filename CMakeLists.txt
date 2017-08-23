@@ -84,7 +84,6 @@ include (CommonInterfaces)
 if(NOT SWIG_FOUND)
     message(WARNING "SWIG not found, interfaces and projects that depend on them will not build properly. \
                     They are not part of the default make targets, so can be skipped. \
-                    If you want to build interfaces (such as the Python bindings), follow the instructions in INSTALL-XXXXX.md file to install SWIG.\
                     Then delete the CMakeCache.txt file from your build directory run the cmake command again.")
 endif()
 
@@ -97,10 +96,7 @@ add_subdirectory(examples)
 add_subdirectory(tutorials)
 
 # Add project for solution-level documentation
-set (DOC INSTALL-Mac.md
-         INSTALL-Ubuntu.md
-         INSTALL-Windows.md
-         README.md
+set (DOC README.md
          StyleGuide.md)
 add_custom_target(documentation ALL DEPENDS ${DOC} SOURCES ${DOC})
 set_property(TARGET documentation PROPERTY FOLDER "documentation")
