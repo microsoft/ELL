@@ -100,7 +100,7 @@ Now let's test that this model works on your PC.  For this you will need to copy
 
  Then to build an ELL project that will run on your PC:
 
-    python "~/git/ELL/ELLwrap.py darknet_config.json darknetImageNetLabels.txt darknet.ellmodel -target host
+    python "~/git/ELL/wrap.py darknet_config.json darknetImageNetLabels.txt darknet.ellmodel -target host
     cd host
     mkdir build
     cd build
@@ -222,7 +222,7 @@ Now let's test that this model works on your PC.  For this you will need to copy
 
  Then to build an ELL project that will run on your PC:
 
-    python "~/git/ELL/ELLwrap.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt VGG16_ImageNet_Caffe.ellmodel -target host
+    python "~/git/ELL/wrap.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt VGG16_ImageNet_Caffe.ellmodel -target host
     cd host
     mkdir build
     cd build
