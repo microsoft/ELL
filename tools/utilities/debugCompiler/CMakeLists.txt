@@ -3,7 +3,7 @@
 #
 
 # define project
-set (tool_name compare)
+set (tool_name debugcompiler)
 
 set (src 
   src/CompareArguments.cpp

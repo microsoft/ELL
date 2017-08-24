@@ -10,14 +10,16 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 # rendering utilties
 
 class DemoHelper:
-    def __init__(self, scaleFactor=1 / 255, threshold=0.25):
+    def __init__(self, threshold=0.25):
         """ Helper class to store information about the model we want to use.
         argv       - arguments passed in from the command line 
-        scaleFactor - each input pixel may need to be scaled. It is common for models to require an 8-bit pixel
-                      to be represented as a value between 0.0 and 1.0, which is the same as multiplying it by 1/255.
         threshold   - specifies a prediction threshold. We will ignore prediction values less than this
         """
-        self.scaleFactor = scaleFactor
+        
+        # each input pixel may need to be scaled. It is common for models to require an 8-bit pixel
+        # to be represented as a value between 0.0 and 1.0, which is the same as multiplying it by 1/255.
+        # This can be configured in the config file.
+        self.scaleFactor = 1 / 255
         self.threshold = threshold
         self.start = time.time()
         self.frame_count = 0
@@ -94,6 +96,8 @@ class DemoHelper:
             self.config = json.loads(f.read())
             self.input_size = (self.config['input_rows'], self.config['input_columns'])
             print("using input size of ", self.input_size)
+            if ("input_scale" in self.config):
+                self.scaleFactor = float(self.config["input_scale"])
 
         if (self.model_file == None):
             # then assume we have a compiled model handy

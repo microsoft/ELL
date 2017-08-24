@@ -1,9 +1,9 @@
-## Comparison Tool
+## Compiler Debug Tool
 
-This tool compares the results of the reference implementation and the compiled
+This tool tests the results of the reference implementation and the compiled
 implementation of a given model against a given test image.
 
-It compares the output of each NeuralNetworkLayer in the model and prints 
+It then compares the output of each NeuralNetworkLayer in the model and prints 
 a report showing statistics of each layer (both compiled and reference).
 
 It also writes out a .csv file for each layer containing two colums, the
@@ -20,12 +20,13 @@ view the compiled Node graph, with annotated Error properties on each node.  It 
 contains a style that will map the error values to different levels of red so you 
 can easily see where the trouble spots are.
 
-**Usage**: compare [options]
+**Usage**: debugcompiler [options]
 
     Input options
             --inputMapFile (-imap) []   Path to the input *.map file
             --inputTestFile (-itf) []   Path to the input test file containing image to process
     Output options
+            --inputScale (-is) [1/255]  How to scale input values (default 1/255)
             --outputDirectory (-od) []  Location of output files (default cwd)
             --report [true]             Generate markdown report
             --graph [true]              Write DGML graph
@@ -47,8 +48,11 @@ If you provide the report.md file in the path to your report output directory yo
 ### Details
 
 The way this tool works is to inject DebugSinkNodes between each NeuralNetworkLayer of the
-ell::model::Node graph.  This DebugSinkNodes provide a call back mechanism so the compare
+ell::model::Node graph.  This DebugSinkNodes provide a call back mechanism so the 
 tool can capture the actual outputs during execution of the model, and this works both
 for the reference implemtation and the compiled implementation.
 
-The compiled implementation is executed in process using the IRExecutionEngine jitter.
+The compiled implementation is executed in process using the IRExecutionEngine jitter
+which is nice because it means we don't have to emit C++ code, and compile it using 
+cmake and a C++ compiler.
+
