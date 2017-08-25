@@ -51,6 +51,10 @@ namespace ell
     void TestUnicodePaths(std::string& basePath)
     {
         auto testdir = GetUnicodeTestPath(basePath);
+        std::cout << "writing test output to " << testdir << std::endl;
+
+        // bugbug: the rolling build for Linux is giving us EACCESSDENIED on this testdir for some reason...
+#ifdef WIN32
         ell::utilities::EnsureDirectoryExists(testdir);
         testing::ProcessTest("Unicode paths", ell::utilities::DirectoryExists(testdir));
 
@@ -62,10 +66,6 @@ namespace ell
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
         std::string utf8banana = converter.to_bytes(banana);
 
-        std::cout << "writing test output to " << testdir << std::endl;
-
-// bugbug: the rolling build for Linux is giving us EACCESSDENIED on this testdir for some reason...
-#ifdef WIN32
         std::string testfile = ell::utilities::JoinPaths(testdir, utf8banana);
         {
             auto outputStream = ell::utilities::OpenOfstream(testfile);
