@@ -71,6 +71,8 @@ int main(int argc, char* argv[])
         std::cout << "loading map..." << std::endl;
         model::DynamicMap map = common::LoadMap(compareArguments.inputMapFile);
 
+        ell::utilities::EnsureDirectoryExists(compareArguments.outputDirectory);
+        
         auto input = GetInputImage(compareArguments.inputTestFile, map, compareArguments.inputScale);
         ModelComparison comparison(compareArguments.outputDirectory);
         comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize);

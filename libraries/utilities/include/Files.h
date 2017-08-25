@@ -90,6 +90,13 @@ namespace utilities
     /// <returns> The path to the directory. </returns>
     bool DirectoryExists(std::string path);
 
+    /// <summary> Returns true if the given directory exists or was created. </summary>
+    ///
+    /// <param name="path"> The path. </param>
+    ///
+    /// <returns> The path to the directory. </returns>
+    void EnsureDirectoryExists(std::string path);
+
     /// <summary> Returns the filename from a path. </summary>
     ///
     /// <param name="filepath"> The path. </param>

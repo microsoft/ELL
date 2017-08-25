@@ -54,6 +54,7 @@ set (include include/AbstractInvoker.h
              include/PPMImageParser.h
              include/RandomEngines.h
              include/StlContainerIterator.h
+             include/StringUtil.h
              include/Tokenizer.h
              include/TransformIterator.h
              include/TupleUtils.h
@@ -122,6 +123,7 @@ set (test_src
   test/src/TypeFactory_test.cpp
   test/src/TypeName_test.cpp
   test/src/Variant_test.cpp
+  test/src/Files_test.cpp
 )
 
 set (test_include 
@@ -133,6 +135,7 @@ set (test_include
   test/include/TypeFactory_test.h
   test/include/TypeName_test.h
   test/include/Variant_test.h
+  test/include/Files_test.h
 )
                   
 source_group("src" FILES ${test_src})

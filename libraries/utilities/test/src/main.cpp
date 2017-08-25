@@ -14,6 +14,7 @@
 #include "TypeFactory_test.h"
 #include "TypeName_test.h"
 #include "Variant_test.h"
+#include "Files_test.h"
 
 // testing
 #include "testing.h"
@@ -81,6 +82,10 @@ int main()
         TestApplyToEach();
         TestFunctionTraits();
         TestApplyFunction();
+
+        // File system tests
+        TestStringf();
+        TestUnicodePaths();
     }
     catch (const utilities::Exception& exception)
     {
