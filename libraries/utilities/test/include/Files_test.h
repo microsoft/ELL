@@ -5,9 +5,10 @@
 //  Authors:  Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <string>
 
 namespace ell
 {
     void TestStringf();
-    void TestUnicodePaths();
+    void TestUnicodePaths(std::string& basePath);
 }

@@ -103,5 +103,11 @@ namespace utilities
     ///
     /// <returns> The filename. </returns>
     std::string JoinPaths(std::string path1, std::string path2);
+
+    /// <summary> Returns the current working directory. </summary>
+    ///
+    /// <returns> The path. </returns>
+    std::string GetWorkingDirectory();
+
 }
 }

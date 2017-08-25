@@ -15,6 +15,7 @@
 #include "TypeName_test.h"
 #include "Variant_test.h"
 #include "Files_test.h"
+#include "Files.h"
 
 // testing
 #include "testing.h"
@@ -33,10 +34,12 @@ using namespace ell;
 
 /// Runs all tests
 ///
-int main()
+int main(int argc, char* argv[])
 {
     try
     {
+        std::string basePath = ell::utilities::GetDirectoryPath(argv[0]);
+
         // Format tests
         TestMatchFormat();
 
@@ -85,7 +88,7 @@ int main()
 
         // File system tests
         TestStringf();
-        TestUnicodePaths();
+        TestUnicodePaths(basePath);
     }
     catch (const utilities::Exception& exception)
     {

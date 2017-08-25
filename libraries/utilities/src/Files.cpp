@@ -241,5 +241,36 @@ namespace ell
                 }
             }
         }
+
+        std::string GetWorkingDirectory()
+        {
+            std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+            const int max_path = 8192;
+            int rc = 0;
+            std::string utf8wd;
+#ifdef WIN32
+            wchar_t path[max_path];
+            if (NULL == _wgetcwd(path, max_path)) 
+            {
+                rc = errno;
+            }
+            else 
+            {
+                // convert to utf-8
+                std::wstring cwd(path);
+                utf8wd = converter.to_bytes(cwd);
+            }
+#else
+            char path[max_path];
+            if (nullptr == getcwd(path, max_path)) {
+                rc = errno;
+            }
+            utf8wd = std::string(path);
+#endif
+            if (rc != 0) {
+                throw std::runtime_error(ell::utilities::stringf("error getting current working directory: %d", rc));
+            }
+            return utf8wd;
+        }
     }
 }

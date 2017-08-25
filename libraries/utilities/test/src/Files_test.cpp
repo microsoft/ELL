@@ -36,33 +36,10 @@ namespace ell
         testing::ProcessTest("Stringf with args", ell::utilities::stringf("test %d is %s", 10, "fun") == "test 10 is fun");
     }
 
-    std::string GetUnicodeTestPath() 
+    std::string GetUnicodeTestPath(std::string& basePath)
     {
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        const int max_path = 8192;
-        int rc = 0;
-        std::string utf8wd;
-#ifdef WIN32
-        wchar_t path[max_path];
-        if (NULL == _wgetcwd(path, max_path)) {
-            rc = errno;
-        }
-        else {
-            // convert to utf-8
-            std::wstring cwd(path);
-            utf8wd = converter.to_bytes(cwd);
-        }
-#else
-        char path[max_path];
-        if (nullptr == getcwd(path, max_path)) {
-            rc = errno;
-        }
-        utf8wd = std::string(path);
-#endif
-        if (rc != 0) {
-            throw std::runtime_error(ell::utilities::stringf("error getting current working directory: %d", rc));
-        }
-        std::string testing = ell::utilities::JoinPaths(utf8wd, "Testing");
+        std::string testing = ell::utilities::JoinPaths(basePath, "Testing");
         std::string unicode = ell::utilities::JoinPaths(testing, "Unicode");
 
         // chinese for 'test'
@@ -73,19 +50,14 @@ namespace ell
         return testdir;
     }
 
-    void TestDirectories()
+    void TestUnicodePaths(std::string& basePath)
     {
-        auto testdir = GetUnicodeTestPath();
+        auto testdir = GetUnicodeTestPath(basePath);
         ell::utilities::EnsureDirectoryExists(testdir);
         testing::ProcessTest("Unicode paths", ell::utilities::DirectoryExists(testdir));
-    }
 
-    void TestUnicodePaths()
-    {
-        TestDirectories();
-
-        auto testdir = GetUnicodeTestPath();
         std::string testContent = "this is a test";
+        int testContentLength = testContent.size();
 
         // chinese for 'banana.txt'
         std::wstring banana(L"\u9999\u8549.txt");
@@ -94,12 +66,13 @@ namespace ell
         std::string testfile = ell::utilities::JoinPaths(testdir, utf8banana);
         {
             auto outputStream = ell::utilities::OpenOfstream(testfile);
-            outputStream.write(testContent.c_str(), testContent.size());
+            outputStream.write(testContent.c_str(), testContentLength);
         } 
         {
             auto inputStream = ell::utilities::OpenIfstream(testfile);
             char buffer[100];
-            inputStream.read(buffer, testContent.size());
+            inputStream.read(buffer, testContentLength);
+            buffer[testContentLength] = '\0';
             std::string actual(buffer);
 
             testing::ProcessTest("Unicode file names", actual == testContent);
