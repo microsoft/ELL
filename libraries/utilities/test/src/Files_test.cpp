@@ -21,9 +21,6 @@
 #include <cstring>
 #include <codecvt>
 #include <locale>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 
 namespace ell
 {
