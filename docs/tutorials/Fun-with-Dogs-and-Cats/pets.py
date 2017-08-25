@@ -73,6 +73,10 @@ class Demo:
             else:
                 caption = ""
 
+            if (caption != lastCaption):
+                print(caption)
+                lastCaption = caption
+
             save = False
             if (text != lastPrediction and text != ""):
                 save = True
@@ -81,10 +85,6 @@ class Demo:
                     self.play(self.woof)
                 elif (text == "Cat"):
                     self.play(self.meow)
-
-            if (caption != lastCaption):
-                print(caption)
-                lastCaption = caption
 
             # Draw the text on the frame
             frameToShow = frame

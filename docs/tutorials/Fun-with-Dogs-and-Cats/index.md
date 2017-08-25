@@ -45,6 +45,8 @@ Add the following files to the pi3 folder:
 - [meow.wav](/ELL/tutorials/Fun-with-Dogs-and-Cats/meow.wav)
 - [pets.py](/ELL/tutorials/Fun-with-Dogs-and-Cats/pets.py)
 
+    cp ~/git/ELL/tutorials/Fun-with-Dogs-and-Cats/* pi3
+
 You can now copy this folder using the 'scp' tool.  From Windows you can use [WinSCP](https://winscp.net/eng/index.php).
 
 ### SSH into Raspberry Pi
@@ -66,7 +68,7 @@ This builds the Python Module that is then loadable by the pets.py script.
 ### Process a static image 
 
 Now if you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-pi-setup) you should have a miniconda
-environment named py34.  So to run the tutorial do this:
+environment named py34, so to run the tutorial do this:
 
 ````
 source activate py34
@@ -125,3 +127,11 @@ If you run into trouble there's some troubleshooting instructions at the bottom 
 [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-pi-setup).
 
 
+### Licenses
+
+The dog barking sound was recorded by davidmenke and published by freesounds.org under
+[Creative Commons License Zero](https://creativecommons.org/publicdomain/zero/1.0/).
+
+The cat meow was recorded by blimp66 and published by freesounds.org under
+[Creative Commons License Attribution](https://creativecommons.org/licenses/by/3.0/)
+then the sound was edited, downsampled and converted to wav format to shrink the file size.
