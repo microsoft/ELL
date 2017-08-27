@@ -66,7 +66,7 @@ namespace nodes
         llvm::Value* bufferedSampleTime = function.Load(pBufferedSampleTime);
 
         // Callback function
-        const emitters::ValueTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
+        const emitters::VariableTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
         function.GetModule().DeclareFunction(_samplingFunctionName, emitters::GetVariableType<bool>(), parameters);
         function.GetModule().IncludeInHeader(_samplingFunctionName);
         function.GetModule().IncludeInCallbackInterface(_samplingFunctionName, "SourceNode");

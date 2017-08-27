@@ -583,7 +583,7 @@ namespace emitters
     //
     // Functions
     //
-    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const ValueTypeList* pArguments)
+    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const VariableTypeList* pArguments)
     {
         // ??? Why doesn't this use getOrInsertFunction?
         return Function(pModule, name, returnType, llvm::Function::LinkageTypes::ExternalLinkage, pArguments);
@@ -602,7 +602,7 @@ namespace emitters
         return static_cast<llvm::Function*>(pModule->getOrInsertFunction(name, type));
     }
 
-    llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const ValueTypeList* pArguments)
+    llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const VariableTypeList* pArguments)
     {
         assert(pModule != nullptr);
 
@@ -755,7 +755,7 @@ namespace emitters
         return _irBuilder.CreateMemSet(pDestination, value, size, 0, true);
     }
 
-    llvm::Function* IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const ValueTypeList& arguments)
+    llvm::Function* IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const VariableTypeList& arguments)
     {
         assert(pModule != nullptr);
         auto types = GetLLVMTypes(arguments);
@@ -887,11 +887,19 @@ namespace emitters
         return _irBuilder.CreateBr(pDestination);
     }
 
-    llvm::StructType* IREmitter::Struct(const std::string& name, const ValueTypeList& fields)
+    llvm::StructType* IREmitter::DeclareStruct(const std::string& name, const VariableTypeList& fields)
     {
-        // TODO: Look up in table first
-        auto types = GetLLVMTypes(fields);
-        return llvm::StructType::create(_llvmContext, types, name);
+        LLVMTypeList llvmFields;
+        for(const auto& field: fields)
+        {
+            llvmFields.push_back(Type(field));
+        }
+        return DeclareStruct(name, llvmFields);
+    }
+
+    llvm::StructType* IREmitter::DeclareStruct(const std::string& name, const LLVMTypeList& fields)
+    {
+        return llvm::StructType::create(_llvmContext, fields, name);
     }
 
     llvm::Type* IREmitter::GetVariableType(VariableType type)
@@ -948,7 +956,7 @@ namespace emitters
         return llvm::ConstantInt::get(_llvmContext, llvm::APInt(SizeOf(type), value, true));
     }
 
-    std::vector<llvm::Type*> IREmitter::GetLLVMTypes(const ValueTypeList& types)
+    std::vector<llvm::Type*> IREmitter::GetLLVMTypes(const VariableTypeList& types)
     {
         std::vector<llvm::Type*> llvmTypes;
         for (auto t : types)

@@ -53,6 +53,7 @@ set (include
     include/IRRuntime.h
     include/IRSwigInterfaceWriter.h
     include/LLVMInclude.h
+    include/LLVMUtilities.h
     include/ModuleEmitter.h
     include/ScalarVariable.h
     include/SymbolTable.h

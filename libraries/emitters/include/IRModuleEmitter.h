@@ -14,6 +14,7 @@
 #include "IRExecutionEngine.h"
 #include "IRFunctionEmitter.h"
 #include "IRRuntime.h"
+#include "LLVMUtilities.h"
 #include "ModuleEmitter.h"
 #include "ScalarVariable.h"
 #include "VectorVariable.h"
@@ -106,7 +107,7 @@ namespace emitters
         /// <param name="functionName"> The name of the function. </param>
         /// <param name="returnType"> The return type of the function. </param>
         /// <param name="args"> The arguments to the function. </param>
-        IRFunctionEmitter& BeginFunction(const std::string& functionName, VariableType returnType, const ValueTypeList& args);
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, VariableType returnType, const VariableTypeList& args);
 
         /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
         ///
@@ -167,7 +168,7 @@ namespace emitters
         /// <param name="value"> The value of the constant. </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the constant. </returns>
-        template <typename ValueType>
+        template<typename ValueType>
         llvm::GlobalVariable* Constant(const std::string& name, ValueType value);
 
         /// <summary> Emit a named, module scoped constant vector. </summary>
@@ -185,7 +186,7 @@ namespace emitters
         /// <param name="value"> The array constant value. </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the constant. </returns>
-        template <typename ValueType>
+        template<typename ValueType>
         llvm::GlobalVariable* ConstantArray(const std::string& name, const std::vector<ValueType>& value);
 
         /// <summary> Emit a named global variable of the given type. </summary>
@@ -237,7 +238,7 @@ namespace emitters
         /// <param name="value"> The value of the array. </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
-        template <typename ValueType>
+        template<typename ValueType>
         llvm::GlobalVariable* GlobalArray(const std::string& name, const std::vector<ValueType>& value);
 
         //
@@ -255,7 +256,7 @@ namespace emitters
         /// <param name="name"> The function name. </param>
         /// <param name="returnType"> The function return type. </param>
         /// <param name="arguments"> The function arguments. </param>
-        void DeclareFunction(const std::string& name, VariableType returnType, const ValueTypeList& arguments);
+        void DeclareFunction(const std::string& name, VariableType returnType, const VariableTypeList& arguments);
 
         /// <summary>
         /// Emit a declaration of an external function with the given return type and named arguments.
@@ -298,21 +299,21 @@ namespace emitters
         // Types
         //
 
-        /// <summary> Emit a module scoped struct with the given fields. </summary>
+        /// <summary> Emit a module-scoped struct with the given fields. </summary>
         ///
         /// <param name="name"> The struct name. </param>
         /// <param name="fields"> The struct fields. </param>
         ///
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
-        llvm::StructType* Struct(const std::string& name, const std::initializer_list<VariableType>& fields);
+        llvm::StructType* DeclareStruct(const std::string& name, const NamedVariableTypeList& fields);
 
-        /// <summary> Emit a module scoped struct with the given fields. </summary>
+        /// <summary> Emit a module-scoped struct with the given fields. </summary>
         ///
         /// <param name="name"> The struct name. </param>
         /// <param name="fields"> The struct fields. </param>
         ///
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
-        llvm::StructType* Struct(const std::string& name, const std::vector<VariableType>& fields);
+        llvm::StructType* DeclareStruct(const std::string& name, const NamedLLVMTypeList& fields);
 
         //
         // Code annotation
@@ -349,29 +350,50 @@ namespace emitters
         /// <param name="value"> The value to set for the symbol. </param>
         void AddPreprocessorDefinition(const std::string& name, const std::string& value);
 
-        /// <summary> Indicates if the module or given function has the associated metadata. </summary>
+        /// <summary> Indicates if the module has the associated metadata. </summary>
         ///
-        /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        ///
+        /// <returns> `true` if the module has the metadata associated with it. </returns>
+        virtual bool HasMetadata(const std::string& tag) override;
+
+        /// <summary> Indicates if a given function has the associated metadata. </summary>
+        ///
+        /// <param name="functionName"> The name of the function. </param>
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> `true` if the function has the metadata associated with it. </returns>
-        virtual bool HasMetadata(const std::string& functionName, const std::string& tag) override;
+        virtual bool HasFunctionMetadata(const std::string& functionName, const std::string& tag) override;
 
-        /// <summary> Gets the metadata associated with the module or given function. </summary>
+        /// <summary> Gets the metadata associated with the module. </summary>
         ///
-        /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> The metadata values, as a vector of strings. </returns>
-        virtual std::vector<std::string> GetMetadata(const std::string& functionName, const std::string& tag) override;
-
-        /// <summary> Associates metadata with the module or given function. </summary>
+        virtual std::vector<std::vector<std::string>> GetMetadata(const std::string& tag) override;
+        
+        /// <summary> Gets the metadata associated with a given function. </summary>
         ///
-        /// <param name="functionName"> The name of the function for function-level metadata, or empty string for the module. </param>
+        /// <param name="functionName"> The name of the function for function-level metadata. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        ///
+        /// <returns> The metadata values, as a vector of strings. </returns>
+        virtual std::vector<std::string> GetFunctionMetadata(const std::string& functionName, const std::string& tag) override;
+
+        /// <summary> Associates metadata with the module. </summary>
+        ///
         /// <param name="tag"> The metadata tag. </param>
         /// <param name="content"> Optional metadata value. </param>
         /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
-        virtual void InsertMetadata(const std::string& functionName, const std::string& tag, const std::string& value = "") override;
+        virtual void InsertMetadata(const std::string& tag, const std::vector<std::string>& value = { "" }) override;
+
+        /// <summary> Associates metadata with a given function. </summary>
+        ///
+        /// <param name="functionName"> The name of the function. </param>
+        /// <param name="tag"> The metadata tag. </param>
+        /// <param name="content"> Optional metadata value. </param>
+        /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
+        virtual void InsertFunctionMetadata(const std::string& functionName, const std::string& tag, const std::vector<std::string>& value = { "" }) override;
 
         //
         // Code output / input
@@ -449,7 +471,7 @@ namespace emitters
         /// <summary> Emit declaration of GetXXClockMilliseconds. </summary>
         ///
         /// <typeparam name="ClockType"> The clock type. </typeparam>
-        template <typename ClockType>
+        template<typename ClockType>
         void DeclareGetClockMilliseconds();
 
         /// <summary> Add a main function into which you will inject debugging code. </summary>
@@ -530,51 +552,51 @@ namespace emitters
         llvm::Value* EmitVariable(Variable& var);
 
         // Templated version implementing above
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitVariable(Variable& var);
 
         /// Emit IR for a scalar variable.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitScalar(Variable& var);
 
         /// Emit IR for a vector variable.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitVector(Variable& var);
 
         /// Emit IR for a constant.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitLiteral(LiteralVariable<T>& var);
 
         /// Emit IR for a Global scalar with an initial value.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitGlobal(InitializedScalarVariable<T>& var);
 
         /// Emit IR for a stack scalar variable.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitLocal(ScalarVariable<T>& var);
 
         /// Emit IR for a stack scalar variable with an initial value.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitLocal(InitializedScalarVariable<T>& var);
 
         /// Emit IR for a constant vector.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitLiteralVector(LiteralVectorVariable<T>& var);
 
         /// Emit IR for a global vector. Global is initialized to zero.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitGlobalVector(VectorVariable<T>& var);
 
         /// Emit IR for a global vector with initial values.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitGlobalVector(InitializedVectorVariable<T>& var);
 
         /// Emit IR for a reference to an element in a vector.
-        template <typename T>
+        template<typename T>
         llvm::Value* EmitRef(VectorElementVariable<T>& var);
 
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, bool isPublic = false);
-        IRFunctionEmitter Function(const std::string& name, VariableType returnType, const ValueTypeList& arguments, bool isPublic = false);
+        IRFunctionEmitter Function(const std::string& name, VariableType returnType, const VariableTypeList& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType>& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes, bool isPublic = false);
@@ -587,7 +609,7 @@ namespace emitters
         // Lower-level internal functions
         //
         llvm::GlobalVariable* Global(const std::string& name, llvm::Type* pType, llvm::Constant* pInitial, bool isConst);
-        IRFunctionEmitter Function(const std::string& name, VariableType returnType, const ValueTypeList* pArguments, bool isPublic);
+        IRFunctionEmitter Function(const std::string& name, VariableType returnType, const VariableTypeList* pArguments, bool isPublic);
         llvm::Function::LinkageTypes Linkage(bool isPublic);
         llvm::ConstantAggregateZero* InitializeArray(llvm::ArrayType* pType);
 

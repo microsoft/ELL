@@ -9,17 +9,18 @@
 
 #include "EmitterTypes.h"
 #include "Exception.h"
+#include "LLVMUtilities.h"
 #include "SymbolTable.h"
 
 // llvm
-#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constant.h"
+#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Value.h"
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/BasicBlock.h"
 
 // stl
 #include <unordered_map>
@@ -34,18 +35,18 @@ namespace emitters
 
     /// <summary> Symbol Table that maps symbol Names to emitted IR Value* </summary>
     using IRVariableTable = SymbolTable<llvm::Value*>;
-    
+
     /// <summary> Symbol Table that maps type Names to emitted IR Type* </summary>
     using IRTypeTable = SymbolTable<llvm::Type*>;
 
     /// <summary> Convert LLVM errors into an ELL styled exception </summary>
     using LLVMException = utilities::ErrorCodeException<std::error_code>;
 
-    /// <summary> 
+    /// <summary>
     /// Wraps the LLVM API with an easy to use object model that hides some unncessary detail.
     /// Incorporates our own x-compiler abstractions such as VariableType and TypedOperator.
     ///
-    /// Note: IREmitter is stateful. It has a "current block" that it is emitting IR into. 
+    /// Note: IREmitter is stateful. It has a "current block" that it is emitting IR into.
     /// </summary>
     class IREmitter
     {
@@ -198,7 +199,7 @@ namespace emitters
         /// <param name="value"> The pointer value. </param>
         ///
         /// <returns> Pointer to an llvm::Constant that represents an pointer. </returns>
-        template <typename ValueType>
+        template<typename ValueType>
         llvm::Constant* Pointer(ValueType* ptr);
 
         /// <summary> Emit a Zero value of the given type. </summary>
@@ -242,7 +243,7 @@ namespace emitters
         /// <param name="pValue"> Pointer to the input value. </param>
         ///
         /// <returns> Pointer to the output value. </returns>
-        template <typename InputType, typename OutputType>
+        template<typename InputType, typename OutputType>
         llvm::Value* CastValue(llvm::Value* pValue);
 
         /// <summary> Emit a cast operation from one one type to another. </summary>
@@ -356,7 +357,7 @@ namespace emitters
         /// <param name="pArguments"> Function arguments. </param>
         ///
         /// <returns> Pointer to the declared function. </returns>
-        llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const ValueTypeList* pArguments = nullptr);
+        llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const VariableTypeList* pArguments = nullptr);
 
         /// <summary> Emit a declaration for an extern function. </summary>
         ///
@@ -386,7 +387,7 @@ namespace emitters
         /// <param name="pArguments"> Function arguments. </param>
         ///
         /// <returns> Pointer to the declared function. </returns>
-        llvm::Function* Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const ValueTypeList* pArguments);
+        llvm::Function* Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const VariableTypeList* pArguments);
 
         /// <summary> Emits the function declaration and arguments, when beginning a new function. </summary>
         ///
@@ -398,7 +399,7 @@ namespace emitters
         ///
         /// <returns> Pointer to the declared function. </returns>
         llvm::Function* Function(llvm::Module* pModule, const std::string& name, VariableType returnType, llvm::Function::LinkageTypes linkage, const NamedVariableTypeList& arguments);
-        
+
         /// <summary> Emits the function declaration and arguments, when beginning a new function. </summary>
         ///
         /// <param name="pModule"> The module in which the function is declared. </param>
@@ -533,7 +534,7 @@ namespace emitters
         /// <param name="arguments"> The arguments. </param>
         ///
         /// <returns> Pointer to the intrinsic function. </returns>
-        llvm::Function* GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const ValueTypeList& arguments);
+        llvm::Function* GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const VariableTypeList& arguments);
 
         /// <summary> Emit a Phi instruction. </summary>
         ///
@@ -658,13 +659,21 @@ namespace emitters
         /// <returns> Pointer to a llvm::BranchInst that represents the branch. </returns>
         llvm::BranchInst* Branch(llvm::BasicBlock* pDestination);
 
-        /// <summary> Emits a declaration of a new Struct with the given members. </summary>
+        /// <summary> Emits a declaration of a new Struct with the given fields. </summary>
         ///
         /// <param name="name"> The struct name. </param>
-        /// <param name="members"> The list of struct members. </param>
+        /// <param name="fields"> The list of struct fields. </param>
         ///
         /// <returns> Pointer to a llvm::StructType that represents the declared struct. </returns>
-        llvm::StructType* Struct(const std::string& name, const ValueTypeList& members);
+        llvm::StructType* DeclareStruct(const std::string& name, const VariableTypeList& fields);
+
+        /// <summary> Emits a declaration of a new Struct with the given fields. </summary>
+        ///
+        /// <param name="name"> The struct name. </param>
+        /// <param name="fields"> The list of struct fields. </param>
+        ///
+        /// <returns> Pointer to a llvm::StructType that represents the declared struct. </returns>
+        llvm::StructType* DeclareStruct(const std::string& name, const LLVMTypeList& fields);
 
         /// <summary> Emits a new module with a given name. </summary>
         ///
@@ -712,9 +721,9 @@ namespace emitters
 
         /// <summary> Converts a list of ELL types to LLVM Type* values. </summary>
         ///
-        /// <param name="types"> The ValueTypeList of ELL types. </param>
+        /// <param name="types"> The VariableTypeList of ELL types. </param>
         /// <returns> A std::vector of llvm::Type* values. </returns>
-        std::vector<llvm::Type*> GetLLVMTypes(const ValueTypeList& types);
+        std::vector<llvm::Type*> GetLLVMTypes(const VariableTypeList& types);
 
     private:
         llvm::Type* GetVariableType(VariableType type);

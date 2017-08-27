@@ -44,6 +44,9 @@ namespace ell
 {
 namespace model
 {
+    using NodeInfo = ::NodeInfo;
+    using PerformaceCounters = ::PerformanceCounters;
+    
     /// <summary> A utility class that emits IR to populate NodeInfo structs. </summary>
     class NodeInfoEmitter
     {

@@ -85,12 +85,12 @@ namespace emitters
     {
         auto currentPos = _emitter.GetCurrentInsertPoint();
         // assert(currentBlock != nullptr);
-        IRFunctionEmitter newFunction = Function(functionName, returnType, ValueTypeList{}, true);
+        IRFunctionEmitter newFunction = Function(functionName, returnType, VariableTypeList{}, true);
         _functionStack.emplace(newFunction, currentPos);
         return _functionStack.top().first;
     }
 
-    IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, const ValueTypeList& args)
+    IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, const VariableTypeList& args)
     {
         auto currentPos = _emitter.GetCurrentInsertPoint();
         // assert(currentBlock != nullptr);
@@ -180,76 +180,95 @@ namespace emitters
         _functionComments[functionName] = comments;
     }
 
-    std::vector<std::string> IRModuleEmitter::GetMetadata(const std::string& functionName, const std::string& tag)
+    // Module metadata
+    std::vector<std::vector<std::string>> IRModuleEmitter::GetMetadata(const std::string& tag)
     {
-        if (!HasMetadata(functionName, tag))
+        if (!HasMetadata(tag))
+        {
+            throw EmitterException(EmitterError::metadataNotFound);
+        }
+
+        std::vector<std::vector<std::string>> values;
+        const llvm::NamedMDNode* metadata = _pModule->getNamedMetadata(tag);
+        for (const auto& op : metadata->operands()) // op is an MDNode*
+        {
+            std::vector<std::string> opValues;
+            for (const auto& innerOp : op->operands())
+            {
+                opValues.push_back(llvm::cast<llvm::MDString>(innerOp)->getString());
+            }
+            values.push_back(opValues);
+        }
+        return values;
+    }
+
+    // Function metadata
+    std::vector<std::string> IRModuleEmitter::GetFunctionMetadata(const std::string& functionName, const std::string& tag)
+    {
+        if (!HasFunctionMetadata(functionName, tag))
         {
             throw EmitterException(EmitterError::metadataNotFound);
         }
 
         std::vector<std::string> values;
-        if (functionName.length() == 0)
+        auto pFunction = GetFunction(functionName);
+        const llvm::MDNode* metadata = pFunction->getMetadata(tag);
+        for (const auto& op : metadata->operands())
         {
-            // Module metadata
-            const llvm::NamedMDNode* metadata = _pModule->getNamedMetadata(tag);
-            for (const auto& op : metadata->operands())
-            {
-                values.push_back(llvm::cast<llvm::MDString>(op->getOperand(0))->getString());
-            }
-        }
-        else
-        {
-            // Function metadata
-            auto pFunction = GetFunction(functionName);
-            const llvm::MDNode* metadata = pFunction->getMetadata(tag);
-
             // llvm::Function::setMetadata appears to only support single entries?
-            values.push_back(llvm::cast<llvm::MDString>(metadata->getOperand(0))->getString());
+            values.push_back(llvm::cast<llvm::MDString>(op)->getString());
         }
         return values;
     }
 
-    bool IRModuleEmitter::HasMetadata(const std::string& functionName, const std::string& tag)
+    // Module metadata
+    bool IRModuleEmitter::HasMetadata(const std::string& tag)
     {
-        if (functionName.length() == 0)
-        {
-            // Module metadata
-            return (_pModule->getNamedMetadata(tag) != nullptr);
-        }
-        else
-        {
-            // Function metadata
-            auto pFunction = GetFunction(functionName);
-            if (pFunction == nullptr)
-            {
-                throw EmitterException(EmitterError::functionNotFound);
-            }
-            return (pFunction->getMetadata(tag) != nullptr);
-        }
+        return (_pModule->getNamedMetadata(tag) != nullptr);
     }
 
-    void IRModuleEmitter::InsertMetadata(const std::string& functionName, const std::string& tag, const std::string& value)
+    // Function metadata
+    bool IRModuleEmitter::HasFunctionMetadata(const std::string& functionName, const std::string& tag)
     {
-        llvm::Metadata* metadataElements[] = { llvm::MDString::get(_emitter.GetContext(), value) };
+        auto pFunction = GetFunction(functionName);
+        if (pFunction == nullptr)
+        {
+            throw EmitterException(EmitterError::functionNotFound);
+        }
+        return (pFunction->getMetadata(tag) != nullptr);
+    }
+
+    // Module metadata
+    void IRModuleEmitter::InsertMetadata(const std::string& tag, const std::vector<std::string>& values)
+    {
+        std::vector<llvm::Metadata*> metadataElements;
+        for (const auto& value : values)
+        {
+            metadataElements.push_back({ llvm::MDString::get(_emitter.GetContext(), value) });
+        }
+
         auto metadataNode = llvm::MDNode::get(_emitter.GetContext(), metadataElements);
+        auto metadata = _pModule->getOrInsertNamedMetadata(tag);
+        metadata->addOperand(metadataNode);
+    }
 
-        if (functionName.length() == 0)
+    // Function metadata
+    void IRModuleEmitter::InsertFunctionMetadata(const std::string& functionName, const std::string& tag, const std::vector<std::string>& values)
+    {
+        std::vector<llvm::Metadata*> metadataElements;
+        for (const auto& value : values)
         {
-            // Module metadata
-            auto metadata = _pModule->getOrInsertNamedMetadata(tag);
-            metadata->addOperand(metadataNode);
+            metadataElements.push_back({ llvm::MDString::get(_emitter.GetContext(), value) });
         }
-        else
-        {
-            // Function metadata
-            auto pFunction = GetFunction(functionName);
-            if (pFunction == nullptr)
-            {
-                throw EmitterException(EmitterError::functionNotFound);
-            }
 
-            pFunction->setMetadata(tag, metadataNode);
+        auto metadataNode = llvm::MDNode::get(_emitter.GetContext(), metadataElements);
+        auto pFunction = GetFunction(functionName);
+        if (pFunction == nullptr)
+        {
+            throw EmitterException(EmitterError::functionNotFound);
         }
+
+        pFunction->setMetadata(tag, metadataNode);
     }
 
     //
@@ -365,7 +384,7 @@ namespace emitters
         _emitter.DeclareFunction(GetLLVMModule(), name, returnType, nullptr);
     }
 
-    void IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const ValueTypeList& arguments)
+    void IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const VariableTypeList& arguments)
     {
         _emitter.DeclareFunction(GetLLVMModule(), name, returnType, &arguments);
     }
@@ -385,14 +404,14 @@ namespace emitters
         return Function(name, returnType, nullptr, isPublic);
     }
 
-    IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const ValueTypeList& arguments, bool isPublic)
+    IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const VariableTypeList& arguments, bool isPublic)
     {
         return Function(name, returnType, &arguments, isPublic);
     }
 
     IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType>& arguments, bool isPublic)
     {
-        ValueTypeList valueTypeList = arguments;
+        VariableTypeList valueTypeList = arguments;
         return Function(name, returnType, &valueTypeList, isPublic);
     }
 
@@ -408,7 +427,7 @@ namespace emitters
         return IRFunctionEmitter(this, &_emitter, pFunction, arguments, name);
     }
 
-    IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const ValueTypeList* pArguments, bool isPublic)
+    IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, const VariableTypeList* pArguments, bool isPublic)
     {
         llvm::Function* pFunction = _emitter.Function(GetLLVMModule(), name, returnType, Linkage(isPublic), pArguments);
         if (pFunction == nullptr)
@@ -440,7 +459,7 @@ namespace emitters
 
     llvm::Function* IRModuleEmitter::GetIntrinsic(llvm::Intrinsic::ID id, const std::initializer_list<VariableType>& arguments)
     {
-        ValueTypeList valueTypeList = arguments;
+        VariableTypeList valueTypeList = arguments;
         return _emitter.GetIntrinsic(GetLLVMModule(), id, valueTypeList);
     }
 
@@ -448,15 +467,36 @@ namespace emitters
     // Types
     //
 
-    llvm::StructType* IRModuleEmitter::Struct(const std::string& name, const std::initializer_list<VariableType>& fields)
+    llvm::StructType* IRModuleEmitter::DeclareStruct(const std::string& name, const NamedVariableTypeList& fields)
     {
-        ValueTypeList valueTypeList = fields;
-        return _emitter.Struct(name, valueTypeList);
+        std::vector<std::string> fieldNames;
+        std::vector<VariableType> types;
+        for(const auto& field: fields)
+        {
+            fieldNames.push_back(field.first);
+            types.push_back(field.second);
+        }
+
+        auto structType = _emitter.DeclareStruct(name, types);
+        auto tag = GetStructFieldsTagName(structType);
+        InsertMetadata(tag, fieldNames);
+        return structType;
     }
 
-    llvm::StructType* IRModuleEmitter::Struct(const std::string& name, const std::vector<VariableType>& fields)
+    llvm::StructType* IRModuleEmitter::DeclareStruct(const std::string& name, const NamedLLVMTypeList& fields)
     {
-        return _emitter.Struct(name, fields);
+        std::vector<std::string> fieldNames;
+        std::vector<LLVMType> types;
+        for(const auto& field: fields)
+        {
+            fieldNames.push_back(field.first);
+            types.push_back(field.second);
+        }
+
+        auto structType = _emitter.DeclareStruct(name, types);
+        auto tag = GetStructFieldsTagName(structType);
+        InsertMetadata(tag, fieldNames);
+        return structType;
     }
 
     //
@@ -649,13 +689,13 @@ namespace emitters
         DeclareFunction("free", VariableType::Void, { VariableType::BytePointer });
     }
 
-    template <>
+    template<>
     void IRModuleEmitter::DeclareGetClockMilliseconds<std::chrono::steady_clock>()
     {
         DeclareFunction("ELL_GetSteadyClockMilliseconds", VariableType::Double);
     }
 
-    template <>
+    template<>
     void IRModuleEmitter::DeclareGetClockMilliseconds<std::chrono::system_clock>()
     {
         DeclareFunction("ELL_GetSystemClockMilliseconds", VariableType::Double);
@@ -709,17 +749,17 @@ namespace emitters
 
     void IRModuleEmitter::IncludeInHeader(const std::string& functionName)
     {
-        InsertMetadata(functionName, c_declareInHeaderTagName);
+        InsertFunctionMetadata(functionName, c_declareFunctionInHeaderTagName);
     }
 
     void IRModuleEmitter::IncludeTypeInHeader(const std::string& typeName)
     {
-        InsertMetadata("", c_declareInHeaderTagName, typeName);
+        InsertMetadata(c_declareTypeInHeaderTagName, { typeName });
     }
 
     void IRModuleEmitter::IncludeInCallbackInterface(const std::string& functionName, const std::string& nodeName)
     {
-        InsertMetadata(functionName, c_callbackFunctionTagName, nodeName);
+        InsertFunctionMetadata(functionName, c_callbackFunctionTagName, { nodeName });
     }
 
     //

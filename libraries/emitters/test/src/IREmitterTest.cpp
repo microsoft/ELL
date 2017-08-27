@@ -113,7 +113,7 @@ void TestLLVM()
     IRModuleEmitter module("Looper");
     module.DeclarePrintf();
 
-    llvm::StructType* structType = module.Struct("ShiftRegister", { VariableType::Int32, VariableType::Double });
+    llvm::StructType* structType = module.DeclareStruct("ShiftRegister", { { "size", VariableType::Int32 }, { "value", VariableType::Double } });
 
     std::vector<double> data({ 3.3, 4.4, 5.5, 6.6, 7.7 });
     llvm::GlobalVariable* pData = module.ConstantArray("g_weights", data);
@@ -428,9 +428,9 @@ void TestMetadata()
     fn.Verify();
 
     // Module-level metadata
-    module.InsertMetadata("", "hello.world");
-    module.InsertMetadata("", "hello.world.content", "12345");
-    module.InsertMetadata("", "hello.world.content", "67890");
+    module.InsertMetadata("hello.world");
+    module.InsertMetadata("hello.world.content", { "12345" });
+    module.InsertMetadata("hello.world.content", { "67890" });
 
     auto fnMain = module.BeginMainFunction();
     fnMain.Call("TestMetadata");
@@ -438,30 +438,40 @@ void TestMetadata()
     module.DebugDump();
 
     // Missing metadata
-    testing::ProcessTest("Testing missing module metadata check", testing::IsEqual(module.HasMetadata("", "does.not.exist"), false));
-    testing::ProcessTest("Testing missing function metadata check", testing::IsEqual(module.HasMetadata("TestMetadata", "fn.does.not.exist"), false));
+    testing::ProcessTest("Testing missing module metadata check", testing::IsEqual(module.HasMetadata("does.not.exist"), false));
+    testing::ProcessTest("Testing missing function metadata check", testing::IsEqual(module.HasFunctionMetadata("TestMetadata", "fn.does.not.exist"), false));
 
     // Empty metadata
-    std::vector<std::string> actual = module.GetMetadata("", "hello.world");
+    auto actualModuleMetadata = module.GetMetadata("hello.world");
+    std::vector<std::string> flattenedModuleMetadata;
+    for(auto m: actualModuleMetadata)
+    {
+        flattenedModuleMetadata.push_back(m[0]);
+    }
     std::vector<std::string> expected{ "" };
-    testing::ProcessTest("Testing empty module metadata check", testing::IsEqual(module.HasMetadata("", "hello.world"), true));
-    testing::ProcessTest("Testing empty module metadata get", testing::IsEqual(actual, expected));
-    actual = module.GetMetadata("TestMetadata", "hello.fn");
-    testing::ProcessTest("Testing empty function metadata check", testing::IsEqual(module.HasMetadata("TestMetadata", "hello.fn"), true));
-    testing::ProcessTest("Testing empty function metadata get", testing::IsEqual(actual, expected));
-
+    testing::ProcessTest("Testing empty module metadata check", testing::IsEqual(module.HasMetadata("hello.world"), true));
+    testing::ProcessTest("Testing empty module metadata get", testing::IsEqual(flattenedModuleMetadata, expected));
+    std::vector<std::string> actualFunctionMetadata = module.GetFunctionMetadata("TestMetadata", "hello.fn");
+    testing::ProcessTest("Testing empty function metadata check", testing::IsEqual(module.HasFunctionMetadata("TestMetadata", "hello.fn"), true));
+    testing::ProcessTest("Testing empty function metadata get", testing::IsEqual(actualFunctionMetadata, expected));
+    
     // Non-empty metadata
-    actual = module.GetMetadata("", "hello.world.content");
+    actualModuleMetadata = module.GetMetadata("hello.world.content");
+    flattenedModuleMetadata.clear();
+    for(auto m: actualModuleMetadata)
+    {
+        flattenedModuleMetadata.push_back(m[0]);
+    }
     expected.clear();
     expected.push_back("12345");
     expected.push_back("67890");
-    testing::ProcessTest("Testing non-empty module metadata check", testing::IsEqual(module.HasMetadata("", "hello.world.content"), true));
-    testing::ProcessTest("Testing non-empty module metadata get", testing::IsEqual(actual, expected));
-    actual = module.GetMetadata("TestMetadata", "hello.fn.content");
+    testing::ProcessTest("Testing non-empty module metadata check", testing::IsEqual(module.HasMetadata("hello.world.content"), true));
+    testing::ProcessTest("Testing non-empty module metadata get", testing::IsEqual(flattenedModuleMetadata, expected));
+    actualFunctionMetadata = module.GetFunctionMetadata("TestMetadata", "hello.fn.content");
     expected.clear();
     expected.push_back("test content");
-    testing::ProcessTest("Testing non-empty function metadata check", testing::IsEqual(module.HasMetadata("TestMetadata", "hello.fn.content"), true));
-    testing::ProcessTest("Testing non-empty function metadata get", testing::IsEqual(actual, expected));
+    testing::ProcessTest("Testing non-empty function metadata check", testing::IsEqual(module.HasFunctionMetadata("TestMetadata", "hello.fn.content"), true));
+    testing::ProcessTest("Testing non-empty function metadata get", testing::IsEqual(actualFunctionMetadata, expected));
 
     // Just for fun - metadata should have no effect
     IRExecutionEngine jit(std::move(module));

@@ -182,7 +182,7 @@ namespace emitters
     using NamedVariableType = std::pair<std::string, VariableType>;
 
     ///<summary> Collections of variable types </summary>
-    using ValueTypeList = std::vector<VariableType>;
+    using VariableTypeList = std::vector<VariableType>;
 
     ///<summary> Collections of named variable types </summary>
     using NamedVariableTypeList = std::vector<NamedVariableType>;
