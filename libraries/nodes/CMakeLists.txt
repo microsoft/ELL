@@ -21,7 +21,6 @@ set (include include/AccumulatorNode.h
              include/DotProductNode.h
              include/DTWDistanceNode.h
              include/ExtremalValueNode.h
-             include/EuclideanDistanceNode.h
              include/ForestPredictorNode.h
              include/FullyConnectedLayerNode.h
              include/IRNode.h
@@ -45,6 +44,7 @@ set (include include/AccumulatorNode.h
              include/SinkNode.h
              include/SoftmaxLayerNode.h
              include/SourceNode.h
+             include/SquaredEuclideanDistanceNode.h
              include/SumNode.h
              include/TypeCastNode.h
              include/UnaryOperationNode.h
@@ -82,7 +82,6 @@ set (tcc tcc/AccumulatorNode.tcc
          tcc/DotProductNode.tcc
          tcc/DTWDistanceNode.tcc
          tcc/ExtremalValueNode.tcc
-         tcc/EuclideanDistanceNode.tcc
          tcc/ForestPredictorNode.tcc
          tcc/L2NormNode.tcc
          tcc/MatrixVectorProductNode.tcc
@@ -99,7 +98,8 @@ set (tcc tcc/AccumulatorNode.tcc
          tcc/TypeCastNode.tcc
          tcc/UnaryOperationNode.tcc
          tcc/ValueSelectorNode.tcc
-         tcc/SourceNode.tcc)
+         tcc/SourceNode.tcc
+         tcc/SquaredEuclideanDistanceNode.tcc)
 
 source_group("include" FILES ${include})
 source_group("src" FILES ${src})

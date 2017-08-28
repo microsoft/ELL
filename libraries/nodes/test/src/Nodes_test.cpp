@@ -17,7 +17,7 @@
 #include "DTWDistanceNode.h"
 #include "DelayNode.h"
 #include "DemultiplexerNode.h"
-#include "EuclideanDistanceNode.h"
+#include "SquaredEuclideanDistanceNode.h"
 #include "ForestPredictorNode.h"
 #include "L2NormNode.h"
 #include "LinearPredictorNode.h"
@@ -400,14 +400,14 @@ void TestEuclideanDistanceNodeCompute()
 	v(1, 2) = 0.5;
 
 	std::vector<double> input = { 1, 2, 3 };
-	std::vector<double> output = { std::sqrt(10.53), std::sqrt(8.43) };
+	std::vector<double> output = { 10.53, 8.43 };
 
 	model::Model model;
 	auto inputNode = model.AddNode<model::InputNode<double>>(input.size());
 
 	inputNode->SetInput(input);
 
-	auto euclideanDistanceNode = model.AddNode<nodes::EuclideanDistanceNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, v);
+	auto euclideanDistanceNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, v);
 	auto computeOutput = model.ComputeOutput(euclideanDistanceNode->output);
 
 	testing::ProcessTest("Testing Euclidean distance node compute", testing::IsEqual(output, computeOutput));
@@ -623,7 +623,7 @@ void TestEuclideanDistanceNodeRefine()
 
     inputNode->SetInput(input);
 
-    auto euclideanDistanceNode = model.AddNode<nodes::EuclideanDistanceNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, v);
+    auto euclideanDistanceNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, v);
 
     model::TransformContext context;
     model::ModelTransformer transformer;
