@@ -15,6 +15,7 @@
 #include "L2NormNode.h"
 #include "UnaryOperationNode.h"
 #include "MatrixVectorProductNode.h"
+#include "SquaredEuclideanDistanceNode.h"
 #include "ExtremalValueNode.h"
 
 // utilities
@@ -80,25 +81,19 @@ namespace nodes
         auto prototypes = _predictor.GetPrototypes();
         auto m = _predictor.GetNumPrototypes();
         auto k = _predictor.GetProjectedDimension();
-        auto gammaNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetGamma() * _predictor.GetGamma() * -1);
-        model::PortElements<double> similarityOutputs;
+
+        std::vector<double> multiplier(m, _predictor.GetGamma() * _predictor.GetGamma() * -1);
+        auto gammaNode = transformer.AddNode<ConstantNode<double>>(multiplier);
+
+        // Distance to each prototype
+        auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInputNode->output, prototypes.Transpose());
 
         // Similarity to each prototype
-        for (size_t i = 0; i < m; ++i)
-        {
-            std::vector<double> prototype(prototypes.GetColumn(i).ToArray());
-            auto prototypeNode = transformer.AddNode<ConstantNode<double>>(prototype);
-
-            auto similarityDistanceNode1 = transformer.AddNode<BinaryOperationNode<double>>(projecedInputNode->output, prototypeNode->output, emitters::BinaryOperationType::subtract);
-            auto similarityDistanceNode2 = transformer.AddNode<L2NormNode<double>>(similarityDistanceNode1->output);
-            auto squareSimilarityDistNode = transformer.AddNode<BinaryOperationNode<double>>(similarityDistanceNode2->output, similarityDistanceNode2->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-            auto scaledSimilarityDistNode = transformer.AddNode<BinaryOperationNode<double>>(squareSimilarityDistNode->output, gammaNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-            auto similarityMultiplier = transformer.AddNode<UnaryOperationNode<double>>(scaledSimilarityDistNode->output, emitters::UnaryOperationType::exp);
-            similarityOutputs.Append(similarityMultiplier->output);
-        }
+        auto scaledDistanceNode = transformer.AddNode<BinaryOperationNode<double>>(squareDistanceNode->output, gammaNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
+        auto expDistanceNode = transformer.AddNode<UnaryOperationNode<double>>(scaledDistanceNode->output, emitters::UnaryOperationType::exp);
 
         // Get the prediction label
-        auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(similarityOutputs, _predictor.GetLabelEmbeddings());
+        auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(expDistanceNode->output, _predictor.GetLabelEmbeddings());
         auto predictionLabelNode = transformer.AddNode<ArgMaxNode<double>>(labelScoresNode->output);
 
         transformer.MapNodeOutput(outputScore, predictionLabelNode->val);
