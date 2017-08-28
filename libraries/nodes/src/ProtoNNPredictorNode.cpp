@@ -86,7 +86,8 @@ namespace nodes
         auto gammaNode = transformer.AddNode<ConstantNode<double>>(multiplier);
 
         // Distance to each prototype
-        auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInputNode->output, prototypes.GetConstReference().Transpose());
+        math::RowMatrixReference<double> prototypesMatrix = prototypes.Transpose();
+        auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInputNode->output, prototypesMatrix);
 
         // Similarity to each prototype
         auto scaledDistanceNode = transformer.AddNode<BinaryOperationNode<double>>(squareDistanceNode->output, gammaNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
