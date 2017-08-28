@@ -261,7 +261,7 @@ namespace emitters
     //
     llvm::Function* IRRuntime::GetSGEMVFunction()
     {
-        ValueTypeList argTypes = {
+        VariableTypeList argTypes = {
             VariableType::Int32, // order
             VariableType::Int32, // transpose
             VariableType::Int32, // m
@@ -284,7 +284,7 @@ namespace emitters
 
     llvm::Function* IRRuntime::GetDGEMVFunction()
     {
-        ValueTypeList argTypes = {
+        VariableTypeList argTypes = {
             VariableType::Int32, // order
             VariableType::Int32, // transpose
             VariableType::Int32, // m
@@ -307,7 +307,7 @@ namespace emitters
 
     llvm::Function* IRRuntime::GetSGEMMFunction()
     {
-        ValueTypeList argTypes = {
+        VariableTypeList argTypes = {
             VariableType::Int32, // order
             VariableType::Int32, // transposeA
             VariableType::Int32, // transposeB
@@ -332,7 +332,7 @@ namespace emitters
 
     llvm::Function* IRRuntime::GetDGEMMFunction()
     {
-        ValueTypeList argTypes = {
+        VariableTypeList argTypes = {
             VariableType::Int32, // order
             VariableType::Int32, // transposeA
             VariableType::Int32, // transposeB

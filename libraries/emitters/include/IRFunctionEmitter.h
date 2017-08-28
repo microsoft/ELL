@@ -831,6 +831,13 @@ namespace emitters
         /// <param name="content"> The content to insert for the given metadata tag. </param>
         /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
         void InsertMetadata(const std::string& tag, const std::string& content = "");
+        
+        /// <summary> Inserts arbitrary function-level metadata into generated IR code. </summary>
+        ///
+        /// <param name="tag"> The tag of the metadata to set. </param>
+        /// <param name="content"> The content to insert for the given metadata tag. </param>
+        /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
+        void InsertMetadata(const std::string& tag, const std::vector<std::string>& content);
 
         /// <summary> Emits an ELL_GetXXClockMilliseconds library function. </summary>
         ///

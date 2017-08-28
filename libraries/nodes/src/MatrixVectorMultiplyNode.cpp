@@ -11,23 +11,10 @@
 // math
 #include "Matrix.h"
 #include "MatrixOperations.h"
+#include "BlasWrapper.h"
 
-// BLAS
-#ifdef USE_BLAS
-#include "cblas.h"
-#else
-enum CBLAS_ORDER
-{
-    CblasRowMajor = 101,
-    CblasColMajor = 102
-};
-
-enum CBLAS_TRANSPOSE
-{
-    CblasNoTrans = 111,
-    CblasTrans = 112
-};
-#endif
+using namespace ell::math;
+using namespace ell::math::Blas;
 
 namespace ell
 {
@@ -50,8 +37,8 @@ namespace nodes
             llvm::Function* gemv = function.GetModule().GetRuntime().GetGEMVFunction<ValueType>();
             assert(gemv != nullptr && "Couldn't get GEMV function!");
 
-            emitters::IRValueList args{ function.Literal(CBLAS_ORDER::CblasRowMajor),
-                                        function.Literal(CBLAS_TRANSPOSE::CblasNoTrans),
+            emitters::IRValueList args{ function.Literal(GetCBlasMatrixOrder(MatrixLayout::rowMajor)),
+                                        function.Literal(GetCBlasMatrixTranspose(MatrixTranspose::noTranspose)),
                                         function.Literal(m),
                                         function.Literal(n),
                                         function.Literal(static_cast<ValueType>(1.0)), // alpha

@@ -61,5 +61,7 @@ def main(args):
         # Show the new frame
         helper.show_image(frameToShow, save)
 
+    helper.report_times()
+
 if __name__ == "__main__":
     main(sys.argv)

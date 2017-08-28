@@ -7,7 +7,7 @@
 #include <vector>
 #include <algorithm> 
 
-std::vector<float> ResizeImage(std::string& fileName, int rows, int cols)
+std::vector<float> ResizeImage(std::string& fileName, int rows, int cols, float scale)
 {
     std::stringstream stream;
     stream << R"xx(
@@ -32,11 +32,11 @@ def resize_image(image, newSize) :
         resized = cv2.resize(cropped, newSize)
         return resized
 
-def prepare_image_for_predictor(image, newSize) :
+def prepare_image_for_predictor(image, newSize, scale) :
     resized = resize_image(image, newSize)
     resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
     resized = resized.astype(np.float).ravel()
-    resized = resized * (1.0 / 255.0)
+    resized = resized * scale
     return resized
 
 def save_raw(name, data) :
@@ -48,17 +48,20 @@ def main() :
     file = sys.argv[1]
     rows = int(sys.argv[2])
     cols = int(sys.argv[3])
+    scale = 1 / 255;
+    if (len(sys.argv) == 5):
+        scale = float(sys.argv[4])
     image = cv2.imread(file)
     if image is None:
         print("Error reading image {}".format(file))
-    resized = prepare_image_for_predictor(image, (rows, cols))
+    resized = prepare_image_for_predictor(image, (rows, cols), scale)
     save_raw(file + '.dat', resized)
 
 main()
 
 )xx";
 
-    ExecutePythonScript(stream.str(), { "", fileName, std::to_string(rows), std::to_string(cols) });
+    ExecutePythonScript(stream.str(), { "", fileName, std::to_string(rows), std::to_string(cols), std::to_string(scale) });
 
     // now load the result.
     std::ifstream stm(fileName + ".dat", std::ios::in | std::ios::binary);

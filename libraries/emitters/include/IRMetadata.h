@@ -25,12 +25,17 @@ namespace emitters
     /// <summary> Indicates that a function is a callback that should be wrapped by SWIG. </summary>
     static const std::string c_callbackFunctionTagName = "ell.fn.callback";
 
-    /// <summary> Indicates that a function or type should be declared in the generated C/C++ header. </summary>
+    /// <summary> Indicates that a function should be declared in the generated C/C++ header. </summary>
     /// <remarks>
-    /// For functions, set a function-level tag with an empty value.
-    /// For types, set a module-level tag, using the type name as the value.
+    /// Set a function-level tag with an empty value.
     /// </remarks>
-    static const std::string c_declareInHeaderTagName = "ell.header.declare";
+    static const std::string c_declareFunctionInHeaderTagName = "ell.header.declareFn";
+
+    /// <summary> Indicates that a type should be declared in the generated C/C++ header. </summary>
+    /// <remarks>
+    /// Set a module-level tag, using the type name as the value.
+    /// </remarks>
+    static const std::string c_declareTypeInHeaderTagName = "ell.header.declareType";
 
     /// <summary> Indicates the Predict function that should be wrapped by SWIG. </summary>
     static const std::string c_predictFunctionTagName = "ell.fn.predict";
@@ -49,6 +54,12 @@ namespace emitters
     /// Set the value to the API name of the function.
     /// </remarks>
     static const std::string c_stepTimeFunctionTagName = "ell.fn.stepTime";
+
+    /// <summary> Gets tag to Indicate the names of a struct's fields. </summary>
+    /// <remarks>
+    /// Returns a module-level tag, with the type name encoded in the name and field names as the value.
+    /// </remarks>
+    std::string GetStructFieldsTagName(llvm::StructType* structType);
 
     //
     // Utilities for reading metadata (that wrap IRModuleEmitter)
@@ -69,12 +80,12 @@ namespace emitters
     /// <returns> A vector of LLVM functions with values for the given metadata tag. </returns>
     std::vector<FunctionTagValues> GetFunctionsWithTag(IRModuleEmitter& moduleEmitter, const std::string& tag);
 
-    /// <summary> Gets values associated with a module-level metadata tag. </summary>
+    /// <summary> Gets singleton values associated with a module-level metadata tag. </summary>
     ///
     /// <param name="moduleEmitter"> The `IRModuleEmitter` containing the module to search </param>
     /// <param name="tag"> The global metadata tag. </param>
     ///
     /// <returns> An unordered_set of values for the given metadata tag. </returns>
-    std::unordered_set<std::string> GetModuleTagValues(IRModuleEmitter& moduleEmitter, const std::string& tag);
+    std::unordered_set<std::string> GetSingletonModuleTagValues(IRModuleEmitter& moduleEmitter, const std::string& tag);
 }
 }

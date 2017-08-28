@@ -742,8 +742,10 @@ class NegativeBiasLayer(BaseLayer):
             self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
 
         bias = -1.0 * self.layer.constants[0].value
-        biasVector = converters.get_float_vector_from_constant(
-            bias, layerParameters.outputShape.channels)
+        if len(bias.shape) == 0:
+            biasVector = converters.get_float_vector_from_constant(bias, layerParameters.outputShape.channels)
+        else:
+            biasVector = converters.get_float_vector_from_cntk_array(bias)
 
         # Create the ELL bias layer
         ellLayers.append(ELL.FloatBiasLayer(layerParameters, biasVector))

@@ -15,14 +15,14 @@ else()
 endif()
 
 
-set (module_name builder)
+set (module_name wrap)
 set (builder_src
     templates/CMakeLists.python.txt.in
     wrap.py
     README.md)
 
 add_custom_target(${module_name} DEPENDS ${builder_src} SOURCES ${builder_src})
-set_property(TARGET ${module_name} PROPERTY FOLDER "tools/wrap")
+set_property(TARGET ${module_name} PROPERTY FOLDER "tools")
 
 # copy tutorial files
 foreach(PY_FILE ${builder_src})
@@ -37,5 +37,5 @@ endif()
 
 set (OUTPUT_DIR ${CMAKE_BINARY_DIR}/tools)
 
-set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile.exe\", \"blas\": \"${BLAS_LIBS}\" }")
+set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile\", \"blas\": \"${BLAS_LIBS}\" }")
 file(WRITE "${OUTPUT_DIR}/tools.json" ${JSON})

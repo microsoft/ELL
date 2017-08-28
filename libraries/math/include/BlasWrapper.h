@@ -8,11 +8,10 @@
 
 #pragma once
 
-// OpenBLAS
-#include "cblas.h"
-
 // stl
 #include <cstddef> // size_t
+
+#include "Matrix.h"
 
 namespace ell
 {
@@ -20,6 +19,16 @@ namespace math
 {
     namespace Blas
     {
+        /// <summary> Map the given enum value to OpenBlas's definition of CBLAS_ORDER.</summary>
+        ///
+        /// <param name="order">The ELL definition of MatrixLayout to be mapped. </param>
+        int GetCBlasMatrixOrder(MatrixLayout order);
+
+        /// <summary> Map the given enum value to OpenBlas's definition of CBLAS_TRANSPOSE.</summary>
+        ///
+        /// <param name="order">The ELL definition of MatrixTranspose to be mapped. </param>
+        int GetCBlasMatrixTranspose(MatrixTranspose transpose);
+
         /// <summary> Sets the number of threads. </summary>
         ///
         /// <param name="numThreads"> The number of threads. </param>
@@ -115,8 +124,8 @@ namespace math
         /// <param name="beta"> The scalar beta, which multiplies the left-hand side vector y. </param>
         /// <param name="y"> Pointer to the first element of the vector y, multiplied by beta and used to store the result. </param>
         /// <param name="incy"> The incy. </param>
-        void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, float alpha, const float* M, int lda, const float* x, int incx, float beta, float* y, int incy);
-        void Gemv(CBLAS_ORDER order, CBLAS_TRANSPOSE transpose, int m, int n, double alpha, const double* M, int lda, const double* x, int incx, double beta, double* y, int incy);
+        void Gemv(MatrixLayout order, MatrixTranspose transpose, int m, int n, float alpha, const float* M, int lda, const float* x, int incx, float beta, float* y, int incy);
+        void Gemv(MatrixLayout order, MatrixTranspose transpose, int m, int n, double alpha, const double* M, int lda, const double* x, int incx, double beta, double* y, int incy);
         /// @}
 
         /// @{
@@ -136,8 +145,8 @@ namespace math
         /// <param name="beta"> The scalar beta, which multiplies the matrix C. </param>
         /// <param name="C"> The matrix C. </param>
         /// <param name="ldc"> The matrix increment for C. </param>
-        void Gemm(CBLAS_ORDER order, CBLAS_TRANSPOSE transposeA, CBLAS_TRANSPOSE transposeB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
-        void Gemm(CBLAS_ORDER order, CBLAS_TRANSPOSE transposeA, CBLAS_TRANSPOSE transposeB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc);
+        void Gemm(MatrixLayout order, MatrixTranspose transposeA, MatrixTranspose transposeB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
+        void Gemm(MatrixLayout order, MatrixTranspose transposeA, MatrixTranspose transposeB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc);
         /// @}
     }
 }

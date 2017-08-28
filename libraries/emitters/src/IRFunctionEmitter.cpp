@@ -800,8 +800,17 @@ namespace emitters
 
     void IRFunctionEmitter::InsertMetadata(const std::string& tag, const std::string& content)
     {
+        InsertMetadata(tag, std::vector<std::string>({content}));
+    }
+
+    void IRFunctionEmitter::InsertMetadata(const std::string& tag, const std::vector<std::string>& content)
+    {
         auto& context = GetLLVMContext();
-        llvm::Metadata* metadataElements[] = { llvm::MDString::get(context, content) };
+        std::vector<llvm::Metadata*> metadataElements;
+        for (const auto& value : content)
+        {
+            metadataElements.push_back({ llvm::MDString::get(context, value) });
+        }
         auto metadataNode = llvm::MDNode::get(context, metadataElements);
         _pFunction->setMetadata(tag, metadataNode);
     }
@@ -900,7 +909,7 @@ namespace emitters
     //
     void IRFunctionEmitter::IncludeInHeader()
     {
-        InsertMetadata(c_declareInHeaderTagName);
+        InsertMetadata(c_declareFunctionInHeaderTagName);
     }
 
     void IRFunctionEmitter::IncludeInPredictInterface()

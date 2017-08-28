@@ -1,3 +1,9 @@
+---
+layout: default
+title: Installing ELL on Linux
+permalink: /Installing-and-building-ELL/INSTALL-Linux/
+---
+
 # Building the Embedded Learning Library (ELL) on Ubuntu Linux
 
 ### Cloning the ELL repository
@@ -42,7 +48,7 @@ Install the BSD editline and history libraries
 
 #### zlib
 
-    sudo apt-get install zlibc zlib1g zlib1g-dev
+    sudo apt-get install -y zlibc zlib1g zlib1g-dev
 
 #### SWIG
 
@@ -54,26 +60,17 @@ tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12
 ./configure --without-pcre && make && sudo make install
 ```
 
-#### Python
-
-The tutorials require Python 3.6, we recommend you use [Miniconda](https://conda.io/miniconda.html), which works well with Jupyter notebooks and provides a way to manage different Python versions.   Note: you can also use the full [Anaconda](https://www.continuum.io/downloads) if you already have that installed.
-
-If you build ELL from a `conda` Python 3.6 environment then the Python language bindings will be built and you can run the
-tutorials.
-
-To configure the Python 3.6 environment using Miniconda:
-```
-# Create the environment
-conda create -n py36 anaconda python=3
-# Activate the environment
-source activate py36
-```
-Now you have an activated `conda` Python 3.6 environment, and if you build ELL from this environment then the Python language bindings will be built and you can run the tutorials.
-
 ### Optional Prerequisites (OpenBLAS and Doxygen)
 ELL can optionally take advantage of the optimized linear algebra libraries in [*OpenBLAS*](http://www.openblas.net/), and generate code documentation using *Doxygen*. To install these optional dependencies, type
 
     sudo apt-get install -y libopenblas-dev doxygen
+
+### Activate Conda Environment
+
+The following commandline instructions assume you are using your activated Python 3.6 conda environment in a new terminal window.  
+See [Python setup instructions](/ELL/Installing-and-building-ELL/).
+
+    source activate py36
 
 ### Building ELL
 Next, use CMake to create a makefile. In the repository root directory, create a `build` subdirectory and change to that directory:

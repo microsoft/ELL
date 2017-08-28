@@ -3,13 +3,14 @@
 #
 
 # define project
-set (tool_name compare)
+set (tool_name debugcompiler)
 
 set (src 
   src/CompareArguments.cpp
   src/CompareUtils.cpp
   src/main.cpp
   src/ModelComparison.cpp
+  src/visualizeReport.py
 )
 
 set (include

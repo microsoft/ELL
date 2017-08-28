@@ -79,8 +79,6 @@ class DarknetImporter():
             f.write(config_json)
             f.close()
 
-        print(config_json)
-
 if __name__ == "__main__":
     importer = DarknetImporter()
     if (not importer.parse_command_line(sys.argv)):

@@ -10,4 +10,4 @@ cmake ..
 make
 cd ..
 export DISPLAY=:0
-python demo.py darknet_config.json darknetImageNetLabels.txt schoolbus.png -once
+python demo.py darknet_config.json darknetImageNetLabels.txt schoolbus.png -iterations 1

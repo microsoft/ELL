@@ -58,8 +58,6 @@ def main(args):
         f.write(config_json)
         f.close()
 
-    print(config_json)
-
 if __name__ == "__main__":
     main(sys.argv)
 

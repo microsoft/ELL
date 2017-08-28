@@ -29,7 +29,7 @@
 
 using namespace ell;
 
-std::vector<float> GetInputImage(std::string filename, const model::DynamicMap& map)
+std::vector<float> GetInputImage(std::string filename, const model::DynamicMap& map, float inputScale)
 {
     auto inputShape = GetInputShape(map);
     auto outputSize = map.GetOutputSize();
@@ -40,7 +40,7 @@ std::vector<float> GetInputImage(std::string filename, const model::DynamicMap& 
         std::cout << "Model output size: " << outputSize << std::endl;
     }
 
-     return ResizeImage(filename, inputShape[0], inputShape[1]);
+    return ResizeImage(filename, inputShape[0], inputShape[1], inputScale);
 }
 
 int main(int argc, char* argv[])
@@ -60,12 +60,20 @@ int main(int argc, char* argv[])
             std::cout << commandLineParser.GetHelpString() << std::endl;
             return 1;
         }
+        if (!ell::utilities::FileExists(compareArguments.inputMapFile)) {
+
+            std::cout << "### model file not found: " << compareArguments.inputMapFile << std::endl;
+            std::cout << commandLineParser.GetHelpString() << std::endl;
+            return 1;
+        }
 
         // load map file
         std::cout << "loading map..." << std::endl;
         model::DynamicMap map = common::LoadMap(compareArguments.inputMapFile);
 
-        auto input = GetInputImage(compareArguments.inputTestFile, map);
+        ell::utilities::EnsureDirectoryExists(compareArguments.outputDirectory);
+        
+        auto input = GetInputImage(compareArguments.inputTestFile, map, compareArguments.inputScale);
         ModelComparison comparison(compareArguments.outputDirectory);
         comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize);
 

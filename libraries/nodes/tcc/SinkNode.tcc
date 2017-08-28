@@ -49,7 +49,7 @@ namespace ell
             if (IsScalar(input))
             {
                 // Callback signature: void SinkFunction(ValueType t)
-                const emitters::ValueTypeList parameters = { emitters::GetVariableType<ValueType>() };
+                const emitters::VariableTypeList parameters = { emitters::GetVariableType<ValueType>() };
                 function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
 
                 llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
@@ -60,7 +60,7 @@ namespace ell
             else
             {
                 // Callback signature: void SinkFunction(ValueType* array)
-                const emitters::ValueTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
+                const emitters::VariableTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
                 function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
 
                 llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);

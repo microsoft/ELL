@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     EuclideanDistanceNode.h (nodes)
+//  File:     SquaredEuclideanDistanceNode.h (nodes)
 //  Authors:  Suresh Iyengar
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,13 +23,13 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> A node that represents Euclidean distances of input vector to a set of vectors stacked into rows of a matrix. </summary>
+    /// <summary> A node that represents squared Euclidean distances of input vector to a set of vectors stacked into rows of a matrix. </summary>
     ///
     /// <typeparam name="ValueType"> The Matrix element and input type. </typeparam>
     /// <typeparam name="layout"> The Matrix layout. </typeparam>
     ///
     template <typename ValueType, math::MatrixLayout layout>
-    class EuclideanDistanceNode : public model::Node
+    class SquaredEuclideanDistanceNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
@@ -41,19 +41,19 @@ namespace nodes
         /// @}
 
         /// <summary> Default Constructor </summary>
-        EuclideanDistanceNode();
+        SquaredEuclideanDistanceNode();
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The input vector </param>
         /// <param name="v"> The set of vectors to compute the distance from stacked into a row matrix</param>
-        EuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v);
+        SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "EuclideanDistanceNode"; }
-        // static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, layout>("EuclideanDistanceNode"); }
+        static std::string GetTypeName() { return "SquaredEuclideanDistanceNode"; }
+        // static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, layout>("SquaredEuclideanDistanceNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -83,7 +83,7 @@ namespace nodes
         math::Matrix<ValueType, layout> _v;
     };
 
-    /// <summary> Adds a Euclidean node to a model transformer. </summary>
+    /// <summary> Adds a SquaredEuclidean node to a model transformer. </summary>
     ///
     /// <typeparam name="ValueType"> The Matrix element type. </typeparam>
     /// <typeparam name="layout"> The Matrix layout. </typeparam>
@@ -93,8 +93,8 @@ namespace nodes
     ///
     /// <returns> The node added to the model. </returns>
     template <typename ValueType, math::MatrixLayout layout>
-    EuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> w, model::ModelTransformer& transformer);
+    SquaredEuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> w, model::ModelTransformer& transformer);
 }
 }
 
-#include "../tcc/EuclideanDistanceNode.tcc"
+#include "../tcc/SquaredEuclideanDistanceNode.tcc"

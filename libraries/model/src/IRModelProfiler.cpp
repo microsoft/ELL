@@ -11,6 +11,7 @@
 // emitters
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
+#include "LLVMUtilities.h"
 
 // utilities
 #include "UniqueId.h"
@@ -174,22 +175,13 @@ namespace model
         auto doubleType = llvm::Type::getDoubleTy(context);
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
 
-        // NodeInfo
-        std::vector<llvm::Type*> fields = {
-            int8PtrType, // 1, nodeName
-            int8PtrType, // 2, nodeType
-        };
-
-        _nodeInfoType = llvm::StructType::create(context, fields, GetNamespacePrefix() + "_NodeInfo");
+        // NodeInfo struct fields
+        emitters::NamedLLVMTypeList infoFields = {{"nodeName", int8PtrType}, {"nodeType", int8PtrType}};
+        _nodeInfoType = _module->DeclareStruct(GetNamespacePrefix() + "_NodeInfo", infoFields);
         _module->IncludeTypeInHeader(_nodeInfoType->getName());
 
-        // NodePerformanceCounters
-        fields = {
-            int64Type, // count
-            doubleType // timer
-        };
-
-        _performanceCountersType = llvm::StructType::create(context, fields, GetNamespacePrefix() + "_PerformanceCounters");
+        emitters::NamedLLVMTypeList countersFields = {{"count", int64Type}, {"totalTime", doubleType}};        
+        _performanceCountersType = _module->DeclareStruct(GetNamespacePrefix() + "_PerformanceCounters", countersFields);
         _module->IncludeTypeInHeader(_performanceCountersType->getName());
     }
 

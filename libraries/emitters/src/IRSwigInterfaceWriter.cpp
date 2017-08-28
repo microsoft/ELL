@@ -324,7 +324,7 @@ namespace emitters
                 WriteCommaSeparatedList(os, list);
             }
 
-            void WriteCallbackValueTypeList(std::ostream& os) const
+            void WriteCallbackVariableTypeList(std::ostream& os) const
             {
                 std::vector<std::string> list;
 
@@ -370,7 +370,7 @@ namespace emitters
             void WriteForwarderClassHeader(std::ostream& os) const
             {
                 os << "class " << _className << " : public ell::api::CallbackForwarder<";
-                WriteCallbackValueTypeList(os);
+                WriteCallbackVariableTypeList(os);
                 os << ">\n";
                 os << "{\npublic:\n";
 

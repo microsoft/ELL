@@ -10,14 +10,16 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 # rendering utilties
 
 class DemoHelper:
-    def __init__(self, scaleFactor=1 / 255, threshold=0.25):
+    def __init__(self, threshold=0.25):
         """ Helper class to store information about the model we want to use.
         argv       - arguments passed in from the command line 
-        scaleFactor - each input pixel may need to be scaled. It is common for models to require an 8-bit pixel
-                      to be represented as a value between 0.0 and 1.0, which is the same as multiplying it by 1/255.
         threshold   - specifies a prediction threshold. We will ignore prediction values less than this
         """
-        self.scaleFactor = scaleFactor
+        
+        # each input pixel may need to be scaled. It is common for models to require an 8-bit pixel
+        # to be represented as a value between 0.0 and 1.0, which is the same as multiplying it by 1/255.
+        # This can be configured in the config file.
+        self.scaleFactor = 1 / 255
         self.threshold = threshold
         self.start = time.time()
         self.frame_count = 0
@@ -35,12 +37,19 @@ class DemoHelper:
         self.config_file = None
         self.labels_file = None
         self.model_file = None
-        self.once = None  # whether to loop or just perform one prediction.
+        self.iterations = None  # limit number of iterations through the loop.
+        self.total_time = 0
+        self.time_count = 0
+        self.warm_up = True
 
     def print_usage(self):
-        print("Usage: " + self.command_name + " configFile labels [model|-save|cameraId|staticImage|-once]")
+        print("Usage: " + self.command_name + " configFile labels [model|-save|cameraId|staticImage|-iterations i|-threshold %]")
         print("Runs the given ELL model passing images from camera or static image file")
         print("If no model file is given, it tries to load the compiled model defined in the config file")
+        print("The iterations argument is used for testing where you want to do only 1 or more calls to predict.")
+        print("The threshold argument can be used to set the required minimum prediction score, the default is 0.25")
+        print("If you lower the threshold you will see more prediction labels, but they have a higher chance of being")
+        print("completely wrong.")
         print("Example:")
         print("    gettingStarted darknet_config.json darknetImageNetLabels.txt darknet.ellmodel")
         print("This shows opencv window with image classified by the model using given labels")
@@ -56,20 +65,38 @@ class DemoHelper:
         i = 1
         while (i < len(argv)):
             arg = argv[i]
-            if (arg[0] == "-" or arg[0] == "/"):
+            if arg[0] == "-" or arg[0] == "/":
                 option = arg[1:]
-                if (option.lower() == "save"):
+                if option.lower() == "save":
                     self.save_images = 1
-                elif (option.lower() == "once"):
-                    self.once = 1
+                elif option.lower() == "iterations":
+                    i = i + 1
+                    if (i < len(argv)):
+                        self.iterations = int(argv[i])
+                        if self.iterations == 0:
+                            print("invalid number of iterations")
+                            return false
+                    else: 
+                        print("missing number of iterations after -iterations argument")
+                        return false
+                elif option.lower() == "threshold":
+                    i = i + 1
+                    if (i < len(argv)):
+                        self.threshold = float(argv[i])
+                        if self.threshold < 0.001 or self.threshold > 1:
+                            print("invalid threshold value, it should be greater than zero and less than 1")
+                            return false
+                    else: 
+                        print("missing floating point value after threshold argument")
+                        return false
                 else:
                     print("Unknown option: " + arg)
                     return False
             elif arg.isdigit():
                 self.camera = int(arg)
-            elif (self.config_file == None):
+            elif self.config_file == None:
                 self.config_file = arg
-            elif (self.labels_file == None):
+            elif self.labels_file == None:
                 self.labels_file = arg
             else:
                 ext = os.path.splitext(arg)[1]
@@ -80,10 +107,10 @@ class DemoHelper:
                     self.camera = None
             i = i + 1
 
-        if (self.config_file == None):
+        if self.config_file == None:
             print("missing config file argument")
             return False  
-        if (self.labels_file == None):
+        if self.labels_file == None:
             print("missing label file argument")
             return False       
 
@@ -94,6 +121,8 @@ class DemoHelper:
             self.config = json.loads(f.read())
             self.input_size = (self.config['input_rows'], self.config['input_columns'])
             print("using input size of ", self.input_size)
+            if ("input_scale" in self.config):
+                self.scaleFactor = float(self.config["input_scale"])
 
         if (self.model_file == None):
             # then assume we have a compiled model handy
@@ -112,15 +141,15 @@ class DemoHelper:
 
     def import_compiled_model(self):
         name = self.config['model']
-        if (name == ""):
+        if name == "":
             raise Exception("config file is missing model name")
         
         func_name = self.config['func']
-        if (func_name == ""):
+        if func_name == "":
             raise Exception("config file is missing func name")
         
         name = os.path.splitext(name)[0]
-        if (not os.path.isdir('build')):
+        if not os.path.isdir('build'):
             raise Exception("you don't have a 'build' directory, have you compiled this project yet?")
 
         # Import the compiled model wrapper
@@ -144,7 +173,7 @@ class DemoHelper:
 
     def show_image(self, frameToShow, save):
         cv2.imshow('frame', frameToShow)
-        if (save and not self.save_images is None):
+        if save and self.save_images != None:
             name = 'frame' + str(self.save_images) + ".png"
             cv2.imwrite(name, frameToShow)
             self.save_images = self.save_images + 1
@@ -156,13 +185,29 @@ class DemoHelper:
         return labels
 
     def predict(self, data):
-        if (self.once == 1):
-            self.once = 2
-        if (self.model == None):
+        if self.iterations != None:
+            self.iterations = self.iterations - 1
+        start = time.time()
+        if self.model == None:
             self.compiled_func(data, self.results)
-            return self.results
         else:
-            return self.model.ComputeFloat(data)
+            self.results = self.model.ComputeFloat(data)
+        end = time.time()
+        diff = end - start
+
+        # if warm up is true then discard the first time
+        if self.time_count == 1 and self.warm_up:
+            self.warm_up = False
+            self.total_time = 0
+            self.time_count = 0
+
+        self.total_time = self.total_time + diff
+        self.time_count = self.time_count + 1
+        return self.results
+
+    def report_times(self):
+        if self.time_count > 0:
+            print("Average prediction time: " + str(self.total_time/self.time_count))            
 
     def get_top_n(self, predictions, N):
         """Return at most the top 5 predictions as a list of tuples that meet the threshold."""
@@ -175,7 +220,7 @@ class DemoHelper:
                     break
         result = []
         for element in topN:
-            if (element[0] > self.threshold):
+            if element[0] > self.threshold:
                 i = int(element[1])
                 if (i < len(self.labels)):
                     result.append((self.labels[i], round(element[0], 2)))
@@ -186,7 +231,7 @@ class DemoHelper:
         import ell_utilities
 
         name = self.model_name
-        if (intervalMs > 0):
+        if intervalMs > 0:
             ell_map = ell_utilities.ell_steppable_map_from_float_predictor(
                 predictor, intervalMs, name + "InputCallback", name + "OutputCallback")
         else:
@@ -222,7 +267,7 @@ class DemoHelper:
     def resize_image(self, image, newSize):
         # Shape: [rows, cols, channels]
         """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order, with each pixel multiplied by the configured scaleFactor."""
-        if (image.shape[0] > image.shape[1]):  # Tall (more rows than cols)
+        if image.shape[0] > image.shape[1]:  # Tall (more rows than cols)
             rowStart = int((image.shape[0] - image.shape[1]) / 2)
             rowEnd = rowStart + image.shape[1]
             colStart = 0
@@ -255,9 +300,9 @@ class DemoHelper:
 
     def draw_fps(self, image):
         now = time.time()
-        if (self.frame_count > 0):
+        if self.frame_count > 0:
             diff = now - self.start
-            if (diff >= 1):
+            if diff >= 1:
                 self.fps = round(self.frame_count / diff, 1)
                 self.frame_count = 0
                 self.start = now
@@ -281,7 +326,7 @@ class DemoHelper:
         return 3
 
     def done(self):
-        if (self.once == 2):
+        if self.iterations is not None and self.iterations <= 0:
             return True
         # on slow devices this helps let the images to show up on screen
         result = False

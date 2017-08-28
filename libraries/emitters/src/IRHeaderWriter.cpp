@@ -95,7 +95,7 @@ namespace emitters
             }
         }
 
-        void WriteStructDefinition(std::ostream& os, llvm::StructType* t)
+        void WriteStructDefinition(std::ostream& os, llvm::StructType* t, const std::vector<std::string>& fieldNames)
         {
             if (t->hasName()) // && !t->isLiteral() ?
             {
@@ -106,7 +106,7 @@ namespace emitters
                 for (auto& fieldType : t->elements())
                 {
                     os << "    ";
-                    std::string fieldName = std::string("param") + std::to_string(index);
+                    std::string fieldName = (index >= fieldNames.size()) ? std::string("param") + std::to_string(index) : fieldNames[index];
                     WriteLLVMVariableDeclaration(os, fieldType, fieldName);
                     os << ";\n";
                     ++index;
@@ -229,15 +229,27 @@ namespace emitters
             os << "//\n// Types\n//\n\n";
 
             // Look for the module-level "declare in header" tag
-            if (moduleEmitter.HasMetadata("", c_declareInHeaderTagName))
+            if (moduleEmitter.HasMetadata(c_declareTypeInHeaderTagName))
             {
-                auto typeNames = GetModuleTagValues(moduleEmitter, c_declareInHeaderTagName);
+                auto typeNames = GetSingletonModuleTagValues(moduleEmitter, c_declareTypeInHeaderTagName);
+
                 auto structTypes = pModule->getIdentifiedStructTypes();
                 for (const auto& t : structTypes)
                 {
                     if (t->hasName() && (typeNames.cend() != typeNames.find(t->getName())))
                     {
-                        WriteStructDefinition(os, t);
+                        // Get struct field names
+                        auto tagName = GetStructFieldsTagName(t);
+                        std::vector<std::string> fieldNames;
+                        if(moduleEmitter.HasMetadata(tagName))
+                        {
+                            auto fieldNameMetadata = moduleEmitter.GetMetadata(tagName);
+                            if(fieldNameMetadata.size() > 0)
+                            {
+                                fieldNames = fieldNameMetadata[0];
+                            }
+                        }
+                        WriteStructDefinition(os, t, fieldNames);
                         os << "\n\n";
                     }
                 }
@@ -246,7 +258,7 @@ namespace emitters
             os << "\n";
             os << "//\n// Functions\n//\n\n";
             // Now write out function signatures
-            auto tagValues = GetFunctionsWithTag(moduleEmitter, c_declareInHeaderTagName);
+            auto tagValues = GetFunctionsWithTag(moduleEmitter, c_declareFunctionInHeaderTagName);
             for (auto& tv : tagValues)
             {
                 WriteFunctionDeclaration(os, moduleEmitter, *(tv.function));
