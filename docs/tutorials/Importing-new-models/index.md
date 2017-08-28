@@ -13,9 +13,10 @@ permalink: /tutorials/Importing-new-models/
 
 ### Prerequisites
 
-1. We will use `Python 3.6` for this tutorial on your desktop PC.
+1. We will use `Python 3.6` for this tutorial on your desktop PC,
+including the [setup for OpenCV](/ELL/Installing-OpenCV/).
 
-2. You will need to be sure you built ELL as per [Installing and building ELL](/ELL/Installing-and-building-ELL/).  
+2. You will need to be sure you built ELL as per [Installing and building ELL](/ELL/Installing-and-building-ELL/).
 You will need to build ELL after you install Python from your activate your conda environment, 
 so that the `CMake` step picks up on the fact that you have Python 3.6 installed.
 
