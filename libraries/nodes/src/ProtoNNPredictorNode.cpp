@@ -15,7 +15,7 @@
 #include "L2NormNode.h"
 #include "UnaryOperationNode.h"
 #include "MatrixVectorProductNode.h"
-#include "EuclideanDistanceNode.h"
+#include "SquaredEuclideanDistanceNode.h"
 #include "ExtremalValueNode.h"
 
 // utilities
@@ -86,10 +86,9 @@ namespace nodes
         auto gammaNode = transformer.AddNode<ConstantNode<double>>(multiplier);
 
         // Distance to each prototype
-        auto distanceNode = transformer.AddNode<EuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInputNode->output, prototypes.Transpose());
+        auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInputNode->output, prototypes.Transpose());
 
         // Similarity to each prototype
-        auto squareDistanceNode = transformer.AddNode<BinaryOperationNode<double>>(distanceNode->output, distanceNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
         auto scaledDistanceNode = transformer.AddNode<BinaryOperationNode<double>>(squareDistanceNode->output, gammaNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
         auto expDistanceNode = transformer.AddNode<UnaryOperationNode<double>>(scaledDistanceNode->output, emitters::UnaryOperationType::exp);
 
