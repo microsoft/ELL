@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 import cv2
 import numpy as np
 import time
@@ -15,6 +16,13 @@ class DemoHelper:
         argv       - arguments passed in from the command line 
         threshold   - specifies a prediction threshold. We will ignore prediction values less than this
         """
+
+        self.arg_parser = argparse.ArgumentParser(
+            "Runs the given ELL model passing images from camera or static image file\n"
+            "If no model file is given, it tries to load the compiled model defined in the config file\n"
+            "Example:\n"
+            "   python demo.py darknet_config.json darknetImageNetLabels.txt --model darknet.ellmodel\n"
+            "This shows opencv window with image classified by the model using given labels")
         
         # each input pixel may need to be scaled. It is common for models to require an 8-bit pixel
         # to be represented as a value between 0.0 and 1.0, which is the same as multiplying it by 1/255.
@@ -29,7 +37,6 @@ class DemoHelper:
         self.captureDevice = None
         self.frame = None
         self.save_images = None
-        self.command_name = None
         self.model_file = None
         self.model = None
         self.compiled = None
@@ -42,77 +49,43 @@ class DemoHelper:
         self.time_count = 0
         self.warm_up = True
 
-    def print_usage(self):
-        print("Usage: " + self.command_name + " configFile labels [model|-save|cameraId|staticImage|-iterations i|-threshold %]")
-        print("Runs the given ELL model passing images from camera or static image file")
-        print("If no model file is given, it tries to load the compiled model defined in the config file")
-        print("The iterations argument is used for testing where you want to do only 1 or more calls to predict.")
-        print("The threshold argument can be used to set the required minimum prediction score, the default is 0.25")
-        print("If you lower the threshold you will see more prediction labels, but they have a higher chance of being")
-        print("completely wrong.")
-        print("Example:")
-        print("    gettingStarted darknet_config.json darknetImageNetLabels.txt darknet.ellmodel")
-        print("This shows opencv window with image classified by the model using given labels")
-        return
-
     def parse_arguments(self, argv):
-        # Parse arguments
-        self.command_name = argv[0]
+        # required arguments
+        self.arg_parser.add_argument("configFile", help="path to the model configuration file")
+        self.arg_parser.add_argument("labels", help="path to the labels file for evaluating the model")
 
-        if (len(argv) < 3):
-            return False
+        # options
+        self.arg_parser.add_argument("--model", help="path to a model file")
+        self.arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
+        self.arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
+        self.arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
 
-        i = 1
-        while (i < len(argv)):
-            arg = argv[i]
-            if arg[0] == "-" or arg[0] == "/":
-                option = arg[1:]
-                if option.lower() == "save":
-                    self.save_images = 1
-                elif option.lower() == "iterations":
-                    i = i + 1
-                    if (i < len(argv)):
-                        self.iterations = int(argv[i])
-                        if self.iterations == 0:
-                            print("invalid number of iterations")
-                            return false
-                    else: 
-                        print("missing number of iterations after -iterations argument")
-                        return false
-                elif option.lower() == "threshold":
-                    i = i + 1
-                    if (i < len(argv)):
-                        self.threshold = float(argv[i])
-                        if self.threshold < 0.001 or self.threshold > 1:
-                            print("invalid threshold value, it should be greater than zero and less than 1")
-                            return false
-                    else: 
-                        print("missing floating point value after threshold argument")
-                        return false
-                else:
-                    print("Unknown option: " + arg)
-                    return False
-            elif arg.isdigit():
-                self.camera = int(arg)
-            elif self.config_file == None:
-                self.config_file = arg
-            elif self.labels_file == None:
-                self.labels_file = arg
-            else:
-                ext = os.path.splitext(arg)[1]
-                if (ext.lower() == ".ellmodel"):
-                    self.model_file = arg
-                else:
-                    self.imageFilename = arg
-                    self.camera = None
-            i = i + 1
+        # mutually exclusive options
+        group = self.arg_parser.add_mutually_exclusive_group()
+        group.add_argument("--camera", type=int, help="the camera id of the webcam", default=self.camera)
+        group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
 
-        if self.config_file == None:
-            print("missing config file argument")
-            return False  
-        if self.labels_file == None:
-            print("missing label file argument")
-            return False       
+        argv.pop(0) # when an args list is passed to parse_args, the first argument (program name) needs to be dropped
+        args = self.arg_parser.parse_args(argv)
+        
+        # process required arguments
+        self.labels_file = args.labels
+        self.config_file = args.configFile
+
+        # process options
+        self.model_file = args.model
+        self.save_images = args.save
+        self.threshold = args.threshold
+        if (args.iterations):
+            self.iterations = args.iterations
+
+        # process mutually exclusive options
+        if (args.camera):
+            self.camera = args.camera
+            self.imageFilename = None
+        elif (args.image):
+            self.imageFilename = args.image
+            self.camera = None
 
         # load the labels
         self.labels = self.load_labels(self.labels_file)

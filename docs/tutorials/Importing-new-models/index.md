@@ -128,7 +128,7 @@ And finally to run the test on video input:
 
 And to test with a static image:
 
-    python demo.py darknet_config.json darknetImageNetLabels.txt schoolbus.png
+    python demo.py darknet_config.json darknetImageNetLabels.txt --image coffeemug.jpg
 
 ## CNTK
 
@@ -249,7 +249,7 @@ And finally to run the test on video input:
 
 And to test with a static image:
 
-    python demo.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt schoolbus.png
+    python demo.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt --image coffeemug.jpg
 
 ### Summary
 

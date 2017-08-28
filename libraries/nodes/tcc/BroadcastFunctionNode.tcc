@@ -851,7 +851,10 @@ namespace nodes
 
         if (prevSecondaryInputs.biasNode == nullptr)
         {
-            bias = thisSecondaryInputs.biasNode->GetValues();
+            if (thisSecondaryInputs.biasNode != nullptr)
+            {
+                bias = thisSecondaryInputs.biasNode->GetValues();
+            }
         }
         else
         {

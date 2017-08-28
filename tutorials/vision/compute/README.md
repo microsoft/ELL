@@ -62,10 +62,10 @@ Great, next you can test that the `darknet.ellmodel` works with the ELL
 model "interpreter" by running the following:
 
 ````
-python demo.py darknet_config.json darknet.ellmodel darknetImageNetLabels.txt
+python demo.py darknet_config.json darknetImageNetLabels.txt --model darknet.ellmodel
 ````
 
-And with camera pointing at a Zebra you should see something lik this:
+And with camera pointing at a Zebra you should see something like this:
 
 ![Zebra](zebra.png)
 
@@ -91,7 +91,7 @@ You will get a config output and an ELL model file named `VGG16_ImageNet_Caffe.e
 And similarly you can test that the `VGG16_ImageNet_Caffe.ellmodel` works with the ELL model "interpreter" by running the following:
 
 ````
-python demo.py VGG16_ImageNet_Caffe_config.json VGG16_ImageNet_Caffe.ellmodel cntkVgg16ImageNetLabels.txt
+python demo.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt --model VGG16_ImageNet_Caffe.ellmodel
 ````
 
 (you can copy the `cntkVgg16ImageNetLabels.txt` from the gettingStarted folder).

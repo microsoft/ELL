@@ -1,21 +1,20 @@
 #
-# cmake file
+# CMake file for Raspberry Pi test tools
 #
 
 find_package(PythonInterp)
-find_package(PythonLibs)
-if(${PYTHONLIBS_FOUND})
+if(${PYTHONINTERP_FOUND})
 
     set(module_name "pitest")
 
-    set(importer_src drivetest.py runtest.sh schoolbus.png)
+    set(test_src drivetest.py runtest.sh.in coffeemug.jpg buildtask.cmd)
 
-    add_custom_target(${module_name} DEPENDS SOURCES ${importer_src})
+    add_custom_target(${module_name} DEPENDS SOURCES ${test_src})
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/utilities")
-    #copy files
-    foreach(PY_FILE ${importer_src})
-        configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
+    # copy files
+    foreach(FILE ${test_src})
+        configure_file(${FILE} ${FILE} COPYONLY)
     endforeach()
 
-endif()  # PYTHONLIBS_FOUND
+endif()  # PYTHONINTERP_FOUND

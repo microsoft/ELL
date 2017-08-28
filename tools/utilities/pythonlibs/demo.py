@@ -20,9 +20,7 @@ import demoHelper as d
 
 def main(args):
     helper = d.DemoHelper()
-    if (not helper.parse_arguments(args)):
-        helper.print_usage()
-        return
+    helper.parse_arguments(args)
 
     # Initialize image source
     helper.init_image_source()

@@ -8,10 +8,12 @@
 ##
 ####################################################################################################
 import os
+from os.path import basename
 import sys
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_path, '../pythonlibs'))
 import find_ell
+import argparse
 import subprocess
 import json
 import operator
@@ -22,6 +24,10 @@ import paramiko
 
 class DriveTest:
     def __init__(self):
+        self.arg_parser = argparse.ArgumentParser(
+            "This script uses ELL to create a raspberry pi demo project for a model (default is darknet), pushes it to the given\n"
+            "raspberry pi ip address using ssh and scp, then executes the test.  The test measures the accuracy\n"
+            "and performance of the model and it writes these results to a test_results.json data file")
         self.ipaddress = None
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)
@@ -29,7 +35,10 @@ class DriveTest:
         self.output_dir = None
         self.config_file = None
         self.weights_file = None
+        self.model_name = None
+        self.labels_file = None
         self.ell_model = None
+        self.ell_json = None
         self.username = "pi"
         self.password = "raspberry"
         self.ssh = None
@@ -37,23 +46,38 @@ class DriveTest:
         if (not os.path.isdir(self.pitest_dir)):
             os.makedirs(self.pitest_dir)
 
-    def print_usage(self):
-        print("Usage: drivetest.py ipaddress [outdir]")
-        print("This script uses ELL to create a raspberry pi demo project for darknet model, pushes it to the given")
-        print("raspberry pi ip address using ssh and scp, then executes the test.  The test measures the accuracy")
-        print("and performance of the model and it writes these results to a test_results.json data file")
-        
     def parse_command_line(self, argv):
-        if (len(argv) == 1):
-            return False
-        if (len(argv) > 1):
-            self.ipaddress = argv[1]
-        if (len(argv) > 2):
-            self.pitest_dir = argv[2]
-        if (len(argv) > 3):
-            return False
-        self.output_dir = os.path.join(self.pitest_dir, "pi3")
-        return True
+        # required arguments
+        self.arg_parser.add_argument("ipaddress")
+
+        # options
+        self.arg_parser.add_argument("--outdir", default=self.pitest_dir)
+
+        model_group = self.arg_parser.add_argument_group('model', 'options for loading a non-default model. All 3 must be specified for a non-default model to be used.')
+        model_group.add_argument("--model", help="path to an ELL model file, the filename (without extension) will be used as the model name")
+        model_group.add_argument("--labels", help="path to the labels file for evaluating the model")
+        model_group.add_argument("--config", help="path to the ELL model JSON file")
+
+        argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
+        args = self.arg_parser.parse_args(argv)
+
+        self.ipaddress = args.ipaddress
+        self.pitest_dir = args.outdir
+
+        self.ell_model = args.model
+        self.labels_file = args.labels
+        self.ell_json = args.config
+
+        if (self.ell_model is None or self.labels_file is None or self.ell_json is None):
+            self.model_name = "darknet"
+            self.labels_file = os.path.join(self.pitest_dir, "darknetImageNetLabels.txt")
+            self.ell_json = os.path.join(self.pitest_dir, "darknet_config.json")
+        else:
+            self.model_name = os.path.splitext(basename(self.ell_model))[0]
+
+        self.output_dir = os.path.join(self.pitest_dir, "pi3", self.model_name)
+        if (not os.path.isdir(self.output_dir)):
+            os.makedirs(self.output_dir)
 
     def download(self, url, localpath):
         req = request.URLopener()
@@ -70,19 +94,25 @@ class DriveTest:
             dest = os.path.join(target_dir, file_name)
             copyfile(path, dest)
 
-    def normalize_newlines(self, src, dest):
+    def configure_runtest(self, dest):
+        with open(os.path.join(self.ell_root, "tools/utilities/pitest/runtest.sh.in"), 'r') as f:
+            template = f.read()
+        template = template.replace("@LABELS@", basename(self.labels_file))
+        template = template.replace("@CONFIG@", basename(self.ell_json))
+        output_template = os.path.join(dest, "runtest.sh")
+
         # raspberry pi requires runtest to use 0xa for newlines, so fix autocrlf that happens on windows.
-        with open(src, 'r') as infile, open(dest, 'w', newline='\n') as outfile:
-            outfile.writelines(infile.readlines())
+        with open(output_template, 'w', newline='\n') as of:
+            of.write(template)
 
     def get_bash_files(self):
         # copy demo files needed to run the test
-        self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/schoolbus.png"),        
+        self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
                            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demo.py"),
-                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py") ], "pi3") 
-        self.normalize_newlines(os.path.join(self.ell_root, "tools/utilities/pitest/runtest.sh"), 
-                            os.path.join(self.pitest_dir, "pi3", "runtest.sh"))
-        bitcode = os.path.join(self.output_dir, "darknet.bc")
+                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py") ], self.output_dir) 
+        self.configure_runtest(self.output_dir)
+    
+        bitcode = os.path.join(self.output_dir, self.model_name + ".bc")
         if (os.path.isfile(bitcode)):
             os.remove(bitcode) # don't need to copy this one over and it is big!
 
@@ -97,7 +127,7 @@ class DriveTest:
         self.copy_files( [ os.path.join(self.ell_root, "tutorials/vision/gettingStarted/darknetImageNetLabels.txt") ], "")
 
     def import_darknet(self):
-        self.ell_model = os.path.join(self.pitest_dir, "darknet.ellmodel")
+        self.ell_model = os.path.join(self.pitest_dir, self.model_name + ".ellmodel")
         if (not os.path.isfile(self.ell_model)):
             sys.path.append(os.path.join(current_path, '../../importers/darknet'))
             darknet_importer = __import__("darknet_import")
@@ -105,10 +135,16 @@ class DriveTest:
             importer.parse_command_line(["", self.config_file, self.weights_file])
             importer.run()
 
-            
+    def get_model(self):
+        if (self.model_name == "darknet"):
+            self.get_darknet()
+            self.import_darknet()
+        else:
+            print("using ELL model: " + self.model_name)
+
     def make_project(self):
-        labels_file = os.path.join(self.pitest_dir, "darknetImageNetLabels.txt")
-        json_file = os.path.join(self.pitest_dir, "darknet_config.json")
+        labels_file = os.path.join(self.pitest_dir, self.labels_file)
+        json_file = os.path.join(self.pitest_dir, self.ell_json)
         if (os.path.isdir(self.output_dir)):
             rmtree(self.output_dir)
         sys.path.append(os.path.join(current_path, '../../wrap'))
@@ -171,7 +207,7 @@ class DriveTest:
         print("==========================================================")
         found = False
         for line in output:
-            if (line.startswith("school bus")):                
+            if (line.startswith("coffee mug")):                
                 found = True
         
         if (found):
@@ -181,8 +217,7 @@ class DriveTest:
             sys.exit(1)
         
     def run_test(self):
-        self.get_darknet()
-        self.import_darknet()
+        self.get_model()
         self.make_project()
         self.get_bash_files()
         self.connect_ssh()
@@ -193,7 +228,5 @@ class DriveTest:
 if __name__ == "__main__":
     args = sys.argv
     tester = DriveTest()
-    if (not tester.parse_command_line(args)):
-        tester.print_usage()
-    else:
-        tester.run_test()
+    tester.parse_command_line(args)
+    tester.run_test()

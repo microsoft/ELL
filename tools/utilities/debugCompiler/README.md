@@ -10,7 +10,7 @@ It also writes out a .csv file for each layer containing two colums, the
 reference column and the compiled column so you can see the actual numbers.
 
 As a side effect it also converts the given test image to a raw data file.
-For example, if you provided `schoolbus.jpg` you will see `schoolbus.jpg.dat`
+For example, if you provided `coffeemug.jpg` you will see `coffeemug.jpg.dat`
 which is the resized image, converted to double floating point values then dumped
 as a raw array, so the file contains `double[n]` where n is the size of the file 
 divided by 8.

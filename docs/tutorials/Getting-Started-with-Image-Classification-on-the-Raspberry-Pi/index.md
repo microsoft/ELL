@@ -70,9 +70,9 @@ Windows: copy ..\..\tools\utilities\pythonlibs\demo*.py pi3
 You can also copy this static image over for testing if you do not have a web camera for your pi:
 
 ````
-cp ../../tools/utilities/pitest/schoolbus.png pi3
+cp ../../tools/utilities/pitest/coffeemug.jpg pi3
 
-Windows: copy ..\..\tools\utilities\pitest\schoolbus.png pi3
+Windows: copy ..\..\tools\utilities\pitest\coffeemug.jpg pi3
 ````
 
 You should now have a pi3 folder that is ready to copy to your Raspberry Pi.  You can do that using the 'scp' tool.  On Windows you can use [WinSCP](https://winscp.net/eng/index.php).
@@ -100,7 +100,7 @@ environment named py34.  So to run the tutorial do this:
 
 ````
 source activate py34
-python demo.py config.json categories.txt schoolbus.png
+python demo.py config.json categories.txt --image coffeemug.jpg
 ````
 And it will classify the image, you should see output like this:
 ````

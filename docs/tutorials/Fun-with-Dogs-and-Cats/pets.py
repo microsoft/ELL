@@ -96,8 +96,6 @@ class Demo:
 
 if __name__ == "__main__":
     helper = d.DemoHelper()
-    if (not helper.parse_arguments(sys.argv)):
-        helper.print_usage()
-    else:
-        demo = Demo(helper)
-        demo.run()
+    helper.parse_arguments(sys.argv)
+    demo = Demo(helper)
+    demo.run()
