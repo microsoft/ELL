@@ -16,6 +16,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../
 import find_ell
 import cntk_to_ell
 import ell_utilities
+import extractor
 import json
 
 def main(args):
@@ -27,7 +28,15 @@ def main(args):
         print("This outputs 'VGG16_ImageNet_Caffe.ellmodel' and 'VGG16_ImageNet_Caffe_config.json'")
         return
     
-    filename = args[1]
+    # extract the model if it's in an archive
+    unzip = extractor.Extractor(args[1])
+    success, filename = unzip.extract_file(".cntk")
+    if (success):
+        print("extracted: " + filename)
+    else:
+        # not a zip archive
+        filename = args[1]
+
     predictor = cntk_to_ell.predictor_from_cntk_model(filename)
 
     input_shape = predictor.GetInputShape()
@@ -47,7 +56,8 @@ def main(args):
         'input_channels': input_shape.channels,
         'output_rows': output_shape.rows,
         'output_columns': output_shape.columns,
-        'output_channels': output_shape.channels
+        'output_channels': output_shape.channels,
+        'input_scale': 1
     }
 
     config_file_name = os.path.splitext(filename)[0]+'_config.json'

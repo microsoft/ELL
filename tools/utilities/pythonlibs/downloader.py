@@ -1,3 +1,13 @@
+####################################################################################################
+##
+##  Project:  Embedded Learning Library (ELL)
+##  File:     downloader.py
+##  Authors:  Chris Lovett
+##
+##  Requires: Python 3.x
+##
+####################################################################################################
+
 import os
 from urllib import request
 

@@ -1,7 +1,7 @@
 ####################################################################################################
 ##
 ##  Project:  Embedded Learning Library (ELL)
-##  File:     referenceTest.py
+##  File:     demo.py
 ##  Authors:  Chris Lovett
 ##
 ##  Requires: Python 3.x

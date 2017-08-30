@@ -10,7 +10,10 @@ Our gallery is a collection of bits and pieces that you can download and use in 
 
 ## Image Classification Models
 
-* [64x64 Binarized Convolutional Neural Network](/ELL/gallery/VGG-16)
+### ILSVRC2012
+* [64x64 Convolutional Neural Network](/ELL/gallery/ILSVRC2012/V16-64)
+* [160x160 Convolutional Neural Network](/ELL/gallery/ILSVRC2012/V16-160)
+* [192x192 Convolutional Neural Network](/ELL/gallery/ILSVRC2012/V16-192)
 
 ## 3D Designs
 

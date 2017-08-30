@@ -1,3 +1,13 @@
+####################################################################################################
+##
+##  Project:  Embedded Learning Library (ELL)
+##  File:     demoHelper.py
+##  Authors:  Chris Lovett
+##
+##  Requires: Python 3.x
+##
+####################################################################################################
+
 import os
 import sys
 import argparse
@@ -45,6 +55,7 @@ class DemoHelper:
         self.labels_file = None
         self.model_file = None
         self.iterations = None  # limit number of iterations through the loop.
+        self.realLabels = None
         self.total_time = 0
         self.time_count = 0
         self.warm_up = True
@@ -59,6 +70,7 @@ class DemoHelper:
         self.arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
         self.arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
         self.arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
+        self.arg_parser.add_argument("--realLabels", help="returns the numeric labels as predictions instead of the text labels", action='store_true')
 
         # mutually exclusive options
         group = self.arg_parser.add_mutually_exclusive_group()
@@ -78,6 +90,7 @@ class DemoHelper:
         self.threshold = args.threshold
         if (args.iterations):
             self.iterations = args.iterations
+        self.realLabels = args.realLabels
 
         # process mutually exclusive options
         if (args.camera):
@@ -178,9 +191,18 @@ class DemoHelper:
         self.time_count = self.time_count + 1
         return self.results
 
-    def report_times(self):
+    def get_times(self):
+        """Returns the average prediction time, if available."""
+        average_time = None
         if self.time_count > 0:
-            print("Average prediction time: " + str(self.total_time/self.time_count))            
+            average_time = self.total_time/self.time_count
+        return average_time
+
+    def report_times(self):
+        """Prints the average prediction time, if available."""
+        average_time = self.get_times()
+        if average_time is not None:
+            print("Average prediction time: " + str(average_time))
 
     def get_top_n(self, predictions, N):
         """Return at most the top 5 predictions as a list of tuples that meet the threshold."""
@@ -196,7 +218,10 @@ class DemoHelper:
             if element[0] > self.threshold:
                 i = int(element[1])
                 if (i < len(self.labels)):
-                    result.append((self.labels[i], round(element[0], 2)))
+                    if self.realLabels:
+                        result.append((i, round(element[0], 2)))
+                    else:
+                        result.append((self.labels[i], round(element[0], 2)))
         return result
 
     def get_predictor_map(self, predictor, intervalMs):

@@ -21,6 +21,7 @@ from shutil import copyfile
 from shutil import rmtree
 from urllib import request
 import paramiko
+import extractor
 
 class DriveTest:
     def __init__(self):
@@ -64,20 +65,31 @@ class DriveTest:
         self.ipaddress = args.ipaddress
         self.pitest_dir = args.outdir
 
-        self.ell_model = args.model
-        self.labels_file = args.labels
-        self.ell_json = args.config
-
-        if (self.ell_model is None or self.labels_file is None or self.ell_json is None):
-            self.model_name = "darknet"
-            self.labels_file = os.path.join(self.pitest_dir, "darknetImageNetLabels.txt")
-            self.ell_json = os.path.join(self.pitest_dir, "darknet_config.json")
-        else:
-            self.model_name = os.path.splitext(basename(self.ell_model))[0]
+        self.extract_model_info(args.model, args.labels, args.config)
 
         self.output_dir = os.path.join(self.pitest_dir, "pi3", self.model_name)
         if (not os.path.isdir(self.output_dir)):
             os.makedirs(self.output_dir)
+
+    def extract_model_info(self, ell_model, labels_file, config):
+        if (ell_model is None or labels_file is None or config is None):
+            self.model_name = "darknet"
+            self.labels_file = os.path.join(self.pitest_dir, "darknetImageNetLabels.txt")
+            self.ell_json = os.path.join(self.pitest_dir, "darknet_config.json")
+        else:
+            # extract the model if it's in an archive
+            unzip = extractor.Extractor(ell_model)
+            success, filename = unzip.extract_file(".ell")
+            if (success):
+                print("extracted: " + filename)
+                self.ell_model = filename
+            else:
+                # not a zip archive
+                self.ell_model = ell_model
+
+            self.model_name = os.path.splitext(basename(self.ell_model))[0]
+            self.labels_file = labels_file
+            self.ell_json = config
 
     def download(self, url, localpath):
         req = request.URLopener()
@@ -128,19 +140,17 @@ class DriveTest:
 
     def import_darknet(self):
         self.ell_model = os.path.join(self.pitest_dir, self.model_name + ".ellmodel")
-        if (not os.path.isfile(self.ell_model)):
-            sys.path.append(os.path.join(current_path, '../../importers/darknet'))
-            darknet_importer = __import__("darknet_import")
-            importer = darknet_importer.DarknetImporter()
-            importer.parse_command_line(["", self.config_file, self.weights_file])
-            importer.run()
+        sys.path.append(os.path.join(current_path, '../../importers/darknet'))
+        darknet_importer = __import__("darknet_import")
+        importer = darknet_importer.DarknetImporter()
+        importer.parse_command_line(["", self.config_file, self.weights_file])
+        importer.run()
 
     def get_model(self):
         if (self.model_name == "darknet"):
             self.get_darknet()
             self.import_darknet()
-        else:
-            print("using ELL model: " + self.model_name)
+        print("using ELL model: " + self.model_name)
 
     def make_project(self):
         labels_file = os.path.join(self.pitest_dir, self.labels_file)

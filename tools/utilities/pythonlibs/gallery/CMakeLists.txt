@@ -1,13 +1,13 @@
 #
-# cmake file for python utilities
+# cmake file for python model gallery utilities
 #
 
 find_package(PythonInterp)
 if(${PYTHONINTERP_FOUND})
 
-    set(module_name "pythonlibs")
+    set(module_name "pythonlibs_gallery")
 
-    set(lib_src buildtools.py demo.py demoHelper.py downloader.py extractor.py find_ell.py)
+    set(lib_src copy_validation_set.py generate_md.py run_validation.py validate.py validate.sh.in)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${lib_src})
 
@@ -16,7 +16,5 @@ if(${PYTHONINTERP_FOUND})
     foreach(PY_FILE ${lib_src})
         configure_file(${PY_FILE} ${PY_FILE} COPYONLY)
     endforeach()
-
-    add_subdirectory(gallery)
 
 endif()  # PYTHONINTERP_FOUND
