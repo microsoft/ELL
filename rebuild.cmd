@@ -15,8 +15,14 @@ REM find which supported VS version is installed
 set Vs14=
 set Vs15=
 
-if "%1"=="14" set Vs14=1 && goto :step2
-if "%1"=="15" set Vs15=1 && goto :step2
+if "%1"=="14" (
+  set Vs14=1
+  goto :step2
+)
+if "%1"=="15" (
+  set Vs15=1
+  goto :step2
+)
 
 set InstallationVersion=
 for /f "usebackq tokens=1* delims=: " %%i in (`external\vswhere.2.1.3\tools\vswhere.exe -legacy`) do (
@@ -31,14 +37,16 @@ for /f "usebackq tokens=1* delims=: " %%i in (`external\vswhere.2.1.3\tools\vswh
 if "!Vs14! and !Vs15!" == "0 and 0" goto :NoCompatibleVsInstall
 :step2
 set CMakeGenerator=Visual Studio 14 2015 Win64
-
+if "!Vs15!" == "1" (
+    set CMakeGenerator=Visual Studio 15 2017 Win64
+)
 if "!Vs14! and !Vs15!" == "1 and 1" (
     set /p id="Use VS 2017 ? "
     if /i "!id!"=="y" set CMakeGenerator=Visual Studio 15 2017 Win64
-    if /i "!id!"=="yes" set CMakeGenerator=Visual Studio 15 2017 
+    if /i "!id!"=="yes" set CMakeGenerator=Visual Studio 15 2017 Win64
 )
 
-echo Using VS version %CMakeGenerator%
+echo Using VS version !CMakeGenerator!
 if not EXIST build goto :mkbuild
 
 set retry=10
@@ -54,7 +62,7 @@ mkdir build
 if ERRORLEVEL 1 goto :nodelete
 
 cd build
-cmake -G "%CMakeGenerator%" ..
+cmake -G "!CMakeGenerator!" ..
 if ERRORLEVEL 1 goto :nocmake
 
 cmake --build . --config Release
