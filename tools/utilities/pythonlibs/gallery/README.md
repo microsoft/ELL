@@ -15,7 +15,7 @@ val.zip@/ILSVRC2012_val_00000004.JPEG	809
 ```
 Each entry contains a path to the image file (e.g. `val.zip@/ILSVRC2012_val_00000001.JPEG`) and the ground truth label (`65`). You don't have to worry about the `val.zip@/` part of the path, because you will provide the local path to your validation images to the script. The script then uses the basename of the image path to construct a new path relative to the actual local path of each image. 
 
-Usage:
+### Usage
 ```
 python copy_validation_set.py --help
 usage: This script takes a CNTK val.map.txt and a path to the validation set, and copies maxfiles files
@@ -37,7 +37,7 @@ optional arguments:
   --labels LABELS      path to the labels to optionally copy
 ```
 
-Example:
+### Example
 Copy up to 50 images from the validation set on the host machine to a Raspberry Pi (target) at the IP address of 192.168.1.100 by calling this script on the host machine (note: not on the Raspberry Pi):
 ```
 (py36) python copy_validation_set.py val.map.txt source_path_to_validation_set 192.168.1.100 --maxfiles 50
@@ -47,12 +47,12 @@ The images will be copied to /home/pi/validation on the Raspberry Pi device. Aft
 ## run_validation.py
 This utility performs a validation pass on a given model on a Raspberry Pi using scp, and retrieves the validation result. This requires the model to have been deployed to `/home/pi/pi3` and the validation set to be copied to `/home/pi/validation`.
 
-Workflow from your host machine:
-1. Deploy a model to your target (Raspberry Pi3) using `drivetest.py1 from `ELL_ROOT/build/tools/utilities/pitest`.
+### Workflow from your host machine:
+1. Deploy a model to your target (Raspberry Pi3) using `drivetest.py` from `ELL_ROOT/build/tools/utilities/pitest`.
 2. Copy the validation set to your target using `copy_validation_set.py` described above.
 3. Run `run_validation.py` from your host machine to initiate validation on the target.
 
-Usage:
+### Usage
 ```
 python run_validation.py  --help
 usage: This script performs a validation pass on a given model
@@ -73,15 +73,15 @@ optional arguments:
                        validation set) (default: 200)
 ```
 
-Example:
+### Example
 After the `v_I64x64x3CCMCCMCCCMCCCMCCCMF2048` model is deployed to /home/pi/pi3, run the validation test on at most 10 images by calling this script from your host machine (note: not on the Raspberry Pi). 
 
-This will SSH to the Raspberry Pi at 192.168.1.100, call the Python bindings for the v_I64x64x3CCMCCMCCCMCCCMCCCMF2048 model, and run through the images in the validation set. To do this, it deploys the validate.py and validate.sh helper scripts to the Raspberry Pi.
+This will SSH to the Raspberry Pi at 192.168.1.100, call the Python bindings for the `v_I64x64x3CCMCCMCCCMCCCMCCCMF2048` model, and run through the images in the validation set. To do this, it deploys the validate.py and validate.sh helper scripts to the Raspberry Pi.
 
 ```
 (py36) python run_validation.py --maxfiles 10 v_I64x64x3CCMCCMCCCMCCCMCCCMF2048 192.168.1.100
 ```
-Note that some models do take a long time to run on the Raspberry Pi, and consume high CPU usage for the OpenBLAS operations. You should try with a relatively small --maxfiles setting and increase as needed.
+Note that some models do take a long time to run on the Raspberry Pi, and consume high CPU usage for the OpenBLAS operations. For these models, try a relatively small --maxfiles setting and increase as needed.
 
 ## generate_md.py
 To be added
