@@ -36,7 +36,7 @@ class GenerateMarkdown:
 
         self.modeldir = args.modeldir
         self.model = basename(self.modeldir)
-        self.outfile = args.outfile
+        self.outfile = open(args.outfile, 'w', encoding='utf-8')
 
     def get_model_file(self, suffix):
         filename = os.path.join(self.modeldir, self.model + suffix)
@@ -52,14 +52,14 @@ class GenerateMarkdown:
             results = json.loads(f.read())
             sum_average_times = reduce(lambda x, y: x + float(y['avg_time']), results, 0)
             average_time = sum_average_times / len(results)
-            print(platform + ": " + str(average_time) + "s/frame")
+            self.outfile.write("\n| Performance | " + platform + ": " + str(average_time) + "s/frame\n")
 
     def get_model_layers(self, root):
         """Returns a list of the high-level layers (i.e. function blocks) that make up the CNTK model """
         stack = [root.root_function]  # node
         layers = []         # final result, list of all relevant layers
         visited = set()
-        in_model = False
+        #in_model = False
 
         while stack:
             node = stack.pop(0)
@@ -77,15 +77,14 @@ class GenerateMarkdown:
                     pass
             # Add function nodes but skip Variable nodes
             if (not isinstance(node, Variable)) and (not node.uid in visited):
-                if (not in_model and node.name == "fc_output"):
-                    in_model = True
-                    layers.append(node)
-                elif in_model:
-                    if (node.name == "mean_removed_input"):
-                        layers.append(node)
-                        break
-                    layers.append(node)
-
+                #if (not in_model and node.name == "fc_output"):
+                #    in_model = True
+                #    layers.append(node)
+                #elif in_model:
+                #    if (node.name == "mean_removed_input"):
+                #        layers.append(node)
+                #        break
+                layers.append(node)
                 visited.add(node.uid)
 
         # CNTK layers are in opposite order to what ELL wants, so reverse the list
@@ -104,6 +103,8 @@ class GenerateMarkdown:
     def get_architecture(self):
         # TODO: we should have _config.json define the architecture sothat we don't need this
         filename = self.get_model_file(".cntk.zip")
+
+        self.outfile.write("\n| Architecture | ");
         with zipfile.ZipFile(filename) as zf:
             for member in zf.infolist():
                 _, e = os.path.splitext(member.filename)
@@ -113,7 +114,7 @@ class GenerateMarkdown:
                     model_root = load_model(os.path.join(path, member.filename))
                     layers = self.get_model_layers(model_root)
                     result = reduce(lambda x, y: x + self.format_model_layer(y) + "<br>", layers, "")
-                    print (result)
+                    self.outfile.write(result)
                     break
 
     def run(self):

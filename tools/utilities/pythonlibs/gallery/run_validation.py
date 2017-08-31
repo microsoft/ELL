@@ -110,15 +110,15 @@ class RunValidation:
 
     def run(self):
         self.connect()
-        self.configure_sh_script("validation.sh")
+        self.configure_sh_script("validate.sh")
 
         # publish files to the device
-        bash_files = ["validation.sh", "validation.py"]
+        bash_files = ["validate.sh", "validate.py"]
         self.publish(bash_files)
 
         # run validation
-        self.exec_remote_command("chmod u+x /home/pi/pi3/validation.sh")
-        output = self.exec_remote_command("/home/pi/pi3/validation.sh")
+        self.exec_remote_command("chmod u+x /home/pi/pi3/validate.sh")
+        output = self.exec_remote_command("/home/pi/pi3/validate.sh")
         self.receive("validation.json", self.model + "_validation.json")
 
 if __name__ == "__main__":
