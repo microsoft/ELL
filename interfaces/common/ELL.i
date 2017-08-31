@@ -36,7 +36,7 @@
 %include "unique_ptr.i"
 %include "exception.i"
 #endif
-
+ 
 // Add ELL exception handling
 %exception 
 {

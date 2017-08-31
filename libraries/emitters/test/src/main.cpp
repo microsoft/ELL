@@ -29,6 +29,7 @@ void TestIR()
     // From IRFunctionTest.h
     TestIRAddFunction();
     TestIRFunction();
+    TestHeader();
 }
 
 int main(int argc, char* argv[])

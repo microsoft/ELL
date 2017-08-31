@@ -20,9 +20,10 @@ using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
-    // VerboseRegion region;
+    //VerboseRegion region;
 
     TestFloatNode();
+    TestMultipleOutputNodes();
     TestCompilableDotProductNode2(3);
     TestCompilableDotProductNode2(4);
 

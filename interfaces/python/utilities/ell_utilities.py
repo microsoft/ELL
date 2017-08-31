@@ -20,14 +20,15 @@ def ell_map_from_float_predictor(predictor):
     try:
         model = ELL.ELL_Model()
         builder = ELL.ELL_ModelBuilder()
-        shape = predictor.GetInputShape()
+        inputShape = predictor.GetInputShape()
+        outputShape = predictor.GetOutputShape()
 
         inputNode = builder.AddInputNode(
-            model, shape.rows * shape.columns * shape.channels, ELL.ELL_PortType_smallReal)
+            model, inputShape, ELL.ELL_PortType_smallReal)
         nnNode = builder.AddFloatNeuralNetworkPredictorNode(
             model, ELL.ELL_PortElements(inputNode.GetOutputPort("output")), predictor)
         outputNode = builder.AddOutputNode(
-            model, ELL.ELL_PortElements(nnNode.GetOutputPort("output")))
+            model, outputShape, ELL.ELL_PortElements(nnNode.GetOutputPort("output")))
 
         ell_map = ELL.ELL_Map(model, ELL.ELL_InputNode(
             inputNode), ELL.ELL_PortElements(outputNode.GetOutputPort("output")))

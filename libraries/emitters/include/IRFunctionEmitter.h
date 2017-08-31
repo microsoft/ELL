@@ -464,7 +464,15 @@ namespace emitters
         ///
         /// <param name="pTopBlock"> Pointer to the top block. </param>
         /// <param name="pBottomBlock"> Pointer to the bottom block. </param>
-        void ConcatBlocks(llvm::BasicBlock* pTopBlock, llvm::BasicBlock* pBottomBlock);
+        void ConcatenateBlocks(llvm::BasicBlock* pTopBlock, llvm::BasicBlock* pBottomBlock);
+
+        /// <summary>
+        /// Injects a branch from each block in the list to the next, removing any existing terminating branches. Places
+        /// them in order in the function block list.
+        /// </summary>
+        ///
+        /// <param name="blocks"> The list of blocks to concatenate. </param>
+        void ConcatenateBlocks(std::vector<llvm::BasicBlock*> blocks);
 
         /// <summary> Concats the new block to the current block and updates the current block. </summary>
         ///
@@ -980,7 +988,7 @@ namespace emitters
         void IncludeInPredictInterface();
 
         /// <summary> Tags a profiling function to be included in the SWIG interface. </summary>
-        void IncludeInProfilingInterface();
+        void IncludeInSwigInterface();
 
         /// <summary> Tags a callback function to be included in the SWIG interface. </summary>
         void IncludeInCallbackInterface();

@@ -406,10 +406,22 @@ namespace emitters
         /// <param name="name"> The function name. </param>
         /// <param name="returnType"> Function return type. </param>
         /// <param name="linkage"> The linkage. </param>
+        /// <param name="arguments"> Function arguments. </param>
+        ///
+        /// <returns> Pointer to the declared function. </returns>
+        llvm::Function* Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const NamedVariableTypeList& arguments);
+
+        /// <summary> Emits the function declaration and arguments, when beginning a new function. </summary>
+        ///
+        /// <param name="pModule"> The module in which the function is declared. </param>
+        /// <param name="name"> The function name. </param>
+        /// <param name="returnType"> Function return type. </param>
+        /// <param name="linkage"> The linkage. </param>
         /// <param name="argTypes"> The function argument types. </param>
         ///
         /// <returns> Pointer to the declared function. </returns>
         llvm::Function* Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const std::vector<llvm::Type*>& argTypes);
+
 
         /// <summary> Emit the beginning of a new code block in the given function. </summary>
         ///
@@ -675,6 +687,22 @@ namespace emitters
         /// <returns> Pointer to a llvm::StructType that represents the declared struct. </returns>
         llvm::StructType* DeclareStruct(const std::string& name, const LLVMTypeList& fields);
 
+        /// <summary> Emit a module scoped struct with the given fields. </summary>
+        ///
+        /// <param name="name"> The struct name. </param>
+        /// <param name="fields"> The struct fields. </param>
+        ///
+        /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
+        llvm::StructType* DeclareStruct(const std::string& name, const NamedVariableTypeList& args);
+
+        /// <summary> Gets a declaration of a Struct with the given name.</summary>
+        ///
+        /// <param name="name"> The struct name. </param>
+        ///
+        /// <returns> Pointer to a llvm::StructType that represents the declared struct. </returns>
+        llvm::StructType* GetStruct(const std::string& name);
+
+
         /// <summary> Emits a new module with a given name. </summary>
         ///
         /// <param name="name"> The module name. </param>
@@ -738,6 +766,7 @@ namespace emitters
         llvm::IRBuilder<> _irBuilder; // IRBuilder API
         IRVariableTable _stringLiterals; // String literals are emitted as constants. We have to track them ourselves to prevent dupes.
         llvm::Value* _pZeroLiteral = nullptr;
+        std::unordered_map<std::string, llvm::StructType*> _structs;
     };
 }
 }

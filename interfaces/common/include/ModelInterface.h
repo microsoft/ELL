@@ -332,8 +332,9 @@ public:
     ELL_Node AddDoubleNeuralNetworkPredictorNode(ELL_Model model, ELL_PortElements input, ell::api::predictors::NeuralNetworkPredictor<double> predictor);
     ELL_Node AddFloatNeuralNetworkPredictorNode(ELL_Model model, ELL_PortElements input, ell::api::predictors::NeuralNetworkPredictor<float> predictor);
 
-    ELL_Node AddInputNode(ELL_Model model, int size, ELL_PortType type);
-    ELL_Node AddOutputNode(ELL_Model model, ELL_PortElements input);
+    ELL_Node AddInputNode(ELL_Model model, ell::math::TensorShape& shape, ELL_PortType type);
+    ELL_Node AddOutputNode(ELL_Model model, ell::math::TensorShape& shape, ELL_PortElements input);
+
     ELL_Node AddSinkNode(ELL_Model model, ELL_PortElements input, const std::string& sinkFunctionName);
     ELL_Node AddSourceNode(ELL_Model model, ELL_PortElements input, ELL_PortType outputType, int outputSize, const std::string& sourceFunctionName);
 
@@ -372,6 +373,8 @@ public:
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);
     void Save(const std::string& filename) const;
     void Load(const std::string& filename);
+    ell::math::TensorShape GetInputShape() const;
+    ell::math::TensorShape GetOutputShape() const;
     
 private:
     std::shared_ptr<ell::model::DynamicMap> _map;

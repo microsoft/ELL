@@ -150,7 +150,7 @@ def parse_cfg(filename):
                 layer['inputPaddingScheme'] = ELL.PaddingScheme.min
             else:
                 layer['inputPaddingScheme'] = ELL.PaddingScheme.zeros
-        layer['inputShape'] = ELL.LayerShape(int(layer['h']) + 2 * int(layer['inputPadding']), int(layer['w']) + 2 * int(layer['inputPadding']), int(layer['c']))
+        layer['inputShape'] = ELL.TensorShape(int(layer['h']) + 2 * int(layer['inputPadding']), int(layer['w']) + 2 * int(layer['inputPadding']), int(layer['c']))
 
         if (i < (len(network) - 1)):
             nextLayer = network[i + 1]
@@ -164,13 +164,13 @@ def parse_cfg(filename):
             else:
                 layer['outputPaddingScheme'] = ELL.PaddingScheme.zeros
 
-            layer['outputShape'] = ELL.LayerShape(int(layer['out_h']) + 2 * int(layer['outputPadding']), int(layer['out_w']) + 2 * int(layer['outputPadding']), int(layer['out_c']))
-            layer['outputShapeMinusPadding'] = ELL.LayerShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
+            layer['outputShape'] = ELL.TensorShape(int(layer['out_h']) + 2 * int(layer['outputPadding']), int(layer['out_w']) + 2 * int(layer['outputPadding']), int(layer['out_c']))
+            layer['outputShapeMinusPadding'] = ELL.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
         else:
             layer['outputPadding'] = 0
             layer['outputPaddingScheme'] = ELL.PaddingScheme.zeros
-            layer['outputShape'] = ELL.LayerShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
-            layer['outputShapeMinusPadding'] = ELL.LayerShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
+            layer['outputShape'] = ELL.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
+            layer['outputShapeMinusPadding'] = ELL.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
 
     return network
 

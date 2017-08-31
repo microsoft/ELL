@@ -13,7 +13,6 @@
 
 // model
 #include "DynamicMap.h"
-#include "InputNode.h"
 #include "Model.h"
 #include "Node.h"
 #include "OutputPort.h"
@@ -35,7 +34,7 @@ namespace ell
 namespace model
 {
     /// <summary> Abstract base class for a map that has been compiled </summary>
-    class CompiledMap : public model::DynamicMap
+    class CompiledMap : public DynamicMap
     {
     public:
         CompiledMap(const CompiledMap& other) = delete;

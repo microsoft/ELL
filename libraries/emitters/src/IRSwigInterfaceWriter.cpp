@@ -522,6 +522,40 @@ namespace emitters
             os << "%include \"callback.i\"\n";
         }
 
+        void WriteShapeWrappers(std::ostream& os, IRModuleEmitter& moduleEmitter) 
+        {
+            auto pModule = moduleEmitter.GetLLVMModule();
+            std::string moduleName = pModule->getName();
+
+            os << "%include \"shape.i\"\n";
+
+            /*
+            * Wrap the darknet_GetInputShape "C" function so we return the TensorShape on the stack
+            * as a conveniently wrapped Python type.
+
+            %inline %{
+                ell::api::TensorShape darknet_GetInputShape(int index) {
+                    TensorShape  s;
+                    darknet_GetInputShape(index, &s);
+                    return ell::api::TensorShape{s.rows, s.columns, s.channels};
+                }
+            %} */
+
+            os << "%inline %{\n";
+            os << "  ell::api::TensorShape " << moduleName << "_GetInputShape(int index) {\n";
+            os << "    TensorShape  s;\n";
+            os << "    " << moduleName << "_GetInputShape(index, &s);\n";
+            os << "    return ell::api::TensorShape{ s.rows, s.columns, s.channels };\n";
+            os << "  }\n";
+            os << "  ell::api::TensorShape " << moduleName << "_GetOutputShape(int index) {\n";
+            os << "    TensorShape  s;\n";
+            os << "    " << moduleName << "_GetOutputShape(index, &s);\n";
+            os << "    return ell::api::TensorShape{ s.rows, s.columns, s.channels };\n";
+            os << "  }\n";
+            os << "%}\n";
+
+        }
+
         void WriteModuleSwigCode(std::ostream& os, IRModuleEmitter& moduleEmitter, const std::string& headerName)
         {
             // Module C++ #include
@@ -538,7 +572,10 @@ namespace emitters
             }
 
             os << "%include \"" << headerName << "\"\n";
+            WriteShapeWrappers(os, moduleEmitter);
+
         }
+
     }
 
     void WriteModuleSwigHeader(std::ostream& os, IRModuleEmitter& moduleEmitter)
@@ -550,7 +587,7 @@ namespace emitters
 
         auto predicts = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
         auto callbacks = GetFunctionsWithTag(moduleEmitter, c_callbackFunctionTagName);
-        auto profilers = GetFunctionsWithTag(moduleEmitter, c_profilingFunctionTagName);
+        auto swigFunctions = GetFunctionsWithTag(moduleEmitter, c_swigFunctionTagName);
 
         // Dependencies
         {
@@ -581,8 +618,8 @@ namespace emitters
             writer.WriteHeaderCode(os);
         }
 
-        // Profiling functions
-        for (const auto& p : profilers)
+        // General functions
+        for (const auto& p : swigFunctions)
         {
             WriteFunctionDeclaration(os, moduleEmitter, *(p.function));
             os << "\n\n";

@@ -40,8 +40,8 @@ namespace emitters
     /// <summary> Indicates the Predict function that should be wrapped by SWIG. </summary>
     static const std::string c_predictFunctionTagName = "ell.fn.predict";
 
-    /// <summary> Indicates a profiling function that should be wrapped by SWIG. </summary>
-    static const std::string c_profilingFunctionTagName = "ell.fn.profiling";
+    /// <summary> Indicates a function that should be wrapped by SWIG. </summary>
+    static const std::string c_swigFunctionTagName = "ell.fn.swig";
 
     /// <summary> Indicates the Step function that should be wrapped by SWIG. </summary>
     /// <remarks>

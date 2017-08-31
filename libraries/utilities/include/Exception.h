@@ -19,12 +19,16 @@ namespace utilities
     class Exception : public std::exception
     {
     public:
+        Exception(const std::string& message) : _message(message) { }
+
         virtual ~Exception() = default;
 
         /// <summary> Gets the message. </summary>
         ///
         /// <returns> A message string; </returns>
-        virtual const std::string& GetMessage() const noexcept = 0;
+        virtual const std::string& GetMessage() const { return _message; }
+    private:
+        std::string _message;
     };
 
     /// <summary> Base class for exceptions with error codes. </summary>
@@ -45,14 +49,8 @@ namespace utilities
         /// <returns> The error code. </returns>
         ErrorCodeType GetErrorCode() const noexcept { return _errorCode; };
 
-        /// <summary> Gets the message. </summary>
-        ///
-        /// <returns> A message string; </returns>
-        virtual const std::string& GetMessage() const noexcept override { return _message; }
-
     private:
         ErrorCodeType _errorCode;
-        std::string _message;
     };
 
     /// <summary> Error codes for exceptions that are the programmer's fault, namely, things that are known at compile time. </summary>

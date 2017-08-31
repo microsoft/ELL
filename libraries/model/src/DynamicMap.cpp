@@ -9,7 +9,7 @@
 #include "DynamicMap.h"
 #include "Exception.h"
 #include "ModelTransformer.h"
-
+#include "OutputNode.h"
 // stl
 #include <algorithm>
 #include <unordered_set>
@@ -179,7 +179,7 @@ namespace model
         swap(a._outputElementsMap, b._outputElementsMap);
     }
 
-    std::vector<const Node*> DynamicMap::GetOutputNodes()
+    std::vector<const Node*> DynamicMap::GetAllOutputNodes() const
     {
         // gather output nodes
         std::unordered_set<const Node*> outputNodes;
@@ -194,7 +194,7 @@ namespace model
         return { outputNodes.begin(), outputNodes.end() };
     }
 
-    std::vector<const Node*> DynamicMap::GetDebugSinkNodes()
+    std::vector<const Node*> DynamicMap::GetDebugSinkNodes() const
     {
         // gather SinkNodes
         std::unordered_set<const Node*> sinkNodes;
@@ -255,7 +255,7 @@ namespace model
         TransformContext context;
         ModelTransformer transformer;
 
-        auto outputNodeVec = GetOutputNodes();
+        auto outputNodeVec = GetAllOutputNodes();
         auto sinkNodes = GetDebugSinkNodes();
         outputNodeVec.insert(outputNodeVec.end(), sinkNodes.begin(), sinkNodes.end());
         auto minimalModel = transformer.CopyModel(_model, outputNodeVec, context);
@@ -271,6 +271,41 @@ namespace model
     size_t DynamicMap::GetOutputSize() const
     {
         return GetOutput(0).Size();
+    }
+
+    math::TensorShape DynamicMap::GetInputShape() const
+    {
+        return GetInput(0)->GetShape();
+    }
+
+    std::vector<const InputNodeBase*> DynamicMap::GetInputNodes() const
+    {
+        return std::vector<const InputNodeBase*>(_inputNodes.begin(), _inputNodes.end());
+    }
+
+    std::vector<const OutputNodeBase*> DynamicMap::GetOutputNodes() const
+    {
+        std::vector<const OutputNodeBase*> result;
+        auto allOutputs = GetAllOutputNodes();
+        for (auto iter = allOutputs.begin(), end = allOutputs.end(); iter != end; iter++)
+        {
+            const Node* node = *iter;
+            const OutputNodeBase* outputNode = dynamic_cast<const OutputNodeBase*>(node);
+            if (outputNode != nullptr) {
+                result.push_back(outputNode);
+            }
+        }
+        return result;
+    }
+
+    math::TensorShape DynamicMap::GetOutputShape() const
+    {
+        auto outputNodeVec = GetOutputNodes();
+        if (outputNodeVec.size() > 0) {
+            const OutputNodeBase* node = dynamic_cast<const OutputNodeBase*>(outputNodeVec[0]);
+            return node->GetShape();
+        }
+        return math::TensorShape();
     }
 
     Port::PortType DynamicMap::GetInputType() const
@@ -310,6 +345,11 @@ namespace model
         auto refinedModel = transformer.TransformModel(_model, transformFunction, context);
         FixTransformedIO(transformer);
         _model = std::move(refinedModel);
+    }
+
+    ell::utilities::ArchiveVersion DynamicMap::GetArchiveVersion() const
+    {
+        return Model::GetCurrentArchiveVersion();
     }
 
     void DynamicMap::WriteToArchive(utilities::Archiver& archiver) const

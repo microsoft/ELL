@@ -12,11 +12,15 @@ namespace model
 {
     template <typename ValueType>
     OutputNode<ValueType>::OutputNode()
-        : OutputNodeBase(_input, _output), _input(this, {}, inputPortName), _output(this, outputPortName, 0){};
+        : OutputNodeBase(_input, _output, OutputShape{ 0,0,0 }), _input(this, {}, inputPortName), _output(this, outputPortName, 0) {};
 
     template <typename ValueType>
     OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input)
-        : OutputNodeBase(_input, _output), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
+        : OutputNodeBase(_input, _output, OutputShape{ input.Size(), 1, 1 }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()) {};
+
+    template <typename ValueType>
+    OutputNode<ValueType>::OutputNode(const model::PortElements<ValueType>& input, OutputShape shape)
+        : OutputNodeBase(_input, _output, shape), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()) {};
 
     template <typename ValueType>
     void OutputNode<ValueType>::Compute() const
@@ -28,52 +32,8 @@ namespace model
     void OutputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newPortElements);
+        auto newNode = transformer.AddNode<OutputNode<ValueType>>(newPortElements, GetShape());
         transformer.MapNodeOutput(output, newNode->output);
-    }
-
-    template <typename ValueType>
-    void OutputNode<ValueType>::Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
-    {
-        assert(GetPortVariableType(input) == GetPortVariableType(output));
-
-        auto inputIsInputNode = (dynamic_cast<const InputNodeBase*>(input.GetInputElement(0).ReferencedPort()->GetNode()) != nullptr);
-        // TODO: re-enable this branch when scalar port bug is fixed 
-        if (IsPureVector(input) && input.Size() != 1 && output.Size() != 1 && !inputIsInputNode && false)
-        {
-            auto pVar = compiler.GetVariableForElement(input.GetInputElement(0));
-            compiler.SetVariableForPort(output, pVar);
-        }
-        else
-        {
-            llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
-            if (input.Size() == 1)
-            {
-                llvm::Value* pVal = compiler.LoadPortElementVariable(input.GetInputElement(0));
-                function.Store(pOutput, pVal);
-            }
-            else
-            {
-                auto inputElements = input.GetInputElements();
-                int rangeStart = 0;
-                for (auto range : inputElements.GetRanges())
-                {
-                    llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
-                    auto forLoop = function.ForLoop();
-                    auto rangeSize = range.Size();
-                    forLoop.Begin(rangeSize);
-                    {
-                        auto i = forLoop.LoadIterationVariable();
-                        auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
-                        auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
-                        llvm::Value* pValue = function.ValueAt(pInput, inputIndex);
-                        function.SetValueAt(pOutput, outputIndex, pValue);
-                    }
-                    forLoop.End();
-                    rangeStart += rangeSize;
-                }
-            }
-        }
     }
 
     template <typename ValueType>
@@ -81,6 +41,8 @@ namespace model
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
+        ell::math::TensorShape shape = GetShape();
+        archiver[shapeName] << std::vector<size_t>({ shape.rows,shape.columns,shape.channels });
     }
 
     template <typename ValueType>
@@ -88,7 +50,13 @@ namespace model
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
+        std::vector<size_t> shapeVector;
+        archiver[shapeName] >> shapeVector;
         _output.SetSize(_input.Size());
+        if (shapeVector.size() >= 3) {
+            OutputShape shape{ shapeVector[0], shapeVector[1], shapeVector[2] };
+            SetShape(shape);
+        }
     }
 }
 }

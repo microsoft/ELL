@@ -46,25 +46,30 @@ namespace model
 
         // if output isn't a simple port, add an output node to model
         auto out = map.GetOutput(0);
+        ell::math::TensorShape shape{ out.Size(),1,1 }; // default shape from PortElementsBase::Size()
+        auto outNodes = map.GetOutputNodes();
+        if (outNodes.size() > 0) {
+            shape = outNodes[0]->GetShape();
+        }
         if (!out.IsFullPortOutput())
         {
             model::OutputNodeBase* outputNode = nullptr;
             switch (out.GetPortType())
             {
                 case model::Port::PortType::boolean:
-                    outputNode = map.GetModel().AddNode<model::OutputNode<bool>>(model::PortElements<bool>(out));
+                    outputNode = map.GetModel().AddNode<model::OutputNode<bool>>(model::PortElements<bool>(out), shape);
                     break;
                 case model::Port::PortType::integer:
-                    outputNode = map.GetModel().AddNode<model::OutputNode<int>>(model::PortElements<int>(out));
+                    outputNode = map.GetModel().AddNode<model::OutputNode<int>>(model::PortElements<int>(out), shape);
                     break;
                 case model::Port::PortType::bigInt:
-                    outputNode = map.GetModel().AddNode<model::OutputNode<int64_t>>(model::PortElements<int64_t>(out));
+                    outputNode = map.GetModel().AddNode<model::OutputNode<int64_t>>(model::PortElements<int64_t>(out), shape);
                     break;
                 case model::Port::PortType::smallReal:
-                    outputNode = map.GetModel().AddNode<model::OutputNode<float>>(model::PortElements<float>(out));
+                    outputNode = map.GetModel().AddNode<model::OutputNode<float>>(model::PortElements<float>(out), shape);
                     break;
                 case model::Port::PortType::real:
-                    outputNode = map.GetModel().AddNode<model::OutputNode<double>>(model::PortElements<double>(out));
+                    outputNode = map.GetModel().AddNode<model::OutputNode<double>>(model::PortElements<double>(out), shape);
                     break;
                 default:
                     throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
@@ -118,6 +123,9 @@ namespace model
         EmitGetInputSizeFunction(map);
         EmitGetOutputSizeFunction(map);
         EmitGetNumNodesFunction(map);
+        EmitShapeEnum();
+        EmitGetInputShapeFunction(map);
+        EmitGetOutputShapeFunction(map);
     }
 
     void IRMapCompiler::EmitGetInputSizeFunction(const DynamicMap& map)
@@ -125,20 +133,170 @@ namespace model
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputSize", int32Type, {});
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputSize", int32Type);
         function.IncludeInHeader();
         function.Return(function.Literal(static_cast<int>(map.GetInputSize())));
         _moduleEmitter.EndFunction();
     }
+
 
     void IRMapCompiler::EmitGetOutputSizeFunction(const DynamicMap& map)
     {
         auto& context = _moduleEmitter.GetLLVMContext();
         auto int32Type = llvm::Type::getInt32Ty(context);
 
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputSize", int32Type, {});
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputSize", int32Type);
         function.IncludeInHeader();
         function.Return(function.Literal(static_cast<int>(map.GetOutputSize())));
+        _moduleEmitter.EndFunction();
+    }
+
+    const char* TensorShapeName = "TensorShape";
+
+    void IRMapCompiler::EmitShapeEnum()
+    {
+        auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
+        if (shapeType == nullptr) {
+            auto int32Type = ell::emitters::VariableType::Int32;
+            emitters::NamedVariableTypeList namedFields = { { "rows", int32Type },{ "columns", int32Type },{ "channels" , int32Type } };
+            auto shapeType = _moduleEmitter.DeclareStruct(TensorShapeName, namedFields);
+            _moduleEmitter.IncludeTypeInHeader(shapeType->getName());
+        }
+    }
+
+    void IRMapCompiler::EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<ell::math::TensorShape> shapes)
+    {
+        auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
+        auto arguments = fn.Arguments().begin();
+        auto indexArgument = &(*arguments++);
+        indexArgument->setName("index");
+        auto shapeArgument = &(*arguments++);
+        shapeArgument->setName("shape");
+        auto& emitter = _moduleEmitter.GetIREmitter();
+        auto& irBuilder = emitter.GetIRBuilder();
+        auto rowsPtr = irBuilder.CreateInBoundsGEP(shapeType, shapeArgument, { fn.Literal(0), fn.Literal(0) });
+        rowsPtr->setName("rows");
+        auto columnsPtr = irBuilder.CreateInBoundsGEP(shapeType, shapeArgument, { fn.Literal(0), fn.Literal(1) });
+        columnsPtr->setName("columns");
+        auto channelsPtr = irBuilder.CreateInBoundsGEP(shapeType, shapeArgument, { fn.Literal(0), fn.Literal(2) });
+        channelsPtr->setName("channels");
+        auto pMainBlock = fn.GetCurrentBlock();
+
+        std::vector<llvm::BasicBlock*> blocks;
+        blocks.push_back(pMainBlock);
+        // create the final block in the case the index is out of range or there are no shapes and reutrn empty TensorShape.
+        auto pDoneBlock = fn.BeginBlock("NoMatchBlock");
+        {
+            fn.Store(rowsPtr, fn.Literal(0));
+            fn.Store(columnsPtr, fn.Literal(0));
+            fn.Store(channelsPtr, fn.Literal(0));
+            fn.Return();
+        }
+
+        if (shapes.size() > 0)
+        {
+            int index = 0;
+            for (auto ptr = shapes.begin(), end = shapes.end(); ptr != end; ptr++, index++) {
+                std::string labelSuffix = std::to_string(index);
+
+                auto followBlock = fn.BeginBlock("FollowBlock" + labelSuffix);
+                auto thenBlock = fn.BeginBlock("ThenBlock" + labelSuffix);
+                {
+                    math::TensorShape shape = *ptr;
+                    fn.Store(rowsPtr, fn.Literal((int)shape.rows));
+                    fn.Store(columnsPtr, fn.Literal((int)shape.columns));
+                    fn.Store(channelsPtr, fn.Literal((int)shape.channels));
+                    fn.Return();
+                }
+                auto elseBlock = fn.BeginBlock("ElseBlock" + labelSuffix);
+                {
+                    fn.Branch(followBlock);
+                }
+                auto conditionBlock = fn.BeginBlock("IfBlock" + labelSuffix);
+                {
+                    auto compare = new llvm::ICmpInst(*conditionBlock, llvm::ICmpInst::ICMP_EQ, indexArgument, fn.Literal(index));
+                    llvm::BranchInst::Create(thenBlock, elseBlock, compare, conditionBlock);
+                }
+                blocks.push_back(conditionBlock);
+                blocks.push_back(followBlock);
+            }
+            fn.SetCurrentBlock(blocks[blocks.size() - 1]);
+            fn.Branch(pDoneBlock);
+        }
+
+        fn.SetCurrentBlock(pMainBlock);
+        if (blocks.size() > 1)
+        {
+            fn.Branch(blocks[1]); // jump to first statement.
+        }
+
+        blocks.push_back(pDoneBlock);
+        // ensure all blocks are properly chained with branch instructions and inserted into the function BasicBlockList.
+        fn.ConcatenateBlocks(blocks); 
+    }
+
+
+    // This is the type of code we are trying to generate for the GetInputShape and GetOutputShape functions:
+    // 
+    // void foo_GetInputShape(int index, struct TensorShape* s)
+    // {
+    //     if (index == 0) {
+    //         s->rows = 224;
+    //         s->columns = 224;
+    //         s->channels = 3;
+    //         return;
+    //     }
+    //     if (index == 1) {
+    //         s->rows = 224;
+    //         s->columns = 224;
+    //         s->channels = 3;
+    //         return;
+    //     }
+    //     s->rows = 0;
+    //     s->columns = 0;
+    //     s->channels = 0;
+    // }
+    // 
+
+    void IRMapCompiler::EmitGetInputShapeFunction(const DynamicMap& map)
+    {
+        // We have to create this interface because LLVM cannot reliably return structures on the stack.
+        // void darknet_GetInputShape(struct TensorShape* shape, int index)
+        auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
+        auto& context = _moduleEmitter.GetLLVMContext();
+        auto voidType = llvm::Type::getVoidTy(context);
+        auto int32Type = llvm::Type::getInt32Ty(context);
+        const std::vector<llvm::Type*> parameters = { { int32Type }, { shapeType->getPointerTo() } };
+        auto fn = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputShape", voidType, parameters);
+        fn.IncludeInHeader();
+        auto nodes = map.GetInputNodes();
+        std::vector<math::TensorShape> shapes;
+        for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++) {
+            const ell::model::InputNodeBase* node = *ptr;
+            shapes.push_back(node->GetShape());
+        }
+        EmitShapeConditionals(fn, shapes);
+        _moduleEmitter.EndFunction();
+    }
+
+    void IRMapCompiler::EmitGetOutputShapeFunction(const DynamicMap& map)
+    {
+        // We have to create this interface because LLVM cannot reliably return structures on the stack.
+        // void darknet_GetInputShape(struct TensorShape* shape, int index)
+        auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
+        auto& context = _moduleEmitter.GetLLVMContext();
+        auto voidType = llvm::Type::getVoidTy(context);
+        auto int32Type = llvm::Type::getInt32Ty(context);
+        const std::vector<llvm::Type*> parameters = { { int32Type },{ shapeType->getPointerTo() } };
+        auto fn = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputShape", voidType, parameters);
+        fn.IncludeInHeader();
+        auto nodes = map.GetOutputNodes();
+        std::vector<math::TensorShape> shapes;
+        for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++) {
+            const ell::model::OutputNodeBase* node = *ptr;
+            shapes.push_back(node->GetShape());
+        }
+        EmitShapeConditionals(fn, shapes);
         _moduleEmitter.EndFunction();
     }
 
@@ -148,7 +306,7 @@ namespace model
         auto int32Type = llvm::Type::getInt32Ty(context);
         int numNodes = map.GetModel().Size();
 
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetNumNodes", int32Type, {});
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetNumNodes", int32Type);
         function.IncludeInHeader();
         function.Return(function.Literal(numNodes));
         _moduleEmitter.EndFunction();

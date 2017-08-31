@@ -11,7 +11,9 @@
 #include "InputNode.h"
 #include "ModelTransformer.h"
 #include "Node.h"
+#include "OutputNode.h"
 #include "PortElements.h"
+#include "Tensor.h"
 
 // data
 #include "DataVector.h"
@@ -32,6 +34,8 @@ namespace ell
 {
 namespace model
 {
+    class OutputNodeBase;
+
     /// <summary> Class that wraps a model and its designated outputs </summary>
     class DynamicMap : public utilities::IArchivable
     {
@@ -93,6 +97,16 @@ namespace model
         ///
         /// <returns> The dimensionality of the map's output port </returns>
         size_t GetOutputSize() const;
+
+        /// <summary> Returns the shape of the map's input </summary>
+        ///
+        /// <returns> The dimensionality of the map's input port </returns>
+        math::TensorShape GetInputShape() const;
+
+        /// <summary> Returns the shape of the map's output </summary>
+        ///
+        /// <returns> The dimensionality of the map's output port </returns>
+        math::TensorShape GetOutputShape() const;
 
         /// <summary> Returns the type of the map's input </summary>
         ///
@@ -156,6 +170,16 @@ namespace model
         /// <returns> The input nodes </returns>
         const std::vector<InputNodeBase*>& GetInputs() { return _inputNodes; }
 
+        /// <summary> Returns the input nodes </summary>
+        ///
+        /// <returns> The input nodes </returns>
+        std::vector<const InputNodeBase*> GetInputNodes() const;
+
+        /// <summary> Returns the output nodes </summary>
+        ///
+        /// <returns> The output nodes </returns>
+        std::vector<const OutputNodeBase*> GetOutputNodes() const;
+
         /// <summary> Get the number of outputs </summary>
         ///
         /// <returns> The number of outputs </returns>
@@ -176,7 +200,7 @@ namespace model
         /// <summary> Returns the outputs </summary>
         ///
         /// <returns> The outputs </returns>
-        const std::vector<PortElementsBase>& GetOutputs() { return _outputElements; }
+        const std::vector<PortElementsBase>& GetOutputs() const { return _outputElements; }
 
         /// <summary> Resets a specified output. </summary>
         ///
@@ -314,6 +338,7 @@ namespace model
         virtual std::vector<float> ComputeFloatOutput(const PortElementsBase& outputs) const;
         virtual std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs) const;
 
+        virtual ell::utilities::ArchiveVersion GetArchiveVersion() const override;
     private:
         Model _model;
 
@@ -325,8 +350,8 @@ namespace model
         std::vector<std::string> _outputNames;
         std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
 
-        std::vector<const Node*> GetOutputNodes();
-        std::vector<const Node*> GetDebugSinkNodes();
+        std::vector<const Node*> GetAllOutputNodes() const;
+        std::vector<const Node*> GetDebugSinkNodes() const;
         void FixTransformedIO(ModelTransformer& transformer);
     };
 

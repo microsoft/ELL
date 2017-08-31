@@ -1,19 +1,22 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     LogicException.tcc (utilities)
+//  File:     TensorShape.h (math)
 //  Authors:  Ofer Dekel
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma once
 
 namespace ell
 {
-namespace utilities
-{
-    template <typename ErrorCodeType>
-    ErrorCodeException<ErrorCodeType>::ErrorCodeException(ErrorCodeType errorCode, const std::string& message)
-        : Exception(message), _errorCode(errorCode)
+    namespace math
     {
+        ///<summary> A handy struct that describes the shape of a tensor</summary>
+        struct TensorShape
+        {
+            size_t rows;
+            size_t columns;
+            size_t channels;
+        };
     }
-}
 }

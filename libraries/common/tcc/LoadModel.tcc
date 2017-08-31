@@ -10,6 +10,7 @@
 #include "Archiver.h"
 #include "Files.h"
 #include "JsonArchiver.h"
+#include "Exception.h"
 
 namespace ell
 {
@@ -29,9 +30,9 @@ namespace common
             unarchiver.Unarchive(map);
             return map;
         }
-        catch (const std::exception&)
+        catch (const ell::utilities::Exception& ex)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file.");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file: " + ex.GetMessage());
         }
     }
 

@@ -12,11 +12,16 @@ namespace model
 {
     template <typename ValueType>
     InputNode<ValueType>::InputNode()
-        : InputNodeBase(_output), _output(this, outputPortName, 0){};
+        : InputNodeBase(_output, InputShape{ 0,0,0 }), _output(this, outputPortName, 0) {};
 
     template <typename ValueType>
     InputNode<ValueType>::InputNode(size_t size)
-        : InputNodeBase(_output), _output(this, outputPortName, size){};
+        : InputNodeBase(_output, InputShape{ size,1,1 }), _output(this, outputPortName, size) {};
+
+
+    template <typename ValueType>
+    InputNode<ValueType>::InputNode(InputShape shape)
+        : InputNodeBase(_output, shape), _output(this, outputPortName, shape.rows * shape.columns * shape.channels) {};
 
     template <typename ValueType>
     void InputNode<ValueType>::SetInput(ValueType inputValue)
@@ -40,7 +45,7 @@ namespace model
     template <typename ValueType>
     void InputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newNode = transformer.AddNode<InputNode<ValueType>>(_output.Size());
+        auto newNode = transformer.AddNode<InputNode<ValueType>>(GetShape());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -55,6 +60,8 @@ namespace model
     {
         Node::WriteToArchive(archiver);
         archiver["size"] << _output.Size();
+        InputShape shape = GetShape();
+        archiver["shape"] << std::vector<size_t>({ shape.rows,shape.columns,shape.channels });
     }
 
     template <typename ValueType>
@@ -63,7 +70,13 @@ namespace model
         Node::ReadFromArchive(archiver);
         int size;
         archiver["size"] >> size;
+        std::vector<size_t> shapeVector;
+        archiver["shape"] >> shapeVector;
         _output.SetSize(size);
+        if (shapeVector.size() >= 3) {
+            InputShape shape{ shapeVector[0], shapeVector[1], shapeVector[2] };
+            SetShape(shape);
+        }
     }
 }
 }

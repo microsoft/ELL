@@ -30,6 +30,7 @@ set (include
     include/CompiledMap.h
     include/DynamicMap.h
     include/CompilableNode.h
+    include/InputNodeBase.h
     include/InputNode.h
     include/InputPort.h
     include/IRCompiledMap.h
@@ -42,6 +43,7 @@ set (include
     include/ModelTransformer.h
     include/Node.h
     include/NodeMap.h
+    include/OutputNodeBase.h
     include/OutputNode.h
     include/OutputPort.h
     include/Port.h

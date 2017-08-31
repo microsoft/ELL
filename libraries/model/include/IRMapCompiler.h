@@ -177,6 +177,11 @@ namespace model
         void EmitGetOutputSizeFunction(const DynamicMap& map);
         void EmitGetNumNodesFunction(const DynamicMap& map);
 
+        void EmitShapeEnum();
+        void EmitGetInputShapeFunction(const DynamicMap& map);
+        void EmitGetOutputShapeFunction(const DynamicMap& map);
+        void EmitShapeConditionals(emitters::IRFunctionEmitter& fn, std::vector<ell::math::TensorShape> shapes);
+
         // stack of node regions
         std::vector<NodeMap<emitters::IRBlockRegion*>> _nodeRegions;
     };

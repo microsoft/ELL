@@ -10,10 +10,11 @@
 
 #include "CompilableNode.h"
 #include "CompilableNodeUtilities.h"
-#include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 #include "Node.h"
+#include "OutputNodeBase.h"
 #include "OutputPort.h"
+#include "Tensor.h"
 
 // utilities
 #include "IArchivable.h"
@@ -28,24 +29,6 @@ namespace ell
 /// <summary> model namespace </summary>
 namespace model
 {
-    /// <summary> A node that represents an output from the system. </summary>
-    class OutputNodeBase : public CompilableNode
-    {
-    public:
-        const InputPortBase& GetInputPort() const { return _inputBase; }
-        const OutputPortBase& GetOutputPort() const { return _outputBase; }
-        using Node::GetInputPort;
-        using Node::GetOutputPort;
-
-    protected:
-        OutputNodeBase(InputPortBase& input, OutputPortBase& output);
-        virtual bool ShouldCompileInline() const override { return true; }
-        virtual bool HasState() const override { return false; }
-
-    private:
-        InputPortBase& _inputBase;
-        OutputPortBase& _outputBase;
-    };
 
     /// <summary> A node that represents an output from the system. </summary>
     template <typename ValueType>
@@ -56,6 +39,7 @@ namespace model
         /// @{
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
+        static constexpr const char* shapeName = "shape";
         const model::InputPort<ValueType>& input = _input;
         const model::OutputPort<ValueType>& output = _output;
         /// @}
@@ -67,6 +51,12 @@ namespace model
         ///
         /// <param name="input"> The `PortElements<>` to get the input data from </param>
         OutputNode(const model::PortElements<ValueType>& input);
+
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name="input"> The `PortElements<>` to get the input data from </param>
+        /// <param name="shape"> The shape of the input data</param>
+        OutputNode(const model::PortElements<ValueType>& input, OutputShape shape);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -87,8 +77,6 @@ namespace model
 
     protected:
         virtual void Compute() const override;
-        virtual void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-
         InputPort<ValueType> _input;
         OutputPort<ValueType> _output;
     };

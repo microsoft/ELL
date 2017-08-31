@@ -15,6 +15,7 @@
 #include "IRExecutionEngine.h"
 #include "IRFunctionEmitter.h"
 #include "IRModuleEmitter.h"
+#include "IRHeaderWriter.h"
 
 // testing
 #include "testing.h"
@@ -25,6 +26,7 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <sstream>
 
 using namespace ell;
 using namespace ell::emitters;
@@ -476,4 +478,41 @@ void TestMetadata()
     // Just for fun - metadata should have no effect
     IRExecutionEngine jit(std::move(module));
     jit.RunMain();
+}
+
+
+void TestHeader()
+{
+    IRModuleEmitter module("Predictor");
+    auto int32Type = ell::emitters::VariableType::Int32;
+    emitters::NamedVariableTypeList namedFields = { { "rows", int32Type },{ "columns", int32Type },{ "channels" , int32Type } };
+    auto shapeType = module.DeclareStruct("Shape", namedFields);
+    // test that this casues the type to show up in the module header.
+    module.IncludeTypeInHeader(shapeType->getName());
+
+    const emitters::NamedVariableTypeList parameters = { { "index", emitters::GetVariableType<int>() } };
+    auto function = module.BeginFunction("Test_GetInputShape", shapeType, parameters);
+    // test that this causes the function to show up in the module header
+    function.IncludeInHeader();
+    auto& emitter = module.GetIREmitter();
+    auto& irBuilder = emitter.GetIRBuilder();
+    llvm::AllocaInst* shapeVar = function.Variable(shapeType, "shape");
+    auto rowsPtr = irBuilder.CreateInBoundsGEP(shapeType, shapeVar, { function.Literal(0), function.Literal(0) });
+    auto columnsPtr = irBuilder.CreateInBoundsGEP(shapeType, shapeVar, { function.Literal(0), function.Literal(1) });
+    auto channelsPtr = irBuilder.CreateInBoundsGEP(shapeType, shapeVar, { function.Literal(0), function.Literal(2) });
+    function.Store(rowsPtr, function.Literal(224));
+    function.Store(columnsPtr, function.Literal(224));
+    function.Store(channelsPtr, function.Literal(3));
+    function.Return(function.ValueAt(shapeVar));
+    module.EndFunction();
+
+    std::ostringstream out;
+    ell::emitters::WriteModuleHeader(out, module);
+
+    std::string result = out.str();
+    auto structPos = result.find("struct Shape");
+    auto funcPos = result.find("struct Shape Test_GetInputShape(int32_t");
+    testing::ProcessTest("Testing header generation", 
+        structPos != std::string::npos && funcPos != std::string::npos);
+    
 }

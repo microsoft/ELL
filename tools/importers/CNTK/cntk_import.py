@@ -51,12 +51,8 @@ def main(args):
 
     model_config = {
         'model': tail,
-        'input_rows': input_shape.rows,
-        'input_columns': input_shape.columns,
-        'input_channels': input_shape.channels,
-        'output_rows': output_shape.rows,
-        'output_columns': output_shape.columns,
-        'output_channels': output_shape.channels,
+        'input_shape': [ input_shape.rows, input_shape.columns, input_shape.channels ],
+        'output_shape': [ output_shape.rows, output_shape.columns, output_shape.channels ],
         'input_scale': 1
     }
 

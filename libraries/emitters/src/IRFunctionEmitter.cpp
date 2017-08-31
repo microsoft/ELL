@@ -423,7 +423,19 @@ namespace emitters
         return _pEmitter->BlockBefore(_pFunction, pBlock, label);
     }
 
-    void IRFunctionEmitter::ConcatBlocks(llvm::BasicBlock* pTopBlock, llvm::BasicBlock* pBottomBlock)
+    void IRFunctionEmitter::ConcatenateBlocks(std::vector<llvm::BasicBlock*> blocks)
+    {
+        llvm::BasicBlock* previousBlock = nullptr;
+        for (auto ptr = blocks.begin(), end = blocks.end(); ptr != end; ptr++) {
+            llvm::BasicBlock* nextBlock = *ptr;
+            if (previousBlock != nullptr) {
+                ConcatenateBlocks(previousBlock, nextBlock);
+            }
+            previousBlock = nextBlock;
+        }
+    }
+
+    void IRFunctionEmitter::ConcatenateBlocks(llvm::BasicBlock* pTopBlock, llvm::BasicBlock* pBottomBlock)
     {
         assert(pTopBlock != nullptr && pBottomBlock != nullptr);
 
@@ -431,8 +443,10 @@ namespace emitters
         _pEmitter->BlockAfter(_pFunction, pTopBlock, pBottomBlock);
         auto pPrevCurBlock = SetCurrentBlock(pTopBlock);
         {
-            DeleteTerminatingBranch();
-            Branch(pBottomBlock);
+            auto termInst = pTopBlock->getTerminator();
+            if (termInst == nullptr) {
+                Branch(pBottomBlock);
+            }
         }
         SetCurrentBlock(pPrevCurBlock);
     }
@@ -440,7 +454,7 @@ namespace emitters
     void IRFunctionEmitter::MergeBlock(llvm::BasicBlock* pBlock)
     {
         assert(pBlock != nullptr);
-        ConcatBlocks(GetCurrentBlock(), pBlock);
+        ConcatenateBlocks(GetCurrentBlock(), pBlock);
         SetCurrentBlock(pBlock);
     }
 
@@ -917,9 +931,9 @@ namespace emitters
         InsertMetadata(c_predictFunctionTagName);
     }
 
-    void IRFunctionEmitter::IncludeInProfilingInterface()
+    void IRFunctionEmitter::IncludeInSwigInterface()
     {
-        InsertMetadata(c_profilingFunctionTagName);
+        InsertMetadata(c_swigFunctionTagName);
     }
 
     void IRFunctionEmitter::IncludeInCallbackInterface()

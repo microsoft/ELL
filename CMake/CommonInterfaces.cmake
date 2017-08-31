@@ -162,7 +162,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
     else()
       if(SWIG_FOUND)
         swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
-        swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} ${INTERFACE_LIBRARIES} common evaluators functions model nodes predictors trainers utilities emitters)
+        swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} ${INTERFACE_LIBRARIES} common evaluators functions model nodes predictors trainers utilities emitters math)
 
       else()
         add_custom_target(${PREPEND_TARGET}${module_name} 
@@ -215,6 +215,7 @@ macro(generate_emitted_interface_module MODEL_NAME MODEL_LIBRARIES COMMON_PATH L
   set (INTERFACE_MAIN ${MODEL_NAME}.i)
 
   list(APPEND INTERFACE_FILES ${COMMON_PATH}/callback.i
+                       ${COMMON_PATH}/shape.i
                        ${COMMON_PATH}/callback_javascript_post.i
                        ${COMMON_PATH}/callback_javascript_pre.i
                        ${COMMON_PATH}/callback_python_post.i

@@ -9,6 +9,7 @@
 #include "ModelComparison.h"
 #include "CompareUtils.h"
 #include "VectorStats.h"
+#include "DebugSinkNode.h"
 
 // emitters
 #include "EmitterTypes.h"

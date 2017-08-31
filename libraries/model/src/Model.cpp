@@ -23,7 +23,7 @@ namespace model
         //
         // Current Model archive format version
         //
-        const int c_currentModelArchiveVersion = 1;
+        const int c_currentModelArchiveVersion = 2;
     }
 
     //

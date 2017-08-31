@@ -81,84 +81,85 @@
 #include <iostream>
 #include <ostream>
 #include <string>
+#include <sstream>
 
 using namespace ell;
 
 namespace
 {
-size_t GetShapeSize(const math::Triplet& shape)
-{
-    return shape[0] * shape[1] * shape[2];
-}
-
-template <typename ValueType>
-class Uniform
-{
-public:
-    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
-        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
-
-    ValueType operator()()
+    size_t GetShapeSize(const math::Triplet& shape)
     {
-        double uniform = static_cast<double>(_rng()) / _range;
-        return static_cast<ValueType>((uniform * _outputRange) + _minOutput);
+        return shape[0] * shape[1] * shape[2];
     }
 
-private:
-    std::default_random_engine _rng;
-    double _range;
-    ValueType _minOutput;
-    ValueType _outputRange;
-};
+    template <typename ValueType>
+    class Uniform
+    {
+    public:
+        Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
+            : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
 
-template <typename ElementType>
-void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
-{
-    Uniform<ElementType> rand(min, max);
-    std::generate(vector.begin(), vector.end(), rand);
-}
+        ValueType operator()()
+        {
+            double uniform = static_cast<double>(_rng()) / _range;
+            return static_cast<ValueType>((uniform * _outputRange) + _minOutput);
+        }
 
-template <typename ElementType>
-void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
-{
-    Uniform<ElementType> rand(min, max);
-    vector.Generate(rand);
-}
+    private:
+        std::default_random_engine _rng;
+        double _range;
+        ValueType _minOutput;
+        ValueType _outputRange;
+    };
 
-template <typename ElementType>
-void FillRandomTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType min = -1, ElementType max = 1)
-{
-    Uniform<ElementType> rand(min, max);
-    tensor.Generate(rand);
-}
+    template <typename ElementType>
+    void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
+    {
+        Uniform<ElementType> rand(min, max);
+        std::generate(vector.begin(), vector.end(), rand);
+    }
 
-template <typename ElementType>
-void FillVector(std::vector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
-{
-    ElementType val = 0;
-    std::generate(vector.begin(), vector.end(), [&val]() { return val++; });
-}
+    template <typename ElementType>
+    void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
+    {
+        Uniform<ElementType> rand(min, max);
+        vector.Generate(rand);
+    }
 
-template <typename ElementType>
-void FillVector(ell::math::ColumnVector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
-{
-    ElementType val = 0;
-    vector.Generate([&val]() { return val++; });
-}
+    template <typename ElementType>
+    void FillRandomTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType min = -1, ElementType max = 1)
+    {
+        Uniform<ElementType> rand(min, max);
+        tensor.Generate(rand);
+    }
 
-template <typename ElementType>
-void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
-{
-    ElementType val = 0;
-    tensor.Generate([&val]() { return val++; });
-}
+    template <typename ElementType>
+    void FillVector(std::vector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
+    {
+        ElementType val = 0;
+        std::generate(vector.begin(), vector.end(), [&val]() { return val++; });
+    }
 
-template <typename ElementType>
-void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
-{
-    ElementType val = 0;
-    tensor.Generate([&val]() { return val++; });
-}
+    template <typename ElementType>
+    void FillVector(ell::math::ColumnVector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
+    {
+        ElementType val = 0;
+        vector.Generate([&val]() { return val++; });
+    }
+
+    template <typename ElementType>
+    void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
+    {
+        ElementType val = 0;
+        tensor.Generate([&val]() { return val++; });
+    }
+
+    template <typename ElementType>
+    void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
+    {
+        ElementType val = 0;
+        tensor.Generate([&val]() { return val++; });
+    }
 }
 
 void TestCompileIsEqual()
@@ -293,7 +294,7 @@ public:
     LabeledPrototype() = default;
     LabeledPrototype(const LabeledPrototype&) = default;
     LabeledPrototype(int label, const std::vector<std::vector<double>>& prototype)
-        : _label(label), _prototype(prototype){};
+        : _label(label), _prototype(prototype) {};
     int Label() const { return _label; }
     size_t Dimension() const { return _prototype[0].size(); }
     std::vector<std::vector<double>> Prototype() const { return _prototype; }
@@ -510,10 +511,10 @@ InputCallbackTester<double> g_testerCompiled;
 
 // C callback (called by emitted model)
 extern "C" {
-bool CompiledSourceNode_InputCallback(double* input)
-{
-    return g_testerCompiled.InputCallback(input);
-}
+    bool CompiledSourceNode_InputCallback(double* input)
+    {
+        return g_testerCompiled.InputCallback(input);
+    }
 }
 TESTING_FORCE_DEFINE_SYMBOL(CompiledSourceNode_InputCallback, bool, double*);
 
@@ -548,20 +549,20 @@ void TestCompilableSourceNode(bool runJit)
 
 // C callback (called by emitted model)
 extern "C" {
-size_t g_sinkOutputSize = 0;
-std::vector<double> outputValues;
-void CompiledSinkNode_OutputCallback_Scalar(double output)
-{
-    assert(g_sinkOutputSize == 1);
-    outputValues.push_back(output);
-}
-TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Scalar, void, double);
+    size_t g_sinkOutputSize = 0;
+    std::vector<double> outputValues;
+    void CompiledSinkNode_OutputCallback_Scalar(double output)
+    {
+        assert(g_sinkOutputSize == 1);
+        outputValues.push_back(output);
+    }
+    TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Scalar, void, double);
 
-void CompiledSinkNode_OutputCallback_Vector(double* output)
-{
-    assert(g_sinkOutputSize > 1);
-    outputValues.assign(output, output + g_sinkOutputSize); // assign reallocates as needed
-}
+    void CompiledSinkNode_OutputCallback_Vector(double* output)
+    {
+        assert(g_sinkOutputSize > 1);
+        outputValues.assign(output, output + g_sinkOutputSize); // assign reallocates as needed
+    }
 }
 TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Vector, void, double*);
 
@@ -615,6 +616,37 @@ void TestFloatNode()
     // compare output
     std::vector<std::vector<float>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "AccumulatorNode<float>");
+}
+
+void TestMultipleOutputNodes()
+{
+    model::Model model;
+    ell::math::TensorShape shape{ 224, 224, 3 };
+    auto inputNode = model.AddNode<model::InputNode<double>>(shape);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output, shape);
+
+// this is blocked by IRMapCompiler.cpp line 42 which throws, so uncomment this when we decide to fix that.
+//    auto outputNode2 = model.AddNode<model::OutputNode<double>>(inputNode->output);
+
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } }); // , { "output2", outputNode2->output } });
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    PrintIR(compiledMap);
+
+    std::ostringstream buffer;
+    compiledMap.WriteCode(buffer, emitters::ModuleOutputFormat::ir);
+
+    std::string result = buffer.str();
+
+    // some minimal strings for testing, full verbose string comparison might be too fragile to future code gen changes.
+    auto inputFuncPos = result.find("define void @ELL_GetInputShape(i32 %index, %TensorShape.0* %shape");
+    auto outputFuncpos = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape.0* %shape");
+    auto storePos = result.find("store i32 224, i32* %rows, align 4");
+    testing::ProcessTest("Testing GetOutputShape generation",
+        storePos != std::string::npos && inputFuncPos != std::string::npos && outputFuncpos != std::string::npos);
 }
 
 void TestCompilableDotProductNode2(int dimension)
@@ -679,7 +711,7 @@ protected:
     {
         int inputSize = _input1.Size();
         assert(inputSize == _input2.Size());
-        return { currentFunction.Literal(inputSize) };
+        return{ currentFunction.Literal(inputSize) };
     }
 
 private:
@@ -1531,10 +1563,10 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     ElementType v3 = 18;
     ElementType v4 = 18;
     testing::ProcessTest("Testing ConvolutionalLayer, values",
-                         testing::IsEqual(output(0, 0, 0), v1, eps) &&
-                             testing::IsEqual(output(0, 0, 1), v2, eps) &&
-                             testing::IsEqual(output(0, 1, 0), v3, eps) &&
-                             testing::IsEqual(output(0, 1, 1), v4, eps));
+        testing::IsEqual(output(0, 0, 0), v1, eps) &&
+        testing::IsEqual(output(0, 0, 1), v2, eps) &&
+        testing::IsEqual(output(0, 1, 0), v3, eps) &&
+        testing::IsEqual(output(0, 1, 1), v4, eps));
 
     // Create model
     model::Model model;
@@ -1786,3 +1818,4 @@ void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
+

@@ -11,7 +11,7 @@
 
 // neural network
 #include "Layer.h"
-
+#include "MathInterface.h"
 #include "ActivationLayer.h"
 #include "BatchNormalizationLayer.h"
 #include "BiasLayer.h"
@@ -54,17 +54,11 @@ namespace neural
     using LayerType = ell::predictors::neural::LayerType;
     using PaddingScheme = ell::predictors::neural::PaddingScheme;
     using PaddingParameters = ell::predictors::neural::PaddingParameters;
+    using LayerShape = ell::math::TensorShape;
 
     //////////////////////////////////////////////////////////////////////////
     // Common types used by the neural layers
     //////////////////////////////////////////////////////////////////////////
-    struct LayerShape
-    {
-        size_t rows;
-        size_t columns;
-        size_t channels;
-    };
-
     struct LayerParameters
     {
         LayerShape inputShape;
@@ -187,7 +181,7 @@ namespace neural
     {
     public:
         BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ell::api::math::Tensor<ElementType>& weightsTensor)
-            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels), convolutionalParameters(convolutionalParameters)
+            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.shape.rows, weightsTensor.shape.columns, weightsTensor.shape.channels), convolutionalParameters(convolutionalParameters)
         {
         }
 
@@ -206,7 +200,7 @@ namespace neural
     {
     public:
         ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, const ell::api::math::Tensor<ElementType>& weightsTensor)
-            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels), convolutionalParameters(convolutionalParameters)
+            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.shape.rows, weightsTensor.shape.columns, weightsTensor.shape.channels), convolutionalParameters(convolutionalParameters)
         {
         }
 
@@ -222,7 +216,7 @@ namespace neural
     {
     public:
         FullyConnectedLayer(const LayerParameters& layerParameters, const ell::api::math::Tensor<ElementType>& weightsTensor)
-            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.rows, weightsTensor.columns, weightsTensor.channels)
+            : Layer<ElementType>(layerParameters), weights(weightsTensor.data, weightsTensor.shape.rows, weightsTensor.shape.columns, weightsTensor.shape.channels)
         {
         }
 

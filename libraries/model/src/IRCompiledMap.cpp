@@ -274,6 +274,7 @@ namespace model
         }
 
         // if output isn't a simple port, add an output node to model
+        auto shape = GetOutputShape();
         auto out = GetOutput(0);
         if (!out.IsFullPortOutput())
         {
@@ -281,19 +282,19 @@ namespace model
             switch (out.GetPortType())
             {
                 case model::Port::PortType::boolean:
-                    outputNode = GetModel().AddNode<model::OutputNode<bool>>(model::PortElements<bool>(out));
+                    outputNode = GetModel().AddNode<model::OutputNode<bool>>(model::PortElements<bool>(out), shape);
                     break;
                 case model::Port::PortType::integer:
-                    outputNode = GetModel().AddNode<model::OutputNode<int>>(model::PortElements<int>(out));
+                    outputNode = GetModel().AddNode<model::OutputNode<int>>(model::PortElements<int>(out), shape);
                     break;
                 case model::Port::PortType::bigInt:
-                    outputNode = GetModel().AddNode<model::OutputNode<int64_t>>(model::PortElements<int64_t>(out));
+                    outputNode = GetModel().AddNode<model::OutputNode<int64_t>>(model::PortElements<int64_t>(out), shape);
                     break;
                 case model::Port::PortType::smallReal:
-                    outputNode = GetModel().AddNode<model::OutputNode<float>>(model::PortElements<float>(out));
+                    outputNode = GetModel().AddNode<model::OutputNode<float>>(model::PortElements<float>(out), shape);
                     break;
                 case model::Port::PortType::real:
-                    outputNode = GetModel().AddNode<model::OutputNode<double>>(model::PortElements<double>(out));
+                    outputNode = GetModel().AddNode<model::OutputNode<double>>(model::PortElements<double>(out), shape);
                     break;
                 default:
                     throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);

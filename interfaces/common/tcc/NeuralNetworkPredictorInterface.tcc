@@ -156,7 +156,7 @@ namespace predictors
                     else if (apiLayer.activation == api::ActivationType::prelu)
                     {
                         auto& preluApiLayer = LayerAs<api::PReLUActivationLayer<ElementType>>(layer);
-                        TensorType alpha(preluApiLayer.alpha.rows, preluApiLayer.alpha.columns, preluApiLayer.alpha.channels, preluApiLayer.alpha.data);
+                        TensorType alpha(preluApiLayer.alpha.shape.rows, preluApiLayer.alpha.shape.columns, preluApiLayer.alpha.shape.channels, preluApiLayer.alpha.data);
                         underlying::ParametricReLUActivation<ElementType> prelu(alpha);
                         underlyingLayers.push_back(std::make_unique<underlying::ActivationLayer<ElementType, underlying::ParametricReLUActivation>>(parameters, prelu));
                     }
@@ -182,21 +182,21 @@ namespace predictors
                 case (underlying::LayerType::binaryConvolution):
                 {
                     auto& apiLayer = LayerAs<api::BinaryConvolutionalLayer<ElementType>>(layer);
-                    TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
+                    TensorType weights(apiLayer.weights.shape.rows, apiLayer.weights.shape.columns, apiLayer.weights.shape.channels, apiLayer.weights.data);
                     underlyingLayers.push_back(std::make_unique<underlying::BinaryConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
                 }
                 break;
                 case (underlying::LayerType::convolution):
                 {
                     auto& apiLayer = LayerAs<api::ConvolutionalLayer<ElementType>>(layer);
-                    TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
+                    TensorType weights(apiLayer.weights.shape.rows, apiLayer.weights.shape.columns, apiLayer.weights.shape.channels, apiLayer.weights.data);
                     underlyingLayers.push_back(std::make_unique<underlying::ConvolutionalLayer<ElementType>>(parameters, apiLayer.convolutionalParameters, weights));
                 }
                 break;
                 case (underlying::LayerType::fullyConnected):
                 {
                     auto& apiLayer = LayerAs<api::FullyConnectedLayer<ElementType>>(layer);
-                    TensorType weights(apiLayer.weights.rows, apiLayer.weights.columns, apiLayer.weights.channels, apiLayer.weights.data);
+                    TensorType weights(apiLayer.weights.shape.rows, apiLayer.weights.shape.columns, apiLayer.weights.shape.channels, apiLayer.weights.data);
                     underlyingLayers.push_back(std::make_unique<underlying::FullyConnectedLayer<ElementType>>(parameters, weights));
                 }
                 break;

@@ -49,6 +49,7 @@ set (INTERFACE_FILES ../common/common.i
                      ../common/model.i
                      ../common/nodes.i
                      ../common/noncopyable.i
+                     ../common/shape.i
                      ../common/trainers.i
                      ../common/predictors.i
                      ../common/predictors_javascript_post.i
@@ -77,6 +78,7 @@ include_directories(../libraries/predictors/include)
 include_directories(../libraries/predictors/neural/include)
 include_directories(../libraries/trainers/include)
 include_directories(../libraries/utilities/include)
+include_directories(../libraries/math/include)
 
 add_subdirectory(common)
 add_subdirectory(python)

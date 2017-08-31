@@ -37,7 +37,7 @@ for /f "usebackq tokens=1* delims=: " %%i in (`external\vswhere.2.1.3\tools\vswh
 if "!Vs14! and !Vs15!" == "0 and 0" goto :NoCompatibleVsInstall
 :step2
 set CMakeGenerator=Visual Studio 14 2015 Win64
-if "!Vs15!" == "1" (
+if "!Vs14! and !Vs15!" == "0 and 1" (
     set CMakeGenerator=Visual Studio 15 2017 Win64
 )
 if "!Vs14! and !Vs15!" == "1 and 1" (

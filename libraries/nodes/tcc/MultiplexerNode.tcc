@@ -22,7 +22,7 @@ namespace nodes
     {
         if (selector.Size() != 1)
         {
-            throw std::runtime_error("Error: Condition must be 1-D signal");
+            throw ell::utilities::Exception("Error: Condition must be 1-D signal");
         }
     };
 

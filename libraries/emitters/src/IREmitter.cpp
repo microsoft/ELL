@@ -630,6 +630,17 @@ namespace emitters
         return pFunction;
     }
 
+    llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const NamedVariableTypeList& arguments)
+    {
+        assert(pModule != nullptr);
+
+        auto types = BindArgumentTypes(arguments);
+        llvm::FunctionType* pFunctionType = llvm::FunctionType::get(returnType, types, false);
+        llvm::Function* pFunction = CreateFunction(pModule, name, linkage, pFunctionType);
+        BindArgumentNames(pFunction, arguments);
+        return pFunction;
+    }
+
     llvm::Function* IREmitter::Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const std::vector<llvm::Type*>& argTypes)
     {
         assert(pModule != nullptr);
@@ -899,7 +910,26 @@ namespace emitters
 
     llvm::StructType* IREmitter::DeclareStruct(const std::string& name, const LLVMTypeList& fields)
     {
-        return llvm::StructType::create(_llvmContext, fields, name);
+        auto structType = llvm::StructType::create(_llvmContext, fields, name);
+        _structs[name] = structType;
+        return structType;
+    }
+
+    llvm::StructType* IREmitter::DeclareStruct(const std::string& name, const NamedVariableTypeList& fields)
+    {
+        llvm::StructType* type = GetStruct(name);
+        if (type != nullptr) {
+            throw EmitterException(EmitterError::duplicateSymbol);
+        }
+        auto types = BindArgumentTypes(fields);
+        auto structType = llvm::StructType::create(_llvmContext, types, name);
+        _structs[name] = structType;
+        return structType;
+    }
+
+    llvm::StructType* IREmitter::GetStruct(const std::string& name)
+    {
+        return _structs[name];
     }
 
     llvm::Type* IREmitter::GetVariableType(VariableType type)

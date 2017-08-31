@@ -47,6 +47,7 @@ class DemoHelper:
         self.captureDevice = None
         self.frame = None
         self.save_images = None
+        self.image_index = 0;
         self.model_file = None
         self.model = None
         self.compiled = None
@@ -59,6 +60,8 @@ class DemoHelper:
         self.total_time = 0
         self.time_count = 0
         self.warm_up = True
+        self.input_shape = None
+        self.output_shape = None
 
     def parse_arguments(self, argv):
         # required arguments
@@ -105,8 +108,6 @@ class DemoHelper:
         
         with open(self.config_file) as f:
             self.config = json.loads(f.read())
-            self.input_size = (self.config['input_rows'], self.config['input_columns'])
-            print("using input size of ", self.input_size)
             if ("input_scale" in self.config):
                 self.scaleFactor = float(self.config["input_scale"])
 
@@ -115,15 +116,24 @@ class DemoHelper:
             self.import_compiled_model()
         else:
             # this is the "interpreted" model route, so we need the ELL runtime.
-            sys.path.append(script_path)
-            print("### Loading ELL modules...")
-            __import__("find_ell")
-            ELL = __import__("ELL")            
-            ell_utilities = __import__("ell_utilities")
-            print("loading model: " + self.model_file)
-            self.model = ELL.ELL_Map(self.model_file)
-
+            self.import_ell_map();
+            
+        self.input_size = (self.input_shape.rows, self.input_shape.columns)
+        
+        print("Found input_shape [%d,%d,%d]" % (self.input_shape.rows, self.input_shape.columns, self.input_shape.channels))
         return True
+
+    def import_ell_map(self):
+        sys.path.append(script_path)
+        print("### Loading ELL modules...")
+        __import__("find_ell")
+        ELL = __import__("ELL")            
+        ell_utilities = __import__("ell_utilities")
+        print("loading model: " + self.model_file)
+        self.model = ELL.ELL_Map(self.model_file)
+        self.input_shape = self.model.GetInputShape()
+        self.output_shape = self.model.GetOutputShape()
+
 
     def import_compiled_model(self):
         name = self.config['model']
@@ -143,7 +153,13 @@ class DemoHelper:
         sys.path.append(os.path.join(script_path, 'build/Release'))
         try:
             self.compiled = __import__(name)
-            size = int(self.config['output_rows']) * self.config['output_columns'] * self.config['output_channels']
+            
+            inputShapeGetter = getattr(self.compiled, name + "_GetInputShape")
+            outputShapeGetter = getattr(self.compiled, name + "_GetOutputShape")
+            self.input_shape = inputShapeGetter(0)
+            self.output_shape = outputShapeGetter(0)
+
+            size = int(self.output_shape.rows * self.output_shape.columns * self.output_shape.channels)
             self.results = self.compiled.FloatVector(size)
             try:
                 self.compiled_func = getattr(self.compiled, func_name)
@@ -159,10 +175,10 @@ class DemoHelper:
 
     def show_image(self, frameToShow, save):
         cv2.imshow('frame', frameToShow)
-        if save and self.save_images != None:
-            name = 'frame' + str(self.save_images) + ".png"
+        if save and self.save_images:
+            name = 'frame' + str(self.image_index) + ".png"
             cv2.imwrite(name, frameToShow)
-            self.save_images = self.save_images + 1
+            self.image_index = self.image_index + 1
 
     def load_labels(self, fileName):
         labels = []

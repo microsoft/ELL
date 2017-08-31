@@ -36,6 +36,7 @@ void TestCompilableSourceNode(bool runJit);
 void TestCompilableSinkNode(bool runJit);
 void TestCompilableDotProductNode2(int dimension);
 void TestFloatNode();
+void TestMultipleOutputNodes();
 
 //
 // NN layer nodes

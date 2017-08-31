@@ -8,14 +8,6 @@ namespace predictors
 namespace neural
 {
 
-    %extend LayerShape
-    {  
-        LayerShape(size_t rows, size_t columns, size_t channels) 
-        {
-            return new ell::api::predictors::neural::LayerShape{rows, columns, channels};
-        }
-    };
-
     %extend LayerParameters
     {  
         LayerParameters(const LayerShape& inputShape,

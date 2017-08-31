@@ -24,8 +24,8 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 #endif
 
 // Documentation
-%feature("docstring") LayerParameters::inputShape "LayerShape representing input dimensions"
-%feature("docstring") LayerParameters::outputShape "LayerShape representing output dimensions"
+%feature("docstring") LayerParameters::inputShape "TensorShape representing input dimensions"
+%feature("docstring") LayerParameters::outputShape "TensorShape representing output dimensions"
 %feature("docstring") PaddingParameters::PaddingParameters %{
     PaddingParameters(scheme, size)
         scheme: one of PaddingScheme values
@@ -101,6 +101,9 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 %template(DoubleSoftmaxLayer) ell::api::predictors::neural::SoftmaxLayer<double>;
 %template(DoubleLayerVector) std::vector<ell::api::predictors::neural::Layer<double>*>;
 %template(DoubleNeuralNetworkPredictor) ell::api::predictors::NeuralNetworkPredictor<double>;
+// Restore environment
+%rename("%s") ""; // Unignore everything
+
 #endif
 
 // Include language specific SWIG definitions that must be declared after the
@@ -110,6 +113,3 @@ using PaddingParameters = ell::predictors::neural::PaddingParameters;
 #elif SWIGJAVASCRIPT
     %include "predictors_javascript_post.i"
 #endif
-
-// Restore environment
-%rename("%s") ""; // Unignore everything

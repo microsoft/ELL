@@ -329,19 +329,12 @@ namespace common
     template <typename UnarchiverType>
     model::Model LoadArchivedModel(std::istream& stream)
     {
-        try
-        {
-            utilities::SerializationContext context;
-            RegisterNodeTypes(context);
-            UnarchiverType unarchiver(stream, context);
-            model::Model model;
-            unarchiver.Unarchive(model);
-            return model;
-        }
-        catch (const std::exception&)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read file.");
-        }
+        utilities::SerializationContext context;
+        RegisterNodeTypes(context);
+        UnarchiverType unarchiver(stream, context);
+        model::Model model;
+        unarchiver.Unarchive(model);
+        return model;
     }
 
     template <typename ArchiverType, typename ObjectType>

@@ -22,12 +22,12 @@ namespace nodes
     {
         if (condition.Size() != 1)
         {
-            throw std::runtime_error("Error: Condition must be 1-D signal");
+            throw ell::utilities::Exception("Error: Condition must be 1-D signal");
         }
 
         if (input1.Size() != input2.Size())
         {
-            throw std::runtime_error("Error: input values must be same dimension");
+            throw ell::utilities::Exception("Error: input values must be same dimension");
         }
     };
 

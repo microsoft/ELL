@@ -102,6 +102,12 @@ namespace emitters
         /// <param name="returnType"> The return type of the function. </param>
         IRFunctionEmitter& BeginFunction(const std::string& functionName, VariableType returnType);
 
+        /// <summary> Begins an IR function with no arguments and directs subsequent commands to it. </summary>
+        ///
+        /// <param name="functionName"> The name of the function. </param>
+        /// <param name="returnType"> The return type of the function. </param>
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, llvm::Type* returnType);
+
         /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
         ///
         /// <param name="functionName"> The name of the function. </param>
@@ -115,6 +121,13 @@ namespace emitters
         /// <param name="returnType"> The return type of the function. </param>
         /// <param name="args"> The arguments to the function. </param>
         IRFunctionEmitter& BeginFunction(const std::string& functionName, VariableType returnType, const NamedVariableTypeList& args);
+
+        /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
+        ///
+        /// <param name="functionName"> The name of the function. </param>
+        /// <param name="returnType"> The return type of the function. </param>
+        /// <param name="args"> The arguments to the function. </param>
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, llvm::Type* returnType, const NamedVariableTypeList& args);
 
         /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
         ///
@@ -315,6 +328,12 @@ namespace emitters
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
         llvm::StructType* DeclareStruct(const std::string& name, const NamedLLVMTypeList& fields);
 
+        /// <summary> Gets a declaration of a Struct with the given name.</summary>
+        ///
+        /// <param name="name"> The struct name. </param>
+        ///
+        /// <returns> Pointer to a llvm::StructType that represents the declared struct. </returns>
+        llvm::StructType* GetStruct(const std::string& name);
         //
         // Code annotation
         //
@@ -598,6 +617,7 @@ namespace emitters
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const VariableTypeList& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments, bool isPublic = false);
+        IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const NamedVariableTypeList& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType>& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes, bool isPublic = false);
 

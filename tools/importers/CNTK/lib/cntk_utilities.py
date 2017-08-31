@@ -78,12 +78,12 @@ def ell_activation_type_to_string(type):
 
 
 def ell_shape_to_string(shape):
-    """Returns the string representation of an ELL.LayerShape"""
+    """Returns the string representation of an ELL.TensorShape"""
     return (str(shape.rows) + "x" + str(shape.columns) + "x" + str(shape.channels))
 
 
 def get_shape(inputShape):
-    """"Returns the ELL.LayerShape corresponding to the output shape with no adjustment for padding"""
+    """"Returns the ELL.TensorShape corresponding to the output shape with no adjustment for padding"""
 
     if (len(inputShape) == 3):
         # CNTK's shape tensor is in channels, rows, columns order
@@ -96,11 +96,11 @@ def get_shape(inputShape):
         rows = 1
         columns = 1
 
-    return ELL.LayerShape(rows, columns, channels)
+    return ELL.TensorShape(rows, columns, channels)
 
 
 def get_adjusted_shape(inputShape, paddingParameters):
-    """"Returns the ELL.LayerShape corresponding to the input shape adjusted with padding"""
+    """"Returns the ELL.TensorShape corresponding to the input shape adjusted with padding"""
 
     if (len(inputShape) == 3):
         # Adjust the input shape to account for padding in the row and column dimensions
@@ -120,7 +120,7 @@ def get_adjusted_shape(inputShape, paddingParameters):
         raise NotImplementedError(
             "Unsupported input shape length: " + str(len(inputShape)))
 
-    return ELL.LayerShape(rows, columns, channels)
+    return ELL.TensorShape(rows, columns, channels)
 
 
 def get_model_layers(root):
