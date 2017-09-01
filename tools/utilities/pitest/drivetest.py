@@ -87,7 +87,9 @@ class DriveTest:
                 # not a zip archive
                 self.ell_model = ell_model
 
-            self.model_name = os.path.splitext(basename(self.ell_model))[0]
+            self.model_name, ext = os.path.splitext(basename(self.ell_model))
+            if ext.lower() == ".zip":
+                self.model_name, ext = os.path.splitext(self.model_name)
             self.labels_file = labels_file
             self.ell_json = config
 
