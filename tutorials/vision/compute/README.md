@@ -44,7 +44,7 @@ convolutional:  4 x 4 x 512 ->  4 x 4 x 1024 , pad  1
 convolutional:  4 x 4 x 1024 ->  4 x 4 x 1000 , pad  0
 avg_pool:  4 x 4 x 1000 ->  1 x 1 x 1000 , pad  0
 softmax:  1 x 1 x 1000 ->  1 x 1 x 1000
-Saving model file: 'darknet.ellmodel'
+Saving model file: 'darknet.ell'
 Saving config file: 'darknet_config.json'
 {
   "input_height": 224,
@@ -58,11 +58,11 @@ Saving config file: 'darknet_config.json'
 
 ### Test the Darknet Model
 
-Great, next you can test that the `darknet.ellmodel` works with the ELL
+Great, next you can test that the `darknet.ell` works with the ELL
 model "interpreter" by running the following:
 
 ````
-python demo.py darknet_config.json darknetImageNetLabels.txt --model darknet.ellmodel
+python demo.py darknet_config.json darknetImageNetLabels.txt --model darknet.ell
 ````
 
 And with camera pointing at a Zebra you should see something like this:
@@ -83,15 +83,15 @@ With the command line from the `~/tools/importers/CNTK` folder.
 python cntk_import.py VGG16_ImageNet_Caffe.model
 ````
 
-You will get a config output and an ELL model file named `VGG16_ImageNet_Caffe.ellmodel`
+You will get a config output and an ELL model file named `VGG16_ImageNet_Caffe.ell`
 
 
 ### Test the CNTK Model
 
-And similarly you can test that the `VGG16_ImageNet_Caffe.ellmodel` works with the ELL model "interpreter" by running the following:
+And similarly you can test that the `VGG16_ImageNet_Caffe.ell` works with the ELL model "interpreter" by running the following:
 
 ````
-python demo.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt --model VGG16_ImageNet_Caffe.ellmodel
+python demo.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt --model VGG16_ImageNet_Caffe.ell
 ````
 
 (you can copy the `cntkVgg16ImageNetLabels.txt` from the gettingStarted folder).

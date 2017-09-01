@@ -1,12 +1,13 @@
 {
   "_type": "Model",
-  "_version": "1",
+  "_version": "2",
   "nodes": [
   {
     "_type": "InputNode<double>",
-    "_version": "0",
+    "_version": "2",
     "id":     "1010",
-    "size": 2
+    "size": 2,
+    "shape": [2, 1, 1]
   }, 
   {
     "_type": "BinaryPredicateNode<double>",
@@ -32,7 +33,7 @@
   }, 
   {
     "_type": "OutputNode<bool>",
-    "_version": "0",
+    "_version": "2",
     "id":     "1012",
     "input": {
       "_type": "InputPort<bool>",
@@ -41,6 +42,7 @@
       "name": "input",
       "type": 6,
       "input":       "1011.output"
-    }
+    },
+    "shape": [1, 1, 1]
   }]
 }

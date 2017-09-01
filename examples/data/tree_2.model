@@ -1,12 +1,13 @@
 {
   "_type": "Model",
-  "_version": "1",
+  "_version": "2",
   "nodes": [
   {
     "_type": "InputNode<double>",
-    "_version": "0",
+    "_version": "2",
     "id":     "1072",
-    "size": 3
+    "size": 3,
+    "shape": [3, 1, 1]
   }, 
   {
     "_type": "ForestPredictorNode<SingleElementThresholdPredictor,ConstantPredictor>",

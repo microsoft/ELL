@@ -54,7 +54,7 @@ class DarknetImporter():
         input_shape = predictor.GetInputShape()
         output_shape = predictor.GetOutputShape()
         
-        model_file_name = os.path.splitext(self.model_file)[0]+'.ellmodel'
+        model_file_name = os.path.splitext(self.model_file)[0]+'.ell'
         head, tail = os.path.split(self.model_file)
 
         ell_map = ell_utilities.ell_map_from_float_predictor(predictor)

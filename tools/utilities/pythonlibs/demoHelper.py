@@ -31,7 +31,7 @@ class DemoHelper:
             "Runs the given ELL model passing images from camera or static image file\n"
             "If no model file is given, it tries to load the compiled model defined in the config file\n"
             "Example:\n"
-            "   python demo.py darknet_config.json darknetImageNetLabels.txt --model darknet.ellmodel\n"
+            "   python demo.py darknet_config.json darknetImageNetLabels.txt --model darknet.ell\n"
             "This shows opencv window with image classified by the model using given labels")
         
         # each input pixel may need to be scaled. It is common for models to require an 8-bit pixel

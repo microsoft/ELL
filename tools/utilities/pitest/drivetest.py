@@ -21,7 +21,7 @@ from shutil import copyfile
 from shutil import rmtree
 from urllib import request
 import paramiko
-import extractor
+import ziptools
 
 class DriveTest:
     def __init__(self):
@@ -78,7 +78,7 @@ class DriveTest:
             self.ell_json = os.path.join(self.pitest_dir, "darknet_config.json")
         else:
             # extract the model if it's in an archive
-            unzip = extractor.Extractor(ell_model)
+            unzip = ziptools.Extractor(ell_model)
             success, filename = unzip.extract_file(".ell")
             if (success):
                 print("extracted: " + filename)
@@ -141,7 +141,7 @@ class DriveTest:
         self.copy_files( [ os.path.join(self.ell_root, "tutorials/vision/gettingStarted/darknetImageNetLabels.txt") ], "")
 
     def import_darknet(self):
-        self.ell_model = os.path.join(self.pitest_dir, self.model_name + ".ellmodel")
+        self.ell_model = os.path.join(self.pitest_dir, self.model_name + ".ell")
         sys.path.append(os.path.join(current_path, '../../importers/darknet'))
         darknet_importer = __import__("darknet_import")
         importer = darknet_importer.DarknetImporter()

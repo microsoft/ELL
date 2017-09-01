@@ -54,7 +54,7 @@ These parameters are filled and the resulting CMakeLists.txt file is written to 
 
 Next it invokes the ell compiler to compile the given model.  The command line looks like this:
 ````
-compile -imap ImageNet.ellmodel -cfn predict -cmn ImageNet --bitcode --swig --blas true --target pi3 -od pi3
+compile -imap ImageNet.ell -cfn predict -cmn ImageNet --bitcode --swig --blas true --target pi3 -od pi3
 ````
 This compiler is created by the ELL build and you will find it in `~/git/ELL/build/bin` and on Windows it will be in `d:\git\ELL\ELL\build\bin\release\`.
 #### Generating SWIG interfaces

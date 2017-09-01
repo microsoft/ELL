@@ -1,12 +1,13 @@
 {
   "_type": "Model",
-  "_version": "1",
+  "_version": "2",
   "nodes": [
   {
     "_type": "InputNode<double>",
-    "_version": "0",
+    "_version": "2",
     "id":     "1718",
-    "size": 3
+    "size": 3,
+    "shape": [3, 1, 1]
   }, 
   {
     "_type": "ConstantNode<double>",
@@ -66,7 +67,7 @@
   }, 
   {
     "_type": "OutputNode<double>",
-    "_version": "0",
+    "_version": "2",
     "id":     "1723",
     "input": {
       "_type": "InputPort<double>",
@@ -75,6 +76,7 @@
       "name": "input",
       "type": 2,
       "input":       "{1721.output, 1722.output}"
-    }
+    },
+    "shape": [6, 1, 1]
   }]
 }

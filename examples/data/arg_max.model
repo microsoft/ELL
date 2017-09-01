@@ -1,12 +1,13 @@
 {
   "_type": "Model",
-  "_version": "1",
+  "_version": "2",
   "nodes": [
   {
     "_type": "InputNode<double>",
-    "_version": "0",
+    "_version": "2",
     "id":     "1016",
-    "size": 3
+    "size": 3,
+    "shape": [3, 1, 1]
   }, 
   {
     "_type": "ArgMaxNode<double>",
@@ -39,7 +40,7 @@
   }, 
   {
     "_type": "OutputNode<int>",
-    "_version": "0",
+    "_version": "2",
     "id":     "1018",
     "input": {
       "_type": "InputPort<int>",
@@ -48,6 +49,7 @@
       "name": "input",
       "type": 3,
       "input":       "1017.argVal"
-    }
+    },
+    "shape": [1, 1, 1]
   }]
 }

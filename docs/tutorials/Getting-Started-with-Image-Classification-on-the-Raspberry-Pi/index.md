@@ -50,14 +50,14 @@ unzip ell.zip
 
 (On windows you can use Windows explorer to unzip the model, just place the file in the same directory)
 
-You should now have a `categories.txt` file and a `ImageNet.ellmodel` file.
+You should now have a `categories.txt` file and a `ImageNet.ell` file.
 
 ### Wrap the model in a Python callable module
 
 For this tutorial we want to call the model from Python.  ELL provides a compiler that can take the model and compile it into code that will run on a target platform - in this case the Raspberry Pi running Linux, so it generates code for armv7-linux-gnueabihf, and for the cortex-a53 CPU.
 
 ````
-python ../../tools/wrap/wrap.py categories.txt ImageNet.ellmodel -lang python -target pi3    
+python ../../tools/wrap/wrap.py categories.txt ImageNet.ell -lang python -target pi3    
 ````
 
 We also want to copy some additional python code to your pi for the purpose of running this tutorial:

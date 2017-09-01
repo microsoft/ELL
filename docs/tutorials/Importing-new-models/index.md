@@ -81,13 +81,13 @@ You should see some output like this while it is loading the model:
     convolutional:  4 x 4 x 1024 ->  4 x 4 x 1000 , pad  0
     avg_pool:  4 x 4 x 1000 ->  1 x 1 x 1000 , pad  0
     softmax:  1 x 1 x 1000 ->  1 x 1 x 1000
-    Saving model file: 'darknet.ellmodel'
+    Saving model file: 'darknet.ell'
     Saving config file: 'darknet_config.json'
 
 Wait for a few seconds (depending on your computer performance) and you should see the 
 following new files in your directory:
 
-    darknet.ellmodel
+    darknet.ell
     darknet_config.json
 
 The config file simply contains information about the inputs and outputs for this model.
@@ -101,7 +101,7 @@ Now let's test that this model works on your PC.  For this you will need to copy
 
  Then to build an ELL project that will run on your PC:
 
-    python "~/git/ELL/wrap.py darknet_config.json darknetImageNetLabels.txt darknet.ellmodel -target host
+    python "~/git/ELL/wrap.py darknet_config.json darknetImageNetLabels.txt darknet.ell -target host
     cd host
     mkdir build
     cd build
@@ -205,11 +205,11 @@ Now you should see some output like this:
     Softmax :  1x1x1000  ->  1x1x1000 | input padding 0  output padding 0
 
     Finished pre-processing.
-    Saving model file: 'VGG16_ImageNet_Caffe.ellmodel'
+    Saving model file: 'VGG16_ImageNet_Caffe.ell'
 
 This will take a few minutes because the model file is pretty large, about 150 mb.
 
-    VGG16_ImageNet_Caffe.ellmodel
+    VGG16_ImageNet_Caffe.ell
     VGG16_ImageNet_Caffe_config.json
 
 The config file simply contains information about the inputs and outputs for this model.
@@ -223,7 +223,7 @@ Now let's test that this model works on your PC.  For this you will need to copy
 
  Then to build an ELL project that will run on your PC:
 
-    python "~/git/ELL/wrap.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt VGG16_ImageNet_Caffe.ellmodel -target host
+    python "~/git/ELL/wrap.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt VGG16_ImageNet_Caffe.ell -target host
     cd host
     mkdir build
     cd build
@@ -255,6 +255,6 @@ And to test with a static image:
 ### Summary
 
 Notice that the steps for testing an ELL model are virtually identical.  Once the model
-is converted to .ellmodel format it doesn't matter any more whether it came from Darknet
+is converted to .ell format it doesn't matter any more whether it came from Darknet
 or CNTK.  The only difference is the label file where the labels can be in a different order
 because of how the model was trained.
