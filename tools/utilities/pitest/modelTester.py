@@ -31,7 +31,7 @@ class ModelTester:
             "Runs the given ELL model passing images from camera or static image file\n"
             "If no model file is given, it tries to load the compiled model defined in the config file\n"
             "Example:\n"
-            "   python modelTester.py darknet_config.json darknetImageNetLabels.txt --truth val_map.txt --folder images --model darknet.ell\n"
+            "   python modelTester.py darknet_config.json darknetImageNetLabels.txt --truth val_map.txt --folder images --model darknet.ellmodel\n"
             "This shows opencv window with image classified by the model using given labels")
         
         # each input pixel may need to be scaled. It is common for models to require an 8-bit pixel
@@ -55,7 +55,6 @@ class ModelTester:
         self.config_file = None
         self.labels_file = None
         self.model_file = None
-        self.iterations = None  # limit number of iterations through the loop.
         self.total_time = 0
         self.time_count = 0
         self.warm_up = True
@@ -70,6 +69,8 @@ class ModelTester:
         self.tests_failed = 0
         self.automatic = False
         self.start_time = time.time()
+        self.test_top_n = 1
+        self.test_complete = False
 
     def parse_arguments(self, argv):
         # required arguments
@@ -78,14 +79,14 @@ class ModelTester:
 
         # options
         self.arg_parser.add_argument("--model", help="path to a model file")
-        self.arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
         self.arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
         self.arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
 
         self.arg_parser.add_argument("--folder", help="path to a folder full of images defined in the truth map file")
         self.arg_parser.add_argument("--truth", help="path to a map file, each line contains two values, the name of image and the classifaction value for each")
         self.arg_parser.add_argument("--truthlabels", help="path to a labels for the truth file (in case these are different from your model labels)")
-
+        self.arg_parser.add_argument("--top", type=int, help="how many of the top labels to include in the test (default 1)", default=self.test_top_n)
+    
         # mutually exclusive options
         group = self.arg_parser.add_mutually_exclusive_group()
         group.add_argument("--camera", type=int, help="the camera id of the webcam", default=self.camera)
@@ -104,8 +105,6 @@ class ModelTester:
         self.model_file = args.model
         self.save_images = args.save
         self.threshold = args.threshold
-        if (args.iterations):
-            self.iterations = args.iterations
 
         # process mutually exclusive options
         if (args.camera):
@@ -119,7 +118,7 @@ class ModelTester:
 
         # load the labels
         self.labels = self.load_labels(self.labels_file)
-        
+        self.test_top_n = args.top
         self.image_folder = args.folder
         self.val_map = self.load_truth(args.truth)
         if args.truthlabels:
@@ -209,8 +208,6 @@ class ModelTester:
         return labels
 
     def predict(self, data):
-        if self.iterations != None:
-            self.iterations = self.iterations - 1
         start = time.time()
         if self.model == None:
             self.compiled_func(data, self.results)
@@ -241,6 +238,8 @@ class ModelTester:
         average_time = self.get_times()
         if average_time is not None:
             print("Average prediction time: " + str(average_time))
+        if self.tests_passed > 0 or self.tests_failed > 0:
+            self.report_test_results()
 
     def get_top_n(self, predictions, N):
         """Return at most the top 5 predictions as a list of tuples that meet the threshold."""
@@ -391,18 +390,12 @@ class ModelTester:
         return 3
 
     def done(self):
-        if self.iterations is not None and self.iterations <= 0:
-            return True
         # on slow devices this helps let the images to show up on screen
         result = False
 
-        if self.automatic:
-            key = cv2.waitKey(1) & 0xFF
-            key = cv2.waitKey(1) & 0xFF
-            key = cv2.waitKey(1) & 0xFF
-            self.record_result()
-            return False
-
+        if self.test_complete:
+            return True
+        
         for i in range(self.get_wait()):
             key = cv2.waitKey(1) & 0xFF
             if key == 27:
@@ -415,11 +408,14 @@ class ModelTester:
     def onKeyDown(self, key):
         if key == ord(' '):
             self.record_result()
+            self.automatic = False
         elif key == ord('a'):
             self.automatic = True
             self.start_time = time.time()
             print("starting automatic test run...")
             print(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()))
+        if self.automatic:
+            self.record_result()
 
     def get_truth_label(self, i):
         if i < len(self.val_labels):
@@ -428,10 +424,19 @@ class ModelTester:
 
     def record_result(self):
         # check current prediction matches the truth.
-        actual = self.get_current_label()
         expected = self.get_truth_label(self.map_entry[1])
-        print("  Actual=" + actual + ", Expected=" + expected)        
-        if self.labels_match(actual, expected):
+        topN = self.get_top_n(self.results, self.test_top_n)
+        winner = None
+        actual = []
+        for top in topN:
+            label = self.get_label(top[0])
+            actual.append(label)
+            if self.labels_match(label, expected):  
+                winner = top  
+                break
+        
+        print("  Actual=" + ",".join(actual) + ", Expected=" + expected)        
+        if winner != None:
             self.tests_passed = self.tests_passed + 1
             print("  Test passed (%d)" % (self.val_pos))
         else:
@@ -473,6 +478,10 @@ class ModelTester:
             else:
                 print("image file '%s' does not exist" % (path))
         
+        self.test_complete = True
+        return frame    
+    
+    def report_test_results(self):
         # test complete
         total = self.tests_passed + self.tests_failed
         pass_rate = (self.tests_passed * 100) / total
@@ -484,7 +493,6 @@ class ModelTester:
         print(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()))
         print("Total run time is %d seconds" % (total_seconds))
         print("Average time per image %f seconds" % (total_seconds / total))
-        sys.exit(0)
 
 def main(args):
     helper = ModelTester()
