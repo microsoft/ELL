@@ -38,5 +38,5 @@ class Zipper:
     def zip_file(self, input_file, output_zip):
         """Produces an output_zip with a single input_file compressed"""
         with zipfile.ZipFile(output_zip, "w", zipfile.ZIP_DEFLATED) as zf:
-            zf.write(input_file)
+            zf.write(input_file, basename(input_file))
  
