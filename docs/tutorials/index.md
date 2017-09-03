@@ -8,12 +8,11 @@ permalink: /tutorials/
 
 ## Setting Up
 
-* [Setting Up your Raspberry Pi for AI](/ELL/tutorials/Setting-Up-your-Raspberry-Pi-for-AI)
+* [Setting Up your Raspberry Pi](/ELL/tutorials/Setting-Up-your-Raspberry-Pi)
 * [Active Cooling your Raspberry Pi 3](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3)
 
 # Computer Vision
 
-* [Installing and building ELL](/ELL/Installing-and-building-ELL/)
 * [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/)
 * [Fun with Dogs and Cats](/ELL/tutorials/Fun-with-Dogs-and-Cats/)
 * [Importing new models](/ELL/tutorials/Importing-new-models/)

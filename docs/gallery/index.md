@@ -8,7 +8,7 @@ permalink: /gallery/
 
 Our gallery is a collection of bits and pieces that you can download and use in your projects. 
 
-## Image Classification Models
+## Pretrained Image Classification Models
 
 ### ILSVRC2012
 

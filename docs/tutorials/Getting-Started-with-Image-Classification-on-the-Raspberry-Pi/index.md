@@ -5,31 +5,22 @@ permalink: /tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry
 ---
 # Getting Started with Image Classification on Raspberry Pi
 
-### Materials
+In this tutorial, you will download a pretrained image classifier from the [gallery](/ELL/gallery/) to your laptop or desktop computer and compile it for the Raspberry Pi. Then, you will copy the compiled classifier to your Pi and write a Python script that captures images from the Pi's camera and attempts to classify them.  
 
-* A Raspberry Pi
-* Cooling fan attachment (see our [instructions on cooling your Pi](/ELL/gallery/Raspberry-Pi-3-Fan-Mount)) (optional)
-* A USB webcam (optional)
-* A display (optional)
+## Materials
 
-### Overview
+* Laptop or desktop computer (Windows, Linux, or Mac)
+* Raspberry Pi
+* Raspberry Pi Camera or USB webcam (optional)
+* Display (optional)
+* Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/)) (optional)
 
-In this tutorial, you will download a pretrained image classifier from the gallery, compile the classifier for the Raspberry Pi, and write a Python script that invokes the classifier. When the Python script runs on the Pi, you will be able to point the camera as a variety of objects and the classifier will attempt to identify them.
+## Prerequisites
 
-### Prerequisites
+* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). Specifically, this tutorial relies on ELL, CMake, SWIG, and Python 3.6. 
+* Follow our instructions for [setting up your Raspberry Pi](/ELL/tutorials/Raspberry-pi-setup).
 
-1. We will use `Python 3.6` for this tutorial on your dev box.
-We highly recommend using the miniconda or full anaconda python environment because it comes with many
-handy tools like `curl` which we will use later on.
-
-2. You will also need a simple web cam or a pi cam.  If you don't have one handy, we will show you how to load
-static images or .mp4 videos and process those instead.
-
-3. Additional Software is needed on your Raspberry Pi - See [Setup Raspberry Pi](/ELL/tutorials/Raspberry-pi-setup). 
-
-4. You will need to be sure you built ELL as per the ELL INSTALL-xxx.md instructions at the root of this git repo.  You will need to build ELL after you install Python from your activate your conda environment, so that the `CMake` step picks up on the fact that you have Python 3.6 installed.
-
-### Download pre-trained model
+## Download pre-trained model
 
 First open a terminal window and activate your anaconda environment.  If you followed our setup instructions you will have
 an environment named `py36` so you would do this to activate that:
@@ -52,7 +43,7 @@ unzip ell.zip
 
 You should now have a `categories.txt` file and a `ImageNet.ell` file.
 
-### Wrap the model in a Python callable module
+### Wrap the model in a Python module
 
 For this tutorial we want to call the model from Python.  ELL provides a compiler that can take the model and compile it into code that will run on a target platform - in this case the Raspberry Pi running Linux, so it generates code for armv7-linux-gnueabihf, and for the cortex-a53 CPU.
 
