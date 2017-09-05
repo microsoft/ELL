@@ -43,13 +43,19 @@ namespace utilities
         static constexpr bool value = type::value;
     };
 
+    /// <summary> Utility function to get type name from a template parameter </summary>
+    ///
+    /// <typeparam name="Type"> The type (e.g., 'double') </typeparam>
+    template <typename Type>
+    std::string GetTypeName();
+    
     /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
     ///
     /// <param name="baseType"> The base type (e.g., 'Vector') </param>
     /// <typeparam name="Types"> The templated type (e.g., 'double') </typeparam>
     template <typename... Types>
     std::string GetCompositeTypeName(std::string baseType);
-
+    
     /// <summary> Utility function to get templated type names (e.g., Vector<double>) </summary>
     ///
     /// <param name="baseType"> The base type (e.g., 'Vector') </param>

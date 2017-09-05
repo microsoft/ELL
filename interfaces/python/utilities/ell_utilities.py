@@ -48,19 +48,20 @@ def ell_steppable_map_from_float_predictor(predictor, millisecond_interval, inpu
     try:
         model = ELL.ELL_Model()
         builder = ELL.ELL_ModelBuilder()
-        shape = predictor.GetInputShape()
+        inputShape = predictor.GetInputShape()
+        outputShape = predictor.GetOutputShape()
 
         inputNode = builder.AddInputNode(
-            model, 2, ELL.ELL_PortType_real)  # time signal
+            model, inputShape, ELL.ELL_PortType_real)  # time signal
         sourceNode = builder.AddSourceNode(
             model, ELL.ELL_PortElements(inputNode.GetOutputPort("output")),
-            ELL.ELL_PortType_smallReal, shape.rows * shape.columns * shape.channels, input_callback_name)
+            ELL.ELL_PortType_smallReal, inputShape.Size(), input_callback_name)
         nnNode = builder.AddFloatNeuralNetworkPredictorNode(
             model, ELL.ELL_PortElements(sourceNode.GetOutputPort("output")), predictor)
         sinkNode = builder.AddSinkNode(
             model, ELL.ELL_PortElements(nnNode.GetOutputPort("output")), output_callback_name)
         outputNode = builder.AddOutputNode(
-            model, ELL.ELL_PortElements(sinkNode.GetOutputPort("output")))
+            model, outputShape, ELL.ELL_PortElements(sinkNode.GetOutputPort("output")))
 
         ell_steppable_map = ELL.ELL_SteppableMap(
             model, ELL.ELL_InputNode(inputNode),

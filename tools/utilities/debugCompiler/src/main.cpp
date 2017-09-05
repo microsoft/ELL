@@ -40,7 +40,7 @@ std::vector<float> GetInputImage(std::string filename, const model::DynamicMap& 
         std::cout << "Model output size: " << outputSize << std::endl;
     }
 
-    return ResizeImage(filename, inputShape[0], inputShape[1], inputScale);
+    return ResizeImage<float>(filename, inputShape[0], inputShape[1], inputScale);
 }
 
 int main(int argc, char* argv[])

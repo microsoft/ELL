@@ -17,6 +17,9 @@
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 
+// math
+#include "TensorShape.h"
+
 // model
 #include "InputPort.h"
 #include "Node.h"

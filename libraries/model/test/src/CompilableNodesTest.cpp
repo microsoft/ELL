@@ -13,6 +13,9 @@
 // common
 #include "LoadModel.h" // for RegisterNodeTypes
 
+// math
+#include "TensorShape.h"
+
 // model
 #include "CompiledMap.h"
 #include "DynamicMap.h"

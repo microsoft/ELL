@@ -9,6 +9,9 @@
 
 #ifndef SWIG
 
+// math
+#include "TensorShape.h"
+
 // neural network
 #include "Layer.h"
 #include "MathInterface.h"

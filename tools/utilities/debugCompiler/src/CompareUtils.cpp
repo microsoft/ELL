@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     CompareUtils.cpp (debugNet)
+//  File:     CompareUtils.cpp (compare)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,6 @@
 #include "CommandLineParser.h"
 #include "Exception.h"
 #include "Files.h"
-#include "MillisecondTimer.h"
 #include "PPMImageParser.h"
 
 // stl

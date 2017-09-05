@@ -9,6 +9,9 @@
 
 #ifndef SWIG
 
+// math
+#include "TensorShape.h"
+
 // model
 #include "IRCompiledMap.h"
 #include "InputNode.h"

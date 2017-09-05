@@ -42,7 +42,7 @@ namespace model
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         ell::math::TensorShape shape = GetShape();
-        archiver[shapeName] << std::vector<size_t>({ shape.rows,shape.columns,shape.channels });
+        archiver[shapeName] << std::vector<size_t>({ shape.rows, shape.columns, shape.channels });
     }
 
     template <typename ValueType>
@@ -53,7 +53,8 @@ namespace model
         std::vector<size_t> shapeVector;
         archiver[shapeName] >> shapeVector;
         _output.SetSize(_input.Size());
-        if (shapeVector.size() >= 3) {
+        if (shapeVector.size() >= 3) 
+        {
             OutputShape shape{ shapeVector[0], shapeVector[1], shapeVector[2] };
             SetShape(shape);
         }

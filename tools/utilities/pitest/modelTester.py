@@ -179,7 +179,7 @@ class ModelTester:
             self.input_shape = inputShapeGetter(0)
             self.output_shape = outputShapeGetter(0)
 
-            size = int(self.output_shape.rows * self.output_shape.columns * self.output_shape.channels)
+            size = int(self.output_shape.Size())
             self.results = self.compiled.FloatVector(size)
             try:
                 self.compiled_func = getattr(self.compiled, func_name)

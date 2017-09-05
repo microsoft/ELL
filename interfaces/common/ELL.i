@@ -24,6 +24,8 @@
 
 // stl
 #include <node.h>
+
+// Javascript engine includes
 #include <v8.h>
 #include <nan.h>
 %}

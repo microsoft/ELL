@@ -9,7 +9,6 @@
 
 #include "Matrix.h"
 #include "Vector.h"
-#include "TensorShape.h"
 
 // stl
 #include <cmath>

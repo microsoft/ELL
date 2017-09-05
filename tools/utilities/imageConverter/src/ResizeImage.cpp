@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     ResizeImage.cpp (imageConverter)
+//  Authors:  Chris Lovett
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "InvokePython.h"
 
 #include <sstream>
@@ -7,7 +15,8 @@
 #include <vector>
 #include <algorithm> 
 
-std::vector<float> ResizeImage(std::string& fileName, int rows, int cols, float scale)
+template <typename T>
+std::vector<T> ResizeImage(std::string& fileName, int rows, int cols, double inputScale)
 {
     std::stringstream stream;
     stream << R"xx(
@@ -61,7 +70,7 @@ main()
 
 )xx";
 
-    ExecutePythonScript(stream.str(), { "", fileName, std::to_string(rows), std::to_string(cols), std::to_string(scale) });
+    ExecutePythonScript(stream.str(), { "", fileName, std::to_string(rows), std::to_string(cols), std::to_string(inputScale) });
 
     // now load the result.
     std::ifstream stm(fileName + ".dat", std::ios::in | std::ios::binary);
@@ -71,10 +80,22 @@ main()
     size_t len = size / sizeof(double);
     auto buffer = std::vector<double>(len);
     stm.read((char*)buffer.data(), size);
-    std::vector<float> result(len);
+    std::vector<T> result(len);
     for (size_t i = 0; i < len; i++)
     {
-        result[i] = static_cast<float>(buffer[i]);
+        result[i] = static_cast<T>(buffer[i]);
     }
     return result;
 }
+
+template 
+std::vector<int> ResizeImage(std::string& fileName, int rows, int cols, double inputScale);
+
+template 
+std::vector<int64_t> ResizeImage(std::string& fileName, int rows, int cols, double inputScale);
+
+template 
+std::vector<float> ResizeImage(std::string& fileName, int rows, int cols, double inputScale);
+
+template 
+std::vector<double> ResizeImage(std::string& fileName, int rows, int cols, double inputScale);

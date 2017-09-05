@@ -11,10 +11,10 @@ namespace ell
 namespace utilities
 {
     template <typename T>
-    OutputStreamImpostor& OutputStreamImpostor::operator<<(const T& value)
+    std::ostream& OutputStreamImpostor::operator<<(T&& value)
     {
         *_outputStream << value;
-        return *this;
+        return *_outputStream;
     }
 }
 }

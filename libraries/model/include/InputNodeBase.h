@@ -13,7 +13,9 @@
 #include "ModelTransformer.h"
 #include "Node.h"
 #include "OutputPort.h"
-#include "Tensor.h"
+
+// math
+#include "TensorShape.h"
 
 // utilities
 #include "IArchivable.h"

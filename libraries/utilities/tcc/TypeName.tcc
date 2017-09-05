@@ -46,6 +46,12 @@ namespace utilities
         return GetCompositeTypeName<T>("vector");
     }
 
+    template <typename Type>
+    std::string GetTypeName()
+    {
+        return TypeName<Type>::GetName();
+    }
+
     template <typename... Types>
     std::string GetCompositeTypeName(std::string baseType)
     {

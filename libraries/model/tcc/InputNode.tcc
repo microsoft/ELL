@@ -21,7 +21,7 @@ namespace model
 
     template <typename ValueType>
     InputNode<ValueType>::InputNode(InputShape shape)
-        : InputNodeBase(_output, shape), _output(this, outputPortName, shape.rows * shape.columns * shape.channels) {};
+        : InputNodeBase(_output, shape), _output(this, outputPortName, shape.Size()) {};
 
     template <typename ValueType>
     void InputNode<ValueType>::SetInput(ValueType inputValue)

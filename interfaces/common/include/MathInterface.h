@@ -9,7 +9,9 @@
 
 #ifndef SWIG
 
-#include "Tensor.h"
+// math
+#include "TensorShape.h"
+
 // stl
 #include <vector>
 #include <array>

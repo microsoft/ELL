@@ -40,7 +40,7 @@ namespace utilities
 
         /// <summary> Constructor that creates an object that directs output to a file</summary>
         ///
-        /// <param name="filename">A filename</param>
+        /// <param name="filename"> A filename </param>
         OutputStreamImpostor(std::string filename);
 
         /// <summary> Casting operator that returns a reference to an ostream. This allows us to use an OutputStreamImpostor
@@ -55,7 +55,7 @@ namespace utilities
         ///
         /// <param name="value"> The value to output </param>
         template <typename T>
-        OutputStreamImpostor& operator<<(const T& value);
+        std::ostream& operator<<(T&& value);
 
     private:
         std::shared_ptr<std::ofstream> _outputFileStream;
