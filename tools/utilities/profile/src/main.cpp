@@ -68,7 +68,6 @@ std::vector<T> GetInputData(std::string filename, const math::TensorShape& input
 template<typename InputType>
 std::vector<InputType> GetModelInput(model::DynamicMap& map, const ProfileArguments& profileArguments)
 {
-    using 
     auto inputShape = map.GetInputShape();
     auto outputSize = map.GetOutputSize();
     std::vector<InputType> input = GetInputData<InputType>(profileArguments.inputTestFile, inputShape, 1.0f);
