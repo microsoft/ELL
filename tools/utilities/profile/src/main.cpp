@@ -56,10 +56,10 @@ std::vector<T> GetInputData(std::string filename, const math::TensorShape& input
         auto inputSize = inputShape.Size();
         std::vector<T> result(inputSize);
         auto engine = utilities::GetRandomEngine("123");
-        std::uniform_real_distribution<T> dist;
+        std::uniform_real_distribution<double> dist;
         for (auto index = 0; index < inputSize; ++index)
         {
-            result[index] = dist(engine);
+            result[index] = static_cast<T>(dist(engine));
         }
         return result;
     }
@@ -68,6 +68,7 @@ std::vector<T> GetInputData(std::string filename, const math::TensorShape& input
 template<typename InputType>
 std::vector<InputType> GetModelInput(model::DynamicMap& map, const ProfileArguments& profileArguments)
 {
+    using 
     auto inputShape = map.GetInputShape();
     auto outputSize = map.GetOutputSize();
     std::vector<InputType> input = GetInputData<InputType>(profileArguments.inputTestFile, inputShape, 1.0f);

@@ -187,11 +187,11 @@ namespace emitters
     ///<summary> Collections of named variable types </summary>
     using NamedVariableTypeList = std::vector<NamedVariableType>;
 
-    /// <summary> Gets the value form the VariableType enum that corresponds to a given native c++ type. </summary>
+    /// <summary> Gets the VariableType enum that corresponds to a given native C++ type. </summary>
     ///
-    /// <typeparam name="ValueType"> The native c++ type being mapped to a value of VariableType. </typeparam>
+    /// <typeparam name="ValueType"> The native C++ type being mapped to a value of VariableType. </typeparam>
     ///
-    /// <returns> A VariableType that corresponds to a given native c++ type. </returns>
+    /// <returns> A VariableType that corresponds to a given native C++ type. </returns>
     template <typename ValueType>
     VariableType GetVariableType();
 
