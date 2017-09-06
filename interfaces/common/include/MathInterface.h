@@ -9,12 +9,12 @@
 
 #ifndef SWIG
 
-// math
-#include "TensorShape.h"
-
 // stl
-#include <vector>
 #include <array>
+#include <vector>
+#include <stddef.h>
+
+#include "TensorShape.h"
 #endif
 
 namespace ell

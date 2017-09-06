@@ -18,6 +18,7 @@ namespace api{
         int rows;
         int columns;
         int channels;
+        int Size() const { return rows * columns * channels; }
     } TensorShape;
 }
 }

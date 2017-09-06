@@ -43,7 +43,7 @@ def main(args):
         top5 = helper.get_top_n(predictions, 5)
 
         # Turn the top5 into a text string to display
-        text = "".join([str(element[0]) + "(" + str(int(100*element[1])) + "%)  " for element in top5])
+        text = "".join([helper.get_label(element[0]) + "(" + str(int(element[1]*100)) + "%)  " for element in top5])
 
         save = False
         if (text != lastPrediction):
@@ -62,4 +62,6 @@ def main(args):
     helper.report_times()
 
 if __name__ == "__main__":
-    main(sys.argv)
+    args = sys.argv
+    args.pop(0) # when an args list is passed to parse_args, the first argument (program name) needs to be dropped
+    main(args)

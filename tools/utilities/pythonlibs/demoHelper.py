@@ -47,7 +47,7 @@ class DemoHelper:
         self.captureDevice = None
         self.frame = None
         self.save_images = None
-        self.image_index = 0;
+        self.image_index = 0
         self.model_file = None
         self.model = None
         self.compiled = None
@@ -56,14 +56,13 @@ class DemoHelper:
         self.labels_file = None
         self.model_file = None
         self.iterations = None  # limit number of iterations through the loop.
-        self.realLabels = None
         self.total_time = 0
         self.time_count = 0
         self.warm_up = True
         self.input_shape = None
         self.output_shape = None
 
-    def parse_arguments(self, argv):
+    def add_arguments(self):
         # required arguments
         self.arg_parser.add_argument("configFile", help="path to the model configuration file")
         self.arg_parser.add_argument("labels", help="path to the labels file for evaluating the model")
@@ -73,16 +72,20 @@ class DemoHelper:
         self.arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
         self.arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
         self.arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
-        self.arg_parser.add_argument("--realLabels", help="returns the numeric labels as predictions instead of the text labels", action='store_true')
 
         # mutually exclusive options
         group = self.arg_parser.add_mutually_exclusive_group()
         group.add_argument("--camera", type=int, help="the camera id of the webcam", default=self.camera)
         group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
 
-        argv.pop(0) # when an args list is passed to parse_args, the first argument (program name) needs to be dropped
+
+    def parse_arguments(self, argv):
+        self.add_arguments()
         args = self.arg_parser.parse_args(argv)
-        
+        self.initialize(args)
+
+    def initialize(self, args):
+        # called after parse_args to extract args from the arg_parser.
         # process required arguments
         self.labels_file = args.labels
         self.config_file = args.configFile
@@ -93,7 +96,6 @@ class DemoHelper:
         self.threshold = args.threshold
         if (args.iterations):
             self.iterations = args.iterations
-        self.realLabels = args.realLabels
 
         # process mutually exclusive options
         if (args.camera):
@@ -125,6 +127,7 @@ class DemoHelper:
 
     def import_ell_map(self):
         sys.path.append(script_path)
+        sys.path.append(os.getcwd())
         print("### Loading ELL modules...")
         __import__("find_ell")
         ELL = __import__("ELL")            
@@ -151,6 +154,8 @@ class DemoHelper:
         # Import the compiled model wrapper
         sys.path.append(os.path.join(script_path, 'build'))
         sys.path.append(os.path.join(script_path, 'build/Release'))
+        sys.path.append(os.path.join(os.getcwd(), 'build'))
+        sys.path.append(os.path.join(os.getcwd(), 'build/Release'))
         try:
             self.compiled = __import__(name)
             
@@ -167,7 +172,7 @@ class DemoHelper:
                 raise Exception(func_name + " function not found in compiled module")
         except:    
             errorType, value, traceback = sys.exc_info()
-            print("### Exception: " + str(errorType))
+            print("### Exception: " + str(errorType) + ": " + value)
             print("====================================================================")
             print("Compiled ELL python module is not loading")
             print("It is possible that you need to add LibOpenBLAS to your system path (See Install-*.md) from root of this repo")
@@ -221,7 +226,7 @@ class DemoHelper:
             print("Average prediction time: " + str(average_time))
 
     def get_top_n(self, predictions, N):
-        """Return at most the top 5 predictions as a list of tuples that meet the threshold."""
+        """Return at most the top N predictions as a list of tuples that meet the threshold."""
         topN = np.zeros([N, 2])
 
         for p in range(len(predictions)):
@@ -233,12 +238,13 @@ class DemoHelper:
         for element in topN:
             if element[0] > self.threshold:
                 i = int(element[1])
-                if (i < len(self.labels)):
-                    if self.realLabels:
-                        result.append((i, round(element[0], 2)))
-                    else:
-                        result.append((self.labels[i], round(element[0], 2)))
+                result.append((i, element[0]))
         return result
+
+    def get_label(self, i):
+        if (i < len(self.labels)):
+            return self.labels[i]
+        return ""
 
     def get_predictor_map(self, predictor, intervalMs):
         """Creates an ELL map from an ELL predictor"""
