@@ -7,7 +7,13 @@ if(${PYTHONINTERP_FOUND})
 
     set(module_name "pythonlibs_gallery")
 
-    set(lib_src copy_validation_set.py generate_md.py run_validation.py validate.py validate.sh.in)
+    set(lib_src copy_validation_set.py
+        generate_md.py
+        run_validation.py
+        validate.py
+        validate.sh.in
+        vision_model.md.in
+        zip_file.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${lib_src})
 

@@ -1,7 +1,7 @@
 ####################################################################################################
 ##
 ##  Project:  Embedded Learning Library (ELL)
-##  File:     generate_md.py
+##  File:     generate_md.py (gallery)
 ##  Authors:  Lisa Ong
 ##
 ##  Requires: Python 3.x, cntk-2.0-cp35
@@ -12,11 +12,21 @@ import sys
 import argparse
 import json
 import re
-import zipfile
-from cntk import load_model
-from cntk.layers.typing import *
 from functools import reduce
 from os.path import basename
+
+# ELL utilities
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../'))
+import find_ell
+import ELL
+import ziptools
+
+# CNTK
+from cntk import load_model
+from cntk.layers.typing import *
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../importers/CNTK'))
+import lib.cntk_layers as cntk_layers
+import lib.cntk_utilities as cntk_utilities
 
 class GenerateMarkdown:
     def __init__(self):
@@ -25,104 +35,128 @@ class GenerateMarkdown:
         self.modeldir = None
         self.model = None
         self.outfile = None
+        self.template = None
 
     def parse_command_line(self, argv):
         # required arguments
         self.arg_parser.add_argument("modeldir", help="the directory containing the model files")
         self.arg_parser.add_argument("outfile", help="path to the output filename")
 
-        argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
+        # optional arguments
+        self.arg_parser.add_argument("--template", help="path to the input markdown template file", default="vision_model.md.in")
         args = self.arg_parser.parse_args(argv)
 
         self.modeldir = args.modeldir
         self.model = basename(self.modeldir)
-        self.outfile = open(args.outfile, 'w', encoding='utf-8')
+        self.outfile = args.outfile
 
-    def get_model_file(self, suffix):
-        filename = os.path.join(self.modeldir, self.model + suffix)
+        if (not os.path.isfile(args.template)):
+            raise Exception("Template file not found: " + args.template)
+        with open(args.template, 'r') as f:
+            self.template = f.read()
+
+        permalink = os.path.splitext(basename(self.outfile))[0]
+        self.set_value("@PERMALINK@", permalink)
+
+    def get_model_file(self, name, is_suffix=True):
+        """Returns the path to a file from the model directory, given the filename or a suffix"""
+        if is_suffix:
+            filename = os.path.join(self.modeldir, self.model + name)
+        else:
+            filename = os.path.join(self.modeldir, name)
+            
         if (not os.path.isfile(filename)):
             raise Exception("File not found: " + filename)
         return filename
 
-    def get_performance(self, platform):
-        """Averages the performance metrics"""
-        filename = self.get_model_file("_validation_" + platform + ".json")
+    def format_float(self, value):
+        return "{0:.2f}".format(value)
+
+    def set_value(self, key, value):
+        self.template = self.template.replace(key, str(value))
+
+    def write_properties(self):
+        """Writes the basic properties of the model"""
+        filename = self.get_model_file("_modelargs.json")
+        with open(filename, 'r') as f:
+            results = json.loads(f.read())
+            self.set_value("@IMAGE_SIZE@", results['image_size'])
+            self.set_value("@NUM_CLASSES@", results['num_classes'])
+            self.set_value("@MODEL_NAME@", results['name'])
+
+        filename = self.get_model_file(".ell.zip")
+        unzip = ziptools.Extractor(filename)
+        success, temp = unzip.extract_file(".ell")
+        if (success):
+            print("extracted: " + temp)
+            size_mb = round(os.path.getsize(temp) / (1000 * 1000))
+            self.set_value("@MODEL_SIZE_MB@", size_mb)
+            os.remove(temp)
+        else:
+            # not a zip archive
+            print("Error, not a valid zip archive: " + filename)
+
+    def write_performance(self, platforms):
+        """Writes the metrics for the list of platforms"""
+        for platform in platforms:
+            filename = self.get_model_file("_validation_" + platform + ".json")
+
+            with open(filename, 'r') as f:
+                results = json.loads(f.read())
+                average_time = reduce(lambda x, y: x + float(y['avg_time']), results, 0) / len(results)
+                self.set_value("@" + platform.upper() + "_SECONDS_PER_FRAME@", self.format_float(average_time))
+
+    def sanitize_layer_string(self, layer_str):
+        # these are special characters in markdown files
+        s = re.sub(r'\|', r'', layer_str)
+        return s
+
+    def write_architecture(self):
+        """Writes the model architecture in the desired format"""
+        filename = self.get_model_file(".cntk.zip")
+        unzip = ziptools.Extractor(filename)
+        success, temp = unzip.extract_file(".cntk")
+        if (success):
+            print("extracted: " + temp)
+            model_root = load_model(temp)
+            model_layers = cntk_utilities.get_model_layers(model_root)
+            layers = cntk_layers.get_filtered_layers_list(model_layers)
+
+            result = reduce(lambda x, y: x + self.sanitize_layer_string(y.__str__()) + "<br>", layers, "")
+            self.set_value("@MODEL_ARCH@", result)
+            os.remove(temp)
+        else:
+            # not a zip archive
+            print("Error, not a valid zip archive: " + filename)
+
+    def write_accuracy(self):
+        """Writes the accuracy from the model test result"""
+        filename = self.get_model_file("test_eval.json", is_suffix=False)
 
         with open(filename, 'r') as f:
             results = json.loads(f.read())
-            sum_average_times = reduce(lambda x, y: x + float(y['avg_time']), results, 0)
-            average_time = sum_average_times / len(results)
-            self.outfile.write("\n| Performance | " + platform + ": " + str(average_time) + "s/frame\n")
+            self.set_value("@TOP_1_ACCURACY@", self.format_float(100 * (1.0 - float(results['average_top1_error']))))
+            self.set_value("@TOP_5_ACCURACY@", self.format_float(100 * (1.0 - float(results['average_top5_error']))))
+            self.set_value("@TOP_1_ERROR@", self.format_float(100 * float(results['average_top1_error'])))
+            self.set_value("@TOP_5_ERROR@", self.format_float(100 * float(results['average_top5_error'])))
 
-    def get_model_layers(self, root):
-        """Returns a list of the high-level layers (i.e. function blocks) that make up the CNTK model """
-        stack = [root.root_function]  # node
-        layers = []         # final result, list of all relevant layers
-        visited = set()
-        #in_model = False
-
-        while stack:
-            node = stack.pop(0)
-            from cntk import cntk_py
-            try:
-                # Function node
-                stack = list(node.root_function.inputs) + stack
-            except AttributeError:
-                # OutputVariable node. We need process the owner node if this is an output.
-                try:
-                    if node.is_output:
-                        stack.insert(0, node.owner)
-                        continue
-                except AttributeError:
-                    pass
-            # Add function nodes but skip Variable nodes
-            if (not isinstance(node, Variable)) and (not node.uid in visited):
-                #if (not in_model and node.name == "fc_output"):
-                #    in_model = True
-                #    layers.append(node)
-                #elif in_model:
-                #    if (node.name == "mean_removed_input"):
-                #        layers.append(node)
-                #        break
-                layers.append(node)
-                visited.add(node.uid)
-
-        # CNTK layers are in opposite order to what ELL wants, so reverse the list
-        layers.reverse()
-        return layers
-
-    def format_model_layer(self, cntk_layer):
-        # channels, rows, columns => rows, columns, channels
-        s = re.sub(r'Tensor\[(\d+),(\d+),(\d+)\]', r'Tensor[\2,\3,\1]', cntk_layer.__str__())
-
-        # remove labels
-        s = re.sub(r'^(.+): ', r'', s)
-
-        return s
-
-    def get_architecture(self):
-        # TODO: we should have _config.json define the architecture sothat we don't need this
-        filename = self.get_model_file(".cntk.zip")
-
-        self.outfile.write("\n| Architecture | ");
-        with zipfile.ZipFile(filename) as zf:
-            for member in zf.infolist():
-                _, e = os.path.splitext(member.filename)
-                if (e == ".cntk"):
-                    path = os.path.dirname(filename)
-                    zf.extract(member, path)
-                    model_root = load_model(os.path.join(path, member.filename))
-                    layers = self.get_model_layers(model_root)
-                    result = reduce(lambda x, y: x + self.format_model_layer(y) + "<br>", layers, "")
-                    self.outfile.write(result)
-                    break
+    def save(self):
+        with open(self.outfile, 'w', encoding='utf-8') as of:
+            of.write(self.template)
+        print("Saved to: " + self.outfile)
 
     def run(self):
-        self.get_performance("pi3")
-        self.get_architecture()
+        self.write_properties()
+        self.write_architecture()
+        self.write_accuracy()
+        self.write_performance(["pi3"])
+        self.save()
 
 if __name__ == "__main__":
-    args = sys.argv
     program = GenerateMarkdown()
-    program.parse_command_line(args)
+
+    argv = sys.argv
+    argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
+    program.parse_command_line(argv)
+
     program.run()

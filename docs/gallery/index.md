@@ -12,13 +12,16 @@ Our gallery is a collection of bits and pieces that you can download and use in 
 
 ### ILSVRC2012
 
-* [64x64 Convolutional Neural Network (0.20 error rate, 1s/frame)](/ELL/gallery/ILSVRC2012/V16-64)
-* [160x160 Convolutional Neural Network (0.17 error rate, 8s/frame)](/ELL/gallery/ILSVRC2012/V16-160)
-* [160x160 Convolutional Neural Network (0.21 error rate, 0.75s/frame)](/ELL/gallery/ILSVRC2012/DN-160)
-* [192x192 Convolutional Neural Network (0.15 error rate, 11.4s/frame)](/ELL/gallery/ILSVRC2012/V16-192)
-* [192x192 Convolutional Neural Network (0.21 error rate, 1.0s/frame)](/ELL/gallery/ILSVRC2012/DN-192)
-* [224x224 Convolutional Neural Network (0.20 error rate, 1.5s/frame)](/ELL/gallery/ILSVRC2012/DN-224)
-* [256x256 Convolutional Neural Network (0.19 error rate, 1.9s/frame)](/ELL/gallery/ILSVRC2012/DN-256)
+* [64x64x3 Convolutional Neural Network (42.88% top 1 error, 19.51% top 5 error, 1.01s/frame @ TBD CPU)](/ELL/gallery/ILSVRC2012/v_I64x64x3CCMCCMCCCMCCCMCCCMF2048)
+* [160x160x3 Convolutional Neural Network (42.40% top 1 error, 19.61% top 5 error, 0.66s/frame @ TBD CPU)](/ELL/gallery/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A)
+* [160x160x3 Convolutional Neural Network (64.22% top 1 error, 39.44% top 5 error, 0.79s/frame @ TBD CPU)](/ELL/gallery/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A)
+* [192x192x3 Convolutional Neural Network (40.99% top 1 error, 18.26% top 5 error, 0.91s/frame @ TBD CPU)](/ELL/gallery/ILSVRC2012/d_I192x192x3CMCMCMCMCMCMC1A)
+* [192x192x3 Convolutional Neural Network (61.17% top 1 error, 36.17% top 5 error, 1.09s/frame @ TBD CPU)](/ELL/gallery/ILSVRC2012/d_I192x192x3NCMNCMNBMNBMNBMNBMNC1A)
+* [224x224x3 Convolutional Neural Network (39.79% top 1 error, 17.52% top 5 error, 1.26s/frame @ TBD CPU)](/ELL/gallery/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A)
+* [224x224x3 Convolutional Neural Network (59.85% top 1 error, 34.92% top 5 error, 1.56s/frame @ TBD CPU)](/ELL/gallery/ILSVRC2012/d_I224x224x3NCMNCMNBMNBMNBMNBMNC1A)
+* [256x256x3 Convolutional Neural Network (38.93% top 1 error, 16.82% top 5 error, 1.61s/frame @ TBD CPU)](/ELL/gallery/ILSVRC2012/d_I256x256x3CMCMCMCMCMCMC1A)
+* [256x256x3 Convolutional Neural Network (56.90% top 1 error, 31.81% top 5 error, 2.00s/frame @ TBD CPU)](/ELL/gallery/ILSVRC2012/d_I256x256x3NCMNCMNBMNBMNBMNBMNC1A)
+
 
 ## 3D Designs
 

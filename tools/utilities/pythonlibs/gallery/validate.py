@@ -1,7 +1,7 @@
 ####################################################################################################
 ##
 # Project:  Embedded Learning Library (ELL)
-# File:     validate.py
+# File:     validate.py (gallery)
 # Authors:  Chris Lovett, Lisa Ong
 ##
 # Requires: Python 3.x
@@ -34,13 +34,13 @@ def main(args):
                 raise Exception("File not found: " + filename)
 
             result = validate_image(["validate.py", args.config_file, args.labels, "--image",
-                                     filename, "--iterations", "5", "--threshold", "0.02"], filename)
+                                     filename, "--iterations", "5", "--threshold", "0.0"], filename)
 
             result["truth"] = c
             results.append(result)
 
     with open('validation.json', 'w', encoding='utf-8') as o:
-        json.dump(results, o, ensure_ascii=False)
+        json.dump(results, o, ensure_ascii=False, indent=2)
 
 
 def validate_image(args, filename):

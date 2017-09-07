@@ -1,0 +1,27 @@
+---
+layout: default
+title: @IMAGE_SIZE@x@IMAGE_SIZE@x3 Convolutional Neural Network
+permalink: /gallery/ILSVRC2012/@PERMALINK@
+---
+
+[Back to Gallery](/ELL/gallery)
+
+## ILSVRC2012 Classification: @IMAGE_SIZE@x@IMAGE_SIZE@x3 Convolutional Neural Network (@TOP_1_ERROR@% top 1 error, @TOP_5_ERROR@% top 5 error, @PI3_SECONDS_PER_FRAME@s/frame)
+
+|=
+| Download | [@MODEL_NAME@.ell.zip](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/@MODEL_NAME@/@MODEL_NAME@.ell.zip)
+|-
+| Accuracy | ILSVRC2012: @TOP_5_ACCURACY@% (Top 5), @TOP_1_ACCURACY@% (Top 1) 
+|-
+| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: @PI3_SECONDS_PER_FRAME@s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 800MHz: <br>DragonBoard 410c @ 1.2GHz:
+|-
+| Uncompressed Size | @MODEL_SIZE_MB@MB
+|-
+| Input | @IMAGE_SIZE@ x @IMAGE_SIZE@ x {R,G,B}
+|-
+| Architecure | @MODEL_ARCH@
+|-
+| Output | [ILSVRC2012 @NUM_CLASSES@ classes](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ImageNetLabels.txt)
+|-
+| Notes | Trained by Chuck Jacobs using CNTK 2.1
+|=

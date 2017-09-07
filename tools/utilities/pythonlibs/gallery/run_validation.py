@@ -1,7 +1,7 @@
 ####################################################################################################
 ##
 ##  Project:  Embedded Learning Library (ELL)
-##  File:     run_validation.py
+##  File:     run_validation.py (gallery)
 ##  Authors:  Lisa Ong
 ##
 ##  Requires: Python 3.x
