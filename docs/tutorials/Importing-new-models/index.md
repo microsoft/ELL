@@ -101,7 +101,7 @@ Now let's test that this model works on your PC.  For this you will need to copy
 
  Then to build an ELL project that will run on your PC:
 
-    python "~/git/ELL/wrap.py darknet_config.json darknetImageNetLabels.txt darknet.ell -target host
+    python "~/git/ELL/wrap.py darknetImageNetLabels.txt darknet.ell -target host
     cd host
     mkdir build
     cd build
@@ -125,11 +125,11 @@ Then to build it:
 
 And finally to run the test on video input:
 
-    python demo.py darknet_config.json darknetImageNetLabels.txt
+    python demo.py darknetImageNetLabels.txt --compiled darknet
 
 And to test with a static image:
 
-    python demo.py darknet_config.json darknetImageNetLabels.txt --image coffeemug.jpg
+    python demo.py darknetImageNetLabels.txt --compiled darknet --image coffeemug.jpg
 
 ## CNTK
 
@@ -223,7 +223,7 @@ Now let's test that this model works on your PC.  For this you will need to copy
 
  Then to build an ELL project that will run on your PC:
 
-    python "~/git/ELL/wrap.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt VGG16_ImageNet_Caffe.ell -target host
+    python "~/git/ELL/wrap.py cntkVgg16ImageNetLabels.txt VGG16_ImageNet_Caffe.ell -target host
     cd host
     mkdir build
     cd build
@@ -246,11 +246,11 @@ Then to build it:
 
 And finally to run the test on video input:
 
-    python demo.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt
+    python demo.py cntkVgg16ImageNetLabels.txt --compiled VGG16_ImageNet_Caffe
 
 And to test with a static image:
 
-    python demo.py VGG16_ImageNet_Caffe_config.json cntkVgg16ImageNetLabels.txt --image coffeemug.jpg
+    python demo.py cntkVgg16ImageNetLabels.txt --compiled VGG16_ImageNet_Caffe --image coffeemug.jpg
 
 ### Summary
 

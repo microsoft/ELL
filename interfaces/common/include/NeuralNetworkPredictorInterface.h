@@ -41,7 +41,7 @@ namespace predictors
         using UnderlyingInputParameters = typename ell::predictors::neural::InputLayer<ElementType>::InputParameters;
         using UnderlyingInputLayer = typename ell::predictors::neural::InputLayer<ElementType>;
 
-        NeuralNetworkPredictor(const std::vector<Layer*>& layers);
+        NeuralNetworkPredictor(const std::vector<Layer*>& layers, ElementType scaleFactor=1.0f);
         std::vector<ElementType> Predict(const std::vector<double>& input);
         neural::LayerShape GetInputShape() const;
         neural::LayerShape GetOutputShape() const;

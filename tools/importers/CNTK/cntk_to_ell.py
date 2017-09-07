@@ -22,12 +22,15 @@ import lib.cntk_layers as cntk_layers
 import lib.cntk_utilities as cntk_utilities
 
 
-def predictor_from_cntk_model(modelFile):
+def predictor_from_cntk_model(modelFile, plotModel=False):
     """Loads a CNTK model and returns an ELL.NeuralNetworkPredictor"""
 
     print("Loading...")
     z = load_model(modelFile)
     print("\nFinished loading.")
+
+    if (plotModel is True):
+        cntk_utilities.plot_model(z, 'model.png')
 
     print("Pre-processing...")
     modelLayers = cntk_utilities.get_model_layers(z)

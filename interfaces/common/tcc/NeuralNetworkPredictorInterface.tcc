@@ -38,7 +38,7 @@ namespace predictors
     // Api classes for the neural predictor
     //////////////////////////////////////////////////////////////////////////
     template <typename ElementType>
-    NeuralNetworkPredictor<ElementType>::NeuralNetworkPredictor(const std::vector<ell::api::predictors::neural::Layer<ElementType>*>& layers)
+    NeuralNetworkPredictor<ElementType>::NeuralNetworkPredictor(const std::vector<ell::api::predictors::neural::Layer<ElementType>*>& layers, ElementType scaleFactor)
     {
         if (layers.size() > 0)
         {
@@ -50,7 +50,7 @@ namespace predictors
                   underlying::NoPadding(),
                   { parameters.inputShape.rows, parameters.inputShape.columns, parameters.inputShape.channels },
                   parameters.inputPaddingParameters,
-                  1.0
+                  scaleFactor
                 };
             auto inputLayer = std::make_unique<underlying::InputLayer<ElementType>>(inputParameters);
 

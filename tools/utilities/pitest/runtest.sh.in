@@ -10,4 +10,4 @@ cmake ..
 make
 cd ..
 export DISPLAY=:0
-python demo.py @CONFIG@ @LABELS@ --image coffeemug.jpg --iterations 1
+python demo.py @LABELS@ --compiled @COMPILED_MODEL@ --image coffeemug.jpg --iterations 1

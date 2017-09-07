@@ -1,6 +1,6 @@
 ## Wrap.py
 
-**Usage:** wrap.py config_file label_file model_file [-lang name|-target name|-outdir name|-v]
+**Usage:** wrap.py label_file model_file [-lang name|-target name|-outdir name|-v]
 
 This tool wraps a given ELL model in a CMake C++ buildable project that builds a language specific module that makes it possible for you to invoke the ELL model on a given target platform from your specified programming language.
 

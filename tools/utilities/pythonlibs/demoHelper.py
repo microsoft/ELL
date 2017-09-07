@@ -14,7 +14,6 @@ import argparse
 import cv2
 import numpy as np
 import time
-import json
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 # Helper class that interfaces with opencv and provides handy conversion from opencv to ELL buffers and 
@@ -29,30 +28,29 @@ class DemoHelper:
 
         self.arg_parser = argparse.ArgumentParser(
             "Runs the given ELL model passing images from camera or static image file\n"
-            "If no model file is given, it tries to load the compiled model defined in the config file\n"
+            "Either the ELL model file, or the compiled model's Python module must be given,\n"
+            "using the --model or --compiled options respectively.\n"
             "Example:\n"
-            "   python demo.py darknet_config.json darknetImageNetLabels.txt --model darknet.ell\n"
+            "   python demo.py categories.txt --compiled tutorial1/pi3/model1\n"
+            "   python demo.py categories.txt --model model1.ell\n"
             "This shows opencv window with image classified by the model using given labels")
         
-        # each input pixel may need to be scaled. It is common for models to require an 8-bit pixel
-        # to be represented as a value between 0.0 and 1.0, which is the same as multiplying it by 1/255.
-        # This can be configured in the config file.
-        self.scaleFactor = 1 / 255
         self.threshold = threshold
         self.start = time.time()
         self.frame_count = 0
         self.fps = 0
         self.camera = 0
-        self.imageFilename = None
-        self.captureDevice = None
+        self.image_filename = None
+        self.capture_device = None
         self.frame = None
         self.save_images = None
         self.image_index = 0
         self.model_file = None
         self.model = None
+        self.model_name = "model"
         self.compiled = None
+        self.compiled_module = None
         self.compiled_func = None
-        self.config_file = None
         self.labels_file = None
         self.model_file = None
         self.iterations = None  # limit number of iterations through the loop.
@@ -64,11 +62,9 @@ class DemoHelper:
 
     def add_arguments(self):
         # required arguments
-        self.arg_parser.add_argument("configFile", help="path to the model configuration file")
         self.arg_parser.add_argument("labels", help="path to the labels file for evaluating the model")
 
         # options
-        self.arg_parser.add_argument("--model", help="path to a model file")
         self.arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
         self.arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
         self.arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
@@ -78,46 +74,51 @@ class DemoHelper:
         group.add_argument("--camera", type=int, help="the camera id of the webcam", default=self.camera)
         group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
 
+        group2 = self.arg_parser.add_mutually_exclusive_group()
+        group2.add_argument("--model", help="path to a model file")
+        group2.add_argument("--compiled", help="path to the compiled model's Python module")
 
     def parse_arguments(self, argv):
         self.add_arguments()
         args = self.arg_parser.parse_args(argv)
         self.initialize(args)
 
+    def value_from_arg(self, argValue, defaultValue):
+        if (argValue is not None):
+            return argValue
+        return defaultValue
+
     def initialize(self, args):
         # called after parse_args to extract args from the arg_parser.
         # process required arguments
         self.labels_file = args.labels
-        self.config_file = args.configFile
 
         # process options
-        self.model_file = args.model
-        self.save_images = args.save
-        self.threshold = args.threshold
-        if (args.iterations):
-            self.iterations = args.iterations
+        self.save_images = self.value_from_arg(args.save, None)
+        self.threshold = self.value_from_arg(args.threshold, None)
+        self.iterations = self.value_from_arg(args.iterations, None)
+        self.camera = self.value_from_arg(args.iterations, 0)
+        self.image_filename = self.value_from_arg(args.image, None)
 
-        # process mutually exclusive options
+        # process image source options
         if (args.camera):
-            self.camera = args.camera
-            self.imageFilename = None
+            self.image_filename = None
         elif (args.image):
-            self.imageFilename = args.image
             self.camera = None
 
         # load the labels
         self.labels = self.load_labels(self.labels_file)
         
-        with open(self.config_file) as f:
-            self.config = json.loads(f.read())
-            if ("input_scale" in self.config):
-                self.scaleFactor = float(self.config["input_scale"])
-
+        # process model options and load the model
+        self.model_file = args.model
+        self.compiled = args.compiled
         if (self.model_file == None):
-            # then assume we have a compiled model handy
-            self.import_compiled_model()
+            # this is the compiled model route, so load the wrapped module
+            self.model_name = os.path.split(self.compiled)[1]
+            self.import_compiled_model(self.compiled, self.model_name)
         else:
             # this is the "interpreted" model route, so we need the ELL runtime.
+            self.model_name = os.path.splitext(self.model_file)[0]
             self.import_ell_map()
             
         self.input_size = (self.input_shape.rows, self.input_shape.columns)
@@ -137,37 +138,37 @@ class DemoHelper:
         self.input_shape = self.model.GetInputShape()
         self.output_shape = self.model.GetOutputShape()
 
-
-    def import_compiled_model(self):
-        name = self.config['model']
-        if name == "":
-            raise Exception("config file is missing model name")
-        
-        func_name = self.config['func']
-        if func_name == "":
-            raise Exception("config file is missing func name")
-        
-        name = os.path.splitext(name)[0]
-        if not os.path.isdir('build'):
+    def import_compiled_model(self, compiledModulePath, name):
+        moduleDirectory = os.path.dirname(compiledModulePath)
+        print('Looking for: ' + name + ' in ' + moduleDirectory)
+        if (not os.path.isdir('build')) and (not os.path.isdir(moduleDirectory + '/build')):
             raise Exception("you don't have a 'build' directory, have you compiled this project yet?")
 
-        # Import the compiled model wrapper
+        func_name = name + '_predict'
+        if func_name == "":
+            raise Exception("Could not construct func name. Is the --compiled argument correct?")
+        
+        # Import the compiled model wrapper. Add the possible build directories.
+        sys.path.append(script_path)
+        sys.path.append(moduleDirectory)
+        sys.path.append(os.path.join(moduleDirectory, 'build'))
+        sys.path.append(os.path.join(moduleDirectory, 'build/Release'))
         sys.path.append(os.path.join(script_path, 'build'))
         sys.path.append(os.path.join(script_path, 'build/Release'))
         sys.path.append(os.path.join(os.getcwd(), 'build'))
         sys.path.append(os.path.join(os.getcwd(), 'build/Release'))
         try:
-            self.compiled = __import__(name)
+            self.compiled_module = __import__(name)
             
-            inputShapeGetter = getattr(self.compiled, name + "_GetInputShape")
-            outputShapeGetter = getattr(self.compiled, name + "_GetOutputShape")
+            inputShapeGetter = getattr(self.compiled_module, name + "_GetInputShape")
+            outputShapeGetter = getattr(self.compiled_module, name + "_GetOutputShape")
             self.input_shape = inputShapeGetter(0)
             self.output_shape = outputShapeGetter(0)
 
-            size = int(self.output_shape.Size())
-            self.results = self.compiled.FloatVector(size)
+            size = int(self.output_shape.rows * self.output_shape.columns * self.output_shape.channels)
+            self.results = self.compiled_module.FloatVector(size)
             try:
-                self.compiled_func = getattr(self.compiled, func_name)
+                self.compiled_func = getattr(self.compiled_module, func_name)
             except AttributeError:
                 raise Exception(func_name + " function not found in compiled module")
         except:    
@@ -266,27 +267,27 @@ class DemoHelper:
     def init_image_source(self):
         # Start video capture device or load static image
         if self.camera is not None:
-            self.captureDevice = cv2.VideoCapture(self.camera)
-        elif self.imageFilename:
-            self.frame = cv2.imread(self.imageFilename)
+            self.capture_device = cv2.VideoCapture(self.camera)
+        elif self.image_filename:
+            self.frame = cv2.imread(self.image_filename)
             if (type(self.frame) == type(None)):
                 raise Exception('image from %s failed to load' %
-                                (self.imageFilename))
+                                (self.image_filename))
 
     def get_next_frame(self):
-        if self.captureDevice is not None:
+        if self.capture_device is not None:
             # if predictor is too slow frames get buffered, this is designed to flush that buffer
             for i in range(self.get_wait()):
-                ret, self.frame = self.captureDevice.read()
+                ret, self.frame = self.capture_device.read()
             if (not ret):
-                raise Exception('your captureDevice is not returning images')
+                raise Exception('your capture device is not returning images')
             return self.frame
         else:
             return np.copy(self.frame)
 
     def resize_image(self, image, newSize):
         # Shape: [rows, cols, channels]
-        """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order, with each pixel multiplied by the configured scaleFactor."""
+        """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order."""
         if image.shape[0] > image.shape[1]:  # Tall (more rows than cols)
             rowStart = int((image.shape[0] - image.shape[1]) / 2)
             rowEnd = rowStart + image.shape[1]
@@ -303,20 +304,33 @@ class DemoHelper:
         return resized
 
     def prepare_image_for_predictor(self, image):
-        """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order, with each pixel multiplied by the configured scaleFactor."""        
+        """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order."""        
         resized = self.resize_image(image, self.input_size)
         resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
-        resized = resized * self.scaleFactor
         resized = resized.astype(np.float).ravel()
         return resized
 
     def draw_label(self, image, label):
-        """Helper to draw text onto an image"""
-        cv2.rectangle(
-            image, (0, 0), (image.shape[1], 40), (50, 200, 50), cv2.FILLED)
-        cv2.putText(image, label, (10, 25),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
+        """Helper to draw text label onto an image"""
+        self.draw_header(image, label)
         return
+
+    def draw_header(self, image, text):
+        """Helper to draw header text block onto an image"""
+        self.draw_text_block(image, text, (0, 0), (50, 200, 50))
+        return
+
+    def draw_footer(self, image, text):
+        """Helper to draw footer text block onto an image"""
+        self.draw_text_block(image, text, (0, image.shape[0] - 40), (200, 100, 100))
+        return
+
+    def draw_text_block(self, image, text, blockTopLeft=(0,0), blockColor=(50, 200, 50), blockHeight=40, fontScale=0.8):
+        """Helper to draw a filled rectangle with text onto an image"""
+        cv2.rectangle(
+            image, blockTopLeft, (image.shape[1], blockTopLeft[1] + blockHeight), blockColor, cv2.FILLED)
+        cv2.putText(image, text, (blockTopLeft[0] + int(blockHeight / 4), blockTopLeft[1] + int(blockHeight * 0.667)),
+                     cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 0, 0), 2, cv2.LINE_AA)
 
     def draw_fps(self, image):
         now = time.time()

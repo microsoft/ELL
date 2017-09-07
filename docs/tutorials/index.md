@@ -16,3 +16,4 @@ permalink: /tutorials/
 * [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/)
 * [Fun with Dogs and Cats](/ELL/tutorials/Fun-with-Dogs-and-Cats/)
 * [Importing new models](/ELL/tutorials/Importing-new-models/)
+* [Comparing Image Classification models side by side on the Raspberry Pi](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/)

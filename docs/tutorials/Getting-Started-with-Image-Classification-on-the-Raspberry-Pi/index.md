@@ -39,7 +39,7 @@ curl --location -o ell.zip https://github.com/Microsoft/ELL-models/raw/master/mo
 ```
 
 You should now have a `ImageNetLabels.txt` file and a `ell.zip` file that is about 28 megabytes.
-Now inside ell.zip is the ell model named `d_I224x224x3CMCMCMCMCMCMC1A.ell` so unzip the archive
+Inside ell.zip is the ell model named `d_I224x224x3CMCMCMCMCMCMC1A.ell` so unzip the archive
 and place this file in the tutorial1 folder, then rename it to `ImageNet.ell`.
 
 ### Wrap the model in a Python module
@@ -81,7 +81,7 @@ make
 cd ..
 ````
 
-This builds the Python Module that is then loadable by the demo python scripts.
+This builds the Python Module that is then loadable by the demo Python scripts.
 
 ### Process a static image 
 
@@ -90,7 +90,7 @@ environment named py34.  So to run the tutorial do this:
 
 ````
 source activate py34
-python demo.py config.json ImageNetLabels.txt --image coffeemug.jpg
+python demo.py ImageNetLabels.txt --compiled ImageNet --image coffeemug.jpg
 ````
 And it will classify the image, you should see output like this:
 ````
@@ -106,7 +106,7 @@ And if you have a display connected you should see something like this:
 If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
 
 ````
-python demo.py config.json ImageNetLabels.txt
+python demo.py ImageNetLabels.txt  --compiled ImageNet
 ````
 
 You will see the same kind of window appear only this time it is showing the video stream.

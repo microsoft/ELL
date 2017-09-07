@@ -23,7 +23,6 @@ import buildtools
 class ModuleBuilder:
     def __init__(self):
         self.target = "host"
-        self.config_file = None
         self.label_file = None
         self.condig = None
         self.model_file = None
@@ -39,7 +38,7 @@ class ModuleBuilder:
         self.verbose = False
 
     def print_usage(self):
-        print("Usage: wrap.py config_file label_file model_file [-lang name|-target name|-outdir name|-v]")
+        print("Usage: wrap.py label_file model_file [-lang name|-target name|-outdir name|-v]")
         print("This tool wraps a given ELL model in a CMake buildable project that builds a language")
         print("specific module that can call the ELL model on a given target platform.")
         print("")
@@ -72,8 +71,6 @@ class ModuleBuilder:
                 else:
                     print("Unknown option: " + arg)
                     return False                
-            elif (self.config_file == None):
-                self.config_file = arg
             elif (self.label_file == None):
                 self.label_file = arg
             elif (self.model_file == None):
@@ -83,9 +80,6 @@ class ModuleBuilder:
                 return False
             i = i + 1
 
-        if (self.config_file == None):
-            print("missing config file argument")
-            return False  
         if (self.model_file == None):
             print("missing model file argument")
             return False  
@@ -99,9 +93,6 @@ class ModuleBuilder:
         head, tail = os.path.split(self.model_file)
         self.model_name =  os.path.splitext(tail)[0]        
         
-        with open(self.config_file) as f:
-            self.config = json.loads(f.read())
-
         return True
 
     def find_files(self):
@@ -168,10 +159,9 @@ class ModuleBuilder:
         self.tools.compile(self.model_file, self.func_name, self.model_name, self.target, self.output_dir)
         self.tools.swig(self.output_dir, self.model_name, self.language)
         self.tools.llc(self.output_dir, self.model_name, self.target)
-        self.save_config()
         self.create_cmake_file()
         if (self.target == "host"):
-            print("success, now you can build the 'host' folder")
+            print("success, now you can build the '" + self.output_dir + "' folder")
         else:
             print("success, now copy the " + self.output_dir + " to your target machine and build it there")
         

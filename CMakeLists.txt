@@ -92,9 +92,6 @@ add_subdirectory(interfaces)
 # Add examples (has dependencies on SWIG-generated interfaces)
 add_subdirectory(examples)
 
-# Add tutorials (has dependencies on SWIG-generated interfaces)
-add_subdirectory(tutorials)
-
 # Add project for solution-level documentation
 set (DOC README.md
          StyleGuide.md)

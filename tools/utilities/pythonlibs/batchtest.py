@@ -29,7 +29,7 @@ class ModelTester(demoHelper.DemoHelper):
         self.arg_parser = argparse.ArgumentParser(
             "Runs the given ELL model passing images from a test folder\n"
             "Example:\n"
-            "   python modelTester.py darknet_config.json darknetImageNetLabels.txt --truth val_map.txt --folder images --model darknet.ell\n"
+            "   python modelTester.py darknetImageNetLabels.txt --truth val_map.txt --folder images --model darknet.ell\n"
             )
         
         self.start = time.time()

@@ -390,6 +390,16 @@ def process_fully_connected_layer(layer, weightsData):
 
     return layers
 
+def get_first_scaling_layer(nextLayerParameters):
+    scaleValues = np.ones((nextLayerParameters.inputShape.channels), dtype=np.float) * [1/255]
+
+    inputShape = ELL.TensorShape(nextLayerParameters.inputShape.rows - (2 * nextLayerParameters.inputPaddingParameters.paddingSize), 
+                                    nextLayerParameters.inputShape.columns - (2 * nextLayerParameters.inputPaddingParameters.paddingSize), 
+                                    nextLayerParameters.inputShape.channels)
+
+    layerParameters = create_layer_parameters(inputShape, 0, ELL.PaddingScheme.zeros, nextLayerParameters.inputShape, nextLayerParameters.inputPaddingParameters.paddingSize, nextLayerParameters.inputPaddingParameters.paddingScheme)
+    return ELL.FloatScalingLayer(layerParameters, scaleValues.ravel())
+
 def process_network(network, weightsData, convolutionOrder):
     """Returns an ELL.FloatNeuralNetworkPredictor as a result of parsing the network layers"""
     ellLayers = []
@@ -410,6 +420,12 @@ def process_network(network, weightsData, convolutionOrder):
         else:
             print("Skipping, ", layer['type'], "layer")
             print()
+
+    if (len(ellLayers) > 0):
+        # Darknet expects the input to be between 0 and 1, so prepend 
+        # a scaling layer with a scale factor of 1/255
+        parameters = ellLayers[0].parameters
+        ellLayers = [get_first_scaling_layer(parameters)] + ellLayers
 
     predictor = ELL.FloatNeuralNetworkPredictor(ellLayers)
     return predictor

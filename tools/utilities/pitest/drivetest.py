@@ -112,7 +112,7 @@ class DriveTest:
         with open(os.path.join(self.ell_root, "tools/utilities/pitest/runtest.sh.in"), 'r') as f:
             template = f.read()
         template = template.replace("@LABELS@", basename(self.labels_file))
-        template = template.replace("@CONFIG@", basename(self.ell_json))
+        template = template.replace("@COMPILED_MODEL@", basename(self.model_name))
         output_template = os.path.join(dest, "runtest.sh")
 
         # raspberry pi requires runtest to use 0xa for newlines, so fix autocrlf that happens on windows.
@@ -138,7 +138,7 @@ class DriveTest:
             self.download("https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg", self.config_file)
             self.download("https://pjreddie.com/media/files/darknet.weights", self.weights_file)
         
-        self.copy_files( [ os.path.join(self.ell_root, "tutorials/vision/gettingStarted/darknetImageNetLabels.txt") ], "")
+        self.copy_files( [ os.path.join(self.ell_root, "docs/tutorials/Importing-new-models/darknetImageNetLabels.txt") ], "")
 
     def import_darknet(self):
         self.ell_model = os.path.join(self.pitest_dir, self.model_name + ".ell")
@@ -162,7 +162,7 @@ class DriveTest:
         sys.path.append(os.path.join(current_path, '../../wrap'))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        builder.parse_command_line(["", json_file, labels_file, self.ell_model, "-target", "pi3", "-outdir", self.output_dir])
+        builder.parse_command_line(["", labels_file, self.ell_model, "-target", "pi3", "-outdir", self.output_dir])
         builder.run()
 
     def connect_ssh(self):
