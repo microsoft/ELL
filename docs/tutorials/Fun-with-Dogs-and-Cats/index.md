@@ -67,7 +67,7 @@ This builds the Python Module that is then loadable by the pets.py script.
 
 ### Process a static image 
 
-Now if you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-pi-setup) you should have a miniconda
+Now if you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi) you should have a miniconda
 environment named py34, so to run the tutorial do this:
 
 ````
@@ -124,7 +124,7 @@ Python runtime.
 ### Toubleshooting
 
 If you run into trouble there's some troubleshooting instructions at the bottom of the 
-[Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-pi-setup).
+[Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi).
 
 
 ### Licenses

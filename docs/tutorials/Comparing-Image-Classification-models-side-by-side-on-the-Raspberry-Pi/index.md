@@ -5,6 +5,8 @@ permalink: /tutorials/Comparing-Image-Classification-models-side-by-side-on-the-
 ---
 # Comparing Image Classification models side by side on the Raspberry Pi
 
+![screenshot](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/Screenshot.jpg)
+
 ### Materials
 
 * A Raspberry Pi
@@ -14,7 +16,7 @@ permalink: /tutorials/Comparing-Image-Classification-models-side-by-side-on-the-
 
 ### Overview
 
-In this tutorial, you will download two pretrained image classifiers from the gallery, compile the classifiers for the Raspberry Pi, and write a Python script that invokes the classifiers in a round-robin fashion and displays results side by side. When the Python script runs on the Pi, you will be able to point the camera at a variety of objects and compare tboth result and evaluation time per frame of the the classifiers.
+In this tutorial, you will download two pretrained image classifiers from the gallery, compile the classifiers for the Raspberry Pi, and write a Python script that invokes the classifiers in a round-robin fashion and displays results side by side. When the Python script runs on the Pi, you will be able to point the camera at a variety of objects and compare both result and evaluation time per frame of the the classifiers.
 
 ### Prerequisites
 
@@ -27,7 +29,7 @@ handy tools like `curl` which we will use later on.
 2. You will also need a simple web cam or a pi cam.  If you don't have one handy, we will show you how to load
 static images or .mp4 videos and process those instead.
 
-3. Additional Software is needed on your Raspberry Pi - See [Setup Raspberry Pi](/ELL/tutorials/Raspberry-pi-setup). 
+3. Additional Software is needed on your Raspberry Pi - See [Setup Raspberry Pi](/ELL/tutorials/Setting-Up-your-Raspberry-Pi). 
 
 4. You will need to be sure you built ELL as per the ELL INSTALL-xxx.md instructions at the root of this git repo.  You will need to build ELL after you install Python from your activate your conda environment, so that the `CMake` step picks up on the fact that you have Python 3.6 installed.
 
@@ -40,11 +42,14 @@ source activate py36
 ```
 Then cd into your ELL git repo where you did the build already
 ```
-cd ELL/build/tutorials
+cd ELL/build
+mkdir tutorials
+cd tutorials
 ```
 Then make a new directory named `sideBySideTutorial` under your ELL git repo in the build/tutorials folder and download the following pre-trained models.  These models are trained on the 1000-class ImageNet data set and have already been converted to the ELL model format.  
 ```
-mkdir tutorial1 && cd sideBySideTutorial
+mkdir sideBySideTutorial
+cd sideBySideTutorial
 curl --location -o ImageNetLabels.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ImageNetLabels.txt
 curl --location -o ell1.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
 ```
@@ -114,7 +119,7 @@ cd ..
 
 ### Process a static image 
 
-Now if you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-pi-setup) you should have a miniconda
+Now if you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi) you should have a miniconda
 environment named py34.  So to run the tutorial do this:
 
 ````
@@ -122,9 +127,8 @@ source activate py34
 python sideBySideDemo.py ImageNetLabels.txt --compiled model1/model1,model2/model2 --image coffeemug.jpg
 ````
 
-If you have a display connected you should see something like this:
+If you have a display connected you should see the screen shot at the top of this page.
 
-![screenshot](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/Screenshot.png)
 
 ### Process Video
 
@@ -145,4 +149,4 @@ many types of African animals.
 ### Toubleshooting
 
 If you run into trouble there's some troubleshooting instructions at the bottom of the 
-[Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-pi-setup).
+[Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi).

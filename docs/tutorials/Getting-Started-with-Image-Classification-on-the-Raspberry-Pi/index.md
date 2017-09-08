@@ -18,7 +18,7 @@ In this tutorial, you will download a pretrained image classifier from the [gall
 ## Prerequisites
 
 * Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). Specifically, this tutorial relies on ELL, CMake, SWIG, and Python 3.6. 
-* Follow our instructions for [setting up your Raspberry Pi](/ELL/tutorials/Raspberry-pi-setup).
+* Follow our instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-Up-your-Raspberry-Pi).
 
 ## Download pre-trained model
 
@@ -85,7 +85,7 @@ This builds the Python Module that is then loadable by the demo Python scripts.
 
 ### Process a static image 
 
-Now if you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-pi-setup) you should have a miniconda
+Now if you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi) you should have a miniconda
 environment named py34.  So to run the tutorial do this:
 
 ````
@@ -120,4 +120,4 @@ many types of African animals.
 ### Toubleshooting
 
 If you run into trouble there's some troubleshooting instructions at the bottom of the 
-[Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-pi-setup).
+[Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi).
