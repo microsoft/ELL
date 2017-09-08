@@ -30,7 +30,6 @@ def main(argv):
     arg_parser.add_argument("cntk_model_file", help="path to a CNTK model file, or a zip archive of a CNTK model file")
     arg_parser.add_argument("--zip_ell_model", help="zips the output ELL model if set", action="store_true")
 
-    argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
     args = arg_parser.parse_args(argv)
 
     # extract the model if it's in an archive
@@ -60,22 +59,7 @@ def main(argv):
         zipper.zip_file(model_file_name, model_file_name + ".zip")
         os.remove(model_file_name)
 
-    model_config = {
-        'model': tail,
-        'input_shape': [ input_shape.rows, input_shape.columns, input_shape.channels ],
-        'output_shape': [ output_shape.rows, output_shape.columns, output_shape.channels ],
-        'input_scale': 1
-    }
-
-    config_file_name = os.path.splitext(filename)[0]+'_config.json'
-    config_json = json.dumps(model_config, indent=2, sort_keys=True)
-
-    print("Saving config file: '" + config_file_name + "'")
-    with open(config_file_name, 'w') as f:
-        f.write(config_json)
-        f.close()
-
 if __name__ == "__main__":
-    main(sys.argv)
-
-
+    argv = sys.argv
+    argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
+    main(argv)

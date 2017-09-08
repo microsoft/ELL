@@ -71,12 +71,15 @@ class RunValidation:
 
     def receive(self, src, dest):
         sftp = paramiko.SFTPClient.from_transport(self.ssh.get_transport())
-
         print("receiving:" + src)
         src_file = self.linux_join(self.dest_dir, src)
-        sftp.get(src_file, dest)
 
-        sftp.close()
+        try:
+            sftp.get(src_file, dest)
+        except IOError:
+            print("file not found: " + src_file)
+        finally:
+            sftp.close()
 
     def exec_remote_command(self, cmd):
         print("remote:" + cmd)
@@ -100,7 +103,7 @@ class RunValidation:
         with open("validate.sh.in", 'r') as f:
             template = f.read()
         template = template.replace("@LABELS@", self.labels)
-        template = template.replace("@MODEL@", self.model)
+        template = template.replace("@COMPILED_MODEL@", self.model)
         template = template.replace("@MAXFILES@", str(self.maxfiles))
 
         self.delete_if_exists(output)
@@ -113,13 +116,14 @@ class RunValidation:
         self.configure_sh_script("validate.sh")
 
         # publish files to the device
-        bash_files = ["validate.sh", "validate.py"]
+        bash_files = ["validate.sh", "validate.py", "../procmon.py"]
         self.publish(bash_files)
 
         # run validation
         self.exec_remote_command("chmod u+x /home/pi/pi3/validate.sh")
         output = self.exec_remote_command("/home/pi/pi3/validate.sh")
         self.receive("validation.json", self.model + "_validation.json")
+        self.receive("procmon.json", self.model + "_procmon.json")
 
 if __name__ == "__main__":
     args = sys.argv

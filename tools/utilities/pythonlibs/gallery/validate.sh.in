@@ -4,4 +4,4 @@ source activate py34
 cd /home/pi/pi3
 
 export DISPLAY=:0
-python validate.py --maxfiles @MAXFILES@ /home/pi/validation/val_map.txt /home/pi/validation/ @MODEL@_config.json @LABELS@
+python validate.py --maxfiles @MAXFILES@ /home/pi/validation/val_map.txt /home/pi/validation/ @LABELS@ @COMPILED_MODEL@

@@ -61,25 +61,9 @@ class DarknetImporter():
         print("Saving model file: '" + model_file_name + "'")
         ell_map.Save(model_file_name)
 
-        model_config = {
-            'model': tail,
-            'input_shape': [ input_shape.rows, input_shape.columns, input_shape.channels ],
-            'output_shape': [ output_shape.rows, output_shape.columns, output_shape.channels ]
-        }
-
-        config_file_name = os.path.splitext(self.model_file)[0]+'_config.json'
-        config_json = json.dumps(model_config, indent=2, sort_keys=True)
-
-        print("Saving config file: '" + config_file_name + "'")
-        with open(config_file_name, 'w') as f:
-            f.write(config_json)
-            f.close()
-
 if __name__ == "__main__":
     importer = DarknetImporter()
     if (not importer.parse_command_line(sys.argv)):
         importer.print_usage()
     else:
         importer.run()
-
-

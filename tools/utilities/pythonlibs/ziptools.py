@@ -15,7 +15,6 @@ import zipfile
 class Extractor:
     def __init__(self, archive):
         self.archive = archive
-        return
 
     def extract_file(self, file_extension):
         """Extracts the first file matching the file extension"""

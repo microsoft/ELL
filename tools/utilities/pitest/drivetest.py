@@ -57,7 +57,6 @@ class DriveTest:
         model_group = self.arg_parser.add_argument_group('model', 'options for loading a non-default model. All 3 must be specified for a non-default model to be used.')
         model_group.add_argument("--model", help="path to an ELL model file, the filename (without extension) will be used as the model name")
         model_group.add_argument("--labels", help="path to the labels file for evaluating the model")
-        model_group.add_argument("--config", help="path to the ELL model JSON file")
 
         argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
         args = self.arg_parser.parse_args(argv)
@@ -65,17 +64,16 @@ class DriveTest:
         self.ipaddress = args.ipaddress
         self.pitest_dir = args.outdir
 
-        self.extract_model_info(args.model, args.labels, args.config)
+        self.extract_model_info(args.model, args.labels)
 
         self.output_dir = os.path.join(self.pitest_dir, "pi3", self.model_name)
         if (not os.path.isdir(self.output_dir)):
             os.makedirs(self.output_dir)
 
-    def extract_model_info(self, ell_model, labels_file, config):
-        if (ell_model is None or labels_file is None or config is None):
+    def extract_model_info(self, ell_model, labels_file):
+        if (ell_model is None or labels_file is None):
             self.model_name = "darknet"
             self.labels_file = os.path.join(self.pitest_dir, "darknetImageNetLabels.txt")
-            self.ell_json = os.path.join(self.pitest_dir, "darknet_config.json")
         else:
             # extract the model if it's in an archive
             unzip = ziptools.Extractor(ell_model)
@@ -91,7 +89,6 @@ class DriveTest:
             if ext.lower() == ".zip":
                 self.model_name, ext = os.path.splitext(self.model_name)
             self.labels_file = labels_file
-            self.ell_json = config
 
     def download(self, url, localpath):
         req = request.URLopener()
@@ -156,7 +153,6 @@ class DriveTest:
 
     def make_project(self):
         labels_file = os.path.join(self.pitest_dir, self.labels_file)
-        json_file = os.path.join(self.pitest_dir, self.ell_json)
         if (os.path.isdir(self.output_dir)):
             rmtree(self.output_dir)
         sys.path.append(os.path.join(current_path, '../../wrap'))
