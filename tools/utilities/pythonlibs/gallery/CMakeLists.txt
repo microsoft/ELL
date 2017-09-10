@@ -8,6 +8,7 @@ if(${PYTHONINTERP_FOUND})
     set(module_name "pythonlibs_gallery")
 
     set(lib_src copy_validation_set.py
+        generate_index.py
         generate_md.py
         run_validation.py
         validate.py

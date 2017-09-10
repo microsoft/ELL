@@ -50,11 +50,11 @@ Then make a new directory named `sideBySideTutorial` under your ELL git repo in 
 ```
 mkdir sideBySideTutorial
 cd sideBySideTutorial
-curl --location -o ImageNetLabels.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ImageNetLabels.txt
+curl --location -o ILSVRC2012_labels.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt
 curl --location -o ell1.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
 ```
 
-You should now have a `ImageNetLabels.txt` file and a `ell1.zip` file that is about 28 megabytes.
+You should now have a `ILSVRC2012_labels.txt` file and a `ell1.zip` file that is about 28 megabytes.
 Inside ell1.zip is the ell model named `d_I224x224x3CMCMCMCMCMCMC1A.ell` so unzip the archive
 and place this file in the sideBySideTutorial folder, then rename it to `model1.ell`.
 
@@ -66,15 +66,15 @@ You should now have `ell2.zip` file that is about 166 megabytes.
 Inside ell2.zip is the ell model named `v_I160x160x3CCMCCMCCCMCCCMCCCMF2048.ell` so unzip the archive
 and place this file in the sideBySideTutorial folder, then rename it to `model2.ell`.
 
-At this point, you have the labels in `ImageNetLabels.txt`, and 2 ELL models: `model1.ell` and `model2.ell`.
+At this point, you have the labels in `ILSVRC2012_labels.txt`, and 2 ELL models: `model1.ell` and `model2.ell`.
 
 ### Wrap the models in Python callable modules
 
 For this tutorial we want to call the model from Python.  ELL provides a compiler that can take the model and compile it into code that will run on a target platform - in this case the Raspberry Pi running Linux, so it generates code for armv7-linux-gnueabihf, and for the cortex-a53 CPU.
 
 ````
-python ../../tools/wrap/wrap.py ImageNetLabels.txt model1.ell -lang python -target pi3 -outdir model1
-python ../../tools/wrap/wrap.py ImageNetLabels.txt model2.ell -lang python -target pi3 -outdir model2
+python ../../tools/wrap/wrap.py ILSVRC2012_labels.txt model1.ell -lang python -target pi3 -outdir model1
+python ../../tools/wrap/wrap.py ILSVRC2012_labels.txt model2.ell -lang python -target pi3 -outdir model2
 ````
 
 We also want to copy some additional python code to your pi for the purpose of running this tutorial:
@@ -124,7 +124,7 @@ environment named py34.  So to run the tutorial do this:
 
 ````
 source activate py34
-python sideBySideDemo.py ImageNetLabels.txt --compiled model1/model1,model2/model2 --image coffeemug.jpg
+python sideBySideDemo.py ILSVRC2012_labels.txt --compiled model1/model1,model2/model2 --image coffeemug.jpg
 ````
 
 If you have a display connected you should see the screen shot at the top of this page.
@@ -135,7 +135,7 @@ If you have a display connected you should see the screen shot at the top of thi
 If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
 
 ````
-python sideBySideDemo.py ImageNetLabels.txt  --compiled model1/model1,model2/model2
+python sideBySideDemo.py ILSVRC2012_labels.txt  --compiled model1/model1,model2/model2
 ````
 
 You will see the same kind of window appear only this time it is showing the video stream.

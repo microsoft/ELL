@@ -58,7 +58,7 @@ class GenerateMarkdown:
         permalink = os.path.splitext(basename(self.outfile))[0]
         self.set_value("@PERMALINK@", permalink)
 
-    def get_model_file(self, name, is_suffix=True):
+    def get_model_filename(self, name, is_suffix=False):
         """Returns the path to a file from the model directory, given the filename or a suffix"""
         if is_suffix:
             filename = os.path.join(self.modeldir, self.model + name)
@@ -77,14 +77,14 @@ class GenerateMarkdown:
 
     def write_properties(self):
         """Writes the basic properties of the model"""
-        filename = self.get_model_file("_modelargs.json")
+        filename = self.get_model_filename("modelargs.json")
         with open(filename, 'r') as f:
             results = json.loads(f.read())
             self.set_value("@IMAGE_SIZE@", results['image_size'])
             self.set_value("@NUM_CLASSES@", results['num_classes'])
             self.set_value("@MODEL_NAME@", results['name'])
 
-        filename = self.get_model_file(".ell.zip")
+        filename = self.get_model_filename(".ell.zip", is_suffix=True)
         unzip = ziptools.Extractor(filename)
         success, temp = unzip.extract_file(".ell")
         if (success):
@@ -99,10 +99,11 @@ class GenerateMarkdown:
     def write_performance(self, platforms):
         """Writes the metrics for the list of platforms"""
         for platform in platforms:
-            filename = self.get_model_file("_validation_" + platform + ".json")
+            filename = self.get_model_filename("validation_" + platform + ".json")
 
             with open(filename, 'r') as f:
-                results = json.loads(f.read())
+                data = json.loads(f.read())
+                results = data['results']
                 average_time = reduce(lambda x, y: x + float(y['avg_time']), results, 0) / len(results)
                 self.set_value("@" + platform.upper() + "_SECONDS_PER_FRAME@", self.format_float(average_time))
 
@@ -113,7 +114,7 @@ class GenerateMarkdown:
 
     def write_architecture(self):
         """Writes the model architecture in the desired format"""
-        filename = self.get_model_file(".cntk.zip")
+        filename = self.get_model_filename(".cntk.zip", is_suffix=True)
         unzip = ziptools.Extractor(filename)
         success, temp = unzip.extract_file(".cntk")
         if (success):
@@ -131,7 +132,7 @@ class GenerateMarkdown:
 
     def write_accuracy(self):
         """Writes the accuracy from the model test result"""
-        filename = self.get_model_file("test_eval.json", is_suffix=False)
+        filename = self.get_model_filename("test_eval.json")
 
         with open(filename, 'r') as f:
             results = json.loads(f.read())

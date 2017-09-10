@@ -101,7 +101,8 @@ def monitor_resource_usage():
        because CPU usage is expected to peg during model evaluation
     """
     process = psutil.Process()
-    subprocess.Popen(["nohup", "python", "procmon.py", str(process.pid), "--logfile", "procmon.json"])
+    subprocess.Popen(["nohup", "python", "procmon.py", str(process.pid), "--logfile", "procmon.json",
+        "--interval", "0.25"])
 
 
 if __name__ == "__main__":

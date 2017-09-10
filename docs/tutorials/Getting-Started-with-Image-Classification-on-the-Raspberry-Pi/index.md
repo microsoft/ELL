@@ -34,11 +34,11 @@ cd ELL/build/tutorials
 Then make a new directory named `tutorial1` under your ELL git repo in the build/tutorials folder and download the following pre-trained model.  This model is trained on the 1000-class ImageNet data set and has already been converted to the ELL model format.  
 ```
 mkdir tutorial1 && cd tutorial1
-curl --location -o ImageNetLabels.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ImageNetLabels.txt
+curl --location -o ILSVRC2012_labels.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt
 curl --location -o ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
 ```
 
-You should now have a `ImageNetLabels.txt` file and a `ell.zip` file that is about 28 megabytes.
+You should now have a `ILSVRC2012_labels.txt` file and a `ell.zip` file that is about 28 megabytes.
 Inside ell.zip is the ell model named `d_I224x224x3CMCMCMCMCMCMC1A.ell` so unzip the archive
 and place this file in the tutorial1 folder, then rename it to `ImageNet.ell`.
 
@@ -47,7 +47,7 @@ and place this file in the tutorial1 folder, then rename it to `ImageNet.ell`.
 For this tutorial we want to call the model from Python.  ELL provides a compiler that can take the model and compile it into code that will run on a target platform - in this case the Raspberry Pi running Linux, so it generates code for armv7-linux-gnueabihf, and for the cortex-a53 CPU.
 
 ````
-python ../../tools/wrap/wrap.py ImageNetLabels.txt ImageNet.ell -lang python -target pi3    
+python ../../tools/wrap/wrap.py ILSVRC2012_labels.txt ImageNet.ell -lang python -target pi3    
 ````
 
 We also want to copy some additional python code to your pi for the purpose of running this tutorial:
@@ -90,7 +90,7 @@ environment named py34.  So to run the tutorial do this:
 
 ````
 source activate py34
-python demo.py ImageNetLabels.txt --compiled ImageNet --image coffeemug.jpg
+python demo.py ILSVRC2012_labels.txt --compiled ImageNet --image coffeemug.jpg
 ````
 And it will classify the image, you should see output like this:
 ````
@@ -106,7 +106,7 @@ And if you have a display connected you should see something like this:
 If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
 
 ````
-python demo.py ImageNetLabels.txt  --compiled ImageNet
+python demo.py ILSVRC2012_labels.txt  --compiled ImageNet
 ````
 
 You will see the same kind of window appear only this time it is showing the video stream.
