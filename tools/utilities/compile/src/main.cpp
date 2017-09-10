@@ -192,17 +192,15 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::MapLoadA
     }
     if (compileArguments.outputAssembly || compileArguments.outputObjectCode)
     {
-        emitters::MachineCodeOutputOptions compileMachineCodeOptions;
-
         if (compileArguments.outputAssembly)
         {
             TimingOutputCollector timer(timingOutput, "Time to save assembly code", compileArguments.verbose);
-            compiledMap.WriteCode(baseFilename + ".s", emitters::ModuleOutputFormat::assembly, compileMachineCodeOptions);
+            compiledMap.WriteCode(baseFilename + ".s", emitters::ModuleOutputFormat::assembly);
         }
         if (compileArguments.outputObjectCode)
         {
             TimingOutputCollector timer(timingOutput, "Time to save object code", compileArguments.verbose);
-            compiledMap.WriteCode(baseFilename + ".o", emitters::ModuleOutputFormat::objectCode, compileMachineCodeOptions);
+            compiledMap.WriteCode(baseFilename + ".o", emitters::ModuleOutputFormat::objectCode);
         }
     }
     if (compileArguments.outputSwigInterface)

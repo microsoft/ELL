@@ -23,14 +23,19 @@ namespace emitters
     {
         static const size_t c_defaultNumBits = 64;
 
+        // Triples
         std::string c_macTriple = "x86_64-apple-macosx10.12.0"; // alternate: "x86_64-apple-darwin16.0.0"
         std::string c_linuxTriple = "x86_64-pc-linux-gnu";
         std::string c_windowsTriple = "x86_64-pc-win32";
+        std::string c_pi0Triple = "-arm-linux-gnueabihf"; // was "armv6m-unknown-none-eabi"
         std::string c_armTriple = "armv7-linux-gnueabihf";
         std::string c_arm64Triple = "aarch64-unknown-linux-gnu"; // DragonBoard
         std::string c_iosTriple = "aarch64-apple-ios"; // alternates: "arm64-apple-ios7.0.0", "thumbv7-apple-ios7.0"
+
+        // CPUs
+        std::string c_pi3Cpu = "cortex-a53";
+
         // clang settings:
-        // triple=thumbv7-apple-ios7.0
         // target=armv7-apple-darwin
 
         std::string c_macDataLayout = "e-m:o-i64:64-f80:128-n8:16:32:64-S128";
@@ -81,12 +86,18 @@ namespace emitters
                 _parameters.targetDevice.triple = c_windowsTriple;
                 _parameters.targetDevice.dataLayout = c_windowsDataLayout;
             }
+            else if (_parameters.targetDevice.deviceName == "pi0")
+            {
+                _parameters.targetDevice.triple = c_pi0Triple;
+                _parameters.targetDevice.dataLayout = c_armDataLayout;
+                _parameters.targetDevice.numBits = 32;
+            }
             else if (_parameters.targetDevice.deviceName == "pi3") // pi3 (Raspbian)
             {
                 _parameters.targetDevice.triple = c_armTriple; // For some reason, the assembly doesn't like this
                 _parameters.targetDevice.dataLayout = c_armDataLayout;
                 _parameters.targetDevice.numBits = 32;
-                _parameters.targetDevice.cpu = "cortex-a53"; // maybe not necessary
+                _parameters.targetDevice.cpu = c_pi3Cpu; // maybe not necessary
             }
             else if (_parameters.targetDevice.deviceName == "pi3_64") // pi3 (openSUSE)
             {
@@ -94,9 +105,9 @@ namespace emitters
                 _parameters.targetDevice.triple = c_arm64Triple;
                 _parameters.targetDevice.dataLayout = c_arm64DataLayout;
                 _parameters.targetDevice.numBits = 64;
-                _parameters.targetDevice.cpu = "cortex-a53";
+                _parameters.targetDevice.cpu = c_pi3Cpu;
             }
-            else if (_parameters.targetDevice.deviceName == "aarch64") // arm64 linux (DragonBoard)
+            else if (_parameters.targetDevice.deviceName == "aarch64") // arm64 linux (DragonBoard) 
             {
                 // need to set arch to aarch64?
                 _parameters.targetDevice.triple = c_arm64Triple;
@@ -133,7 +144,7 @@ namespace emitters
     {
         WriteToFile(filePath, GetFormatFromExtension(utilities::GetFileExtension(filePath, true)));
     }
-
+    
     void ModuleEmitter::WriteToFile(const std::string& filePath, ModuleOutputFormat format)
     {
         auto stream = utilities::OpenOfstream(filePath);

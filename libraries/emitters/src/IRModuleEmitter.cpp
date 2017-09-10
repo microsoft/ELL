@@ -126,7 +126,6 @@ namespace emitters
         return _functionStack.top().first;
     }
 
-
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes)
     {
         auto currentPos = _emitter.GetCurrentInsertPoint();
@@ -502,7 +501,7 @@ namespace emitters
     {
         std::vector<std::string> fieldNames;
         std::vector<VariableType> types;
-        for(const auto& field: fields)
+        for (const auto& field : fields)
         {
             fieldNames.push_back(field.first);
             types.push_back(field.second);
@@ -518,7 +517,7 @@ namespace emitters
     {
         std::vector<std::string> fieldNames;
         std::vector<LLVMType> types;
-        for(const auto& field: fields)
+        for (const auto& field : fields)
         {
             fieldNames.push_back(field.first);
             types.push_back(field.second);
@@ -542,6 +541,18 @@ namespace emitters
     void IRModuleEmitter::WriteToFile(const std::string& filePath, ModuleOutputFormat format)
     {
         MachineCodeOutputOptions options;
+        auto compilerParameters = GetCompilerParameters();
+        options.targetDevice = compilerParameters.targetDevice;
+        if (compilerParameters.optimize)
+        {
+            options.optimizationLevel = OptimizationLevel::Aggressive;
+        }
+        // Other params to possibly set:
+        //   bool verboseOutput = false;
+        //   bool verifyModule = false;
+        //   FloatABIType floatABI = FloatABIType::Default;
+        //   FloatFusionMode floatFusionMode = FloatFusionMode::Standard;
+
         switch (format)
         {
             case ModuleOutputFormat::assembly:
@@ -597,6 +608,18 @@ namespace emitters
     void IRModuleEmitter::WriteToStream(std::ostream& stream, ModuleOutputFormat format)
     {
         MachineCodeOutputOptions options;
+        auto compilerParameters = GetCompilerParameters();
+        options.targetDevice = compilerParameters.targetDevice;
+        if (compilerParameters.optimize)
+        {
+            options.optimizationLevel = OptimizationLevel::Aggressive;
+        }
+        // Other params to possibly set:
+        //   bool verboseOutput = false;
+        //   bool verifyModule = false;
+        //   FloatABIType floatABI = FloatABIType::Default;
+        //   FloatFusionMode floatFusionMode = FloatFusionMode::Standard;
+
         WriteToStream(stream, format, options);
     }
 
@@ -621,20 +644,19 @@ namespace emitters
     {
         const auto& params = GetCompilerParameters();
 
-        // TODO: make this code nicer:
-        if (options.targetDevice.triple == "")
+        if (options.targetDevice.triple.empty())
         {
             options.targetDevice.triple = params.targetDevice.triple;
         }
 
-        if (options.targetDevice.cpu == "")
+        if (options.targetDevice.cpu.empty())
         {
-            options.targetDevice.triple = params.targetDevice.cpu;
+            options.targetDevice.cpu = params.targetDevice.cpu;
         }
 
-        if (options.targetDevice.features == "")
+        if (options.targetDevice.features.empty())
         {
-            options.targetDevice.triple = params.targetDevice.features;
+            options.targetDevice.features = params.targetDevice.features;
         }
 
         // optimization level
@@ -725,13 +747,13 @@ namespace emitters
         DeclareFunction("free", VariableType::Void, { VariableType::BytePointer });
     }
 
-    template<>
+    template <>
     void IRModuleEmitter::DeclareGetClockMilliseconds<std::chrono::steady_clock>()
     {
         DeclareFunction("ELL_GetSteadyClockMilliseconds", VariableType::Double);
     }
 
-    template<>
+    template <>
     void IRModuleEmitter::DeclareGetClockMilliseconds<std::chrono::system_clock>()
     {
         DeclareFunction("ELL_GetSystemClockMilliseconds", VariableType::Double);

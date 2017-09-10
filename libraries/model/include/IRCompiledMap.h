@@ -61,13 +61,6 @@ namespace model
         /// <param name="format"> The format to write out </param>
         virtual void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format) const override;
 
-        /// <summary> Output the compiled model to the given file with the given format </summary>
-        ///
-        /// <param name="filePath"> The file to write to </param>
-        /// <param name="format"> The format to write out </param>
-        /// <param name="options"> The options to pass to the code generator </param>
-        void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
-
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
         /// <param name="filePath"> The path to the file to write </param>
@@ -78,13 +71,6 @@ namespace model
         /// <param name="stream"> The stream to write to </param>
         /// <param name="format"> The format to write out </param>
         virtual void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format) const override;
-
-        /// <summary> Output the compiled model to the given file with the given format </summary>
-        ///
-        /// <param name="filePath"> The file to write to </param>
-        /// <param name="format"> The format to write out </param>
-        /// <param name="options"> The options to pass to the code generator </param>
-        void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
@@ -176,6 +162,9 @@ namespace model
         void FinishJitting() const;
 
     protected:
+        void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
+        void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
+
         virtual void SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) const override;
         virtual void SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const override;
         virtual void SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const override;
