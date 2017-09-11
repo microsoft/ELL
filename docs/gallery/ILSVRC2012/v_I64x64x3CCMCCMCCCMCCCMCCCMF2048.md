@@ -9,7 +9,7 @@ permalink: /gallery/ILSVRC2012/v_I64x64x3CCMCCMCCCMCCCMCCCMF2048
 ## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (42.88% top 1 error, 19.51% top 5 error, 1.00s/frame on Raspberry Pi 3)
 
 |=
-| Download | [v_I64x64x3BBMBBMBBBMBBBMBBBMF2048.ell.zip](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I64x64x3BBMBBMBBBMBBBMBBBMF2048/v_I64x64x3BBMBBMBBBMBBBMBBBMF2048.ell.zip)
+| Download | [v_I64x64x3CCMCCMCCCMCCCMCCCMF2048.ell.zip](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I64x64x3CCMCCMCCCMCCCMCCCMF2048/v_I64x64x3CCMCCMCCCMCCCMCCCMF2048.ell.zip)
 |-
 | Accuracy | ILSVRC2012: 80.49% (Top 5), 57.12% (Top 1) 
 |-
