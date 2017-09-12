@@ -140,18 +140,18 @@ namespace nodes
 
         // Input / output memory layouts
         const auto& inputLayout = this->GetInputMemoryLayout();
-        const auto& inputSize = inputLayout.size;
-        const auto& inputStride = inputLayout.stride;
-        const auto& inputOffset = inputLayout.offset;
+        const auto& inputSize = inputLayout.GetActiveSize();
+        const auto& inputStride = inputLayout.GetStride();
+        const auto& inputOffset = inputLayout.GetOffset();
 
         const auto& outputLayout = this->GetOutputMemoryLayout();
-        const auto& outputSize = outputLayout.size;
-        const auto& outputStride = outputLayout.stride;
-        const auto& outputOffset = outputLayout.offset;
+        const auto& outputSize = outputLayout.GetActiveSize();
+        const auto& outputStride = outputLayout.GetStride();
+        const auto& outputOffset = outputLayout.GetOffset();
 
         // Calculate cumulative increment for each dimension
-        Shape inputIncrement = inputLayout.GetCumulativeIncrement();
-        Shape outputIncrement = outputLayout.GetCumulativeIncrement();
+        model::Shape inputIncrement = inputLayout.GetCumulativeIncrement();
+        model::Shape outputIncrement = outputLayout.GetCumulativeIncrement();
 
         const auto& layerParameters = this->GetLayer().GetLayerParameters();
 

@@ -8,8 +8,8 @@
 
 #include "ModelComparison.h"
 #include "CompareUtils.h"
-#include "VectorStats.h"
 #include "DebugSinkNode.h"
+#include "VectorStats.h"
 
 // emitters
 #include "EmitterTypes.h"
@@ -33,6 +33,22 @@ void DebugOutput(char* label, float* output, void* userData)
 //
 // Utility functions
 //
+
+template <typename ValueType>
+std::ostream& operator<<(std::ostream& os, const std::vector<ValueType>& vec)
+{
+    os << "[";
+    for (size_t i = 0, length = vec.size(); i < length; i++)
+    {
+        if (i > 0)
+        {
+            os << ", ";
+        }
+        os << vec[i];
+    }
+    os << " ]";
+    return os;
+}
 
 template <typename ValueType>
 bool IsDebugSinkNode(const model::Node& node)
@@ -79,7 +95,7 @@ std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<
 {
     std::vector<InputType> typedInput(input.begin(), input.end());
     auto result = map.Compute<InputType>(typedInput);
-    return {result.begin(), result.end()};
+    return { result.begin(), result.end() };
 }
 
 template <typename InputType>
@@ -202,7 +218,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
     reference.Transform(transformFunc, context);
 
     model::IRMapCompiler compiler(settings);
-    
+
     // Grab a pointer to the module before TransferOwnership nulls it out.
     llvm::Module* module = compiler.GetModule().GetLLVMModule();
     std::cout << "compiling..." << std::endl;
@@ -224,7 +240,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
     // Compute reference output
     _runningCompiled = false;
     _outputReference = GetMapOutput(_referenceMap, input);
-    
+
     // Gather the reference model DebugNodeSinks
     std::vector<const ell::model::Node*> referenceNodes;
     for (size_t i = 0, length = _layerOutputData.size(); i < length; i++)
@@ -278,7 +294,7 @@ void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelN
     outputStream << std::endl;
 
     WriteRow(outputStream, "", "Overall", _outputReference, _outputCompiled, nullptr);
-    for(auto& layerData: _layerOutputData)
+    for (auto& layerData : _layerOutputData)
     {
         if (layerData.compiledNodeLabel != "")
         {
@@ -291,22 +307,6 @@ void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelN
             //std::cout << "Compiled data missing for reference node " << layerData.referenceNodeLabel << std::endl;
         }
     }
-}
-
-std::string to_string(std::vector<size_t> shape)
-{
-    std::ostringstream ss;
-    ss << "[";
-    for (size_t i = 0, length = shape.size(); i < length; i++)
-    {
-        if (i > 0)
-        {
-            ss << ", ";
-        }
-        ss << shape[i];
-    }
-    ss << " ]";
-    return ss.str();
 }
 
 void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::string name, const std::vector<float>& reference, const std::vector<float>& compiled, LayerCaptureData* layerData)
@@ -340,7 +340,7 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
     outputStream << "````" << std::endl;
     if (layerData != nullptr)
     {
-        outputStream << "size=" << to_string(layerData->size) << ", stride=" << to_string(layerData->stride) << ", offset=" << to_string(layerData->offset) << std::endl;
+        outputStream << "size=" << layerData->size << ", stride=" << layerData->stride << ", offset=" << layerData->offset << std::endl;
     }
     outputStream << "reference: min=" << refStats.Min() << ", max=" << refStats.Max() << ", mean=" << refStats.Mean() << ", stddev=" << refStats.StdDev() << ", var=" << refStats.Variance() << std::endl;
     outputStream << "compiled : min=" << compiledStats.Min() << ", max=" << refStats.Max() << ", mean=" << refStats.Mean() << ", stddev=" << refStats.StdDev() << ", var=" << refStats.Variance() << std::endl;
@@ -411,7 +411,7 @@ void ModelComparison::AddLayer(const char* label, const ValueType* output)
     if (_runningCompiled)
     {
         bool found = false;
-        for(auto& layerData: _layerOutputData)
+        for (auto& layerData : _layerOutputData)
         {
             std::string compiledId = _nodeMap[layerData.referenceNodeLabel];
             if (compiledId == id)
@@ -429,7 +429,7 @@ void ModelComparison::AddLayer(const char* label, const ValueType* output)
     else
     {
         bool found = false;
-        for(auto& layerData: _layerOutputData)
+        for (auto& layerData : _layerOutputData)
         {
             if (layerData.referenceNodeLabel == id)
             {
@@ -478,7 +478,7 @@ void ModelComparison::CreateGraph(const model::Model& model)
                     // the link points from childNode to nextNode implying a flow of data from childNode to nextNode which
                     // is what we want because nextNode is "dependent on" childNode, meaning it consumes the output from
                     // childNode, so the data is flowing from childNode to the nextNode.
-                    if(!IsDebugSinkNode(*upstream))
+                    if (!IsDebugSinkNode(*upstream))
                     {
                         std::string id = to_string(upstream->GetId());
                         std::string typeName = upstream->GetRuntimeTypeName();
@@ -553,9 +553,9 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
             LayerCaptureData& layerData = _layerOutputData[i];
             layerData.compiledDebugNode = newNode;
             auto memLayout = layerNode->GetOutputMemoryLayout();
-            layerData.size = memLayout.size;
-            layerData.stride = memLayout.stride;
-            layerData.offset = memLayout.offset;
+            layerData.size = memLayout.GetActiveSize();
+            layerData.stride = memLayout.GetStride();
+            layerData.offset = memLayout.GetOffset();
             layerData.compiledNodeId = to_string(layerNode->GetId());
             layerData.compiledNodeLabel = label;
             auto referenceLabel = GetSinkNodeLabel(layerData.referenceDebugNode);

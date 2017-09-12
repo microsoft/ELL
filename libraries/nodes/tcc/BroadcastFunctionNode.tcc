@@ -10,29 +10,6 @@ namespace ell
 {
 namespace nodes
 {
-    inline bool ShapesEqual(const Shape& shape1, const Shape& shape2)
-    {
-        auto size = shape1.size();
-        if (size != shape2.size())
-        {
-            return false;
-        }
-
-        for (int index = 0; index < size; ++index)
-        {
-            if (shape1[index] != shape2[index])
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    inline bool PortMemoryLayoutsEqual(const PortMemoryLayout& layout1, const PortMemoryLayout& layout2)
-    {
-        return ShapesEqual(layout1.stride, layout2.stride) && ShapesEqual(layout1.size, layout2.size) && ShapesEqual(layout1.offset, layout2.offset);
-    }
-
     //
     // BroadcastUnaryFunction
     //
@@ -124,9 +101,9 @@ namespace nodes
 
     template <typename ValueType, typename FunctionType>
     BroadcastFunctionNode<ValueType, FunctionType>::BroadcastFunctionNode(const std::vector<model::InputPortBase*>& inputs,
-                                                                          const PortMemoryLayout& inputLayout, size_t broadcastDimension,
+                                                                          const model::PortMemoryLayout& inputLayout, size_t broadcastDimension,
                                                                           const std::vector<model::OutputPortBase*>& outputs,
-                                                                          const PortMemoryLayout& outputLayout,
+                                                                          const model::PortMemoryLayout& outputLayout,
                                                                           FunctionType function,
                                                                           ValueType paddingValue)
         : CompilableNode(inputs, outputs), _inputLayout(inputLayout), _outputLayout(outputLayout), _broadcastDimension(broadcastDimension), _function(function), _paddingValue(paddingValue)
@@ -162,12 +139,12 @@ namespace nodes
         //       Or, instead of unrolling, vectorizing:  if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
         const auto numDimensions = NumPrimaryInputDimensions();
         auto&& inputLayout = GetInputLayout();
-        auto&& inputStride = inputLayout.stride;
-        auto&& inputOffset = inputLayout.offset;
-        auto&& inputSize = inputLayout.size;
+        auto&& inputStride = inputLayout.GetStride();
+        auto&& inputOffset = inputLayout.GetOffset();
+        auto&& inputSize = inputLayout.GetActiveSize();
         auto&& outputLayout = GetOutputLayout();
-        auto&& outputStride = outputLayout.stride;
-        auto&& outputOffset = outputLayout.offset;
+        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputOffset = outputLayout.GetOffset();
         auto&& primaryInput = GetPrimaryInput();
         const auto broadcastDimension = GetBroadcastDimension();
         const auto numSecondaryInputs = NumSecondaryInputs();
@@ -226,12 +203,12 @@ namespace nodes
 
         const auto numDimensions = NumPrimaryInputDimensions();
         auto&& inputLayout = GetInputLayout();
-        auto&& inputStride = inputLayout.stride;
-        auto&& inputOffset = inputLayout.offset;
-        auto&& inputSize = inputLayout.size;
+        auto&& inputStride = inputLayout.GetStride();
+        auto&& inputOffset = inputLayout.GetOffset();
+        auto&& inputSize = inputLayout.GetActiveSize();
         auto&& outputLayout = GetOutputLayout();
-        auto&& outputStride = outputLayout.stride;
-        auto&& outputOffset = outputLayout.offset;
+        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputOffset = outputLayout.GetOffset();
         const auto broadcastDimension = GetBroadcastDimension();
         const auto numSecondaryInputs = NumSecondaryInputs();
         const auto secondaryInputSize = GetSecondaryInputSize();
@@ -322,26 +299,24 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
-                                                                                    const PortMemoryLayout& outputLayout,
+    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                                                                    const model::PortMemoryLayout& outputLayout,
                                                                                     ValueType paddingValue)
         : BroadcastUnaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout, outputLayout, FunctionType{}, paddingValue)
     {
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
-                                                                                    const PortMemoryLayout& outputLayout,
+    BroadcastUnaryFunctionNode<ValueType, FunctionType>::BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
+                                                                                    const model::PortMemoryLayout& outputLayout,
                                                                                     FunctionType function,
                                                                                     ValueType paddingValue)
         : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput }, inputLayout, 0, { &_output }, outputLayout, function, paddingValue)
         , _primaryInput(this, primaryInput, primaryInputPortName)
-        , _output(this, outputPortName, NumElements(outputLayout.stride))
+        , _output(this, outputPortName, model::NumElements(outputLayout.GetStride()))
     {
         // Verify sizes are compatible
-        auto&& inputStride = inputLayout.stride;
-        size_t totalInputSize = std::accumulate(inputStride.begin(), inputStride.end(), 1, std::multiplies<size_t>());
-
+        size_t totalInputSize = inputLayout.GetMemorySize();
         if (primaryInput.Size() < totalInputSize)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Primary input too small");
@@ -363,7 +338,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastUnaryFunctionNode<ValueType, FunctionType>::Compute() const
     {
-        auto outputSize = NumElements(GetOutputLayout().stride);
+        auto outputSize = model::NumElements(GetOutputLayout().GetStride());
         auto output = std::vector<ValueType>(outputSize);
         size_t primaryInputIndex = 0;
 
@@ -424,9 +399,9 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
+    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                                                                       const model::PortElements<ValueType>& secondaryInput, size_t dimension,
-                                                                                      const PortMemoryLayout& outputLayout,
+                                                                                      const model::PortMemoryLayout& outputLayout,
                                                                                       ValueType paddingValue)
         : BroadcastBinaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout,
                                                                secondaryInput, dimension,
@@ -435,24 +410,24 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
+    BroadcastBinaryFunctionNode<ValueType, FunctionType>::BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                                                                       const model::PortElements<ValueType>& secondaryInput, size_t dimension,
-                                                                                      const PortMemoryLayout& outputLayout,
+                                                                                      const model::PortMemoryLayout& outputLayout,
                                                                                       FunctionType function, ValueType paddingValue)
         : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput }, inputLayout, dimension,
                                                          { &_output }, outputLayout, function, paddingValue)
         , _primaryInput(this, primaryInput, primaryInputPortName)
         , _secondaryInput(this, secondaryInput, secondaryInputPortName)
-        , _output(this, outputPortName, NumElements(outputLayout.stride))
+        , _output(this, outputPortName, model::NumElements(outputLayout.GetStride()))
     {
         // Verify sizes are compatible
-        size_t totalInputSize = std::accumulate(inputLayout.stride.begin(), inputLayout.stride.end(), 1, std::multiplies<size_t>());
+        size_t totalInputSize = inputLayout.GetMemorySize();
         if (primaryInput.Size() < totalInputSize)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Primary input too small");
         }
 
-        if (secondaryInput.Size() != inputLayout.size[dimension])
+        if (secondaryInput.Size() != inputLayout.GetActiveSize(dimension))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Broadcast vector size doesn't match input");
         }
@@ -475,7 +450,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastBinaryFunctionNode<ValueType, FunctionType>::Compute() const
     {
-        auto outputSize = NumElements(GetOutputLayout().stride);
+        auto outputSize = model::NumElements(GetOutputLayout().GetStride());
         auto output = std::vector<ValueType>(outputSize);
         size_t primaryInputIndex = 0;
         size_t secondaryInput1Index = 0;
@@ -544,9 +519,9 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
+    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                                                                         const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t dimension,
-                                                                                        const PortMemoryLayout& outputLayout,
+                                                                                        const model::PortMemoryLayout& outputLayout,
                                                                                         ValueType paddingValue)
         : BroadcastTernaryFunctionNode<ValueType, FunctionType>(primaryInput, inputLayout,
                                                                 secondaryInput1, secondaryInput2, dimension,
@@ -555,9 +530,9 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
+    BroadcastTernaryFunctionNode<ValueType, FunctionType>::BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                                                                         const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t dimension,
-                                                                                        const PortMemoryLayout& outputLayout,
+                                                                                        const model::PortMemoryLayout& outputLayout,
                                                                                         FunctionType function,
                                                                                         ValueType paddingValue)
         : BroadcastFunctionNode<ValueType, FunctionType>({ &_primaryInput, &_secondaryInput1, &_secondaryInput2 }, inputLayout, dimension,
@@ -565,16 +540,16 @@ namespace nodes
         , _primaryInput(this, primaryInput, primaryInputPortName)
         , _secondaryInput1(this, secondaryInput1, secondaryInput1PortName)
         , _secondaryInput2(this, secondaryInput2, secondaryInput2PortName)
-        , _output(this, outputPortName, NumElements(outputLayout.stride))
+        , _output(this, outputPortName, model::NumElements(outputLayout.GetStride()))
     {
         // Verify sizes are compatible
-        size_t totalInputSize = std::accumulate(inputLayout.stride.begin(), inputLayout.stride.end(), 1, std::multiplies<size_t>());
+        size_t totalInputSize = inputLayout.GetMemorySize();
         if (primaryInput.Size() < totalInputSize)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Primary input too small");
         }
 
-        if (std::max(secondaryInput1.Size(), secondaryInput2.Size()) != inputLayout.size[dimension])
+        if (std::max(secondaryInput1.Size(), secondaryInput2.Size()) != inputLayout.GetActiveSize(dimension))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Broadcast vector size doesn't match input");
         }
@@ -584,7 +559,7 @@ namespace nodes
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "If present, secondary inputs must have the same size");
         }
 
-        if (!ShapesEqual(inputLayout.size, outputLayout.size))
+        if (!model::ShapesEqual(inputLayout.GetActiveSize(), outputLayout.GetActiveSize()))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active area sizes don't match");
         }
@@ -609,7 +584,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastTernaryFunctionNode<ValueType, FunctionType>::Compute() const
     {
-        auto outputSize = NumElements(GetOutputLayout().stride);
+        auto outputSize = model::NumElements(GetOutputLayout().GetStride());
         auto output = std::vector<ValueType>(outputSize);
         size_t primaryInputIndex = 0;
         size_t secondaryInput1Index = 0;
@@ -697,9 +672,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode(const model::PortElements<ValueType>& primaryInput, const PortMemoryLayout& inputLayout,
+    BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                                                         const model::PortElements<ValueType>& scaleInput, const model::PortElements<ValueType>& biasInput, size_t dimension,
-                                                                        const PortMemoryLayout& outputLayout,
+                                                                        const model::PortMemoryLayout& outputLayout,
                                                                         ValueType paddingValue)
         : BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>(primaryInput, inputLayout,
                                                                                       scaleInput, biasInput, dimension,

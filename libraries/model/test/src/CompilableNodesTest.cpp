@@ -27,6 +27,7 @@
 #include "InputNode.h"
 #include "Model.h"
 #include "OutputNode.h"
+#include "PortMemoryLayout.h"
 
 // nodes
 #include "AccumulatorNode.h"
@@ -45,6 +46,8 @@
 #include "MultiplexerNode.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "PoolingLayerNode.h"
+#include "ReceptiveFieldMatrixNode.h"
+#include "ReorderDataNode.h"
 #include "SinkNode.h"
 #include "SoftmaxLayerNode.h"
 #include "SourceNode.h"
@@ -83,87 +86,98 @@
 #include <algorithm>
 #include <iostream>
 #include <ostream>
-#include <string>
 #include <sstream>
+#include <string>
 
 using namespace ell;
+using namespace ell::predictors;
+using namespace ell::predictors::neural;
 
 namespace
 {
-    size_t GetShapeSize(const math::Triplet& shape)
-    {
-        return shape[0] * shape[1] * shape[2];
-    }
-
-    template <typename ValueType>
-    class Uniform
-    {
-    public:
-        Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
-            : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
-
-        ValueType operator()()
-        {
-            double uniform = static_cast<double>(_rng()) / _range;
-            return static_cast<ValueType>((uniform * _outputRange) + _minOutput);
-        }
-
-    private:
-        std::default_random_engine _rng;
-        double _range;
-        ValueType _minOutput;
-        ValueType _outputRange;
-    };
-
-    template <typename ElementType>
-    void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
-    {
-        Uniform<ElementType> rand(min, max);
-        std::generate(vector.begin(), vector.end(), rand);
-    }
-
-    template <typename ElementType>
-    void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
-    {
-        Uniform<ElementType> rand(min, max);
-        vector.Generate(rand);
-    }
-
-    template <typename ElementType>
-    void FillRandomTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType min = -1, ElementType max = 1)
-    {
-        Uniform<ElementType> rand(min, max);
-        tensor.Generate(rand);
-    }
-
-    template <typename ElementType>
-    void FillVector(std::vector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
-    {
-        ElementType val = 0;
-        std::generate(vector.begin(), vector.end(), [&val]() { return val++; });
-    }
-
-    template <typename ElementType>
-    void FillVector(ell::math::ColumnVector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
-    {
-        ElementType val = 0;
-        vector.Generate([&val]() { return val++; });
-    }
-
-    template <typename ElementType>
-    void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
-    {
-        ElementType val = 0;
-        tensor.Generate([&val]() { return val++; });
-    }
-
-    template <typename ElementType>
-    void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
-    {
-        ElementType val = 0;
-        tensor.Generate([&val]() { return val++; });
-    }
+size_t GetShapeSize(const math::Triplet& shape)
+{
+    return shape[0] * shape[1] * shape[2];
 }
+
+template <typename ValueType>
+class Uniform
+{
+public:
+    Uniform(ValueType minVal, ValueType maxVal, std::string seed = "123")
+        : _rng(utilities::GetRandomEngine(seed)), _range(static_cast<double>(_rng.max() - _rng.min())), _minOutput(minVal), _outputRange(maxVal - minVal) {}
+
+    ValueType operator()()
+    {
+        double uniform = static_cast<double>(_rng()) / _range;
+        return static_cast<ValueType>((uniform * _outputRange) + _minOutput);
+    }
+
+private:
+    std::default_random_engine _rng;
+    double _range;
+    ValueType _minOutput;
+    ValueType _outputRange;
+};
+
+template <typename ElementType>
+void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
+{
+    Uniform<ElementType> rand(min, max);
+    std::generate(vector.begin(), vector.end(), rand);
+}
+
+template <typename ElementType>
+void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
+{
+    Uniform<ElementType> rand(min, max);
+    vector.Generate(rand);
+}
+
+template <typename ElementType>
+void FillRandomTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType min = -1, ElementType max = 1)
+{
+    Uniform<ElementType> rand(min, max);
+    tensor.Generate(rand);
+}
+
+template <typename ElementType>
+void FillVector(std::vector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
+{
+    ElementType val = startValue;
+    std::generate(vector.begin(), vector.end(), [&val, step]() { 
+        auto result = val;
+        val += step;
+        return result; });
+}
+
+template <typename ElementType>
+void FillVector(ell::math::ColumnVector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
+{
+    ElementType val = startValue;
+    vector.Generate([&val]() { return val++; });
+}
+
+template <typename ElementType>
+void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
+{
+    ElementType val = startValue;
+    tensor.Generate([&val, step]() { 
+        auto result = val;
+        val += step;
+        return result; });
+}
+
+template <typename ElementType>
+void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
+{
+    ElementType val = startValue;
+    tensor.Generate([&val, step]() { 
+        auto result = val;
+        val += step;
+        return result; });
+}
+} // end anonymous namespace
 
 void TestCompileIsEqual()
 {
@@ -297,7 +311,7 @@ public:
     LabeledPrototype() = default;
     LabeledPrototype(const LabeledPrototype&) = default;
     LabeledPrototype(int label, const std::vector<std::vector<double>>& prototype)
-        : _label(label), _prototype(prototype) {};
+        : _label(label), _prototype(prototype){};
     int Label() const { return _label; }
     size_t Dimension() const { return _prototype[0].size(); }
     std::vector<std::vector<double>> Prototype() const { return _prototype; }
@@ -478,6 +492,195 @@ void TestCompilableTypeCastNode()
     VerifyCompiledOutput(map, compiledMap, signal, "TypeCastNode");
 }
 
+void TestReorderDataNode1()
+{
+    using ElementType = float;
+    int numRows = 3;
+    int numColumns = 3;
+    int numChannels = 2;
+    model::Model model;
+    model::PortMemoryLayout inputShape({ numRows, numColumns, numChannels }); // Default order: 0, 1, 2 == rows, columns, channels
+    model::PortMemoryLayout outputShape({ numChannels, numRows, numColumns }); // Want to reorder to 2, 0, 1 == channels, rows, columns
+
+    //        [  (1,2)   (3,4)    (5,6) ]
+    // Input: [  (7,8)  (9,10), (11,12))]
+    //        [(13,14) (15,16)  (17,18) ]
+    //
+    // = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    //
+    //         [  1  3  5 ]   [  2  4  6 ]
+    // Output: [  7  9 11 ]   [  8 10 12 ]
+    //         [ 13 15 17 ]   [ 14 16 18 ]
+    //
+    // = 1 3 5 7 9 11 13 15 17 2 4 6 8 10 12 14 16 18
+
+    size_t inputSize = inputShape.GetMemorySize();
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    // auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape);
+    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape, std::vector<int>{ 2, 0, 1 });
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    std::vector<ElementType> input(inputSize);
+    FillVector(input, 1.0f);
+    std::cout << "Input:\n"
+              << input << std::endl;
+
+    // compare output
+    std::vector<std::vector<ElementType>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, "ReorderDataNode");
+}
+
+void TestReorderDataNode2()
+{
+    using ElementType = float;
+    int numRows = 3;
+    int numColumns = 3;
+    int numChannels = 2;
+    int padding = 1;
+    model::Model model;
+    model::PortMemoryLayout inputShape({ numRows, numColumns, numChannels }, { padding, padding, 0 }); // Default order: 0, 1, 2 == rows, columns, channels
+    model::PortMemoryLayout outputShape({ numRows, numColumns, numChannels }); // Transform to order (channels, rows, cols) and remove padding
+
+    //        [    (1,2)   (3,4)   (5,6)   (7,8)   9,10) ]
+    // Input: [  (11,12) (13,14) (15,16) (17,18) (19,20) ]
+    //        [  (21,22) (23,24) (25,26) (27,28) (29,30) ]
+    //        [  (31,32) (33,34) (35,36) (37,38) (39,40) ]
+    //        [  (41,42) (43,44) (45,46) (47,48) (49,50) ]
+    //
+    // = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 ... 50
+    //
+    //         [ 13 15 17 ]   [ 14 16 18 ]
+    // Output: [ 23 25 27 ]   [ 24 26 28 ]
+    //         [ 33 35 37 ]   [ 34 36 38 ]
+    //
+    // = 13 15 17 23 25 27 33 35 37 14 16 18 24 26 28 34 36 38
+
+    size_t inputSize = inputShape.GetMemorySize();
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    auto testNode = model.AddNode<nodes::ReorderDataNode<ElementType>>(inputNode->output, inputShape, outputShape, std::vector<int>{ 2, 0, 1 });
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    std::vector<ElementType> input(inputSize);
+    FillVector(input, 1.0f);
+    std::cout << "Input:\n"
+              << input << std::endl;
+
+    // compare output
+    std::vector<std::vector<ElementType>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, "ReorderDataNode");
+}
+
+void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape)
+{
+    const std::array<int, 3> rcdOrder = std::array<int, 3>{ 0, 1, 2 };
+    const std::array<int, 3> drcOrder = std::array<int, 3>{ 2, 0, 1 };
+    std::array<int, 3> dataOrder = useNewReshape ? drcOrder : rcdOrder;
+
+    using ElementType = float;
+    int numRows = 3;
+    int numColumns = 3;
+
+    model::PortMemoryLayout inputMemoryLayout({ numRows, numColumns, (int)numChannels });
+    size_t filterWidth = 3;
+    size_t stride = 1;
+    size_t paddingSize = 1;
+    size_t outputHeight = numRows;
+    size_t outputWidth = numColumns;
+
+    //
+    // 1 input channel:
+    //
+    //        [ 1 2 3 ]
+    // Input: [ 4 5 6 ]
+    //        [ 7 8 9 ]
+    //
+    // = 1 2 3 4 5 6 7 8 9
+    //
+    //         [ 0 0 0  0 1 2  0 4 5 ]
+    //         [ 0 0 0  1 2 3  4 5 6 ]
+    //         [ 0 0 0  2 3 0  5 6 0 ]
+    //         [ 0 1 2  0 4 5  0 7 8 ]
+    // Output: [ 1 2 3  4 5 6  7 8 9 ]
+    //         [ 2 3 0  5 6 0  8 9 0 ]
+    //         [ 0 4 5  0 7 8  0 0 0 ]
+    //         [ 4 5 6  7 8 9  0 0 0 ]
+    //         [ 5 6 0  8 9 0  0 0 0 ]
+
+    //
+    // 2 input channels:
+    //
+    //        [ 1 2 3 ]  [ 10 11 12 ]
+    // Input: [ 4 5 6 ]  [ 13 14 15 ]
+    //        [ 7 8 9 ]  [ 16 17 18 ]
+    //
+    // = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    //
+    //         [ 0 0 0  0 1 2  0 4 5 ]
+    //         [ 0 0 0  0 10 11  0 13 14 ]
+    //         [ 0 0 0  1 2 3  4 5 6 ]
+    //         [ 0 0 0  10 11 12  13 14 15 ]
+    //         [ 0 0 0  2 3 0  5 6 0 ]
+    //         [ 0 0 0  11 12 0  14 15 0 ]
+    //
+    //         [ 0 1 2  0 4 5  0 7 8 ]
+    //         [ 0 10 11  0 13 14  0 16 17 ]
+    // Output: [ 1 2 3  4 5 6  7 8 9 ]
+    //         [ 10 11 12  13 14 15  16 17 18 ]
+    //         [ 2 3 0  5 6 0  8 9 0 ]
+    //         [ 11 12 0  14 15 0  17 18 0]
+    //
+    //         [ 0 4 5  0 7 8  0 0 0 ]
+    //         [ 0 13 14  0 16 17  0 0 0 ]
+    //         [ 4 5 6  7 8 9  0 0 0 ]
+    //         [ 13 14 15  16 17 18  0 0 0 ]
+    //         [ 5 6 0  8 9 0  0 0 0 ]
+    //         [ 14 15 0  17 18 0  0 0 0 ]
+    //
+
+    size_t inputSize = model::NumElements(inputMemoryLayout.GetStride());
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    auto testNode = model.AddNode<nodes::ReceptiveFieldMatrixNode<ElementType>>(inputNode->output,
+                                                                                inputMemoryLayout,
+                                                                                filterWidth,
+                                                                                stride,
+                                                                                paddingSize,
+                                                                                dataOrder,
+                                                                                outputWidth,
+                                                                                outputHeight);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    std::vector<ElementType> input(inputSize, 1.0);
+    FillVector(input, 1.0f);
+    compiledMap.SetInputValue(0, input);
+    auto compiledResult = compiledMap.ComputeOutput<ElementType>(0);
+    std::cout << "Compiled result size: " << compiledResult.size() << std::endl;
+    std::cout << "  " << compiledResult << std::endl;
+
+    if (numChannels == 1)
+    {
+        // Test vs. known output
+        std::vector<ElementType> desiredOutput = { 0, 0, 0, 0, 1, 2, 0, 4, 5, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0, 2, 3, 0, 5, 6, 0, 0, 1, 2, 0, 4, 5, 0, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 0, 5, 6, 0, 8, 9, 0, 0, 4, 5, 0, 7, 8, 0, 0, 0, 4, 5, 6, 7, 8, 9, 0, 0, 0, 5, 6, 0, 8, 9, 0, 0, 0, 0 };
+        testing::ProcessTest("Testing compiled ReceptiveFieldMatrixNode", testing::IsEqual(compiledResult, desiredOutput));
+    }
+    else if (numChannels == 2)
+    {
+        // Test vs. known output
+        std::vector<ElementType> desiredOutput = { 0, 0, 0, 0, 1, 2, 0, 4, 5, 0, 0, 0, 0, 10, 11, 0, 13, 14, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0, 10, 11, 12, 13, 14, 15, 0, 0, 0, 2, 3, 0, 5, 6, 0, 0, 0, 0, 11, 12, 0, 14, 15, 0, 0, 1, 2, 0, 4, 5, 0, 7, 8, 0, 10, 11, 0, 13, 14, 0, 16, 17, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 2, 3, 0, 5, 6, 0, 8, 9, 0, 11, 12, 0, 14, 15, 0, 17, 18, 0, 0, 4, 5, 0, 7, 8, 0, 0, 0, 0, 13, 14, 0, 16, 17, 0, 0, 0, 4, 5, 6, 7, 8, 9, 0, 0, 0, 13, 14, 15, 16, 17, 18, 0, 0, 0, 5, 6, 0, 8, 9, 0, 0, 0, 0, 14, 15, 0, 17, 18, 0, 0, 0, 0 };
+        testing::ProcessTest("Testing compiled ReceptiveFieldMatrixNode", testing::IsEqual(compiledResult, desiredOutput));
+    }
+
+    // compare compiled version with computed version (currently disabled because Compute() isn't implemented)
+    // std::vector<std::vector<ElementType>> signal = { input };
+    // VerifyCompiledOutput(map, compiledMap, signal, "ReceptiveFieldMatrixNode");
+}
+
 //
 // Now test nodes that compile themselves as a function
 //
@@ -514,10 +717,10 @@ InputCallbackTester<double> g_testerCompiled;
 
 // C callback (called by emitted model)
 extern "C" {
-    bool CompiledSourceNode_InputCallback(double* input)
-    {
-        return g_testerCompiled.InputCallback(input);
-    }
+bool CompiledSourceNode_InputCallback(double* input)
+{
+    return g_testerCompiled.InputCallback(input);
+}
 }
 TESTING_FORCE_DEFINE_SYMBOL(CompiledSourceNode_InputCallback, bool, double*);
 
@@ -552,20 +755,20 @@ void TestCompilableSourceNode(bool runJit)
 
 // C callback (called by emitted model)
 extern "C" {
-    size_t g_sinkOutputSize = 0;
-    std::vector<double> outputValues;
-    void CompiledSinkNode_OutputCallback_Scalar(double output)
-    {
-        assert(g_sinkOutputSize == 1);
-        outputValues.push_back(output);
-    }
-    TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Scalar, void, double);
+size_t g_sinkOutputSize = 0;
+std::vector<double> outputValues;
+void CompiledSinkNode_OutputCallback_Scalar(double output)
+{
+    assert(g_sinkOutputSize == 1);
+    outputValues.push_back(output);
+}
+TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Scalar, void, double);
 
-    void CompiledSinkNode_OutputCallback_Vector(double* output)
-    {
-        assert(g_sinkOutputSize > 1);
-        outputValues.assign(output, output + g_sinkOutputSize); // assign reallocates as needed
-    }
+void CompiledSinkNode_OutputCallback_Vector(double* output)
+{
+    assert(g_sinkOutputSize > 1);
+    outputValues.assign(output, output + g_sinkOutputSize); // assign reallocates as needed
+}
 }
 TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Vector, void, double*);
 
@@ -628,8 +831,8 @@ void TestMultipleOutputNodes()
     auto inputNode = model.AddNode<model::InputNode<double>>(shape);
     auto outputNode = model.AddNode<model::OutputNode<double>>(inputNode->output, shape);
 
-// this is blocked by IRMapCompiler.cpp line 42 which throws, so uncomment this when we decide to fix that.
-//    auto outputNode2 = model.AddNode<model::OutputNode<double>>(inputNode->output);
+    // this is blocked by IRMapCompiler.cpp line 42 which throws, so uncomment this when we decide to fix that.
+    //    auto outputNode2 = model.AddNode<model::OutputNode<double>>(inputNode->output);
 
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } }); // , { "output2", outputNode2->output } });
     model::MapCompilerParameters settings;
@@ -649,7 +852,7 @@ void TestMultipleOutputNodes()
     auto outputFuncpos = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape.0* %shape");
     auto storePos = result.find("store i32 224, i32* %rows, align 4");
     testing::ProcessTest("Testing GetOutputShape generation",
-        storePos != std::string::npos && inputFuncPos != std::string::npos && outputFuncpos != std::string::npos);
+                         storePos != std::string::npos && inputFuncPos != std::string::npos && outputFuncpos != std::string::npos);
 }
 
 void TestCompilableDotProductNode2(int dimension)
@@ -714,7 +917,7 @@ protected:
     {
         int inputSize = _input1.Size();
         assert(inputSize == _input2.Size());
-        return{ currentFunction.Literal(inputSize) };
+        return { currentFunction.Literal(inputSize) };
     }
 
 private:
@@ -796,6 +999,8 @@ void VerifyLayerMap(const ell::model::DynamicMap& map, const ell::model::Node* c
 
 void TestNeuralNetworkPredictorNode1()
 {
+    // Create a simple neural net model with the following layers:
+    // input -> bias
     using ElementType = double;
     using InputParameters = typename predictors::neural::InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename predictors::neural::Layer<ElementType>::LayerParameters;
@@ -850,9 +1055,8 @@ void TestNeuralNetworkPredictorNode1()
 
 void TestNeuralNetworkPredictorNode2()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-
+    // Create a simple neural net model with the following layers:
+    // input -> fully-connected -> bias -> activation -> fully-connected -> bias
     using ElementType = double;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
@@ -863,7 +1067,6 @@ void TestNeuralNetworkPredictorNode2()
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
-    // Build an XOR net from previously trained values.
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
 
@@ -921,9 +1124,8 @@ void TestNeuralNetworkPredictorNode2()
 
 void TestNeuralNetworkPredictorNode3()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-
+    // Create a simple neural net model with the following layers:
+    // input -> convolutional
     using ElementType = double;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
@@ -937,19 +1139,32 @@ void TestNeuralNetworkPredictorNode3()
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
 
-    InputParameters inputParams = { { 3, 3, 3 }, { PaddingScheme::zeros, 0 }, { 5, 5, 3 }, { PaddingScheme::zeros, 1 }, 1 };
+    size_t imageSize = 3;
+    size_t numChannels = 2;
+    size_t k = 3;
+    size_t numFilters = 2;
+    size_t padding = 1;
+    size_t stride = 1;
+
+    // convolve 3x3 image of all 1s with a 3x3 filter of all 1s, with 0-padding on image
+    // result should be:
+    //
+    //   4 6 4
+    //   6 9 6
+    //   4 6 4
+
+    InputParameters inputParams = { { imageSize, imageSize, numChannels }, NoPadding(), { imageSize + 2 * padding, imageSize + 2 * padding, numChannels }, { PaddingScheme::zeros, padding }, 1.0 };
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
-    LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, 1 }, { 3, 3, 8 }, NoPadding() };
+    LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, padding }, { imageSize, imageSize, numFilters }, NoPadding() };
     auto convolutionMethod = ConvolutionMethod::columnwise;
-    ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 1 };
-    TensorType convWeights1(8 * 3, 3, 3);
-    FillTensor(convWeights1);
-    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));
+    ConvolutionalParameters convolutionalParams{ k, stride, convolutionMethod, numFilters };
+    TensorType convWeights(numFilters * k, k, numChannels);
+    FillTensor(convWeights);
+    // convWeights.Fill(1);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights)));
 
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
-    std::vector<ElementType> input(3 * 3 * 3);
-    FillVector(input);
 
     // Create model
     model::Model model;
@@ -964,15 +1179,186 @@ void TestNeuralNetworkPredictorNode3()
     // PrintIR(compiledMap);
 
     // compare output
+    const auto inputSize = imageSize * imageSize * numChannels;
+    std::vector<ElementType> input(inputSize, 1.0);
+    FillVector(input, 1.0);
     std::vector<std::vector<double>> signal = { input };
+
+    compiledMap.SetInputValue(0, input);
+    auto compiledResult = compiledMap.ComputeOutput<ElementType>(0);
+    std::cout << "Compiled result size: " << compiledResult.size() << std::endl;
+    std::cout << "  " << compiledResult << std::endl;
+
     VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_3");
 }
 
 void TestNeuralNetworkPredictorNode4()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
+    // Create a simple neural net model with the following layers:
+    // input -> convolutional (no padding)
 
+    using ElementType = double;
+    using InputParameters = typename InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    size_t imageSize = 5;
+    size_t numChannels = 1;
+    size_t k = 3;
+    size_t numFilters = 1;
+    size_t padding = 0;
+    size_t stride = 1;
+
+    // convolve 5x5 image of all 1s with a 3x3 filter of all 1s, with no padding on image
+    // result should be:
+    //
+    //   9 9 9
+    //   9 9 9
+    //   9 9 9
+
+    InputParameters inputParams = { { imageSize, imageSize, numChannels }, NoPadding(), { imageSize + 2 * padding, imageSize + 2 * padding, numChannels }, { PaddingScheme::zeros, padding }, 1.0 };
+    inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
+
+    LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, padding }, { imageSize-2*(k/2), imageSize-2*(k/2), numFilters }, NoPadding() };
+    auto convolutionMethod = ConvolutionMethod::columnwise;
+    ConvolutionalParameters convolutionalParams{ k, stride, convolutionMethod, numFilters }; // 
+    TensorType convWeights(numFilters * k, k, numChannels);
+    // FillTensor(convWeights);
+    convWeights.Fill(1);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights)));
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
+    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+
+    // compare output
+    const auto inputSize = imageSize * imageSize * numChannels;
+    std::vector<ElementType> input(inputSize, 1.0);
+    // FillVector(input, 1.0);
+    std::vector<std::vector<double>> signal = { input };
+
+    map.SetInputValue(0, input);
+    auto computedResult = map.ComputeOutput<ElementType>(0);
+    std::cout << "Computed result size: " << computedResult.size() << std::endl;
+    std::cout << "  " << computedResult << std::endl;
+
+    compiledMap.SetInputValue(0, input);
+    auto compiledResult = compiledMap.ComputeOutput<ElementType>(0);
+    std::cout << "Compiled result size: " << compiledResult.size() << std::endl;
+    std::cout << "  " << compiledResult << std::endl;
+
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_4");
+}
+
+void TestNeuralNetworkPredictorNode5()
+{
+    // Create a simple neural net model with the following layers:
+    // input -> convolutional -> max_pool -> convolutional -> mean-pooling -> softmax
+    using ElementType = float;
+    using InputParameters = typename InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename NeuralNetworkPredictor<ElementType>::Layers layers;
+
+    size_t k = 3;
+    size_t w = 8;
+    size_t d = 2;
+    size_t f1 = 3;
+    size_t f2 = 6;
+
+    // Input Layer
+    InputParameters inputParams = { { w, w, d }, NoPadding(), { w+2, w+2, d }, ZeroPadding(1), 1 };
+    inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
+
+    // ConvolutionalLayer
+    LayerParameters layerParameters{ inputLayer->GetOutput(), ZeroPadding(1), { w, w, f1 }, NoPadding() };
+    auto convolutionMethod = ConvolutionMethod::columnwise;
+    ConvolutionalParameters convolutionalParams{ k, 1, convolutionMethod, 1 };
+    TensorType convWeights1(f1 * k, k, d);
+    FillTensor(convWeights1, -10.0f, 0.0625f);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));
+    
+    // Max PoolingLayer
+    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { w/2 + 2, w/2 + 2, f1 }, ZeroPadding(1) };
+    PoolingParameters poolingParameters{ 2, 2 }; // window size, stride
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new PoolingLayer<ElementType, MaxPoolingFunction>(layerParameters, poolingParameters)));
+
+    // ConvolutionalLayer
+    layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { w/2, w/2, f2 }, NoPadding() };
+    ConvolutionalParameters convolutionalParams2{ k, 1, convolutionMethod, 1 };
+    TensorType convWeights2(f2 * k, k, f1);
+    FillTensor(convWeights2, -2.0f, 0.0625f);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams2, convWeights2)));
+
+    // Mean PoolingLayer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), { (w/2)/2, (w/2)/2, f2 }, NoPadding() };
+    PoolingParameters poolingParameters2{ 2, 2 };
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new PoolingLayer<ElementType, MeanPoolingFunction>(layerParameters, poolingParameters2)));
+
+    // Create the predictor
+    NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
+    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    settings.compilerSettings.useBlas = true; // !!! if BLAS is off, this fails
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+
+    // Create an input vector
+    std::vector<ElementType> input(w*w*d);
+    FillVector(input);
+
+    map.SetInputValue(0, input);
+    auto computedResult = map.ComputeOutput<ElementType>(0);
+    std::cout << "Computed result size: " << computedResult.size() << std::endl;
+    std::cout << "  " << computedResult << std::endl;
+
+    compiledMap.SetInputValue(0, input);
+    auto compiledResult = compiledMap.ComputeOutput<ElementType>(0);
+    std::cout << "Compiled result size: " << compiledResult.size() << std::endl;
+    std::cout << "  " << compiledResult << std::endl;
+
+    // compare output
+    std::vector<std::vector<ElementType>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_5");
+}
+
+void TestNeuralNetworkPredictorNode6()
+{
+    // Create a simple neural net model with the following layers:
+    // input -> convolutional -> bias -> activation -> batch-norm -> scaling -> max-pooling -> mean-pooling
     using ElementType = double;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
@@ -1051,15 +1437,12 @@ void TestNeuralNetworkPredictorNode4()
 
     // compare output
     std::vector<std::vector<double>> signal = { input };
-    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_4");
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_6");
 }
 
 // tinyYolo prefix test
-void TestNeuralNetworkPredictorNode5()
+void TestNeuralNetworkPredictorNode7()
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-
     using ElementType = double;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
@@ -1229,7 +1612,7 @@ void TestNeuralNetworkPredictorNode5()
     // compare output
     double epsilon = 0.1;
     std::vector<std::vector<double>> signal = { input };
-    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_5", epsilon);
+    VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_7", epsilon);
 }
 
 void TestInputLayerNode(size_t outputPadding)
@@ -1284,8 +1667,6 @@ void TestInputLayerNode(size_t outputPadding)
 template <template <typename> class ActivationFunction>
 void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -1332,8 +1713,6 @@ void TestSigmoidActivationLayerNode(size_t inputPaddingSize, size_t outputPaddin
 
 void TestParametricReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -1449,8 +1828,6 @@ void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
 void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPaddingSize, ell::predictors::neural::PaddingScheme paddingScheme, bool scaleByFilterMeans)
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -1509,8 +1886,6 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
 
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -1566,10 +1941,10 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     ElementType v3 = 18;
     ElementType v4 = 18;
     testing::ProcessTest("Testing ConvolutionalLayer, values",
-        testing::IsEqual(output(0, 0, 0), v1, eps) &&
-        testing::IsEqual(output(0, 0, 1), v2, eps) &&
-        testing::IsEqual(output(0, 1, 0), v3, eps) &&
-        testing::IsEqual(output(0, 1, 1), v4, eps));
+                         testing::IsEqual(output(0, 0, 0), v1, eps) &&
+                             testing::IsEqual(output(0, 0, 1), v2, eps) &&
+                             testing::IsEqual(output(0, 1, 0), v3, eps) &&
+                             testing::IsEqual(output(0, 1, 1), v4, eps));
 
     // Create model
     model::Model model;
@@ -1582,8 +1957,6 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
 
 void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -1696,8 +2069,6 @@ void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSi
 template <template <typename> class PoolingFunction>
 void TestPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
     using ElementType = double;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -1749,9 +2120,6 @@ void TestMeanPoolingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
 void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-
     using ElementType = double;
     using LayerType = predictors::neural::ScalingLayer<ElementType>;
     using LayerParameters = typename LayerType::LayerParameters;
@@ -1790,9 +2158,6 @@ void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
 void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    using namespace ell::predictors;
-    using namespace ell::predictors::neural;
-
     using ElementType = double;
     using LayerType = predictors::neural::SoftmaxLayer<ElementType>;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
@@ -1821,4 +2186,3 @@ void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
-

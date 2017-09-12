@@ -48,7 +48,8 @@ NamespaceIndentation: Inner
 ReflowComments: false
 PenaltyBreakBeforeFirstCallParameter: 100000
 PenaltyBreakComment: 100000
-# Standard: Cpp11 # Broken
 SortIncludes: true
+# SpaceAfterTemplateKeyword: true
+# Standard: Cpp11 # Broken
 UseTab: Never
 ...

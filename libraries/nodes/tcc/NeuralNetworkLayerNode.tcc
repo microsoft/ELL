@@ -18,11 +18,12 @@ namespace nodes
     NeuralNetworkLayerNodeBase<ValueType>::NeuralNetworkLayerNodeBase()
         : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
     {
+        _parameters.includePaddingInInputData = true;
     }
 
     template <typename ValueType>
-    NeuralNetworkLayerNodeBase<ValueType>::NeuralNetworkLayerNodeBase(const model::PortElements<ValueType>& input, size_t outputSize)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputSize)
+    NeuralNetworkLayerNodeBase<ValueType>::NeuralNetworkLayerNodeBase(const model::PortElements<ValueType>& input, const NeuralNetworkLayerNodeParameters& parameters, size_t outputSize)
+        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _parameters(parameters), _output(this, outputPortName, outputSize)
     {
     }
 
@@ -51,52 +52,46 @@ namespace nodes
 
     template <typename DerivedType, typename LayerType, typename ValueType>
     NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::NeuralNetworkLayerNode(const model::PortElements<ValueType>& input, const LayerType& layer)
-        : NeuralNetworkLayerNodeBase<ValueType>(input, layer.GetOutput().Size()), _inputTensor(layer.GetInputShape()), _layer(layer)
+        : NeuralNetworkLayerNodeBase<ValueType>(input, {}, layer.GetOutput().Size()), _inputTensor(layer.GetInputShape()), _layer(layer)
     {
         _layer.GetLayerParameters().input = _inputTensor;
 
-        const auto& layerParameters = this->GetLayer().GetLayerParameters();
+        const auto& layerParameters = this->GetLayerParameters();
 
         // Calculate input dimension parameters
         size_t inputPaddingSize = layerParameters.inputPaddingParameters.paddingSize;
-        auto inputShapeArray = this->GetLayer().GetInputShape();
-        Shape inputStride{ inputShapeArray.begin(), inputShapeArray.end() };
-        Shape inputOffset{ inputPaddingSize, inputPaddingSize, 0 };
-        Shape inputSize(inputStride.size());
-        for (int dimensionIndex = 0; dimensionIndex < inputOffset.size(); ++dimensionIndex)
-        {
-            if(inputStride[dimensionIndex] < (2 * inputOffset[dimensionIndex]))
-            {
-                throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Input size not large enough to accomodate padding");
-            }
-            inputSize[dimensionIndex] = inputStride[dimensionIndex] - (2 * inputOffset[dimensionIndex]);
-        }
-
-        _inputLayout = { inputSize, inputStride, inputOffset };
+        auto inputShape = this->GetLayer().GetInputShape();
+        _inputLayout = CalculateMemoryLayout(inputPaddingSize, inputShape);
 
         // Calculate output dimension parameters
         size_t outputPaddingSize = layerParameters.outputPaddingParameters.paddingSize;
-        auto outputShapeArray = this->_layer.GetOutputShape();
-        Shape outputStride{ outputShapeArray.begin(), outputShapeArray.end() };
-        Shape outputOffset = { outputPaddingSize, outputPaddingSize, 0 };
-        Shape outputSize(outputStride.size());
-        for (int dimensionIndex = 0; dimensionIndex < outputOffset.size(); ++dimensionIndex)
+        auto outputShape = this->_layer.GetOutputShape();
+        _outputLayout = CalculateMemoryLayout(outputPaddingSize, outputShape);
+    }
+
+    template <typename DerivedType, typename LayerType, typename ValueType>
+    model::PortMemoryLayout NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::CalculateMemoryLayout(size_t padding, typename predictors::neural::Layer<ValueType>::Shape dataBufferSize)
+    {
+        // Calculate dimension parameters
+        model::Shape stride{ dataBufferSize.begin(), dataBufferSize.end() };
+        model::Shape offset{ static_cast<int>(padding), static_cast<int>(padding), 0 };
+        model::Shape size(stride.size());
+        for (int dimensionIndex = 0; dimensionIndex < offset.size(); ++dimensionIndex)
         {
-            if(outputStride[dimensionIndex] < (2 * outputOffset[dimensionIndex]))
+            if(stride[dimensionIndex] < (2 * offset[dimensionIndex]))
             {
-                throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Output size not large enough to accomodate padding");
+                throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Data size not large enough to accomodate padding");
             }
-            outputSize[dimensionIndex] = outputStride[dimensionIndex] - (2 * outputOffset[dimensionIndex]);
+            size[dimensionIndex] = stride[dimensionIndex] - (2 * offset[dimensionIndex]);
         }
 
-        _outputLayout = { outputSize, outputStride, outputOffset };
+        return { size, stride, offset };
     }
 
     template <typename DerivedType, typename LayerType, typename ValueType>
     void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         NeuralNetworkLayerNodeBase<ValueType>::WriteToArchive(archiver);
-        math::TensorArchiver::Write(_inputTensor, "inputTensor", archiver);
         archiver["layer"] << _layer;
         archiver["inputLayout"] << _inputLayout;
         archiver["outputLayout"] << _outputLayout;
@@ -106,7 +101,6 @@ namespace nodes
     void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         NeuralNetworkLayerNodeBase<ValueType>::ReadFromArchive(archiver);
-        math::TensorArchiver::Read(_inputTensor, "inputTensor", archiver);
         archiver["layer"] >> _layer;
         _inputTensor = typename LayerType::TensorType(_layer.GetInputShape());
         _layer.GetLayerParameters().input = _inputTensor;

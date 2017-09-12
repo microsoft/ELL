@@ -44,6 +44,13 @@ void ParsedProfileArguments::AddArgs(utilities::CommandLineParser& parser)
         "text");
 
     parser.AddOption(
+        outputComment,
+        "comment",
+        "",
+        "Comment to embed in output",
+        "");
+
+    parser.AddOption(
         filterTrivialNodes,
         "filter",
         "",

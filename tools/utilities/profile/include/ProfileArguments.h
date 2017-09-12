@@ -30,7 +30,8 @@ struct ProfileArguments
     std::string outputFilename = "";
     std::string timingOutputFilename = "";
     ProfileOutputFormat outputFormat = ProfileOutputFormat::text;
-    
+    std::string outputComment = "";
+
     int numIterations = 1;
     int numBurnInIterations = 0;
     bool filterTrivialNodes = true;

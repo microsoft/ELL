@@ -47,35 +47,30 @@ namespace nodes
         //
         // Functions
         //
-        size_t GetFilterVolumeSize(const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters, const PortMemoryLayout& inputMemoryLayout)
+        size_t GetFilterVolumeSize(const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters, const model::PortMemoryLayout& inputMemoryLayout)
         {
-            const auto inputDepth = inputMemoryLayout.size[2];
+            const auto inputDepth = inputMemoryLayout.GetActiveSize(2);
             const auto filterSize = convolutionalParameters.receptiveField;
             return inputDepth * filterSize * filterSize;
         }
 
-        size_t GetMemorySize(const PortMemoryLayout& memoryLayout)
-        {
-            return std::accumulate(memoryLayout.stride.begin(), memoryLayout.stride.end(), 1, std::multiplies<size_t>());
-        }
-
         template <typename PackedBitsType>
-        size_t GetPackedFilterSize(const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters, const PortMemoryLayout& inputMemoryLayout, const PortMemoryLayout& outputMemoryLayout)
+        size_t GetPackedFilterSize(const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout)
         {
-            const size_t numOutputPixels = outputMemoryLayout.size[0] * outputMemoryLayout.size[1];
+            const size_t numOutputPixels = outputMemoryLayout.GetActiveSize(0) * outputMemoryLayout.GetActiveSize(1);
             const size_t filterVolumeSize = GetFilterVolumeSize(convolutionalParameters, inputMemoryLayout);
             return ((filterVolumeSize - 1) / (8 * sizeof(PackedBitsType)) + 1) * numOutputPixels;
         }
 
         llvm::Value* GetValueFromVolume(emitters::IRFunctionEmitter& function,
                                         llvm::Value* inputVolume,
-                                        const PortMemoryLayout& inputLayout,
+                                        const model::PortMemoryLayout& inputLayout,
                                         const predictors::neural::BinaryConvolutionalParameters& convParams,
                                         llvm::Value* valueRow, llvm::Value* valueColumn, llvm::Value* valueChannel)
         {
-            const auto rowStride = inputLayout.stride[0];
-            const auto columnStride = inputLayout.stride[1];
-            const auto channelStride = inputLayout.stride[2];
+            const auto rowStride = inputLayout.GetStride(0);
+            const auto columnStride = inputLayout.GetStride(1);
+            const auto channelStride = inputLayout.GetStride(2);
 
             // row, column, channel order
             auto index1 = function.Operator(times, valueRow, function.Literal<int>(columnStride * channelStride));
@@ -156,15 +151,15 @@ namespace nodes
         template <typename ValueType>
         llvm::Value* GetValueFromPaddedVolume(emitters::IRFunctionEmitter& function,
                                               llvm::Value* inputVolume,
-                                              const PortMemoryLayout& inputLayout,
+                                              const model::PortMemoryLayout& inputLayout,
                                               const predictors::neural::BinaryConvolutionalParameters& convParams,
                                               size_t convPadding,
                                               llvm::Value* inputRow, llvm::Value* inputCol, llvm::Value* inputChannel)
         {
-            const auto inputHeight = inputLayout.size[0];
-            const auto inputWidth = inputLayout.size[1];
-            const auto inputDepth = inputLayout.size[2];
-            const auto inputPadding = inputLayout.offset[0];
+            const auto inputHeight = inputLayout.GetActiveSize(0);
+            const auto inputWidth = inputLayout.GetActiveSize(1);
+            const auto inputDepth = inputLayout.GetActiveSize(2);
+            const auto inputPadding = inputLayout.GetOffset(0);
 
             const int extraPadding = convPadding - inputPadding; // amount by which the convolution's desired padding exceeds input's
             if (extraPadding > 0) // known at compile-time
@@ -184,18 +179,18 @@ namespace nodes
         template <typename ValueType>
         void LoadRow(emitters::IRFunctionEmitter& function,
                      llvm::Value* inputVolume,
-                     const PortMemoryLayout& inputLayout,
+                     const model::PortMemoryLayout& inputLayout,
                      llvm::Value* outputRowIndex,
-                     const PortMemoryLayout& outputLayout,
+                     const model::PortMemoryLayout& outputLayout,
                      const predictors::neural::BinaryConvolutionalParameters& convParams,
                      llvm::Value* realValueRow) // realValueRow == output
         {
-            const auto numChannels = inputLayout.size[2];
-            const auto outputImageWidth = outputLayout.size[1];
-            const auto outputImageHeight = outputLayout.size[0];
+            const auto numChannels = inputLayout.GetActiveSize(2);
+            const auto outputImageWidth = outputLayout.GetActiveSize(1);
+            const auto outputImageHeight = outputLayout.GetActiveSize(0);
             const auto filterSize = convParams.receptiveField;
             const auto stride = convParams.stride;
-            const auto convPadding = inputLayout.offset[0]; // TODO: decouple input data padding from convolution padding
+            const auto convPadding = inputLayout.GetOffset(0); // TODO: decouple input data padding from convolution padding
 
             // compute offset based on outputRowIndex
             auto outputImageRow = function.Operator(divide, outputRowIndex, function.Literal<int>(outputImageWidth));
@@ -326,15 +321,15 @@ namespace nodes
         auto&& outputLayout = this->GetOutputMemoryLayout();
         auto&& convParams = this->GetLayer().GetConvolutionalParameters();
         auto&& layerParams = this->GetLayer().GetLayerParameters();
-        const auto inputHeight = inputLayout.size[0];
-        const auto inputWidth = inputLayout.size[1];
-        const auto inputDepth = inputLayout.size[2];
+        const auto inputHeight = inputLayout.GetActiveSize(0);
+        const auto inputWidth = inputLayout.GetActiveSize(1);
+        const auto inputDepth = inputLayout.GetActiveSize(2);
         const auto filterWidth = convParams.receptiveField;
         const auto fieldVolumeSize = convParams.receptiveField * convParams.receptiveField * inputDepth;
-        const auto outputImageHeight = outputLayout.size[0];
-        const auto outputImageWidth = outputLayout.size[1];
-        const auto numFilters = outputLayout.size[2];
-        const auto padding = inputLayout.offset[0];
+        const auto outputImageHeight = outputLayout.GetActiveSize(0);
+        const auto outputImageWidth = outputLayout.GetActiveSize(1);
+        const auto numFilters = outputLayout.GetActiveSize(2);
+        const auto padding = inputLayout.GetOffset(0);
         const auto shapedInputSize = fieldVolumeSize * outputImageWidth * outputImageHeight;
         const auto outputRows = outputImageWidth * outputImageHeight;
 
@@ -343,10 +338,10 @@ namespace nodes
         auto compressedPaddingMasks = GetCompressedInputPaddingMasks();
 
         using PackedBitsType = int64_t;
-        auto reshapeNode = transformer.AddNode<BinarizeAndReshapeImageNode<ValueType, PackedBitsType>>(newInput,
-                                                                                                       convParams,
-                                                                                                       inputLayout,
-                                                                                                       outputLayout);
+        auto reshapeNode = transformer.AddNode<BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>>(newInput,
+                                                                                                          convParams,
+                                                                                                          inputLayout,
+                                                                                                          outputLayout);
         auto paddingMasksNode = transformer.AddNode<ConstantNode<PackedBitsType>>(compressedPaddingMasks);
         auto filterWeightsNode = transformer.AddNode<ConstantNode<PackedBitsType>>(compressedFilterWeights);
         auto filterMeansNode = transformer.AddNode<ConstantNode<ValueType>>(filterMeans);
@@ -364,41 +359,41 @@ namespace nodes
     }
 
     //
-    // BinarizeAndReshapeImageNode
+    // BinaryReceptiveFieldMatrixNode
     //
 
     template <typename ValueType, typename PackedBitsType>
-    BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::BinarizeAndReshapeImageNode()
+    BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::BinaryReceptiveFieldMatrixNode()
         : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
     {
     }
 
     template <typename ValueType, typename PackedBitsType>
-    BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::BinarizeAndReshapeImageNode(const model::PortElements<ValueType>& input,
-                                                                                        const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
-                                                                                        const PortMemoryLayout& inputMemoryLayout,
-                                                                                        const PortMemoryLayout& outputMemoryLayout)
+    BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::BinaryReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input,
+                                                                                              const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
+                                                                                              const model::PortMemoryLayout& inputMemoryLayout,
+                                                                                              const model::PortMemoryLayout& outputMemoryLayout)
         : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, GetPackedFilterSize<PackedBitsType>(convolutionalParameters, inputMemoryLayout, outputMemoryLayout)), _convolutionalParameters(convolutionalParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
     {
     }
 
     template <typename ValueType, typename PackedBitsType>
-    void BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::Copy(model::ModelTransformer& transformer) const
+    void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<BinarizeAndReshapeImageNode>(newPortElements, _convolutionalParameters, _inputMemoryLayout, _outputMemoryLayout);
+        auto newNode = transformer.AddNode<BinaryReceptiveFieldMatrixNode>(newPortElements, _convolutionalParameters, _inputMemoryLayout, _outputMemoryLayout);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType, typename PackedBitsType>
-    void BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::Compute() const
+    void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::Compute() const
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
     // TODO: Fix this to deal with convParams.stride != 1
     template <typename ValueType, typename PackedBitsType>
-    void BinarizeAndReshapeImageNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         function.GetModule().DeclarePrintf();
 
@@ -411,14 +406,14 @@ namespace nodes
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         auto elementSize = sizeof(PackedBitsType);
         auto numBits = 8 * elementSize;
-        const auto inputDepth = _inputMemoryLayout.size[2];
+        const auto inputDepth = _inputMemoryLayout.GetActiveSize(2);
         const auto filterWidth = _convolutionalParameters.receptiveField;
         const auto fieldVolumeSize = filterWidth * filterWidth * inputDepth;
 
         int packedRowSize = (fieldVolumeSize - 1) / numBits + 1;
         assert(packedRowSize != 0);
-        int outputImageHeight = _outputMemoryLayout.size[0];
-        int outputImageWidth = _outputMemoryLayout.size[1];
+        int outputImageHeight = _outputMemoryLayout.GetActiveSize(0);
+        int outputImageWidth = _outputMemoryLayout.GetActiveSize(1);
 
         // TODO: interleave load/compress more tightly to eliminate need for a scratch variable to hold the whole row
         // TODO: vectorize
@@ -441,6 +436,18 @@ namespace nodes
         outputRowLoop.End();
     }
 
+    template <typename ValueType, typename PackedBitsType>
+    void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+    }
+
+    template <typename ValueType, typename PackedBitsType>
+    void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+    }
+
     //
     // BinaryXnorNode
     //
@@ -457,9 +464,9 @@ namespace nodes
                                                               const model::PortElements<ValueType>& filterMeans,
                                                               const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                                               const predictors::neural::PaddingParameters& inputPaddingParameters,
-                                                              const PortMemoryLayout& inputMemoryLayout,
-                                                              const PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input, &_inputPaddingMasks, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, inputPortName), _inputPaddingMasks(this, compressedInputPaddingMasks, inputPaddingMasksPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, outputPortName, GetMemorySize(outputMemoryLayout)), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
+                                                              const model::PortMemoryLayout& inputMemoryLayout,
+                                                              const model::PortMemoryLayout& outputMemoryLayout)
+        : CompilableNode({ &_input, &_inputPaddingMasks, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, inputPortName), _inputPaddingMasks(this, compressedInputPaddingMasks, inputPaddingMasksPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, outputPortName, outputMemoryLayout.GetMemorySize()), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
     {
     }
 
@@ -494,18 +501,17 @@ namespace nodes
 
         // Input / output memory layouts
         const auto& inputLayout = this->GetInputMemoryLayout();
-        const auto& inputSize = inputLayout.size;
-        const auto& inputStride = inputLayout.stride;
-        const auto& inputOffset = inputLayout.offset;
+        const auto& inputSize = inputLayout.GetActiveSize();
+        const auto& inputStride = inputLayout.GetStride();
+        const auto& inputOffset = inputLayout.GetOffset();
 
         const auto& outputLayout = this->GetOutputMemoryLayout();
-        const auto& outputSize = outputLayout.size;
-        const auto& outputStride = outputLayout.stride;
-        const auto& outputOffset = outputLayout.offset;
+        const auto& outputSize = outputLayout.GetActiveSize();
+        const auto& outputStride = outputLayout.GetStride();
+        const auto& outputOffset = outputLayout.GetOffset();
 
         // Get cumulative increment for each dimension
-        Shape inputIncrement = inputLayout.GetCumulativeIncrement();
-        Shape outputIncrement = outputLayout.GetCumulativeIncrement();
+        model::Shape outputIncrement = outputLayout.GetCumulativeIncrement();
 
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         const auto storedElementSize = sizeof(PackedBitsType);
@@ -626,6 +632,18 @@ namespace nodes
             columnLoop.End();
         }
         rowLoop.End();
+    }
+
+    template <typename ValueType, typename PackedBitsType>
+    void BinaryXnorNode<ValueType, PackedBitsType>::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+    }
+
+    template <typename ValueType, typename PackedBitsType>
+    void BinaryXnorNode<ValueType, PackedBitsType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    {
+        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
     // Explicit specialization

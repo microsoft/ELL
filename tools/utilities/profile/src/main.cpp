@@ -44,7 +44,7 @@ using namespace ell;
 //
 // Test-data-related
 //
-template<typename T>
+template <typename T>
 std::vector<T> GetInputData(std::string filename, const math::TensorShape& inputShape, float scale)
 {
     if (filename != "")
@@ -65,7 +65,7 @@ std::vector<T> GetInputData(std::string filename, const math::TensorShape& input
     }
 }
 
-template<typename InputType>
+template <typename InputType>
 std::vector<InputType> GetModelInput(model::DynamicMap& map, const ProfileArguments& profileArguments)
 {
     auto inputShape = map.GetInputShape();
@@ -88,6 +88,18 @@ utilities::OutputStreamImpostor GetOutputStream(const std::string& filename)
         return { utilities::OutputStreamImpostor::StreamType::cout };
     }
     return { filename };
+}
+
+void WriteUserComment(const std::string& comment, ProfileOutputFormat format,std::ostream& out)
+{
+    if (format == ProfileOutputFormat::text)
+    {
+        out << "Comment: " << comment << "\n";
+    }
+    else // json
+    {
+        out << "\"comment\": \"" << comment << "\"\n";
+    }
 }
 
 void WriteModelStatistics(model::IRCompiledMap& map, ProfileOutputFormat format, std::ostream& out)
@@ -263,7 +275,7 @@ void ResetProfilingInfo(model::IRCompiledMap& map)
     map.ResetNodeTypeProfilingInfo();
 }
 
-template<typename InputType, typename OutputType>
+template <typename InputType, typename OutputType>
 void WarmUpModel(model::IRCompiledMap& map, const std::vector<InputType>& input, int numBurnInIterations)
 {
     for (int iter = 0; iter < numBurnInIterations; ++iter)
@@ -273,7 +285,7 @@ void WarmUpModel(model::IRCompiledMap& map, const std::vector<InputType>& input,
     ResetProfilingInfo(map);
 }
 
-template<typename InputType, typename OutputType>
+template <typename InputType, typename OutputType>
 void TimeModel(model::DynamicMap& map, const std::vector<InputType>& input, const ProfileArguments& profileArguments)
 {
     // Get output stream
@@ -316,16 +328,17 @@ void TimeModel(model::DynamicMap& map, const std::vector<InputType>& input, cons
     }
 }
 
-template<typename InputType, typename OutputType>
+template <typename InputType, typename OutputType>
 void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments)
 {
-    bool printTimingChart = profileArguments.timingOutputFilename != "";
+    const bool printTimingChart = profileArguments.timingOutputFilename != "";
     auto profileOutputStream = GetOutputStream(profileArguments.outputFilename);
     auto timingOutputStream = GetOutputStream(profileArguments.timingOutputFilename);
+    const auto comment = profileArguments.outputComment;
 
     std::vector<InputType> input = GetModelInput<InputType>(map, profileArguments);
 
-    // In "summary only" mode, we don't comile the model with profiling enabled
+    // In "summary only" mode, we don't compile the model with profiling enabled
     // (because we just want the overall run time), so we have a separate codepath
     // for that option
     if (profileArguments.summaryOnly)
@@ -383,12 +396,21 @@ void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArgumen
     // print profile info
     if (format == ProfileOutputFormat::text)
     {
+        if (!comment.empty())
+        {
+            WriteUserComment(comment, format, profileOutputStream);
+        }
         WriteNodeStatistics(compiledMap, format, profileOutputStream);
         WriteModelStatistics(compiledMap, format, profileOutputStream);
     }
     else
     {
         profileOutputStream << "{\n";
+        if (!comment.empty())
+        {
+            WriteUserComment(comment, format, profileOutputStream);
+            profileOutputStream << ",\n";
+        }
         WriteNodeStatistics(compiledMap, format, profileOutputStream);
         profileOutputStream << ",\n";
         WriteModelStatistics(compiledMap, format, profileOutputStream);
@@ -396,7 +418,7 @@ void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArgumen
     }
 }
 
-template<typename InputType>
+template <typename InputType>
 void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments)
 {
     switch (map.GetOutputType())
@@ -464,10 +486,7 @@ int main(int argc, char* argv[])
         }
 
         // load map file
-        std::cout << "Loading model from file " << mapLoadArguments.GetInputFilename() << std::endl;
         auto map = common::LoadMap(mapLoadArguments);
-
-        std::cout << "Profiling model" << std::endl;
         ProfileModel(map, profileArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

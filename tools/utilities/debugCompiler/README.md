@@ -20,7 +20,7 @@ view the compiled Node graph, with annotated Error properties on each node.  It 
 contains a style that will map the error values to different levels of red so you 
 can easily see where the trouble spots are.
 
-**Usage**: debugcompiler [options]
+**Usage**: debugCompiler [options]
 
     Input options
             --inputMapFile (-imap) []   Path to the input *.map file

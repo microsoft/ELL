@@ -75,29 +75,63 @@ namespace nodes
     template <typename ValueType>
     bool NeuralNetworkPredictorNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
+        // TODO:
+        // 
+        // Adjust the padding and data ordering depending on what options were set
+        //
+        // Constraints:
+        //   diag conv: interleaved order, data padding
+        //   normal conv: planar order, no padding
+        //
+        // options:
+        // 
+        // - diag vs. normal conv
+        // - always use regular 'normal' convolution
+        // - always use transposed 'normal' convolution
+        // - threshold to switch between regular and transposed 'normal' conv (ratio of # memcopies?)
+        //
+        // 
+        // - always revert to interleaved order
+        // - always revert to planar order
+        // - keep existing order as long as possible
+        // - choose best order
+
+        // Options
+        NetworkCompileOptions options;
+        options.useDiagonalConvolution = false; // (true implies rcd order, false implies drc order)
+        options.alwaysConvertToInterleaved = true;
+        options.transposeReceptiveFieldMatrix = false;
+
+        // State
+        NetworkCompileState state;
+        state.isInterleavedOrder = true;
+
         auto newInputElements = transformer.TransformPortElements(_input.GetPortElements());
 
         const auto& inputLayer = _predictor.GetInputLayer();
         auto inputShape = inputLayer.GetInputShape();
         auto outputPadding = inputLayer.GetLayerParameters().outputPaddingParameters;
         auto padding = outputPadding.paddingSize;
+
         if (padding != 0)
         {
-            // If the input layer includes padding on its output, add a ReorderDataNode to take care of it.
-            DataShape inputNodeInputShape({ inputShape[2], inputShape[1], inputShape[0] }, { 0, 0, 0 });
-            DataShape inputNodeOutputShape({ inputShape[2], inputShape[1], inputShape[0] }, { 0, padding, padding });
-            auto paddedInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInputElements, inputNodeInputShape, inputNodeOutputShape, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
+            // If the input layer wants padding on its output, add a ReorderDataNode to add padding
+            model::PortMemoryLayout inputNodeShape({ (int)inputShape[0], (int)inputShape[1], (int)inputShape[2] });
+            model::PortMemoryLayout paddedInputNodeShape({ (int)inputShape[0], (int)inputShape[1], (int)inputShape[2] }, { (int)padding, (int)padding, 0 });
+            auto paddedInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInputElements, inputNodeShape, paddedInputNodeShape, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
             newInputElements = paddedInputNode->output;
         }
 
         size_t prevOutputSize = GetShapeSize(inputLayer.GetOutputShape()); // With padding
         auto layerInputs = model::PortElements<ValueType>(newInputElements);
-        Node* lastNode = nullptr;
+        NeuralNetworkLayerNodeBase<ValueType>* lastNode = nullptr;
+
         for (const auto& layer : _predictor.GetLayers())
         {
             auto numInputs = GetShapeSize(layer->GetInputShape());
             assert(prevOutputSize == numInputs);
-            auto layerNode = AddLayerNode(transformer, *layer, layerInputs);
+            auto layerNode = AddLayerNode(transformer, *layer, layerInputs, options, state);
+
             prevOutputSize = GetShapeSize(layer->GetOutputShape());
             layerInputs = model::PortElements<ValueType>{ *layerNode->GetOutputPort(0) };
             lastNode = layerNode;

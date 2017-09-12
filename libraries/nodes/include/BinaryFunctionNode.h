@@ -59,7 +59,7 @@ namespace nodes
         /// <param name="function"> The function to apply coordinate-wise. </param>
         /// <param name="padding"> The padding value. </param>
         BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
-            const PortMemoryLayout& inputLayout, const PortMemoryLayout& outputLayout, FunctionType function, ValueType padding = 0);
+            const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding = 0);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -99,11 +99,11 @@ namespace nodes
         // Inputs
         model::InputPort<ValueType> _input1;
         model::InputPort<ValueType> _input2;
-        PortMemoryLayout _inputLayout;
+        model::PortMemoryLayout _inputLayout;
 
         // Output
         model::OutputPort<ValueType> _output;
-        PortMemoryLayout _outputLayout;
+        model::PortMemoryLayout _outputLayout;
 
         // Function to apply coordinate-wise
         FunctionType _function;

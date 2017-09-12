@@ -20,7 +20,9 @@ using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
-    //VerboseRegion region;
+    // VerboseRegion region;
+    // TestReceptiveFieldMatrixNode(2, false); // old (slow) version -- Fails
+    // return;
 
     TestFloatNode();
     TestMultipleOutputNodes();
@@ -67,6 +69,12 @@ void TestIRCompiler()
     TestCompilableBinaryPredicateNode();
     TestCompilableMultiplexerNode();
     TestCompilableTypeCastNode();
+    TestReorderDataNode1();
+    TestReorderDataNode2();
+    TestReceptiveFieldMatrixNode(1, true);  // new version
+    TestReceptiveFieldMatrixNode(1, false); // old (slow) version
+    TestReceptiveFieldMatrixNode(2, true);  // new version
+    // TestReceptiveFieldMatrixNode(2, false); // old (slow) version -- Fails
     TestCompilableAccumulatorNodeFunction();
     TestCompilableSourceNode(false);
     // TestCompilableSourceNode(true); // Occassionally fails
@@ -85,6 +93,8 @@ void TestIRCompiler()
     TestNeuralNetworkPredictorNode2();
     TestNeuralNetworkPredictorNode3();
     TestNeuralNetworkPredictorNode4();
+    // TestNeuralNetworkPredictorNode5(); // Currently fails
+    TestNeuralNetworkPredictorNode6();
 
     TestInputLayerNode(0);
     TestInputLayerNode(1);

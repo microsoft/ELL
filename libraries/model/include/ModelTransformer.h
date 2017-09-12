@@ -111,14 +111,14 @@ namespace model
         ///
         /// <param name="oldMap"> The port mapping from the original model to an intermediate state. </param>
         /// <param name="newMap"> The port mapping from the intermediate state to the new model. </param>
-        /// <returns> A new mapping from the original model outputs to the new model outputs. </returns> 
+        /// <returns> A new mapping from the original model outputs to the new model outputs. </returns>
         static PortOutputsMap ConcatenateMaps(const PortOutputsMap& oldMap, const PortOutputsMap& newMap);
 
     private:
         std::unordered_map<const OutputPortBase*, PortElementsBase> _map;
     };
 
-    /// <summary> A class that refines or copies models </summary>
+    /// <summary> A class that transforms models (including refinement and copying) </summary>
     class ModelTransformer
     {
     public:
@@ -260,7 +260,6 @@ namespace model
         ///
         /// <returns> The context in use by the transformer. </returns>
         TransformContext& GetContext() { return _context; }
-
 
     private:
         friend class Node;

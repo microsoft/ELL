@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ReshapeImageNode.h (nodes)
+//  File:     ReceptiveFieldMatrixNode.h (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ namespace nodes
     /// Also known as Im2Col.
     /// </summary>
     template <typename ValueType>
-    class ReshapeImageNode : public model::CompilableNode
+    class ReceptiveFieldMatrixNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -44,28 +44,34 @@ namespace nodes
         /// @}
 
         /// <summary> Default constructor. </summary>
-        ReshapeImageNode();
+        ReceptiveFieldMatrixNode();
 
         /// <summary> Constructor. </summary>
         ///
         /// <param name="input"> The input image. </param>
         /// <param name="inputMemoryLayout"> The memory layout of the input image. </param>
-        /// <param name="convolutionalParameters"> The convolutional parameters. </param>
+        /// <param name="filterWidth"> The width of the convolution filters. </param>
+        /// <param name="stride"> The distance between filter application. </param>
+        /// <param name="convolutionPadding"> The amount of padding to use when performing the convolution. </param>
+        /// <param name="dataOrder"> Indicates the order of the dimensions in the data. The first entry is the index of the slowest-incrementing dimension, and the last entry is the index of the fastest-moving dimensions. So, the canonical row, column, channel order is {0, 1, 2}. </param>
         /// <param name="outputWidth"> The output image width. </param>
         /// <param name="outputHeight"> The output image height. </param>
-        ReshapeImageNode(const model::PortElements<ValueType>& input,
-                         const PortMemoryLayout& inputMemoryLayout,
-                         const predictors::neural::ConvolutionalParameters& convolutionalParameters,
-                         size_t outputWidth,
-                         size_t outputHeight);
+        ReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input,
+                                 const model::PortMemoryLayout& inputMemoryLayout,
+                                 size_t filterWidth,
+                                 size_t stride,
+                                 size_t convolutionPadding,
+                                 std::array<int, 3> dataOrder, // 0, 1, 2 == rows, columns, channels -- row-major
+                                 size_t outputWidth,
+                                 size_t outputHeight);
 
         /// <summary> Gets information about the input memory layout </summary>
-        const PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
+        const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ReshapeImageNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("ReceptiveFieldMatrixNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -99,12 +105,15 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
 
-        PortMemoryLayout _inputMemoryLayout;
-        predictors::neural::ConvolutionalParameters _convolutionalParameters;
+        model::PortMemoryLayout _inputMemoryLayout;
+        size_t _filterWidth;
+        size_t _stride;
+        size_t _convolutionPadding;
+        std::array<int, 3> _dataOrder;
         size_t _outputWidth;
         size_t _outputHeight;
     };
 }
 }
 
-#include "../tcc/ReshapeImageNode.tcc"
+#include "../tcc/ReceptiveFieldMatrixNode.tcc"

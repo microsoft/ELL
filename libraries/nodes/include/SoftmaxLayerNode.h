@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "BroadcastFunctionNode.h" // for Shape and PortMemoryLayout
+#include "BroadcastFunctionNode.h" 
 #include "NeuralNetworkLayerNode.h"
 
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 #include "PortElements.h"
+#include "PortMemoryLayout.h"
 
 // predictors
 #include "SoftmaxLayer.h"
@@ -74,8 +75,8 @@ namespace nodes
         void EmitComputeDimensionLoop(model::IRMapCompiler& compiler,
                                       emitters::IRFunctionEmitter& function,
                                       size_t dimension,
-                                      const PortMemoryLayout& inputLayout,
-                                      const PortMemoryLayout& outputLayout,
+                                      const model::PortMemoryLayout& inputLayout,
+                                      const model::PortMemoryLayout& outputLayout,
                                       llvm::Value* pInput,
                                       llvm::Value* pOutput,
                                       llvm::Value* prevInputDimensionOffset,
@@ -87,7 +88,7 @@ namespace nodes
         void EmitComputeDimensionLoop(model::IRMapCompiler& compiler,
                                       emitters::IRFunctionEmitter& function,
                                       size_t dimension,
-                                      const PortMemoryLayout& inputLayout,
+                                      const model::PortMemoryLayout& inputLayout,
                                       llvm::Value* pInput,
                                       llvm::Value* prevInputDimensionOffset,
                                       FunctionType& f) const;

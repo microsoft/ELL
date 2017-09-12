@@ -153,7 +153,7 @@ namespace nodes
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
         auto&& outputLayout = this->GetOutputMemoryLayout();
-        if (!ShapesEqual(inputLayout.size, outputLayout.size))
+        if (!model::ShapesEqual(inputLayout.GetActiveSize(), outputLayout.GetActiveSize()))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active area sizes don't match");
         }
@@ -184,7 +184,7 @@ namespace nodes
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
         auto&& outputLayout = this->GetOutputMemoryLayout();
-        if (!ShapesEqual(inputLayout.size, outputLayout.size))
+        if (!model::ShapesEqual(inputLayout.GetActiveSize(), outputLayout.GetActiveSize()))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active area sizes don't match");
         }

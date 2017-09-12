@@ -148,7 +148,7 @@ void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledM
 
         if (IsVerbose())
         {
-            std::cout << computedResult << " \t" << compiledResult << std::endl;
+            std::cout << "computed: " << computedResult << " \ncompiled: " << compiledResult << std::endl;
             if (!ok)
             {
                 std::cout << "Largest difference: " << LargestDifference(computedResult, compiledResult) << ", epsilon: " << epsilon << std::endl;

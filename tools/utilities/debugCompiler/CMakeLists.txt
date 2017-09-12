@@ -1,9 +1,9 @@
 #
-# cmake file for compare project
+# cmake file for debugCompiler project
 #
 
 # define project
-set (tool_name debugcompiler)
+set (tool_name debugCompiler)
 
 set (src 
   src/CompareArguments.cpp

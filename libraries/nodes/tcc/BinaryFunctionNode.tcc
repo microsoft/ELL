@@ -18,15 +18,15 @@ namespace nodes
 
     template <typename ValueType, typename FunctionType>
     BinaryFunctionNode<ValueType, FunctionType>::BinaryFunctionNode(const model::PortElements<ValueType>& input1, const model::PortElements<ValueType>& input2,
-        const PortMemoryLayout& inputLayout, const PortMemoryLayout& outputLayout, FunctionType function, ValueType padding)
-        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _inputLayout(inputLayout), _output(this, outputPortName, NumElements(outputLayout.stride)), _outputLayout(outputLayout), _function(std::move(function)), _paddingValue(padding)
+        const model::PortMemoryLayout& inputLayout, const model::PortMemoryLayout& outputLayout, FunctionType function, ValueType padding)
+        : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _inputLayout(inputLayout), _output(this, outputPortName, model::NumElements(outputLayout.GetStride())), _outputLayout(outputLayout), _function(std::move(function)), _paddingValue(padding)
     {
         if (input1.Size() != input2.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input sizes must match");
         }
 
-        if (!ShapesEqual(inputLayout.size, outputLayout.size))
+        if (!model::ShapesEqual(inputLayout.GetActiveSize(), outputLayout.GetActiveSize()))
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input and output active areas must match");
         }
@@ -35,7 +35,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BinaryFunctionNode<ValueType, FunctionType>::Compute() const
     {
-        auto outputSize = NumElements(_outputLayout.stride);
+        auto outputSize = model::NumElements(_outputLayout.GetStride());
         auto output = std::vector<ValueType>(outputSize);
 
         const size_t prevInputOffset = 0;
@@ -72,12 +72,12 @@ namespace nodes
         size_t prevInputDimensionOffset,
         size_t prevOutputDimensionOffset) const
     {
-        const auto numDimensions = _inputLayout.size.size();
-        auto&& inputStride = _inputLayout.stride;
-        auto&& inputOffset = _inputLayout.offset;
-        auto&& inputSize = _inputLayout.size;
-        auto&& outputStride = _outputLayout.stride;
-        auto&& outputOffset = _outputLayout.offset;
+        const auto numDimensions = _inputLayout.NumDimensions();
+        auto&& inputStride = _inputLayout.GetStride();
+        auto&& inputOffset = _inputLayout.GetOffset();
+        auto&& inputSize = _inputLayout.GetActiveSize();
+        auto&& outputStride = _outputLayout.GetStride();
+        auto&& outputOffset = _outputLayout.GetOffset();
 
         for (int loopIndex = 0; loopIndex < inputSize[dimension]; ++loopIndex)
         {
@@ -132,12 +132,12 @@ namespace nodes
         llvm::Value* prevInputDimensionOffset,
         llvm::Value* prevOutputDimensionOffset) const
     {
-        const auto numDimensions = _inputLayout.size.size();
-        auto&& inputStride = _inputLayout.stride;
-        auto&& inputOffset = _inputLayout.offset;
-        auto&& inputSize = _inputLayout.size;
-        auto&& outputStride = _outputLayout.stride;
-        auto&& outputOffset = _outputLayout.offset;
+        const auto numDimensions = _inputLayout.NumDimensions();
+        auto&& inputStride = _inputLayout.GetStride();
+        auto&& inputOffset = _inputLayout.GetOffset();
+        auto&& inputSize = _inputLayout.GetActiveSize();
+        auto&& outputStride = _outputLayout.GetStride();
+        auto&& outputOffset = _outputLayout.GetOffset();
 
         auto loop = function.ForLoop();
         loop.Begin(inputSize[dimension]);

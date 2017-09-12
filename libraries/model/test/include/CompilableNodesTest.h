@@ -31,6 +31,9 @@ void TestCompilableScalarBinaryPredicateNode();
 void TestCompilableBinaryPredicateNode();
 void TestCompilableMultiplexerNode();
 void TestCompilableTypeCastNode();
+void TestReorderDataNode1();
+void TestReorderDataNode2();
+void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape);
 void TestCompilableAccumulatorNodeFunction();
 void TestCompilableSourceNode(bool runJit);
 void TestCompilableSinkNode(bool runJit);
@@ -46,6 +49,7 @@ void TestNeuralNetworkPredictorNode2();
 void TestNeuralNetworkPredictorNode3();
 void TestNeuralNetworkPredictorNode4();
 void TestNeuralNetworkPredictorNode5();
+void TestNeuralNetworkPredictorNode6();
 
 enum class ConvolutionType
 {

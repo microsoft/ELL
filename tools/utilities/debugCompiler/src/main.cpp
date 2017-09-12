@@ -15,11 +15,15 @@
 #include "LoadModel.h"
 #include "ModelLoadArguments.h"
 
+// math
+#include "TensorShape.h"
+
 // utilities
 #include "CommandLineParser.h"
 #include "Exception.h"
 #include "Files.h"
 #include "OutputStreamImpostor.h"
+#include "RandomEngines.h"
 
 // stl
 #include <fstream>
@@ -29,22 +33,43 @@
 
 using namespace ell;
 
-std::vector<float> GetInputImage(std::string filename, const model::DynamicMap& map, float inputScale)
+template <typename InputType>
+std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
 {
-    auto inputShape = GetInputShape(map);
-    auto outputSize = map.GetOutputSize();
-    bool verbose = true;
-    if (verbose)
+    auto inputSize = inputShape.Size();
+    std::vector<InputType> result(inputSize);
+    auto engine = utilities::GetRandomEngine("123");
+    std::uniform_real_distribution<InputType> dist; // ack: error if InputType is integer
+    for (auto index = 0; index < inputSize; ++index)
     {
-        std::cout << "Model input dimensions: " << inputShape[0] << " x " << inputShape[1] << " x " << inputShape[2] << std::endl;
-        std::cout << "Model output size: " << outputSize << std::endl;
+        result[index] = dist(engine);
     }
+    return result;
+}
 
-    return ResizeImage<float>(filename, inputShape[0], inputShape[1], inputScale);
+template <typename InputType>
+std::vector<InputType> GetInputImage(std::string filename, const math::TensorShape& inputShape, float inputScale)
+{
+    return ResizeImage<InputType>(filename, inputShape.rows, inputShape.columns, inputScale);
+}
+
+template <typename InputType>
+std::vector<InputType> GetInputData(model::DynamicMap& map, const CompareArguments& compareArguments)
+{
+    auto inputShape = map.GetInputShape();
+    if(compareArguments.inputTestFile.empty())
+    {
+        return GetInputVector<InputType>(inputShape);
+    }
+    else
+    {
+        return GetInputImage<InputType>(compareArguments.inputTestFile, inputShape, compareArguments.inputScale);
+    }
 }
 
 int main(int argc, char* argv[])
 {
+    using TestDataType = float;
     try
     {
         // create a command line parser
@@ -55,14 +80,17 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(compareArguments);
         commandLineParser.Parse();
 
-        if(compareArguments.inputMapFile.empty() || compareArguments.inputTestFile.empty())
+        if (compareArguments.inputMapFile.empty())
         {
+            std::cout << "Model file not specified\n\n";
             std::cout << commandLineParser.GetHelpString() << std::endl;
             return 1;
         }
-        if (!ell::utilities::FileExists(compareArguments.inputMapFile)) {
 
-            std::cout << "### model file not found: " << compareArguments.inputMapFile << std::endl;
+        if (!ell::utilities::FileExists(compareArguments.inputMapFile))
+        {
+
+            std::cout << "Model file not found: " << compareArguments.inputMapFile << std::endl;
             std::cout << commandLineParser.GetHelpString() << std::endl;
             return 1;
         }
@@ -72,13 +100,13 @@ int main(int argc, char* argv[])
         model::DynamicMap map = common::LoadMap(compareArguments.inputMapFile);
 
         ell::utilities::EnsureDirectoryExists(compareArguments.outputDirectory);
-        
-        auto input = GetInputImage(compareArguments.inputTestFile, map, compareArguments.inputScale);
+
+        auto input = GetInputData<TestDataType>(map, compareArguments);
         ModelComparison comparison(compareArguments.outputDirectory);
         comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize);
 
         // Write summary report
-        if(compareArguments.writeReport)
+        if (compareArguments.writeReport)
         {
             std::string reportFileName = utilities::JoinPaths(compareArguments.outputDirectory, "report.md");
             std::ofstream reportStream(reportFileName);
@@ -86,7 +114,7 @@ int main(int argc, char* argv[])
         }
 
         // Write an annotated graph showing where differences occurred in the model between compiled and reference implementation.
-        if(compareArguments.writeGraph)
+        if (compareArguments.writeGraph)
         {
             std::string graphFileName = utilities::JoinPaths(compareArguments.outputDirectory, "graph.dgml");
             std::ofstream graphStream(graphFileName);

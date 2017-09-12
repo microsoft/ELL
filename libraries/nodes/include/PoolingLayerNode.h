@@ -9,12 +9,12 @@
 #pragma once
 
 #include "NeuralNetworkLayerNode.h"
-#include "PortMemoryLayout.h"
 
 // model
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
 #include "PortElements.h"
+#include "PortMemoryLayout.h"
 
 // predictors
 #include "PoolingLayer.h"
@@ -44,7 +44,7 @@ namespace nodes
         /// @}
 
         PoolingLayerNode() = default;
-        
+
         /// <summary> Constructor from a layer. </summary>
         ///
         /// <param name="input"> The input to the layer. </param>

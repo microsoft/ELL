@@ -23,6 +23,7 @@ set (src
     src/OutputPort.cpp
     src/Port.cpp
     src/PortElements.cpp
+    src/PortMemoryLayout.cpp
 )
 
 set (include
@@ -47,8 +48,9 @@ set (include
     include/OutputNode.h
     include/OutputPort.h
     include/Port.h
-    include/SteppableMap.h
     include/PortElements.h
+    include/PortMemoryLayout.h
+    include/SteppableMap.h
 )
 
 set (tcc 
@@ -70,8 +72,9 @@ set (tcc
     tcc/SteppableMap.tcc
 )
 
-set (doc doc/CompileAsFunction.md
-         doc/README.md)
+set (doc 
+    doc/CompileAsFunction.md
+    doc/README.md)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})

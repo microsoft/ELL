@@ -154,8 +154,8 @@ namespace nodes
     template <typename FunctionType>
     void SoftmaxLayerNode<ValueType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
                                                                size_t dimension,
-                                                               const PortMemoryLayout& inputLayout,
-                                                               const PortMemoryLayout& outputLayout,
+                                                               const model::PortMemoryLayout& inputLayout,
+                                                               const model::PortMemoryLayout& outputLayout,
                                                                llvm::Value* pInput,
                                                                llvm::Value* pOutput,
                                                                llvm::Value* prevInputDimensionOffset,
@@ -168,12 +168,12 @@ namespace nodes
         const auto times = emitters::TypedOperator::multiply;
 
         const auto numDimensions = this->NumInputDimensions();
-        auto&& inputStride = inputLayout.stride;
-        auto&& inputOffset = inputLayout.offset;
-        auto&& inputSize = inputLayout.size;
+        auto&& inputStride = inputLayout.GetStride();
+        auto&& inputOffset = inputLayout.GetOffset();
+        auto&& inputSize = inputLayout.GetActiveSize();
 
-        auto&& outputStride = outputLayout.stride;
-        auto&& outputOffset = outputLayout.offset;
+        auto&& outputStride = outputLayout.GetStride();
+        auto&& outputOffset = outputLayout.GetOffset();
 
         auto loop = function.ForLoop();
         loop.Begin(inputSize[dimension]);
@@ -229,7 +229,7 @@ namespace nodes
     template <typename FunctionType>
     void SoftmaxLayerNode<ValueType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
                                                                size_t dimension,
-                                                               const PortMemoryLayout& inputLayout,
+                                                               const model::PortMemoryLayout& inputLayout,
                                                                llvm::Value* pInput,
                                                                llvm::Value* prevInputDimensionOffset,
                                                                FunctionType& f) const
@@ -241,9 +241,9 @@ namespace nodes
         const auto times = emitters::TypedOperator::multiply;
 
         const auto numDimensions = this->NumInputDimensions();
-        auto&& inputStride = inputLayout.stride;
-        auto&& inputOffset = inputLayout.offset;
-        auto&& inputSize = inputLayout.size;
+        auto&& inputStride = inputLayout.GetStride();
+        auto&& inputOffset = inputLayout.GetOffset();
+        auto&& inputSize = inputLayout.GetActiveSize();
 
         auto loop = function.ForLoop();
         loop.Begin(inputSize[dimension]);

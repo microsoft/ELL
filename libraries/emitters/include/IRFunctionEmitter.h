@@ -833,6 +833,16 @@ namespace emitters
         template <typename ValueType>
         void MemorySet(llvm::Value* pDestinationPointer, int destinationOffset, llvm::Value* value, int count);
 
+        /// <summary> Emits a memset call, which sets an array of memory to a given byte value. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the array being set. </typeparam>
+        /// <param name="pDestinationPointer"> Pointer to the base address of the destination. </param>
+        /// <param name="destinationOffset"> Destination address offset. </param>
+        /// <param name="value"> The byte value being set. </param>
+        /// <param name="count"> Number of elements being set. </param>
+        template <typename ValueType>
+        void MemorySet(llvm::Value* pDestinationPointer, llvm::Value* pDestinationOffset, llvm::Value* value, int count);
+
         /// <summary> Inserts arbitrary function-level metadata into generated IR code. </summary>
         ///
         /// <param name="tag"> The tag of the metadata to set. </param>

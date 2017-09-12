@@ -57,9 +57,9 @@ private:
         std::string referenceNodeLabel;
         std::string compiledNodeId;
         std::string compiledNodeLabel;
-        std::vector<size_t> size;
-        std::vector<size_t> stride;
-        std::vector<size_t> offset;
+        std::vector<int> size;
+        std::vector<int> stride;
+        std::vector<int> offset;
         std::vector<float> referenceData;
         std::vector<float> compiledData;
     };

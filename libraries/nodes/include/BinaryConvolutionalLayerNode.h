@@ -73,10 +73,10 @@ namespace nodes
     };
 
     //
-    // BinarizeAndReshapeImageNode
+    // BinaryReceptiveFieldMatrixNode
     //
     template <typename ValueType, typename PackedBitsType = int64_t>
-    class BinarizeAndReshapeImageNode : public model::CompilableNode
+    class BinaryReceptiveFieldMatrixNode : public model::CompilableNode
     {
     public:
         /// @name Input and Output Ports
@@ -87,24 +87,24 @@ namespace nodes
         const model::OutputPort<PackedBitsType>& output = _output;
         /// @}
 
-        BinarizeAndReshapeImageNode();
-        BinarizeAndReshapeImageNode(const model::PortElements<ValueType>& input,
+        BinaryReceptiveFieldMatrixNode();
+        BinaryReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input,
                                     const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
-                                    const PortMemoryLayout& inputMemoryLayout,
-                                    const PortMemoryLayout& outputMemoryLayout);
+                                    const model::PortMemoryLayout& inputMemoryLayout,
+                                    const model::PortMemoryLayout& outputMemoryLayout);
 
         /// <summary> Gets information about the input memory layout </summary>
-        const PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
-        PortMemoryLayout& GetInputMemoryLayout() { return _inputMemoryLayout; }
+        const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
+        model::PortMemoryLayout& GetInputMemoryLayout() { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
-        const PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
-        PortMemoryLayout& GetOutputMemoryLayout() { return _outputMemoryLayout; }
+        const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
+        model::PortMemoryLayout& GetOutputMemoryLayout() { return _outputMemoryLayout; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, PackedBitsType>("BinarizeAndReshapeImageNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType, PackedBitsType>("BinaryReceptiveFieldMatrixNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -116,16 +116,8 @@ namespace nodes
         void Compute() const override;
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         virtual bool HasState() const override { return false; }
-
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
-
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         // Input
@@ -135,8 +127,8 @@ namespace nodes
         model::OutputPort<PackedBitsType> _output;
 
         predictors::neural::BinaryConvolutionalParameters _convolutionalParameters;
-        PortMemoryLayout _inputMemoryLayout;
-        PortMemoryLayout _outputMemoryLayout;
+        model::PortMemoryLayout _inputMemoryLayout;
+        model::PortMemoryLayout _outputMemoryLayout;
     };
 
     //
@@ -179,14 +171,14 @@ namespace nodes
                        const model::PortElements<ValueType>& filterMeans,
                        const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                        const predictors::neural::PaddingParameters& inputPaddingParameters,
-                       const PortMemoryLayout& inputMemoryLayout,
-                       const PortMemoryLayout& outputMemoryLayout);
+                       const model::PortMemoryLayout& inputMemoryLayout,
+                       const model::PortMemoryLayout& outputMemoryLayout);
 
         /// <summary> Gets information about the input memory layout </summary>
-        const PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
+        const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
-        const PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
+        const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -203,16 +195,8 @@ namespace nodes
         void Compute() const override;
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         virtual bool HasState() const override { return true; } // stored state: convolutional parameters and input/output memory layouts
-
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
-
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
-        }
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         // Input
@@ -226,8 +210,8 @@ namespace nodes
 
         predictors::neural::BinaryConvolutionalParameters _convolutionalParameters;
         predictors::neural::PaddingParameters _inputPaddingParameters;
-        PortMemoryLayout _inputMemoryLayout;
-        PortMemoryLayout _outputMemoryLayout;
+        model::PortMemoryLayout _inputMemoryLayout;
+        model::PortMemoryLayout _outputMemoryLayout;
     };
 }
 }

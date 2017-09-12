@@ -353,20 +353,27 @@ template <typename ValueType>
 void WriteLayerReport(std::ostream& reportStream, int index, const nodes::NeuralNetworkLayerNodeBase<ValueType>* layerNode, const OutputInfo& layerOutput, const OutputInfo& nodeOutput)
 {
     auto layerType = layerNode->GetRuntimeTypeName();
+    auto inputLayout = layerNode->GetInputMemoryLayout();
+    auto inputLayoutSize = inputLayout.GetActiveSize();
+    auto inputLayoutStride = inputLayout.GetStride();
+    auto inputLayoutOffset = inputLayout.GetOffset();
+
+    auto outputLayout = layerNode->GetOutputMemoryLayout();
+    auto outputLayoutSize = outputLayout.GetActiveSize();
+    auto outputLayoutStride = outputLayout.GetStride();
+    auto outputLayoutOffset = outputLayout.GetOffset();
 
     reportStream << "<div class='layer'>\n";
     reportStream << "<h2>Layer " << index << ": " << SanitizeTypeName(layerType) << "</h2>\n";
-    auto inputLayout = layerNode->GetInputMemoryLayout();
     reportStream << "<p> <em>Input layout</em> ";
-    reportStream << "size: " << inputLayout.size[0] << " x " << inputLayout.size[1] << " x " << inputLayout.size[2] << ", ";
-    reportStream << "stride: " << inputLayout.stride[0] << " x " << inputLayout.stride[1] << " x " << inputLayout.stride[2] << ", ";
-    reportStream << "offset: " << inputLayout.offset[0] << " x " << inputLayout.offset[1] << " x " << inputLayout.offset[2] << "</p>";
+    reportStream << "size: " << inputLayoutSize[0] << " x " << inputLayoutSize[1] << " x " << inputLayoutSize[2] << ", ";
+    reportStream << "stride: " << inputLayoutStride[0] << " x " << inputLayoutStride[1] << " x " << inputLayoutStride[2] << ", ";
+    reportStream << "offset: " << inputLayoutOffset[0] << " x " << inputLayoutOffset[1] << " x " << inputLayoutOffset[2] << "</p>";
 
-    auto outputLayout = layerNode->GetOutputMemoryLayout();
     reportStream << "<p> <em>Output layout</em> ";
-    reportStream << "size: " << outputLayout.size[0] << " x " << outputLayout.size[1] << " x " << outputLayout.size[2] << ", ";
-    reportStream << "stride: " << outputLayout.stride[0] << " x " << outputLayout.stride[1] << " x " << outputLayout.stride[2] << ", ";
-    reportStream << "offset: " << outputLayout.offset[0] << " x " << outputLayout.offset[1] << " x " << outputLayout.offset[2] << "</p>";
+    reportStream << "size: " << outputLayoutSize[0] << " x " << outputLayoutSize[1] << " x " << outputLayoutSize[2] << ", ";
+    reportStream << "stride: " << outputLayoutStride[0] << " x " << outputLayoutStride[1] << " x " << outputLayoutStride[2] << ", ";
+    reportStream << "offset: " << outputLayoutOffset[0] << " x " << outputLayoutOffset[1] << " x " << outputLayoutOffset[2] << "</p>";
 
     reportStream << "<table>\n";
     reportStream << "<tr>\n";

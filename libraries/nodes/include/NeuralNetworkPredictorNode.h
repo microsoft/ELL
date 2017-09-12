@@ -41,6 +41,7 @@
 // stl
 #include <functional>
 #include <string>
+#include <type_traits>
 
 namespace ell
 {
@@ -88,7 +89,26 @@ public:
 
     /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
     virtual void Copy(model::ModelTransformer& transformer) const override;
+    
+    /// <summary> Options to control how the network is compiled into nodes </summary>
+    struct NetworkCompileOptions
+    {
+        /// <summary> Use diagonal convolution (vs. im2col-based convolution)
+        bool useDiagonalConvolution;
 
+        /// <summary> Ensure the output of the nodes implementing a layer is in the canonical row, column, channel order </summary>
+        bool alwaysConvertToInterleaved;
+
+        /// <summary> When using im2col-based convolution, construct the transpose of the receptive field matrix </summary>
+        bool transposeReceptiveFieldMatrix;
+    };
+    
+    struct NetworkCompileState
+    {
+        /// <summary> Indicates the current order of input data. If `true`, it's in the canonical row, column, channel order. </summary>
+        bool isInterleavedOrder;
+    };
+    
 protected:
     virtual void Compute() const override;
     virtual bool Refine(model::ModelTransformer& transformer) const override;
@@ -96,7 +116,7 @@ protected:
     virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
 private:
-    model::Node* AddLayerNode(model::ModelTransformer& transformer, Layer& layer, const model::PortElements<ValueType>& layerInputs) const;
+    NeuralNetworkLayerNodeBase<ValueType>* AddLayerNode(model::ModelTransformer& transformer, Layer& layer, const model::PortElements<ValueType>& layerInputs, const NetworkCompileOptions& options, NetworkCompileState& state) const;
 
     // Input
     model::InputPort<ValueType> _input;
