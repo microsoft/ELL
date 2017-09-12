@@ -3,6 +3,7 @@
 ##  Project:  Embedded Learning Library (ELL)
 ##  File:     demoHelper.py
 ##  Authors:  Chris Lovett
+##            Byron Changuion
 ##
 ##  Requires: Python 3.x
 ##
@@ -14,11 +15,40 @@ import argparse
 import cv2
 import numpy as np
 import time
+import math
 
 script_path = os.path.dirname(os.path.abspath(__file__))
-# Helper class that interfaces with opencv and provides handy conversion from opencv to ELL buffers and 
-# rendering utilties
 
+def get_common_commandline_args(argv, helpString=""):
+    """
+    Parses common commandline arguments for ELL tutorials and demos and returns an object with the relevant values set from those arguments.
+    """
+    arg_parser = argparse.ArgumentParser(helpString)
+
+    # required arguments
+    arg_parser.add_argument("labels", help="path to the labels file for evaluating the model, or comma separated list if using more than one model")
+
+    # options
+    arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
+    arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
+    arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=0.15)
+
+    # mutually exclusive options
+    group = arg_parser.add_mutually_exclusive_group()
+    group.add_argument("--camera", type=int, help="the camera id of the webcam", default=0)
+    group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
+
+    group2 = arg_parser.add_mutually_exclusive_group()
+    group2.add_argument("--model", help="path to a model file")
+    group2.add_argument("--compiledModel", help="path to the compiled model's Python module")
+    group2.add_argument("--models", help="list of comma separated paths to model files")
+    group2.add_argument("--compiledModels", help="list of comma separated paths to the compiled models' Python modules")
+
+    args = arg_parser.parse_args(argv)
+    return args
+
+# Helper class that interfaces with ELL models to get predictions and provides handy conversion from opencv to ELL buffers and 
+# rendering utilties
 class DemoHelper:
     def __init__(self, threshold=0.25):
         """ Helper class to store information about the model we want to use.
@@ -26,15 +56,6 @@ class DemoHelper:
         threshold   - specifies a prediction threshold. We will ignore prediction values less than this
         """
 
-        self.arg_parser = argparse.ArgumentParser(
-            "Runs the given ELL model passing images from camera or static image file\n"
-            "Either the ELL model file, or the compiled model's Python module must be given,\n"
-            "using the --model or --compiled options respectively.\n"
-            "Example:\n"
-            "   python demo.py categories.txt --compiled tutorial1/pi3/model1\n"
-            "   python demo.py categories.txt --model model1.ell\n"
-            "This shows opencv window with image classified by the model using given labels")
-        
         self.threshold = threshold
         self.start = time.time()
         self.frame_count = 0
@@ -48,7 +69,7 @@ class DemoHelper:
         self.model_file = None
         self.model = None
         self.model_name = "model"
-        self.compiled = None
+        self.compiled_model = None
         self.compiled_module = None
         self.compiled_func = None
         self.labels_file = None
@@ -60,27 +81,8 @@ class DemoHelper:
         self.input_shape = None
         self.output_shape = None
 
-    def add_arguments(self):
-        # required arguments
-        self.arg_parser.add_argument("labels", help="path to the labels file for evaluating the model")
-
-        # options
-        self.arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
-        self.arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
-        self.arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
-
-        # mutually exclusive options
-        group = self.arg_parser.add_mutually_exclusive_group()
-        group.add_argument("--camera", type=int, help="the camera id of the webcam", default=self.camera)
-        group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
-
-        group2 = self.arg_parser.add_mutually_exclusive_group()
-        group2.add_argument("--model", help="path to a model file")
-        group2.add_argument("--compiled", help="path to the compiled model's Python module")
-
-    def parse_arguments(self, argv):
-        self.add_arguments()
-        args = self.arg_parser.parse_args(argv)
+    def parse_arguments(self, argv, helpString):
+        args = get_common_commandline_args(argv, helpString)
         self.initialize(args)
 
     def value_from_arg(self, argValue, defaultValue):
@@ -111,11 +113,11 @@ class DemoHelper:
         
         # process model options and load the model
         self.model_file = args.model
-        self.compiled = args.compiled
+        self.compiled_model = args.compiledModel
         if (self.model_file == None):
             # this is the compiled model route, so load the wrapped module
-            self.model_name = os.path.split(self.compiled)[1]
-            self.import_compiled_model(self.compiled, self.model_name)
+            self.model_name = os.path.split(self.compiled_model)[1]
+            self.import_compiled_model(self.compiled_model, self.model_name)
         else:
             # this is the "interpreted" model route, so we need the ELL runtime.
             self.model_name = os.path.splitext(self.model_file)[0]
@@ -146,7 +148,7 @@ class DemoHelper:
 
         func_name = name + '_predict'
         if func_name == "":
-            raise Exception("Could not construct func name. Is the --compiled argument correct?")
+            raise Exception("Could not construct func name. Is the --compiledModel argument correct?")
         
         # Import the compiled model wrapper. Add the possible build directories.
         sys.path.append(script_path)
@@ -325,14 +327,15 @@ class DemoHelper:
         self.draw_text_block(image, text, (0, image.shape[0] - 40), (200, 100, 100))
         return
 
-    def draw_text_block(self, image, text, blockTopLeft=(0,0), blockColor=(50, 200, 50), blockHeight=40, fontScale=0.8):
+    def draw_text_block(self, image, text, blockTopLeft=(0,0), blockColor=(50, 200, 50), blockHeight=40, fontScale=0.7):
         """Helper to draw a filled rectangle with text onto an image"""
         cv2.rectangle(
             image, blockTopLeft, (image.shape[1], blockTopLeft[1] + blockHeight), blockColor, cv2.FILLED)
         cv2.putText(image, text, (blockTopLeft[0] + int(blockHeight / 4), blockTopLeft[1] + int(blockHeight * 0.667)),
-                     cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 0, 0), 2, cv2.LINE_AA)
+                     cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), 1, cv2.LINE_AA)
 
     def draw_fps(self, image):
+        """Helper to draw frame per second onto image"""
         now = time.time()
         if self.frame_count > 0:
             diff = now - self.start
@@ -369,3 +372,84 @@ class DemoHelper:
                 result = True
                 break
         return result
+
+class TiledImage:
+    def __init__(self, numImages=2, outputHeightAndWidth=(600, 800)):
+        """ Helper class to create a tiled image out of many smaller images.
+        The class calculates how many horizontal and vertical blocks are needed to fit the requested number of images 
+        and fills in unused blocks as blank. For example, to fit 4 images, the number of tiles is 2x2, to fit 5 images,
+        the number of tiles is 3x2, with the last tile being blank.
+        numImages - the maximum number of images that need to be composed into the tiled image. Note that the
+                    actual number of tiles is equal to or larger than this number.
+        outputHeightAndWidth - a list of two values giving the rows and columns of the output image. The output tiled image 
+                            is a composition of sub images.
+        """
+        self.composed_image_shape = self.get_composed_image_shape(numImages)
+        self.number_of_tiles = self.composed_image_shape[0] * self.composed_image_shape[1]
+        self.output_height_and_width = outputHeightAndWidth
+        self.images = None
+        self.window_name = 'ELL side by side'
+        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL) # Ensure the window is resizable
+        # The aspect ratio of the composed image is now self.composed_image_shape[0] : self.composed_image_shape[1]
+        # Adjust the height of the window to account for this, else images will look distorted
+        cv2.resizeWindow(self.window_name, outputHeightAndWidth[1], int(outputHeightAndWidth[0] * (self.composed_image_shape[0] / self.composed_image_shape[1])))
+
+    def get_composed_image_shape(self, numImages):
+        """Returns a tuple indicating the (rows,cols) of the required number of tiles to hold numImages."""
+        # Split the image horizontally
+        numHorizontal = math.ceil(math.sqrt(numImages))
+        # Split the image vertically
+        numVertical = math.ceil(numImages / numHorizontal)
+
+        return (numVertical, numHorizontal)
+
+    def compose(self):
+        """Composes an image made by tiling all the sub-images set with `set_image_at`. """
+        yElements = []
+        for verticalIndex in range(self.composed_image_shape[0]):
+            xElements = []
+            for horizontalIndex in range(self.composed_image_shape[1]):
+                currentIndex = verticalIndex * self.composed_image_shape[1] + horizontalIndex
+                xElements.append(self.images[currentIndex])
+            horizontalImage = np.hstack(tuple(xElements))
+            yElements.append(horizontalImage)
+        composedImage = np.vstack(tuple(yElements))
+
+        # Draw separation lines
+        yStep = int(composedImage.shape[0] / self.composed_image_shape[0])
+        xStep = int(composedImage.shape[1] / self.composed_image_shape[1])
+        y = yStep
+        x = xStep
+        for horizontalIndex in range(1, self.composed_image_shape[1]):
+            cv2.line(composedImage, (x, 0), (x, composedImage.shape[0]), (0, 0, 0), 3)
+            x = x + xStep
+        for verticalIndex in range(1, self.composed_image_shape[0]):
+            cv2.line(composedImage, (0, y), (composedImage.shape[1], y), (0, 0, 0), 3)
+            y = y + yStep
+        
+        return composedImage
+
+    def set_image_at(self, imageIndex, frame):
+        """Sets the image at the specified index. Once all images have been set, the tiled image result can be retrieved with `compose`."""
+        # Ensure self.images is initialized.
+        if self.images is None:
+            self.images = [None] * self.number_of_tiles
+            for i in range(self.number_of_tiles):
+                self.images[i] = np.zeros((frame.shape), np.uint8)
+
+        # Update the image at the specified index
+        if (imageIndex < self.number_of_tiles):
+            self.images[imageIndex] = frame
+            return True
+        return False
+
+    def show(self):
+        """Shows the final result of the tiled image. Returns True if the user indicates they are done viewing by pressing `Esc`. """
+        # Compose the tiled image
+        imageToShow = self.compose()
+        # Show the tiled image
+        cv2.imshow(self.window_name, imageToShow)
+        # Run the update loop and check whether the user has indicated whether they are done
+        if cv2.waitKey(1) & 0xFF == 27:
+            return True
+        return False

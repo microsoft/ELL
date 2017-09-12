@@ -119,7 +119,7 @@ class DriveTest:
     def get_bash_files(self):
         # copy demo files needed to run the test
         self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
-                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demo.py"),
+                           os.path.join(self.ell_root, "docs/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/demo.py"),
                            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py") ], self.output_dir) 
         self.configure_runtest(self.output_dir)
     

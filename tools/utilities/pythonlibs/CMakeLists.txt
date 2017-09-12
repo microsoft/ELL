@@ -7,7 +7,7 @@ if(${PYTHONINTERP_FOUND})
 
     set(module_name "pythonlibs")
 
-    set(lib_src batchtest.py buildtools.py demo.py demoHelper.py downloader.py find_ell.py procmon.py ziptools.py)
+    set(lib_src batchtest.py buildtools.py demoHelper.py downloader.py find_ell.py procmon.py ziptools.py)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${lib_src})
 

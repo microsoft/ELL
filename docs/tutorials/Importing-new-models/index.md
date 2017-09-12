@@ -125,11 +125,11 @@ Then to build it:
 
 And finally to run the test on video input:
 
-    python demo.py darknetImageNetLabels.txt --compiled darknet
+    python demo.py darknetImageNetLabels.txt --compiledModel darknet
 
 And to test with a static image:
 
-    python demo.py darknetImageNetLabels.txt --compiled darknet --image coffeemug.jpg
+    python demo.py darknetImageNetLabels.txt --compiledModel darknet --image coffeemug.jpg
 
 ## CNTK
 
@@ -246,11 +246,11 @@ Then to build it:
 
 And finally to run the test on video input:
 
-    python demo.py cntkVgg16ImageNetLabels.txt --compiled VGG16_ImageNet_Caffe
+    python demo.py cntkVgg16ImageNetLabels.txt --compiledModel VGG16_ImageNet_Caffe
 
 And to test with a static image:
 
-    python demo.py cntkVgg16ImageNetLabels.txt --compiled VGG16_ImageNet_Caffe --image coffeemug.jpg
+    python demo.py cntkVgg16ImageNetLabels.txt --compiledModel VGG16_ImageNet_Caffe --image coffeemug.jpg
 
 ### Summary
 

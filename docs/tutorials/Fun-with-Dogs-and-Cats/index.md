@@ -72,7 +72,7 @@ environment named py34, so to run the tutorial do this:
 
 ````
 source activate py34
-python pets.py categories.txt --compiled model1 --image cat.png
+python pets.py categories.txt --compiledModel model1 --image cat.png
 ````
 And it will classify the image, you should see output like this and you should hear the meow sound:
 ````
@@ -84,7 +84,7 @@ Cat(90%)
 If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
 
 ````
-python pets.py categories.txt --compiled model1
+python pets.py categories.txt --compiledModel model1
 ````
 
 You will see the same kind of window appear only this time it is showing the video stream.

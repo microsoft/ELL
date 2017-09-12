@@ -41,7 +41,7 @@ def run_validation(args):
                 raise Exception("File not found: " + filename)
 
             result = validate_image([args.labels,
-                "--compiled", args.compiled_module, "--image", filename,
+                "--compiledModel", args.compiled_module, "--image", filename,
                 "--iterations", "5", "--threshold", "0.0"], filename)
 
             result["truth"] = int(c)

@@ -20,7 +20,14 @@ import demoHelper as d
 
 def main(args):
     helper = d.DemoHelper()
-    helper.parse_arguments(args)
+    helper.parse_arguments(args,
+            "Runs the given ELL model passing images from camera or static image file\n"
+            "Either the ELL model file, or the compiled model's Python module must be given,\n"
+            "using the --model or --compiledModel options respectively.\n"
+            "Example:\n"
+            "   python demo.py categories.txt --compiledModel tutorial1/pi3/model1\n"
+            "   python demo.py categories.txt --model model1.ell\n"
+            "This shows opencv window with image classified by the model using given labels")
 
     # Initialize image source
     helper.init_image_source()
