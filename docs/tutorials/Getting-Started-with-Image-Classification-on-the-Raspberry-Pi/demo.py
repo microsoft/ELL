@@ -50,7 +50,7 @@ def main(args):
         top5 = helper.get_top_n(predictions, 5)
 
         # Turn the top5 into a text string to display
-        text = "".join([helper.get_label(element[0]) + "(" + str(int(element[1]*100)) + "%)  " for element in top5])
+        text = "".join(["(" + str(int(element[1]*100)) + "%) " + helper.get_label(element[0]) for element in top5])
 
         save = False
         if (text != lastPrediction):

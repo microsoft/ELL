@@ -67,7 +67,7 @@ class DriveTest:
         self.extract_model_info(args.model, args.labels)
 
         self.output_dir = os.path.join(self.pitest_dir, "pi3", self.model_name)
-        if (not os.path.isdir(self.output_dir)):
+        if not os.path.isdir(self.output_dir):
             os.makedirs(self.output_dir)
 
     def extract_model_info(self, ell_model, labels_file):
@@ -78,7 +78,7 @@ class DriveTest:
             # extract the model if it's in an archive
             unzip = ziptools.Extractor(ell_model)
             success, filename = unzip.extract_file(".ell")
-            if (success):
+            if success:
                 print("extracted: " + filename)
                 self.ell_model = filename
             else:
@@ -96,10 +96,10 @@ class DriveTest:
 
     def copy_files(self, list, folder):
         target_dir = os.path.join(self.pitest_dir, folder)
-        if (not os.path.isdir(target_dir)):
+        if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
         for path  in list:
-            if (not os.path.isfile(path)):
+            if not os.path.isfile(path):
                 raise Exception("expected file not found: " + path)
             head,file_name = os.path.split(path)
             dest = os.path.join(target_dir, file_name)
@@ -124,7 +124,7 @@ class DriveTest:
         self.configure_runtest(self.output_dir)
     
         bitcode = os.path.join(self.output_dir, self.model_name + ".bc")
-        if (os.path.isfile(bitcode)):
+        if os.path.isfile(bitcode):
             os.remove(bitcode) # don't need to copy this one over and it is big!
 
     def get_darknet(self):
@@ -146,14 +146,14 @@ class DriveTest:
         importer.run()
 
     def get_model(self):
-        if (self.model_name == "darknet"):
+        if self.model_name == "darknet":
             self.get_darknet()
             self.import_darknet()
         print("using ELL model: " + self.model_name)
 
     def make_project(self):
         labels_file = os.path.join(self.pitest_dir, self.labels_file)
-        if (os.path.isdir(self.output_dir)):
+        if os.path.isdir(self.output_dir):
             rmtree(self.output_dir)
         sys.path.append(os.path.join(current_path, '../../wrap'))
         mpp = __import__("wrap")
@@ -187,7 +187,7 @@ class DriveTest:
         return os.path.join(path, name).replace("\\","/")
 
     def safe_mkdir(self, sftp,  dir):
-        if (not dir in self.created_dirs):
+        if not dir in self.created_dirs:
             print("mkdir: " + dir)
             sftp.mkdir(dir)
             self.created_dirs.append(dir)
@@ -200,7 +200,7 @@ class DriveTest:
             for filename in filenames:
                 src_file = os.path.join(dirname, filename)
                 print("copying:" + src_file)
-                if (os.path.isfile(src_file)):
+                if os.path.isfile(src_file):
                     dest_file = self.linux_join(dest, src_file[len(src) + 1:])
                     sftp.put(src_file, dest_file)
         
@@ -215,10 +215,10 @@ class DriveTest:
         print("==========================================================")
         found = False
         for line in output:
-            if (line.startswith("coffee mug")):                
+            if "coffee mug" in line:                
                 found = True
         
-        if (found):
+        if found:
             print("Test passed")
         else:
             print("Test failed")

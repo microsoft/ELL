@@ -5,6 +5,9 @@ permalink: /tutorials/Fun-with-Dogs-and-Cats/
 ---
 # Fun with Dogs and Cats
 
+
+[![screenshot](/ELL/tutorials/Fun-with-Dogs-and-Cats/thumbnail.png)](https://youtu.be/SOmV8tzg_DU)
+
 ### Materials
 
 * A Raspberry Pi
@@ -20,7 +23,9 @@ and cats from the ImageNet model which contains many different breeds of dogs an
 This technique can be useful if you don't care about the detailed breed information.  Even if
 your optimized ELL model is not accurate enough for individual breeds, you may still get value out of the model by grouping.
 
-This tutorial then creates a fun response to the recognition of a dog or a cat by playing a sound.  As you probably already guessed, it will bark or meow in response to it seeing a dog or a cat.  This also works in headless mode (no display).
+This tutorial then creates a fun response to the recognition of a dog or a cat by playing a sound.  
+As you probably already guessed, it will bark or meow in response to it seeing a dog or a cat.  
+This also works in headless mode (no display).
 So imagine your pi is watching your lawn, and when a dog arrives, it barks at the dog.
 Your kids will have endless fun with this I'm sure.  
 
@@ -51,7 +56,9 @@ You can now copy this folder using the 'scp' tool.  From Windows you can use [Wi
 
 ### SSH into Raspberry Pi
 
-Now log into your Raspberry Pi, either remotely using SSH or directly if you have keyboard and screen attached.
+The build instructions are the same as [tutorial 1](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/).
+
+Log into your Raspberry Pi, either remotely using SSH or directly if you have keyboard and screen attached.
 
 Find the 'pi3' folder you just copied over using scp or winscp and run the following:
 
@@ -79,7 +86,18 @@ And it will classify the image, you should see output like this and you should h
 Cat(90%)
 ````
 
-### Process Video
+### Process a folder
+
+If you have a folder full of your favorite animal pictures including some dogs and cats, you can run 
+the pets.py script on all those images using this command line:
+
+````
+python pets.py categories.txt --compiledModel model1 --folder myFavoriteImages
+````
+
+It will show the first image, then press the `space bar` to advance to the next image.
+
+### Process video
 
 If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
 
@@ -100,26 +118,56 @@ many types of African animals.
 ### How grouping works
 
 Grouping is a very simple concept. The `doglabels.txt` and `catlabels.txt` files are simply
-subsets of the larger file containing 1000 classes of objects.  The `pets.py` script then simply
-takes the prediction from the ELL model and checks to see if the result is in one of these lists:
-````
-top5 = self.helper.get_top_n(predictions, 5)
-text = ""
-if (len(top5) > 0):
-    winner = top5[0]
-    label = winner[0]
-    if (label in self.dogs):
-        text = "Dog"
-    elif (label in self.cats):
-        text = "Cat"
+subsets of the larger file containing 1000 classes of objects. For example `doglabels.txt` 
+contains a list of all the dog breeds that the model was trained to recognize.
 
 ````
+Norwich terrier
+Brittany spaniel
+Ibizan hound
+flat-coated retriever
+toy terrier
+Norfolk terrier
+Tibetan terrier
+Greater Swiss Mountain dog
+...
+````
+
+The `pets.py` script then simply
+takes the prediction from the ELL model and checks to see if the result is in one of these lists:
+````
+    top5 = self.helper.get_top_n(predictions, 5)
+    text = ""
+    if len(top5) > 0:
+        winner = top5[0]
+        label = winner[0]
+        if label in self.dogs:
+            text = "Dog"
+        elif label in self.cats:
+            text = "Cat"
+````
+
 So now we know if text comes back with "Dog" then one of the many dog breeds recognized by the
 ImageNet model has been returned in the top confidence spot, namely, top5[0].
 
 To play sounds we use the built-in Raspberry Pi "aplay" command.  You can also run this on
 your Windows PC and it will use the windows `winsound` library which is built into the windows
 Python runtime.
+
+`pets.py` also contains some code to make sure it doesn't keep barking at you when it is just
+looking at another frame of the same dog or cat.  It uses a [numpy histogram](https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html) of the image to detect when each frame of the picture has significantly changed, which is done as follows:
+
+````
+    hist = np.histogram(data,16,[0,256])[0]
+    diff = 1
+    if lastHist is None:
+        lastHist = hist           
+    else:
+        diff = max(lastHist - hist)
+        lastHist = hist  
+````
+
+So if diff this `diff` is greater than some amount we know the user is looking at something new and then we go on to check to see if a new group is detected. 
 
 ### Toubleshooting
 

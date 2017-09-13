@@ -37,6 +37,7 @@ def get_common_commandline_args(argv, helpString=""):
     group = arg_parser.add_mutually_exclusive_group()
     group.add_argument("--camera", type=int, help="the camera id of the webcam", default=0)
     group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
+    group.add_argument("--folder", help="path to an image folder. If set, evaluates the model using the images found there")
 
     group2 = arg_parser.add_mutually_exclusive_group()
     group2.add_argument("--model", help="path to a model file")
@@ -62,6 +63,9 @@ class DemoHelper:
         self.fps = 0
         self.camera = 0
         self.image_filename = None
+        self.image_folder = None
+        self.images = None
+        self.image_pos = 0
         self.capture_device = None
         self.frame = None
         self.save_images = None
@@ -101,11 +105,16 @@ class DemoHelper:
         self.iterations = self.value_from_arg(args.iterations, None)
         self.camera = self.value_from_arg(args.iterations, 0)
         self.image_filename = self.value_from_arg(args.image, None)
+        self.image_folder = self.value_from_arg(args.folder, None)
 
         # process image source options
         if (args.camera):
             self.image_filename = None
+            self.image_folder = None
         elif (args.image):
+            self.camera = None
+            self.image_folder = None
+        elif (args.folder):
             self.camera = None
 
         # load the labels
@@ -275,6 +284,20 @@ class DemoHelper:
             if (type(self.frame) == type(None)):
                 raise Exception('image from %s failed to load' %
                                 (self.image_filename))
+        elif self.image_folder:
+            self.frame = self.load_next_image()
+    
+    def load_next_image(self):
+        if self.images == None:
+            self.images = os.listdir(self.image_folder)
+        frame = None
+        while frame is None and self.image_pos < len(self.images):
+            filename = os.path.join(self.image_folder, self.images[self.image_pos])
+            frame = cv2.imread(filename)
+            self.image_pos += 1
+        if not frame is None:
+            return frame
+        return self.frame
 
     def get_next_frame(self):
         if self.capture_device is not None:
@@ -368,9 +391,13 @@ class DemoHelper:
         # on slow devices this helps let the images to show up on screen
         result = False
         for i in range(self.get_wait()):
-            if cv2.waitKey(1) & 0xFF == 27:
+            key = cv2.waitKey(1) & 0xFF
+            if key == 27:
                 result = True
                 break
+            if key == ord(' '):
+                self.frame = self.load_next_image()
+                
         return result
 
 class TiledImage:
