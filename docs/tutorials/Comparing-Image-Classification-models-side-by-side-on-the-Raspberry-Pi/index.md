@@ -18,7 +18,7 @@ permalink: /tutorials/Comparing-Image-Classification-models-side-by-side-on-the-
 
 In this tutorial, you will download two pretrained image classifiers from the gallery, compile the classifiers for the Raspberry Pi, and write a Python script that invokes the classifiers in a round-robin fashion and displays results side by side. When the Python script runs on the Pi, you will be able to point the camera at a variety of objects and compare both result and evaluation time per frame of the the classifiers.
 
-For the example in this tutorial, we will download a real-valued model and a binarized version of that model to compare side by side. You'll see that the binarized model is much smaller, but less accurate. Runtime characteristics of the models differ too: the real-valued model uses more resources and draws more power, but may run faster depending on the specific hardware it is run on.
+For the example in this tutorial, we will download a real-valued model and a binarized version of that model to compare side by side. You'll see that the binarized model is much smaller, but less accurate. Runtime characteristics of the models differ too: different models have different resource and power requirements. Play around with other models in the gallery after this tutorial to find the one that best suits your particular scenario.
 
 ### Prerequisites
 We recommend that you are familiar with the concepts in [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/).
@@ -47,7 +47,7 @@ We'll use the (ILSVRC2012_labels.txt)(https://github.com/Microsoft/ELL-models/ra
 
 Note that the model files are zipped, and have long named indicating their architecture. For convenience, we'll just want to save it locally as `ell1.zip` and `ell2.zip`:
 ```
-curl --location -o ILSVRC2012_labels.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt
+curl --location -o labels.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt
 curl --location -o ell1.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
 curl --location -o ell2.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A/d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell.zip
 ```
@@ -61,17 +61,17 @@ unzip ell2.zip
 ```
  Rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model1.ell` and rename the `d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell` model file to `model2.ell`:
 
-| Unix    | `rename d_I224x224x3CMCMCMCMCMCMC1A.ell model1.ell` <br> `rename d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell model2.ell` |
+| Unix    | `mv d_I224x224x3CMCMCMCMCMCMC1A.ell model1.ell` <br> `mv d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell model2.ell` |
 | Windows | `ren d_I224x224x3CMCMCMCMCMCMC1A.ell model1.ell` <br> `ren d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell model2.ell` |
 
-You should now have a `ILSVRC2012_labels.txt` file, a `model1.ell` file and a `model2.ell` file in the `sideBySide` folder.
+You should now have a `labels.txt` file, a `model1.ell` file and a `model2.ell` file in the `sideBySide` folder.
 ### Wrap the models in Python callable modules
 For this tutorial we want to call the model from Python.  ELL provides a compiler that takes a model and compiles it into code that will run on a target platform - in this case the Raspberry Pi running Linux, so it generates code for armv7-linux-gnueabihf, and for the cortex-a53 CPU.
 Similar to the [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/) tutorial, we'll use the `wrap.py` utility, this time with the `--oudir` option to put the models into different directories:
 
 ````
-python ../../tools/wrap/wrap.py ILSVRC2012_labels.txt model1.ell -lang python -target pi3 -outdir model1
-python ../../tools/wrap/wrap.py ILSVRC2012_labels.txt model2.ell -lang python -target pi3 -outdir model2
+python ../../tools/wrap/wrap.py labels.txt model1.ell -lang python -target pi3 -outdir model1
+python ../../tools/wrap/wrap.py labels.txt model2.ell -lang python -target pi3 -outdir model2
 ````
 You should see output similar to the following:
 
@@ -103,7 +103,7 @@ Create a new text file called `sideBySideDemo.py` in your `sideBySide` folder. W
 * Compose an image made up of the results from each model's predictions
 * Show the tiled image result
 
-If you don't want to type it out, the script can found [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySideDemo.py), otherwise follow along below.
+If you don't want to type it out, the script can be found [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySideDemo.py), otherwise follow along below.
 
 First, we need to import the libraries we'll be using in this app, which include system ultilities, numpy and demoHelper that we copied over from ELL utilities:
 ```python
@@ -277,7 +277,7 @@ environment named py34.  So to run the tutorial do this:
 
 ````
 source activate py34
-python sideBySideDemo.py ILSVRC2012_labels.txt --compiledModels model1/model1,model2/model2 --image coffeemug.jpg
+python sideBySideDemo.py labels.txt --compiledModels model1/model1,model2/model2 --image coffeemug.jpg
 ````
 
 If you have a display connected you should see the screen shot at the top of this page.
@@ -286,7 +286,7 @@ If you have a display connected you should see the screen shot at the top of thi
 If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
 
 ````
-python sideBySideDemo.py ILSVRC2012_labels.txt  --compiledModels model1/model1,model2/model2
+python sideBySideDemo.py labels.txt  --compiledModels model1/model1,model2/model2
 ````
 
 You will see the same kind of window appear only this time it is showing the video stream.
@@ -296,6 +296,15 @@ confidence % at the top together with an estimated frame rate.
 `Tip`: for quick image recognition results you can point the video camera at a web image of a dog 
 on your PC screen.  ImageNet models can usually do a good job recognizing  different dog breeds and 
 many types of African animals.
+
+## Next steps
+Different models have different characteristics. For example, some are slow but accurate, while others are faster and less accurate. Some have different power draw than others.
+
+Experiment with which model works best for you by downloading other models in the [ELL gallery](/ELL/gallery/).
+
+Try these related tutorials:
+* [Fun with Dogs and Cats](/ELL/tutorials/Fun-with-Dogs-and-Cats/)
+* [Comparing Image Classification models side by side on the Raspberry Pi](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/)
 
 ### Toubleshooting
 

@@ -534,7 +534,7 @@ namespace emitters
             * as a conveniently wrapped Python type.
 
             %inline %{
-                ell::api::TensorShape darknet_GetInputShape(int index) {
+                ell::api::TensorShape get_default_input_shape() {
                     TensorShape  s;
                     darknet_GetInputShape(index, &s);
                     return ell::api::TensorShape{s.rows, s.columns, s.channels};
@@ -542,14 +542,14 @@ namespace emitters
             %} */
 
             os << "%inline %{\n";
-            os << "  ell::api::TensorShape " << moduleName << "_GetInputShape(int index) {\n";
+            os << "  ell::api::TensorShape get_default_input_shape() {\n";
             os << "    TensorShape  s;\n";
-            os << "    " << moduleName << "_GetInputShape(index, &s);\n";
+            os << "    " << moduleName << "_GetInputShape(0, &s);\n";
             os << "    return ell::api::TensorShape{ s.rows, s.columns, s.channels };\n";
             os << "  }\n";
-            os << "  ell::api::TensorShape " << moduleName << "_GetOutputShape(int index) {\n";
+            os << "  ell::api::TensorShape get_default_output_shape() {\n";
             os << "    TensorShape  s;\n";
-            os << "    " << moduleName << "_GetOutputShape(index, &s);\n";
+            os << "    " << moduleName << "_GetOutputShape(0, &s);\n";
             os << "    return ell::api::TensorShape{ s.rows, s.columns, s.channels };\n";
             os << "  }\n";
             os << "%}\n";
@@ -571,9 +571,15 @@ namespace emitters
                 writer.WriteSwigCode(os);
             }
 
+            // Rename the first predict function for python
+            auto predicts = GetFunctionsWithTag(moduleEmitter, c_predictFunctionTagName);
+            os << "#ifdef SWIGPYTHON\n";
+            std::string functionName = (predicts[0].function)->getName();
+            os << "%rename (predict) " << functionName << ";\n";
+            os << "#endif\n";
+    
             os << "%include \"" << headerName << "\"\n";
             WriteShapeWrappers(os, moduleEmitter);
-
         }
 
     }
@@ -634,6 +640,7 @@ namespace emitters
         os << "//\n// ELL SWIG interface for module " << moduleName << "\n//\n\n";
 
         WriteCommonSwigCode(os, moduleEmitter);
+
         WriteModuleSwigCode(os, moduleEmitter, headerName);
     }
 }

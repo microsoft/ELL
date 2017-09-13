@@ -141,8 +141,11 @@ class DriveTest:
         self.ell_model = os.path.join(self.pitest_dir, self.model_name + ".ell")
         sys.path.append(os.path.join(current_path, '../../importers/darknet'))
         darknet_importer = __import__("darknet_import")
-        importer = darknet_importer.DarknetImporter()
-        importer.parse_command_line(["", self.config_file, self.weights_file])
+        args = {}
+        args['config_file'] = self.config_file
+        args['weights_file'] = self.weights_file
+        args['output_directory'] = None
+        importer = darknet_importer.DarknetImporter(args)
         importer.run()
 
     def get_model(self):

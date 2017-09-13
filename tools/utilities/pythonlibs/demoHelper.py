@@ -155,7 +155,7 @@ class DemoHelper:
         if (not os.path.isdir('build')) and (not os.path.isdir(moduleDirectory + '/build')):
             raise Exception("you don't have a 'build' directory, have you compiled this project yet?")
 
-        func_name = name + '_predict'
+        func_name = 'predict'
         if func_name == "":
             raise Exception("Could not construct func name. Is the --compiledModel argument correct?")
         
@@ -171,10 +171,10 @@ class DemoHelper:
         try:
             self.compiled_module = __import__(name)
             
-            inputShapeGetter = getattr(self.compiled_module, name + "_GetInputShape")
-            outputShapeGetter = getattr(self.compiled_module, name + "_GetOutputShape")
-            self.input_shape = inputShapeGetter(0)
-            self.output_shape = outputShapeGetter(0)
+            inputShapeGetter = getattr(self.compiled_module, "get_default_input_shape")
+            outputShapeGetter = getattr(self.compiled_module, "get_default_output_shape")
+            self.input_shape = inputShapeGetter()
+            self.output_shape = outputShapeGetter()
 
             size = int(self.output_shape.rows * self.output_shape.columns * self.output_shape.channels)
             self.results = self.compiled_module.FloatVector(size)
