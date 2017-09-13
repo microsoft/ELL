@@ -25,18 +25,10 @@ class ModelTester(demoHelper.DemoHelper):
     def __init__(self, threshold=0.0):
 
         super(ModelTester,self).__init__(threshold)
-
-        self.arg_parser = argparse.ArgumentParser(
-            "Runs the given ELL model passing images from a test folder\n"
-            "Example:\n"
-            "   python modelTester.py darknetImageNetLabels.txt --truth val_map.txt --folder images --model darknet.ell\n"
-            )
-        
         self.start = time.time()
         self.val_map = {}
         self.val_pos = 0
         self.val_labels = []     
-        self.image_folder = None
         self.map_entry = None
         self.tests_passed = 0
         self.tests_failed = 0
@@ -45,22 +37,14 @@ class ModelTester(demoHelper.DemoHelper):
         self.test_top_n = 1
         self.test_complete = False
 
-    def add_arguments(self):
-        super(ModelTester,self).add_arguments()    
+    def add_arguments(self, arg_parser):
+        super(ModelTester,self).add_arguments(arg_parser)    
         # args to setup test run
-        self.arg_parser.add_argument("--folder", help="path to a folder full of images defined in the truth map file")
-        self.arg_parser.add_argument("--truth", help="path to a map file, each line contains two values, the name of image and the classifaction value for each")
-        self.arg_parser.add_argument("--truthlabels", help="path to a labels for the truth file (in case these are different from your model labels)")
-        self.arg_parser.add_argument("--top", type=int, help="how many of the top labels to include in the test (default 1)", default=self.test_top_n)
+        arg_parser.add_argument("--truth", help="path to a tsv file, each line contains two values, the file name of the image and the integer classifaction value")
+        arg_parser.add_argument("--truthlabels", help="path to a labels for the truth file (in case these are different from your model labels)")
+        arg_parser.add_argument("--top", type=int, help="how many of the top labels to include in the test (default 1)", default=self.test_top_n)
     
 
-    def parse_arguments(self, argv):
-
-        # inherit demo helper args
-        self.add_arguments()
-        args = self.arg_parser.parse_args(argv)
-        self.initialize(args)
-        
     def initialize(self, args):
         super(ModelTester,self).initialize(args)
 
@@ -69,8 +53,12 @@ class ModelTester(demoHelper.DemoHelper):
 
         # test args
         self.test_top_n = args.top
-        self.image_folder = args.folder
-        if not os.path.isdir(self.image_folder):
+
+        if args.truth is None:
+            print("--truth argument is missing")
+            return False
+
+        if self.image_folder is None or not os.path.isdir(self.image_folder):
             print("image --folder % not found" % (self.image_folder))
             return False
 
@@ -82,18 +70,26 @@ class ModelTester(demoHelper.DemoHelper):
 
         return True
 
+    def init_image_source(self):        
+        self.frame = self.load_next_image()
 
-    def init_image_source(self):
-        # Start video capture device or load static image
-        if self.camera is not None:
-            self.captureDevice = cv2.VideoCapture(self.camera)
-        elif self.imageFilename:
-            self.frame = cv2.imread(self.imageFilename)
-            if (type(self.frame) == type(None)):
-                raise Exception('image from %s failed to load' %
-                                (self.imageFilename))
-        elif self.val_map != None:
-            self.frame = self.load_next_image()
+    def load_next_image(self):
+        self.recorded = False # waiting for user input.
+        frame = None
+        while frame == None and self.val_pos < len(self.val_map):
+            self.map_entry = self.val_map[self.val_pos]
+            self.val_pos = self.val_pos + 1
+            path = os.path.join(self.image_folder, self.map_entry[0])
+            if os.path.isfile(path):
+                frame = cv2.imread(path)
+                if (type(frame) == type(None)):
+                    print('image from %s failed to load' % (path))
+                return frame
+            else:
+                print("image file '%s' does not exist" % (path))
+        
+        self.test_complete = True
+        return self.frame    
 
     def draw_label(self, image, label):
         """Helper to draw text onto an image"""
@@ -133,13 +129,11 @@ class ModelTester(demoHelper.DemoHelper):
 
         if self.test_complete:
             return True
-        
-        for i in range(self.get_wait()):
-            key = cv2.waitKey(1) & 0xFF
-            if key == 27:
-                result = True
-                break
-            self.onKeyDown(key)
+    
+        key = cv2.waitKey(1) & 0xFF
+        if key == 27:
+            result = True
+        self.onKeyDown(key)
 
         return result
 
@@ -173,12 +167,13 @@ class ModelTester(demoHelper.DemoHelper):
                 winner = top  
                 break
         
-        print("  Actual=" + ",".join(actual) + ", Expected=" + expected)        
+        print(",".join(actual))
         if winner != None:
             self.tests_passed = self.tests_passed + 1
             print("  Test passed (%d)" % (self.val_pos))
         else:
-            self.tests_failed = self.tests_failed + 1
+            self.tests_failed = self.tests_failed + 1        
+            print("  ====> Expected=" + expected)       
             print("  Test failed (%d)" % (self.val_pos))
         self.recorded = True
         self.frame = self.load_next_image()
@@ -201,24 +196,6 @@ class ModelTester(demoHelper.DemoHelper):
 
         return result
 
-    def load_next_image(self):
-        self.recorded = False # waiting for user input.
-        frame = None
-        while frame == None and self.val_pos < len(self.val_map):
-            self.map_entry = self.val_map[self.val_pos]
-            self.val_pos = self.val_pos + 1
-            path = os.path.join(self.image_folder, self.map_entry[0])
-            if os.path.isfile(path):
-                frame = cv2.imread(path)
-                if (type(frame) == type(None)):
-                    print('image from %s failed to load' % (path))
-                return frame
-            else:
-                print("image file '%s' does not exist" % (path))
-        
-        self.test_complete = True
-        return self.frame    
-    
     def report_times(self):
         # test complete
         print("====================================================================================================")
@@ -235,7 +212,13 @@ class ModelTester(demoHelper.DemoHelper):
 
 def main(args):
     helper = ModelTester()
-    helper.parse_arguments(args)
+    helper.parse_arguments(args, 
+            "Runs the given ELL model passing images from a test folder where the given truth file contains the name of\n"
+            "each image and the correct prediction (separated by a tab character).\n"
+            "Example:\n"
+            "   python batchtest.py darknetImageNetLabels.txt --truth val_map.txt --folder images --model darknet.ell\n"
+            )
+        
 
     # Initialize image source
     helper.init_image_source()
@@ -260,10 +243,8 @@ def main(args):
         # Turn the top5 into a text string to display
         text = "".join([str(helper.get_label(element[0])) + "(" + str(int(100*element[1])) + "%)  " for element in top5])
 
-        save = False
         if (text != lastPrediction):
             print(text)
-            save = True
             lastPrediction = text
 
         # Draw the text on the frame
@@ -272,7 +253,7 @@ def main(args):
         helper.draw_fps(frameToShow)
 
         # Show the new frame
-        helper.show_image(frameToShow, save)
+        helper.show_image(frameToShow, False)
 
     helper.report_times()
 

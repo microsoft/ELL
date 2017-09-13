@@ -19,39 +19,11 @@ import math
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 
-def get_common_commandline_args(argv, helpString=""):
-    """
-    Parses common commandline arguments for ELL tutorials and demos and returns an object with the relevant values set from those arguments.
-    """
-    arg_parser = argparse.ArgumentParser(helpString)
-
-    # required arguments
-    arg_parser.add_argument("labels", help="path to the labels file for evaluating the model, or comma separated list if using more than one model")
-
-    # options
-    arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
-    arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
-    arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=0.15)
-
-    # mutually exclusive options
-    group = arg_parser.add_mutually_exclusive_group()
-    group.add_argument("--camera", type=int, help="the camera id of the webcam", default=0)
-    group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
-    group.add_argument("--folder", help="path to an image folder. If set, evaluates the model using the images found there")
-
-    group2 = arg_parser.add_mutually_exclusive_group()
-    group2.add_argument("--model", help="path to a model file")
-    group2.add_argument("--compiledModel", help="path to the compiled model's Python module")
-    group2.add_argument("--models", help="list of comma separated paths to model files")
-    group2.add_argument("--compiledModels", help="list of comma separated paths to the compiled models' Python modules")
-
-    args = arg_parser.parse_args(argv)
-    return args
 
 # Helper class that interfaces with ELL models to get predictions and provides handy conversion from opencv to ELL buffers and 
 # rendering utilties
 class DemoHelper:
-    def __init__(self, threshold=0.25):
+    def __init__(self, threshold=0.15):
         """ Helper class to store information about the model we want to use.
         argv       - arguments passed in from the command line 
         threshold   - specifies a prediction threshold. We will ignore prediction values less than this
@@ -84,9 +56,37 @@ class DemoHelper:
         self.warm_up = True
         self.input_shape = None
         self.output_shape = None
+    
+    def add_arguments(self, arg_parser):
+        """
+        Adds common commandline arguments for ELL tutorials and demos and returns an object with the relevant values set from those arguments.
+        Note: This method is designed for subclasses, so they can can add MORE arguments before calling parse_args.
+        """
+
+        # required arguments
+        arg_parser.add_argument("labels", help="path to the labels file for evaluating the model, or comma separated list if using more than one model")
+
+        # options
+        arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
+        arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
+        arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
+
+        # mutually exclusive options
+        group = arg_parser.add_mutually_exclusive_group()
+        group.add_argument("--camera", type=int, help="the camera id of the webcam", default=0)
+        group.add_argument("--image", help="path to an image file. If set, evaluates the model using the image, instead of a webcam")
+        group.add_argument("--folder", help="path to an image folder. If set, evaluates the model using the images found there")
+
+        group2 = arg_parser.add_mutually_exclusive_group()
+        group2.add_argument("--model", help="path to a model file")
+        group2.add_argument("--compiledModel", help="path to the compiled model's Python module")
+        group2.add_argument("--models", help="list of comma separated paths to model files")
+        group2.add_argument("--compiledModels", help="list of comma separated paths to the compiled models' Python modules")
 
     def parse_arguments(self, argv, helpString):
-        args = get_common_commandline_args(argv, helpString)
+        arg_parser = argparse.ArgumentParser(helpString)
+        self.add_arguments(arg_parser)        
+        args = arg_parser.parse_args(argv)
         self.initialize(args)
 
     def value_from_arg(self, argValue, defaultValue):
@@ -282,8 +282,7 @@ class DemoHelper:
         elif self.image_filename:
             self.frame = cv2.imread(self.image_filename)
             if (type(self.frame) == type(None)):
-                raise Exception('image from %s failed to load' %
-                                (self.image_filename))
+                raise Exception('image from %s failed to load' % (self.image_filename))
         elif self.image_folder:
             self.frame = self.load_next_image()
     
