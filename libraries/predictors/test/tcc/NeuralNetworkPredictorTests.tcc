@@ -293,7 +293,7 @@ void PoolingLayerTest()
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
 
-    // Verify BatchNormailzationLayer
+    // Verify PoolingLayer
     TensorType input(4, 4, 2);
     input.Fill(1);
     input(1, 1, 0) = 10;

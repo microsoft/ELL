@@ -62,6 +62,7 @@ class ModelTester(demoHelper.DemoHelper):
             print("image --folder % not found" % (self.image_folder))
             return False
 
+        self.val_map_dir = os.path.dirname(args.truth)
         self.val_map = self.load_truth(args.truth)
         if args.truthlabels:
             self.val_labels = self.load_labels(args.truthlabels)
@@ -79,7 +80,7 @@ class ModelTester(demoHelper.DemoHelper):
         while frame == None and self.val_pos < len(self.val_map):
             self.map_entry = self.val_map[self.val_pos]
             self.val_pos = self.val_pos + 1
-            path = os.path.join(self.image_folder, self.map_entry[0])
+            path = os.path.join(self.val_map_dir, self.map_entry[0])
             if os.path.isfile(path):
                 frame = cv2.imread(path)
                 if (type(frame) == type(None)):
@@ -248,12 +249,12 @@ def main(args):
             lastPrediction = text
 
         # Draw the text on the frame
-        frameToShow = frame
-        helper.draw_label(frameToShow, text)
-        helper.draw_fps(frameToShow)
-
-        # Show the new frame
-        helper.show_image(frameToShow, False)
+        if not helper.automatic:
+            frameToShow = frame
+            helper.draw_label(frameToShow, text)
+            helper.draw_fps(frameToShow)
+            # Show the new frame
+            helper.show_image(frameToShow, False)
 
     helper.report_times()
 

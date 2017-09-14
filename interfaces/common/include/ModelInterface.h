@@ -378,7 +378,7 @@ public:
     void Load(const std::string& filename);
     ell::math::TensorShape GetInputShape() const;
     ell::math::TensorShape GetOutputShape() const;
-    
+    ELL_CompiledMap Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName) const;
 private:
     std::shared_ptr<ell::model::DynamicMap> _map;
 };
@@ -406,6 +406,10 @@ class ELL_CompiledMap
 public:
     ELL_CompiledMap(const ELL_CompiledMap& other) = default;
 
+    void WriteIR(const std::string& filePath);
+    void WriteBitcode(const std::string& filePath);
+    void WriteSwigInterface(const std::string& filePath);
+
     std::string GetCodeString();
     std::vector<double> ComputeDouble(const std::vector<double>& inputData);
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);
@@ -418,6 +422,7 @@ public:
 private:
     std::shared_ptr<ell::model::IRCompiledMap> _map;
 };
+
 
 //
 // Functions

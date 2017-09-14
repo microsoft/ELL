@@ -56,6 +56,7 @@ class DemoHelper:
         self.warm_up = True
         self.input_shape = None
         self.output_shape = None
+        self.bgr = False
     
     def add_arguments(self, arg_parser):
         """
@@ -70,6 +71,7 @@ class DemoHelper:
         arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
         arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
         arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
+        arg_parser.add_argument("--bgr", help="specify whether input data should be in BGR format", default = self.bgr)
 
         # mutually exclusive options
         group = arg_parser.add_mutually_exclusive_group()
@@ -106,6 +108,7 @@ class DemoHelper:
         self.camera = self.value_from_arg(args.iterations, 0)
         self.image_filename = self.value_from_arg(args.image, None)
         self.image_folder = self.value_from_arg(args.folder, None)
+        self.bgr = args.bgr
 
         # process image source options
         if (args.camera):
@@ -330,7 +333,8 @@ class DemoHelper:
     def prepare_image_for_predictor(self, image):
         """Crops, resizes image to outputshape. Returns image as numpy array in in RGB order."""        
         resized = self.resize_image(image, self.input_size)
-        resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+        if not self.bgr:
+            resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
         resized = resized.astype(np.float).ravel()
         return resized
 

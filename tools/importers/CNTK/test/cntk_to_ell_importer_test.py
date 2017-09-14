@@ -13,6 +13,8 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 # Try to import CNTK and ELL. If either don't exist it means they have not being built,
 # so don't run the tests.
 SkipTests = False
+SkipFullModelTests = False
+
 try:
     import unittest
     import sys
@@ -172,6 +174,19 @@ class CntkLayersTestCase(unittest.TestCase):
         if SkipTests:
             self.skipTest('Module not tested, CNTK or ELL module missing')
 
+    def verify_compiled(self, predictor, input, expectedOutput, module_name, method_name, precision=0):
+        # now run same over ELL compiled model
+        map = ell_utilities.ell_map_from_float_predictor(predictor)
+        compiled = map.Compile("host", module_name, method_name)
+        compiledResults = compiled.ComputeFloat(input)
+        # Compare compiled results
+        if precision > 0:
+            np.testing.assert_array_almost_equal(
+                expectedOutput, compiledResults, precision, 'results for %s layer do not match ELL compiled output !' % (module_name))
+        else:
+            np.testing.assert_array_equal(
+                expectedOutput, compiledResults, 'results for %s layer do not match ELL compiled output !' % (module_name))
+
     def test_dense_layer(self):
         # Test a model with a single CNTK Dense layer against the equivalent ELL predictor
         # This verifies that the import functions reshape and reorder values appropriately and
@@ -215,44 +230,54 @@ class CntkLayersTestCase(unittest.TestCase):
         np.testing.assert_array_equal(
             orderedCntkResults, ellResults, 'results for Dense layer do not match!')
 
+        # now run same over ELL compiled model
+        self.verify_compiled(predictor, orderedInputValues, orderedCntkResults, "dense", "test")
         return
 
     def test_max_pooling_layer(self):
         # Test a model with a single CNTK MaxPooling layer against the equivalent ELL predictor
         # This verifies that the import functions reshape and reorder values appropriately and
         # that the equivalent ELL layer produces comparable output
-
-        # Create a MaxPooling CNTK layer
-        poolingLayer = MaxPooling((2, 2), strides=2)
-        # Input order for CNTK is channels, rows, columns
         x = input((3, 12, 12))
-        cntkModel = poolingLayer(x)
-
-        # Create the equivalent ELL predictor
-        layerParameters = ELL.LayerParameters(ELL.TensorShape(12, 12, 3),  # Input order for ELL is rows, columns, channels
-                                              ELL.NoPadding(),
-                                              ELL.TensorShape(6, 6, 3),
-                                              ELL.NoPadding())
-
-        poolingParameters = ELL.PoolingParameters(2, 2)
-        layer = ELL.FloatPoolingLayer(
-            layerParameters, poolingParameters, ELL.PoolingType.max)
-        predictor = ELL.FloatNeuralNetworkPredictor([layer])
-
-        # Get the results for both
+        count = 0
         inputValues = np.arange(432, dtype=np.float32).reshape(3, 12, 12)
-        cntkResults = cntkModel(inputValues)
-        orderedCntkResults = cntk_converters.get_float_vector_from_cntk_array(
-            cntkResults)  # Note that cntk inserts an extra dimension of 1 in the front
-        orderedInputValues = cntk_converters.get_float_vector_from_cntk_array(
-            inputValues)
-        ellResults = predictor.Predict(orderedInputValues)
+        for pool_size in range(1,5):
+            for stride_size in range(1,5):
+                count += 1
+                print("test pooling size (%d,%d) and stride %d" % (pool_size, pool_size, stride_size))
 
-        # Compare them
-        np.testing.assert_array_equal(
-            orderedCntkResults, ellResults, 'results for MaxPooling layer do not match!')
+                # Create a MaxPooling CNTK layer
+                poolingLayer = MaxPooling((pool_size, pool_size), strides=stride_size)
+                # Input order for CNTK is channels, rows, columns
+                cntkModel = poolingLayer(x)
+                # Get the results for both
+                cntkResults = cntkModel(inputValues)[0]
+                outputShape = cntkResults.shape
 
-        return
+                # Create the equivalent ELL predictor
+                layerParameters = ELL.LayerParameters(ELL.TensorShape(12, 12, 3),  # Input order for ELL is rows, columns, channels
+                                                    ELL.NoPadding(),
+                                                    ELL.TensorShape(outputShape[1], outputShape[2], outputShape[0]),
+                                                    ELL.NoPadding())
+        
+                poolingParameters = ELL.PoolingParameters(pool_size, stride_size)
+                layer = ELL.FloatPoolingLayer(
+                    layerParameters, poolingParameters, ELL.PoolingType.max)
+                predictor = ELL.FloatNeuralNetworkPredictor([layer])
+
+                orderedCntkResults = cntk_converters.get_float_vector_from_cntk_array(
+                    cntkResults)  # Note that cntk inserts an extra dimension of 1 in the front
+                orderedInputValues = cntk_converters.get_float_vector_from_cntk_array(
+                    inputValues)
+                ellResults = predictor.Predict(orderedInputValues)        
+
+                # Compare them
+                np.testing.assert_array_equal(
+                    orderedCntkResults, ellResults, 'results for MaxPooling layer do not match!')
+
+                # now run same over ELL compiled model                
+                self.verify_compiled(predictor, orderedInputValues, orderedCntkResults, "max_pooling", "test_" + str(count))
+
 
     def test_convolution_layer(self):
         # Test a model with a single CNTK Convolution layer against the equivalent ELL predictor
@@ -301,6 +326,8 @@ class CntkLayersTestCase(unittest.TestCase):
         np.testing.assert_array_equal(
             orderedCntkResults, ellResults, 'results for Convolution layer do not match!')
 
+        # now run same over ELL compiled model                
+        self.verify_compiled(predictor, orderedInputValues, orderedCntkResults, "convolution", "test")
         return
 
     def test_binary_convolution_layer(self):
@@ -352,6 +379,9 @@ class CntkLayersTestCase(unittest.TestCase):
         # Compare the results
         np.testing.assert_array_equal(
             orderedCntkResults, ellResults, 'results for Binary Convolution layer do not match!')
+            
+        # now run same over ELL compiled model                
+        self.verify_compiled(predictor, orderedInputValues, orderedCntkResults, "binary_convolution", "test")
         return
 
     def test_batch_normalization_layer(self):
@@ -415,8 +445,10 @@ class CntkLayersTestCase(unittest.TestCase):
 
         # Compare the results (precision is 1 less decimal place from epsilon)
         np.testing.assert_array_almost_equal(
-            orderedCntkResults, ellResults, 4, 'results for BatchNormalization layer do not match!')
+            orderedCntkResults, ellResults, 6, 'results for BatchNormalization layer do not match!')
 
+        # now run same over ELL compiled model                
+        self.verify_compiled(predictor, orderedInputValues, orderedCntkResults, "batch_norm", "test", precision=6)
         return
 
     def test_prelu_activation_layer(self):
@@ -460,12 +492,14 @@ class CntkLayersTestCase(unittest.TestCase):
         np.testing.assert_array_equal(
             orderedCntkResults, ellResults, 'results for PReLU Activation layer do not match!')
 
+        # now run same over ELL compiled model                
+        self.verify_compiled(predictor, orderedInputValues, orderedCntkResults, "prelu_activation", "test")
         return
 
 
 class CntkXorModelTestCase(unittest.TestCase):
     def setUp(self):
-        if SkipTests:
+        if SkipTests or SkipFullModelTests:
             self.skipTest('Module not tested, CNTK or ELL module missing')
 
     def test_simple_xor_model(self):
@@ -497,7 +531,7 @@ class CntkXorModelTestCase(unittest.TestCase):
 
 class CntkBinarizedModelTestCase(unittest.TestCase):
     def setUp(self):
-        if SkipTests:
+        if SkipTests or SkipFullModelTests:
             self.skipTest('Module not tested, CNTK or ELL module missing')
 
         # TODO: get a smaller model so that these can be checked in

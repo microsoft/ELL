@@ -30,7 +30,8 @@ def predictor_from_cntk_model(modelFile, plotModel=False):
     print("\nFinished loading.")
 
     if (plotModel is True):
-        cntk_utilities.plot_model(z, 'model.png')
+        filename = os.path.join(os.path.dirname(modelFile), os.path.basename(modelFile) + ".png")
+        cntk_utilities.plot_model(z, filename)
 
     print("Pre-processing...")
     modelLayers = cntk_utilities.get_model_layers(z)

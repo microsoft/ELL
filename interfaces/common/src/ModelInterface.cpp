@@ -512,6 +512,7 @@ std::string ELL_Model::GetJson() const
     return stream.str();
 }
 
+
 #ifndef SWIG
 ELL_Model::ELL_Model(ell::model::Model&& other)
 {
@@ -708,6 +709,19 @@ void ELL_Map::Save(const std::string& filename) const
     ell::common::SaveMap(*_map, filename);
 }
 
+ELL_CompiledMap ELL_Map::Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName) const
+{
+    ell::model::MapCompilerParameters settings;
+    settings.moduleName = moduleName;
+    settings.mapFunctionName = functionName;
+    settings.compilerSettings.targetDevice.deviceName = targetDevice;
+
+    ell::model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(*_map);
+    return ELL_CompiledMap(std::move(compiledMap));
+}
+
+
 //
 // ELL_SteppableMap
 //
@@ -756,7 +770,7 @@ void ELL_SteppableMap::Save(const std::string& filename) const
 //
 // ELL_CompiledMap
 //
-ELL_CompiledMap::ELL_CompiledMap(ell::model::IRCompiledMap map)
+ELL_CompiledMap::ELL_CompiledMap(ell::model::IRCompiledMap map) 
 {
     _map = std::make_shared<ell::model::IRCompiledMap>(std::move(map));
 }
@@ -780,6 +794,32 @@ std::string ELL_CompiledMap::GetCodeString()
     }
     return s.str();
 }
+
+void ELL_CompiledMap::WriteIR(const std::string& filePath)
+{
+    if (_map != nullptr)
+    {
+        _map->WriteCode(filePath, ell::emitters::ModuleOutputFormat::ir);
+    }
+}
+
+void ELL_CompiledMap::WriteBitcode(const std::string& filePath)
+{
+    if (_map != nullptr)
+    {
+        _map->WriteCode(filePath, ell::emitters::ModuleOutputFormat::bitcode);
+    }
+}
+
+void ELL_CompiledMap::WriteSwigInterface(const std::string& filePath)
+{
+    if (_map != nullptr)
+    {
+        _map->WriteCode(filePath, ell::emitters::ModuleOutputFormat::swigInterface);
+    }
+}
+
+
 
 //
 // Functions
