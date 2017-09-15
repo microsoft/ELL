@@ -1,0 +1,9 @@
+"""The various platforms to which ELL models can be compiled"""
+
+MAC = 'mac'
+LINUX = 'linux'
+WINDOWS = 'windows'
+PI3 = 'pi3'
+PI3_64 = 'pi3_64'
+AARCH64 = 'aarch64'
+IOS = 'ios'

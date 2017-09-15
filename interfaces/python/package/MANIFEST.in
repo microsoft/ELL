@@ -1,0 +1,3 @@
+recursive-include ell/Release *
+include ell/*.so
+include ell/*.so.*

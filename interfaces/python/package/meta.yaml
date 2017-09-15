@@ -1,0 +1,22 @@
+package:
+  name: ell
+  version: !!str 0.0.1
+
+source:
+  path: .
+
+requirements:
+  build:
+  - python
+  run:
+  - python
+  - numpy
+  - requests
+  - paramiko
+  - llvmdev >=3.9,<4.0
+  - swig ==3.0.12
+  - opencv
+
+about:
+  home: https://github.com/Microsoft/ELL
+  license: MIT License

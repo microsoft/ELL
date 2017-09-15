@@ -1,0 +1,17 @@
+find_package(PythonInterp)
+find_package(PythonLibs)
+if(${PYTHONLIBS_FOUND})
+
+    set(module_name "pythonpackage_ell_util")
+
+    file(GLOB PYFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
+
+    add_custom_target(${module_name} DEPENDS SOURCES ${PYFILES})
+
+    foreach(FILE ${PYFILES})
+        configure_file(${FILE} ${FILE} COPYONLY)
+    endforeach()
+
+    configure_file(${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/downloader.py downloader.py COPYONLY)
+
+endif()

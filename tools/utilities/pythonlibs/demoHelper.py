@@ -280,6 +280,26 @@ class DemoHelper:
             ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
         return ell_map
 
+    def create_function(self, predictor, intervalMs=0):
+        """Creates an ELL map from an ELL predictor"""
+        from ..util.ell_utilities import ell_map_from_float_predictor, ell_steppable_map_from_float_predictor
+
+        name = self.model_name
+        if (intervalMs > 0):
+            ell_map = ell_steppable_map_from_float_predictor(
+                predictor, intervalMs, name + "InputCallback", name + "OutputCallback")
+        else:
+            ell_map = ell_map_from_float_predictor(predictor)
+        return ell_map
+
+    def compile(self, predictor, platform, path):
+        path += '/model'
+        prediction_function = self.create_function(predictor)
+        prediction_function.Compile(platform, 'model', 'predict', path)
+        from ..util.commands import run_llc, run_swig
+        run_swig(path + '.i')
+        run_llc(path + '.ll')
+
     def save_ell_predictor_to_file(self, predictor, filePath, intervalMs=0):
         """Saves an ELL predictor to file so that it can be compiled to run on a device, with an optional stepInterval in milliseconds"""
         ell_map = self.get_predictor_map(predictor, intervalMs)

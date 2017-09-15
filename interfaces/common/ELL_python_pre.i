@@ -3,9 +3,13 @@
 import os
 __this_file_directory = os.path.dirname(os.path.abspath(__file__))
 
+
 # Check if a directory looks like a valid ELL build directory
 def __is_ell_build_directory(path):
-    return os.path.isdir(os.path.join(path, 'interfaces')) and os.path.isdir(os.path.join(path, 'libraries')) and os.path.isfile(os.path.join(path, 'CMakeCache.txt'))
+    return os.path.isdir(os.path.join(path, 'interfaces')) and os.path.isdir(
+        os.path.join(path, 'libraries')) and os.path.isfile(
+            os.path.join(path, 'CMakeCache.txt'))
+
 
 # Try to find the build directory for ELL
 def __get_ell_build_dir():
@@ -14,9 +18,12 @@ def __get_ell_build_dir():
         return path
     return None
 
+
 __ell_build_dir = __get_ell_build_dir()
 if __ell_build_dir is None:
-    print('Unable to find ELL')
+    parent_dir = os.path.basename(__this_file_directory)
+    if parent_dir != 'ell': # if not the conda package
+        print('warning: Unable to find ELL binaries')
 else:
     import sys
     import os
@@ -36,6 +43,10 @@ else:
 
     # Add build/bin directory to system path, so OpenBLAS DLLs can be found
     if sys.platform == 'win32':
-        os.environ['PATH'] = os.pathsep.join([os.environ['PATH'], os.path.join(bin_dir, 'Release'), os.path.join(bin_dir, 'Debug')])
+        os.environ['PATH'] = os.pathsep.join([
+            os.environ['PATH'],
+            os.path.join(bin_dir, 'Release'),
+            os.path.join(bin_dir, 'Debug')
+        ])
         
 %}
