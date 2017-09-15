@@ -44,6 +44,7 @@ class DriveTest:
         self.password = "raspberry"
         self.ssh = None
         self.created_dirs = []
+        self.profile = False
         if (not os.path.isdir(self.pitest_dir)):
             os.makedirs(self.pitest_dir)
 
@@ -53,6 +54,7 @@ class DriveTest:
 
         # options
         self.arg_parser.add_argument("--outdir", default=self.pitest_dir)
+        self.arg_parser.add_argument("--profile", help="enable profiling functions in the ELL module", action="store_true")
 
         model_group = self.arg_parser.add_argument_group('model', 'options for loading a non-default model. All 3 must be specified for a non-default model to be used.')
         model_group.add_argument("--model", help="path to an ELL model file, the filename (without extension) will be used as the model name")
@@ -63,6 +65,7 @@ class DriveTest:
 
         self.ipaddress = args.ipaddress
         self.pitest_dir = args.outdir
+        self.profile = args.profile
 
         self.extract_model_info(args.model, args.labels)
 
@@ -161,7 +164,10 @@ class DriveTest:
         sys.path.append(os.path.join(current_path, '../../wrap'))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        builder.parse_command_line(["", labels_file, self.ell_model, "-target", "pi3", "-outdir", self.output_dir])
+        builder_args = [labels_file, self.ell_model, "-target", "pi3", "-outdir", self.output_dir]
+        if self.profile:
+            builder_args.append("-profile")
+        builder.parse_command_line(builder_args)
         builder.run()
 
     def connect_ssh(self):

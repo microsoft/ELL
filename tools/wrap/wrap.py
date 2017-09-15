@@ -11,6 +11,7 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../utilities/pythonlibs'))
 import find_ell
+import argparse
 import subprocess
 import json
 import operator
@@ -24,7 +25,7 @@ class ModuleBuilder:
     def __init__(self):
         self.target = "host"
         self.label_file = None
-        self.condig = None
+        self.config = None
         self.model_file = None
         self.output_dir = None
         self.files = []
@@ -36,64 +37,42 @@ class ModuleBuilder:
         self.tools = None
         self.language = "python"
         self.verbose = False
-
-    def print_usage(self):
-        print("Usage: wrap.py label_file model_file [-lang name|-target name|-outdir name|-v]")
-        print("This tool wraps a given ELL model in a CMake buildable project that builds a language")
-        print("specific module that can call the ELL model on a given target platform.")
-        print("")
-        print("The supported languages are:")
-        print("    python   (default)")
-        print("")
-        print("he supported target platforms are:")
-        print("    pi3      raspberry pi 3")
-        print("    aarch64  arm64 Linux, works on Qualcomm DragonBoards")
-        print("    host     (default) your host computer architecture")
-        
+        self.profile = False
 
     def parse_command_line(self, argv):
-        i = 1
-        while (i < len(argv)):
-            arg = argv[i]
-            if (arg[0] == "-"):
-                option = arg[1:]
-                if (option.lower() == "target"):
-                    i = i + 1
-                    self.target = argv[i].lower()
-                elif (option.lower() == "outdir"):
-                    i = i + 1
-                    self.output_dir = argv[i]
-                elif (option.lower() == "lang"):
-                    i = i + 1
-                    self.language = argv[i].lower()
-                elif (option.lower() == "v"):
-                    self.verbose = True
-                else:
-                    print("Unknown option: " + arg)
-                    return False                
-            elif (self.label_file == None):
-                self.label_file = arg
-            elif (self.model_file == None):
-                self.model_file = arg
-            else:
-                print("Too many arguments")
-                return False
-            i = i + 1
+        arg_parser = argparse.ArgumentParser("This tool wraps a given ELL model in a CMake buildable project that builds a language\n"
+            "specific module that can call the ELL model on a given target platform.\n"
+            "\nThe supported languages are:\n"
+            "    python   (default)\n"
+            "\nThe supported target platforms are:\n"
+            "    pi3      raspberry pi 3\n"
+            "    aarch64  arm64 Linux, works on Qualcomm DragonBoards\n"
+            "    host     (default) your host computer architecture\n")
 
-        if (self.model_file == None):
-            print("missing model file argument")
-            return False  
-        if (self.label_file == None):
-            print("missing label file argument")
-            return False        
+        # required arguments
+        arg_parser.add_argument("label_file", help="path to the labels file for the ELL model")
+        arg_parser.add_argument("model_file", help="path to the ELL model file")
 
-        if (self.output_dir == None):
-            self.output_dir = self.target
+        # optional arguments
+        arg_parser.add_argument("--language", "-lang", help="the language for the ELL module", choices=["python"], default=self.language)
+        arg_parser.add_argument("--target", "-target", help="the target platform", choices=["pi3", "aarch64", "host"], default=self.target)
+        arg_parser.add_argument("--outdir", "-outdir", help="the output directory", default=self.target)
+        arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
+        arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
 
-        head, tail = os.path.split(self.model_file)
-        self.model_name =  os.path.splitext(tail)[0]        
+        args = arg_parser.parse_args(argv)
         
-        return True
+        self.label_file = args.label_file
+        self.model_file = args.model_file
+
+        self.language = args.language
+        self.target = args.target
+        self.output_dir = args.outdir
+        self.profile = args.profile
+        self.verbose = args.verbose
+
+        _, tail = os.path.split(self.model_file)
+        self.model_name =  os.path.splitext(tail)[0]        
 
     def find_files(self):
         self.cmake_template = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates/CMakeLists.%s.txt.in" % (self.language))
@@ -133,7 +112,6 @@ class ModuleBuilder:
         with open(output_template, 'w') as f:
             f.write(template)
 
-
     def save_config(self):
         self.config['model'] = self.model_name
         self.config['func'] =  self.model_name + "_" + self.func_name
@@ -156,7 +134,7 @@ class ModuleBuilder:
         self.copy_files(self.includes, "include")
         self.copy_files(self.tcc, "tcc")
         self.create_cmake_file()
-        self.tools.compile(self.model_file, self.func_name, self.model_name, self.target, self.output_dir)
+        self.tools.compile(self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.profile)
         self.tools.swig(self.output_dir, self.model_name, self.language)
         self.tools.llc(self.output_dir, self.model_name, self.target)
         self.create_cmake_file()
@@ -167,7 +145,9 @@ class ModuleBuilder:
         
 if __name__ == "__main__":
     builder = ModuleBuilder()
-    if (not builder.parse_command_line(sys.argv)):
-        builder.print_usage()
-    else:
-        builder.run()
+
+    argv = sys.argv
+    argv.pop(0) # when an args list is passed to parse_args, the first argument (program name) needs to be dropped
+
+    builder.parse_command_line(argv)
+    builder.run()

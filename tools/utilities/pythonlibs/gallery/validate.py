@@ -60,7 +60,7 @@ def run_validation(args):
 def validate_image(args, filename):
     """Evaluates a single image to get predictions"""
     helper = d.DemoHelper()
-    helper.parse_arguments(args)
+    helper.parse_arguments(args, helpString="Evaluates a series of images to get predictions and performance metrics")
 
     # Initialize image source
     helper.init_image_source()

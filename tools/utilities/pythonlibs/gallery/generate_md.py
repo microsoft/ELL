@@ -138,8 +138,6 @@ class GenerateMarkdown:
             results = json.loads(f.read())
             self.set_value("@TOP_1_ACCURACY@", self.format_float(100 * (1.0 - float(results['average_top1_error']))))
             self.set_value("@TOP_5_ACCURACY@", self.format_float(100 * (1.0 - float(results['average_top5_error']))))
-            self.set_value("@TOP_1_ERROR@", self.format_float(100 * float(results['average_top1_error'])))
-            self.set_value("@TOP_5_ERROR@", self.format_float(100 * float(results['average_top5_error'])))
 
     def save(self):
         with open(self.outfile, 'w', encoding='utf-8') as of:

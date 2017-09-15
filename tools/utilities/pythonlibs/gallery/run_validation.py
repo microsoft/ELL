@@ -26,7 +26,7 @@ class RunValidation:
         self.username = "pi"
         self.password = "raspberry"
         self.model = None
-        self.labels = "cntkVgg16ImageNetLabels.txt"
+        self.labels = "ILSVRC2012_labels.txt"
         self.maxfiles = 200
         self.ssh = None
         self.dest_dir = "/home/pi/pi3"
