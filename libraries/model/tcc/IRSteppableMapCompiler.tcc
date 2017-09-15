@@ -72,7 +72,7 @@ namespace model
     IRCompiledMap IRSteppableMapCompiler<ClockType>::Compile(SteppableMap<ClockType> map)
     {
         EnsureValidMap(map);
-        model::TransformContext context{ [](const model::Node& node) { return node.IsCompilable() ? model::NodeAction::compile : model::NodeAction::refine; } };
+        model::TransformContext context{this, [this](const model::Node& node) { return node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
         map.Refine(context);
 
         if (GetMapCompilerParameters().profile)

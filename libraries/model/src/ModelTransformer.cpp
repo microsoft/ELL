@@ -20,18 +20,23 @@ namespace model
     //
     // TransformContext implementation
     //
-    TransformContext::TransformContext()
+    TransformContext::TransformContext() : _compiler(nullptr)
     {
     }
 
-    TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction)
+    TransformContext::TransformContext(const NodeActionFunction& nodeActionFunction) : _compiler(nullptr)
     {
         _nodeActionFunctions.emplace_back(nodeActionFunction);
     }
-
+    
+    TransformContext::TransformContext(const MapCompiler* compiler, const NodeActionFunction& nodeActionFunction) : _compiler(compiler)
+    {
+        _nodeActionFunctions.emplace_back(nodeActionFunction);
+    }
+    
     bool TransformContext::IsNodeCompilable(const Node& node) const
     {
-        return node.IsCompilable();
+        return node.IsCompilable(_compiler);
     }
 
     void TransformContext::AddNodeActionFunction(const NodeActionFunction& nodeActionFunction)
@@ -50,7 +55,7 @@ namespace model
                 return action;
             }
         }
-        return node.IsCompilable() ? NodeAction::compile : NodeAction::refine;
+        return node.IsCompilable(_compiler) ? NodeAction::compile : NodeAction::refine;
     }
 
     //

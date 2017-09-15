@@ -42,7 +42,7 @@ namespace model
         void CompileNode(MapCompiler& compiler);
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
-        virtual bool IsCompilable() const { return true; }
+        virtual bool IsCompilable(const MapCompiler* compiler) const { return true; }
 
     protected:
         CompilableNode(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs)

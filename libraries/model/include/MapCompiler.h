@@ -21,7 +21,6 @@
 #include "Node.h"
 #include "OutputPort.h"
 #include "PortElements.h"
-#include "ModelTransformer.h"
 
 // stl
 #include <stack>

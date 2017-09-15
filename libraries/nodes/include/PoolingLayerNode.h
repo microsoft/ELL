@@ -62,7 +62,7 @@ namespace nodes
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
-        virtual bool IsCompilable() const override { return true; }
+        virtual bool IsCompilable(const model::MapCompiler* compiler) const override { return true; }
 
     protected:
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;

@@ -129,6 +129,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::MapLoadA
     settings.mapFunctionName = functionName;
     settings.compilerSettings.useBlas = compileArguments.useBlas;
     settings.compilerSettings.optimize = compileArguments.optimize;
+    settings.fuseLinearFunctionNodes = compileArguments.fuseLinearOperations;
     settings.profile = compileArguments.profile;
 
     if (compileArguments.target != "")

@@ -43,7 +43,7 @@ namespace model
     void MapCompiler::CompileNodes(Model& model)
     {
         model.Visit([this](const Node& node) {
-            if (!node.IsCompilable())
+            if (!node.IsCompilable(this))
             {
                 std::string typeName = node.GetRuntimeTypeName();
                 throw emitters::EmitterException(emitters::EmitterError::notSupported, std::string("Uncompilable node type: " + typeName));

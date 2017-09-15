@@ -24,8 +24,9 @@ namespace ell
 /// <summary> model namespace </summary>
 namespace model
 {
-    class ModelTransformer;
     class InputPortBase;
+    class MapCompiler;
+    class ModelTransformer;
     class OutputPortBase;
     class Port;
 
@@ -140,7 +141,7 @@ namespace model
         static std::string GetTypeName() { return "Node"; }
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
-        virtual bool IsCompilable() const { return false; }
+        virtual bool IsCompilable(const MapCompiler* compiler) const { return false; }
 
         /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
         ///

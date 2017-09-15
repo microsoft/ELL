@@ -119,10 +119,10 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
         true);
 
     parser.AddOption(
-        foldLinearOperations,
-        "foldLinearOps",
+        fuseLinearOperations,
+        "fuseLinearOps",
         "",
-        "Fold sequences of linear operations with constant coefficients into a single operation",
+        "Fuse sequences of linear operations with constant coefficients into a single operation",
         true);
 
     parser.AddDocumentationString("");

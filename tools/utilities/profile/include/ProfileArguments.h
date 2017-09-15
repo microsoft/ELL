@@ -39,6 +39,7 @@ struct ProfileArguments
 
     bool optimize = true;
     bool useBlas = true;
+    bool fuseLinearOperations = true;
 };
 
 /// <summary> Arguments for parsed print. </summary>

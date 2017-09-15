@@ -44,7 +44,7 @@ struct CompileArguments
     // compilation options
     bool optimize = true;
     bool useBlas = false;
-    bool foldLinearOperations = true;
+    bool fuseLinearOperations = true;
 
     // target machine options
     // known target names: host, mac, linux, windows, arm, arm64, ios

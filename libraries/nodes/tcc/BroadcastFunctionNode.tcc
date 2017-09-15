@@ -107,7 +107,7 @@ namespace nodes
                                                                           FunctionType function,
                                                                           ValueType paddingValue)
         : CompilableNode(inputs, outputs), _inputLayout(inputLayout), _outputLayout(outputLayout), _broadcastDimension(broadcastDimension), _function(function), _paddingValue(paddingValue)
-    {        
+    {
     }
 
     //
@@ -698,9 +698,10 @@ namespace nodes
     }
 
     template <typename ValueType>
-    bool BroadcastLinearFunctionNode<ValueType>::IsCompilable() const
+    bool BroadcastLinearFunctionNode<ValueType>::IsCompilable(const model::MapCompiler* compiler) const
     {
-        return !CanCombineWithPrimaryInput();
+        bool refinable = (compiler != nullptr && compiler->GetMapCompilerParameters().fuseLinearFunctionNodes && CanCombineWithPrimaryInput());
+        return !refinable;
     }
 
     template <typename ValueType>
@@ -856,7 +857,8 @@ namespace nodes
     template <typename ValueType>
     bool BroadcastLinearFunctionNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        if (!CanCombineWithPrimaryInput())
+        auto compiler = transformer.GetContext().GetCompiler();
+        if (IsCompilable(compiler))
         {
             Copy(transformer);
             return false;

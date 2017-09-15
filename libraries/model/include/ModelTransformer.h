@@ -35,6 +35,8 @@ namespace model
     template <typename ValueType>
     class InputNode;
 
+    class MapCompiler;
+
     /// <summary> An action to perform on a node during transformation (refinement/compilation)
     enum class NodeAction
     {
@@ -58,11 +60,22 @@ namespace model
         /// <param name='nodeActionFunction'> A function that indicates how to override the default refinement or compilation of a node </param>
         TransformContext(const NodeActionFunction& nodeActionFunction);
 
+        /// <summary> Constructor </summary>
+        ///
+        /// <param name='compiler'> The MapCompiler that is currently compiling the model </param>
+        /// <param name='nodeActionFunction'> A function that indicates how to override the default refinement or compilation of a node </param>
+        TransformContext(const MapCompiler* compiler, const NodeActionFunction& nodeActionFunction);
+
         /// <summary> Indicates if a node is compilable. </summary>
         ///
         /// <param name="node"> A node. </param>
         /// <returns> Returns true if the node is compilable. </returns>
         bool IsNodeCompilable(const Node& node) const;
+
+        /// <summary> Gets the map compiler. </summary>
+        ///
+        /// <returns> Returns a pointer to the map compiler (or nullptr if one isn't defined). </returns>
+        const MapCompiler* GetCompiler() const { return _compiler; }
 
         /// <summary> Adds a custom node action function to call during refinement </summary>
         ///
@@ -83,6 +96,7 @@ namespace model
 
     private:
         std::vector<NodeActionFunction> _nodeActionFunctions;
+        const MapCompiler* _compiler;
     };
 
     /// <summary> A utility class that maps output ports in a model to elements in a transformed model. </summary>

@@ -91,5 +91,13 @@ void ParsedProfileArguments::AddArgs(utilities::CommandLineParser& parser)
         "",
         "Use BLAS libraries in compiled code",
         true);
+
+    parser.AddOption(
+        fuseLinearOperations,
+        "fuseLinearOps",
+        "",
+        "Fuse sequences of linear operations with constant coefficients into a single operation",
+        true);
+
 }
 }
