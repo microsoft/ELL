@@ -28,5 +28,6 @@ void ParsedCompareArguments::AddArgs(utilities::CommandLineParser& parser)
     parser.AddDocumentationString("Code-generation options");
     parser.AddOption(optimize, "optimize", "opt", "Optimize output code", true);
     parser.AddOption(useBlas, "blas", "", "Emit code that calls BLAS", false);
+    parser.AddOption(bgr, "bgr", "", "Whether to convert test image to BGR format (default RGB)", true);
 }
 }

@@ -16,7 +16,7 @@ namespace ell
 void ParsedPrintArguments::AddArgs(utilities::CommandLineParser& parser)
 {
     parser.AddOption(outputFilename, "outputFilename", "of", "Path to the output file", "");
-    parser.AddOption(outputFormat, "outputFormat", "", "What output format to generate [text|dgml] (default text)", "text");
+    parser.AddOption(outputFormat, "outputFormat", "fmt", "What output format to generate [text|dgml] (default text)", "text");
 }
 
 utilities::CommandLineParseResult ParsedPrintArguments::PostProcess(const utilities::CommandLineParser& parser)

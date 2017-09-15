@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "PrintModel.h"
+#include "LayerInspector.h"
 
 // utilities
 #include "Exception.h"
@@ -22,6 +23,22 @@
 
 namespace ell
 {
+void PrintLayerParameters(std::ostream& out, std::shared_ptr<ell::predictors::neural::Layer<float>> layer)
+{
+    bool first = true;
+    std::vector<NameValue> result = InspectLayerParameters<float>(layer);
+    for (auto ptr = result.begin(), end = result.end(); ptr != end; ptr++)
+    {
+        NameValue nv = *ptr;
+        if (!first)
+        {
+            out << ", ";
+        }
+        out << nv.name << "=" << nv.value;
+        first = false;
+    }
+}
+
 void PrintNode(const model::Node& node, std::ostream& out)
 {
     bool isFirstInputPort = true;
@@ -81,10 +98,9 @@ void PrintNode(const model::Node& node, std::ostream& out)
         for (auto ptr = layers.begin(), end = layers.end(); ptr != end; ptr++)
         {
             std::shared_ptr<ell::predictors::neural::Layer<float>> layer = *ptr;
-            auto shape = layer->GetLayerParameters().outputShape;
             std::string layerName = layer->GetRuntimeTypeName();
             out << "    layer_" << layerId << " = " << layerName << "(";
-            out << "shape=[" << std::to_string(shape[0]) << "," << std::to_string(shape[1]) << "," << std::to_string(shape[2]) << "]";
+            PrintLayerParameters(out, layer);
             out << ")" << std::endl;
             layerId++;
         }

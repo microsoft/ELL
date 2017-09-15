@@ -13,6 +13,7 @@ import os
 import argparse
 import numpy as np
 import cv2
+sys.path.append("d:/git/ell/ell/tools/utilities/pythonlibs")
 import demoHelper as d
 
 # note: to run this in headless mode on a Linux machine run the following from your terminal window
@@ -62,7 +63,9 @@ def get_model_helpers(demoArgs):
 
 def main(args):
     """Main function for the Side By Side tutorial"""
-    demoArgs = d.get_common_commandline_args(args, 
+
+    helper = d.DemoHelper()    
+    arg_parser = argparse.ArgumentParser(
         "Runs a number of ELL models that predict the same categories, passing images from camera or static image file\n"
         "in a round-robin fashion. The output is a tiled image, where each tile is the result of one model."
         "Either the ELL model files, or the compiled models' Python modules must be given,\n"
@@ -71,6 +74,8 @@ def main(args):
         "   python sideBySideDemo.py categories1.txt,categories2.txt --compiledModels models/pi3/model1,models/pi3/model2\n"
         "   python sideBySideDemo.py sameCategories.txt --models model3.ell,model4.ell\n"
         "This shows opencv window with image classified by the models using given labels")
+    helper.add_arguments(arg_parser)        
+    demoArgs = arg_parser.parse_args(args)
     models = get_model_helpers(demoArgs)
     if (len(models) < 1):
         print('Found no models to run')
@@ -99,7 +104,7 @@ def main(args):
             top5 = model.get_top_n(model.results, 5)
 
             # Turn the top5 into a text string to display
-            header_text = "".join([model.get_label(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])
+            header_text = ", ".join(["(" + str(int(100 * element[1])) + "%)" + model.get_label(element[0]) for element in top5])
 
             # Draw the prediction text as a header
             modelFrame = np.copy(frame)

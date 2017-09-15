@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "LayerInspector.h"
 #include "PrintModel.h"
 
 // utilities
@@ -23,6 +24,8 @@
 
 namespace ell
 {
+extern std::string PaddingSchemeToString(ell::predictors::neural::PaddingScheme scheme);
+
 void PrintGraph(const model::Model& model, std::ostream& out)
 {
     // dump DGML graph of model
@@ -41,10 +44,19 @@ void PrintGraph(const model::Model& model, std::ostream& out)
             for (auto ptr = layers.begin(), end = layers.end(); ptr != end; ptr++, layerId++)
             {
                 std::shared_ptr<ell::predictors::neural::Layer<float>> layer = *ptr;
-                auto shape = layer->GetLayerParameters().outputShape;
+                auto params = layer->GetLayerParameters();
+                auto shape = params.outputShape;
+                auto input = params.input;
                 std::string layerName = layer->GetRuntimeTypeName();
                 DgmlNode& layerNode = graph.GetOrCreateNode(layerName + "(" + std::to_string(layerId) + ")", layerName);
-                layerNode.SetProperty("shape", "[" + std::to_string(shape[0]) + "," + std::to_string(shape[1]) + "," + std::to_string(shape[2]) + "]");
+
+                std::vector<NameValue> result = InspectLayerParameters<float>(layer);
+                for (auto ptr = result.begin(), end = result.end(); ptr != end; ptr++)
+                {
+                    NameValue nv = *ptr;
+                    layerNode.SetProperty(nv.name, nv.value);
+                }
+
                 graph.GetOrCreateLink(previousLayer, layerNode, "dependson");
                 previousLayer = layerNode; // chain them together.
             }

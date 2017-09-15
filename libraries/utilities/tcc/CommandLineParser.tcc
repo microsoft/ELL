@@ -8,6 +8,7 @@
 
 // utilities
 #include "Exception.h"
+#include "StringUtil.h"
 
 // stl
 #include <sstream>
@@ -86,7 +87,7 @@ namespace utilities
         for (const auto& valNamePair : valNames)
         {
             // Exact match
-            if(valNamePair.first == str)
+            if (valNamePair.first == str)
             {
                 result = valNamePair.second;
                 return true;
@@ -121,7 +122,8 @@ namespace utilities
     template <>
     inline bool CommandLineParser::ParseVal<bool>(std::string val, bool& result)
     {
-        result = (val[0] == 't');
+        auto lowerval = ToLowercase(val);
+        result = (val == "true" || val == "t");
         return true;
     }
 

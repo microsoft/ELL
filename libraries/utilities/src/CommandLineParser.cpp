@@ -7,16 +7,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CommandLineParser.h"
+#include "StringUtil.h"
 
 // stl
-#include <algorithm>
 #include <iostream>
+#include <locale>
 #include <sstream>
+#include <algorithm>
 
 namespace ell
 {
 namespace utilities
 {
+
     //
     // ParsedArgSet class
     //
@@ -152,7 +155,7 @@ namespace utilities
         bool needsReparse = true;
         while (needsReparse)
         {
-            std::set<std::string> unset_args;
+			std::set<std::string, case_insensitive_comparer> unset_args;
             for (const auto& opt : _options)
             {
                 unset_args.insert(opt.first);
@@ -246,7 +249,7 @@ namespace utilities
         }
     }
 
-    bool CommandLineParser::SetDefaultArgs(const std::set<std::string>& unset_args)
+    bool CommandLineParser::SetDefaultArgs(const std::set<std::string, case_insensitive_comparer>& unset_args)
     {
         bool needsReparse = false;
         for (std::string argumentName : unset_args)
@@ -296,11 +299,13 @@ namespace utilities
 
     bool CommandLineParser::HasOption(std::string option)
     {
+        // case insensitive matching.
         return _options.find(option) != _options.end();
     }
 
     bool CommandLineParser::HasShortName(std::string shortName)
     {
+        // case insensitive matching.
         return _shortToLongNameMap.find(shortName) != _shortToLongNameMap.end();
     }
 
@@ -312,7 +317,7 @@ namespace utilities
             throw CommandLineParserInvalidOptionsException(messageStr.c_str());
         }
 
-        if (_shortToLongNameMap.find(info.shortName) != _shortToLongNameMap.end())
+        if (HasShortName(info.shortName))
         {
             auto messageStr = std::string{ "Error: adding same short name more than once (" } + info.shortName + ")";
             throw CommandLineParserInvalidOptionsException(messageStr.c_str());
@@ -425,7 +430,7 @@ namespace utilities
         size_t longest_name = 0;
         for (const auto& iter : _options)
         {
-            if (iter.first == iter.second.name) // wasn't a previously-undefined option
+            if (ToLowercase(iter.first) == ToLowercase(iter.second.name)) // wasn't a previously-undefined option
             {
                 longest_name = std::max(longest_name, iter.second.optionNameHelpLength());
             }
@@ -475,7 +480,7 @@ namespace utilities
         std::stringstream out;
         out << "Current parameters for " << _exeName << std::endl;
 
-        std::set<std::string> visited_options;
+        std::set<std::string, case_insensitive_comparer> visited_options;
         for (auto& entry : _docEntries)
         {
             if (entry.EntryType == DocumentationEntry::Type::option)

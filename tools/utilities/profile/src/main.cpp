@@ -9,7 +9,7 @@
 #include "ProfileArguments.h"
 
 // tools/imageConverter
-#include "ResizeImage.h"
+#include "LoadImage.h"
 
 // common
 #include "LoadModel.h"
@@ -45,11 +45,11 @@ using namespace ell;
 // Test-data-related
 //
 template <typename T>
-std::vector<T> GetInputData(std::string filename, const math::TensorShape& inputShape, float scale)
+std::vector<T> GetInputData(std::string filename, const math::TensorShape& inputShape, float scale, bool bgr2rgb)
 {
     if (filename != "")
     {
-        return ResizeImage<T>(filename, inputShape.rows, inputShape.columns, scale);
+        return LoadImage<T>(filename, inputShape.rows, inputShape.columns, scale, bgr2rgb ? PixelOrder::RGB : PixelOrder::BGR);
     }
     else
     {
@@ -70,7 +70,7 @@ std::vector<InputType> GetModelInput(model::DynamicMap& map, const ProfileArgume
 {
     auto inputShape = map.GetInputShape();
     auto outputSize = map.GetOutputSize();
-    std::vector<InputType> input = GetInputData<InputType>(profileArguments.inputTestFile, inputShape, 1.0f);
+    std::vector<InputType> input = GetInputData<InputType>(profileArguments.inputTestFile, inputShape, 1.0f, true);
     return input;
 }
 

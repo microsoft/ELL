@@ -1,22 +1,22 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ResizeImage.cpp (imageConverter)
+//  File:     LoadImage.cpp (imageConverter)
 //  Authors:  Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "InvokePython.h"
-
-#include <sstream>
-#include <iostream>
-#include <ios>
+#include "LoadImage.h"
+#include <algorithm>
 #include <fstream>
+#include <ios>
+#include <iostream>
+#include <sstream>
 #include <vector>
-#include <algorithm> 
 
 template <typename T>
-std::vector<T> ResizeImage(std::string& fileName, int rows, int cols, double inputScale)
+std::vector<T> LoadImage(std::string& fileName, int width, int height, double inputScale, PixelOrder order)
 {
     std::stringstream stream;
     stream << R"xx(
@@ -41,9 +41,10 @@ def resize_image(image, newSize) :
         resized = cv2.resize(cropped, newSize)
         return resized
 
-def prepare_image_for_predictor(image, newSize, scale) :
+def prepare_image_for_predictor(image, newSize, scale, bgr2rgb) :
     resized = resize_image(image, newSize)
-    resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+    if bgr2rgb != 0:
+        resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
     resized = resized.astype(np.float).ravel()
     resized = resized * scale
     return resized
@@ -57,20 +58,24 @@ def main() :
     file = sys.argv[1]
     rows = int(sys.argv[2])
     cols = int(sys.argv[3])
-    scale = 1 / 255;
-    if (len(sys.argv) == 5):
+    scale = 1 / 255
+    bgr2rgb = 1
+    if len(sys.argv) >= 5:
         scale = float(sys.argv[4])
+    if len(sys.argv) >= 6:
+        bgr2rgb = int(sys.argv[5])
+        
     image = cv2.imread(file)
     if image is None:
         print("Error reading image {}".format(file))
-    resized = prepare_image_for_predictor(image, (rows, cols), scale)
+    resized = prepare_image_for_predictor(image, (rows, cols), scale, bgr2rgb)
     save_raw(file + '.dat', resized)
 
 main()
 
 )xx";
 
-    ExecutePythonScript(stream.str(), { "", fileName, std::to_string(rows), std::to_string(cols), std::to_string(inputScale) });
+    ExecutePythonScript(stream.str(), { "", fileName, std::to_string(height), std::to_string(width), std::to_string(inputScale), std::to_string((int)order) });
 
     // now load the result.
     std::ifstream stm(fileName + ".dat", std::ios::in | std::ios::binary);
@@ -88,14 +93,10 @@ main()
     return result;
 }
 
-template 
-std::vector<int> ResizeImage(std::string& fileName, int rows, int cols, double inputScale);
+template std::vector<int> LoadImage(std::string& fileName, int width, int height, double inputScale, PixelOrder order);
 
-template 
-std::vector<int64_t> ResizeImage(std::string& fileName, int rows, int cols, double inputScale);
+template std::vector<int64_t> LoadImage(std::string& fileName, int width, int height, double inputScale, PixelOrder order);
 
-template 
-std::vector<float> ResizeImage(std::string& fileName, int rows, int cols, double inputScale);
+template std::vector<float> LoadImage(std::string& fileName, int width, int height, double inputScale, PixelOrder order);
 
-template 
-std::vector<double> ResizeImage(std::string& fileName, int rows, int cols, double inputScale);
+template std::vector<double> LoadImage(std::string& fileName, int width, int height, double inputScale, PixelOrder order);

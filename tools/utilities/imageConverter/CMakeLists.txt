@@ -7,10 +7,10 @@ find_package(PythonLibs 3.5 )
 # define project
 set (library_name imageConverter)
 
-set (src src/ResizeImage.cpp
+set (src src/LoadImage.cpp
 		 src/InvokePython.cpp)
 
-set (include include/ResizeImage.h
+set (include include/LoadImage.h
 				include/InvokePython.h)
 
 source_group("src" FILES ${src})

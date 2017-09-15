@@ -9,7 +9,7 @@
 #include "CompareArguments.h"
 #include "CompareUtils.h"
 #include "ModelComparison.h"
-#include "ResizeImage.h"
+#include "LoadImage.h"
 
 // common
 #include "LoadModel.h"
@@ -48,22 +48,22 @@ std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
 }
 
 template <typename InputType>
-std::vector<InputType> GetInputImage(std::string filename, const math::TensorShape& inputShape, float inputScale)
+std::vector<InputType> GetInputImage(std::string filename, const math::TensorShape& inputShape, float inputScale, bool bgr2rgb)
 {
-    return ResizeImage<InputType>(filename, inputShape.rows, inputShape.columns, inputScale);
+    return LoadImage<InputType>(filename, inputShape.columns, inputShape.rows, inputScale, bgr2rgb ? PixelOrder::RGB : PixelOrder::BGR);
 }
 
 template <typename InputType>
 std::vector<InputType> GetInputData(model::DynamicMap& map, const CompareArguments& compareArguments)
 {
     auto inputShape = map.GetInputShape();
-    if(compareArguments.inputTestFile.empty())
+    if (compareArguments.inputTestFile.empty())
     {
         return GetInputVector<InputType>(inputShape);
     }
     else
     {
-        return GetInputImage<InputType>(compareArguments.inputTestFile, inputShape, compareArguments.inputScale);
+        return GetInputImage<InputType>(compareArguments.inputTestFile, inputShape, compareArguments.inputScale, !compareArguments.bgr);
     }
 }
 

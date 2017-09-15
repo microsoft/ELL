@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "StringUtil.h"
 
 // stl
 #include <cstddef>
@@ -204,19 +205,28 @@ namespace utilities
             std::string optionNameString() const;
             size_t optionNameHelpLength() const;
         };
+		
+		struct case_insensitive_comparer {
+			bool operator() (const std::string& lhs, const std::string& rhs) const {
+				auto lower_lhs = ToLowercase(lhs);
+				auto lower_rhs = ToLowercase(rhs);
+				return lower_lhs < lower_rhs;
+			}
+		};
+
 
         std::vector<std::string> _originalArgs;
         std::string _exeName;
         std::vector<std::string> _positionalArgs; // these are filename-type args at the end, currently unused
         std::map<std::string, std::string> _shortToLongNameMap;
-        std::map<std::string, OptionInfo> _options;
+        std::map<std::string, OptionInfo, case_insensitive_comparer> _options;
         std::vector<DocumentationEntry> _docEntries;
         std::vector<PostParseCallback> _postParseCallbacks;
 
         void AddOption(const OptionInfo& info);
         virtual bool SetOption(std::string option_name); // returns true if we need to reparse
         virtual bool SetOption(std::string option_name, std::string option_val); // returns true if we need to reparse
-        bool SetDefaultArgs(const std::set<std::string>& unset_args); // returns true if we need to reparse
+        bool SetDefaultArgs(const std::set<std::string, case_insensitive_comparer>& unset_args); // returns true if we need to reparse
     };
 
     /// <summary> A mixin class to make parameter structs be parseable. </summary>

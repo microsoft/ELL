@@ -41,6 +41,11 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
+        if (argc == 1) {
+            std::cout << commandLineParser.GetHelpString() << std::endl;
+            return 1;
+        }
+
         // open model file
         model::Model model;
         try
