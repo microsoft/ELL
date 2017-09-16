@@ -94,15 +94,13 @@ void PrintNode(const model::Node& node, std::ostream& out)
         const ell::nodes::NeuralNetworkPredictorNode<float>& predictorNode = dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<float>&>(node);
         auto predictor = predictorNode.GetPredictor();
         auto layers = predictor.GetLayers();
-        int layerId = 0;
         for (auto ptr = layers.begin(), end = layers.end(); ptr != end; ptr++)
         {
             std::shared_ptr<ell::predictors::neural::Layer<float>> layer = *ptr;
             std::string layerName = layer->GetRuntimeTypeName();
-            out << "    layer_" << layerId << " = " << layerName << "(";
+            out << "    " << layerName << "(";
             PrintLayerParameters(out, layer);
             out << ")" << std::endl;
-            layerId++;
         }
     }
 }

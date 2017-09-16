@@ -112,8 +112,8 @@ namespace ell
         auto input = params.input;
         auto shape = params.outputShape;
 
-        result.push_back(NameValue{ "input",  std::to_string(input.NumRows()) + "," + std::to_string(input.NumColumns()) + "," + std::to_string(input.NumChannels()) });
-        result.push_back(NameValue{ "output",  std::to_string(shape[0]) + "," + std::to_string(shape[1]) + "," + std::to_string(shape[2]) });
+		result.push_back(NameValue{ "shape",  "[" + std::to_string(input.NumRows()) + "," + std::to_string(input.NumColumns()) + "," + std::to_string(input.NumChannels()) + "] ->" +
+											  "[" + std::to_string(shape[0]) + "," + std::to_string(shape[1]) + "," + std::to_string(shape[2]) + "]" });
 
         auto inputpadding = params.inputPaddingParameters;
         auto outputpadding = params.outputPaddingParameters;
