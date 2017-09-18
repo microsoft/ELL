@@ -37,9 +37,13 @@ struct ProfileArguments
     bool filterTrivialNodes = true;
     bool summaryOnly = false;
 
+    // compilation options
     bool optimize = true;
     bool useBlas = true;
     bool fuseLinearOperations = true;
+    bool enableParallelFor = true;
+    bool enableVectorization = true;
+    int vectorWidth = 4;
 };
 
 /// <summary> Arguments for parsed print. </summary>

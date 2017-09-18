@@ -34,12 +34,16 @@ Help text for other options:
         --outputFilename (-of) [<cout>]  File for profiling output ('<cout>' for stdout, blank or '<null>' for no output)
         --timingOutput []                File for node timing detail output ('<cout>' for stdout, blank or '<null>' for no output)
         --format (-fmt) [text]           Format for profiling output ('text' or 'json')  {text | json}
+        --comment []                     Comment to embed in output
         --filter [true]                  Filter trivial nodes (InputNode and ConstantNode) from note type output
         --numIterations (-n) [1]         Number of times to run model during the profiling phase
         --burnIn [0]                     Number of initial iterations to run before starting the profiling phase
         --summary [false]                Print timing summary only
         --optimize [true]                Optimize compiled code
         --blas [true]                    Use BLAS libraries in compiled code
+        --foldLinearOps [true]           Fold sequences of linear operations with constant coefficients into a single operation
+        --vectorize (-vec) [false]       Enable ELL's vectorization
+        --vectorWidth (-vw) [4]          Size of vector units
         --help (-h) [false]              Print help and exit
 ```
 

@@ -68,6 +68,13 @@ namespace emitters
         /// <returns> Pointer to an llvm::Type object that corresponds to a pointer to the given VariableType. </returns>
         llvm::PointerType* PointerType(VariableType type);
 
+        /// <summary> Get the LLVM Type information for a pointer to an LLVM  type. </summary>
+        ///
+        /// <param name="type"> The LLVM type representing a pointer to the given type. </param>
+        ///
+        /// <returns> Pointer to an llvm::Type object that corresponds to a pointer to the given VariableType. </returns>
+        llvm::PointerType* PointerType(llvm::Type* type);
+
         /// <summary>
         /// Get the LLVM Type Information for an ARRAY of VariableType, with a given size.
         /// </summary>
@@ -79,7 +86,17 @@ namespace emitters
         llvm::ArrayType* ArrayType(VariableType type, size_t size);
 
         /// <summary>
-        /// Get the LLVM Type Information for a vector of VariableType, with a given size.
+        /// Get the LLVM Type Information for an ARRAY of VariableType, with a given size.
+        /// </summary>
+        ///
+        /// <param name="type"> The entry type. </param>
+        /// <param name="size"> The array size. </param>
+        ///
+        /// <returns> Pointer to an llvm::ArrayType object that represents the specified array. </returns>
+        llvm::ArrayType* ArrayType(llvm::Type* type, size_t size);
+
+        /// <summary>
+        /// Get the LLVM Type Information for a vector of a given size.
         /// </summary>
         ///
         /// <param name="type"> The entry type. </param>
@@ -87,6 +104,16 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::VectorType object that represents the specified vector. </returns>
         llvm::VectorType* VectorType(VariableType type, size_t size);
+
+        /// <summary>
+        /// Get the LLVM Type Information for a vector of a given size.
+        /// </summary>
+        ///
+        /// <param name="type"> The entry type. </param>
+        /// <param name="size"> The vector size. </param>
+        ///
+        /// <returns> Pointer to an llvm::VectorType object that represents the specified vector. </returns>
+        llvm::VectorType* VectorType(llvm::Type* type, size_t size);
 
         /// <summary> Emit a boolean literal. </summary>
         ///
@@ -236,7 +263,7 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents false. </returns>
         llvm::Constant* FalseBit();
 
-        /// <summary> Emit a cast operation from one one type to another. </summary>
+        /// <summary> Emit a cast operation from one type to another. </summary>
         ///
         /// <typeparam name="InputType"> The input type. </typeparam>
         /// <typeparam name="OutputType"> The output type. </typeparam>
@@ -246,13 +273,21 @@ namespace emitters
         template<typename InputType, typename OutputType>
         llvm::Value* CastValue(llvm::Value* pValue);
 
-        /// <summary> Emit a cast operation from one one type to another. </summary>
+        /// <summary> Emit a cast operation from one type to another. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
         /// <param name="destinationType"> Output type. </param>
         ///
         /// <returns> Pointer to the output value. </returns>
         llvm::Value* Cast(llvm::Value* pValue, VariableType destinationType);
+        
+        /// <summary> Emit a cast operation from one type to another. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="destinationType"> Output type. </param>
+        ///
+        /// <returns> Pointer to the output value. </returns>
+        llvm::Value* Cast(llvm::Value* pValue, llvm::Type* destinationType);
 
         /// <summary> Emit a cast operation from an int to a float. </summary>
         ///
@@ -422,7 +457,6 @@ namespace emitters
         /// <returns> Pointer to the declared function. </returns>
         llvm::Function* Function(llvm::Module* pModule, const std::string& name, llvm::Type* returnType, llvm::Function::LinkageTypes linkage, const std::vector<llvm::Type*>& argTypes);
 
-
         /// <summary> Emit the beginning of a new code block in the given function. </summary>
         ///
         /// <param name="pFunction"> Pointer to the function to which the block is added. </param>
@@ -547,6 +581,17 @@ namespace emitters
         ///
         /// <returns> Pointer to the intrinsic function. </returns>
         llvm::Function* GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const VariableTypeList& arguments);
+
+        /// <summary>
+        /// Locates an intrinsic function with a signature matching the description in arguments.
+        /// </summary>
+        ///
+        /// <param name="pModule"> the module. </param>
+        /// <param name="id"> The intrinsic id. </param>
+        /// <param name="arguments"> The arguments. </param>
+        ///
+        /// <returns> Pointer to the intrinsic function. </returns>
+        llvm::Function* GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const LLVMTypeList& arguments);
 
         /// <summary> Emit a Phi instruction. </summary>
         ///
@@ -750,8 +795,8 @@ namespace emitters
         /// <summary> Converts a list of ELL types to LLVM Type* values. </summary>
         ///
         /// <param name="types"> The VariableTypeList of ELL types. </param>
-        /// <returns> A std::vector of llvm::Type* values. </returns>
-        std::vector<llvm::Type*> GetLLVMTypes(const VariableTypeList& types);
+        /// <returns> A LLVMTypeList with the corresponding LLVM types. </returns>
+        LLVMTypeList GetLLVMTypes(const VariableTypeList& types);
 
     private:
         llvm::Type* GetVariableType(VariableType type);

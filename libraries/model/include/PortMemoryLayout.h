@@ -141,7 +141,6 @@ namespace model
         Shape _size; // the "active" area of the memory
         Shape _stride; // the allocated size along each dimension
         Shape _offset; // the offset to the active area for each dimension
-
     };
 
     /// <summary> Checks if two shapes are equal. </summary>

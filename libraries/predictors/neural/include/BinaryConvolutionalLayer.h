@@ -112,6 +112,11 @@ namespace neural
         /// <returns> The padding masks, packed as bits. </returns>
         const std::vector<std::vector<uint64_t>> GetCompressedInputPaddingMasks() const { return _shapedInputPaddingMask; }
 
+        /// <summary> Get the input padding mask sums. </summary>
+        ///
+        /// <returns> The padding masks, packed as bits. </returns>
+        const std::vector<int> GetInputPaddingMaskSums() const { return _shapedInputPaddingMaskSums; }
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -154,6 +159,7 @@ namespace neural
         std::vector<std::vector<uint64_t>> _binarizedShapedInput;
         std::vector<std::vector<uint64_t>> _binarizedWeights;
         std::vector<std::vector<uint64_t>> _shapedInputPaddingMask;
+        std::vector<int> _shapedInputPaddingMaskSums;
         std::vector<ElementType> _filterMeans;
 
         MatrixType _realValuedShapedInputMatrix;

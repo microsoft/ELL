@@ -112,7 +112,7 @@ namespace neural
 
         _binarizedShapedInput.resize(outputShape);
         _shapedInputPaddingMask.resize(outputShape);
-
+        _shapedInputPaddingMaskSums.resize(outputShape);
         // Set the sizes of the shapedInput and padding mask vectors
         const size_t binarizedFilterVolumeSize = ((filterWidth * filterWidth * _layerParameters.input.NumChannels()) - 1) / _binaryElementSize + 1;
         for (size_t i = 0; i < _binarizedShapedInput.size(); ++i)
@@ -460,6 +460,7 @@ namespace neural
             const size_t convolutionalCol = outRow % outputWidth;
             const size_t horizontalStart = (convolutionalCol * _convolutionalParameters.stride);
             const size_t verticalStart = (convolutionalRow * _convolutionalParameters.stride);
+            int maskSum = 0;
 
             for (size_t f = 0; f < fieldVolumeSize; ++f)
             {
@@ -487,8 +488,10 @@ namespace neural
                 if (IsInputZeroPadding(sourceRow, sourceCol))
                 {
                     _shapedInputPaddingMask[outRow][block] -= ((uint64_t)1 << bit);
+                    maskSum += 1;
                 }
             }
+            _shapedInputPaddingMaskSums[outRow] = maskSum;
         }
     }
 }

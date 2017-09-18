@@ -1,0 +1,103 @@
+Node statistics
+Node[1339]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1340]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1341]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1342]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1343]:	InputNode<float>                           	time: 0.00122 ms	count: 10
+Node[1344]:	ReorderDataNode<float>                     	time: 1.50073 ms	count: 10
+Node[1345]:	ReorderDataNode<float>                     	time: 3.04443 ms	count: 10
+Node[1346]:	ReshapeImageNode<float>                    	time: 11.54590 ms	count: 10
+Node[1347]:	MatrixMatrixMultiplyNode<float>            	time: 17.33057 ms	count: 10
+Node[1348]:	ReorderDataNode<float>                     	time: 45.23511 ms	count: 10
+Node[1349]:	ConstantNode<float>                        	time: 0.00122 ms	count: 10
+Node[1350]:	ConstantNode<float>                        	time: 0.00098 ms	count: 10
+Node[1351]:	BroadcastLinearFunctionNode<float>         	time: 7.69043 ms	count: 10
+Node[1352]:	BroadcastUnaryFunctionNode<float>          	time: 9.72656 ms	count: 10
+Node[1353]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 3.87817 ms	count: 10
+Node[1354]:	ReorderDataNode<float>                     	time: 7.67700 ms	count: 10
+Node[1355]:	ReshapeImageNode<float>                    	time: 34.00879 ms	count: 10
+Node[1356]:	MatrixMatrixMultiplyNode<float>            	time: 19.46167 ms	count: 10
+Node[1357]:	ReorderDataNode<float>                     	time: 15.55273 ms	count: 10
+Node[1358]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1359]:	ConstantNode<float>                        	time: 0.00098 ms	count: 10
+Node[1360]:	BroadcastLinearFunctionNode<float>         	time: 3.39966 ms	count: 10
+Node[1361]:	BroadcastUnaryFunctionNode<float>          	time: 4.72656 ms	count: 10
+Node[1362]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 1.70435 ms	count: 10
+Node[1363]:	ReorderDataNode<float>                     	time: 3.74780 ms	count: 10
+Node[1364]:	ReshapeImageNode<float>                    	time: 17.72729 ms	count: 10
+Node[1365]:	MatrixMatrixMultiplyNode<float>            	time: 15.07959 ms	count: 10
+Node[1366]:	ReorderDataNode<float>                     	time: 7.87012 ms	count: 10
+Node[1367]:	ConstantNode<float>                        	time: 0.00098 ms	count: 10
+Node[1368]:	ConstantNode<float>                        	time: 0.00195 ms	count: 10
+Node[1369]:	BroadcastLinearFunctionNode<float>         	time: 1.99731 ms	count: 10
+Node[1370]:	BroadcastUnaryFunctionNode<float>          	time: 2.69409 ms	count: 10
+Node[1371]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 0.79736 ms	count: 10
+Node[1372]:	BinarizeAndReshapeImageNode<float,longlong>	time: 6.01611 ms	count: 10
+Node[1373]:	ConstantNode<longlong>                     	time: 0.00220 ms	count: 10
+Node[1374]:	ConstantNode<longlong>                     	time: 0.00000 ms	count: 10
+Node[1375]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1376]:	BinaryXnorNode<float,longlong>             	time: 18.21143 ms	count: 10
+Node[1377]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1378]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1379]:	BroadcastLinearFunctionNode<float>         	time: 0.75049 ms	count: 10
+Node[1380]:	BroadcastUnaryFunctionNode<float>          	time: 1.05200 ms	count: 10
+Node[1381]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 0.30688 ms	count: 10
+Node[1382]:	BinarizeAndReshapeImageNode<float,longlong>	time: 2.37280 ms	count: 10
+Node[1383]:	ConstantNode<longlong>                     	time: 0.00098 ms	count: 10
+Node[1384]:	ConstantNode<longlong>                     	time: 0.00000 ms	count: 10
+Node[1385]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1386]:	BinaryXnorNode<float,longlong>             	time: 12.29980 ms	count: 10
+Node[1387]:	ConstantNode<float>                        	time: 0.00293 ms	count: 10
+Node[1388]:	ConstantNode<float>                        	time: 0.00098 ms	count: 10
+Node[1389]:	BroadcastLinearFunctionNode<float>         	time: 0.25195 ms	count: 10
+Node[1390]:	BroadcastUnaryFunctionNode<float>          	time: 0.36328 ms	count: 10
+Node[1391]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 0.08618 ms	count: 10
+Node[1392]:	BinarizeAndReshapeImageNode<float,longlong>	time: 0.37671 ms	count: 10
+Node[1393]:	ConstantNode<longlong>                     	time: 0.00098 ms	count: 10
+Node[1394]:	ConstantNode<longlong>                     	time: 0.00000 ms	count: 10
+Node[1395]:	ConstantNode<float>                        	time: 0.00098 ms	count: 10
+Node[1396]:	BinaryXnorNode<float,longlong>             	time: 3.93042 ms	count: 10
+Node[1397]:	ConstantNode<float>                        	time: 0.00415 ms	count: 10
+Node[1398]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1399]:	BroadcastLinearFunctionNode<float>         	time: 0.04004 ms	count: 10
+Node[1400]:	BroadcastUnaryFunctionNode<float>          	time: 0.05103 ms	count: 10
+Node[1401]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 0.30664 ms	count: 10
+Node[1402]:	BinarizeAndReshapeImageNode<float,longlong>	time: 0.69678 ms	count: 10
+Node[1403]:	ConstantNode<longlong>                     	time: 0.00122 ms	count: 10
+Node[1404]:	ConstantNode<longlong>                     	time: 0.00000 ms	count: 10
+Node[1405]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1406]:	BinaryXnorNode<float,longlong>             	time: 15.02832 ms	count: 10
+Node[1407]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1408]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1409]:	BroadcastLinearFunctionNode<float>         	time: 0.07593 ms	count: 10
+Node[1410]:	BroadcastUnaryFunctionNode<float>          	time: 0.10840 ms	count: 10
+Node[1411]:	ReorderDataNode<float>                     	time: 0.08179 ms	count: 10
+Node[1412]:	ReshapeImageNode<float>                    	time: 0.15063 ms	count: 10
+Node[1413]:	MatrixMatrixMultiplyNode<float>            	time: 0.93506 ms	count: 10
+Node[1414]:	ReorderDataNode<float>                     	time: 0.00610 ms	count: 10
+Node[1415]:	ConstantNode<float>                        	time: 0.00000 ms	count: 10
+Node[1416]:	BroadcastLinearFunctionNode<float>         	time: 0.00220 ms	count: 10
+Node[1417]:	BroadcastUnaryFunctionNode<float>          	time: 0.00537 ms	count: 10
+Node[1418]:	PoolingLayerNode<float,MeanPoolingFunction>	time: 0.00098 ms	count: 10
+Node[1419]:	SoftmaxLayerNode<float>                    	time: 0.00977 ms	count: 10
+Node[1420]:	OutputNode<float>                          	time: 0.00171 ms	count: 10
+
+
+Node type statistics
+PoolingLayerNode<float,MeanPoolingFunction>	time: 0.00098 ms 	count: 10
+InputNode<float>                           	time: 0.00122 ms 	count: 10
+OutputNode<float>                          	time: 0.00171 ms 	count: 10
+ConstantNode<longlong>                     	time: 0.00537 ms 	count: 80
+SoftmaxLayerNode<float>                    	time: 0.00977 ms 	count: 10
+ConstantNode<float>                        	time: 0.01514 ms 	count: 230
+PoolingLayerNode<float,MaxPoolingFunction> 	time: 7.07959 ms 	count: 60
+BinarizeAndReshapeImageNode<float,longlong>	time: 9.46240 ms 	count: 40
+BroadcastLinearFunctionNode<float>         	time: 14.20801 ms 	count: 80
+BroadcastUnaryFunctionNode<float>          	time: 18.72729 ms 	count: 80
+BinaryXnorNode<float,longlong>             	time: 49.46997 ms 	count: 40
+MatrixMatrixMultiplyNode<float>            	time: 52.80688 ms 	count: 40
+ReshapeImageNode<float>                    	time: 63.43262 ms 	count: 40
+ReorderDataNode<float>                     	time: 84.71582 ms 	count: 90
+
+Model statistics
+Total time: 300.02881 ms 	count: 10	 time per run: 30.00288 ms

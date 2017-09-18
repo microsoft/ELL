@@ -100,14 +100,29 @@ namespace emitters
         return Type(type)->getPointerTo();
     }
 
+    llvm::PointerType* IREmitter::PointerType(llvm::Type* type)
+    {
+        return type->getPointerTo();
+    }
+
     llvm::ArrayType* IREmitter::ArrayType(VariableType type, size_t size)
     {
         return llvm::ArrayType::get(Type(type), size);
     }
 
+    llvm::ArrayType* IREmitter::ArrayType(llvm::Type* type, size_t size)
+    {
+        return llvm::ArrayType::get(type, size);
+    }
+
     llvm::VectorType* IREmitter::VectorType(VariableType type, size_t size)
     {
         return llvm::VectorType::get(Type(type), size);
+    }
+
+    llvm::VectorType* IREmitter::VectorType(llvm::Type* type, size_t size)
+    {
+        return llvm::VectorType::get(type, size);
     }
 
     llvm::Constant* IREmitter::Literal(const bool value)
@@ -400,6 +415,12 @@ namespace emitters
     {
         assert(pValue != nullptr);
         return _irBuilder.CreateBitCast(pValue, Type(destinationType));
+    }
+
+    llvm::Value* IREmitter::Cast(llvm::Value* pValue, llvm::Type* destinationType)
+    {
+        assert(pValue != nullptr);
+        return _irBuilder.CreateBitCast(pValue, destinationType);
     }
 
     llvm::Value* IREmitter::CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned)
@@ -773,6 +794,12 @@ namespace emitters
         return llvm::Intrinsic::getDeclaration(pModule, id, types);
     }
 
+    llvm::Function* IREmitter::GetIntrinsic(llvm::Module* pModule, llvm::Intrinsic::ID id, const LLVMTypeList& arguments)
+    {
+        assert(pModule != nullptr);
+        return llvm::Intrinsic::getDeclaration(pModule, id, arguments);
+    }
+
     llvm::PHINode* IREmitter::Phi(VariableType type, llvm::Value* pLeftValue, llvm::BasicBlock* pLeftBlock, llvm::Value* pRightValue, llvm::BasicBlock* pRightBlock)
     {
         assert(pLeftBlock != nullptr);
@@ -986,9 +1013,9 @@ namespace emitters
         return llvm::ConstantInt::get(_llvmContext, llvm::APInt(SizeOf(type), value, true));
     }
 
-    std::vector<llvm::Type*> IREmitter::GetLLVMTypes(const VariableTypeList& types)
+    LLVMTypeList IREmitter::GetLLVMTypes(const VariableTypeList& types)
     {
-        std::vector<llvm::Type*> llvmTypes;
+        LLVMTypeList llvmTypes;
         for (auto t : types)
         {
             llvmTypes.push_back(Type(t));

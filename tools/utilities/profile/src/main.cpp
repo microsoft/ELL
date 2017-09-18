@@ -296,6 +296,8 @@ void TimeModel(model::DynamicMap& map, const std::vector<InputType>& input, cons
     settings.compilerSettings.optimize = profileArguments.optimize;
     settings.compilerSettings.useBlas = profileArguments.useBlas;
     settings.fuseLinearFunctionNodes = profileArguments.fuseLinearOperations;
+    settings.compilerSettings.allowVectorInstructions = profileArguments.enableVectorization;
+    settings.compilerSettings.vectorWidth = profileArguments.vectorWidth;
     settings.profile = true;
     model::IRMapCompiler compiler(settings);
 
@@ -353,6 +355,8 @@ void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArgumen
     settings.compilerSettings.optimize = profileArguments.optimize;
     settings.compilerSettings.useBlas = profileArguments.useBlas;
     settings.fuseLinearFunctionNodes = profileArguments.fuseLinearOperations;
+    settings.compilerSettings.allowVectorInstructions = profileArguments.enableVectorization;
+    settings.compilerSettings.vectorWidth = profileArguments.vectorWidth;
     settings.profile = true;
     model::IRMapCompiler compiler(settings);
 

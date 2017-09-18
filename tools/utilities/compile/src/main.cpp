@@ -101,7 +101,12 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::MapLoadA
 
     auto inputFilename = mapLoadArguments.GetInputFilename();
     auto outputDirectory = compileArguments.outputDirectory;
-    auto baseFilename = utilities::RemoveFileExtension(inputFilename);
+
+    auto baseFilename = compileArguments.outputFilenameBase;
+    if(baseFilename.empty())
+    {
+        baseFilename = utilities::RemoveFileExtension(inputFilename);
+    }
     if(outputDirectory != "")
     {
         baseFilename = utilities::JoinPaths(outputDirectory, utilities::GetFileName(baseFilename));
@@ -127,9 +132,11 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::MapLoadA
     model::MapCompilerParameters settings;
     settings.moduleName = namespacePrefix;
     settings.mapFunctionName = functionName;
-    settings.compilerSettings.useBlas = compileArguments.useBlas;
     settings.compilerSettings.optimize = compileArguments.optimize;
+    settings.compilerSettings.useBlas = compileArguments.useBlas;
     settings.fuseLinearFunctionNodes = compileArguments.fuseLinearOperations;
+    settings.compilerSettings.allowVectorInstructions = compileArguments.enableVectorization;
+    settings.compilerSettings.vectorWidth = compileArguments.vectorWidth;
     settings.profile = compileArguments.profile;
 
     if (compileArguments.target != "")

@@ -69,7 +69,8 @@ namespace nodes
     private:
         std::vector<int64_t> GetCompressedFilterWeights() const;
         std::vector<ValueType> GetFilterMeans() const;
-        std::vector<int64_t> GetCompressedInputPaddingMasks() const;
+        std::vector<int64_t> GetCompressedInputPaddingMask() const;
+        std::vector<int> GetInputPaddingMaskSums() const;
     };
 
     //
@@ -89,9 +90,9 @@ namespace nodes
 
         BinaryReceptiveFieldMatrixNode();
         BinaryReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input,
-                                    const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
-                                    const model::PortMemoryLayout& inputMemoryLayout,
-                                    const model::PortMemoryLayout& outputMemoryLayout);
+                                       const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
+                                       const model::PortMemoryLayout& inputMemoryLayout,
+                                       const model::PortMemoryLayout& outputMemoryLayout);
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
@@ -142,11 +143,13 @@ namespace nodes
         /// @{
         static constexpr const char* inputPortName = "input";
         static constexpr const char* inputPaddingMasksPortName = "inputPaddingMasks";
+        static constexpr const char* inputPaddingMaskSumsPortName = "inputPaddingMaskSums";
         static constexpr const char* filterWeightsPortName = "filterWeights";
         static constexpr const char* filterMeansPortName = "filterMeans";
         static constexpr const char* outputPortName = "output";
         const model::InputPort<PackedBitsType>& input = _input;
         const model::InputPort<PackedBitsType>& inputPaddingMasks = _inputPaddingMasks;
+        const model::InputPort<int>& inputPaddingMaskSums = _inputPaddingMaskSums;
         const model::InputPort<PackedBitsType>& filterWeights = _filterWeights;
         const model::InputPort<ValueType>& filterMeans = _filterMeans;
         const model::OutputPort<ValueType>& output = _output;
@@ -157,8 +160,9 @@ namespace nodes
 
         /// <summary> Constructor. </summary>
         ///
-        /// <param name="input"> The ports to get input data from. </param>
+        /// <param name="input"> The image data after being expanded into a GEMM-friendly order, binarized, and packed (via the BinaryReceptiveFieldMatrixNode). </param>
         /// <param name="inputPaddingMasks"> The packed padding masks for the input data. </param>
+        /// <param name="inputPaddingMaskSums"> The sum of padding pixels per row of the shaped input data. </param>
         /// <param name="filterWeights"> The packed binary weights for the convolutional filters. </param>
         /// <param name="filterMeans"> The real-valued means of the convolutional filters. </param>
         /// <param name="convolutionalParameters"> The convolutional parameters. </param>
@@ -167,6 +171,7 @@ namespace nodes
         /// <param name="outputMemoryLayout"> The layout of the output data. </param>
         BinaryXnorNode(const model::PortElements<PackedBitsType>& input,
                        const model::PortElements<PackedBitsType>& inputPaddingMasks,
+                       const model::PortElements<int>& inputPaddingMaskSums,
                        const model::PortElements<PackedBitsType>& filterWeights,
                        const model::PortElements<ValueType>& filterMeans,
                        const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
@@ -174,7 +179,7 @@ namespace nodes
                        const model::PortMemoryLayout& inputMemoryLayout,
                        const model::PortMemoryLayout& outputMemoryLayout);
 
-        /// <summary> Gets information about the input memory layout </summary>
+        /// <summary> Gets information about the input memory layout of the original BinaryConvolutionalLayoutNode </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
@@ -199,9 +204,19 @@ namespace nodes
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        void EmitInnerLoop(emitters::IRFunctionEmitter& function,
+                           llvm::Value* reshapedInput,
+                           llvm::Value* paddingMask,
+                           llvm::Value* weights,
+                           llvm::Value* xorSumVariable,
+                           llvm::Function* popCountFunction,
+                           int numBlocks,
+                           bool hasZeroPadding);
+
         // Input
         model::InputPort<PackedBitsType> _input;
         model::InputPort<PackedBitsType> _inputPaddingMasks;
+        model::InputPort<int> _inputPaddingMaskSums;
         model::InputPort<PackedBitsType> _filterWeights;
         model::InputPort<ValueType> _filterMeans;
 

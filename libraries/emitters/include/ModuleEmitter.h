@@ -35,6 +35,8 @@ namespace emitters
     {
         bool unrollLoops = false;
         bool inlineOperators = true;
+        bool allowVectorInstructions = true;
+        int vectorWidth = 4;
         bool useBlas = false;
         bool optimize = true;
         bool includeDiagnosticInfo = false;

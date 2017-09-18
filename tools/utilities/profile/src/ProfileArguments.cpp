@@ -48,6 +48,7 @@ void ParsedProfileArguments::AddArgs(utilities::CommandLineParser& parser)
         "comment",
         "",
         "Comment to embed in output",
+        "",
         "");
 
     parser.AddOption(
@@ -99,5 +100,18 @@ void ParsedProfileArguments::AddArgs(utilities::CommandLineParser& parser)
         "Fuse sequences of linear operations with constant coefficients into a single operation",
         true);
 
+    parser.AddOption(
+        enableVectorization,
+        "vectorize",
+        "vec",
+        "Enable ELL's vectorization",
+        false);
+
+    parser.AddOption(
+        vectorWidth,
+        "vectorWidth",
+        "vw",
+        "Size of vector units",
+        4);
 }
 }

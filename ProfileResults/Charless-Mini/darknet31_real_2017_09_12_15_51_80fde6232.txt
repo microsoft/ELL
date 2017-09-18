@@ -1,0 +1,101 @@
+Comment: OriginalXnor
+Node statistics
+Node[1339]:	ConstantNode<float>                        	time: 0.00415 ms	count: 20
+Node[1340]:	ConstantNode<float>                        	time: 0.00000 ms	count: 20
+Node[1341]:	ConstantNode<float>                        	time: 0.00098 ms	count: 20
+Node[1342]:	ConstantNode<float>                        	time: 0.00195 ms	count: 20
+Node[1343]:	ConstantNode<float>                        	time: 0.00293 ms	count: 20
+Node[1344]:	ConstantNode<float>                        	time: 0.00195 ms	count: 20
+Node[1345]:	ConstantNode<float>                        	time: 0.00000 ms	count: 20
+Node[1346]:	ConstantNode<float>                        	time: 0.00220 ms	count: 20
+Node[1347]:	InputNode<float>                           	time: 0.00098 ms	count: 20
+Node[1348]:	ReorderDataNode<float>                     	time: 4.23877 ms	count: 20
+Node[1349]:	ReorderDataNode<float>                     	time: 2.58911 ms	count: 20
+Node[1350]:	ReceptiveFieldMatrixNode<float>            	time: 12.44458 ms	count: 20
+Node[1351]:	MatrixMatrixMultiplyNode<float>            	time: 34.99365 ms	count: 20
+Node[1352]:	ReorderDataNode<float>                     	time: 18.81860 ms	count: 20
+Node[1353]:	ConstantNode<float>                        	time: 0.00098 ms	count: 20
+Node[1354]:	ConstantNode<float>                        	time: 0.00000 ms	count: 20
+Node[1355]:	BroadcastLinearFunctionNode<float>         	time: 16.11401 ms	count: 20
+Node[1356]:	BroadcastUnaryFunctionNode<float>          	time: 19.60596 ms	count: 20
+Node[1357]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 7.89551 ms	count: 20
+Node[1358]:	ReorderDataNode<float>                     	time: 8.02734 ms	count: 20
+Node[1359]:	ReceptiveFieldMatrixNode<float>            	time: 15.92627 ms	count: 20
+Node[1360]:	MatrixMatrixMultiplyNode<float>            	time: 39.22778 ms	count: 20
+Node[1361]:	ReorderDataNode<float>                     	time: 8.23364 ms	count: 20
+Node[1362]:	ConstantNode<float>                        	time: 0.00000 ms	count: 20
+Node[1363]:	ConstantNode<float>                        	time: 0.00195 ms	count: 20
+Node[1364]:	BroadcastLinearFunctionNode<float>         	time: 7.98950 ms	count: 20
+Node[1365]:	BroadcastUnaryFunctionNode<float>          	time: 10.08716 ms	count: 20
+Node[1366]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 3.56714 ms	count: 20
+Node[1367]:	ReorderDataNode<float>                     	time: 4.01392 ms	count: 20
+Node[1368]:	ReceptiveFieldMatrixNode<float>            	time: 8.20288 ms	count: 20
+Node[1369]:	MatrixMatrixMultiplyNode<float>            	time: 30.18091 ms	count: 20
+Node[1370]:	ReorderDataNode<float>                     	time: 4.02637 ms	count: 20
+Node[1371]:	ConstantNode<float>                        	time: 0.00220 ms	count: 20
+Node[1372]:	ConstantNode<float>                        	time: 0.00098 ms	count: 20
+Node[1373]:	BroadcastLinearFunctionNode<float>         	time: 4.15649 ms	count: 20
+Node[1374]:	BroadcastUnaryFunctionNode<float>          	time: 5.79272 ms	count: 20
+Node[1375]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 1.68896 ms	count: 20
+Node[1376]:	ReorderDataNode<float>                     	time: 1.33984 ms	count: 20
+Node[1377]:	ReceptiveFieldMatrixNode<float>            	time: 4.65405 ms	count: 20
+Node[1378]:	MatrixMatrixMultiplyNode<float>            	time: 25.45093 ms	count: 20
+Node[1379]:	ReorderDataNode<float>                     	time: 1.65479 ms	count: 20
+Node[1380]:	ConstantNode<float>                        	time: 0.00098 ms	count: 20
+Node[1381]:	ConstantNode<float>                        	time: 0.00195 ms	count: 20
+Node[1382]:	BroadcastLinearFunctionNode<float>         	time: 1.91650 ms	count: 20
+Node[1383]:	BroadcastUnaryFunctionNode<float>          	time: 2.73682 ms	count: 20
+Node[1384]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 0.76904 ms	count: 20
+Node[1385]:	ReorderDataNode<float>                     	time: 0.61304 ms	count: 20
+Node[1386]:	ReceptiveFieldMatrixNode<float>            	time: 2.63281 ms	count: 20
+Node[1387]:	MatrixMatrixMultiplyNode<float>            	time: 24.29297 ms	count: 20
+Node[1388]:	ReorderDataNode<float>                     	time: 0.69849 ms	count: 20
+Node[1389]:	ConstantNode<float>                        	time: 0.00098 ms	count: 20
+Node[1390]:	ConstantNode<float>                        	time: 0.00098 ms	count: 20
+Node[1391]:	BroadcastLinearFunctionNode<float>         	time: 0.95679 ms	count: 20
+Node[1392]:	BroadcastUnaryFunctionNode<float>          	time: 1.27881 ms	count: 20
+Node[1393]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 0.39282 ms	count: 20
+Node[1394]:	ReorderDataNode<float>                     	time: 0.27417 ms	count: 20
+Node[1395]:	ReceptiveFieldMatrixNode<float>            	time: 1.23389 ms	count: 20
+Node[1396]:	MatrixMatrixMultiplyNode<float>            	time: 27.59082 ms	count: 20
+Node[1397]:	ReorderDataNode<float>                     	time: 0.44141 ms	count: 20
+Node[1398]:	ConstantNode<float>                        	time: 0.00000 ms	count: 20
+Node[1399]:	ConstantNode<float>                        	time: 0.00098 ms	count: 20
+Node[1400]:	BroadcastLinearFunctionNode<float>         	time: 0.45923 ms	count: 20
+Node[1401]:	BroadcastUnaryFunctionNode<float>          	time: 0.67188 ms	count: 20
+Node[1402]:	PoolingLayerNode<float,MaxPoolingFunction> 	time: 0.27759 ms	count: 20
+Node[1403]:	ReorderDataNode<float>                     	time: 0.20703 ms	count: 20
+Node[1404]:	ReceptiveFieldMatrixNode<float>            	time: 0.90137 ms	count: 20
+Node[1405]:	MatrixMatrixMultiplyNode<float>            	time: 69.35791 ms	count: 20
+Node[1406]:	ReorderDataNode<float>                     	time: 0.40967 ms	count: 20
+Node[1407]:	ConstantNode<float>                        	time: 0.00000 ms	count: 20
+Node[1408]:	ConstantNode<float>                        	time: 0.00195 ms	count: 20
+Node[1409]:	BroadcastLinearFunctionNode<float>         	time: 0.30127 ms	count: 20
+Node[1410]:	BroadcastUnaryFunctionNode<float>          	time: 0.41577 ms	count: 20
+Node[1411]:	ReorderDataNode<float>                     	time: 0.41895 ms	count: 20
+Node[1412]:	ReceptiveFieldMatrixNode<float>            	time: 0.10986 ms	count: 20
+Node[1413]:	MatrixMatrixMultiplyNode<float>            	time: 1.25952 ms	count: 20
+Node[1414]:	ReorderDataNode<float>                     	time: 0.01294 ms	count: 20
+Node[1415]:	ConstantNode<float>                        	time: 0.00098 ms	count: 20
+Node[1416]:	BroadcastLinearFunctionNode<float>         	time: 0.01099 ms	count: 20
+Node[1417]:	BroadcastUnaryFunctionNode<float>          	time: 0.01904 ms	count: 20
+Node[1418]:	PoolingLayerNode<float,MeanPoolingFunction>	time: 0.00879 ms	count: 20
+Node[1419]:	SoftmaxLayerNode<float>                    	time: 0.01440 ms	count: 20
+Node[1420]:	OutputNode<float>                          	time: 0.00317 ms	count: 20
+
+
+Node type statistics
+InputNode<float>                           	time: 0.00098 ms 	count: 20
+OutputNode<float>                          	time: 0.00317 ms 	count: 20
+PoolingLayerNode<float,MeanPoolingFunction>	time: 0.00879 ms 	count: 20
+SoftmaxLayerNode<float>                    	time: 0.01440 ms 	count: 20
+ConstantNode<float>                        	time: 0.02905 ms 	count: 460
+PoolingLayerNode<float,MaxPoolingFunction> 	time: 14.59106 ms 	count: 120
+BroadcastLinearFunctionNode<float>         	time: 31.90479 ms 	count: 160
+BroadcastUnaryFunctionNode<float>          	time: 40.60815 ms 	count: 160
+ReceptiveFieldMatrixNode<float>            	time: 46.10571 ms 	count: 160
+ReorderDataNode<float>                     	time: 56.01807 ms 	count: 340
+MatrixMatrixMultiplyNode<float>            	time: 252.35449 ms 	count: 160
+
+Model statistics
+Total time: 441.85205 ms 	count: 20	 time per run: 22.09260 ms

@@ -35,6 +35,7 @@ struct CompileArguments
     std::string compiledFunctionName; // defaults to output filename
     std::string compiledModuleName;
     std::string outputDirectory;
+    std::string outputFilenameBase;
     bool verbose = false;
 
     // model-generation options
@@ -45,6 +46,9 @@ struct CompileArguments
     bool optimize = true;
     bool useBlas = false;
     bool fuseLinearOperations = true;
+    bool enableParallelFor = true;
+    bool enableVectorization = true;
+    int vectorWidth = 4;
 
     // target machine options
     // known target names: host, mac, linux, windows, arm, arm64, ios

@@ -8,6 +8,12 @@
 
 #include "BinaryConvolutionalLayerNode.h"
 #include "ConstantNode.h"
+#include "ReorderDataNode.h"
+
+// emitters
+#include "IREmitter.h"
+#include "IRVectorUtilities.h"
+#include "LLVMUtilities.h"
 
 // stl
 #include <algorithm>
@@ -204,22 +210,32 @@ namespace nodes
             {
                 auto rowIndex = rowLoop.LoadIterationVariable();
 
-                // TODO: maybe don't inline these if filterSize is big
-                for (int colIndex = 0; colIndex < filterSize; ++colIndex)
+                auto colLoop = function.ForLoop();
+                colLoop.Begin(filterSize);
                 {
-                    for (int channelIndex = 0; channelIndex < numChannels; ++channelIndex)
+                    auto colIndex = colLoop.LoadIterationVariable();
+
+                    auto channelLoop = function.ForLoop();
+                    channelLoop.Begin(numChannels);
                     {
+                        auto channelIndex = channelLoop.LoadIterationVariable();
                         auto inputRow = function.Operator(plus, inputRowStart, rowIndex);
-                        auto inputColumn = function.Operator(plus, inputColStart, function.Literal(colIndex));
-                        auto inputChannel = function.Literal<int>(channelIndex);
+                        auto inputColumn = function.Operator(plus, inputColStart, colIndex);
+                        auto inputChannel = channelIndex;
 
                         auto value = GetValueFromPaddedVolume<ValueType>(function, inputVolume, inputLayout, convParams, convPadding, inputRow, inputColumn, inputChannel);
 
-                        // h x w x d:  offset = iy*k*d + ix*d + iz
-                        auto outputOffset = function.Operator(plus, function.Operator(times, rowIndex, function.Literal<int>(filterSize * numChannels)), function.Literal<int>(colIndex * numChannels + channelIndex));
+                        // The input is a filterSize x filterSize x numChannels image in in row x column x channel order
+                        //   so offset = (filterSize*numChannels)*row + numChannels*column + channel
+                        auto rowOffset = function.Operator(times, rowIndex, function.Literal<int>(filterSize * numChannels));
+                        auto colOffset = function.Operator(times, colIndex, function.Literal<int>(numChannels));
+                        auto channelBeginOffset = function.Operator(plus, rowOffset, colOffset);
+                        auto outputOffset = function.Operator(plus, channelBeginOffset, channelIndex);
                         function.SetValueAt(realValueRow, outputOffset, value);
                     }
+                    channelLoop.End();
                 }
+                colLoop.End();
             }
             rowLoop.End();
         }
@@ -301,7 +317,7 @@ namespace nodes
     }
 
     template <typename ValueType> // TODO: PackedBitsType
-    std::vector<int64_t> BinaryConvolutionalLayerNode<ValueType>::GetCompressedInputPaddingMasks() const
+    std::vector<int64_t> BinaryConvolutionalLayerNode<ValueType>::GetCompressedInputPaddingMask() const
     {
         std::vector<int64_t> result;
         auto&& masks = this->GetLayer().GetCompressedInputPaddingMasks();
@@ -310,6 +326,12 @@ namespace nodes
             result.insert(result.end(), m.begin(), m.end());
         }
         return result;
+    }
+
+    template <typename ValueType> // TODO: PackedBitsType
+    std::vector<int> BinaryConvolutionalLayerNode<ValueType>::GetInputPaddingMaskSums() const
+    {
+        return this->GetLayer().GetInputPaddingMaskSums();
     }
 
     template <typename ValueType>
@@ -330,12 +352,14 @@ namespace nodes
         const auto outputImageWidth = outputLayout.GetActiveSize(1);
         const auto numFilters = outputLayout.GetActiveSize(2);
         const auto padding = inputLayout.GetOffset(0);
-        const auto shapedInputSize = fieldVolumeSize * outputImageWidth * outputImageHeight;
-        const auto outputRows = outputImageWidth * outputImageHeight;
+        const auto outputDataPadding = outputLayout.GetOffset(0);
+
+        assert(outputDataPadding == 0 && "Convolutional node output padding not supported yet");
 
         auto compressedFilterWeights = GetCompressedFilterWeights();
         auto filterMeans = GetFilterMeans();
-        auto compressedPaddingMasks = GetCompressedInputPaddingMasks();
+        auto compressedPaddingMasks = GetCompressedInputPaddingMask();
+        auto paddingMaskSums = GetInputPaddingMaskSums();
 
         using PackedBitsType = int64_t;
         auto reshapeNode = transformer.AddNode<BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>>(newInput,
@@ -343,10 +367,12 @@ namespace nodes
                                                                                                           inputLayout,
                                                                                                           outputLayout);
         auto paddingMasksNode = transformer.AddNode<ConstantNode<PackedBitsType>>(compressedPaddingMasks);
+        auto paddingMaskSumsNode = transformer.AddNode<ConstantNode<int>>(paddingMaskSums);
         auto filterWeightsNode = transformer.AddNode<ConstantNode<PackedBitsType>>(compressedFilterWeights);
         auto filterMeansNode = transformer.AddNode<ConstantNode<ValueType>>(filterMeans);
         auto xnorNode = transformer.AddNode<BinaryXnorNode<ValueType, PackedBitsType>>(reshapeNode->output,
                                                                                        paddingMasksNode->output,
+                                                                                       paddingMaskSumsNode->output,
                                                                                        filterWeightsNode->output,
                                                                                        filterMeansNode->output,
                                                                                        convParams,
@@ -354,7 +380,11 @@ namespace nodes
                                                                                        inputLayout,
                                                                                        outputLayout);
 
-        transformer.MapNodeOutput(this->output, xnorNode->output);
+        // Output of xnor is in (f x h x w) order, need to transpose to (h x w x f)
+        model::PortMemoryLayout outputShape({ numFilters, outputImageHeight, outputImageWidth });
+        model::PortMemoryLayout transposedOutputShape({ outputImageHeight, outputImageWidth, numFilters }, { outputDataPadding, outputDataPadding, 0 });
+        auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(xnorNode->output, outputShape, transposedOutputShape, std::vector<int>{ 1, 2, 0 });
+        transformer.MapNodeOutput(this->output, reorderOutputNode->output);
         return true;
     }
 
@@ -416,7 +446,6 @@ namespace nodes
         int outputImageWidth = _outputMemoryLayout.GetActiveSize(1);
 
         // TODO: interleave load/compress more tightly to eliminate need for a scratch variable to hold the whole row
-        // TODO: vectorize
         llvm::AllocaInst* realValueRow = function.Variable(emitters::GetVariableType<ValueType>(), fieldVolumeSize);
         auto outputRowLoop = function.ForLoop();
         outputRowLoop.Begin(outputImageWidth * outputImageHeight);
@@ -453,20 +482,21 @@ namespace nodes
     //
     template <typename ValueType, typename PackedBitsType>
     BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode()
-        : CompilableNode({ &_input, &_inputPaddingMasks, &_filterWeights, &_filterMeans }, { &_output }), _input(this, {}, inputPortName), _inputPaddingMasks(this, {}, inputPaddingMasksPortName), _filterWeights(this, {}, filterWeightsPortName), _filterMeans(this, {}, filterMeansPortName), _output(this, outputPortName, 0)
+        : CompilableNode({ &_input, &_inputPaddingMasks, &_inputPaddingMaskSums, &_filterWeights, &_filterMeans }, { &_output }), _input(this, {}, inputPortName), _inputPaddingMasks(this, {}, inputPaddingMasksPortName), _inputPaddingMaskSums(this, {}, inputPaddingMaskSumsPortName), _filterWeights(this, {}, filterWeightsPortName), _filterMeans(this, {}, filterMeansPortName), _output(this, outputPortName, 0)
     {
     }
 
     template <typename ValueType, typename PackedBitsType>
     BinaryXnorNode<ValueType, PackedBitsType>::BinaryXnorNode(const model::PortElements<PackedBitsType>& input,
                                                               const model::PortElements<PackedBitsType>& compressedInputPaddingMasks,
+                                                              const model::PortElements<int>& inputPaddingMaskSums,
                                                               const model::PortElements<PackedBitsType>& compressedFilterWeights,
                                                               const model::PortElements<ValueType>& filterMeans,
                                                               const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                                               const predictors::neural::PaddingParameters& inputPaddingParameters,
                                                               const model::PortMemoryLayout& inputMemoryLayout,
                                                               const model::PortMemoryLayout& outputMemoryLayout)
-        : CompilableNode({ &_input, &_inputPaddingMasks, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, inputPortName), _inputPaddingMasks(this, compressedInputPaddingMasks, inputPaddingMasksPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, outputPortName, outputMemoryLayout.GetMemorySize()), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
+        : CompilableNode({ &_input, &_inputPaddingMasks, &_inputPaddingMaskSums, &_filterWeights, &_filterMeans }, { &_output }), _input(this, input, inputPortName), _inputPaddingMasks(this, compressedInputPaddingMasks, inputPaddingMasksPortName), _inputPaddingMaskSums(this, inputPaddingMaskSums, inputPaddingMaskSumsPortName), _filterWeights(this, compressedFilterWeights, filterWeightsPortName), _filterMeans(this, filterMeans, filterMeansPortName), _output(this, outputPortName, outputMemoryLayout.GetMemorySize()), _convolutionalParameters(convolutionalParameters), _inputPaddingParameters(inputPaddingParameters), _inputMemoryLayout(inputMemoryLayout), _outputMemoryLayout(outputMemoryLayout)
     {
     }
 
@@ -475,9 +505,10 @@ namespace nodes
     {
         auto newInput = transformer.TransformPortElements(_input.GetPortElements());
         auto newInputPaddingMasks = transformer.TransformPortElements(_inputPaddingMasks.GetPortElements());
+        auto newInputPaddingMaskSums = transformer.TransformPortElements(_inputPaddingMaskSums.GetPortElements());
         auto newFilterWeights = transformer.TransformPortElements(_filterWeights.GetPortElements());
         auto newFilterMeans = transformer.TransformPortElements(_filterMeans.GetPortElements());
-        auto newNode = transformer.AddNode<BinaryXnorNode>(newInput, newInputPaddingMasks, newFilterWeights, newFilterMeans, _convolutionalParameters, _inputPaddingParameters, _inputMemoryLayout, _outputMemoryLayout);
+        auto newNode = transformer.AddNode<BinaryXnorNode>(newInput, newInputPaddingMasks, newInputPaddingMaskSums, newFilterWeights, newFilterMeans, _convolutionalParameters, _inputPaddingParameters, _inputMemoryLayout, _outputMemoryLayout);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -488,30 +519,70 @@ namespace nodes
     }
 
     template <typename ValueType, typename PackedBitsType>
+    void BinaryXnorNode<ValueType, PackedBitsType>::EmitInnerLoop(emitters::IRFunctionEmitter& function,
+                                                                  llvm::Value* reshapedInput,
+                                                                  llvm::Value* paddingMask,
+                                                                  llvm::Value* weights,
+                                                                  llvm::Value* xorSumVariable,
+                                                                  llvm::Function* popCountFunction,
+                                                                  int numBlocks,
+                                                                  bool hasZeroPadding)
+    {
+        auto blockLoop = function.ForLoop();
+        blockLoop.Begin(numBlocks);
+        {
+            auto blockIndex = blockLoop.LoadIterationVariable();
+            auto inputVal = function.ValueAt(reshapedInput, blockIndex);
+            auto filterVal = function.ValueAt(weights, blockIndex);
+            auto xorVal = function.Operator(logicalXor, filterVal, inputVal);
+
+            if (hasZeroPadding)
+            {
+                // Mask out the bits associated with zero padding from the XOR value
+                auto paddingMaskVal = function.ValueAt(paddingMask, blockIndex);
+                xorVal = function.Operator(logicalAnd, paddingMaskVal, xorVal);
+            }
+
+            auto xorCount = function.Call(popCountFunction, { xorVal });
+            function.OperationAndUpdate(xorSumVariable, plus, xorCount);
+        }
+        blockLoop.End();
+    }
+
+    template <typename ValueType, typename PackedBitsType>
     void BinaryXnorNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        const auto packedBitsType = emitters::GetVariableType<PackedBitsType>();
-        llvm::Function* popcountFunction = compiler.GetModule().GetIntrinsic(llvm::Intrinsic::ctpop, { packedBitsType });
+        // Get compiler settings
+        const auto& compilerSettings = compiler.GetCompilerParameters();
+        bool useVectorInstructions = compilerSettings.allowVectorInstructions;
+        const int vectorSize = compilerSettings.vectorWidth;
 
+        // Get LLVM types
+        auto& emitter = function.GetEmitter();
+        auto packedBitsType = emitter.Type(emitters::GetVariableType<PackedBitsType>());
+        assert(llvm::VectorType::isValidElementType(packedBitsType) && "Invalid element type for LLVM vector");
+        auto vectorType = emitter.VectorType(packedBitsType, vectorSize);
+        auto vectorPointerType = vectorType->getPointerTo();
+
+        // Get function pointer to popc intrinsics
+        llvm::Function* popcountFunction = compiler.GetModule().GetIntrinsic(llvm::Intrinsic::ctpop, { packedBitsType });
+        llvm::Function* vecPopcountFunction = compiler.GetModule().GetIntrinsic(llvm::Intrinsic::ctpop, { vectorType });
+
+        // Get port variables
+        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         llvm::Value* pFilterWeights = compiler.EnsurePortEmitted(filterWeights);
         llvm::Value* pFilterMeans = compiler.EnsurePortEmitted(filterMeans);
         llvm::Value* pInputPaddingMask = compiler.EnsurePortEmitted(inputPaddingMasks);
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        llvm::Value* pInputPaddingMaskSums = compiler.EnsurePortEmitted(inputPaddingMaskSums);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
-        // Input / output memory layouts
+        // Input / output memory layouts (of the original node)
         const auto& inputLayout = this->GetInputMemoryLayout();
         const auto& inputSize = inputLayout.GetActiveSize();
-        const auto& inputStride = inputLayout.GetStride();
-        const auto& inputOffset = inputLayout.GetOffset();
 
         const auto& outputLayout = this->GetOutputMemoryLayout();
+        // const auto& outputLayout = this->GetOutputMemoryLayout().Reorder({2,0,1}); // TODO: reorder from r,c,d -> d,r,c
         const auto& outputSize = outputLayout.GetActiveSize();
-        const auto& outputStride = outputLayout.GetStride();
-        const auto& outputOffset = outputLayout.GetOffset();
-
-        // Get cumulative increment for each dimension
-        model::Shape outputIncrement = outputLayout.GetCumulativeIncrement();
 
         // The workspace buffer element sizes are dependent on the processor architecture's bitness
         const auto storedElementSize = sizeof(PackedBitsType);
@@ -520,118 +591,130 @@ namespace nodes
         const auto elementSize = numBits / 8;
         assert(elementSize <= storedElementSize);
         const auto filterWidth = _convolutionalParameters.receptiveField;
-        const auto numInputChannels = inputSize[2];
+        const auto numInputChannels = inputSize[2]; // inputSize is the dimensions of the input to the original layer node
         const auto fieldVolumeSize = filterWidth * filterWidth * numInputChannels; // = size*size*numInputChannels
-        const auto outputRows = outputSize[0];
-        const auto outputColumns = outputSize[1];
-        const auto numFilters = outputSize[2];
+
+        // TODO: Put this back once we're using the transposed output layout
+        // const auto numFilters = outputSize[0]; // == # output rows
+        // const auto outputColumns = outputSize[1] * outputSize[2];
+        const auto numFilters = outputSize[2]; // == # output rows
+        const auto outputColumns = outputSize[0] * outputSize[1];
         const auto numStoredBlocksPerFilter = (fieldVolumeSize - 1) / storedElementNumBits + 1;
         const auto packedRowSize = numStoredBlocksPerFilter; // numStoredBlocksPerFilter * (storedElementSize / elementSize);
         assert(packedRowSize != 0);
 
-        // Create constants for dimension names just to remove magic numbers from code below
-        const int rowDimension = 0;
-        const int columnDimension = 1;
-        const int channelDimension = 2;
-
         const auto partialBlockSize = fieldVolumeSize % numBits;
+        const bool hasZeroPadding = predictors::neural::HasPadding(_inputPaddingParameters, predictors::neural::PaddingScheme::zeros);
+
+        const int numVectorBlocks = useVectorInstructions ? packedRowSize / vectorSize : 0;
+        if (numVectorBlocks == 0)
+        {
+            useVectorInstructions = false;
+        }
+
+        const int numScalarBlocks = packedRowSize - (vectorSize * numVectorBlocks);
+
+        // Variables to hold the running sum of xor values
+        llvm::Value* vectorSumVar = useVectorInstructions ? function.Variable(vectorType, "vecXorSum") : nullptr;
+        llvm::Value* sumVar = numScalarBlocks > 0 ? function.Variable(packedBitsType, "xorSum") : nullptr;
 
         // Compute and accumulate xnor counts
-        auto rowLoop = function.ForLoop();
-        rowLoop.Begin(outputRows);
+        auto filterLoop = function.ForLoop();
+        filterLoop.Begin(numFilters);
         {
-            auto outputRowIndex = rowLoop.LoadIterationVariable();
-            llvm::Value* rowOutputInternalOffset = function.Operator(plus, outputRowIndex, function.Literal<int>(outputOffset[rowDimension]));
-            llvm::Value* rowOutputOffset = function.Operator(times, rowOutputInternalOffset, function.Literal<int>(outputIncrement[rowDimension]));
+            auto filterIndex = filterLoop.LoadIterationVariable();
+
+            // The start of the binarized weights matrix for this filter
+            auto weightsBegin = function.Operator(times, filterIndex, function.Literal<int>(numStoredBlocksPerFilter));
+            auto weightsBeginPtr = function.PointerOffset(pFilterWeights, weightsBegin);
+            auto weightsVector = emitter.Cast(weightsBeginPtr, vectorPointerType);
+
+            llvm::Value* filterMean = nullptr;
+            if (_convolutionalParameters.weightsScale == scaleOutputByFilterMeans)
+            {
+                filterMean = function.ValueAt(pFilterMeans, filterIndex);
+            }
 
             auto columnLoop = function.ForLoop();
             columnLoop.Begin(outputColumns);
             {
-                auto outputColumnIndex = columnLoop.LoadIterationVariable();
-                llvm::Value* columnOutputInternalOffset = function.Operator(plus, outputColumnIndex, function.Literal<int>(outputOffset[columnDimension]));
-                auto scaledColumnOutputOffset = function.Operator(times, columnOutputInternalOffset, function.Literal<int>(outputIncrement[columnDimension]));
-                auto columnOutputOffset = function.Operator(plus, rowOutputOffset, scaledColumnOutputOffset);
+                auto outputColumnIndex = columnLoop.LoadIterationVariable(); // outputColumnIndex == input row index
 
-                auto inputRow = function.Operator(plus, function.Operator(times, outputRowIndex, function.Literal<int>(outputColumns)), outputColumnIndex);
-                auto inputBegin = function.Operator(times, inputRow, function.Literal<int>(numStoredBlocksPerFilter));
-                auto channelLoop = function.ForLoop();
-                channelLoop.Begin(numFilters); // filters are the output channels, so numFilters is the # of output channels
+                // The start of the binarized receptive field matrix for this output image pixel
+                auto inputBegin = function.Operator(times, outputColumnIndex, function.Literal<int>(numStoredBlocksPerFilter));
+
+                auto inputBeginPtr = function.PointerOffset(pInput, inputBegin);
+                auto paddingMaskBeginPtr = function.PointerOffset(pInputPaddingMask, inputBegin);
+
+                // cast to vector pointer
+                auto inputVector = emitter.Cast(inputBeginPtr, vectorPointerType);
+                auto paddingMaskVector = emitter.Cast(paddingMaskBeginPtr, vectorPointerType);
+
+                llvm::Value* vectorXorSum = nullptr;
+                if (numVectorBlocks > 0)
                 {
-                    auto outputChannelIndex = channelLoop.LoadIterationVariable();
-                    llvm::Value* channelOutputInternalOffset = function.Operator(plus, outputChannelIndex, function.Literal<int>(outputOffset[channelDimension]));
-                    auto scaledChannelOutputOffset = function.Operator(times, channelOutputInternalOffset, function.Literal<int>(outputIncrement[channelDimension]));
-                    auto channelOutputOffset = function.Operator(plus, columnOutputOffset, scaledChannelOutputOffset);
+                    assert(vectorSumVar != nullptr);
+                    function.Store(vectorSumVar, emitters::FillVector<PackedBitsType>(function, vectorType, 0));
+                    EmitInnerLoop(function, inputVector, paddingMaskVector, weightsVector, vectorSumVar, vecPopcountFunction, numVectorBlocks, hasZeroPadding);
 
-                    auto filterBegin = function.Operator(times, outputChannelIndex, function.Literal<int>(numStoredBlocksPerFilter));
-
-                    llvm::Value* sumVar = function.Variable(packedBitsType, "accum");
-                    function.Store(sumVar, function.Literal<PackedBitsType>(0));
-                    llvm::Value* outputLocationOffset = channelOutputOffset;
-
-                    // Holds the number of zero padding bits in this channel
-                    llvm::Value* paddingSumVar = function.Variable(packedBitsType, "paddingAccum");
-                    function.Store(paddingSumVar, function.Literal<PackedBitsType>(0));
-
-                    // TODO: vectorize this (?)
-                    auto blockLoop = function.ForLoop();
-                    blockLoop.Begin(packedRowSize);
-                    {
-                        auto blockIndex = blockLoop.LoadIterationVariable();
-                        auto inputIndex = function.Operator(plus, inputBegin, blockIndex);
-                        auto inputVal = function.ValueAt(pInput, inputIndex);
-
-                        auto filterIndex = function.Operator(plus, filterBegin, blockIndex);
-                        auto filterVal = function.ValueAt(pFilterWeights, filterIndex);
-                        auto xorVal = function.Operator(logicalXor, filterVal, inputVal);
-
-                        if (predictors::neural::HasPadding(_inputPaddingParameters, predictors::neural::PaddingScheme::zeros))
-                        {
-                            // Mask out the bits associated with zero padding from the XOR value
-                            auto paddingMaskVal = function.ValueAt(pInputPaddingMask, inputIndex);
-                            xorVal = function.Operator(logicalAnd, paddingMaskVal, xorVal);
-
-                            // Compute count of zeros: popcount(~paddingMaskVal) = numBits - popcount(paddingMaskVal)
-                            auto paddingMaskCount = function.Call(popcountFunction, { paddingMaskVal });
-                            auto paddingBitsCount = function.Operator(minus, function.Literal<int64_t>(numBits), paddingMaskCount);
-                            function.Store(paddingSumVar, function.Operator(plus, paddingBitsCount, function.Load(paddingSumVar)));
-                        }
-
-                        auto xorCount = function.Call(popcountFunction, { xorVal });
-                        function.Store(sumVar, function.Operator(plus, xorCount, function.Load(sumVar)));
-                    }
-                    blockLoop.End();
-                    auto sumInt = function.CastValue<PackedBitsType, int>(function.Load(sumVar));
-                    auto scaledSum = function.Operator(plus, function.Operator(times, function.Literal<int>(-2), sumInt), function.Literal<int>(numBits * packedRowSize));
-
-                    // Add back the zero padding, if any (since the scaled sum is made negative, use the minus operation)
-                    auto scaledSumWithPadding = function.Operator(minus, scaledSum, function.CastValue<PackedBitsType, int>(function.Load(paddingSumVar)));
-                    auto sumFloat = function.CastValue<int, ValueType>(scaledSumWithPadding);
-
-                    llvm::Value* adjustedSum = sumFloat;
-                    if (partialBlockSize != 0)
-                    {
-                        const auto filterAdjust = numBits - partialBlockSize;
-                        adjustedSum = function.Operator(minusFloat, sumFloat, function.Literal<ValueType>(filterAdjust));
-                    }
-
-                    if (_convolutionalParameters.weightsScale == scaleOutputByFilterMeans)
-                    {
-                        // Scale output by the filters mean
-                        llvm::Value* filterMean = function.ValueAt(pFilterMeans, outputChannelIndex);
-                        auto scaledOutput = function.Operator(timesFloat, adjustedSum, filterMean);
-                        function.SetValueAt(pOutput, outputLocationOffset, scaledOutput);
-                    }
-                    else
-                    {
-                        // No output scaling
-                        function.SetValueAt(pOutput, outputLocationOffset, adjustedSum);
-                    }
+                    // Accumulate horizontal sum into output
+                    vectorXorSum = emitters::HorizontalVectorSum<PackedBitsType>(function, function.Load(vectorSumVar));
+                    assert(vectorXorSum->getType() == packedBitsType);
                 }
-                channelLoop.End();
+
+                // Now compute the non-vectorized values
+                const int numScalarBlocks = packedRowSize - (vectorSize * numVectorBlocks);
+                if (numScalarBlocks > 0)
+                {
+                    assert(sumVar != nullptr);
+                    function.Store(sumVar, function.Literal<PackedBitsType>(0));
+                    EmitInnerLoop(function, inputBeginPtr, paddingMaskBeginPtr, weightsBeginPtr, sumVar, popcountFunction, numScalarBlocks, hasZeroPadding);
+                }
+
+                llvm::Value* xorSum = (sumVar == nullptr) ? nullptr : function.Load(sumVar);
+                if (vectorXorSum != nullptr)
+                {
+                    xorSum = (xorSum == nullptr) ? vectorXorSum : function.Operator(plus, xorSum, vectorXorSum);
+                }
+                assert(xorSum != nullptr);
+
+                // Output scaling
+                auto sumInt = function.CastValue<PackedBitsType, int>(xorSum);
+                auto scaledSum = function.Operator(plus, function.Operator(times, function.Literal<int>(-2), sumInt), function.Literal<int>(numBits * packedRowSize));
+
+                auto scaledSumWithPadding = scaledSum;
+                if (hasZeroPadding)
+                {
+                    // Add back the zero padding, if any (since the scaled sum is made negative, use the minus operation)
+                    llvm::Value* paddingSum = function.ValueAt(pInputPaddingMaskSums, outputColumnIndex);
+                    scaledSumWithPadding = function.Operator(minus, scaledSum, paddingSum);
+                }
+                auto sumFloat = function.CastValue<int, ValueType>(scaledSumWithPadding);
+
+                llvm::Value* adjustedSum = sumFloat;
+                if (partialBlockSize != 0)
+                {
+                    const auto filterAdjust = numBits - partialBlockSize;
+                    adjustedSum = function.Operator(minusFloat, sumFloat, function.Literal<ValueType>(filterAdjust));
+                }
+
+                auto outIndex = function.Operator(plus, function.Operator(times, filterIndex, function.Literal((int)outputColumns)), outputColumnIndex);
+                if (_convolutionalParameters.weightsScale == scaleOutputByFilterMeans)
+                {
+                    // Scale output by the filters mean
+                    assert(filterMean != nullptr);
+                    auto scaledOutput = function.Operator(timesFloat, adjustedSum, filterMean);
+                    function.SetValueAt(pOutput, outIndex, scaledOutput);
+                }
+                else
+                {
+                    // No output scaling
+                    function.SetValueAt(pOutput, outIndex, adjustedSum);
+                }
             }
             columnLoop.End();
         }
-        rowLoop.End();
+        filterLoop.End();
     }
 
     template <typename ValueType, typename PackedBitsType>

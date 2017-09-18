@@ -493,6 +493,12 @@ namespace emitters
         return _emitter.GetIntrinsic(GetLLVMModule(), id, valueTypeList);
     }
 
+    llvm::Function* IRModuleEmitter::GetIntrinsic(llvm::Intrinsic::ID id, const std::initializer_list<LLVMType>& arguments)
+    {
+        LLVMTypeList valueTypeList = arguments;
+        return _emitter.GetIntrinsic(GetLLVMModule(), id, valueTypeList);
+    }
+
     //
     // Types
     //

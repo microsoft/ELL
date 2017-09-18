@@ -308,6 +308,14 @@ namespace emitters
         /// <returns> Pointer to an llvm::Function that represents the requested function. </returns>
         llvm::Function* GetIntrinsic(llvm::Intrinsic::ID id, const std::initializer_list<VariableType>& arguments);
 
+        /// <summary> Get an LLVM intrinsic function with the given id and signature. </summary>
+        ///
+        /// <param name="id"> The intrinsic function identifier. </param>
+        /// <param name="arguments"> The function arguments. </param>
+        ///
+        /// <returns> Pointer to an llvm::Function that represents the requested function. </returns>
+        llvm::Function* GetIntrinsic(llvm::Intrinsic::ID id, const std::initializer_list<LLVMType>& arguments);
+
         //
         // Types
         //

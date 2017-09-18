@@ -19,6 +19,9 @@
 #include "OutputPort.h"
 #include "PortElements.h"
 
+// emitters
+#include "IRVectorUtilities.h"
+
 // utilities
 #include "TypeName.h"
 
@@ -72,6 +75,7 @@ namespace nodes
 
     private:
         void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+        void CompileVectorizedLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
         void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 
         // Inputs

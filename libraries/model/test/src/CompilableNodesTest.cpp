@@ -169,7 +169,7 @@ void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementT
 }
 
 template <typename ElementType>
-void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
+void FillTensor(ell::math::TensorReference<ElementType, ell::math::Dimension::channel, ell::math::Dimension::column, ell::math::Dimension::row>& tensor, ElementType startValue = 0, ElementType step = 1)
 {
     ElementType val = startValue;
     tensor.Generate([&val, step]() { 
@@ -383,15 +383,19 @@ void TestCompilableScalarSumNode()
 
 void TestCompilableSumNode()
 {
+    using ElementType = int64_t;
+    std::vector<std::vector<ElementType>> signal = { { 1, 2, 3, 4, 5, 6 }, { 7, 8, 9, 3, 4, 5 }, { 2, 3, 2, 1, 5, 3 }, { 1, 2, 3, 4, 5, 6 }, { 7, 8, 9, 7, 4, 2 }, { 5, 2, 1, 2, 5, 9 } };
+    
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto sumNode = model.AddNode<nodes::SumNode<double>>(inputNode->output);
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(signal[0].size());
+    auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(inputNode->output);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", sumNode->output } });
-    model::IRMapCompiler compiler;
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.allowVectorInstructions = true;
+    model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
     // compare output
-    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, "SumNode");
 }
 
@@ -983,8 +987,8 @@ void TestIRNode()
 template <typename ElementType>
 void VerifyLayerMap(const ell::model::DynamicMap& map, const ell::model::Node* computeNode, const typename ell::predictors::neural::Layer<ElementType>::TensorType& inputWithPadding, const typename ell::predictors::neural::Layer<ElementType>::ConstTensorReferenceType& output)
 {
-    std::vector<std::vector<double>> signal = { inputWithPadding.ToArray() };
-    std::vector<std::vector<double>> expectedOutput = { output.ToArray() };
+    std::vector<std::vector<ElementType>> signal = { inputWithPadding.ToArray() };
+    std::vector<std::vector<ElementType>> expectedOutput = { output.ToArray() };
     VerifyMapOutput(map, signal, expectedOutput, computeNode->GetRuntimeTypeName());
 
     model::MapCompilerParameters settings;
@@ -1828,48 +1832,34 @@ void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
 void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPaddingSize, ell::predictors::neural::PaddingScheme paddingScheme, bool scaleByFilterMeans)
 {
-    using ElementType = double;
+    using ElementType = float;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
     using VectorType = typename Layer<ElementType>::VectorType;
 
+    const size_t imageRows = 3;
+    const size_t imageColumns = 3;
+    const size_t numChannels = 2;
+    const size_t k = 3;
+    const size_t numFilters = 2;
+    const size_t stride = 1;
+
     // Verify BinaryConvolutionalLayer with bitwise method
-    TensorType inputWithPadding(1 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorType inputWithPadding(imageRows + 2 * inputPaddingSize, imageColumns + 2 * inputPaddingSize, numChannels);
     TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
     input.Fill(0);
-    input(0, 0, 0) = 2;
-    input(0, 1, 0) = 1;
-    input(0, 0, 1) = 3;
-    input(0, 1, 1) = 2;
-    Shape outputShape = { 1 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
+    int inputSize = input.Size();
+    FillTensor(input, -2*static_cast<ElementType>(inputSize)/3);
+
+    Shape outputShape = { imageRows + 2 * outputPaddingSize, imageColumns + 2 * outputPaddingSize, numFilters };
 
     LayerParameters parameters{ inputWithPadding, { paddingScheme, inputPaddingSize }, outputShape, { paddingScheme, outputPaddingSize } };
-    BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::bitwise, scaleByFilterMeans ? BinaryWeightsScale::mean : BinaryWeightsScale::none };
+    BinaryConvolutionalParameters convolutionalParams{ k, stride, BinaryConvolutionMethod::bitwise, scaleByFilterMeans ? BinaryWeightsScale::mean : BinaryWeightsScale::none };
     TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
-    // clang-format off
-    // Weights size: f x k x k x d = 2*3*3*2 = 36
-    std::vector<ElementType> weightsVector{   // RowMajor then depth order
-        1, -3, 2, -3, 1, -1, 2, 3, -1,
-        2, 4, -1, 3, -1, 2, -1, 4, 2,
-        1, 2, 1, -2, 3, -2, 1, -2, 1,
-        0, 3, 2, 3, -1, 2, -1, 0, -2 };
-    // clang-format on
-    size_t vectorIndex = 0;
-    for (size_t f = 0; f < outputShape[2]; f++)
-    {
-        for (size_t k = 0; k < input.NumChannels(); k++)
-        {
-            for (size_t i = 0; i < convolutionalParams.receptiveField; i++)
-            {
-                for (size_t j = 0; j < convolutionalParams.receptiveField; j++)
-                {
-                    weights(f * convolutionalParams.receptiveField + i, j, k) = weightsVector[vectorIndex++];
-                }
-            }
-        }
-    }
+    int weightsSize = weights.Size();
+    FillTensor(weights, -static_cast<ElementType>(weightsSize)/2);
 
     BinaryConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
     layer.Compute();
@@ -1877,11 +1867,20 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
 
     // Create model
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(inputWithPadding.Size());
-    auto computeNode = model.AddNode<nodes::BinaryConvolutionalLayerNode<double>>(inputNode->output, layer);
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputWithPadding.Size());
+    auto computeNode = model.AddNode<nodes::BinaryConvolutionalLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
 
-    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+    // Compile it
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    settings.compilerSettings.useBlas = true; // !!! if BLAS is off, this fails
+    settings.compilerSettings.allowVectorInstructions = false;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    auto signal = std::vector<std::vector<ElementType>> {inputWithPadding.ToArray()};
+    VerifyCompiledOutput<ElementType>(map, compiledMap, {signal}, computeNode->GetRuntimeTypeName());
 }
 
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPaddingSize, size_t outputPaddingSize)

@@ -20,14 +20,14 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
     parser.AddOption(
         outputHeader,
         "header",
-        "",
+        "hh",
         "Write out a header file",
         false);
 
     parser.AddOption(
         outputIr,
         "ir",
-        "",
+        "ir",
         "Write out an LLVM IR (.ll) file",
         false);
 
@@ -77,7 +77,14 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
         outputDirectory,
         "outputDirectory",
         "od",
-        "Output directory for compiled model files (if none specified, use the input directory",
+        "Output directory for compiled model files (if none specified, use the input directory)",
+        "");
+
+    parser.AddOption(
+        outputFilenameBase,
+        "outputFilenameBase",
+        "ob",
+        "Base filename for compiled model files (if none specified, use the input model filename)",
         "");
 
     parser.AddDocumentationString("");
@@ -124,6 +131,20 @@ void ParsedCompileArguments::AddArgs(utilities::CommandLineParser& parser)
         "",
         "Fuse sequences of linear operations with constant coefficients into a single operation",
         true);
+
+    parser.AddOption(
+        enableVectorization,
+        "vectorize",
+        "vec",
+        "Enable ELL's vectorization",
+        false);
+
+    parser.AddOption(
+        vectorWidth,
+        "vectorWidth",
+        "vw",
+        "Size of vector units",
+        4);
 
     parser.AddDocumentationString("");
     parser.AddDocumentationString("Target device options");
