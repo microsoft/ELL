@@ -26,14 +26,16 @@ import ziptools
 class DriveTest:
     def __init__(self):
         self.arg_parser = argparse.ArgumentParser(
-            "This script uses ELL to create a raspberry pi demo project for a model (default is darknet), pushes it to the given\n"
-            "raspberry pi ip address using ssh and scp, then executes the test.  The test measures the accuracy\n"
-            "and performance of the model and it writes these results to a test_results.json data file")
+            "This script uses ELL to create a demo project for a model (default is darknet)\n"
+            "on a target device (default is Raspberry Pi 3), pushes it to the given\n"
+            "device's ip address using ssh and scp, then executes the test.\n"
+            "The test also measures the accuracy and performance of evaluating the model.\n")
         self.ipaddress = None
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)
-        self.pitest_dir = os.path.join(self.build_root, "test", "pitest")
+        self.test_dir = os.path.join(self.build_root, "test", "pitest")
         self.output_dir = None
+        self.target_dir = "/home/pi/pi3"
         self.config_file = None
         self.weights_file = None
         self.model_name = None
@@ -42,41 +44,55 @@ class DriveTest:
         self.ell_json = None
         self.username = "pi"
         self.password = "raspberry"
+        self.target = "pi3"
         self.ssh = None
         self.created_dirs = []
         self.profile = False
-        if (not os.path.isdir(self.pitest_dir)):
-            os.makedirs(self.pitest_dir)
+        if (not os.path.isdir(self.test_dir)):
+            os.makedirs(self.test_dir)
 
     def parse_command_line(self, argv):
         # required arguments
         self.arg_parser.add_argument("ipaddress")
 
         # options
-        self.arg_parser.add_argument("--outdir", default=self.pitest_dir)
+        self.arg_parser.add_argument("--outdir", default=self.test_dir)
         self.arg_parser.add_argument("--profile", help="enable profiling functions in the ELL module", action="store_true")
 
         model_group = self.arg_parser.add_argument_group('model', 'options for loading a non-default model. All 3 must be specified for a non-default model to be used.')
         model_group.add_argument("--model", help="path to an ELL model file, the filename (without extension) will be used as the model name")
         model_group.add_argument("--labels", help="path to the labels file for evaluating the model")
 
+        self.arg_parser.add_argument("--target", help="the target platform.\n"
+            "Choices are pi3 (Raspberry Pi 3) and aarch64 (Dragonboard)", choices=["pi3", "pi3_64", "aarch64"], default=self.target)
+        self.arg_parser.add_argument("--target_dir", help="the directory on the target device for running the test", default=self.target_dir)
+        self.arg_parser.add_argument("--username", help="the username for the target device", default=self.username)
+        self.arg_parser.add_argument("--password", help="the password for the target device", default=self.password)
+
         argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
         args = self.arg_parser.parse_args(argv)
 
+        self.init(args)
+
+    def init(self, args):
         self.ipaddress = args.ipaddress
-        self.pitest_dir = args.outdir
+        self.test_dir = args.outdir
         self.profile = args.profile
+        self.target = args.target
+        self.target_dir = args.target_dir
+        self.username = args.username
+        self.password = args.password
 
         self.extract_model_info(args.model, args.labels)
 
-        self.output_dir = os.path.join(self.pitest_dir, "pi3", self.model_name)
+        self.output_dir = os.path.join(self.test_dir, self.target, self.model_name)
         if not os.path.isdir(self.output_dir):
             os.makedirs(self.output_dir)
 
     def extract_model_info(self, ell_model, labels_file):
         if (ell_model is None or labels_file is None):
             self.model_name = "darknet"
-            self.labels_file = os.path.join(self.pitest_dir, "darknetImageNetLabels.txt")
+            self.labels_file = os.path.join(self.test_dir, "darknetImageNetLabels.txt")
         else:
             # extract the model if it's in an archive
             unzip = ziptools.Extractor(ell_model)
@@ -98,7 +114,7 @@ class DriveTest:
         req.retrieve(url, localpath)
 
     def copy_files(self, list, folder):
-        target_dir = os.path.join(self.pitest_dir, folder)
+        target_dir = os.path.join(self.test_dir, folder)
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
         for path  in list:
@@ -113,6 +129,7 @@ class DriveTest:
             template = f.read()
         template = template.replace("@LABELS@", basename(self.labels_file))
         template = template.replace("@COMPILED_MODEL@", basename(self.model_name))
+        template = template.replace("@TARGET_DIR@", self.target_dir)
         output_template = os.path.join(dest, "runtest.sh")
 
         # raspberry pi requires runtest to use 0xa for newlines, so fix autocrlf that happens on windows.
@@ -131,8 +148,8 @@ class DriveTest:
             os.remove(bitcode) # don't need to copy this one over and it is big!
 
     def get_darknet(self):
-        self.config_file = os.path.join(self.pitest_dir, "darknet.cfg")
-        self.weights_file = os.path.join(self.pitest_dir, "darknet.weights")
+        self.config_file = os.path.join(self.test_dir, "darknet.cfg")
+        self.weights_file = os.path.join(self.test_dir, "darknet.weights")
         if (not os.path.isfile(self.config_file) or not os.path.isfile(self.weights_file)):
             print("downloading darknet model...")
             self.download("https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg", self.config_file)
@@ -141,7 +158,7 @@ class DriveTest:
         self.copy_files( [ os.path.join(self.ell_root, "docs/tutorials/Importing-new-models/darknetImageNetLabels.txt") ], "")
 
     def import_darknet(self):
-        self.ell_model = os.path.join(self.pitest_dir, self.model_name + ".ell")
+        self.ell_model = os.path.join(self.test_dir, self.model_name + ".ell")
         sys.path.append(os.path.join(current_path, '../../importers/darknet'))
         darknet_importer = __import__("darknet_import")
         args = {}
@@ -158,13 +175,13 @@ class DriveTest:
         print("using ELL model: " + self.model_name)
 
     def make_project(self):
-        labels_file = os.path.join(self.pitest_dir, self.labels_file)
+        labels_file = os.path.join(self.test_dir, self.labels_file)
         if os.path.isdir(self.output_dir):
             rmtree(self.output_dir)
         sys.path.append(os.path.join(current_path, '../../wrap'))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        builder_args = [labels_file, self.ell_model, "-target", "pi3", "-outdir", self.output_dir]
+        builder_args = [labels_file, self.ell_model, "-target", self.target, "-outdir", self.output_dir]
         if self.profile:
             builder_args.append("-profile")
         builder.parse_command_line(builder_args)
@@ -173,7 +190,7 @@ class DriveTest:
     def connect_ssh(self):
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        print("connecting to raspberry pi at " + self.ipaddress)
+        print("connecting to target device at " + self.ipaddress)
         self.ssh.connect(self.ipaddress, username=self.username, password=self.password)
 
     def exec_remote_command(self, cmd):
@@ -188,8 +205,8 @@ class DriveTest:
             print('... ' + line.strip('\n'))
         return output
 
-    def clean_pi(self):
-        self.exec_remote_command('rm -rf pi3')
+    def clean_target(self):
+        self.exec_remote_command('rm -rf {}'.format(basename(self.target_dir)))
 
     def linux_join(self, path, name):
         # on windows os.path.join uses backslashes which doesn't work on the pi!
@@ -215,16 +232,16 @@ class DriveTest:
         
     def publish_bits(self):  
         sftp = paramiko.SFTPClient.from_transport(self.ssh.get_transport())
-        self.sftp_copy_dir(sftp, self.output_dir, "/home/pi/pi3")
+        self.sftp_copy_dir(sftp, self.output_dir, self.target_dir)
         sftp.close()     
 
     def execute_remote_test(self):   
-        self.exec_remote_command("chmod u+x /home/pi/pi3/runtest.sh")
-        output = self.exec_remote_command("/home/pi/pi3/runtest.sh")
+        self.exec_remote_command("chmod u+x {}/runtest.sh".format(self.target_dir))
+        output = self.exec_remote_command("{}/runtest.sh".format(self.target_dir))
         print("==========================================================")
         found = False
         for line in output:
-            if "coffee mug" in line:                
+            if "coffee mug" in line:
                 found = True
         
         if found:
@@ -238,7 +255,7 @@ class DriveTest:
         self.make_project()
         self.get_bash_files()
         self.connect_ssh()
-        self.clean_pi()
+        self.clean_target()
         self.publish_bits()
         self.execute_remote_test()
 

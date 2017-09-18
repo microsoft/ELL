@@ -1,7 +1,7 @@
 #!/bin/bash
-export PATH="/home/pi/miniconda3/bin:$PATH"
-source activate py34
-cd /home/pi/pi3
+export PATH="/home/pi/miniconda3/bin:/root/py34/bin:/home/linaro/py34/bin:$PATH"
+source activate py34 > /dev/null 2>&1
+cd @TARGET_DIR@
 
 export DISPLAY=:0
-python validate.py --maxfiles @MAXFILES@ /home/pi/validation/val_map.txt /home/pi/validation/ @LABELS@ @COMPILED_MODEL@
+python validate.py --maxfiles @MAXFILES@ @TRUTH@ @IMAGES@ @LABELS@ @COMPILED_MODEL@

@@ -51,7 +51,7 @@ class GenerateMarkdown:
         self.outfile = args.outfile
 
         if (not os.path.isfile(args.template)):
-            raise Exception("Template file not found: " + args.template)
+            raise FileNotFoundError("Template file not found: " + args.template)
         with open(args.template, 'r') as f:
             self.template = f.read()
 
@@ -66,7 +66,7 @@ class GenerateMarkdown:
             filename = os.path.join(self.modeldir, name)
             
         if (not os.path.isfile(filename)):
-            raise Exception("File not found: " + filename)
+            raise FileNotFoundError("File not found: " + filename)
         return filename
 
     def format_float(self, value):
@@ -99,13 +99,15 @@ class GenerateMarkdown:
     def write_performance(self, platforms):
         """Writes the metrics for the list of platforms"""
         for platform in platforms:
-            filename = self.get_model_filename("validation_" + platform + ".json")
-
-            with open(filename, 'r') as f:
-                data = json.loads(f.read())
-                results = data['results']
-                average_time = reduce(lambda x, y: x + float(y['avg_time']), results, 0) / len(results)
-                self.set_value("@" + platform.upper() + "_SECONDS_PER_FRAME@", self.format_float(average_time))
+            try:
+                filename = self.get_model_filename("validation_" + platform + ".json")
+                with open(filename, 'r') as f:
+                    data = json.loads(f.read())
+                    results = data['results']
+                    average_time = reduce(lambda x, y: x + float(y['avg_time']), results, 0) / len(results)
+                    self.set_value("@" + platform + "_SECONDS_PER_FRAME@", self.format_float(average_time))
+            except FileNotFoundError:
+                pass
 
     def sanitize_layer_string(self, layer_str):
         # these are special characters in markdown files
@@ -148,7 +150,7 @@ class GenerateMarkdown:
         self.write_properties()
         self.write_architecture()
         self.write_accuracy()
-        self.write_performance(["pi3"])
+        self.write_performance(["pi3", "pi3_64", "aarch64"])
         self.save()
 
 if __name__ == "__main__":

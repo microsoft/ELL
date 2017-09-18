@@ -18,7 +18,7 @@ class CopyValidationSet:
     def __init__(self):
         self.arg_parser = argparse.ArgumentParser(
             "This script takes a CNTK val.map.txt and a path to the validation set, and copies maxfiles files\n"
-            "to a Raspberry Pi using scp\n")
+            "to a target device (e.g. Raspberry Pi 3) using scp\n")
         self.ipaddress = None
         self.username = "pi"
         self.password = "raspberry"
@@ -27,27 +27,35 @@ class CopyValidationSet:
         self.labels = None
         self.maxfiles = 200
         self.created_dirs = []
-        self.dest_dir = "/home/pi/validation"
+        self.target_dir = "/home/pi/validation"
 
     def parse_command_line(self, argv):
         # required arguments
         self.arg_parser.add_argument("validation_map", help="val.map.txt file containing the filenames and classes")
         self.arg_parser.add_argument("validation_path", help="path to the validation set")
-        self.arg_parser.add_argument("ipaddress", help="ip address of the Raspberry Pi to copy to")
+        self.arg_parser.add_argument("ipaddress", help="ip address of the target device to copy to")
 
         # options
         self.arg_parser.add_argument("--maxfiles", type=int, default=self.maxfiles, help="max number of files to copy (up to the size of the validation set)")
-        self.arg_parser.add_argument("--destdir", default=self.dest_dir, help="destination directory on the Raspberry Pi")
+        self.arg_parser.add_argument("--target_dir", default=self.target_dir, help="destination directory on the target device")
         self.arg_parser.add_argument("--labels", default=None, help="path to the labels to optionally copy")
+        self.arg_parser.add_argument("--username", default=self.username, help="username for the target device")
+        self.arg_parser.add_argument("--password", default=self.password, help="password for the target device")
 
         argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
         args = self.arg_parser.parse_args(argv)
 
+        self.init(args)
+
+    def init(self, args):
         self.ipaddress = args.ipaddress
         self.validation_map = args.validation_map
         self.validation_path = args.validation_path
         self.maxfiles = args.maxfiles
         self.labels = args.labels
+        self.username = args.username
+        self.password = args.password
+        self.target_dir = args.target_dir
 
     def safe_mkdir(self, ssh, sftp, dir):
         if (not dir in self.created_dirs):
@@ -67,12 +75,12 @@ class CopyValidationSet:
         ssh.connect(self.ipaddress, username=self.username, password=self.password)
         sftp = paramiko.SFTPClient.from_transport(ssh.get_transport())
 
-        self.safe_mkdir(ssh, sftp, self.dest_dir + "/")
+        self.safe_mkdir(ssh, sftp, self.target_dir + "/")
 
         for src_file in files:
             if (os.path.isfile(src_file)):
                 print("copying:" + src_file)
-                dest_file = self.linux_join(self.dest_dir, basename(src_file))
+                dest_file = self.linux_join(self.target_dir, basename(src_file))
                 sftp.put(src_file, dest_file)
 
         sftp.close()

@@ -40,7 +40,7 @@ class ModelTester(demoHelper.DemoHelper):
     def add_arguments(self, arg_parser):
         super(ModelTester,self).add_arguments(arg_parser)    
         # args to setup test run
-        arg_parser.add_argument("--truth", help="path to a tsv file, each line contains two values, the file name of the image and the integer classifaction value")
+        arg_parser.add_argument("--truth", help="path to a tsv file, each line contains two values, the file name of the image and the integer classification value")
         arg_parser.add_argument("--truthlabels", help="path to a labels for the truth file (in case these are different from your model labels)")
         arg_parser.add_argument("--top", type=int, help="how many of the top labels to include in the test (default 1)", default=self.test_top_n)
     

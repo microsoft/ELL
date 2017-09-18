@@ -33,6 +33,7 @@ class ProcessMonitor:
                     'cpu_times', 'cpu_percent', 'num_threads', 'memory_info'])
                 stat['timestamp'] = psutil.boot_time()
                 stat['system_cpu_percent'] = psutil.cpu_percent(interval=None, percpu=True)
+                stat['system_cpu_freq'] = psutil.cpu_freq(percpu=True)
 
                 if firstcall:
                     # first call is throwaway (see documentation for cpu_percent on why)
