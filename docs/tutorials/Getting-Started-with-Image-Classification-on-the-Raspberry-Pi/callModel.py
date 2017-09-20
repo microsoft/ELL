@@ -15,10 +15,10 @@ import numpy as np
 # Add the appropriate paths so the wrapped model can be loaded.
 # Typically, that would be the path of the wrapped model.py file, and the corresponding
 # native module, typically in build/release
-os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.getcwd())
-sys.path.append(os.path.join(os.getcwd(), 'build'))
-sys.path.append(os.path.join(os.getcwd(), 'build/Release'))
+scriptPath = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(scriptPath)
+sys.path.append(os.path.join(scriptPath, 'build'))
+sys.path.append(os.path.join(scriptPath, 'build/Release'))
 
 # Load the wrapped model's Python module
 import model

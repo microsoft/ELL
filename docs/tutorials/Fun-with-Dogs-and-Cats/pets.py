@@ -145,6 +145,6 @@ if __name__ == "__main__":
             "   python pets.py categories.txt --compiledModel tutorial1/pi3/model1\n"
             "   python pets.py categories.txt --model model1.ell\n"
             "This groups predictions from an image classifier by cats and dogs and plays an appropriate ")
-            "sound for one of these groups is recognized")
+            "sound for one of these groups is recognized"
     demo = Demo(helper)
     demo.run()

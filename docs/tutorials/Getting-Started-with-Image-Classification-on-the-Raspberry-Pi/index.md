@@ -58,6 +58,9 @@ unzip ell.zip
 
 You should now have a `labels.txt` file and a `model.ell` file in the `tutorial1` folder.
 
+Note: this particular model was trained to expect images in the format BGR (as opposed to RGB), so we will
+use the "--bgr true" on the demo script below to tell it to use this format for the input to the model.
+
 ## Wrap the model in a Python module
 ELL provides a compiler that takes a model and compiles it into code that will run on a target platform. Let's take a look at how we'd wrap the model for Python to run on the host platform. First, let's use the `wrap` tool to compile the model and generate a `cmake` project for a Python callable module:
 ````
@@ -89,10 +92,10 @@ import sys
 import os
 import numpy as np
 
-os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.getcwd())
-sys.path.append(os.path.join(os.getcwd(), 'build'))
-sys.path.append(os.path.join(os.getcwd(), 'build/Release'))
+scriptPath = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(scriptPath)
+sys.path.append(os.path.join(scriptPath, 'build'))
+sys.path.append(os.path.join(scriptPath, 'build/Release'))
 ```
 
 Now, we can load the model's Python module with a simple `import`:
@@ -148,6 +151,7 @@ So far, we've called the model with fake input data that is all zeros. Next, let
 For this tutorial we want to call the model from Python on our Raspberry Pi. ELL's compiler takes a model and compiles it into code that will run on a target platform - in this case the Raspberry Pi running Linux, so it generates code for armv7-linux-gnueabihf, and for the cortex-a53 CPU. We use the `wrap` tool again and this time tell it to target the `pi3` platform:
 
 ````
+# from the tutorials1 folder
 python "../../tools/wrap/wrap.py" labels.txt model.ell -lang python -target pi3   
 ````
 You should see output similar to the following:
@@ -159,8 +163,8 @@ You should see output similar to the following:
 
 We also want to copy some additional python code to your Raspberry Pi for the purpose of running this tutorial. You can also copy a static image over for testing:
 
-| Unix    | `cp ../../tools/utilities/pythonlibs/*.py pi3`       <br> `cp ../../tools/utilities/pitest/coffeemug.jpg pi3`   |
-| Windows | `copy ..\..\tools\utilities\pythonlibs\*.py pi3` <br> `copy ..\..\tools\utilities\pitest\coffeemug.jpg pi3` |
+| Unix    | `cp ../../tools/utilities/pythonlibs/demo*.py pi3`       <br> `cp ../../tools/utilities/pitest/coffeemug.jpg pi3`   |
+| Windows | `copy ..\..\tools\utilities\pythonlibs\demo*.py pi3` <br> `copy ..\..\tools\utilities\pitest\coffeemug.jpg pi3` |
 
 You should now have a `pi3` folder containing a python module for your model, as well as some helpful python utilities which we'll 
 use in the next section.
@@ -172,7 +176,7 @@ Create a new text file called `demo.py` in your `tutorial1` folder. We'll add Py
 * Run the image through the model
 * Show the classification results
 
-If you don't want to type it out, the script can found [here](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/demo.py), otherwise follow along below.
+If you don't want to type it out, the script can found [here](/ELL/tutorials/shared/demo.py), otherwise follow along below.
 
 First, we need to import the libraries we'll be using in this app, which include system ultilities, numpy and demoHelper that we copied over from ELL utilities:
 ```python
@@ -284,7 +288,7 @@ environment named py34.  So to run the tutorial do this:
 
 ````
 source activate py34
-python demo.py labels.txt --compiledModel model --image coffeemug.jpg
+python demo.py labels.txt --compiledModel model --image coffeemug.jpg --bgr true
 ````
 And it will classify the image, you should see output like this:
 ````
@@ -298,8 +302,9 @@ And if you have a display connected you should see something like the screenshot
 If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
 
 ````
-python demo.py labels.txt  --compiledModel model
+python demo.py labels.txt  --compiledModel model --bgr true
 ````
+(just press ESCAPE on your keyboard to close the app)
 
 You will see the same kind of window appear only this time it is showing the video stream.
 Then when your camera is pointed at an object that the model recognizes you will see the label and 

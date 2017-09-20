@@ -20,11 +20,9 @@ including the [setup for OpenCV](/ELL/Installing-OpenCV/).
 You will need to build ELL after you install Python from your activate your conda environment, 
 so that the `CMake` step picks up on the fact that you have Python 3.6 installed.
 
-3. This tutorial assumes your ELL bits live in the location "~/git/ELL".  On Linux and Mac
+3. This tutorial assumes your ELL bits live in the location "~/ELL".  On Linux and Mac
 this may well be the case.  On Windows you may need to replace this syntax with a real Windows
-drive location like this: "d:/git/ELL".  **Note:** Windows supports forward slashes if you
-include the entire path in double quotes.  This makes it easier to share tutorial text 
-across Linux and Windows.  We will also use "cp" to copy files, on windows change that to "copy".
+drive location like this: "d:/ELL".  **Note:** We will also use "cp" to copy files, on windows change that to "copy".
 
 4. CMake 3.5 or newer, which you needed to build ELL.  On Linux you will need GCC 4.9 ore later or CLang 3.9.
 On Windows you will also need Visual Studio 2015 ot 2017 with C++ language feature installed.
@@ -52,8 +50,8 @@ See the *darknet_import.py* Python module (found in the `tools/importers/darknet
 So let's download a Darknet ImageNet reference model using `curl` to a new temporary directory
 on your PC using your `anaconda environment`:
 
-    curl -O https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg
-    curl -O https://pjreddie.com/media/files/darknet.weights
+    curl --location -O https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg
+    curl --location -O https://pjreddie.com/media/files/darknet.weights
 
 If your conda environment doesn't have curl just run this:
 
@@ -61,7 +59,7 @@ If your conda environment doesn't have curl just run this:
 
 So, to convert this Darknet model to the ELL format simply create a new directory
 
-    python "~/git/ELL/tools/importers/darknet/darknet_import.py" darknet.cfg darknet.weights
+    python "~/ELL/tools/importers/darknet/darknet_import.py" darknet.cfg darknet.weights
 
 You should see some output like this while it is loading the model:
 
@@ -82,26 +80,25 @@ You should see some output like this while it is loading the model:
     avg_pool:  4 x 4 x 1000 ->  1 x 1 x 1000 , pad  0
     softmax:  1 x 1 x 1000 ->  1 x 1 x 1000
     Saving model file: 'darknet.ell'
-    Saving config file: 'darknet_config.json'
 
 Wait for a few seconds (depending on your computer performance) and you should see the 
-following new files in your directory:
+following new file in your directory:
 
     darknet.ell
-    darknet_config.json
 
-The config file simply contains information about the inputs and outputs for this model.
+This is a JSON file that contains all the information needed for ELL to be able to 
+compile this model to code.
 
 ### Testing Darknet
 
 Now let's test that this model works on your PC.  For this you will need to copy the
 `darknetImageNetLabels.txt` from this tutorial folder:
 
-    cp ~/git/ELL/docs/Importing-new-models/darknetImageNetLabels.txt .
+    cp ~/ELL/docs/tutorials/Importing-new-models/darknetImageNetLabels.txt .
 
  Then to build an ELL project that will run on your PC:
 
-    python "~/git/ELL/wrap.py darknetImageNetLabels.txt darknet.ell -target host
+    python ~/ELL/tools/wrap/wrap.py darknetImageNetLabels.txt darknet.ell -target host
     cd host
     mkdir build
     cd build
@@ -121,7 +118,8 @@ Then to build it:
 
     cmake --build . --config Release
     cd ..
-    cp /y ~/git/ELL/tools/utilities/pythonlibs/demo* .
+    cp ~/ELL/tools/utilities/pythonlibs/demoHelper.py .
+    cp ~/ELL/docs/tutorials/shared/demo.py .
 
 And finally to run the test on video input:
 
@@ -149,81 +147,69 @@ that location.
 
 Then download the CNTK ImageNet reference model as follows:
 
-    curl -O https://www.cntk.ai/Models/Caffe_Converted/VGG16_ImageNet_Caffe.model
+    curl --location -o cntkmodel.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.cntk.zip
+    unzip cntkmodel.zip    
 
 If your conda environment doesn't have curl just run this:
 
     conda install curl
 
-Now import this model into the ELL format:
+Now rename the file `d_I224x224x3CMCMCMCMCMCMC1A.cntk` to something simpler like `model2.cntk` and import this model into the ELL format:
 
-    python "~/git/ELL/tools/importers/cntk/cntk_import.py" VGG16_ImageNet_Caffe.model
+    python "~/ELL/tools/importers/cntk/cntk_import.py" model2.cntk
 
 Now you should see some output like this:
+````
+Loading...
+Selected CPU as the process wide default device.
 
-    Loading...
-    Selected CPU as the process wide default device.
+Finished loading.
+Pre-processing...
+Will not process ReduceElements - skipping this layer as irrelevant.
+Will not process ClassificationError - skipping this layer as irrelevant.
+Will not process ReduceElements - skipping this layer as irrelevant.
+Will not process CrossEntropyWithSoftmax - skipping this layer as irrelevant.
+Will not process Reshape - skipping this layer as irrelevant.
+Will not process Combine - skipping this layer as irrelevant.
+Minus :  224x224x3  ->  226x226x3 | input padding 0  output padding 1
+Convolution(LeakyReLU) :  226x226x3  ->  224x224x16 | input padding 1  output padding 0
+BatchNormalization :  224x224x16  ->  224x224x16 | input padding 0  output padding 0
+MaxPooling :  224x224x16  ->  114x114x16 | input padding 0  output padding 1
+Convolution(LeakyReLU) :  114x114x16  ->  112x112x64 | input padding 1  output padding 0
+BatchNormalization :  112x112x64  ->  112x112x64 | input padding 0  output padding 0
+MaxPooling :  112x112x64  ->  58x58x64 | input padding 0  output padding 1
+Convolution(LeakyReLU) :  58x58x64  ->  56x56x64 | input padding 1  output padding 0
+BatchNormalization :  56x56x64  ->  56x56x64 | input padding 0  output padding 0
+MaxPooling :  56x56x64  ->  30x30x64 | input padding 0  output padding 1
+Convolution(LeakyReLU) :  30x30x64  ->  28x28x128 | input padding 1  output padding 0
+BatchNormalization :  28x28x128  ->  28x28x128 | input padding 0  output padding 0
+MaxPooling :  28x28x128  ->  16x16x128 | input padding 0  output padding 1
+Convolution(LeakyReLU) :  16x16x128  ->  14x14x256 | input padding 1  output padding 0
+BatchNormalization :  14x14x256  ->  14x14x256 | input padding 0  output padding 0
+MaxPooling :  14x14x256  ->  9x9x256 | input padding 0  output padding 1
+Convolution(LeakyReLU) :  9x9x256  ->  7x7x512 | input padding 1  output padding 0
+BatchNormalization :  7x7x512  ->  7x7x512 | input padding 0  output padding 0
+MaxPooling :  7x7x512  ->  6x6x512 | input padding 0  output padding 1
+Convolution(LeakyReLU) :  6x6x512  ->  4x4x1024 | input padding 1  output padding 0
+BatchNormalization :  4x4x1024  ->  4x4x1024 | input padding 0  output padding 0
+Convolution :  4x4x1024  ->  4x4x1000 | input padding 0  output padding 0
+AveragePooling :  4x4x1000  ->  1x1x1000 | input padding 0  output padding 0
+Softmax :  1x1x1000  ->  1x1x1 | input padding 0  output padding 0
 
-    Finished loading.
-    Pre-processing...
-    Convolution :  226x226x3  ->  224x224x64 | input padding 1  output padding 0
-    ReLU :  224x224x64  ->  226x226x64 | input padding 0  output padding 1
-    Convolution :  226x226x64  ->  224x224x64 | input padding 1  output padding 0
-    ReLU :  224x224x64  ->  224x224x64 | input padding 0  output padding 0
-    MaxPooling :  224x224x64  ->  114x114x64 | input padding 0  output padding 1
-    Convolution :  114x114x64  ->  112x112x128 | input padding 1  output padding 0
-    ReLU :  112x112x128  ->  114x114x128 | input padding 0  output padding 1
-    Convolution :  114x114x128  ->  112x112x128 | input padding 1  output padding 0
-    ReLU :  112x112x128  ->  112x112x128 | input padding 0  output padding 0
-    MaxPooling :  112x112x128  ->  58x58x128 | input padding 0  output padding 1
-    Convolution :  58x58x128  ->  56x56x256 | input padding 1  output padding 0
-    ReLU :  56x56x256  ->  58x58x256 | input padding 0  output padding 1
-    Convolution :  58x58x256  ->  56x56x256 | input padding 1  output padding 0
-    ReLU :  56x56x256  ->  58x58x256 | input padding 0  output padding 1
-    Convolution :  58x58x256  ->  56x56x256 | input padding 1  output padding 0
-    ReLU :  56x56x256  ->  56x56x256 | input padding 0  output padding 0
-    MaxPooling :  56x56x256  ->  30x30x256 | input padding 0  output padding 1
-    Convolution :  30x30x256  ->  28x28x512 | input padding 1  output padding 0
-    ReLU :  28x28x512  ->  30x30x512 | input padding 0  output padding 1
-    Convolution :  30x30x512  ->  28x28x512 | input padding 1  output padding 0
-    ReLU :  28x28x512  ->  30x30x512 | input padding 0  output padding 1
-    Convolution :  30x30x512  ->  28x28x512 | input padding 1  output padding 0
-    ReLU :  28x28x512  ->  28x28x512 | input padding 0  output padding 0
-    MaxPooling :  28x28x512  ->  16x16x512 | input padding 0  output padding 1
-    Convolution :  16x16x512  ->  14x14x512 | input padding 1  output padding 0
-    ReLU :  14x14x512  ->  16x16x512 | input padding 0  output padding 1
-    Convolution :  16x16x512  ->  14x14x512 | input padding 1  output padding 0
-    ReLU :  14x14x512  ->  16x16x512 | input padding 0  output padding 1
-    Convolution :  16x16x512  ->  14x14x512 | input padding 1  output padding 0
-    ReLU :  14x14x512  ->  14x14x512 | input padding 0  output padding 0
-    MaxPooling :  14x14x512  ->  7x7x512 | input padding 0  output padding 0
-    linear :  7x7x512  ->  1x1x4096 | input padding 0  output padding 0
-    ReLU :  1x1x4096  ->  1x1x4096 | input padding 0  output padding 0
-    linear :  1x1x4096  ->  1x1x4096 | input padding 0  output padding 0
-    ReLU :  1x1x4096  ->  1x1x4096 | input padding 0  output padding 0
-    linear :  1x1x4096  ->  1x1x1000 | input padding 0  output padding 0
-    Softmax :  1x1x1000  ->  1x1x1000 | input padding 0  output padding 0
-
-    Finished pre-processing.
-    Saving model file: 'VGG16_ImageNet_Caffe.ell'
-
-This will take a few minutes because the model file is pretty large, about 150 mb.
-
-    VGG16_ImageNet_Caffe.ell
-    VGG16_ImageNet_Caffe_config.json
-
-The config file simply contains information about the inputs and outputs for this model.
+Finished pre-processing.
+Saving model file: 'model2.ell'
+````
 
 ### Testing CNTK Model
 
-Now let's test that this model works on your PC.  For this you will need to copy the
-`cntkVgg16ImageNetLabels.txt` from this tutorial folder:
+Now let's test that this model works on your PC.  For this you will need to download the
+labels file:
 
-    cp ~/git/ELL/docs/Importing-new-models/cntkVgg16ImageNetLabels.txt .
+    curl --location -o categories.txt https://raw.githubusercontent.com/Microsoft/ELL-models/master/models/ILSVRC2012/ILSVRC2012_labels.txt
 
  Then to build an ELL project that will run on your PC:
 
-    python "~/git/ELL/wrap.py cntkVgg16ImageNetLabels.txt VGG16_ImageNet_Caffe.ell -target host
+    python "~/ELL/tools/wrap/wrap.py categories.txt model2.cntk -target host
     cd host
     mkdir build
     cd build
@@ -242,15 +228,16 @@ Then to build it:
 
     cmake --build . --config Release
     cd ..
-    cp /y ~/git/ELL/tools/utilities/pythonlibs/demo* .
+    cp ~/ELL/tools/utilities/pythonlibs/demoHelper.py .
+    cp ~/ELL/docs/tutorials/shared/demo.py . --bgr true
 
 And finally to run the test on video input:
 
-    python demo.py cntkVgg16ImageNetLabels.txt --compiledModel VGG16_ImageNet_Caffe
+    python demo.py categories.txt --compiledModel model2 --bgr true
 
 And to test with a static image:
 
-    python demo.py cntkVgg16ImageNetLabels.txt --compiledModel VGG16_ImageNet_Caffe --image coffeemug.jpg
+    python demo.py categories.txt --compiledModel model2 --image coffeemug.jpg --bgr true
 
 ### Summary
 

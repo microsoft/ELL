@@ -17,6 +17,7 @@
 // utilities
 #include "CommandLineParser.h"
 #include "Exception.h"
+#include "NeuralNetworkPredictorNode.h"
 #include "OutputStreamImpostor.h"
 
 // model
@@ -26,6 +27,16 @@
 #include <iostream>
 
 using namespace ell;
+
+bool IsNeuralNetworkPredictorNode(const ell::model::Node* node)
+{
+    if (dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<float>*>(node) != nullptr)
+    {
+        return true;
+    }
+
+    return dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<double>*>(node) != nullptr;
+}
 
 int main(int argc, char* argv[])
 {
@@ -41,32 +52,50 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(printArguments);
         commandLineParser.Parse();
 
-        if (argc == 1) {
+        if (argc == 1)
+        {
+            std::cout << commandLineParser.GetHelpString() << std::endl;
+            return 1;
+        }
+        if (modelLoadArguments.inputModelFile == "")
+        {
+
+            std::cout << "### Error: Please specify a model to print using the -imf argument" << std::endl
+                      << std::endl;
             std::cout << commandLineParser.GetHelpString() << std::endl;
             return 1;
         }
 
         // open model file
-        model::Model model;
+        model::DynamicMap map;
         try
         {
-            model = common::LoadModel(modelLoadArguments.inputModelFile);
+            model::Model model = common::LoadModel(modelLoadArguments.inputModelFile);
+            std::vector<std::pair<std::string, model::InputNodeBase*>> inputs;
+            std::vector<std::pair<std::string, model::PortElementsBase>> outputs;
+            map = model::DynamicMap(model, inputs, outputs);
         }
         catch (const utilities::Exception&)
         {
-            auto map = common::LoadMap(modelLoadArguments.inputModelFile);
-            model = map.GetModel();
+            // perhaps this file is a map
+            map = common::LoadMap(modelLoadArguments.inputModelFile);
+        }
+
+        if (printArguments.refine)
+        {
+            model::TransformContext context;
+            map.Refine(context, 100);
         }
 
         // print model
         utilities::OutputStreamImpostor out = printArguments.outputStream;
         if (printArguments.outputFormat == "dgml")
         {
-            PrintGraph(model, out);
+            PrintGraph(map.GetModel(), out);
         }
         else
         {
-            PrintModel(model, out);
+            PrintModel(map.GetModel(), out);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

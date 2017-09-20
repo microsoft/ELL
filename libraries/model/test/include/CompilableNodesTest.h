@@ -68,7 +68,7 @@ void TestBinaryConvolutionalLayerNode(size_t inputPadding = 1, size_t outputPadd
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
 void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
 void TestFullyConnectedLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
-void TestMaxPoolingLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
-void TestMeanPoolingLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
+void TestMaxPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPadding = 0, size_t outputPadding = 0);
+void TestMeanPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPadding = 0, size_t outputPadding = 0);
 void TestScalingLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestSoftmaxLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);

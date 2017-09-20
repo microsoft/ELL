@@ -28,14 +28,16 @@ class ModelTester(demoHelper.DemoHelper):
         self.start = time.time()
         self.val_map = {}
         self.val_pos = 0
+        self.val_end = 0
         self.val_labels = []     
         self.map_entry = None
         self.tests_passed = 0
         self.tests_failed = 0
-        self.automatic = False
         self.start_time = time.time()
         self.test_top_n = 1
         self.test_complete = False
+        self.batch = 0
+        self.automatic = True
 
     def add_arguments(self, arg_parser):
         super(ModelTester,self).add_arguments(arg_parser)    
@@ -43,6 +45,7 @@ class ModelTester(demoHelper.DemoHelper):
         arg_parser.add_argument("--truth", help="path to a tsv file, each line contains two values, the file name of the image and the integer classification value")
         arg_parser.add_argument("--truthlabels", help="path to a labels for the truth file (in case these are different from your model labels)")
         arg_parser.add_argument("--top", type=int, help="how many of the top labels to include in the test (default 1)", default=self.test_top_n)
+        arg_parser.add_argument("--batch", type=int, help="which batch out of 10 batches to execute (default all)", default=0)
     
 
     def initialize(self, args):
@@ -53,6 +56,7 @@ class ModelTester(demoHelper.DemoHelper):
 
         # test args
         self.test_top_n = args.top
+        self.batch = args.batch
 
         if args.truth is None:
             print("--truth argument is missing")
@@ -69,6 +73,16 @@ class ModelTester(demoHelper.DemoHelper):
         else:
             self.val_labels = self.labels
 
+        self.val_end = len(self.val_map)
+        self.batch_size = self.val_end / 10
+        if self.batch > 0:
+            self.val_pos = (self.batch - 1) * self.batch_size
+            self.val_end = self.val_pos + self.batch_size
+            
+        self.automatic = True
+        self.start_time = time.time()
+        print("starting automatic test run...")
+        print(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()))
         return True
 
     def init_image_source(self):        
@@ -77,7 +91,7 @@ class ModelTester(demoHelper.DemoHelper):
     def load_next_image(self):
         self.recorded = False # waiting for user input.
         frame = None
-        while frame == None and self.val_pos < len(self.val_map):
+        while frame == None and self.val_pos < self.val_end:
             self.map_entry = self.val_map[self.val_pos]
             self.val_pos = self.val_pos + 1
             path = os.path.join(self.val_map_dir, self.map_entry[0])
@@ -131,23 +145,7 @@ class ModelTester(demoHelper.DemoHelper):
         if self.test_complete:
             return True
     
-        key = cv2.waitKey(1) & 0xFF
-        if key == 27:
-            result = True
-        self.onKeyDown(key)
-
-        return result
-
-    def onKeyDown(self, key):
-        if key == ord(' '):
-            self.record_result()
-            self.automatic = False
-        elif key == ord('a'):
-            self.automatic = True
-            self.start_time = time.time()
-            print("starting automatic test run...")
-            print(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()))
-        if self.automatic:
+        if self.automatic and not self.results is None:
             self.record_result()
 
     def get_truth_label(self, i):
@@ -168,14 +166,18 @@ class ModelTester(demoHelper.DemoHelper):
                 winner = top  
                 break
         
-        print(",".join(actual))
+        print(",".join(actual))            
         if winner != None:
             self.tests_passed = self.tests_passed + 1
-            print("  Test passed (%d)" % (self.val_pos))
+            total = self.tests_passed + self.tests_failed
+            pass_rate = (self.tests_passed * 100) / total
+            print("  Test passed (%d), current pass rate %d" % (self.val_pos, pass_rate))
         else:
-            self.tests_failed = self.tests_failed + 1        
+            self.tests_failed = self.tests_failed + 1    
+            total = self.tests_passed + self.tests_failed
+            pass_rate = (self.tests_passed * 100) / total    
             print("  ====> Expected=" + expected)       
-            print("  Test failed (%d)" % (self.val_pos))
+            print("  Test failed (%d), current pass rate %d" % (self.val_pos, pass_rate))
         self.recorded = True
         self.frame = self.load_next_image()
 
@@ -235,7 +237,10 @@ def main(args):
         data = helper.prepare_image_for_predictor(frame)
 
         # Get the model to classify the image, by returning a list of probabilities for the classes it can detect
+        now = time.time()
         predictions = helper.predict(data)
+        now2 = time.time()
+        print("Test %d predicted in %f seconds" % (helper.val_pos, now2-now))
 
         # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
         # each with the text label and the prediction score.
@@ -245,16 +250,9 @@ def main(args):
         text = "".join([str(helper.get_label(element[0])) + "(" + str(int(100*element[1])) + "%)  " for element in top5])
 
         if (text != lastPrediction):
-            print(text)
+            print("  " + text)
             lastPrediction = text
 
-        # Draw the text on the frame
-        if not helper.automatic:
-            frameToShow = frame
-            helper.draw_label(frameToShow, text)
-            helper.draw_fps(frameToShow)
-            # Show the new frame
-            helper.show_image(frameToShow, False)
 
     helper.report_times()
 

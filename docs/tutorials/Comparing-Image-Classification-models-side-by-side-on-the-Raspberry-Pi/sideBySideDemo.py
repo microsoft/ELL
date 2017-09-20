@@ -13,7 +13,8 @@ import os
 import argparse
 import numpy as np
 import cv2
-sys.path.append("d:/git/ell/ell/tools/utilities/pythonlibs")
+script_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(script_path, "../../../tools/utilities/pythonlibs"))
 import demoHelper as d
 
 # note: to run this in headless mode on a Linux machine run the following from your terminal window
@@ -117,9 +118,10 @@ def main(args):
 
             # Set the image with the header and footer text as one of the tiles
             tiledImage.set_image_at(modelIndex, modelFrame)
-            done = tiledImage.show()
-            if done:
-                break
+            tiledImage.show()
+
+            done = models[0].done()
+            if done: break
 
 if __name__ == "__main__":
     args = sys.argv

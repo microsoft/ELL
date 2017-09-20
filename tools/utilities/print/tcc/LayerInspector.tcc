@@ -90,7 +90,7 @@ namespace ell
         result.push_back(NameValue{ "stride", std::to_string(params.stride) });
         result.push_back(NameValue{ "method", ConvolutionMethodToString(params.method) });
 		result.push_back(NameValue{ "receptiveField", std::to_string(params.receptiveField) });
-		result.push_back(NameValue{ "numFiltersAtATime", std::to_string(params.numFiltersAtATime) });
+		result.push_back(NameValue{ "numFilters", std::to_string(params.numFiltersAtATime) });
         return result;
     }
 
@@ -100,7 +100,7 @@ namespace ell
         std::vector<NameValue> result;
         auto params = layer->GetPoolingParameters();
         result.push_back(NameValue{ "stride", std::to_string(params.stride) });
-        result.push_back(NameValue{ "poolingSize", std::to_string(params.poolingSize) });
+        result.push_back(NameValue{ "size", std::to_string(params.poolingSize) });
         return result;
     }
 
@@ -112,7 +112,7 @@ namespace ell
         auto input = params.input;
         auto shape = params.outputShape;
 
-		result.push_back(NameValue{ "shape",  "[" + std::to_string(input.NumRows()) + "," + std::to_string(input.NumColumns()) + "," + std::to_string(input.NumChannels()) + "] ->" +
+		result.push_back(NameValue{ "shape",  "[" + std::to_string(input.NumRows()) + "," + std::to_string(input.NumColumns()) + "," + std::to_string(input.NumChannels()) + "]->" +
 											  "[" + std::to_string(shape[0]) + "," + std::to_string(shape[1]) + "," + std::to_string(shape[2]) + "]" });
 
         auto inputpadding = params.inputPaddingParameters;
@@ -141,7 +141,7 @@ namespace ell
         const ell::predictors::neural::PoolingLayer<ElementType, ell::predictors::neural::MaxPoolingFunction>* maxpooling = dynamic_cast<const ell::predictors::neural::PoolingLayer<ElementType, ell::predictors::neural::MaxPoolingFunction>*>(layer.get());
         if (maxpooling != nullptr)
         {
-            result.push_back(NameValue{ "poolingFunction", "maxpooling" });
+            result.push_back(NameValue{ "function", "maxpooling" });
             std::vector<NameValue> more = InspectPoolingLayerParameters<ElementType, ell::predictors::neural::MaxPoolingFunction>(maxpooling);
             result.insert(result.end(), more.begin(), more.end());
         }
@@ -149,7 +149,7 @@ namespace ell
         const ell::predictors::neural::PoolingLayer<ElementType, ell::predictors::neural::MeanPoolingFunction>* meanpooling = dynamic_cast<const ell::predictors::neural::PoolingLayer<ElementType, ell::predictors::neural::MeanPoolingFunction>*>(layer.get());
         if (meanpooling != nullptr)
         {
-            result.push_back(NameValue{ "poolingFunction", "meanpooling" });
+            result.push_back(NameValue{ "function", "meanpooling" });
             std::vector<NameValue> more = InspectPoolingLayerParameters<ElementType, ell::predictors::neural::MeanPoolingFunction>(meanpooling);
             result.insert(result.end(), more.begin(), more.end());
         }

@@ -22,6 +22,7 @@ struct PrintArguments
 {
     std::string outputFilename;
     std::string outputFormat;
+    bool refine;
     utilities::OutputStreamImpostor outputStream;
 };
 

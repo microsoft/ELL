@@ -44,7 +44,7 @@ void PrintNode(const model::Node& node, std::ostream& out)
     bool isFirstInputPort = true;
     auto nodeType = node.GetRuntimeTypeName();
     bool isInputNode = nodeType.find("InputNode") == 0;
-    out << "node_" << node.GetId() << " = " << nodeType << "(";
+    out << nodeType << "(";
     if (isInputNode)
     {
         const auto& outputPort = node.GetOutputPorts()[0];
@@ -70,13 +70,10 @@ void PrintNode(const model::Node& node, std::ostream& out)
                 isFirstRange = false;
 
                 auto port = range.ReferencedPort();
-                out << "node_" << port->GetNode()->GetId() << "." << port->GetName();
-                if (!range.IsFullPortRange())
-                {
-                    auto start = range.GetStartIndex();
-                    auto size = range.Size();
-                    out << "[" << start << ":" << (start + size) << "]";
-                }
+                out << port->GetName();
+                auto start = range.GetStartIndex();
+                auto size = range.Size();
+                out << "[" << start << ":" << (start + size) << "]";
             }
 
             if (elements.NumRanges() > 1)

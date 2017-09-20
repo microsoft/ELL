@@ -10,7 +10,7 @@ permalink: /tutorials/Fun-with-Dogs-and-Cats/
 
 ### Materials
 
-* A Raspberry Pi
+* A Raspberry Pi (or you can run it on your PC too if you want)
 * Headphones or speakers for your Raspberry Pi
 * A USB webcam
 
@@ -79,7 +79,7 @@ environment named py34, so to run the tutorial do this:
 
 ````
 source activate py34
-python pets.py categories.txt --compiledModel model1 --image cat.png
+python pets.py categories.txt --compiledModel model --image cat.png --bgr true
 ````
 And it will classify the image, you should see output like this and you should hear the meow sound:
 ````
@@ -92,18 +92,20 @@ If you have a folder full of your favorite animal pictures including some dogs a
 the pets.py script on all those images using this command line:
 
 ````
-python pets.py categories.txt --compiledModel model1 --folder myFavoriteImages
+python pets.py categories.txt --compiledModel model --folder myFavoriteImages --bgr true
 ````
 
-It will show the first image, then press the `space bar` to advance to the next image.
+It will show the first image, then press the `space bar` to advance to the next image
+and `escape` to close the app.
 
 ### Process video
 
 If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
 
 ````
-python pets.py categories.txt --compiledModel model1
+python pets.py categories.txt --compiledModel model --bgr true
 ````
+(just press `escape` on your keyboard to close the app)
 
 You will see the same kind of window appear only this time it is showing the video stream.
 Then when your camera is pointed at an object that the model recognizes you will see the label and 
@@ -150,6 +152,9 @@ takes the prediction from the ELL model and checks to see if the result is in on
 So now we know if text comes back with "Dog" then one of the many dog breeds recognized by the
 ImageNet model has been returned in the top confidence spot, namely, top5[0].
 
+This just looks at the top prediction.  You could easiliy change this code to look for a dog
+or cat in any of the top 5 predictions.
+
 To play sounds we use the built-in Raspberry Pi "aplay" command.  You can also run this on
 your Windows PC and it will use the windows `winsound` library which is built into the windows
 Python runtime.
@@ -167,7 +172,7 @@ looking at another frame of the same dog or cat.  It uses a [numpy histogram](ht
         lastHist = hist  
 ````
 
-So if diff this `diff` is greater than some amount we know the user is looking at something new and then we go on to check to see if a new group is detected. 
+So if this `diff` is greater than some amount we know the user is looking at something new and then we go on to check to see if a new group is detected. 
 
 ### Toubleshooting
 

@@ -48,7 +48,7 @@ When prompted to install, reply [yes] to add Miniconda3 to your PATH. Next creat
 Remember to run `source activate py34` each time you start a new terminal window. 
 
 ### OpenCV
-`OpenCV` is a computer vision library that enables us to read images a camera, resize them, and convert them to NumPy arrays for processing by ELL. To install `OpenCV`, 
+`OpenCV` is a computer vision library that enables us to read images from a camera, resize them, and convert them to NumPy arrays for processing by ELL. To install `OpenCV`, 
 
     conda install -c microsoft-ell opencv
 

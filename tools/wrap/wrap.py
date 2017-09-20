@@ -56,7 +56,7 @@ class ModuleBuilder:
         # optional arguments
         arg_parser.add_argument("--language", "-lang", help="the language for the ELL module", choices=["python"], default=self.language)
         arg_parser.add_argument("--target", "-target", help="the target platform", choices=["pi3", "pi3_64", "aarch64", "host"], default=self.target)
-        arg_parser.add_argument("--outdir", "-outdir", help="the output directory", default=self.target)
+        arg_parser.add_argument("--outdir", "-outdir", help="the output directory")
         arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
         arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
 
@@ -68,6 +68,8 @@ class ModuleBuilder:
         self.language = args.language
         self.target = args.target
         self.output_dir = args.outdir
+        if self.output_dir is None:
+            self.output_dir  = self.target
         self.profile = args.profile
         self.verbose = args.verbose
 

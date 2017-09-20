@@ -71,9 +71,9 @@ void TestIRCompiler()
     TestCompilableTypeCastNode();
     TestReorderDataNode1();
     TestReorderDataNode2();
-    TestReceptiveFieldMatrixNode(1, true);  // new version
+    TestReceptiveFieldMatrixNode(1, true); // new version
     TestReceptiveFieldMatrixNode(1, false); // old (slow) version
-    TestReceptiveFieldMatrixNode(2, true);  // new version
+    TestReceptiveFieldMatrixNode(2, true); // new version
     // TestReceptiveFieldMatrixNode(2, false); // old (slow) version -- Fails
     TestCompilableAccumulatorNodeFunction();
     TestCompilableSourceNode(false);
@@ -125,6 +125,31 @@ void TestIRCompiler()
     TestBiasLayerNode(0, 1);
     TestBiasLayerNode(0, 2);
     // TestBiasLayerNode(1, 0); // Input padding not supported (yet)
+    TestMaxPoolingLayerNode(8, 8, 6, 6, 3, 1, 2, 1);
+    TestMaxPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 1);
+    TestMaxPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 2);
+    TestMaxPoolingLayerNode(8, 8, 6, 6, 3, 1, 1, 0);
+    TestMaxPoolingLayerNode(8, 8, 6, 6, 3, 1, 2, 1);
+
+    // test weird case we are seeing in some cntk models (this test is failing!)
+    // TestMaxPoolingLayerNode(7, 7, 4, 4, 2, 2, 0, 0);
+
+    TestMeanPoolingLayerNode(8, 8, 6, 6, 3, 1);
+    TestMeanPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 1);
+    TestMeanPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 2);
+    TestMeanPoolingLayerNode(8, 8, 6, 6, 3, 1, 1, 0);
+
+    TestMeanPoolingLayerNode(8, 8, 2, 1, 2, 1);
+
+    TestScalingLayerNode();
+    TestScalingLayerNode(0, 1);
+    TestScalingLayerNode(0, 2);
+    // TestScalingLayerNode(1, 0); // Input padding not supported (yet)
+
+    TestSoftmaxLayerNode();
+    TestSoftmaxLayerNode(0, 1);
+    TestSoftmaxLayerNode(0, 2);
+    // TestSoftmaxLayerNode(1, 0); // Input padding not supported (yet)
 
     TestBinaryConvolutionalLayerNode();
     TestBinaryConvolutionalLayerNode(1, 0, PaddingScheme::zeros, true);
@@ -144,27 +169,6 @@ void TestIRCompiler()
     // TestFullyConnectedLayerNode(0, 2); // Fully-connected layer nodes can't have padding (yet)
     // TestFullyConnectedLayerNode(1, 1); // Fully-connected layer nodes can't have padding (yet)
 
-    TestMaxPoolingLayerNode();
-    TestMaxPoolingLayerNode(0, 1);
-    TestMaxPoolingLayerNode(0, 2);
-    TestMaxPoolingLayerNode(1, 0);
-    TestMaxPoolingLayerNode(2, 1);
-
-    TestMeanPoolingLayerNode();
-    TestMeanPoolingLayerNode(0, 1);
-    TestMeanPoolingLayerNode(0, 2);
-    TestMeanPoolingLayerNode(1, 0);
-    TestMeanPoolingLayerNode(2, 1);
-
-    TestScalingLayerNode();
-    TestScalingLayerNode(0, 1);
-    TestScalingLayerNode(0, 2);
-    // TestScalingLayerNode(1, 0); // Input padding not supported (yet)
-
-    TestSoftmaxLayerNode();
-    TestSoftmaxLayerNode(0, 1);
-    TestSoftmaxLayerNode(0, 2);
-    // TestSoftmaxLayerNode(1, 0); // Input padding not supported (yet)
 }
 
 int main(int argc, char* argv[])

@@ -57,6 +57,7 @@ class DemoHelper:
         self.input_shape = None
         self.output_shape = None
         self.bgr = False
+        self.results = None
     
     def add_arguments(self, arg_parser):
         """
@@ -132,7 +133,7 @@ class DemoHelper:
             self.import_compiled_model(self.compiled_model, self.model_name)
         else:
             # this is the "interpreted" model route, so we need the ELL runtime.
-            self.model_name = os.path.splitext(self.model_file)[0]
+            self.model_name = os.path.splitext(os.path.basename(self.model_file))[0]
             self.import_ell_map()
             
         self.input_size = (self.input_shape.rows, self.input_shape.columns)
@@ -460,6 +461,17 @@ class TiledImage:
 
         return (numVertical, numHorizontal)
 
+    def resize_to_same_height(self, images):
+        minHeight = min([i.shape[0] for i in images])
+        for i in range(len(images)):
+            shape = images[i].shape
+            h = shape[0]
+            if h > minHeight:
+                scale = minHeight / h
+                newSize = (int(shape[1] * scale), int(shape[0] * scale))
+                images[i] = cv2.resize(images[i], newSize)
+        return images
+
     def compose(self):
         """Composes an image made by tiling all the sub-images set with `set_image_at`. """
         yElements = []
@@ -468,6 +480,8 @@ class TiledImage:
             for horizontalIndex in range(self.composed_image_shape[1]):
                 currentIndex = verticalIndex * self.composed_image_shape[1] + horizontalIndex
                 xElements.append(self.images[currentIndex])
+            # np.hstack only works if the images are the same height 
+            xElements = self.resize_to_same_height(xElements)
             horizontalImage = np.hstack(tuple(xElements))
             yElements.append(horizontalImage)
         composedImage = np.vstack(tuple(yElements))
@@ -506,7 +520,3 @@ class TiledImage:
         imageToShow = self.compose()
         # Show the tiled image
         cv2.imshow(self.window_name, imageToShow)
-        # Run the update loop and check whether the user has indicated whether they are done
-        if cv2.waitKey(1) & 0xFF == 27:
-            return True
-        return False
