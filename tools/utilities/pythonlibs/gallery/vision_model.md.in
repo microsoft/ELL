@@ -13,7 +13,7 @@ permalink: /gallery/ILSVRC2012/@PERMALINK@
 |-
 | Accuracy | ILSVRC2012: @TOP_5_ACCURACY@% (Top 5), @TOP_1_ACCURACY@% (Top 1) 
 |-
-| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: @pi3_SECONDS_PER_FRAME@s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 800MHz: @pi3_64_SECONDS_PER_FRAME<br>DragonBoard 410c @ 1.2GHz: @aarch64_SECONDS_PER_FRAME@s/frame
+| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: @pi3_SECONDS_PER_FRAME@s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: @pi3_64_SECONDS_PER_FRAME@s/frame<br>DragonBoard 410c @ 1.2GHz: @aarch64_SECONDS_PER_FRAME@s/frame
 |-
 | Uncompressed Size | @MODEL_SIZE_MB@MB
 |-

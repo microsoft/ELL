@@ -13,7 +13,7 @@ permalink: /gallery/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A
 |-
 | Accuracy | ILSVRC2012: 82.49% (Top 5), 60.03% (Top 1) 
 |-
-| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: 1.11s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 800MHz: @pi3_64_SECONDS_PER_FRAME<br>DragonBoard 410c @ 1.2GHz: 0.66s/frame
+| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: 1.11s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 1.08s/frame<br>DragonBoard 410c @ 1.2GHz: 0.58s/frame
 |-
 | Uncompressed Size | 91MB
 |-

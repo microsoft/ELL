@@ -26,36 +26,39 @@ def run_validation(args):
     """Loops through each image in the validation set (or a subset of it),
        evaluates it for predictions, and saves the results
     """
-    with open(args.validation_map, 'r') as vm:
+    with open(args.validation_map, 'r') as valmap:
         top1 = 0
         top5 = 0
         results = {}
         results["results"] = []
-        subset = list(islice(vm, args.maxfiles))
+        subset = list(islice(valmap, args.maxfiles))
 
         # subset contains the list to validate
         for entry in subset:
             f, c = entry.split()
             filename = os.path.join(args.validation_path, basename(f))
-            if (not os.path.isfile(filename)):
+            if not os.path.isfile(filename):
                 raise Exception("File not found: " + filename)
 
+            # assume: the CNTK models we are validating are trained to expect input as BGR
             result = validate_image([args.labels,
                 "--compiledModel", args.compiled_module, "--image", filename,
-                "--iterations", "5", "--threshold", "0.0"], filename)
+                "--iterations", "5", "--threshold", "0.0", "--bgr", "true"], filename)
 
             result["truth"] = int(c)
             results["results"].append(result)
 
             # each prediction is (label, probability)
-            top1 = top1 + int(result["truth"] == result["predictions"][0][0])
-            top5 = top5 + int(reduce(lambda x, y: x or (y[0] == result["truth"]), result["predictions"], False))
+            if len(result["predictions"]) > 0:
+                top1 = top1 + int(result["truth"] == result["predictions"][0][0])
+                top5 = top5 + int(reduce(lambda x, y: x or (y[0] == result["truth"]), result["predictions"], False))
 
         results["top1_percent"] = (top1 / args.maxfiles) * 100
         results["top5_percent"] = (top5 / args.maxfiles) * 100
 
-        with open('validation.json', 'w', encoding='utf-8') as o:
-            json.dump(results, o, ensure_ascii=False, indent=2)
+        # write Windows line endings
+        with open('validation.json', 'w', encoding='utf-8', newline='\r\n') as outfile:
+            json.dump(results, outfile, ensure_ascii=False, indent=2)
 
 def validate_image(args, filename):
     """Evaluates a single image to get predictions"""

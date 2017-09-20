@@ -126,11 +126,13 @@ endif()
 
 if(NOT WIN32)
     ## Note: libopenblas installs on ubuntu in /usr/lib and /usr/include
+    ## Note: libopenblas installs on openSUSE in /usr/lib64 and /usr/include/openblas
     set(BLAS_INCLUDE_SEARCH_PATHS
         /System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/
         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers/
         /usr/include
         /usr/local/include
+        /usr/include/openblas
     )
 
     set(BLAS_LIB_SEARCH_PATHS

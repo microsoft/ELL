@@ -6,14 +6,14 @@ permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 160x160x3 Convolutional Neural Network (68.39% top 1 accuracy, 88.38% top 5 accuracy, 5.15s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 160x160x3 Convolutional Neural Network (68.39% top 1 accuracy, 88.38% top 5 accuracy, 5.22s/frame on Raspberry Pi 3)
 
 |=
 | Download | [v_I160x160x3BBMBBMBBBMBBBMBBBMF2048.ell.zip](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3BBMBBMBBBMBBBMBBBMF2048/v_I160x160x3BBMBBMBBBMBBBMBBBMF2048.ell.zip)
 |-
 | Accuracy | ILSVRC2012: 88.38% (Top 5), 68.39% (Top 1) 
 |-
-| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: 5.15s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 800MHz: @pi3_64_SECONDS_PER_FRAME<br>DragonBoard 410c @ 1.2GHz: 3.54s/frame
+| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: 5.22s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 4.46s/frame<br>DragonBoard 410c @ 1.2GHz: 2.91s/frame
 |-
 | Uncompressed Size | 535MB
 |-

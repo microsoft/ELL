@@ -106,7 +106,9 @@ class GenerateMarkdown:
                     results = data['results']
                     average_time = reduce(lambda x, y: x + float(y['avg_time']), results, 0) / len(results)
                     self.set_value("@" + platform + "_SECONDS_PER_FRAME@", self.format_float(average_time))
-            except FileNotFoundError:
+            except:
+                # leave entries empty if file isn't found, orinvalid json (validation not complete on the target)
+                self.set_value("@" + platform + "_SECONDS_PER_FRAME@", "")
                 pass
 
     def sanitize_layer_string(self, layer_str):
