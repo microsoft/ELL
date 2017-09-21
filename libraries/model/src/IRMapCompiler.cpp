@@ -28,7 +28,7 @@ namespace model
     IRMapCompiler::IRMapCompiler(const MapCompilerParameters& settings)
         : MapCompiler(settings), _moduleEmitter(settings.moduleName), _profiler()
     {
-        _moduleEmitter.SetCompilerParameters(settings.compilerSettings);
+        _moduleEmitter.SetCompilerParameters(GetMapCompilerParameters().compilerSettings);
         _nodeRegions.emplace_back();
     }
 

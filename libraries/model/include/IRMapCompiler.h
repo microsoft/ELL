@@ -57,20 +57,20 @@ namespace model
         /// <summary> Gets the compiler parameters being used by the IR emitter. </summary>
         ///
         /// <returns> The CompilerParameters struct used by the IR emitter to control code generation. </returns>
-        emitters::CompilerParameters GetCompilerParameters() const { return GetModule().GetCompilerParameters(); }
+        const emitters::CompilerParameters& GetCompilerParameters() const { return GetModule().GetCompilerParameters(); }
 
         //
         // Routines useful to Node implementers
         //
 
-        /// <summary> Returns the ModuleEmitter associated with this map. </summary>
+        /// <summary> Returns the IRModuleEmitter associated with this map. </summary>
         ///
-        /// <returns> The ModuleEmitter associated with this map. </returns>
+        /// <returns> The IRModuleEmitter associated with this map. </returns>
         emitters::IRModuleEmitter& GetModule() { return _moduleEmitter; }
 
-        /// <summary> Returns the ModuleEmitter associated with this map. </summary>
+        /// <summary> Returns the IRModuleEmitter associated with this map. </summary>
         ///
-        /// <returns> The ModuleEmitter associated with this map. </returns>
+        /// <returns> The IRModuleEmitter associated with this map. </returns>
         const emitters::IRModuleEmitter& GetModule() const { return _moduleEmitter; }
 
         /// <summary> Ensure that variable for the outport port referenced by this input port has been declared in IR </summary>

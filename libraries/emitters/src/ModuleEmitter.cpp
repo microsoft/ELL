@@ -62,62 +62,66 @@ namespace emitters
     void ModuleEmitter::SetCompilerParameters(const CompilerParameters& parameters)
     {
         _parameters = parameters;
+        CompleteCompilerParameters(_parameters);
+    }
 
-        if (_parameters.targetDevice.numBits == 0)
+    void ModuleEmitter::CompleteCompilerParameters(CompilerParameters& parameters)
+    {
+        if (parameters.targetDevice.numBits == 0)
         {
-            _parameters.targetDevice.numBits = c_defaultNumBits;
+            parameters.targetDevice.numBits = c_defaultNumBits;
         }
 
         // Set low-level args based on target name (if present)
-        if (_parameters.targetDevice.deviceName != "")
+        if (parameters.targetDevice.deviceName != "")
         {
-            if (_parameters.targetDevice.deviceName == "mac")
+            if (parameters.targetDevice.deviceName == "mac")
             {
-                _parameters.targetDevice.triple = c_macTriple;
-                _parameters.targetDevice.dataLayout = c_macDataLayout;
+                parameters.targetDevice.triple = c_macTriple;
+                parameters.targetDevice.dataLayout = c_macDataLayout;
             }
-            else if (_parameters.targetDevice.deviceName == "linux")
+            else if (parameters.targetDevice.deviceName == "linux")
             {
-                _parameters.targetDevice.triple = c_linuxTriple;
-                _parameters.targetDevice.dataLayout = c_linuxDataLayout;
+                parameters.targetDevice.triple = c_linuxTriple;
+                parameters.targetDevice.dataLayout = c_linuxDataLayout;
             }
-            else if (_parameters.targetDevice.deviceName == "windows")
+            else if (parameters.targetDevice.deviceName == "windows")
             {
-                _parameters.targetDevice.triple = c_windowsTriple;
-                _parameters.targetDevice.dataLayout = c_windowsDataLayout;
+                parameters.targetDevice.triple = c_windowsTriple;
+                parameters.targetDevice.dataLayout = c_windowsDataLayout;
             }
-            else if (_parameters.targetDevice.deviceName == "pi0")
+            else if (parameters.targetDevice.deviceName == "pi0")
             {
-                _parameters.targetDevice.triple = c_pi0Triple;
-                _parameters.targetDevice.dataLayout = c_armDataLayout;
-                _parameters.targetDevice.numBits = 32;
+                parameters.targetDevice.triple = c_pi0Triple;
+                parameters.targetDevice.dataLayout = c_armDataLayout;
+                parameters.targetDevice.numBits = 32;
             }
-            else if (_parameters.targetDevice.deviceName == "pi3") // pi3 (Raspbian)
+            else if (parameters.targetDevice.deviceName == "pi3") // pi3 (Raspbian)
             {
-                _parameters.targetDevice.triple = c_armTriple; // For some reason, the assembly doesn't like this
-                _parameters.targetDevice.dataLayout = c_armDataLayout;
-                _parameters.targetDevice.numBits = 32;
-                _parameters.targetDevice.cpu = c_pi3Cpu; // maybe not necessary
+                parameters.targetDevice.triple = c_armTriple;
+                parameters.targetDevice.dataLayout = c_armDataLayout;
+                parameters.targetDevice.numBits = 32;
+                parameters.targetDevice.cpu = c_pi3Cpu; // maybe not necessary
             }
-            else if (_parameters.targetDevice.deviceName == "pi3_64") // pi3 (openSUSE)
+            else if (parameters.targetDevice.deviceName == "pi3_64") // pi3 (openSUSE)
             {
                 // need to set arch to aarch64?
-                _parameters.targetDevice.triple = c_arm64Triple;
-                _parameters.targetDevice.dataLayout = c_arm64DataLayout;
-                _parameters.targetDevice.numBits = 64;
-                _parameters.targetDevice.cpu = c_pi3Cpu;
+                parameters.targetDevice.triple = c_arm64Triple;
+                parameters.targetDevice.dataLayout = c_arm64DataLayout;
+                parameters.targetDevice.numBits = 64;
+                parameters.targetDevice.cpu = c_pi3Cpu;
             }
-            else if (_parameters.targetDevice.deviceName == "aarch64") // arm64 linux (DragonBoard) 
+            else if (parameters.targetDevice.deviceName == "aarch64") // arm64 linux (DragonBoard) 
             {
                 // need to set arch to aarch64?
-                _parameters.targetDevice.triple = c_arm64Triple;
-                _parameters.targetDevice.dataLayout = c_arm64DataLayout;
-                _parameters.targetDevice.numBits = 64;
+                parameters.targetDevice.triple = c_arm64Triple;
+                parameters.targetDevice.dataLayout = c_arm64DataLayout;
+                parameters.targetDevice.numBits = 64;
             }
-            else if (_parameters.targetDevice.deviceName == "ios")
+            else if (parameters.targetDevice.deviceName == "ios")
             {
-                _parameters.targetDevice.triple = c_iosTriple;
-                _parameters.targetDevice.dataLayout = c_iosDataLayout;
+                parameters.targetDevice.triple = c_iosTriple;
+                parameters.targetDevice.dataLayout = c_iosDataLayout;
             }
             else
             {
@@ -126,16 +130,16 @@ namespace emitters
         }
         else
         {
-            if (_parameters.targetDevice.cpu == "cortex-m0")
+            if (parameters.targetDevice.cpu == "cortex-m0")
             {
-                _parameters.targetDevice.triple = "armv6m-unknown-none-eabi";
-                _parameters.targetDevice.features = "+armv6-m,+v6m";
-                _parameters.targetDevice.architecture = "thumb";
+                parameters.targetDevice.triple = "armv6m-unknown-none-eabi";
+                parameters.targetDevice.features = "+armv6-m,+v6m";
+                parameters.targetDevice.architecture = "thumb";
             }
-            else if (_parameters.targetDevice.cpu == "cortex-m4")
+            else if (parameters.targetDevice.cpu == "cortex-m4")
             {
-                _parameters.targetDevice.triple = "arm-none-eabi";
-                _parameters.targetDevice.features = "+armv7e-m,+v7,soft-float";
+                parameters.targetDevice.triple = "arm-none-eabi";
+                parameters.targetDevice.features = "+armv7e-m,+v7,soft-float";
             }
         }
     }
