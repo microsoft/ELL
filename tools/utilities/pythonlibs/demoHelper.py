@@ -197,7 +197,12 @@ class DemoHelper:
             raise Exception("Compiled model failed to load")
 
     def show_image(self, frameToShow, save):
-        cv2.imshow('frame', frameToShow)
+        try:
+            cv2.imshow('frame', frameToShow)
+        except cv2.error as e:
+            # OpenCV may not have been built with GTK or Carbon support
+            pass
+            
         if save and self.save_images:
             name = 'frame' + str(self.image_index) + ".png"
             cv2.imwrite(name, frameToShow)
@@ -423,14 +428,18 @@ class DemoHelper:
             return True
         # on slow devices this helps let the images to show up on screen
         result = False
-        for i in range(self.get_wait()):
-            key = cv2.waitKey(1) & 0xFF
-            if key == 27:
-                result = True
-                break
-            if key == ord(' '):
-                self.frame = self.load_next_image()
-                
+        try:
+            for i in range(self.get_wait()):
+                key = cv2.waitKey(1) & 0xFF
+                if key == 27:
+                    result = True
+                    break
+                if key == ord(' '):
+                    self.frame = self.load_next_image()
+        except cv2.error as e:
+            # OpenCV may not have been built with GTK or Carbon support
+            pass
+
         return result
 
 class TiledImage:

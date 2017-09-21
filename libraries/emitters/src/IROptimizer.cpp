@@ -78,8 +78,8 @@ namespace emitters
 
     void IRFunctionOptimizer::AddStandardPasses()
     {
-        AddInstructionCombiner();
         AddMemoryToRegisterPass();
+        AddInstructionCombiner();
         AddReassociation(); 
         AddCommonSubexpressionEliminator();
         AddControlFlowSimplification();

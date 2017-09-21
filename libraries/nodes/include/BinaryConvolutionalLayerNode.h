@@ -67,16 +67,24 @@ namespace nodes
         virtual bool Refine(model::ModelTransformer& transformer) const override;
 
     private:
-        std::vector<int64_t> GetCompressedFilterWeights() const;
+        template <typename PackedBitsType>
+        std::vector<PackedBitsType> GetCompressedFilterWeights() const;
+
         std::vector<ValueType> GetFilterMeans() const;
-        std::vector<int64_t> GetCompressedInputPaddingMask() const;
+
+        template <typename PackedBitsType>
+        std::vector<PackedBitsType> GetCompressedInputPaddingMask() const;
+
         std::vector<int> GetInputPaddingMaskSums() const;
+        
+        template <typename PackedBitsType>
+        model::PortElements<ValueType> AddRefinedNodes(model::ModelTransformer& transformer, const model::PortElements<ValueType>& input) const;
     };
 
     //
     // BinaryReceptiveFieldMatrixNode
     //
-    template <typename ValueType, typename PackedBitsType = int64_t>
+    template <typename ValueType, typename PackedBitsType>
     class BinaryReceptiveFieldMatrixNode : public model::CompilableNode
     {
     public:
@@ -135,7 +143,7 @@ namespace nodes
     //
     // BinaryXnorNode
     //
-    template <typename ValueType, typename PackedBitsType = int64_t>
+    template <typename ValueType, typename PackedBitsType>
     class BinaryXnorNode : public model::CompilableNode
     {
     public:
@@ -210,6 +218,7 @@ namespace nodes
                            llvm::Value* weights,
                            llvm::Value* xorSumVariable,
                            llvm::Function* popCountFunction,
+                           int startBlock,
                            int numBlocks,
                            bool hasZeroPadding);
 

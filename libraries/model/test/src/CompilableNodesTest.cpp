@@ -187,8 +187,6 @@ void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, E
         val += step;
         return result; });
 }
-
-
 } // end anonymous namespace
 
 void TestCompileIsEqual()
@@ -1853,14 +1851,14 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
 
     const size_t imageRows = 3;
     const size_t imageColumns = 3;
-    const size_t numChannels = 2;
+    const size_t numChannels = 32;
     const size_t k = 3;
     const size_t numFilters = 2;
     const size_t stride = 1;
 
     // Verify BinaryConvolutionalLayer with bitwise method
     TensorType inputWithPadding(imageRows + 2 * inputPaddingSize, imageColumns + 2 * inputPaddingSize, numChannels);
-    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, 2, 2, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, imageRows, imageColumns, numChannels);
     input.Fill(0);
     int inputSize = input.Size();
     FillTensor(input, -2*static_cast<ElementType>(inputSize)/3);
@@ -1888,6 +1886,7 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
     settings.compilerSettings.optimize = true;
     settings.compilerSettings.useBlas = true; // !!! if BLAS is off, this fails
     settings.compilerSettings.allowVectorInstructions = false;
+    settings.compilerSettings.vectorWidth = 2;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 

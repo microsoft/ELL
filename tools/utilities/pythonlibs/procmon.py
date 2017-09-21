@@ -54,8 +54,9 @@ class ProcessMonitor:
             results["summary"] = summary
 
             if self.output_file:
-                with open(self.output_file, 'w', encoding='utf-8') as of:
-                    json.dump(results, of, ensure_ascii=False, indent=2)
+                # write Windows line endings
+                with open(self.output_file, 'w', encoding='utf-8', newline='\r\n') as outfile:
+                    json.dump(results, outfile, ensure_ascii=False, indent=2)
 
     def summarize(self, stats):
         summary = {}

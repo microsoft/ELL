@@ -18,6 +18,7 @@ namespace model
     MapCompiler::MapCompiler(const MapCompilerParameters& settings)
         : _parameters(settings)
     {
+        emitters::ModuleEmitter::CompleteCompilerParameters(_parameters.compilerSettings);
         PushScope();
     }
 

@@ -56,7 +56,7 @@ namespace model
         /// <summary> Gets the model-specific compiler parameters being used by the map compiler. </summary>
         ///
         /// <returns> The MapCompilerParameters struct used by the map compiler to control code generation. </returns>
-        MapCompilerParameters GetMapCompilerParameters() const { return _parameters; }
+        const MapCompilerParameters& GetMapCompilerParameters() const { return _parameters; }
 
         //
         // Routines for Node implementers
