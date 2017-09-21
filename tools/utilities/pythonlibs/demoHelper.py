@@ -56,6 +56,7 @@ class DemoHelper:
         self.warm_up = True
         self.input_shape = None
         self.output_shape = None
+        self.output_size = 0
         self.bgr = False
         self.results = None
     
@@ -152,12 +153,13 @@ class DemoHelper:
         self.model = ELL.ELL_Map(self.model_file)
         self.input_shape = self.model.GetInputShape()
         self.output_shape = self.model.GetOutputShape()
+        self.output_size = int(self.output_shape.rows * self.output_shape.columns * self.output_shape.channels)
 
     def import_compiled_model(self, compiledModulePath, name):
         moduleDirectory = os.path.dirname(compiledModulePath)
         print('Looking for: ' + name + ' in ' + moduleDirectory)
         if (not os.path.isdir('build')) and (not os.path.isdir(moduleDirectory + '/build')):
-            raise Exception("you don't have a 'build' directory, have you compiled this project yet?")
+            raise Exception("you don't have a 'build' directory in '" + compiledModulePath + "', have you compiled this project yet?")
 
         func_name = 'predict'
         if func_name == "":
@@ -180,8 +182,8 @@ class DemoHelper:
             self.input_shape = inputShapeGetter()
             self.output_shape = outputShapeGetter()
 
-            size = int(self.output_shape.rows * self.output_shape.columns * self.output_shape.channels)
-            self.results = self.compiled_module.FloatVector(size)
+            self.output_size = int(self.output_shape.rows * self.output_shape.columns * self.output_shape.channels)
+            self.results = self.compiled_module.FloatVector(self.output_size)
             try:
                 self.compiled_func = getattr(self.compiled_module, func_name)
             except AttributeError:

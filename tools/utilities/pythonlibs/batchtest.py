@@ -38,6 +38,8 @@ class ModelTester(demoHelper.DemoHelper):
         self.test_complete = False
         self.batch = 0
         self.automatic = True
+        self.groups = None
+        self.confusion_matrix = None
 
     def add_arguments(self, arg_parser):
         super(ModelTester,self).add_arguments(arg_parser)    
@@ -46,6 +48,7 @@ class ModelTester(demoHelper.DemoHelper):
         arg_parser.add_argument("--truthlabels", help="path to a labels for the truth file (in case these are different from your model labels)")
         arg_parser.add_argument("--top", type=int, help="how many of the top labels to include in the test (default 1)", default=self.test_top_n)
         arg_parser.add_argument("--batch", type=int, help="which batch out of 10 batches to execute (default all)", default=0)
+        arg_parser.add_argument("--groups", nargs='*', help="filenames that provide a grouping for the labels")
     
 
     def initialize(self, args):
@@ -79,11 +82,25 @@ class ModelTester(demoHelper.DemoHelper):
             self.val_pos = (self.batch - 1) * self.batch_size
             self.val_end = self.val_pos + self.batch_size
             
+        self.confusion_matrix = np.zeros((self.output_size, self.output_size))
+        self.load_group_labels(args.groups)
+
         self.automatic = True
         self.start_time = time.time()
         print("starting automatic test run...")
         print(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()))
         return True
+
+    def load_group_labels(self, filenames):
+        if filenames is None:
+            return None
+        groups = []
+        for name in filenames:
+            groups.append(self.load_labels(name))
+        
+        size = len(groups)+1
+        self.confusion_matrix = np.zeros((size, size))
+        self.groups = groups
 
     def init_image_source(self):        
         self.frame = self.load_next_image()
@@ -148,18 +165,44 @@ class ModelTester(demoHelper.DemoHelper):
         if self.automatic and not self.results is None:
             self.record_result()
 
+    def label_in_group(self, label, group):
+        for x in group:
+            if self.labels_match(label, x):
+                return True
+        return False
+
     def get_truth_label(self, i):
         if i < len(self.val_labels):
             return self.val_labels[i]
         return ""
 
+    def get_grouped_result(self, prediction):
+        label = self.get_label(prediction)
+        for i in range(len(self.groups)):
+            g = self.groups[i]
+            if self.label_in_group(label, g):
+                return i
+        return len(self.groups)
+
+    def record_confusion(self, prediction, expected):
+        if not self.groups is None:
+            prediction = self.get_grouped_result(prediction)
+            expected = self.get_grouped_result(expected)
+        self.confusion_matrix[prediction,expected] += 1
+
+    def save_confusion(self):
+        if not self.confusion_matrix is None:
+            self.confusion_matrix.savetxt("confusion" + str(self.batch) + ".txt")
+
     def record_result(self):
+
         # check current prediction matches the truth.
         expected = self.get_truth_label(self.map_entry[1])
         topN = self.get_top_n(self.results, self.test_top_n)
         winner = None
         actual = []
         for top in topN:
+            self.record_confusion(top[0], self.map_entry[1])
             label = self.get_label(top[0])
             actual.append(label)
             if self.labels_match(label, expected):  
@@ -201,6 +244,7 @@ class ModelTester(demoHelper.DemoHelper):
 
     def report_times(self):
         # test complete
+        self.save_confusion()
         print("====================================================================================================")
         total = self.tests_passed + self.tests_failed
         if (total > 0):
