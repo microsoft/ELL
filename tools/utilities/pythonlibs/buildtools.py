@@ -19,6 +19,7 @@ class EllBuildTools:
         self.compiler = None
         self.swigexe = None
         self.llcexe = None
+        self.optexe = None
         self.blas = None
         if not os.path.isdir(self.build_root):
             raise Exception("Could not find '%s', please make sure to build the ELL project first" % (self.build_root))
@@ -43,6 +44,10 @@ class EllBuildTools:
         self.llcexe = self.tools['llc']
         if self.llcexe == "":
             raise Exception("tools.json is missing llc info")
+
+        self.optexe = self.tools['opt']
+        if self.optexe == "":
+            raise Exception("tools.json is missing opt info")
         
         if ("blas" in self.tools):
             self.blas = self.tools['blas']  # this one can be empty.
@@ -85,7 +90,7 @@ class EllBuildTools:
         print("generating " + language + " interfaces for " + model_name + " in " + output_dir)
         self.run(args)
     
-    def get_llc_options(self, target):        
+    def get_llc_options(self, target):
         common = ["-filetype=obj", "-O3"]
         # arch processing
         if target == "pi3": # Raspberry Pi 3
@@ -100,11 +105,21 @@ class EllBuildTools:
     def llc(self, output_dir, model_name, target):
         # llc -filetype=obj _darknetReference.ll -O3 -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53 -relocation-model=pic
         args = [self.llcexe, 
-                os.path.join(output_dir, model_name + ".bc"), 
+                os.path.join(output_dir, model_name + ".opt.bc"), 
                 "-o", os.path.join(output_dir, model_name + ".obj"), 
                 ]
         args = args + self.get_llc_options(target)
         print("running llc...")
+        self.run(args)
+
+    def opt(self, output_dir, model_name):
+        # opt compiled_model.ll -o compiled_model_opt.ll -O3
+        args = [self.optexe,
+                os.path.join(output_dir, model_name + ".bc"), 
+                "-o", os.path.join(output_dir, model_name + ".opt.bc"), 
+                "-O3"
+            ]
+        print("running opt...")
         self.run(args)
 
     def compile(self, model_file, func_name, model_name, target, output_dir, profile=False):

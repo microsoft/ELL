@@ -138,6 +138,7 @@ class ModuleBuilder:
         self.create_cmake_file()
         self.tools.compile(self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.profile)
         self.tools.swig(self.output_dir, self.model_name, self.language)
+        self.tools.opt(self.output_dir, self.model_name)
         self.tools.llc(self.output_dir, self.model_name, self.target)
         self.create_cmake_file()
         if (self.target == "host"):

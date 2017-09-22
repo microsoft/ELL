@@ -14,6 +14,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_path, '../pythonlibs'))
 import find_ell
 import argparse
+import glob
 import subprocess
 import json
 import operator
@@ -136,16 +137,24 @@ class DriveTest:
         with open(output_template, 'w', newline='\n') as of:
             of.write(template)
 
+    def find_files_with_extension(self, path, extension):
+        cwd = os.getcwd()
+        os.chdir(path)
+        files = glob.glob("*.{}".format(extension))
+        os.chdir(cwd)
+        return files
+
     def get_bash_files(self):
         # copy demo files needed to run the test
         self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
                            os.path.join(self.ell_root, "docs/tutorials/shared/demo.py"),
                            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py") ], self.output_dir) 
         self.configure_runtest(self.output_dir)
-    
-        bitcode = os.path.join(self.output_dir, self.model_name + ".bc")
-        if os.path.isfile(bitcode):
-            os.remove(bitcode) # don't need to copy this one over and it is big!
+
+        # avoid copying over bitcode files (as they are big)
+        bitcode_files = self.find_files_with_extension(self.output_dir, "bc")
+        for bitcode in bitcode_files:
+            os.remove(os.path.join(self.output_dir, bitcode))
 
     def get_darknet(self):
         self.config_file = os.path.join(self.test_dir, "darknet.cfg")

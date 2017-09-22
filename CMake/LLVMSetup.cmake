@@ -58,7 +58,7 @@ if(LLVM_FOUND)
 
 elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
     set(LLVM_PACKAGE_NAME LLVMNativeWindowsLibs.x64)
-    set(LLVM_PACKAGE_VERSION 3.9.1)
+    set(LLVM_PACKAGE_VERSION 3.9.2)
     set(LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})
 
     # Get LLVM libraries via NuGet if we're on Windows

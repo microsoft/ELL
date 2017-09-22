@@ -82,7 +82,7 @@ class GenerateMarkdown:
             results = json.loads(f.read())
             self.set_value("@IMAGE_SIZE@", results['image_size'])
             self.set_value("@NUM_CLASSES@", results['num_classes'])
-            self.set_value("@MODEL_NAME@", results['name'])
+            self.set_value("@MODEL_NAME@", self.model)
 
         filename = self.get_model_filename(".ell.zip", is_suffix=True)
         unzip = ziptools.Extractor(filename)

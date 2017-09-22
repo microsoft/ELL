@@ -72,4 +72,5 @@ Finally it uses LLC to cross-compile the model so that code runs on your specifi
 ````
 llc pi3\ImageNet.bc -o pi3\ImageNet.obj -filetype=obj -O3 -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53 -relocation-model=pic
 ````
-On Windows LLC is also included in a nuget package so you will find it in `d:\git\ELL\external|LLVMNativeWindowsLibs.x64.3.9.1\build\native\tools\`.
+On Windows LLC is also included in a NuGet package so you will find it in `d:\git\ELL\external\LLVMNativeWindowsLibs.x64.<llvm_version>\build\native\tools\`,
+where <llvm_version> is version of LLVM bundled in the NuGet package.
