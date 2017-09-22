@@ -29,8 +29,8 @@ namespace neural
         // TODO: if padding is true and window size is even, offset input by 1
         auto input = GetInput();
         auto output = GetOutputMinusPadding();
-        const int inputDataPaddingSize = GetLayerParameters().inputPaddingParameters.paddingSize;
-        const int poolingWindowSize = _poolingParameters.poolingSize;
+        const size_t inputDataPaddingSize = GetLayerParameters().inputPaddingParameters.paddingSize;
+        const size_t poolingWindowSize = _poolingParameters.poolingSize;
         if (inputDataPaddingSize > 0 && poolingWindowSize%2 == 0)
         {
             input = input.GetSubTensor({1, 1, 0}, {input.NumRows()-1, input.NumColumns()-1, input.NumChannels()});
@@ -78,7 +78,7 @@ namespace neural
     template <typename ElementType, template <typename> class PoolingFunctionType>
     bool PoolingLayer<ElementType, PoolingFunctionType>::UsesPadding() const
     {
-        const int inputDataPaddingSize = GetLayerParameters().inputPaddingParameters.paddingSize;
+        const size_t inputDataPaddingSize = GetLayerParameters().inputPaddingParameters.paddingSize;
         const auto inputShape = GetInputShapeMinusPadding();
         const auto outputShape = GetOutputShapeMinusPadding();
         const auto inputWidth = inputShape[0];
