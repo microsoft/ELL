@@ -42,6 +42,7 @@ VectorStats::VectorStats(const std::vector<ValueType>& vec)
     }
     _variance = sumDiffMeanSq / vec.size();
     _stdDev = std::sqrt(_variance);
+    _size = vec.size();
     _valid = true;
 }
 
@@ -72,4 +73,34 @@ double VectorStats::Diff(const std::vector<ValueType>& vec1, const std::vector<V
         }
     }
     return error;
+}
+
+template <typename ValueType>
+std::vector<ValueType> Subtract(const std::vector<ValueType>& vec1, const std::vector<ValueType>& vec2)
+{
+    auto size1 = vec1.size();    
+    auto size2 = vec2.size();
+    assert(size1 == size2); // require this for now
+    auto maxSize = std::max(size1, size2);
+    std::vector<ValueType> result(maxSize);
+    for(size_t index = 0; index < maxSize; ++index)
+    {
+        auto val1 = index < size1 ? vec1[index] : 0;
+        auto val2 = index < size2 ? vec2[index] : 0;
+        result[index] = val1 - val2;
+    }
+
+    return result;
+}
+
+template <typename ValueType>
+std::vector<ValueType> Abs(const std::vector<ValueType>& vec)
+{
+    std::vector<ValueType> result(vec.size());
+    for(size_t index = 0; index < vec.size(); ++index)
+    {
+        result[index] = std::fabs(vec[index]);
+    }
+
+    return result;
 }

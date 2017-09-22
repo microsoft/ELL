@@ -65,8 +65,22 @@ namespace nodes
         virtual bool IsCompilable(const model::MapCompiler* compiler) const override { return true; }
 
     protected:
+        template <typename PoolingFunctionT>
+        llvm::Value* GetPoolingWindowValue(emitters::IRFunctionEmitter& function,
+                                           int windowRowStart,
+                                           int windowRowEnd,
+                                           int windowColumnStart,
+                                           int windowColumnEnd,
+                                           llvm::Value* inputRow,
+                                           llvm::Value* inputColumn,
+                                           llvm::Value* inputChannel,
+                                           llvm::Value* inputBuffer,
+                                           const model::Shape& inputIncrement,
+                                           PoolingFunctionT& poolingFunction);
+
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         using BaseType::HasState;
+        using BaseType::GetLayer;
     };
 }
 }

@@ -131,6 +131,11 @@ namespace neural
         Layer()
             : _layerParameters{ math::Triplet{ 0, 0, 0 }, NoPadding(), { 0, 0, 0 }, NoPadding() }, _output(math::Triplet{ 0, 0, 0 }) {}
 
+        /// <summary> Returns a reference to the input tensor. </summary>
+        ///
+        /// <returns> Reference to the output tensor. </returns>
+        ConstTensorReferenceType GetInput() const { return _layerParameters.input; }
+
         /// <summary> Returns a reference to the output tensor. </summary>
         ///
         /// <returns> Reference to the output tensor. </returns>
@@ -208,10 +213,11 @@ namespace neural
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
-        /// <summary> Returns a reference to the output tensor. </summary>
+
+        /// <summary> Returns a read/write reference to the sub tensor of the input that does not contain padding. </summary>
         ///
-        /// <returns> Reference to the output tensor. </returns>
-        TensorReferenceType GetOutputTensor() { return _output; }
+        /// <returns> Read/write reference to the input tensor, minus padding. </returns>
+        TensorReferenceType GetInputMinusPadding();
 
         /// <summary> Returns a read/write reference to the sub tensor of the output that does not contain padding. </summary>
         ///

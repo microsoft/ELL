@@ -199,9 +199,18 @@ namespace neural
     }
 
     template <typename ElementType>
+    typename Layer<ElementType>::TensorReferenceType Layer<ElementType>::GetInputMinusPadding()
+    { 
+        auto padding = _layerParameters.inputPaddingParameters.paddingSize;
+        return _layerParameters.input.GetSubTensor({ padding, padding, 0 }, GetInputShapeMinusPadding());
+    }
+    
+    template <typename ElementType>
     typename Layer<ElementType>::TensorReferenceType Layer<ElementType>::GetOutputMinusPadding()
     { 
-        return _output.GetSubTensor({ _layerParameters.outputPaddingParameters.paddingSize, _layerParameters.outputPaddingParameters.paddingSize, 0 }, { _output.NumRows() - 2 * _layerParameters.outputPaddingParameters.paddingSize, _output.NumColumns() - 2 * _layerParameters.outputPaddingParameters.paddingSize, _output.NumChannels() });
+        auto padding = _layerParameters.outputPaddingParameters.paddingSize;
+        return _output.GetSubTensor({ padding, padding, 0 }, 
+            { _output.NumRows() - 2 * padding, _output.NumColumns() - 2 * padding, _output.NumChannels() });
     }
 
     template <typename ElementType>

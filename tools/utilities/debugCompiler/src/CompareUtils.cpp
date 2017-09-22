@@ -42,8 +42,35 @@
 using namespace ell;
 
 //
-// General
+// General utility functions
 //
+
+std::string SanitizeTypeName(std::string layerType)
+{
+    std::replace(layerType.begin(), layerType.end(), '<', '_');
+    std::replace(layerType.begin(), layerType.end(), '>', '_');
+    std::replace(layerType.begin(), layerType.end(), ',', '_');
+    return layerType;
+}
+
+std::string GetLayerFilename(const std::string& layerType, int index)
+{
+    return std::string{ "Layer_" } + std::to_string(index) + "_" + SanitizeTypeName(layerType) + ".tsv";
+}
+
+std::string GetNodeOutputFilename(const std::string& layerType, int index, const std::string& suffix)
+{
+    if (suffix == "")
+        return std::string{ "Layer_" } + std::to_string(index) + "_" + SanitizeTypeName(layerType) + ".tsv";
+    else
+        return std::string{ "Layer_" } + std::to_string(index) + "_" + SanitizeTypeName(layerType) + "_" + suffix + ".tsv";
+}
+
+std::string GetNodeFilename(const std::string& nodeType, int index)
+{
+    return std::string{ "Node_" } + std::to_string(index) + "_" + SanitizeTypeName(nodeType) + ".tsv";
+}
+
 void PrintPortElements(std::ostream& os, const model::PortElementsBase& elements)
 {
     if (elements.NumRanges() > 1)
@@ -73,6 +100,46 @@ void PrintPortElements(std::ostream& os, const model::PortElementsBase& elements
     }
 }
 
+Shape GetInputShape(const ell::model::DynamicMap& map)
+{
+    auto inputSize = map.GetInputSize();
+
+    // Guess if this takes an image as input. If not return a shape of (N,1,1)
+    // TODO: add a way for maps / models to annotate their input with shape info
+    if (HasNeuralNetworkPredictor(map))
+    {
+        // Guess the size of the input image
+        size_t numChannels = 3;
+        size_t numPixels = inputSize / 3;
+        size_t width = static_cast<size_t>(std::sqrt(numPixels));
+        if (inputSize % numChannels || width * width != numPixels)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model must consume a square image with 3 channels");
+        }
+        size_t height = width;
+        return { height, width, numChannels };
+    }
+    else
+    {
+        return { inputSize, 1, 1 };
+    }
+}
+
+
+IOState::IOState(std::ostream& stream) : _stream(stream) 
+{
+    _flags = _stream.flags();
+    _precision = _stream.precision();
+    _width = _stream.width();
+}
+
+IOState::~IOState()
+{
+    _stream.flags(_flags);
+    _stream.precision(_precision);
+    _stream.width(_width);
+}
+
 //
 // Sink-node-related
 //
@@ -94,7 +161,7 @@ std::string GetSinkNodeLabel(const ell::model::Node* node)
 }
 
 //
-// Neural-net-related
+// Neural-net-related functions
 //
 bool IsNeuralNetworkPredictorNode(const ell::model::Node* node)
 {
@@ -169,56 +236,6 @@ ell::predictors::NeuralNetworkPredictor<double> GetNeuralNetworkPredictor(ell::m
     throw ell::utilities::InputException(ell::utilities::InputExceptionErrors::invalidArgument, "Model must contain a neural network predictor");
 }
 
-Shape GetInputShape(const ell::model::DynamicMap& map)
-{
-    auto inputSize = map.GetInputSize();
-
-    // Guess if this takes an image as input. If not return a shape of (N,1,1)
-    // TODO: add a way for maps / models to annotate their input with shape info
-    if (HasNeuralNetworkPredictor(map))
-    {
-        // Guess the size of the input image
-        size_t numChannels = 3;
-        size_t numPixels = inputSize / 3;
-        size_t width = static_cast<size_t>(std::sqrt(numPixels));
-        if (inputSize % numChannels || width * width != numPixels)
-        {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model must consume a square image with 3 channels");
-        }
-        size_t height = width;
-        return { height, width, numChannels };
-    }
-    else
-    {
-        return { inputSize, 1, 1 };
-    }
-}
-
-std::string SanitizeTypeName(std::string layerType)
-{
-    std::replace(layerType.begin(), layerType.end(), '<', '_');
-    std::replace(layerType.begin(), layerType.end(), '>', '_');
-    std::replace(layerType.begin(), layerType.end(), ',', '_');
-    return layerType;
-}
-
-std::string GetLayerFilename(const std::string& layerType, int index)
-{
-    return std::string{ "Layer_" } + std::to_string(index) + "_" + SanitizeTypeName(layerType) + ".tsv";
-}
-
-std::string GetNodeOutputFilename(const std::string& layerType, int index, const std::string& suffix)
-{
-    if (suffix == "")
-        return std::string{ "Layer_" } + std::to_string(index) + "_" + SanitizeTypeName(layerType) + ".tsv";
-    else
-        return std::string{ "Layer_" } + std::to_string(index) + "_" + SanitizeTypeName(layerType) + "_" + suffix + ".tsv";
-}
-
-std::string GetNodeFilename(const std::string& nodeType, int index)
-{
-    return std::string{ "Node_" } + std::to_string(index) + "_" + SanitizeTypeName(nodeType) + ".tsv";
-}
 //
 // Report-writing
 //
@@ -441,26 +458,3 @@ void WriteReportFooter(std::ostream& reportStream)
     reportStream << "</html>\n";
 }
 
-//
-// generating test data
-//
-double GetPixelVal(double x, double y, int ch, int index)
-{
-    switch (index)
-    {
-        case 0:
-            return std::sin(x) + std::cos(y * 2 + ch);
-
-        case 1:
-            return std::sin(x * 1.5) + std::cos(y * 2 + ch);
-
-        case 2:
-            return std::sin(x) + std::cos(y * 2.5 + ch);
-
-        case 3:
-            return std::sin(x) + std::cos(y * .25 + ch);
-
-        default:
-            return std::sin(x * 0.25 + ch / 8.0) + std::cos(y * 2 + ch);
-    }
-}

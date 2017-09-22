@@ -36,7 +36,7 @@ class ModelComparison
 public:
     ModelComparison(std::string outputDirectory);
 
-    void Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize);
+    void Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize, bool allowVectorInstructions);
 
     void SaveOutput(std::string name, const std::vector<float>& reference, const std::vector<float>& compiled);
 
@@ -72,7 +72,10 @@ private:
     void CreateGraph(const model::Model& model);
     void AddStyles();
     void WriteRow(std::ostream& outputStream, std::string id, std::string name, const std::vector<float>& reference, const std::vector<float>& compiled, LayerCaptureData* layerData);
-
+    void WriteNodeDetail(std::ostream& outputStream, const model::Node* node);
+    template <typename ValueType>
+    void WriteLayerNodeDetail(std::ostream& outputStream, const ell::nodes::NeuralNetworkLayerNodeBase<ValueType>* layerNode);
+    
     bool _addingReference;
     DgmlGraph _graph;
     std::map<std::string, std::string> _nodeMap; // map id of reference node to compiled node.

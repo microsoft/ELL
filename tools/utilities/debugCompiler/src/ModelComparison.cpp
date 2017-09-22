@@ -8,11 +8,14 @@
 
 #include "ModelComparison.h"
 #include "CompareUtils.h"
-#include "DebugSinkNode.h"
 #include "VectorStats.h"
 
 // emitters
 #include "EmitterTypes.h"
+
+// nodes
+#include "ReorderDataNode.h"
+#include "DebugSinkNode.h"
 
 // utilities
 #include "DgmlGraph.h"
@@ -25,8 +28,11 @@
 extern "C" {
 void DebugOutput(char* label, float* output, void* userData)
 {
-    ModelComparison* self = static_cast<ModelComparison*>(userData);
-    self->AddLayer(label, output);
+    if(userData != nullptr)
+    {
+        ModelComparison* self = static_cast<ModelComparison*>(userData);
+        self->AddLayer(label, output);
+    }
 }
 }
 
@@ -134,7 +140,6 @@ std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<
             return GetMapOutput<int>(map, input);
             break;
         case model::Port::PortType::bigInt:
-            // model::ValueType<model::Port::PortType::bigInt>>
             return GetMapOutput<int64_t>(map, input);
             break;
         default:
@@ -183,7 +188,7 @@ void ModelComparison::SetUpReferenceMap(model::DynamicMap& map)
     _referenceMap.Transform(transformFunc, addSinkNodeContext);
 }
 
-void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize)
+void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize, bool allowVectorInstructions)
 {
     SetUpReferenceMap(reference);
     _addingReference = false;
@@ -193,6 +198,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
 
     model::MapCompilerParameters settings;
     settings.compilerSettings.useBlas = useBlas;
+    settings.compilerSettings.allowVectorInstructions = allowVectorInstructions;
     settings.compilerSettings.optimize = optimize;
     settings.profile = false;
     settings.compilerSettings.targetDevice.deviceName = "host";
@@ -223,11 +229,19 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
     llvm::Module* module = compiler.GetModule().GetLLVMModule();
     std::cout << "compiling..." << std::endl;
 
+    void* temp = (void*)(&DebugOutput);
     model::IRCompiledMap compiledMap = compiler.Compile(reference);
 
     // Windows can not do automatic resolution of symbols, so it won't find the DebugOutput function above unless I help it here.
     auto func = module->getFunction("DebugOutput");
-    compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uint64_t>(&DebugOutput));
+    if(func != nullptr)
+    {
+        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uint64_t>(&DebugOutput));
+    }
+    else
+    {
+        std::cout << "Got null DebugOutput function" << std::endl;
+    }
 
     std::cout << "jitting..." << std::endl;
     compiledMap.FinishJitting();
@@ -304,7 +318,7 @@ void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelN
         }
         else
         {
-            //std::cout << "Compiled data missing for reference node " << layerData.referenceNodeLabel << std::endl;
+            std::cout << "Compiled data missing for reference node " << layerData.referenceNodeLabel << std::endl;
         }
     }
 }
@@ -323,28 +337,47 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
 
     VectorStats refStats(reference);
     VectorStats compiledStats(compiled);
-    float diff = VectorStats::Diff(reference, compiled);
+    VectorStats diffStats(Abs(Subtract(reference, compiled)));
+    
+    float absDiffSum = VectorStats::Diff(reference, compiled);
     if (layerData != nullptr)
     {
         if (!_hasMinMax)
         {
-            _minError = _maxError = diff;
+            _minError = _maxError = absDiffSum;
             _hasMinMax = true;
         }
         else
         {
-            _minError = fmin(_minError, diff);
-            _maxError = fmax(_maxError, diff);
+            _minError = fmin(_minError, absDiffSum);
+            _maxError = fmax(_maxError, absDiffSum);
         }
     }
     outputStream << "````" << std::endl;
     if (layerData != nullptr)
     {
-        outputStream << "size=" << layerData->size << ", stride=" << layerData->stride << ", offset=" << layerData->offset << std::endl;
+        const ell::model::Node* node = layerData->referenceDebugNode;
+        if (node != nullptr)
+        {
+            WriteNodeDetail(outputStream, node);
+        }
+        else
+        {
+            outputStream << "output size = " << layerData->size << ", datasize = " << layerData->stride << ", offset = " << layerData->offset << std::endl;
+        }
     }
-    outputStream << "reference: min=" << refStats.Min() << ", max=" << refStats.Max() << ", mean=" << refStats.Mean() << ", stddev=" << refStats.StdDev() << ", var=" << refStats.Variance() << std::endl;
-    outputStream << "compiled : min=" << compiledStats.Min() << ", max=" << refStats.Max() << ", mean=" << refStats.Mean() << ", stddev=" << refStats.StdDev() << ", var=" << refStats.Variance() << std::endl;
-    outputStream << "difference: " << diff << std::endl;
+
+    // TODO: write out as a table?
+    // |           |      min     |      max |  mean |    stddev |         var |
+    // |-----------|--------------|----------|-------|-----------|-------------|
+    // | reference |  5.30016e-19 | 0.943143 | 0.001 | 0.0298175 | 0.000889082 |
+    // | compiled  |  5.30014e-19 | 0.943143 | 0.001 | 0.0298175 | 0.000889082 |
+    
+    outputStream << "reference : min = " << refStats.Min() << ", max = " << refStats.Max() << ", mean = " << refStats.Mean() << ", stddev = " << refStats.StdDev() << ", var = " << refStats.Variance() << std::endl;
+    outputStream << "compiled  : min = " << compiledStats.Min() << ", max = " << compiledStats.Max() << ", mean = " << compiledStats.Mean() << ", stddev = " << compiledStats.StdDev() << ", var = " << compiledStats.Variance() << std::endl;
+    outputStream << "difference: min = " << diffStats.Min() << ", max = " << diffStats.Max() << ", mean = " << diffStats.Mean() << ", stddev = " << diffStats.StdDev() << ", var = " << diffStats.Variance() << std::endl;
+    outputStream << "sum of absolute differences: " << absDiffSum << std::endl;
+    outputStream << "N: " << refStats.NumElements() << std::endl;
     outputStream << "````" << std::endl;
     outputStream << std::endl;
 
@@ -354,7 +387,70 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
         DgmlNode* node = _graph.GetNode(id);
         if (node != nullptr)
         {
-            node->Properties["Error"] = std::to_string(diff);
+            node->Properties["Error"] = std::to_string(absDiffSum);
+        }
+    }
+}
+
+template <typename ValueType>
+void ModelComparison::WriteLayerNodeDetail(std::ostream& outputStream, const ell::nodes::NeuralNetworkLayerNodeBase<ValueType>* layerNode)
+{
+    auto layerType = layerNode->GetRuntimeTypeName();
+    auto inputLayout = layerNode->GetInputMemoryLayout();
+    auto inputLayoutSize = inputLayout.GetActiveSize();
+    auto inputLayoutStride = inputLayout.GetStride();
+    auto inputLayoutOffset = inputLayout.GetOffset();
+
+    auto outputLayout = layerNode->GetOutputMemoryLayout();
+    auto outputLayoutSize = outputLayout.GetActiveSize();
+    auto outputLayoutStride = outputLayout.GetStride();
+    auto outputLayoutOffset = outputLayout.GetOffset();
+
+    outputStream << "Input size:  " << inputLayoutSize[0] << " x " << inputLayoutSize[1] << " x " << inputLayoutSize[2] << ", ";
+    outputStream << "stride: " << inputLayoutStride[0] << " x " << inputLayoutStride[1] << " x " << inputLayoutStride[2] << ", ";
+    outputStream << "offset: " << inputLayoutOffset[0] << ",  " << inputLayoutOffset[1] << ",  " << inputLayoutOffset[2] << "\n";
+
+    outputStream << "Output size: " << outputLayoutSize[0] << " x " << outputLayoutSize[1] << " x " << outputLayoutSize[2] << ", ";
+    outputStream << "stride: " << outputLayoutStride[0] << " x " << outputLayoutStride[1] << " x " << outputLayoutStride[2] << ", ";
+    outputStream << "offset: " << outputLayoutOffset[0] << " x " << outputLayoutOffset[1] << " x " << outputLayoutOffset[2] << "\n";
+}
+
+void ModelComparison::WriteNodeDetail(std::ostream& outputStream, const model::Node* node)
+{
+    auto parents = node->GetParentNodes();
+    // node should be a DebugSinkNode, which should only have 1 parent
+    if (parents.size() != 1)
+    {
+        outputStream << "Input port sizes: ";
+        const auto& ports = node->GetInputPorts();
+        for (const auto& port : ports)
+        {
+            outputStream << port->Size() << "\t";
+        }
+        outputStream << "\n";
+        return;
+    }
+    else
+    {
+        parents = parents[0]->GetParentNodes();
+        if(parents.size() == 1)
+        {
+            node = parents[0];
+        }
+    }
+
+    // Write out more detail if this node is a NN layer node
+    const ell::nodes::NeuralNetworkLayerNodeBase<float>* floatLayerNode = dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<float>*>(node);
+    if (floatLayerNode != nullptr)
+    {
+        WriteLayerNodeDetail(outputStream, floatLayerNode);
+    }
+    else
+    {
+        const ell::nodes::NeuralNetworkLayerNodeBase<double>* doubleLayerNode = dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<double>*>(node);
+        if (doubleLayerNode != nullptr)
+        {
+            WriteLayerNodeDetail(outputStream, doubleLayerNode);
         }
     }
 }
@@ -517,20 +613,39 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
 template <typename ValueType>
 void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, const nodes::NeuralNetworkLayerNodeBase<ValueType>* layerNode)
 {
-    // todo: add additional argument to the sink function telling user which layer this is...
     std::string sinkFunctionName = "DebugOutput";
     auto newPortElements = transformer.GetCorrespondingOutputs(layerNode->output);
     std::string label = layerNode->GetRuntimeTypeName() + "(" + to_string(layerNode->GetId()) + ")";
+    
+    auto layerOutputLayout = layerNode->GetOutputMemoryLayout();
+    auto layerOutputLayoutMinusPadding = ell::model::PortMemoryLayout(layerOutputLayout.GetActiveSize());
 
-    size_t size = layerNode->GetOutputSize();
+    // size_t size = layerNode->GetOutputSize();
+    size_t size = layerOutputLayoutMinusPadding.GetMemorySize();
     _outputSizes[label] = size;
 
-    auto sinkFunction = [this](const std::string& label, const std::vector<ValueType>& output, void* userData) {
-        AddLayer(label.c_str(), &output[0]);
+    auto reorderNode = transformer.AddNode<ell::nodes::ReorderDataNode<ValueType>>(
+        newPortElements,
+        layerOutputLayout,
+        layerOutputLayout);
+        // layerOutputLayoutMinusPadding);
+    
+    auto nullSinkFunction = [this](const std::string& label, const std::vector<ValueType>& output, void* userData) {
     };
 
-    auto newNode = transformer.AddNode<ell::nodes::DebugSinkNode<ValueType>>(
+    auto sinkFunction = [this](const std::string& label, const std::vector<ValueType>& output, void* userData) {
+        AddLayer(label.c_str(), output.data());
+    };
+    
+    auto nullSinkNode = transformer.AddNode<ell::nodes::DebugSinkNode<ValueType>>(
         newPortElements,
+        nullSinkFunction,
+        label,
+        static_cast<void*>(this),
+        sinkFunctionName);
+
+    auto sinkNode = transformer.AddNode<ell::nodes::DebugSinkNode<ValueType>>(
+        reorderNode->output,
         sinkFunction,
         label,
         static_cast<void*>(this),
@@ -540,7 +655,7 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
     {
         LayerCaptureData layerData;
         layerData.compiledDebugNode = nullptr;
-        layerData.referenceDebugNode = newNode;
+        layerData.referenceDebugNode = sinkNode;
         layerData.referenceNodeLabel = label;
         _layerOutputData.emplace_back(std::move(layerData));
         _nextIndex = 0;
@@ -551,7 +666,7 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
         if (i < _layerOutputData.size())
         {
             LayerCaptureData& layerData = _layerOutputData[i];
-            layerData.compiledDebugNode = newNode;
+            layerData.compiledDebugNode = sinkNode;
             auto memLayout = layerNode->GetOutputMemoryLayout();
             layerData.size = memLayout.GetActiveSize();
             layerData.stride = memLayout.GetStride();

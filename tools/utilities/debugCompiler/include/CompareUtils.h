@@ -47,16 +47,21 @@ std::string GetNodeFilename(const std::string& nodeType, int index);
 void PrintPortElements(std::ostream& os, const ell::model::PortElementsBase& elements);
 Shape GetInputShape(const ell::model::DynamicMap& map);
 
-//
-// Functions for generating test data
-//
-template <typename ValueType>
-std::vector<ValueType> GetConvNetTestImage(int w, int h, int d, int index);
+class IOState
+{
+public:
+    IOState(std::ostream& _stream);
+    ~IOState();
 
-double GetPixelVal(double x, double y, int ch, int index);
+private:
+    std::ostream& _stream;
+    std::ios_base::fmtflags _flags;
+    std::streamsize _precision;
+    std::streamsize _width;
+};
 
 //
-// Result data-related functions
+// Result data-related
 //
 struct OutputInfo
 {

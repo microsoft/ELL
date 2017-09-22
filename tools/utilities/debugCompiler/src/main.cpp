@@ -24,6 +24,7 @@
 #include "Files.h"
 #include "OutputStreamImpostor.h"
 #include "RandomEngines.h"
+#include "TypeTraits.h"
 
 // stl
 #include <fstream>
@@ -33,13 +34,27 @@
 
 using namespace ell;
 
-template <typename InputType>
+template <typename InputType, utilities::IsIntegral<InputType> = true>
 std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
 {
     auto inputSize = inputShape.Size();
     std::vector<InputType> result(inputSize);
     auto engine = utilities::GetRandomEngine("123");
-    std::uniform_real_distribution<InputType> dist; // ack: error if InputType is integer
+    std::uniform_int_distribution<InputType> dist;
+    for (auto index = 0; index < inputSize; ++index)
+    {
+        result[index] = dist(engine);
+    }
+    return result;
+}
+
+template <typename InputType, utilities::IsFloatingPoint<InputType> = true>
+std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
+{
+    auto inputSize = inputShape.Size();
+    std::vector<InputType> result(inputSize);
+    auto engine = utilities::GetRandomEngine("123");
+    std::uniform_real_distribution<InputType> dist;
     for (auto index = 0; index < inputSize; ++index)
     {
         result[index] = dist(engine);
@@ -103,7 +118,7 @@ int main(int argc, char* argv[])
 
         auto input = GetInputData<TestDataType>(map, compareArguments);
         ModelComparison comparison(compareArguments.outputDirectory);
-        comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize);
+        comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize, compareArguments.allowVectorInstructions);
 
         // Write summary report
         if (compareArguments.writeReport)

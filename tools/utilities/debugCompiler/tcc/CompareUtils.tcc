@@ -97,29 +97,3 @@ void WriteStatsRow(std::ostream& reportStream, const VectorStats& layerStats, co
     reportStream << " </tr>\n";
 }
 
-template <typename ValueType>
-std::vector<ValueType> GetConvNetTestImage(int w, int h, int d, int index)
-{
-    srand(123);
-
-    std::vector<ValueType> result(w * h * d);
-    double scaleX = 1.0 / w;
-    double scaleY = 1.0 / h;
-    int outputIndex = 0;
-    for (int ch = 0; ch < d; ++ch)
-    {
-        for (int y = 0; y < h; ++y)
-        {
-            for (int x = 0; x < w; ++x)
-            {
-                double value = GetPixelVal(x * scaleX, y * scaleY, ch, index) + (((double)rand() / (RAND_MAX)) - 0.5);
-                result[outputIndex] = static_cast<ValueType>(value);
-                ++outputIndex;
-            }
-        }
-    }
-    return result;
-}
-
-
-

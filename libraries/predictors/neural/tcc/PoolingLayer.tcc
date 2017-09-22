@@ -22,12 +22,19 @@ namespace neural
         _poolingParameters(poolingParameters)
     {
     }
-
+    
     template <typename ElementType, template <typename> class PoolingFunctionType>
     void PoolingLayer<ElementType, PoolingFunctionType>::Compute()
     {
+        // TODO: if padding is true and window size is even, offset input by 1
+        auto input = GetInput();
         auto output = GetOutputMinusPadding();
-        auto& input = _layerParameters.input;
+        const int inputDataPaddingSize = GetLayerParameters().inputPaddingParameters.paddingSize;
+        const int poolingWindowSize = _poolingParameters.poolingSize;
+        if (inputDataPaddingSize > 0 && poolingWindowSize%2 == 0)
+        {
+            input = input.GetSubTensor({1, 1, 0}, {input.NumRows()-1, input.NumColumns()-1, input.NumChannels()});
+        }
 
         for (size_t row = 0; row < output.NumRows(); row++)
         {
@@ -37,9 +44,9 @@ namespace neural
                 const size_t startColumn = column * _poolingParameters.stride;
                 std::vector<PoolingFunctionType<ElementType>> poolingValues(output.NumChannels());
 
-                for (size_t pool_y = 0; pool_y < _poolingParameters.poolingSize; pool_y++)
+                for (size_t pool_y = 0; pool_y < poolingWindowSize; pool_y++)
                 {
-                    for (size_t pool_x = 0; pool_x < _poolingParameters.poolingSize; pool_x++)
+                    for (size_t pool_x = 0; pool_x < poolingWindowSize; pool_x++)
                     {
                         for (size_t channel = 0; channel < output.NumChannels(); channel++)
                         {
@@ -65,6 +72,34 @@ namespace neural
                     output(row, column, channel) = poolingValues[channel].GetValue();
                 }
             }
+        }
+    }
+
+    template <typename ElementType, template <typename> class PoolingFunctionType>
+    bool PoolingLayer<ElementType, PoolingFunctionType>::UsesPadding() const
+    {
+        const int inputDataPaddingSize = GetLayerParameters().inputPaddingParameters.paddingSize;
+        const auto inputShape = GetInputShapeMinusPadding();
+        const auto outputShape = GetOutputShapeMinusPadding();
+        const auto inputWidth = inputShape[0];
+        const auto outputWidth = outputShape[0];
+        const auto stride = _poolingParameters.stride;
+        const auto poolingSize = _poolingParameters.poolingSize;
+
+        const auto paddedOutputWidth = (inputWidth-1) / stride + 1; // ceil(inputWidth/stride);
+        const auto nonPaddedOutputWidth = (inputWidth-poolingSize) / stride + 1; // ceil((inputWidth-windowWidth+1) / stride)
+
+        if(outputWidth == nonPaddedOutputWidth)
+        {
+            return false;
+        }
+        else if(outputWidth == paddedOutputWidth)
+        {
+            return true;
+        }
+        else
+        {
+            return inputDataPaddingSize != 0;
         }
     }
 

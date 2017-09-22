@@ -36,6 +36,7 @@ struct CompareArguments
     // compilation parameters
     bool optimize = true;
     bool useBlas = false;
+    bool allowVectorInstructions = false;
 };
 
 /// <summary> Arguments for parsed print. </summary>

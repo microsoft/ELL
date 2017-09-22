@@ -2089,7 +2089,7 @@ void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_t o
     const double eps = 1e-6;
 
     // Build a model
-    const size_t numDims = 2;
+    const size_t numDims = 16;
 
     TensorType inputWithPadding(inRows + 2 * inputPaddingSize, inCols + 2 * inputPaddingSize, numDims);
     TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, inRows, inCols, numDims);
