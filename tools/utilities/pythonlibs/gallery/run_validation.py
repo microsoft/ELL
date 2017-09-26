@@ -14,6 +14,7 @@ import argparse
 import paramiko
 from itertools import islice
 from os.path import basename
+from time import sleep
 
 class RunValidation:
     def __init__(self):
@@ -26,7 +27,7 @@ class RunValidation:
         self.username = "pi"
         self.password = "raspberry"
         self.model = None
-        self.labels = "ILSVRC2012_labels.txt"
+        self.labels = "categories.txt"
         self.maxfiles = 200
         self.ssh = None
         self.target_dir = "/home/pi/pi3"
@@ -140,10 +141,17 @@ class RunValidation:
         bash_files = ["validate.sh", "validate.py", "../procmon.py"]
         self.publish(bash_files)
 
+        # kill zombie python processes on the device
+        self.exec_remote_command("pkill -9 python")
+
         # run validation
         self.exec_remote_command("chmod u+x {}/validate.sh".format(self.target_dir))
         output = self.exec_remote_command("{}/validate.sh".format(self.target_dir))
+        self.receive("validation.out", "{}_validation_{}.out".format(self.model, self.target))
         self.receive("validation.json", "{}_validation_{}.json".format(self.model, self.target))
+
+        # wait 2 seconds for procmon to exit
+        sleep(2)
         self.receive("procmon.json", "{}_procmon_{}.json".format(self.model, self.target))
 
 if __name__ == "__main__":

@@ -4,4 +4,4 @@ source activate py34 > /dev/null 2>&1
 cd @TARGET_DIR@
 
 export DISPLAY=:0
-python validate.py --maxfiles @MAXFILES@ @TRUTH@ @IMAGES@ @LABELS@ @COMPILED_MODEL@
+python validate.py --maxfiles @MAXFILES@ @TRUTH@ @IMAGES@ @LABELS@ @COMPILED_MODEL@ > validation.out

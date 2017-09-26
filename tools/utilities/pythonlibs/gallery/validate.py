@@ -90,11 +90,12 @@ def validate_image(args, filename):
         text = "".join(
             [str(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])
 
-        print("\t" + text)
+        print("\tPrediction: " + text)
         result["predictions"] = top5
 
     result["avg_time"] = helper.get_times()
-    print("\t" + str(result["avg_time"]))
+    helper.report_times(node_level=False)
+
     return result
 
 

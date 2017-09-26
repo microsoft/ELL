@@ -40,7 +40,6 @@ class ProcessMonitor:
                     firstcall = False
                 else:
                     stats.append(stat)
-                    print(stat)
 
                 sleep(self.interval)
 
@@ -76,7 +75,6 @@ class ProcessMonitor:
         summary["mean_resident_set_b"] = statistics.mean([x['memory_info'].rss for x in stats])
         summary["mean_virtual_memory_b"] = statistics.mean([x['memory_info'].vms for x in stats])
 
-        print(summary)
         return summary
 
 if __name__ == "__main__":

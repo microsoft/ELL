@@ -21,7 +21,7 @@ permalink: /gallery/ILSVRC2012/@PERMALINK@
 |-
 | Architecure | @MODEL_ARCH@
 |-
-| Output | [ILSVRC2012 @NUM_CLASSES@ classes](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt)
+| Output | [ILSVRC2012 @NUM_CLASSES@ classes](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)
 |-
 | Notes | Trained by Chuck Jacobs using CNTK 2.1
 |=

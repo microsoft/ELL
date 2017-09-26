@@ -242,7 +242,7 @@ class DemoHelper:
             average_time = self.total_time/self.time_count
         return average_time
 
-    def report_times(self):
+    def report_times(self, node_level=True):
         """Prints the average prediction time and additional profiling info, if available."""
         average_time = self.get_times()
         if average_time is not None:
@@ -252,8 +252,9 @@ class DemoHelper:
         if hasattr(self.compiled_module, self.model_name + "_PrintModelProfilingInfo"):
             getattr(self.compiled_module, self.model_name + "_PrintModelProfilingInfo")()
 
-        if hasattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo"):
-            getattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo")()
+        if node_level:
+            if hasattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo"):
+                getattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo")()
 
     def get_top_n(self, predictions, N):
         """Return at most the top N predictions as a list of tuples that meet the threshold."""

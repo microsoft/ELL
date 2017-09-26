@@ -28,6 +28,9 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../
 import lib.cntk_layers as cntk_layers
 import lib.cntk_utilities as cntk_utilities
 
+# local helpers
+import model_data_retriever
+
 class GenerateMarkdown:
     def __init__(self):
         self.arg_parser = argparse.ArgumentParser(
@@ -36,6 +39,7 @@ class GenerateMarkdown:
         self.model = None
         self.outfile = None
         self.template = None
+        self.data_retriever = None
 
     def parse_command_line(self, argv):
         # required arguments
@@ -58,54 +62,28 @@ class GenerateMarkdown:
         permalink = os.path.splitext(basename(self.outfile))[0]
         self.set_value("@PERMALINK@", permalink)
 
-    def get_model_filename(self, name, is_suffix=False):
-        """Returns the path to a file from the model directory, given the filename or a suffix"""
-        if is_suffix:
-            filename = os.path.join(self.modeldir, self.model + name)
-        else:
-            filename = os.path.join(self.modeldir, name)
-            
-        if (not os.path.isfile(filename)):
-            raise FileNotFoundError("File not found: " + filename)
-        return filename
-
-    def format_float(self, value):
-        return "{0:.2f}".format(value)
+        self.data_retriever = model_data_retriever.ModelDataRetriever(self.modeldir, self.model)
 
     def set_value(self, key, value):
         self.template = self.template.replace(key, str(value))
 
     def write_properties(self):
         """Writes the basic properties of the model"""
-        filename = self.get_model_filename("modelargs.json")
-        with open(filename, 'r') as f:
-            results = json.loads(f.read())
-            self.set_value("@IMAGE_SIZE@", results['image_size'])
-            self.set_value("@NUM_CLASSES@", results['num_classes'])
-            self.set_value("@MODEL_NAME@", self.model)
+        properties = self.data_retriever.get_model_properties()
 
-        filename = self.get_model_filename(".ell.zip", is_suffix=True)
-        unzip = ziptools.Extractor(filename)
-        success, temp = unzip.extract_file(".ell")
-        if (success):
-            print("extracted: " + temp)
-            size_mb = round(os.path.getsize(temp) / (1000 * 1000))
-            self.set_value("@MODEL_SIZE_MB@", size_mb)
-            os.remove(temp)
-        else:
-            # not a zip archive
-            print("Error, not a valid zip archive: " + filename)
+        self.set_value("@IMAGE_SIZE@", properties['image_size'])
+        self.set_value("@NUM_CLASSES@", properties['num_classes'])
+        self.set_value("@MODEL_NAME@", self.model)
+        self.set_value("@MODEL_SIZE_MB@", properties['size_mb'])
 
     def write_performance(self, platforms):
         """Writes the metrics for the list of platforms"""
+        speed = self.data_retriever.get_model_seconds_per_frame(platforms)
+
         for platform in platforms:
             try:
-                filename = self.get_model_filename("validation_" + platform + ".json")
-                with open(filename, 'r') as f:
-                    data = json.loads(f.read())
-                    results = data['results']
-                    average_time = reduce(lambda x, y: x + float(y['avg_time']), results, 0) / len(results)
-                    self.set_value("@" + platform + "_SECONDS_PER_FRAME@", self.format_float(average_time))
+                average_time = speed[platform]
+                self.set_value("@" + platform + "_SECONDS_PER_FRAME@", average_time)
             except:
                 # leave entries empty if file isn't found, orinvalid json (validation not complete on the target)
                 self.set_value("@" + platform + "_SECONDS_PER_FRAME@", "")
@@ -118,7 +96,10 @@ class GenerateMarkdown:
 
     def write_architecture(self):
         """Writes the model architecture in the desired format"""
-        filename = self.get_model_filename(".cntk.zip", is_suffix=True)
+        filename = os.path.join(self.modeldir, self.model + ".cntk.zip")
+        if (not os.path.isfile(filename)):
+            raise FileNotFoundError("File not found: " + filename)
+
         unzip = ziptools.Extractor(filename)
         success, temp = unzip.extract_file(".cntk")
         if (success):
@@ -136,12 +117,10 @@ class GenerateMarkdown:
 
     def write_accuracy(self):
         """Writes the accuracy from the model test result"""
-        filename = self.get_model_filename("test_eval.json")
+        accuracy = self.data_retriever.get_model_topN_accuracies()
 
-        with open(filename, 'r') as f:
-            results = json.loads(f.read())
-            self.set_value("@TOP_1_ACCURACY@", self.format_float(100 * (1.0 - float(results['average_top1_error']))))
-            self.set_value("@TOP_5_ACCURACY@", self.format_float(100 * (1.0 - float(results['average_top5_error']))))
+        self.set_value("@TOP_1_ACCURACY@", accuracy['top1'])
+        self.set_value("@TOP_5_ACCURACY@", accuracy['top5'])
 
     def save(self):
         with open(self.outfile, 'w', encoding='utf-8') as of:

@@ -13,7 +13,7 @@ permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF4096
 |-
 | Accuracy | ILSVRC2012: 88.38% (Top 5), 68.42% (Top 1) 
 |-
-| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 4.63s/frame<br>DragonBoard 410c @ 1.2GHz: 10.64s/frame
+| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 4.40s/frame<br>DragonBoard 410c @ 1.2GHz: 5.91s/frame
 |-
 | Uncompressed Size | 892MB
 |-
@@ -21,7 +21,7 @@ permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF4096
 |-
 | Architecure | Minus :  160x160x3  ->  162x162x3  input padding 0  output padding 1<br>Convolution(ReLU) :  162x162x3  ->  162x162x64  input padding 1  output padding 1<br>Convolution(ReLU) :  162x162x64  ->  160x160x64  input padding 1  output padding 0<br>MaxPooling :  160x160x64  ->  82x82x64  input padding 0  output padding 1<br>Convolution(ReLU) :  82x82x64  ->  82x82x128  input padding 1  output padding 1<br>Convolution(ReLU) :  82x82x128  ->  80x80x128  input padding 1  output padding 0<br>MaxPooling :  80x80x128  ->  42x42x128  input padding 0  output padding 1<br>Convolution(ReLU) :  42x42x128  ->  42x42x256  input padding 1  output padding 1<br>Convolution(ReLU) :  42x42x256  ->  42x42x256  input padding 1  output padding 1<br>Convolution(ReLU) :  42x42x256  ->  40x40x256  input padding 1  output padding 0<br>MaxPooling :  40x40x256  ->  22x22x256  input padding 0  output padding 1<br>Convolution(ReLU) :  22x22x256  ->  22x22x512  input padding 1  output padding 1<br>Convolution(ReLU) :  22x22x512  ->  22x22x512  input padding 1  output padding 1<br>Convolution(ReLU) :  22x22x512  ->  20x20x512  input padding 1  output padding 0<br>MaxPooling :  20x20x512  ->  12x12x512  input padding 0  output padding 1<br>Convolution(ReLU) :  12x12x512  ->  12x12x512  input padding 1  output padding 1<br>Convolution(ReLU) :  12x12x512  ->  12x12x512  input padding 1  output padding 1<br>Convolution(ReLU) :  12x12x512  ->  10x10x512  input padding 1  output padding 0<br>MaxPooling :  10x10x512  ->  5x5x512  input padding 0  output padding 0<br>Dense :  5x5x512  ->  1x1x4096  input padding 0  output padding 0<br>Dense :  1x1x4096  ->  1x1x1000  input padding 0  output padding 0<br>ElementTimes :  1x1x1000  ->  1x1x1000  input padding 0  output padding 0<br>Softmax :  1x1x1000  ->  1x1x1  input padding 0  output padding 0<br>
 |-
-| Output | [ILSVRC2012 1000 classes](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt)
+| Output | [ILSVRC2012 1000 classes](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)
 |-
 | Notes | Trained by Chuck Jacobs using CNTK 2.1
 |=
