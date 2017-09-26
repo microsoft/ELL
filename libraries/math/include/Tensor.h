@@ -40,7 +40,7 @@ namespace math
     template <Dimension dimension0, Dimension dimension1, Dimension dimension2>
     constexpr int IndexOfDimension(Dimension dimension)
     {
-        // STYLE violation 
+        // STYLE discrepancy 
         return dimension == dimension0 ? 0 : (dimension == dimension1 ? 1 : (dimension == dimension2 ? 2 : -1));
     }
 
@@ -56,7 +56,7 @@ namespace math
     template <Dimension dimension0, Dimension dimension1, Dimension dimension2>
     struct TensorLayout
     {
-        static Triplet ShapeToLayout(Triplet shape) { return{ shape[rowPosition], shape[columnPosition], shape[channelPosition] }; } // STYLE violation 
+        static Triplet ShapeToLayout(Triplet shape) { return{ shape[rowPosition], shape[columnPosition], shape[channelPosition] }; } // STYLE discrepancy 
         static const size_t rowPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::row);
         static const size_t columnPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::column);
         static const size_t channelPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::channel);
@@ -696,10 +696,10 @@ namespace math
         static void Read(Tensor<ElementType, dimension0, dimension1, dimension2>& tensor, const std::string& name, utilities::Unarchiver& archiver);
 
     private:
-        static std::string GetRowsName(const std::string& name) { return name + "_rows"; } // STYLE violation
-        static std::string GetColumnsName(const std::string& name) { return name + "_columns"; } // STYLE violation
-        static std::string GetChannelsName(const std::string& name) { return name + "_channels"; } // STYLE violation
-        static std::string GetValuesName(const std::string& name) { return name + "_values"; } // STYLE violation
+        static std::string GetRowsName(const std::string& name) { return name + "_rows"; } // STYLE discrepancy
+        static std::string GetColumnsName(const std::string& name) { return name + "_columns"; } // STYLE discrepancy
+        static std::string GetChannelsName(const std::string& name) { return name + "_channels"; } // STYLE discrepancy
+        static std::string GetValuesName(const std::string& name) { return name + "_values"; } // STYLE discrepancy
     };
 
     //

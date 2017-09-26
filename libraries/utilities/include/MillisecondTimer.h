@@ -26,7 +26,7 @@ namespace utilities
         /// <summary></summary>
         void Start()
         {
-            // STYLE violation
+            // STYLE discrepancy
             _start = std::chrono::system_clock::now();
             _running = true;
         }
@@ -34,7 +34,7 @@ namespace utilities
         /// <summary></summary>
         void Stop()
         {
-            // STYLE violation
+            // STYLE discrepancy
             _end = std::chrono::system_clock::now();
             _running = false;
         }
@@ -42,7 +42,7 @@ namespace utilities
         /// <summary></summary>
         void Reset()
         {
-            // STYLE violation
+            // STYLE discrepancy
             _start = std::chrono::system_clock::now();
             _end = _start;
         }
@@ -50,7 +50,7 @@ namespace utilities
         /// <summary></summary>
         std::chrono::milliseconds::rep Elapsed()
         {
-            // STYLE violation
+            // STYLE discrepancy
             if (_running)
             {
                 _end = std::chrono::system_clock::now();

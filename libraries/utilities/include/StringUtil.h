@@ -1,4 +1,4 @@
-// STYLE violation 
+// STYLE discrepancy 
 
 #pragma once
 
@@ -15,7 +15,7 @@ namespace utilities
     ///<summary></summary>
     static std::string ToLowercase(const std::string& s)
     {
-        // STYLE violation 
+        // STYLE discrepancy 
         std::string lower = s;
         std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
         return lower;
@@ -25,7 +25,7 @@ namespace utilities
     ///<summary></summary>
     static int _vscprintf(const char* format, va_list pargs)
     {
-        // STYLE violation 
+        // STYLE discrepancy 
         int retval;
         va_list argcopy;
         va_copy(argcopy, pargs);
@@ -38,7 +38,7 @@ namespace utilities
     ///<summary></summary>
     static std::string stringf(const char* format, ...)
     {
-        // STYLE violation 
+        // STYLE discrepancy 
         va_list args;
         va_start(args, format);
 

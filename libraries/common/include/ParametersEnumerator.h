@@ -89,7 +89,7 @@ namespace common
     template <typename ParametersType, typename... ValueTypes>
     ParametersEnumerator<ParametersType, ValueTypes...> MakeParametersEnumerator(std::vector<ValueTypes>... parameterValues)
     {
-        // STYLE violation 
+        // STYLE discrepancy 
         return ParametersEnumerator<ParametersType, ValueTypes...>(parameterValues...);
     }
 }

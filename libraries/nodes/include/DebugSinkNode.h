@@ -74,7 +74,7 @@ namespace nodes
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary></summary>
-        virtual void ChangeSink(DebugSinkFunction<ValueType> sink) { _sink = sink; } // STYLE violation
+        virtual void ChangeSink(DebugSinkFunction<ValueType> sink) { _sink = sink; } // STYLE discrepancy
 
         /// <summary></summary>
         virtual std::string GetLabel() const { return _label; }

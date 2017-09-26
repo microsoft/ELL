@@ -59,7 +59,7 @@ namespace model
         virtual void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         virtual ell::utilities::ArchiveVersion GetArchiveVersion() const override;
 
-        void SetShape(const OutputShape& shape) { _shape = shape; } // STYLE violation
+        void SetShape(const OutputShape& shape) { _shape = shape; } // STYLE discrepancy
     private:
         InputPortBase& _inputBase;
         OutputPortBase& _outputBase;

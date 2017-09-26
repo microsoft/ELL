@@ -210,7 +210,7 @@ namespace utilities
 
         struct case_insensitive_comparer {
             bool operator() (const std::string& lhs, const std::string& rhs) const {
-                // STYLE violation
+                // STYLE discrepancy
                 auto lower_lhs = ToLowercase(lhs);
                 auto lower_rhs = ToLowercase(rhs);
                 return lower_lhs < lower_rhs;

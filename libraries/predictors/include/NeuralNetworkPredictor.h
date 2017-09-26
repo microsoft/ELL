@@ -93,7 +93,7 @@ namespace predictors
         /// <summary> Sets the underlying layers. </summary>
         ///
         /// <returns> The underlying vector of layers. </returns>
-        void SetLayers(Layers&& layers) { _layers = std::move(layers); } // STYLE violation
+        void SetLayers(Layers&& layers) { _layers = std::move(layers); } // STYLE discrepancy
 
         /// <summary> Gets the dimension of the input layer. </summary>
         ///
