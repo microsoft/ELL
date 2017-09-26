@@ -30,7 +30,6 @@ namespace math
         Tensor(const std::vector<ElementType>& data, size_t rows, size_t columns, size_t channels) :
             shape{ rows, columns, channels }, data(data)
         {
-
         }
 
         const ell::math::TensorShape shape;

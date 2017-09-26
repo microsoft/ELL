@@ -366,14 +366,14 @@ namespace emitters
         /// <param name="pValue"> Pointer to the value being compared to true. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the comparison result. </returns>
-        llvm::Value* IsTrue(llvm::Value* pValue) { return Comparison(pValue, true); }
+        llvm::Value* IsTrue(llvm::Value* pValue) { return Comparison(pValue, true); } // STYLE violation
 
         /// <summary> Emit a comparison for whether the given value is False. </summary>
         ///
         /// <param name="pValue"> Pointer to the value being compared to false. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the comparison result. </returns>
-        llvm::Value* IsFalse(llvm::Value* pValue) { return Comparison(pValue, false); }
+        llvm::Value* IsFalse(llvm::Value* pValue) { return Comparison(pValue, false); } // STYLE violation
 
         /// <summary> Emit a select instruction. </summary>
         ///

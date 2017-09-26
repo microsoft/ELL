@@ -72,19 +72,23 @@ namespace neural
     static PaddingParameters NoPadding() { return { PaddingScheme::zeros, 0 }; }
 
     /// <summary> Function to return parameters that represent padding the specified pixel width with zeros. </summary
-    static PaddingParameters ZeroPadding(size_t width) { return { PaddingScheme::zeros, width }; }
+    static PaddingParameters ZeroPadding(size_t width) { return { PaddingScheme::zeros, width };  // STYLE violation
+    }
 
     /// <summary> Function to return parameters that represent padding the specified pixel width with the minimum value. </summary
-    static const PaddingParameters MinPadding(size_t width) { return { PaddingScheme::min, width }; }
+    static const PaddingParameters MinPadding(size_t width) { return { PaddingScheme::min, width };  // STYLE violation
+    }
 
     /// <summary> Function to return parameters that represent padding the specified pixel width with -1. </summary
-    static const PaddingParameters MinusOnePadding(size_t width) { return { PaddingScheme::minusOnes, width }; }
+    static const PaddingParameters MinusOnePadding(size_t width) { return { PaddingScheme::minusOnes, width };  // STYLE violation
+    }
 
     /// <summary> Helper function to determine if a PaddingParameters struct represents no padding </summary>
-    static bool HasPadding(const PaddingParameters& padding) { return padding.paddingSize != 0; }
+    static bool HasPadding(const PaddingParameters& padding) { return padding.paddingSize != 0;  // STYLE violation
+    }
 
     /// <summary> Helper function to determine if a PaddingParameters struct represents zero padding </summary>
-    static bool HasPadding(const PaddingParameters& padding, PaddingScheme scheme) { return HasPadding(padding) && (padding.paddingScheme == scheme); }
+    static bool HasPadding(const PaddingParameters& padding, PaddingScheme scheme) { return HasPadding(padding) && (padding.paddingScheme == scheme); } // STYLE violation
 
     /// <summary> Get the padding value to fill with </summary>
     template <typename ValueType>
@@ -268,7 +272,7 @@ namespace neural
         /// <summary> Sets the output reference to be saved in the context.
         ///
         /// <param name="outputReference"> The output reference to save, typically from the layer that has just been deserialized. </param>
-        void SetOutputReference(ConstTensorReferenceType outputReference) { _outputReference = outputReference; }
+        void SetOutputReference(ConstTensorReferenceType outputReference) { _outputReference = outputReference; } // STYLE violation
 
         /// <summary> Returns the previously saved output reference. </summary>
         ///

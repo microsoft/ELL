@@ -79,6 +79,8 @@ namespace data
         class DatasetExampleIterator : public IExampleIterator<IteratorExampleType>
         {
         public:
+            using InternalIteratorType = typename std::vector<DatasetExampleType>::const_iterator;
+
             /// <summary></summary>
             DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end);
 
@@ -94,8 +96,6 @@ namespace data
             ///
             /// <returns> The example. </returns>
             virtual IteratorExampleType Get() const override { return _current->template CopyAs<IteratorExampleType>(); }
-
-            using InternalIteratorType = typename std::vector<DatasetExampleType>::const_iterator;
 
         private:
             InternalIteratorType _current;

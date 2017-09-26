@@ -84,7 +84,7 @@ namespace emitters
         /// <param name="pointerType"> The llvm type of the pointer to return. </param>
         ///
         /// <returns> Pointer to an llvm::ConstantPointerNull that represents a null pointer of the given pointer type. </returns>
-        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType) { return _pEmitter->NullPointer(pointerType); }
+        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType) { return _pEmitter->NullPointer(pointerType); } // STYLE violation 
 
         /// <summary> Emit an instruction to load a function argument. </summary>
         ///

@@ -20,7 +20,7 @@ namespace utilities
     {
     public:
         /// <summary></summary>
-        Exception(const std::string& message) : _message(message) { }
+        Exception(const std::string& message) : _message(message) { }  // STYLE violation 
 
         virtual ~Exception() = default;
 
