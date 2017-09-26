@@ -15,32 +15,42 @@ namespace ell
 {
 namespace utilities
 {
+    /// <summary></summary>
     class MillisecondTimer
     {
     public:
+        /// <summary></summary>
         MillisecondTimer()
             : _start(std::chrono::system_clock::now()), _running(true) {}
 
+        /// <summary></summary>
         void Start()
         {
+            // STYLE violation
             _start = std::chrono::system_clock::now();
             _running = true;
         }
 
+        /// <summary></summary>
         void Stop()
         {
+            // STYLE violation
             _end = std::chrono::system_clock::now();
             _running = false;
         }
 
+        /// <summary></summary>
         void Reset()
         {
+            // STYLE violation
             _start = std::chrono::system_clock::now();
             _end = _start;
         }
 
+        /// <summary></summary>
         std::chrono::milliseconds::rep Elapsed()
         {
+            // STYLE violation
             if (_running)
             {
                 _end = std::chrono::system_clock::now();

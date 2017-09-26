@@ -152,24 +152,39 @@ namespace trainers
     class Param_W : public ProtoNNModelParameter
     {
     public:
+        /// <summary></summary>
         Param_W(size_t dimension1, size_t dimension2);
+
+        /// <summary></summary>
         virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossType lossType) override;
+
+        /// <summary></summary>
         virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossType lossType) override;
     };
 
     class Param_B : public ProtoNNModelParameter
     {
     public:
+        /// <summary></summary>
         Param_B(size_t dimension1, size_t dimension2);
+
+        /// <summary></summary>
         virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossType lossType) override;
+
+        /// <summary></summary>
         virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossType lossType) override;
     };
 
     class Param_Z : public ProtoNNModelParameter
     {
     public:
+        /// <summary></summary>
         Param_Z(size_t dimension1, size_t dimension2);
+
+        /// <summary></summary>
         virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossType lossType) override;
+
+        /// <summary></summary>
         virtual math::ColumnMatrix<double> gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, ProtoNNLossType lossType) override;
     };
 

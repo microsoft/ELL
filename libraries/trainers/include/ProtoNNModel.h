@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ProtoNNTrainer.h (trainers)
+//  File:     ProtoNNModel.h (trainers)
 //  Authors:  Suresh Iyengar
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ namespace trainers
     struct ProtoNNTrainerParameters
     {
         size_t projectedDimesion;
-		size_t numPrototypesPerLabel;
+        size_t numPrototypesPerLabel;
         size_t numPrototypes;
         size_t numLabels;
         double lambdaW;

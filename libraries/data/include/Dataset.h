@@ -79,6 +79,9 @@ namespace data
         class DatasetExampleIterator : public IExampleIterator<IteratorExampleType>
         {
         public:
+            /// <summary></summary>
+            DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end);
+
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if it succeeds, false if it fails. </returns>
@@ -93,7 +96,6 @@ namespace data
             virtual IteratorExampleType Get() const override { return _current->template CopyAs<IteratorExampleType>(); }
 
             using InternalIteratorType = typename std::vector<DatasetExampleType>::const_iterator;
-            DatasetExampleIterator(InternalIteratorType begin, InternalIteratorType end);
 
         private:
             InternalIteratorType _current;

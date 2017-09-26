@@ -23,6 +23,7 @@ namespace emitters
     class IRLoader
     {
     public:
+        /// <summary></summary>
         IRLoader(llvm::LLVMContext& context)
             : _llvmContext(context) {}
 

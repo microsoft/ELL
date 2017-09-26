@@ -136,7 +136,10 @@ namespace utilities
         template <typename ValueType>
         bool TrySetValueFrom(ValueType&& value);
 
+        /// <summary></summary>
         bool TrySetValueFrom(const Variant& value);
+
+        /// <summary></summary>
         bool TrySetValueFrom(Variant& value);
 
         /// <summary> Set a Variant's value from a string (preserving its type) </summary>

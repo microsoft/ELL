@@ -96,7 +96,10 @@ namespace nodes
         const model::OutputPort<PackedBitsType>& output = _output;
         /// @}
 
+        /// <summary></summary>
         BinaryReceptiveFieldMatrixNode();
+
+        /// <summary></summary>
         BinaryReceptiveFieldMatrixNode(const model::PortElements<ValueType>& input,
                                        const predictors::neural::BinaryConvolutionalParameters& convolutionalParameters,
                                        const model::PortMemoryLayout& inputMemoryLayout,
@@ -104,10 +107,14 @@ namespace nodes
 
         /// <summary> Gets information about the input memory layout </summary>
         const model::PortMemoryLayout& GetInputMemoryLayout() const { return _inputMemoryLayout; }
+
+        /// <summary></summary>
         model::PortMemoryLayout& GetInputMemoryLayout() { return _inputMemoryLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
         const model::PortMemoryLayout& GetOutputMemoryLayout() const { return _outputMemoryLayout; }
+
+        /// <summary></summary>
         model::PortMemoryLayout& GetOutputMemoryLayout() { return _outputMemoryLayout; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
