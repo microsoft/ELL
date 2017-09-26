@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# A script that creates a compiled profiler in a subdirectory:
+#   - create subdirectory (w/name of model)
+#   - run compile on model and save model .h and .o to subdirectory
+#   - copy c++ and cmake files to subdirectory
+
+# Usage: make_profiler.sh model_file [output_directory] <compile options> 
+
+set -x
+
+pushd .
+
+model_name=$1
+shift
+model_file=$model_name".ell"
+
+profiler_directory=$model_name"_profiler"
+next_opt=$1
+if [ ${next_opt:0:1} != '-' ] ; then
+    profiler_directory=$next_opt
+    shift
+fi
+
+mkdir $profiler_directory
+@COMPILE_EXECUTABLE@ -imap $model_file --profile --ir --objectCode --header -od $profiler_directory -ob compiled_model $@
+@COMPILE_EXECUTABLE@ -imap $model_file --ir --objectCode --header -od $profiler_directory -ob compiled_model_noprofile $@
+
+# Platform-specific options
+pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
+
+llc_opts=$pi3_llc_opts
+cd $profiler_directory
+@LLC_EXECUTABLE@ compiled_model.ll -o compiled_model_llc.o -O3 --filetype=obj $llc_opts
+@OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3
+@LLC_EXECUTABLE@ compiled_model_opt.ll -o compiled_model_opt.o -O3 --filetype=obj $llc_opts
+
+@LLC_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_llc.o -O3 --filetype=obj $llc_opts
+@OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3
+@LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj $llc_opts
+
+cp ../tools/utilities/profile/compiled_profile_main.cpp .
+cp ../tools/utilities/profile/compiled_exercise_model_main.cpp .
+cp ../tools/utilities/profile/CMakeLists-compiled.txt.in ./CMakeLists.txt
+cp ../tools/utilities/profile/OpenBLASSetup.cmake ./OpenBLASSetup.cmake
+popd

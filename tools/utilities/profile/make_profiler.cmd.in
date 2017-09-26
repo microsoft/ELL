@@ -1,0 +1,35 @@
+SETLOCAL ENABLEEXTENSIONS
+
+REM A script that creates a compiled profiler in a subdirectory:
+REM   - create subdirectory (w/name of model)
+REM   - run compile on model and save model .h and .o to subdirectory
+REM   - copy c++ and cmake files to subdirectory
+
+REM Usage: make_profiler.cmd model_file <compile options> 
+
+pushd .
+
+set model_name=%1
+shift
+set model_file="%model_name%.ell"
+set profiler_directory="%model_name%_profiler"
+
+mkdir %profiler_directory%
+@COMPILE_EXECUTABLE@ -imap %model_file% --profile --ir --objectCode --header -od %profiler_directory% -ob compiled_model %*
+@COMPILE_EXECUTABLE@ -imap %model_file% --ir --objectCode --header -od %profiler_directory% -ob compiled_model_noprofile %*
+
+cd %profiler_directory%
+@LLC_EXECUTABLE@ compiled_model.ll -o compiled_model_llc.o -O3 --filetype=obj -relocation-model=pic
+@OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3
+@LLC_EXECUTABLE@ compiled_model_opt.ll -o compiled_model_opt.o -O3 --filetype=obj -relocation-model=pic
+
+@LLC_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_llc.o -O3 --filetype=obj -relocation-model=pic
+@OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3
+@LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj -relocation-model=pic
+
+copy ..\tools\utilities\profile\compiled_profile_main.cpp .
+copy ..\tools\utilities\profile\compiled_exercise_model_main.cpp .
+copy ..\tools\utilities\profile\CMakeLists-compiled.txt.in .\CMakeLists.txt
+copy ..\tools\utilities\profile\OpenBLASSetup.cmake .\OpenBLASSetup.cmake
+popd
+
