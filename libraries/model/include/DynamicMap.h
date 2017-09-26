@@ -304,6 +304,7 @@ namespace model
         /// <param name="b"> The other map to swap. </param>
         friend void swap(DynamicMap& a, DynamicMap& b);
 
+        /// <summary></summary>
         void Prune(); // prune away unused parts of internal model
 
     protected:

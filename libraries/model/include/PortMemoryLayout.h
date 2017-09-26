@@ -73,11 +73,22 @@ namespace model
         /// <returns> The number of dimensions </summary>
         size_t NumDimensions() const { return _size.size(); }
 
+        /// <summary></summary>
         const Shape& GetActiveSize() const { return _size; }
+
+        /// <summary></summary>
         const Shape& GetStride() const { return _stride; }
+
+        /// <summary></summary>
         const Shape& GetOffset() const { return _offset; }
+
+        /// <summary></summary>
         int GetActiveSize(size_t index) const { return _size[index]; }
+
+        /// <summary></summary>
         int GetStride(size_t index) const { return _stride[index]; }
+
+        /// <summary></summary>
         int GetOffset(size_t index) const { return _offset[index]; }
 
         /// <summary> Returns the number of active elements in this memory layout </summary>

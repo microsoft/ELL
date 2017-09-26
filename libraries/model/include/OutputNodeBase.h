@@ -37,11 +37,19 @@ namespace model
     class OutputNodeBase : public CompilableNode
     {
     public:
+        /// <summary></summary>
         const InputPortBase& GetInputPort() const { return _inputBase; }
+
+        /// <summary></summary>
         const OutputPortBase& GetOutputPort() const { return _outputBase; }
+
+        /// <summary></summary>
         using Node::GetInputPort;
+
+        /// <summary></summary>
         using Node::GetOutputPort;
 
+        /// <summary></summary>
         OutputShape GetShape() const { return _shape; }
 
     protected:

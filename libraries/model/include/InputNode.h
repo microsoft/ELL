@@ -80,6 +80,7 @@ namespace model
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         virtual void Copy(ModelTransformer& transformer) const override;
 
+        /// <summary></summary>
         size_t Size() const { return _output.Size(); }
 
     protected:

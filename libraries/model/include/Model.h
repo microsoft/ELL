@@ -34,7 +34,7 @@ namespace model
     class NodeIterator : public utilities::IIterator<const Node*>
     {
     public:
-        NodeIterator() {}
+        NodeIterator() = default;
 
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///

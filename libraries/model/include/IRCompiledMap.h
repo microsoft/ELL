@@ -159,6 +159,7 @@ namespace model
         /// <summary> Reset the performance counters for all the node types to zero. </summary>
         void ResetNodeTypeProfilingInfo();
 
+        /// <summary></summary>
         void FinishJitting() const;
 
     protected:
