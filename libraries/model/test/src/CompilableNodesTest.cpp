@@ -860,10 +860,10 @@ void TestMultipleOutputNodes()
     compiledMap.WriteCode(buffer, emitters::ModuleOutputFormat::ir);
 
     std::string result = buffer.str();
-
+    
     // some minimal strings for testing, full verbose string comparison might be too fragile to future code gen changes.
-    auto inputFuncPos = result.find("define void @ELL_GetInputShape(i32 %index, %TensorShape.0* %shape");
-    auto outputFuncpos = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape.0* %shape");
+    auto inputFuncPos = result.find("define void @ELL_GetInputShape(i32 %index, %TensorShape* %shape");
+    auto outputFuncpos = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape* %shape");
     auto storePos = result.find("store i32 224, i32* %rows, align 4");
     testing::ProcessTest("Testing GetOutputShape generation",
                          storePos != std::string::npos && inputFuncPos != std::string::npos && outputFuncpos != std::string::npos);

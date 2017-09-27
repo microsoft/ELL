@@ -34,13 +34,6 @@ namespace ell
 {
 namespace emitters
 {
-    namespace
-    {
-        static llvm::LLVMContext g_globalLLVMContext;
-        static bool g_llvmIsInitialized = false;
-        static std::unique_ptr<IRDiagnosticHandler> g_globalDiagnosticHandler = nullptr;
-    }
-
     //
     // Public methods
     //
@@ -50,22 +43,11 @@ namespace emitters
     //
 
     IRModuleEmitter::IRModuleEmitter(const std::string& moduleName)
-        : _llvmContext(g_globalLLVMContext), _emitter(_llvmContext), _runtime(*this)
+        : _llvmContext(new llvm::LLVMContext()), _emitter(*_llvmContext), _runtime(*this)
     {
         InitializeLLVM();
         InitializeGlobalPassRegistry();
         _pModule = _emitter.AddModule(moduleName);
-        if (GetCompilerParameters().includeDiagnosticInfo)
-        {
-            DeclarePrintf();
-        }
-    }
-
-    IRModuleEmitter::IRModuleEmitter(std::unique_ptr<llvm::Module> pModule)
-        : _llvmContext(g_globalLLVMContext), _emitter(_llvmContext), _runtime(*this), _pModule(std::move(pModule))
-    {
-        InitializeLLVM();
-        InitializeGlobalPassRegistry();
         if (GetCompilerParameters().includeDiagnosticInfo)
         {
             DeclarePrintf();
@@ -773,7 +755,7 @@ namespace emitters
 
     IRDiagnosticHandler& IRModuleEmitter::GetDiagnosticHandler()
     {
-        return *g_globalDiagnosticHandler;
+        return *_diagnosticHandler;
     }
 
     void IRModuleEmitter::DebugDump()
@@ -895,11 +877,6 @@ namespace emitters
     //
     void IRModuleEmitter::InitializeLLVM()
     {
-        if (g_llvmIsInitialized)
-        {
-            return;
-        }
-
         // All targets
         llvm::InitializeAllTargetInfos();
         llvm::InitializeAllTargets();
@@ -915,7 +892,7 @@ namespace emitters
         llvm::InitializeNativeTargetDisassembler();
 
         // Create a diagnostic handler to record if there was an error
-        g_globalDiagnosticHandler = std::unique_ptr<IRDiagnosticHandler>(new IRDiagnosticHandler(g_globalLLVMContext));
+        _diagnosticHandler = std::unique_ptr<IRDiagnosticHandler>(new IRDiagnosticHandler(*_llvmContext));
     }
 
     llvm::PassRegistry* IRModuleEmitter::InitializeGlobalPassRegistry()

@@ -17,5 +17,6 @@ void TestLogical();
 void TestMutableConditionForLoop();
 void TestMetadata();
 void TestHeader();
+void TestTwoEmitsInOneSession();
 void SetOutputPathBase(std::string path);
 std::string OutputPath(const char* pRelPath);
