@@ -1,7 +1,7 @@
 #
 # cmake file for builder project
 #
-include (CommonInterfaces)
+include(CommonInterfaces)
 
 find_package(PythonInterp)
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
@@ -12,8 +12,8 @@ else()
     set(ADDITIONAL_DISTUTILS_FLAGS install)
 endif()
 
-set (module_name wrap)
-set (builder_src
+set(module_name wrap)
+set(builder_src
     templates/CMakeLists.python.txt.in
     wrap.py
     README.md)
@@ -38,7 +38,7 @@ if(NOT OPT_EXECUTABLE)
     return()
 endif()
 
-set (OUTPUT_DIR ${CMAKE_BINARY_DIR}/tools)
+set(OUTPUT_DIR ${CMAKE_BINARY_DIR}/tools)
 
 set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile\", \"blas\": \"${BLAS_LIBS}\", \"opt\": \"${OPT_EXECUTABLE}\" }")
 file(WRITE "${OUTPUT_DIR}/tools.json" ${JSON})

@@ -61,6 +61,7 @@ enable_testing()
 set(PACKAGE_ROOT ${EXTERNAL_DIR})
 include(OpenBLASSetup)
 include(LLVMSetup)
+include(SWIGSetup)
 include(CopySharedLibraries)
 include(AddPrecompiledHeader)
 
@@ -78,15 +79,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/private AND EXISTS ${CMAKE_SOURCE_DIR}/private/CMa
 endif()
 
 # Add SWIG-generated interfaces
-
-include (CommonInterfaces)
-
-if(NOT SWIG_FOUND)
-    message(WARNING "SWIG not found, interfaces and projects that depend on them will not build properly. \
-                    They are not part of the default make targets, so can be skipped. \
-                    Then delete the CMakeCache.txt file from your build directory run the cmake command again.")
-endif()
-
+include(CommonInterfaces)
 add_subdirectory(interfaces)
 
 # Add examples (has dependencies on SWIG-generated interfaces)
