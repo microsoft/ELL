@@ -399,12 +399,12 @@ namespace emitters
 
     void IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType)
     {
-        _emitter.DeclareFunction(GetLLVMModule(), name, returnType, nullptr);
+        _emitter.DeclareFunction(GetLLVMModule(), name, returnType);
     }
 
     void IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const VariableTypeList& arguments)
     {
-        _emitter.DeclareFunction(GetLLVMModule(), name, returnType, &arguments);
+        _emitter.DeclareFunction(GetLLVMModule(), name, returnType, arguments);
     }
 
     void IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments)

@@ -604,22 +604,36 @@ namespace emitters
     //
     // Functions
     //
-    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const VariableTypeList* pArguments)
+    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name)
     {
-        // ??? Why doesn't this use getOrInsertFunction?
-        return Function(pModule, name, returnType, llvm::Function::LinkageTypes::ExternalLinkage, pArguments);
+        assert(pModule != nullptr);
+        auto functionType = llvm::FunctionType::get(_irBuilder.getVoidTy(), false);        
+        return DeclareFunction(pModule, name, functionType);
     }
-
+    
+    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType)
+    {
+        auto functionType = llvm::FunctionType::get(Type(returnType), false);        
+        return DeclareFunction(pModule, name, functionType);
+    }
+    
+    llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const VariableTypeList& arguments)
+    {
+        auto types = GetLLVMTypes(arguments);
+        auto functionType = llvm::FunctionType::get(Type(returnType), types, false);
+        return DeclareFunction(pModule, name, functionType);
+    }
+    
     llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments)
     {
-        // ??? Why doesn't this use getOrInsertFunction?
-        return Function(pModule, name, returnType, llvm::Function::LinkageTypes::ExternalLinkage, arguments);
+        auto types = BindArgumentTypes(arguments);
+        auto functionType = llvm::FunctionType::get(Type(returnType), types, false);
+        return DeclareFunction(pModule, name, functionType);
     }
 
     llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, llvm::FunctionType* type)
     {
         assert(pModule != nullptr);
-
         return static_cast<llvm::Function*>(pModule->getOrInsertFunction(name, type));
     }
 
