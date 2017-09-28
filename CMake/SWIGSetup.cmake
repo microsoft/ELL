@@ -22,11 +22,10 @@
 #
 
 if(WIN32)
-  if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../external/swigwintools.3.0.12/tools/swigwin-3.0.12/swig.exe")
-    set(SWIG_DIR "${CMAKE_CURRENT_LIST_DIR}/../external/swigwintools.3.0.12/tools/swigwin-3.0.12")
+  set(SWIG_VERSION "3.0.12")
+  if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../external/swigwintools.${SWIG_VERSION}/tools/swigwin-${SWIG_VERSION}/swig.exe")
+    set(SWIG_DIR "${CMAKE_CURRENT_LIST_DIR}/../external/swigwintools.${SWIG_VERSION}/tools/swigwin-${SWIG_VERSION}")
     set(SWIG_EXECUTABLE "${SWIG_DIR}/swig.exe")
-    set(SWIG_VERSION "3.0.12")
-    set(SWIG_DIR "${CMAKE_CURRENT_LIST_DIR}/../external/swigwintools.3.0.12/tools/swigwin-3.0.12")
   endif()
 endif()
 
