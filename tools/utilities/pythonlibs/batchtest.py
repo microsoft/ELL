@@ -26,14 +26,20 @@ class TestResults:
         self.tests_passed = 0
         self.tests_failed = 0
         self.confusion_matrix = np.zeros((size, size))
+        self.results = []
 
-    def record_result(self, passed, test_index, expected):
+    def record_result(self, passed, test_index, prediction, probability, expected):
         msg = "passed"
         if passed:
             self.tests_passed += 1
         else:
             msg = "failed"
             self.tests_failed += 1
+        
+        ok = 1
+        if not passed:
+            ok = 0
+        self.results.append((test_index, ok, prediction, probability))
          
         total = self.tests_passed + self.tests_failed
         pass_rate = (self.tests_passed * 100) / total  
@@ -57,7 +63,8 @@ class TestResults:
         if not self.confusion_matrix is None:
             np.savetxt("top" + str(self.test_top_n) + "_batch_" + str(batch) + ".txt", self.confusion_matrix)
 
-    
+        with open("top" + str(self.test_top_n) + "_batch_" + str(batch) + ".json", 'w', encoding='utf-8', newline='\r\n') as outfile:
+            json.dump(self.results, outfile, ensure_ascii=False, indent=2)
 
 # Helper class that interfaces with opencv and provides handy conversion from opencv to ELL buffers and 
 # rendering utilties
@@ -256,34 +263,42 @@ class ModelTester(demoHelper.DemoHelper):
         # check current prediction matches the truth.
         expected = self.map_entry[1]
         expected_label =  self.get_truth_label(expected)
+        if not self.groups is None:
+            expected = self.get_grouped_result(expected)
+            expected_label =  self.group_names[expected]
+
         topN = self.get_top_n(self.results, self.test_top_n)
         winner = None
         actual = []
         first = True
+        topNPrediction = None
+        topNProbability = 0
         for top in topN:
             prediction = top[0]
             label = self.get_label(prediction)
             if not self.groups is None:
                 prediction = self.get_grouped_result(prediction)
                 label = self.group_names[prediction]
-                expected = self.get_grouped_result(expected)
-                expected_label =  self.group_names[expected]
 
             matches = self.labels_match(label, expected_label)
             if first:
-                self.top1.record_confusion(prediction, expected)
-                self.top1.record_result(matches, self.val_pos, expected_label)
+                topNPrediction = prediction
+                topNProbability = top[1]
                 first = False
-            if self.topN != None:
-                self.topN.record_confusion(prediction, expected)
-                
+                self.top1.record_confusion(prediction, expected)
+                self.top1.record_result(matches, self.val_pos, prediction, topNProbability, expected_label)
+            
             actual.append(label)
-            if matches:  
-                winner = top  
-        
+            if matches and winner is None:
+                winner = top
+                topNPrediction = prediction
+                topNProbability = top[1]
+                break
+    
         print("  " + ",".join(actual))    
-        if self.topN != None:    
-            self.topN.record_result(winner != None, self.val_pos, expected_label)    
+        if self.topN != None:
+            self.topN.record_confusion(topNPrediction, expected)
+            self.topN.record_result(winner != None, self.val_pos, topNPrediction, topNProbability, expected_label)    
         
         if winner == None:
             print("  ====> Expected=" + expected_label)
