@@ -339,8 +339,8 @@ void WriteModelReport(std::ostream& reportStream, const OutputInfo& layerOutput,
     }
     reportStream << "</tr>\n";
 
-    VectorStats layerStats(layerOutput.outputs);
-    VectorStats nodeStats(nodeOutput.outputs);
+    VectorStatistics layerStats(layerOutput.outputs);
+    VectorStatistics nodeStats(nodeOutput.outputs);
 
     std::vector<double> diffOutput;
     if (layerOutput.outputs.size() > 0 && nodeOutput.outputs.size() > 0)
@@ -354,12 +354,12 @@ void WriteModelReport(std::ostream& reportStream, const OutputInfo& layerOutput,
             diffOutput[index] = layerOutput.outputs[index] - nodeOutput.outputs[index];
         }
     }
-    VectorStats diffStats(diffOutput);
+    VectorStatistics diffStats(diffOutput);
 
-    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "min", [](const VectorStats& s) { return s.Min(); });
-    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "max", [](const VectorStats& s) { return s.Max(); });
-    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "mean", [](const VectorStats& s) { return s.Mean(); });
-    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "stdDev", [](const VectorStats& s) { return s.StdDev(); });
+    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "min", [](const VectorStatistics& s) { return s.Min(); });
+    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "max", [](const VectorStatistics& s) { return s.Max(); });
+    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "mean", [](const VectorStatistics& s) { return s.Mean(); });
+    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "stdDev", [](const VectorStatistics& s) { return s.StdDev(); });
 
     reportStream << "</table>\n";
     reportStream << "</div>\n";
@@ -409,8 +409,8 @@ void WriteLayerReport(std::ostream& reportStream, int index, const nodes::Neural
     }
     reportStream << "</tr>\n";
 
-    VectorStats layerStats(layerOutput.outputs);
-    VectorStats nodeStats(nodeOutput.outputs);
+    VectorStatistics layerStats(layerOutput.outputs);
+    VectorStatistics nodeStats(nodeOutput.outputs);
 
     std::vector<double> diffOutput;
     if (layerOutput.outputs.size() > 0 && nodeOutput.outputs.size() > 0)
@@ -424,12 +424,12 @@ void WriteLayerReport(std::ostream& reportStream, int index, const nodes::Neural
             diffOutput[index] = layerOutput.outputs[index] - nodeOutput.outputs[index];
         }
     }
-    VectorStats diffStats(diffOutput);
+    VectorStatistics diffStats(diffOutput);
 
-    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "min", [](const VectorStats& s) { return s.Min(); });
-    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "max", [](const VectorStats& s) { return s.Max(); });
-    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "mean", [](const VectorStats& s) { return s.Mean(); });
-    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "stdDev", [](const VectorStats& s) { return s.StdDev(); });
+    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "min", [](const VectorStatistics& s) { return s.Min(); });
+    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "max", [](const VectorStatistics& s) { return s.Max(); });
+    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "mean", [](const VectorStatistics& s) { return s.Mean(); });
+    WriteStatsRow(reportStream, layerStats, nodeStats, diffStats, "stdDev", [](const VectorStatistics& s) { return s.StdDev(); });
 
     reportStream << "</table>\n";
     reportStream << "</div>\n";

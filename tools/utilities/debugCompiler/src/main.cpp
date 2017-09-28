@@ -133,7 +133,11 @@ int main(int argc, char* argv[])
         {
             std::string graphFileName = utilities::JoinPaths(compareArguments.outputDirectory, "graph.dgml");
             std::ofstream graphStream(graphFileName);
-            comparison.SaveGraph(graphStream);
+            comparison.SaveDgml(graphStream);
+
+            std::string dotFileName = utilities::JoinPaths(compareArguments.outputDirectory, "graph.dot");
+            std::ofstream dotStream(dotFileName);
+            comparison.SaveDot(dotStream);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

@@ -1,19 +1,20 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     DebugNetUtils.cpp (debugNet)
+//  File:     VectorStatistics.tcc (debugCompiler)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "VectorStats.h"
+#include "VectorStatistics.h"
 
 #include <algorithm>
+#include <cassert>
 //
-// VectorStats class
+// VectorStatistics class
 //
 template <typename ValueType>
-VectorStats::VectorStats(const std::vector<ValueType>& vec)
+VectorStatistics::VectorStatistics(const std::vector<ValueType>& vec)
 {
     if (vec.size() == 0)
     {
@@ -47,7 +48,7 @@ VectorStats::VectorStats(const std::vector<ValueType>& vec)
 }
 
 template <typename ValueType>
-double VectorStats::Diff(const std::vector<ValueType>& vec1, const std::vector<ValueType>& vec2)
+double VectorStatistics::Diff(const std::vector<ValueType>& vec1, const std::vector<ValueType>& vec2)
 {
     ValueType error = 0;
     for (size_t i = 0, len1 = vec1.size(), len2 = vec2.size(); i < len1 || i < len2; i++)

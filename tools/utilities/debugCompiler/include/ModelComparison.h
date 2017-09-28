@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "DgmlGraph.h"
+#include "Graph.h"
 #include "IRExecutionEngine.h"
 
 // model
@@ -44,7 +44,9 @@ public:
 
     void WriteReport(std::ostream& outputStream, std::string modelName, std::string testDataName);
 
-    void SaveGraph(std::ostream& stm);
+    void SaveDgml(std::ostream& stm);
+
+    void SaveDot(std::ostream& stm);
 
     template <typename ValueType>
     void AddLayer(const char* label, const ValueType* output);
@@ -77,7 +79,7 @@ private:
     void WriteLayerNodeDetail(std::ostream& outputStream, const ell::nodes::NeuralNetworkLayerNodeBase<ValueType>* layerNode);
     
     bool _addingReference;
-    DgmlGraph _graph;
+    ell::utilities::Graph _graph;
     std::map<std::string, std::string> _nodeMap; // map id of reference node to compiled node.
     std::map<std::string, size_t> _outputSizes;
     model::DynamicMap _referenceMap;

@@ -15,5 +15,6 @@ if(${PYTHONLIBS_FOUND})
         configure_file(${FILE} ${FILE} COPYONLY)
     endforeach()
 
+    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/packages/ell")
 endif()
 

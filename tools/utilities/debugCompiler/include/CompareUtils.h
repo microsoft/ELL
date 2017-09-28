@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "VectorStats.h"
+#include "VectorStatistics.h"
 
 // utilities
 #include "Exception.h"
@@ -117,7 +117,7 @@ void WriteModelReport(std::ostream& reportStream, const OutputInfo& layerOutput,
 void WriteLayerReport(std::ostream& reportStream, int index, const ell::model::Node* layerNode, const OutputInfo& layerOutput, const OutputInfo& nodeOutput);
 
 template <typename FunctionType>
-void WriteStatsRow(std::ostream& reportStream, const VectorStats& layerStats, const VectorStats& nodeStats, const VectorStats& diffStats, const std::string& header, FunctionType getValueFunction);
+void WriteStatsRow(std::ostream& reportStream, const VectorStatistics& layerStats, const VectorStatistics& nodeStats, const VectorStatistics& diffStats, const std::string& header, FunctionType getValueFunction);
 
 void WriteReportFooter(std::ostream& reportStream);
 

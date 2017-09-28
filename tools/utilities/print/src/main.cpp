@@ -19,6 +19,7 @@
 #include "Exception.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "OutputStreamImpostor.h"
+#include "StringUtil.h"
 
 // model
 #include "Model.h"
@@ -27,6 +28,7 @@
 #include <iostream>
 
 using namespace ell;
+using namespace ell::utilities;
 
 bool IsNeuralNetworkPredictorNode(const ell::model::Node* node)
 {
@@ -89,9 +91,10 @@ int main(int argc, char* argv[])
 
         // print model
         utilities::OutputStreamImpostor out = printArguments.outputStream;
-        if (printArguments.outputFormat == "dgml")
+        auto lowerOutputFormat = ToLowercase(printArguments.outputFormat);
+        if (lowerOutputFormat == "dgml" || lowerOutputFormat == "dot")
         {
-            PrintGraph(map.GetModel(), out);
+            PrintGraph(map.GetModel(), lowerOutputFormat, out);
         }
         else
         {

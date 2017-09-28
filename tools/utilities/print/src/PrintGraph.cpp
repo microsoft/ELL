@@ -14,7 +14,7 @@
 #include "OutputStreamImpostor.h"
 
 // model
-#include "DgmlGraph.h"
+#include "Graph.h"
 #include "InputPort.h"
 #include "Model.h"
 #include "NeuralNetworkPredictorNode.h"
@@ -22,24 +22,26 @@
 #include <iostream>
 #include <string>
 
+using namespace ell::utilities;
+
 namespace ell
 {
 extern std::string PaddingSchemeToString(ell::predictors::neural::PaddingScheme scheme);
 
-void PrintGraph(const model::Model& model, std::ostream& out)
+void PrintGraph(const model::Model& model, const std::string& outputFormat, std::ostream& out)
 {
     // dump DGML graph of model
-    DgmlGraph graph;
+    Graph graph;
     model.Visit([&](const model::Node& node) {
         std::string typeName = node.GetRuntimeTypeName();
-        DgmlNode childNode = graph.GetOrCreateNode(to_string(node.GetId()), typeName);
+        GraphNode& childNode = graph.GetOrCreateNode(to_string(node.GetId()), typeName);
 
         if (typeName == "NeuralNetworkPredictorNode<float>")
         {
             const ell::nodes::NeuralNetworkPredictorNode<float>& predictorNode = dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<float>&>(node);
             auto predictor = predictorNode.GetPredictor();
             auto layers = predictor.GetLayers();
-            DgmlNode& previousLayer = childNode;
+            GraphNode& previousLayer = childNode;
             int layerId = 0;
             for (auto ptr = layers.begin(), end = layers.end(); ptr != end; ptr++, layerId++)
             {
@@ -48,7 +50,7 @@ void PrintGraph(const model::Model& model, std::ostream& out)
                 auto shape = params.outputShape;
                 auto input = params.input;
                 std::string layerName = layer->GetRuntimeTypeName();
-                DgmlNode& layerNode = graph.GetOrCreateNode(layerName + "(" + std::to_string(layerId) + ")", layerName);
+                GraphNode& layerNode = graph.GetOrCreateNode(layerName + "(" + std::to_string(layerId) + ")", layerName);
 
                 std::vector<NameValue> result = InspectLayerParameters<float>(layer);
                 for (auto ptr = result.begin(), end = result.end(); ptr != end; ptr++)
@@ -69,13 +71,20 @@ void PrintGraph(const model::Model& model, std::ostream& out)
                 const model::Node* upstream = *ptr;
                 if (upstream != nullptr)
                 {
-                    DgmlNode& nextNode = graph.GetOrCreateNode(to_string(upstream->GetId()), upstream->GetRuntimeTypeName());
+                    GraphNode& nextNode = graph.GetOrCreateNode(to_string(upstream->GetId()), upstream->GetRuntimeTypeName());
                     graph.GetOrCreateLink(childNode, nextNode, "");
                 }
             }
         }
     });
 
-    graph.Save(out);
+    if (outputFormat == "dgml")
+    {
+        graph.SaveDgml(out);
+    }
+    else
+    {
+        graph.SaveDot(out);
+    }
 }
 }

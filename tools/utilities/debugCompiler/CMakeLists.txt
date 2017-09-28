@@ -17,12 +17,12 @@ set (include
   include/CompareArguments.h
   include/CompareUtils.h
   include/ModelComparison.h
-  include/VectorStats.h
+  include/VectorStatistics.h
 )
     
 set (tcc 
   tcc/CompareUtils.tcc
-  tcc/VectorStats.tcc
+  tcc/VectorStatistics.tcc
 )
 
 source_group("src" FILES ${src})
