@@ -28,12 +28,12 @@ namespace nodes
         auto scaleValuesNode = transformer.AddNode<ConstantNode<ValueType>>(scaleValues);
         auto biasValuesNode = transformer.AddNode<ConstantNode<ValueType>>(); // nothing
 
-        size_t dimension = 2;
+        const size_t channelDimension = 2;
         auto computeNode = transformer.AddNode<BroadcastLinearFunctionNode<ValueType>>(newInput,
                                                                                        this->GetInputMemoryLayout(),
                                                                                        scaleValuesNode->output,
                                                                                        biasValuesNode->output,
-                                                                                       dimension,
+                                                                                       channelDimension,
                                                                                        this->GetOutputMemoryLayout());
         transformer.MapNodeOutput(this->output, computeNode->output);
         return true;

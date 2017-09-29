@@ -65,27 +65,25 @@ namespace nodes
     // BroadcastLinearFunction
     //
     template <typename ValueType>
-    ValueType BroadcastLinearFunction<ValueType>::Compute(ValueType x, ValueType a, ValueType b) const
+    ValueType BroadcastLinearFunction<ValueType>::Compute(ValueType x, ValueType scale, ValueType bias) const
     {
-        return a * x + b;
+        return scale * x + bias;
     }
 
     template <typename ValueType>
-    llvm::Value* BroadcastLinearFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* a, llvm::Value* b) const
+    llvm::Value* BroadcastLinearFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* scale, llvm::Value* bias) const
     {
-        if (a == nullptr) // bias only
+        if (scale == nullptr) // bias only
         {
-            return function.Operator(emitters::GetAddForValueType<ValueType>(), x, b);
+            return function.Operator(emitters::GetAddForValueType<ValueType>(), x, bias);
         }
-        else if (b == nullptr) // scale only
+        else if (bias == nullptr) // scale only
         {
-            return function.Operator(emitters::GetMultiplyForValueType<ValueType>(), a, x);
+            return function.Operator(emitters::GetMultiplyForValueType<ValueType>(), scale, x);
         }
         else
         {
-            assert(a != nullptr);
-            assert(b != nullptr);
-            return function.Operator(emitters::GetAddForValueType<ValueType>(), function.Operator(emitters::GetMultiplyForValueType<ValueType>(), a, x), b);
+            return function.Operator(emitters::GetAddForValueType<ValueType>(), function.Operator(emitters::GetMultiplyForValueType<ValueType>(), scale, x), bias);
         }
     }
 
@@ -686,12 +684,12 @@ namespace nodes
     void BroadcastLinearFunctionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto primaryInputElements = transformer.TransformPortElements(primaryInput.GetPortElements());
-        auto secondaryInput1Elements = transformer.TransformPortElements(secondaryInput1.GetPortElements());
-        auto secondaryInput2Elements = transformer.TransformPortElements(secondaryInput2.GetPortElements());
+        auto scaleInputElements = transformer.TransformPortElements(secondaryInput1.GetPortElements());
+        auto biasInputElements = transformer.TransformPortElements(secondaryInput2.GetPortElements());
         auto newNode = transformer.AddNode<BroadcastLinearFunctionNode<ValueType>>(primaryInputElements,
                                                                                    this->GetInputLayout(),
-                                                                                   secondaryInput1Elements,
-                                                                                   secondaryInput2Elements,
+                                                                                   scaleInputElements,
+                                                                                   biasInputElements,
                                                                                    this->GetBroadcastDimension(),
                                                                                    this->GetOutputLayout());
         transformer.MapNodeOutput(output, newNode->output);
@@ -708,26 +706,26 @@ namespace nodes
     bool BroadcastLinearFunctionNode<ValueType>::HasSimpleConstantSecondaryInputs() const
     {
         // First verify our inputs are compatible
-        int secondaryInput1Size = secondaryInput1.Size();
-        int secondaryInput2Size = secondaryInput2.Size();
+        int scaleInputSize = secondaryInput1.Size();
+        int biasInputSize = secondaryInput2.Size();
 
-        if (secondaryInput1Size > 0 && secondaryInput2Size > 0 && secondaryInput1Size != secondaryInput2Size)
+        if (scaleInputSize > 0 && biasInputSize > 0 && scaleInputSize != biasInputSize)
         {
             return false; // sizes incompatible
         }
 
-        const auto& el1 = secondaryInput1.GetPortElements();
-        const auto& el2 = secondaryInput2.GetPortElements();
+        const auto& scaleElements = secondaryInput1.GetPortElements();
+        const auto& biasElements = secondaryInput2.GetPortElements();
 
-        if (!el1.IsFullPortOutput() || !el2.IsFullPortOutput())
+        if (!scaleElements.IsFullPortOutput() || !biasElements.IsFullPortOutput())
         {
             return false; // we require all inputs to a port to come from the same place (though we could relax this requirement in the future, perhaps)
         }
 
-        const ConstantNode<ValueType>* secondaryInput1Node = secondaryInput1Size == 0 ? nullptr : dynamic_cast<const ConstantNode<ValueType>*>(el1.GetElement(0).ReferencedPort()->GetNode());
-        const ConstantNode<ValueType>* secondaryInput2Node = secondaryInput2Size == 0 ? nullptr : dynamic_cast<const ConstantNode<ValueType>*>(el2.GetElement(0).ReferencedPort()->GetNode());
+        const ConstantNode<ValueType>* scaleInputNode = scaleInputSize == 0 ? nullptr : dynamic_cast<const ConstantNode<ValueType>*>(scaleElements.GetElement(0).ReferencedPort()->GetNode());
+        const ConstantNode<ValueType>* biasInputNode = biasInputSize == 0 ? nullptr : dynamic_cast<const ConstantNode<ValueType>*>(biasElements.GetElement(0).ReferencedPort()->GetNode());
 
-        if (secondaryInput1Node == nullptr && secondaryInput2Node == nullptr)
+        if (scaleInputNode == nullptr && biasInputNode == nullptr)
         {
             return false; // need at least one secondary input
         }
@@ -744,13 +742,13 @@ namespace nodes
             return false;
         }
 
-        const auto& el1 = primaryInput.GetPortElements();
-        if (!el1.IsFullPortOutput())
+        const auto& primaryElements = primaryInput.GetPortElements();
+        if (!primaryElements.IsFullPortOutput())
         {
             return false; // we require all inputs to a port to come from the same place (though we could relax this requirement in the future, perhaps)
         }
 
-        const BroadcastLinearFunctionNode<ValueType>* primaryInputNode = dynamic_cast<const BroadcastLinearFunctionNode<ValueType>*>(el1.GetElement(0).ReferencedPort()->GetNode());
+        const BroadcastLinearFunctionNode<ValueType>* primaryInputNode = dynamic_cast<const BroadcastLinearFunctionNode<ValueType>*>(primaryElements.GetElement(0).ReferencedPort()->GetNode());
         if (primaryInputNode == nullptr)
         {
             return false; // primary input must be another linear function
@@ -780,75 +778,89 @@ namespace nodes
     template <typename ValueType>
     typename BroadcastLinearFunctionNode<ValueType>::LinearCoeffNodes BroadcastLinearFunctionNode<ValueType>::GetConstantSecondaryInputNodes() const
     {
-        const auto& el1 = secondaryInput1.GetPortElements();
-        const auto& el2 = secondaryInput2.GetPortElements();
+        const auto& scaleElements = secondaryInput1.GetPortElements();
+        const auto& biasElements = secondaryInput2.GetPortElements();
 
-        if (!el1.IsFullPortOutput() || !el2.IsFullPortOutput())
+        if ((scaleElements.Size() != 0 && !scaleElements.IsFullPortOutput()) || (biasElements.Size() != 0 && !biasElements.IsFullPortOutput()))
         {
-            return { nullptr, nullptr }; // we require all inputs to a port to come from the same place (though we could relax this requirement in the future, perhaps)
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Combined linear function coefficients must be full port output");
         }
 
-        int secondaryInput1Size = el1.Size();
-        int secondaryInput2Size = el2.Size();
-        if (secondaryInput1Size > 0 && secondaryInput2Size > 0 && secondaryInput1Size != secondaryInput2Size)
+        int scaleInputSize = scaleElements.Size();
+        int biasInputSize = biasElements.Size();
+        if (scaleInputSize > 0 && biasInputSize > 0 && scaleInputSize != biasInputSize)
         {
-            return { nullptr, nullptr };
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Combined linear function coefficients must have same size");
         }
 
-        const ConstantNode<ValueType>* secondaryInput1Node = secondaryInput1Size == 0 ? nullptr : dynamic_cast<const ConstantNode<ValueType>*>(el1.GetElement(0).ReferencedPort()->GetNode());
-        const ConstantNode<ValueType>* secondaryInput2Node = secondaryInput2Size == 0 ? nullptr : dynamic_cast<const ConstantNode<ValueType>*>(el2.GetElement(0).ReferencedPort()->GetNode());
+        const ConstantNode<ValueType>* scaleInputNode = scaleInputSize == 0 ? nullptr : dynamic_cast<const ConstantNode<ValueType>*>(scaleElements.GetElement(0).ReferencedPort()->GetNode());
+        const ConstantNode<ValueType>* biasInputNode = biasInputSize == 0 ? nullptr : dynamic_cast<const ConstantNode<ValueType>*>(biasElements.GetElement(0).ReferencedPort()->GetNode());
 
-        return { secondaryInput1Node, secondaryInput2Node };
+        return { scaleInputNode, biasInputNode };
     }
 
     template <typename ValueType>
     void BroadcastLinearFunctionNode<ValueType>::GetCombinedLinearCoeffs(const BroadcastLinearFunctionNode<ValueType>& prevNode, std::vector<ValueType>& scale, std::vector<ValueType>& bias) const
     {
+        // Here, we have two linear functions, f1(x) = s1*x + b1; f2(x) = s2*x + b2
+        // and we want to find their composition f' = s'*x + b' = f2(f1(x)) = (f2 * f1)(x) = s2*(s1*x + b1) + b2 = s1*s2*x + (b1*s2 + b2)
+        // (Where `prevNode` is the node computing f1, and `this` is the node representing f2)
+
         auto prevSecondaryInputs = prevNode.GetConstantSecondaryInputNodes();
         auto thisSecondaryInputs = GetConstantSecondaryInputNodes();
 
-        if (thisSecondaryInputs.scaleNode == nullptr)
+        // Compute the combined scale, s' = s1*s2
+        if (prevSecondaryInputs.scaleNode == nullptr && thisSecondaryInputs.scaleNode == nullptr) // s1 == 1, s2 == 1, so s' = 1
         {
-            scale = prevSecondaryInputs.scaleNode->GetValues();
+            scale.resize(0); // signal there's no scale (scale = 1)
         }
-        else if (prevSecondaryInputs.scaleNode == nullptr)
+        else if (prevSecondaryInputs.scaleNode == nullptr) // s1 == 1, so s' = s2
         {
-            scale = thisSecondaryInputs.scaleNode->GetValues();
+            scale = thisSecondaryInputs.scaleNode->GetValues(); // s2
         }
-        else
+        else if (thisSecondaryInputs.scaleNode == nullptr) // s2 == 1, so s' = s1,
         {
-            scale = prevSecondaryInputs.scaleNode->GetValues();
-            const auto& thisScaleValues = thisSecondaryInputs.scaleNode->GetValues();
+            scale = prevSecondaryInputs.scaleNode->GetValues(); // s1
+        }
+        else // s' = s1*s2*x
+        {
+            scale = prevSecondaryInputs.scaleNode->GetValues(); // scale = s1
+            const auto& s2 = thisSecondaryInputs.scaleNode->GetValues();
+            assert(s2.size() == scale.size());
             for (int index = 0; index < scale.size(); ++index)
             {
-                scale[index] *= thisScaleValues[index];
+                scale[index] *= s2[index];
             }
         }
 
-        if (prevSecondaryInputs.biasNode == nullptr)
+        // Now compute the combined bias, b' = (b1*s2) + b2
+        if (prevSecondaryInputs.biasNode == nullptr && thisSecondaryInputs.biasNode == nullptr) // b1 == 0, b2 == 0, so b' == 0
         {
-            if (thisSecondaryInputs.biasNode != nullptr)
-            {
-                bias = thisSecondaryInputs.biasNode->GetValues();
-            }
+            bias.resize(0); // signal there's no bias (bias = 0)
         }
-        else
+        else if (prevSecondaryInputs.biasNode == nullptr) // b1 == 0, so b' = b2
         {
-            bias = prevSecondaryInputs.biasNode->GetValues();
-            if (thisSecondaryInputs.scaleNode != nullptr)
+            bias = thisSecondaryInputs.biasNode->GetValues(); // b2
+        }
+        else // b' = (b1*s2) + b1 (but s2 may be 1, and b1 may be zero)
+        {
+            bias = prevSecondaryInputs.biasNode->GetValues(); // bias == b1
+            if (thisSecondaryInputs.scaleNode != nullptr) // if s2 is present, set bias = bias*s2
             {
-                const auto& thisScaleValues = thisSecondaryInputs.scaleNode->GetValues();
+                const auto& s2 = thisSecondaryInputs.scaleNode->GetValues();
+                assert(s2.size() == bias.size());
                 for (int index = 0; index < bias.size(); ++index)
                 {
-                    bias[index] *= thisScaleValues[index];
+                    bias[index] *= s2[index];
                 }
             }
-            if (thisSecondaryInputs.biasNode != nullptr)
+
+            if (thisSecondaryInputs.biasNode == nullptr) // b2 == 0, so b' = b1*s2, but perhaps s2 == 1
             {
-                const auto& thisBiasValues = thisSecondaryInputs.biasNode->GetValues();
+                const auto& b2 = thisSecondaryInputs.biasNode->GetValues(); // now add b2
                 for (int index = 0; index < bias.size(); ++index)
                 {
-                    bias[index] += thisBiasValues[index];
+                    bias[index] += b2[index];
                 }
             }
         }
@@ -871,12 +883,12 @@ namespace nodes
         // Now, we just want to get the primaryInput elements of _that_ node
         auto prevNode = dynamic_cast<const BroadcastLinearFunctionNode<ValueType>*>(primaryInputElements.GetElement(0).ReferencedPort()->GetNode());
         assert(prevNode != nullptr);
-        auto prevPrimaryInputElements = prevNode->primaryInput.GetPortElements();
 
         std::vector<ValueType> newScale;
         std::vector<ValueType> newBias;
         GetCombinedLinearCoeffs(*prevNode, newScale, newBias);
 
+        auto prevPrimaryInputElements = prevNode->primaryInput.GetPortElements();
         auto scaleValuesNode = transformer.AddNode<ConstantNode<ValueType>>(newScale);
         auto biasValuesNode = transformer.AddNode<ConstantNode<ValueType>>(newBias);
         auto newNode = transformer.AddNode<BroadcastLinearFunctionNode<ValueType>>(prevPrimaryInputElements,

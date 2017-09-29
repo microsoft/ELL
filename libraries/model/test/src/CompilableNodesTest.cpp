@@ -1532,7 +1532,7 @@ void TestNeuralNetworkPredictorNode7()
     const Shape inputSize = { 224, 224, 3 };
     const Shape paddedInputSize = { 226, 226, 3 };
 
-    // Input Layer
+    // Input layer
     InputParameters inputParams{ inputSize, NoPadding(), paddedInputSize, ZeroPadding(1), 1.0 };
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
@@ -2246,4 +2246,68 @@ void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     auto computeNode = model.AddNode<nodes::SoftmaxLayerNode<ElementType>>(inputNode->output, layer);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
+}
+
+void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
+{
+    // Create a simple neural net model with the following layers:
+    // input -> scaling -> bias
+    using ElementType = double;
+    using InputParameters = typename InputLayer<ElementType>::InputParameters;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
+
+    // Build a net
+    typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
+    typename NeuralNetworkPredictor<ElementType>::Layers layers;
+    Layer<ElementType>::Shape dataShape = {rows, columns, channels };
+    auto dataSize = rows * columns * channels;
+
+    // Input layer
+    InputParameters inputParams = { dataShape, NoPadding(), dataShape, NoPadding() };
+    inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
+
+    LayerParameters layerParameters{ inputLayer->GetOutput(), NoPadding(), dataShape, NoPadding() };
+    
+    // Set up initial bias layer
+    layerParameters = { inputLayer->GetOutput(), NoPadding(), dataShape, NoPadding() };
+    VectorType bias1(channels);
+    FillRandomVector(bias1);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
+
+    // Set up scaling layer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), dataShape, NoPadding() };
+    VectorType scale1(channels);
+    FillRandomVector(scale1);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scale1)));
+    
+    // Set up bias layer
+    layerParameters = { layers.back()->GetOutput(), NoPadding(), dataShape, NoPadding() };
+    VectorType bias2(channels);
+    FillRandomVector(bias2);
+    layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias2)));
+
+    NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
+    std::vector<ElementType> input(rows*columns*channels);
+    FillRandomVector(input);
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(GetShapeSize(neuralNetwork.GetInputShape()));
+    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<double>>(inputNode->output, neuralNetwork);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    settings.fuseLinearFunctionNodes = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    // compare output
+    std::vector<std::vector<double>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, "Fused linear layers");
 }

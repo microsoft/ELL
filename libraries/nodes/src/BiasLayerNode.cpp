@@ -24,16 +24,16 @@ namespace nodes
     bool BiasLayerNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newInput = transformer.TransformPortElements(this->input.GetPortElements());
-        auto scaleValuesNode = transformer.AddNode<ConstantNode<ValueType>>(); // nothing
         auto biasValues = this->_layer.GetBias().ToArray();
+        auto scaleValuesNode = transformer.AddNode<ConstantNode<ValueType>>(); // nothing
         auto biasValuesNode = transformer.AddNode<ConstantNode<ValueType>>(biasValues);
 
-        const size_t dimension = 2;
+        const size_t channelDimension = 2;
         auto computeNode = transformer.AddNode<BroadcastLinearFunctionNode<ValueType>>(newInput,
                                                                                        this->GetInputMemoryLayout(),
                                                                                        scaleValuesNode->output,
                                                                                        biasValuesNode->output,
-                                                                                       dimension,
+                                                                                       channelDimension,
                                                                                        this->GetOutputMemoryLayout());
         transformer.MapNodeOutput(this->output, computeNode->output);
         return true;

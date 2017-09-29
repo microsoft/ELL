@@ -104,6 +104,8 @@ void TestIRCompiler()
     // TestNeuralNetworkPredictorNode5(); // Currently fails (but just barely...)
     // TestNeuralNetworkPredictorNode6();
 
+    TestFusedLinearLayerNodes(4, 6, 8);
+
     // TestInputLayerNode(0);
     TestInputLayerNode(1);
 

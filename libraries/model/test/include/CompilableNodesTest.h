@@ -78,3 +78,4 @@ void TestMaxPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_
 void TestMeanPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPadding = 0, size_t outputPadding = 0);
 void TestScalingLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestSoftmaxLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
+void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels);
