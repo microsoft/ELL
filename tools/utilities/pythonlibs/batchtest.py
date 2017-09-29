@@ -115,7 +115,7 @@ class ModelTester(demoHelper.DemoHelper):
             return False
 
         if self.image_folder is None or not os.path.isdir(self.image_folder):
-            print("image --folder % not found" % (self.image_folder))
+            print("image --folder %s not found" % (self.image_folder))
             return False
 
         self.val_map_dir = os.path.dirname(args.truth)
