@@ -6,7 +6,7 @@ permalink: /gallery/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 160x160x3 Convolutional Neural Network (57.12% top 1 accuracy, 80.22% top 5 accuracy, 0.32s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 160x160x3 Convolutional Neural Network (59.01% top 1 accuracy, 81.74% top 5 accuracy, 0.30s/frame on Raspberry Pi 3)
 
 <table>
     <tr>
@@ -15,11 +15,11 @@ permalink: /gallery/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A
     </tr>
     <tr>
         <td> Accuracy </td>
-        <td colspan="3"> ILSVRC2012: 80.22% (Top 5), 57.12% (Top 1) </td>
+        <td colspan="3"> ILSVRC2012: 81.74% (Top 5), 59.01% (Top 1) </td>
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.32s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.33s/frame<br>DragonBoard 410c @ 1.2GHz: 0.17s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.30s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.33s/frame<br>DragonBoard 410c @ 1.2GHz: 0.18s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
@@ -34,72 +34,72 @@ permalink: /gallery/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A
         <tr class="table-row-condensed">
 	<td>Convolution</td>
 	<td>&#8680; 160x160x16</td>
-	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+	<td>size=3x3, stride=1, type=float32, activation=relu</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Pooling</td>
-	<td>&#8680; 82x82x16</td>
+	<td>&#8680; 80x80x16</td>
 	<td>size=2x2, stride=2, operation=max</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Convolution</td>
 	<td>&#8680; 80x80x64</td>
-	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+	<td>size=3x3, stride=1, type=float32, activation=relu</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Pooling</td>
-	<td>&#8680; 42x42x64</td>
+	<td>&#8680; 40x40x64</td>
 	<td>size=2x2, stride=2, operation=max</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Convolution</td>
 	<td>&#8680; 40x40x64</td>
-	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+	<td>size=3x3, stride=1, type=float32, activation=relu</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Pooling</td>
-	<td>&#8680; 22x22x64</td>
+	<td>&#8680; 20x20x64</td>
 	<td>size=2x2, stride=2, operation=max</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Convolution</td>
 	<td>&#8680; 20x20x128</td>
-	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+	<td>size=3x3, stride=1, type=float32, activation=relu</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Pooling</td>
-	<td>&#8680; 12x12x128</td>
+	<td>&#8680; 10x10x128</td>
 	<td>size=2x2, stride=2, operation=max</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Convolution</td>
 	<td>&#8680; 10x10x256</td>
-	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+	<td>size=3x3, stride=1, type=float32, activation=relu</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Pooling</td>
-	<td>&#8680; 7x7x256</td>
+	<td>&#8680; 5x5x256</td>
 	<td>size=2x2, stride=2, operation=max</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Convolution</td>
 	<td>&#8680; 5x5x512</td>
-	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+	<td>size=3x3, stride=1, type=float32, activation=relu</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Pooling</td>
-	<td>&#8680; 5x5x512</td>
+	<td>&#8680; 3x3x512</td>
 	<td>size=2x2, stride=2, operation=max</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Convolution</td>
 	<td>&#8680; 3x3x1024</td>
-	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+	<td>size=3x3, stride=1, type=float32, activation=relu</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Convolution</td>
 	<td>&#8680; 3x3x1000</td>
-	<td>size=1x1, stride=1, type=float32</td>
+	<td>size=1x1, stride=1, type=float32, activation=relu</td>
 </tr>
 <tr class="table-row-condensed">
 	<td>Pooling</td>

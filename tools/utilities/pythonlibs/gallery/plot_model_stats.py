@@ -114,7 +114,7 @@ class PlotModelStats:
            reference: http://oco-carbon.com/metrics/find-pareto-frontiers-in-python/
         """
         # sort the values in ascending order, and apply a limit to x
-        values = sorted([[x[i], y[i], models[i]] for i in range(len(x)) if x[i] < max_x], reverse=False)
+        values = sorted([[float(x[i]), float(y[i]), models[i]] for i in range(len(x)) if float(x[i]) < max_x], reverse=False)
         frontier = [values[0]]
         for pair in values[1:]:
             if pair[1] >= frontier[-1][1]: # look for higher values of Y...
