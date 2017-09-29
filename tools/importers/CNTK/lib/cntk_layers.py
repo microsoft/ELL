@@ -84,6 +84,10 @@ class BaseLayer:
         raise NotImplementedError(
             "Error: subclasses must override this method")
 
+    def clone_cntk_layer(self, feature):
+        """Returns a shallow clone of the CNTK layer for operating on the given feature (input-variable) """
+        raise NotImplementedError(
+            "Error: subclasses must override this method")
 
 class DenseLayer(BaseLayer):
     """Logic for converting a CNTK Dense layer to ELL"""
@@ -152,6 +156,13 @@ class DenseLayer(BaseLayer):
                     ellLayers.append(ELL.FloatActivationLayer(
                         layerParameters, activationType))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+        weightsParameter = utilities.find_parameter_by_name(
+            self.layer.parameters, 'W', 0)
+        biasParameter = utilities.find_parameter_by_name(
+            self.layer.parameters, 'b', 1)
+        return Dense(self.layer.shape)(feature)
 
 class BinaryConvolutionLayer(BaseLayer):
     """Logic for converting a CNTK Binary Convolution layer to ELL"""
@@ -236,6 +247,20 @@ class BinaryConvolutionLayer(BaseLayer):
         ellLayers.append(ELL.FloatBinaryConvolutionalLayer(
             layerParameters, convolutionalParameters, weightsTensor))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+
+        weightsShape = self.weights_parameter.shape  # filters, channels, rows, columns
+        pad = self.attributes['autoPadding'][0] or (
+            self.attributes['autoPadding'][1] and self.attributes['autoPadding'][2])
+
+        # Bias is a separate layer and not processed by this class
+        # Activation is a separate layer and not processed by this class
+
+        x = CustomSign(x)
+        return BinaryConvolution((weightsShape[2], weightsShape[3]), num_filters=weightsShape[0],
+                                 channels=weightsShape[1], init=self.weights_parameter.value,
+                                 pad=pad, activation=False, bias=False, init_bias=0)(feature)
 
 class ConvolutionLayer(BaseLayer):
     """Logic for converting a CNTK Convolution layer to ELL"""
@@ -365,6 +390,31 @@ class ConvolutionLayer(BaseLayer):
                 ellLayers.append(ELL.FloatActivationLayer(
                     layerParameters, activationType))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+
+        activation = None
+        nodes = utilities.get_model_layers(self.layer.block_root)
+        if (utilities.find_node_by_op_name(nodes, 'ReLU') != None):
+            activation = relu
+        elif (utilities.find_node_by_op_name(nodes, 'Sigmoid') != None):
+            activation = sigmoid
+        elif (utilities.find_node_by_op_name(nodes, 'LeakyReLU') != None):
+            activation = leaky_relu
+
+        weightsShape = self.weights_parameter.shape
+        pad = self.attributes['autoPadding'][0] or (
+            self.attributes['autoPadding'][1] and self.attributes['autoPadding'][2])
+        bias = (self.bias_parameter is not None)
+
+        layer = Convolution((weightsShape[2], weightsShape[3]), weightsShape[0],
+                            pad=pad, activation=activation, bias=bias)(feature)
+
+        layer.parameters[0].value = self.weights_parameter.value
+        if bias:
+            layer.parameters[1].value = self.bias_parameter.value
+        return layer
+
 
 class LinearLayer(BaseLayer):
     """Logic for converting a CNTK Linear layer to ELL"""
@@ -431,6 +481,9 @@ class LinearLayer(BaseLayer):
                 ellLayers.append(ELL.FloatActivationLayer(
                     layerParameters, activationType))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+        raise NotImplementedError("Error: not yet implemented")
 
 class ElementTimesLayer(BaseLayer):
     """Logic for converting a CNTK ElementTimes layer to ELL"""
@@ -466,6 +519,12 @@ class ElementTimesLayer(BaseLayer):
         ellLayers.append(ELL.FloatScalingLayer(
             layerParameters, scalesVector))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+
+        x = reshape(feature, (self.layer.ell_outputShape.channels,))
+        return element_times(x, self.scale)
+
 
 class BasePoolingLayer(BaseLayer):
     """Common logic for converting a Pooling layer to ELL"""
@@ -491,6 +550,15 @@ class BasePoolingLayer(BaseLayer):
 
         return ELL.PaddingParameters(self.padding_scheme, padding)
 
+    def get_cntk_parameters(self):
+        pad = False        
+        if ('autoPadding' in self.attributes and True in self.attributes['autoPadding']):
+            pad = True
+        poolingSize = self.attributes['poolingWindowShape']
+        filterShape = (poolingSize[0], poolingSize[1])
+        stride = self.attributes['strides'][0]
+        return pad, filterShape, stride
+
     def process(self, ellLayers):
         """Appends the ELL representation of the current layer to ellLayers."""
 
@@ -508,6 +576,11 @@ class BasePoolingLayer(BaseLayer):
         ellLayers.append(ELL.FloatPoolingLayer(
             layerParameters, poolingParameters, self.pooling_type))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+
+        raise NotImplementedError(
+            "Error: subclasses must override this method")
 
 class MaxPoolingLayer(BasePoolingLayer):
     """Logic for converting a CNTK MaxPooling layer to ELL"""
@@ -519,6 +592,11 @@ class MaxPoolingLayer(BasePoolingLayer):
 
         super().__init__(layer)
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+
+        pad, filterShape, stride = self.get_cntk_parameters()
+        return MaxPooling(filterShape, strides=(stride, stride), pad=pad)(feature)
 
 class AveragePoolingLayer(BasePoolingLayer):
     """Logic for converting a CNTK AveragePooling layer to ELL"""
@@ -530,6 +608,11 @@ class AveragePoolingLayer(BasePoolingLayer):
 
         super().__init__(layer)
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop"""
+
+        pad, filterShape, stride = self.get_cntk_parameters()
+        return AveragePooling(filterShape, strides=(stride, stride), pad=pad)(feature)
 
 class PoolingLayer(BaseLayer):
     """Logic for converting a CNTK Pooling layer to ELL"""
@@ -550,6 +633,10 @@ class PoolingLayer(BaseLayer):
         """Appends the ELL representation of the current layer to ellLayers."""
         self.actual_layer.process(ellLayers)
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop"""
+
+        return self.actual_layer.clone_cntk_layer(feature)
 
 class ReLULayer(BaseLayer):
     """Logic for converting a CNTK ReLU layer to ELL"""
@@ -568,6 +655,11 @@ class ReLULayer(BaseLayer):
         # Create the ELL activation layer
         ellLayers.append(ELL.FloatActivationLayer(
             layerParameters, ELL.ActivationType.relu))
+
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+
+        return relu(feature)
 
 
 class LeakyReLULayer(BaseLayer):
@@ -588,6 +680,10 @@ class LeakyReLULayer(BaseLayer):
         ellLayers.append(ELL.FloatActivationLayer(
             layerParameters, ELL.ActivationType.leaky))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+
+        return leaky_relu(feature)
 
 class PReLULayer(BaseLayer):
     """Logic for converting a CNTK PReLU layer to ELL"""
@@ -612,6 +708,11 @@ class PReLULayer(BaseLayer):
         ellLayers.append(ELL.FloatPReLUActivationLayer(
             layerParameters, preluTensor))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+
+        return param_relu(self.prelu_parameter, feature)
+
 
 class SoftmaxLayer(BaseLayer):
     """Logic for converting a CNTK Softmax layer to ELL"""
@@ -635,6 +736,10 @@ class SoftmaxLayer(BaseLayer):
         # Create the ELL softmax layer
         ellLayers.append(ELL.FloatSoftmaxLayer(layerParameters))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+
+        return softmax(feature)
 
 class BatchNormalizationLayer(BaseLayer):
     """Logic for converting a CNTK BatchNormalization layer to ELL"""
@@ -691,6 +796,14 @@ class BatchNormalizationLayer(BaseLayer):
             middleLayerParameters, scaleVector))
         ellLayers.append(ELL.FloatBiasLayer(lastLayerParameters, biasVector))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+        scale = parameter(shape=self.scale.shape, init=self.scale.value, name='scale')
+        bias = parameter(shape=self.scale.shape, init=self.bias.value, name='bias')
+        run_mean = constant(shape=self.scale.shape, value=self.mean.value, name='aggregate_mean')
+        run_variance = constant(shape=self.scale.shape, value=self.variance.value, name='aggregate_variance')
+        run_count = constant(0, shape=(), name='aggregate_count')
+        return batch_normalization(feature, scale, bias, run_mean, run_variance, running_count=run_count, spatial=True)
 
 class BiasLayer(BaseLayer):
     """Logic for converting a CNTK Plus layer to ELL"""
@@ -715,6 +828,10 @@ class BiasLayer(BaseLayer):
 
         # Create the ELL bias layer
         ellLayers.append(ELL.FloatBiasLayer(layerParameters, biasVector))
+
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+        return plus(self.layer.parameters[0], feature)
 
 
 class NegativeBiasLayer(BaseLayer):
@@ -750,6 +867,9 @@ class NegativeBiasLayer(BaseLayer):
         # Create the ELL bias layer
         ellLayers.append(ELL.FloatBiasLayer(layerParameters, biasVector))
 
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+        return minus(feature, constant(self.layer.constants[0].value), name=self.layer.output.name)
 
 class LayerFactory():
     @staticmethod

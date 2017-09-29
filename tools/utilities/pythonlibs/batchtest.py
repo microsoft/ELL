@@ -289,7 +289,7 @@ class ModelTester(demoHelper.DemoHelper):
                 self.top1.record_result(matches, self.val_pos, prediction, topNProbability, expected_label)
             
             actual.append(label)
-            if matches and winner is None:
+            if matches:
                 winner = top
                 topNPrediction = prediction
                 topNProbability = top[1]
