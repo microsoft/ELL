@@ -26,3 +26,13 @@
     }
   }
 }
+
+
+// Condensed vertical row with padding
+
+.table-row-condensed {
+  > td {
+    padding-top: $row-condensed-cell-padding;
+    padding-bottom: $row-condensed-cell-padding;
+  }
+}

@@ -14,7 +14,7 @@ import json
 import matplotlib.pyplot as plt
 
 # local helpers
-import model_data_retriever
+import model_info_retriever as mir
 
 class PlotModelStats:
     def __init__(self):
@@ -101,13 +101,13 @@ class PlotModelStats:
     def get_stats(self):
         """Collects the statistics from the models"""
         for model in self.models:
-            try:
-                data_retriever = model_data_retriever.ModelDataRetriever(os.path.join(self.models_root, model), model)
-                accuracy = data_retriever.get_model_topN_accuracies()
-                speed = data_retriever.get_model_seconds_per_frame(self.platforms_symbols.keys())
-                self.model_stats.append({"model": model, "accuracy" : accuracy, "secs_per_frame" : speed})
-            except:
-                print("Could not collect stats for model '{}', skipping".format(model))
+            with mir.ModelInfoRetriever(os.path.join(self.models_root, model), model) as model_data:
+                try:
+                    accuracy = model_data.get_model_topN_accuracies()
+                    speed = model_data.get_model_seconds_per_frame(self.platforms_symbols.keys())
+                    self.model_stats.append({"model": model, "accuracy" : accuracy, "secs_per_frame" : speed})
+                except:
+                    print("Could not collect stats for model '{}', skipping".format(model))
 
     def pareto_frontier(self, x, y, models, max_x):
         """Takes two lists of x and y values, and return the sorted elements that lie on the Pareto frontier
