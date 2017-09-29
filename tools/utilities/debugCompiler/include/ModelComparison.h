@@ -36,7 +36,7 @@ class ModelComparison
 public:
     ModelComparison(std::string outputDirectory);
 
-    void Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize, bool allowVectorInstructions);
+    void Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize, bool allowVectorInstructions, bool fuseLinearOps);
 
     void SaveOutput(std::string name, const std::vector<float>& reference, const std::vector<float>& compiled);
 

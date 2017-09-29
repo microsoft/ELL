@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
         auto input = GetInputData<TestDataType>(map, compareArguments);
         ModelComparison comparison(compareArguments.outputDirectory);
-        comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize, compareArguments.allowVectorInstructions);
+        comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize, compareArguments.allowVectorInstructions, compareArguments.fuseLinearOperations);
 
         // Write summary report
         if (compareArguments.writeReport)

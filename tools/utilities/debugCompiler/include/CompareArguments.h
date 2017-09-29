@@ -37,6 +37,7 @@ struct CompareArguments
     bool optimize = true;
     bool useBlas = false;
     bool allowVectorInstructions = false;
+    bool fuseLinearOperations = true;
 };
 
 /// <summary> Arguments for parsed print. </summary>

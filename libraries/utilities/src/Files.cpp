@@ -224,7 +224,7 @@ namespace ell
                 // recurrsively walk up the path making sure all intermediate paths exist.
                 std::string dirName = GetFileName(path);
                 std::string parentPath = GetDirectoryPath(path);
-                if (dirName != "")
+                if (parentPath != "")
                 {
                     EnsureDirectoryExists(parentPath);
                 }

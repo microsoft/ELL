@@ -191,7 +191,7 @@ void ModelComparison::SetUpReferenceMap(model::DynamicMap& map)
     _referenceMap.Transform(transformFunc, addSinkNodeContext);
 }
 
-void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize, bool allowVectorInstructions)
+void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize, bool allowVectorInstructions, bool fuseLinearOps)
 {
     SetUpReferenceMap(reference);
     _addingReference = false;
@@ -203,6 +203,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
     settings.compilerSettings.useBlas = useBlas;
     settings.compilerSettings.allowVectorInstructions = allowVectorInstructions;
     settings.compilerSettings.optimize = optimize;
+    settings.fuseLinearFunctionNodes = fuseLinearOps;
     settings.profile = false;
     settings.compilerSettings.targetDevice.deviceName = "host";
 

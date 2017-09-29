@@ -122,7 +122,7 @@ class EllBuildTools:
         print("running opt...")
         self.run(args)
 
-    def compile(self, model_file, func_name, model_name, target, output_dir, profile=False):
+    def compile(self, model_file, func_name, model_name, target, output_dir, profile=False, fuseLinearOps=True):
         args = [self.compiler, 
                 "-imap", 
                 model_file,
@@ -132,6 +132,7 @@ class EllBuildTools:
                 "--swig", 
                 "--target", target, 
                 "-od", output_dir,
+                "--fuseLinearOps", str(fuseLinearOps)
                 ]
         args.append("--blas")
         hasBlas = target != "host" or (self.blas is not None and self.blas != "")
