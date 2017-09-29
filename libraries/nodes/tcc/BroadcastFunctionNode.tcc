@@ -855,7 +855,7 @@ namespace nodes
                 }
             }
 
-            if (thisSecondaryInputs.biasNode == nullptr) // b2 == 0, so b' = b1*s2, but perhaps s2 == 1
+            if (thisSecondaryInputs.biasNode != nullptr) // b2 == 0, so b' = b1*s2, but perhaps s2 == 1
             {
                 const auto& b2 = thisSecondaryInputs.biasNode->GetValues(); // now add b2
                 for (int index = 0; index < bias.size(); ++index)

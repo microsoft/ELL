@@ -51,8 +51,8 @@ namespace neural
             /// <summary> The padding requirements for the output. </summary>
             PaddingParameters outputPaddingParameters;
 
-            /// <summary> The scale factor to apply to each input value. Default is 1 (i.e. no scale). </summary>
-            ElementType scale = static_cast<ElementType>(1);
+            /// <summary> The scale factor to apply to each input value. Default is undefined. </summary>
+            ElementType scale;
         };
 
         /// <summary> Instantiates an instance of an input layer. </summary>

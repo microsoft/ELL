@@ -2268,7 +2268,7 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     auto dataSize = rows * columns * channels;
 
     // Input layer
-    InputParameters inputParams = { dataShape, NoPadding(), dataShape, NoPadding() };
+    InputParameters inputParams = { dataShape, NoPadding(), dataShape, NoPadding(), 1 };
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
     LayerParameters layerParameters{ inputLayer->GetOutput(), NoPadding(), dataShape, NoPadding() };
