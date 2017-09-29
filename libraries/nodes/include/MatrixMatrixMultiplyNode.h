@@ -8,6 +8,9 @@
 
 #pragma once
 
+// emitters
+#include "IRFunctionEmitter.h"
+
 // model
 #include "CompilableNode.h"
 #include "IRMapCompiler.h"
@@ -17,9 +20,6 @@
 #include "Node.h"
 #include "OutputPort.h"
 #include "PortElements.h"
-
-// emitters
-#include "IRFunctionEmitter.h"
 
 // utilities
 #include "Exception.h"

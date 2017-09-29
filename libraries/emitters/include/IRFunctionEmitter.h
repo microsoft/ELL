@@ -843,6 +843,16 @@ namespace emitters
         template <typename ValueType>
         void MemorySet(llvm::Value* pDestinationPointer, llvm::Value* pDestinationOffset, llvm::Value* value, int count);
 
+        /// <summary> Emits a memset call, which sets an array of memory to a given byte value. </summary>
+        ///
+        /// <typeparam name="ValueType"> The type of the array being set. </typeparam>
+        /// <param name="pDestinationPointer"> Pointer to the base address of the destination. </param>
+        /// <param name="destinationOffset"> Destination address offset. </param>
+        /// <param name="value"> The byte value being set. </param>
+        /// <param name="count"> Number of elements being set. </param>
+        template <typename ValueType>
+        void MemorySet(llvm::Value* pDestinationPointer, llvm::Value* pDestinationOffset, llvm::Value* value, llvm::Value* count);
+
         /// <summary> Inserts arbitrary function-level metadata into generated IR code. </summary>
         ///
         /// <param name="tag"> The tag of the metadata to set. </param>
@@ -949,6 +959,68 @@ namespace emitters
         template <typename ValueType>
         void ShiftAndUpdate(llvm::Value* pBuffer, int bufferSize, int shiftCount, llvm::Value* pNewData, llvm::Value* pShiftedData = nullptr);
 
+        /// <summary> Call the matrix-vector multiply routine that computes y = A*x </summary>
+        ///
+        /// <typeparam name="ValueType"> The datatype to use (must be `float` or `double`) </typeparam>
+        /// <param name="m"> The number of rows in the matrix A and the output vector y </param>
+        /// <param name="n"> The number of columns in the matrix A and the vector x </param>
+        /// <param name="A"> The matrix to multiply with a vector </param>
+        /// <param name="lda"> The stride of the matrix -- the number of elements between rows </param>
+        /// <param name="x"> The input vector x </param>
+        /// <param name="incx"> The increment between values of x </param>
+        /// <param name="y"> The output vector y </param>
+        /// <param name="incy"> The increment between values of y </param>
+        template <typename ValueType>
+        void CallGEMV(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy);
+        
+        /// <summary> Call the matrix-vector multiply routine that computes y = alpha*A*x + beta*y </summary>
+        ///
+        /// <typeparam name="ValueType"> The datatype to use (must be `float` or `double`) </typeparam>
+        /// <param name="m"> The number of rows in the matrix A and the output vector y </param>
+        /// <param name="n"> The number of columns in the matrix A and the vector x </param>
+        /// <param name="alpha"> The scalar to multiply with the A*x product </param>
+        /// <param name="A"> The matrix to multiply with a vector </param>
+        /// <param name="lda"> The stride of the matrix -- the number of elements between rows </param>
+        /// <param name="x"> The input vector x </param>
+        /// <param name="incx"> The increment between values of x </param>
+        /// <param name="beta"> The scalar to multiply with y before adding to the alpha*A*x product </param>
+        /// <param name="y"> The output vector y </param>
+        /// <param name="incy"> The increment between values of y </param>
+        template <typename ValueType>
+        void CallGEMV(int m, int n, ValueType alpha, llvm::Value* A, int lda, llvm::Value* x, int incx, ValueType beta, llvm::Value* y, int incy);
+
+        /// <summary> Call the matrix-matrix multiply routine that computes the matrix product C = A*B </summary>
+        ///
+        /// <typeparam name="ValueType"> The datatype to use (must be `float` or `double`) </typeparam>
+        /// <param name="m"> The number of rows in the matrix A and the output matrix  C </param>
+        /// <param name="n"> The number of columns in the matrix B and the output matrix C </param>
+        /// <param name="k"> The number of rows in the matrix A and columns in matrix B </param>
+        /// <param name="A"> The matrix to multiply on the left </param>
+        /// <param name="lda"> The stride of the matrix A -- the number of elements between rows </param>
+        /// <param name="B"> The matrix to multiply on the right </param>
+        /// <param name="ldb"> The stride of the matrix B -- the number of elements between rows </param>
+        /// <param name="C"> The result matrix </param>
+        /// <param name="ldc"> The stride of the matrix C -- the number of elements between rows </param>
+        template <typename ValueType>
+        void CallGEMM(int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc);
+
+        /// <summary> Call the matrix-matrix multiply routine that computes the matrix product C = A*B, but with potentially-transposed matrices </summary>
+        ///
+        /// <typeparam name="ValueType"> The datatype to use (must be `float` or `double`) </typeparam>
+        /// <param name="transposeA"> If `true`, use A' instead of A in the above equation </param>
+        /// <param name="transposeB"> If `true`, use B' instead of B in the above equation </param>
+        /// <param name="m"> The number of rows in the matrix A and the output matrix  C </param>
+        /// <param name="n"> The number of columns in the matrix B and the output matrix C </param>
+        /// <param name="k"> The number of rows in the matrix A and columns in matrix B </param>
+        /// <param name="A"> The matrix to multiply on the left </param>
+        /// <param name="lda"> The stride of the matrix A -- the number of elements between rows </param>
+        /// <param name="B"> The matrix to multiply on the right </param>
+        /// <param name="ldb"> The stride of the matrix B -- the number of elements between rows </param>
+        /// <param name="C"> The result matrix </param>
+        /// <param name="ldc"> The stride of the matrix C -- the number of elements between rows </param>
+        template <typename ValueType>
+        void CallGEMM(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc);
+
         /// <summary> Gets a pointer to the underlying llvm::Function. </summary>
         ///
         /// <returns> Pointer to an llvm::Function. </returns>
@@ -1047,6 +1119,8 @@ namespace emitters
         void RegisterFunctionArgs(const NamedVariableTypeList& args);
         void CompleteFunction(bool optimize = true);
         void CompleteFunction(IRFunctionOptimizer& optimizer);
+
+        bool CanUseBlas() const;
 
         llvm::Function* ResolveFunction(const std::string& name);
         llvm::Module* GetLLVMModule() { return _pFunction->getParent(); }

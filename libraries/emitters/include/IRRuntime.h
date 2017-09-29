@@ -43,18 +43,26 @@ namespace emitters
         //
 
         /// <summary> Get the sqrt function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
         llvm::Function* GetSqrtFunction();
 
         /// <summary> Get the abs function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
         llvm::Function* GetAbsFunction();
 
         /// <summary> Get the exp function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
         llvm::Function* GetExpFunction();
 
         /// <summary> Get the log function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
         llvm::Function* GetLogFunction();
 
@@ -63,24 +71,32 @@ namespace emitters
         //
 
         /// <summary> Get the dot product function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
         llvm::Function* GetDotProductFunction();
 
         //
-        // BLAS functions
+        // Matrix functions
         //
 
         /// <summary> Get the BLAS gemv function for the given type. </summary>
         ///
-        /// <typeparam name="ValueType"> The data type used (`float` or `double`) <typeparam>
+        /// <typeparam name="ValueType"> The data type used (`float` or `double`). <typeparam>
+        /// <param name="useBlas"> Indicates whether or not to use BLAS to perform the operation. <param>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetGEMVFunction();
+        llvm::Function* GetGEMVFunction(bool useBlas);
 
         /// <summary> Get the BLAS gemm function for the given type. </summary>
         ///
         /// <typeparam name="ValueType"> The data type used (`float` or `double`) <typeparam>
+        /// <param name="useBlas"> Indicates whether or not to use BLAS to perform the operation. <param>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
         template <typename ValueType>
-        llvm::Function* GetGEMMFunction();
+        llvm::Function* GetGEMMFunction(bool useBlas);
 
     private:
         std::string GetNamespacePrefix() const;
@@ -90,13 +106,13 @@ namespace emitters
         llvm::Function* GetExpFunction(VariableType argType);
         llvm::Function* GetLogFunction(VariableType argType);
 
-        llvm::Function* EmitDotProductFunction();
-        llvm::Function* EmitDotProductFunctionF();
+        llvm::Function* GetDotProductIntFunction();
+        llvm::Function* GetDotProductFloatFunction();
 
-        llvm::Function* GetSGEMVFunction();
-        llvm::Function* GetSGEMMFunction();
-        llvm::Function* GetDGEMVFunction();
-        llvm::Function* GetDGEMMFunction();
+        llvm::Function* GetSGEMVFunction(bool useBlas);
+        llvm::Function* GetSGEMMFunction(bool useBlas);
+        llvm::Function* GetDGEMVFunction(bool useBlas);
+        llvm::Function* GetDGEMMFunction(bool useBlas);
 
         llvm::Function* ResolveCurrentTimeFunction(llvm::StructType* timespecType);
 

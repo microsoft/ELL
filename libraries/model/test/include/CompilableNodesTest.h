@@ -42,6 +42,12 @@ void TestFloatNode();
 void TestMultipleOutputNodes();
 
 //
+// mathy nodes
+//
+void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas);
+void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas);
+
+//
 // NN layer nodes
 //
 void TestNeuralNetworkPredictorNode1();

@@ -43,6 +43,8 @@
 #include "ExtremalValueNode.h"
 #include "FullyConnectedLayerNode.h"
 #include "IRNode.h"
+#include "MatrixMatrixMultiplyNode.h"
+#include "MatrixVectorMultiplyNode.h"
 #include "MultiplexerNode.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "PoolingLayerNode.h"
@@ -867,6 +869,61 @@ void TestMultipleOutputNodes()
     auto storePos = result.find("store i32 224, i32* %rows, align 4");
     testing::ProcessTest("Testing GetOutputShape generation",
                          storePos != std::string::npos && inputFuncPos != std::string::npos && outputFuncpos != std::string::npos);
+}
+
+void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas)
+{
+    using ValueType = float;
+    std::vector<ValueType> vectorVals(n);
+    FillVector(vectorVals);
+
+    model::Model model;
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(m*n);
+    auto inputVectorNode = model.AddNode<nodes::ConstantNode<ValueType>>(vectorVals);
+
+    auto matVecMultNode = model.AddNode<nodes::MatrixVectorMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, n, inputVectorNode->output);
+    
+    auto map = model::DynamicMap(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matVecMultNode->output } });
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.useBlas = useBlas;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+
+    // compare output
+    std::vector<ValueType> matrixVals(m * n);
+    FillVector(matrixVals);
+    std::vector<std::vector<ValueType>> signal = { matrixVals };
+    VerifyCompiledOutput(map, compiledMap, signal, "MatrixVectorMultiplyNode");
+}
+
+void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
+{
+    using ValueType = float;
+    std::vector<ValueType> matrixBVals(k * n);
+    FillVector(matrixBVals);
+
+    model::Model model;
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(m * k);
+    auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals);
+
+    int lda = k;
+    int ldb = n;
+    int ldc = n;
+    auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, k, lda, matrixBNode->output, ldb, ldc);
+    
+    auto map = model::DynamicMap(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.useBlas = useBlas;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+    // PrintIR(compiledMap);
+
+    // compare output
+    std::vector<ValueType> matrixAVals(m * k);
+    FillVector(matrixAVals);
+    std::vector<std::vector<ValueType>> signal = { matrixAVals };
+    VerifyCompiledOutput(map, compiledMap, signal, "MatrixMatrixMultiplyNode");
 }
 
 void TestCompilableDotProductNode2(int dimension)

@@ -55,6 +55,12 @@ void TestIRCompiler()
     // TestLinearPredictor(); // FAILS -- crash
     // TestForest(); // FAILS -- crash
 
+    TestMatrixVectorMultiplyNode(10, 5, true);
+    TestMatrixVectorMultiplyNode(10, 5, false);
+    TestMatrixMatrixMultiplyNode(4, 5, 6, true);
+    TestMatrixMatrixMultiplyNode(4, 5, 6, false);
+    // TestMatrixMatrixMultiplyNode(15, 25600, 27, false); // Fails due to numerical  issues
+
     TestCompilableScalarOutputNode();
     TestCompilableVectorOutputNode();
     TestCompilableAccumulatorNode();

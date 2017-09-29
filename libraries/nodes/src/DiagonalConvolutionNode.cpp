@@ -10,8 +10,9 @@
 #include "ConstantNode.h"
 #include "MatrixMatrixMultiplyNode.h"
 
-using namespace ell::math;
-using namespace ell::math::Blas;
+// math
+#include "Matrix.h"
+#include "MatrixOperations.h"
 
 namespace ell
 {
@@ -43,88 +44,6 @@ namespace nodes
         //
         // Functions to emit portions of IR
         //
-
-        template <typename ValueType>
-        void EmitMatrixMatrixMultiplyBlas(emitters::IRFunctionEmitter& function, bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
-        {
-            llvm::Function* gemm = function.GetModule().GetRuntime().GetGEMMFunction<ValueType>();
-
-            emitters::IRValueList args{
-                function.Literal(GetCBlasMatrixOrder(MatrixLayout::rowMajor)), // order
-                function.Literal(GetCBlasMatrixTranspose(transposeA ? MatrixTranspose::transpose : MatrixTranspose::noTranspose)), // transposeA
-                function.Literal(GetCBlasMatrixTranspose(transposeB ? MatrixTranspose::transpose : MatrixTranspose::noTranspose)), // transposeB
-                function.Literal(m),
-                function.Literal(n),
-                function.Literal(k),
-                function.Literal(static_cast<ValueType>(1.0)), // alpha
-                A,
-                function.Literal(lda), // lda
-                B,
-                function.Literal(ldb), // ldb
-                function.Literal(static_cast<ValueType>(0.0)), // beta
-                C, // C (output)
-                function.Literal(ldc) // ldc
-            };
-            function.Call(gemm, args);
-        }
-
-        // TODO: emit this as a function in the module
-        template <typename ValueType>
-        void EmitMatrixMatrixMultiplySlow(emitters::IRFunctionEmitter& function, bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
-        {
-            if (transposeA || transposeB)
-            {
-                assert(false && "Transpose not implemented in slow mat mult path");
-            }
-
-            llvm::Value* accum = function.Variable(emitters::GetVariableType<ValueType>(), "accum");
-
-            auto mLoop = function.ForLoop();
-            mLoop.Begin(m);
-            {
-                auto mIndex = mLoop.LoadIterationVariable();
-
-                auto nLoop = function.ForLoop();
-                nLoop.Begin(n);
-                {
-                    auto nIndex = nLoop.LoadIterationVariable();
-
-                    function.Store(accum, function.Literal(static_cast<ValueType>(0.0)));
-                    auto kLoop = function.ForLoop();
-                    kLoop.Begin(k);
-                    {
-                        auto kIndex = kLoop.LoadIterationVariable();
-
-                        auto aIndex = function.Operator(plus, function.Operator(times, mIndex, function.Literal(lda)), kIndex);
-                        auto aValue = function.ValueAt(A, aIndex);
-                        auto bIndex = function.Operator(plus, function.Operator(times, kIndex, function.Literal(ldb)), nIndex);
-                        auto bValue = function.ValueAt(B, bIndex);
-                        auto value = function.Operator(timesFloat, aValue, bValue);
-                        function.OperationAndUpdate(accum, plusFloat, value);
-                    }
-                    kLoop.End();
-
-                    // store output in C[m,n]
-                    auto cIndex = function.Operator(plus, function.Operator(times, mIndex, function.Literal(ldc)), nIndex);
-                    function.SetValueAt(C, cIndex, function.Load(accum));
-                }
-                nLoop.End();
-            }
-            mLoop.End();
-        }
-
-        template <typename ValueType>
-        void EmitMatrixMatrixMultiply(emitters::IRFunctionEmitter& function, bool useBlas, bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
-        {
-            if (useBlas)
-            {
-                EmitMatrixMatrixMultiplyBlas<ValueType>(function, transposeA, transposeB, m, n, k, A, lda, B, ldb, C, ldc);
-            }
-            else
-            {
-                EmitMatrixMatrixMultiplySlow<ValueType>(function, transposeA, transposeB, m, n, k, A, lda, B, ldb, C, ldc);
-            }
-        }
 
         size_t GetFilterVolumeSize(const predictors::neural::ConvolutionalParameters& convolutionalParameters, const model::PortMemoryLayout& inputLayout)
         {
@@ -263,8 +182,6 @@ namespace nodes
         // output is a (w+2p) x (h+2p) x f array
         llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
 
-        const bool useBlas = compiler.GetMapCompilerParameters().compilerSettings.useBlas;
-
         // Model parameters
         auto&& inputLayout = this->GetInputMemoryLayout();
         auto&& outputLayout = this->GetOutputMemoryLayout();
@@ -381,7 +298,7 @@ namespace nodes
                 int ldc = filterWidth * batchSize;
 
                 // Note: Wl is transposed
-                EmitMatrixMatrixMultiply<ValueType>(function, useBlas, false, true, m, n, k, Vj, lda, Wl, ldb, scratchPtr, ldc);
+                function.CallGEMM<ValueType>(false, true, m, n, k, Vj, lda, Wl, ldb, scratchPtr, ldc);
 
                 // S loop here as well
                 auto stackLoop = function.ForLoop();

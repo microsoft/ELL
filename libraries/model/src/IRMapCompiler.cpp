@@ -266,7 +266,7 @@ namespace model
         auto& context = _moduleEmitter.GetLLVMContext();
         auto voidType = llvm::Type::getVoidTy(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
-        const std::vector<llvm::Type*> parameters = { { int32Type }, { shapeType->getPointerTo() } };
+        const std::vector<llvm::Type*> parameters = { int32Type, shapeType->getPointerTo() };
         auto fn = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputShape", voidType, parameters);
         fn.IncludeInHeader();
         auto nodes = map.GetInputNodes();
@@ -287,7 +287,7 @@ namespace model
         auto& context = _moduleEmitter.GetLLVMContext();
         auto voidType = llvm::Type::getVoidTy(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
-        const std::vector<llvm::Type*> parameters = { { int32Type },{ shapeType->getPointerTo() } };
+        const std::vector<llvm::Type*> parameters = { int32Type, shapeType->getPointerTo() };
         auto fn = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputShape", voidType, parameters);
         fn.IncludeInHeader();
         auto nodes = map.GetOutputNodes();
