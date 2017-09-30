@@ -258,18 +258,9 @@ class DemoHelper:
 
     def get_top_n(self, predictions, N):
         """Return at most the top N predictions as a list of tuples that meet the threshold."""
-        topN = np.zeros([N, 2])
-
-        for p in range(len(predictions)):
-            for t in range(len(topN)):
-                if predictions[p] > topN[t][0]:
-                    topN[t] = [predictions[p], p]
-                    break
-        result = []
-        for element in topN:
-            if element[0] > self.threshold:
-                i = int(element[1])
-                result.append((i, element[0]))
+        map = [(i,predictions[i]) for i in range(len(predictions)) if predictions[i] >= self.threshold]
+        map.sort(key=lambda tup: tup[1], reverse=True)
+        result = map[:N]
         return result
 
     def get_label(self, i):

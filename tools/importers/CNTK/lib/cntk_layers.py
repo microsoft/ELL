@@ -18,6 +18,7 @@ from cntk.layers.typing import *
 from cntk.ops import *
 from cntk import load_model
 from cntk.logging.graph import *
+from custom_functions import CustomSign,BinaryConvolution
 
 import lib.cntk_converters as converters
 import lib.cntk_utilities as utilities
@@ -257,7 +258,7 @@ class BinaryConvolutionLayer(BaseLayer):
         # Bias is a separate layer and not processed by this class
         # Activation is a separate layer and not processed by this class
 
-        x = CustomSign(x)
+        x = CustomSign(feature)
         return BinaryConvolution((weightsShape[2], weightsShape[3]), num_filters=weightsShape[0],
                                  channels=weightsShape[1], init=self.weights_parameter.value,
                                  pad=pad, activation=False, bias=False, init_bias=0)(feature)
