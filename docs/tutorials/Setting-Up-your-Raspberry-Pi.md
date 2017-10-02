@@ -19,7 +19,7 @@ Most of our tutorials follow a common workflow. The first steps involve authorin
 AI workloads guzzle power, so we recommend using a high quality USB power adapter and micro USB cable. An adapter rated for 12 Watts (2.4 Amps) per USB port works best. We've had a good experience with 12W-per-port USB power adapters from Apple, Anker, and Amazon Basics. Long and thin cables will often result in a noticeable voltage drop and fail to provide sufficient power to your Raspberry Pi. Generic unbranded cables are hit-and-miss. For a few extra dollars you can get a nice name-brand cable, like the Anker PowerLine, and save yourself a lot of frustration.
 
 ### Operating System
-Our tutorials assume that the operating system running on your Pi is [*Raspbian Jessie*](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/2017-07-05-raspbian-jessie.zip), not the more recent *Raspian Stretch*.
+Our tutorials assume that the operating system running on your Pi is *Raspbian Jessie* ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)), not the more recent *Raspbian Stretch*.
 
 ### CMake
 We use `CMake` on the Raspberry Pi to create Python modules that can be called from our tutorial code. To install `CMake` on your Pi, connect to the network, open a terminal window, and type

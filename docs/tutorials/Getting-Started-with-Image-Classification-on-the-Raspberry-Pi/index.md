@@ -118,6 +118,7 @@ First, import a few dependencies and add directories to our path, to allow Pytho
 ```python
 import sys
 import os
+import cv2
 import numpy as np
 
 scriptPath = os.path.dirname(os.path.abspath(__file__))

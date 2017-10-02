@@ -16,7 +16,7 @@ In this tutorial, we will download two models from the [ELL gallery](/ELL/galler
 * Laptop or desktop computer (Windows, Linux, or Mac)
 * Raspberry Pi
 * Raspberry Pi camera or USB webcam
-* *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/))
+* *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
 #### Prerequisites
 
@@ -292,7 +292,7 @@ source activate py34
 python sideBySide.py
 ```
 
-If you have a camera and display connected to your Pi, you should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. If you downloaded the full source for [tutorial.py](/ELL/tutorials/shared/tutorial.py), you will also see the average time in milliseconds it takes each model to process a frame. Try to get a sense of the relative accuracy and speed of each model. 
+If you have a camera and display connected to your Pi, you should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. If you downloaded the full source for [sideBySide.py](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySide.py), you will also see the average time in milliseconds it takes each model to process a frame. Try to get a sense of the relative accuracy and speed of each model. 
 
 ## Troubleshooting
 

@@ -148,7 +148,7 @@ curl --location -o categories.txt https://raw.githubusercontent.com/pjreddie/dar
 
 ## Using the  model
 
-Once the model is in the ELL format, it no longer matters whether it came from CNTK or Darknet, and the only difference is the categories file. To test the model from Python, follow the steps in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with the model you just imported. Alternatively, to test the model from C++, follow the steps in [Getting started with image classification in C++](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/). 
+Once the model is in the ELL format, it no longer matters whether it came from CNTK or Darknet, and the only difference is the categories file. To test the model from Python, follow the steps in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with the model you just imported. Alternatively, to test the model from C++, follow the steps in [Getting started with image classification on the Raspberry Pi in C++](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/). 
 
 ## Troubleshooting
 

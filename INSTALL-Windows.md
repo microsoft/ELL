@@ -18,7 +18,7 @@ ELL requires a C++ compiler. On Windows, we support *Visual Studio 2015 update 3
 
 ELL uses the [*CMake*](https://cmake.org/) build system, version 3.8 or newer. Download and install it from <https://cmake.org/download/>.
 
-### LLVM 3.9, SWIG 3.0.12, OpenBlas, and Doxygen via NuGet
+### LLVM 3.9, SWIG 3.0.12, OpenBLAS, and Doxygen via NuGet
 
 ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 3.9 or newer.
 
