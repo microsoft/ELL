@@ -16,7 +16,7 @@ In this tutorial, we will download a pretrained image classifier from the [ELL g
 * Laptop or desktop computer
 * Raspberry Pi
 * Raspberry Pi camera or USB webcam
-* *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/))
+* *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
 #### Prerequisites
 
