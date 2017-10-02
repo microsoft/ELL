@@ -85,7 +85,7 @@ def validate_image(args, filename):
 
         # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
         # each with the text label and the prediction score.
-        top5 = helper.get_top_n(predictions, 5)
+        top5 = helper.get_top_n_predictions(predictions, 5)
 
         text = "".join(
             [str(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])

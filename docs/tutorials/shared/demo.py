@@ -47,7 +47,7 @@ def main(args):
 
         # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
         # each with the text label and the prediction score.
-        top5 = helper.get_top_n(predictions, 5)
+        top5 = helper.get_top_n_predictions(predictions, 5)
 
         # Turn the top5 into a text string to display
         text = ", ".join(["(" + str(int(element[1]*100)) + "%) " + helper.get_label(element[0]) for element in top5])

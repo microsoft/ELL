@@ -256,9 +256,12 @@ class DemoHelper:
             if hasattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo"):
                 getattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo")()
 
-    def get_top_n(self, predictions, N):
-        """Return at most the top N predictions as a list of tuples that meet the threshold."""
-        map = [(i,predictions[i]) for i in range(len(predictions)) if predictions[i] >= self.threshold]
+    def get_top_n_predictions(self, predictions, N = 5, threshold = 0.20):
+        """Return at most the top N predictions as a list of tuples that meet the threshold.
+        The first of element of each tuple represents the index or class of the prediction and the second 
+        element represents that probability or confidence value.
+        """
+        map = [(i,predictions[i]) for i in range(len(predictions)) if predictions[i] >= threshold]
         map.sort(key=lambda tup: tup[1], reverse=True)
         result = map[:N]
         return result

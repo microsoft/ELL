@@ -20,14 +20,14 @@ import json
 import operator
 from shutil import copyfile
 from shutil import rmtree
-from urllib import request
 import paramiko
-import ziptools
+import zipfile
+import requests
 
 class DriveTest:
     def __init__(self):
         self.arg_parser = argparse.ArgumentParser(
-            "This script uses ELL to create a demo project for a model (default is darknet)\n"
+            "This script uses ELL to create a demo project for a model (default is d_I160x160x3CMCMCMCMCMCMC1A from the ELL gallery)\n"
             "on a target device (default is Raspberry Pi 3), pushes it to the given\n"
             "device's ip address using ssh and scp, then executes the test.\n"
             "The test also measures the accuracy and performance of evaluating the model.\n")
@@ -37,8 +37,6 @@ class DriveTest:
         self.test_dir = os.path.join(self.build_root, "test", "pitest")
         self.output_dir = None
         self.target_dir = "/home/pi/pi3"
-        self.config_file = None
-        self.weights_file = None
         self.model_name = None
         self.labels_file = None
         self.ell_model = None
@@ -92,10 +90,9 @@ class DriveTest:
 
     def extract_model_info(self, ell_model, labels_file):
         if (ell_model is None or labels_file is None):
-            self.model_name = "darknet"
-            self.labels_file = os.path.join(self.test_dir, "darknetImageNetLabels.txt")
+            self.model_name = "d_I160x160x3CMCMCMCMCMCMC1A"
+            self.labels_file = os.path.join(self.test_dir, "categories.txt")
         else:
-            # extract the model if it's in an archive
             unzip = ziptools.Extractor(ell_model)
             success, filename = unzip.extract_file(".ell")
             if success:
@@ -111,8 +108,11 @@ class DriveTest:
             self.labels_file = labels_file
 
     def download(self, url, localpath):
-        req = request.URLopener()
-        req.retrieve(url, localpath)
+        # Download the file
+        response = requests.get(url, stream=True)
+        # Write the file to disk
+        with open(localpath, "wb") as handle:
+            handle.write(response.content)        
 
     def copy_files(self, list, folder):
         target_dir = os.path.join(self.test_dir, folder)
@@ -156,31 +156,22 @@ class DriveTest:
         for bitcode in bitcode_files:
             os.remove(os.path.join(self.output_dir, bitcode))
 
-    def get_darknet(self):
-        self.config_file = os.path.join(self.test_dir, "darknet.cfg")
-        self.weights_file = os.path.join(self.test_dir, "darknet.weights")
-        if (not os.path.isfile(self.config_file) or not os.path.isfile(self.weights_file)):
-            print("downloading darknet model...")
-            self.download("https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg", self.config_file)
-            self.download("https://pjreddie.com/media/files/darknet.weights", self.weights_file)
-        
-        self.copy_files( [ os.path.join(self.ell_root, "docs/tutorials/Importing-new-models/darknetImageNetLabels.txt") ], "")
-
-    def import_darknet(self):
-        self.ell_model = os.path.join(self.test_dir, self.model_name + ".ell")
-        sys.path.append(os.path.join(current_path, '../../importers/darknet'))
-        darknet_importer = __import__("darknet_import")
-        args = {}
-        args['config_file'] = self.config_file
-        args['weights_file'] = self.weights_file
-        args['output_directory'] = None
-        importer = darknet_importer.DarknetImporter(args)
-        importer.run()
+    def get_default_model(self):
+        # Download the model
+        self.model_file = self.model_name + '.ell'
+        self.ell_model = 'd_I160x160x3CMCMCMCMCMCMC1A.ell'
+        if (not os.path.isfile(self.model_file)) or (not os.path.isfile(self.labels_file)) :
+            print("downloading default model...")
+            self.download("https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip", "d_I160x160x3CMCMCMCMCMCMC1A.ell.zip")
+            # extract the model if it's in an archive
+            with zipfile.ZipFile("d_I160x160x3CMCMCMCMCMCMC1A.ell.zip") as myzip:
+                myzip.extractall()
+            print("downloading default categories.txt...")
+            self.download("https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt", self.labels_file)
 
     def get_model(self):
-        if self.model_name == "darknet":
-            self.get_darknet()
-            self.import_darknet()
+        if self.model_name == "d_I160x160x3CMCMCMCMCMCMC1A":
+            self.get_default_model()
         print("using ELL model: " + self.model_name)
 
     def make_project(self):
@@ -190,7 +181,7 @@ class DriveTest:
         sys.path.append(os.path.join(current_path, '../../wrap'))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        builder_args = [labels_file, self.ell_model, "-target", self.target, "-outdir", self.output_dir]
+        builder_args = [labels_file, self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v"]
         if self.profile:
             builder_args.append("-profile")
         builder.parse_command_line(builder_args)

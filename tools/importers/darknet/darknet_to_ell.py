@@ -80,7 +80,10 @@ def parse_cfg(filename):
             layer['out_h'] = int(convolutional_out_height(layer))
             layer['out_w'] = int(convolutional_out_width(layer))
             layer['out_c'] = int(layer['filters'])
-            print("convolutional: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'], ', pad ', layer['padding'])
+            if ('xnor' in layer) and (layer['xnor'] == '1'):
+                print("binary convolutional: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'], ', pad ', layer['padding'])
+            else:
+                print("convolutional: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'], ', pad ', layer['padding'])
         elif layer['type'] == 'connected':
             layer['h'] = network[i-1]['out_h']
             layer['w'] = network[i-1]['out_w']

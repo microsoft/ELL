@@ -12,8 +12,9 @@ else()
     set(ADDITIONAL_DISTUTILS_FLAGS install)
 endif()
 
-set(module_name wrap)
-set(builder_src
+set (module_name wrap)
+set (builder_src
+    templates/CMakeLists.cpp.txt.in
     templates/CMakeLists.python.txt.in
     wrap.py
     README.md)

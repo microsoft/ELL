@@ -1,0 +1,44 @@
+#
+# Generated CMakeLists.txt for linking with the @ELL_model@ static library on @Arch@
+# WARNING: Any changes made to this file will be overwritten!
+#
+# Required variables for configuring this file from CMake:
+#    ELL_model - name of the model
+#    Arch - target architecture, e.g. host, pi3.
+#    ELL_ROOT - location of ELL git repo
+#
+# Usage:
+#
+#   Linux / Mac:
+#     mkdir build && cd build
+#     cmake ..
+#     make
+#
+#   Windows 64 bit:
+#     mkdir build && cd build
+#     VS 2015: cmake -G "Visual Studio 14 2015 Win64" ..
+#     VS 2017: cmake -G "Visual Studio 15 2017 Win64" ..
+#     Build the generated .sln in Release, or run cmake --build . --config=Release
+#
+
+cmake_minimum_required(VERSION 3.3)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+project(@ELL_model@)
+
+# dependencies
+if(WIN32)
+    # path to the OpenBLAS Nuget
+    set(PACKAGE_ROOT "@ELL_ROOT@")
+endif()
+include(OpenBLASSetup.cmake)
+
+add_library(@ELL_model@ STATIC IMPORTED GLOBAL)
+
+set_property(TARGET model APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_SOURCE_DIR}/include")
+set_target_properties(@ELL_model@ PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/@ELL_model@.@OBJECT_EXTENSION@)
+if(BLAS_LIBS)
+    target_link_libraries(@ELL_model@ INTERFACE ${BLAS_LIBS})
+endif()
+

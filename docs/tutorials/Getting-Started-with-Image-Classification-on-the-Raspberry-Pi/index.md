@@ -1,91 +1,119 @@
 ---
 layout: default
-title: Getting Started with Image Classification on the Raspberry Pi
-permalink: /tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/
+title: Getting started with image classification on the Raspberry Pi
+permalink: /tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/
 ---
-# Getting Started with Image Classification on Raspberry Pi
+
+# Getting started with image classification on Raspberry Pi
+
+In this tutorial, we will download a pre-trained image classifier from the [ELL gallery](/ELL/gallery/) to a laptop or desktop computer. We will then compile the classifier and wrap it in a Python module. Finally, we will write a simple Python script that captures images from the Raspberry Pi's camera and sends them to the Python module for classification.
+
+---
 
 ![screenshot](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/Screenshot.png)
 
-In this tutorial, you will download a pretrained image classifier from the [ELL gallery](/ELL/gallery/) to your laptop or desktop computer and compile it for the Raspberry Pi. Then, you will copy the compiled classifier to your Pi and write a Python script that captures images from the Pi's camera and attempts to classify them.  
+#### Materials
 
-## Materials
-
-* Laptop or desktop computer (Windows, Linux, or Mac)
+* Laptop or desktop computer
 * Raspberry Pi
-* Raspberry Pi Camera or USB webcam (optional)
-* Display (optional)
-* Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/)) (optional)
+* Raspberry Pi camera or USB webcam
+* *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
-## Prerequisites
+#### Prerequisites
 
-* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). Specifically, this tutorial relies on ELL, CMake, SWIG, and Python 3.6. 
-* Follow our instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-Up-your-Raspberry-Pi).
+* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). Specifically, this tutorial requires ELL, CMake, SWIG, and Python 3.6. 
+* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 
-## Activate your environment, create tutorials directory
-Open a terminal window and activate your anaconda environment.  If you followed our setup instructions you will have
-an environment named `py36` so you would do this to activate that:
+## Step 1: Activate your environment and create a tutorial directory
+
+If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your Anaconda environment. 
+
 ```
-source activate py36
+[Unix] source activate py36
+[Windows] activate py36
 ```
-Then cd into your ELL git repo where you did the build already, and create a `tutorials` folder to group all the tutorials under:
+
+Then, cd into the directory where you built ELL and create a `tutorials` directory. In that directory, create another directory named `tutorial1`.
+
 ```
 cd ELL/build
 mkdir tutorials
 cd tutorials
-```
-
-## Download pre-trained model
-Make a new directory named `tutorial1` in the `build/tutorials` folder which is where we will download a pre-trained model. 
-```
 mkdir tutorial1
 cd tutorial1
 ```
-ELL has a [gallery of pre-trained models](/ELL/gallery). For this tutorial, we'll use a model trained on the ILSVRC2012 data set. Along with the model, you'll want to download a labels file that has friendly text names for each of the 1000 classes that the model is trained to recognize.
-We'll use the (ILSVRC2012_labels.txt)(https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt) labels file and [this model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip) from the gallery. Note that the model file is zipped, and has a long name indicating its architecture. For convenience, we'll just want to save it locally as `ell.zip`:
+
+## Step 2: Download pre-trained model
+
+Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip) into the `tutorial1` directory. The model file contains a pre-trained Deep Neural Network for image classification, and is one of the models available from the [ELL gallery](/ELL/gallery). The file's long name indicates the Neural Network's architecture, but don't worry about that for now and save it locally as `model.ell.zip`. 
+
 ```
-curl --location -o labels.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt
-curl --location -o ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
+curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
 ```
-Inside `ell.zip` is the ell model named `d_I224x224x3CMCMCMCMCMCMC1A.ell`, so unzip the archive to the current directory (`tutorial1`). Recent versions of git come with the `unzip` tool:
+
+Unzip the compressed file.
+
 ```
-unzip ell.zip
+unzip model.ell.zip
 ```
- Rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`:
 
-| Unix    | `mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell` |
-| Windows | `ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell` |
+Rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`:
 
-You should now have a `labels.txt` file and a `model.ell` file in the `tutorial1` folder.
+```
+[Unix] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+[Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+```
 
-Note: this particular model was trained to expect images in the format BGR (as opposed to RGB), so we will
-use the "--bgr true" on the demo script below to tell it to use this format for the input to the model.
+(One Windows, unzip is part of the Git distribution, for example, in `\Program Files\Git\usr\bin`.)
+Next, download the file with the [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) for this model into the `tutorial1` directory. The 1000 categories in this file are the types of objects that the model is trained to recognize.
 
-## Wrap the model in a Python module
-ELL provides a compiler that takes a model and compiles it into code that will run on a target platform. Let's take a look at how we'd wrap the model for Python to run on the host platform. First, let's use the `wrap` tool to compile the model and generate a `cmake` project for a Python callable module:
-````
-python "../../tools/wrap/wrap.py" labels.txt model.ell -lang python -target host
-````
-You should see output similar to the following:
+```
+curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
+```
 
-    compiling model...
-    generating python interfaces for model in host
-    running llc...
-    success, now you can build the 'host' folder
+There should now be a `model.ell` file and a `categories.txt` file in the `tutorial1` directory.
 
-Next, we build the project in `host` folder using `cmake`. For example:
+## Step 3: Compile and run the model on your laptop or desktop computer 
 
-| Unix    | `cd host` <br> `mkdir build` <br> `cd build` <br> `cmake ..` <br> `make` <br> `cd ..`  |
-| Windows | `cd host` <br> `mkdir build` <br> `cd build` <br> `cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell ..` <br> `cmake --build . --config release` <br> `cd ..` |
+Before deploying the model to the Raspberry Pi, we will practice deploying it to the laptop or desktop computer. Deploying an ELL model requires two steps. First, we run a tool called `wrap`, which both compiles `model.ell` into a library and generates a CMake project to build a Python wrapper for that library. Second, we call CMake to build the Python library. 
 
-Let's take a look at how we might call the model's predict function using Python. Create a new text file called `callModel.py` in your `tutorial1` folder. We'll add Python code to:
-* Load the model
-* Create blank input and output data
-* Run the input through the predictor and get the results
+Run `wrap` as follows.
 
-If you don't want to type it out, the script can be found [here](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/callModel.py), otherwise follow along below.
+```
+python "../../tools/wrap/wrap.py" categories.txt model.ell -lang python -target host
+```
 
-First, let's import some modules we'll need, and add some directories to our path so that Python can properly load the model's Python module. Typically, that would be the path of the wrapped model.py file, and the corresponding native module, in build/release:
+Note that we gave `wrap` the command line option `-target host`, which tells it to generate machine code for execution on our computer, rather than machine code for the Raspberry Pi. If all goes well, you should see the following output.
+
+```
+compiling model...
+generating python interfaces for model in host
+running llc...
+success, now you can build the 'host' folder
+```
+
+The `wrap` tool creates a `cmake` project in a new directory named `host`. Create a `build` directory inside the `host` directory and change to that directory
+
+```
+cd host
+mkdir build
+cd build
+```
+
+To finish creating the Python wrapper, build the `cmake` project. 
+
+```
+[Unix] cmake .. && make
+[Windows] cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell .. && cmake --build . --config release
+```
+
+We have just created a Python module named `model`, which includes functions that report the model's input and output dimensions and enables us to pass images to the image classifier.  
+
+## Step 4: Invoke the model on your computer
+
+The next step is to create a Python script that loads the model, sends images to it, and interprets its output. If you just want the full script, copy it from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/callModel.py) into the `host` directory. Otherwise, create an empty text file named `callModel.py` in the `host` directory and copy in the code snippets below. 
+
+First, import a few dependencies and add directories to our path, to allow Python to find the module that we created above.  
 
 ```python
 import sys
@@ -98,16 +126,14 @@ sys.path.append(os.path.join(scriptPath, 'build'))
 sys.path.append(os.path.join(scriptPath, 'build/Release'))
 ```
 
-Now, we can load the model's Python module with a simple `import`:
+Next, load the Python module representing the wrapped ELL model.
+
 ```python
 import model
 ```
 
-The model contains functions to:
-* Get the input and output dimensions
-* Produce predictions from input
+Print the model's input and output shapes.
 
-Let's print out the input and output dimensions for this model:
 ```python
 input_shape = model.get_default_input_shape()
 output_shape = model.get_default_output_shape()
@@ -115,215 +141,225 @@ print("Model input shape: " + str([input_shape.rows,input_shape.columns,input_sh
 print("Model output shape: " + str([output_shape.rows,output_shape.columns,output_shape.channels]))
 ```
 
-When run on this model, you should see output something like:
+You should see output similar to this.
 
-    Model input shape: [224, 224, 3]
-    Model output shape: [1, 1, 1000]
+```
+Model input shape: [224, 224, 3]
+Model output shape: [1, 1, 1000]
+```
 
-So the input is a 3-channel image of height 224 and width 224 (which can also be represented as a vector of size 224 * 224 * 3), and the output is a tensor of 1x1x1000 which can be represented as a vector of 1000 elements.
+The input to the model is a 3-channel image of height 224 and width 224 (which can also be represented as an array of size 224 * 224 * 3 = 150528). The shape of the output is 1 x 1 x 1000, which can be represented as an array of 1000 elements. Allocate an array to store the model's output. 
 
-Next, let's create data structures to hold the input and output data:
 ```python
-# Create a blank input of the appropriate size
-input = model.FloatVector(input_shape.Size())
-# Create a blank output of the appropriate size to hold the prediction results
 predictions = model.FloatVector(output_shape.Size())
 ```
-The most useful thing this model does is to produce predictions given some input. Let's call the model's predict function with the input:
+
+Choose an image file to send to the model. For example, use our coffee mug image, [coffeemug.jpg](/ELL/tutorials/shared/coffeemug.jpg). Use OpenCV to read the image:
+
+```python
+image = cv2.imread("coffeemug.jpg")
+```
+
+The image stored in the `image` variable cannot be sent to the model as-is, because the model takes its input as an array of `float` values. Moreover, the model expects the input image to have a certain shape and a specific ordering of the color channels (which, in this case, is Blue-Green-Red). Since preparing images for the model is such a common operation, we created a helper function for it called `prepare_image_for_model`. Copy and paste the code for [prepare_image_for_model](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/imageHelper.py) and put it at the top of the file, right after the `import model` statement. Then, call the helper function to prepare your image.
+
+```python
+input = prepare_image_for_model(image, input_shape.columns, input_shape.rows)
+```
+
+Finally, invoke the model by calling its `predict` method.
+
 ```python
 model.predict(input, predictions)
 ```
-The predictions come back as a vector of probability values. The index of the value represents the class, and the probability values represents the confidence that the model has that the input is that particular class. 
-Let's get the index of the highest confidence score:
+
+The `predict` method fills the `predictions` array with probability scores, which sum to 1. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Print the index of the highest confidence category.
+
 ```python
-# Print the index of the highest confidence prediction
-print(np.argmax(predictions))
+categories = open('categories.txt', 'r').readlines()
+predictionIndex = int(np.argmax(predictions))
+print("Category index: " + str(predictionIndex))
+print("Category text: " + categories[predictionIndex])
+print("Confidence: " + str(predictions[predictionIndex]))
 ```
-The output would be something like:
 
-    650
+This code also looks up the category name by reading the corresponding line in `categories.txt`. For example, if the highest confidence category is 504, line 504 of `categories.txt` is `coffee mug`. The value at `predictions[504]` is the model's confidence in this prediction. For example, a value of `0.514353` means that the model is 51% confident that the image contains a coffee mug.
 
-In the above case, we'd lookup line 650 of the labels file to get the text name of the predicted class.
+## Step 5: Compile the model for execution on the Raspberry Pi
 
-So far, we've called the model with fake input data that is all zeros. Next, let's wrap the model for running on the Pi, and see how we can pass real images through the model instead.
+We are ready to cross-compile the model for deployment on the Raspberry Pi. As before, run the `wrap` tool on your laptop or desktop computer, but this time specify the target platform as `pi3`. This tells the ELL compiler to generate machine code for the Raspberry Pi's ARM Cortex A53 processor.
 
-## Wrap the model in a Python module for the Raspberry Pi
-For this tutorial we want to call the model from Python on our Raspberry Pi. ELL's compiler takes a model and compiles it into code that will run on a target platform - in this case the Raspberry Pi running Linux, so it generates code for armv7-linux-gnueabihf, and for the cortex-a53 CPU. We use the `wrap` tool again and this time tell it to target the `pi3` platform:
+```
+python "../../tools/wrap/wrap.py" categories.txt model.ell -lang python -target pi3   
+```
 
-````
-# from the tutorials1 folder
-python "../../tools/wrap/wrap.py" labels.txt model.ell -lang python -target pi3   
-````
-You should see output similar to the following:
+The `wrap` tool creates a new directory named `pi3`, which contains a CMake project that can be used to build the desired Python module. This time, we need to build this project on the Raspberry Pi. Before moving to the Pi, we also want to copy over some Python helper code: 
 
-    compiling model...
-    generating python interfaces for model in pi3
-    running llc...
-    success, now copy the pi3 to your target machine and build it there
+```
+[Unix] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
+[Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
+```
 
-We also want to copy some additional python code to your Raspberry Pi for the purpose of running this tutorial. You can also copy a static image over for testing:
+At this point, you should now have a `pi3` folder that contains a `cmake` project that builds the Python wrapper and some helpful Python utilities.
 
-| Unix    | `cp ../../tools/utilities/pythonlibs/demo*.py pi3`       <br> `cp ../../tools/utilities/pitest/coffeemug.jpg pi3`   |
-| Windows | `copy ..\..\tools\utilities\pythonlibs\demo*.py pi3` <br> `copy ..\..\tools\utilities\pitest\coffeemug.jpg pi3` |
+## Step 6: Write code to invoke the model on the Raspberry Pi
 
-You should now have a `pi3` folder containing a python module for your model, as well as some helpful python utilities which we'll 
-use in the next section.
+We will write a Python script that invokes the model and runs the demo on a Raspberry Pi. The script will load the Python wrapper that we created above, read images from the camera, pass these images to the model, and display the classification results. If you just want the full script, copy it from [here](/ELL/tutorials/shared/tutorial.py). Otherwise, create an empty text file named `tutorial.py` and copy in the code snippets below. 
 
-## Call your model from a Python app
-Create a new text file called `demo.py` in your `tutorial1` folder. We'll add Python code to:
-* Load the compiled image classification model
-* Get an image
-* Run the image through the model
-* Show the classification results
+First, import a few dependencies, including system utilities, opencv, numpy and the `modelHelper` code that we copied over.
 
-If you don't want to type it out, the script can found [here](/ELL/tutorials/shared/demo.py), otherwise follow along below.
-
-First, we need to import the libraries we'll be using in this app, which include system ultilities, numpy and demoHelper that we copied over from ELL utilities:
 ```python
 import sys
 import os
+import time
 import numpy as np
 import cv2
-import demoHelper as d
 ```
-Then we define our main function, which instantiates a helper class to load the model. The helper knows which model to load by parsing the commandline arguments:
+For convenience, include the helper code that we copied earlier.
+
+```python
+import tutorialHelpers as helpers
+```
+
+Import the module that contains the compiled ELL model.
+
+```python
+import model
+```
+
+The following functions help us get an image from the camera and read in the categories file.
+
+```python
+# Function to return an image from our camera using OpenCV
+def get_image_from_camera(camera):
+    if camera is not None:
+        # if predictor is too slow frames get buffered, this is designed to flush that buffer
+        ret, frame = camera.read()
+        if (not ret):
+            raise Exception('your capture device is not returning images')
+        return frame
+    return None
+
+# Return an array of strings corresponding to the model's recognized categories or classes.
+# The order of the strings in this file are expected to match the order of the
+# model's output predictions.
+def get_categories_from_file(fileName):
+    labels = []
+    with open(fileName) as f:
+        labels = f.read().splitlines()
+    return labels
+```
+Define our main entry point and use the camera as our image source:
 ```python
 def main(args):
-    helper = d.DemoHelper()
-    helper.parse_arguments(args,
-            "Runs the given ELL model passing images from camera or static image file\n"
-            "Either the ELL model file, or the compiled model's Python module must be given,\n"
-            "using the --model or --compiledModel options respectively.\n"
-            "Example:\n"
-            "   python demo.py categories.txt --compiledModel tutorial1/pi3/model1\n"
-            "   python demo.py categories.txt --model model1.ell\n"
-            "This shows opencv window with image classified by the model using given labels")
+    if (len(args) < 1):
+        print("usage: python tutorial.py categories.txt")
+        exit()
+    
+    # Open the video camera. To use a different camera, change the camera index.
+    camera = cv2.VideoCapture(0)
 ```
-The command-line arguments also specify whether our images come from an image file or an attached webcam. Either way, we need to initialize our image source.
-```python
-    # Initialize image source
-    helper.init_image_source()
-    # In order to minimize console output, we compare the model's current prediction with its previous. Store the last prediction in 'lastPrediction'
-    lastPrediction = ""
-```
-Next, we set up a loop that keeps going until the helper indicates it is done. Typically, this is when the user hits the Esc key.
-At the start of every loop iteration, we want to grab an image from the image source:
-```python
-    while (not helper.done()):
-        # Grab next frame
-        frame = helper.get_next_frame()
-```
-`frame` now holds image data for the model. However, it often cannot be used as-is, because models are typically trained with:
-* specific image sizes e.g. 224 x 224 x 3
-* specific ordering of color channels e.g. RGB.
-Our helper uses OpenCV to grab images from the image source (file or webcam). Their size is dependent on the source, and the ordering is always BGR from OpenCV.
-Therefore, we need to crop and or resize the image while maintaining the same aspect ratio, and reorder the color channels from BGR to RGB. Since
-this is such a common operation, the helper implements this in a method called `prepare_image_for_predictor`:
+
+Use the function we defined above to read the category names from the file provided on the command line.  
 
 ```python
-        # Prepare the image to send to the model.
-        # This involves scaling to the required input dimension and re-ordering from BGR to RGB
-        data = helper.prepare_image_for_predictor(frame)
+    categories = get_categories_from_file(args[0])
 ```
-We are now ready to get a classify the image in the frame. The model has a `predict` method, which will return a list of probabilities for each of the 1000 classes it can detect:
+
+The model expects its input in a certain shape. Get this shape and store it for use later on. 
 
 ```python
-        # Get the model to classify the image, by returning a list of probabilities for the classes it can detect
-        predictions = helper.predict(data)
+    inputShape = model.get_default_input_shape()
 ```
-Note that this is just an array of values, where each element is a probability between 0 and 1. It is typical to reject any that do not meet a particular threshold, since that represents low confidence results. Re-ordering so that we get only the Top 5 predictions is also useful. The index of the prediction represents the class, the value represents the score. We can use the labels file to match the index of the prediction to its text label, and then construct a string with the label and score.
+
+Allocate an array to store the model's output. 
 
 ```python
-        # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
-        # each with the text label and the prediction score.
-        top5 = helper.get_top_n(predictions, 5)
-
-        # Turn the top5 into a text string to display
-        text = "".join([helper.get_label(element[0]) + "(" + str(int(element[1]*100)) + "%)  " for element in top5])
-
+    outputShape = model.get_default_output_shape()
+    predictions = model.FloatVector(outputShape.Size())
 ```
-Lastly, let's display the results. We'll do this in 2 ways:
-* to the console by calling `print` with the prediction text. In order to not spam the console, we'll only print if the current 
-prediction text is different from the previous one.
-* to a GUI window. The helper has methods that use OpenCV to add text to an image and then show that image in a window
+
+Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user hits any key. At the start of every loop iteration, read an image from the camera.
 
 ```python
-        save = False
-        if (text != lastPrediction):
-            print(text)
-            save = True
-            lastPrediction = text
-
-        # Draw the text on the frame
-        frameToShow = frame
-        helper.draw_label(frameToShow, text)
-        helper.draw_fps(frameToShow)
-
-        # Show the new frame
-        helper.show_image(frameToShow, save)
+    while (cv2.waitKey(1) == 0xFF):
+        image = get_image_from_camera(camera)
 ```
 
-Your `pi3` folder is ready to copy to your Raspberry Pi.  You can do that using the 'scp' tool.  On Windows you can use [WinSCP](https://winscp.net/eng/index.php).
+As mentioned above, the image stored in the `image` variable cannot be sent to the model as-is and needs to be processed using the [prepare_image_for_model](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/imageHelper.py) helper function.
 
-## SSH into Raspberry Pi
+```python
+        input = helpers.prepare_image_for_model(image, inputShape.columns, inputShape.rows)
+```
 
-Now log into your Raspberry Pi, either remotely using SSH or directly if you have keyboard and screen attached.
+With the processed image input handy, call the `predict` method to invoke the model. 
 
-Find the `pi3` folder you just copied over using scp or winscp and run the following:
+```python
+        model.predict(input, predictions)
+```
 
-````
+As before, the `predict` method fills the `predictions` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n_predictions`.
+
+```python
+        top5 = helpers.get_top_n_predictions(predictions, 5)
+```
+
+`top5` is an array of tuples, where the first element is the category index and the second element is the probability of that category. Match the category indices in `top5` with the category names in `categories`.
+
+```python
+        headerText = "".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] for element in top5])
+```
+
+Use the `draw_header` helper function to display the predicted category on the Raspberry Pi's display. Also display the camera image. 
+
+```python
+        helpers.draw_header(image, headerText)
+        cv2.imshow('ELL model', image)
+```
+Finally, write the code that invokes the `main` function and runs your script.
+
+```python
+if __name__ == "__main__":
+    args = sys.argv
+    args.pop(0)
+    main(args)
+```
+
+We are ready to move to the Raspberry Pi. You can copy the `pi3` folder to the Pi using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
+
+## Step 7: Build the Python module on the Raspberry Pi
+
+Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and display connected. Find the `pi3` folder you just copied from your computer and build the python module that wraps the ELL model.
+
+```
 cd pi3
-mkdir build && cd build
+mkdir build
+cd build
 cmake ..
 make
 cd ..
-````
+```
 
-This builds the Python Module that is then loadable by the demo Python scripts.
+We just created a Python module named `model`, which includes functions that report the model's input and output dimensions and enables us to pass images to the model for classification. 
 
-## Process a static image 
+## Step 8: Classify live video on the Raspberry Pi
 
-Now if you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi) you should have a miniconda
-environment named py34.  So to run the tutorial do this:
+If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an anaconda environment named `py34`. Activate it and run the script that we wrote above. 
 
-````
+```
 source activate py34
-python demo.py labels.txt --compiledModel model --image coffeemug.jpg --bgr true
-````
-And it will classify the image, you should see output like this:
-````
-coffee mug(85%)
-````
+python tutorial.py categories.txt
+```
 
-And if you have a display connected you should see something like the screenshot at the top of this page.
+If you have a camera and display connected to your Pi, you should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and different types of African animals. 
 
-## Process Video
-
-If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
-
-````
-python demo.py labels.txt  --compiledModel model --bgr true
-````
-(just press ESCAPE on your keyboard to close the app)
-
-You will see the same kind of window appear only this time it is showing the video stream.
-Then when your camera is pointed at an object that the model recognizes you will see the label and 
-confidence % at the top together with an estimated frame rate.
-
-`Tip`: for quick image recognition results you can point the video camera at a web image of a dog 
-on your PC screen.  ImageNet models can usually do a good job recognizing  different dog breeds and 
-many types of African animals.
+If you copied the full source for [tutorial.py](/ELL/tutorials/shared/tutorial.py), you will also see the average time in milliseconds it takes the model to process a frame.
 
 ## Next steps
-Different models have different characteristics. For example, some are slow but accurate, while others are faster and less accurate. Some have different power draw than others.
 
-Experiment with which model works best for your scenario by downloading other models in the [ELL gallery](/ELL/gallery/).
+The [ELL gallery](/ELL/gallery/) offers different models for image classification. Some are slow but accurate, while others are faster and less accurate. Different models can even lead to different power draw on the Raspberry Pi. Repeat the steps above with different models. 
 
-Try these related tutorials:
-* [Fun with Dogs and Cats](/ELL/tutorials/Fun-with-Dogs-and-Cats/)
-* [Importing new models](/ELL/tutorials/Importing-new-models/)
+We used the `wrap` tool as a convenient way to compile the model and prepare for building its Python wrapper. To understand what `wrap` does under the hood, read the [wrap documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
 
-## Toubleshooting
+## Troubleshooting
 
-If you run into trouble there's some troubleshooting instructions at the bottom of the 
-[Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi).
+If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).

@@ -29,6 +29,6 @@ See also our tutorial on [Active Cooling your Raspberry Pi 3](/ELL/tutorials/Act
 |-
 | License | Distributed under Creative Commons Attribution 4.0
 |-
-| Notes | Designed by Spencer Persaud<br>Does not require support material<br>But it will require extra nylon spacers to get the bar up off the board.
+| Notes | Designed by Spencer Persaud<br>Does not require support material, but requires extra nylon spacers.
 |=
 

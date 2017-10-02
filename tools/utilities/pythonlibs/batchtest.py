@@ -215,7 +215,7 @@ class ModelTester(demoHelper.DemoHelper):
         return False
 
     def get_current_label(self):
-        topN = self.get_top_n(self.results, 1)
+        topN = self.get_top_n_predictions(self.results, 1)
         if len(topN) > 0:
             return self.get_label(topN[0][0])
         return "unknown"
@@ -267,7 +267,7 @@ class ModelTester(demoHelper.DemoHelper):
             expected = self.get_grouped_result(expected)
             expected_label =  self.group_names[expected]
 
-        topN = self.get_top_n(self.results, self.test_top_n)
+        topN = self.get_top_n_predictions(self.results, self.test_top_n)
         winner = None
         actual = []
         first = True
