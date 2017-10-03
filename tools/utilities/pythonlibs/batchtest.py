@@ -39,7 +39,7 @@ class TestResults:
         ok = 1
         if not passed:
             ok = 0
-        self.results.append((test_index, ok, prediction, probability))
+        self.results.append((test_index, ok, int(prediction), float(probability)))
          
         total = self.tests_passed + self.tests_failed
         pass_rate = (self.tests_passed * 100) / total  
@@ -52,19 +52,31 @@ class TestResults:
     def record_confusion(self, prediction, expected):
         self.confusion_matrix[prediction,expected] += 1
 
-    def report_results(self, batch):
+    def report_results(self, batch, compiled):
         print("======top %d results for batch %d ==============================================================================================" % (self.test_top_n, batch))
         total = self.tests_passed + self.tests_failed
+        pass_rate = 0
         if (total > 0):
             pass_rate = (self.tests_passed * 100) / total
             result = "%d tests passed out of total %d, (%d tests failed) a pass rate of %d " % (self.tests_passed, total, self.tests_failed, pass_rate)
             print(result + "%")
+            
+        report_name = "top" + str(self.test_top_n);
+        if compiled:
+            report_name += "_compiled"
+        else:
+            report_name += "_reference"
+
+        if (batch > 0):
+            report_name +=  "_batch_" + str(batch);
 
         if not self.confusion_matrix is None:
-            np.savetxt("top" + str(self.test_top_n) + "_batch_" + str(batch) + ".txt", self.confusion_matrix)
+            np.savetxt(report_name + ".txt", self.confusion_matrix)
 
-        with open("top" + str(self.test_top_n) + "_batch_" + str(batch) + ".json", 'w', encoding='utf-8', newline='\r\n') as outfile:
+        with open(report_name + ".json", 'w', encoding='utf-8', newline='\r\n') as outfile:
             json.dump(self.results, outfile, ensure_ascii=False, indent=2)
+
+        return pass_rate
 
 # Helper class that interfaces with opencv and provides handy conversion from opencv to ELL buffers and 
 # rendering utilties
@@ -90,6 +102,7 @@ class ModelTester(demoHelper.DemoHelper):
         self.predict_count = 0
         self.has_prediction = False
         self.reverse = False
+        self.report = None
 
     def add_arguments(self, arg_parser):
         super(ModelTester,self).add_arguments(arg_parser)    
@@ -99,7 +112,8 @@ class ModelTester(demoHelper.DemoHelper):
         arg_parser.add_argument("--top", type=int, help="how many of the top labels to include in the test (default 1)", default=1)
         arg_parser.add_argument("--batch", type=int, help="which batch out of 10 batches to execute (default all)", default=0)
         arg_parser.add_argument("--groups", nargs='*', help="filenames that provide a grouping for the labels")
-    
+        arg_parser.add_argument("--report", help="filename of summary report to append to")
+
 
     def initialize(self, args):
         super(ModelTester,self).initialize(args)
@@ -109,6 +123,7 @@ class ModelTester(demoHelper.DemoHelper):
 
         # test args
         self.batch = args.batch
+        self.report = args.report
         
         if args.truth is None:
             print("--truth argument is missing")
@@ -326,9 +341,21 @@ class ModelTester(demoHelper.DemoHelper):
 
     def report_times(self):
         # test complete
-        self.top1.report_results(self.batch)
+        is_compiled = (self.compiled_model != None)
+        t1 = self.top1.report_results(self.batch, is_compiled)
+        t5 = 0
         if self.topN != None:
-            self.topN.report_results(self.batch)
+            t5 = self.topN.report_results(self.batch, is_compiled)
+            
+        if self.report != None:
+            if not os.path.isfile(self.report):
+                with open(self.report, "w") as myfile:
+                    myfile.write("model,top1,top5\n")
+                    myfile.close()
+
+            with open(self.report, "a") as myfile:
+                myfile.write("%s,%f,%f\n" % (self.model_name, t1, t5))
+                myfile.close()
             
         total_seconds = self.predict_time
         print(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()))

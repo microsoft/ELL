@@ -18,7 +18,7 @@ from cntk.layers.typing import *
 from cntk.ops import *
 from cntk import load_model
 from cntk.logging.graph import *
-from custom_functions import CustomSign,BinaryConvolution
+from custom_functions import CustomSign, BinaryConvolution
 
 import lib.cntk_converters as converters
 import lib.cntk_utilities as utilities

@@ -13,7 +13,7 @@ import os
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(script_path, ".."))
 import cntk_to_ell
-from custom_functions import CustomSign,BinaryConvolution
+from custom_functions import CustomSign, BinaryConvolution
 import ELL
 import ell_utilities
 import lib.cntk_layers as cntk_layers
@@ -291,7 +291,7 @@ def main(argv):
     arg_parser.add_argument("label_file", help="path to a labels file")
     arg_parser.add_argument("model_file", help="path to a CNTK model file, or a zip archive of a CNTK model file")
     arg_parser.add_argument("--image", help="path to a image file to use as input (default is random data)")
-    arg_parser.add_argument("--layers", type=bool, help="zips the output ELL model if set", default=False)
+    arg_parser.add_argument("--layers", type=bool, help="turns on layer-by-layer testing", default=False)
     args = arg_parser.parse_args(argv)
     test = FullModelTest(args)
     test.run()

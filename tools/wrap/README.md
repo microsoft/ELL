@@ -38,11 +38,8 @@ Included in the templates folder is a CMakeLists.python.txt.in template.
 The final CMakeLists.txt file is generated from this template by filling
 in some text parameters:
 
-<style>
-table, td { border:1px solid #A0A0D0;border-colapse:collapse;padding:5px; }
-</style>
-<table>
-<table>
+
+<table style="border:1px solid #A0A0A0">
 <tr><td>ELL_model</td><td>of the model</td></tr>
 <tr><td>Arch</td><td>target architecture, e.g. host, pi3</td></tr>
 <tr><td>OBJECT_EXTENSION</td><td>obj or o</td></tr>
@@ -57,11 +54,7 @@ Included in the templates folder is a CMakeLists.cpp.txt.in template.
 The final CMakeLists.txt file is generated from this template by filling
 in some text parameters:
 
-<style>
-table, td { border:1px solid #A0A0D0;border-colapse:collapse;padding:5px; }
-</style>
-<table>
-<table>
+<table style="border:1px solid #A0A0A0"">
 <tr><td>ELL_model</td><td>of the model</td></tr>
 <tr><td>Arch</td><td>target architecture, e.g. host, pi3</td></tr>
 <tr><td>OBJECT_EXTENSION</td><td>obj or o</td></tr>
