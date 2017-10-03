@@ -1,3 +1,4 @@
+
 ---
 layout: home
 title: The Embedded Learning Library
@@ -29,6 +30,7 @@ The ELL code and sample code in our tutorials are released under the [MIT Open S
 
 ## Code of conduct
 ELL has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information on this code of conduct, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 
 
 
