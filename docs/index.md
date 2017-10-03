@@ -1,4 +1,3 @@
-
 ---
 layout: home
 title: The Embedded Learning Library
