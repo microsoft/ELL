@@ -11,7 +11,7 @@ set /A retry=!retry!-1
 if "!retry!"=="0" goto :nodelete
 if not exist build goto :build
 rd /s /q build 
-if ERRORLEVEL 1 external\sleep 2 
+if exist build external\sleep 2 
 goto :retry
 
 

@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Fun with Dogs and Cats
+title: Boosting classifier accuracy by grouping categories
 permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 ---
 # Boosting classifier accuracy by grouping categories
@@ -27,7 +27,7 @@ In this tutorial, we will split the 1000 image-categories, which our model was t
 
 ## Overview
 
-The pre-trained models in the [ELL gallery](/ELL/gallery/) are trained to identify 1000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). Often times, we are only interested in a subset of these categories and we don't require the fine-grained categorization that the model was trained to provide. For example, we may want to classify images of dogs versus images of cats, whereas the model is actually trained to distinguish between 6 different varieties of cat and 106 different varieties of dog.
+The pre-trained models in the [ELL gallery](/ELL/gallery/) are trained to identify 1000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). Often times, we are only interested in a subset of these categories and we don't require the fine-grained categorization that the model was trained to provide. For example, we may want to classify images of dogs versus images of cats, whereas the model is actually trained to distinguish between 11 different varieties of cat and 106 different varieties of dog.
 
 The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate on the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5% on the 3-class problem. We will build an application that grabs a frame from a camera, plays a barking sound when it recognizes one of the dog varieties, and plays a meow sound when it recognizes one of the cat varieties.
 
@@ -139,7 +139,7 @@ Define the main entry point and start the camera.
     camera = cv2.VideoCapture(0)
 ```
 
-Read the file of category names. Grouping uses subsets of the total categories, where each group is a unique subset. The `doglabels.txt` and `catlabels.txt` files are simply subsets of the larger file containing 1000 classes of objects. For example `doglabels.txt` contains a list of all the dog breeds that the model was trained to recognize. Read the overall categories, and the categories for the dogs and cats groups.
+Read the file of category names. Grouping uses subsets of the total categories, where each group is a unique subset. The `dogs.txt` and `cats.txt` files are simply subsets of the larger file containing 1000 classes of objects. For example `dogs.txt` contains a list of all the dog breeds that the model was trained to recognize. Read the overall categories, and the categories for the dogs and cats groups.
 
 ```python
     categories = get_categories_from_file(args[0])
@@ -218,7 +218,7 @@ Check whether the prediction is part of a group.
                 if label_in_set(label, dogs):
                     group = "Dog"
                 elif label_in_set(label, cats):
-                    group = "Cat"```
+                    group = "Cat"
 ```
 
 If the prediction is in one of the define category groups, take the appropriate action.
@@ -265,4 +265,4 @@ python pets.py categories.txt
 Point your camera at different objects and see how the model classifies them. Look at `dogs.txt` and `cats.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen, have your computer display images of different animals, and see when it barks or meows. If you copied the full source for [pets.py](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py), you will also see the average time it takes for the model to process a single frame.
 
 ## Troubleshooting
-If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi).
+If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
