@@ -210,10 +210,10 @@ Match the category indices in `top5` with the category names in `categories`.
         }
 ```
 
-Use the `drawHeader` helper function to display the predicted category on the Raspberry Pi's display. Also display the camera image.
+Use the `DrawHeader` helper function to display the predicted category on the Raspberry Pi's display. Also display the camera image.
 
 ```cpp
-        tutorialHelpers::drawHeader(image, headerText.str());
+        tutorialHelpers::DrawHeader(image, headerText.str());
         cv::imshow("ELL model", image);
     };
     return 0;

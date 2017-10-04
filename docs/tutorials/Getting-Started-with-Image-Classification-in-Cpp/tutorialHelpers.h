@@ -91,7 +91,7 @@ public:
     }
 
     // Add a duration to a vector and calculate the mean duration.
-    static double getMeanDuration(std::vector<double>& accumulated, double duration, size_t maxAccumulatedExntries = 30)
+    static double GetMeanDuration(std::vector<double>& accumulated, double duration, size_t maxAccumulatedExntries = 30)
     {
         accumulated.emplace_back(duration);
         if (accumulated.size() > maxAccumulatedExntries) accumulated.erase(accumulated.begin());
@@ -100,26 +100,26 @@ public:
         return std::accumulate(accumulated.begin(), accumulated.end(), 0.0, meanFunction);
     }
 
-    // Helper to draw a header text block on an image
-    static void drawHeader(cv::Mat& image, const std::string& text)
-    {
-        int blockHeight = 40;
-        drawTextBlock(image, text, cv::Point(0, 0), cv::Scalar(50, 200, 50), blockHeight);
-    }
-
-    // Helper to draw a footer text block on an image
-    static void drawFooter(cv::Mat& image, const std::string& text)
-    {
-        int blockHeight = 40;
-        drawTextBlock(image, text, cv::Point(0, image.rows - blockHeight), cv::Scalar(200, 100, 100), blockHeight);
-    }
-
     // Helper to draw a colored text block with black text inside
-    static void drawTextBlock(cv::Mat& image, const std::string& text, cv::Point topLeft, cv::Scalar color, int height = 40)
+    static void DrawTextBlock(cv::Mat& image, const std::string& text, cv::Point topLeft, cv::Scalar color, int height = 40)
     {
         double fontScale = 0.7;
         cv::rectangle(image, topLeft, cv::Point(image.cols, topLeft.y + height), color, cv::FILLED);
         cv::putText(image, text, cv::Point(topLeft.x + height / 4, topLeft.y + (int)(height * 0.667)),
                     cv::FONT_HERSHEY_COMPLEX_SMALL, fontScale, cv::Scalar(0, 0, 0), 1, cv::LINE_AA);
+    }
+
+    // Helper to draw a header text block on an image
+    static void DrawHeader(cv::Mat& image, const std::string& text)
+    {
+        int blockHeight = 40;
+        DrawTextBlock(image, text, cv::Point(0, 0), cv::Scalar(50, 200, 50), blockHeight);
+    }
+
+    // Helper to draw a footer text block on an image
+    static void DrawFooter(cv::Mat& image, const std::string& text)
+    {
+        int blockHeight = 40;
+        DrawTextBlock(image, text, cv::Point(0, image.rows - blockHeight), cv::Scalar(200, 100, 100), blockHeight);
     }
 };
