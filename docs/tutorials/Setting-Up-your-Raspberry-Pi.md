@@ -15,11 +15,11 @@ Most of our tutorials follow a common workflow. The first steps involve authorin
 ## Basic Pi Setup
 
 ### Power Adapter and Power Cable
-
 AI workloads guzzle power, so we recommend using a high quality USB power adapter and micro USB cable. An adapter rated for 12 Watts (2.4 Amps) per USB port works best. We've had a good experience with 12W-per-port USB power adapters from Apple, Anker, and Amazon Basics. Long and thin cables will often result in a noticeable voltage drop and fail to provide sufficient power to your Raspberry Pi. Generic unbranded cables are hit-and-miss. For a few extra dollars you can get a nice name-brand cable, like the Anker PowerLine, and save yourself a lot of frustration.
 
 ### Operating System
-Our tutorials assume that the operating system running on your Pi is *Raspbian Jessie* ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)), not the more recent *Raspbian Stretch*.
+Our tutorials assume that the operating system running on your Pi is *Raspbian Jessie* ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)), not the more recent *Raspbian Stretch*. 
+The NOOBS installer is easier to setup because it does not require manually imaging your SD card. However, when installing on your Pi, carefully select `Raspbian with PIXEL` for Jessie from the list of available OSes instead of the recommended option (which installs Raspbian Stretch).
 
 ### CMake
 We use `CMake` on the Raspberry Pi to create Python modules that can be called from our tutorial code. To install `CMake` on your Pi, connect to the network, open a terminal window, and type
@@ -51,6 +51,10 @@ Remember to run `source activate py34` each time you start a new terminal window
 `OpenCV` is a computer vision library that enables us to read images from a camera, resize them, and convert them to NumPy arrays for processing by ELL. To install `OpenCV`,
 
     conda install -c microsoft-ell opencv
+
+### SSH
+Our tutorials will require copying files to run on the Pi. A typical way to copy files to the Pi is to use the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
+To enable SSH on your Pi, go to `Preferences > Raspberry Pi Configuration` from the Raspbian menu, select the `Interfaces` tab and set `SSH` to `Enabled`.
 
 ## Tips and Tweaks
 
@@ -113,7 +117,7 @@ To overclock the processor, experiment with frequencies of 800, 900, 1000, and e
 
 **ImportError: libavcodec.so.56: cannot open shared object file: No such file or directory**
 
-If you do not have the built in libavcodec.so.56, it probably means that you are running a newer version of Raspbian. Our tutorials currently require [Raspbian Jessie](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/2017-07-05-raspbian-jessie.zip).
+If you do not have the built in libavcodec.so.56, it probably means that you are running a newer version of Raspbian. Our tutorials currently require Raspbian Jessie.
 
 
 **ImportError: No module named 'numpy'**
