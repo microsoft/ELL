@@ -155,7 +155,7 @@ def get_categories_from_file(fileName):
     return labels
 ```
 
-Define our main entry point and use the camera as an image source.
+Define the main entry point and use the camera as an image source.
 
 ```python
 def main(args):
@@ -168,7 +168,7 @@ Use the function we defined above to read the category names from the file provi
     categories = get_categories_from_file("categories.txt")
 ```
 
-Define an array to hold our models.
+Define an array to hold the models.
 
 ```python
     models = [model1, model2]    
@@ -192,7 +192,7 @@ Allocate arrays to store each model's output.
     predictionArrays.append(models[1].FloatVector(outputShape.Size()))
 ```
 
-Declare a tiled image used to compose our results. We get this from the helper module we imported earlier.
+Create a tiled image that will be used to display the two frames side-by-side. This function is provided by the helper module that we imported earlier.
 
 ```python
     tiledImage = helpers.TiledImage(len(models))

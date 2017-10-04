@@ -7,7 +7,7 @@ The Embedded Learning Library (ELL) allows you to design and deploy intelligent 
 
 We built ELL for makers, technology enthusiasts, students, entrepreneurs, and developers who aspire to build intelligent devices and AI-powered gadgets. Our tools, our code, and all of the other resources available on this website are free for anyone to adapt and use (for details, see licensing below). Just keep in mind that ELL is a work in progress and that we expect it change rapidly, including breaking API changes.
 
-ELL is a software library and an accompanying set of software tools, written in modern C++, with an optional interface in Python. Download ELL from our [GitHub repository](https://github.com/Microsoft/ELL), either as a [zip file](https://github.com/Microsoft/ELL/archive/master.zip), or with the following clone command:
+ELL is a software library and an accompanying set of software tools, written in modern C++, with an optional interface in Python. Download ELL from our [GitHub repository](https://github.com/Microsoft/ELL), either as a [zip file](https://github.com/Microsoft/ELL/archive/master.zip), or with the following command:
 
     git clone https://github.com/Microsoft/ELL.git
 
@@ -19,7 +19,7 @@ Install ELL on a
 laptop or desktop computer. If you intend to deploy models onto a Raspberry Pi, follow our instruction on [setting up the Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 
 ## Getting Started
-A great place to start is our [tutorials section](/ELL/tutorials). As we develop and release new functionality in ELL, we publish new tutorials that showcase that functionality. Currently, our tutorials are focused on simple embedded computer vision tasks on Raspberry Pi, but we expect the scope to grow with time. Have fun!
+A great place to start is our [tutorials section](/ELL/tutorials). As we develop and release new functionality in ELL, we also publish tutorials that showcase that functionality. Currently, our tutorials are focused on simple embedded computer vision tasks on Raspberry Pi, but we expect the scope to grow with time. Have fun!
 
 ## The ELL Gallery
 Our [gallery](/ELL/gallery) is a collection of bits and pieces that you can download and use in your projects. Currently, the gallery includes a handful of pre-trained computer vision models and instructions for 3D printing an [active cooling attachment](/ELL/gallery/Raspberry-Pi-3-Fan-Mount) for your Raspberry Pi.

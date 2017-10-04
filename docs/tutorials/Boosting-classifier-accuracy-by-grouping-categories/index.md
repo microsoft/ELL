@@ -5,7 +5,7 @@ permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 ---
 # Boosting classifier accuracy by grouping categories
 
-In this tutorial, we will split the 1000 image-categories, which our model was trained to classify, into three disjoint sets: *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will demonstrate how a classifier with low accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, barks when it sees a dog, and meows when it sees a cat.
+In this tutorial, we will split the 1000 image-categories, which the model was trained to classify, into three disjoint sets: *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will demonstrate how a classifier with low accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, barks when it sees a dog, and meows when it sees a cat.
 
 ---
 
@@ -29,7 +29,7 @@ In this tutorial, we will split the 1000 image-categories, which our model was t
 
 The pre-trained models in the [ELL gallery](/ELL/gallery/) are trained to identify 1000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). Often times, we are only interested in a subset of these categories and we don't require the fine-grained categorization that the model was trained to provide. For example, we may want to classify images of dogs versus images of cats, whereas the model is actually trained to distinguish between 11 different varieties of cat and 106 different varieties of dog.
 
-The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate on the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5% on the 3-class problem. We will build an application that grabs a frame from a camera, plays a barking sound when it recognizes one of the dog varieties, and plays a meow sound when it recognizes one of the cat varieties.
+The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate on the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will build an application that grabs a frame from a camera, plays a barking sound when it recognizes one of the dog varieties, and plays a meow sound when it recognizes one of the cat varieties.
 
 ## Step 1: Deploy a pre-trained model on a Raspberry Pi
 

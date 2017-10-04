@@ -35,17 +35,15 @@ These infra-red images show a Pi running idle (left) and after a few minutes of 
 
 ![Pi with Fan](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/Pi-with-Fan.jpg)
 
-That's it - your Pi is ready to rock and roll.
-
 #### Mounting on the Raspberry Pi 7" Touchscreen Display
 
-Most other active cooling solutions for the Raspberry Pi come in the form of an active cooling enclosure or case. A variety of different active cooling cases can be purchased online and some of them work well. However, enclosing the Pi in a case isn't always desirable. For example, in many of our own projects, we like to mount our Pis onto the Raspberry Pi 7" Touchscreen Display. Therefore, we specifically designed our active cooling solution to be compatible with the 7" Touchscreen Display. The only difference in the assembly instructions is that we don't need nuts for the M2.5 x 12 screws. Instead, they screw directly into the M2.5 standoffs that come with the 7" Touchscreen Display.
+Most other active cooling solutions for the Raspberry Pi come in the form of an active cooling enclosure or case. A variety of different active cooling cases can be purchased online and some of them work well. However, enclosing the Pi in a case isn't always desirable. For example, in many of our own projects, we like to mount Raspberry Pis onto the Raspberry Pi 7" Touchscreen Display. Therefore, we specifically designed our active cooling solution to be compatible with the 7" Touchscreen Display. The only difference in the assembly instructions is that we don't need nuts for the M2.5 x 12 screws. Instead, they screw directly into the M2.5 standoffs that come with the 7" Touchscreen Display.
 
 ![Pi with Fan on Display](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/Pi-with-Fan-on-Display.jpg)
 
 #### Printing without standoffs
 
-You may have noticed that our *Pi 3 Fan Mount* comes in two versions, with or without standoffs. If your 3D printer can print support material, we recommend printing the version with standoffs. On the other hand, if your printer only supports a single filament, you may have more luck printing the version without standoffs. In that case, we recommend using appropriate spacers or standoffs.
+You may have noticed that the *Pi 3 Fan Mount* comes in two versions, with or without standoffs. If your 3D printer can print support material, we recommend printing the version with standoffs. On the other hand, if your printer only supports a single filament, you may have more luck printing the version without standoffs. In that case, we recommend using nylon spacers or standoffs to lift the plastic mount off of the Pi circuit board.
 
 ![Two Mount Designs](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/Two-Mount-Designs.jpg)
 
@@ -81,8 +79,8 @@ multi_line_plot("/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/Pi-Heating-Da
 
 The x-axis represents time in seconds and the y-axis represents the processor temperature in Celsius. The measurement starts with the idle processor temperature, and the stress test begins after 20 seconds.
 
-The `none` configuration quickly overheats. Within a few minutes, the processor temperature hits 85 degrees, the temperature at which the processor starts protecting itself by throttling down its frequency. The passive cooling configuration, `heat sink`, isn't much better. At first, the heat sink absorbs some of the heat, causing the processor temperature to rise more slowly. However, the heat sink struggles to dissipate that heat and the processor temperature gradually climbs into the 70's. The passive heat sink prevented the processor from reaching the critical temperature of 85 degrees, but came too close for comfort. Processor temperature depends on many factors, such as ambient temperature, processor load, and processor frequency. Moreover, different Raspberry Pi units behave differently. Our experiment was conducted in an air conditioned office (room temperature was about 26 degrees Celsius) and we can imagine getting into trouble under different circumstances.
+The `none` configuration quickly overheats. Within a few minutes, the processor temperature hits 85 degrees, the temperature at which the processor starts protecting itself by throttling down its frequency. The passive cooling configuration, `heat sink`, isn't much better. At first, the heat sink absorbs some of the heat, causing the processor temperature to rise more slowly. However, the heat sink struggles to dissipate that heat and the processor temperature gradually climbs into the 70's. The passive heat sink prevented the processor from reaching the critical temperature of 85 degrees, but came too close for comfort. Processor temperature depends on many factors, such as ambient temperature, processor load, and processor frequency. Moreover, different Raspberry Pi units behave differently. The experiment was conducted in an air conditioned office (room temperature was about 26 degrees Celsius) and we can imagine getting into trouble under different circumstances.
 
 We were surprised to see the effectiveness of the fan in the `fan` configuration, where the processor temperature quickly stabilizes around 63 degrees. The clear winner is the `both` configuration, where the combination of fan and heat sink works like a champion, and the processor temperature remains below 50 degrees.
 
-Try to repeat our experiment with different AI workloads and different cooling configurations. To measure processor temperature, use the command `watch /opt/vc/bin/vcgencmd measure_temp`.
+Try to repeat the experiment with different AI workloads and different cooling configurations. To measure processor temperature, use the command `watch /opt/vc/bin/vcgencmd measure_temp`.

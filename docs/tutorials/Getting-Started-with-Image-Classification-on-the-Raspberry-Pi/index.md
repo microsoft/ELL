@@ -75,7 +75,7 @@ There should now be a `model.ell` file and a `categories.txt` file in the `tutor
 
 ## Step 3: Compile and run the model on your laptop or desktop computer 
 
-Before deploying the model to the Raspberry Pi, we will practice deploying it to the laptop or desktop computer. Deploying an ELL model requires two steps. First, we run a tool called `wrap`, which both compiles `model.ell` into a library and generates a CMake project to build a Python wrapper for that library. Second, we call CMake to build the Python library. 
+Before deploying the model to the Raspberry Pi, we will practice deploying it to the laptop or desktop computer. Deploying an ELL model requires two steps. First, we run a tool named `wrap`, which both compiles `model.ell` into machine code and generates a CMake project to build a Python wrapper for it. Second, we call CMake to build the Python library. 
 
 Run `wrap` as follows.
 
@@ -83,7 +83,7 @@ Run `wrap` as follows.
 python "../../tools/wrap/wrap.py" categories.txt model.ell -lang python -target host
 ```
 
-Note that we gave `wrap` the command line option `-target host`, which tells it to generate machine code for execution on our computer, rather than machine code for the Raspberry Pi. If all goes well, you should see the following output.
+Note that we gave `wrap` the command line option `-target host`, which tells it to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi. If all goes well, you should see the following output.
 
 ```
 compiling model...
@@ -107,13 +107,13 @@ To finish creating the Python wrapper, build the `cmake` project.
 [Windows] cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell .. && cmake --build . --config release
 ```
 
-We have just created a Python module named `model`, which includes functions that report the model's input and output dimensions and enables us to pass images to the image classifier.  
+We have just created a Python module named `model`. This module provides functions that report the shapes of the model's input and output, as well as the `predict` function, which invokes the classifier. 
 
 ## Step 4: Invoke the model on your computer
 
-The next step is to create a Python script that loads the model, sends images to it, and interprets its output. If you just want the full script, copy it from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/callModel.py) into the `host` directory. Otherwise, create an empty text file named `callModel.py` in the `host` directory and copy in the code snippets below. 
+The next step is to create a Python script that loads the model, sends images to it, and interprets the model's output. If you just want the full script, copy it from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/callModel.py) into the `host` directory. Otherwise, create an empty text file named `callModel.py` in the `host` directory and copy in the code snippets below. 
 
-First, import a few dependencies and add directories to our path, to allow Python to find the module that we created above.  
+First, import a few dependencies and add directories to the path, to allow Python to find the module that we created above.  
 
 ```python
 import sys
@@ -149,7 +149,7 @@ Model input shape: [224, 224, 3]
 Model output shape: [1, 1, 1000]
 ```
 
-The input to the model is a 3-channel image of height 224 and width 224 (which can also be represented as an array of size 224 * 224 * 3 = 150528). The shape of the output is 1 x 1 x 1000, which can be represented as an array of 1000 elements. Allocate an array to store the model's output. 
+The input to the model is a 3-channel image of height 224 and width 224, which can also be represented as an array of size 224 * 224 * 3 = 150528. The shape of the output is 1 x 1 x 1000, which can be represented as an array of 1000 elements. Allocate an array to store the model's output. 
 
 ```python
 predictions = model.FloatVector(output_shape.Size())
@@ -161,7 +161,7 @@ Choose an image file to send to the model. For example, use our coffee mug image
 image = cv2.imread("coffeemug.jpg")
 ```
 
-The image stored in the `image` variable cannot be sent to the model as-is, because the model takes its input as an array of `float` values. Moreover, the model expects the input image to have a certain shape and a specific ordering of the color channels (which, in this case, is Blue-Green-Red). Since preparing images for the model is such a common operation, we created a helper function for it called `prepare_image_for_model`. Copy and paste the code for [prepare_image_for_model](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/imageHelper.py) and put it at the top of the file, right after the `import model` statement. Then, call the helper function to prepare your image.
+The image stored in the `image` variable cannot be sent to the model as-is, because the model takes its input as an array of `float` values. Moreover, the model expects the input image to have a certain shape and a specific ordering of the color channels (which, in this case, is Blue-Green-Red). Since preparing images for the model is such a common operation, we created a helper function for it named `prepare_image_for_model`. Copy and paste the code for [prepare_image_for_model](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/imageHelper.py) and put it at the top of the file, right after the `import model` statement. Then, call the helper function to prepare your image.
 
 ```python
 input = prepare_image_for_model(image, input_shape.columns, input_shape.rows)
@@ -227,10 +227,9 @@ Import the module that contains the compiled ELL model.
 import model
 ```
 
-The following functions help us get an image from the camera and read in the categories file.
+The following function helps us read an image from the camera.
 
 ```python
-# Function to return an image from our camera using OpenCV
 def get_image_from_camera(camera):
     if camera is not None:
         # if predictor is too slow frames get buffered, this is designed to flush that buffer
@@ -239,17 +238,10 @@ def get_image_from_camera(camera):
             raise Exception('your capture device is not returning images')
         return frame
     return None
-
-# Return an array of strings corresponding to the model's recognized categories or classes.
-# The order of the strings in this file are expected to match the order of the
-# model's output predictions.
-def get_categories_from_file(fileName):
-    labels = []
-    with open(fileName) as f:
-        labels = f.read().splitlines()
-    return labels
 ```
-Define our main entry point and use the camera as our image source:
+
+Define the main entry point and use the camera as the image source:
+
 ```python
 def main(args):
     if (len(args) < 1):

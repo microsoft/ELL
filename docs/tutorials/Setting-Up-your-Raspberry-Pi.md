@@ -15,42 +15,66 @@ Most of our tutorials follow a common workflow. The first steps involve authorin
 ## Basic Pi Setup
 
 ### Power Adapter and Power Cable
-
-AI workloads guzzle power, so we recommend using a high quality USB power adapter and micro USB cable. An adapter rated for 12 Watts (2.4 Amps) per USB port works best. We've had a good experience with 12W-per-port USB power adapters from Apple, Anker, and Amazon Basics. Long and thin cables will often result in a noticeable voltage drop and fail to provide sufficient power to your Raspberry Pi. Generic unbranded cables are hit-and-miss. For a few extra dollars you can get a nice name-brand cable, like the Anker PowerLine, and save yourself a lot of frustration.
+AI workloads guzzle power, so we recommend using a high quality power supply. If you use a USB power adapter and micro USB cable, choose an adapter rated for at least 12 Watts (2.4 Amps) per USB port. We've had good experience with 12W-per-port USB power adapters from Apple, Anker, and Amazon Basics. Long and thin micro USB cables will often result in a noticeable voltage drop and fail to provide sufficient power to the Raspberry Pi. For a few extra dollars you can get a nice name-brand cable, like the Anker PowerLine, and save yourself a lot of frustration.
 
 ### Operating System
 Our tutorials assume that the operating system running on your Pi is *Raspbian Jessie* ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)), not the more recent *Raspbian Stretch*.
 
-### CMake
-We use `CMake` on the Raspberry Pi to create Python modules that can be called from our tutorial code. To install `CMake` on your Pi, connect to the network, open a terminal window, and type
+### Network
+Connect your Pi to the network, either over Wifi or with an Ethernet cable. We will use the network both to download required software to the Pi and to transfer compiled ELL models from your computer to the Pi.
 
-    sudo apt-get update
-    sudo apt-get install -y cmake
+### CMake
+We use CMake on the Raspberry Pi to create Python modules that can be called from our tutorial code. To install CMake on your Pi, connect to the network, open a terminal window, and type
+
+```
+sudo apt-get update
+sudo apt-get install -y cmake
+```
 
 ### OpenBLAS
-`OpenBLAS` is a library for fast linear algebra operations, which can significantly increase the speed of your models. It is optional, but highly recommended. To install `OpenBLAS`,
+OpenBLAS is a library for fast linear algebra operations, which can significantly increase the speed of your models. It is optional, but highly recommended. To install OpenBLAS, type the following.
 
-    sudo apt-get install -y libopenblas-dev
+```
+sudo apt-get install -y libopenblas-dev
+```
 
 ### Python 3.4 via Miniconda
-Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). We recommend using the [Miniconda](https://conda.io/miniconda.html) distribution of Python, which makes it easy to install any required Python modules. To install Miniconda,
+Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). We recommend using the [Miniconda](https://conda.io/miniconda.html) distribution of Python, which makes it easy to install any required Python modules. To install Miniconda, type the following. 
 
-    wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
-    chmod +x Miniconda3-latest-Linux-armv7l.sh
-    ./Miniconda3-latest-Linux-armv7l.sh
+```
+wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
+chmod +x Miniconda3-latest-Linux-armv7l.sh
+./Miniconda3-latest-Linux-armv7l.sh
+```
 
-When prompted to install, reply [yes] to add Miniconda3 to your PATH. Next create an environment, as follows
+When prompted to install, reply [yes] to add Miniconda3 to your PATH. Next create an environment, as follows.
 
-    source ~/.bashrc
-    conda create --name py34 python=3
-    source activate py34
+```
+source ~/.bashrc
+conda create --name py34 python=3.4
+source activate py34
+```
 
 Remember to run `source activate py34` each time you start a new terminal window.
 
 ### OpenCV
-`OpenCV` is a computer vision library that enables us to read images from a camera, resize them, and convert them to NumPy arrays for processing by ELL. To install `OpenCV`,
+[OpenCV](http://opencv.org/) is a computer vision library that enables us to read images from a camera, resize them, and prepare them for processing by ELL. To install OpenCV, type the following.
 
-    conda install -c microsoft-ell opencv
+```
+conda install -c microsoft-ell opencv
+```
+
+By default, OpenCV can read images from a USB webcam, but not from the Raspberry Pi camera. To enable the Pi camera, first make sure that the camera interface is enabled by running the Pi configuration tool. 
+
+```
+sudo raspi-config
+```
+
+Select `enable camera`, hit `enter`, and go to `finish`. Then, load the camera module, as follows.
+
+```
+sudo modprobe bcm2835-v4l2
+```
 
 ## Tips and Tweaks
 
@@ -60,13 +84,17 @@ Raspberry Pis weren't designed to run AI workloads. Many AI workloads, like visu
 
 Edit the file `~/.config/lxsession/LXDE-pi/autostart`, for example, by typing
 
-    leafpad ~/.config/lxsession/LXDE-pi/autostart
+```
+leafpad ~/.config/lxsession/LXDE-pi/autostart
+```
 
-Add the following lines to this file
+Add the following lines to this file.
 
-    @xset -dpms
-    @xset s noblank
-    @xset s off
+```
+@xset -dpms
+@xset s noblank
+@xset s off
+```
 
 The first line disables energy star and the next two lines disable the screensaver. These changes take effect after rebooting.
 
@@ -74,40 +102,52 @@ The first line disables energy star and the next two lines disable the screensav
 
 The Raspberry Pi supports dynamic clocking, which means that it can change the processor frequency according to processor load. You can check the range of processor frequencies that your Raspberry Pi is configured for by typing `lscpu`. To disable dynamic clocking, edit `/boot/config.txt`, for example, by typing
 
-   sudo leafpad /boot/config.txt
+```
+sudo leafpad /boot/config.txt
+```
 
 Add the setting
 
-    force_turbo=1
+```
+force_turbo=1
+```
 
 This change takes effect after rebooting.
 
 ### Underclocking and Overclocking
 
-Computation produces heat. Even at the default processor frequency of 700MHz, a Raspberry Pi running a serious AI workload at room temperature can overheat unless fitted with a physical cooling device. We recommend following our instructions for [active cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/). If you don't want to physically cool your Pi, you can cool it by reducing the processor frequency (underclocking).
+Computation produces heat. Even at the default processor frequency of 700MHz, a Raspberry Pi running a serious AI workload at room temperature can overheat unless fitted with a physical cooling device. We recommend following our instructions for [actively cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/). If you don't want to physically cool your Pi, you can cool it by reducing the processor frequency (underclocking).
 
-If you do fit your Pi with active cooling, you can also increase the processor frequency (overclocking) without overheating. **Be warned** that overclocking your Raspberry Pi can void your warranty. Also, we've experienced some weird behavior when overclocking our Pis: some Pi units freeze up while other units lose their USB peripherals. You won't know how your specific Pi will react to overclocking until you try it. Overclocking isn't for the faint of heart - **proceed at your own risk**.
+If you do fit your Pi with an active cooling attachment, you can also increase the processor frequency (overclocking) without overheating. **Be warned** that overclocking your Raspberry Pi can void your warranty. Also, we've experienced some weird behavior when overclocking Raspberry Pis: some Pi units freeze up while other units lose their USB peripherals. You won't know how your specific Pi will react to overclocking until you try it. Overclocking isn't for the faint of heart - **proceed at your own risk**.
 
-To change your processor frequency, edit `/boot/config.txt`, for example, by typing
+To change your processor frequency, edit `/boot/config.txt`, for example, by typing the following. 
 
-   sudo leafpad /boot/config.txt
+```
+sudo leafpad /boot/config.txt
+```
 
 The default processor speed is 700 MHz. To underclock your processor, add the setting
 
-    arm_freq=600
+```
+arm_freq=600
+```
 
-The change takes effect after a reboot. Once the Pi reboots, you can confirm the change using the utility `lscpu`. To check if a frequency of 600MHz is slow enough, run your AI workload and measure the processor temperature. Measuring temperature can be done by typing
+The change takes effect after a reboot. Once the Pi reboots, you can confirm the change using the utility `lscpu`. To check if a frequency of 600MHz is slow enough, run your AI workload and measure the processor temperature. Measuring temperature can be done as follows.
 
-    watch /opt/vc/bin/vcgencmd measure_temp
+```
+watch /opt/vc/bin/vcgencmd measure_temp
+```
 
 This command prints the processor temperature every 2 seconds. When fully stressing your Pi, you want the processor temperature to stay far below 85 degrees Celsius. As a rule of thumb, we like to keep processor temperature below 60 degrees.
 
-To overclock the processor, experiment with frequencies of 800, 900, 1000, and even 1200. You will also want to tweak some of the other parameters, such as `sdram_freq` and `over_voltage`. We like to use this configuration:
+To overclock the processor, experiment with frequencies of 800, 900, 1000, and even 1200. You will also want to tweak some of the other parameters, such as `sdram_freq` and `over_voltage`. We like to use the following configuration.
 
-    arm_freq=900
-    sdram_freq=500
-    over_voltage=6
-    temp_limit=75
+```
+arm_freq=900
+sdram_freq=500
+over_voltage=6
+temp_limit=75
+```
 
 ## Troubleshooting
 
