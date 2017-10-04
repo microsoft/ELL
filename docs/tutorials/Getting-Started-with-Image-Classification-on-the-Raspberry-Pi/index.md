@@ -337,7 +337,7 @@ python tutorial.py
 
 If you have a camera and display connected to your Pi, you should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and different types of African animals. 
 
-If you copied the full source for [tutorial.py](/ELL/tutorials/shared/tutorial.py), you will also see the average time in milliseconds it takes the model to process a frame.
+If you copied the full source for [tutorial.py](/ELL/tutorials/shared/tutorial.py), you will also see the average time in milliseconds it takes the model to process each image. If you compare the displayed time with the time indicated in the [ELL gallery](/ELL/gallery/), you will notice that your model runs slower than it should. The slow down is caused by inefficiencies in the Python wrapper, and we are working to fix this problem. To run the model at its top speed, follow the [C++ version of this tutorial](/ELL/tutorials/Getting-started-with-image-classification-in-cpp).
 
 ## Next steps
 
