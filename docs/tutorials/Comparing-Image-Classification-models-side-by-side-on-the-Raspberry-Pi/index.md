@@ -35,7 +35,7 @@ If you followed the setup instructions, you should have an environment named `py
 
 Then, cd into the directory where you built ELL and create a `sideBySide` directory
 
-```
+```shell
 cd ELL/build
 mkdir sideBySide
 cd sideBySide
@@ -46,21 +46,21 @@ cd sideBySide
 Download this [real-valued ELL model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip) and this [binarized ELL model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip)
 into the `sideBySide` directory.
 
-```
+```shell
 curl --location -o model1.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip
 curl --location -o model2.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip
 ```
 
 Unzip the compressed files.
 
-```
+```shell
 unzip model1.ell.zip
 unzip model2.ell.zip
 ```
 
 Rename them to `model1.ell` and `model2.ell` respectively.
 
-```
+```shell
 [Unix] mv d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && mv d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
 [Windows] ren d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && ren d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
 ```
@@ -68,7 +68,7 @@ Rename them to `model1.ell` and `model2.ell` respectively.
 (One Windows, unzip is part of the Git distribution, for example, in `\Program Files\Git\usr\bin`.)
 Next, download the file of [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) that correspond to these models.
 
-```
+```shell
 curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
 ```
 
@@ -268,7 +268,7 @@ We are ready to move to the Raspberry Pi. You can copy the `sideBySide` folder t
 
 Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and screen connected. Find the `sideBySide` folder you just copied over and build the two CMake projects.
 
-```
+```shell
 cd model1
 mkdir build
 cd build
