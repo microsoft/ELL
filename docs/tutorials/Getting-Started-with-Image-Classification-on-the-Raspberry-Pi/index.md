@@ -232,7 +232,6 @@ The following function helps us read an image from the camera.
 ```python
 def get_image_from_camera(camera):
     if camera is not None:
-        # if predictor is too slow frames get buffered, this is designed to flush that buffer
         ret, frame = camera.read()
         if (not ret):
             raise Exception('your capture device is not returning images')
@@ -240,22 +239,17 @@ def get_image_from_camera(camera):
     return None
 ```
 
-Define the main entry point and use the camera as the image source:
+Define the main entry point and use the camera as the image source.
 
 ```python
-def main(args):
-    if (len(args) < 1):
-        print("usage: python tutorial.py categories.txt")
-        exit()
-    
-    # Open the video camera. To use a different camera, change the camera index.
+def main():
     camera = cv2.VideoCapture(0)
 ```
 
-Use the function we defined above to read the category names from the file provided on the command line.  
+Read the file of category names.
 
 ```python
-    categories = get_categories_from_file(args[0])
+    categories = open('categories.txt', 'r').readlines()
 ```
 
 The model expects its input in a certain shape. Get this shape and store it for use later on. 
@@ -312,9 +306,7 @@ Finally, write the code that invokes the `main` function and runs your script.
 
 ```python
 if __name__ == "__main__":
-    args = sys.argv
-    args.pop(0)
-    main(args)
+    main()
 ```
 
 We are ready to move to the Raspberry Pi. You can copy the `pi3` folder to the Pi using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
@@ -340,7 +332,7 @@ If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-
 
 ```
 source activate py34
-python tutorial.py categories.txt
+python tutorial.py
 ```
 
 If you have a camera and display connected to your Pi, you should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and different types of African animals. 

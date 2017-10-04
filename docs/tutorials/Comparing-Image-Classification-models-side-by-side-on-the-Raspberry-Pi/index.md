@@ -158,14 +158,14 @@ def get_categories_from_file(fileName):
 Define the main entry point and use the camera as an image source.
 
 ```python
-def main(args):
+def main():
     camera = cv2.VideoCapture(0)
 ```
 
-Use the function we defined above to read the category names from the file provided on the command line.  
+Read the file of category names.
 
 ```python
-    categories = get_categories_from_file("categories.txt")
+    categories = open('categories.txt', 'r').readlines()
 ```
 
 Define an array to hold the models.
@@ -257,9 +257,7 @@ Finally, write the code that invokes the `main` function and runs your script.
 
 ```python
 if __name__ == "__main__":
-    args = sys.argv
-    args.pop(0) # when an args list is passed to parse_args, the first argument (program name) needs to be dropped
-    main(sys.argv)
+    main()
 ```
 
 We are ready to move to the Raspberry Pi. You can copy the `sideBySide` folder to the Pi using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.

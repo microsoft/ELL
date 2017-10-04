@@ -122,7 +122,7 @@ Finally, include the helper functions that were copied over earlier.
 Define the following functions, which will help us get images from the camera and read in the categories file.
 
 ```cpp
-// Helper function to get an image from the camera using OpenCV
+// Read an image from the camera
 static cv::Mat getImageFromCamera(cv::VideoCapture& camera)
 {
     cv::Mat frame;
@@ -130,10 +130,8 @@ static cv::Mat getImageFromCamera(cv::VideoCapture& camera)
     return frame;
 }
 
-// Return a vector of strings corresponding to the model's recognized categories or classes.
-// The order of the strings in this file are expected to match the order of the
-// model's output predictions.
-static std::vector<std::string> getCategoriesFromFile(const std::string& filename)
+// Read a file of strings.
+static std::vector<std::string> ReadLines(const std::string& filename)
 {
     std::vector<std::string> categories;
 
@@ -154,19 +152,13 @@ Define the `main` function and start the camera.
 ```cpp
 int main(int argc, char** argv )
 {
-    if ( argc < 2 )
-    {
-        printf("usage: tutorial categories.txt\n");
-        return -1;
-    }
-    // Open the video camera. To use a different camera, change the camera index.
     cv::VideoCapture camera(0);
 ```
 
 Use the function we defined above to read the category names from the file provided on the command line.
 
 ```cpp
-    auto categories = getCategoriesFromFile(argv[1]);
+    auto categories = ReadLines("categories.txt");
 ```
 
 The model expects its input in a certain shape. Get this shape and store it for use later on.  
@@ -190,10 +182,10 @@ Next, set up a loop that keeps going until OpenCV indicates it is done, which is
         cv::Mat image = getImageFromCamera(camera);
 ```
 
-The image stored in the `image` variable cannot be sent to the model as-is, because the model takes its input as an vector of `float` values. Moreover, the model expects the input image to have a certain shape and a specific ordering of the color channels (which, in this case, is Blue-Green-Red). Since preparing images for the model is such a common operation, we created a helper function for it named `prepareImageForModel`.
+The image stored in the `image` variable cannot be sent to the model as-is, because the model takes its input as an vector of `float` values. Moreover, the model expects the input image to have a certain shape and a specific ordering of the color channels (which, in this case, is Blue-Green-Red). Since preparing images for the model is such a common operation, we created a helper function for it named `PrepareImageForModel`.
 
 ```cpp
-        auto input = tutorialHelpers::prepareImageForModel(image, inputShape.columns, inputShape.rows);
+        auto input = tutorialHelpers::PrepareImageForModel(image, inputShape.columns, inputShape.rows);
 ```
 
 With the processed image input handy, call the `predict` method to invoke the model.
@@ -202,10 +194,10 @@ With the processed image input handy, call the `predict` method to invoke the mo
         model_predict(input, predictions);
 ```
 
-The `predict` method fills the `predictions` vector with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `getTopNPredictions`.
+The `predict` method fills the `predictions` vector with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `GetTopNPredictions`.
 
 ```cpp
-        auto top5 = tutorialHelpers::getTopNPredictions(predictions, 5);
+        auto top5 = tutorialHelpers::GetTopNPredictions(predictions, 5);
 ```
 
 Match the category indices in `top5` with the category names in `categories`.
@@ -284,11 +276,8 @@ cd ..
 
 ## Step 7: Classify live video on the Raspberry Pi
 
-Make sure that a camera is connected to your Pi and run the application. 
+Make sure that a camera is connected to your Pi and run the `tutorial` program. 
 
-````
-tutorial categories.txt
-````
 
 You should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and different types of African animals.
 

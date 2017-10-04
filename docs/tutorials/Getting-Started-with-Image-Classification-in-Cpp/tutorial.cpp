@@ -80,11 +80,11 @@ int main(int argc, char** argv )
         // or load the image from some other source.
         cv::Mat image = getImageFromCamera(camera);
 
-        // Prepare the image to pass to the model. This helper:
-        // - crops and resizes the image maintaining proper aspect ratio
-        // - reorders the image channels if needed
-        // - returns the data as a std::vector<float> so it can be handed to the model
-        auto input = tutorialHelpers::prepareImageForModel(image, inputShape.columns, inputShape.rows);
+        // Prepare an image for processing. 
+        // - Resize and center-crop to the required width and height while preserving aspect ratio.
+        // - OpenCV gives the image in BGR order, if needed, re-order the channels to RGB.
+        // - Convert the OpenCV result to a std::vector<float>
+        auto input = tutorialHelpers::PrepareImageForModel(image, inputShape.columns, inputShape.rows);
 
         auto start = std::chrono::steady_clock::now();        
         // Get the predicted classes using the model's predict function on the image input data. 
@@ -93,9 +93,9 @@ int main(int argc, char** argv )
         model_predict(input, predictions);
         auto end = std::chrono::steady_clock::now();
 
-        // Let's grab the value of the top 5 predictions and their index, which represents the top five most 
+        // Get the value of the top 5 predictions and their index, which represents the top five most 
         // confident matches and the class or category they belong to.
-        auto top5 = tutorialHelpers::getTopNPredictions(predictions, 5);
+        auto top5 = tutorialHelpers::GetTopNPredictions(predictions, 5);
 
         // Draw header text that represents the top5 predictions
         std::stringstream headerText;

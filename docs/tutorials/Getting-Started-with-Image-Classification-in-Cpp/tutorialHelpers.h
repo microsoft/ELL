@@ -15,13 +15,11 @@
 class tutorialHelpers
 {
 public:
-    // Prepare an image for use with a model. Typically, this involves:
-    // - Resize and center crop to the required width and height while preserving the image's aspect ratio.
-    //   Simple resize may result in a stretched or squashed image which will affect the model's ability
-    //   to classify images.
-    // - OpenCV gives the image in BGR order, so we may need to re-order the channels to RGB.
-    // - Convert the OpenCV result to a std::vector<float> for use with ELL model
-    static std::vector<float> prepareImageForModel(cv::Mat& image, int requiredWidth, int requiredHeight, bool reorderToRGB = false)
+    // Prepare an image for processing by an ELL model. 
+    // - Resize and center-crop to the required width and height while preserving aspect ratio.
+    // - OpenCV gives the image in BGR order, if needed, re-order the channels to RGB.
+    // - Convert the OpenCV result to a std::vector<float>
+    static std::vector<float> PrepareImageForModel(cv::Mat& image, int requiredWidth, int requiredHeight, bool reorderToRGB = false)
     {
         cv::Mat resultImage = cv::Mat::zeros(requiredWidth, requiredHeight, image.type() );
         std::vector<float> result(resultImage.total() * resultImage.channels());
@@ -66,7 +64,7 @@ public:
     // Returns up to the top N predictions (that exceed our threshold) as a vector of std::pair, 
     // where the first represents the index or class of the prediction and the second 
     // represents that probability or confidence value.
-    static std::vector<std::pair<size_t, float>> getTopNPredictions(const std::vector<float>& predictions, size_t topN = 5, double threshold = 0.20)
+    static std::vector<std::pair<size_t, float>> GetTopNPredictions(const std::vector<float>& predictions, size_t topN = 5, double threshold = 0.20)
     {
         std::vector<std::pair<size_t, float>> result;
 

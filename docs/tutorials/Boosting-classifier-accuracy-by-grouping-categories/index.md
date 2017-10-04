@@ -66,23 +66,16 @@ Also, import the Python module for the compiled ELL model.
 import model
 ```
 
-As in previous tutorials, define some helper functions to get images from the camera and read a list of categories from file.
+As in previous tutorials, define a helper functions that reads images from the camera.
 
 ```python
 def get_image_from_camera(camera):
     if camera is not None:
-        # if predictor is too slow frames get buffered, this is designed to flush that buffer
         ret, frame = camera.read()
         if (not ret):
             raise Exception('your capture device is not returning images')
         return frame
     return None
-
-def get_categories_from_file(fileName):
-    labels = []
-    with open(fileName) as f:
-        labels = f.read().splitlines()
-    return labels
 ```
 
 Next, define helper functions that check whether a category is contained in a category list. Since categories can sometimes have more than one text description, each category label may be several strings, separated by commas. Checking whether a category label matches means checking whether any one of those elements is contained in the label, and whether any match occurs in the set.
@@ -131,20 +124,18 @@ def take_action(group):
 Define the main entry point and start the camera.
 
 ```python
-    if (len(args) < 1):
-        print("usage: python pets.py categories.txt")
-        exit()
+ def main():
 
     # Open the video camera. To use a different camera, change the camera index.
     camera = cv2.VideoCapture(0)
 ```
 
-Read the file of category names. Grouping uses subsets of the total categories, where each group is a unique subset. The `dogs.txt` and `cats.txt` files are simply subsets of the larger file containing 1000 classes of objects. For example `dogs.txt` contains a list of all the dog breeds that the model was trained to recognize. Read the overall categories, and the categories for the dogs and cats groups.
+Read the category names from `categories.txt`, the list of dog-breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
 
 ```python
-    categories = get_categories_from_file(args[0])
-    dogs = get_categories_from_file("dogs.txt")
-    cats = get_categories_from_file("cats.txt")
+    categories = open('categories.txt', 'r').readlines()
+    dogs = open('dogs.txt', 'r').readlines()
+    cats = open('cats.txt', 'r').readlines()
 ```
 
 Get the model input and output shapes and allocate an array to hold the model output. 
@@ -248,9 +239,7 @@ Finally, update the state if enough time has passed and display the image and he
         cv2.imshow('Grouping', image)
 
 if __name__ == "__main__":
-    args = sys.argv
-    args.pop(0)
-    main(args)
+    main()
 ```
 
 ## Step 3: Classify live video on the Raspberry Pi
@@ -259,7 +248,7 @@ If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-
 
 ```
 source activate py34
-python pets.py categories.txt
+python pets.py
 ```
 
 Point your camera at different objects and see how the model classifies them. Look at `dogs.txt` and `cats.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen, have your computer display images of different animals, and see when it barks or meows. If you copied the full source for [pets.py](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py), you will also see the average time it takes for the model to process a single frame.
