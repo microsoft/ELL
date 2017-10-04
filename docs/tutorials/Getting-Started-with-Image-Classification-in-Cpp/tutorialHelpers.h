@@ -17,15 +17,14 @@ class tutorialHelpers
 public:
     // Prepare an image for processing by an ELL model. 
     // - Resize and center-crop to the required width and height while preserving aspect ratio.
-    // - OpenCV gives the image in BGR order, if needed, re-order the channels to RGB.
+    // - OpenCV gives the image in BGR order. If needed, re-order the channels to RGB.
     // - Convert the OpenCV result to a std::vector<float>
     static std::vector<float> PrepareImageForModel(cv::Mat& image, int requiredWidth, int requiredHeight, bool reorderToRGB = false)
     {
         cv::Mat resultImage = cv::Mat::zeros(requiredWidth, requiredHeight, image.type() );
         std::vector<float> result(resultImage.total() * resultImage.channels());
         
-        // Create a region of interest that defines a center crop, keeping the initial aspect ratio
-        // but whose destination dimensions are compatible with the requiredWidth and requiredHeight
+        // Define a region of interest whose shape is compatible with the requiredWidth and requiredHeight
         cv::Rect roi;
         if (image.rows >= image.cols)
         {
@@ -45,26 +44,28 @@ public:
             roi.x = (image.cols - roi.width) / 2;
             roi.y = 0;
         }
+
         // Crop the image to the region of interest
         cv::Mat centerCropped = image(roi);
+
         // Resize to the required dimensions
         cv::resize(centerCropped, resultImage, resultImage.size());
-        // Re-order if needed
+        
+        // Reorder color channels if needed
         if (reorderToRGB)
         {
             cv::cvtColor(resultImage, resultImage, cv::COLOR_BGR2RGB);
         }
 
-        // Convert the cv::Mat into a vector of floats
+        // Convert to a vector of floats
         result.assign(resultImage.datastart, resultImage.dataend);
 
         return result;
      }
 
-    // Returns up to the top N predictions (that exceed our threshold) as a vector of std::pair, 
-    // where the first represents the index or class of the prediction and the second 
-    // represents that probability or confidence value.
-    static std::vector<std::pair<size_t, float>> GetTopNPredictions(const std::vector<float>& predictions, size_t topN = 5, double threshold = 0.20)
+    // Returns the top N scores that exceed a given threshold. The result is a vector of std::pair, 
+    // where the first element of each pair is the index and the second is the score. 
+    static std::vector<std::pair<size_t, float>> GetTopN(const std::vector<float>& predictions, size_t topN = 5, double threshold = 0.20)
     {
         std::vector<std::pair<size_t, float>> result;
 
@@ -91,16 +92,16 @@ public:
     }
 
     // Add a duration to a vector and calculate the mean duration.
-    static double GetMeanDuration(std::vector<double>& accumulated, double duration, size_t maxAccumulatedExntries = 30)
+    static double GetMeanDuration(std::vector<double>& accumulated, double duration, size_t maxAccumulatedEntries = 30)
     {
         accumulated.emplace_back(duration);
-        if (accumulated.size() > maxAccumulatedExntries) accumulated.erase(accumulated.begin());
+        if (accumulated.size() > maxAccumulatedEntries) accumulated.erase(accumulated.begin());
         auto meanFunction = [&accumulated](double a, double b) {return a + b / accumulated.size(); };
 
         return std::accumulate(accumulated.begin(), accumulated.end(), 0.0, meanFunction);
     }
 
-    // Helper to draw a colored text block with black text inside
+    // Draw a colored text block with black text inside
     static void DrawTextBlock(cv::Mat& image, const std::string& text, cv::Point topLeft, cv::Scalar color, int height = 40)
     {
         double fontScale = 0.7;
@@ -109,14 +110,14 @@ public:
                     cv::FONT_HERSHEY_COMPLEX_SMALL, fontScale, cv::Scalar(0, 0, 0), 1, cv::LINE_AA);
     }
 
-    // Helper to draw a header text block on an image
+    // Draw a header text block on an image
     static void DrawHeader(cv::Mat& image, const std::string& text)
     {
         int blockHeight = 40;
         DrawTextBlock(image, text, cv::Point(0, 0), cv::Scalar(50, 200, 50), blockHeight);
     }
 
-    // Helper to draw a footer text block on an image
+    // Draw a footer text block on an image
     static void DrawFooter(cv::Mat& image, const std::string& text)
     {
         int blockHeight = 40;

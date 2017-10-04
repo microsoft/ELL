@@ -51,7 +51,7 @@ def prepare_image_for_model(image, requiredWidth, requiredHeight, reorderToRGB =
     result = resized.astype(np.float).ravel()
     return result
 
-def get_top_n_predictions(predictions, N = 5, threshold = 0.20):
+def get_top_n(predictions, N = 5, threshold = 0.20):
     """Return at most the top N predictions as a list of tuples that meet the threshold.
        The first of element of each tuple represents the index or class of the prediction and the second 
        element represents that probability or confidence value.

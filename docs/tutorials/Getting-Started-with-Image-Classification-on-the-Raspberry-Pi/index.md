@@ -284,10 +284,10 @@ With the processed image input handy, call the `predict` method to invoke the mo
         model.predict(input, predictions)
 ```
 
-As before, the `predict` method fills the `predictions` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n_predictions`.
+As before, the `predict` method fills the `predictions` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n`.
 
 ```python
-        top5 = helpers.get_top_n_predictions(predictions, 5)
+        top5 = helpers.get_top_n(predictions, 5)
 ```
 
 `top5` is an array of tuples, where the first element is the category index and the second element is the probability of that category. Match the category indices in `top5` with the category names in `categories`.

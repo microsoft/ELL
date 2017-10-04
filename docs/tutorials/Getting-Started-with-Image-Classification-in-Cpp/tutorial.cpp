@@ -33,7 +33,7 @@ static cv::Mat GetImageFromFile(const std::string& filename)
 }
 
 // Read a file of strings
-static std::vector<std::string> ReadLines(const std::string& filename)
+static std::vector<std::string> ReadLinesFromFile(const std::string& filename)
 {
     std::vector<std::string> categories;
 
@@ -54,7 +54,7 @@ int main(int argc, char** argv )
     cv::VideoCapture camera(0);
 
     // Read the category names
-    auto categories = ReadLines("categories.txt");
+    auto categories = ReadLinesFromFile("categories.txt");
 
     // Get the model's input shape. We will use this information later to resize images appropriately.
     TensorShape inputShape;
@@ -74,7 +74,7 @@ int main(int argc, char** argv )
 
         // Prepare an image for processing
         // - Resize and center-crop to the required width and height while preserving aspect ratio.
-        // - OpenCV gives the image in BGR order, if needed, re-order the channels to RGB.
+        // - OpenCV gives the image in BGR order. If needed, re-order the channels to RGB.
         // - Convert the OpenCV result to a std::vector<float>
         auto input = tutorialHelpers::PrepareImageForModel(image, inputShape.columns, inputShape.rows);
 
@@ -84,7 +84,7 @@ int main(int argc, char** argv )
         auto end = std::chrono::steady_clock::now();
 
         // Get the value of the top 5 predictions 
-        auto top5 = tutorialHelpers::GetTopNPredictions(predictions, 5);
+        auto top5 = tutorialHelpers::GetTopN(predictions, 5);
 
         // Generate header text that represents the top5 predictions
         std::stringstream headerText;

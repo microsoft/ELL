@@ -123,15 +123,15 @@ Define the following functions, which will help us get images from the camera an
 
 ```cpp
 // Read an image from the camera
-static cv::Mat getImageFromCamera(cv::VideoCapture& camera)
+static cv::Mat GetImageFromCamera(cv::VideoCapture& camera)
 {
     cv::Mat frame;
     camera >> frame;
     return frame;
 }
 
-// Read a file of strings.
-static std::vector<std::string> ReadLines(const std::string& filename)
+// Read a file of strings
+static std::vector<std::string> ReadLinesFromFile(const std::string& filename)
 {
     std::vector<std::string> categories;
 
@@ -158,7 +158,7 @@ int main(int argc, char** argv )
 Use the function we defined above to read the category names from the file provided on the command line.
 
 ```cpp
-    auto categories = ReadLines("categories.txt");
+    auto categories = ReadLinesFromFile("categories.txt");
 ```
 
 The model expects its input in a certain shape. Get this shape and store it for use later on.  
@@ -179,7 +179,7 @@ Next, set up a loop that keeps going until OpenCV indicates it is done, which is
 ```cpp:
     while (cv::waitKey(1) == 0xFF)
     {
-        cv::Mat image = getImageFromCamera(camera);
+        cv::Mat image = GetImageFromCamera(camera);
 ```
 
 The image stored in the `image` variable cannot be sent to the model as-is, because the model takes its input as an vector of `float` values. Moreover, the model expects the input image to have a certain shape and a specific ordering of the color channels (which, in this case, is Blue-Green-Red). Since preparing images for the model is such a common operation, we created a helper function for it named `PrepareImageForModel`.
@@ -194,10 +194,10 @@ With the processed image input handy, call the `predict` method to invoke the mo
         model_predict(input, predictions);
 ```
 
-The `predict` method fills the `predictions` vector with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `GetTopNPredictions`.
+The `predict` method fills the `predictions` vector with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `GetTopN`.
 
 ```cpp
-        auto top5 = tutorialHelpers::GetTopNPredictions(predictions, 5);
+        auto top5 = tutorialHelpers::GetTopN(predictions, 5);
 ```
 
 Match the category indices in `top5` with the category names in `categories`.
