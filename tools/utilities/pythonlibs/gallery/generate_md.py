@@ -10,9 +10,14 @@
 import os
 import sys
 import argparse
+import re
 
 # local helpers
 import model_info_retriever as mir
+
+def disable_text_wrapping(text):
+    """Convert spaces to non-breaking spaces so that columns don't wrap"""
+    return re.sub(r" ", "&nbsp;", text)
 
 class GenerateMarkdown:
     def __init__(self):
@@ -67,15 +72,22 @@ class GenerateMarkdown:
         """Formats arch_layers to HTML table rows"""
         def _format_parameters(dict):
             pairs = ["{}={}".format(key, dict[key]) for key in dict.keys()]
-            return ", ".join(pairs)
+            return ",&nbsp;".join(pairs)
 
-        result = ""
+        result = "\n"
         for layer in arch_layers:
-            result += "<tr class=\"table-row-condensed\">\n"
-            result += "\t<td>{}</td>\n".format(layer["name"])
-            result += "\t<td>&#8680; {}</td>\n".format(layer["output_shape"])
-            result += "\t<td>{}</td>\n".format(_format_parameters(layer["parameters"]))
-            result += "</tr>\n"
+            # formatted for readability
+            result += "\t\t\t\t<tr class=\"arch-table\">\n"
+            result += "\t\t\t\t\t<td>{}</td>\n".format(disable_text_wrapping(layer["name"]))
+            result += "\t\t\t\t\t<td>&#8680;&nbsp;{}</td>\n".format(disable_text_wrapping(layer["output_shape"]))
+            result += "\t\t\t\t\t<td>{}</td>\n".format(disable_text_wrapping(_format_parameters(layer["parameters"])))
+            result += "\t\t\t\t</tr>\n"
+
+        result += "\t\t\t"
+
+        # tabs to spaces (for consistency in the generated markdown)
+        result = re.sub(r"\t", "    ", result)
+
         return result
 
     def write_model_info(self):
@@ -89,7 +101,6 @@ class GenerateMarkdown:
         arch_layers = self.model_data["architecture"]
         html = self._arch_layers_to_html(arch_layers)
         self._set_value("@MODEL_ARCH@", html)
-        self._set_value("@MODEL_ARCH_ROWSPAN@", len(arch_layers) + 1) # add 1 to align the column height
 
         # properties
         properties = self.model_data["properties"]

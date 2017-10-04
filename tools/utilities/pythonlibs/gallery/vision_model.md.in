@@ -30,8 +30,10 @@ permalink: /gallery/ILSVRC2012/@PERMALINK@
         <td colspan="3"> @IMAGE_SIZE@ x @IMAGE_SIZE@ x {B,G,R} </td>
     </tr>
     <tr>
-        <td rowspan="@MODEL_ARCH_ROWSPAN@"> Architecture </td>
-        @MODEL_ARCH@
+        <td> Architecture </td>
+        <td>
+            <table class="arch-table">@MODEL_ARCH@</table>
+        </td>
     </tr>
     <tr>
         <td> Output </td>

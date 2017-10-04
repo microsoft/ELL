@@ -30,93 +30,96 @@ permalink: /gallery/ILSVRC2012/d_I256x256x3NCMNCMNBMNBMNBMNBMNB1A
         <td colspan="3"> 256 x 256 x {B,G,R} </td>
     </tr>
     <tr>
-        <td rowspan="18"> Architecture </td>
-        <tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 256x256x16</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 130x130x16</td>
-	<td>size=2x2, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 128x128x64</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 66x66x64</td>
-	<td>size=2x2, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 64x64x64</td>
-	<td>size=3x3, stride=1, type=int64, activation=parametric relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 32x32x64</td>
-	<td>size=3x3, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 32x32x128</td>
-	<td>size=3x3, stride=1, type=int64, activation=parametric relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 16x16x128</td>
-	<td>size=3x3, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 16x16x256</td>
-	<td>size=3x3, stride=1, type=int64, activation=parametric relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 8x8x256</td>
-	<td>size=3x3, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 8x8x512</td>
-	<td>size=3x3, stride=1, type=int64, activation=parametric relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 4x4x512</td>
-	<td>size=3x3, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 4x4x1024</td>
-	<td>size=3x3, stride=1, type=int64, activation=parametric relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 2x2x1024</td>
-	<td>size=3x3, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 2x2x1000</td>
-	<td>size=1x1, stride=1, type=float32</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 1x1x1000</td>
-	<td>size=2x2, stride=1, operation=average</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Softmax</td>
-	<td>&#8680; 1x1x1000</td>
-	<td></td>
-</tr>
-
+        <td> Architecture </td>
+        <td>
+            <table class="arch-table">
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;256x256x16</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;130x130x16</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;128x128x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;66x66x64</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;64x64x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;32x32x64</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;32x32x128</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;16x16x128</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;16x16x256</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;8x8x256</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;8x8x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;4x4x512</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;4x4x1024</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;2x2x1024</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;2x2x1000</td>
+                    <td>size=1x1,&nbsp;stride=1,&nbsp;type=float32</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;1x1x1000</td>
+                    <td>size=2x2,&nbsp;stride=1,&nbsp;operation=average</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Softmax</td>
+                    <td>&#8680;&nbsp;1x1x1000</td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
     </tr>
     <tr>
         <td> Output </td>

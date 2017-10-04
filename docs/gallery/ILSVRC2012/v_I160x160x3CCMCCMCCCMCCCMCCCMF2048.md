@@ -30,103 +30,106 @@ permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048
         <td colspan="3"> 160 x 160 x {B,G,R} </td>
     </tr>
     <tr>
-        <td rowspan="20"> Architecture </td>
-        <tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 160x160x64</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 160x160x64</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 82x82x64</td>
-	<td>size=2x2, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 80x80x128</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 80x80x128</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 42x42x128</td>
-	<td>size=2x2, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 40x40x256</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 40x40x256</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 40x40x256</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 22x22x256</td>
-	<td>size=2x2, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 20x20x512</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 20x20x512</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 20x20x512</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 12x12x512</td>
-	<td>size=2x2, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 10x10x512</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 10x10x512</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Convolution</td>
-	<td>&#8680; 10x10x512</td>
-	<td>size=3x3, stride=1, type=float32, activation=relu</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Pooling</td>
-	<td>&#8680; 5x5x512</td>
-	<td>size=2x2, stride=2, operation=max</td>
-</tr>
-<tr class="table-row-condensed">
-	<td>Softmax</td>
-	<td>&#8680; 1x1x1000</td>
-	<td></td>
-</tr>
-
+        <td> Architecture </td>
+        <td>
+            <table class="arch-table">
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;160x160x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;160x160x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;82x82x64</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;80x80x128</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;80x80x128</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;42x42x128</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;40x40x256</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;40x40x256</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;40x40x256</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;22x22x256</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;20x20x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;20x20x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;20x20x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;12x12x512</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;10x10x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;10x10x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;10x10x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;5x5x512</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Softmax</td>
+                    <td>&#8680;&nbsp;1x1x1000</td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
     </tr>
     <tr>
         <td> Output </td>
