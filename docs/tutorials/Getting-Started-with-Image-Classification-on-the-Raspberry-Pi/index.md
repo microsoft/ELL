@@ -8,7 +8,7 @@ permalink: /tutorials/Getting-started-with-image-classification-on-the-Raspberry
 
 *by Chris Lovett, Byron Changuion, and Ofer Dekel*
 
-In this tutorial, we will download a pre-trained image classifier from the [ELL gallery](/ELL/gallery/) to a laptop or desktop computer. We will then compile the classifier and wrap it in a Python module. Finally, we will write a simple Python script that captures images from the Raspberry Pi's camera and sends them to the Python module for classification.
+In this tutorial, we will download a pre-trained image classification model from the [ELL gallery](/ELL/gallery/) to a laptop or desktop computer. We will then compile the model and wrap it in a Python module. Finally, we will write a simple Python script that captures images from the Raspberry Pi's camera and sends them to the Python module for classification.
 
 ---
 
@@ -109,7 +109,7 @@ To finish creating the Python wrapper, build the `cmake` project.
 [Windows] cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell .. && cmake --build . --config release
 ```
 
-We have just created a Python module named `model`. This module provides functions that report the shapes of the model's input and output, as well as the `predict` function, which invokes the classifier. 
+We have just created a Python module named `model`. This module provides functions that report the shapes of the model's input and output, as well as the `predict` function, which invokes the model. 
 
 ## Step 4: Invoke the model on your computer
 
