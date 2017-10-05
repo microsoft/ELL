@@ -264,7 +264,7 @@ We are ready to move to the Raspberry Pi. If your Pi is accessible over the netw
 
 ## Step 6: Build the project on the Raspberry Pi
 
-Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and screen attached. Find the `cppTutorial` directory you just copied over and build the CMake project.
+Log into your Raspberry Pi, find the `cppTutorial` directory you just copied over, and build the CMake project.
 
 ```
 cd cppTutorial

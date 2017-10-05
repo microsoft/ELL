@@ -199,7 +199,7 @@ Next, set up a loop that keeps going until OpenCV indicates it is done, which is
         image = get_image_from_camera(camera)
 ```
 
-Iterate over the models. In this case, we'll randomize the order so that, on average, no model has an advantage over another due to caching and so on.
+Iterate over the models. In this case, we'll randomize the order so that, on average, neither model has an advantage over another.
 
 ```python
         modelIndexes = np.arange(len(models))
@@ -258,7 +258,7 @@ We are ready to move to the Raspberry Pi. If your Pi is accessible over the netw
 
 ## Step 5: Build the Python wrappers on the Raspberry Pi
 
-Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and screen connected. Find the `sideBySide` directory you just copied over and build the two CMake projects.
+Log into your Raspberry Pi, find the `sideBySide` directory you just copied over, and build the two CMake projects.
 
 ```
 cd model1

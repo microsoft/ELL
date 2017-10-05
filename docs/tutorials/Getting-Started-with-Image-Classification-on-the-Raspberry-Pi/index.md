@@ -316,7 +316,7 @@ We are ready to move to the Raspberry Pi. If your Pi is accessible over the netw
 
 ## Step 7: Build the Python module on the Raspberry Pi
 
-Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and display connected. Find the `pi3` directory you just copied from your computer and build the python module that wraps the ELL model.
+Log into your Raspberry Pi, find the `pi3` directory you just copied from your computer, and build the python module that wraps the ELL model.
 
 ```
 cd pi3
