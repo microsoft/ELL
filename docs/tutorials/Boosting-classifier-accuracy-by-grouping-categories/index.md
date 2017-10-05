@@ -80,7 +80,7 @@ def get_image_from_camera(camera):
     return None
 ```
 
-Next, define helper functions that check whether a category is contained in a category list. Since categories can sometimes have more than one text description, each category label may be several strings, separated by commas. Checking whether a category label matches means checking whether any one of those elements is contained in the label, and whether any match occurs in the set.
+Next, define helper functions that check whether a category is contained in a category list. Since categories can sometimes have more than one text description, each category may contain several strings, separated by commas. Checking whether a category matches means checking whether any one of those elements is contained in the category name, and whether any match occurs in the set.
 
 ```python
 def labels_match(a, b):

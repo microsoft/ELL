@@ -33,22 +33,12 @@ def get_image_from_camera(camera):
         return frame
     return None
 
-# Return an array of strings corresponding to the model's recognized categories or classes.
-# The order of the strings in this file are expected to match the order of the
-# model's output predictions.
-def get_categories_from_file(fileName):
-    labels = []
-    with open(fileName) as f:
-        labels = f.read().splitlines()
-    return labels
-
-def main(args):
-        
+def main():
     # Open the video camera. To use a different camera, change the camera index.
     camera = cv2.VideoCapture(0)
 
-    # Read the category labels
-    categories = get_categories_from_file("categories.txt")    
+    # Read the category names
+    categories = open('categories.txt', 'r').readlines()
 
     # Define the models we'll be using
     models = [model1, model2]    
@@ -100,7 +90,7 @@ def main(args):
 
             # Let's grab the value of the top 5 predictions and their index, which represents the top five most 
             # confident matches and the class or category they belong to.
-            top5 = helpers.get_top_n_predictions(predictionArrays[modelIndex], 5)
+            top5 = helpers.get_top_n(predictionArrays[modelIndex], 5)
 
             # Draw header text that represents the top5 predictions
             modelFrame = np.copy(image)
@@ -118,6 +108,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = sys.argv
-    args.pop(0) # when an args list is passed to parse_args, the first argument (program name) needs to be dropped
-    main(sys.argv)
+    main()

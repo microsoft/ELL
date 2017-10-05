@@ -8,8 +8,7 @@ permalink: /tutorials/Comparing-image-classification-models-side-by-side-on-the-
 
 *by Byron Changuion and Ofer Dekel*
 
-
-In this tutorial, we will download two models from the [ELL gallery](/ELL/gallery/) and run them side-by-side on a Raspberry Pi. Some of the models on the gallery are slower abd accurate, while others are faster but less accurate. Running two models as once allows us to get a sense of their relative speeds and accuracies. Specifically, we will compare a standard (real valued) Convolutional Neural Network to a Neural Network that contains binarized layers. The binarized model is smaller and faster, but less accurate. 
+In this tutorial, we will download two models from the [ELL gallery](/ELL/gallery/) and run them side-by-side on a Raspberry Pi. Some of the models on the gallery are slower and accurate, while others are faster but less accurate. Alternating between two models gives us a sense of their relative speeds and accuracies. Specifically, we will compare a standard (real valued) Convolutional Neural Network to a Neural Network that contains binarized layers. The binarized model is smaller and faster, but less accurate. 
 
 ---
 
@@ -48,7 +47,7 @@ cd sideBySide
 ## Step 2: Download two pre-trained models
 
 Download this [real-valued ELL model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip) and this [binarized ELL model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip)
-into the `sideBySide` directory.
+into the `sideBySide` directory. For convenience, rename them `model1.ell.zip` and `model2.ell.zip`. 
 
 ```
 curl --location -o model1.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip
@@ -78,7 +77,7 @@ curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/ma
 
 There should now be `model1.ell` and `model2.ell` files as well as a `categories.txt` file in the `sideBySide` directory.
 
-## Step 3: Wrap the models in Python callable modules
+## Step 3: Compile the models and create Python wrappers
 
 Use the `wrap.py` tool to compile the models and create Python wrappers. We'll use the `--outdir` option to put the models into different directories.
 
@@ -102,20 +101,20 @@ running llc...
 success, now you can build the 'model2' folder
 ````
 
-We also want to copy some additional python code to your Raspberry Pi for the purpose of running this tutorial.
+Also copy a few helper functions to the `pi3` directory.
 
 ```
 [Unix] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
 [Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
 ```
 
-You should now have a `sideBySide` directory containing `model1` and `model2` directories as well as some helpful python utilities which we'll use later in this tutorial.
+You should now have a `sideBySide` directory containing `model1` and `model2` directories as well as some helpful python utilities, which we'll use later in this tutorial.
 
 We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the `sideBySide` directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
 ## Step 4: Call your models from a Python script
 
-We will write a Python script that grabs images from the camera, invokes the models one at a time, and displays the two frames side-by-side. If you just want the full script, copy it from [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySide.py). Otherwise, create an empty text file named `sideBySide.py` and copy in the code snippets below. 
+We will write a Python script that reads images from the camera, invokes the models one at a time, and displays the two frames side-by-side. If you just want the full script, copy it from [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySide.py). Otherwise, create an empty text file named `sideBySide.py` and copy in the code snippets below. 
 
 First, import a few dependencies, including system utilities, OpenCV, and NumPy.
 ```python
@@ -148,15 +147,6 @@ def get_image_from_camera(camera):
             raise Exception('your capture device is not returning images')
         return frame
     return None
-
-# Return an array of strings corresponding to the model's recognized categories or classes.
-# The order of the strings in this file are expected to match the order of the
-# model's output predictions.
-def get_categories_from_file(fileName):
-    labels = []
-    with open(fileName) as f:
-        labels = f.read().splitlines()
-    return labels
 ```
 
 Define the main entry point and use the camera as an image source.
@@ -231,10 +221,10 @@ With the processed image input handy, call the `predict` method to invoke the mo
             model.predict(input, predictionArrays[modelIndex])
 ```
 
-As before, the `predict` method fills the `predictionsArray[modelIndex]` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n_predictions`.
+As before, the `predict` method fills the `predictionsArray[modelIndex]` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n`.
 
 ```python
-            top5 = helpers.get_top_n_predictions(predictionArrays[modelIndex], 5)
+            top5 = helpers.get_top_n(predictionArrays[modelIndex], 5)
 ```
 
 `top5` is an array of tuples, where the first element is the category index and the second element is the probability of that category. Match the category indices in `top5` with the category names in `categories`.

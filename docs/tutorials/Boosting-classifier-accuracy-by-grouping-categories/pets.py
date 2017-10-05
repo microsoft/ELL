@@ -80,18 +80,14 @@ def take_action(group):
         # A prediction in the cat category group was detected, play a `meow` sound
         play(meowSound)
 
-def main(args):
-    if (len(args) < 1):
-        print("usage: python pets.py categories.txt")
-        exit()
-
+def main():
     # Open the video camera. To use a different camera, change the camera index.
     camera = cv2.VideoCapture(0)
 
-    # Read the category labels
-    categories = get_categories_from_file(args[0])
-    dogs = get_categories_from_file("dogLabels.txt")
-    cats = get_categories_from_file("catLabels.txt")
+    # Read the category names
+    categories = open('categories.txt', 'r').readlines()
+    dogs = open('dogs.txt', 'r').readlines()
+    cats = open('cats.txt', 'r').readlines()
 
     # Get the model's input dimensions. We'll use this information later to resize images appropriately.
     inputShape = model.get_default_input_shape()
@@ -135,7 +131,7 @@ def main(args):
 
             # Let's grab the value of the top prediction and its index, which represents the top most 
             # confident match and the class or category it belongs to.
-            topN = helpers.get_top_n_predictions(predictions, 1)
+            topN = helpers.get_top_n(predictions, 1)
 
             # See whether the prediction is in one of our groups
             group = ""
@@ -165,10 +161,9 @@ def main(args):
             headerText = ""
 
         helpers.draw_header(image, headerText)
+        
         # Display the image using opencv
         cv2.imshow('Grouping', image)
 
 if __name__ == "__main__":
-    args = sys.argv
-    args.pop(0)
-    main(args)
+    main()
