@@ -5,6 +5,8 @@ permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 ---
 # Boosting classifier accuracy by grouping categories
 
+*by Chris Lovett, Byron Changuion, and Ofer Dekel*
+
 In this tutorial, we will split the 1000 image-categories, which the model was trained to classify, into three disjoint sets: *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will demonstrate how a classifier with low accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, barks when it sees a dog, and meows when it sees a cat.
 
 ---
@@ -29,7 +31,7 @@ In this tutorial, we will split the 1000 image-categories, which the model was t
 
 The pre-trained models in the [ELL gallery](/ELL/gallery/) are trained to identify 1000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). Often times, we are only interested in a subset of these categories and we don't require the fine-grained categorization that the model was trained to provide. For example, we may want to classify images of dogs versus images of cats, whereas the model is actually trained to distinguish between 11 different varieties of cat and 106 different varieties of dog.
 
-The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate on the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will build an application that grabs a frame from a camera, plays a barking sound when it recognizes one of the dog varieties, and plays a meow sound when it recognizes one of the cat varieties.
+The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate on the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will write a script that grabs a frame from a camera, plays a barking sound when it recognizes one of the dog varieties, and plays a meow sound when it recognizes one of the cat varieties.
 
 ## Step 1: Deploy a pre-trained model on a Raspberry Pi
 
@@ -99,7 +101,6 @@ def label_in_set(label, label_set):
 When a prediction belonging to the dog group or the cat group is detected, we want to play the appropriate sound file. Define helper functions that play a bark or a meow.
 
 ```python
-# Declare variables that define where to find the sounds files we will play
 script_path = os.path.dirname(os.path.abspath(__file__))
 woofSound = os.path.join(script_path, "woof.wav")
 meowSound = os.path.join(script_path, "meow.wav")
@@ -114,10 +115,8 @@ def play(filename):
 
 def take_action(group):
     if group == "Dog":
-        # A prediction in the dog category group was detected, play a `woof` sound
         play(woofSound)
     elif group == "Cat":
-        # A prediction in the cat category group was detected, play a `meow` sound
         play(meowSound)
 ```
 
@@ -125,8 +124,6 @@ Define the main entry point and start the camera.
 
 ```python
  def main():
-
-    # Open the video camera. To use a different camera, change the camera index.
     camera = cv2.VideoCapture(0)
 ```
 
@@ -160,7 +157,6 @@ Declare a loop where we get an image from the camera and prepare it to be used a
 
 ```python
    while (cv2.waitKey(1) == 0xFF):
-        # Get an image from the camera. If you'd like to use a different image, load the image from some other source.
         image = get_image_from_camera(camera)
 
         # Prepare the image to pass to the model. This helper:
@@ -251,7 +247,7 @@ source activate py34
 python pets.py
 ```
 
-Point your camera at different objects and see how the model classifies them. Look at `dogs.txt` and `cats.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen, have your computer display images of different animals, and see when it barks or meows. If you copied the full source for [pets.py](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py), you will also see the average time it takes for the model to process a single frame.
+Point your camera at different objects and see how the model classifies them. Look at `dogs.txt` and `cats.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen, have your computer display images of different animals, and see when it barks or meows. If you copied the full `pets.py` script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py), you will also see the average time it takes for the model to process a single frame.
 
 ## Troubleshooting
 If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).

@@ -6,6 +6,9 @@ permalink: /tutorials/Active-cooling-your-Raspberry-Pi-3/
 
 # Active cooling your Raspberry Pi 3
 
+*by Ofer Dekel*
+
+
 The Raspberry Pi 3 tends to overheat when pushed to its limits. When the processor's internal temperature approaches 85 degrees Celsius, it protects itself by clocking down or shutting down completely, and the performance of our AI models takes a hit.
 
 ![Idle RPi3 heatmap](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/Pi-3-IR.jpg)

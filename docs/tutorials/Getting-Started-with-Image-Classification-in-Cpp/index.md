@@ -5,7 +5,9 @@ permalink: /tutorials/Getting-started-with-image-classification-in-cpp/
 ---
 # Getting started with image classification on Raspberry Pi in C++
 
-In this tutorial, we will download a pretrained image classifier from the [ELL gallery](/ELL/gallery/) to a laptop or desktop computer. We will then compile the classifier as a C++ object file and create a CMake project that makes it easy to use the classifier in a C++ program. Finally, we will write a simple C++ application that captures images from the Raspberry Pi's camera and classifies them.
+*by Byron Changuion and Ofer Dekel*
+
+In this tutorial, we will download a pretrained image classifier from the [ELL gallery](/ELL/gallery/) to a laptop or desktop computer. We will then compile the classifier as a C++ object file and create a CMake project that makes it easy to use the classifier in a C++ program. Finally, we will write a simple C++ program that captures images from the Raspberry Pi's camera and classifies them.
 
 ---
 
@@ -91,11 +93,11 @@ Copy over some additional C++ helper code that makes it easier to send images to
 [Windows] copy ..\..\..\docs\tutorials\Getting-Started-with-Image-Classification-in-Cpp\*.h .
 ```
 
-A this point, you should now have a `cppTutorial` folder that contains helper C++ code, a `model` subfolder with the compiled ELL model and a CMake project.
+A this point, you should now have a `cppTutorial` directory that contains helper C++ code, a `model` subdirectory with the compiled ELL model and a CMake project.
 
-## Step 4: Call your model from a C++ application
+## Step 4: Call your model from a C++ program
 
-We will write a C++ application that invokes the model and run the demo on a Raspberry Pi. The application will read images from the camera, pass them to the model, and display the results. Either copy the complete code from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/tutorial.cpp) or create an empty text file named `tutorial.cpp` in the `cppTutorial` directory and copy in the code snippets below.
+We will write a C++ program that invokes the model and run the demo on a Raspberry Pi. The program will read images from the camera, pass them to the model, and display the results. Either copy the complete code from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/tutorial.cpp) or create an empty text file named `tutorial.cpp` in the `cppTutorial` directory and copy in the code snippets below.
 
 First, add the required include statements. Our code depends on some STL libraries and on the OpenCV library.
 
@@ -220,9 +222,9 @@ Use the `DrawHeader` helper function to display the predicted category on the Ra
 }
 ```
 
-## Step 5: Create a CMake project for the application
+## Step 5: Create a CMake project for your program
 
-We will use CMake to build the application. Either download the complete `CMakeLists.txt` from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/CMakeLists.txt), or create an empty text file named `CMakeLists.txt` and copy in the project definitions below.
+We will use CMake to build our project. Either download the complete `CMakeLists.txt` from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/CMakeLists.txt), or create an empty text file named `CMakeLists.txt` and copy in the project definitions below.
 
 ```cmake
 project( tutorial )
@@ -252,17 +254,17 @@ Define the target executable `tutorial` and tell CMake to build `tutorial.cpp` a
 add_executable(tutorial tutorial.cpp)
 ```
 
-Finally, tell CMake to link the application with OpenCV and the ELL model.
+Finally, tell CMake to link the program with OpenCV and the ELL model.
 
 ```cmake
 target_link_libraries(tutorial ${OpenCV_LIBS} model)
 ```
 
-Your `cppTutorial` folder is ready to copy to your Raspberry Pi.  You can do that using the 'scp' tool.  On Windows you can use [WinSCP](https://winscp.net/eng/index.php). Be sure to copy the `cppTutorial/model` sub-directory too.
+We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the `cppTutorial` directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool. Be sure to copy the `cppTutorial/model` directory too.
 
-## Step 6: Build the application on the Raspberry Pi
+## Step 6: Build the project on the Raspberry Pi
 
-Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and screen attached. Find the `cppTutorial` folder you just copied over and build the CMake project.
+Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and screen attached. Find the `cppTutorial` directory you just copied over and build the CMake project.
 
 ```
 cd cppTutorial
@@ -273,20 +275,17 @@ make
 cd ..
 ```
 
-
 ## Step 7: Classify live video on the Raspberry Pi
 
 Make sure that a camera is connected to your Pi and run the `tutorial` program. 
 
+You should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and other types of animals.
 
-You should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and different types of African animals.
-
-If you copied the full source for [tutorial.cpp](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/tutorial.cpp),
-you will also see the average time in milliseconds it takes the model to process a frame.
+If you copied the full `tutorial.cpp` file from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/tutorial.cpp), you will also see the average time in milliseconds it takes the model to process a frame.
 
 ## Next steps
 
-The [ELL gallery](/ELL/gallery/) offers different models for image classification. Some are slow but accurate, while others are faster and less accurate. Different models can even lead to different power draw on the Raspberry Pi. Repeat the steps above with different models.
+The [ELL gallery](/ELL/gallery/) offers different models for image classification. Some are slow and accurate, while others are faster and less accurate. Different models can even lead to different power draw on the Raspberry Pi. Repeat the steps above with different models.
 
 ## Troubleshooting
 

@@ -6,6 +6,8 @@ permalink: /tutorials/Importing-models/
 
 # Importing models
 
+*by Byron Changuion*
+
 The [ELL gallery](/ELL/gallery/) includes different pre-trained ELL models for you to download and use. However, you may also want to train your own models. In this tutorial, we will import Neural Network models that were trained with the [Microsoft Cognitive Toolkit (CNTK)](https://www.microsoft.com/en-us/cognitive-toolkit/) or with [Darknet](https://pjreddie.com/darknet/). 
 
 ---
@@ -146,11 +148,10 @@ In addition to the model, also download the categories file, which contains the 
 curl --location -o categories.txt https://raw.githubusercontent.com/pjreddie/darknet/master/data/imagenet.shortnames.list
 ```
 
-## Using the  model
+## Using the model
 
 Once the model is in the ELL format, it no longer matters whether it came from CNTK or Darknet, and the only difference is the categories file. To test the model from Python, follow the steps in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with the model you just imported. Alternatively, to test the model from C++, follow the steps in [Getting started with image classification on the Raspberry Pi in C++](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/). 
 
 ## Troubleshooting
 
 ELL currently supports a subset of the layer types and activation functions that can appear in CNTK and Darknet models. If you try to import a model that contains an unsupported layer type, the importer will fail. With time, ELL will support more layer types. In the meantime, try changing the model to use the supported layer types. 
-

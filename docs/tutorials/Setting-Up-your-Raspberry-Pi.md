@@ -6,6 +6,8 @@ permalink: /tutorials/Setting-up-your-Raspberry-Pi
 
 # Setting up your Raspberry Pi for tutorials
 
+*by Chris Lovett and Ofer Dekel*
+
 Most of our tutorials follow a common workflow. The first steps involve authoring and designing an ELL model - these steps are typically done on a laptop or desktop computer (Windows, Linux, or Mac). The next steps involve deploying the ELL model and invoking it on the Raspberry Pi - these steps are typically done on the Pi itself. Therefore, you need to setup both your computer and your Pi with the necessary prerequisites. The step-by-step instructions below describe how to setup your Pi. Installation steps for your computer can be found here:
 
 * [Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md)

@@ -23,7 +23,6 @@ import tutorialHelpers as helpers
 # Read an image from the camera
 def get_image_from_camera(camera):
     if camera is not None:
-        # if predictor is too slow frames get buffered, this is designed to flush that buffer
         ret, frame = camera.read()
         if (not ret):
             raise Exception('your capture device is not returning images')
@@ -38,11 +37,11 @@ def main():
     categories = open('categories.txt', 'r').readlines()
 
     # Get the model's input shape. We will use this information later to resize images appropriately.
-    inputShape = model.get_default_input_shape()
+    input_shape = model.get_default_input_shape()
 
     # Get the model's output shape and create an array to hold the model's output predictions
-    outputShape = model.get_default_output_shape()
-    predictions = model.FloatVector(outputShape.Size())
+    output_shape = model.get_default_output_shape()
+    predictions = model.FloatVector(output_shape.Size())
 
     # Declare a variable to hold the prediction times
     predictionTimes = []
@@ -56,7 +55,7 @@ def main():
         # - Resize and center-crop to the required width and height while preserving aspect ratio.
         # - OpenCV gives the image in BGR order. If needed, re-order the channels to RGB.
         # - Convert the OpenCV result to a std::vector<float>
-        input = helpers.prepare_image_for_model(image, inputShape.columns, inputShape.rows)
+        input = helpers.prepare_image_for_model(image, input_shape.columns, input_shape.rows)
 
         # Invoke the model, measure how long it takes
         start = time.time()

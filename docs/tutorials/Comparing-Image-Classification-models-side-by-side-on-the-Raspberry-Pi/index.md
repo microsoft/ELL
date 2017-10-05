@@ -3,7 +3,11 @@ layout: default
 title: Comparing image classification models side by side on the Raspberry Pi
 permalink: /tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/
 ---
+
 # Comparing image classification models side by side on the Raspberry Pi
+
+*by Byron Changuion and Ofer Dekel*
+
 
 In this tutorial, we will download two models from the [ELL gallery](/ELL/gallery/) and run them side-by-side on a Raspberry Pi. Some of the models on the gallery are slower abd accurate, while others are faster but less accurate. Running two models as once allows us to get a sense of their relative speeds and accuracies. Specifically, we will compare a standard (real valued) Convolutional Neural Network to a Neural Network that contains binarized layers. The binarized model is smaller and faster, but less accurate. 
 
@@ -105,15 +109,15 @@ We also want to copy some additional python code to your Raspberry Pi for the pu
 [Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
 ```
 
-You should now have a `sideBySide` folder containing `model1` and `model2` directories as well as some helpful python utilities which we'll use later in this tutorial.
+You should now have a `sideBySide` directory containing `model1` and `model2` directories as well as some helpful python utilities which we'll use later in this tutorial.
 
-We are ready to move to the Raspberry Pi. You can copy the `sideBySide` folder to the Pi using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
+We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the `sideBySide` directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
 ## Step 4: Call your models from a Python script
 
 We will write a Python script that grabs images from the camera, invokes the models one at a time, and displays the two frames side-by-side. If you just want the full script, copy it from [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySide.py). Otherwise, create an empty text file named `sideBySide.py` and copy in the code snippets below. 
 
-First, import a few dependencies, including system utilities, opencv, and numpy.
+First, import a few dependencies, including system utilities, OpenCV, and NumPy.
 ```python
 import sys
 import os
@@ -260,11 +264,11 @@ if __name__ == "__main__":
     main()
 ```
 
-We are ready to move to the Raspberry Pi. You can copy the `sideBySide` folder to the Pi using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
+We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the `sideBySide` directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
 ## Step 5: Build the Python wrappers on the Raspberry Pi
 
-Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and screen connected. Find the `sideBySide` folder you just copied over and build the two CMake projects.
+Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and screen connected. Find the `sideBySide` directory you just copied over and build the two CMake projects.
 
 ```
 cd model1
@@ -292,7 +296,7 @@ python sideBySide.py
 
 If you have a camera and display connected to your Pi, you should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. 
 
-If you downloaded the full source for [sideBySide.py](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySide.py), you will also see the average time in milliseconds it takes each model to process a frame. Try to get a sense of the relative accuracy and speed of each model. If you compare the displayed times with the time indicated in the [ELL gallery](/ELL/gallery/), you will notice that your model runs slower than it should. The slow down is caused by inefficiencies in the Python wrapper, and we are working to fix this problem. 
+If you downloaded the full `sideBySide.py` script from [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySide.py), you will also see the average time in milliseconds it takes each model to process a frame. Try to get a sense of the relative accuracy and speed of each model. If you compare the displayed times with the time indicated in the [ELL gallery](/ELL/gallery/), you will notice that your model runs slower than it should. The slow down is caused by inefficiencies in the Python wrapper, and we are working to fix this problem. 
 
 ## Troubleshooting
 
