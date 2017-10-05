@@ -7,7 +7,7 @@ permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 
 *by Chris Lovett, Byron Changuion, and Ofer Dekel*
 
-In this tutorial, we will split the 1000 image-categories, which the model was trained to classify, into three disjoint sets: *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will demonstrate how a classifier with low accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, barks when it sees a dog, and meows when it sees a cat.
+In this tutorial, we take an image classifier that was trained to recognize 1000 different image categories and use it to solve a simpler classification problem: distinguishing between *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will see how a classifier with low accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, barks if it sees a dog, and meows if it sees a cat.
 
 ---
 
@@ -23,32 +23,32 @@ In this tutorial, we will split the 1000 image-categories, which the model was t
 
 #### Prerequisites
 
-* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). Specifically, this tutorial requires ELL, CMake, SWIG, and Python 3.6.
+* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
 * Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 * Complete the basic tutorial, [Getting started with image classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), to learn how to produce a Python wrapper for an ELL model.
 
 ## Overview
 
-The pre-trained models in the [ELL gallery](/ELL/gallery/) are trained to identify 1000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). Often times, we are only interested in a subset of these categories and we don't require the fine-grained categorization that the model was trained to provide. For example, we may want to classify images of dogs versus images of cats, whereas the model is actually trained to distinguish between 11 different varieties of cat and 106 different varieties of dog.
+The pre-trained models in the [ELL gallery](/ELL/gallery/) are trained to identify 1000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). Often times, we are only interested in a subset of these categories and we don't require the fine-grained categorization that the model was trained to provide. For example, we may want to distinguish between images of dogs versus images of cats, whereas the model is actually trained to distinguish between several different varieties of cats and over 100 different dog breeds.
 
-The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate on the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will write a script that grabs a frame from a camera, plays a barking sound when it recognizes one of the dog varieties, and plays a meow sound when it recognizes one of the cat varieties.
+The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate for the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will write a script that grabs a frame from a camera, plays a barking sound when it recognizes one of the dog varieties, and plays a meow sound when it recognizes one of the cat varieties.
 
-## Step 1: Deploy a pre-trained model on a Raspberry Pi
+## Step 1: Deploy a pre-trained model on the Raspberry Pi
 
-Start by repeating the steps of the basic tutorial, [Getting Started with Image Classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with [this faster and less accurate model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip). Namely, download the model, use the `wrap` tool to compile it for the Raspberry Pi, copy the CMake project to the Pi, and build it. After completing these steps, you should have a Python module on your Pi named `model`.
+Start by repeating the steps of the basic tutorial, [Getting Started with Image Classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with [this faster and less accurate model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip). Namely, download the model to your computer, use the `wrap` tool to compile it for the Raspberry Pi, copy the resulting CMake project to the Pi, and build it there. After completing these steps, you should have a Python module on your Pi named `model`.
 
 Copy the following files to your Pi.
 - [dogs.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/dogs.txt)
 - [cats.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/cats.txt)
 - [tutorialHelpers.py](/ELL/tutorials/shared/tutorialHelpers.py)
 
-Additionally, download sound files (.wav) of a dog bark and a cat meow (for example, try this [bark](http://freesound.org/people/davidmenke/sounds/231762/) and this [meow](http://freesound.org/people/blimp66/sounds/397661/) ). Alternatively, record yourself barking and meowing. Rename the bark sound file `woof.wav` and the meow sound file `meow.wav`.
+Additionally, download or record `.wav` sound files of a dog bark and a cat meow (for example, try this [bark](http://freesound.org/people/davidmenke/sounds/231762/) and this [meow](http://freesound.org/people/blimp66/sounds/397661/) ). Name the bark sound file `woof.wav` and the meow sound file `meow.wav`.
 
 ## Step 2: Write a script 
 
 We will write a Python script that invokes the model on a Raspberry Pi, groups the categories as described above, and takes action if a dog or cat is recognized. If you just want the code, copy the complete script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py). Otherwise, create an empty text file named `pets.py` and copy in the code snippets below. 
 
-First, import the modules we need:
+First, import the required modules.
 
 ```python
 import sys
@@ -127,7 +127,7 @@ Define the main entry point and start the camera.
     camera = cv2.VideoCapture(0)
 ```
 
-Read the category names from `categories.txt`, the list of dog-breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
+Read the category names from `categories.txt`, the list of dog breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
 
 ```python
     categories = open('categories.txt', 'r').readlines()
@@ -156,7 +156,7 @@ For this tutorial, we'll keep some state to ensure we don't keep taking the same
 Declare a loop where we get an image from the camera and prepare it to be used as input to the model.
 
 ```python
-   while (cv2.waitKey(1) == 0xFF):
+    while (cv2.waitKey(1) == 0xFF):
         image = get_image_from_camera(camera)
 
         # Prepare the image to pass to the model. This helper:
@@ -182,16 +182,16 @@ We'll use OpenCV to get a histogram using OpenCV as a quick way to detect whethe
         if diff >= significantDiff and now - lastPredictionTime > 2:
 ```
 
-It's time to call the model to get predictions.
+Send the processed image to the model and its array of predictions.
 
 ```python
             model.predict(input, predictions)
 ```
 
-Use the helpers to get the top predictions, which is returned a list of tuples.
+Use the helper function to get the top prediction.
 
 ```python
-            topN = helpers.get_top_n_predictions(predictions, 1)
+            topN = helpers.get_top_n(predictions, 1)
 ```
 
 Check whether the prediction is part of a group.

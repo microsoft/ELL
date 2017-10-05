@@ -18,7 +18,7 @@ The [ELL gallery](/ELL/gallery/) includes different pre-trained ELL models for y
 
 #### Prerequisites
 
-* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). Specifically, this tutorial requires ELL, CMake, SWIG, and Python 3.6. 
+* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
 * To import a model from the CNTK file format, you must install the [CNTK python packages](https://docs.microsoft.com/en-us/cognitive-toolkit/setup-cntk-on-your-machine).
 
 ## Importing models
@@ -40,7 +40,7 @@ Choose whether you want to import a model from the CNTK file format or the Darkn
 
 ## Importing a model from the Microsoft Cognitive Toolkit (CNTK)
 
-A Neural Network model in the CNTK file format can be converted into an ELL model using the *cntk_import.py* Python script, found in the `ELL/tools/importers/cntk` directory. As an example, we will import one of the models available on the [CNTK website](https://www.microsoft.com/en-us/cognitive-toolkit/).
+A Neural Network model in the CNTK file format can be converted into an ELL model using the *cntk_import.py* Python script, found in the `ELL/tools/importers/cntk` directory. As an example, we will import one of the models available on the [CNTK website](https://www.microsoft.com/en-us/cognitive-toolkit/). First, download the model to your computer.
 
 ```
 curl --location -o model.cntk https://www.cntk.ai/Models/Caffe_Converted/VGG16_ImageNet_Caffe.model
@@ -95,7 +95,7 @@ Finished pre-processing.
 Saving model file: 'model.ell'
 ````
 
-When the script finishes running, you should see a new file named `model.ell` appear in your directory. This ELL model file is a JSON file that contains both the model configuration and the model weights. 
+When the script finishes running, a new file named `model.ell` will appear in your directory. This ELL model file is a JSON file that contains both the model configuration and the model weights. 
 
 In addition to the model, also download the categories file, which contains the names of the categories predicted by the model, and which we require below.
 
@@ -105,7 +105,7 @@ curl --location -o categories.txt https://raw.githubusercontent.com/Microsoft/EL
 
 ## Importing a model from Darknet
 
-A Neural Network model in the Darknet file format can be converted into an ELL model using the *darknet_import.py* Python script, found in the `ELL/tools/importers/darknet` directory. As an example, we will import the Darknet reference model, available from the [Darknet website](https://pjreddie.com/darknet/). 
+A Neural Network model in the Darknet file format can be converted into an ELL model using the *darknet_import.py* Python script, found in the `ELL/tools/importers/darknet` directory. As an example, we will import the Darknet reference model, available from the [Darknet website](https://pjreddie.com/darknet/). First, download the model to your computer.
 
 ```
 curl --location -o model.cfg https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg
@@ -140,7 +140,7 @@ softmax:  1 x 1 x 1000 ->  1 x 1 x 1000
 Saving model file: 'model.ell'
 ```
 
-When the script finishes running, you should see a new file named `model.ell` appear in your directory. This ELL model file is a JSON file that contains both the model configuration and the model weights. 
+When the script finishes running, a new file named `model.ell` will appear in your directory. This ELL model file is a JSON file that contains both the model configuration and the model weights. 
 
 In addition to the model, also download the categories file, which contains the names of the categories predicted by the model, and which we require below.
 
@@ -148,9 +148,11 @@ In addition to the model, also download the categories file, which contains the 
 curl --location -o categories.txt https://raw.githubusercontent.com/pjreddie/darknet/master/data/imagenet.shortnames.list
 ```
 
+Note that this categories file is different from the one used by the CNTK model above. 
+
 ## Using the model
 
-Once the model is in the ELL format, it no longer matters whether it came from CNTK or Darknet, and the only difference is the categories file. To test the model from Python, follow the steps in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with the model you just imported. Alternatively, to test the model from C++, follow the steps in [Getting started with image classification on the Raspberry Pi in C++](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/). 
+Once the model is in the ELL format, it no longer matters whether it came from CNTK or Darknet. To invoke the model from Python, follow the steps in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with the model you just imported. Alternatively, to invoke the model from C++, follow the steps in [Getting started with image classification on the Raspberry Pi in C++](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/). 
 
 ## Troubleshooting
 
