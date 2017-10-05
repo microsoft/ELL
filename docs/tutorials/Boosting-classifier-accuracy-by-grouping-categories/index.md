@@ -138,10 +138,10 @@ Read the category names from `categories.txt`, the list of dog-breed categories 
 Get the model input and output shapes and allocate an array to hold the model output. 
 
 ```python
-    inputShape = model1.get_default_input_shape()
+    inputShape = model.get_default_input_shape()
 
-    outputShape = model1.get_default_output_shape()
-    predictions = model1.FloatVector(outputShape.Size())
+    outputShape = model.get_default_output_shape()
+    predictions = model.FloatVector(outputShape.Size())
 ```
 
 For this tutorial, we'll keep some state to ensure we don't keep taking the same action over and over for the same image. Initialize the state as follows.
@@ -185,7 +185,7 @@ We'll use OpenCV to get a histogram using OpenCV as a quick way to detect whethe
 It's time to call the model to get predictions.
 
 ```python
-            model1.predict(input, predictions)
+            model.predict(input, predictions)
 ```
 
 Use the helpers to get the top predictions, which is returned a list of tuples.

@@ -20,7 +20,7 @@ if (os.name == "nt"):
     import winsound
 
 # import the ELL model's Python module
-import model1
+import model
 
 # Function to return an image from our camera using OpenCV
 def get_image_from_camera(camera):
@@ -94,11 +94,11 @@ def main(args):
     cats = get_categories_from_file("catLabels.txt")
 
     # Get the model's input dimensions. We'll use this information later to resize images appropriately.
-    inputShape = model1.get_default_input_shape()
+    inputShape = model.get_default_input_shape()
 
     # Create a vector to hold the model's output predictions
-    outputShape = model1.get_default_output_shape()
-    predictions = model1.FloatVector(outputShape.Size())
+    outputShape = model.get_default_output_shape()
+    predictions = model.FloatVector(outputShape.Size())
 
     # Declare variables to hold state that we use to ensure we play sounds on new recognition
     lastHist = None
@@ -131,7 +131,7 @@ def main(args):
             # Get the predicted classes using the model's predict function on the image input data. 
             # The predictions are returned as a vector with the probability that the image
             # contains the class represented by that index.
-            model1.predict(input, predictions)
+            model.predict(input, predictions)
 
             # Let's grab the value of the top prediction and its index, which represents the top most 
             # confident match and the class or category it belongs to.
