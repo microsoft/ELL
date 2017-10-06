@@ -16,7 +16,8 @@ goto :retry
 
 
 :build
-call build.cmd
+call build.cmd %1 %2 %3 %4 %5
+if ERRORLEVEL 1 exit /B 1
 
 goto :eof
 

@@ -49,8 +49,14 @@ curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/mas
 Unzip the compressed file and rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`. On Windows, note that the `unzip` utility is distributed as part of Git, for example, in `\Program Files\Git\usr\bin`.
 
 ```
-[Linux/Mac] unzip model.ell.zip` <br> `mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
-[Windows] unzip model.ell.zip` <br> `ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+unzip model.ell.zip
+```
+
+Then, rename it.
+
+```
+[Linux/Mac] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+[Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 ```
 
 Next, download the file of [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) that correspond to this model into the `cppTutorial` directory.
@@ -180,7 +186,7 @@ Allocate a vector to store the model's output.
 
 Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user hits any key. At the start of each loop iteration, read an image from the camera:
 
-```cpp:
+```cpp
     while (cv::waitKey(1) == 0xFF)
     {
         cv::Mat image = GetImageFromCamera(camera);
@@ -284,6 +290,11 @@ Make sure that a camera is connected to your Pi and run the `tutorial` program.
 You should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and other types of animals.
 
 If you copied the full `tutorial.cpp` file from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/tutorial.cpp), you will also see the average time in milliseconds it takes the model to process a frame.
+
+There is also an option to process a static image, if you copy one to your Pi you can run this:
+````
+tutorial categories.txt schoolbus.png
+````
 
 ## Next steps
 

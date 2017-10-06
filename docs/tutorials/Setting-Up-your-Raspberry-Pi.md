@@ -72,11 +72,21 @@ By default, OpenCV can read images from a USB webcam, but not from the Raspberry
 sudo raspi-config
 ```
 
+
 Select `enable camera`, hit `enter`, and go to `finish`. Then, load the camera module, as follows.
 
 ```
 sudo modprobe bcm2835-v4l2
 ```
+
+To run the `C++` tutorials you also need the C++ OpenCV SDK, which you can install on your Raspberry Pi using the following command. 
+
+    sudo apt-get install libopencv-dev
+
+### SSH
+Our tutorials will require copying files to run on the Pi. A typical way to copy files to the Pi is to use the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
+To enable SSH on your Pi, go to `Preferences > Raspberry Pi Configuration` from the Raspbian menu, select the `Interfaces` tab and set `SSH` to `Enabled`.
+
 
 ## Tips and Tweaks
 
@@ -155,9 +165,13 @@ temp_limit=75
 
 **ImportError: libavcodec.so.56: cannot open shared object file: No such file or directory**
 
-If you do not have the built in libavcodec.so.56, it probably means that you are running a newer version of Raspbian. Our tutorials currently require [Raspbian Jessie](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/2017-07-05-raspbian-jessie.zip).
+If you do not have the built in libavcodec.so.56, it probably means that you are running a newer version of Raspbian. Our tutorials currently require Raspbian Jessie.
 
 
 **ImportError: No module named 'numpy'**
 
 You probably forgot to activate your Miniconda environment using `source activate py34`. See `Miniconda` instructions above.
+
+**(ELL model:18037): Gtk-WARNING **: cannot open display**
+
+You are probably trying to use OpenCV from an SSH terminal window. In this case, you simply need to tell OpenCV which display to use with the command `export DISPLAY=:0`. Many of our tutorials also expect keyboard input to terminate the demo. From SSH you can kill the application from the command line by typing CTRL+C.

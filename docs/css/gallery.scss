@@ -1,0 +1,24 @@
+---
+# this ensures Jekyll reads the file to be transformed into CSS later
+# only Main files contain this front matter, not partials.
+---
+
+@import "bootstrap/variables";
+
+//
+// Model gallery
+// --------------------------------------------------
+
+// Model architecture nested table
+.arch-table {
+    border-style: none;
+    > tr {
+        padding: $row-condensed-cell-padding;
+    }
+    > th,
+    > td {
+        background-color: $body-bg;
+        border-style: none;
+        padding: $row-condensed-cell-padding;
+    }
+}

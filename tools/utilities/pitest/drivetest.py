@@ -23,6 +23,9 @@ from shutil import rmtree
 import paramiko
 import zipfile
 import requests
+import picluster
+import socket
+import time
 
 class DriveTest:
     def __init__(self):
@@ -44,6 +47,8 @@ class DriveTest:
         self.username = "pi"
         self.password = "raspberry"
         self.target = "pi3"
+        self.machine = None
+        self.cluser = None
         self.ssh = None
         self.created_dirs = []
         self.profile = False
@@ -74,8 +79,7 @@ class DriveTest:
         self.init(args)
 
     def init(self, args):
-        self.ipaddress = args.ipaddress
-        self.test_dir = args.outdir
+        self.test_dir = os.path.abspath(args.outdir)
         self.profile = args.profile
         self.target = args.target
         self.target_dir = args.target_dir
@@ -83,24 +87,46 @@ class DriveTest:
         self.password = args.password
 
         self.extract_model_info(args.model, args.labels)
+        self.ipaddress = self.resolve_address(args.ipaddress)
 
         self.output_dir = os.path.join(self.test_dir, self.target, self.model_name)
         if not os.path.isdir(self.output_dir):
             os.makedirs(self.output_dir)
+
+    def resolve_address(self, ipaddress):
+        if len(ipaddress) > 4 and ipaddress[:4].lower() == "http":
+            # then this is a pi cluster server, so find a free machine
+            self.cluster = picluster.PiBoardTable(ipaddress)
+            self.machine = self.cluster.wait_for_free_machine(self.model_name)
+            print("Using machine at " + self.machine.ip_address)
+            return self.machine.ip_address
+        else:
+            return ipaddress
+
+    def free_machine(self):
+        if self.machine != None:
+            f = self.cluster.free(self.machine.ip_address)
+            if f.current_user_name != '':
+                print("Failed to free the machine at " + self.machine.ip_address)
+
 
     def extract_model_info(self, ell_model, labels_file):
         if (ell_model is None or labels_file is None):
             self.model_name = "d_I160x160x3CMCMCMCMCMCMC1A"
             self.labels_file = os.path.join(self.test_dir, "categories.txt")
         else:
-            unzip = ziptools.Extractor(ell_model)
-            success, filename = unzip.extract_file(".ell")
-            if success:
-                print("extracted: " + filename)
-                self.ell_model = filename
-            else:
-                # not a zip archive
-                self.ell_model = ell_model
+            self.ell_model = ell_model
+            name,ext = os.path.splitext(ell_model)
+            if ext.lower() == ".zip":
+                with zipfile.ZipFile(ell_model) as myzip:
+                    filename = myzip.extract(myzip.filelist[0])
+                
+                if filename != "":
+                    print("extracted: " + filename)
+                    self.ell_model = filename
+                else:
+                    # not a zip archive
+                    self.ell_model = ell_model
 
             self.model_name, ext = os.path.splitext(basename(self.ell_model))
             if ext.lower() == ".zip":
@@ -119,6 +145,7 @@ class DriveTest:
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
         for path  in list:
+            print("Copying file: " + path + " to " + target_dir)
             if not os.path.isfile(path):
                 raise Exception("expected file not found: " + path)
             head,file_name = os.path.split(path)
@@ -247,20 +274,25 @@ class DriveTest:
         if found:
             print("Test passed")
         else:
-            print("Test failed")
-            sys.exit(1)
+            print("Test failed")            
         
     def run_test(self):
-        self.get_model()
-        self.make_project()
-        self.get_bash_files()
-        self.connect_ssh()
-        self.clean_target()
-        self.publish_bits()
-        self.execute_remote_test()
+        try:
+            self.get_model()
+            self.make_project()
+            self.get_bash_files()
+            self.connect_ssh()
+            self.clean_target()
+            self.publish_bits()
+            self.execute_remote_test()
+        except:
+            errorType, value, traceback = sys.exc_info()
+            print("### Exception: " + str(errorType) + ": " + str(value))
+        self.free_machine()
 
 if __name__ == "__main__":
     args = sys.argv
     tester = DriveTest()
     tester.parse_command_line(args)
     tester.run_test()
+    

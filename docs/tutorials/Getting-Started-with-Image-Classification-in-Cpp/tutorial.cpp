@@ -67,7 +67,7 @@ int main(int argc, char** argv )
     std::vector<double>  predictionTimes;
     double meanTimeToPredict = 0.0;
 
-    while (cv::waitKey(1) == 0xFF)
+    while (cv::waitKey(1) == -1)
     {
         // Get an image from the camera. (Alternatively, call GetImageFromFile to read from file)
         cv::Mat image = GetImageFromCamera(camera);

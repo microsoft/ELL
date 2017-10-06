@@ -1,3 +1,4 @@
+@ECHO OFF
 SETLOCAL ENABLEEXTENSIONS
 
 REM A script that creates a compiled profiler in a subdirectory:
@@ -9,23 +10,38 @@ REM Usage: make_profiler.cmd model_file <compile options>
 
 pushd .
 
-set model_name=%1
+if "%1"=="" (
+    goto :usage
+)
+
+set model_file=%1
+set model_name=%~n1
 shift
-set model_file="%model_name%.ell"
+
 set profiler_directory="%model_name%_profiler"
+
+set next_opt=%1
+if "%next_opt:~0,1%"=="-" (
+    set profiler_directory=%1
+)
+shift
+
+REM Platform-specific options
+REM pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
+set llc_opts="-relocation-model=pic"
 
 mkdir %profiler_directory%
 @COMPILE_EXECUTABLE@ -imap %model_file% --profile --ir --objectCode --header -od %profiler_directory% -ob compiled_model %*
 @COMPILE_EXECUTABLE@ -imap %model_file% --ir --objectCode --header -od %profiler_directory% -ob compiled_model_noprofile %*
 
 cd %profiler_directory%
-@LLC_EXECUTABLE@ compiled_model.ll -o compiled_model_llc.o -O3 --filetype=obj -relocation-model=pic
+@LLC_EXECUTABLE@ compiled_model.ll -o compiled_model_llc.o -O3 --filetype=obj %llc_opts%
 @OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3
-@LLC_EXECUTABLE@ compiled_model_opt.ll -o compiled_model_opt.o -O3 --filetype=obj -relocation-model=pic
+@LLC_EXECUTABLE@ compiled_model_opt.ll -o compiled_model_opt.o -O3 --filetype=obj %llc_opts%
 
-@LLC_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_llc.o -O3 --filetype=obj -relocation-model=pic
+@LLC_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_llc.o -O3 --filetype=obj %llc_opts%
 @OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3
-@LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj -relocation-model=pic
+@LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj %llc_opts%
 
 copy ..\tools\utilities\profile\compiled_profile_main.cpp .
 copy ..\tools\utilities\profile\compiled_exercise_model_main.cpp .
@@ -33,3 +49,6 @@ copy ..\tools\utilities\profile\CMakeLists-compiled.txt.in .\CMakeLists.txt
 copy ..\tools\utilities\profile\OpenBLASSetup.cmake .\OpenBLASSetup.cmake
 popd
 
+:usage
+
+echo Usage: make_profiler.cmd model_file [<output directory>] [<compile options>]

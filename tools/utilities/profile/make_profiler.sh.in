@@ -5,15 +5,15 @@
 #   - run compile on model and save model .h and .o to subdirectory
 #   - copy c++ and cmake files to subdirectory
 
-# Usage: make_profiler.sh model_file [output_directory] <compile options> 
+# Usage: make_profiler.sh model_file.ell [output_directory] <compile options> 
 
 set -x
 
 pushd .
 
-model_name=$1
+model_file=$1
+model_name="${model_file%.*}"
 shift
-model_file=$model_name".ell"
 
 profiler_directory=$model_name"_profiler"
 next_opt=$1
@@ -22,14 +22,15 @@ if [ ${next_opt:0:1} != '-' ] ; then
     shift
 fi
 
+# Platform-specific options
+# pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
+pi3_llc_opts="-relocation-model=pic"
+llc_opts=$pi3_llc_opts
+
 mkdir $profiler_directory
 @COMPILE_EXECUTABLE@ -imap $model_file --profile --ir --objectCode --header -od $profiler_directory -ob compiled_model $@
 @COMPILE_EXECUTABLE@ -imap $model_file --ir --objectCode --header -od $profiler_directory -ob compiled_model_noprofile $@
 
-# Platform-specific options
-pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
-
-llc_opts=$pi3_llc_opts
 cd $profiler_directory
 @LLC_EXECUTABLE@ compiled_model.ll -o compiled_model_llc.o -O3 --filetype=obj $llc_opts
 @OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3
