@@ -8,8 +8,8 @@
 
 #include "CompareArguments.h"
 #include "CompareUtils.h"
-#include "ModelComparison.h"
 #include "LoadImage.h"
+#include "ModelComparison.h"
 
 // common
 #include "LoadModel.h"
@@ -114,8 +114,10 @@ int main(int argc, char* argv[])
         std::cout << "loading map..." << std::endl;
         model::DynamicMap map = common::LoadMap(compareArguments.inputMapFile);
 
-        ell::utilities::EnsureDirectoryExists(compareArguments.outputDirectory);
-
+        if (compareArguments.outputDirectory != "")
+        {
+            ell::utilities::EnsureDirectoryExists(compareArguments.outputDirectory);
+        }
         auto input = GetInputData<TestDataType>(map, compareArguments);
         ModelComparison comparison(compareArguments.outputDirectory);
         comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize, compareArguments.allowVectorInstructions, compareArguments.fuseLinearOperations);
