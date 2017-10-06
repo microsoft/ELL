@@ -16,7 +16,7 @@ In this tutorial, we will download a pretrained image classification model from 
 #### Materials
 
 * Laptop or desktop computer
-* Raspberry Pi
+* Raspberry Pi 3
 * Raspberry Pi camera or USB webcam
 * *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
@@ -46,14 +46,13 @@ Download this [compressed ELL model file](https://github.com/Microsoft/ELL-model
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
 ```
 
-Unzip the compressed file and rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`:
+Unzip the compressed file and rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`. On Windows, note that the `unzip` utility is distributed as part of Git, for example, in `\Program Files\Git\usr\bin`.
 
 ```
-[Unix] unzip model.ell.zip` <br> `mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+[Linux/Mac] unzip model.ell.zip` <br> `mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 [Windows] unzip model.ell.zip` <br> `ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 ```
 
-(One Windows, unzip is part of the Git distribution, for example, in `\Program Files\Git\usr\bin`.)
 Next, download the file of [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) that correspond to this model into the `cppTutorial` directory.
 
 ```
@@ -76,6 +75,7 @@ Note that we gave `wrap` the command line option `-target pi3`, which tells it t
 
 ```
     compiling model...
+    running opt...
     running llc...
     success, now you can build the 'model' folder
 ```
@@ -91,7 +91,7 @@ The directory also contains a `CMakeLists.txt` file that defines a CMake project
 Copy additional C++ helper code that makes it easier to send images to the model.
 
 ```
-[Unix] cp ../../../docs/tutorials/Getting-Started-with-Image-Classification-in-Cpp/*.h .
+[Linux/Mac] cp ../../../docs/tutorials/Getting-Started-with-Image-Classification-in-Cpp/*.h .
 [Windows] copy ..\..\..\docs\tutorials\Getting-Started-with-Image-Classification-in-Cpp\*.h .
 ```
 

@@ -16,7 +16,7 @@ In this tutorial, we will take an image classification model that was trained to
 #### Materials
 
 * Laptop or desktop computer
-* Raspberry Pi
+* Raspberry Pi 3
 * Headphones or speakers for your Raspberry Pi
 * Raspberry Pi camera or USB webcam
 * *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))

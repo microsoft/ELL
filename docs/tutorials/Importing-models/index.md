@@ -25,10 +25,10 @@ The [ELL gallery](/ELL/gallery/) includes different pre-trained ELL models for y
 
 If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your Anaconda environment. 
 
-| Platform | To activate the Anaconda environment...
-| --- | ---
-| Unix    | `source activate py36` 
-| Windows | `activate py36` 
+```
+[Linux/Mac] source activate py36
+[Windows] activate py36
+```
 
 We recommend using Curl to download files. If Curl isn't installed in your Anaconda environment, install it as follows. 
 

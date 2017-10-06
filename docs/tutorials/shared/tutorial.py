@@ -14,6 +14,10 @@ import time
 import numpy as np
 import cv2
 
+scriptPath = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(scriptPath)
+sys.path.append(os.path.join(scriptPath, 'build'))
+
 # Import the Python wrapper for the ELL model
 import model
 

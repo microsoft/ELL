@@ -17,7 +17,7 @@ In this tutorial, we will download two models from the [ELL gallery](/ELL/galler
 #### Materials
 
 * Laptop or desktop computer (Windows, Linux, or Mac)
-* Raspberry Pi
+* Raspberry Pi 3
 * Raspberry Pi camera or USB webcam
 * *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
@@ -32,7 +32,7 @@ In this tutorial, we will download two models from the [ELL gallery](/ELL/galler
 If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your anaconda environment.  
 
 ```
-[Unix] source activate py36
+[Linux/Mac] source activate py36
 [Windows] activate py36 
 ```
 
@@ -54,7 +54,7 @@ curl --location -o model1.ell.zip https://github.com/Microsoft/ELL-models/raw/ma
 curl --location -o model2.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip
 ```
 
-Unzip the compressed files.
+Unzip the compressed files. On Windows, note that the `unzip` utility is distributed as part of Git, for example, in `\Program Files\Git\usr\bin`.
 
 ```
 unzip model1.ell.zip
@@ -64,11 +64,10 @@ unzip model2.ell.zip
 Rename them to `model1.ell` and `model2.ell` respectively.
 
 ```
-[Unix] mv d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && mv d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
+[Linux/Mac] mv d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && mv d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
 [Windows] ren d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && ren d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
 ```
 
-(One Windows, unzip is part of the Git distribution, for example, in `\Program Files\Git\usr\bin`.)
 Next, download the file of [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) that correspond to these models.
 
 ```
@@ -104,7 +103,7 @@ success, now you can build the 'model2' folder
 Also copy a few helper functions to the `pi3` directory.
 
 ```
-[Unix] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
+[Linux/Mac] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
 [Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
 ```
 

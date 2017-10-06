@@ -17,7 +17,7 @@ In this tutorial, we will download a pre-trained image classification model from
 #### Materials
 
 * Laptop or desktop computer
-* Raspberry Pi
+* Raspberry Pi 3
 * Raspberry Pi camera or USB webcam
 * *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
@@ -31,7 +31,7 @@ In this tutorial, we will download a pre-trained image classification model from
 If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your Anaconda environment. 
 
 ```
-[Unix] source activate py36
+[Linux/Mac] source activate py36
 [Windows] activate py36
 ```
 
@@ -53,7 +53,7 @@ Download this [compressed ELL model file](https://github.com/Microsoft/ELL-model
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
 ```
 
-Unzip the compressed file.
+Unzip the compressed file. On Windows, note that the `unzip` utility is distributed as part of Git, for example, in `\Program Files\Git\usr\bin`.
 
 ```
 unzip model.ell.zip
@@ -62,11 +62,10 @@ unzip model.ell.zip
 Rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`:
 
 ```
-[Unix] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+[Linux/Mac] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 [Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 ```
 
-(One Windows, unzip is part of the Git distribution, for example, in `\Program Files\Git\usr\bin`.)
 Next, download the file with the [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) for this model into the `tutorial1` directory. The 1000 categories in this file are the types of objects that the model is trained to recognize.
 
 ```
@@ -90,6 +89,7 @@ Note that we gave `wrap` the command line option `-target host`, which tells it 
 ```
 compiling model...
 generating python interfaces for model in host
+running opt...
 running llc...
 success, now you can build the 'host' folder
 ```
@@ -105,7 +105,7 @@ cd build
 To finish creating the Python wrapper, build the `cmake` project. 
 
 ```
-[Unix] cmake .. && make
+[Linux/Mac] cmake .. && make
 [Windows] cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell .. && cmake --build . --config release
 ```
 
@@ -181,7 +181,7 @@ The `predict` method fills the `predictions` array with non-negative scores that
 categories = open('categories.txt', 'r').readlines()
 predictionIndex = int(np.argmax(predictions))
 print("Category index: " + str(predictionIndex))
-print("Category text: " + categories[predictionIndex])
+print("Category name: " + categories[predictionIndex])
 print("Confidence: " + str(predictions[predictionIndex]))
 ```
 
@@ -198,7 +198,7 @@ python "../../tools/wrap/wrap.py" categories.txt model.ell -lang python -target 
 The `wrap` tool creates a new directory named `pi3`, which contains a CMake project that can be used to build the desired Python module. This time, we need to build this project on the Raspberry Pi. Before moving to the Pi, we also want to copy over some Python helper code: 
 
 ```
-[Unix] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
+[Linux/Mac] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
 [Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
 ```
 
