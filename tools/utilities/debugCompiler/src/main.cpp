@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompareArguments.h"
-#include "CompareUtils.h"
 #include "LoadImage.h"
 #include "ModelComparison.h"
 
@@ -35,29 +34,29 @@
 using namespace ell;
 
 template <typename InputType, utilities::IsIntegral<InputType> = true>
-std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
+std::vector<InputType> GetInputVector(const math::TensorShape& inputShape, float scale)
 {
     auto inputSize = inputShape.Size();
     std::vector<InputType> result(inputSize);
     auto engine = utilities::GetRandomEngine("123");
-    std::uniform_int_distribution<InputType> dist;
+    std::uniform_int_distribution<InputType> dist(0, 255);
     for (auto index = 0; index < inputSize; ++index)
     {
-        result[index] = dist(engine);
+        result[index] = dist(engine) * scale;
     }
     return result;
 }
 
 template <typename InputType, utilities::IsFloatingPoint<InputType> = true>
-std::vector<InputType> GetInputVector(const math::TensorShape& inputShape)
+std::vector<InputType> GetInputVector(const math::TensorShape& inputShape, float scale)
 {
     auto inputSize = inputShape.Size();
     std::vector<InputType> result(inputSize);
     auto engine = utilities::GetRandomEngine("123");
-    std::uniform_real_distribution<InputType> dist;
+    std::uniform_real_distribution<InputType> dist(0, std::nextafter(255, std::numeric_limits<InputType>::max()));
     for (auto index = 0; index < inputSize; ++index)
     {
-        result[index] = dist(engine);
+        result[index] = dist(engine) * scale;
     }
     return result;
 }
@@ -74,7 +73,7 @@ std::vector<InputType> GetInputData(model::DynamicMap& map, const CompareArgumen
     auto inputShape = map.GetInputShape();
     if (compareArguments.inputTestFile.empty())
     {
-        return GetInputVector<InputType>(inputShape);
+        return GetInputVector<InputType>(inputShape, compareArguments.inputScale);
     }
     else
     {
@@ -118,19 +117,30 @@ int main(int argc, char* argv[])
         {
             ell::utilities::EnsureDirectoryExists(compareArguments.outputDirectory);
         }
+
         auto input = GetInputData<TestDataType>(map, compareArguments);
         ModelComparison comparison(compareArguments.outputDirectory);
-        comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize, compareArguments.allowVectorInstructions, compareArguments.fuseLinearOperations);
+
+        model::MapCompilerParameters settings;
+        settings.compilerSettings.optimize = compareArguments.optimize;
+        settings.compilerSettings.useBlas = compareArguments.useBlas;
+        settings.fuseLinearFunctionNodes = false;
+        settings.compilerSettings.allowVectorInstructions = compareArguments.enableVectorization;
+        settings.compilerSettings.vectorWidth = compareArguments.vectorWidth;
+        settings.compilerSettings.targetDevice.deviceName = "host";
+        settings.profile = false;
+        comparison.Compare(input, map, settings);
 
         // Write summary report
         if (compareArguments.writeReport)
         {
             std::string reportFileName = utilities::JoinPaths(compareArguments.outputDirectory, "report.md");
             std::ofstream reportStream(reportFileName);
-            comparison.WriteReport(reportStream, compareArguments.inputMapFile, compareArguments.inputTestFile);
+            comparison.WriteReport(reportStream, compareArguments.inputMapFile, compareArguments.inputTestFile, compareArguments.writePrediction);
         }
 
-        // Write an annotated graph showing where differences occurred in the model between compiled and reference implementation.
+        // Write an annotated graph showing where differences occurred in the model
+        // between compiled and reference implementation.
         if (compareArguments.writeGraph)
         {
             std::string graphFileName = utilities::JoinPaths(compareArguments.outputDirectory, "graph.dgml");

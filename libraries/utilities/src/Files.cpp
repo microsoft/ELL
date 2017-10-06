@@ -266,7 +266,7 @@ namespace utilities
         }
 #else
         char path[max_path];
-        if (nullptr == getcwd(path, max_path))
+        if (getcwd(path, max_path) == nullptr)
         {
             rc = errno;
         }

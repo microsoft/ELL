@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// utilities
-#include "CompareUtils.h"
 #include "ModelComparison.h"
 #include "VectorStatistics.h"
 
@@ -15,12 +13,12 @@
 #include "EmitterTypes.h"
 
 // nodes
-#include "ReorderDataNode.h"
 #include "DebugSinkNode.h"
+#include "NeuralNetworkPredictorNode.h"
 
 // utilities
-#include "Graph.h"
 #include "Files.h"
+#include "Graph.h"
 
 // stl
 #include <sstream>
@@ -29,15 +27,17 @@
 extern "C" {
 void DebugOutput(char* label, float* output, void* userData)
 {
-    if(userData != nullptr)
+    if (userData != nullptr)
     {
-        ModelComparison* self = static_cast<ModelComparison*>(userData);
+        ell::ModelComparison* self = static_cast<ell::ModelComparison*>(userData);
         self->AddLayer(label, output);
     }
 }
 }
 
 using namespace ell::utilities;
+namespace ell
+{
 
 //
 // Utility functions
@@ -57,6 +57,26 @@ std::ostream& operator<<(std::ostream& os, const std::vector<ValueType>& vec)
     }
     os << " ]";
     return os;
+}
+
+//
+// Sink node related
+//
+std::string GetSinkNodeLabel(const ell::model::Node* node)
+{
+    auto floatSinkNode = dynamic_cast<const ell::nodes::DebugSinkNode<float>*>(node);
+    if (floatSinkNode != nullptr)
+    {
+        return floatSinkNode->GetLabel();
+    }
+
+    auto doubleSinkNode = dynamic_cast<const ell::nodes::DebugSinkNode<double>*>(node);
+    if (doubleSinkNode != nullptr)
+    {
+        return doubleSinkNode->GetLabel();
+    }
+
+    return "";
 }
 
 template <typename ValueType>
@@ -99,6 +119,46 @@ std::string GetDebugSinkNodeLabel(const model::Node& node)
     return "";
 }
 
+//
+// Neural network node related
+//
+
+template <typename ValueType>
+bool IsNeuralNetworkPredictorNode(const ell::model::Node* node)
+{
+    return dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<ValueType>*>(node) != nullptr;
+}
+
+template <typename ValueType>
+bool IsNeuralNetworkLayerNode(const ell::model::Node* node)
+{
+    return dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<ValueType>*>(node) != nullptr;
+}
+
+bool IsNeuralNetworkPredictorNode(const ell::model::Node* node)
+{
+    if (dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<float>*>(node) != nullptr)
+    {
+        return true;
+    }
+
+    return dynamic_cast<const ell::nodes::NeuralNetworkPredictorNode<double>*>(node) != nullptr;
+}
+
+bool IsNeuralNetworkLayerNode(const ell::model::Node* node)
+{
+    if (dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<float>*>(node) != nullptr)
+    {
+        return true;
+    }
+
+    return dynamic_cast<const ell::nodes::NeuralNetworkLayerNodeBase<double>*>(node) != nullptr;
+}
+
+
+//
+// Getting map output
+//
 template <typename InputType, typename OutputType>
 std::vector<float> GetMapOutput(const model::DynamicMap& map, const std::vector<float>& input)
 {
@@ -191,21 +251,13 @@ void ModelComparison::SetUpReferenceMap(model::DynamicMap& map)
     _referenceMap.Transform(transformFunc, addSinkNodeContext);
 }
 
-void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize, bool allowVectorInstructions, bool fuseLinearOps)
+void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, const model::MapCompilerParameters& settings)
 {
     SetUpReferenceMap(reference);
     _addingReference = false;
 
     // Ok, now compile the model with debug set to true so we can get the DebugOutput
     // function calls to compare compiled model with reference implementation.
-
-    model::MapCompilerParameters settings;
-    settings.compilerSettings.useBlas = useBlas;
-    settings.compilerSettings.allowVectorInstructions = allowVectorInstructions;
-    settings.compilerSettings.optimize = optimize;
-    settings.fuseLinearFunctionNodes = fuseLinearOps;
-    settings.profile = false;
-    settings.compilerSettings.targetDevice.deviceName = "host";
 
     // now repeat the refine step again, this time when AddDebugOutputNode is called we save the compiled Node information.
     auto refineLayerFunc = [](const model::Node& node) {
@@ -238,7 +290,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
 
     // Windows can not do automatic resolution of symbols, so it won't find the DebugOutput function above unless I help it here.
     auto func = module->getFunction("DebugOutput");
-    if(func != nullptr)
+    if (func != nullptr)
     {
         compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uint64_t>(&DebugOutput));
     }
@@ -301,7 +353,7 @@ size_t ModelComparison::GetOutputSize(const std::string& nodeId)
     return _outputSizes[nodeId];
 }
 
-void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelName, std::string testDataName)
+void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelName, std::string testDataName, bool writePrediction)
 {
     std::cout << "writing report..." << std::endl;
 
@@ -311,14 +363,14 @@ void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelN
     outputStream << "**image**: " << testDataName << std::endl;
     outputStream << std::endl;
 
-    WriteRow(outputStream, "", "Overall", _outputReference, _outputCompiled, nullptr);
+    WriteModelInfo(outputStream, _outputReference, _outputCompiled, writePrediction);
     for (auto& layerData : _layerOutputData)
     {
         if (layerData.compiledNodeLabel != "")
         {
             std::string id = layerData.compiledNodeId;
             std::string label = layerData.compiledNodeLabel;
-            WriteRow(outputStream, id, label, layerData.referenceData, layerData.compiledData, &layerData);
+            WriteNodeRow(outputStream, id, label, layerData.referenceData, layerData.compiledData, layerData);
         }
         else
         {
@@ -327,7 +379,64 @@ void ModelComparison::WriteReport(std::ostream& outputStream, std::string modelN
     }
 }
 
-void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::string name, const std::vector<float>& reference, const std::vector<float>& compiled, LayerCaptureData* layerData)
+void ModelComparison::WriteStatsRow(std::ostream& outputStream, const VectorStatistics& refStats, const VectorStatistics& compiledStats, const VectorStatistics& diffStats, float absDiffSum)
+{
+    // TODO: write out as a table?
+    // |           |      min     |      max |  mean |    stddev |         var |
+    // |-----------|--------------|----------|-------|-----------|-------------|
+    // | reference |  5.30016e-19 | 0.943143 | 0.001 | 0.0298175 | 0.000889082 |
+    // | compiled  |  5.30014e-19 | 0.943143 | 0.001 | 0.0298175 | 0.000889082 |
+
+    outputStream << "reference : min = " << refStats.Min() << ", max = " << refStats.Max() << ", mean = " << refStats.Mean() << ", stddev = " << refStats.StdDev() << ", var = " << refStats.Variance() << std::endl;
+    outputStream << "compiled  : min = " << compiledStats.Min() << ", max = " << compiledStats.Max() << ", mean = " << compiledStats.Mean() << ", stddev = " << compiledStats.StdDev() << ", var = " << compiledStats.Variance() << std::endl;
+    outputStream << "difference: min = " << diffStats.Min() << ", max = " << diffStats.Max() << ", mean = " << diffStats.Mean() << ", stddev = " << diffStats.StdDev() << ", var = " << diffStats.Variance() << std::endl;
+    outputStream << "sum of absolute differences: " << absDiffSum << std::endl;
+    outputStream << std::endl;
+}
+
+void ModelComparison::WriteModelInfo(std::ostream& outputStream, const std::vector<float>& reference, const std::vector<float>& compiled, bool writePrediction)
+{
+    if (compiled.size() == 0)
+    {
+        // Layer was pruned from compiled model
+        return;
+    }
+
+    SaveOutput("Compare_Overall", reference, compiled);
+
+    outputStream << "## Overall model" << std::endl;
+
+    VectorStatistics refStats(reference);
+    VectorStatistics compiledStats(compiled);
+    VectorStatistics diffStats(Abs(Subtract(reference, compiled)));
+    float absDiffSum = VectorStatistics::Diff(reference, compiled);
+
+    outputStream << "````" << std::endl;
+    bool writeCategoryName = false;
+    std::vector<std::string> categoryNames; // TODO: read this in from a file
+    if (writePrediction)
+    {
+        auto referencePred = std::max_element(reference.begin(), reference.end()) - reference.begin();
+        auto compiledPred = std::max_element(compiled.begin(), compiled.end()) - compiled.begin();
+        outputStream << "Reference label: " << referencePred;
+        if (writeCategoryName)
+        {
+            outputStream << categoryNames[referencePred];
+        }
+        outputStream << "  \n";
+        outputStream << "Compiled label:  " << compiledPred << "  \n";
+        if (writeCategoryName)
+        {
+            outputStream << categoryNames[compiledPred];
+        }
+        outputStream << "  \n";
+    }
+    WriteStatsRow(outputStream, refStats, compiledStats, diffStats, absDiffSum);
+    outputStream << "N: " << refStats.NumElements() << std::endl;
+    outputStream << "````" << std::endl;
+}
+
+void ModelComparison::WriteNodeRow(std::ostream& outputStream, std::string id, std::string name, const std::vector<float>& reference, const std::vector<float>& compiled, const LayerCaptureData& layerData)
 {
     if (compiled.size() == 0)
     {
@@ -339,51 +448,46 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
 
     outputStream << "## " << name << std::endl;
 
-    VectorStatistics refStats(reference);
-    VectorStatistics compiledStats(compiled);
-    VectorStatistics diffStats(Abs(Subtract(reference, compiled)));
-    
-    float absDiffSum = VectorStatistics::Diff(reference, compiled);
-    if (layerData != nullptr)
+    // Get mem layout, extract relevant part, get subtensor
+    math::ChannelColumnRowTensor<float> refTensor(layerData.stride[0], layerData.stride[1], layerData.stride[2], reference);
+    math::ChannelColumnRowTensor<float> compiledTensor(layerData.stride[0], layerData.stride[1], layerData.stride[2], compiled);
+    math::ChannelColumnRowTensor<float> diffTensor(layerData.stride[0], layerData.stride[1], layerData.stride[2], Abs(Subtract(reference, compiled)));
+
+    auto validRefTensor = refTensor.GetSubTensor(layerData.offset[0], layerData.offset[1], layerData.offset[2], layerData.size[0], layerData.size[1], layerData.size[2]);
+    auto validCompiledTensor = compiledTensor.GetSubTensor(layerData.offset[0], layerData.offset[1], layerData.offset[2], layerData.size[0], layerData.size[1], layerData.size[2]);
+    auto validDiffTensor = diffTensor.GetSubTensor(layerData.offset[0], layerData.offset[1], layerData.offset[2], layerData.size[0], layerData.size[1], layerData.size[2]);
+
+    VectorStatistics refStats(validRefTensor);
+    VectorStatistics compiledStats(validCompiledTensor);
+    VectorStatistics diffStats(Abs(Subtract(validRefTensor, validCompiledTensor)));
+
+    float absDiffSum = VectorStatistics::Diff(validRefTensor, validCompiledTensor);
+    if (!_hasMinMax)
     {
-        if (!_hasMinMax)
-        {
-            _minError = _maxError = absDiffSum;
-            _hasMinMax = true;
-        }
-        else
-        {
-            _minError = fmin(_minError, absDiffSum);
-            _maxError = fmax(_maxError, absDiffSum);
-        }
+        _minError = _maxError = absDiffSum;
+        _hasMinMax = true;
     }
-    outputStream << "````" << std::endl;
-    if (layerData != nullptr)
+    else
     {
-        const ell::model::Node* node = layerData->referenceDebugNode;
-        if (node != nullptr)
-        {
-            WriteNodeDetail(outputStream, node);
-        }
-        else
-        {
-            outputStream << "output size = " << layerData->size << ", datasize = " << layerData->stride << ", offset = " << layerData->offset << std::endl;
-        }
+        _minError = fmin(_minError, absDiffSum);
+        _maxError = fmax(_maxError, absDiffSum);
     }
 
-    // TODO: write out as a table?
-    // |           |      min     |      max |  mean |    stddev |         var |
-    // |-----------|--------------|----------|-------|-----------|-------------|
-    // | reference |  5.30016e-19 | 0.943143 | 0.001 | 0.0298175 | 0.000889082 |
-    // | compiled  |  5.30014e-19 | 0.943143 | 0.001 | 0.0298175 | 0.000889082 |
-    
-    outputStream << "reference : min = " << refStats.Min() << ", max = " << refStats.Max() << ", mean = " << refStats.Mean() << ", stddev = " << refStats.StdDev() << ", var = " << refStats.Variance() << std::endl;
-    outputStream << "compiled  : min = " << compiledStats.Min() << ", max = " << compiledStats.Max() << ", mean = " << compiledStats.Mean() << ", stddev = " << compiledStats.StdDev() << ", var = " << compiledStats.Variance() << std::endl;
-    outputStream << "difference: min = " << diffStats.Min() << ", max = " << diffStats.Max() << ", mean = " << diffStats.Mean() << ", stddev = " << diffStats.StdDev() << ", var = " << diffStats.Variance() << std::endl;
-    outputStream << "sum of absolute differences: " << absDiffSum << std::endl;
-    outputStream << "N: " << refStats.NumElements() << std::endl;
     outputStream << "````" << std::endl;
-    outputStream << std::endl;
+    const ell::model::Node* node = layerData.referenceDebugNode;
+    if (node != nullptr)
+    {
+        WriteNodeDetail(outputStream, node);
+        outputStream << "\n";
+    }
+    else
+    {
+        // throw? Is it an error to not have a node here?
+        outputStream << "output size = " << layerData.size << ", datasize = " << layerData.stride << ", offset = " << layerData.offset << std::endl;
+    }
+
+    WriteStatsRow(outputStream, refStats, compiledStats, diffStats, absDiffSum);
+    outputStream << "````" << std::endl;
 
     if (id != "")
     {
@@ -412,11 +516,11 @@ void ModelComparison::WriteLayerNodeDetail(std::ostream& outputStream, const ell
 
     outputStream << "Input size:  " << inputLayoutSize[0] << " x " << inputLayoutSize[1] << " x " << inputLayoutSize[2] << ", ";
     outputStream << "stride: " << inputLayoutStride[0] << " x " << inputLayoutStride[1] << " x " << inputLayoutStride[2] << ", ";
-    outputStream << "offset: " << inputLayoutOffset[0] << ",  " << inputLayoutOffset[1] << ",  " << inputLayoutOffset[2] << "\n";
+    outputStream << "offset: " << inputLayoutOffset[0] << ",  " << inputLayoutOffset[1] << ",  " << inputLayoutOffset[2] << "  \n";
 
     outputStream << "Output size: " << outputLayoutSize[0] << " x " << outputLayoutSize[1] << " x " << outputLayoutSize[2] << ", ";
     outputStream << "stride: " << outputLayoutStride[0] << " x " << outputLayoutStride[1] << " x " << outputLayoutStride[2] << ", ";
-    outputStream << "offset: " << outputLayoutOffset[0] << " x " << outputLayoutOffset[1] << " x " << outputLayoutOffset[2] << "\n";
+    outputStream << "offset: " << outputLayoutOffset[0] << ",  " << outputLayoutOffset[1] << ",  " << outputLayoutOffset[2] << "  \n";
 }
 
 void ModelComparison::WriteNodeDetail(std::ostream& outputStream, const model::Node* node)
@@ -436,11 +540,7 @@ void ModelComparison::WriteNodeDetail(std::ostream& outputStream, const model::N
     }
     else
     {
-        parents = parents[0]->GetParentNodes();
-        if(parents.size() == 1)
-        {
-            node = parents[0];
-        }
+        node = parents[0];
     }
 
     // Write out more detail if this node is a NN layer node
@@ -485,7 +585,7 @@ void ModelComparison::AddStyles()
 
     GraphStyleCondition condition{ "Error > 0" };
     GraphStyle es{ "Node", "Error", "Gradient", condition };
-    GraphStyleSetter red{ "Background", "",  "Color.FromRgb(55 + 200 * (" + expr + " + " + std::to_string(min) + ") / " + std::to_string(range) + ", 0, 0)" };
+    GraphStyleSetter red{ "Background", "", "Color.FromRgb(55 + 200 * (" + expr + " + " + std::to_string(min) + ") / " + std::to_string(range) + ", 0, 0)" };
     es.GetSetters().push_back(red);
 
     // add nice styles to show the errors.
@@ -581,17 +681,17 @@ void ModelComparison::CreateGraph(const model::Model& model)
     });
 }
 
-void ModelComparison::SaveDgml(std::ostream& stm)
+void ModelComparison::SaveDgml(std::ostream& outputStream)
 {
     AddStyles();
     // and add <Styles> section to the graph to that is clearly visible.
-    _graph.SaveDgml(stm);
+    _graph.SaveDgml(outputStream);
 }
 
-void ModelComparison::SaveDot(std::ostream& stm)
+void ModelComparison::SaveDot(std::ostream& outputStream)
 {
     // and add <Styles> section to the graph to that is clearly visible.
-    _graph.SaveDot(stm);
+    _graph.SaveDot(outputStream);
 }
 
 void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, const model::Node& node)
@@ -616,36 +716,16 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
     std::string sinkFunctionName = "DebugOutput";
     auto newPortElements = transformer.GetCorrespondingOutputs(layerNode->output);
     std::string label = layerNode->GetRuntimeTypeName() + "(" + to_string(layerNode->GetId()) + ")";
-    
-    auto layerOutputLayout = layerNode->GetOutputMemoryLayout();
-    auto layerOutputLayoutMinusPadding = ell::model::PortMemoryLayout(layerOutputLayout.GetActiveSize());
 
-    // size_t size = layerNode->GetOutputSize();
-    size_t size = layerOutputLayoutMinusPadding.GetMemorySize();
+    size_t size = layerNode->GetOutputSize();
     _outputSizes[label] = size;
-
-    auto reorderNode = transformer.AddNode<ell::nodes::ReorderDataNode<ValueType>>(
-        newPortElements,
-        layerOutputLayout,
-        layerOutputLayout);
-        // layerOutputLayoutMinusPadding);
-    
-    auto nullSinkFunction = [this](const std::string& label, const std::vector<ValueType>& output, void* userData) {
-    };
 
     auto sinkFunction = [this](const std::string& label, const std::vector<ValueType>& output, void* userData) {
         AddLayer(label.c_str(), output.data());
     };
-    
-    auto nullSinkNode = transformer.AddNode<ell::nodes::DebugSinkNode<ValueType>>(
-        newPortElements,
-        nullSinkFunction,
-        label,
-        static_cast<void*>(this),
-        sinkFunctionName);
 
     auto sinkNode = transformer.AddNode<ell::nodes::DebugSinkNode<ValueType>>(
-        reorderNode->output,
+        newPortElements,
         sinkFunction,
         label,
         static_cast<void*>(this),
@@ -677,4 +757,5 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
             _nodeMap[referenceLabel] = label;
         }
     }
+}
 }

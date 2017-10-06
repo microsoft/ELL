@@ -89,10 +89,13 @@ namespace math
     /// (increment of 1). </typeparam>
     /// <typeparam name="dimension1"> Identity of the tensor dimension with a minor memory increment. </typeparam>
     /// <typeparam name="dimension2"> Identity of the tensor dimension with a major memory increment. </typeparam>
-    template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     class ConstTensorReference 
     {
     public:
+
+        using TensorElementType = ElementType;
+
         /// <summary> Constructs an instance of ConstTensorReference. </summary>
         ///
         /// <param name="shape"> The tensor shape (always given in logical coordinates: row, column, channel). </param>
@@ -275,6 +278,11 @@ namespace math
 
         /// @}
 
+        /// <summary> Determines of this Tensor is stored in contiguous memory. </summary>
+        ///
+        /// <returns> True if contiguous, false if not. </returns>
+        bool IsContiguous() const;
+
         /// <summary> Returns a copy of the contents of the Tensor. </summary>
         ///
         /// <returns> A std::vector with a copy of the contents of the Tensor. </returns>
@@ -339,6 +347,7 @@ namespace math
     {
     public:
         using ConstTensorRef = ConstTensorReference<ElementType, dimension0, dimension1, dimension2>;
+        using TensorElementType = typename ConstTensorRef::TensorElementType;
         using ConstTensorRef::ConstTensorReference;
         using ConstTensorRef::operator();
         using ConstTensorRef::Size;
@@ -555,6 +564,7 @@ namespace math
     {
     public:
         using TensorRef = TensorReference<ElementType, dimension0, dimension1, dimension2>;
+        using TensorElementType = typename TensorRef::TensorElementType;
         using TensorRef::TensorReference;
         using TensorRef::operator();
         using TensorRef::Size;

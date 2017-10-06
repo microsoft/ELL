@@ -6,15 +6,29 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "VectorStatistics.h"
-
+// stl
 #include <algorithm>
 #include <cassert>
+
+namespace ell
+{
 //
 // VectorStatistics class
 //
 template <typename ValueType>
 VectorStatistics::VectorStatistics(const std::vector<ValueType>& vec)
+{
+    Initialize(vec);
+}
+
+template <typename TensorType>
+VectorStatistics::VectorStatistics(const TensorType& tensor)
+{
+    Initialize(tensor.ToArray());
+}
+
+template <typename ValueType>
+void VectorStatistics::Initialize(const std::vector<ValueType>& vec)
 {
     if (vec.size() == 0)
     {
@@ -76,15 +90,21 @@ double VectorStatistics::Diff(const std::vector<ValueType>& vec1, const std::vec
     return error;
 }
 
+template <typename TensorType>
+double VectorStatistics::Diff(const TensorType& tensor1, const TensorType& tensor2)
+{
+    return Diff(tensor1.ToArray(), tensor2.ToArray());
+}
+
 template <typename ValueType>
 std::vector<ValueType> Subtract(const std::vector<ValueType>& vec1, const std::vector<ValueType>& vec2)
 {
-    auto size1 = vec1.size();    
+    auto size1 = vec1.size();
     auto size2 = vec2.size();
     assert(size1 == size2); // require this for now
     auto maxSize = std::max(size1, size2);
     std::vector<ValueType> result(maxSize);
-    for(size_t index = 0; index < maxSize; ++index)
+    for (size_t index = 0; index < maxSize; ++index)
     {
         auto val1 = index < size1 ? vec1[index] : 0;
         auto val2 = index < size2 ? vec2[index] : 0;
@@ -94,14 +114,42 @@ std::vector<ValueType> Subtract(const std::vector<ValueType>& vec1, const std::v
     return result;
 }
 
+template <typename TensorType>
+ell::math::ChannelColumnRowTensor<typename TensorType::TensorElementType> Subtract(const TensorType& tensor1, const TensorType& tensor2)
+{
+    ell::math::ChannelColumnRowTensor<typename TensorType::TensorElementType> result(tensor1);
+
+    for (size_t i = 0; i < result.NumRows(); ++i)
+    {
+        for (size_t j = 0; j < result.NumColumns(); ++j)
+        {
+            for (size_t k = 0; k < result.NumChannels(); ++k)
+            {
+                result(i, j, k) = tensor1(i, j, k) - tensor2(i, j, k);
+            }
+        }
+    }
+
+    return result;
+}
+
 template <typename ValueType>
 std::vector<ValueType> Abs(const std::vector<ValueType>& vec)
 {
     std::vector<ValueType> result(vec.size());
-    for(size_t index = 0; index < vec.size(); ++index)
+    for (size_t index = 0; index < vec.size(); ++index)
     {
         result[index] = std::fabs(vec[index]);
     }
 
     return result;
+}
+
+template <typename TensorType>
+ell::math::ChannelColumnRowTensor<typename TensorType::TensorElementType> Abs(const TensorType& tensor)
+{
+    ell::math::ChannelColumnRowTensor<typename TensorType::TensorElementType> result(tensor);
+    result.Transform([](auto x) { return std::abs(x); });
+    return result;
+}
 }
