@@ -8,12 +8,16 @@ permalink: /tutorials/
 
 ## Setting Up
 
-* [Setting Up your Raspberry Pi](/ELL/tutorials/Setting-Up-your-Raspberry-Pi)
-* [Active Cooling your Raspberry Pi 3](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3)
+* [Setting up your Raspberry Pi for tutorials](/ELL/tutorials/Setting-up-your-Raspberry-Pi)
+* [Active cooling your Raspberry Pi 3](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3)
 
-# Computer Vision
+## Image Classification Tutorials in Python
 
-* [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/)
-* [Fun with Dogs and Cats](/ELL/tutorials/Fun-with-Dogs-and-Cats/)
-* [Importing new models](/ELL/tutorials/Importing-new-models/)
-* [Comparing Image Classification models side by side on the Raspberry Pi](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/)
+* [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/)
+* [Boosting classifier accuracy by grouping categories](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/)
+* [Importing models](/ELL/tutorials/Importing-models/)
+* [Comparing image classification models side by side on the Raspberry Pi](/ELL/tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/)
+
+## Image Classification Tutorials in C++
+
+* [Getting started with image classification on the Raspberry Pi in C++](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/)

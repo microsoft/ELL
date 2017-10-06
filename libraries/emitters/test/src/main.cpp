@@ -30,6 +30,7 @@ void TestIR()
     TestIRAddFunction();
     TestIRFunction();
     TestHeader();
+    TestTwoEmitsInOneSession();
 }
 
 int main(int argc, char* argv[])

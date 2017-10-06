@@ -242,7 +242,7 @@ class DemoHelper:
             average_time = self.total_time/self.time_count
         return average_time
 
-    def report_times(self):
+    def report_times(self, node_level=True):
         """Prints the average prediction time and additional profiling info, if available."""
         average_time = self.get_times()
         if average_time is not None:
@@ -252,23 +252,18 @@ class DemoHelper:
         if hasattr(self.compiled_module, self.model_name + "_PrintModelProfilingInfo"):
             getattr(self.compiled_module, self.model_name + "_PrintModelProfilingInfo")()
 
-        if hasattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo"):
-            getattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo")()
+        if node_level:
+            if hasattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo"):
+                getattr(self.compiled_module, self.model_name + "_PrintNodeProfilingInfo")()
 
-    def get_top_n(self, predictions, N):
-        """Return at most the top N predictions as a list of tuples that meet the threshold."""
-        topN = np.zeros([N, 2])
-
-        for p in range(len(predictions)):
-            for t in range(len(topN)):
-                if predictions[p] > topN[t][0]:
-                    topN[t] = [predictions[p], p]
-                    break
-        result = []
-        for element in topN:
-            if element[0] > self.threshold:
-                i = int(element[1])
-                result.append((i, element[0]))
+    def get_top_n_predictions(self, predictions, N = 5):
+        """Return at most the top N predictions as a list of tuples that meet the threshold.
+        The first of element of each tuple represents the index or class of the prediction and the second 
+        element represents that probability or confidence value.
+        """
+        map = [(i,predictions[i]) for i in range(len(predictions)) if predictions[i] >= self.threshold]
+        map.sort(key=lambda tup: tup[1], reverse=True)
+        result = map[:N]
         return result
 
     def get_label(self, i):

@@ -54,7 +54,7 @@ class ModuleBuilder:
         arg_parser.add_argument("model_file", help="path to the ELL model file")
 
         # optional arguments
-        arg_parser.add_argument("--language", "-lang", help="the language for the ELL module", choices=["python"], default=self.language)
+        arg_parser.add_argument("--language", "-lang", help="the language for the ELL module", choices=["python", "cpp"], default=self.language)
         arg_parser.add_argument("--target", "-target", help="the target platform", choices=["pi3", "pi3_64", "aarch64", "host"], default=self.target)
         arg_parser.add_argument("--outdir", "-outdir", help="the output directory")
         arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
@@ -135,9 +135,9 @@ class ModuleBuilder:
         self.copy_files(self.files, "")
         self.copy_files(self.includes, "include")
         self.copy_files(self.tcc, "tcc")
-        self.create_cmake_file()
         self.tools.compile(self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.profile)
-        self.tools.swig(self.output_dir, self.model_name, self.language)
+        if self.language != "cpp":
+            self.tools.swig(self.output_dir, self.model_name, self.language)
         self.tools.opt(self.output_dir, self.model_name)
         self.tools.llc(self.output_dir, self.model_name, self.target)
         self.create_cmake_file()

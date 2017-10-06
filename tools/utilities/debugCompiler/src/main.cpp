@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
         auto input = GetInputData<TestDataType>(map, compareArguments);
         ModelComparison comparison(compareArguments.outputDirectory);
-        comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize, compareArguments.allowVectorInstructions);
+        comparison.Compare(input, map, compareArguments.useBlas, compareArguments.optimize, compareArguments.allowVectorInstructions, compareArguments.fuseLinearOperations);
 
         // Write summary report
         if (compareArguments.writeReport)
@@ -133,7 +133,11 @@ int main(int argc, char* argv[])
         {
             std::string graphFileName = utilities::JoinPaths(compareArguments.outputDirectory, "graph.dgml");
             std::ofstream graphStream(graphFileName);
-            comparison.SaveGraph(graphStream);
+            comparison.SaveDgml(graphStream);
+
+            std::string dotFileName = utilities::JoinPaths(compareArguments.outputDirectory, "graph.dot");
+            std::ofstream dotStream(dotFileName);
+            comparison.SaveDot(dotStream);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

@@ -1,312 +1,299 @@
 ---
 layout: default
-title: Comparing Image Classification models side by side on the Raspberry Pi
-permalink: /tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/
+title: Comparing image classification models side by side on the Raspberry Pi
+permalink: /tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/
 ---
-# Comparing Image Classification models side by side on the Raspberry Pi
+# Comparing image classification models side by side on the Raspberry Pi
 
-![screenshot](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/Screenshot.jpg)
+In this tutorial, we will download two models from the [ELL gallery](/ELL/gallery/) and run them side-by-side on a Raspberry Pi. Some of the models on the gallery are slower abd accurate, while others are faster but less accurate. Running two models as once allows us to get a sense of their relative speeds and accuracies. Specifically, we will compare a standard (real valued) Convolutional Neural Network to a Neural Network that contains binarized layers. The binarized model is smaller and faster, but less accurate. 
 
-### Materials
+---
 
-* A Raspberry Pi
-* Cooling fan attachment (see our [instructions on cooling your Pi](/ELL/gallery/Raspberry-Pi-3-Fan-Mount)) (optional)
-* A USB webcam (optional)
-* A display (optional)
+![screenshot](Screenshot.jpg)
 
-### Overview
+#### Materials
 
-In this tutorial, you will download two pretrained image classifiers from the gallery, compile the classifiers for the Raspberry Pi, and write a Python script that invokes the classifiers in a round-robin fashion and displays results side by side. When the Python script runs on the Pi, you will be able to point the camera at a variety of objects and compare both result and evaluation time per frame of the the classifiers.
+* Laptop or desktop computer (Windows, Linux, or Mac)
+* Raspberry Pi
+* Raspberry Pi camera or USB webcam
+* *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
-For the example in this tutorial, we will download a real-valued model and a binarized version of that model to compare side by side. You'll see that the binarized model is much smaller, but less accurate. Runtime characteristics of the models differ too: different models have different resource and power requirements. Play around with other models in the gallery after this tutorial to find the one that best suits your particular scenario.
+#### Prerequisites
 
-### Prerequisites
-We recommend that you are familiar with the concepts in [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/).
+* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). Specifically, this tutorial requires ELL, CMake, SWIG, and Python 3.6. 
+* Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
+* Complete the basic tutorial, [Getting started with image classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), to learn how to produce a Python wrapper for an ELL model.
 
-1. We will use `Python 3.6` for this tutorial on your dev box.
-We highly recommend using the miniconda or full anaconda python environment because it comes with many
-handy tools like `curl` which we will use later on.
+## Step 1: Activate your environment and create a tutorial directory
 
-2. You will also need a simple web cam or a pi cam.  If you don't have one handy, we will show you how to load
-static images or .mp4 videos and process those instead.
+If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your anaconda environment.  
 
-3. Additional Software is needed on your Raspberry Pi - See [Setup Raspberry Pi](/ELL/tutorials/Setting-Up-your-Raspberry-Pi). 
-
-4. You will need to be sure you built ELL as per the ELL INSTALL-xxx.md instructions at the root of this git repo.  You will need to build ELL after you install Python from your activate your conda environment, so that the `CMake` step picks up on the fact that you have Python 3.6 installed.
-
-### Download pre-trained models
-Make a new directory named `sideBySide` in the `build/tutorials` folder which is where we will download a pre-trained model. 
 ```
+[Unix] source activate py36
+[Windows] activate py36 
+```
+
+Then, cd into the directory where you built ELL and create a `sideBySide` directory
+
+```shell
+cd ELL/build
 mkdir sideBySide
 cd sideBySide
 ```
-ELL has a [gallery of pre-trained models](/ELL/gallery). For this tutorial, we'll use models trained on the ILSVRC2012 data set. Along with the models, you'll want to download a labels file that has friendly text names for each of the 1000 classes that the models are trained to recognize.
-We'll use the (ILSVRC2012_labels.txt)(https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt) labels file and the following two model files:
-* A real-valued model at https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
-* A binarized version at https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A/d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell.zip
 
-Note that the model files are zipped, and have long named indicating their architecture. For convenience, we'll just want to save it locally as `ell1.zip` and `ell2.zip`:
-```
-curl --location -o labels.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt
-curl --location -o ell1.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
-curl --location -o ell2.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A/d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell.zip
-```
-Inside `ell1.zip` is the ell model named `d_I224x224x3CMCMCMCMCMCMC1A.ell`, so unzip the archive to the current directory (`sideBySide`). 
-Inside `ell2.zip` is the ell model named `d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell`, so unzip the archive to the current directory (`sideBySide`). 
+## Step 2: Download two pre-trained models
 
-Recent versions of git come with the `unzip` tool:
-```
-unzip ell1.zip
-unzip ell2.zip
-```
- Rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model1.ell` and rename the `d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell` model file to `model2.ell`:
+Download this [real-valued ELL model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip) and this [binarized ELL model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip)
+into the `sideBySide` directory.
 
-| Unix    | `mv d_I224x224x3CMCMCMCMCMCMC1A.ell model1.ell` <br> `mv d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell model2.ell` |
-| Windows | `ren d_I224x224x3CMCMCMCMCMCMC1A.ell model1.ell` <br> `ren d_I224x224x3NCMNBMNBMNBMNBMNBMNC1A.ell model2.ell` |
+```shell
+curl --location -o model1.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip
+curl --location -o model2.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip
+```
 
-You should now have a `labels.txt` file, a `model1.ell` file and a `model2.ell` file in the `sideBySide` folder.
-### Wrap the models in Python callable modules
-For this tutorial we want to call the model from Python.  ELL provides a compiler that takes a model and compiles it into code that will run on a target platform - in this case the Raspberry Pi running Linux, so it generates code for armv7-linux-gnueabihf, and for the cortex-a53 CPU.
-Similar to the [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/) tutorial, we'll use the `wrap.py` utility, this time with the `--oudir` option to put the models into different directories:
+Unzip the compressed files.
+
+```shell
+unzip model1.ell.zip
+unzip model2.ell.zip
+```
+
+Rename them to `model1.ell` and `model2.ell` respectively.
+
+```shell
+[Unix] mv d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && mv d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
+[Windows] ren d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && ren d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
+```
+
+(One Windows, unzip is part of the Git distribution, for example, in `\Program Files\Git\usr\bin`.)
+Next, download the file of [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) that correspond to these models.
+
+```shell
+curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
+```
+
+There should now be `model1.ell` and `model2.ell` files as well as a `categories.txt` file in the `sideBySide` directory.
+
+## Step 3: Wrap the models in Python callable modules
+
+Use the `wrap.py` tool to compile the models and create Python wrappers. We'll use the `--outdir` option to put the models into different directories.
 
 ````
-python ../../tools/wrap/wrap.py labels.txt model1.ell -lang python -target pi3 -outdir model1
-python ../../tools/wrap/wrap.py labels.txt model2.ell -lang python -target pi3 -outdir model2
+python ../../tools/wrap/wrap.py categories.txt model1.ell -lang python -target pi3 -outdir model1
+python ../../tools/wrap/wrap.py categories.txt model2.ell -lang python -target pi3 -outdir model2
 ````
 You should see output similar to the following:
 
 ````
 compiling model...
 generating python interfaces for model1 in model1
+running opt...
 running llc...
 success, now you can build the 'model1' folder
 ...
 compiling model...
 generating python interfaces for model2 in model2
+running opt...
 running llc...
 success, now you can build the 'model2' folder
 ````
 
-We also want to copy some additional python code to your Raspberry Pi for the purpose of running this tutorial. You can also copy a static image over for testing:
+We also want to copy some additional python code to your Raspberry Pi for the purpose of running this tutorial.
 
-| Unix    | `cp ../../tools/utilities/pythonlibs/*.py .`       <br> `cp ../../tools/utilities/pitest/coffeemug.jpg .`   |
-| Windows | `copy ..\..\tools\utilities\pythonlibs\*.py .` <br> `copy ..\..\tools\utilities\pitest\coffeemug.jpg .` |
+```
+[Unix] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
+[Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
+```
 
-You should now have a `sideBySide` folder containing `model1` and `model2` directories as well as some helpful python utilities which we'll use in the next section.
+You should now have a `sideBySide` folder containing `model1` and `model2` directories as well as some helpful python utilities which we'll use later in this tutorial.
 
-## Call your model from a Python app
-Create a new text file called `sideBySideDemo.py` in your `sideBySide` folder. We'll add Python code to:
-* Parse the list of models
-* Load the compiled models
-* Get an image
-* Run the image through each model in turn
-* Compose an image made up of the results from each model's predictions
-* Show the tiled image result
+We are ready to move to the Raspberry Pi. You can copy the `sideBySide` folder to the Pi using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
-If you don't want to type it out, the script can be found [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySideDemo.py), otherwise follow along below.
+## Step 4: Call your models from a Python script
 
-First, we need to import the libraries we'll be using in this app, which include system ultilities, numpy and demoHelper that we copied over from ELL utilities:
+We will write a Python script that grabs images from the camera, invokes the models one at a time, and displays the two frames side-by-side. If you just want the full script, copy it from [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySide.py). Otherwise, create an empty text file named `sideBySide.py` and copy in the code snippets below. 
+
+First, import a few dependencies, including system utilities, opencv, and numpy.
 ```python
 import sys
 import os
+import time
 import numpy as np
 import cv2
-import demoHelper as d
+import tutorialHelpers as helpers
 ```
-Next, we're going to define a helper function that will split the argument string specifying the models to run side by side, and instantiate a model helper wrapper object for each, returning an array of all the wrapped models. We used the model helper class before in [Getting Started with Image Classification on the Raspberry Pi](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/), it provides handy functions to load and call ELL models.
+
+Next, we need to import the models. Since they are contained in different directories, add the relative paths so Python can find them:
 
 ```python
-def get_model_helpers(demoArgs):
-    """
-    Returns a list of model helpers, initialized from the commandline arguments in demoArgs
-    """
-    models = []
-    numModels = 0
-
-    # Split the labels string on commas.
-    demoArgs.labelsList = [x.strip() for x in demoArgs.labels.split(',')]
-
-    if demoArgs.models:
-        # Split the models string on commas
-        demoArgs.modelsList = [x.strip() for x in demoArgs.models.split(',')]
-        numModels = len(demoArgs.modelsList)
-        demoArgs.compiledList = [None] * numModels
-    else:
-        # Split the compiled string on commas
-        demoArgs.compiledList = [x.strip() for x in demoArgs.compiledModels.split(',')]
-        numModels = len(demoArgs.compiledList)
-        demoArgs.modelsList = [None] * numModels
-    # If the number of elements in the labelsList is 1, then use the same labels file
-    # for all models
-    if (len(demoArgs.labelsList) == 1):
-        demoArgs.labelsList = demoArgs.labelsList * numModels
-
-    # Iterate over the model list and instantiate a helper for each.
-    # Interactions with each model will be done via this wrapper class.
-    helperArgs = demoArgs
-    for i in range(numModels):
-        # Instantiate a new helper for the model and initialize it
-        helper = d.DemoHelper()
-        helperArgs.labels = demoArgs.labelsList[i]
-        helperArgs.model = demoArgs.modelsList[i]
-        helperArgs.compiledModel = demoArgs.compiledList[i]        
-        helper.initialize(helperArgs)
-        helper.init_image_source()
-        # Add it to the list
-        models.append(helper)
-
-    return models
+sys.path.append("model1")
+sys.path.append("model1/build/Release")
+sys.path.append("model2")
+sys.path.append("model2/build/Release")
+import model1
+import model2
 ```
-Next, we'll define the main function, which contains the primary application logic for this tutorial. We need to parse the commandline arguments, and call our helper function we just defined to get a list of models we will use. 
+
+The following functions help us get an image from the camera and read in the categories file.
+
+```python
+def get_image_from_camera(camera):
+    if camera is not None:
+        ret, frame = camera.read()
+        if (not ret):
+            raise Exception('your capture device is not returning images')
+        return frame
+    return None
+
+# Return an array of strings corresponding to the model's recognized categories or classes.
+# The order of the strings in this file are expected to match the order of the
+# model's output predictions.
+def get_categories_from_file(fileName):
+    labels = []
+    with open(fileName) as f:
+        labels = f.read().splitlines()
+    return labels
+```
+
+Define our main entry point and use the camera as an image source.
+
 ```python
 def main(args):
-    """Main function for the Side By Side tutorial"""
-    demoArgs = d.get_common_commandline_args(args, 
-        "Runs a number of ELL models that predict the same categories, passing images from camera or static image file\n"
-        "in a round-robin fashion. The output is a tiled image, where each tile is the result of one model."
-        "Either the ELL model files, or the compiled models' Python modules must be given,\n"
-        "using the --models or --compiledModels options respectively.\n"
-        "Example:\n"
-        "   python sideBySideDemo.py categories1.txt,categories2.txt --compiledModels models/pi3/model1,models/pi3/model2\n"
-        "   python sideBySideDemo.py sameCategories.txt --models model3.ell,model4.ell\n"
-        "This shows opencv window with image classified by the models using given labels")
-    models = get_model_helpers(demoArgs)
-    if (len(models) < 1):
-        print('Found no models to run')
-        sys.exit()
+    camera = cv2.VideoCapture(0)
+```
 
-```
-We'll use a helper class called TiledImage to crete the output for this tutorial. The TiledImage class composes a set of images into one which can be displayed by OpenCV. Each tile in the output image is the result of passing a frame to a model instance.
+Use the function we defined above to read the category names from the file provided on the command line.  
+
 ```python
-    tiledImage = d.TiledImage(len(models))
+    categories = get_categories_from_file("categories.txt")
 ```
-Declare a loop so we can keep grabbing frames to push through the models. For simplicity, just ask the first model to grab a frame. The same frame will be passed to each model.
+
+Define an array to hold our models.
+
 ```python
-    done = False
-    while (not done):
-        # Grab next frame
-        frame = models[0].get_next_frame()
+    models = [model1, model2]    
 ```
-We want to pass the frame to each model in turn. For fairness, we'll randomize the order so that no one model benefits from cache locality more than another.
+
+The models expect input in a certain shape. For each model, get this shape and store it for use later on. 
+
+```python    
+    inputShapes = []
+    inputShapes.append(models[0].get_default_input_shape())
+    inputShapes.append(models[1].get_default_input_shape())
+```
+
+Allocate arrays to store each model's output. 
+
 ```python
-        # Run through models in random order to get a fairer average of evaluation time
+    predictionArrays = []
+    outputShape = models[0].get_default_output_shape()
+    predictionArrays.append(models[0].FloatVector(outputShape.Size()))
+    outputShape = models[1].get_default_output_shape()
+    predictionArrays.append(models[1].FloatVector(outputShape.Size()))
+```
+
+Declare a tiled image used to compose our results. We get this from the helper module we imported earlier.
+
+```python
+    tiledImage = helpers.TiledImage(len(models))
+```
+
+Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user hits any key. At the start of every loop iteration, read an image from the camera.
+
+```python
+    while (cv2.waitKey(1) == 0xFF):
+        image = get_image_from_camera(camera)
+```
+
+Iterate over the models. In this case, we'll randomize the order so that, on average, no model has an advantage over another due to caching and so on.
+
+```python
         modelIndexes = np.arange(len(models))
         np.random.shuffle(modelIndexes)
-```
-Iterate over the models. `frame` now holds image data for the model. However, it often cannot be used as-is, because models are typically trained with:
-* specific image sizes e.g. 224 x 224 x 3
-* specific ordering of color channels e.g. RGB. Our helper uses OpenCV to grab images from the image source (file or webcam). Their size is dependent on the source, and the ordering is always BGR from OpenCV. Therefore, we need to crop and or resize the image while maintaining the same aspect ratio, and reorder the color channels from BGR to RGB. Since this is such a common operation, the helper implements this in a method called prepare_image_for_predictor:
-```python
+
         for modelIndex in modelIndexes:
             model = models[modelIndex]
-            # Prepare the image to send to the model.
-            # This involves scaling to the required input dimension and re-ordering from BGR to RGB
-            data = model.prepare_image_for_predictor(frame)
 ```
 
-We are now ready to get a classify the image in the frame. The model has a 'predict' method, which will return a list of probabilities for each of the 1000 classes it can detect:
-```python
-            # Get the compiled model to classify the image, by returning a list of probabilities for the classes it can detect
-            model.predict(data)
-```
-Note that this is just an array of values, where each element is a probability between 0 and 1. It is typical to reject any that do not meet a particular threshold, since that represents low confidence results. Re-ordering so that we get only the Top 5 predictions is also useful. The index of the prediction represents the class, the value represents the score. We can use the labels file to match the index of the prediction to its text label, and then construct a string with the label and score.
-We'll use this string as header text for each tile.
-```python
-            # Get the (at most) top 5 predictions that meet our threshold.
-            top5 = model.get_top_n(model.results, 5)
+For each model, prepare the image as input to the model's predict function.
 
-            # Turn the top5 into a text string to display
-            header_text = "".join([model.get_label(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])
-            # Draw the prediction text as a header
-            modelFrame = np.copy(frame)
-            model.draw_header(modelFrame, header_text)
-```
-Each model wrapper is keeping track of how long the `predict` function took to return a result. This is the model's evaluation time, and we will set it as part of the footer text:
 ```python
-            # Draw the evaluation time as the footer
-            evaluationTime = model.get_times() * 1000 # time in ms
-            if (evaluationTime is not None):
-                footerText = '{:.0f}'.format(evaluationTime) + 'ms/frame, ' + model.model_name
-                model.draw_footer(modelFrame, footerText)
+            input = helpers.prepare_image_for_model(image, inputShapes[modelIndex].columns, inputShapes[modelIndex].rows)
 ```
-Lastly, update the tiled image with this frame. Each output frame composed from results of the model will be one tile in the output:
+
+With the processed image input handy, call the `predict` method to invoke the model. 
+
 ```python
-            # Set the image with the header and footer text as one of the tiles
+            model.predict(input, predictionArrays[modelIndex])
+```
+
+As before, the `predict` method fills the `predictionsArray[modelIndex]` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n_predictions`.
+
+```python
+            top5 = helpers.get_top_n_predictions(predictionArrays[modelIndex], 5)
+```
+
+`top5` is an array of tuples, where the first element is the category index and the second element is the probability of that category. Match the category indices in `top5` with the category names in `categories`.
+
+```python
+            headerText = "".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] + "  " for element in top5])
+```
+
+Use the `draw_header` helper function to write the predicted category on the image. Since each model will write its own result, we make a copy of the input image.
+
+```python
+            modelFrame = np.copy(image)
+            helpers.draw_header(modelFrame, headerText)
+```
+
+The model has now produced a frame which has the input image and the model's prediction results. Set this as one of the tiles in the tiledImage and show the result.
+
+```python
             tiledImage.set_image_at(modelIndex, modelFrame)
-            done = tiledImage.show()
-            if done:
-                break
+            tiledImage.show()
+```
 
+Finally, write the code that invokes the `main` function and runs your script.
+
+```python
 if __name__ == "__main__":
     args = sys.argv
     args.pop(0) # when an args list is passed to parse_args, the first argument (program name) needs to be dropped
     main(sys.argv)
 ```
-Your `sideBySide` folder is ready to copy to your Raspberry Pi. You can do that using the ‘scp’ tool. On Windows you can use WinSCP.
 
-### SSH into Raspberry Pi
+We are ready to move to the Raspberry Pi. You can copy the `sideBySide` folder to the Pi using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
-Now log into your Raspberry Pi, either remotely using SSH or directly if you have keyboard and screen attached.
+## Step 5: Build the Python wrappers on the Raspberry Pi
 
-Find the `model1` folder you just copied over using scp or winscp and run the following:
+Log into your Raspberry Pi, either remotely using SSH or directly if you have a keyboard and screen connected. Find the `sideBySide` folder you just copied over and build the two CMake projects.
 
-````
+```shell
 cd model1
 mkdir build
 cd build
 cmake ..
 make
-cd ..
-cd ..
-````
-This builds the Python Module that is then loadable by the demo Python scripts. Do the same for the `model2` folder:
-
-````
+cd ../..
 cd model2
 mkdir build
 cd build
 cmake ..
 make
-cd ..
-cd ..
-````
+cd ../..
+```
 
-### Process a static image 
-Now if you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi) you should have a miniconda
-environment named py34.  So to run the tutorial do this:
+## Step 8: Classify live video on the Raspberry Pi
 
-````
+If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an anaconda environment named `py34`. Activate it and run the script that we wrote above. 
+
+```
 source activate py34
-python sideBySideDemo.py labels.txt --compiledModels model1/model1,model2/model2 --image coffeemug.jpg
-````
+python sideBySide.py
+```
 
-If you have a display connected you should see the screen shot at the top of this page.
+If you have a camera and display connected to your Pi, you should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. If you downloaded the full source for [sideBySide.py](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/sideBySide.py), you will also see the average time in milliseconds it takes each model to process a frame. Try to get a sense of the relative accuracy and speed of each model. 
 
-### Process Video
-If you have a USB camera attached to your Pi then you can also use ELL to process video frames:
+## Troubleshooting
 
-````
-python sideBySideDemo.py labels.txt  --compiledModels model1/model1,model2/model2
-````
-
-You will see the same kind of window appear only this time it is showing the video stream.
-Then when your camera is pointed at an object that the model recognizes you will see the label and 
-confidence % at the top together with an estimated frame rate.
-
-`Tip`: for quick image recognition results you can point the video camera at a web image of a dog 
-on your PC screen.  ImageNet models can usually do a good job recognizing  different dog breeds and 
-many types of African animals.
-
-## Next steps
-Different models have different characteristics. For example, some are slow but accurate, while others are faster and less accurate. Some have different power draw than others.
-
-Experiment with which model works best for you by downloading other models in the [ELL gallery](/ELL/gallery/).
-
-Try these related tutorials:
-* [Fun with Dogs and Cats](/ELL/tutorials/Fun-with-Dogs-and-Cats/)
-* [Comparing Image Classification models side by side on the Raspberry Pi](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/)
-
-### Toubleshooting
-
-If you run into trouble there's some troubleshooting instructions at the bottom of the 
-[Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-Up-your-Raspberry-Pi).
+If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).

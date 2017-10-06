@@ -79,7 +79,7 @@ void WriteVector(const std::string& filename, const std::vector<ValueType>& vec)
 }
 
 template <typename FunctionType>
-void WriteStatsRow(std::ostream& reportStream, const VectorStats& layerStats, const VectorStats& nodeStats, const VectorStats& diffStats, const std::string& header, FunctionType getValueFunction)
+void WriteStatsRow(std::ostream& reportStream, const VectorStatistics& layerStats, const VectorStatistics& nodeStats, const VectorStatistics& diffStats, const std::string& header, FunctionType getValueFunction)
 {
     reportStream << "<tr> <td>" << header << "</td>";
     if (layerStats.IsValid())

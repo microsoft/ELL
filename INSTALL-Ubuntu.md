@@ -1,6 +1,6 @@
 # Building the Embedded Learning Library (ELL) on Ubuntu Linux
 
-ELL enables you to design and deploy intelligent machine-learned models onto single-board computers, like Raspberry Pi, Arduino. However, most of your interaction with ELL occurs on a laptop or desktop computer. The steps below describe how to build ELL on a laptop or desktop running Ubuntu Linux. 
+ELL enables you to design and deploy intelligent machine-learned models onto single-board computers, like Raspberry Pi and Arduino. Most of your interaction with ELL occurs on a laptop or desktop computer, rather than the single-board machine itself. The steps below describe how to build ELL on a laptop or desktop running Ubuntu Linux.
 
 ## Cloning the ELL repository
 
@@ -12,7 +12,7 @@ To clone the ELL repository, type
 
     git clone https://github.com/Microsoft/ELL.git
 
-## Prerequisites
+## Prerequisites for building ELL
 
 We recommend using the `apt-get` package manager to download and install prerequisites. First, make sure that apt-get is up to date by
 
@@ -21,7 +21,7 @@ We recommend using the `apt-get` package manager to download and install prerequ
 ### gcc 5, CMake 3.8, libedit, zlib, OpenBLAS, and Doxygen via apt-get
 
 ELL requires the following tools and libraries, some of which are installed by default on Ubuntu systems:
-* *gcc 5* or newer - C++14 compiler 
+* *gcc 5* or newer - C++14 compiler
 * [*CMake*](https://cmake.org/) version 3.8 or newer - build system
 * *libedit* and *zlib* libraries
 
@@ -50,13 +50,13 @@ and look for the version number. If the version number is 3.9 or greater, you ca
 
 ### SWIG 3.0.12
 
-[*SWIG*](http://swig.org) is a tool that generates Python interaces to C++ libraries. If you intend to use ELL from Python, you must install SWIG version 3.0.12 or newer. At the time of writing this document, `apt-get` doesn't yet have the latest version of `SWIG`, so it must be installed manually
+[*SWIG*](http://swig.org) is a tool that generates Python interfaces to C++ libraries. If you intend to use ELL from Python, you must install SWIG version 3.0.12 or newer. At the time of writing this document, `apt-get` doesn't yet have the latest version of `SWIG`, so it must be installed manually
 
    wget http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
    tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12
    ./configure --without-pcre && make && sudo make install
 
-## Python 3.6 and OpenCV via Miniconda
+## Using ELL in Python
 
 ELL can optionally be used from Python 3.6. We recommend using the [Miniconda](https://conda.io/miniconda.html) distribution of Python, which makes it easy to install any required Python modules. Download and install Miniconda from here <https://conda.io/miniconda.html>.
 
@@ -68,7 +68,7 @@ Next, activate the environment you just created by typing
 
     source activate py36
 
-You need to repeat this activation command each time you open a new terminal and intend to use ELL from Python. Also, make sure to ativate the `py36` environment before building ELL, to ensure that Python interfaces are created.   
+You need to repeat this activation command each time you open a new terminal and intend to use ELL from Python. Also, make sure to activate the `py36` environment before building ELL, to ensure that Python interfaces are created.
 
 For computer vision tasks, we recommend capturing and preprocessing images using *OpenCV*. To install OpenCV in the current Python environment, type
 
@@ -76,7 +76,7 @@ For computer vision tasks, we recommend capturing and preprocessing images using
 
 ## Building ELL
 
-We build ELL by using CMake to create a makefile, invoking that makefile, and optionally building Python interfaces. If you intend to build Python interfaces, make sure to activate the `py36` miniconda environment as described above. 
+We build ELL by using CMake to create a makefile, invoking that makefile, and optionally building Python interfaces. If you intend to build Python interfaces, make sure to activate the `py36` miniconda environment as described above.
 
 In the repository root directory, create a `build` subdirectory and change to that directory.
 
@@ -93,11 +93,10 @@ Don't forget the two dots (..) at the end of the command! This creates a makefil
 
 Optionally, build Python interfaces by typing
 
-    make _ELL_python 
+    make _ELL_python
 
 The generated executables will appear in `ELL/build/bin`.
 
 # Advanced Installation
 
-See our [advanced installation instructions](INSTALL-Advanced.md).
-
+The instructions above are enough to start using ELL. For more advanced topics, like testing and generating documentation, please see our [advanced installation instructions](INSTALL-Advanced.md).

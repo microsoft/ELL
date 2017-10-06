@@ -85,16 +85,17 @@ def validate_image(args, filename):
 
         # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
         # each with the text label and the prediction score.
-        top5 = helper.get_top_n(predictions, 5)
+        top5 = helper.get_top_n_predictions(predictions, 5)
 
         text = "".join(
             [str(element[0]) + "(" + str(int(100 * element[1])) + "%)  " for element in top5])
 
-        print("\t" + text)
+        print("\tPrediction: " + text)
         result["predictions"] = top5
 
     result["avg_time"] = helper.get_times()
-    print("\t" + str(result["avg_time"]))
+    helper.report_times(node_level=False)
+
     return result
 
 

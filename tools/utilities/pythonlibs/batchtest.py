@@ -18,38 +18,102 @@ import json
 import demoHelper 
 
 script_path = os.path.dirname(os.path.abspath(__file__))
+
+# Helper class that contains test results for the top N test.
+class TestResults:
+    def __init__(self, n, size):
+        self.test_top_n = n
+        self.tests_passed = 0
+        self.tests_failed = 0
+        self.confusion_matrix = np.zeros((size, size))
+        self.results = []
+
+    def record_result(self, passed, test_index, prediction, probability, expected):
+        msg = "passed"
+        if passed:
+            self.tests_passed += 1
+        else:
+            msg = "failed"
+            self.tests_failed += 1
+        
+        ok = 1
+        if not passed:
+            ok = 0
+        self.results.append((test_index, ok, int(prediction), float(probability)))
+         
+        total = self.tests_passed + self.tests_failed
+        pass_rate = (self.tests_passed * 100) / total  
+        print("  Top %d test %s (%d), current pass rate %d" % (self.test_top_n, msg, test_index, pass_rate))
+
+    def resize(self, size):
+        # used when we are grouping results into smaller set.
+        self.confusion_matrix = np.zeros((size, size))
+
+    def record_confusion(self, prediction, expected):
+        self.confusion_matrix[prediction,expected] += 1
+
+    def report_results(self, batch, compiled):
+        print("======top %d results for batch %d ==============================================================================================" % (self.test_top_n, batch))
+        total = self.tests_passed + self.tests_failed
+        pass_rate = 0
+        if (total > 0):
+            pass_rate = (self.tests_passed * 100) / total
+            result = "%d tests passed out of total %d, (%d tests failed) a pass rate of %d " % (self.tests_passed, total, self.tests_failed, pass_rate)
+            print(result + "%")
+            
+        report_name = "top" + str(self.test_top_n);
+        if compiled:
+            report_name += "_compiled"
+        else:
+            report_name += "_reference"
+
+        if (batch > 0):
+            report_name +=  "_batch_" + str(batch);
+
+        if not self.confusion_matrix is None:
+            np.savetxt(report_name + ".txt", self.confusion_matrix)
+
+        with open(report_name + ".json", 'w', encoding='utf-8', newline='\r\n') as outfile:
+            json.dump(self.results, outfile, ensure_ascii=False, indent=2)
+
+        return pass_rate
+
 # Helper class that interfaces with opencv and provides handy conversion from opencv to ELL buffers and 
 # rendering utilties
-
 class ModelTester(demoHelper.DemoHelper):
     def __init__(self, threshold=0.0):
 
         super(ModelTester,self).__init__(threshold)
-        self.start = time.time()
         self.val_map = {}
         self.val_pos = 0
         self.val_end = 0
+        self.val_step = 1
         self.val_labels = []     
         self.map_entry = None
-        self.tests_passed = 0
-        self.tests_failed = 0
-        self.start_time = time.time()
-        self.test_top_n = 1
         self.test_complete = False
         self.batch = 0
         self.automatic = True
         self.groups = None
-        self.confusion_matrix = None
+        self.group_names = {}
+        self.top1 = None
+        self.topN = None
+        self.test_top_n = 1
+        self.predict_time = 0
+        self.predict_count = 0
+        self.has_prediction = False
+        self.reverse = False
+        self.report = None
 
     def add_arguments(self, arg_parser):
         super(ModelTester,self).add_arguments(arg_parser)    
         # args to setup test run
         arg_parser.add_argument("--truth", help="path to a tsv file, each line contains two values, the file name of the image and the integer classification value")
         arg_parser.add_argument("--truthlabels", help="path to a labels for the truth file (in case these are different from your model labels)")
-        arg_parser.add_argument("--top", type=int, help="how many of the top labels to include in the test (default 1)", default=self.test_top_n)
+        arg_parser.add_argument("--top", type=int, help="how many of the top labels to include in the test (default 1)", default=1)
         arg_parser.add_argument("--batch", type=int, help="which batch out of 10 batches to execute (default all)", default=0)
         arg_parser.add_argument("--groups", nargs='*', help="filenames that provide a grouping for the labels")
-    
+        arg_parser.add_argument("--report", help="filename of summary report to append to")
+
 
     def initialize(self, args):
         super(ModelTester,self).initialize(args)
@@ -58,15 +122,15 @@ class ModelTester(demoHelper.DemoHelper):
         self.camera = None
 
         # test args
-        self.test_top_n = args.top
         self.batch = args.batch
-
+        self.report = args.report
+        
         if args.truth is None:
             print("--truth argument is missing")
             return False
 
         if self.image_folder is None or not os.path.isdir(self.image_folder):
-            print("image --folder % not found" % (self.image_folder))
+            print("image --folder %s not found" % (self.image_folder))
             return False
 
         self.val_map_dir = os.path.dirname(args.truth)
@@ -81,13 +145,22 @@ class ModelTester(demoHelper.DemoHelper):
         if self.batch > 0:
             self.val_pos = (self.batch - 1) * self.batch_size
             self.val_end = self.val_pos + self.batch_size
-            
-        self.confusion_matrix = np.zeros((self.output_size, self.output_size))
+
+        if self.reverse:
+            temp = self.val_pos            
+            self.val_step = -1  # go backwards        
+            self.val_pos = self.val_end - 1
+            self.val_end = temp - 1
+            print("starting batch %d at %d and going to %d with step %d" % (self.batch, self.val_pos, self.val_end, self.val_step))
+
+        self.top1 = TestResults(1, self.output_size)
+        self.test_top_n = args.top
+        if self.test_top_n != 1 and self.test_top_n != 0:
+            self.topN = TestResults(args.top, self.output_size)
+
         self.load_group_labels(args.groups)
 
         self.automatic = True
-        self.start_time = time.time()
-        print("starting automatic test run...")
         print(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()))
         return True
 
@@ -95,11 +168,18 @@ class ModelTester(demoHelper.DemoHelper):
         if filenames is None:
             return None
         groups = []
+        i = 0
         for name in filenames:
             groups.append(self.load_labels(name))
+            self.group_names[i] = os.path.basename(name)
+            i += 1
+        
+        self.group_names[i] = "other"
         
         size = len(groups)+1
-        self.confusion_matrix = np.zeros((size, size))
+        self.top1.resize(size)
+        if self.topN != None:
+            self.topN.resize(size)
         self.groups = groups
 
     def init_image_source(self):        
@@ -108,9 +188,9 @@ class ModelTester(demoHelper.DemoHelper):
     def load_next_image(self):
         self.recorded = False # waiting for user input.
         frame = None
-        while frame == None and self.val_pos < self.val_end:
+        while frame == None and self.val_pos != self.val_end:
             self.map_entry = self.val_map[self.val_pos]
-            self.val_pos = self.val_pos + 1
+            self.val_pos += self.val_step
             path = os.path.join(self.val_map_dir, self.map_entry[0])
             if os.path.isfile(path):
                 frame = cv2.imread(path)
@@ -150,7 +230,7 @@ class ModelTester(demoHelper.DemoHelper):
         return False
 
     def get_current_label(self):
-        topN = self.get_top_n(self.results, 1)
+        topN = self.get_top_n_predictions(self.results, 1)
         if len(topN) > 0:
             return self.get_label(topN[0][0])
         return "unknown"
@@ -162,7 +242,7 @@ class ModelTester(demoHelper.DemoHelper):
         if self.test_complete:
             return True
     
-        if self.automatic and not self.results is None:
+        if self.automatic and self.has_prediction:
             self.record_result()
 
     def label_in_group(self, label, group):
@@ -184,43 +264,60 @@ class ModelTester(demoHelper.DemoHelper):
                 return i
         return len(self.groups)
 
-    def record_confusion(self, prediction, expected):
-        if not self.groups is None:
-            prediction = self.get_grouped_result(prediction)
-            expected = self.get_grouped_result(expected)
-        self.confusion_matrix[prediction,expected] += 1
-
-    def save_confusion(self):
-        if not self.confusion_matrix is None:
-            self.confusion_matrix.savetxt("confusion" + str(self.batch) + ".txt")
+    def predict(self, data):
+        now = time.time()
+        super(ModelTester,self).predict(data)
+        now2 = time.time()
+        self.predict_time += now2 - now
+        self.predict_count += 1
+        self.has_prediction = True
+        print("Test %d predicted in %f seconds" % (self.val_pos, now2 - now))
 
     def record_result(self):
-
+        self.has_prediction = False
         # check current prediction matches the truth.
-        expected = self.get_truth_label(self.map_entry[1])
-        topN = self.get_top_n(self.results, self.test_top_n)
+        expected = self.map_entry[1]
+        expected_label =  self.get_truth_label(expected)
+        if not self.groups is None:
+            expected = self.get_grouped_result(expected)
+            expected_label =  self.group_names[expected]
+
+        topN = self.get_top_n_predictions(self.results, self.test_top_n)
         winner = None
         actual = []
+        first = True
+        topNPrediction = None
+        topNProbability = 0
         for top in topN:
-            self.record_confusion(top[0], self.map_entry[1])
-            label = self.get_label(top[0])
+            prediction = top[0]
+            label = self.get_label(prediction)
+            if not self.groups is None:
+                prediction = self.get_grouped_result(prediction)
+                label = self.group_names[prediction]
+
+            matches = self.labels_match(label, expected_label)
+            if first:
+                topNPrediction = prediction
+                topNProbability = top[1]
+                first = False
+                self.top1.record_confusion(prediction, expected)
+                self.top1.record_result(matches, self.val_pos, prediction, topNProbability, expected_label)
+            
             actual.append(label)
-            if self.labels_match(label, expected):  
-                winner = top  
+            if matches:
+                winner = top
+                topNPrediction = prediction
+                topNProbability = top[1]
                 break
+    
+        print("  " + ",".join(actual))    
+        if self.topN != None:
+            self.topN.record_confusion(topNPrediction, expected)
+            self.topN.record_result(winner != None, self.val_pos, topNPrediction, topNProbability, expected_label)    
         
-        print(",".join(actual))            
-        if winner != None:
-            self.tests_passed = self.tests_passed + 1
-            total = self.tests_passed + self.tests_failed
-            pass_rate = (self.tests_passed * 100) / total
-            print("  Test passed (%d), current pass rate %d" % (self.val_pos, pass_rate))
-        else:
-            self.tests_failed = self.tests_failed + 1    
-            total = self.tests_passed + self.tests_failed
-            pass_rate = (self.tests_passed * 100) / total    
-            print("  ====> Expected=" + expected)       
-            print("  Test failed (%d), current pass rate %d" % (self.val_pos, pass_rate))
+        if winner == None:
+            print("  ====> Expected=" + expected_label)
+            
         self.recorded = True
         self.frame = self.load_next_image()
 
@@ -244,18 +341,28 @@ class ModelTester(demoHelper.DemoHelper):
 
     def report_times(self):
         # test complete
-        self.save_confusion()
-        print("====================================================================================================")
-        total = self.tests_passed + self.tests_failed
-        if (total > 0):
-            pass_rate = (self.tests_passed * 100) / total
-            result = "%d tests passed out of total %d, (%d tests failed) a pass rate of %d " % (self.tests_passed, total, self.tests_failed, pass_rate)
-            print(result + "%")
-            end_time = time.time()
-            total_seconds = end_time - self.start_time
-            print(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()))
-            print("Total run time is %d seconds" % (total_seconds))
-            print("Average time per image %f seconds" % (total_seconds / total))
+        is_compiled = (self.compiled_model != None)
+        t1 = self.top1.report_results(self.batch, is_compiled)
+        t5 = 0
+        if self.topN != None:
+            t5 = self.topN.report_results(self.batch, is_compiled)
+            
+        if self.report != None:
+            if not os.path.isfile(self.report):
+                with open(self.report, "w") as myfile:
+                    myfile.write("model,top1,top5\n")
+                    myfile.close()
+
+            with open(self.report, "a") as myfile:
+                myfile.write("%s,%f,%f\n" % (self.model_name, t1, t5))
+                myfile.close()
+            
+        total_seconds = self.predict_time
+        print(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime()))
+        print("Total prediction time is %d seconds" % (total_seconds))
+        print("Average time per image %f seconds" % (total_seconds / self.predict_count))
+
+
 
 def main(args):
     helper = ModelTester()
@@ -281,22 +388,7 @@ def main(args):
         data = helper.prepare_image_for_predictor(frame)
 
         # Get the model to classify the image, by returning a list of probabilities for the classes it can detect
-        now = time.time()
-        predictions = helper.predict(data)
-        now2 = time.time()
-        print("Test %d predicted in %f seconds" % (helper.val_pos, now2-now))
-
-        # Get the (at most) top 5 predictions that meet our threshold. This is returned as a list of tuples,
-        # each with the text label and the prediction score.
-        top5 = helper.get_top_n(predictions, 5)
-
-        # Turn the top5 into a text string to display
-        text = "".join([str(helper.get_label(element[0])) + "(" + str(int(100*element[1])) + "%)  " for element in top5])
-
-        if (text != lastPrediction):
-            print("  " + text)
-            lastPrediction = text
-
+        helper.predict(data)
 
     helper.report_times()
 

@@ -55,5 +55,24 @@ namespace utilities
 
         return std::string(buf.get());
     }
+
+    /// <summary> Replace all instances of the 'from' substring in 'str' with the value of 'to'. </summary>
+    static void ReplaceAll(std::string& str, const std::string& from, const std::string& to)
+    {
+        if (from.empty())
+            return;
+        std::string wsRet;
+        wsRet.reserve(str.length());
+        size_t start_pos = 0, pos;
+        while ((pos = str.find(from, start_pos)) != std::string::npos)
+        {
+            wsRet += str.substr(start_pos, pos - start_pos);
+            wsRet += to;
+            pos += from.length();
+            start_pos = pos;
+        }
+        wsRet += str.substr(start_pos);
+        str.swap(wsRet); // faster than str = wsRet;
+    }
 }
 }

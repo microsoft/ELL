@@ -6,22 +6,128 @@ permalink: /gallery/ILSVRC2012/d_I192x192x3NCMNCMNBMNBMNBMNBMNC1A
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 192x192x3 Convolutional Neural Network (39.05% top 1 accuracy, 64.23% top 5 accuracy, 0.75s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 192x192x3 Convolutional Neural Network (39.05% top 1 accuracy, 64.23% top 5 accuracy, 0.38s/frame on Raspberry Pi 3)
 
-|=
-| Download | [d_I192x192x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I192x192x3NCMNCMNBMNBMNBMNBMNC1A/d_I192x192x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip)
-|-
-| Accuracy | ILSVRC2012: 64.23% (Top 5), 39.05% (Top 1) 
-|-
-| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: 0.75s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.64s/frame<br>DragonBoard 410c @ 1.2GHz: 0.36s/frame
-|-
-| Uncompressed Size | 18MB
-|-
-| Input | 192 x 192 x {R,G,B}
-|-
-| Architecure | Minus :  192x192x3  ->  194x194x3  input padding 0  output padding 1<br>Convolution(ReLU) :  194x194x3  ->  192x192x16  input padding 1  output padding 0<br>BatchNormalization :  192x192x16  ->  192x192x16  input padding 0  output padding 0<br>MaxPooling :  192x192x16  ->  98x98x16  input padding 0  output padding 1<br>Convolution(ReLU) :  98x98x16  ->  96x96x64  input padding 1  output padding 0<br>BatchNormalization :  96x96x64  ->  96x96x64  input padding 0  output padding 0<br>MaxPooling :  96x96x64  ->  50x50x64  input padding 0  output padding 1<br>BinaryConvolution :  50x50x64  ->  48x48x64  input padding 1  output padding 0<br>Plus :  48x48x64  ->  48x48x64  input padding 0  output padding 0<br>PReLU :  48x48x64  ->  50x50x64  input padding 0  output padding 1<br>MaxPooling :  50x50x64  ->  24x24x64  input padding 1  output padding 0<br>BatchNormalization :  24x24x64  ->  26x26x64  input padding 0  output padding 1<br>BinaryConvolution :  26x26x64  ->  24x24x128  input padding 1  output padding 0<br>Plus :  24x24x128  ->  24x24x128  input padding 0  output padding 0<br>PReLU :  24x24x128  ->  26x26x128  input padding 0  output padding 1<br>MaxPooling :  26x26x128  ->  12x12x128  input padding 1  output padding 0<br>BatchNormalization :  12x12x128  ->  14x14x128  input padding 0  output padding 1<br>BinaryConvolution :  14x14x128  ->  12x12x256  input padding 1  output padding 0<br>Plus :  12x12x256  ->  12x12x256  input padding 0  output padding 0<br>PReLU :  12x12x256  ->  14x14x256  input padding 0  output padding 1<br>MaxPooling :  14x14x256  ->  6x6x256  input padding 1  output padding 0<br>BatchNormalization :  6x6x256  ->  8x8x256  input padding 0  output padding 1<br>BinaryConvolution :  8x8x256  ->  6x6x512  input padding 1  output padding 0<br>Plus :  6x6x512  ->  6x6x512  input padding 0  output padding 0<br>PReLU :  6x6x512  ->  8x8x512  input padding 0  output padding 1<br>MaxPooling :  8x8x512  ->  3x3x512  input padding 1  output padding 0<br>BatchNormalization :  3x3x512  ->  5x5x512  input padding 0  output padding 1<br>BinaryConvolution :  5x5x512  ->  3x3x1024  input padding 1  output padding 0<br>Plus :  3x3x1024  ->  3x3x1024  input padding 0  output padding 0<br>PReLU :  3x3x1024  ->  5x5x1024  input padding 0  output padding 1<br>MaxPooling :  5x5x1024  ->  2x2x1024  input padding 1  output padding 0<br>BatchNormalization :  2x2x1024  ->  2x2x1024  input padding 0  output padding 0<br>Convolution :  2x2x1024  ->  2x2x1000  input padding 0  output padding 0<br>AveragePooling :  2x2x1000  ->  1x1x1000  input padding 0  output padding 0<br>ElementTimes :  1x1x1000  ->  1x1x1000  input padding 0  output padding 0<br>Softmax :  1x1x1000  ->  1x1x1  input padding 0  output padding 0<br>
-|-
-| Output | [ILSVRC2012 1000 classes](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt)
-|-
-| Notes | Trained by Chuck Jacobs using CNTK 2.1
-|=
+<table>
+    <tr>
+        <td> Download </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I192x192x3NCMNCMNBMNBMNBMNBMNC1A/d_I192x192x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip">d_I192x192x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip</a></td>
+    </tr>
+    <tr>
+        <td> Accuracy </td>
+        <td colspan="3"> ILSVRC2012: 64.23% (Top 5), 39.05% (Top 1) </td>
+    </tr>
+    <tr>
+        <td> Performance </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.38s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.32s/frame<br>DragonBoard 410c @ 1.2GHz: 0.21s/frame </td>
+    </tr>
+    <tr>
+        <td> Uncompressed Size </td>
+        <td colspan="3"> 18MB </td>
+    </tr>
+    <tr>
+        <td> Input </td>
+        <td colspan="3"> 192 x 192 x {B,G,R} </td>
+    </tr>
+    <tr>
+        <td> Architecture </td>
+        <td>
+            <table class="arch-table">
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;192x192x16</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;98x98x16</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;96x96x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;50x50x64</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;48x48x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;24x24x64</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;24x24x128</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;12x12x128</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;12x12x256</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;6x6x256</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;6x6x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;3x3x512</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;3x3x1024</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;2x2x1024</td>
+                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;2x2x1000</td>
+                    <td>size=1x1,&nbsp;stride=1,&nbsp;type=float32</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;1x1x1000</td>
+                    <td>size=2x2,&nbsp;stride=1,&nbsp;operation=average</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Softmax</td>
+                    <td>&#8680;&nbsp;1x1x1000</td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td> Output </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt">ILSVRC2012 1000 classes</a> </td>
+    </tr>
+    <tr>
+        <td> Notes </td>
+        <td colspan="3"> Trained by Chuck Jacobs using CNTK 2.1 </td>
+    </tr>
+</table>
+

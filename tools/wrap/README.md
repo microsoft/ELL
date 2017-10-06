@@ -6,6 +6,7 @@ This tool wraps a given ELL model in a CMake C++ buildable project that builds a
 
 The supported languages are:
 - `python`   (default)
+- `cpp`
 
 The supported target platforms are:
 - `pi3`      raspberry pi 3
@@ -31,17 +32,14 @@ copy "d:\git\ELL\libraries/emitters/include/ClockInterface.h" "pi3\include\Clock
 copy "d:\git\ELL\interfaces/common/tcc/CallbackInterface.tcc" "pi3\tcc\CallbackInterface.tcc"
 ````
 
-### Templated CMakeLists.txt
+### Templated CMakeLists.txt for Python
 
 Included in the templates folder is a CMakeLists.python.txt.in template.
 The final CMakeLists.txt file is generated from this template by filling
 in some text parameters:
 
-<style>
-table, td { border:1px solid #A0A0D0;border-colapse:collapse;padding:5px; }
-</style>
-<table>
-<table>
+
+<table style="border:1px solid #A0A0A0">
 <tr><td>ELL_model</td><td>of the model</td></tr>
 <tr><td>Arch</td><td>target architecture, e.g. host, pi3</td></tr>
 <tr><td>OBJECT_EXTENSION</td><td>obj or o</td></tr>
@@ -50,6 +48,22 @@ table, td { border:1px solid #A0A0D0;border-colapse:collapse;padding:5px; }
 
 These parameters are filled and the resulting CMakeLists.txt file is written to the output folder.
 
+### Templated CMakeLists.txt for C++
+
+Included in the templates folder is a CMakeLists.cpp.txt.in template.
+The final CMakeLists.txt file is generated from this template by filling
+in some text parameters:
+
+<table style="border:1px solid #A0A0A0"">
+<tr><td>ELL_model</td><td>of the model</td></tr>
+<tr><td>Arch</td><td>target architecture, e.g. host, pi3</td></tr>
+<tr><td>OBJECT_EXTENSION</td><td>obj or o</td></tr>
+<tr><td>ELL_ROOT</td><td>location of ELL git repo</td></tr>
+</table>
+
+These parameters are filled and the resulting CMakeLists.txt file is written to the output folder.
+This describes the compiled model to CMake so that it can be referenced in C++ projects, such as a calling application.
+
 #### Compile Model
 
 Next it invokes the ell compiler to compile the given model.  The command line looks like this:
@@ -57,15 +71,23 @@ Next it invokes the ell compiler to compile the given model.  The command line l
 compile -imap ImageNet.ell -cfn predict -cmn ImageNet --bitcode --swig --blas true --target pi3 -od pi3
 ````
 This compiler is created by the ELL build and you will find it in `~/git/ELL/build/bin` and on Windows it will be in `d:\git\ELL\ELL\build\bin\release\`.
+
+#### Optimizing the code
+
+Next, wrap invokes the optimizing LLVM tool `opt` on the output from compile. The command looks something like:
+````
+opt.exe pi3\ImageNet.bc -o pi3\ImageNet.opt.bc -O3
+````
+
 #### Generating SWIG interfaces
 
-ELL uses SWIG to generate the stubs necessary to convert between programming languages:
+For language targets other than C++, ELL uses SWIG to generate the stubs necessary to convert between programming languages:
 ````
 swig -python -c++ -Fmicrosoft -py3 -outdir pi3 -ID:\git\ELL\interfaces/common -ID:\git\ELL\interfaces/common/include -ID:\git\ELL\libraries/emitters/include -o pi3\ImageNetPYTHON_wrap.cxx pi3\ImageNet.i
 ````
 On Windows we include SWIG in a nuget package, so you will find it in `d:\git\ELL\external\swigwintools.3.0.12\tools\swigwin-3.0.12\`
 
-#### Targetting the Model
+#### Targeting the Model
 
 Finally it uses LLC to cross-compile the model so that code runs on your specified target platform.  
 

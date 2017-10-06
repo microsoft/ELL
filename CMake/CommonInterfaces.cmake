@@ -15,16 +15,6 @@ if(WIN32)
 set(GLOBAL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/release")
 endif()
 
-find_package(SWIG 3.0.12)
-if (WIN32 AND NOT SWIG_FOUND) 
-  if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../external/swigwintools.3.0.12/tools/swigwin-3.0.12/swig.exe")
-    set(SWIG_DIR "${CMAKE_CURRENT_LIST_DIR}/../external/swigwintools.3.0.12/tools/swigwin-3.0.12")
-    set(SWIG_EXECUTABLE "${SWIG_DIR}/swig.exe")
-    set(SWIG_VERSION "3.0.12")
-    set(SWIG_FOUND TRUE)
-  endif()
-endif()
-
 #
 # Common macro to create swig-generated language wrappers
 #

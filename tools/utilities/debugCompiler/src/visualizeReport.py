@@ -16,10 +16,12 @@ class LayerInfo:
         self.compiled = []
         with open(os.path.join(dir, self.filename)) as csv:
            for line in csv:
-               if not line.startswith("reference"):
-                   values = line.rstrip().split(",")
-                   self.reference.append(float(values[0]))
-                   self.compiled.append(float(values[1]))
+                values = line.rstrip().split(",")
+                try:
+                    self.reference.append(float(values[0]))
+                    self.compiled.append(float(values[1]))
+                except:
+                    pass  # ignore header row
     
 class LayerComparison:
 
@@ -43,34 +45,37 @@ class LayerComparison:
         return True
 
     def load(self, filename):
-      name = ""
-      layers=[]
-      dir = os.path.dirname(filename)
-      with open(filename) as f:
-        for line in f:
-            if (line.startswith("## ")):
-                name = line[3:].rstrip()
-            if (line.startswith("size=")):
-                i = line.index("[")
-                j = line.index("]")
-                size = line[i+1:j-1].split(",")
-                size = list(map(int, size))
-                                
-                s = line.index("stride=")
-                i = line.index("[", s)
-                j = line.index("]", s)
-                stride = line[i+1:j-1].split(",")
-                stride = list(map(int, stride))
+        name = ""
+        layers=[]
+        dir = os.path.dirname(filename)
+        size = None
+        stride = None
+        offset = None
+        with open(filename) as f:
+            for line in f:
+                if (line.startswith("## ")):
+                    name = line[3:].rstrip()
+                    stride = None
                 
-                s = line.index("offset=")
-                i = line.index("[", s)
-                j = line.index("]", s)
-                offset = line[i+1:j-1].split(",")
-                offset = list(map(int, offset))                
-                
-                print("loading layer ", name, " of size ", size, ", stride ", stride, ", offset", offset);
-                layers.append(LayerInfo(dir, name, size, stride, offset))  
-      return layers  
+                parts = line.split(',')
+                if (parts[0].startswith("Output size:")):
+                    for part in parts:
+                        nvalue = part.split(":")
+                        if len(nvalue) == 2:
+                            varname = nvalue[0].strip()
+                            rvalue = nvalue[1].strip().split(" x ")
+                            shape = list(map(int, rvalue))
+                            if varname == "Output size":
+                                size = shape
+                            elif varname == "stride":
+                                stride = shape
+                            elif varname == "offset":
+                                offset = shape
+                    
+                    if size != None:
+                        print("loading layer ", name, " of size ", size, ", stride ", stride, ", offset", offset);
+                        layers.append(LayerInfo(dir, name, size, stride, offset))  
+        return layers  
       
     def tileChannels(self, img, stride):
        w = stride[0]
@@ -148,19 +153,32 @@ class LayerComparison:
             a = a * scale;
         gray = a.astype(np.uint8)
         return cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR);
-        
+       
+    def reshape(self, data, stride):
+       try:
+          return np.reshape(data, stride)
+       except:
+          # try again with our own calculation (assumes data is square)
+          print("error: data doesn't match stride: %s" % (str(stride)))
+          size = int(math.sqrt(len(data) / 3))
+          try:
+             return np.reshape(data, (size,size,3))
+          except:
+             print("error: data is not square")
+             data = np.zeros(stride[0]*stride[1]*stride[2])
+             return np.reshape(data, stride)
            
     def showLayer(self, i):
        layer = self.layers[i]
        print("Showing Layer " + layer.name + ", size=" + str(layer.size) + ", stride=" + str(layer.stride) + ", offset=" + str(layer.offset))
        stride = layer.stride
        name = "Reference Layer " + str(i) + ": " + layer.name
-       a = np.reshape(layer.reference, stride)
+       a = self.reshape(layer.reference, stride)
        name2 = "Compiled Layer " + str(i) + ": " + layer.name
-       b = np.reshape(layer.compiled, stride)
+       b = self.reshape(layer.compiled, stride)
 
-       ta = self.tileChannels(a, stride)
-       tb = self.tileChannels(b, stride)
+       ta = self.tileChannels(a, a.shape)
+       tb = self.tileChannels(b, b.shape)
 
        ta = self.rgbImage(ta)
        tb = self.rgbImage(tb)

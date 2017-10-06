@@ -6,22 +6,123 @@ permalink: /gallery/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 160x160x3 Convolutional Neural Network (57.12% top 1 accuracy, 80.22% top 5 accuracy, 0.60s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 160x160x3 Convolutional Neural Network (58.13% top 1 accuracy, 80.62% top 5 accuracy, 0.30s/frame on Raspberry Pi 3)
 
-|=
-| Download | [d_I160x160x3CMCMCMCMCMCMC1A.ell.zip](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip)
-|-
-| Accuracy | ILSVRC2012: 80.22% (Top 5), 57.12% (Top 1) 
-|-
-| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: 0.60s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.58s/frame<br>DragonBoard 410c @ 1.2GHz: 0.31s/frame
-|-
-| Uncompressed Size | 91MB
-|-
-| Input | 160 x 160 x {R,G,B}
-|-
-| Architecure | Minus :  160x160x3  ->  162x162x3  input padding 0  output padding 1<br>Convolution(LeakyReLU) :  162x162x3  ->  160x160x16  input padding 1  output padding 0<br>BatchNormalization :  160x160x16  ->  160x160x16  input padding 0  output padding 0<br>MaxPooling :  160x160x16  ->  82x82x16  input padding 0  output padding 1<br>Convolution(LeakyReLU) :  82x82x16  ->  80x80x64  input padding 1  output padding 0<br>BatchNormalization :  80x80x64  ->  80x80x64  input padding 0  output padding 0<br>MaxPooling :  80x80x64  ->  42x42x64  input padding 0  output padding 1<br>Convolution(LeakyReLU) :  42x42x64  ->  40x40x64  input padding 1  output padding 0<br>BatchNormalization :  40x40x64  ->  40x40x64  input padding 0  output padding 0<br>MaxPooling :  40x40x64  ->  22x22x64  input padding 0  output padding 1<br>Convolution(LeakyReLU) :  22x22x64  ->  20x20x128  input padding 1  output padding 0<br>BatchNormalization :  20x20x128  ->  20x20x128  input padding 0  output padding 0<br>MaxPooling :  20x20x128  ->  12x12x128  input padding 0  output padding 1<br>Convolution(LeakyReLU) :  12x12x128  ->  10x10x256  input padding 1  output padding 0<br>BatchNormalization :  10x10x256  ->  10x10x256  input padding 0  output padding 0<br>MaxPooling :  10x10x256  ->  7x7x256  input padding 0  output padding 1<br>Convolution(LeakyReLU) :  7x7x256  ->  5x5x512  input padding 1  output padding 0<br>BatchNormalization :  5x5x512  ->  5x5x512  input padding 0  output padding 0<br>MaxPooling :  5x5x512  ->  5x5x512  input padding 0  output padding 1<br>Convolution(LeakyReLU) :  5x5x512  ->  3x3x1024  input padding 1  output padding 0<br>BatchNormalization :  3x3x1024  ->  3x3x1024  input padding 0  output padding 0<br>Convolution :  3x3x1024  ->  3x3x1000  input padding 0  output padding 0<br>AveragePooling :  3x3x1000  ->  1x1x1000  input padding 0  output padding 0<br>Softmax :  1x1x1000  ->  1x1x1  input padding 0  output padding 0<br>
-|-
-| Output | [ILSVRC2012 1000 classes](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt)
-|-
-| Notes | Trained by Chuck Jacobs using CNTK 2.1
-|=
+<table>
+    <tr>
+        <td> Download </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip">d_I160x160x3CMCMCMCMCMCMC1A.ell.zip</a></td>
+    </tr>
+    <tr>
+        <td> Accuracy </td>
+        <td colspan="3"> ILSVRC2012: 80.62% (Top 5), 58.13% (Top 1) </td>
+    </tr>
+    <tr>
+        <td> Performance </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.30s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.33s/frame<br>DragonBoard 410c @ 1.2GHz: 0.18s/frame </td>
+    </tr>
+    <tr>
+        <td> Uncompressed Size </td>
+        <td colspan="3"> 91MB </td>
+    </tr>
+    <tr>
+        <td> Input </td>
+        <td colspan="3"> 160 x 160 x {B,G,R} </td>
+    </tr>
+    <tr>
+        <td> Architecture </td>
+        <td>
+            <table class="arch-table">
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;160x160x16</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;82x82x16</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;80x80x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;42x42x64</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;40x40x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;22x22x64</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;20x20x128</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;12x12x128</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;10x10x256</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;7x7x256</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;5x5x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;5x5x512</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;3x3x1024</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=leaky&nbsp;relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;3x3x1000</td>
+                    <td>size=1x1,&nbsp;stride=1,&nbsp;type=float32</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;1x1x1000</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;operation=average</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Softmax</td>
+                    <td>&#8680;&nbsp;1x1x1000</td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td> Output </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt">ILSVRC2012 1000 classes</a> </td>
+    </tr>
+    <tr>
+        <td> Notes </td>
+        <td colspan="3"> Trained by Chuck Jacobs using CNTK 2.1 </td>
+    </tr>
+</table>
+

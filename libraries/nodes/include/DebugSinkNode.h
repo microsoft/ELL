@@ -73,10 +73,11 @@ namespace nodes
         /// <param name="transformer"> The `ModelTransformer` receiving the copy  </param>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
-        /// <summary></summary>
-        virtual void ChangeSink(DebugSinkFunction<ValueType> sink) { _sink = sink; } // STYLE discrepancy
+        /// <summary> Changes the sink function to the given one </summary>
+        /// <param name="sink"> A DebugSinkFunction to be called with the output of this node </param>
+        virtual void ChangeSink(DebugSinkFunction<ValueType> sink) { _sink = sink; }
 
-        /// <summary></summary>
+        /// <summary> Get the label of this node </summary>
         virtual std::string GetLabel() const { return _label; }
 
     protected:

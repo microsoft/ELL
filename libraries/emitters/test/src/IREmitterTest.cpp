@@ -513,6 +513,36 @@ void TestHeader()
     auto structPos = result.find("struct Shape");
     auto funcPos = result.find("struct Shape Test_GetInputShape(int32_t");
     testing::ProcessTest("Testing header generation", 
-        structPos != std::string::npos && funcPos != std::string::npos);
+        structPos != std::string::npos && funcPos != std::string::npos);   
+}
+
+std::string EmitStruct(const char* moduleName)
+{
+    const char* TensorShapeName = "TensorShape";
+    IRModuleEmitter emitter(moduleName);
+    auto int32Type = ell::emitters::VariableType::Int32;
+    emitters::NamedVariableTypeList namedFields = { { "rows", int32Type },{ "columns", int32Type },{ "channels" , int32Type } };
+    auto shapeType = emitter.DeclareStruct(TensorShapeName, namedFields);
+    emitter.IncludeTypeInHeader(shapeType->getName());
+
+    const emitters::NamedVariableTypeList parameters = { { "index", emitters::GetVariableType<int>() } };    
+    auto function = emitter.BeginFunction("Dummy", shapeType, parameters);
+    function.IncludeInHeader();
+    emitter.EndFunction();
     
+    std::ostringstream out;
+    ell::emitters::WriteModuleHeader(out, emitter);
+    return out.str();
+}
+
+void TestTwoEmitsInOneSession()
+{
+    auto emit1 = EmitStruct("Mod1");
+    auto emit2 = EmitStruct("Mod2");
+    std::cout << emit1 << std::endl;
+    std::cout << emit2 << std::endl;
+    auto badpos1 = emit1.find("TensorShape.");
+    auto badpos2 = emit2.find("TensorShape.");
+    testing::ProcessTest("Testing two uses of module emitter",    
+        badpos1 == std::string::npos && badpos2 == std::string::npos);
 }

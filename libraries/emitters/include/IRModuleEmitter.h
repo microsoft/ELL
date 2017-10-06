@@ -44,12 +44,6 @@ namespace emitters
         /// <param name="moduleName"> Name of the module. </param>
         IRModuleEmitter(const std::string& moduleName);
 
-        /// <summary> Construct an emitter for the given module. </summary>
-        ///
-        /// <param name="emitter"> An IREmitter. </param>
-        /// <param name="pModule"> Unique pointer to the llvm module. </param>
-        IRModuleEmitter(std::unique_ptr<llvm::Module> pModule);
-
         IRModuleEmitter(IRModuleEmitter&& other) = default;
         virtual ~IRModuleEmitter() = default;
 
@@ -543,7 +537,7 @@ namespace emitters
         /// <summary> Gets a reference to the underlying llvm context. </summary>
         ///
         /// <returns> Reference to the underlying llvm context. </returns>
-        llvm::LLVMContext& GetLLVMContext() { return _llvmContext; }
+        llvm::LLVMContext& GetLLVMContext() { return *_llvmContext; }
 
         //
         // Metadata
@@ -644,13 +638,14 @@ namespace emitters
         //
         // LLVM global state management
         //
-        static void InitializeLLVM();
+        void InitializeLLVM();
         static llvm::PassRegistry* InitializeGlobalPassRegistry();
 
         //
         // Data members
         //
-        llvm::LLVMContext& _llvmContext; // LLVM global context
+        std::unique_ptr<llvm::LLVMContext> _llvmContext; // LLVM global context
+        std::unique_ptr<IRDiagnosticHandler> _diagnosticHandler = nullptr;
         IREmitter _emitter;
         std::stack<std::pair<IRFunctionEmitter, llvm::IRBuilder<>::InsertPoint>> _functionStack; // contains the location we were emitting code into when we paused to emit a new function
 

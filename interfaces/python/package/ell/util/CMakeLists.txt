@@ -14,4 +14,5 @@ if(${PYTHONLIBS_FOUND})
 
     configure_file(${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/downloader.py downloader.py COPYONLY)
 
+    set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/packages/ell/util")
 endif()

@@ -8,20 +8,40 @@ permalink: /gallery/ILSVRC2012/@PERMALINK@
 
 ## ILSVRC2012 Classification: @IMAGE_SIZE@x@IMAGE_SIZE@x3 Convolutional Neural Network (@TOP_1_ACCURACY@% top 1 accuracy, @TOP_5_ACCURACY@% top 5 accuracy, @pi3_SECONDS_PER_FRAME@s/frame on Raspberry Pi 3)
 
-|=
-| Download | [@MODEL_NAME@.ell.zip](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/@MODEL_NAME@/@MODEL_NAME@.ell.zip)
-|-
-| Accuracy | ILSVRC2012: @TOP_5_ACCURACY@% (Top 5), @TOP_1_ACCURACY@% (Top 1) 
-|-
-| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: @pi3_SECONDS_PER_FRAME@s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: @pi3_64_SECONDS_PER_FRAME@s/frame<br>DragonBoard 410c @ 1.2GHz: @aarch64_SECONDS_PER_FRAME@s/frame
-|-
-| Uncompressed Size | @MODEL_SIZE_MB@MB
-|-
-| Input | @IMAGE_SIZE@ x @IMAGE_SIZE@ x {R,G,B}
-|-
-| Architecure | @MODEL_ARCH@
-|-
-| Output | [ILSVRC2012 @NUM_CLASSES@ classes](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt)
-|-
-| Notes | Trained by Chuck Jacobs using CNTK 2.1
-|=
+<table>
+    <tr>
+        <td> Download </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/@MODEL_NAME@/@MODEL_NAME@.ell.zip">@MODEL_NAME@.ell.zip</a></td>
+    </tr>
+    <tr>
+        <td> Accuracy </td>
+        <td colspan="3"> ILSVRC2012: @TOP_5_ACCURACY@% (Top 5), @TOP_1_ACCURACY@% (Top 1) </td>
+    </tr>
+    <tr>
+        <td> Performance </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: @pi3_SECONDS_PER_FRAME@s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: @pi3_64_SECONDS_PER_FRAME@s/frame<br>DragonBoard 410c @ 1.2GHz: @aarch64_SECONDS_PER_FRAME@s/frame </td>
+    </tr>
+    <tr>
+        <td> Uncompressed Size </td>
+        <td colspan="3"> @MODEL_SIZE_MB@MB </td>
+    </tr>
+    <tr>
+        <td> Input </td>
+        <td colspan="3"> @IMAGE_SIZE@ x @IMAGE_SIZE@ x {B,G,R} </td>
+    </tr>
+    <tr>
+        <td> Architecture </td>
+        <td>
+            <table class="arch-table">@MODEL_ARCH@</table>
+        </td>
+    </tr>
+    <tr>
+        <td> Output </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt">ILSVRC2012 @NUM_CLASSES@ classes</a> </td>
+    </tr>
+    <tr>
+        <td> Notes </td>
+        <td colspan="3"> Trained by Chuck Jacobs using CNTK 2.1 </td>
+    </tr>
+</table>
+

@@ -137,6 +137,14 @@ namespace emitters
     }
 
     template <typename ValueType>
+    void IRFunctionEmitter::MemorySet(llvm::Value* pDestinationPointer, llvm::Value* pDestinationOffset, llvm::Value* value, llvm::Value* count)
+    {
+        auto pDestination = PointerOffset(pDestinationPointer, pDestinationOffset);
+        auto byteCount = Operator(emitters::TypedOperator::multiply, count, Literal<int>(sizeof(ValueType)));
+        _pEmitter->MemorySet(pDestination, value, byteCount);
+    }
+
+    template <typename ValueType>
     void IRFunctionEmitter::ShiftAndUpdate(llvm::Value* buffer, int bufferSize, int shiftCount, llvm::Value* pNewData, llvm::Value* pShiftedData)
     {
         assert(buffer != nullptr);

@@ -304,8 +304,8 @@ namespace model
         /// <param name="b"> The other map to swap. </param>
         friend void swap(DynamicMap& a, DynamicMap& b);
 
-        /// <summary></summary>
-        void Prune(); // prune away unused parts of internal model
+        /// <summary>Prune away unused parts of internal model. </summary>
+        void Prune();
 
     protected:
         template<typename DataVectorType, typename ElementsType, data::IsDataVector<DataVectorType> Concept = true>

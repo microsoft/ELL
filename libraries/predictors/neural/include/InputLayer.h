@@ -41,13 +41,17 @@ namespace neural
         {
             /// <summary> Shape of the input tensor.. </summary>
             Shape inputShape;
+
             /// <summary> The padding requirements for the input. </summary>
             PaddingParameters inputPaddingParameters;
+
             /// <summary> The extents of the tensor in logical order (row, column, channel). This size includes padding. </summary>
             Shape outputShape;
+
             /// <summary> The padding requirements for the output. </summary>
             PaddingParameters outputPaddingParameters;
-            /// <summary> The scale factor to apply to each input value. Default is 1 (i.e. no scale). </summary>
+
+            /// <summary> The scale factor to apply to each input value. Default is undefined. </summary>
             ElementType scale;
         };
 

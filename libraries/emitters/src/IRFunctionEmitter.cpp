@@ -10,8 +10,8 @@
 #include "EmitterException.h"
 #include "IRBlockRegion.h"
 #include "IREmitter.h"
-#include "IRModuleEmitter.h"
 #include "IRMetadata.h"
+#include "IRModuleEmitter.h"
 
 // stl
 #include <chrono>
@@ -426,9 +426,11 @@ namespace emitters
     void IRFunctionEmitter::ConcatenateBlocks(std::vector<llvm::BasicBlock*> blocks)
     {
         llvm::BasicBlock* previousBlock = nullptr;
-        for (auto ptr = blocks.begin(), end = blocks.end(); ptr != end; ptr++) {
+        for (auto ptr = blocks.begin(), end = blocks.end(); ptr != end; ptr++)
+        {
             llvm::BasicBlock* nextBlock = *ptr;
-            if (previousBlock != nullptr) {
+            if (previousBlock != nullptr)
+            {
                 ConcatenateBlocks(previousBlock, nextBlock);
             }
             previousBlock = nextBlock;
@@ -444,7 +446,8 @@ namespace emitters
         auto pPrevCurBlock = SetCurrentBlock(pTopBlock);
         {
             auto termInst = pTopBlock->getTerminator();
-            if (termInst == nullptr) {
+            if (termInst == nullptr)
+            {
                 Branch(pBottomBlock);
             }
         }
@@ -814,7 +817,7 @@ namespace emitters
 
     void IRFunctionEmitter::InsertMetadata(const std::string& tag, const std::string& content)
     {
-        InsertMetadata(tag, std::vector<std::string>({content}));
+        InsertMetadata(tag, std::vector<std::string>({ content }));
     }
 
     void IRFunctionEmitter::InsertMetadata(const std::string& tag, const std::vector<std::string>& content)
@@ -873,6 +876,86 @@ namespace emitters
         VectorOperator(TypedOperator::multiply, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
             OperationAndUpdate(pDestination, TypedOperator::add, pValue);
         });
+    }
+
+    //
+    // BLAS functions
+    //
+    template <typename ValueType>
+    void IRFunctionEmitter::CallGEMV(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy)
+    {
+        CallGEMV<ValueType>(m, n, static_cast<ValueType>(1.0), A, lda, x, incx, static_cast<ValueType>(0.0), y, incy);
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::CallGEMV(int m, int n, ValueType alpha, llvm::Value* A, int lda, llvm::Value* x, int incx, ValueType beta, llvm::Value* y, int incy)
+    {
+        auto useBlas = CanUseBlas();
+        llvm::Function* gemv = GetModule().GetRuntime().GetGEMVFunction<ValueType>(useBlas);
+        if(gemv == nullptr)
+        {
+            throw EmitterException(EmitterError::functionNotFound, "Couldn't find GEMV function");
+        }
+
+        const auto CblasRowMajor = 101;
+        const auto CblasNoTrans = 111;
+        emitters::IRValueList args{ Literal(CblasRowMajor),
+                                    Literal(CblasNoTrans), // transpose
+                                    Literal(m),
+                                    Literal(n),
+                                    Literal(alpha),
+                                    A,
+                                    Literal(lda),
+                                    x,
+                                    Literal(incx),
+                                    Literal(beta),
+                                    y, // (output)
+                                    Literal(incy) };
+        Call(gemv, args);
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::CallGEMM(int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
+    {
+        CallGEMM<ValueType>(false, false, m, n, k, A, lda, B, ldb, C, ldc);
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::CallGEMM(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
+    {
+        auto useBlas = CanUseBlas();
+        llvm::Function* gemm = GetModule().GetRuntime().GetGEMMFunction<ValueType>(useBlas);
+        if(gemm == nullptr)
+        {
+            throw EmitterException(EmitterError::functionNotFound, "Couldn't find GEMM function");
+        }
+
+        if(!useBlas && (transposeA || transposeB))
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Transposed matrix multiply not currently implemented in non-blas codepath");
+        }
+
+        const auto CblasRowMajor = 101;
+        const auto CblasNoTrans = 111;
+        const auto CblasTrans = 112;
+
+        emitters::IRValueList args{
+            Literal(CblasRowMajor), // order
+            Literal(transposeA ? CblasTrans : CblasNoTrans), // transposeA
+            Literal(transposeB ? CblasTrans : CblasNoTrans), // transposeB
+            Literal(m),
+            Literal(n),
+            Literal(k),
+            Literal(static_cast<ValueType>(1.0)), // alpha
+            A,
+            Literal(lda), // lda
+            B,
+            Literal(ldb), // ldb
+            Literal(static_cast<ValueType>(0.0)), // beta
+            C, // C (output)
+            Literal(ldc) // ldc
+        };
+        Call(gemm, args);
     }
 
     llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)
@@ -951,6 +1034,11 @@ namespace emitters
         InsertMetadata(c_stepTimeFunctionTagName, functionName);
     }
 
+    bool IRFunctionEmitter::CanUseBlas() const
+    {
+        return GetModule().GetCompilerParameters().useBlas;
+    }
+
     //
     // IRFunctionCallArguments
     //
@@ -983,5 +1071,24 @@ namespace emitters
         Append(pVector);
         return pVector;
     }
+
+    //
+    // Explicit specializations
+    //
+    template void IRFunctionEmitter::CallGEMV<float>(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy);
+
+    template void IRFunctionEmitter::CallGEMV<float>(int m, int n, float alpha, llvm::Value* A, int lda, llvm::Value* x, int incx, float beta, llvm::Value* y, int incy);
+
+    template void IRFunctionEmitter::CallGEMV<double>(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy);
+
+    template void IRFunctionEmitter::CallGEMV<double>(int m, int n, double alpha, llvm::Value* A, int lda, llvm::Value* x, int incx, double beta, llvm::Value* y, int incy);
+
+    template void IRFunctionEmitter::CallGEMM<float>(int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc);
+
+    template void IRFunctionEmitter::CallGEMM<float>(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc);
+
+    template void IRFunctionEmitter::CallGEMM<double>(int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc);
+
+    template void IRFunctionEmitter::CallGEMM<double>(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc);
 }
 }

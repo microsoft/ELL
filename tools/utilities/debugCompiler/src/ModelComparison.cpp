@@ -6,9 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ModelComparison.h"
+// utilities
 #include "CompareUtils.h"
-#include "VectorStats.h"
+#include "ModelComparison.h"
+#include "VectorStatistics.h"
 
 // emitters
 #include "EmitterTypes.h"
@@ -18,7 +19,7 @@
 #include "DebugSinkNode.h"
 
 // utilities
-#include "DgmlGraph.h"
+#include "Graph.h"
 #include "Files.h"
 
 // stl
@@ -35,6 +36,8 @@ void DebugOutput(char* label, float* output, void* userData)
     }
 }
 }
+
+using namespace ell::utilities;
 
 //
 // Utility functions
@@ -188,7 +191,7 @@ void ModelComparison::SetUpReferenceMap(model::DynamicMap& map)
     _referenceMap.Transform(transformFunc, addSinkNodeContext);
 }
 
-void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize, bool allowVectorInstructions)
+void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& reference, bool useBlas, bool optimize, bool allowVectorInstructions, bool fuseLinearOps)
 {
     SetUpReferenceMap(reference);
     _addingReference = false;
@@ -200,6 +203,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
     settings.compilerSettings.useBlas = useBlas;
     settings.compilerSettings.allowVectorInstructions = allowVectorInstructions;
     settings.compilerSettings.optimize = optimize;
+    settings.fuseLinearFunctionNodes = fuseLinearOps;
     settings.profile = false;
     settings.compilerSettings.targetDevice.deviceName = "host";
 
@@ -279,8 +283,8 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
 void ModelComparison::SaveOutput(std::string name, const std::vector<float>& reference, const std::vector<float>& compiled)
 {
     std::string fileSafeId = name;
-    DgmlGraph::ReplaceAll(fileSafeId, "<", "_");
-    DgmlGraph::ReplaceAll(fileSafeId, ">", "_");
+    ReplaceAll(fileSafeId, "<", "_");
+    ReplaceAll(fileSafeId, ">", "_");
 
     auto fullPath = utilities::JoinPaths(_outputDirectory, fileSafeId + ".csv");
     std::ofstream data(fullPath);
@@ -335,11 +339,11 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
 
     outputStream << "## " << name << std::endl;
 
-    VectorStats refStats(reference);
-    VectorStats compiledStats(compiled);
-    VectorStats diffStats(Abs(Subtract(reference, compiled)));
+    VectorStatistics refStats(reference);
+    VectorStatistics compiledStats(compiled);
+    VectorStatistics diffStats(Abs(Subtract(reference, compiled)));
     
-    float absDiffSum = VectorStats::Diff(reference, compiled);
+    float absDiffSum = VectorStatistics::Diff(reference, compiled);
     if (layerData != nullptr)
     {
         if (!_hasMinMax)
@@ -384,10 +388,10 @@ void ModelComparison::WriteRow(std::ostream& outputStream, std::string id, std::
     if (id != "")
     {
         id = _nodeMap[id]; // map old id to new id
-        DgmlNode* node = _graph.GetNode(id);
+        GraphNode* node = _graph.GetNode(id);
         if (node != nullptr)
         {
-            node->Properties["Error"] = std::to_string(absDiffSum);
+            node->GetProperties()["Error"] = std::to_string(absDiffSum);
         }
     }
 }
@@ -477,22 +481,12 @@ void ModelComparison::AddStyles()
         expr = "Math.Log(Error)";
     }
 
-    DgmlProperty p;
-    p.Id = "Error";
-    p.Label = "Error";
-    p.Description = "Amount of error between compiled and reference layers";
-    p.DataType = "double";
-    _graph.AddProperty(p);
+    _graph.AddProperty(GraphProperty{ "Error", "Error", "Amount of error between compiled and reference layers", "double" });
 
-    DgmlStyle es;
-    es.TargetType = "Node";
-    es.GroupLabel = "Error";
-    es.ValueLabel = "Gradient";
-    es.Condition.Expression = "Error > 0";
-    DgmlStyleSetter red;
-    red.Property = "Background";
-    red.Expression = "Color.FromRgb(55 + 200 * (" + expr + " + " + std::to_string(min) + ") / " + std::to_string(range) + ", 0, 0)";
-    es.Setters.push_back(red);
+    GraphStyleCondition condition{ "Error > 0" };
+    GraphStyle es{ "Node", "Error", "Gradient", condition };
+    GraphStyleSetter red{ "Background", "",  "Color.FromRgb(55 + 200 * (" + expr + " + " + std::to_string(min) + ") / " + std::to_string(range) + ", 0, 0)" };
+    es.GetSetters().push_back(red);
 
     // add nice styles to show the errors.
     _graph.AddStyle(es);
@@ -564,7 +558,7 @@ void ModelComparison::CreateGraph(const model::Model& model)
         }
         else
         {
-            DgmlNode childNode = _graph.GetOrCreateNode(to_string(node.GetId()), typeName);
+            GraphNode& childNode = _graph.GetOrCreateNode(to_string(node.GetId()), typeName);
             auto dependencies = node.GetDependentNodes();
             for (auto ptr = dependencies.begin(), end = dependencies.end(); ptr != end; ptr++)
             {
@@ -578,7 +572,7 @@ void ModelComparison::CreateGraph(const model::Model& model)
                     {
                         std::string id = to_string(upstream->GetId());
                         std::string typeName = upstream->GetRuntimeTypeName();
-                        DgmlNode& nextNode = _graph.GetOrCreateNode(id, typeName);
+                        GraphNode& nextNode = _graph.GetOrCreateNode(id, typeName);
                         _graph.GetOrCreateLink(childNode, nextNode, "");
                     }
                 }
@@ -587,11 +581,17 @@ void ModelComparison::CreateGraph(const model::Model& model)
     });
 }
 
-void ModelComparison::SaveGraph(std::ostream& stm)
+void ModelComparison::SaveDgml(std::ostream& stm)
 {
     AddStyles();
     // and add <Styles> section to the graph to that is clearly visible.
-    _graph.Save(stm);
+    _graph.SaveDgml(stm);
+}
+
+void ModelComparison::SaveDot(std::ostream& stm)
+{
+    // and add <Styles> section to the graph to that is clearly visible.
+    _graph.SaveDot(stm);
 }
 
 void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, const model::Node& node)

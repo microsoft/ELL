@@ -16,7 +16,7 @@ namespace ell
 void ParsedPrintArguments::AddArgs(utilities::CommandLineParser& parser)
 {
     parser.AddOption(outputFilename, "outputFilename", "of", "Path to the output file", "");
-    parser.AddOption(outputFormat, "outputFormat", "fmt", "What output format to generate [text|dgml] (default text)", "text");
+    parser.AddOption(outputFormat, "outputFormat", "fmt", "What output format to generate [text|dgml|dot] (default text)", "text");
 	parser.AddOption(refine, "refine", "r", "Refine the model before printing", false);
 }
 

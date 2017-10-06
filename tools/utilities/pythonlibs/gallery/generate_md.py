@@ -4,29 +4,20 @@
 ##  File:     generate_md.py (gallery)
 ##  Authors:  Lisa Ong
 ##
-##  Requires: Python 3.x, cntk-2.0-cp35
+##  Requires: Python 3.x
 ##
 ####################################################################################################
 import os
 import sys
 import argparse
-import json
 import re
-from functools import reduce
-from os.path import basename
 
-# ELL utilities
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../'))
-import find_ell
-import ELL
-import ziptools
+# local helpers
+import model_info_retriever as mir
 
-# CNTK
-from cntk import load_model
-from cntk.layers.typing import *
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../importers/CNTK'))
-import lib.cntk_layers as cntk_layers
-import lib.cntk_utilities as cntk_utilities
+def disable_text_wrapping(text):
+    """Convert spaces to non-breaking spaces so that columns don't wrap"""
+    return re.sub(r" ", "&nbsp;", text)
 
 class GenerateMarkdown:
     def __init__(self):
@@ -41,107 +32,93 @@ class GenerateMarkdown:
         # required arguments
         self.arg_parser.add_argument("modeldir", help="the directory containing the model files")
         self.arg_parser.add_argument("outfile", help="path to the output filename")
+        self.arg_parser.add_argument("printexe", help="path to the print executable that dumps raw model architecture")
 
         # optional arguments
         self.arg_parser.add_argument("--template", help="path to the input markdown template file", default="vision_model.md.in")
+
         args = self.arg_parser.parse_args(argv)
 
         self.modeldir = args.modeldir
-        self.model = basename(self.modeldir)
+        self.model = os.path.basename(self.modeldir)
         self.outfile = args.outfile
+        self.printexe = args.printexe
+        self.model_data = {}
+        self.platforms = ["pi3", "pi3_64", "aarch64"]
 
         if (not os.path.isfile(args.template)):
             raise FileNotFoundError("Template file not found: " + args.template)
         with open(args.template, 'r') as f:
             self.template = f.read()
 
-        permalink = os.path.splitext(basename(self.outfile))[0]
-        self.set_value("@PERMALINK@", permalink)
+        permalink = os.path.splitext(os.path.basename(self.outfile))[0]
+        self._set_value("@PERMALINK@", permalink)
 
-    def get_model_filename(self, name, is_suffix=False):
-        """Returns the path to a file from the model directory, given the filename or a suffix"""
-        if is_suffix:
-            filename = os.path.join(self.modeldir, self.model + name)
-        else:
-            filename = os.path.join(self.modeldir, name)
-            
-        if (not os.path.isfile(filename)):
-            raise FileNotFoundError("File not found: " + filename)
-        return filename
-
-    def format_float(self, value):
-        return "{0:.2f}".format(value)
-
-    def set_value(self, key, value):
+    def _set_value(self, key, value):
+        """Replaces keys with values in the template"""
         self.template = self.template.replace(key, str(value))
 
-    def write_properties(self):
-        """Writes the basic properties of the model"""
-        filename = self.get_model_filename("modelargs.json")
-        with open(filename, 'r') as f:
-            results = json.loads(f.read())
-            self.set_value("@IMAGE_SIZE@", results['image_size'])
-            self.set_value("@NUM_CLASSES@", results['num_classes'])
-            self.set_value("@MODEL_NAME@", self.model)
+    def get_model_info(self):
+        """Gathers information about the model"""
+        with mir.ModelInfoRetriever(self.modeldir, self.model) as model_data:
+            self.model_data = {
+                "accuracy" : model_data.get_model_topN_accuracies(),
+                "architecture" : model_data.get_model_architecture(self.printexe),
+                "properties" : model_data.get_model_properties(),
+                "timings" : model_data.get_model_seconds_per_frame(self.platforms)
+            }
 
-        filename = self.get_model_filename(".ell.zip", is_suffix=True)
-        unzip = ziptools.Extractor(filename)
-        success, temp = unzip.extract_file(".ell")
-        if (success):
-            print("extracted: " + temp)
-            size_mb = round(os.path.getsize(temp) / (1000 * 1000))
-            self.set_value("@MODEL_SIZE_MB@", size_mb)
-            os.remove(temp)
-        else:
-            # not a zip archive
-            print("Error, not a valid zip archive: " + filename)
+    def _arch_layers_to_html(self, arch_layers):
+        """Formats arch_layers to HTML table rows"""
+        def _format_parameters(dict):
+            pairs = ["{}={}".format(key, dict[key]) for key in dict.keys()]
+            return ",&nbsp;".join(pairs)
 
-    def write_performance(self, platforms):
-        """Writes the metrics for the list of platforms"""
-        for platform in platforms:
+        result = "\n"
+        for layer in arch_layers:
+            # formatted for readability
+            result += "\t\t\t\t<tr class=\"arch-table\">\n"
+            result += "\t\t\t\t\t<td>{}</td>\n".format(disable_text_wrapping(layer["name"]))
+            result += "\t\t\t\t\t<td>&#8680;&nbsp;{}</td>\n".format(disable_text_wrapping(layer["output_shape"]))
+            result += "\t\t\t\t\t<td>{}</td>\n".format(disable_text_wrapping(_format_parameters(layer["parameters"])))
+            result += "\t\t\t\t</tr>\n"
+
+        result += "\t\t\t"
+
+        # tabs to spaces (for consistency in the generated markdown)
+        result = re.sub(r"\t", "    ", result)
+
+        return result
+
+    def write_model_info(self):
+        """Writes information about the model using the template"""
+        # accuracy
+        accuracy = self.model_data["accuracy"]
+        self._set_value("@TOP_1_ACCURACY@", accuracy['top1'])
+        self._set_value("@TOP_5_ACCURACY@", accuracy['top5'])
+
+        # architecture
+        arch_layers = self.model_data["architecture"]
+        html = self._arch_layers_to_html(arch_layers)
+        self._set_value("@MODEL_ARCH@", html)
+
+        # properties
+        properties = self.model_data["properties"]
+        self._set_value("@IMAGE_SIZE@", properties["image_size"])
+        self._set_value("@MODEL_NAME@", self.model)
+        self._set_value("@MODEL_SIZE_MB@", properties["size_mb"])
+        self._set_value("@NUM_CLASSES@", properties["num_classes"])
+
+        # timings per platform
+        timings = self.model_data["timings"]
+        for platform in self.platforms:
             try:
-                filename = self.get_model_filename("validation_" + platform + ".json")
-                with open(filename, 'r') as f:
-                    data = json.loads(f.read())
-                    results = data['results']
-                    average_time = reduce(lambda x, y: x + float(y['avg_time']), results, 0) / len(results)
-                    self.set_value("@" + platform + "_SECONDS_PER_FRAME@", self.format_float(average_time))
+                self._set_value("@" + platform + "_SECONDS_PER_FRAME@", timings[platform])
             except:
-                # leave entries empty if file isn't found, orinvalid json (validation not complete on the target)
-                self.set_value("@" + platform + "_SECONDS_PER_FRAME@", "")
+                # leave entry empty if file isn't found (validation not run on the target)
+                # or if json is invalid (validation not complete on the target)
+                self._set_value("@" + platform + "_SECONDS_PER_FRAME@", "")
                 pass
-
-    def sanitize_layer_string(self, layer_str):
-        # these are special characters in markdown files
-        s = re.sub(r'\|', r'', layer_str)
-        return s
-
-    def write_architecture(self):
-        """Writes the model architecture in the desired format"""
-        filename = self.get_model_filename(".cntk.zip", is_suffix=True)
-        unzip = ziptools.Extractor(filename)
-        success, temp = unzip.extract_file(".cntk")
-        if (success):
-            print("extracted: " + temp)
-            model_root = load_model(temp)
-            model_layers = cntk_utilities.get_model_layers(model_root)
-            layers = cntk_layers.get_filtered_layers_list(model_layers)
-
-            result = reduce(lambda x, y: x + self.sanitize_layer_string(y.__str__()) + "<br>", layers, "")
-            self.set_value("@MODEL_ARCH@", result)
-            os.remove(temp)
-        else:
-            # not a zip archive
-            print("Error, not a valid zip archive: " + filename)
-
-    def write_accuracy(self):
-        """Writes the accuracy from the model test result"""
-        filename = self.get_model_filename("test_eval.json")
-
-        with open(filename, 'r') as f:
-            results = json.loads(f.read())
-            self.set_value("@TOP_1_ACCURACY@", self.format_float(100 * (1.0 - float(results['average_top1_error']))))
-            self.set_value("@TOP_5_ACCURACY@", self.format_float(100 * (1.0 - float(results['average_top5_error']))))
 
     def save(self):
         with open(self.outfile, 'w', encoding='utf-8') as of:
@@ -149,10 +126,8 @@ class GenerateMarkdown:
         print("Saved to: " + self.outfile)
 
     def run(self):
-        self.write_properties()
-        self.write_architecture()
-        self.write_accuracy()
-        self.write_performance(["pi3", "pi3_64", "aarch64"])
+        self.get_model_info()
+        self.write_model_info()
         self.save()
 
 if __name__ == "__main__":

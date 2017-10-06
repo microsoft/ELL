@@ -384,15 +384,32 @@ namespace emitters
         /// <returns> Pointer to an llvm::Value that represents the select result. </returns>
         llvm::Value* Select(llvm::Value* pCmp, llvm::Value* pTrueValue, llvm::Value* pFalseValue);
 
+        /// <summary> Emit a declaration for an extern function with no arguments and no return value. </summary>
+        ///
+        /// <param name="pModule"> The module in which the function is declared. </param>
+        /// <param name="name"> The function name. </param>
+        ///
+        /// <returns> Pointer to the declared function. </returns>
+        llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name);
+
+        /// <summary> Emit a declaration for an extern function with no arguments. </summary>
+        ///
+        /// <param name="pModule"> The module in which the function is declared. </param>
+        /// <param name="name"> The function name. </param>
+        /// <param name="returnType"> Function return type. </param>
+        ///
+        /// <returns> Pointer to the declared function. </returns>
+        llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType);
+
         /// <summary> Emit a declaration for an extern function. </summary>
         ///
         /// <param name="pModule"> The module in which the function is declared. </param>
         /// <param name="name"> The function name. </param>
         /// <param name="returnType"> Function return type. </param>
-        /// <param name="pArguments"> Function arguments. </param>
+        /// <param name="arguments"> Function arguments. </param>
         ///
         /// <returns> Pointer to the declared function. </returns>
-        llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const VariableTypeList* pArguments = nullptr);
+        llvm::Function* DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const VariableTypeList& arguments);
 
         /// <summary> Emit a declaration for an extern function. </summary>
         ///

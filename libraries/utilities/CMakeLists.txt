@@ -11,6 +11,7 @@ set (src src/Archiver.cpp
          src/CStringParser.cpp
          src/Files.cpp
          src/Format.cpp
+         src/Graph.cpp
          src/IArchivable.cpp
          src/IndentedTextWriter.cpp
          src/IntegerList.cpp
@@ -35,7 +36,7 @@ set (include include/AbstractInvoker.h
              include/ConformingVector.h
              include/CStringParser.h
              include/Debug.h
-			 include/DgmlGraph.h
+             include/Graph.h
              include/Exception.h
              include/Files.h
              include/Format.h

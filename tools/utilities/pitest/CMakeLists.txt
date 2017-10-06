@@ -7,7 +7,7 @@ if(${PYTHONINTERP_FOUND})
 
     set(module_name "pitest")
 
-    set(test_src drivetest.py runtest.sh.in coffeemug.jpg buildtask.cmd)
+    set(test_src drivetest.py picluster.py runtest.sh.in coffeemug.jpg buildtask.cmd)
 
     add_custom_target(${module_name} DEPENDS SOURCES ${test_src})
 

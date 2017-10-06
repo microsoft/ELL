@@ -16,5 +16,6 @@
 
 namespace ell
 {
-void PrintGraph(const model::Model& model, std::ostream& out);
+void PrintGraph(const model::Model& model, const std::string& outputFormat,
+                std::ostream& out);
 }

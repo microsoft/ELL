@@ -6,22 +6,138 @@ permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 160x160x3 Convolutional Neural Network (68.39% top 1 accuracy, 88.38% top 5 accuracy, 5.02s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 160x160x3 Convolutional Neural Network (68.39% top 1 accuracy, 88.38% top 5 accuracy, 4.72s/frame on Raspberry Pi 3)
 
-|=
-| Download | [v_I160x160x3CCMCCMCCCMCCCMCCCMF2048.ell.zip](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048.ell.zip)
-|-
-| Accuracy | ILSVRC2012: 88.38% (Top 5), 68.39% (Top 1) 
-|-
-| Performance | Raspberry Pi 3 (Raspbian) @ 700MHz: 5.02s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 4.53s/frame<br>DragonBoard 410c @ 1.2GHz: 2.98s/frame
-|-
-| Uncompressed Size | 535MB
-|-
-| Input | 160 x 160 x {R,G,B}
-|-
-| Architecure | Minus :  160x160x3  ->  162x162x3  input padding 0  output padding 1<br>Convolution(ReLU) :  162x162x3  ->  162x162x64  input padding 1  output padding 1<br>Convolution(ReLU) :  162x162x64  ->  160x160x64  input padding 1  output padding 0<br>MaxPooling :  160x160x64  ->  82x82x64  input padding 0  output padding 1<br>Convolution(ReLU) :  82x82x64  ->  82x82x128  input padding 1  output padding 1<br>Convolution(ReLU) :  82x82x128  ->  80x80x128  input padding 1  output padding 0<br>MaxPooling :  80x80x128  ->  42x42x128  input padding 0  output padding 1<br>Convolution(ReLU) :  42x42x128  ->  42x42x256  input padding 1  output padding 1<br>Convolution(ReLU) :  42x42x256  ->  42x42x256  input padding 1  output padding 1<br>Convolution(ReLU) :  42x42x256  ->  40x40x256  input padding 1  output padding 0<br>MaxPooling :  40x40x256  ->  22x22x256  input padding 0  output padding 1<br>Convolution(ReLU) :  22x22x256  ->  22x22x512  input padding 1  output padding 1<br>Convolution(ReLU) :  22x22x512  ->  22x22x512  input padding 1  output padding 1<br>Convolution(ReLU) :  22x22x512  ->  20x20x512  input padding 1  output padding 0<br>MaxPooling :  20x20x512  ->  12x12x512  input padding 0  output padding 1<br>Convolution(ReLU) :  12x12x512  ->  12x12x512  input padding 1  output padding 1<br>Convolution(ReLU) :  12x12x512  ->  12x12x512  input padding 1  output padding 1<br>Convolution(ReLU) :  12x12x512  ->  10x10x512  input padding 1  output padding 0<br>MaxPooling :  10x10x512  ->  5x5x512  input padding 0  output padding 0<br>Dense :  5x5x512  ->  1x1x2048  input padding 0  output padding 0<br>Dense :  1x1x2048  ->  1x1x1000  input padding 0  output padding 0<br>ElementTimes :  1x1x1000  ->  1x1x1000  input padding 0  output padding 0<br>Softmax :  1x1x1000  ->  1x1x1  input padding 0  output padding 0<br>
-|-
-| Output | [ILSVRC2012 1000 classes](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/ILSVRC2012_labels.txt)
-|-
-| Notes | Trained by Chuck Jacobs using CNTK 2.1
-|=
+<table>
+    <tr>
+        <td> Download </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048.ell.zip">v_I160x160x3CCMCCMCCCMCCCMCCCMF2048.ell.zip</a></td>
+    </tr>
+    <tr>
+        <td> Accuracy </td>
+        <td colspan="3"> ILSVRC2012: 88.38% (Top 5), 68.39% (Top 1) </td>
+    </tr>
+    <tr>
+        <td> Performance </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 4.72s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 4.29s/frame<br>DragonBoard 410c @ 1.2GHz: 2.98s/frame </td>
+    </tr>
+    <tr>
+        <td> Uncompressed Size </td>
+        <td colspan="3"> 535MB </td>
+    </tr>
+    <tr>
+        <td> Input </td>
+        <td colspan="3"> 160 x 160 x {B,G,R} </td>
+    </tr>
+    <tr>
+        <td> Architecture </td>
+        <td>
+            <table class="arch-table">
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;160x160x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;160x160x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;82x82x64</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;80x80x128</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;80x80x128</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;42x42x128</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;40x40x256</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;40x40x256</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;40x40x256</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;22x22x256</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;20x20x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;20x20x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;20x20x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;12x12x512</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;10x10x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;10x10x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;10x10x512</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;5x5x512</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Softmax</td>
+                    <td>&#8680;&nbsp;1x1x1000</td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td> Output </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt">ILSVRC2012 1000 classes</a> </td>
+    </tr>
+    <tr>
+        <td> Notes </td>
+        <td colspan="3"> Trained by Chuck Jacobs using CNTK 2.1 </td>
+    </tr>
+</table>
+

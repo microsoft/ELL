@@ -41,7 +41,7 @@ namespace emitters
         {
             if (_pDotProductFunction == nullptr)
             {
-                _pDotProductFunction = EmitDotProductFunction();
+                _pDotProductFunction = GetDotProductIntFunction();
             }
             return _pDotProductFunction;
         }
@@ -49,7 +49,7 @@ namespace emitters
         {
             if (_pDotProductFunctionFloat == nullptr)
             {
-                _pDotProductFunctionFloat = EmitDotProductFunctionF();
+                _pDotProductFunctionFloat = GetDotProductFloatFunction();
             }
             return _pDotProductFunctionFloat;
         }

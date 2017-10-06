@@ -17,13 +17,164 @@ namespace ell
 {
 namespace emitters
 {
+    namespace
+    {
+        //
+        // Native implementations of matrix operation functions (as opposed to calling out to BLAS)
+        //
+        template <typename ValueType>
+        llvm::Function* EmitGEMVFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
+        {
+            const auto plus = emitters::TypedOperator::add;
+            const auto times = emitters::TypedOperator::multiply;
+            const auto plusFloat = emitters::TypedOperator::addFloat;
+            const auto timesFloat = emitters::TypedOperator::multiplyFloat;
+    
+            auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);            
+            auto arguments = function.Arguments().begin();
+            auto order = &(*arguments++);
+            auto transpose = &(*arguments++);
+            auto m = &(*arguments++);
+            auto n = &(*arguments++);
+            auto alpha = &(*arguments++);
+            auto A = &(*arguments++);
+            auto lda = &(*arguments++);
+            auto x = &(*arguments++);
+            auto incx = &(*arguments++);
+            auto beta = &(*arguments++);
+            auto y = &(*arguments++);
+            auto incy = &(*arguments++);
+                    
+            llvm::Value* accum = function.Variable(emitters::GetVariableType<ValueType>(), "accum");
+    
+            auto iLoop = function.ForLoop();
+            iLoop.Begin(m);
+            {
+                auto i = iLoop.LoadIterationVariable();
+                function.Store(accum, function.Literal(static_cast<ValueType>(0.0)));
+                auto jLoop = function.ForLoop();
+                jLoop.Begin(n);
+                {
+                    auto j = jLoop.LoadIterationVariable();
+                    auto aIndex = function.Operator(plus, function.Operator(times, i, lda), j);
+                    auto xIndex = function.Operator(times, j, incx);
+                    auto aVal = function.ValueAt(A, aIndex);
+                    auto xVal = function.ValueAt(x, xIndex);
+                    auto aTimesX = function.Operator(timesFloat, aVal, xVal);
+                    function.OperationAndUpdate(accum, plusFloat, aTimesX);
+                }
+                jLoop.End();
+    
+                auto yIndex = function.Operator(times, i, incy);
+                function.SetValueAt(y, yIndex, function.Load(accum));
+            }
+            iLoop.End();
+            function.Return(function.Literal<int>(0));
+            module.EndFunction();
+            return function.GetFunction();
+        }
+
+
+        template <typename ValueType>
+        llvm::Function* EmitGEMMFunction(IRModuleEmitter& module, const std::string& functionName, const VariableTypeList& argTypes)
+        {
+            const auto plus = emitters::TypedOperator::add;
+            const auto times = emitters::TypedOperator::multiply;
+            const auto plusFloat = emitters::TypedOperator::addFloat;
+            const auto timesFloat = emitters::TypedOperator::multiplyFloat;
+    
+            auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);            
+            auto arguments = function.Arguments().begin();
+            auto order = &(*arguments++);
+            auto transposeA = &(*arguments++);
+            auto transposeB = &(*arguments++);
+            auto m = &(*arguments++);
+            auto n = &(*arguments++);
+            auto k = &(*arguments++);
+            auto alpha = &(*arguments++);
+            auto A = &(*arguments++);
+            auto lda = &(*arguments++);
+            auto B = &(*arguments++);
+            auto ldb = &(*arguments++);
+            auto beta = &(*arguments++);
+            auto C = &(*arguments++);
+            auto ldc = &(*arguments++);
+
+            // C = A x B, A: mxk, B: kxn, C: mxn
+            // A': kxm, B': nxk
+
+            // Loop orders:
+            // A*B:   i, k, j
+            // A'*B:  k, i, j
+            // A*B':  i, j, k
+            // A'*B': k, j, i (?)
+
+            // Clear output
+            auto count = function.Operator(times, ldc, m);
+            function.MemorySet<ValueType>(C, function.Literal<int>(0), function.Literal<uint8_t>(0), count);
+
+            // TODO: deal with transposes
+
+            // Accumulate partial values into output
+            auto iLoop = function.ForLoop();
+            iLoop.Begin(m);
+            {
+                auto iIndex = iLoop.LoadIterationVariable();
+
+                auto kLoop = function.ForLoop();
+                kLoop.Begin(k);
+                {
+                    auto kIndex = kLoop.LoadIterationVariable();
+
+                    auto jLoop = function.ForLoop();
+                    jLoop.Begin(n);
+                    {
+                        auto jIndex = jLoop.LoadIterationVariable();
+
+                        llvm::Value* aIndex = nullptr;
+                        llvm::Value* bIndex = nullptr;
+                        aIndex = function.Operator(plus, function.Operator(times, iIndex, lda), kIndex);
+                        bIndex = function.Operator(plus, function.Operator(times, kIndex, ldb), jIndex);
+                        // if (transposeA)
+                        //     aIndex = function.Operator(plus, function.Operator(times, kIndex, function.Literal(lda)), iIndex);
+                        // else
+                        //     aIndex = function.Operator(plus, function.Operator(times, iIndex, function.Literal(lda)), kIndex);
+
+                        // if (transposeB)
+                        //     bIndex = function.Operator(plus, function.Operator(times, jIndex, function.Literal(ldb)), kIndex);
+                        // else
+                        //     bIndex = function.Operator(plus, function.Operator(times, kIndex, function.Literal(ldb)), jIndex);
+
+                        auto aValue = function.ValueAt(A, aIndex);
+                        auto bValue = function.ValueAt(B, bIndex);
+                        auto value = function.Operator(timesFloat, aValue, bValue);
+                        // store output in C[m,n]
+                        auto cIndex = function.Operator(plus, function.Operator(times, iIndex, ldc), jIndex);
+                        auto oldVal = function.ValueAt(C, cIndex);
+                        auto sum = function.Operator(plusFloat, oldVal, value);
+                        function.SetValueAt(C, cIndex, sum);
+                    }
+                    jLoop.End();
+
+                }
+                kLoop.End();
+            }
+            iLoop.End();
+            function.Return(function.Literal<int>(0));
+
+            module.EndFunction();
+            return function.GetFunction();
+        }
+
+    } // end anonymous namespace
+
     static const std::string& countName = "count";
     static const std::string& lVectorName = "pLVector";
     static const std::string& rVectorName = "pRVector";
     static const std::string& resultName = "pResult";
 
-    static const std::string& dotProductFloatName = "DotProductF";
-    static const std::string& dotProductIntName = "DotProduct";
+    static const std::string& dotProductFloatName = "DotProductFloat";
+    static const std::string& dotProductIntName = "DotProductInt";
     static const std::string& getTimeFunctionName = "GetTime";
 
     IRRuntime::IRRuntime(IRModuleEmitter& module)
@@ -36,14 +187,14 @@ namespace emitters
         return _module.GetModuleName();
     }
 
-    llvm::Function* IRRuntime::EmitDotProductFunctionF()
+    llvm::Function* IRRuntime::GetDotProductFloatFunction()
     {
         auto functionName = GetNamespacePrefix() + "_" + dotProductFloatName;
-        NamedVariableTypeList argList = { { countName, VariableType::Int32 },
+        NamedVariableTypeList argTypes = { { countName, VariableType::Int32 },
                                           { lVectorName, VariableType::DoublePointer },
                                           { rVectorName, VariableType::DoublePointer },
                                           { resultName, VariableType::DoublePointer } };
-        auto function = _module.BeginFunction(functionName, VariableType::Void, argList);
+        auto function = _module.BeginFunction(functionName, VariableType::Void, argTypes);
         function.IncludeInHeader();
 
         auto arguments = function.Arguments().begin();
@@ -58,14 +209,14 @@ namespace emitters
         return function.GetFunction();
     }
 
-    llvm::Function* IRRuntime::EmitDotProductFunction()
+    llvm::Function* IRRuntime::GetDotProductIntFunction()
     {
         auto functionName = GetNamespacePrefix() + "_" + dotProductIntName;
-        NamedVariableTypeList argList = { { countName, VariableType::Int32 },
+        NamedVariableTypeList argTypes = { { countName, VariableType::Int32 },
                                           { lVectorName, VariableType::Int32Pointer },
                                           { rVectorName, VariableType::Int32Pointer },
                                           { resultName, VariableType::Int32Pointer } };
-        auto function = _module.BeginFunction(functionName, VariableType::Void, argList);
+        auto function = _module.BeginFunction(functionName, VariableType::Void, argTypes);
         function.IncludeInHeader();
 
         auto arguments = function.Arguments().begin();
@@ -259,7 +410,7 @@ namespace emitters
     //
     // BLAS
     //
-    llvm::Function* IRRuntime::GetSGEMVFunction()
+    llvm::Function* IRRuntime::GetSGEMVFunction(bool useBlas)
     {
         VariableTypeList argTypes = {
             VariableType::Int32, // order
@@ -267,7 +418,7 @@ namespace emitters
             VariableType::Int32, // m
             VariableType::Int32, // n
             VariableType::Float, // alpha
-            VariableType::FloatPointer, // M
+            VariableType::FloatPointer, // A
             VariableType::Int32, // lda
             VariableType::FloatPointer, // x
             VariableType::Int32, // incx
@@ -277,12 +428,24 @@ namespace emitters
         };
 
         auto pModule = _module.GetLLVMModule();
-        auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
-        auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
-        return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_sgemv", functionType));
+        if(useBlas)
+        {        
+            auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
+            auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
+            return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_sgemv", functionType));
+        }
+        else
+        {
+            auto pFunction = pModule->getFunction("noblas_sgemv");
+            if(pFunction != nullptr)
+            {
+                return pFunction;
+            }
+            return EmitGEMVFunction<float>(_module, "noblas_sgemv", argTypes);
+        }
     }
-
-    llvm::Function* IRRuntime::GetDGEMVFunction()
+    
+    llvm::Function* IRRuntime::GetDGEMVFunction(bool useBlas)
     {
         VariableTypeList argTypes = {
             VariableType::Int32, // order
@@ -300,12 +463,24 @@ namespace emitters
         };
 
         auto pModule = _module.GetLLVMModule();
-        auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
-        auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
-        return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_dgemv", functionType));
+        if(useBlas)
+        {
+            auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
+            auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
+            return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_dgemv", functionType));
+        }
+        else
+        {
+            auto pFunction = pModule->getFunction("noblas_dgemv");
+            if(pFunction != nullptr)
+            {
+                return pFunction;
+            }
+            return EmitGEMVFunction<double>(_module, "noblas_dgemv", argTypes);
+        }
     }
 
-    llvm::Function* IRRuntime::GetSGEMMFunction()
+    llvm::Function* IRRuntime::GetSGEMMFunction(bool useBlas)
     {
         VariableTypeList argTypes = {
             VariableType::Int32, // order
@@ -325,12 +500,24 @@ namespace emitters
         };
 
         auto pModule = _module.GetLLVMModule();
-        auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
-        auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
-        return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_sgemm", functionType));
+        if(useBlas)
+        {
+            auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
+            auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
+            return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_sgemm", functionType));
+        }
+        else
+        {
+            auto pFunction = pModule->getFunction("noblas_sgemm");
+            if(pFunction != nullptr)
+            {
+                return pFunction;
+            }
+            return EmitGEMMFunction<float>(_module, "noblas_sgemm", argTypes);
+        }
     }
 
-    llvm::Function* IRRuntime::GetDGEMMFunction()
+    llvm::Function* IRRuntime::GetDGEMMFunction(bool useBlas)
     {
         VariableTypeList argTypes = {
             VariableType::Int32, // order
@@ -350,33 +537,45 @@ namespace emitters
         };
 
         auto pModule = _module.GetLLVMModule();
-        auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
-        auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
-        return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_dgemm", functionType));
+        if(useBlas)
+        {
+            auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
+            auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
+            return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_dgemm", functionType));
+        }
+        else
+        {
+            auto pFunction = pModule->getFunction("noblas_dgemm");
+            if(pFunction != nullptr)
+            {
+                return pFunction;
+            }
+            return EmitGEMMFunction<double>(_module, "noblas_dgemm", argTypes);
+        }
     }
 
     template <>
-    llvm::Function* IRRuntime::GetGEMVFunction<float>()
+    llvm::Function* IRRuntime::GetGEMVFunction<float>(bool useBlas)
     {
-        return GetSGEMVFunction();
+        return GetSGEMVFunction(useBlas);
     }
 
     template <>
-    llvm::Function* IRRuntime::GetGEMVFunction<double>()
+    llvm::Function* IRRuntime::GetGEMVFunction<double>(bool useBlas)
     {
-        return GetDGEMVFunction();
+        return GetDGEMVFunction(useBlas);
     }
 
     template <>
-    llvm::Function* IRRuntime::GetGEMMFunction<float>()
+    llvm::Function* IRRuntime::GetGEMMFunction<float>(bool useBlas)
     {
-        return GetSGEMMFunction();
+        return GetSGEMMFunction(useBlas);
     }
 
     template <>
-    llvm::Function* IRRuntime::GetGEMMFunction<double>()
+    llvm::Function* IRRuntime::GetGEMMFunction<double>(bool useBlas)
     {
-        return GetDGEMMFunction();
+        return GetDGEMMFunction(useBlas);
     }
 }
 }
