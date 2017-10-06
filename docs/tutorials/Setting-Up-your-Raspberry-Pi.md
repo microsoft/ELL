@@ -72,8 +72,7 @@ By default, OpenCV can read images from a USB webcam, but not from the Raspberry
 sudo raspi-config
 ```
 
-
-Select `enable camera`, hit `enter`, and go to `finish`. Then, load the camera module, as follows.
+Select `5 Interfacing Options`, hit `enter`, select `P1 Camera` and hit `enter` again. Select `Yes` to enable the camera interface. Then, load the camera module, as follows.
 
 ```
 sudo modprobe bcm2835-v4l2
@@ -84,8 +83,15 @@ To run the `C++` tutorials you also need the C++ OpenCV SDK, which you can insta
     sudo apt-get install libopencv-dev
 
 ### SSH
-Our tutorials will require copying files to run on the Pi. A typical way to copy files to the Pi is to use the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
-To enable SSH on your Pi, go to `Preferences > Raspberry Pi Configuration` from the Raspbian menu, select the `Interfaces` tab and set `SSH` to `Enabled`.
+Our tutorials require copying files to run on the Pi. A typical way to copy files to the Pi is to use the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
+
+To enable SSH on your Pi, run the Pi configuration tool.
+
+```
+sudo raspi-config
+```
+
+Select `5 Interfacing Options`, hit `enter`, select `P2 SSH` and hit `enter` again. Select `Yes` to enable the SSH server.
 
 
 ## Tips and Tweaks
