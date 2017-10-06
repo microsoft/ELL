@@ -60,6 +60,15 @@ int main(int argc, char** argv )
     // Open the video camera. To use a different camera, change the camera index.
     cv::VideoCapture camera(0);
 
+    cv::Mat staticImage;
+
+    bool hasStaticImage = false;
+    if (argc == 3)
+    {
+        staticImage = getImageFromFile(argv[2]);
+        hasStaticImage = true;
+    }
+
     // Read the category labels
     auto categories = getCategoriesFromFile(argv[1]);
 
@@ -74,11 +83,19 @@ int main(int argc, char** argv )
     std::vector<double>  predictionTimes;
     double meanTimeToPredict = 0.0;
 
-    while (cv::waitKey(1) == 0xFF)
+    while (cv::waitKey(1) == -1)
     {
         // Get an image from the camera. If you'd like to use a different image, change this to call getImageFromFile,
         // or load the image from some other source.
-        cv::Mat image = getImageFromCamera(camera);
+        cv::Mat image;
+        if (hasStaticImage) 
+        {
+            image = staticImage;
+        } 
+        else 
+        {
+            image = getImageFromCamera(camera);
+        }
 
         // Prepare the image to pass to the model. This helper:
         // - crops and resizes the image maintaining proper aspect ratio

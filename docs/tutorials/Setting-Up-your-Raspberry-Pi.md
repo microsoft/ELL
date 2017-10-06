@@ -52,6 +52,10 @@ Remember to run `source activate py34` each time you start a new terminal window
 
     conda install -c microsoft-ell opencv
 
+To run the `C++` tutorials you will also need the C++ OpenCV SDK which you can install on your Raspberry Pi with this command:
+
+    sudo apt-get install libopencv-dev
+
 ### SSH
 Our tutorials will require copying files to run on the Pi. A typical way to copy files to the Pi is to use the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 To enable SSH on your Pi, go to `Preferences > Raspberry Pi Configuration` from the Raspbian menu, select the `Interfaces` tab and set `SSH` to `Enabled`.
@@ -123,3 +127,9 @@ If you do not have the built in libavcodec.so.56, it probably means that you are
 **ImportError: No module named 'numpy'**
 
 You probably forgot to activate your Miniconda environment using `source activate py34`. See `Miniconda` instructions above.
+
+**(ELL model:18037): Gtk-WARNING **: cannot open display**
+
+You are probably trying to run one of the OpenCV demo's from an SSH terminal window.  In this case you simply need to tell
+OpenCV which display to use using `export DISPLAY=:0`. Many of our demos also expect keyboard input to terminate the demo.
+From SSH you can kill the application from the command line by typing CTRL+C.

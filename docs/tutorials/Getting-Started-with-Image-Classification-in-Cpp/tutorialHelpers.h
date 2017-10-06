@@ -120,8 +120,8 @@ public:
     static void drawTextBlock(cv::Mat& image, const std::string& text, cv::Point topLeft, cv::Scalar color, int height = 40)
     {
         double fontScale = 0.7;
-        cv::rectangle(image, topLeft, cv::Point(image.cols, topLeft.y + height), color, cv::FILLED);
+        cv::rectangle(image, topLeft, cv::Point(image.cols, topLeft.y + height), color, CV_FILLED);
         cv::putText(image, text, cv::Point(topLeft.x + height / 4, topLeft.y + (int)(height * 0.667)),
-                    cv::FONT_HERSHEY_COMPLEX_SMALL, fontScale, cv::Scalar(0, 0, 0), 1, cv::LINE_AA);
+                    cv::FONT_HERSHEY_COMPLEX_SMALL, fontScale, cv::Scalar(0, 0, 0), 1, CV_AA);
     }
 };

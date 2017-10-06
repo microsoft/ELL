@@ -78,6 +78,25 @@ The project executables will appear in `ELL/build/bin`. Finally, to build ELL's 
 
     cmake --build . --target _ELL_python --config Release
 
+## Path Environment
+
+When you run cmake in the ELL build folder it will output something like this:
+````
+-- Using OpenBLAS compiled for haswell
+-- Using BLAS include path: D:/git/ELL/ELL/external/OpenBLASLibs.0.2.19.3/build/native/x64/haswell/include
+-- Using BLAS library: D:/git/ELL/ELL/external/OpenBLASLibs.0.2.19.3/build/native/x64/haswell/lib/libopenblas.dll.a
+````
+
+This tells you which version of OpenBLAS ELL will be using.  So if you want to be able to run an ELL program
+from anywhere on your machine (outside of your ELL git repo) you will need to help your app find this DLL.
+This can be done by modifying your PATH environment variable like this:
+
+````
+set PATH=%PATH%;D:/git/ELL/ELL/external/OpenBLASLibs.0.2.19.3/build/native/x64/haswell/bin
+````
+
+Note: the end of this path was changed to add `/bin` instead of /include or /lib.  The bin folder is where the actual DLL's live and it is the DLL's that your app will need to find.  You can set this PATH locally for a given terminal window or you can add it in your system PATH if you want to.
+
 # Advanced Installation
 
 The instructions above are enough to start using ELL. For more advanced topics, like testing and generating documentation, please see our [advanced installation instructions](INSTALL-Advanced.md).

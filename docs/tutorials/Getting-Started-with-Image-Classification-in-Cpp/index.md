@@ -44,11 +44,11 @@ Download this [compressed ELL model file](https://github.com/Microsoft/ELL-model
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
 ```
 
-Unzip the compressed file and rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`:
-
+Unzip the compressed file and rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`
+using `unzip model.ell.zip` then rename it:
 ```
-[Unix] unzip model.ell.zip` <br> `mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
-[Windows] unzip model.ell.zip` <br> `ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+[Linux/OSX] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+[Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 ```
 
 (One Windows, unzip is part of the Git distribution, for example, in `\Program Files\Git\usr\bin`.)
@@ -184,7 +184,7 @@ Allocate a vector to store the model's output.
 
 Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user hits any key. At the start of every loop iteration, read an image from the camera:
 
-```cpp:
+```cpp
     while (cv::waitKey(1) == 0xFF)
     {
         cv::Mat image = getImageFromCamera(camera);
@@ -281,6 +281,7 @@ make
 cd ..
 ```
 
+**Note:** for this to work you must have installed `libopencv-dev` as per the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 
 ## Step 7: Classify live video on the Raspberry Pi
 
@@ -294,6 +295,11 @@ You should see a window similar to the screenshot at the top of this page. Point
 
 If you copied the full source for [tutorial.cpp](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/tutorial.cpp),
 you will also see the average time in milliseconds it takes the model to process a frame.
+
+There is also an option to process a static image, if you copy one to your Pi you can run this:
+````
+tutorial categories.txt schoolbus.png
+````
 
 ## Next steps
 
