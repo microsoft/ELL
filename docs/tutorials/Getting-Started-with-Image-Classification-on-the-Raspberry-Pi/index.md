@@ -206,7 +206,7 @@ At this point, you should have a `pi3` directory that contains a `cmake` project
 
 ## Step 6: Write code to invoke the model on the Raspberry Pi
 
-We will write a Python script that invokes the model and runs the demo on the Raspberry Pi. The script will load the Python wrapper that we created above, read images from the camera, pass these images to the model, and display the classification results. If you just want the full script, copy it from [here](/ELL/tutorials/shared/tutorial.py). Otherwise, create an empty text file named `tutorial.py` and copy in the code snippets below. 
+We will write a Python script that invokes the model and runs the demo on the Raspberry Pi. The script will load the Python wrapper that we created above, read images from the camera, pass these images to the model, and display the classification results. If you just want the full script, copy it from [here](/ELL/tutorials/shared/tutorial.py). Otherwise, create an empty text file named `tutorial.py` in the `pi3` directory and copy in the code snippets below. 
 
 First, import a few dependencies, including system utilities, OpenCV, and NumPy.
 
