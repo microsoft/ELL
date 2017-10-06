@@ -42,7 +42,7 @@ Copy the following files to your Pi.
 - [cats.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/cats.txt)
 - [tutorialHelpers.py](/ELL/tutorials/shared/tutorialHelpers.py)
 
-Additionally, download or record `.wav` sound files of a dog bark and a cat meow (for example, try this [bark](http://freesound.org/people/davidmenke/sounds/231762/) and this [meow](http://freesound.org/people/blimp66/sounds/397661/) ). Name the bark sound file `woof.wav` and the meow sound file `meow.wav`.
+Additionally, download or record `.wav` sound files of a dog bark and a cat meow (for example, try this [bark](http://freesound.org/people/davidmenke/sounds/231762/) and this [meow](https://freesound.org/people/tuberatanka/sounds/110011/)). Name the bark sound file `woof.wav` and the meow sound file `meow.wav`.
 
 ## Step 2: Write a script 
 
