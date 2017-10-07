@@ -7,8 +7,6 @@ permalink: /tutorials/Comparing-image-classification-models-side-by-side-on-the-
 
 In this tutorial, we will download two models from the [ELL gallery](/ELL/gallery/) and run them side-by-side on a Raspberry Pi. Some of the models on the gallery are slower abd accurate, while others are faster but less accurate. Running two models as once allows us to get a sense of their relative speeds and accuracies. Specifically, we will compare a standard (real valued) Convolutional Neural Network to a Neural Network that contains binarized layers. The binarized model is smaller and faster, but less accurate. 
 
----
-
 ![screenshot](Screenshot.jpg)
 
 #### Materials
