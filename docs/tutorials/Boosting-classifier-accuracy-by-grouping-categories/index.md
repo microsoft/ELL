@@ -68,7 +68,7 @@ Also, import the Python module for the compiled ELL model.
 import model
 ```
 
-As in previous tutorials, define a helper functions that reads images from the camera.
+As in previous tutorials, define a helper function that reads images from the camera.
 
 ```python
 def get_image_from_camera(camera):
@@ -182,7 +182,7 @@ We'll use OpenCV to get a histogram using OpenCV as a quick way to detect whethe
         if diff >= significantDiff and now - lastPredictionTime > 2:
 ```
 
-Send the processed image to the model and its array of predictions.
+Send the processed image to the model get and its array of predictions.
 
 ```python
             model.predict(input, predictions)
