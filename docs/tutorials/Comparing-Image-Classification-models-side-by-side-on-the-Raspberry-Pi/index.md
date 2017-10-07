@@ -32,7 +32,7 @@ In this tutorial, we will download two models from the [ELL gallery](/ELL/galler
 If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your anaconda environment.  
 
 ```
-[Linux/Mac] source activate py36
+[Linux/macOS] source activate py36
 [Windows] activate py36 
 ```
 
@@ -103,7 +103,7 @@ success, now you can build the 'model2' folder
 Also copy a few helper functions to the `pi3` directory.
 
 ```
-[Linux/Mac] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
+[Linux/macOS] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
 [Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
 ```
 

@@ -55,7 +55,7 @@ unzip model.ell.zip
 Then, rename it.
 
 ```
-[Linux/Mac] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+[Linux/macOS] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 [Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 ```
 
@@ -97,7 +97,7 @@ The directory also contains a `CMakeLists.txt` file that defines a CMake project
 Copy additional C++ helper code that makes it easier to send images to the model.
 
 ```
-[Linux/Mac] cp ../../../docs/tutorials/Getting-Started-with-Image-Classification-in-Cpp/*.h .
+[Linux/macOS] cp ../../../docs/tutorials/Getting-Started-with-Image-Classification-in-Cpp/*.h .
 [Windows] copy ..\..\..\docs\tutorials\Getting-Started-with-Image-Classification-in-Cpp\*.h .
 ```
 

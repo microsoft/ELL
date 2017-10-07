@@ -31,7 +31,7 @@ In this tutorial, we will download a pre-trained image classification model from
 If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your Anaconda environment. 
 
 ```
-[Linux/Mac] source activate py36
+[Linux/macOS] source activate py36
 [Windows] activate py36
 ```
 
@@ -62,7 +62,7 @@ unzip model.ell.zip
 Rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`:
 
 ```
-[Linux/Mac] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+[Linux/macOS] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 [Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 ```
 
@@ -105,7 +105,7 @@ cd build
 To finish creating the Python wrapper, build the `cmake` project. 
 
 ```
-[Linux/Mac] cmake .. && make
+[Linux/macOS] cmake .. && make
 [Windows] cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell .. && cmake --build . --config release
 ```
 
@@ -198,7 +198,7 @@ python "../../tools/wrap/wrap.py" categories.txt model.ell -lang python -target 
 The `wrap` tool creates a new directory named `pi3`, which contains a CMake project that can be used to build the desired Python module. This time, we need to build this project on the Raspberry Pi. Before moving to the Pi, we also want to copy over some Python helper code: 
 
 ```
-[Linux/Mac] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
+[Linux/macOS] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
 [Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
 ```
 
