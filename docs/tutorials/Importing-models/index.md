@@ -6,7 +6,7 @@ permalink: /tutorials/Importing-models/
 
 # Importing models
 
-*by Byron Changuion*
+*by Chris Lovett and Byron Changuion*
 
 The [ELL gallery](/ELL/gallery/) includes different pre-trained ELL models for you to download and use. However, you may also want to train your own models. In this tutorial, we will import Neural Network models that were trained with the [Microsoft Cognitive Toolkit (CNTK)](https://www.microsoft.com/en-us/cognitive-toolkit/) or with [Darknet](https://pjreddie.com/darknet/). 
 
