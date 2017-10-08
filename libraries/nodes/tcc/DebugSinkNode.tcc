@@ -49,7 +49,7 @@ namespace ell
         void DebugSinkNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
         {
             llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-            auto userData = function.Pointer(_userData);
+            auto userData = function.Pointer((char*)_userData);
 
             // EvaluateInput defaults to 'pass through' in base implementation, which means
             // we always call the sink function
@@ -57,28 +57,22 @@ namespace ell
             {
                 const emitters::NamedVariableTypeList parameters = { { "label", emitters::GetVariableType<char*>() },
                                                                      { "output", emitters::GetVariableType<ValueType>() },
-                                                                     { "userData", emitters::GetVariableType<void*>() } };
+                                                                     { "userData", emitters::GetVariableType<char*>() } };
 
-                // Callback signature: void DebugSinkNode(char* label, ValueType t, void* userData)
+                // Callback signature: void DebugSinkNode(char* label, ValueType t, char* userData)
                 function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
-
                 llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
-                DEBUG_EMIT_PRINTF(function, _sinkFunctionName + "\n");
-
                 function.Call(pSinkFunction, { function.Literal(_label), pInput, userData });
             }
             else
             {
                 const emitters::NamedVariableTypeList parameters = { { "label", emitters::GetVariableType<char*>() },
                                                                      { "output", emitters::GetPointerType(emitters::GetVariableType<ValueType>()) },
-                                                                     { "userData", emitters::GetVariableType<void*>() } };
+                                                                     { "userData", emitters::GetVariableType<char*>() } };
 
-                // Callback signature: void DebugSinkNode(char* label, ValueType* array, void* userData)
+                // Callback signature: void DebugSinkNode(char* label, ValueType* array, char* userData)
                 function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
-
                 llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
-                DEBUG_EMIT_PRINTF(function, _sinkFunctionName + "\n");
-
                 function.Call(pSinkFunction, { function.Literal(_label), function.PointerOffset(pInput, function.Literal(0)), userData });
             }
 

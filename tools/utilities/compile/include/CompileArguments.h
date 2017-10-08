@@ -46,8 +46,8 @@ struct CompileArguments
     bool optimize = true;
     bool useBlas = false;
     bool fuseLinearOperations = true;
-    bool enableParallelFor = true;
-    bool enableVectorization = true;
+    bool enableParallelFor = false;
+    bool enableVectorization = false;
     int vectorWidth = 4;
 
     // target machine options

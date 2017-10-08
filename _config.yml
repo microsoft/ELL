@@ -9,6 +9,8 @@ author:
 #  url:        https://github.com/Microsoft/ELL 
 
 # Gems
+plugins:
+  - jekyll-relative-links
 
 destination: ./_site
 plugins_dir:     ./_plugins
@@ -17,6 +19,9 @@ data_dir: ./_data
 
 source: docs
 
+relative_links:
+  enabled:     true
+  collections: false
 
 # Handling Reading
 safe:         false
@@ -76,3 +81,5 @@ kramdown:
 
 sass:
     sass_dir: _sass
+
+
