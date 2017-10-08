@@ -20,6 +20,7 @@ sys.path.append("model1")
 sys.path.append("model1/build/Release")
 sys.path.append("model2")
 sys.path.append("model2/build/Release")
+
 import model1
 import model2
 

@@ -17,6 +17,7 @@ import cv2
 scriptPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(scriptPath)
 sys.path.append(os.path.join(scriptPath, 'build'))
+sys.path.append(os.path.join(scriptPath, 'build/Release')) # required for Windows
 
 # Import the Python wrapper for the ELL model
 import model
