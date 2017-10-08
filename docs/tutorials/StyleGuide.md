@@ -53,9 +53,10 @@ Use consistent terminology within a tutorial and across tutorials.
 For example:
 
 * classifier, classification function, predictor, hypothesis, model
-* folder, directory, subdirectory
+* folder, directory, subdirectory, sub-directory
 * USB power supply, USB power adapter, USB wall-wart
 * webcam, USB cam, cam, camera
+* app, application, demo
 * tensor dimensions, tensor sizes, tensor shape
 
  These are lists of terms that are usually interchangeable. We choose one term (often arbitrarily) and stick to it across our tutorials (unless there's a good reason not to). Look at other tutorials to see which term is already in use. 
