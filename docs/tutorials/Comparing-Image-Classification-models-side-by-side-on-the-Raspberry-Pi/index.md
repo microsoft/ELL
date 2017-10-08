@@ -31,7 +31,7 @@ In this tutorial, we will download two models from the [ELL gallery](/ELL/galler
 
 If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your anaconda environment.  
 
-```
+```shell
 [Linux/macOS] source activate py36
 [Windows] activate py36 
 ```
@@ -80,13 +80,14 @@ There should now be `model1.ell` and `model2.ell` files as well as a `categories
 
 Use the `wrap.py` tool to compile the models and create Python wrappers. We'll use the `--outdir` option to put the models into different directories.
 
-````
+```shell
 python ../../tools/wrap/wrap.py categories.txt model1.ell -lang python -target pi3 -outdir model1
 python ../../tools/wrap/wrap.py categories.txt model2.ell -lang python -target pi3 -outdir model2
-````
+```
+
 You should see output similar to the following:
 
-````
+```
 compiling model...
 generating python interfaces for model1 in model1
 running opt...
@@ -98,11 +99,11 @@ generating python interfaces for model2 in model2
 running opt...
 running llc...
 success, now you can build the 'model2' folder
-````
+```
 
 Also copy a few helper functions to the `pi3` directory.
 
-```
+```shell
 [Linux/macOS] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
 [Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
 ```
@@ -278,7 +279,7 @@ cd ../..
 
 If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an anaconda environment named `py34`. Activate it and run the script that we wrote above. 
 
-```
+```shell
 source activate py34
 python sideBySide.py
 ```

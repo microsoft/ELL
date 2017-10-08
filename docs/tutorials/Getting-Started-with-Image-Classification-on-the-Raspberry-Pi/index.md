@@ -30,14 +30,14 @@ In this tutorial, we will download a pre-trained image classification model from
 
 If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your Anaconda environment. 
 
-```
+```shell
 [Linux/macOS] source activate py36
 [Windows] activate py36
 ```
 
 Then, cd into the directory where you built ELL and create a `tutorials` directory. In that directory, create another directory named `tutorial1`.
 
-```
+```shell
 cd ELL/build
 mkdir tutorials
 cd tutorials
@@ -49,26 +49,26 @@ cd tutorial1
 
 Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip) into the `tutorial1` directory. The model file contains a pre-trained Deep Neural Network for image classification, and is one of the models available from the [ELL gallery](/ELL/gallery). The file's long name indicates the Neural Network's architecture, but don't worry about that for now and save it locally as `model.ell.zip`. 
 
-```
+```shell
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
 ```
 
 Unzip the compressed file. On Windows, note that the `unzip` utility is distributed as part of Git, for example, in `\Program Files\Git\usr\bin`.
 
-```
+```shell
 unzip model.ell.zip
 ```
 
 Rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`:
 
-```
+```shell
 [Linux/macOS] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 [Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 ```
 
 Next, download the file with the [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) for this model into the `tutorial1` directory. The 1000 categories in this file are the types of objects that the model is trained to recognize.
 
-```
+```shell
 curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
 ```
 
@@ -80,7 +80,7 @@ Before deploying the model to the Raspberry Pi, we will practice deploying it to
 
 Run `wrap` as follows.
 
-```
+```shell
 python "../../tools/wrap/wrap.py" categories.txt model.ell -lang python -target host
 ```
 
@@ -96,7 +96,7 @@ success, now you can build the 'host' folder
 
 The `wrap` tool creates a `cmake` project in a new directory named `host`. Create a `build` directory inside the `host` directory and change to that directory
 
-```
+```shell
 cd host
 mkdir build
 cd build
@@ -104,7 +104,7 @@ cd build
 
 To finish creating the Python wrapper, build the `cmake` project. 
 
-```
+```shell
 [Linux/macOS] cmake .. && make
 [Windows] cmake -G "Visual Studio 14 2015 Win64" -DPROCESSOR_HINT=haswell .. && cmake --build . --config release
 ```
@@ -197,7 +197,7 @@ python "../../tools/wrap/wrap.py" categories.txt model.ell -lang python -target 
 
 The `wrap` tool creates a new directory named `pi3`, which contains a CMake project that can be used to build the desired Python module. This time, we need to build this project on the Raspberry Pi. Before moving to the Pi, we also want to copy over some Python helper code: 
 
-```
+```shell
 [Linux/macOS] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
 [Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
 ```
@@ -318,7 +318,7 @@ We are ready to move to the Raspberry Pi. If your Pi is accessible over the netw
 
 Log into your Raspberry Pi, find the `pi3` directory you just copied from your computer, and build the python module that wraps the ELL model.
 
-```
+```shell
 cd pi3
 mkdir build
 cd build
@@ -333,7 +333,7 @@ We just created a Python module named `model`, which includes functions that rep
 
 If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an anaconda environment named `py34`. Activate it and run the script that we wrote above. 
 
-```
+```shell
 source activate py34
 python tutorial.py
 ```

@@ -242,7 +242,7 @@ if __name__ == "__main__":
 
 If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an anaconda environment named `py34`. Activate the environment and run the script.   
 
-```
+```shell
 source activate py34
 python pets.py
 ```

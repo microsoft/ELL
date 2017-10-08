@@ -25,14 +25,14 @@ The [ELL gallery](/ELL/gallery/) includes different pre-trained ELL models for y
 
 If you followed the setup instructions, you should have an environment named `py36`. Open a terminal window and activate your Anaconda environment. 
 
-```
+```shell
 [Linux/macOS] source activate py36
 [Windows] activate py36
 ```
 
 We recommend using Curl to download files. If Curl isn't installed in your Anaconda environment, install it as follows. 
 
-```
+```shell
 conda install curl
 ```
 
@@ -42,19 +42,19 @@ Choose whether you want to import a model from the CNTK file format or the Darkn
 
 A Neural Network model in the CNTK file format can be converted into an ELL model using the *cntk_import.py* Python script, found in the `ELL/tools/importers/cntk` directory. As an example, we will import one of the models available on the [CNTK website](https://www.microsoft.com/en-us/cognitive-toolkit/). First, download the model to your computer.
 
-```
+```shell
 curl --location -o model.cntk https://www.cntk.ai/Models/Caffe_Converted/VGG16_ImageNet_Caffe.model
 ```
 
 Next, run the importer script, making sure to provide the CNTK model as a command line parameter.
 
-```
+```shell
 python "~/ELL/tools/importers/cntk/cntk_import.py" model.cntk
 ```
 
 You should see some output like this as the model is being imported. 
 
-````
+```
 Loading...
 Selected CPU as the process wide default device.
 
@@ -93,13 +93,13 @@ Softmax :  1x1x1000  ->  1x1x1 | input padding 0  output padding 0
 
 Finished pre-processing.
 Saving model file: 'model.ell'
-````
+```
 
 When the script finishes running, a new file named `model.ell` will appear in your directory. This ELL model file is a JSON file that contains both the model configuration and the model weights. 
 
 In addition to the model, also download the categories file, which contains the names of the categories predicted by the model, and which we require below.
 
-```
+```shell
 curl --location -o categories.txt https://raw.githubusercontent.com/Microsoft/ELL-models/master/models/ILSVRC2012/ILSVRC2012_labels.txt
 ```
 
@@ -107,14 +107,14 @@ curl --location -o categories.txt https://raw.githubusercontent.com/Microsoft/EL
 
 A Neural Network model in the Darknet file format can be converted into an ELL model using the *darknet_import.py* Python script, found in the `ELL/tools/importers/darknet` directory. As an example, we will import the Darknet reference model, available from the [Darknet website](https://pjreddie.com/darknet/). First, download the model to your computer.
 
-```
+```shell
 curl --location -o model.cfg https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg
 curl --location -o model.weights https://pjreddie.com/media/files/darknet.weights
 ```
 
 Next, run the importer script, making sure to provide the model configuration file (.cfg) and model weights files (.weights) as command line parameters.
 
-```
+```shell
 python "~/ELL/tools/importers/darknet/darknet_import.py" model.cfg model.weights
 ```
 
@@ -144,7 +144,7 @@ When the script finishes running, a new file named `model.ell` will appear in yo
 
 In addition to the model, also download the categories file, which contains the names of the categories predicted by the model, and which we require below.
 
-```
+```shell
 curl --location -o categories.txt https://raw.githubusercontent.com/pjreddie/darknet/master/data/imagenet.shortnames.list
 ```
 
