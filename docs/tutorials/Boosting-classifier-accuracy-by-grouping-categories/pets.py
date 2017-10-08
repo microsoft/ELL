@@ -32,15 +32,6 @@ def get_image_from_camera(camera):
         return frame
     return None
 
-# Return an array of strings corresponding to the model's recognized categories or classes.
-# The order of the strings in this file are expected to match the order of the
-# model's output predictions.
-def get_categories_from_file(fileName):
-    labels = []
-    with open(fileName) as f:
-        labels = f.read().splitlines()
-    return labels
-
 # Returns True if an element of the comma separated label `a` is an element of the comma separated label `b`
 def labels_match(a, b):
     x = [s.strip().lower() for s in a.split(',')]

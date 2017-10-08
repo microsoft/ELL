@@ -13,11 +13,11 @@ ELL is a software library and an accompanying set of software tools, written in 
 git clone https://github.com/Microsoft/ELL.git
 ```
 
-While the goal of ELL is to deploy software onto resource constrained platforms and small single-board computers, most of the interaction with ELL occurs on a laptop or desktop computer (Windows, Ubuntu Linux, or Mac). Technically, you can think of ELL as a cross-compiler for embedded intelligence - the compiler itself runs on your laptop or desktop computer and the machine code that it generates runs on your single-board computer.
+While the goal of ELL is to deploy software onto resource constrained platforms and small single-board computers, most of the interaction with ELL occurs on a laptop or desktop computer (Windows, Ubuntu Linux, or macOS). Technically, you can think of ELL as a cross-compiler for embedded intelligence - the compiler itself runs on your laptop or desktop computer and the machine code that it generates runs on your single-board computer.
 
 ## Installation and Setup
 Install ELL on a
-[Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), or [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)
+[Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), or [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)
 laptop or desktop computer. If you intend to deploy models onto a Raspberry Pi, follow our instruction on [setting up the Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 
 ## Getting Started

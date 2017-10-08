@@ -23,7 +23,7 @@ In this tutorial, we will take an image classification model that was trained to
 
 #### Prerequisites
 
-* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
+* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
 * Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 * Complete the basic tutorial, [Getting started with image classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), to learn how to produce a Python wrapper for an ELL model.
 
@@ -31,7 +31,7 @@ In this tutorial, we will take an image classification model that was trained to
 
 The pre-trained models in the [ELL gallery](/ELL/gallery/) are trained to identify 1000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). Often times, we are only interested in a subset of these categories and we don't require the fine-grained categorization that the model was trained to provide. For example, we may want to distinguish between images of dogs versus images of cats, whereas the model is actually trained to distinguish between several different varieties of cats and over 100 different dog breeds.
 
-The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate for the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will write a script that grabs a frame from a camera, plays a barking sound when it recognizes one of the dog varieties, and plays a meow sound when it recognizes one of the cat varieties.
+The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate for the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will write a script that grabs a frame from a camera, plays a barking sound when it recognizes a dog, and plays a meow sound when it recognizes a cat.
 
 ## Step 1: Deploy a pre-trained model on the Raspberry Pi
 

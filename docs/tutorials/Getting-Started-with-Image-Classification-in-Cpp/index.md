@@ -22,7 +22,7 @@ In this tutorial, we will download a pretrained image classification model from 
 
 #### Prerequisites
 
-* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [Mac](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). Specifically, this tutorial requires ELL, CMake, and Python 3.6. Note that Python is required to run a tool named `wrap.py`, which makes compilation easy. If you prefer not to use `wrap.py`, you can perform the compilation steps manually, as described in the [wrap tool documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
+* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). Specifically, this tutorial requires ELL, CMake, and Python 3.6. Note that Python is required to run a tool named `wrap.py`, which makes compilation easy. If you prefer not to use `wrap.py`, you can perform the compilation steps manually, as described in the [wrap tool documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
 * Follow the instructions for [setting up your Raspberry Pi](/ELL/tutorials/Setting-up-your-Raspberry-Pi).
 * *optional* - Read through the instructions in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/).
 

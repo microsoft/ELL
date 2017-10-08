@@ -28,7 +28,7 @@ Connect your Pi to the network, either over Wifi or with an Ethernet cable. We w
 ### CMake
 We use CMake on the Raspberry Pi to create Python modules that can be called from our tutorial code. To install CMake on your Pi, connect to the network, open a terminal window, and type
 
-```
+```shell
 sudo apt-get update
 sudo apt-get install -y cmake
 ```
@@ -36,14 +36,14 @@ sudo apt-get install -y cmake
 ### OpenBLAS
 OpenBLAS is a library for fast linear algebra operations, which can significantly increase the speed of your models. It is optional, but highly recommended. To install OpenBLAS, type the following.
 
-```
+```shell
 sudo apt-get install -y libopenblas-dev
 ```
 
 ### Python 3.4 via Miniconda
 Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). We recommend using the [Miniconda](https://conda.io/miniconda.html) distribution of Python, which makes it easy to install any required Python modules. To install Miniconda, type the following. 
 
-```
+```shell
 wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
 chmod +x Miniconda3-latest-Linux-armv7l.sh
 ./Miniconda3-latest-Linux-armv7l.sh
@@ -51,7 +51,7 @@ chmod +x Miniconda3-latest-Linux-armv7l.sh
 
 When prompted to install, reply [yes] to add Miniconda3 to your PATH. Next create an environment, as follows.
 
-```
+```shell
 source ~/.bashrc
 conda create --name py34 python=3.4
 source activate py34
@@ -62,25 +62,25 @@ Remember to run `source activate py34` each time you start a new terminal window
 ### OpenCV
 [OpenCV](http://opencv.org/) is a computer vision library that enables us to read images from a camera, resize them, and prepare them for processing by ELL. To install OpenCV, type the following.
 
-```
+```shell
 conda install -c microsoft-ell opencv
 ```
 
 By default, OpenCV can read images from a USB webcam, but not from the Raspberry Pi camera. To enable the Pi camera, first make sure that the camera interface is enabled by running the Pi configuration tool. 
 
-```
+```shell
 sudo raspi-config
 ```
 
 Select `5 Interfacing Options`, hit `Enter`, select `P1 Camera` and hit `Enter` again. Select `Yes` to enable the camera interface. Then, load the camera module, as follows.
 
-```
+```shell
 sudo modprobe bcm2835-v4l2
 ```
 
 To run the `C++` tutorials you also need the C++ OpenCV SDK, which you can install on your Raspberry Pi using the following command. 
 
-```
+```shell
 sudo apt-get install libopencv-dev
 ```
 
@@ -89,7 +89,7 @@ Our tutorials require copying files to run on the Pi. A typical way to copy file
 
 To enable SSH on your Pi, run the Pi configuration tool.
 
-```
+```shell
 sudo raspi-config
 ```
 
@@ -103,7 +103,7 @@ Raspberry Pis weren't designed to run AI workloads. Many AI workloads, like visu
 
 Edit the file `~/.config/lxsession/LXDE-pi/autostart`, for example, by typing
 
-```
+```shell
 leafpad ~/.config/lxsession/LXDE-pi/autostart
 ```
 
@@ -121,7 +121,7 @@ The first line disables energy star and the next two lines disable the screensav
 
 The Raspberry Pi supports dynamic clocking, which means that it can change the processor frequency according to processor load. You can check the range of processor frequencies that your Raspberry Pi is configured for by typing `lscpu`. To disable dynamic clocking, edit `/boot/config.txt`, for example, by typing
 
-```
+```shell
 sudo leafpad /boot/config.txt
 ```
 
@@ -141,7 +141,7 @@ If you do fit your Pi with an active cooling attachment, you can also increase t
 
 To change your processor frequency, edit `/boot/config.txt`, for example, by typing the following. 
 
-```
+```shell
 sudo leafpad /boot/config.txt
 ```
 
@@ -153,7 +153,7 @@ arm_freq=600
 
 The change takes effect after a reboot. Once the Pi reboots, you can confirm the change using the utility `lscpu`. To check if a frequency of 600MHz is slow enough, run your AI workload and measure the processor temperature. Measuring temperature can be done as follows.
 
-```
+```shell
 watch /opt/vc/bin/vcgencmd measure_temp
 ```
 
