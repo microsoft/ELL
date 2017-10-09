@@ -12,7 +12,7 @@ In this tutorial, we will download a pre-trained image classification model from
 
 ---
 
-![screenshot](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/Screenshot.png)
+![screenshot](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/Screenshot.jpg)
 
 #### Materials
 
