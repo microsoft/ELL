@@ -12,8 +12,8 @@ The voice should be informal and friendly, but don't try to be hip or clever. Av
 
 Convey all useful information, but prefer to do so in a brief and concise way.    
 
-* Good: "Raspian throttles the processor speed when under heavy load to protect itself from overheating."
-* Not as good: "Raspian has an extensive internal logic that allows is to adapt the processor speed according to the amount of computational load at any given moment - when the processor is under heavy load it clocks itself down to prevent overheating, which can lead to severe and permanent damage." 
+* Good: "Raspbian throttles the processor speed when under heavy load to protect itself from overheating."
+* Not as good: "Raspbian has an extensive internal logic that allows is to adapt the processor speed according to the amount of computational load at any given moment - when the processor is under heavy load it clocks itself down to prevent overheating, which can lead to severe and permanent damage." 
 
 #### Don't say its easy
 
@@ -69,7 +69,7 @@ When possible, write linear step-by-step instructions. Avoid foreshadowing the f
 
 1. Skip end punctuation on titles and lists
 2. Include a comma after each item in a list. "Shake, rattle, and roll"
-3. Capitalize the first word of a sentence and any proper nouns (Python, CMake, Raspian, Pi). Avoid title case, even in titles
+3. Capitalize the first word of a sentence and any proper nouns (Python, CMake, Raspbian, Pi). Avoid title case, even in titles
 4. Use bullets for lists, not as a way to emphasize text
 5. Don't use too many colons 
 
