@@ -261,3 +261,4 @@ LaunchXslt/obj/**
 /_site/
 /.sass-cache/
 Gemfile.lock
+ProfileResults/
