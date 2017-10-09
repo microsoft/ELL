@@ -1,0 +1,125 @@
+---
+layout: default
+title: 128x128x3 Convolutional Neural Network
+permalink: /gallery/ILSVRC2012/d_I128x128x3CMCMCMCMCMCMC1A
+---
+
+[Back to Gallery](/ELL/gallery)
+
+## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (52.06% top 1 accuracy, 76.43% top 5 accuracy, 0.17s/frame on Raspberry Pi 3)
+
+<table>
+    <tr>
+        <td> Download </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I128x128x3CMCMCMCMCMCMC1A/d_I128x128x3CMCMCMCMCMCMC1A.ell.zip">d_I128x128x3CMCMCMCMCMCMC1A.ell.zip</a></td>
+    </tr>
+    <tr>
+        <td> Accuracy </td>
+        <td colspan="3"> ILSVRC2012: 76.43% (Top 5), 52.06% (Top 1) </td>
+    </tr>
+    <tr>
+        <td> Performance </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.17s/frame</td>
+    </tr>
+    <tr>
+        <td> Uncompressed Size </td>
+        <td colspan="3"> 38MB </td>
+    </tr>
+    <tr>
+        <td> Input </td>
+        <td colspan="3"> 128 x 128 x {B,G,R} </td>
+    </tr>
+    <tr>
+        <td rowspan="17"> Architecture </td>
+        <tr>
+	<td>Convolution</td>
+	<td>&#8680; 128x128x16</td>
+	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+</tr>
+<tr>
+	<td>Pooling</td>
+	<td>&#8680; 64x64x16</td>
+	<td>size=2x2, stride=2, operation=max</td>
+</tr>
+<tr>
+	<td>Convolution</td>
+	<td>&#8680; 64x64x64</td>
+	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+</tr>
+<tr>
+	<td>Pooling</td>
+	<td>&#8680; 32x32x64</td>
+	<td>size=2x2, stride=2, operation=max</td>
+</tr>
+<tr>
+	<td>Convolution</td>
+	<td>&#8680; 32x32x64</td>
+	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+</tr>
+<tr>
+	<td>Pooling</td>
+	<td>&#8680; 16x16x64</td>
+	<td>size=2x2, stride=2, operation=max</td>
+</tr>
+<tr>
+	<td>Convolution</td>
+	<td>&#8680; 16x16x128</td>
+	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+</tr>
+<tr>
+	<td>Pooling</td>
+	<td>&#8680; 8x8x128</td>
+	<td>size=2x2, stride=2, operation=max</td>
+</tr>
+<tr>
+	<td>Convolution</td>
+	<td>&#8680; 8x8x256</td>
+	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+</tr>
+<tr>
+	<td>Pooling</td>
+	<td>&#8680; 4x4x256</td>
+	<td>size=2x2, stride=2, operation=max</td>
+</tr>
+<tr>
+	<td>Convolution</td>
+	<td>&#8680; 4x4x512</td>
+	<td>size=3x3, stride=1, type=float32, activation=leaky relu</td>
+</tr>
+<tr>
+	<td>Pooling</td>
+	<td>&#8680; 2x2x512</td>
+	<td>size=2x2, stride=2, operation=max</td>
+</tr>
+<tr>
+	<td>Convolution</td>
+	<td>&#8680; 2x2x1024</td>
+	<td>size=1x1, stride=1, type=float32, activation=leaky relu</td>
+</tr>
+<tr>
+	<td>Convolution</td>
+	<td>&#8680; 2x2x1000</td>
+	<td>size=1x1, stride=1, type=float32</td>
+</tr>
+<tr>
+	<td>Pooling</td>
+	<td>&#8680; 1x1x1000</td>
+	<td>size=2x2, stride=1, operation=average</td>
+</tr>
+<tr>
+	<td>Softmax</td>
+	<td>&#8680; 1x1x1000</td>
+	<td></td>
+</tr>
+
+    </tr>
+    <tr>
+        <td> Output </td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt">ILSVRC2012 1000 classes</a> </td>
+    </tr>
+    <tr>
+        <td> Notes </td>
+        <td colspan="3"> Trained by Juan Lema using CNTK 2.1 </td>
+    </tr>
+</table>
+
