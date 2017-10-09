@@ -30,7 +30,10 @@ namespace nodes
     ///
     /// In device-side compiled code, the function signature should be:
     /// ```
-    /// void DebugSinkFunction(char* label, ValueType* input, void* userData)
+    /// void DebugSinkFunction(char* label, ValueType* input, char* userData);
+    ///
+    /// Note: the userData argument in the compiled code is char* instead of void* because LLVM doesn't consider pointer-to-void to be a valid type
+    ///   (for some versions of LLVM, at least)
     /// ```
     template<typename ValueType>
     using DebugSinkFunction = std::function<void(const std::string&, const std::vector<ValueType>&, void* userData)>;

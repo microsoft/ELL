@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     CompareArguments.h (print)
+//  File:     CompareArguments.h (debugCompiler)
 //  Authors:  Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,14 +30,17 @@ struct CompareArguments
 
     // output options
     std::string outputDirectory = "";
-    bool writeReport = false;
-    bool writeGraph = false;
+    bool writeReport = true;
+    bool writeGraph = true;
+    bool writePrediction = true;
 
-    // compilation parameters
+    // compilation options
     bool optimize = true;
-    bool useBlas = false;
-    bool allowVectorInstructions = false;
+    bool useBlas = true;
     bool fuseLinearOperations = true;
+    bool enableParallelFor = false;
+    bool enableVectorization = false;
+    int vectorWidth = 4;
 };
 
 /// <summary> Arguments for parsed print. </summary>

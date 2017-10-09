@@ -39,7 +39,7 @@ namespace neural
         /// <summary> Parameters common to all layers. </summary>
         struct InputParameters
         {
-            /// <summary> Shape of the input tensor.. </summary>
+            /// <summary> Shape of the input tensor. </summary>
             Shape inputShape;
 
             /// <summary> The padding requirements for the input. </summary>

@@ -231,8 +231,37 @@ namespace math
     }
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    bool ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::IsContiguous() const
+    {
+        auto layoutShape = TensorLayoutT::ShapeToLayout(GetShape());
+        return layoutShape[0] == _contents.increments[0] && layoutShape[1] == _contents.increments[1];
+    }
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     std::vector<ElementType> ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::ToArray() const
     {
+        if(!IsContiguous())
+        {
+            auto resultLayout = TensorLayoutT::ShapeToLayout(GetShape());
+            auto resultInc0 = resultLayout[0];
+            auto resultInc1 = resultLayout[0] * resultLayout[1];
+
+            std::vector<ElementType> result(NumRows() * NumColumns() * NumChannels());
+            for (size_t i = 0; i < NumRows(); ++i)
+            {
+                for (size_t j = 0; j < NumColumns(); ++j)
+                {
+                    for (size_t k = 0; k < NumChannels(); ++k)
+                    {
+                        auto val = (*this)(i, j, k);
+                        auto layoutCoordinate = TensorLayoutT::ShapeToLayout({i, j, k});
+                        auto resultIndex = layoutCoordinate[0] + layoutCoordinate[1] * resultInc0 + layoutCoordinate[2] * resultInc1;
+                        result[resultIndex] = val;
+                    }
+                }
+            }                
+            return result;
+        }
         return { _contents.pData, _contents.pData + Size() };
     }
 
@@ -278,7 +307,6 @@ namespace math
     {
         _contents.pData = pData;
     }
-
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     ElementType& TensorReference<ElementType, dimension0, dimension1, dimension2>::operator()(size_t row, size_t column, size_t channel)

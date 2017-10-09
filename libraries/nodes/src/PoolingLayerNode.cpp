@@ -74,20 +74,25 @@ namespace nodes
         }
     } // end anonymous namespace
 
+    //
+    // MaxPoolingFunction
+    //
     template <typename ValueType>
     class MaxPoolingFunction
     {
     public:
-        MaxPoolingFunction(emitters::IRFunctionEmitter& function, int staticCount)
+        MaxPoolingFunction(emitters::IRFunctionEmitter& function, bool useZeroMaxPadding, int staticCount)
         {
             auto valueType = emitters::GetVariableType<ValueType>();
             _accumValueVar = function.Variable(valueType, "poolingAccumValue");
+            _paddingValue = useZeroMaxPadding ? function.Literal<ValueType>(0) : function.Literal<ValueType>(std::numeric_limits<ValueType>::lowest());
+            _initialValue = function.Literal<ValueType>(std::numeric_limits<ValueType>::lowest());
             Reset(function, staticCount);
         }
 
         void Reset(emitters::IRFunctionEmitter& function, int count)
         {
-            function.Store(_accumValueVar, function.Literal(-(std::numeric_limits<ValueType>::max())));
+            function.Store(_accumValueVar, _initialValue);
         }
 
         void Accumulate(emitters::IRFunctionEmitter& function, llvm::Value* value)
@@ -102,7 +107,7 @@ namespace nodes
 
         llvm::Value* GetValueAtPadding(emitters::IRFunctionEmitter& function)
         {
-            return function.Literal<ValueType>(-(std::numeric_limits<ValueType>::max()));
+            return _paddingValue;
         }
 
         llvm::Value* GetValue(emitters::IRFunctionEmitter& function)
@@ -112,13 +117,18 @@ namespace nodes
 
     private:
         llvm::Value* _accumValueVar;
+        llvm::Value* _initialValue;
+        llvm::Value* _paddingValue;
     };
 
+    //
+    // MeanPoolingFunction
+    //
     template <typename ValueType>
     class MeanPoolingFunction
     {
     public:
-        MeanPoolingFunction(emitters::IRFunctionEmitter& function, int staticCount)
+        MeanPoolingFunction(emitters::IRFunctionEmitter& function, bool /* useZeroMaxPadding */, int staticCount)
             : _count(staticCount)
         {
             auto valueType = emitters::GetVariableType<ValueType>();
@@ -225,6 +235,16 @@ namespace nodes
         // Number of cells in this pooling window
         int numCells = (windowRowEnd - windowRowBegin) * (windowColumnEnd - windowColumnBegin);
         poolingFunction.Reset(function, numCells);
+
+        // Window size and stride
+        auto poolingParameters = this->GetLayer().GetPoolingParameters();
+        int windowSize = poolingParameters.poolingSize;
+
+        bool hasFullWindow = (numCells == windowSize * windowSize);
+        if (!hasFullWindow) // TODO: check that this is a max-pooling layer node
+        {
+            poolingFunction.Accumulate(function, poolingFunction.GetValueAtPadding(function));
+        }
 
         // Double-loop to iterate over each entry in the pooling window. The middle of the window is (0,0)
         for (int poolingRow = windowRowBegin; poolingRow < windowRowEnd; ++poolingRow) // in [-w/2, w/2]
@@ -415,13 +435,14 @@ namespace nodes
         int windowSize = poolingParameters.poolingSize;
 
         // Create the pooling function
+        bool useZeroMaxPadding = true; 
         using FType = typename PoolingFunctionT<PoolingFunctionType, ValueType>::type;
-        FType poolingFunction{ function, windowSize * windowSize };
+        FType poolingFunction{ function, useZeroMaxPadding, windowSize * windowSize };
 
-        // These are the amount that the pooling window extends to the left and right of the center pixel.
+        // These "window extent" variables indicate the amount that the pooling window extends to the left and right (or top/bottom) of the center pixel.
         //   posWindowExtent is always floor(windowSize/2)
         //   If the pooling window size is odd, negWindowExtent == -posWindowExtent,
-        //   if the pooling window size is even, negWindowExtent = -(posWindowExtent - 1)
+        //   if the pooling window size is even, negWindowExtent == -(posWindowExtent - 1)
         const int negWindowExtent = ((-windowSize + 1) / 2);
         const int posWindowExtent = windowSize / 2;
 

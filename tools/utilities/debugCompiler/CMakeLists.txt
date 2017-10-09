@@ -7,7 +7,6 @@ set (tool_name debugCompiler)
 
 set (src 
   src/CompareArguments.cpp
-  src/CompareUtils.cpp
   src/main.cpp
   src/ModelComparison.cpp
   src/visualizeReport.py
@@ -15,13 +14,11 @@ set (src
 
 set (include
   include/CompareArguments.h
-  include/CompareUtils.h
   include/ModelComparison.h
   include/VectorStatistics.h
 )
     
 set (tcc 
-  tcc/CompareUtils.tcc
   tcc/VectorStatistics.tcc
 )
 
@@ -34,7 +31,7 @@ set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
 set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
 add_executable(${tool_name} ${src} ${include} ${tcc})
 target_include_directories(${tool_name} PRIVATE include imageConverter utilities)
-target_link_libraries(${tool_name} utilities model nodes common imageConverter)
+target_link_libraries(${tool_name} utilities math model nodes common imageConverter)
 copy_shared_libraries(${tool_name})
 
 set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/utilities")
