@@ -143,17 +143,17 @@ static cv::Mat GetImageFromCamera(cv::VideoCapture& camera)
 // Read a file of strings
 static std::vector<std::string> ReadLinesFromFile(const std::string& filename)
 {
-    std::vector<std::string> categories;
+    std::vector<std::string> lines;
+    std::string line;
 
     std::ifstream file(filename);
-    std::string line;
 
     while (std::getline(file, line))
     {
-        if (line.length() > 0) categories.emplace_back(line);
+        if (line.length() > 0) lines.emplace_back(line);
     }
 
-    return categories;
+    return lines;
 }
 ```
 
