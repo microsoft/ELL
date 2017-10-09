@@ -39,7 +39,7 @@ def main():
     camera = cv2.VideoCapture(0)
 
     # Read the category names
-    categories = open('categories.txt', 'r').readlines()
+    categories = open('categories.txt', 'r').read().splitlines()
 
     # Get the model's input shape. We will use this information later to resize images appropriately.
     input_shape = model.get_default_input_shape()
@@ -71,7 +71,7 @@ def main():
         top5 = helpers.get_top_n(predictions, 5)
 
         # Generate header text that represents the top5 predictions
-        headerText = "".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] for element in top5])
+        headerText = ", ".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] for element in top5])
         helpers.draw_header(image, headerText)
 
         # Generate footer text that represents the mean evaluation time

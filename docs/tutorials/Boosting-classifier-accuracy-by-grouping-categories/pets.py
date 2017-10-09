@@ -76,7 +76,7 @@ def main():
     camera = cv2.VideoCapture(0)
 
     # Read the category names
-    categories = open('categories.txt', 'r').readlines()
+    categories = open('categories.txt', 'r').read().splitlines()
     dogs = open('dogs.txt', 'r').readlines()
     cats = open('cats.txt', 'r').readlines()
 

@@ -39,7 +39,7 @@ def main():
     camera = cv2.VideoCapture(0)
 
     # Read the category names
-    categories = open('categories.txt', 'r').readlines()
+    categories = open('categories.txt', 'r').read().splitlines()
 
     # Define the models we'll be using
     models = [model1, model2]    
@@ -95,7 +95,7 @@ def main():
 
             # Draw header text that represents the top5 predictions
             modelFrame = np.copy(image)
-            headerText = "".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] + "  " for element in top5])
+            headerText = ", ".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] + "  " for element in top5])
             helpers.draw_header(modelFrame, headerText)
 
             # Draw footer text representing the mean evaluation time
