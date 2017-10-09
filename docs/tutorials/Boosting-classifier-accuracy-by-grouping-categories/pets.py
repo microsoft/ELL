@@ -77,8 +77,8 @@ def main():
 
     # Read the category names
     categories = open('categories.txt', 'r').read().splitlines()
-    dogs = open('dogs.txt', 'r').readlines()
-    cats = open('cats.txt', 'r').readlines()
+    dogs = open('dogs.txt', 'r').read().splitlines()
+    cats = open('cats.txt', 'r').read().splitlines()
 
     # Get the model's input dimensions. We'll use this information later to resize images appropriately.
     inputShape = model.get_default_input_shape()

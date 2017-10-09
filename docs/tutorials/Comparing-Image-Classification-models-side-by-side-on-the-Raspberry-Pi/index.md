@@ -159,7 +159,7 @@ def main():
 Read the file of category names.
 
 ```python
-    categories = open('categories.txt', 'r').readlines()
+    categories = open('categories.txt', 'r').read().splitlines()
 ```
 
 Define an array to hold the models.
@@ -230,7 +230,7 @@ As before, the `predict` method fills the `predictionsArray[modelIndex]` array w
 `top5` is an array of tuples, where the first element is the category index and the second element is the probability of that category. Match the category indices in `top5` with the category names in `categories`.
 
 ```python
-            headerText = "".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] + "  " for element in top5])
+            headerText = ", ".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] + "  " for element in top5])
 ```
 
 Use the `draw_header` helper function to write the predicted category on the image. Since each model will write its own result, we make a copy of the input image.

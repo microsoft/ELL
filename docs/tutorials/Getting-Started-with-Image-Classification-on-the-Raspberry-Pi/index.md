@@ -178,7 +178,7 @@ model.predict(input, predictions)
 The `predict` method fills the `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Print the index of the highest confidence category.
 
 ```python
-categories = open('categories.txt', 'r').readlines()
+categories = open('categories.txt', 'r').read().splitlines()
 predictionIndex = int(np.argmax(predictions))
 print("Category index: " + str(predictionIndex))
 print("Category name: " + categories[predictionIndex])
@@ -252,7 +252,7 @@ def main():
 Read the file of category names.
 
 ```python
-    categories = open('categories.txt', 'r').readlines()
+    categories = open('categories.txt', 'r').read().splitlines()
 ```
 
 The model expects its input in a certain shape. Get this shape and store it for use later on. 
@@ -296,7 +296,7 @@ As before, the `predict` method fills the `predictions` array with the model out
 `top5` is an array of tuples, where the first element in each tuple is the category index and the second element is the probability of that category. Match the category indices in `top5` with the corresponding names in `categories` and construct a string that represents the model output.
 
 ```python
-        headerText = "".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] for element in top5])
+        headerText = ", ".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] for element in top5])
 ```
 
 Use the `draw_header` helper function to display the predicted category on the Raspberry Pi's display. Also display the camera image. 

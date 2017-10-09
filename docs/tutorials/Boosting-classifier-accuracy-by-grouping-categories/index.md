@@ -130,9 +130,9 @@ Define the main entry point and start the camera.
 Read the category names from `categories.txt`, the list of dog breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
 
 ```python
-    categories = open('categories.txt', 'r').readlines()
-    dogs = open('dogs.txt', 'r').readlines()
-    cats = open('cats.txt', 'r').readlines()
+    categories = open('categories.txt', 'r').read().splitlines()
+    dogs = open('dogs.txt', 'r').read().splitlines()
+    cats = open('cats.txt', 'r').read().splitlines()
 ```
 
 Get the model input and output shapes and allocate an array to hold the model output. 
