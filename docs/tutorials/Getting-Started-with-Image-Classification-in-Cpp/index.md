@@ -160,7 +160,7 @@ static std::vector<std::string> ReadLinesFromFile(const std::string& filename)
 Define the `main` function and start the camera.
 
 ```cpp
-int main(int argc, char** argv )
+int main(int argc, char** argv)
 {
     cv::VideoCapture camera(0);
 ```
@@ -225,7 +225,7 @@ Use the `DrawHeader` helper function to display the predicted category on the Ra
 ```cpp
         tutorialHelpers::DrawHeader(image, headerText.str());
         cv::imshow("ELL model", image);
-    };
+    }
     return 0;
 }
 ```

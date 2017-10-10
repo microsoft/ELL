@@ -37,7 +37,7 @@ static std::vector<std::string> ReadLinesFromFile(const std::string& filename)
 {
     std::vector<std::string> lines;
     std::string line;
-    
+
     std::ifstream file(filename);
 
     while (std::getline(file, line))
@@ -48,7 +48,7 @@ static std::vector<std::string> ReadLinesFromFile(const std::string& filename)
     return lines;
 }
 
-int main(int argc, char** argv )
+int main(int argc, char** argv)
 {
     // Open the video camera. To use a different camera, change the camera index.
     cv::VideoCapture camera(0);
@@ -102,7 +102,7 @@ int main(int argc, char** argv )
 
         // Display the image
         cv::imshow("ELL model", image);
-    };
+    }
 
     std::cout << "Mean prediction time: " << meanTimeToPredict << "ms/frame" << std::endl;
 
