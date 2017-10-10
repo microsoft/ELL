@@ -78,7 +78,7 @@ int main(int argc, char** argv)
         // - Convert the OpenCV result to a std::vector<float>
         auto input = tutorialHelpers::PrepareImageForModel(image, inputShape.columns, inputShape.rows);
 
-        // Invoke the model, measure how long it takes
+        // Send the image to the compiled model and fill the predictions vector with scores, measure how long it takes
         auto start = std::chrono::steady_clock::now();
         model_predict(input, predictions);
         auto end = std::chrono::steady_clock::now();

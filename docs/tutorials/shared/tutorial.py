@@ -62,7 +62,7 @@ def main():
         # - Convert the OpenCV result to a std::vector<float>
         input = helpers.prepare_image_for_model(image, input_shape.columns, input_shape.rows)
 
-        # Invoke the model, measure how long it takes
+        # Send the image to the compiled model and fill the predictions vector with scores, measure how long it takes
         start = time.time()
         model.predict(input, predictions)
         end = time.time()

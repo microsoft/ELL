@@ -167,7 +167,7 @@ int main(int argc, char** argv)
     cv::VideoCapture camera(0);
 ```
 
-Use the function we defined above to read the category names from the `categories.txt` file.
+The argument `0` in the function call above selects the default camera. If you have more than one camera connected to your Pi, choose which camera to use by changing this argument. Next, read the category names from the `categories.txt` file.
 
 ```cpp
     auto categories = ReadLinesFromFile("categories.txt");

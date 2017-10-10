@@ -251,7 +251,7 @@ def main():
     camera = cv2.VideoCapture(0)
 ```
 
-Read the file of category names.
+The argument `0` in the function call above selects the default camera. If you have more than one camera connected to your Pi, choose which camera to use by changing this argument. Next, read the category names from the `categories.txt` file.
 
 ```python
     categories = open('categories.txt', 'r').read().splitlines()
