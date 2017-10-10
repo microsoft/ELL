@@ -40,7 +40,7 @@ cd cppTutorial
 
 ## Step 2: Download a pre-trained model
 
-Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip) into the `tutorial1` directory. The model file contains a pre-trained Deep Neural Network for image classification, and is one of the models available from the [ELL gallery](/ELL/gallery). The file's long name indicates the Neural Network's architecture, but don't worry about that for now and save it locally as `model.ell.zip`.
+Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip) into the `cppTutorial` directory. The model file contains a pre-trained Deep Neural Network for image classification, and is one of the models available from the [ELL gallery](/ELL/gallery). The file's long name indicates the Neural Network's architecture, but don't worry about that for now and save it locally as `model.ell.zip`.
 
 ```shell
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
@@ -59,11 +59,13 @@ Then, rename it.
 [Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 ```
 
-Next, download the file of [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) that correspond to this model into the `cppTutorial` directory.
+Next, download the `categories.txt` file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) and save it in the `cppTutorial` directory.
 
 ```shell
 curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
 ```
+
+This file contains the names of the 1000 categories that the model is trained to recognize. For example, if the model recognizes an object of category 504, we can read line 504 of `categories.txt` and see that the name of the recognized category is `coffee mug`. 
 
 There should now be a `model.ell` file and a `categories.txt` file in the `cppTutorial` directory.
 

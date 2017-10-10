@@ -66,11 +66,13 @@ Rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`:
 [Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
 ```
 
-Next, download the file with the [category names](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) for this model into the `tutorial1` directory. The 1000 categories in this file are the types of objects that the model is trained to recognize.
+Next, download the `categories.txt` file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) and save it in the `tutorial1` directory.
 
 ```shell
 curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
 ```
+
+This file contains the names of the 1000 categories that the model is trained to recognize. For example, if the model recognizes an object of category 504, we can read line 504 of `categories.txt` and see that the name of the recognized category is `coffee mug`. 
 
 There should now be a `model.ell` file and a `categories.txt` file in the `tutorial1` directory.
 
@@ -185,7 +187,7 @@ print("Category name: " + categories[predictionIndex])
 print("Confidence: " + str(predictions[predictionIndex]))
 ```
 
-This code also looks up the category name by reading the corresponding line in `categories.txt`. For example, if the highest confidence category is 504, line 504 of `categories.txt` is `coffee mug`. The value at `predictions[504]` is the model's confidence that the image contains a coffee mug. For example, a value of `0.514353` means that the model is 51% confident that the image contains a coffee mug.
+This code also looks up the category name in the `categories` array. For example, say that the highest confidence category is category 504. The string in `categories[504]` is the name of category 504, which happens to be `coffee mug`. The value at `predictions[504]` is the model's confidence that the image contains a coffee mug.
 
 ## Step 5: Compile the model for execution on the Raspberry Pi
 
