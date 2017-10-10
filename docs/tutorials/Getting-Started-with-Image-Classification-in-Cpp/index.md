@@ -287,7 +287,11 @@ cd ..
 
 ## Step 7: Classify live video on the Raspberry Pi
 
-Make sure that a camera is connected to your Pi and run the `tutorial` program. 
+Make sure that a camera is connected to your Pi and run the program.
+
+```shell
+build/tutorial
+``` 
 
 You should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and other types of animals.
 
