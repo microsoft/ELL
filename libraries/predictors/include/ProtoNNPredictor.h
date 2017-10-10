@@ -141,10 +141,6 @@ namespace predictors
     private:
         math::ColumnVector<double> GetLabelScores(const DataVectorType& inputVector) const;
 
-        static void WriteMatrixToArchive(utilities::Archiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> M);
-
-        static math::ColumnMatrix<double> ReadMatrixFromArchive(utilities::Unarchiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel);
-
         // Input dimension
         size_t _dimension;
 
