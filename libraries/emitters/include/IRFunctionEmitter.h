@@ -25,13 +25,6 @@ namespace emitters
     class IRFunctionEmitter
     {
     public:
-        IRFunctionEmitter() = default;
-
-        IRFunctionEmitter(const IRFunctionEmitter&) = default;
-        IRFunctionEmitter(IRFunctionEmitter&&) = default;
-        IRFunctionEmitter& operator=(const IRFunctionEmitter&) = default;
-        IRFunctionEmitter& operator=(IRFunctionEmitter&&) = default;
-
         /// <summary> Query if this IRFunctionEmitter is valid. </summary>
         ///
         /// <returns> True if valid, false if not. </returns>

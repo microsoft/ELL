@@ -86,7 +86,7 @@ namespace data
 
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
-            /// <returns> true if it succeeds, false if it fails. </returns>
+            /// <returns> true if the iterator is currently pointing to a valid iterate. </returns>
             virtual bool IsValid() const override { return _current < _end; }
 
             /// <summary> Proceeds to the Next iterate. </summary>
