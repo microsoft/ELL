@@ -75,17 +75,27 @@ namespace nodes
     } // end anonymous namespace
 
     //
+    // Note: the pooling function constructors take a `staticCount` parameter. This parameter
+    // tells how many valid data values the function will be evaluated over in order to compute 
+    // the output of one pooling window. It's currently only used to determine the denominator for the 
+    // mean pooling. The pooling functions are able to work in a mode where they know ahead of time
+    // how many values they'll be evaluated over, and also in a mode where they have to count it
+    // dynamically. If nonnegative, the `staticCount` parameter tells how many times the function
+    // will be called (via `Accumulate`) for one pooling window. If `staticCount` < 0, then the function
+    // operates in the dynamic mode where it keeps a count of the number of times its been called. 
+
+    //
     // MaxPoolingFunction
     //
     template <typename ValueType>
     class MaxPoolingFunction
     {
     public:
-        MaxPoolingFunction(emitters::IRFunctionEmitter& function, bool useZeroMaxPadding, int staticCount)
+        MaxPoolingFunction(emitters::IRFunctionEmitter& function, int staticCount, ValueType paddingValue = 0)
         {
             auto valueType = emitters::GetVariableType<ValueType>();
             _accumValueVar = function.Variable(valueType, "poolingAccumValue");
-            _paddingValue = useZeroMaxPadding ? function.Literal<ValueType>(0) : function.Literal<ValueType>(std::numeric_limits<ValueType>::lowest());
+            _paddingValue = function.Literal<ValueType>(paddingValue);
             _initialValue = function.Literal<ValueType>(std::numeric_limits<ValueType>::lowest());
             Reset(function, staticCount);
         }
@@ -128,12 +138,14 @@ namespace nodes
     class MeanPoolingFunction
     {
     public:
-        MeanPoolingFunction(emitters::IRFunctionEmitter& function, bool /* useZeroMaxPadding */, int staticCount)
+        MeanPoolingFunction(emitters::IRFunctionEmitter& function, int staticCount, ValueType paddingValue = 0)
             : _count(staticCount)
         {
             auto valueType = emitters::GetVariableType<ValueType>();
+            _paddingValue = function.Literal(paddingValue);
             _accumValueVar = function.Variable(valueType, "poolingAccumValue");
-            _countVar = _count > 0 ? function.Variable(emitters::VariableType::Int32, "poolingAccumCount") : nullptr;
+            // if we don't know how many times we'll be called, create a variable (_countVar) to keep track
+            _countVar = staticCount < 0 ? function.Variable(emitters::VariableType::Int32, "poolingAccumCount") : nullptr;
             Reset(function, staticCount);
         }
 
@@ -160,12 +172,8 @@ namespace nodes
 
         llvm::Value* GetValueAtPadding(emitters::IRFunctionEmitter& function)
         {
-            if (_countVar == nullptr)
-            {
-                assert(false && "GetValueAtPadding shouldn't be called for this pooling function");
-                // TODO: throw
-            }
-            return function.Literal<ValueType>(0);
+            assert(_countVar != nullptr && "GetValueAtPadding shouldn't be called for this pooling function");
+            return _paddingValue;
         }
 
         llvm::Value* GetValue(emitters::IRFunctionEmitter& function)
@@ -181,6 +189,7 @@ namespace nodes
         }
 
     private:
+        llvm::Value* _paddingValue;
         llvm::Value* _accumValueVar;
         llvm::Value* _countVar;
         int _count;
@@ -203,6 +212,12 @@ namespace nodes
     {
         using type = MeanPoolingFunction<ValueType>;
     };
+
+    template <template <typename> class PoolingFunctionType, typename ValueType>
+    bool IsMaxPoolingFunction(const PoolingFunctionType<ValueType>& function)
+    {
+        return std::is_same<PoolingFunctionType<ValueType>, MaxPoolingFunction<ValueType>>();
+    }
 
     //
     // PoolingLayerNode
@@ -241,7 +256,7 @@ namespace nodes
         int windowSize = poolingParameters.poolingSize;
 
         bool hasFullWindow = (numCells == windowSize * windowSize);
-        if (!hasFullWindow) // TODO: check that this is a max-pooling layer node
+        if (!hasFullWindow && IsMaxPoolingFunction(poolingFunction))
         {
             poolingFunction.Accumulate(function, poolingFunction.GetValueAtPadding(function));
         }
@@ -435,9 +450,8 @@ namespace nodes
         int windowSize = poolingParameters.poolingSize;
 
         // Create the pooling function
-        bool useZeroMaxPadding = true; 
         using FType = typename PoolingFunctionT<PoolingFunctionType, ValueType>::type;
-        FType poolingFunction{ function, useZeroMaxPadding, windowSize * windowSize };
+        FType poolingFunction{ function, windowSize * windowSize }; // Create the pooling function with a 'full' pooling window. 
 
         // These "window extent" variables indicate the amount that the pooling window extends to the left and right (or top/bottom) of the center pixel.
         //   posWindowExtent is always floor(windowSize/2)
