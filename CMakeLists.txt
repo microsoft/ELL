@@ -37,21 +37,18 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Set global compilation flags
-if(NOT WIN32 AND NOT CYGWIN)
-  add_compile_options("-fvisibility-inlines-hidden")
-endif()
-
-# Set Visual Studio-specific options
-if(MSVC)
+if(MSVC) 
+  # Set Visual Studio-specific options
   add_definitions(-DUNICODE)
   add_compile_options(/MP)
   add_compile_options(/bigobj)
-endif()
-
-# Set options so we don't get visibility warnings with LLVM
-if(NOT WIN32 AND NOT CYGWIN)
-  add_compile_options("-fvisibility-inlines-hidden")
+  add_compile_options(/W4)
+else() 
+  # Set Clang/GCC-specific options
+  add_compile_options(-Wall)
+  add_compile_options(-Wno-missing-braces)
+  add_compile_options(-Wmissing-field-initializers)
+  add_compile_options(-fvisibility-inlines-hidden)
 endif()
 
 # Turn on ctest tests
