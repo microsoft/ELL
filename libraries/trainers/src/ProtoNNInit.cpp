@@ -63,12 +63,10 @@ namespace trainers
 
     double ProtoNNInit::InitializeGamma(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> D, double gammaInit)
     {
-        auto numValues = D.NumRows() * D.NumColumns();
-        assert(numValues > 0);
-        std::vector<double> values;
-        values.assign(D.GetDataPointer(), D.GetDataPointer() + (size_t)(numValues));
+        auto values = D.ToArray();
+        assert(values.size() > 0);
         std::sort(values.begin(), values.end());
-        auto median = values[numValues / 2];
+        auto median = values[values.size() / 2];
         auto rbfWidth = 2.5;
         return gammaInit * (rbfWidth / std::sqrt(-1.0 * std::log(median)));
     }

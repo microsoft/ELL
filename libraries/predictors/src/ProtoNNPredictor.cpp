@@ -81,38 +81,18 @@ namespace predictors
     {
         archiver["dim"] << _dimension;
         archiver["gamma"] << _gamma;
-        WriteMatrixToArchive(archiver, "w_rows", "w_columns", "w_data", _W);
-        WriteMatrixToArchive(archiver, "b_rows", "b_columns", "b_data", _B);
-        WriteMatrixToArchive(archiver, "z_rows", "z_columns", "z_data", _Z);
+        math::MatrixArchiver::Write(_W, "w", archiver);
+        math::MatrixArchiver::Write(_B, "b", archiver);
+        math::MatrixArchiver::Write(_Z, "z", archiver);
     }
 
     void ProtoNNPredictor::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         archiver["dim"] >> _dimension;
         archiver["gamma"] >> _gamma;
-        _W = ReadMatrixFromArchive(archiver, "w_rows", "w_columns", "w_data");
-        _B = ReadMatrixFromArchive(archiver, "b_rows", "b_columns", "b_data");
-        _Z = ReadMatrixFromArchive(archiver, "z_rows", "z_columns", "z_data");
-    }
-
-    void ProtoNNPredictor::WriteMatrixToArchive(utilities::Archiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel, math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> M)
-    {
-        archiver[rowLabel] << M.NumRows();
-        archiver[colLabel] << M.NumColumns();
-        std::vector<double> temp;
-        temp.assign(M.GetDataPointer(), M.GetDataPointer() + (size_t)(M.NumRows() * M.NumColumns()));
-        archiver[dataLabel] << temp;
-    }
-
-    math::ColumnMatrix<double> ProtoNNPredictor::ReadMatrixFromArchive(utilities::Unarchiver& archiver, std::string rowLabel, std::string colLabel, std::string dataLabel)
-    {
-        size_t w_rows = 0;
-        size_t w_columns = 0;
-        archiver[rowLabel] >> w_rows;
-        archiver[colLabel] >> w_columns;
-        std::vector<double> temp;
-        archiver[dataLabel] >> temp;
-        return math::ColumnMatrix<double>(w_rows, w_columns, temp);
+        math::MatrixArchiver::Read(_W, "w", archiver);
+        math::MatrixArchiver::Read(_B, "b", archiver);
+        math::MatrixArchiver::Read(_Z, "z", archiver);
     }
 }
 }
