@@ -22,7 +22,7 @@ namespace nodes
     {
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     MatrixMatrixMultiplyNode<ValueType>::MatrixMatrixMultiplyNode(const model::PortElements<ValueType>& input1, size_t m, size_t n, size_t k, size_t matrix1Stride, const model::PortElements<ValueType>& input2, size_t matrix2Stride, size_t outputMatrixStride)
         : CompilableNode({ &_input1, &_input2 }, { &_output }), _input1(this, input1, input1PortName), _input2(this, input2, input2PortName), _output(this, outputPortName, m * n), _m(m), _n(n), _k(k), _lda(matrix1Stride), _ldb(matrix2Stride), _ldc(outputMatrixStride), _transpose1(false), _transpose2(false)
     {
@@ -52,7 +52,7 @@ namespace nodes
         }
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Compute() const
     {
         assert(!_transpose1 && !_transpose2 && "MatrixMatrixMultiplyNode::Compute() with transposed matrix not yet implemented!");
@@ -73,7 +73,7 @@ namespace nodes
         _output.SetOutput(outputMatrixValues);
     };
 
-    template <typename ValueType>
+    template<typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         auto PortElements1 = transformer.TransformPortElements(_input1.GetPortElements());
@@ -82,7 +82,7 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {  
         llvm::Value* pInput1 = compiler.EnsurePortEmitted(input1);
@@ -92,7 +92,7 @@ namespace nodes
         function.CallGEMM<ValueType>(_transpose1, _transpose2, (int)_m, (int)_n, (int)_k, pInput1, (int)_lda, pInput2, (int)_ldb, pOutput, (int)_ldc);
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
@@ -109,7 +109,7 @@ namespace nodes
         archiver["transpose2"] << _transpose2;
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);

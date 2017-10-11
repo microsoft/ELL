@@ -76,7 +76,7 @@ namespace nodes
         std::vector<PackedBitsType> GetCompressedInputPaddingMask() const;
 
         std::vector<int> GetInputPaddingMaskSums() const;
-        
+
         template <typename PackedBitsType>
         model::PortElements<ValueType> AddRefinedNodes(model::ModelTransformer& transformer, const model::PortElements<ValueType>& input) const;
     };
@@ -207,6 +207,23 @@ namespace nodes
         virtual void Copy(model::ModelTransformer& transformer) const override;
         void Compute() const override;
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        void ComputeFilterOutput(model::IRMapCompiler& compiler,
+                                 emitters::IRFunctionEmitter& function,
+                                 llvm::Value* pInput,
+                                 llvm::Value* pFilterWeights,
+                                 llvm::Value* pFilterMeans,
+                                 llvm::Value* pInputPaddingMask,
+                                 llvm::Value* pInputPaddingMaskSums,
+                                 llvm::Value* pOutput,
+                                 llvm::Value* filterIndex,
+                                 bool hasZeroPadding,
+                                 int outputColumns,
+                                 int packedRowSize,
+                                 int packedRowStride,
+                                 bool useVectorInstructions,
+                                 int vectorSize,
+                                 int numVectorBlocks);
+
         virtual bool HasState() const override { return true; } // stored state: convolutional parameters and input/output memory layouts
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
@@ -221,6 +238,8 @@ namespace nodes
                            int startBlock,
                            int numBlocks,
                            bool hasZeroPadding);
+
+        emitters::IRFunctionEmitter GetTaskFunction(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 
         // Input
         model::InputPort<PackedBitsType> _input;

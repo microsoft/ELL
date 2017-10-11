@@ -13,6 +13,7 @@
 
 // common
 #include "LoadModel.h"
+#include "MapCompilerArguments.h"
 #include "ModelLoadArguments.h"
 
 // math
@@ -286,19 +287,14 @@ void WarmUpModel(model::IRCompiledMap& map, const std::vector<InputType>& input,
 }
 
 template <typename InputType, typename OutputType>
-void TimeModel(model::DynamicMap& map, const std::vector<InputType>& input, const ProfileArguments& profileArguments)
+void TimeModel(model::DynamicMap& map, const std::vector<InputType>& input, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
 {
     // Get output stream
     auto outputStream = GetOutputStream(profileArguments.outputFilename);
 
     // Compile map
-    model::MapCompilerParameters settings;
-    settings.compilerSettings.optimize = profileArguments.optimize;
-    settings.compilerSettings.useBlas = profileArguments.useBlas;
-    settings.fuseLinearFunctionNodes = profileArguments.fuseLinearOperations;
-    settings.compilerSettings.allowVectorInstructions = profileArguments.enableVectorization;
-    settings.compilerSettings.vectorWidth = profileArguments.vectorWidth;
-    settings.profile = true;
+    model::MapCompilerParameters settings = mapCompilerArguments.GetMapCompilerParameters("");
+    settings.profile = false;
     model::IRMapCompiler compiler(settings);
 
     std::cout << "Compiling model" << std::endl;
@@ -332,7 +328,7 @@ void TimeModel(model::DynamicMap& map, const std::vector<InputType>& input, cons
 }
 
 template <typename InputType, typename OutputType>
-void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments)
+void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
 {
     const bool printTimingChart = profileArguments.timingOutputFilename != "";
     auto profileOutputStream = GetOutputStream(profileArguments.outputFilename);
@@ -346,17 +342,12 @@ void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArgumen
     // for that option
     if (profileArguments.summaryOnly)
     {
-        TimeModel<InputType, OutputType>(map, input, profileArguments);
+        TimeModel<InputType, OutputType>(map, input, profileArguments, mapCompilerArguments);
         return;
     }
 
     // Compile map
-    model::MapCompilerParameters settings;
-    settings.compilerSettings.optimize = profileArguments.optimize;
-    settings.compilerSettings.useBlas = profileArguments.useBlas;
-    settings.fuseLinearFunctionNodes = profileArguments.fuseLinearOperations;
-    settings.compilerSettings.allowVectorInstructions = profileArguments.enableVectorization;
-    settings.compilerSettings.vectorWidth = profileArguments.vectorWidth;
+    model::MapCompilerParameters settings = mapCompilerArguments.GetMapCompilerParameters("");
     settings.profile = true;
     model::IRMapCompiler compiler(settings);
 
@@ -425,21 +416,21 @@ void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArgumen
 }
 
 template <typename InputType>
-void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments)
+void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
 {
     switch (map.GetOutputType())
     {
         case model::Port::PortType::smallReal:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments);
+            ProfileModel<InputType, model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments);
             break;
         case model::Port::PortType::real:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::real>>(map, profileArguments);
+            ProfileModel<InputType, model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments);
             break;
         case model::Port::PortType::integer:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::integer>>(map, profileArguments);
+            ProfileModel<InputType, model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments);
             break;
         case model::Port::PortType::bigInt:
-            ProfileModel<InputType, model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments);
+            ProfileModel<InputType, model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments);
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported output type");
@@ -449,21 +440,21 @@ void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArgumen
 //
 // Load the map and process it
 //
-void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments)
+void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArguments, const common::MapCompilerArguments& mapCompilerArguments)
 {
     switch (map.GetInputType())
     {
         case model::Port::PortType::smallReal:
-            ProfileModel<model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments);
+            ProfileModel<model::ValueType<model::Port::PortType::smallReal>>(map, profileArguments, mapCompilerArguments);
             break;
         case model::Port::PortType::real:
-            ProfileModel<model::ValueType<model::Port::PortType::real>>(map, profileArguments);
+            ProfileModel<model::ValueType<model::Port::PortType::real>>(map, profileArguments, mapCompilerArguments);
             break;
         case model::Port::PortType::integer:
-            ProfileModel<model::ValueType<model::Port::PortType::integer>>(map, profileArguments);
+            ProfileModel<model::ValueType<model::Port::PortType::integer>>(map, profileArguments, mapCompilerArguments);
             break;
         case model::Port::PortType::bigInt:
-            ProfileModel<model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments);
+            ProfileModel<model::ValueType<model::Port::PortType::bigInt>>(map, profileArguments, mapCompilerArguments);
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Model has an unsupported input type");
@@ -482,6 +473,10 @@ int main(int argc, char* argv[])
         commandLineParser.AddOptionSet(mapLoadArguments);
         ParsedProfileArguments profileArguments;
         commandLineParser.AddOptionSet(profileArguments);
+        common::ParsedMapCompilerArguments compileArguments;
+        commandLineParser.AddDocumentationString("Code generation options");
+        commandLineParser.AddOptionSet(compileArguments);
+        commandLineParser.DisableOption("--profile");
         commandLineParser.Parse();
 
         // if no input specified, print help and exit
@@ -493,7 +488,7 @@ int main(int argc, char* argv[])
 
         // load map file
         auto map = common::LoadMap(mapLoadArguments);
-        ProfileModel(map, profileArguments);
+        ProfileModel(map, profileArguments, compileArguments);
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

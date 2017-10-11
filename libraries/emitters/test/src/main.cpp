@@ -6,8 +6,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "AsyncEmitterTest.h"
 #include "IREmitterTest.h"
 #include "IRFunctionTest.h"
+#include "PosixEmitterTest.h"
 
 // testing
 #include "testing.h"
@@ -25,17 +27,34 @@ void TestIR()
     TestLogical();
     TestMutableConditionForLoop();
     TestMetadata();
+    TestHeader();
+    TestTwoEmitsInOneSession();
+    TestStruct();
 
     // From IRFunctionTest.h
     TestIRAddFunction();
     TestIRFunction();
-    TestHeader();
-    TestTwoEmitsInOneSession();
+}
+
+void TestAsyncEmitter()
+{
+    TestIRAsyncTask();
+}
+
+void TestPosixEmitter()
+{
+    TestPthreadSelf();
+    TestPthreadCreate();
 }
 
 int main(int argc, char* argv[])
 {
+    TestStruct();
+    return 0;
+
     TestIR();
+    TestAsyncEmitter();
+    TestPosixEmitter();
 
     if (testing::DidTestFail())
     {

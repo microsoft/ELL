@@ -56,9 +56,9 @@ namespace emitters
         global, /// <summary> Global variable </summary>
         heap, /// <summary> Heap allocated variable </summary>
         rValue, /// <summary> Variable returned by a helper function </summary>
+
         input, /// <summary> Input function argument </summary>
         output /// <summary> Output function argument </summary>
-
     };
 
     /// <summary>

@@ -13,6 +13,7 @@ endif()
 set (src 
     src/EmitterTypes.cpp
     src/IRAssemblyWriter.cpp
+    src/IRAsyncTask.cpp
     src/IRBlockRegion.cpp
     src/IRDiagnosticHandler.cpp
     src/IREmitter.cpp
@@ -25,8 +26,10 @@ set (src
     src/IRMetadata.cpp
     src/IRModuleEmitter.cpp
     src/IROptimizer.cpp
+    src/IRPosixRuntime.cpp
     src/IRRuntime.cpp
     src/IRSwigInterfaceWriter.cpp
+    src/LLVMUtilities.cpp
     src/ModuleEmitter.cpp
     src/TargetDevice.cpp
     src/Variable.cpp
@@ -38,6 +41,7 @@ set (include
     include/EmitterException.h
     include/EmitterTypes.h
     include/IRAssemblyWriter.h
+    include/IRAsyncTask.h
     include/IRBlockRegion.h
     include/IRDiagnosticHandler.h
     include/IREmitter.h
@@ -50,6 +54,7 @@ set (include
     include/IRModuleEmitter.h
     include/IRMetadata.h
     include/IROptimizer.h
+    include/IRPosixRuntime.h
     include/IRRuntime.h
     include/IRSwigInterfaceWriter.h
     include/LLVMInclude.h
@@ -103,13 +108,17 @@ endif()
 
 set (test_src
   test/src/main.cpp
+  test/src/AsyncEmitterTest.cpp
   test/src/IREmitterTest.cpp
   test/src/IRFunctionTest.cpp
+  test/src/PosixEmitterTest.cpp
 )
 
 set (test_include 
+  test/include/AsyncEmitterTest.h
   test/include/IREmitterTest.h
   test/include/IRFunctionTest.h
+  test/include/PosixEmitterTest.h
 )
 
 source_group("src" FILES ${test_src})

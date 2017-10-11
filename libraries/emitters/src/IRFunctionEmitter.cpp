@@ -103,6 +103,11 @@ namespace emitters
         }
     }
 
+    llvm::Value* IRFunctionEmitter::GetFunctionArgument(const std::string& name)
+    {
+        return _locals.Get(name);
+    }
+
     void IRFunctionEmitter::Verify()
     {
         llvm::verifyFunction(*_pFunction);
@@ -121,6 +126,16 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::Cast(llvm::Value* pValue, VariableType valueType)
     {
         return _pEmitter->Cast(pValue, valueType);
+    }
+
+    llvm::Value* IRFunctionEmitter::Cast(llvm::Value* pValue, llvm::Type* valueType)
+    {
+        return _pEmitter->Cast(pValue, valueType);
+    }
+
+    llvm::Value* IRFunctionEmitter::CastPointer(llvm::Value* pValue, llvm::Type* valueType)
+    {
+        return _pEmitter->CastPointer(pValue, valueType);
     }
 
     llvm::Value* IRFunctionEmitter::CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned)
@@ -577,6 +592,12 @@ namespace emitters
         return _pEmitter->StackAllocate(type, size);
     }
 
+    llvm::AllocaInst* IRFunctionEmitter::Variable(llvm::Type* type, int size)
+    {
+        EntryBlockScope scope(*this);
+        return _pEmitter->StackAllocate(type, size);
+    }
+
     llvm::Value* IRFunctionEmitter::Load(llvm::Value* pPointer)
     {
         auto result = _pEmitter->Load(pPointer);
@@ -630,6 +651,17 @@ namespace emitters
         return _pEmitter->Store(PtrOffsetA(pPointer, pOffset), pValue);
     }
 
+    void IRFunctionEmitter::FillStruct(llvm::Value* structPtr, const std::vector<llvm::Value*>& fieldValues)
+    {
+        auto& emitter = GetEmitter();
+        auto& irBuilder = emitter.GetIRBuilder();
+        for(int index = 0; index < fieldValues.size(); ++index)
+        {
+            auto field = irBuilder.CreateInBoundsGEP(structPtr, { Literal(0), Literal(index) });
+            Store(field, fieldValues[index]);
+        }
+    }
+
     llvm::Value* IRFunctionEmitter::PtrOffsetH(llvm::Value* pointer, int offset)
     {
         return PtrOffsetH(pointer, Literal(offset));
@@ -674,6 +706,11 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::PointerOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pFieldOffset)
     {
         return _pEmitter->PointerOffset(pGlobal, pOffset, pFieldOffset);
+    }
+
+    llvm::Value* IRFunctionEmitter::GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex)
+    {
+        return _pEmitter->GetStructFieldPointer(structPtr, fieldIndex);
     }
 
     llvm::Value* IRFunctionEmitter::ValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset)
@@ -761,6 +798,26 @@ namespace emitters
         return IRIfEmitter(*this, comparison, pValue, pTestValue);
     }
 
+    IRAsyncTask IRFunctionEmitter::Async(llvm::Function* taskFunction)
+    {
+        return Async(taskFunction, {});
+    }
+
+    IRAsyncTask IRFunctionEmitter::Async(IRFunctionEmitter& taskFunction)
+    {
+        return Async(taskFunction, {});
+    }
+
+    IRAsyncTask IRFunctionEmitter::Async(llvm::Function* taskFunction, const std::vector<llvm::Value*>& arguments)
+    {
+        return IRAsyncTask(*this, taskFunction, arguments);
+    }
+
+    IRAsyncTask IRFunctionEmitter::Async(IRFunctionEmitter& taskFunction, const std::vector<llvm::Value*>& arguments)
+    {
+        return IRAsyncTask(*this, taskFunction, arguments);
+    }
+
     void IRFunctionEmitter::Optimize()
     {
         IRFunctionOptimizer optimizer(GetLLVMModule());
@@ -799,6 +856,14 @@ namespace emitters
         IRValueList callArgs;
         callArgs.push_back(_pEmitter->Literal(format));
         callArgs.insert(callArgs.end(), arguments);
+        return Call(PrintfFnName, callArgs);
+    }
+
+    llvm::Value* IRFunctionEmitter::Printf(const std::string& format, std::vector<llvm::Value*> arguments)
+    {
+        IRValueList callArgs;
+        callArgs.push_back(_pEmitter->Literal(format));
+        callArgs.insert(callArgs.end(), arguments.begin(), arguments.end());
         return Call(PrintfFnName, callArgs);
     }
 
@@ -881,18 +946,18 @@ namespace emitters
     //
     // BLAS functions
     //
-    template <typename ValueType>
+    template<typename ValueType>
     void IRFunctionEmitter::CallGEMV(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy)
     {
         CallGEMV<ValueType>(m, n, static_cast<ValueType>(1.0), A, lda, x, incx, static_cast<ValueType>(0.0), y, incy);
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void IRFunctionEmitter::CallGEMV(int m, int n, ValueType alpha, llvm::Value* A, int lda, llvm::Value* x, int incx, ValueType beta, llvm::Value* y, int incy)
     {
         auto useBlas = CanUseBlas();
         llvm::Function* gemv = GetModule().GetRuntime().GetGEMVFunction<ValueType>(useBlas);
-        if(gemv == nullptr)
+        if (gemv == nullptr)
         {
             throw EmitterException(EmitterError::functionNotFound, "Couldn't find GEMV function");
         }
@@ -914,23 +979,23 @@ namespace emitters
         Call(gemv, args);
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void IRFunctionEmitter::CallGEMM(int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
     {
         CallGEMM<ValueType>(false, false, m, n, k, A, lda, B, ldb, C, ldc);
     }
 
-    template <typename ValueType>
+    template<typename ValueType>
     void IRFunctionEmitter::CallGEMM(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
     {
         auto useBlas = CanUseBlas();
         llvm::Function* gemm = GetModule().GetRuntime().GetGEMMFunction<ValueType>(useBlas);
-        if(gemm == nullptr)
+        if (gemm == nullptr)
         {
             throw EmitterException(EmitterError::functionNotFound, "Couldn't find GEMM function");
         }
 
-        if(!useBlas && (transposeA || transposeB))
+        if (!useBlas && (transposeA || transposeB))
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Transposed matrix multiply not currently implemented in non-blas codepath");
         }
@@ -958,6 +1023,61 @@ namespace emitters
         Call(gemm, args);
     }
 
+    //
+    // Calling POSIX functions
+    //
+
+    bool IRFunctionEmitter::HasPosixFunctions() const
+    {
+        return true; // for now
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadCreate(llvm::Value* threadVar, llvm::Value* attrPtr, llvm::Function* taskFunction, llvm::Value* taskArgument)
+    {
+        auto selfFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadCreateFunction();
+        return Call(selfFunction, { threadVar, attrPtr, taskFunction, taskArgument });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadEqual(llvm::Value* thread1, llvm::Value* thread2)
+    {
+        auto equalFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadEqualFunction();
+        return Call(equalFunction, { thread1, thread2 });
+    }
+
+    void IRFunctionEmitter::PthreadExit(llvm::Value* status)
+    {
+        auto exitFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadExitFunction();
+        Call(exitFunction, { status });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadGetConcurrency()
+    {
+        auto getConcurrencyFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadGetConcurrencyFunction();
+        return Call(getConcurrencyFunction, {});
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadDetach(llvm::Value* thread)
+    {
+        auto detachFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadDetachFunction();
+        return Call(detachFunction, { thread });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadJoin(llvm::Value* thread, llvm::Value* statusOut)
+    {
+        auto joinFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadJoinFunction();
+        return Call(joinFunction, { thread, statusOut });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadSelf()
+    {
+        auto selfFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadSelfFunction();
+        return Call(selfFunction, {});
+    }
+
+    //
+    //
+    //
+
     llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)
     {
         llvm::Function* pFunction = GetLLVMModule()->getFunction(name);
@@ -979,13 +1099,13 @@ namespace emitters
         _pFunction->print(out);
     }
 
-    template <>
+    template<>
     llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::steady_clock>()
     {
         return Call(GetSteadyClockFnName, nullptr /*no arguments*/);
     }
 
-    template <>
+    template<>
     llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::system_clock>()
     {
         return Call(GetSystemClockFnName, nullptr /*no arguments*/);

@@ -33,14 +33,6 @@ struct CompareArguments
     bool writeReport = true;
     bool writeGraph = true;
     bool writePrediction = true;
-
-    // compilation options
-    bool optimize = true;
-    bool useBlas = true;
-    bool fuseLinearOperations = true;
-    bool enableParallelFor = false;
-    bool enableVectorization = false;
-    int vectorWidth = 4;
 };
 
 /// <summary> Arguments for parsed print. </summary>

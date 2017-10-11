@@ -9,6 +9,9 @@
 
 #include <string>
 
+void SetOutputPathBase(std::string path);
+std::string OutputPath(const char* pRelPath);
+
 void TestLLVM();
 void TestLLVMShiftRegister();
 void TestIfElseComplex();
@@ -18,5 +21,4 @@ void TestMutableConditionForLoop();
 void TestMetadata();
 void TestHeader();
 void TestTwoEmitsInOneSession();
-void SetOutputPathBase(std::string path);
-std::string OutputPath(const char* pRelPath);
+void TestStruct();

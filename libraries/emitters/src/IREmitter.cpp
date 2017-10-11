@@ -25,20 +25,30 @@ namespace emitters
         void ValidateArguments(llvm::Function* f, const IRValueList& args)
         {
             llvm::FunctionType* fType = f->getFunctionType();
-            int numArgs = std::min((int)args.size(), (int)fType->getNumParams());
-            for (int index = 0; index < numArgs; ++index)
+            auto numArgs = args.size();
+            if(f->isVarArg()) // If the function is a varargs function, don't check the extra varargs parameters
+            {
+                numArgs = fType->getNumParams();
+            }
+
+            if (numArgs > args.size())
+            {
+                throw EmitterException(EmitterError::badFunctionArguments, "wrong number of arguments for function");
+            }
+
+            for (size_t index = 0; index < numArgs; ++index)
             {
                 auto paramType = fType->getParamType(index);
                 auto argType = args[index]->getType();
-                if(paramType == nullptr)
+                if (paramType == nullptr)
                 {
                     throw EmitterException(EmitterError::badFunctionDefinition, "function has null parameter type");
                 }
-                if(argType == nullptr)
+                if (argType == nullptr)
                 {
                     throw EmitterException(EmitterError::badFunctionArguments, "function being called with null parameter type");
                 }
-                if(paramType != argType)
+                if (paramType != argType)
                 {
                     throw EmitterException(EmitterError::badFunctionArguments, "mismatched types for function");
                 }
@@ -246,7 +256,6 @@ namespace emitters
         return llvm::ConstantInt::getFalse(_llvmContext);
     }
 
-    
     llvm::ConstantPointerNull* IREmitter::NullPointer(llvm::PointerType* pointerType)
     {
         return llvm::ConstantPointerNull::get(pointerType);
@@ -421,6 +430,12 @@ namespace emitters
     {
         assert(pValue != nullptr);
         return _irBuilder.CreateBitCast(pValue, destinationType);
+    }
+
+    llvm::Value* IREmitter::CastPointer(llvm::Value* pValue, llvm::Type* destinationType)
+    {
+        assert(pValue != nullptr);
+        return _irBuilder.CreatePointerCast(pValue, destinationType);
     }
 
     llvm::Value* IREmitter::CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned)
@@ -607,23 +622,23 @@ namespace emitters
     llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name)
     {
         assert(pModule != nullptr);
-        auto functionType = llvm::FunctionType::get(_irBuilder.getVoidTy(), false);        
+        auto functionType = llvm::FunctionType::get(_irBuilder.getVoidTy(), false);
         return DeclareFunction(pModule, name, functionType);
     }
-    
+
     llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType)
     {
-        auto functionType = llvm::FunctionType::get(Type(returnType), false);        
+        auto functionType = llvm::FunctionType::get(Type(returnType), false);
         return DeclareFunction(pModule, name, functionType);
     }
-    
+
     llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const VariableTypeList& arguments)
     {
         auto types = GetLLVMTypes(arguments);
         auto functionType = llvm::FunctionType::get(Type(returnType), types, false);
         return DeclareFunction(pModule, name, functionType);
     }
-    
+
     llvm::Function* IREmitter::DeclareFunction(llvm::Module* pModule, const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments)
     {
         auto types = BindArgumentTypes(arguments);
@@ -840,7 +855,8 @@ namespace emitters
         llvm::Value* derefArguments[1]{
             Zero()
         };
-        return _irBuilder.CreateGEP(pArray->getValueType(), pArray, derefArguments);
+
+        return _irBuilder.CreateGEP(pArray, derefArguments);
     }
 
     llvm::Value* IREmitter::PointerOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset)
@@ -852,9 +868,11 @@ namespace emitters
             Zero(),
             pOffset
         };
-        return _irBuilder.CreateGEP(pArray->getValueType(), pArray, derefArguments);
+
+        return _irBuilder.CreateGEP(pArray, derefArguments);
     }
 
+    // TODO: rename this to avoid clashes with other PointerOffset()
     llvm::Value* IREmitter::PointerOffset(llvm::GlobalVariable* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset)
     {
         assert(pArray != nullptr);
@@ -882,6 +900,11 @@ namespace emitters
         return _irBuilder.CreateInBoundsGEP(pArray, derefArguments);
     }
 
+    llvm::Value* IREmitter::GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex)
+    {
+        return _irBuilder.CreateStructGEP(structPtr->getType(), structPtr, fieldIndex);
+    }
+
     llvm::LoadInst* IREmitter::Load(llvm::Value* pPointer)
     {
         assert(pPointer != nullptr);
@@ -906,6 +929,11 @@ namespace emitters
         return _irBuilder.CreateAlloca(Type(type), nullptr);
     }
 
+    llvm::AllocaInst* IREmitter::StackAllocate(llvm::Type* type)
+    {
+        return _irBuilder.CreateAlloca(type, nullptr);
+    }
+
     llvm::AllocaInst* IREmitter::StackAllocate(VariableType type, const std::string& name)
     {
         return _irBuilder.CreateAlloca(Type(type), nullptr, name);
@@ -918,9 +946,14 @@ namespace emitters
         return _irBuilder.CreateAlloca(pType, nullptr, name);
     }
 
-    llvm::AllocaInst* IREmitter::StackAllocate(VariableType type, int size)
+    llvm::AllocaInst* IREmitter::StackAllocate(VariableType type, size_t size)
     {
-        return _irBuilder.CreateAlloca(Type(type), Literal(size));
+        return _irBuilder.CreateAlloca(Type(type), Literal(static_cast<int>(size)));
+    }
+
+    llvm::AllocaInst* IREmitter::StackAllocate(llvm::Type* type, size_t size)
+    {
+        return _irBuilder.CreateAlloca(type, Literal(static_cast<int>(size)));
     }
 
     llvm::BranchInst* IREmitter::Branch(llvm::Value* pConditionValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
@@ -942,7 +975,7 @@ namespace emitters
     llvm::StructType* IREmitter::DeclareStruct(const std::string& name, const VariableTypeList& fields)
     {
         LLVMTypeList llvmFields;
-        for(const auto& field: fields)
+        for (const auto& field : fields)
         {
             llvmFields.push_back(Type(field));
         }
@@ -959,13 +992,19 @@ namespace emitters
     llvm::StructType* IREmitter::DeclareStruct(const std::string& name, const NamedVariableTypeList& fields)
     {
         llvm::StructType* type = GetStruct(name);
-        if (type != nullptr) {
+        if (type != nullptr)
+        {
             throw EmitterException(EmitterError::duplicateSymbol);
         }
         auto types = BindArgumentTypes(fields);
         auto structType = llvm::StructType::create(_llvmContext, types, name);
         _structs[name] = structType;
         return structType;
+    }
+
+    llvm::StructType* IREmitter::DeclareAnonymousStruct(const LLVMTypeList& fields, bool packed)
+    {
+        return llvm::StructType::get(_llvmContext, fields, packed);
     }
 
     llvm::StructType* IREmitter::GetStruct(const std::string& name)

@@ -11,6 +11,24 @@ set -x
 
 pushd .
 
+# Capture all arguments into a bash array
+all_args=("$@")
+parallel="false"
+# Extract target value
+for arg in "${all_args[@]}"; do
+    if [ "${prev_arg}" == "--target" ] ; then
+        target=$arg
+    fi
+
+    if [ "${arg}" == "--parallel" ] || [ "${arg}" == "-par" ]; then
+        parallel=true
+    fi
+    prev_arg=$arg
+done
+
+echo "Target: ${target}"
+echo "Parallel: ${parallel}"
+
 model_file=$1
 model_name="${model_file%.*}"
 shift
@@ -23,9 +41,12 @@ if [ ${next_opt:0:1} != '-' ] ; then
 fi
 
 # Platform-specific options
-# pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
-pi3_llc_opts="-relocation-model=pic"
-llc_opts=$pi3_llc_opts
+generic_llc_opts="-relocation-model=pic"
+pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
+llc_opts=$generic_llc_opts
+if [ ${target} == 'pi3' ] ; then
+    llc_opts=$pi3_llc_opts
+fi
 
 mkdir $profiler_directory
 @COMPILE_EXECUTABLE@ -imap $model_file --profile --ir --objectCode --header -od $profiler_directory -ob compiled_model $@
@@ -33,15 +54,21 @@ mkdir $profiler_directory
 
 cd $profiler_directory
 @LLC_EXECUTABLE@ compiled_model.ll -o compiled_model_llc.o -O3 --filetype=obj $llc_opts
-@OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3
+@OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_opt.ll -o compiled_model_opt.o -O3 --filetype=obj $llc_opts
 
 @LLC_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_llc.o -O3 --filetype=obj $llc_opts
-@OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3
+@OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj $llc_opts
 
 cp ../tools/utilities/profile/compiled_profile_main.cpp .
 cp ../tools/utilities/profile/compiled_exercise_model_main.cpp .
-cp ../tools/utilities/profile/CMakeLists-compiled.txt.in ./CMakeLists.txt
+
+if [ ${parallel} == "true" ] ; then
+    cp ../tools/utilities/profile/CMakeLists-compiled-parallel.txt.in ./CMakeLists.txt
+else
+    cp ../tools/utilities/profile/CMakeLists-compiled.txt.in ./CMakeLists.txt
+fi
+
 cp ../tools/utilities/profile/OpenBLASSetup.cmake ./OpenBLASSetup.cmake
 popd

@@ -1,0 +1,60 @@
+#
+# CMake file for compiled profilers
+#
+
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+
+project(profiler)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include(./OpenBLASSetup.cmake)
+
+#
+# Compiled profiler that spits out per-node profiling information
+#
+
+set (src 
+  compiled_profile_main.cpp
+  )
+
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
+source_group("tcc" FILES ${tcc})
+
+# Version using ELL's native object file output
+add_executable(profile ${src} ${include} ${tcc})
+target_link_libraries(profile ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS} -pthread)
+
+# Version with LLVM's llc tool compiling ELL's IR output
+add_executable(profile_llc ${src} ${include} ${tcc})
+target_link_libraries(profile_llc ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_llc.o ${BLAS_LIBS} -pthread)
+
+# Version with LLVM's opt tool optimizing ELL's IR output and then compiling with llc
+add_executable(profile_opt ${src} ${include} ${tcc})
+target_link_libraries(profile_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} -pthread)
+
+
+#
+# Simple program that just exercises the model and exits. Used with low-level system profiling and timing tools 
+#
+
+set (src 
+  compiled_exercise_model_main.cpp
+  )
+
+source_group("src" FILES ${src})
+source_group("include" FILES ${include})
+source_group("tcc" FILES ${tcc})
+
+# Version using ELL's native object file output
+add_executable(exercise_model ${src} ${include} ${tcc})
+target_link_libraries(exercise_model ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS} -pthread)
+
+# Version with LLVM's llc tool compiling ELL's IR output
+add_executable(exercise_model_llc ${src} ${include} ${tcc})
+target_link_libraries(exercise_model_llc ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_llc.o ${BLAS_LIBS} -pthread)
+
+# Version with LLVM's opt tool optimizing ELL's IR output and then compiling with llc
+add_executable(exercise_model_opt ${src} ${include} ${tcc})
+target_link_libraries(exercise_model_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} -pthread)

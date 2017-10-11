@@ -332,28 +332,28 @@ namespace emitters
 
     llvm::GlobalVariable* IRModuleEmitter::Constant(VariableType type, const std::string& name, double value)
     {
-        return Global(name, _emitter.Type(type), _emitter.Literal(value), true);
+        return AddGlobal(name, _emitter.Type(type), _emitter.Literal(value), true);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::ConstantArray(const std::string& name, const std::vector<double>& value)
     {
-        return Global(name, _emitter.ArrayType(VariableType::Double, value.size()), _emitter.Literal(value), true);
+        return AddGlobal(name, _emitter.ArrayType(VariableType::Double, value.size()), _emitter.Literal(value), true);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::Global(VariableType type, const std::string& name)
     {
-        return Global(name, _emitter.Type(type), _emitter.Zero(type), false);
+        return AddGlobal(name, _emitter.Type(type), _emitter.Zero(type), false);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::Global(llvm::Type* pType, const std::string& name)
     {
-        return Global(name, pType, nullptr, false);
+        return AddGlobal(name, pType, nullptr, false);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::GlobalArray(VariableType type, const std::string& name, const size_t size)
     {
         llvm::ArrayType* pArrayType = _emitter.ArrayType(type, size);
-        return Global(name, pArrayType, InitializeArray(pArrayType), false);
+        return AddGlobal(name, pArrayType, InitializeArray(pArrayType), false);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::GlobalArray(const std::string& name, llvm::Type* pType, const size_t size)
@@ -361,42 +361,47 @@ namespace emitters
         assert(pType != nullptr);
 
         llvm::ArrayType* pArrayType = llvm::ArrayType::get(pType, size);
-        return Global(name, pArrayType, InitializeArray(pArrayType), false);
+        return AddGlobal(name, pArrayType, InitializeArray(pArrayType), false);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::GlobalArray(const std::string& name, const std::vector<double>& value)
     {
-        return Global(name, _emitter.ArrayType(VariableType::Double, value.size()), _emitter.Literal(value), false);
+        return AddGlobal(name, _emitter.ArrayType(VariableType::Double, value.size()), _emitter.Literal(value), false);
     }
 
     // This is the actual implementation --- we should call it something different and/or put it in IREmitter
-    llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, llvm::Type* pType, llvm::Constant* pInitial, bool isConst)
+    llvm::GlobalVariable* IRModuleEmitter::AddGlobal(const std::string& name, llvm::Type* pType, llvm::Constant* pInitial, bool isConst)
     {
-        return new llvm::GlobalVariable(*GetLLVMModule(), pType, isConst, llvm::GlobalValue::InternalLinkage, pInitial, name); // TODO: make sure we really want to return a new'd pointer
+        _pModule->getOrInsertGlobal(name, pType);
+        auto global = _pModule->getNamedGlobal(name);
+        global->setInitializer(pInitial);
+        global->setConstant(isConst);
+        assert(llvm::isa<llvm::GlobalVariable>(global));
+        return llvm::cast<llvm::GlobalVariable>(global);
     }
 
     //
     // Functions
     //
 
-    void IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType)
+    llvm::Function* IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType)
     {
-        _emitter.DeclareFunction(GetLLVMModule(), name, returnType);
+        return _emitter.DeclareFunction(GetLLVMModule(), name, returnType);
     }
 
-    void IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const VariableTypeList& arguments)
+    llvm::Function* IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const VariableTypeList& arguments)
     {
-        _emitter.DeclareFunction(GetLLVMModule(), name, returnType, arguments);
+        return _emitter.DeclareFunction(GetLLVMModule(), name, returnType, arguments);
     }
 
-    void IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments)
+    llvm::Function* IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments)
     {
-        _emitter.DeclareFunction(GetLLVMModule(), name, returnType, arguments);
+        return _emitter.DeclareFunction(GetLLVMModule(), name, returnType, arguments);
     }
 
-    void IRModuleEmitter::DeclareFunction(const std::string& name, llvm::FunctionType* functionType)
+    llvm::Function* IRModuleEmitter::DeclareFunction(const std::string& name, llvm::FunctionType* functionType)
     {
-        _emitter.DeclareFunction(GetLLVMModule(), name, functionType);
+        return _emitter.DeclareFunction(GetLLVMModule(), name, functionType);
     }
 
     IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, VariableType returnType, bool isPublic)
@@ -515,6 +520,16 @@ namespace emitters
         auto tag = GetStructFieldsTagName(structType);
         InsertMetadata(tag, fieldNames);
         return structType;
+    }
+
+    llvm::StructType* IRModuleEmitter::DeclareStruct(const std::string& name, const LLVMTypeList& fields)
+    {
+        return _emitter.DeclareStruct(name, fields);
+    }
+
+    llvm::StructType* IRModuleEmitter::DeclareAnonymousStruct(const LLVMTypeList& fieldTypes, bool packed)
+    {
+        return _emitter.DeclareAnonymousStruct(fieldTypes, packed);
     }
 
     llvm::StructType* IRModuleEmitter::GetStruct(const std::string& name)
@@ -779,6 +794,11 @@ namespace emitters
         GetLLVMModule()->setTargetTriple(triple);
     }
 
+    const llvm::DataLayout& IRModuleEmitter::GetTargetDataLayout() const
+    {
+        return GetLLVMModule()->getDataLayout();
+    }
+
     void IRModuleEmitter::SetTargetDataLayout(const std::string& dataLayout)
     {
         GetLLVMModule()->setDataLayout(llvm::DataLayout(dataLayout));
@@ -831,6 +851,8 @@ namespace emitters
                 return _globals.Get(name);
 
             case VariableScope::local:
+                return GetCurrentFunction().GetEmittedVariable(scope, name);
+
             case VariableScope::input:
             case VariableScope::output:
                 return GetCurrentFunction().GetEmittedVariable(scope, name);

@@ -14,8 +14,8 @@
 #include "IREmitter.h"
 #include "IRExecutionEngine.h"
 #include "IRFunctionEmitter.h"
-#include "IRModuleEmitter.h"
 #include "IRHeaderWriter.h"
+#include "IRModuleEmitter.h"
 
 // testing
 #include "testing.h"
@@ -24,9 +24,9 @@
 #include <iostream>
 #include <memory>
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 using namespace ell;
 using namespace ell::emitters;
@@ -446,7 +446,7 @@ void TestMetadata()
     // Empty metadata
     auto actualModuleMetadata = module.GetMetadata("hello.world");
     std::vector<std::string> flattenedModuleMetadata;
-    for(auto m: actualModuleMetadata)
+    for (auto m : actualModuleMetadata)
     {
         flattenedModuleMetadata.push_back(m[0]);
     }
@@ -456,11 +456,11 @@ void TestMetadata()
     std::vector<std::string> actualFunctionMetadata = module.GetFunctionMetadata("TestMetadata", "hello.fn");
     testing::ProcessTest("Testing empty function metadata check", testing::IsEqual(module.HasFunctionMetadata("TestMetadata", "hello.fn"), true));
     testing::ProcessTest("Testing empty function metadata get", testing::IsEqual(actualFunctionMetadata, expected));
-    
+
     // Non-empty metadata
     actualModuleMetadata = module.GetMetadata("hello.world.content");
     flattenedModuleMetadata.clear();
-    for(auto m: actualModuleMetadata)
+    for (auto m : actualModuleMetadata)
     {
         flattenedModuleMetadata.push_back(m[0]);
     }
@@ -480,12 +480,11 @@ void TestMetadata()
     jit.RunMain();
 }
 
-
 void TestHeader()
 {
     IRModuleEmitter module("Predictor");
     auto int32Type = ell::emitters::VariableType::Int32;
-    emitters::NamedVariableTypeList namedFields = { { "rows", int32Type },{ "columns", int32Type },{ "channels" , int32Type } };
+    emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
     auto shapeType = module.DeclareStruct("Shape", namedFields);
     // test that this casues the type to show up in the module header.
     module.IncludeTypeInHeader(shapeType->getName());
@@ -512,8 +511,8 @@ void TestHeader()
     std::string result = out.str();
     auto structPos = result.find("struct Shape");
     auto funcPos = result.find("struct Shape Test_GetInputShape(int32_t");
-    testing::ProcessTest("Testing header generation", 
-        structPos != std::string::npos && funcPos != std::string::npos);   
+    testing::ProcessTest("Testing header generation",
+                         structPos != std::string::npos && funcPos != std::string::npos);
 }
 
 std::string EmitStruct(const char* moduleName)
@@ -521,15 +520,15 @@ std::string EmitStruct(const char* moduleName)
     const char* TensorShapeName = "TensorShape";
     IRModuleEmitter emitter(moduleName);
     auto int32Type = ell::emitters::VariableType::Int32;
-    emitters::NamedVariableTypeList namedFields = { { "rows", int32Type },{ "columns", int32Type },{ "channels" , int32Type } };
+    emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
     auto shapeType = emitter.DeclareStruct(TensorShapeName, namedFields);
     emitter.IncludeTypeInHeader(shapeType->getName());
 
-    const emitters::NamedVariableTypeList parameters = { { "index", emitters::GetVariableType<int>() } };    
+    const emitters::NamedVariableTypeList parameters = { { "index", emitters::GetVariableType<int>() } };
     auto function = emitter.BeginFunction("Dummy", shapeType, parameters);
     function.IncludeInHeader();
     emitter.EndFunction();
-    
+
     std::ostringstream out;
     ell::emitters::WriteModuleHeader(out, emitter);
     return out.str();
@@ -543,6 +542,28 @@ void TestTwoEmitsInOneSession()
     std::cout << emit2 << std::endl;
     auto badpos1 = emit1.find("TensorShape.");
     auto badpos2 = emit2.find("TensorShape.");
-    testing::ProcessTest("Testing two uses of module emitter",    
-        badpos1 == std::string::npos && badpos2 == std::string::npos);
+    testing::ProcessTest("Testing two uses of module emitter",
+                         badpos1 == std::string::npos && badpos2 == std::string::npos);
+}
+
+void TestStruct()
+{
+    IRModuleEmitter module("StructTest");
+    auto& context = module.GetLLVMContext();
+    auto int32Type = llvm::Type::getInt32Ty(context);
+    auto int8PtrType = llvm::Type::getInt8PtrTy(context);
+    auto int8PtrPtrType = llvm::Type::getInt8PtrTy(context)->getPointerTo();
+    llvm::StructType* structType = module.DeclareStruct("s", { { "a", int32Type }, { "b", int8PtrType }, { "c", int32Type } });
+
+    module.DeclarePrintf();
+
+    auto function = module.BeginMainFunction();
+    function.Print("Begin\n");
+    // function.PrintForEach("%f\n", pRegister, data.size());
+   
+    function.Return();
+    module.EndFunction();
+
+    module.WriteToFile("testStruct.ll");
+    module.WriteToFile("testStruct.h");
 }

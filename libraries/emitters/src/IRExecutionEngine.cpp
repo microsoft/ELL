@@ -47,16 +47,6 @@ namespace emitters
         }
     }
 
-    void IRExecutionEngine::SelectTarget(const llvm::Triple& targetTriple, const std::string& cpuArchitecture, const std::string& cpuName, const std::vector<std::string>& attributes)
-    {
-        llvm::SmallVector<std::string, 4> attrs;
-        for (auto attribute : attributes)
-        {
-            attrs.push_back(attribute);
-        }
-        _pBuilder->selectTarget(targetTriple, cpuArchitecture, cpuName, attrs);
-    }
-
     void IRExecutionEngine::AddModule(std::unique_ptr<llvm::Module> pModule)
     {
         assert(pModule != nullptr);

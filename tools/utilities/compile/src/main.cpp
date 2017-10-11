@@ -18,6 +18,7 @@
 
 // common
 #include "LoadModel.h"
+#include "MapCompilerArguments.h"
 #include "MapLoadArguments.h"
 
 // model
@@ -86,84 +87,24 @@ private:
 };
 
 template <typename MapType, typename MapCompilerType>
-void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::MapLoadArguments& mapLoadArguments, MapType& map)
+void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMapCompilerArguments& mapCompilerArguments, common::MapLoadArguments& mapLoadArguments, MapType& map)
 {
     std::stringstream timingOutput;
-
-    // create the desired output type(s)
-    bool namespaceSpecified = true;
-    auto namespacePrefix = compileArguments.compiledModuleName;
-    if (namespacePrefix == "")
-    {
-        namespacePrefix = "ELL";
-        namespaceSpecified = false;
-    }
 
     auto inputFilename = mapLoadArguments.GetInputFilename();
     auto outputDirectory = compileArguments.outputDirectory;
 
     auto baseFilename = compileArguments.outputFilenameBase;
-    if(baseFilename.empty())
+    if (baseFilename.empty())
     {
         baseFilename = utilities::RemoveFileExtension(inputFilename);
     }
-    if(outputDirectory != "")
+    if (!outputDirectory.empty())
     {
         baseFilename = utilities::JoinPaths(outputDirectory, utilities::GetFileName(baseFilename));
     }
 
-    std::string functionName;
-    if (compileArguments.compiledFunctionName == "")
-    {
-        if (namespaceSpecified)
-        {
-            functionName = namespacePrefix + "_predict";
-        }
-        else
-        {
-            functionName = baseFilename;
-        }
-    }
-    else
-    {
-        functionName = namespacePrefix + "_" + compileArguments.compiledFunctionName;
-    }
-
-    model::MapCompilerParameters settings;
-    settings.moduleName = namespacePrefix;
-    settings.mapFunctionName = functionName;
-    settings.compilerSettings.optimize = compileArguments.optimize;
-    settings.compilerSettings.useBlas = compileArguments.useBlas;
-    settings.fuseLinearFunctionNodes = compileArguments.fuseLinearOperations;
-    settings.compilerSettings.allowVectorInstructions = compileArguments.enableVectorization;
-    settings.compilerSettings.vectorWidth = compileArguments.vectorWidth;
-    settings.profile = compileArguments.profile;
-
-    if (compileArguments.target != "")
-    {
-        settings.compilerSettings.targetDevice.deviceName = compileArguments.target;
-    }
-
-    if (compileArguments.targetTriple != "")
-    {
-        settings.compilerSettings.targetDevice.triple = compileArguments.targetTriple;
-    }
-
-    if (compileArguments.targetDataLayout != "")
-    {
-        settings.compilerSettings.targetDevice.dataLayout = compileArguments.targetDataLayout;
-    }
-
-    if (compileArguments.targetFeatures != "")
-    {
-        settings.compilerSettings.targetDevice.features = compileArguments.targetFeatures;
-    }
-
-    if (compileArguments.numBits != 0)
-    {
-        settings.compilerSettings.targetDevice.numBits = compileArguments.numBits;
-    }
-
+    model::MapCompilerParameters settings = mapCompilerArguments.GetMapCompilerParameters(baseFilename);
     if (compileArguments.outputRefinedMap)
     {
         model::TransformContext context;
@@ -235,12 +176,16 @@ int main(int argc, char* argv[])
         // add arguments to the command line parser
         common::ParsedMapLoadArguments mapLoadArguments;
         ParsedCompileArguments compileArguments;
+        common::ParsedMapCompilerArguments mapCompilerArguments;
 
         commandLineParser.AddDocumentationString("Input file options");
         commandLineParser.AddOptionSet(mapLoadArguments);
 
         commandLineParser.AddDocumentationString("");
         commandLineParser.AddOptionSet(compileArguments);
+
+        commandLineParser.AddDocumentationString("Code generation options");
+        commandLineParser.AddOptionSet(mapCompilerArguments);
 
         // parse command line
         commandLineParser.Parse();
@@ -265,7 +210,7 @@ int main(int argc, char* argv[])
                 TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);
                 auto map = common::LoadMap<MapType, MapArgumentType>(mapLoadArguments);
                 timer.Stop();
-                ProduceMapOutput<MapType, MapCompilerType>(compileArguments, mapLoadArguments, map);
+                ProduceMapOutput<MapType, MapCompilerType>(compileArguments, mapCompilerArguments, mapLoadArguments, map);
                 break;
             }
 
@@ -278,7 +223,7 @@ int main(int argc, char* argv[])
                 TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);
                 auto map = common::LoadMap<MapType, MapArgumentType>(mapLoadArguments);
                 timer.Stop();
-                ProduceMapOutput<MapType, MapCompilerType>(compileArguments, mapLoadArguments, map);
+                ProduceMapOutput<MapType, MapCompilerType>(compileArguments, mapCompilerArguments, mapLoadArguments, map);
                 break;
             }
 
@@ -290,7 +235,7 @@ int main(int argc, char* argv[])
                 TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);
                 auto map = common::LoadMap(mapLoadArguments);
                 timer.Stop();
-                ProduceMapOutput<MapType, MapCompilerType>(compileArguments, mapLoadArguments, map);
+                ProduceMapOutput<MapType, MapCompilerType>(compileArguments, mapCompilerArguments, mapLoadArguments, map);
                 break;
             }
 

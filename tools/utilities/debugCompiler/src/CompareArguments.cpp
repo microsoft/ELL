@@ -23,12 +23,5 @@ void ParsedCompareArguments::AddArgs(utilities::CommandLineParser& parser)
     parser.AddOption(writeReport, "report", "", "Generate markdown report", true);
     parser.AddOption(writeGraph, "graph", "", "Write DGML graph", true);
     parser.AddOption(writePrediction, "pred", "", "Write prediction to report", true);
-
-    parser.AddDocumentationString("Code-generation options");
-    parser.AddOption(optimize, "optimize", "opt", "Optimize output code", true);
-    parser.AddOption(useBlas, "blas", "", "Emit code that calls BLAS", true);
-    parser.AddOption(fuseLinearOperations, "fuseLinearOps", "", "Fuse sequences of linear operations with constant coefficients into a single operation", true);
-    parser.AddOption(enableVectorization, "vectorize", "vec", "Enable ELL's vectorization", false);
-    parser.AddOption(vectorWidth, "vectorWidth", "vw", "Size of vector units", 4);
 }
 }

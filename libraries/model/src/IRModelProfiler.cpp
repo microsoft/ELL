@@ -608,8 +608,8 @@ namespace model
 
     llvm::Value* ModelProfiler::CallGetCurrentTime(emitters::IRFunctionEmitter& function)
     {
-        auto getTimeFunc = _module->GetRuntime().GetCurrentTimeFunction();
-        return function.Call(getTimeFunc, {});
+        auto time = _module->GetRuntime().GetCurrentTime(function);
+        return time;
     }
 }
 }

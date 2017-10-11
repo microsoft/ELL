@@ -37,17 +37,6 @@ namespace emitters
         /// <param name="pModule"> The module. </param>
         IRExecutionEngine(std::unique_ptr<llvm::Module> pModule);
 
-        /// <summary>
-        /// Similar to LLI.exe. Set the CPU type, architecture and so on that the execution engine should
-        /// use. By default we will automatically map to x86.
-        /// </summary>
-        ///
-        /// <param name="targetTriple"> Target triple. </param>
-        /// <param name="cpuArchitecture"> The CPU architecture. </param>
-        /// <param name="cpuName"> Name of the CPU. </param>
-        /// <param name="attributes"> A vector of attributes. </param>
-        void SelectTarget(const llvm::Triple& targetTriple, const std::string& cpuArchitecture, const std::string& cpuName, const std::vector<std::string>& attributes);
-
         /// <summary> Add an additional module to the execution engine. </summary>
         ///
         /// <param name="pModule"> The module to add. </param>

@@ -45,7 +45,7 @@ namespace emitters
         /// <param name="repeatCount"> Number of repetitions. </param>
         ///
         /// <returns> Pointer to the llvm::BasicBlock that represents the for loop. </returns>
-        llvm::BasicBlock* Begin(const int repeatCount);
+        llvm::BasicBlock* Begin(int repeatCount);
 
         /// <summary> Emits the beginning of a for loop that repeats the given number of times. </summary>
         ///
@@ -61,7 +61,16 @@ namespace emitters
         /// <param name="stepSize"> Size of the step. </param>
         ///
         /// <returns> Pointer to the llvm::BasicBlock that represents the for loop. </returns>
-        llvm::BasicBlock* Begin(const int iStartAt, const int iMaxValue, const int stepSize);
+        llvm::BasicBlock* Begin(int iStartAt, int iMaxValue, int stepSize);
+
+        /// <summary> Emits the beginning of a for loop from iStartAt to iMaxValue, with a given step size. </summary>
+        ///
+        /// <param name="iStartAt"> The start interation value. </param>
+        /// <param name="iMaxValue"> The max iteration value. </param>
+        /// <param name="stepSize"> Size of the step. </param>
+        ///
+        /// <returns> Pointer to the llvm::BasicBlock that represents the for loop. </returns>
+        llvm::BasicBlock* Begin(llvm::Value* iStartAt, llvm::Value* iMaxValue, llvm::Value* stepSize);
 
         /// <summary> Emits the beginning of a for loop that uses a mutable test value. </summary>
         ///

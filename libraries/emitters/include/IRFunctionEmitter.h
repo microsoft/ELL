@@ -8,12 +8,20 @@
 
 #pragma once
 
+#include "IRAsyncTask.h"
 #include "IREmitter.h"
 #include "IRIfEmitter.h"
 #include "IRLoopEmitter.h"
 #include "IROptimizer.h"
 #include "LLVMInclude.h"
 #include "Variable.h"
+
+// stl
+#include <functional>
+#include <initializer_list>
+#include <ostream>
+#include <string>
+#include <vector>
 
 namespace ell
 {
@@ -50,6 +58,13 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::Value that represents the variable. </returns>
         llvm::Value* GetEmittedVariable(const VariableScope scope, const std::string& name);
+
+        /// <summary> Gets an argument to the function by name. </summary>
+        ///
+        /// <param name="name"> The variable name. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the variable. </returns>
+        llvm::Value* GetFunctionArgument(const std::string& name);
 
         /// <summary> Emit a literal into the function. </summary>
         ///
@@ -118,6 +133,22 @@ namespace emitters
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         llvm::Value* Cast(llvm::Value* pValue, VariableType valueType);
 
+        /// <summary> Emit cast to a given type. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="valueType"> The type to cast to. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        llvm::Value* Cast(llvm::Value* pValue, llvm::Type* valueType);
+
+        /// <summary> Emit pointer cast to a given pointer type. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="valueType"> The type to cast to. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        llvm::Value* CastPointer(llvm::Value* pValue, llvm::Type* valueType);
+
         /// <summary> Emit a cast from int to float. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
@@ -173,7 +204,7 @@ namespace emitters
         ///
         /// <returns> Pointer to the result of the function call. </returns>
         llvm::Value* Call(const std::string& name, const IRValueList& arguments);
-
+        
         /// <summary> Emit a call to a function with arguments. </summary>
         ///
         /// <param name="name"> The function name. </param>
@@ -543,6 +574,14 @@ namespace emitters
         /// <returns> Pointer to the array. </returns>
         llvm::AllocaInst* Variable(VariableType type, int size);
 
+        /// <summary> Emit a stack array of the given size. </summary>
+        ///
+        /// <param name="type"> The array entry type. </param>
+        /// <param name="size"> The array size. </param>
+        ///
+        /// <returns> Pointer to the array. </returns>
+        llvm::AllocaInst* Variable(llvm::Type* type, int size);
+
         /// <summary> Return an emitted stack variable and assign it a name. </summary>
         ///
         /// <param name="type"> The variable type. </param>
@@ -669,6 +708,12 @@ namespace emitters
         /// <param name="pOffset"> The offset. </param>
         /// <param name="pValue"> The value to set. </param>
         llvm::Value* SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pValue);
+        
+        /// <summary> Set the fields of a struct. </summary>
+        ///
+        /// <param name="structPtr"> The struct to be filled in. </param>
+        /// <param name="fieldValues"> The values to set the fields to. </param>
+        void FillStruct(llvm::Value* structPtr, const std::vector<llvm::Value*>& fieldValues);
 
         /// <summary> Emits a pointer to a global. </summary>
         ///
@@ -702,6 +747,14 @@ namespace emitters
         /// <returns> Pointer to a value that represents that field. </returns>
         llvm::Value* PointerOffset(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pFieldOffset);
 
+        /// <summary> Get a pointer to a fields in a struct. </summary>
+        ///
+        /// <param name="structPtr"> Pointer to the struct. </param>
+        /// <param name="fieldIndex"> The index of the field to get. </param>
+        ///
+        /// <returns> A pointer the specified field in the struct. </returns>
+        llvm::Value* GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex);
+
         //
         // Expressions
         //
@@ -725,8 +778,38 @@ namespace emitters
         /// <returns> An IRIfEmitter. </returns>
         IRIfEmitter If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue);
 
+        /// <summary> Creates an asynchronous task. </summary>
+        ///
+        /// <param name="task"> The function to run asynchronously. </param>
+        ///
+        /// <returns> A task object representing the running task. </param>
+        IRAsyncTask Async(llvm::Function* task);
+        
+        /// <summary> Creates an asynchronous task. </summary>
+        ///
+        /// <param name="task"> The function to run asynchronously. </param>
+        ///
+        /// <returns> A task object representing the running task. </param>
+        IRAsyncTask Async(IRFunctionEmitter& task);
+
+        /// <summary> Creates an asynchronous task. </summary>
+        ///
+        /// <param name="task"> The function to run asynchronously. </param>
+        /// <param name="arguments"> The arguments to the task function. </param>
+        ///
+        /// <returns> A task object representing the running task. </param>
+        IRAsyncTask Async(llvm::Function* task, const std::vector<llvm::Value*>& arguments);
+
+        /// <summary> Creates an asynchronous task. </summary>
+        ///
+        /// <param name="task"> The function to run asynchronously. </param>
+        /// <param name="arguments"> The arguments to the task function. </param>
+        ///
+        /// <returns> A task object representing the running task. </param>
+        IRAsyncTask Async(IRFunctionEmitter& task, const std::vector<llvm::Value*>& arguments);
+
         //
-        // Standard useful function calls
+        // Standard C library function calls
         //
 
         /// <summary> Emits a malloc call. </summary>
@@ -772,6 +855,14 @@ namespace emitters
         ///
         /// <returns> Pointer to the return value of the call to the printf function. </returns>
         llvm::Value* Printf(const std::string& format, std::initializer_list<llvm::Value*> arguments);
+
+        /// <summary> Emits a printf call. </summary>
+        ///
+        /// <param name="format"> Describes the printf format to use. </param>
+        /// <param name="arguments"> Arguments to the printf call. </param>
+        ///
+        /// <returns> Pointer to the return value of the call to the printf function. </returns>
+        llvm::Value* Printf(const std::string& format, std::vector<llvm::Value*> arguments);
 
         /// <summary> Emits a memmove call, which moves an array of variables. </summary>
         ///
@@ -1021,6 +1112,40 @@ namespace emitters
         template <typename ValueType>
         void CallGEMM(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc);
 
+        //
+        // Calling POSIX functions
+        //
+        // Note: the arguments to the following functions are just llvm::Value* representations of the value to
+        //   be passed to the underlying POSIX function. See IRPosixRuntime for more POSIX-specific information.
+
+        /// <summary> Indicates if the target has POSIX functions available to it. </summary>
+        bool HasPosixFunctions() const;
+        
+        /// <summary> Emits a call to the POSIX `pthread_create` function. </summary>
+        llvm::Value* PthreadCreate(llvm::Value* threadVar, llvm::Value* attrPtr, llvm::Function* taskFunction, llvm::Value* taskArgument);
+        
+        /// <summary> Emits a call to the POSIX `pthread_equal` function. </summary>
+        llvm::Value* PthreadEqual(llvm::Value* thread1, llvm::Value* thread2);
+        
+        /// <summary> Emits a call to the POSIX `pthread_exit` function. </summary>
+        void PthreadExit(llvm::Value* status);
+        
+        /// <summary> Emits a call to the POSIX `pthread_getconcurrency` function. </summary>
+        llvm::Value* PthreadGetConcurrency();
+        
+        /// <summary> Emits a call to the POSIX `pthread_detach` function. </summary>
+        llvm::Value* PthreadDetach(llvm::Value* thread);
+        
+        /// <summary> Emits a call to the POSIX `pthread_join` function. </summary>
+        llvm::Value* PthreadJoin(llvm::Value* thread, llvm::Value* statusOut);
+        
+        /// <summary> Emits a call to the POSIX `pthread_self` function. </summary>
+        llvm::Value* PthreadSelf();
+        
+        //
+        // Information about the current function begin emitted
+        //
+
         /// <summary> Gets a pointer to the underlying llvm::Function. </summary>
         ///
         /// <returns> Pointer to an llvm::Function. </returns>
@@ -1113,6 +1238,8 @@ namespace emitters
         llvm::Value* ValueAtH(llvm::Value* pPointer, int offset);
         llvm::Value* ValueAtH(llvm::Value* pPointer, llvm::Value* pOffset);
         llvm::Value* SetValueAtH(llvm::Value* pPointer, int offset, llvm::Value* pValue);
+
+        friend class IRModuleEmitter;
 
         llvm::BasicBlock* GetEntryBlock() { return _entryBlock; }
         void SetUpFunction();

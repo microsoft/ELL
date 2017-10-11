@@ -10,10 +10,10 @@
 #include "StringUtil.h"
 
 // stl
+#include <algorithm>
 #include <iostream>
 #include <locale>
 #include <sstream>
-#include <algorithm>
 
 namespace ell
 {
@@ -155,10 +155,13 @@ namespace utilities
         bool needsReparse = true;
         while (needsReparse)
         {
-			std::set<std::string, case_insensitive_comparer> unset_args;
+            std::set<std::string, case_insensitive_comparer> unset_args;
             for (const auto& opt : _options)
             {
-                unset_args.insert(opt.first);
+                if (opt.second.enabled)
+                {
+                    unset_args.insert(opt.first);
+                }
             }
 
             needsReparse = false;
@@ -166,7 +169,11 @@ namespace utilities
             for (size_t index = 1; index < argc; index++)
             {
                 std::string arg = _originalArgs[index];
-                if (arg[0] == '-') // it's an option
+                if (arg == "--") // "--" is the special "ignore this" option --- used to put between flag arguments and the positional arguments
+                {
+                    // nothing
+                }
+                else if (arg[0] == '-') // it's an option
                 {
                     std::string option;
                     if (arg[1] == '-') // long name
@@ -176,49 +183,45 @@ namespace utilities
                     else // short name
                     {
                         std::string shortName = std::string(arg.begin() + 1, arg.end());
+                        if (!HasShortName(shortName))
+                        {
+                            throw CommandLineParserErrorException("Unknown option", { std::string("Error: unknown option ") + arg });
+                        }
                         option = _shortToLongNameMap[shortName];
                     }
 
-                    if (option == "" && arg != "--") // "--" is the special "ignore this" option --- used to put between flag arguments and the filepath
+                    if (!HasOption(option) || !_options[option].enabled)
                     {
-                        std::string errorMessage = "Error: unknown option " + arg;
-                        throw CommandLineParserErrorException("Unknown option", { errorMessage });
-                        if (index < argc - 1 && _originalArgs[index + 1][0] != '-') // skip the Next value as well, unless it's an option
+                        throw CommandLineParserErrorException("Unknown option", { std::string("Error: unknown option ") + arg });
+                    }
+
+                    unset_args.erase(option);
+                    if (index < argc - 1)
+                    {
+                        std::string val = _originalArgs[index + 1];
+                        if (val[0] == '-')
                         {
+                            // next token in an option, so use the default unset-value string
+                            needsReparse = SetOption(option) || needsReparse;
+                        }
+                        else
+                        {
+                            needsReparse = SetOption(option, val) || needsReparse;
                             index++;
                         }
                     }
-
-                    if (option != "")
+                    else // this is the last thing on the line --- assume it's a shortcut for --option true
                     {
-                        unset_args.erase(option);
-                        if (index < argc - 1)
-                        {
-                            std::string val = _originalArgs[index + 1];
-                            if (val[0] == '-')
-                            {
-                                // next token in an option, so use the default unset-value string
-                                needsReparse = SetOption(option) || needsReparse;
-                            }
-                            else
-                            {
-                                needsReparse = SetOption(option, val) || needsReparse;
-                                index++;
-                            }
-                        }
-                        else // this is the last thing on the line --- assume it's a shortcut for --option true
-                        {
-                            needsReparse = SetOption(option) || needsReparse;
-                        }
+                        needsReparse = SetOption(option) || needsReparse;
                     }
                 }
                 else
                 {
-                    _positionalArgs.push_back(_originalArgs[index]);
+                    _positionalArgs.push_back(arg);
                 }
             }
 
-            // Need to std::set default args here, in case one of them enables a conditional argument std::set
+            // Need to set default args here, in case one of them enables a conditional argument set
             needsReparse = SetDefaultArgs(unset_args) || needsReparse;
         }
 
@@ -247,6 +250,18 @@ namespace utilities
         {
             throw CommandLineParserErrorException("Error in parse callback", parseErrors);
         }
+    }
+
+    CommandLineParser::OptionInfo* CommandLineParser::FindOption(const std::string& name)
+    {
+        // case insensitive matching.
+        auto iter = _options.find(name);
+        if (iter == _options.end())
+        {
+            return nullptr;
+        }
+
+        return &iter->second;
     }
 
     bool CommandLineParser::SetDefaultArgs(const std::set<std::string, case_insensitive_comparer>& unset_args)
@@ -297,15 +312,14 @@ namespace utilities
         AddOption(info);
     }
 
-    bool CommandLineParser::HasOption(std::string option)
+    bool CommandLineParser::HasOption(std::string name)
     {
         // case insensitive matching.
-        return _options.find(option) != _options.end();
+        return _options.find(name) != _options.end();
     }
 
     bool CommandLineParser::HasShortName(std::string shortName)
     {
-        // case insensitive matching.
         return _shortToLongNameMap.find(shortName) != _shortToLongNameMap.end();
     }
 
@@ -423,6 +437,24 @@ namespace utilities
         _docEntries.emplace_back(DocumentationEntry::Type::str, str);
     }
 
+    void CommandLineParser::DisableOption(std::string name)
+    {
+        auto option = FindOption(name);
+        if (option != nullptr)
+        {
+            option->enabled = false;
+        }
+    }
+
+    void CommandLineParser::EnableOption(std::string name)
+    {
+        auto option = FindOption(name);
+        if (option != nullptr)
+        {
+            option->enabled = true;
+        }
+    }
+
     std::string CommandLineParser::GetHelpString()
     {
         std::stringstream out;
@@ -446,23 +478,26 @@ namespace utilities
                 case DocumentationEntry::Type::option:
                 {
                     const OptionInfo& info = _options[entry.EntryString];
-                    std::string option_name = info.optionNameString();
-                    size_t thisOptionNameLen = info.optionNameHelpLength();
-                    size_t pad_len = 2 + (longest_name - thisOptionNameLen);
-                    std::string padding(pad_len, ' ');
-                    out << "\t--" << option_name << padding << info.description;
-                    if (info.enumValues.size() > 0)
+                    if (info.enabled)
                     {
-                        out << "  {";
-                        std::string sep = "";
-                        out << info.enumValues[0];
-                        for (size_t index = 1; index < info.enumValues.size(); ++index)
+                        std::string option_name = info.optionNameString();
+                        size_t thisOptionNameLen = info.optionNameHelpLength();
+                        size_t pad_len = 2 + (longest_name - thisOptionNameLen);
+                        std::string padding(pad_len, ' ');
+                        out << "\t--" << option_name << padding << info.description;
+                        if (info.enumValues.size() > 0)
                         {
-                            out << " | " << info.enumValues[index];
+                            out << "  {";
+                            std::string sep = "";
+                            out << info.enumValues[0];
+                            for (size_t index = 1; index < info.enumValues.size(); ++index)
+                            {
+                                out << " | " << info.enumValues[index];
+                            }
+                            out << "}";
                         }
-                        out << "}";
+                        out << std::endl;
                     }
-                    out << std::endl;
                 }
                 break;
 
@@ -530,9 +565,9 @@ namespace utilities
         return out.str();
     }
 
-    std::string CommandLineParser::GetOptionValue(const std::string& option)
+    std::string CommandLineParser::GetOptionValue(const std::string& name)
     {
-        auto it = _options.find(option);
+        auto it = _options.find(name);
         if (it != _options.end())
         {
             return it->second.currentValueString;

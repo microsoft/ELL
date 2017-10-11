@@ -12,6 +12,7 @@
 
 // common
 #include "LoadModel.h"
+#include "MapCompilerArguments.h"
 #include "ModelLoadArguments.h"
 
 // math
@@ -92,6 +93,9 @@ int main(int argc, char* argv[])
         // add arguments to the command line parser
         ParsedCompareArguments compareArguments;
         commandLineParser.AddOptionSet(compareArguments);
+        common::ParsedMapCompilerArguments compileArguments;
+        commandLineParser.AddDocumentationString("Code generation options");
+        commandLineParser.AddOptionSet(compileArguments);
         commandLineParser.Parse();
 
         if (compareArguments.inputMapFile.empty())
@@ -121,14 +125,7 @@ int main(int argc, char* argv[])
         auto input = GetInputData<TestDataType>(map, compareArguments);
         ModelComparison comparison(compareArguments.outputDirectory);
 
-        model::MapCompilerParameters settings;
-        settings.compilerSettings.optimize = compareArguments.optimize;
-        settings.compilerSettings.useBlas = compareArguments.useBlas;
-        settings.fuseLinearFunctionNodes = false;
-        settings.compilerSettings.allowVectorInstructions = compareArguments.enableVectorization;
-        settings.compilerSettings.vectorWidth = compareArguments.vectorWidth;
-        settings.compilerSettings.targetDevice.deviceName = "host";
-        settings.profile = false;
+        model::MapCompilerParameters settings = compileArguments.GetMapCompilerParameters("");
         comparison.Compare(input, map, settings);
 
         // Write summary report

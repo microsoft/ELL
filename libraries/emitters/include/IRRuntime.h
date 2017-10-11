@@ -9,6 +9,7 @@
 #pragma once
 
 #include "EmitterTypes.h"
+#include "IRPosixRuntime.h"
 #include "LLVMInclude.h"
 
 // utilities
@@ -19,24 +20,16 @@ namespace ell
 namespace emitters
 {
     class IRModuleEmitter;
+    class IRFunctionEmitter;
 
     /// <summary> Manages external as well as compiler auto-generated functions </summary>
     class IRRuntime
     {
     public:
-        /// <summary> Construct a new runtime </summary>
-        ///
-        /// <param name="module"> The module being compiled. </param>
-        IRRuntime(IRModuleEmitter& module);
-
         //
         // Misc runtime functions
         //
-
-        /// <summary> Get a pointer to the device-side time function. </summary>
-        ///
-        /// <returns> An LLVM function pointer to the current time function. </returns>
-        llvm::Function* GetCurrentTimeFunction(); // returns a double containing the current time (in _milliseconds_ from some arbitrary start time)
+        llvm::Value* GetCurrentTime(IRFunctionEmitter& function);
 
         //
         // Standard math functions
@@ -98,9 +91,26 @@ namespace emitters
         template <typename ValueType>
         llvm::Function* GetGEMMFunction(bool useBlas);
 
+        //
+        // Posix functions
+        //
+        IRPosixRuntime& GetPosixEmitter() { return _posixRuntime; }
+
     private:
+        friend IRModuleEmitter;
+        IRRuntime(IRModuleEmitter& module);
+        
         std::string GetNamespacePrefix() const;
 
+        //
+        // Getting pointers to functions
+        //
+
+        // time
+        llvm::Function* GetCurrentTimeFunction(); // returns a double containing the current time (in _milliseconds_ from some arbitrary start time)
+        llvm::Function* ResolveCurrentTimeFunction(llvm::StructType* timespecType);
+
+        // math
         llvm::Function* GetSqrtFunction(VariableType argType);
         llvm::Function* GetAbsFunction(VariableType argType);
         llvm::Function* GetExpFunction(VariableType argType);
@@ -114,9 +124,27 @@ namespace emitters
         llvm::Function* GetDGEMVFunction(bool useBlas);
         llvm::Function* GetDGEMMFunction(bool useBlas);
 
-        llvm::Function* ResolveCurrentTimeFunction(llvm::StructType* timespecType);
+        // POSIX threads
+        // pthread_create
+        // pthread_equal
+        // pthread_exit
+        // pthread_join
+        // pthread_self
+        // pthread_mutex_init
+        // pthread_mutex_destroy
+        // pthread_mutex_lock
+        // pthread_mutex_trylock
+        // pthread_mutex_unlock
+        // pthread_cond_init
+        // pthread_cond_destroy
+        // phtread_cond_wait
+        // pthread_cond_timedwait
+        // pthread_code_signal
+        // pthread_cond_broadcast
+        // pthread_once
 
         IRModuleEmitter& _module;
+        IRPosixRuntime _posixRuntime;
 
         llvm::Function* _pDotProductFunctionFloat = nullptr;
         llvm::Function* _pDotProductFunction = nullptr;

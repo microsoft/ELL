@@ -42,7 +42,7 @@ public:
         return x + 5.0;
     }
 
-    llvm::Value* Compile(IRFunctionEmitter& function, llvm::Value* x) const override // or should this be llvm::Value* x???
+    llvm::Value* Compile(IRFunctionEmitter& function, llvm::Value* x) const override 
     {
         llvm::Value* sum = function.Operator(emitters::GetAddForValueType<double>(), x, function.Literal<double>(5.0));
         return sum;
@@ -71,8 +71,8 @@ void TestIRAddFunction()
     args.push_back({ "y", VariableType::Double });
     auto function = module.BeginFunction(functionName, VariableType::Double, args);
 
-    llvm::Value* xArg = function.GetEmittedVariable(VariableScope::input, "x");
-    llvm::Value* yArg = function.GetEmittedVariable(VariableScope::input, "y");
+    llvm::Value* xArg = function.GetFunctionArgument("x");
+    llvm::Value* yArg = function.GetFunctionArgument("y");
     auto result = func.Compile(function, xArg, yArg);
     function.Return(result);
     module.EndFunction();
@@ -108,7 +108,7 @@ void TestIRFunction()
     args.push_back({ "x", VariableType::Double });
     auto function = module.BeginFunction(functionName, VariableType::Double, args);
 
-    llvm::Value* arg = function.GetEmittedVariable(VariableScope::input, "x");
+    llvm::Value* arg = function.GetFunctionArgument("x");
     auto result = func.Compile(function, arg);
     function.Return(result);
     module.EndFunction();

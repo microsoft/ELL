@@ -22,9 +22,10 @@ using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
-    // VerboseRegion region;
+    VerboseRegion region;
     // TestReceptiveFieldMatrixNode(2, false); // old (slow) version -- Fails
-    // return;
+    TestBinaryConvolutionalLayerNode(32, 32, 3, 5);
+    return;
 
     TestFloatNode();
     TestMultipleOutputNodes();
@@ -163,10 +164,10 @@ void TestIRCompiler()
     TestSoftmaxLayerNode(0, 2);
     // TestSoftmaxLayerNode(1, 0); // Input padding not supported (yet)
 
-    TestBinaryConvolutionalLayerNode();
-    TestBinaryConvolutionalLayerNode(1, 0, PaddingScheme::zeros, true);
-    TestBinaryConvolutionalLayerNode(1, 0, PaddingScheme::minusOnes, false);
-    TestBinaryConvolutionalLayerNode(1, 0, PaddingScheme::minusOnes, true);
+    TestBinaryConvolutionalLayerNode(32, 32, 3, 4);
+    TestBinaryConvolutionalLayerNode(32, 32, 3, 4, 1, 0, PaddingScheme::zeros, true);
+    TestBinaryConvolutionalLayerNode(32, 32, 3, 4, 1, 0, PaddingScheme::minusOnes, false);
+    TestBinaryConvolutionalLayerNode(32, 32, 3, 4, 1, 0, PaddingScheme::minusOnes, true);
 
     // TestConvolutionalLayerNode(ConvolutionType::GEMM);
     TestConvolutionalLayerNode(ConvolutionType::GEMM, 1, 0);

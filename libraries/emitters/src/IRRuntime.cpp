@@ -7,9 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IRRuntime.h"
+#include "IRFunctionEmitter.h"
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 
+// stl
 #include <iostream>
 #include <time.h>
 
@@ -178,7 +180,7 @@ namespace emitters
     static const std::string& getTimeFunctionName = "GetTime";
 
     IRRuntime::IRRuntime(IRModuleEmitter& module)
-        : _module(module)
+        : _module(module), _posixRuntime(module)
     {
     }
 
@@ -234,6 +236,14 @@ namespace emitters
     {
         llvm::Function* function = nullptr;
 
+        auto& context = _module.GetLLVMContext();
+        auto int32Type = llvm::Type::getInt32Ty(context);
+        auto int64Type = llvm::Type::getInt64Ty(context);
+        auto doubleType = llvm::Type::getDoubleTy(context);
+
+        auto tmFieldType = timespecType->getElementType(0); // The type of the first field of the timespec struct -- it's the correct bitsize for 'int'
+        auto intType = tmFieldType;
+
         if (_module.GetCompilerParameters().targetDevice.IsWindows())
         {
             // We normally assume there is a system function "clock_gettime" that provides high resolution times for profiling the emitted model.
@@ -253,12 +263,6 @@ namespace emitters
             //        return 0;
             //    }
 
-            auto& context = _module.GetLLVMContext();
-            auto int32Type = llvm::Type::getInt32Ty(context);
-            auto int64Type = llvm::Type::getInt64Ty(context);
-            auto doubleType = llvm::Type::getDoubleTy(context);
-
-            auto tmFieldType = timespecType->getElementType(0);
             const VariableType tmFieldVarType = tmFieldType == int64Type ? VariableType::Int64 : VariableType::Int32;
 
             auto zero = llvm::ConstantInt::get(int32Type, 0);
@@ -266,8 +270,8 @@ namespace emitters
 
             llvm::FunctionType* qpcProto = llvm::FunctionType::get(int32Type, { int64Type->getPointerTo() }, false);
             _module.DeclareFunction("QueryPerformanceCounter", qpcProto);
-            auto qpcFunction = _module.GetFunction("QueryPerformanceCounter");
             _module.DeclareFunction("QueryPerformanceFrequency", qpcProto);
+            auto qpcFunction = _module.GetFunction("QueryPerformanceCounter");
             auto qpfFunction = _module.GetFunction("QueryPerformanceFrequency");
 
             std::vector<llvm::Type*> args;
@@ -322,10 +326,20 @@ namespace emitters
         }
         else
         {
+            volatile void* temp = (void*)(&clock_gettime);
+            llvm::FunctionType* gettimeType = llvm::FunctionType::get(intType, { int32Type, timespecType->getPointerTo() }, false);
+            _module.DeclareFunction("clock_gettime", gettimeType);
             function = _module.GetFunction("clock_gettime");
         }
 
         return function;
+    }
+
+    llvm::Value* IRRuntime::GetCurrentTime(IRFunctionEmitter& function)
+    {
+        auto getTimeFunc = GetCurrentTimeFunction();
+        auto time = function.Call(getTimeFunc, {});
+        return time;
     }
 
     llvm::Function* IRRuntime::GetCurrentTimeFunction()
@@ -338,19 +352,10 @@ namespace emitters
             auto int32Type = llvm::Type::getInt32Ty(context);
             auto int64Type = llvm::Type::getInt64Ty(context);
 
-            llvm::StructType* timespecType = nullptr;
-            if (_module.GetCompilerParameters().targetDevice.numBits == 32)
-            {
-                // These are really time_t and long
-                timespecType = llvm::StructType::create(context, { int32Type, int32Type }, "timespec");
-            }
-            else
-            {
-                timespecType = llvm::StructType::create(context, { int64Type, int64Type }, "timespec");
-            }
+            llvm::StructType* timespecType = _posixRuntime.GetTimespecType();
             llvm::FunctionType* gettimeType = llvm::FunctionType::get(int32Type, { int32Type, timespecType->getPointerTo() }, false);
             _module.DeclareFunction("clock_gettime", gettimeType);
-
+            
             // make struct
             auto getTimeFunction = ResolveCurrentTimeFunction(timespecType);
             if (getTimeFunction != nullptr)

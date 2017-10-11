@@ -1897,7 +1897,7 @@ void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
-void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPaddingSize, ell::predictors::neural::PaddingScheme paddingScheme, bool scaleByFilterMeans)
+void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, size_t numChannels, size_t numFilters, size_t inputPaddingSize, size_t outputPaddingSize, ell::predictors::neural::PaddingScheme paddingScheme, bool scaleByFilterMeans)
 {
     using ElementType = float;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
@@ -1906,11 +1906,7 @@ void TestBinaryConvolutionalLayerNode(size_t inputPaddingSize, size_t outputPadd
     using Shape = typename Layer<ElementType>::Shape;
     using VectorType = typename Layer<ElementType>::VectorType;
 
-    const size_t imageRows = 3;
-    const size_t imageColumns = 3;
-    const size_t numChannels = 32;
     const size_t k = 3;
-    const size_t numFilters = 2;
     const size_t stride = 1;
 
     // Verify BinaryConvolutionalLayer with bitwise method

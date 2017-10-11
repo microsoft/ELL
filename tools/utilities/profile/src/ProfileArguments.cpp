@@ -78,40 +78,5 @@ void ParsedProfileArguments::AddArgs(utilities::CommandLineParser& parser)
         "",
         "Print timing summary only",
         false);
-
-    parser.AddOption(
-        optimize,
-        "optimize",
-        "",
-        "Optimize compiled code",
-        true);
-
-    parser.AddOption(
-        useBlas,
-        "blas",
-        "",
-        "Use BLAS libraries in compiled code",
-        true);
-
-    parser.AddOption(
-        fuseLinearOperations,
-        "fuseLinearOps",
-        "",
-        "Fuse sequences of linear operations with constant coefficients into a single operation",
-        true);
-
-    parser.AddOption(
-        enableVectorization,
-        "vectorize",
-        "vec",
-        "Enable ELL's vectorization",
-        false);
-
-    parser.AddOption(
-        vectorWidth,
-        "vectorWidth",
-        "vw",
-        "Size of vector units",
-        4);
 }
 }

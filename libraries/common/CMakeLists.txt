@@ -11,6 +11,7 @@ set (src
   src/EvaluatorArguments.cpp
   src/LoadModel.cpp
   src/MakeTrainer.cpp
+  src/MapCompilerArguments.cpp
   src/MapLoadArguments.cpp
   src/MapSaveArguments.cpp
   src/ModelLoadArguments.cpp
@@ -30,6 +31,7 @@ set (include
   include/LoadModel.h
   include/MakeEvaluator.h
   include/MakeTrainer.h
+  include/MapCompilerArguments.h
   include/MapLoadArguments.h
   include/MapSaveArguments.h
   include/ModelLoadArguments.h

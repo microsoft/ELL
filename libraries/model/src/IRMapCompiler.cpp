@@ -29,6 +29,9 @@ namespace model
         : MapCompiler(settings), _moduleEmitter(settings.moduleName), _profiler()
     {
         _moduleEmitter.SetCompilerParameters(GetMapCompilerParameters().compilerSettings);
+        _moduleEmitter.SetTargetTriple(GetCompilerParameters().targetDevice.triple);
+        _moduleEmitter.SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
+
         _nodeRegions.emplace_back();
     }
 
@@ -46,9 +49,10 @@ namespace model
 
         // if output isn't a simple port, add an output node to model
         auto out = map.GetOutput(0);
-        ell::math::TensorShape shape{ out.Size(),1,1 }; // default shape from PortElementsBase::Size()
+        ell::math::TensorShape shape{ out.Size(), 1, 1 }; // default shape from PortElementsBase::Size()
         auto outNodes = map.GetOutputNodes();
-        if (outNodes.size() > 0) {
+        if (outNodes.size() > 0)
+        {
             shape = outNodes[0]->GetShape();
         }
         if (!out.IsFullPortOutput())
@@ -139,7 +143,6 @@ namespace model
         _moduleEmitter.EndFunction();
     }
 
-
     void IRMapCompiler::EmitGetOutputSizeFunction(const DynamicMap& map)
     {
         auto& context = _moduleEmitter.GetLLVMContext();
@@ -156,9 +159,10 @@ namespace model
     void IRMapCompiler::EmitShapeEnum()
     {
         auto shapeType = _moduleEmitter.GetStruct(TensorShapeName);
-        if (shapeType == nullptr) {
+        if (shapeType == nullptr)
+        {
             auto int32Type = ell::emitters::VariableType::Int32;
-            emitters::NamedVariableTypeList namedFields = { { "rows", int32Type },{ "columns", int32Type },{ "channels" , int32Type } };
+            emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
             auto shapeType = _moduleEmitter.DeclareStruct(TensorShapeName, namedFields);
             _moduleEmitter.IncludeTypeInHeader(shapeType->getName());
         }
@@ -196,7 +200,8 @@ namespace model
         if (shapes.size() > 0)
         {
             int index = 0;
-            for (auto ptr = shapes.begin(), end = shapes.end(); ptr != end; ptr++, index++) {
+            for (auto ptr = shapes.begin(), end = shapes.end(); ptr != end; ptr++, index++)
+            {
                 std::string labelSuffix = std::to_string(index);
 
                 auto followBlock = fn.BeginBlock("FollowBlock" + labelSuffix);
@@ -232,12 +237,11 @@ namespace model
 
         blocks.push_back(pDoneBlock);
         // ensure all blocks are properly chained with branch instructions and inserted into the function BasicBlockList.
-        fn.ConcatenateBlocks(blocks); 
+        fn.ConcatenateBlocks(blocks);
     }
 
-
     // This is the type of code we are trying to generate for the GetInputShape and GetOutputShape functions:
-    // 
+    //
     // void foo_GetInputShape(int index, struct TensorShape* s)
     // {
     //     if (index == 0) {
@@ -256,7 +260,7 @@ namespace model
     //     s->columns = 0;
     //     s->channels = 0;
     // }
-    // 
+    //
 
     void IRMapCompiler::EmitGetInputShapeFunction(const DynamicMap& map)
     {
@@ -271,7 +275,8 @@ namespace model
         fn.IncludeInHeader();
         auto nodes = map.GetInputNodes();
         std::vector<math::TensorShape> shapes;
-        for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++) {
+        for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
+        {
             const ell::model::InputNodeBase* node = *ptr;
             shapes.push_back(node->GetShape());
         }
@@ -292,7 +297,8 @@ namespace model
         fn.IncludeInHeader();
         auto nodes = map.GetOutputNodes();
         std::vector<math::TensorShape> shapes;
-        for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++) {
+        for (auto ptr = nodes.begin(), end = nodes.end(); ptr != end; ptr++)
+        {
             const ell::model::OutputNodeBase* node = *ptr;
             shapes.push_back(node->GetShape());
         }

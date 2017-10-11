@@ -57,6 +57,7 @@ if(NOT OPT_EXECUTABLE)
 endif()
 
 configure_file(CMakeLists-compiled.txt.in CMakeLists-compiled.txt.in @ONLY)
+configure_file(CMakeLists-compiled-parallel.txt.in CMakeLists-compiled-parallel.txt.in @ONLY)
 configure_file(src/compiled_profile_main.cpp compiled_profile_main.cpp COPYONLY)
 configure_file(src/compiled_exercise_model_main.cpp compiled_exercise_model_main.cpp COPYONLY)
 configure_file(make_profiler.sh.in make_profiler.sh @ONLY)
@@ -74,4 +75,4 @@ if(WIN32)
     GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 endif()
 
-add_custom_target(make_profiler DEPENDS compile CMakeLists-compiled.txt.in src/compiled_profile_main.cpp src/compiled_exercise_model_main.cpp make_profiler.sh.in make_profiler.cmd.in)
+add_custom_target(make_profiler DEPENDS compile CMakeLists-compiled.txt.in CMakeLists-compiled-parallel.txt.in src/compiled_profile_main.cpp src/compiled_exercise_model_main.cpp make_profiler.sh.in make_profiler.cmd.in)

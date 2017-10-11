@@ -117,6 +117,16 @@ namespace utilities
         /// <param name="docString"> The string to be printed </param>
         virtual void AddDocumentationString(std::string docString);
 
+        /// <summary> Disables an option </summary>
+        ///
+        /// <param name="name"> The long name for the option. </param>
+        virtual void DisableOption(std::string name);
+
+        /// <summary> Enables a previously-disabled option </summary>
+        ///
+        /// <param name="name"> The long name for the option. </param>
+        virtual void EnableOption(std::string name);
+
         using PostParseCallback = std::function<CommandLineParseResult(CommandLineParser&)>;
 
         /// <summary> Adds a callback function that gets invoked after Parse() is called </summary>
@@ -141,13 +151,15 @@ namespace utilities
         std::string GetCommandLine() const;
 
         /// <summary> Returns the value of a given option (as a string) </summary>
-        std::string GetOptionValue(const std::string& option);
+        ///
+        /// <param name="name"> The long name for the option </param>
+        std::string GetOptionValue(const std::string& name);
 
         /// <summary> Returns true if the given option has been registered </summary>
         ///
-        /// <param name="option"> The long name for the option </param>
+        /// <param name="name"> The long name for the option </param>
         /// <returns> true if the given option has been registered </returns>
-        bool HasOption(std::string option);
+        bool HasOption(std::string name);
 
         /// <summary> Returns true if the given short name has been registered </summary>
         ///
@@ -192,6 +204,7 @@ namespace utilities
             std::string emptyValueString; // value to use if no value follows the option
             std::string currentValueString;
             std::vector<std::string> enumValues;
+            bool enabled = true;
 
             std::vector<std::function<bool(std::string)>> set_value_callbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
             std::vector<std::function<bool(std::string)>> didSetValueCallbacks; // callback returns "true" if value was successfully std::set, otherwise "false"
@@ -226,6 +239,7 @@ namespace utilities
         void AddOption(const OptionInfo& info);
         virtual bool SetOption(std::string option_name); // returns true if we need to reparse
         virtual bool SetOption(std::string option_name, std::string option_val); // returns true if we need to reparse
+        OptionInfo* FindOption(const std::string& name);
         bool SetDefaultArgs(const std::set<std::string, case_insensitive_comparer>& unset_args); // returns true if we need to reparse
     };
 

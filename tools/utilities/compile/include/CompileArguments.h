@@ -8,6 +8,9 @@
 
 #pragma once
 
+// model
+#include "MapCompiler.h"
+
 // utilities
 #include "CommandLineParser.h"
 #include "OutputStreamImpostor.h"
@@ -32,35 +35,12 @@ struct CompileArguments
     bool outputSwigInterface = false;
     bool outputRefinedMap = false;
     bool outputCompiledMap = false;
-    std::string compiledFunctionName; // defaults to output filename
-    std::string compiledModuleName;
     std::string outputDirectory;
     std::string outputFilenameBase;
     bool verbose = false;
 
     // model-generation options
     int maxRefinementIterations = 0;
-    bool profile = false;
-
-    // compilation options
-    bool optimize = true;
-    bool useBlas = false;
-    bool fuseLinearOperations = true;
-    bool enableParallelFor = false;
-    bool enableVectorization = false;
-    int vectorWidth = 4;
-
-    // target machine options
-    // known target names: host, mac, linux, windows, arm, arm64, ios
-    std::string target = "";
-
-    // These can override default setting for a target
-    std::string cpu = "";
-    int numBits = NumBitsDefault;
-    std::string targetTriple = "";
-    std::string targetArchitecture = "";
-    std::string targetFeatures = "";
-    std::string targetDataLayout = "";
 };
 
 /// <summary> Parsed command line arguments for the compile executable. </summary>
@@ -70,5 +50,7 @@ struct ParsedCompileArguments : public CompileArguments, public utilities::Parse
     ///
     /// <param name="parser"> [in,out] The parser. </param>
     virtual void AddArgs(utilities::CommandLineParser& parser) override;
+
+    model::MapCompilerParameters GetMapCompilerParameters(const std::string& baseFilename);
 };
 }

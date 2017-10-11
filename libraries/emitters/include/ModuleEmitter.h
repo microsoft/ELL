@@ -40,7 +40,9 @@ namespace emitters
         bool useBlas = false;
         bool optimize = true;
         bool includeDiagnosticInfo = false;
-
+        bool parallelize = false;
+        int maxThreads = 4;
+        
         TargetDevice targetDevice;
     };
 

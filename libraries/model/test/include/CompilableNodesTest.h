@@ -70,7 +70,7 @@ void TestParametricReLUActivationLayerNode(size_t inputPadding = 0, size_t outpu
 void TestSigmoidActivationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestBatchNormalizationLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestBiasLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
-void TestBinaryConvolutionalLayerNode(size_t inputPadding = 1, size_t outputPadding = 0, ell::predictors::neural::PaddingScheme = ell::predictors::neural::PaddingScheme::zeros, bool scaleByFilterMeans = true);
+void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, size_t numChannels, size_t numFilters, size_t inputPadding = 1, size_t outputPadding = 0, ell::predictors::neural::PaddingScheme = ell::predictors::neural::PaddingScheme::zeros, bool scaleByFilterMeans = true);
 void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
 void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPadding = 1, size_t outputPadding = 0);
 void TestFullyConnectedLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);

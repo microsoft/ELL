@@ -36,11 +36,11 @@ mkdir %profiler_directory%
 
 cd %profiler_directory%
 @LLC_EXECUTABLE@ compiled_model.ll -o compiled_model_llc.o -O3 --filetype=obj %llc_opts%
-@OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3
+@OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_opt.ll -o compiled_model_opt.o -O3 --filetype=obj %llc_opts%
 
 @LLC_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_llc.o -O3 --filetype=obj %llc_opts%
-@OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3
+@OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj %llc_opts%
 
 copy ..\tools\utilities\profile\compiled_profile_main.cpp .

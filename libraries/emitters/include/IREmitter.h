@@ -289,6 +289,14 @@ namespace emitters
         /// <returns> Pointer to the output value. </returns>
         llvm::Value* Cast(llvm::Value* pValue, llvm::Type* destinationType);
 
+        /// <summary> Emit a cast operation from one pointer type to another. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="destinationType"> Output type. </param>
+        ///
+        /// <returns> Pointer to the output value. </returns>
+        llvm::Value* CastPointer(llvm::Value* pValue, llvm::Type* destinationType);
+
         /// <summary> Emit a cast operation from an int to a float. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
@@ -663,6 +671,14 @@ namespace emitters
         /// <returns> Pointer to a value that represents that field. </returns>
         llvm::Value* PointerOffset(llvm::AllocaInst* pArray, llvm::Value* pOffset, llvm::Value* pFieldOffset);
 
+        /// <summary> Get a pointer to a fields in a struct. </summary>
+        ///
+        /// <param name="structPtr"> Pointer to the struct. </param>
+        /// <param name="fieldIndex"> The index of the field to get. </param>
+        ///
+        /// <returns> A pointer the specified field in the struct. </returns>
+        llvm::Value* GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex);
+        
         /// <summary> Emits an instruction to load a value referenced by a pointer into a register. </summary>
         ///
         /// <param name="pPointer"> Pointer to the adress being. </param>
@@ -693,6 +709,13 @@ namespace emitters
         /// <returns> Pointer to the resulting llvm::AllocaInst. </returns>
         llvm::AllocaInst* StackAllocate(VariableType type);
 
+        /// <summary> Emits instruction to create a stack variable. </summary>
+        ///
+        /// <param name="type"> The variable type. </param>
+        ///
+        /// <returns> Pointer to the resulting llvm::AllocaInst. </returns>
+        llvm::AllocaInst* StackAllocate(llvm::Type* type);
+
         /// <summary> Emits instruction to create a named stack variable. </summary>
         ///
         /// <param name="type"> The variable type. </param>
@@ -715,7 +738,15 @@ namespace emitters
         /// <param name="size"> The array size. </param>
         ///
         /// <returns> Pointer to a llvm::AllocaInst that represents the allocated array. </returns>
-        llvm::AllocaInst* StackAllocate(VariableType type, int size);
+        llvm::AllocaInst* StackAllocate(VariableType type, size_t size);
+
+        /// <summary> Emits a stack alloc instruction for an array of primitive types. </summary>
+        ///
+        /// <param name="type"> The array entry type. </param>
+        /// <param name="size"> The array size. </param>
+        ///
+        /// <returns> Pointer to a llvm::AllocaInst that represents the allocated array. </returns>
+        llvm::AllocaInst* StackAllocate(llvm::Type* type, size_t size);
 
         /// <summary> Emit a conditional branch. </summary>
         ///
@@ -757,13 +788,20 @@ namespace emitters
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
         llvm::StructType* DeclareStruct(const std::string& name, const NamedVariableTypeList& args);
 
+        /// <summary> Emit a module-scoped anonymous struct with the given fields. </summary>
+        ///
+        /// <param name="fields"> The struct fields. </param>
+        /// <param name="packed"> If `true`, the fields will be packed together without any padding. </param>
+        ///
+        /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
+        llvm::StructType* DeclareAnonymousStruct(const LLVMTypeList& fields, bool packed = false);
+
         /// <summary> Gets a declaration of a Struct with the given name.</summary>
         ///
         /// <param name="name"> The struct name. </param>
         ///
         /// <returns> Pointer to a llvm::StructType that represents the declared struct. </returns>
         llvm::StructType* GetStruct(const std::string& name);
-
 
         /// <summary> Emits a new module with a given name. </summary>
         ///

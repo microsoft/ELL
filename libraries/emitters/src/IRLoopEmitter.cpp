@@ -45,17 +45,26 @@ namespace emitters
         return _functionEmitter.Load(_pIterationVariable);
     }
 
-    llvm::BasicBlock* IRForLoopEmitter::Begin(const int repeatCount)
+    llvm::BasicBlock* IRForLoopEmitter::Begin(int repeatCount)
     {
         return Begin(0, repeatCount, 1);
     }
 
-    llvm::BasicBlock* IRForLoopEmitter::Begin(const int iStartAt, const int iMaxValue, const int stepSize)
+    llvm::BasicBlock* IRForLoopEmitter::Begin(int iStartAt, int iMaxValue, int stepSize)
     {
         CreateBlocks();
         EmitIterationVariable(VariableType::Int32, _functionEmitter.Literal(iStartAt));
         EmitCondition(TypedComparison::lessThan, _functionEmitter.Literal(iMaxValue));
         EmitIncrement(VariableType::Int32, _functionEmitter.Literal(stepSize));
+        return PrepareBody();
+    }
+
+    llvm::BasicBlock* IRForLoopEmitter::Begin(llvm::Value* iStartAt, llvm::Value* iMaxValue, llvm::Value* stepSize)
+    {
+        CreateBlocks();
+        EmitIterationVariable(VariableType::Int32, iStartAt);
+        EmitCondition(TypedComparison::lessThan, iMaxValue);
+        EmitIncrement(VariableType::Int32, stepSize);
         return PrepareBody();
     }
 
@@ -94,7 +103,7 @@ namespace emitters
         _functionEmitter.Branch(_pConditionBlock);
         _functionEmitter.SetCurrentBlock(_pConditionBlock);
         {
-            _functionEmitter.Branch(type, _functionEmitter.Load(_pIterationVariable), pTestValue, _pBodyBlock, _pAfterBlock);
+            _functionEmitter.Branch(type, _functionEmitter.Load(_pIterationVariable), pTestValue, _pBodyBlock, _pAfterBlock); // TODO: add loop metadata to the branch instruction
         }
     }
 

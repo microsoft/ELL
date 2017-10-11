@@ -11,6 +11,7 @@
 
 // llvm
 #include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
 
 namespace ell
 {
@@ -31,9 +32,16 @@ namespace emitters
     //
     // Type conversion from emitter types to LLVM types
     //
-
     std::vector<LLVMType> GetLLVMTypes(const VariableTypeList& types);
     std::vector<NamedLLVMType> GetLLVMTypes(const NamedVariableTypeList& types);
     
+    //
+    // Get types from LLVM values
+    //
+    std::vector<LLVMType> GetLLVMTypes(const std::vector<llvm::Value*> values);
+
+    // TODO:
+    // template <typename... ArgTypes>
+    // std::vector<LLVMType> GetLLVMTypes(ArgTypes... args);
 }
 }
