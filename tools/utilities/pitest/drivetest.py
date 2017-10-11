@@ -50,6 +50,8 @@ class DriveTest:
         self.machine = None
         self.cluser = None
         self.ssh = None
+        self.blas = True
+        self.expression = None
         self.created_dirs = []
         self.profile = False
         if (not os.path.isdir(self.test_dir)):
@@ -72,11 +74,17 @@ class DriveTest:
         self.arg_parser.add_argument("--target_dir", help="the directory on the target device for running the test", default=self.target_dir)
         self.arg_parser.add_argument("--username", help="the username for the target device", default=self.username)
         self.arg_parser.add_argument("--password", help="the password for the target device", default=self.password)
+        self.arg_parser.add_argument("--iterations", "-i", type=int, help="the number of iterations for each predict (default 1)", default=1)
+        self.arg_parser.add_argument("--expression", "-e", help="the string to search for to verify test passed (default 'coffee mug')", default="coffee mug")
+        self.arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
 
         argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
         args = self.arg_parser.parse_args(argv)
 
         self.init(args)
+
+    def str2bool(self, v):
+        return v.lower() in ("yes", "true", "t", "1")
 
     def init(self, args):
         self.test_dir = os.path.abspath(args.outdir)
@@ -85,7 +93,9 @@ class DriveTest:
         self.target_dir = args.target_dir
         self.username = args.username
         self.password = args.password
-
+        self.iterations = args.iterations
+        self.expression = args.expression
+        self.blas = self.str2bool(args.blas)
         self.extract_model_info(args.model, args.labels)
         self.ipaddress = self.resolve_address(args.ipaddress)
 
@@ -131,7 +141,7 @@ class DriveTest:
             self.model_name, ext = os.path.splitext(basename(self.ell_model))
             if ext.lower() == ".zip":
                 self.model_name, ext = os.path.splitext(self.model_name)
-            self.labels_file = labels_file
+            self.labels_file = os.path.abspath(labels_file)
 
     def download(self, url, localpath):
         # Download the file
@@ -158,6 +168,7 @@ class DriveTest:
         template = template.replace("@LABELS@", basename(self.labels_file))
         template = template.replace("@COMPILED_MODEL@", basename(self.model_name))
         template = template.replace("@TARGET_DIR@", self.target_dir)
+        template = template.replace("@ITERATIONS@", str(self.iterations))
         output_template = os.path.join(dest, "runtest.sh")
 
         # raspberry pi requires runtest to use 0xa for newlines, so fix autocrlf that happens on windows.
@@ -208,7 +219,8 @@ class DriveTest:
         sys.path.append(os.path.join(current_path, '../../wrap'))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        builder_args = [labels_file, self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v"]
+        builder_args = [labels_file, self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
+            "--blas", str(self.blas) ]
         if self.profile:
             builder_args.append("-profile")
         builder.parse_command_line(builder_args)
@@ -224,12 +236,18 @@ class DriveTest:
         print("remote:" + cmd)
         output = []
         stdin, stdout, stderr = self.ssh.exec_command(cmd)
-        for line in stdout:
-            output.append(line.strip('\n'))
-            print('... ' + line.strip('\n'))
-        for line in stderr:
-            output.append(line.strip('\n'))
-            print('... ' + line.strip('\n'))
+        while True:
+            line = stdout.readline()
+            if line != "":
+                output.append(line.strip('\n'))
+                print("..." + line.strip('\n'))
+            err = stderr.readline()
+            if err != "":
+                output.append(err.strip('\n'))
+                print("..." + err.strip('\n'))
+            if line == "" and err == "":
+                break
+
         return output
 
     def clean_target(self):
@@ -268,7 +286,7 @@ class DriveTest:
         print("==========================================================")
         found = False
         for line in output:
-            if "coffee mug" in line:
+            if self.expression in line:
                 found = True
         
         if found:
@@ -285,10 +303,13 @@ class DriveTest:
             self.clean_target()
             self.publish_bits()
             self.execute_remote_test()
-        except:
+            self.free_machine()
+        except:            
             errorType, value, traceback = sys.exc_info()
             print("### Exception: " + str(errorType) + ": " + str(value))
-        self.free_machine()
+            self.free_machine()
+            raise Exception("### Test Failed")
+            
 
 if __name__ == "__main__":
     args = sys.argv

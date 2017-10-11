@@ -73,7 +73,7 @@ class DemoHelper:
         arg_parser.add_argument("--iterations", type=int, help="limits how many times the model will be evaluated, the default is to loop forever")
         arg_parser.add_argument("--save", help="save images captured by the camera", action='store_true')
         arg_parser.add_argument("--threshold", type=float, help="threshold for the minimum prediction score. A lower threshold will show more prediction labels, but they have a higher chance of being completely wrong.", default=self.threshold)
-        arg_parser.add_argument("--bgr", help="specify whether input data should be in BGR format", default = self.bgr)
+        arg_parser.add_argument("--bgr", help="specify True if input data should be in BGR format (default False)", default = self.bgr)
 
         # mutually exclusive options
         group = arg_parser.add_mutually_exclusive_group()
@@ -190,7 +190,7 @@ class DemoHelper:
                 raise Exception(func_name + " function not found in compiled module")
         except:    
             errorType, value, traceback = sys.exc_info()
-            print("### Exception: " + str(errorType) + ": " + value)
+            print("### Exception: " + str(errorType) + ": " + str(value))
             print("====================================================================")
             print("Compiled ELL python module is not loading")
             print("It is possible that you need to add LibOpenBLAS to your system path (See Install-*.md) from root of this repo")

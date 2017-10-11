@@ -3,6 +3,8 @@ import requests
 import json
 import socket
 import time
+from dateutil.parser import parse
+import datetime
 
 class PiBoardEntity(): 
     def __init__(self, values = None):
@@ -15,6 +17,7 @@ class PiBoardEntity():
             self.current_task_name = ""
             self.current_user_name = ""
             self.command = ""       
+            self.last_heartbeat = ""
 
     def load(self, values) :        
         self.ip_address = values['IpAddress']
@@ -23,6 +26,7 @@ class PiBoardEntity():
         self.current_task_name = values['CurrentTaskName']
         self.current_user_name = values['CurrentUserName']
         self.command = values['Command']
+        self.last_heartbeat = values['LastHeartbeat']
 
     def deserialize(self, text):
         values = json.loads(text)
@@ -112,15 +116,29 @@ class PiBoardTable:
             name += "_" + self.get_local_ip()        
         return name
 
+    def heartbeat_is_valid(self, heartbeat):
+        # heartbeat should be updating every minute, we'll give it max of 5 minutes to comply
+        now = datetime.datetime.utcnow()
+        h = datetime.datetime.utcfromtimestamp(heartbeat.timestamp())
+        diff = abs(now.timestamp() - h.timestamp())
+        return diff < 5 * 60
+
     def wait_for_free_machine(self, jobName):
         # then this is a pi cluster server, so find a free machine
         while True:
             for e in self.get_all():
-                if e.command != 'Lock':
-                    print(self.username + " is attempting to lock machine at " + e.ip_address)
-                    result = self.lock(e.ip_address, jobName)
-                    if result.current_user_name == self.username:
-                        # we got it
-                        return result
+                try:
+                    heartbeat = parse(e.last_heartbeat)
+                    if not self.heartbeat_is_valid(heartbeat):
+                        print("machine at %s is not sending heartbeats" % (e.ip_address))
+                    elif e.command != 'Lock':
+                        print(self.username + " is attempting to lock machine at " + e.ip_address)
+                        result = self.lock(e.ip_address, jobName)
+                        if result.current_user_name == self.username:
+                            # we got it
+                            return result
+                except:
+                    pass
+
             print("All machines are busy, sleeping 10 seconds and trying again...")
             time.sleep(10)

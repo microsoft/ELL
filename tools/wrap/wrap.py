@@ -38,6 +38,10 @@ class ModuleBuilder:
         self.language = "python"
         self.verbose = False
         self.profile = False
+        self.blas = False
+
+    def str2bool(self, v):
+        return v.lower() in ("yes", "true", "t", "1")
 
     def parse_command_line(self, argv):
         arg_parser = argparse.ArgumentParser("This tool wraps a given ELL model in a CMake buildable project that builds a language\n"
@@ -59,6 +63,7 @@ class ModuleBuilder:
         arg_parser.add_argument("--outdir", "-outdir", help="the output directory")
         arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
         arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
+        arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="False")
 
         args = arg_parser.parse_args(argv)
         
@@ -72,6 +77,7 @@ class ModuleBuilder:
             self.output_dir  = self.target
         self.profile = args.profile
         self.verbose = args.verbose
+        self.blas = self.str2bool(args.blas)
 
         _, tail = os.path.split(self.model_file)
         self.model_name =  os.path.splitext(tail)[0]        
@@ -135,7 +141,7 @@ class ModuleBuilder:
         self.copy_files(self.files, "")
         self.copy_files(self.includes, "include")
         self.copy_files(self.tcc, "tcc")
-        self.tools.compile(self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.profile)
+        self.tools.compile(self.model_file, self.func_name, self.model_name, self.target, self.output_dir, self.blas, self.profile)
         if self.language != "cpp":
             self.tools.swig(self.output_dir, self.model_name, self.language)
         self.tools.opt(self.output_dir, self.model_name)
