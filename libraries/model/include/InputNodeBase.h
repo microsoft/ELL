@@ -58,7 +58,7 @@ namespace model
         InputNodeBase(OutputPortBase& output, ell::math::TensorShape shape);
         virtual bool ShouldCompileInline() const override { return true; }
         virtual bool HasState() const override { return false; }
-        void SetShape(const ell::math::TensorShape& shape) { _shape = shape; }
+        void SetShape(const ell::math::TensorShape& shape) { _shape = shape; }  // STYLE discrepancy
         virtual ell::utilities::ArchiveVersion GetArchiveVersion() const override;
     private:
         OutputPortBase& _outputBase;

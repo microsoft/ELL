@@ -646,9 +646,9 @@ namespace math
         static void Read(Matrix<ElementType, layout>& matrix, const std::string& name, utilities::Unarchiver& archiver);
 
     private:
-        static std::string GetRowsName(const std::string& name) { return name + "_rows"; }
-        static std::string GetColumnsName(const std::string& name) { return name + "_columns"; }
-        static std::string GetValuesName(const std::string& name) { return name + "_values"; }
+        static std::string GetRowsName(const std::string& name) { return name + "_rows"; } // STYLE discrepancy
+        static std::string GetColumnsName(const std::string& name) { return name + "_columns"; } // STYLE discrepancy
+        static std::string GetValuesName(const std::string& name) { return name + "_values"; } // STYLE discrepancy
     };
 
     //

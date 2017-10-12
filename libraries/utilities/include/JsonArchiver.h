@@ -175,9 +175,16 @@ namespace utilities
     class JsonUtilities
     {
     public:
+        /// <summary></summary>
         static std::string EncodeString(const std::string& str);
+
+        /// <summary></summary>
         static std::string DecodeString(const std::string& str);
+
+        /// <summary></summary>
         static std::string EncodeTypeName(const std::string& str);
+
+        /// <summary></summary>
         static std::string DecodeTypeName(const std::string& str);
     };
 }

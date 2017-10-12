@@ -65,6 +65,7 @@ namespace utilities
 #endif
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(float);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(double);
+
         virtual void ArchiveArray(const char* name, const std::vector<std::string>& array) override;
         virtual void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) override;
 

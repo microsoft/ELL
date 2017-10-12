@@ -65,7 +65,7 @@ namespace nodes
     public:
         BroadcastUnaryFunction() = default;
         BroadcastUnaryFunction(const BroadcastUnaryFunction&) = default;
-        virtual ~BroadcastUnaryFunction() {}
+        virtual ~BroadcastUnaryFunction() = default;
 
         /// <summary> Computes a value (on the host machine) </summary>
         ///
@@ -106,7 +106,7 @@ namespace nodes
     public:
         BroadcastBinaryFunction() = default;
         BroadcastBinaryFunction(const BroadcastBinaryFunction&) = default;
-        virtual ~BroadcastBinaryFunction() {}
+        virtual ~BroadcastBinaryFunction() = default;
 
         /// <summary> Computes a value (on the host machine) </summary>
         ///
@@ -149,7 +149,7 @@ namespace nodes
     public:
         BroadcastTernaryFunction() = default;
         BroadcastTernaryFunction(const BroadcastTernaryFunction&) = default;
-        virtual ~BroadcastTernaryFunction() {}
+        virtual ~BroadcastTernaryFunction() = default;
 
         /// <summary> Computes a value (on the host machine) </summary>
         ///
@@ -287,19 +287,27 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
+        /// <summary></summary>
         BroadcastUnaryFunctionNode();
 
+        /// <summary></summary>
         BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                    const model::PortMemoryLayout& outputLayout,
                                    ValueType padding = 0);
 
+        /// <summary></summary>
         BroadcastUnaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                    const model::PortMemoryLayout& outputLayout,
                                    FunctionType function,
                                    ValueType padding = 0);
 
+        /// <summary></summary>
         virtual int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
+
+        /// <summary></summary>
         virtual int GetSecondaryInputSize() const override { return 0; }
+
+        /// <summary></summary>
         virtual int NumSecondaryInputs() const override { return 0; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -356,19 +364,29 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
+        /// <summary></summary>
         BroadcastBinaryFunctionNode();
+
+        /// <summary></summary>
         BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                     const model::PortElements<ValueType>& secondaryInput, size_t secondaryInputDimension,
                                     const model::PortMemoryLayout& outputLayout,
                                     ValueType padding = 0);
+
+        /// <summary></summary>
         BroadcastBinaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                     const model::PortElements<ValueType>& secondaryInput, size_t secondaryInputDimension,
                                     const model::PortMemoryLayout& outputLayout,
                                     FunctionType function,
                                     ValueType padding = 0);
 
+        /// <summary></summary>
         virtual int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
+
+        /// <summary></summary>
         virtual int GetSecondaryInputSize() const override { return _secondaryInput.Size(); }
+
+        /// <summary></summary>
         virtual int NumSecondaryInputs() const override { return 1; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -429,19 +447,29 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
+        /// <summary></summary>
         BroadcastTernaryFunctionNode();
+
+        /// <summary></summary>
         BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                      const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t secondaryInputDimension,
                                      const model::PortMemoryLayout& outputLayout,
                                      ValueType padding = 0);
+
+        /// <summary></summary>
         BroadcastTernaryFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                      const model::PortElements<ValueType>& secondaryInput1, const model::PortElements<ValueType>& secondaryInput2, size_t secondaryInputDimension,
                                      const model::PortMemoryLayout& outputLayout,
                                      FunctionType function,
                                      ValueType padding = 0);
 
+        /// <summary></summary>
         virtual int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
+
+        /// <summary></summary>
         virtual int GetSecondaryInputSize() const override { return std::max(_secondaryInput1.Size(), _secondaryInput2.Size()); }
+
+        /// <summary></summary>
         virtual int NumSecondaryInputs() const override { return 2; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -495,7 +523,10 @@ namespace nodes
         using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>::secondaryInput2;
         using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>::output;
 
+        /// <summary></summary>
         BroadcastLinearFunctionNode();
+
+        /// <summary></summary>
         BroadcastLinearFunctionNode(const model::PortElements<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout,
                                     const model::PortElements<ValueType>& scaleInput, const model::PortElements<ValueType>& biasInput, size_t secondaryInputDimension,
                                     const model::PortMemoryLayout& outputLayout,

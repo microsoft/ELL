@@ -33,13 +33,6 @@ namespace emitters
     class IRFunctionEmitter
     {
     public:
-        IRFunctionEmitter() = default;
-
-        IRFunctionEmitter(const IRFunctionEmitter&) = default;
-        IRFunctionEmitter(IRFunctionEmitter&&) = default;
-        IRFunctionEmitter& operator=(const IRFunctionEmitter&) = default;
-        IRFunctionEmitter& operator=(IRFunctionEmitter&&) = default;
-
         /// <summary> Query if this IRFunctionEmitter is valid. </summary>
         ///
         /// <returns> True if valid, false if not. </returns>
@@ -99,7 +92,7 @@ namespace emitters
         /// <param name="pointerType"> The llvm type of the pointer to return. </param>
         ///
         /// <returns> Pointer to an llvm::ConstantPointerNull that represents a null pointer of the given pointer type. </returns>
-        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType) { return _pEmitter->NullPointer(pointerType); }
+        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType) { return _pEmitter->NullPointer(pointerType); } // STYLE discrepancy 
 
         /// <summary> Emit an instruction to load a function argument. </summary>
         ///

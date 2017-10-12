@@ -74,6 +74,8 @@ namespace utilities
         /// <param name="argc"> The number of argument strings in the array of arguments </param>
         /// <param name="argv"> The array of argument strings </param>
         CommandLineParser(int argc, char* argv[]);
+
+        /// <summary></summary>
         CommandLineParser(int argc, const char* argv[]);
 
         /// <summary> Adds a new option to the command-line parser </summary>
@@ -218,14 +220,15 @@ namespace utilities
             std::string optionNameString() const;
             size_t optionNameHelpLength() const;
         };
-		
-		struct case_insensitive_comparer {
-			bool operator() (const std::string& lhs, const std::string& rhs) const {
-				auto lower_lhs = ToLowercase(lhs);
-				auto lower_rhs = ToLowercase(rhs);
-				return lower_lhs < lower_rhs;
-			}
-		};
+
+        struct case_insensitive_comparer {
+            bool operator() (const std::string& lhs, const std::string& rhs) const {
+                // STYLE discrepancy
+                auto lower_lhs = ToLowercase(lhs);
+                auto lower_rhs = ToLowercase(rhs);
+                return lower_lhs < lower_rhs;
+            }
+        };
 
 
         std::vector<std::string> _originalArgs;
@@ -270,6 +273,7 @@ namespace utilities
     class CommandLineParserException : public std::runtime_error
     {
     public:
+        /// <summary></summary>
         CommandLineParserException(const char* message)
             : std::runtime_error(message){};
     };
@@ -302,6 +306,8 @@ namespace utilities
         /// <summary> Constructor. Called by command-line parser </summary>
         CommandLineParserErrorException(const char* message)
             : CommandLineParserException(message) {}
+
+        /// <summary></summary>
         CommandLineParserErrorException(const char* message, std::vector<ParseError> errors)
             : CommandLineParserException(message), _errors(errors) {}
     private:
@@ -329,6 +335,7 @@ namespace utilities
     class CommandLineParserInvalidOptionsException : public CommandLineParserException
     {
     public:
+        /// <summary></summary>
         CommandLineParserInvalidOptionsException(const char* what)
             : CommandLineParserException(what) {}
     };

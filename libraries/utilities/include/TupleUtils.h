@@ -43,6 +43,7 @@ namespace utilities
     template <typename TupleType, template <typename> class WrapperType, size_t... Sequence>
     static auto MakeWrappedTupleHelper(const TupleType& tuple, std::index_sequence<Sequence...>)
     {
+        // STYLE discrepancy
         // fails if Wrapper<T> has no copy constructor
         return typename TupleOfWrappedElements<WrapperType, typename std::tuple_element<Sequence, TupleType>::type...>::type{};
     }
@@ -50,6 +51,7 @@ namespace utilities
     template <typename TupleType, template <typename> class WrapperType>
     static auto MakeWrappedTuple(const TupleType& tuple)
     {
+        // STYLE discrepancy
         // Note: fails if Wrapper<T> has no copy constructor
         return MakeWrappedTupleHelper<TupleType, WrapperType>(tuple, std::make_index_sequence<std::tuple_size<TupleType>::value>());
     }
@@ -70,18 +72,21 @@ namespace utilities
     template <typename WrappedType, template <typename> class WrapperType>
     auto UnwrapType(WrapperType<WrappedType>* x)
     {
+        // STYLE discrepancy
         return WrappedType{};
     }
 
     template <typename WrappedType, template <typename> class WrapperType>
     auto UnwrapType(WrapperType<WrappedType> x)
     {
+        // STYLE discrepancy
         return WrappedType{};
     }
 
     template <typename... WrappedTypes>
     auto UnwrapTuple(const std::tuple<WrappedTypes...>& elements)
     {
+        // STYLE discrepancy
         return std::tuple<decltype(UnwrapType(WrappedTypes{}))...>{};
     }
 

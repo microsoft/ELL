@@ -37,11 +37,16 @@ namespace model
     class OutputNodeBase : public CompilableNode
     {
     public:
-        const InputPortBase& GetInputPort() const { return _inputBase; }
-        const OutputPortBase& GetOutputPort() const { return _outputBase; }
         using Node::GetInputPort;
         using Node::GetOutputPort;
 
+        /// <summary></summary>
+        const InputPortBase& GetInputPort() const { return _inputBase; }
+
+        /// <summary></summary>
+        const OutputPortBase& GetOutputPort() const { return _outputBase; }
+
+        /// <summary></summary>
         OutputShape GetShape() const { return _shape; }
 
     protected:
@@ -51,7 +56,7 @@ namespace model
         virtual void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         virtual ell::utilities::ArchiveVersion GetArchiveVersion() const override;
 
-        void SetShape(const OutputShape& shape) { _shape = shape; }
+        void SetShape(const OutputShape& shape) { _shape = shape; } // STYLE discrepancy
     private:
         InputPortBase& _inputBase;
         OutputPortBase& _outputBase;

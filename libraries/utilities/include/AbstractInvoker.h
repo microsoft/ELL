@@ -64,6 +64,7 @@ namespace utilities
     class AbstractInvoker<BaseType, DerivedType, DerivedTypes...>
     {
     public:
+        /// <summary></summary>
         template <typename ReturnType, typename FunctorType>
         static ReturnType Invoke(const FunctorType& functor, const BaseType* basePointer);
     };
@@ -72,6 +73,7 @@ namespace utilities
     class AbstractInvoker<BaseType>
     {
     public:
+        /// <summary></summary>
         template <typename ReturnType, typename FunctorType>
         static ReturnType Invoke(const FunctorType& functor, const BaseType* basePointer);
     };

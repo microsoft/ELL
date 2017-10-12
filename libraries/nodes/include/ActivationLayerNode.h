@@ -35,7 +35,7 @@ namespace nodes
     class ReLUActivationFunction : public BroadcastUnaryFunction<ValueType>
     {
     public:
-        virtual ~ReLUActivationFunction() {}
+        virtual ~ReLUActivationFunction() = default;
 
         /// <summary> Computes the ReLU activation (on the host machine) </summary>
         ///

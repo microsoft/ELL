@@ -1,3 +1,5 @@
+// STYLE discrepancy 
+
 #pragma once
 
 #include <algorithm>
@@ -10,16 +12,20 @@ namespace ell
 {
 namespace utilities
 {
+    ///<summary></summary>
     static std::string ToLowercase(const std::string& s)
     {
+        // STYLE discrepancy 
         std::string lower = s;
         std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
         return lower;
     }
 
 #ifndef _MSC_VER
+    ///<summary></summary>
     static int _vscprintf(const char* format, va_list pargs)
     {
+        // STYLE discrepancy 
         int retval;
         va_list argcopy;
         va_copy(argcopy, pargs);
@@ -29,8 +35,10 @@ namespace utilities
     }
 #endif
 
+    ///<summary></summary>
     static std::string stringf(const char* format, ...)
     {
+        // STYLE discrepancy 
         va_list args;
         va_start(args, format);
 

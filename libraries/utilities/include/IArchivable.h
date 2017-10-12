@@ -52,6 +52,7 @@ namespace utilities
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const { return GetTypeName(); }
 
+        /// <summary></summary>
         virtual bool ArchiveAsPrimitive() const { return false; }
 
     protected:

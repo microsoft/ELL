@@ -34,8 +34,6 @@ namespace model
     class NodeIterator : public utilities::IIterator<const Node*>
     {
     public:
-        NodeIterator() {}
-
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if valid, false if not. </returns>
@@ -64,12 +62,6 @@ namespace model
     class Model : public utilities::IArchivable
     {
     public:
-        Model() = default;
-        Model(const Model& other) = default;
-        Model(Model&& other) = default;
-        Model& operator=(const Model& other) = default;
-        Model& operator=(Model&& other) = default;
-
         /// <summary> Factory method used to create nodes and add them to the model. </summary>
         template <typename NodeType, typename... Args>
         NodeType* AddNode(Args&&... args);

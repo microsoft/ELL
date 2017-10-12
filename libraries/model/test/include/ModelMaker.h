@@ -77,9 +77,10 @@ public:
 
     const std::string& Name = _name;
 
-    void SetName(const std::string name)
+    void SetName(const std::string& name)
     {
-        _name = std::move(name);
+        // STYLE discrepancy 
+        _name = name;
     }
 
 private:

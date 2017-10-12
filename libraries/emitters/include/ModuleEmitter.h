@@ -50,7 +50,9 @@ namespace emitters
     class ModuleEmitter
     {
     public:
+        /// <summary></summary>
         ModuleEmitter();
+
         virtual ~ModuleEmitter() = default;
 
         /// <summary> Return the base compiler settings </summary>
