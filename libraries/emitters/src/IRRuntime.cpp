@@ -31,8 +31,8 @@ namespace emitters
             const auto times = emitters::TypedOperator::multiply;
             const auto plusFloat = emitters::TypedOperator::addFloat;
             const auto timesFloat = emitters::TypedOperator::multiplyFloat;
-    
-            auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);            
+
+            auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);
             auto arguments = function.Arguments().begin();
             auto order = &(*arguments++);
             auto transpose = &(*arguments++);
@@ -46,9 +46,9 @@ namespace emitters
             auto beta = &(*arguments++);
             auto y = &(*arguments++);
             auto incy = &(*arguments++);
-                    
+
             llvm::Value* accum = function.Variable(emitters::GetVariableType<ValueType>(), "accum");
-    
+
             auto iLoop = function.ForLoop();
             iLoop.Begin(m);
             {
@@ -66,7 +66,7 @@ namespace emitters
                     function.OperationAndUpdate(accum, plusFloat, aTimesX);
                 }
                 jLoop.End();
-    
+
                 auto yIndex = function.Operator(times, i, incy);
                 function.SetValueAt(y, yIndex, function.Load(accum));
             }
@@ -84,8 +84,8 @@ namespace emitters
             const auto times = emitters::TypedOperator::multiply;
             const auto plusFloat = emitters::TypedOperator::addFloat;
             const auto timesFloat = emitters::TypedOperator::multiplyFloat;
-    
-            auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);            
+
+            auto function = module.BeginFunction(functionName, VariableType::Int32, argTypes);
             auto arguments = function.Arguments().begin();
             auto order = &(*arguments++);
             auto transposeA = &(*arguments++);
@@ -326,7 +326,12 @@ namespace emitters
         }
         else
         {
+#ifndef WIN32
+            // On non-Windows, we need to make sure the linker links in
+            // the clock_gettime function.
             volatile void* temp = (void*)(&clock_gettime);
+#endif
+
             llvm::FunctionType* gettimeType = llvm::FunctionType::get(intType, { int32Type, timespecType->getPointerTo() }, false);
             _module.DeclareFunction("clock_gettime", gettimeType);
             function = _module.GetFunction("clock_gettime");
@@ -355,7 +360,7 @@ namespace emitters
             llvm::StructType* timespecType = _posixRuntime.GetTimespecType();
             llvm::FunctionType* gettimeType = llvm::FunctionType::get(int32Type, { int32Type, timespecType->getPointerTo() }, false);
             _module.DeclareFunction("clock_gettime", gettimeType);
-            
+
             // make struct
             auto getTimeFunction = ResolveCurrentTimeFunction(timespecType);
             if (getTimeFunction != nullptr)
@@ -434,7 +439,7 @@ namespace emitters
 
         auto pModule = _module.GetLLVMModule();
         if(useBlas)
-        {        
+        {
             auto types = _module.GetIREmitter().GetLLVMTypes(argTypes);
             auto functionType = llvm::FunctionType::get(_module.GetIREmitter().Type(emitters::VariableType::Int32), types, false);
             return static_cast<llvm::Function*>(pModule->getOrInsertFunction("cblas_sgemv", functionType));
@@ -449,7 +454,7 @@ namespace emitters
             return EmitGEMVFunction<float>(_module, "noblas_sgemv", argTypes);
         }
     }
-    
+
     llvm::Function* IRRuntime::GetDGEMVFunction(bool useBlas)
     {
         VariableTypeList argTypes = {
