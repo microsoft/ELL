@@ -52,7 +52,7 @@ def main():
     predictionTimes = []
     meanTimeToPredict = 0.0
 
-    while (cv2.waitKey(1) == 0xFF):
+    while ((cv2.waitKey(1) & 0xFF) == 0xFF):
         # Get an image from the camera. 
         image = get_image_from_camera(camera)
 
@@ -82,7 +82,7 @@ def main():
         # Display the image
         cv2.imshow('ELL model', image)
 
-    print('Mean prediction time: ' + '{:.0f}'.format(meanTimeToPredict) + 'ms/frame')
+    print('Mean prediction time: ' + '{:.0f}'.format(meanTimeToPredict * 1000) + 'ms/frame')
 
 if __name__ == "__main__":
     main()

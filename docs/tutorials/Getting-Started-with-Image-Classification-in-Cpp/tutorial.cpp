@@ -67,7 +67,7 @@ int main(int argc, char** argv)
     std::vector<double>  predictionTimes;
     double meanTimeToPredict = 0.0;
 
-    while (cv::waitKey(1) == -1)
+    while ((cv::waitKey(1) & 0xFF) == 0xFF)
     {
         // Get an image from the camera. (Alternatively, call GetImageFromFile to read from file)
         cv::Mat image = GetImageFromCamera(camera);
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
         model_predict(input, predictions);
         auto end = std::chrono::steady_clock::now();
 
-        // Get the value of the top 5 predictions 
+        // Get the value of the top 5 predictions
         auto top5 = tutorialHelpers::GetTopN(predictions, 5);
 
         // Generate header text that represents the top5 predictions

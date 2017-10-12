@@ -189,7 +189,7 @@ Allocate a vector to store the model's output.
 Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user hits any key. At the start of each loop iteration, read an image from the camera:
 
 ```cpp
-    while (cv::waitKey(1) == 0xFF)
+    while ((cv::waitKey(1) & 0xFF) == 0xFF)
     {
         cv::Mat image = GetImageFromCamera(camera);
 ```
@@ -237,13 +237,13 @@ Use the `DrawHeader` helper function to display the predicted category on the Ra
 We will create a CMake project for the program that we wrote above. Either download the complete `CMakeLists.txt` from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/CMakeLists.txt), or create an empty text file named `CMakeLists.txt` and copy in the project definitions below.
 
 ```cmake
-project( tutorial )
+project(tutorial)
 ```
 
-Set the `OpenCV_DIR` variable to your `OpenCV/build` location. For example, if the full path to that directory is `C:/Install/OpenCV3/opencv/build` then add the following. 
+Set the `OpenCV_DIR` variable to the directory containing `OpenCVConfig.cmake`. For example, on the Raspberry Pi, if the full file path is `/usr/share/OpenCV/OpenCVConfig.cmake` then add the following.
 
 ```cmake
-set(OpenCV_DIR C:/Install/OpenCV3/opencv/build)
+set(OpenCV_DIR /usr/share/OpenCV)
 ```
 
 Tell CMake to find OpenCV.

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project( tutorial )
+project(tutorial)
 set(CMAKE_CXX_STANDARD 11)
 
 # Change this to set OpenCV_DIR to your opencv/build location

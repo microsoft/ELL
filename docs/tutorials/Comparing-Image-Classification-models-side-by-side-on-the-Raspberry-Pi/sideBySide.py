@@ -17,8 +17,10 @@ import tutorialHelpers as helpers
 
 # Import models. Since they are contained in different directories, add the relative paths so Python can find them
 sys.path.append("model1")
+sys.path.append("model1/build")
 sys.path.append("model1/build/Release")
 sys.path.append("model2")
+sys.path.append("model2/build")
 sys.path.append("model2/build/Release")
 
 import model1
@@ -42,7 +44,7 @@ def main():
     categories = open('categories.txt', 'r').read().splitlines()
 
     # Define the models we'll be using
-    models = [model1, model2]    
+    models = [model1, model2]
 
     # Get the models' input dimensions. We'll use this information later to resize images appropriately.
     inputShapes = []
@@ -64,8 +66,8 @@ def main():
 
     # Declare a tiled image used to compose our results
     tiledImage = helpers.TiledImage(len(models))
-    
-    while (cv2.waitKey(1) == 0xFF):
+
+    while ((cv2.waitKey(1) & 0xFF) == 0xFF):
         # Get an image from the camera. If you'd like to use a different image, load the image from some other source.
         image = get_image_from_camera(camera)
 
@@ -91,11 +93,11 @@ def main():
 
             # Let's grab the value of the top 5 predictions and their index, which represents the top five most 
             # confident matches and the class or category they belong to.
-            top5 = helpers.get_top_n(predictionArrays[modelIndex], 5)
+            top5 = helpers.get_top_n(predictionArrays[modelIndex], N=5, threshold=0.10)
 
             # Draw header text that represents the top5 predictions
             modelFrame = np.copy(image)
-            headerText = ", ".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] + "  " for element in top5])
+            headerText = "".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] + "  " for element in top5])
             helpers.draw_header(modelFrame, headerText)
 
             # Draw footer text representing the mean evaluation time

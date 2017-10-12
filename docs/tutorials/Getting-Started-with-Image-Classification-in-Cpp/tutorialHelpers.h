@@ -15,56 +15,50 @@
 class tutorialHelpers
 {
 public:
-    // Prepare an image for processing by an ELL model. 
+    // Prepare an image for processing by an ELL model. Typically, this involves:
     // - Resize and center-crop to the required width and height while preserving aspect ratio.
-    // - OpenCV gives the image in BGR order. If needed, re-order the channels to RGB.
-    // - Convert the OpenCV result to a std::vector<float>
+    //   Simple resize may result in a stretched or squashed image which will affect the model's ability
+    //   to classify images.
+    // - OpenCV gives the image in BGR order, so we may need to re-order the channels to RGB.
+    // - Convert the OpenCV result to a std::vector<float> for use with the ELL model.
     static std::vector<float> PrepareImageForModel(cv::Mat& image, int requiredWidth, int requiredHeight, bool reorderToRGB = false)
     {
-        cv::Mat resultImage = cv::Mat::zeros(requiredWidth, requiredHeight, image.type() );
-        std::vector<float> result(resultImage.total() * resultImage.channels());
-        
-        // Define a region of interest whose shape is compatible with the requiredWidth and requiredHeight
+        cv::Mat resultImage = cv::Mat::zeros(requiredWidth, requiredHeight, image.type());
+
         cv::Rect roi;
-        if (image.rows >= image.cols)
+        if (image.rows > image.cols) // Tall (more rows than columns)
         {
-            float scale = ( (float) requiredWidth ) / image.cols;
-
-            roi.width = image.cols;
-            roi.height = (int)(image.rows * scale);
+            roi.y = (image.rows - image.cols) / 2;
+            roi.height = image.cols;
             roi.x = 0;
-            roi.y = (image.rows - roi.height) / 2;
+            roi.width = image.cols;
         }
-        else
+        else // Wide (more columns than rows)
         {
-            float scale = ( (float) requiredHeight ) / image.rows;
-            
-            roi.width = int(image.cols * scale);
-            roi.height = image.rows;
-            roi.x = (image.cols - roi.width) / 2;
             roi.y = 0;
+            roi.height = image.rows;
+            roi.x = (image.cols - image.rows) / 2;
+            roi.width = image.rows;
         }
 
-        // Crop the image to the region of interest
+        // Center crop the image maintaining aspect ratio
         cv::Mat centerCropped = image(roi);
 
-        // Resize to the required dimensions
+        // Resize to model's requirements
         cv::resize(centerCropped, resultImage, resultImage.size());
-        
-        // Reorder color channels if needed
+
+        // Re-order color channels if needed
         if (reorderToRGB)
         {
             cv::cvtColor(resultImage, resultImage, cv::COLOR_BGR2RGB);
         }
 
-        // Convert to a vector of floats
-        result.assign(resultImage.datastart, resultImage.dataend);
-
-        return result;
+        // Return as a vector of floats
+        return { resultImage.datastart, resultImage.dataend };
      }
 
-    // Returns the top N scores that exceed a given threshold. The result is a vector of std::pair, 
-    // where the first element of each pair is the index and the second is the score. 
+    // Returns the top N scores that exceed a given threshold. The result is a vector of std::pair,
+    // where the first element of each pair is the index and the second is the score.
     static std::vector<std::pair<size_t, float>> GetTopN(const std::vector<float>& predictions, size_t topN = 5, double threshold = 0.20)
     {
         std::vector<std::pair<size_t, float>> result;
@@ -74,15 +68,15 @@ public:
         std::iota(indexes.begin(), indexes.end(), 0);
 
         // sort indexes based on comparing prediction values
-        std::sort(indexes.begin(), indexes.end(), [&predictions](size_t index1, size_t index2) 
+        std::sort(indexes.begin(), indexes.end(), [&predictions](size_t index1, size_t index2)
         {
-            return predictions[index1] > predictions[index2]; 
+            return predictions[index1] > predictions[index2];
         });
 
         // Make a std::pair and append it to the result for N predictions
         for (size_t i = 0; i < topN; i++)
         {
-            if (predictions[indexes[i]] > threshold)
+            if (predictions[indexes[i]] >= threshold)
             {
                 result.emplace_back(std::pair<size_t, float>({ indexes[i], predictions[indexes[i]] }));
             }
@@ -105,9 +99,9 @@ public:
     static void DrawTextBlock(cv::Mat& image, const std::string& text, cv::Point topLeft, cv::Scalar color, int height = 40)
     {
         double fontScale = 0.7;
-        cv::rectangle(image, topLeft, cv::Point(image.cols, topLeft.y + height), color, cv::FILLED);
+        cv::rectangle(image, topLeft, cv::Point(image.cols, topLeft.y + height), color, CV_FILLED);
         cv::putText(image, text, cv::Point(topLeft.x + height / 4, topLeft.y + (int)(height * 0.667)),
-                    cv::FONT_HERSHEY_COMPLEX_SMALL, fontScale, cv::Scalar(0, 0, 0), 1, cv::LINE_AA);
+                    cv::FONT_HERSHEY_COMPLEX_SMALL, fontScale, cv::Scalar(0, 0, 0), 1, CV_AA);
     }
 
     // Draw a header text block on an image

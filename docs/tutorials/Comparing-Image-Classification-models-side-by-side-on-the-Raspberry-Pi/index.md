@@ -64,7 +64,7 @@ unzip model2.ell.zip
 Rename them to `model1.ell` and `model2.ell` respectively.
 
 ```shell
-[Unix] mv d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && mv d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
+[Linux/macOS] mv d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && mv d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
 [Windows] ren d_I160x160x3CMCMCMCMCMCMC1A.ell model1.ell && ren d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell model2.ell
 ```
 
@@ -101,11 +101,11 @@ running llc...
 success, now you can build the 'model2' folder
 ```
 
-Also copy a few helper functions to the `pi3` directory.
+Also copy a few helper functions to the `sideBySide` directory.
 
 ```shell
-[Linux/macOS] cp ../../../docs/tutorials/shared/tutorialHelpers.py pi3
-[Windows] copy ..\..\..\docs\tutorials\shared\tutorialHelpers.py pi3
+[Linux/macOS] cp ../../docs/tutorials/shared/tutorialHelpers.py .
+[Windows] copy ..\..\docs\tutorials\shared\tutorialHelpers.py .
 ```
 
 You should now have a `sideBySide` directory containing `model1` and `model2` directories as well as some helpful python utilities, which we'll use later in this tutorial.
@@ -130,8 +130,10 @@ Next, we need to import the models. Since they are contained in different direct
 
 ```python
 sys.path.append("model1")
+sys.path.append("model1/build")
 sys.path.append("model1/build/Release")
 sys.path.append("model2")
+sys.path.append("model2/build")
 sys.path.append("model2/build/Release")
 import model1
 import model2
@@ -195,7 +197,7 @@ Create a tiled image that will be used to display the two frames side-by-side. T
 Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user hits any key. At the start of every loop iteration, read an image from the camera.
 
 ```python
-    while (cv2.waitKey(1) == 0xFF):
+    while ((cv2.waitKey(1) & 0xFF) == 0xFF):
         image = get_image_from_camera(camera)
 ```
 
@@ -221,16 +223,16 @@ With the processed image input handy, call the `predict` method to invoke the mo
             model.predict(input, predictionArrays[modelIndex])
 ```
 
-As before, the `predict` method fills the `predictionsArray[modelIndex]` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n`.
+As before, the `predict` method fills the `predictionsArray[modelIndex]` array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n`, selecting predictions with a 10% or higher confidence. A threshold of 10% will show more predictions from the binarized model for comparison purposes.
 
 ```python
-            top5 = helpers.get_top_n(predictionArrays[modelIndex], 5)
+            top5 = helpers.get_top_n(predictionArrays[modelIndex], N=5, threshold=0.10)
 ```
 
 `top5` is an array of tuples, where the first element is the category index and the second element is the probability of that category. Match the category indices in `top5` with the category names in `categories`.
 
 ```python
-            headerText = ", ".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] + "  " for element in top5])
+            headerText = "".join(["(" + str(int(element[1]*100)) + "%) " + categories[element[0]] + "  " for element in top5])
 ```
 
 Use the `draw_header` helper function to write the predicted category on the image. Since each model will write its own result, we make a copy of the input image.

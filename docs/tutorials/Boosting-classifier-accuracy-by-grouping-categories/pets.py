@@ -87,13 +87,9 @@ def main():
     outputShape = model.get_default_output_shape()
     predictions = model.FloatVector(outputShape.Size())
 
-    # Declare variables to hold state that we use to ensure we play sounds on new recognition
-    lastHist = None
-    significantDiff = 5000
-    lastPredictionTime = 0
     headerText = ""
 
-    while (cv2.waitKey(1) == 0xFF):
+    while ((cv2.waitKey(1) & 0xFF) == 0xFF):
         # Get an image from the camera. If you'd like to use a different image, load the image from some other source.
         image = get_image_from_camera(camera)
 
@@ -103,52 +99,34 @@ def main():
         # - returns the data as a ravelled numpy array of floats so it can be handed to the model
         input = helpers.prepare_image_for_model(image, inputShape.columns, inputShape.rows)
 
-        # Get a histogram using OpenCV as a quick way to detect whether the image has changed significantly
-        hist = np.histogram(input,16,[0,256])[0]
-        diff = 1
-        if lastHist is None:
-            lastHist = hist           
+        # Get the predicted classes using the model's predict function on the image input data. 
+        # The predictions are returned as a vector with the probability that the image
+        # contains the class represented by that index.
+        model.predict(input, predictions)
+
+        # Let's grab the value of the top prediction and its index, which represents the top most 
+        # confident match and the class or category it belongs to.
+        topN = helpers.get_top_n(predictions, 1, threshold=0.05)
+
+        # See whether the prediction is in one of our groups
+        group = ""
+        caption = ""
+        label = ""
+        if len(topN) > 0:
+            top = topN[0]
+            label = categories[top[0]]
+            if label_in_set(label, dogs):
+                group = "Dog"
+            elif label_in_set(label, cats):
+                group = "Cat"
+            
+        if not group == "":
+            # A group was detected, so take action
+            top = topN[0]
+            take_action(group)
+            headerText = "(" + str(int(top[1]*100)) + "%) " + group
         else:
-            diff = max(lastHist - hist)
-
-        # Check whether the image has changed significantly and that enough time has passed
-        # since our last prediction to decide whether to predict again
-        now = time.time()
-        if diff >= significantDiff and now - lastPredictionTime > 2:
-            # Get the predicted classes using the model's predict function on the image input data. 
-            # The predictions are returned as a vector with the probability that the image
-            # contains the class represented by that index.
-            model.predict(input, predictions)
-
-            # Let's grab the value of the top prediction and its index, which represents the top most 
-            # confident match and the class or category it belongs to.
-            topN = helpers.get_top_n(predictions, 1)
-
-            # See whether the prediction is in one of our groups
-            group = ""
-            caption = ""
-            label = ""
-            if len(topN) > 0:
-                top = topN[0]
-                label = categories[top[0]]
-                if label_in_set(label, dogs):
-                    group = "Dog"
-                elif label_in_set(label, cats):
-                    group = "Cat"
-            
-            if not group == "":
-                # A group was detected, so take action
-                top = topN[0]
-                take_action(group)
-                headerText = "(" + str(int(top[1]*100)) + "%) " + group
-                lastPredictionTime = now
-                lastHist = hist
-            else:
-                # No group was detected
-                headerText = ""
-            
-        if now - lastPredictionTime > 2:
-            # Reset the header text
+            # No group was detected
             headerText = ""
 
         helpers.draw_header(image, headerText)

@@ -98,7 +98,7 @@ def label_in_set(label, label_set):
     return False
 ```
 
-When a prediction belonging to the dog group or the cat group is detected, we want to play the appropriate sound file. Define helper functions that play a bark or a meow.
+When a prediction belonging to the dog group or the cat group is detected, we want to play the appropriate sound file. Define helper functions that play a woof or a meow.
 
 ```python
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -123,7 +123,7 @@ def take_action(group):
 Define the main entry point and start the camera.
 
 ```python
- def main():
+def main():
     camera = cv2.VideoCapture(0)
 ```
 
@@ -144,19 +144,16 @@ Get the model input and output shapes and allocate an array to hold the model ou
     predictions = model.FloatVector(outputShape.Size())
 ```
 
-For this tutorial, we'll keep some state to ensure we don't keep taking the same action over and over for the same image. Initialize the state as follows.
+Allocate a variable to hold the header text. This will be used to display the prediction result.
 
 ```python
-    lastHist = None
-    significantDiff = 5000
-    lastPredictionTime = 0
     headerText = ""
 ```
 
 Declare a loop where we get an image from the camera and prepare it to be used as input to the model.
 
 ```python
-    while (cv2.waitKey(1) == 0xFF):
+    while ((cv2.waitKey(1) & 0xFF) == 0xFF):
         image = get_image_from_camera(camera)
 
         # Prepare the image to pass to the model. This helper:
@@ -166,70 +163,48 @@ Declare a loop where we get an image from the camera and prepare it to be used a
         input = helpers.prepare_image_for_model(image, inputShape.columns, inputShape.rows)
 ```
 
-We'll use OpenCV to get a histogram using OpenCV as a quick way to detect whether the image has changed significantly. This is to create a better experience than having the same action be taken on the same prediction over and over. We'll also ensure that enough time has passed for the sound file to have fully played out.
-
-```python
-        hist = np.histogram(input,16,[0,256])[0]
-        diff = 1
-        if lastHist is None:
-            lastHist = hist           
-        else:
-            diff = max(lastHist - hist)
-
-        # Check whether the image has changed significantly and that enough time has passed
-        # since our last prediction to decide whether to predict again
-        now = time.time()
-        if diff >= significantDiff and now - lastPredictionTime > 2:
-```
-
 Send the processed image to the model get and its array of predictions.
 
 ```python
-            model.predict(input, predictions)
+        model.predict(input, predictions)
 ```
 
-Use the helper function to get the top prediction.
+Use the helper function to get the top prediction. The `threshold` parameter selects predictions with a 5% or higher confidence.
 
 ```python
-            topN = helpers.get_top_n(predictions, 1)
+        topN = helpers.get_top_n(predictions, 1, threshold=0.05)
 ```
 
 Check whether the prediction is part of a group.
 
 ```python
-            group = ""
-            label = ""
-            if len(topN) > 0:
-                top = topN[0]
-                label = categories[top[0]]
-                if label_in_set(label, dogs):
-                    group = "Dog"
-                elif label_in_set(label, cats):
-                    group = "Cat"
+        group = ""
+        label = ""
+        if len(topN) > 0:
+            top = topN[0]
+            label = categories[top[0]]
+            if label_in_set(label, dogs):
+                group = "Dog"
+            elif label_in_set(label, cats):
+                group = "Cat"
 ```
 
 If the prediction is in one of the define category groups, take the appropriate action.
 
 ```python
-            if not group == "":
-                # A group was detected, so take action
-                top = topN[0]
-                take_action(group)
-                headerText = "(" + str(int(top[1]*100)) + "%) " + group
-                lastPredictionTime = now
-                lastHist = hist
-            else:
-                # No group was detected
-                headerText = ""
+        if not group == "":
+            # A group was detected, so take action
+            top = topN[0]
+            take_action(group)
+            headerText = "(" + str(int(top[1]*100)) + "%) " + group
+        else:
+            # No group was detected
+            headerText = ""
 ```
 
-Finally, update the state if enough time has passed and display the image and header text.
+Finally, display the image and header text.
 
 ```python
-        if now - lastPredictionTime > 2:
-            # Reset the header text
-            headerText = ""
-
         helpers.draw_header(image, headerText)
         # Display the image using opencv
         cv2.imshow('Grouping', image)

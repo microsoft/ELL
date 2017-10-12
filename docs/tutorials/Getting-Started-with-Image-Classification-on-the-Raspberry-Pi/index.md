@@ -273,7 +273,7 @@ Allocate an array to store the model's output.
 Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user hits any key. At the start of each iteration, read an image from the camera.
 
 ```python
-    while (cv2.waitKey(1) == 0xFF):
+    while ((cv2.waitKey(1) & 0xFF) == 0xFF):
         image = get_image_from_camera(camera)
 ```
 
