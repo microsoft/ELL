@@ -3,7 +3,7 @@
 ## Overview
 
 ELL is an early preview of our work on building and deploying machine-learned pipelines onto resource-constrained embedded platforms. 
-This project is a work in progress and we expect it to change rapidly. At this early stage, we recommend not to take any dependencies on our work.    
+This project is a work in progress and so expect it to change rapidly.   
 
 ## License
 

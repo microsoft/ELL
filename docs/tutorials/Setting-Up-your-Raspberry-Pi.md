@@ -17,7 +17,7 @@ Most of our tutorials follow a common workflow. The first steps involve authorin
 ## Basic Pi Setup
 
 ### Power Adapter and Power Cable
-AI workloads guzzle power, so we recommend using a high quality power supply. If you use a USB power adapter and micro USB cable, choose an adapter rated for at least 12 Watts (2.4 Amps) per USB port. We've had good experience with 12W-per-port USB power adapters from Apple, Anker, and Amazon Basics. Long and thin micro USB cables will often result in a noticeable voltage drop and fail to provide sufficient power to the Raspberry Pi. For a few extra dollars you can get a nice name-brand cable, like the Anker PowerLine, and save yourself a lot of frustration.
+AI workloads guzzle power, so be sure to use a high quality power supply. If you use a USB power adapter and micro USB cable, choose an adapter rated for at least 12 Watts (2.4 Amps) per USB port. We've had good experience with 12W-per-port USB power adapters from Apple, Anker, and Amazon Basics. Long and thin micro USB cables will often result in a noticeable voltage drop and fail to provide sufficient power to the Raspberry Pi. For a few extra dollars you can get a nice name-brand cable, like the Anker PowerLine, and save yourself a lot of frustration.
 
 ### Operating System
 Our tutorials assume that the operating system running on your Pi is *Raspbian Jessie* ([NOOBS](https://downloads.raspberrypi.org/NOOBS/images/NOOBS-2017-07-05/) or [image](https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/)), not the more recent *Raspbian Stretch*.
@@ -41,7 +41,9 @@ sudo apt-get install -y libopenblas-dev
 ```
 
 ### Python 3.4 via Miniconda
-Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). We recommend using the [Miniconda](https://conda.io/miniconda.html) distribution of Python, which makes it easy to install any required Python modules. To install Miniconda, type the following. 
+Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). 
+An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
+To install Miniconda, type the following. 
 
 ```shell
 wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
@@ -63,7 +65,13 @@ Remember to run `source activate py34` each time you start a new terminal window
 [OpenCV](http://opencv.org/) is a computer vision library that enables us to read images from a camera, resize them, and prepare them for processing by ELL. To install OpenCV, type the following.
 
 ```shell
-conda install -c microsoft-ell opencv
+conda install -c microsoft-ell opencv -y
+```
+
+To run the `C++` tutorials you also need the C++ OpenCV SDK, which you can install on your Raspberry Pi using the following command. 
+
+```shell
+sudo apt-get install -y libopencv-dev
 ```
 
 By default, OpenCV can read images from a USB webcam, but not from the Raspberry Pi camera. To enable the Pi camera, first make sure that the camera interface is enabled by running the Pi configuration tool. 
@@ -76,12 +84,6 @@ Select `5 Interfacing Options`, hit `Enter`, select `P1 Camera` and hit `Enter` 
 
 ```shell
 sudo modprobe bcm2835-v4l2
-```
-
-To run the `C++` tutorials you also need the C++ OpenCV SDK, which you can install on your Raspberry Pi using the following command. 
-
-```shell
-sudo apt-get install libopencv-dev
 ```
 
 ### SSH
@@ -135,7 +137,7 @@ This change takes effect after rebooting.
 
 ### Underclocking and Overclocking
 
-Computation produces heat. Even at the default processor frequency of 700MHz, a Raspberry Pi running a serious AI workload at room temperature can overheat unless fitted with a physical cooling device. We recommend following our instructions for [actively cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/). If you don't want to physically cool your Pi, you can cool it by reducing the processor frequency (underclocking).
+Computation produces heat. Even at the default processor frequency of 700MHz, a Raspberry Pi running a serious AI workload at room temperature can overheat unless fitted with a physical cooling device. See [actively cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/). If you don't want to physically cool your Pi, you can cool it by reducing the processor frequency (underclocking).
 
 If you do fit your Pi with an active cooling attachment, you can also increase the processor frequency (overclocking) without overheating. **Be warned** that overclocking your Raspberry Pi can void your warranty. Also, we've experienced some weird behavior when overclocking Raspberry Pis: some Pi units freeze up while other units lose their USB peripherals. You won't know how your specific Pi will react to overclocking until you try it. Overclocking isn't for the faint of heart - **proceed at your own risk**.
 

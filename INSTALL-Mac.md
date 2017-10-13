@@ -6,32 +6,44 @@ ELL enables you to design and deploy intelligent machine-learned models onto sin
 
 The instructions below assume that ELL was obtained from `github.com/Microsoft/ELL` using *git*. One way to install a git client is to open a Terminal and type
 
-    brew install git
+```shell
+brew install git
+```
 
 To clone the ELL repository, type
 
-    git clone https://github.com/Microsoft/ELL.git
+```shell
+git clone https://github.com/Microsoft/ELL.git
+```
 
 ## Prerequisites for building ELL
 
-We recommend using the [*Homebrew*](http://brew.sh/) package manager to download and install prerequisites. Homebrew can be downloaded and installed by
+[*Homebrew*](http://brew.sh/) is a package manager that makes it easy to install the prerequesits. Homebrew can be downloaded and installed by
 
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```shell
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
 
 If you already have Homebrew installed, update it to the latest version by typing
 
-    brew update
+```shell
+brew update
+```
 
 ### LLVM and Clang
 
-ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 3.9 or newer. `Clang` is a C++ compiler built on top of LLVM, and we recommend using Clang to build ELL. To download and install LLVM and Clang, type
+ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 3.9.  `Clang` is a C++ compiler built on top of LLVM, and it is the best choice for building ELL. To download and install LLVM and Clang, type
 
-    brew install llvm@3.9 --with-clang
+```shell
+brew install llvm@3.9
+```
 
 Alternatively, if you have already have *Xcode* installed and prefer to use the version of *Clang* included with it, you must still install LLVM and make sure that the command-line version of the *Xcode* tools are available.
 
-    brew install llvm@3.9
-    xcode-select --install
+```shell
+brew install llvm@3.9
+xcode-select --install
+```
 
 If you already have LLVM installed, ensure that you have version 3.9. Note that CMake assumes that the LLVM binary files are located in the standard Homebrew location, which is `/usr/local/opt`.
 
@@ -40,34 +52,45 @@ If you already have LLVM installed, ensure that you have version 3.9. Note that 
 ELL uses the [*CMake*](https://cmake.org/) build system, version 3.8 or newer.
 
 Optionally, ELL can take advantage of these additional tools:
-* [*SWIG*](http://swig.org) version 3.0.12 or newer - a tool that generates Python interfaces to C++ libraries. Required if you intend to use ELL from Python
-* [*OpenBLAS*](http://www.openblas.net/) - fast linear algebra
-* *Doxygen* - code documentation
+
+* [*SWIG*](http://swig.org) version 3.0.12 - a tool that generates Python interfaces to C++ libraries. Required if you intend to use ELL from Python.
+* [*OpenBLAS*](http://www.openblas.net/) - version 0.2.19.3 - fast linear algebra. OpenBLAS can make models execute up to 10 times faster.
+* [*Doxygen*](www.doxygen.org/) -  version 1.8.13 - it is used to generate nice code documentation for the ELL API.
 
 To install all of the above, type
 
-    brew install cmake
-    brew install swig
-    brew install homebrew/science/openblas
-    brew install doxygen
+```shell
+brew install cmake
+brew install swig
+brew install homebrew/science/openblas
+brew install doxygen
+```
 
 ## Using ELL in Python
 
-ELL can optionally be used from Python 3.6. We recommend using the [Miniconda](https://conda.io/miniconda.html) distribution of Python, which makes it easy to install any required Python modules. Download and install Miniconda from here <https://conda.io/miniconda.html>.
+ELL can optionally be used from Python 3.6. 
+An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
+Download and install Miniconda from here <https://conda.io/miniconda.html>.
 
-After installing Miniconda, create a Python 3.6 environment by typing
+After installing Miniconda, create a Python 3.6 environment and include the `numpy` module by typing
 
-    conda create -n py36 anaconda python=3.6
+```shell
+conda create -n py36 numpy python=3.6
+```
 
 Next, activate the environment you just created by typing
 
-    source activate py36
+```shell
+source activate py36
+```
 
 You need to repeat this activation command each time you open a new terminal and intend to use ELL from Python. Also, make sure to activate the `py36` environment before building ELL, to ensure that Python interfaces are created.
 
-For computer vision tasks, we recommend capturing and preprocessing images using *OpenCV*. To install OpenCV in the current Python environment, type
+*OpenCV* is a library that helps with capturing and preprocessing images. To install OpenCV in the current Python environment, type
 
-    conda install -c conda-forge opencv
+```shell
+conda install -c conda-forge opencv
+```
 
 ## Building ELL
 
@@ -75,20 +98,28 @@ We build ELL by using CMake to create a makefile, invoking that makefile, and op
 
 In the repository root directory, create a `build` subdirectory and change to that directory.
 
-    mkdir build
-    cd build
+```shell
+mkdir build
+cd build
+```
 
 Invoke CMake by typing
 
-    cmake ..
+```shell
+cmake ..
+```
 
 Don't forget the two dots (..) at the end of the command! This creates a makefile for the project. Next, invoke the makefile by typing
 
-    make
+```shell
+make
+```
 
 Optionally, build Python interfaces by typing
 
-    make _ELL_python
+```shell
+make _ELL_python
+```
 
 The generated executables will appear in `ELL/build/bin`.
 

@@ -5,6 +5,8 @@ import socket
 import time
 from dateutil.parser import parse
 import datetime
+import uuid
+import random
 
 class PiBoardEntity(): 
     def __init__(self, values = None):
@@ -18,6 +20,7 @@ class PiBoardEntity():
             self.current_user_name = ""
             self.command = ""       
             self.last_heartbeat = ""
+            self.lock_key = ""
 
     def load(self, values) :        
         self.ip_address = values['IpAddress']
@@ -27,6 +30,7 @@ class PiBoardEntity():
         self.current_user_name = values['CurrentUserName']
         self.command = values['Command']
         self.last_heartbeat = values['LastHeartbeat']
+        self.lock_key = values['LockKey']
 
     def deserialize(self, text):
         values = json.loads(text)
@@ -36,8 +40,7 @@ class PiBoardEntity():
         return json.dumps({'IpAddress': self.ip_address, 
                             'OsName': self.os_name, 'OsVersion': self.os_version, 
                             'CurrentTaskName': self.current_task_name, 'CurrentUserName': self.current_user_name,
-                            'Command':self.command })
-
+                            'Command':self.command, "LockKey": self.lock_key })
 
 class PiBoardTable:
     def __init__(self, endpoint, username = None):
@@ -50,7 +53,6 @@ class PiBoardTable:
         body = entity.serialize()
         headers = {'content-type': 'application/json'}
         r = requests.post(self.endpoint, data=body, headers=headers)
-        print("update result: " + str(r))
         if r.status_code != 200:
             raise Exception("update failed: " + str(r.status_code))
         e = json.loads(r.text)
@@ -83,13 +85,15 @@ class PiBoardTable:
         a.ip_address = ip
         a.current_user_name = self.username
         a.command = "Lock"
+        a.lock_key = str(uuid.uuid1())
+        # make the job name unique in every instance
         a.current_task_name = jobName
         r = self.update(a)
-        if r.current_user_name != self.username or r.command != "Lock":
+        if r.current_user_name != self.username or r.command != "Lock" or r.current_task_name != a.current_task_name or r.lock_key != a.lock_key:
             raise Exception("Lock failed")
         return r
     
-    def free(self, ip):
+    def unlock(self, ip):
         # now try and lock the device for our usage.
         a = PiBoardEntity()
         a.ip_address = ip
@@ -126,17 +130,17 @@ class PiBoardTable:
     def wait_for_free_machine(self, jobName):
         # then this is a pi cluster server, so find a free machine
         while True:
-            for e in self.get_all():
+            machines = self.get_all()
+            random.shuffle(machines)
+            for e in machines:
                 try:
                     heartbeat = parse(e.last_heartbeat)
                     if not self.heartbeat_is_valid(heartbeat):
-                        print("machine at %s is not sending heartbeats" % (e.ip_address))
+                        print("note: machine at %s is not sending heartbeats" % (e.ip_address))
                     elif e.command != 'Lock':
-                        print(self.username + " is attempting to lock machine at " + e.ip_address)
                         result = self.lock(e.ip_address, jobName)
-                        if result.current_user_name == self.username:
-                            # we got it
-                            return result
+                        # no exception, so we got it
+                        return result
                 except:
                     pass
 

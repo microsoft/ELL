@@ -46,7 +46,7 @@ Most other active cooling solutions for the Raspberry Pi come in the form of an 
 
 #### Printing without standoffs
 
-You may have noticed that the *Pi 3 Fan Mount* comes in two versions, with or without standoffs. If your 3D printer can print support material, we recommend printing the version with standoffs. On the other hand, if your printer only supports a single filament, you may have more luck printing the version without standoffs. In that case, we recommend using nylon spacers or standoffs to lift the plastic mount off of the Pi circuit board.
+You may have noticed that the *Pi 3 Fan Mount* comes in two versions, with or without standoffs. If your 3D printer can print support material, then print the version with standoffs. On the other hand, if your printer only supports a single filament, you may have more luck printing the version without standoffs. In that case, you will need to add nylon spacers or standoffs to lift the plastic mount off of the Pi circuit board.
 
 ![Two Mount Designs](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/Two-Mount-Designs.jpg)
 

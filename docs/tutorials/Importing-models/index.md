@@ -30,7 +30,7 @@ If you followed the setup instructions, you should have an environment named `py
 [Windows] activate py36
 ```
 
-We recommend using Curl to download files. If Curl isn't installed in your Anaconda environment, install it as follows. 
+Curl provides an easy way to download files. If Curl isn't installed in your Anaconda environment, install it as follows. 
 
 ```shell
 conda install curl

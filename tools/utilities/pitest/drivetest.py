@@ -54,6 +54,7 @@ class DriveTest:
         self.expression = None
         self.created_dirs = []
         self.profile = False
+        self.test = False
         if (not os.path.isdir(self.test_dir)):
             os.makedirs(self.test_dir)
 
@@ -77,6 +78,7 @@ class DriveTest:
         self.arg_parser.add_argument("--iterations", "-i", type=int, help="the number of iterations for each predict (default 1)", default=1)
         self.arg_parser.add_argument("--expression", "-e", help="the string to search for to verify test passed (default 'coffee mug')", default="coffee mug")
         self.arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
+        self.arg_parser.add_argument("--test", help="test only, assume the outdir has already been built (default 'False')", action="store_true")
 
         argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
         args = self.arg_parser.parse_args(argv)
@@ -96,6 +98,7 @@ class DriveTest:
         self.iterations = args.iterations
         self.expression = args.expression
         self.blas = self.str2bool(args.blas)
+        self.test = args.test
         self.extract_model_info(args.model, args.labels)
         self.ipaddress = self.resolve_address(args.ipaddress)
 
@@ -115,7 +118,7 @@ class DriveTest:
 
     def free_machine(self):
         if self.machine != None:
-            f = self.cluster.free(self.machine.ip_address)
+            f = self.cluster.unlock(self.machine.ip_address)
             if f.current_user_name != '':
                 print("Failed to free the machine at " + self.machine.ip_address)
 
@@ -296,9 +299,10 @@ class DriveTest:
         
     def run_test(self):
         try:
-            self.get_model()
-            self.make_project()
-            self.get_bash_files()
+            if not self.test:
+                self.get_model()
+                self.make_project()
+                self.get_bash_files()
             self.connect_ssh()
             self.clean_target()
             self.publish_bits()
