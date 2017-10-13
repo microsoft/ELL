@@ -14,8 +14,8 @@ namespace common
 {
     void ParsedProtoNNTrainerArguments::AddArgs(utilities::CommandLineParser& parser)
     {
-        parser.AddOption(projectedDimesion,
-            "projectedDimesion",
+        parser.AddOption(projectedDimension,
+            "projectedDimension",
             "pd",
             "The projected dimension", 5);
 

@@ -24,7 +24,7 @@ namespace trainers
     /// <summary> Parameters for the ProtoNN trainer. </summary>
     struct ProtoNNTrainerParameters
     {
-        size_t projectedDimesion;
+        size_t projectedDimension;
         size_t numPrototypesPerLabel;
         size_t numPrototypes;
         size_t numLabels;

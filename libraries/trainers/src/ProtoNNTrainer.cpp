@@ -40,7 +40,7 @@ namespace trainers
     }
 
     ProtoNNTrainer::ProtoNNTrainer(size_t numExamples, size_t dim, const ProtoNNTrainerParameters& parameters)
-        : _dimemsion(dim), _parameters(parameters), _X(dim, numExamples), _Y(parameters.numLabels, numExamples), _protoNNPredictor(dim, parameters.projectedDimesion, parameters.numPrototypesPerLabel * parameters.numLabels, parameters.numLabels, parameters.gamma)
+        : _dimemsion(dim), _parameters(parameters), _X(dim, numExamples), _Y(parameters.numLabels, numExamples), _protoNNPredictor(dim, parameters.projectedDimension, parameters.numPrototypesPerLabel * parameters.numLabels, parameters.numLabels, parameters.gamma)
     {
     }
 
@@ -58,7 +58,7 @@ namespace trainers
         _parameters.numPrototypes = _parameters.numLabels * _parameters.numPrototypesPerLabel;
 
         size_t D = _dimemsion;
-        size_t d = _parameters.projectedDimesion; // projection dimension
+        size_t d = _parameters.projectedDimension; // projection dimension
         size_t n = _X.NumColumns();
         size_t m = _parameters.numPrototypes; // number of prototypes
         size_t l = _parameters.numLabels; // number of labels
