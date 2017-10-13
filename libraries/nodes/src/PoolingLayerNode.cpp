@@ -31,17 +31,24 @@ namespace nodes
             Interval windowBounds;
         };
 
+        std::ostream& operator<<(std::ostream& os, const RegionBounds& bounds)
+        {
+            os << "input: [" << bounds.inputBounds.begin << ", " << bounds.inputBounds.end << "), window: [" << bounds.windowBounds.begin << ", " << bounds.windowBounds.end << ")";
+            return os;
+        }
+
         RegionBounds GetRegionBounds(int regionId, int inputSize, int windowSize, int stride, bool usesPadding)
         {
             RegionBounds result;
             const int negWindowExtent = ((-windowSize + 1) / 2);
             const int posWindowExtent = windowSize / 2;
 
-            // Default values for the 0,0 region
+            // Default values for the 0 (middle) region. This is the region where the entire window covers valid input.
+            // 
             result.inputBounds.begin = -negWindowExtent;
             result.inputBounds.end = inputSize - posWindowExtent;
             result.windowBounds.begin = negWindowExtent;
-            result.windowBounds.end = posWindowExtent + 1;
+            result.windowBounds.end = posWindowExtent + 1; // +1 because we use half-open intervals: [begin, end)
 
             if (usesPadding)
             {
@@ -53,7 +60,7 @@ namespace nodes
                 }
                 else if (regionId > 0)
                 {
-                    result.inputBounds.begin = inputSize - regionId;
+                    result.inputBounds.begin = inputSize - posWindowExtent + regionId - 1;
                     result.inputBounds.end = result.inputBounds.begin + 1;
                     result.windowBounds.end -= regionId;
                 }
@@ -62,8 +69,7 @@ namespace nodes
             {
                 if (regionId == 0)
                 {
-                    // result.inputBounds.begin -= negWindowExtent;
-                    // result.inputBounds.end -= negWindowExtent;
+                    // nothing
                 }
                 else
                 {
@@ -463,29 +469,23 @@ namespace nodes
         const bool usesPadding = GetLayer().UsesPadding();
 
         // Pointers to beginning of 'active' area of input and output
-        // const auto inputBufferOffset = usesPadding ? (inputIncrement[0] * inputOffset[0]) + (inputIncrement[1] * inputOffset[1]) + (inputIncrement[2] * inputOffset[2]) : (inputIncrement[0] * posWindowExtent) + (inputIncrement[1] * posWindowExtent) + (inputIncrement[2] * inputOffset[2]);
         const auto inputBufferOffset = (inputIncrement[0] * inputOffset[0]) + (inputIncrement[1] * inputOffset[1]) + (inputIncrement[2] * inputOffset[2]);
         const auto outputBufferOffset = (outputIncrement[0] * outputOffset[0]) + (outputIncrement[1] * outputOffset[1]) + (outputIncrement[2] * outputOffset[2]);
         auto inputBuffer = function.PointerOffset(pInput, inputBufferOffset);
         auto outputBuffer = function.PointerOffset(pOutput, outputBufferOffset);
 
-        // Divide the output into regions that have different support over the pooling window. There are `windowSize` regions
-        //
+        // Divide the output into regions that have different support over the pooling window. There are `windowSize` regions in each dimension.
         for (int rowsRegion = negWindowExtent; rowsRegion <= posWindowExtent; ++rowsRegion)
         {
             auto rowRegionBounds = GetRegionBounds(rowsRegion, inputRows, windowSize, stride, usesPadding);
-
             for (int colsRegion = negWindowExtent; colsRegion <= posWindowExtent; ++colsRegion)
             {
                 auto columnRegionBounds = GetRegionBounds(colsRegion, inputColumns, windowSize, stride, usesPadding);
-
                 const int padOffset = usesPadding ? 0 : -negWindowExtent;
                 // Now the current input region is bounded by [rowRegionBounds.inputBounds.begin, rowRegionBounds.inputBounds.end) x [columnRegionBounds.inputBounds.begin, inputColEnd]
                 int minInputRow = std::max(rowRegionBounds.inputBounds.begin, 0);
-                // int maxInputRow = std::min(inputRowEnd, outputRows * stride);
                 int maxInputRow = std::min(rowRegionBounds.inputBounds.end, inputRows);
                 int minInputCol = std::max(columnRegionBounds.inputBounds.begin, 0);
-                // int maxInputCol = std::min(columnRegionBounds.inputBounds.end, outputColumns * stride);
                 int maxInputCol = std::min(columnRegionBounds.inputBounds.end, inputColumns);
                 auto minOutputRow = (minInputRow - padOffset + stride - 1) / stride;
                 auto maxOutputRow = (maxInputRow - padOffset - 1) / stride + 1;
@@ -532,7 +532,6 @@ namespace nodes
                 }
             }
         }
-
     } // end function
 
     // Explicit specialization

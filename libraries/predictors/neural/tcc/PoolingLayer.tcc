@@ -15,7 +15,7 @@ namespace predictors
 {
 namespace neural
 {
-
+    
     template <typename ElementType, template <typename> class PoolingFunctionType>
     PoolingLayer<ElementType, PoolingFunctionType>::PoolingLayer(const LayerParameters& layerParameters, PoolingParameters poolingParameters) :
         Layer<ElementType>(layerParameters),
@@ -26,15 +26,10 @@ namespace neural
     template <typename ElementType, template <typename> class PoolingFunctionType>
     void PoolingLayer<ElementType, PoolingFunctionType>::Compute()
     {
-        // TODO: if padding is true and window size is even, offset input by 1
         auto input = GetInput();
         auto output = GetOutputMinusPadding();
         const size_t inputDataPaddingSize = GetLayerParameters().inputPaddingParameters.paddingSize;
         const size_t poolingWindowSize = _poolingParameters.poolingSize;
-        if (inputDataPaddingSize > 0 && poolingWindowSize%2 == 0)
-        {
-            input = input.GetSubTensor({1, 1, 0}, {input.NumRows()-1, input.NumColumns()-1, input.NumChannels()});
-        }
 
         for (size_t row = 0; row < output.NumRows(); row++)
         {
@@ -50,11 +45,10 @@ namespace neural
                     {
                         for (size_t channel = 0; channel < output.NumChannels(); channel++)
                         {
-
-                            // Special case here for certain networks that rely on pooling fields that are even outside of
-                            // the specified padding.
+                            // Account for when part of the pooling window falls beyond the pooling region.
                             size_t inputRow = startRow + pool_y;
                             size_t inputColumn = startColumn + pool_x;
+
                             if ((inputRow < input.NumRows()) && (inputColumn < input.NumColumns()))
                             {
                                 poolingValues[channel].Accumulate(input(inputRow, inputColumn, channel));

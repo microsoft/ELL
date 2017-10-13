@@ -21,7 +21,7 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> Specifies the hyper parameters of the convolutional layer. </summary>
+    /// <summary> Specifies the hyper parameters of the pooling layer. </summary>
     struct PoolingParameters
     {
         /// <summary> Width and height of the pooling field that is slid over the input. </summary>

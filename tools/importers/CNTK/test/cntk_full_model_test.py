@@ -16,8 +16,10 @@ import cntk_to_ell
 from custom_functions import CustomSign, BinaryConvolution
 import ELL
 import ell_utilities
+import lib.cntk_converters as cntk_converters
 import lib.cntk_layers as cntk_layers
 import lib.cntk_utilities as cntk_utilities
+from custom_functions import BinaryConvolution, CustomSign
 import numpy as np
 import cv2
 import math
@@ -39,30 +41,33 @@ class FullModelTest:
         self.layer_index = 1
         self.layers = args.layers # whether to test the whole model or layer by layer
 
-    def compare_arrays(self, a, b, msg, precision=0):
+    def compare_arrays(self, a, b, msg, precision=1e-4):
         a = a.astype(dtype=np.float32).ravel()
         b = b.astype(dtype=np.float32).ravel()
+
+        if len(a) != len(b): raise Exception("Arrays are not the same size. Output dimensions are different!")
+
         min_diff = abs(min(a) - min(b))
         max_diff = abs(max(a) - max(b))
         largest_diff = max([abs(x) for x in (a - b)])
         std_dev_diff = abs(np.std(a) - np.std(b))
         mean_diff = abs(np.mean(a) - np.mean(b))
 
-        if min_diff > precision or max_diff > precision or std_dev_diff > precision or mean_diff > precision or largest_diff > precision:
+        if not np.allclose(a, b, atol=precision):
             print("  " + msg)
-        
+
         if min_diff > precision:
             print("    min %f versus %f, diff is %.10f" % (min(a), min(b), min_diff))
-        
+
         if max_diff > precision:
             print("    max %f versus %f, diff is %.10f" % (max(a), max(b), max_diff))
-            
+
         if mean_diff > precision:
             print("    mean %f versus %f, diff is %.10f" % (np.mean(a), np.mean(b), mean_diff))
-            
+
         if std_dev_diff > precision:
             print("    stddev %f versus %f, diff is %.10f" % (np.std(a), np.std(b), std_dev_diff))
-            
+
         if largest_diff > precision:
             print("    largest individual diff=%.10f" % (largest_diff))
 
@@ -72,7 +77,7 @@ class FullModelTest:
             raise Exception('image from %s failed to load' % (filename))
         return image
 
-    
+
     def resize_image(self, image, newSize):
         # Shape: [rows, cols, channels]
         """Crops, resizes image to newSize."""
@@ -138,19 +143,14 @@ class FullModelTest:
         self.report.write("## %s\n" % (name))
         self.report.write("````\n")
         shape = self.data.shape
-        if len(shape) == 1:
-            shape = (shape[0],1,1)
-        self.report.write("Output size: %d x %d x %d, stride: %d x %d x %d, offset: %d x %d x %d\n" % (shape[1],shape[2],shape[0],shape[1],shape[2],shape[0],0,0,0))
+        self.report.write("Output size: " + str(shape))
+
         self.report.write("````\n")
 
         with open("Compare_" + name + ".csv", "w") as f:
             f.write("cntk,ell,compiled\n")
-            a = self.data
-            if len(self.data.shape) == 1:
-                a = self.data.ravel().astype(dtype=np.float)
-            else:
-                a =  np.transpose(self.data, (1, 2, 0)).ravel().astype(dtype=np.float)
-
+            
+            a = cntk_converters.get_float_vector_from_cntk_array(self.data)
             b = self.ell_data.ravel()
             c = self.compiled_data.ravel()
             pos = 0
@@ -198,14 +198,14 @@ class FullModelTest:
                 data = np.transpose(data, (2, 0, 1)) # to match CNTK (channel, rows, coumns) order
             else:
                 # then just use a range of numbers as input.
-                data = range(self.input_shape[0] * self.input_shape[1] * self.input_shape[2])
+                data = ((np.random.rand(self.input_shape[0] * self.input_shape[1] * self.input_shape[2]) * 10) - 5).astype(np.float32) # Random input from -5 to 5
                 data = np.reshape(data, self.input_shape).astype(dtype=np.float32)
                 data = self.normalize(data)
         return data
 
     def compare_layer(self, layer):  
         print("Comparing layer " + str(layer))
-        
+
         if self.input_shape is None:
             for node_input in layer.layer.inputs:
                 if node_input.is_input and isinstance(node_input, cntk.variables.Variable):
@@ -257,24 +257,24 @@ class FullModelTest:
         # and verify compiled is also the same
         self.verify_compiled(predictor, ellTestInput, ellArray, op_name)
 
-    def verify_compiled(self, predictor, input, expectedOutput, module_name, precision=0):
+    def verify_compiled(self, predictor, input, expectedOutput, module_name, precision=1e-4):
         # now run same over ELL compiled model
         map = ell_utilities.ell_map_from_float_predictor(predictor)
         compiled = map.Compile("host", module_name, "test" + str(self.method_index))
         self.method_index += 1
         compiledResults = compiled.ComputeFloat(input)
-        ca = np.array(compiledResults) # convert back to numpy        
+        ca = np.array(compiledResults) # convert back to numpy
         self.compiled_data = ca
         expectedFloats = expectedOutput.astype(dtype=np.float32)
         # Compare compiled results
         self.compare_arrays(expectedFloats, ca, 'results for %s layer do not match ELL compiled output !' % (module_name), precision)
-        
+
     def load_labels(self, fileName):
         labels = []
         with open(fileName) as f:
             labels = f.read().splitlines()
         return labels
-        
+
     def get_label(self, i):
         if (i < len(self.labels)):
             return self.labels[i]

@@ -22,7 +22,7 @@ from custom_functions import CustomSign, BinaryConvolution
 
 import lib.cntk_converters as converters
 import lib.cntk_utilities as utilities
-
+from custom_functions import BinaryConvolution, CustomSign
 
 class BaseLayer:
     """Base class with common layer processing functionality"""
@@ -64,7 +64,7 @@ class BaseLayer:
     def set_output_characteristics(self, nextLayer):
         """Sets the output characteristics based on the next layer"""
 
-        if (nextLayer is not None):
+        if nextLayer:
             self.layer.ell_outputPaddingParameters = nextLayer.layer.ell_inputPaddingParameters
             self.layer.ell_outputShape = utilities.get_adjusted_shape(
                 self.layer.output.shape, self.layer.ell_outputPaddingParameters)
@@ -261,7 +261,7 @@ class BinaryConvolutionLayer(BaseLayer):
         x = CustomSign(feature)
         return BinaryConvolution((weightsShape[2], weightsShape[3]), num_filters=weightsShape[0],
                                  channels=weightsShape[1], init=self.weights_parameter.value,
-                                 pad=pad, activation=False, bias=False, init_bias=0)(feature)
+                                 pad=pad, activation=False, bias=False, init_bias=0)(x)
 
 class ConvolutionLayer(BaseLayer):
     """Logic for converting a CNTK Convolution layer to ELL"""
@@ -526,7 +526,6 @@ class ElementTimesLayer(BaseLayer):
         x = reshape(feature, (self.layer.ell_outputShape.channels,))
         return element_times(x, self.scale)
 
-
 class BasePoolingLayer(BaseLayer):
     """Common logic for converting a Pooling layer to ELL"""
 
@@ -540,10 +539,10 @@ class BasePoolingLayer(BaseLayer):
     def get_input_padding_parameters(self):
         """Returns the ELL.PaddingParameters for a layer's input."""
 
+        padding = 0
         if ('autoPadding' in self.attributes):
             if (self.attributes['autoPadding'][0] == True):
-                padding = int(
-                    (self.attributes['poolingWindowShape'][0] - 1) / 2)
+                padding = int((self.attributes['poolingWindowShape'][0] - 1) / 2)
             else:
                 padding = self.attributes['upperPad'][0]
         else:

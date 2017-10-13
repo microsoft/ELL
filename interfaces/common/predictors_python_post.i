@@ -63,7 +63,7 @@ namespace neural
             return new ell::predictors::neural::PoolingParameters{poolingSize, stride};
         }
     };
-
+    
 }
 }
 }

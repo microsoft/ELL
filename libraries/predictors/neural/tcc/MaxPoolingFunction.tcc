@@ -8,7 +8,7 @@
 
 // stl
 #include <algorithm>
-#include <limits> 
+#include <limits>
 
 namespace ell
 {
@@ -17,7 +17,7 @@ namespace predictors
 namespace neural
 {
     template <typename ElementType>
-    MaxPoolingFunction<ElementType>::MaxPoolingFunction() : _max(-(std::numeric_limits<ElementType>::max()))
+    MaxPoolingFunction<ElementType>::MaxPoolingFunction() : _max(std::numeric_limits<ElementType>::lowest())
     {
     }
 

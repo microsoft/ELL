@@ -148,6 +148,7 @@ void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledM
 
         if (IsVerbose())
         {
+            std::cout << "input: " << input << std::endl;
             std::cout << "computed: " << computedResult << " \n\ncompiled: " << compiledResult << std::endl;
             if (!ok)
             {

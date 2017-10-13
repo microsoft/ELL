@@ -22,10 +22,9 @@ using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
-    VerboseRegion region;
+    // VerboseRegion region;
     // TestReceptiveFieldMatrixNode(2, false); // old (slow) version -- Fails
-    TestBinaryConvolutionalLayerNode(32, 32, 3, 5);
-    return;
+    // return;
 
     TestFloatNode();
     TestMultipleOutputNodes();
@@ -137,22 +136,24 @@ void TestIRCompiler()
     TestBiasLayerNode(0, 2);
     // TestBiasLayerNode(1, 0); // Input padding not supported (yet)
 
-    TestMaxPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 0); // params: inW, inH, outW, outH, poolingWindowSize, stride, inputPadding, outputPadding
-    TestMaxPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 1);
-    TestMaxPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 2);
+    TestMaxPoolingLayerNode(5, 5, 16, 5, 5, 4, 1, 1, 0); // params: inW, inH, inChannels, outW, outH, poolingWindowSize, stride, inputPadding, outputPadding
 
-    TestMaxPoolingLayerNode(10, 10, 5, 5, 3, 2, 1, 0);    
-    TestMaxPoolingLayerNode(10, 10, 9, 9, 2, 1, 0, 0);
+    TestMaxPoolingLayerNode(8, 8, 16, 6, 6, 3, 1, 0, 0); // params: inW, inH, inChannels, outW, outH, poolingWindowSize, stride, inputPadding, outputPadding
+    TestMaxPoolingLayerNode(8, 8, 16, 6, 6, 3, 1, 0, 1);
+    TestMaxPoolingLayerNode(8, 8, 16, 6, 6, 3, 1, 0, 2);
+
+    TestMaxPoolingLayerNode(10, 10, 16, 5, 5, 3, 2, 1, 0);    
+    TestMaxPoolingLayerNode(10, 10, 16, 9, 9, 2, 1, 0, 0);
 
     // test weird case we are seeing in some cntk models
-    TestMaxPoolingLayerNode(7, 7, 4, 4, 2, 2, 1, 0);
+    TestMaxPoolingLayerNode(7, 7, 16, 4, 4, 2, 2, 0, 0);
 
-    TestMeanPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 0);
-    TestMeanPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 1);
-    TestMeanPoolingLayerNode(8, 8, 6, 6, 3, 1, 0, 2);
-    // TestMeanPoolingLayerNode(8, 8, 6, 6, 3, 1, 1, 0);
+    TestMeanPoolingLayerNode(8, 8, 16, 6, 6, 3, 1, 0, 0);
+    TestMeanPoolingLayerNode(8, 8, 16, 6, 6, 3, 1, 0, 1);
+    TestMeanPoolingLayerNode(8, 8, 16, 6, 6, 3, 1, 0, 2);
+    // TestMeanPoolingLayerNode(8, 8, 16, 6, 6, 3, 1, 1, 0);
 
-    // TestMeanPoolingLayerNode(8, 8, 2, 1, 2, 1, 0, 0);
+    // TestMeanPoolingLayerNode(8, 8, 16, 2, 1, 2, 1, 0, 0);
 
     TestScalingLayerNode();
     TestScalingLayerNode(0, 1);

@@ -16,7 +16,7 @@ class Extractor:
     def __init__(self, archive):
         self.archive = archive
 
-    def extract_file(self, file_extension):
+    def extract_file(self, file_extension, deleteExisting = True):
         """Extracts the first file matching the file extension"""
         _, ext = os.path.splitext(basename(self.archive))
         if (ext == ".zip"):
@@ -25,6 +25,8 @@ class Extractor:
                     _, e = os.path.splitext(member.filename)
                     if (e == file_extension):
                         path = os.path.dirname(self.archive)
+                        if (deleteExisting and os.path.exists(path)):
+                            os.remove(member.filename)
                         zf.extract(member, path)
                         return True, os.path.join(path, member.filename)
         else:

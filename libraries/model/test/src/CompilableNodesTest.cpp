@@ -2130,7 +2130,7 @@ void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSi
 }
 
 template <typename ElementType, template <typename> class PoolingFunction>
-void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPaddingSize, size_t outputPaddingSize, double epsilon)
+void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPaddingSize, size_t outputPaddingSize, double epsilon)
 {
     std::string tname = typeid(ElementType).name();
     std::cout << "TestPoolingLayerNode< " << tname << ">([" << inRows << "," << inCols << "],[" << outRows << "," << outCols << "], pool=" << poolingSize << ", stride=" << poolingStride << ", inpad=" << inputPaddingSize << ", outpad=" << outputPaddingSize << ", e=" << epsilon << ")\n";
@@ -2142,12 +2142,11 @@ void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_t o
     const double eps = 1e-6;
 
     // Build a model
-    const size_t numDims = 16;
-
-    TensorType inputWithPadding(inRows + 2 * inputPaddingSize, inCols + 2 * inputPaddingSize, numDims);
-    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, inRows, inCols, numDims);
+    TensorType inputWithPadding(inRows + 2 * inputPaddingSize, inCols + 2 * inputPaddingSize, numChannels);
+    TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, inRows, inCols, numChannels);
     FillTensor(input);
-    Shape outputShape = { outRows + 2 * outputPaddingSize, outCols + 2 * outputPaddingSize, numDims };
+    
+    Shape outputShape = { outRows + 2 * outputPaddingSize, outCols + 2 * outputPaddingSize, numChannels };
     LayerParameters layerParameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
     PoolingParameters poolingParameters{ poolingSize, poolingStride };
     PoolingLayer<ElementType, PoolingFunction> layer(layerParameters, poolingParameters);
@@ -2163,16 +2162,16 @@ void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_t o
     VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output);
 }
 
-void TestMaxPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPaddingSize, size_t outputPaddingSize)
+void TestMaxPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    TestPoolingLayerNode<double, predictors::neural::MaxPoolingFunction>(inRows, inCols, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-10);
-    TestPoolingLayerNode<float, predictors::neural::MaxPoolingFunction>(inRows, inCols, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-5);
+    TestPoolingLayerNode<double, predictors::neural::MaxPoolingFunction>(inRows, inCols, numChannels, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-10);
+    TestPoolingLayerNode<float, predictors::neural::MaxPoolingFunction>(inRows, inCols, numChannels, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-5);
 }
 
-void TestMeanPoolingLayerNode(size_t inRows, size_t inCols, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPaddingSize, size_t outputPaddingSize)
+void TestMeanPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPaddingSize, size_t outputPaddingSize)
 {
-    TestPoolingLayerNode<double, ell::predictors::neural::MeanPoolingFunction>(inRows, inCols, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-10);
-    TestPoolingLayerNode<float, ell::predictors::neural::MeanPoolingFunction>(inRows, inCols, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-5);
+    TestPoolingLayerNode<double, ell::predictors::neural::MeanPoolingFunction>(inRows, inCols, numChannels, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-10);
+    TestPoolingLayerNode<float, ell::predictors::neural::MeanPoolingFunction>(inRows, inCols, numChannels, outRows, outCols, poolingSize, poolingStride, inputPaddingSize, outputPaddingSize, 1e-5);
 }
 
 void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)

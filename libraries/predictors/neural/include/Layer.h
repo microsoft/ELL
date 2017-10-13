@@ -218,10 +218,10 @@ namespace neural
 
     protected:
 
-        /// <summary> Returns a read/write reference to the sub tensor of the input that does not contain padding. </summary>
+        /// <summary> Returns a read reference to the sub tensor of the input that does not contain padding. </summary>
         ///
-        /// <returns> Read/write reference to the input tensor, minus padding. </returns>
-        TensorReferenceType GetInputMinusPadding();
+        /// <returns> Read reference to the input tensor, minus padding. </returns>
+        ConstTensorReferenceType GetInputMinusPadding();
 
         /// <summary> Returns a read/write reference to the sub tensor of the output that does not contain padding. </summary>
         ///

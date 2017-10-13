@@ -293,7 +293,7 @@ void PoolingLayerTest()
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
 
-    // Verify PoolingLayer
+    // Verify PoolingLayer with no padding
     TensorType input(4, 4, 2);
     input.Fill(1);
     input(1, 1, 0) = 10;
@@ -313,6 +313,32 @@ void PoolingLayerTest()
 
     testing::ProcessTest("Testing PoolingLayer, values", Equals(output(1, 1, 0), 10) && Equals(output(1, 2, 0), 20) && Equals(output(2, 1, 0), 30) && Equals(output(2, 2, 0), 40) && Equals(output(1, 1, 1), 11) && Equals(output(1, 2, 1), 21) && Equals(output(2, 1, 1), 31) && Equals(output(2, 2, 1), 41));
     testing::ProcessTest("Testing PoolingLayer, padding", output(0, 0, 0) == 0 && output(0, 1, 0) == 0 && output(2, 3, 1) == 0 && output(3, 3, 1) == 0);
+
+    // Verify PoolingLayer with padding
+    TensorType input2 // This input must include the padding
+    {
+        { {  0,  0 },  {  0,  0 }, {  0,  0 }, {  0,  0 },  {  0,  0 }, {  0,  0 } },
+        { {  0,  -1 }, {  5,  6 }, {  0,  0 },  { 20, 21 },  {  0,  0 }, {  0,  0 } },
+        { {  0,  0 },  { -1,  0 }, { 10, 11 },  {  0,  0 },  {  0,  0 }, {  0,  0 } },
+        { {  0,  0 },  { 30, 31 }, {  0,  0 },  {  0,  0 },  {  -1,  0 }, {  0,  0 } },
+        { {  0,  0 },  {  0,  0 }, {  0,  -5 }, {  0,  0 },  { 40, 41 }, {  0,  0 } },
+        { {  0,  0 },  {  0,  0 }, {  0,  0 },  {  0,  -1 }, {  0,  0 }, {  0,  0 } },
+    };
+    TensorType expected2
+    {
+        { {  5,  6 }, { 20, 21 }, {  0,  0 } },
+        { { 30, 31 }, { 10, 11 }, {  0,  0 } },
+        { {  0,  0 }, {  0,  0 }, { 40, 41 } },
+    };
+
+    Shape outputShape2 = { 3, 3, 2 };
+    LayerParameters parameters2{ input2, ZeroPadding(1), outputShape2, NoPadding() };
+    PoolingParameters poolingParams2{ 2, 2 };
+    PoolingLayer<ElementType, MaxPoolingFunction> poolingLayer2(parameters2, poolingParams2);
+    poolingLayer2.Compute();
+    auto output2 = poolingLayer2.GetOutput();
+
+    testing::ProcessTest("Testing PoolingLayer with padding, values", output2.IsEqual(expected2));
 }
 
 template <typename ElementType>

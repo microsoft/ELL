@@ -187,7 +187,7 @@ namespace neural
         _output = TensorType(_layerParameters.outputShape);
 
         LayerSerializationContext<ElementType>* layerContext = dynamic_cast<LayerSerializationContext<ElementType>*>(&archiver.GetContext());
-        if(layerContext != nullptr)
+        if (layerContext != nullptr)
         {
             // Set the input reference to the previously restored layer's output. This is saved in the
             // serialization context
@@ -196,13 +196,16 @@ namespace neural
             // Save the output reference to the serialization context
             layerContext->SetOutputReference(GetOutput());
         }
+
+        // Set the initial padding
+        InitializeOutputValues(_output, _layerParameters.outputPaddingParameters);
     }
 
     template <typename ElementType>
-    typename Layer<ElementType>::TensorReferenceType Layer<ElementType>::GetInputMinusPadding()
+    typename Layer<ElementType>::ConstTensorReferenceType Layer<ElementType>::GetInputMinusPadding()
     { 
         auto padding = _layerParameters.inputPaddingParameters.paddingSize;
-        return _layerParameters.input.GetSubTensor({ padding, padding, 0 }, GetInputShapeMinusPadding());
+        return _layerParameters.input.GetSubTensor({ padding, padding, 0 }, GetInputShapeMinusPadding() );
     }
     
     template <typename ElementType>
