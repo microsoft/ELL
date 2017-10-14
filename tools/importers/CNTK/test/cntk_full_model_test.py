@@ -110,7 +110,7 @@ class FullModelTest:
             print("ell picks: %s" % (self.get_label(np.argmax(self.ell_data))))
         if type(self.compiled_data) != type(None):
             print("ell compiled picks: %s" % (self.get_label(np.argmax(self.compiled_data))))
-    
+
     def run(self):
         self.report = open("report.md", "w")
         self.report.write("# Comparison Results\n")
@@ -138,7 +138,7 @@ class FullModelTest:
         return a * (255 / max)
 
     def save_layer_outputs(self, op_name):
-        name = op_name + "(" + str(self.layer_index) + ")"        
+        name = op_name + "(" + str(self.layer_index) + ")"
         self.layer_index += 1
         self.report.write("## %s\n" % (name))
         self.report.write("````\n")
@@ -149,7 +149,7 @@ class FullModelTest:
 
         with open("Compare_" + name + ".csv", "w") as f:
             f.write("cntk,ell,compiled\n")
-            
+
             a = cntk_converters.get_float_vector_from_cntk_array(self.data)
             b = self.ell_data.ravel()
             c = self.compiled_data.ravel()
@@ -166,7 +166,7 @@ class FullModelTest:
         shape = predictor.GetInputShape()
         self.input_shape = (shape.channels,shape.rows,shape.columns) # to CNTK (channel, rows, coumns) order
         self.data = self.get_input_data()
-                
+
         if (len(self.cntk_model.arguments) > 1):
             output = np.zeros(self.cntk_model.arguments[1].shape).astype(np.float32)
             predictions = self.cntk_model.eval({self.cntk_model.arguments[0]:[self.data],self.cntk_model .arguments[1]:output})
@@ -182,18 +182,18 @@ class FullModelTest:
                     s = np.max(shape)
                     if (s > size):
                         size = s
-                        output = predictions[key][0] / 100                
-        else:            
+                        output = predictions[key][0] / 100
+        else:
             output = predictions[0]
-        
+
         self.verify_ell("Softmax", predictor, self.data, output)
         self.data = output # make this the input to the next layer.
         self.save_layer_outputs("Softmax")
 
     def get_input_data(self):
         data = self.data # from previous layer
-        if (type(data) == type(None)):  
-            if (type(self.image) != type(None)):  
+        if (type(data) == type(None)):
+            if (type(self.image) != type(None)):
                 data = self.prepare_image_for_predictor(self.image).astype(dtype=np.float32).reshape((self.input_shape[1],self.input_shape[2],self.input_shape[0]))
                 data = np.transpose(data, (2, 0, 1)) # to match CNTK (channel, rows, coumns) order
             else:
@@ -203,7 +203,7 @@ class FullModelTest:
                 data = self.normalize(data)
         return data
 
-    def compare_layer(self, layer):  
+    def compare_layer(self, layer):
         print("Comparing layer " + str(layer))
 
         if self.input_shape is None:
@@ -214,7 +214,7 @@ class FullModelTest:
                     break
 
         self.data = self.get_input_data()
-                
+
         # execute cntk model and save the output for comparison with ELL.
         feature = cntk.input_variable(self.data.shape)
         clone = layer.clone_cntk_layer(feature)
@@ -224,8 +224,8 @@ class FullModelTest:
         self.data = output # make this the input to the next layer.
         self.save_layer_outputs(layer.op_name)
 
-    def get_predictor(self, layer): 
-        
+    def get_predictor(self, layer):
+
         ell_layers = []
         # remove output_padding from because CNTK doesn't have output padding.
         layer.layer.ell_outputPaddingParameters = ELL.PaddingParameters(ELL.PaddingScheme.zeros, 0)
@@ -235,10 +235,10 @@ class FullModelTest:
         # Create an ELL neural network predictor from the relevant CNTK layers
         return ELL.FloatNeuralNetworkPredictor(ell_layers)
 
-    
+
     def verify_ell(self, op_name, predictor, data, expected):
         # now compare this with the equivalent ELL layer, both reference and compiled.
-        
+
         if len(data.shape) == 1:
             ellTestInput = data.ravel().astype(dtype=np.float)
         else:
@@ -253,7 +253,7 @@ class FullModelTest:
 
         # now compare these results.
         self.compare_arrays(expected, out2.astype(dtype=np.float32), 'Results for %s layer do not match!' % (op_name))
-        
+
         # and verify compiled is also the same
         self.verify_compiled(predictor, ellTestInput, ellArray, op_name)
 
