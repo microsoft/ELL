@@ -457,7 +457,8 @@ namespace nodes
 
         // Create the pooling function
         using FType = typename PoolingFunctionT<PoolingFunctionType, ValueType>::type;
-        FType poolingFunction{ function, windowSize * windowSize }; // Create the pooling function with a 'full' pooling window. 
+        auto paddingValue = ell::predictors::neural::GetPaddingValue<ValueType>(this->GetLayer().GetLayerParameters().inputPaddingParameters.paddingScheme);
+        FType poolingFunction{ function, windowSize * windowSize, paddingValue }; // Create the pooling function with a 'full' pooling window. 
 
         // These "window extent" variables indicate the amount that the pooling window extends to the left and right (or top/bottom) of the center pixel.
         //   posWindowExtent is always floor(windowSize/2)
