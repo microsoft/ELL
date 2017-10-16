@@ -38,7 +38,7 @@ class ModuleBuilder:
         self.language = "python"
         self.verbose = False
         self.profile = False
-        self.blas = False
+        self.blas = True
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
@@ -63,7 +63,7 @@ class ModuleBuilder:
         arg_parser.add_argument("--outdir", "-outdir", help="the output directory")
         arg_parser.add_argument("--profile", "-profile", help="enable profiling functions in the ELL module", action="store_true")
         arg_parser.add_argument("--verbose", "-v", help="print verbose output", action="store_true")
-        arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="False")
+        arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
 
         args = arg_parser.parse_args(argv)
         
