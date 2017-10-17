@@ -71,9 +71,6 @@ source_group("neural\\tcc" FILES ${neural_tcc})
 
 add_library(${library_name} ${src} ${include} ${tcc} ${neural_src} ${neural_include} ${neural_tcc})
 target_include_directories(${library_name} PUBLIC include neural/include)
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${library_name} PRIVATE -fPIC)
-endif()
 target_link_libraries(${library_name} data utilities)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")

@@ -46,10 +46,6 @@ target_link_libraries(${library_name} utilities ${BLAS_LIBS})
 
 if(BLAS_FOUND)
   target_compile_definitions(${library_name} PUBLIC USE_BLAS=1)
-
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    target_compile_options(${library_name} PRIVATE -fPIC)
-  endif()
 endif()
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")

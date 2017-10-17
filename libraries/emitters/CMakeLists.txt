@@ -86,10 +86,6 @@ source_group("tcc" FILES ${tcc})
 
 add_library(${library_name} ${src} ${include} ${tcc})
 target_include_directories(${library_name} PUBLIC include ${LLVM_INCLUDE_DIRS})
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${library_name} PRIVATE -fPIC)
-endif()
-
 target_link_libraries(${library_name} utilities ${LLVM_LIBS})
 target_compile_definitions(${library_name} PUBLIC ${LLVM_DEFINITIONS})
 target_compile_options(${library_name} PUBLIC ${LLVM_COMPILE_OPTIONS})

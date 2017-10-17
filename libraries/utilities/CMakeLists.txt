@@ -95,10 +95,6 @@ source_group("tcc" FILES ${tcc})
 add_library(${library_name} ${src} ${include} ${tcc})
 target_include_directories(${library_name} PUBLIC include)
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(${library_name} PRIVATE -fPIC)
-endif()
-
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   target_link_libraries(${library_name} -pthread)
 endif()

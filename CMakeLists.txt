@@ -37,6 +37,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Apply -fPIC where applicable to the platform
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 if(MSVC) 
   # Set Visual Studio-specific options
   add_definitions(-DUNICODE)
