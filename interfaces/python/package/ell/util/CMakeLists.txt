@@ -12,7 +12,11 @@ if(${PYTHONLIBS_FOUND})
         configure_file(${FILE} ${FILE} COPYONLY)
     endforeach()
 
-    configure_file(${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/downloader.py downloader.py COPYONLY)
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/tools/utilities/pythonlibs/download_helper.py
+        download_helper.py
+        COPYONLY
+    )
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/packages/ell/util")
 endif()

@@ -13,6 +13,7 @@ import sys
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_path, '../pythonlibs'))
 import find_ell
+from download_helper import *
 import argparse
 import glob
 import subprocess
@@ -133,7 +134,7 @@ class DriveTest:
             if ext.lower() == ".zip":
                 with zipfile.ZipFile(ell_model) as myzip:
                     filename = myzip.extract(myzip.filelist[0])
-                
+
                 if filename != "":
                     print("extracted: " + filename)
                     self.ell_model = filename
@@ -146,22 +147,15 @@ class DriveTest:
                 self.model_name, ext = os.path.splitext(self.model_name)
             self.labels_file = os.path.abspath(labels_file)
 
-    def download(self, url, localpath):
-        # Download the file
-        response = requests.get(url, stream=True)
-        # Write the file to disk
-        with open(localpath, "wb") as handle:
-            handle.write(response.content)        
-
     def copy_files(self, list, folder):
         target_dir = os.path.join(self.test_dir, folder)
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
-        for path  in list:
+        for path in list:
             print("Copying file: " + path + " to " + target_dir)
             if not os.path.isfile(path):
                 raise Exception("expected file not found: " + path)
-            head,file_name = os.path.split(path)
+            head, file_name = os.path.split(path)
             dest = os.path.join(target_dir, file_name)
             copyfile(path, dest)
 
@@ -189,7 +183,7 @@ class DriveTest:
         # copy demo files needed to run the test
         self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
                            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demo.py"),
-                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py") ], self.output_dir) 
+                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py") ], self.output_dir)
         self.configure_runtest(self.output_dir)
 
         # avoid copying over bitcode files (as they are big)
@@ -199,16 +193,14 @@ class DriveTest:
 
     def get_default_model(self):
         # Download the model
-        self.model_file = self.model_name + '.ell'
-        self.ell_model = 'd_I160x160x3CMCMCMCMCMCMC1A.ell'
-        if (not os.path.isfile(self.model_file)) or (not os.path.isfile(self.labels_file)) :
+        self.ell_model = self.model_name + '.ell'
+        if (not os.path.isfile(self.ell_model)) or (not os.path.isfile(self.labels_file)) :
             print("downloading default model...")
-            self.download("https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip", "d_I160x160x3CMCMCMCMCMCMC1A.ell.zip")
-            # extract the model if it's in an archive
-            with zipfile.ZipFile("d_I160x160x3CMCMCMCMCMCMC1A.ell.zip") as myzip:
-                myzip.extractall()
+            self.ell_model = download_and_extract_model(
+                "https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip",
+                model_extension=".ell")
             print("downloading default categories.txt...")
-            self.download("https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt", self.labels_file)
+            self.labels_file = download_file("https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt")
 
     def get_model(self):
         if self.model_name == "d_I160x160x3CMCMCMCMCMCMC1A":
@@ -277,13 +269,13 @@ class DriveTest:
                 if os.path.isfile(src_file):
                     dest_file = self.linux_join(dest, src_file[len(src) + 1:])
                     sftp.put(src_file, dest_file)
-        
-    def publish_bits(self):  
+
+    def publish_bits(self):
         sftp = paramiko.SFTPClient.from_transport(self.ssh.get_transport())
         self.sftp_copy_dir(sftp, self.output_dir, self.target_dir)
-        sftp.close()     
+        sftp.close()
 
-    def execute_remote_test(self):   
+    def execute_remote_test(self):
         self.exec_remote_command("chmod u+x {}/runtest.sh".format(self.target_dir))
         output = self.exec_remote_command("{}/runtest.sh".format(self.target_dir))
         print("==========================================================")
@@ -291,12 +283,12 @@ class DriveTest:
         for line in output:
             if self.expression in line:
                 found = True
-        
+
         if found:
             print("Test passed")
         else:
-            print("Test failed")            
-        
+            print("Test failed")
+
     def run_test(self):
         try:
             if not self.test:
@@ -308,16 +300,15 @@ class DriveTest:
             self.publish_bits()
             self.execute_remote_test()
             self.free_machine()
-        except:            
+        except:
             errorType, value, traceback = sys.exc_info()
             print("### Exception: " + str(errorType) + ": " + str(value))
             self.free_machine()
             raise Exception("### Test Failed")
-            
+
 
 if __name__ == "__main__":
     args = sys.argv
     tester = DriveTest()
     tester.parse_command_line(args)
     tester.run_test()
-    

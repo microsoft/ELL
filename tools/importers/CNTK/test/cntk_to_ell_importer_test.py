@@ -49,50 +49,9 @@ try:
     import requests
     import math
     from itertools import product
+    from download_helper import *
 except Exception:
     SkipTests = True
-
-
-def get_model_name(url):
-    fileName = os.path.basename(url)
-    modelFileName, ext = os.path.splitext(fileName)
-    if (not ext == '.zip'):
-        modelFileName = fileName
-    modelName, _ = os.path.splitext(modelFileName)
-    return modelName
-
-
-def download_file(url):
-    "Downloads file pointed to by `url`."
-    fileName = os.path.basename(url)
-    # Download the file
-    response = requests.get(url, stream=True)
-
-    # Write the file to disk
-    with open(fileName, "wb") as handle:
-        handle.write(response.content)
-    return fileName
-
-
-def download_and_extract_model(url, model_extension='.cntk'):
-    """Downloads file pointed to by `url`. Once downloaded, unzips the
-    downloaded file.
-    """
-    modelName = get_model_name(url)
-
-    # Download the file
-    fileName = download_file(url)
-
-    # Extract the file if it's a zip
-    unzip = ziptools.Extractor(fileName)
-    success, modelFileName = unzip.extract_file(model_extension)
-    if success:
-        print("extracted zipped model: " + modelFileName)
-    else:
-        print("non-zipped model: " + fileName)
-        modelFileName = fileName
-
-    return modelName
 
 
 def BatchNormalizationTester(map_rank=1,
