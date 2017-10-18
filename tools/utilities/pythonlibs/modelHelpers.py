@@ -22,13 +22,18 @@ sys.path.append(script_path)
 sys.path.append(os.path.join(script_path, 'build'))
 sys.path.append(os.path.join(script_path, 'build/Release'))
 
-def prepare_image_for_model(image, requiredWidth, requiredHeight, reorderToRGB = False):
+
+def prepare_image_for_model(image, requiredWidth, requiredHeight,
+                            reorder_to_rgb=False):
     """ Prepare an image for use with a model. Typically, this involves:
-        - Resize and center crop to the required width and height while preserving the image's aspect ratio.
-          Simple resize may result in a stretched or squashed image which will affect the model's ability
-          to classify images.
-        - OpenCV gives the image in BGR order, so we may need to re-order the channels to RGB.
-        - Convert the OpenCV result to a std::vector<float> for use with ELL model
+        - Resize and center crop to the required width and height while
+        preserving the image's aspect ratio. Simple resize may result in a
+        stretched or squashed image which will affect the model's ability to
+        classify images.
+        - OpenCV gives the image in BGR order, so we may need to re-order the
+        channels to RGB.
+        - Convert the OpenCV result to a std::vector<float> for use with ELL
+        model
     """
     if image.shape[0] > image.shape[1]:  # Tall (more rows than cols)
         rowStart = int((image.shape[0] - image.shape[1]) / 2)
@@ -45,7 +50,7 @@ def prepare_image_for_model(image, requiredWidth, requiredHeight, reorderToRGB =
     # Resize to model's requirements
     resized = cv2.resize(cropped, (requiredHeight, requiredWidth))
     # Re-order if needed
-    if not reorderToRGB:
+    if reorder_to_rgb:
         resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
     # Return as a vector of floats
     result = resized.astype(np.float).ravel()
@@ -53,7 +58,7 @@ def prepare_image_for_model(image, requiredWidth, requiredHeight, reorderToRGB =
 
 def get_top_n_predictions(predictions, N = 5, threshold = 0.20):
     """Return at most the top N predictions as a list of tuples that meet the threshold.
-       The first of element of each tuple represents the index or class of the prediction and the second 
+       The first of element of each tuple represents the index or class of the prediction and the second
        element represents that probability or confidence value.
     """
     map = [(i,predictions[i]) for i in range(len(predictions)) if predictions[i] >= threshold]

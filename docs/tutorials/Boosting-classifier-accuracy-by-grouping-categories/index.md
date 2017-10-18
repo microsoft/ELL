@@ -7,7 +7,7 @@ permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 
 *by Chris Lovett, Byron Changuion, and Ofer Dekel*
 
-In this tutorial, we will take an image classification model that was trained to recognize 1000 different image categories and use it to solve a simpler classification problem: distinguishing between *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will see how a model with low classification accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, and prints `woof!` if it sees a dog and `meow!` if it sees a cat.
+In this tutorial, we will take an image classification model that was trained to recognize 1000 different image categories and use it to solve a simpler classification problem: distinguishing between *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will see how a model with low classification accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, and prints `Woof!!` if it sees a dog and `Meow!!` if it sees a cat.
 
 ---
 
@@ -39,7 +39,7 @@ Start by repeating the steps of the basic tutorial, [Getting Started with Image 
 Copy the following files to your Pi.
 - [dogs.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/dogs.txt)
 - [cats.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/cats.txt)
-- [tutorialHelpers.py](/ELL/tutorials/shared/tutorialHelpers.py)
+- [tutorial_helpers.py](/ELL/tutorials/shared/tutorial_helpers.py)
 
 ## Step 2: Write a script
 
@@ -48,12 +48,8 @@ We will write a Python script that invokes the model on a Raspberry Pi, groups t
 First, import the required modules.
 
 ```python
-import sys
-import os
-import numpy as np
 import cv2
-import time
-import tutorialHelpers as helpers
+import tutorial_helpers as helpers
 ```
 
 Also, import the Python module for the compiled ELL model.
@@ -66,10 +62,10 @@ As in previous tutorials, define a helper function that reads images from the ca
 
 ```python
 def get_image_from_camera(camera):
-    if camera is not None:
+    if camera:
         ret, frame = camera.read()
-        if (not ret):
-            raise Exception('your capture device is not returning images')
+        if not ret:
+            raise Exception("your capture device is not returning images")
         return frame
     return None
 ```
@@ -78,10 +74,10 @@ Next, define helper functions that check whether a category is contained in a ca
 
 ```python
 def labels_match(a, b):
-    x = [s.strip().lower() for s in a.split(',')]
-    y = [s.strip().lower() for s in b.split(',')]
+    x = [s.strip().lower() for s in a.split(",")]
+    y = [s.strip().lower() for s in b.split(",")]
     for w in x:
-        if (w in y):
+        if w in y:
             return True
     return False
 
@@ -110,9 +106,9 @@ def main():
 Read the category names from `categories.txt`, the list of dog breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
 
 ```python
-    with open('categories.txt', 'r') as categories_file,\
-            open('dogs.txt', 'r') as dogs_file,\
-            open('cats.txt', 'r') as cats_file:
+    with open("categories.txt", "r") as categories_file,\
+            open("dogs.txt", "r") as dogs_file,\
+            open("cats.txt", "r") as cats_file:
         categories = categories_file.read().splitlines()
         dogs = dogs_file.read().splitlines()
         cats = cats_file.read().splitlines()
@@ -121,41 +117,34 @@ Read the category names from `categories.txt`, the list of dog breed categories 
 Get the model input and output shapes and allocate an array to hold the model output.
 
 ```python
-    inputShape = model.get_default_input_shape()
+    input_shape = model.get_default_input_shape()
 
-    outputShape = model.get_default_output_shape()
-    predictions = model.FloatVector(outputShape.Size())
-```
-
-Allocate a variable to hold the header text. This will be used to display the prediction result.
-
-```python
-    headerText = ""
+    predictions = model.FloatVector(model.get_default_output_shape().Size())
 ```
 
 Declare a loop where we get an image from the camera and prepare it to be used as input to the model.
+The preparation of the image involves cropping and resizing the image while maintaining the aspect ratio,
+reordering the image channels (if needed), and returning the image data as a flat `numpy` array of
+floats so that it can be provided as input to the model.
 
 ```python
-    while ((cv2.waitKey(1) & 0xFF) == 0xFF):
+    while (cv2.waitKey(1) & 0xFF) == 0xFF:
         image = get_image_from_camera(camera)
 
-        # Prepare the image to pass to the model. This helper:
-        # - crops and resizes the image maintaining proper aspect ratio
-        # - reorders the image channels if needed
-        # - returns the data as a ravelled numpy array of floats so it can be handed to the model
-        input = helpers.prepare_image_for_model(image, inputShape.columns, inputShape.rows)
+        input_data = helpers.prepare_image_for_model(
+            image, input_shape.columns, input_shape.rows)
 ```
 
 Send the processed image to the model get and its array of predictions.
 
 ```python
-        model.predict(input, predictions)
+        model.predict(input_data, predictions)
 ```
 
 Use the helper function to get the top prediction. The `threshold` parameter selects predictions with a 5% or higher confidence.
 
 ```python
-        topN = helpers.get_top_n(predictions, 1, threshold=0.05)
+        top_n = helpers.get_top_n(predictions, 1, threshold=0.05)
 ```
 
 Check whether the prediction is part of a group.
@@ -163,8 +152,8 @@ Check whether the prediction is part of a group.
 ```python
         group = ""
         label = ""
-        if len(topN) > 0:
-            top = topN[0]
+        if top_n:
+            top = top_n[0]
             label = categories[top[0]]
             if label_in_set(label, dogs):
                 group = "Dog"
@@ -175,22 +164,19 @@ Check whether the prediction is part of a group.
 If the prediction is in one of the define category groups, take the appropriate action.
 
 ```python
-        if not group == "":
-            # A group was detected, so take action
-            top = topN[0]
+        header_text = ""
+        if group:
+            top = top_n[0]
             take_action(group)
-            headerText = "(" + str(int(top[1]*100)) + "%) " + group
-        else:
-            # No group was detected
-            headerText = ""
+            header_text = "({:.0%}) {}".format(top[1], group)
 ```
 
 Finally, display the image and header text.
 
 ```python
-        helpers.draw_header(image, headerText)
-        # Display the image using opencv
-        cv2.imshow('Grouping', image)
+        helpers.draw_header(image, header_text)
+
+        cv2.imshow("Grouping", image)
 
 if __name__ == "__main__":
     main()
@@ -213,7 +199,7 @@ A fun next step would be to introduce the playing of sounds indicate whether a d
 example, a dog's bark can be downloaded [here](http://freesound.org/people/davidmenke/sounds/231762/) and a
 cat's meow can be downloaded [here](https://freesound.org/people/tuberatanka/sounds/110011/).
 
-These can be used with the `play_sound` function that's available in the `tutorialHelpers` module, to play
+These can be used with the `play_sound` function that's available in the `tutorial_helpers` module, to play
 sounds on your computer or on the Raspberry Pi. More details on playing sounds can be found in [Notes on Playing Audio](/ELL/tutorials/Notes-on-Playing-Audio).
 
 ## Troubleshooting
