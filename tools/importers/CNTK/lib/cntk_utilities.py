@@ -47,8 +47,7 @@ def find_node_by_op_name(parameters, name):
             return p
     return None
 
-
-def get_activation_type(nodes):
+def get_ell_activation_type(nodes):
     """Returns an ELL.ActivationType from the list of nodes"""
     if (find_node_by_op_name(nodes, 'ReLU') != None):
         return ELL.ActivationType.relu
@@ -59,6 +58,23 @@ def get_activation_type(nodes):
 
     return None
 
+def get_cntk_activation_op(nodes):
+    """Returns an ELL.ActivationType from the list of nodes"""
+    if (find_node_by_op_name(nodes, 'ReLU') != None):
+        return relu
+    elif (find_node_by_op_name(nodes, 'Sigmoid') != None):
+        return sigmoid
+    elif (find_node_by_op_name(nodes, 'LeakyReLU') != None):
+        return leaky_relu
+
+    return None
+
+def get_cntk_activation_name(nodes):
+    """Returns an ELL.ActivationType from the list of nodes"""
+    for name in ['ReLU', 'Sigmoid', 'LeakyReLU']:
+        if find_node_by_op_name(nodes, name):
+            return name
+    return None
 
 def is_softmax_activation(nodes):
     """Returns True is the nodes contain a softmax activation"""

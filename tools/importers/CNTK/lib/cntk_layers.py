@@ -30,6 +30,7 @@ class BaseLayer:
     def __init__(self, layer):
         self.layer = layer
         self.layer.ell_inputPaddingParameters = self.get_input_padding_parameters()
+        self.additional_layer_text = None
 
         if not hasattr(self, 'input_shape'):
             if (len(self.layer.arguments) > 0 and len(self.layer.arguments[0].shape) > 0):
@@ -47,12 +48,13 @@ class BaseLayer:
         """Prints summary info about this layer.
            Derived classes may override this.
         """
-        return " ".join((self.op_name, ": ", utilities.ell_shape_to_string(self.layer.ell_inputShape), " -> ",
-                         utilities.ell_shape_to_string(
-            self.layer.ell_outputShape),
-            "| input padding", str(
-                self.layer.ell_inputPaddingParameters.paddingSize),
-            " output padding", str(self.layer.ell_outputPaddingParameters.paddingSize)))
+        layer_prefix = self.op_name
+        if self.additional_layer_text:
+            layer_prefix = '{} ({})'.format(layer_prefix, self.additional_layer_text)
+        return '{} : {} -> {} | input padding {} output padding {}'.format(layer_prefix, utilities.ell_shape_to_string(self.layer.ell_inputShape),
+                         utilities.ell_shape_to_string(self.layer.ell_outputShape),
+                         str(self.layer.ell_inputPaddingParameters.paddingSize),
+                         str(self.layer.ell_outputPaddingParameters.paddingSize))
 
     def get_input_padding_parameters(self):
         """Returns the default ELL.PaddingParameters for a layer's input.
@@ -99,6 +101,8 @@ class DenseLayer(BaseLayer):
 
         self.op_name = 'Dense'
         super().__init__(layer)
+        internalNodes = utilities.get_model_layers(self.layer.block_root)
+        self.additional_layer_text = utilities.get_cntk_activation_name(internalNodes)
 
     def process(self, ellLayers):
         """Appends the ELL equivalent of the current layer to ellLayers."""
@@ -131,7 +135,7 @@ class DenseLayer(BaseLayer):
         layerParameters = firstLayerParameters
 
         internalNodes = utilities.get_model_layers(self.layer.block_root)
-        activationType = utilities.get_activation_type(internalNodes)
+        activationType = utilities.get_ell_activation_type(internalNodes)
 
         # Create the ELL fully connected layer
         ellLayers.append(ELL.FloatFullyConnectedLayer(
@@ -163,7 +167,17 @@ class DenseLayer(BaseLayer):
             self.layer.parameters, 'W', 0)
         biasParameter = utilities.find_parameter_by_name(
             self.layer.parameters, 'b', 1)
-        return Dense(self.layer.shape)(feature)
+
+        internalNodes = utilities.get_model_layers(self.layer.block_root)
+        activationType = utilities.get_cntk_activation_op(internalNodes)
+
+        includeBias = biasParameter is not None
+        layer = Dense(self.layer.shape, activation=activationType, bias=includeBias)(feature)
+        
+        layer.parameters[0].value = weightsParameter.value
+        if includeBias:
+            layer.parameters[1].value = biasParameter.value
+        return layer
 
 class BinaryConvolutionLayer(BaseLayer):
     """Logic for converting a CNTK Binary Convolution layer to ELL"""
@@ -271,8 +285,7 @@ class ConvolutionLayer(BaseLayer):
             raise ValueError(
                 "Error: Convolution layer node is not in block node")
 
-        self.op_name = 'Convolution'
-
+        self.op_name = 'Convolution'                
         # initialize weights and input characteristics
         self.input_parameter = layer.arguments[0]
         self.weights_parameter = utilities.find_parameter_by_name(
@@ -290,26 +303,14 @@ class ConvolutionLayer(BaseLayer):
         self.input_shape = self.input_parameter.shape
 
         super().__init__(layer)
-
-    def __repr__(self):
-        """Prints summary info about this layer."""
-
-        label = self.op_name
-        nodes = utilities.get_model_layers(self.layer.block_root)
+        nodes = utilities.get_model_layers(layer.block_root)
         if utilities.is_softmax_activation(nodes):
-            label += "(softmax)"
+            self.additional_layer_text = 'softmax'
         else:
-            activation_type = utilities.get_activation_type(nodes)
-            if activation_type is not None:
-                label += "(" + utilities.ell_activation_type_to_string(activation_type) + ")"
-
-        return " ".join((label, ": ", utilities.ell_shape_to_string(self.layer.ell_inputShape), " -> ",
-                         utilities.ell_shape_to_string(
-            self.layer.ell_outputShape),
-            "| input padding", str(
-                self.layer.ell_inputPaddingParameters.paddingSize),
-            " output padding", str(self.layer.ell_outputPaddingParameters.paddingSize)))
-
+            activation_type = utilities.get_cntk_activation_name(nodes)
+            if activation_type:
+                self.additional_layer_text = activation_type
+        
     def get_input_padding_parameters(self):
         """Returns the ELL.PaddingParameters for a layer's input."""
 
@@ -361,7 +362,7 @@ class ConvolutionLayer(BaseLayer):
         filterBatchSize = layerParameters.outputShape.channels
 
         internalNodes = utilities.get_model_layers(self.layer.block_root)
-        activationType = utilities.get_activation_type(internalNodes)
+        activationType = utilities.get_ell_activation_type(internalNodes)
 
         convolutionalParameters = ELL.ConvolutionalParameters(
             receptiveField, stride, self.convolution_method, filterBatchSize)
@@ -394,14 +395,8 @@ class ConvolutionLayer(BaseLayer):
     def clone_cntk_layer(self, feature):
         """Returns a clone of the CNTK layer for per-layer forward prop validation"""
 
-        activation = None
         nodes = utilities.get_model_layers(self.layer.block_root)
-        if (utilities.find_node_by_op_name(nodes, 'ReLU') != None):
-            activation = relu
-        elif (utilities.find_node_by_op_name(nodes, 'Sigmoid') != None):
-            activation = sigmoid
-        elif (utilities.find_node_by_op_name(nodes, 'LeakyReLU') != None):
-            activation = leaky_relu
+        activation = utilities.get_cntk_activation_op(nodes)
 
         weightsShape = self.weights_parameter.shape
         pad = self.attributes['autoPadding'][0] or (
@@ -455,7 +450,7 @@ class LinearLayer(BaseLayer):
         layerParameters = firstLayerParameters
 
         internalNodes = utilities.get_model_layers(self.layer.block_root)
-        activationType = utilities.get_activation_type(internalNodes)
+        activationType = utilities.get_ell_activation_type(internalNodes)
 
         # Create the ELL fully connected layer
         ellLayers.append(ELL.FloatFullyConnectedLayer(
@@ -638,6 +633,39 @@ class PoolingLayer(BaseLayer):
 
         return self.actual_layer.clone_cntk_layer(feature)
 
+class ActivationLayer(BaseLayer):
+    """Logic for converting a CNTK Activation layer to ELL"""
+
+    def __init__(self, layer):
+        if not layer.is_block:
+            raise ValueError("Activation node is not a block node")
+        self.op_name = 'Activation'            
+        super().__init__(layer)
+            
+        internal_nodes = utilities.get_model_layers(self.layer.block_root)
+        self.activation_type = utilities.get_ell_activation_type(internal_nodes)        
+        self.additional_layer_text = utilities.get_cntk_activation_name(internal_nodes)
+
+    def process(self, ellLayers):
+        """Appends the ELL representation of the current layer to ellLayers."""
+
+        # Create the ELL.LayerParameters for the ELL layer
+        layerParameters = ELL.LayerParameters(
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters)
+
+        # Create the ELL activation layer
+        ellLayers.append(ELL.FloatActivationLayer(
+            layerParameters, self.activation_type))
+
+    def clone_cntk_layer(self, feature):
+        """Returns a clone of the CNTK layer for per-layer forward prop validation"""
+        if self.activation_type == ELL.ActivationType.sigmoid:
+            return sigmoid(feature)
+        elif self.activation_type == ELL.ActivationType.leaky:
+            return leaky_relu(feature)
+        else:
+            return relu(feature)
+
 class ReLULayer(BaseLayer):
     """Logic for converting a CNTK ReLU layer to ELL"""
 
@@ -660,7 +688,6 @@ class ReLULayer(BaseLayer):
         """Returns a clone of the CNTK layer for per-layer forward prop validation"""
 
         return relu(feature)
-
 
 class LeakyReLULayer(BaseLayer):
     """Logic for converting a CNTK LeakyReLU layer to ELL"""
@@ -875,7 +902,9 @@ class LayerFactory():
     @staticmethod
     def get_layer_object(cntkLayer):
         try:
-            if (cntkLayer.op_name == 'AveragePooling'):
+            if (cntkLayer.op_name == 'Activation'):
+                return ActivationLayer(cntkLayer)
+            elif (cntkLayer.op_name == 'AveragePooling'):
                 return AveragePoolingLayer(cntkLayer)
             elif (cntkLayer.op_name == 'BatchNormalization'):
                 return BatchNormalizationLayer(cntkLayer)

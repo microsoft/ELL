@@ -146,7 +146,7 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
         for output in z.outputs:
             if (output.shape == (len(labels),)):
                 out = out[output]
-        cntkResults = cntk.ops.softmax(out[0]).eval()
+        cntkResults = softmax(out[0]).eval()
 
         # For the full model, we compare prediction output instead of layers
         np.testing.assert_array_almost_equal(
@@ -158,11 +158,11 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
         if (layersToConvert[-1].layer.op_name == 'CrossEntropyWithSoftmax' and
                 len(layersToConvert) > 2):
             # ugly hack for CrossEntropyWithSoftmax
-            from cntk.ops import softmax
             zz = as_composite(layersToConvert[-2].layer)
             zz = softmax(zz)
         else:
             zz = as_composite(layersToConvert[-1].layer)
+            zz = softmax(zz)
 
         out = zz(cntkTestInput)
         orderedCntkModelResults = cntk_converters.\
@@ -612,7 +612,10 @@ class CntkToEllFullModelTestBase(CntkToEllTestBase):
     CATEGORIES_URL = 'https://raw.githubusercontent.com/Microsoft/ELL-models/master/models/ILSVRC2012/categories.txt'
     MODEL_URLS = [
         'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.cntk.zip',
-        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNB1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNB1A.cntk.zip'
+        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNB1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNB1A.cntk.zip',
+        # Uncomment the next URL to test a VGG model in the gallery.
+        # This could add >20mins to each test run, so it is not included by default.
+        #'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048.cntk.zip'
     ]
 
     def setUp(self):
@@ -690,12 +693,13 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             for output in cntkModel.outputs:
                 if (output.shape == (len(self.categories),)):
                     out = out[output]
-            cntkResults = cntk.ops.softmax(out[0]).eval()
+            cntkResults = softmax(out[0]).eval()
 
             print('Comparing predictor output (reference)')
             sys.stdout.flush()
 
             ellPredictorResults = predictor.Predict(ellOrderedInput)
+
             # Verify CNTK results and predictor results match
             np.testing.assert_array_almost_equal(
                 cntkResults, ellPredictorResults, decimal=5,
@@ -705,6 +709,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             print('Comparing map output (reference)')
             sys.stdout.flush()
             ellMapResults = ellMap.ComputeFloat(ellOrderedInput)
+
             # Verify CNTK results and ELL map results match
             np.testing.assert_array_almost_equal(
                 cntkResults, ellMapResults, decimal=5,
@@ -813,7 +818,7 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
                               dtype=np.float32)
             predictions = self.cntk_model.eval({
                 self.cntk_model.arguments[0]: [self.data],
-                self.cntk_model.arguments[1]: output})
+                self.cntk_model.arguments[1]: [list(range(len(self.categories)))] })
         else:
             predictions = self.cntk_model.eval({
                 self.cntk_model.arguments[0]: [self.data]})
@@ -845,7 +850,7 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
 
         ellTestInput = cntk_converters.get_float_vector_from_cntk_array(
             input_data)
-        ellResults = np.array(predictor.Predict(ellTestInput))
+        ellResults = np.array(predictor.Predict(ellTestInput)).ravel()
 
         ellResultsOutputShape = predictor.GetOutputShape()
         reshapedEllOutput = np.reshape(
