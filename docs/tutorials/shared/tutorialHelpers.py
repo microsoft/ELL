@@ -16,6 +16,7 @@ import cv2
 import numpy as np
 import time
 import math
+import platform
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(script_path)
@@ -56,7 +57,7 @@ def prepare_image_for_model(image, requiredWidth, requiredHeight, reorderToRGB =
 
 def get_top_n(predictions, N = 5, threshold = 0.20):
     """Return at most the top N predictions as a list of tuples that meet the threshold.
-       The first of element of each tuple represents the index or class of the prediction and the second 
+       The first of element of each tuple represents the index or class of the prediction and the second
        element represents that probability or confidence value.
     """
     map = [(i,predictions[i]) for i in range(len(predictions)) if predictions[i] >= threshold]
@@ -95,12 +96,12 @@ def draw_text_block(image, text, blockTopLeft=(0,0), blockColor=(50, 200, 50), b
 class TiledImage:
     def __init__(self, numImages=2, outputHeightAndWidth=(600, 800)):
         """ Helper class to create a tiled image out of many smaller images.
-        The class calculates how many horizontal and vertical blocks are needed to fit the requested number of images 
+        The class calculates how many horizontal and vertical blocks are needed to fit the requested number of images
         and fills in unused blocks as blank. For example, to fit 4 images, the number of tiles is 2x2, to fit 5 images,
         the number of tiles is 3x2, with the last tile being blank.
         numImages - the maximum number of images that need to be composed into the tiled image. Note that the
                     actual number of tiles is equal to or larger than this number.
-        outputHeightAndWidth - a list of two values giving the rows and columns of the output image. The output tiled image 
+        outputHeightAndWidth - a list of two values giving the rows and columns of the output image. The output tiled image
                             is a composition of sub images.
         """
         self.composed_image_shape = self.get_composed_image_shape(numImages)
@@ -141,7 +142,7 @@ class TiledImage:
             for horizontalIndex in range(self.composed_image_shape[1]):
                 currentIndex = verticalIndex * self.composed_image_shape[1] + horizontalIndex
                 xElements.append(self.images[currentIndex])
-            # np.hstack only works if the images are the same height 
+            # np.hstack only works if the images are the same height
             xElements = self.resize_to_same_height(xElements)
             horizontalImage = np.hstack(tuple(xElements))
             yElements.append(horizontalImage)
@@ -158,7 +159,7 @@ class TiledImage:
         for verticalIndex in range(1, self.composed_image_shape[0]):
             cv2.line(composedImage, (0, y), (composedImage.shape[1], y), (0, 0, 0), 3)
             y = y + yStep
-        
+
         return composedImage
 
     def set_image_at(self, imageIndex, frame):
@@ -181,3 +182,25 @@ class TiledImage:
         imageToShow = self.compose()
         # Show the tiled image
         cv2.imshow(self.window_name, imageToShow)
+
+
+def play_sound(sound_file):
+    """Plays the audio file that is at the fully qualified path `sound_file`"""
+    system = platform.system()
+    if system == "Windows":
+        import winsound
+        winsound.PlaySound(sound_file,
+                           winsound.SND_FILENAME | winsound.SND_ASYNC)
+    elif system == "Darwin":  # macOS
+        from AppKit import NSSound
+        from Foundation import NSURL
+        cwd = os.getcwd()
+        url = NSURL.URLWithString_("file://" + sound_file)
+        NSSound.alloc().initWithContentsOfURL_byReference_(url, True).play()
+    else:  # Linux
+        import subprocess
+        command = ["aplay", sound_file]
+        subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            bufsize=0, universal_newlines=True)
+

@@ -7,7 +7,7 @@ permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 
 *by Chris Lovett, Byron Changuion, and Ofer Dekel*
 
-In this tutorial, we will take an image classification model that was trained to recognize 1000 different image categories and use it to solve a simpler classification problem: distinguishing between *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will see how a model with low classification accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, barks if it sees a dog, and meows if it sees a cat.
+In this tutorial, we will take an image classification model that was trained to recognize 1000 different image categories and use it to solve a simpler classification problem: distinguishing between *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will see how a model with low classification accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, and prints `woof!` if it sees a dog and `meow!` if it sees a cat.
 
 ---
 
@@ -17,7 +17,6 @@ In this tutorial, we will take an image classification model that was trained to
 
 * Laptop or desktop computer
 * Raspberry Pi 3
-* Headphones or speakers for your Raspberry Pi
 * Raspberry Pi camera or USB webcam
 * *optional* - Active cooling attachment (see our [tutorial on cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/))
 
@@ -42,11 +41,9 @@ Copy the following files to your Pi.
 - [cats.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/cats.txt)
 - [tutorialHelpers.py](/ELL/tutorials/shared/tutorialHelpers.py)
 
-Additionally, download or record `.wav` sound files of a dog bark and a cat meow (for example, try this [bark](http://freesound.org/people/davidmenke/sounds/231762/) and this [meow](https://freesound.org/people/tuberatanka/sounds/110011/)). Name the bark sound file `woof.wav` and the meow sound file `meow.wav`.
+## Step 2: Write a script
 
-## Step 2: Write a script 
-
-We will write a Python script that invokes the model on a Raspberry Pi, groups the categories as described above, and takes action if a dog or cat is recognized. If you just want the code, copy the complete script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py). Otherwise, create an empty text file named `pets.py` and copy in the code snippets below. 
+We will write a Python script that invokes the model on a Raspberry Pi, groups the categories as described above, and takes action if a dog or cat is recognized. If you just want the code, copy the complete script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py). Otherwise, create an empty text file named `pets.py` and copy in the code snippets below.
 
 First, import the required modules.
 
@@ -56,9 +53,6 @@ import os
 import numpy as np
 import cv2
 import time
-import subprocess
-if (os.name == "nt"):
-    import winsound
 import tutorialHelpers as helpers
 ```
 
@@ -97,29 +91,15 @@ def label_in_set(label, label_set):
             return True
     return False
 ```
-
-When a prediction belonging to the dog group or the cat group is detected, we want to play the appropriate sound file. Define helper functions that play a woof or a meow.
+When a prediction belonging to the dog group or the cat group is detected, we want to print the appropriate string. Define helper functions that print a woof or a meow.
 
 ```python
-script_path = os.path.dirname(os.path.abspath(__file__))
-woofSound = os.path.join(script_path, "woof.wav")
-meowSound = os.path.join(script_path, "meow.wav")
-
-def play(filename):
-    if (os.name == "nt"):
-        winsound.PlaySound(filename, winsound.SND_FILENAME | winsound.SND_ASYNC)
-    else:
-        command = ["aplay", filename]
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0, universal_newlines = True)
-        proc.wait()
-
 def take_action(group):
     if group == "Dog":
-        play(woofSound)
+        print("Woof!!")
     elif group == "Cat":
-        play(meowSound)
+        print("Meow!!")
 ```
-
 Define the main entry point and start the camera.
 
 ```python
@@ -130,12 +110,15 @@ def main():
 Read the category names from `categories.txt`, the list of dog breed categories from `dogs.txt`, and the list of cat breed categories from `cats.txt`.
 
 ```python
-    categories = open('categories.txt', 'r').read().splitlines()
-    dogs = open('dogs.txt', 'r').read().splitlines()
-    cats = open('cats.txt', 'r').read().splitlines()
+    with open('categories.txt', 'r') as categories_file,\
+            open('dogs.txt', 'r') as dogs_file,\
+            open('cats.txt', 'r') as cats_file:
+        categories = categories_file.read().splitlines()
+        dogs = dogs_file.read().splitlines()
+        cats = cats_file.read().splitlines()
 ```
 
-Get the model input and output shapes and allocate an array to hold the model output. 
+Get the model input and output shapes and allocate an array to hold the model output.
 
 ```python
     inputShape = model.get_default_input_shape()
@@ -215,7 +198,7 @@ if __name__ == "__main__":
 
 ## Step 3: Classify live video on the Raspberry Pi
 
-If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an anaconda environment named `py34`. Activate the environment and run the script.   
+If you followed the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi), you should have an anaconda environment named `py34`. Activate the environment and run the script.
 
 ```shell
 source activate py34
@@ -223,6 +206,15 @@ python pets.py
 ```
 
 Point your camera at different objects and see how the model classifies them. Look at `dogs.txt` and `cats.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen, have your computer display images of different animals, and see when it barks or meows. If you copied the full `pets.py` script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets.py), you will also see the average time it takes for the model to process a single frame.
+
+## Next steps
+
+A fun next step would be to introduce the playing of sounds indicate whether a dog or cat was detected. For
+example, a dog's bark can be downloaded [here](http://freesound.org/people/davidmenke/sounds/231762/) and a
+cat's meow can be downloaded [here](https://freesound.org/people/tuberatanka/sounds/110011/).
+
+These can be used with the `play_sound` function that's available in the `tutorialHelpers` module, to play
+sounds on your computer or on the Raspberry Pi. More details on playing sounds can be found in [Notes on Playing Audio](/ELL/tutorials/Notes-on-Playing-Audio).
 
 ## Troubleshooting
 If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).

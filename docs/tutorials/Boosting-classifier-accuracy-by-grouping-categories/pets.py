@@ -1,4 +1,4 @@
-####################################################################################################
+###############################################################################
 ##
 ##  Project:  Embedded Learning Library (ELL)
 ##  File:     pets.py
@@ -7,7 +7,7 @@
 ##
 ##  Requires: Python 3.x
 ##
-####################################################################################################
+###############################################################################
 
 import sys
 import os
@@ -15,9 +15,6 @@ import numpy as np
 import cv2
 import time
 import tutorialHelpers as helpers
-import subprocess
-if (os.name == "nt"):
-    import winsound
 
 # import the ELL model's Python module
 import model
@@ -48,37 +45,26 @@ def label_in_set(label, label_set):
             return True
     return False
 
-# Declare variables that define where to find the sounds files we will play
-script_path = os.path.dirname(os.path.abspath(__file__))
-woofSound = os.path.join(script_path, "woof.wav")
-meowSound = os.path.join(script_path, "meow.wav")
-
-# Helper function to play a sound
-def play(filename):
-    if (os.name == "nt"):
-        winsound.PlaySound(filename, winsound.SND_FILENAME | winsound.SND_ASYNC)
-    else:
-        command = ["aplay", filename]
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0, universal_newlines = True)
-        proc.wait()
-
 # Helper function to decide what action to take when we detect a group
 def take_action(group):
     if group == "Dog":
-        # A prediction in the dog category group was detected, play a `woof` sound
-        play(woofSound)
+        # A prediction in the dog category group was detected, print a `woof`
+        print("Woof!!")
     elif group == "Cat":
-        # A prediction in the cat category group was detected, play a `meow` sound
-        play(meowSound)
+        # A prediction in the cat category group was detected, print a `meow`
+        print("Meow!!")
 
 def main():
     # Open the video camera. To use a different camera, change the camera index.
     camera = cv2.VideoCapture(0)
 
     # Read the category names
-    categories = open('categories.txt', 'r').read().splitlines()
-    dogs = open('dogs.txt', 'r').read().splitlines()
-    cats = open('cats.txt', 'r').read().splitlines()
+    with open('categories.txt', 'r') as categories_file,\
+            open('dogs.txt', 'r') as dogs_file,\
+            open('cats.txt', 'r') as cats_file:
+        categories = categories_file.read().splitlines()
+        dogs = dogs_file.read().splitlines()
+        cats = cats_file.read().splitlines()
 
     # Get the model's input dimensions. We'll use this information later to resize images appropriately.
     inputShape = model.get_default_input_shape()
@@ -99,12 +85,12 @@ def main():
         # - returns the data as a ravelled numpy array of floats so it can be handed to the model
         input = helpers.prepare_image_for_model(image, inputShape.columns, inputShape.rows)
 
-        # Get the predicted classes using the model's predict function on the image input data. 
+        # Get the predicted classes using the model's predict function on the image input data.
         # The predictions are returned as a vector with the probability that the image
         # contains the class represented by that index.
         model.predict(input, predictions)
 
-        # Let's grab the value of the top prediction and its index, which represents the top most 
+        # Let's grab the value of the top prediction and its index, which represents the top most
         # confident match and the class or category it belongs to.
         topN = helpers.get_top_n(predictions, 1, threshold=0.05)
 
@@ -119,7 +105,7 @@ def main():
                 group = "Dog"
             elif label_in_set(label, cats):
                 group = "Cat"
-            
+
         if not group == "":
             # A group was detected, so take action
             top = topN[0]
@@ -130,7 +116,7 @@ def main():
             headerText = ""
 
         helpers.draw_header(image, headerText)
-        
+
         # Display the image using opencv
         cv2.imshow('Grouping', image)
 
