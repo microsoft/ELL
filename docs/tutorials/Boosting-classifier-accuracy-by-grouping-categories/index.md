@@ -34,7 +34,7 @@ The dogs versus cats classification problem is easier than the original 1000 cla
 
 ## Step 1: Deploy a pre-trained model on the Raspberry Pi
 
-Start by repeating the steps of the basic tutorial, [Getting Started with Image Classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with [this faster and less accurate model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNC1A.ell.zip). Namely, download the model to your computer, use the `wrap` tool to compile it for the Raspberry Pi, copy the resulting CMake project to the Pi, and build it there. After completing these steps, you should have a Python module on your Pi named `model`.
+Start by repeating the steps of the basic tutorial, [Getting Started with Image Classification on Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/), but replace the model suggested in that tutorial with [this faster and less accurate model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMC1AS/d_I160x160x3CMCMBMBMBMBMC1AS.ell.zip). Namely, download the model to your computer, use the `wrap` tool to compile it for the Raspberry Pi, copy the resulting CMake project to the Pi, and build it there. After completing these steps, you should have a Python module on your Pi named `model`.
 
 Copy the following files to your Pi.
 - [dogs.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/dogs.txt)

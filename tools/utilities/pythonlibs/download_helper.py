@@ -5,9 +5,14 @@ import requests
 import ziptools
 
 
-def download_file(url):
-    """Downloads file pointed to by `url`."""
+def download_file(url, local_folder=None):
+    """Downloads file pointed to by `url`.
+    If `local_folder` is not supplied, downloads to the current folder.
+    """
     filename = os.path.basename(url)
+    if local_folder:
+        filename = os.path.join(local_folder, filename)
+
     # Download the file
     response = requests.get(url, stream=True)
 
@@ -17,9 +22,10 @@ def download_file(url):
     return filename
 
 
-def download_and_extract_model(url, model_extension='.cntk'):
+def download_and_extract_model(url, model_extension='.cntk', local_folder=None):
     """Downloads file pointed to by `url`. Once downloaded, unzips the
     downloaded file.
+    If `local_folder` is not supplied, downloads to the current folder.
     """
     def get_model_name(url):
         filename = os.path.basename(url)
@@ -32,7 +38,7 @@ def download_and_extract_model(url, model_extension='.cntk'):
     model_name = get_model_name(url)
 
     # Download the file
-    filename = download_file(url)
+    filename = download_file(url, local_folder)
 
     # Extract the file if it's a zip
     unzip = ziptools.Extractor(filename)
@@ -41,7 +47,6 @@ def download_and_extract_model(url, model_extension='.cntk'):
         print("extracted zipped model: " + model_filename)
     else:
         print("non-zipped model: " + filename)
-        model_filename = filename
 
     return model_name
 

@@ -31,7 +31,7 @@ import time
 class DriveTest:
     def __init__(self):
         self.arg_parser = argparse.ArgumentParser(
-            "This script uses ELL to create a demo project for a model (default is d_I160x160x3CMCMCMCMCMCMC1A from the ELL gallery)\n"
+            "This script uses ELL to create a demo project for a model (default is d_I160x160x3CMCMCMCMCMCMC1AS from the ELL gallery)\n"
             "on a target device (default is Raspberry Pi 3), pushes it to the given\n"
             "device's ip address using ssh and scp, then executes the test.\n"
             "The test also measures the accuracy and performance of evaluating the model.\n")
@@ -126,7 +126,7 @@ class DriveTest:
 
     def extract_model_info(self, ell_model, labels_file):
         if (ell_model is None or labels_file is None):
-            self.model_name = "d_I160x160x3CMCMCMCMCMCMC1A"
+            self.model_name = "d_I160x160x3CMCMCMCMCMCMC1AS"
             self.labels_file = os.path.join(self.test_dir, "categories.txt")
         else:
             self.ell_model = ell_model
@@ -193,28 +193,29 @@ class DriveTest:
 
     def get_default_model(self):
         # Download the model
-        self.ell_model = self.model_name + '.ell'
+        self.ell_model = os.path.join(self.test_dir, self.model_name + '.ell')
         if (not os.path.isfile(self.ell_model)) or (not os.path.isfile(self.labels_file)) :
             print("downloading default model...")
-            self.ell_model = download_and_extract_model(
-                "https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.ell.zip",
-                model_extension=".ell")
+            download_and_extract_model(
+                "https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.ell.zip",
+                model_extension=".ell",
+                local_folder=self.test_dir)
             print("downloading default categories.txt...")
-            self.labels_file = download_file("https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt")
+            self.labels_file = download_file("https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt",
+                local_folder=self.test_dir)
 
     def get_model(self):
-        if self.model_name == "d_I160x160x3CMCMCMCMCMCMC1A":
+        if self.model_name == "d_I160x160x3CMCMCMCMCMCMC1AS":
             self.get_default_model()
         print("using ELL model: " + self.model_name)
 
     def make_project(self):
-        labels_file = os.path.join(self.test_dir, self.labels_file)
         if os.path.isdir(self.output_dir):
             rmtree(self.output_dir)
         sys.path.append(os.path.join(current_path, '../../wrap'))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        builder_args = [labels_file, self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
+        builder_args = [self.labels_file, self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
             "--blas", str(self.blas) ]
         if self.profile:
             builder_args.append("-profile")

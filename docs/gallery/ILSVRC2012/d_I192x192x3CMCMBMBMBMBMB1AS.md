@@ -1,33 +1,33 @@
 ---
 layout: default
-title: 256x256x3 Convolutional Neural Network
-permalink: /gallery/ILSVRC2012/d_I256x256x3NCMNBMNBMNBMNBMNBMNC1A
+title: 192x192x3 Convolutional Neural Network
+permalink: /gallery/ILSVRC2012/d_I192x192x3CMCMBMBMBMBMB1AS
 ---
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 256x256x3 Convolutional Neural Network (38.26% top 1 accuracy, 62.46% top 5 accuracy, 1.01s/frame on Raspberry Pi 3)
+## ILSVRC2012 Classification: 192x192x3 Convolutional Neural Network (39.32% top 1 accuracy, 64.55% top 5 accuracy, 0.38s/frame on Raspberry Pi 3)
 
 <table>
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I256x256x3NCMNBMNBMNBMNBMNBMNC1A/d_I256x256x3NCMNBMNBMNBMNBMNBMNC1A.ell.zip">d_I256x256x3NCMNBMNBMNBMNBMNBMNC1A.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I192x192x3CMCMBMBMBMBMB1AS/d_I192x192x3CMCMBMBMBMBMB1AS.ell.zip">d_I192x192x3CMCMBMBMBMBMB1AS.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
-        <td colspan="3"> ILSVRC2012: 62.46% (Top 5), 38.26% (Top 1) </td>
+        <td colspan="3"> ILSVRC2012: 64.55% (Top 5), 39.32% (Top 1) </td>
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 1.01s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.83s/frame<br>DragonBoard 410c @ 1.2GHz: 0.50s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.38s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: 0.32s/frame<br>DragonBoard 410c @ 1.2GHz: 0.21s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
-        <td colspan="3"> 35MB </td>
+        <td colspan="3"> 18MB </td>
     </tr>
     <tr>
         <td> Input </td>
-        <td colspan="3"> 256 x 256 x {B,G,R} </td>
+        <td colspan="3"> 192 x 192 x {B,G,R} </td>
     </tr>
     <tr>
         <td> Architecture </td>
@@ -35,67 +35,67 @@ permalink: /gallery/ILSVRC2012/d_I256x256x3NCMNBMNBMNBMNBMNBMNC1A
             <table class="arch-table">
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;256x256x16</td>
+                    <td>&#8680;&nbsp;192x192x16</td>
                     <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;130x130x16</td>
+                    <td>&#8680;&nbsp;98x98x16</td>
                     <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;128x128x64</td>
+                    <td>&#8680;&nbsp;96x96x64</td>
+                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=float32,&nbsp;activation=relu</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Pooling</td>
+                    <td>&#8680;&nbsp;50x50x64</td>
+                    <td>size=2x2,&nbsp;stride=2,&nbsp;operation=max</td>
+                </tr>
+                <tr class="arch-table">
+                    <td>Convolution</td>
+                    <td>&#8680;&nbsp;48x48x64</td>
                     <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;64x64x64</td>
+                    <td>&#8680;&nbsp;24x24x64</td>
                     <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;64x64x64</td>
+                    <td>&#8680;&nbsp;24x24x128</td>
                     <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;32x32x64</td>
+                    <td>&#8680;&nbsp;12x12x128</td>
                     <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;32x32x128</td>
+                    <td>&#8680;&nbsp;12x12x256</td>
                     <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;16x16x128</td>
+                    <td>&#8680;&nbsp;6x6x256</td>
                     <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;16x16x256</td>
+                    <td>&#8680;&nbsp;6x6x512</td>
                     <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Pooling</td>
-                    <td>&#8680;&nbsp;8x8x256</td>
+                    <td>&#8680;&nbsp;3x3x512</td>
                     <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
                 </tr>
                 <tr class="arch-table">
                     <td>Convolution</td>
-                    <td>&#8680;&nbsp;8x8x512</td>
-                    <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Pooling</td>
-                    <td>&#8680;&nbsp;4x4x512</td>
-                    <td>size=3x3,&nbsp;stride=2,&nbsp;operation=max</td>
-                </tr>
-                <tr class="arch-table">
-                    <td>Convolution</td>
-                    <td>&#8680;&nbsp;4x4x1024</td>
+                    <td>&#8680;&nbsp;3x3x1024</td>
                     <td>size=3x3,&nbsp;stride=1,&nbsp;type=int64,&nbsp;activation=parametric&nbsp;relu</td>
                 </tr>
                 <tr class="arch-table">

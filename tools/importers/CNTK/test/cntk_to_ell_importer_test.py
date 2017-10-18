@@ -611,11 +611,11 @@ class CntkXorModelTestCase(CntkToEllTestBase):
 class CntkToEllFullModelTestBase(CntkToEllTestBase):
     CATEGORIES_URL = 'https://raw.githubusercontent.com/Microsoft/ELL-models/master/models/ILSVRC2012/categories.txt'
     MODEL_URLS = [
-        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1A/d_I160x160x3CMCMCMCMCMCMC1A.cntk.zip',
-        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3NCMNCMNBMNBMNBMNBMNB1A/d_I160x160x3NCMNCMNBMNBMNBMNBMNB1A.cntk.zip',
+        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip',
+        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMB1AS/d_I160x160x3CMCMBMBMBMBMB1AS.cntk.zip',
         # Uncomment the next URL to test a VGG model in the gallery.
         # This could add >20mins to each test run, so it is not included by default.
-        #'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048.cntk.zip'
+        #'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S.cntk.zip'
     ]
 
     def setUp(self):

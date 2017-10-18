@@ -74,12 +74,12 @@ optional arguments:
 ```
 
 ### Example
-After the `v_I64x64x3CCMCCMCCCMCCCMCCCMF2048` model is deployed to /home/pi/pi3, run the validation test on at most 10 images by calling this script from your host machine (note: not on the Raspberry Pi). 
+After the `d_I224x224x3CMCMCMCMCMCMC1AS` model is deployed to /home/pi/pi3, run the validation test on at most 10 images by calling this script from your host machine (note: not on the Raspberry Pi). 
 
-This will SSH to the Raspberry Pi at 192.168.1.100, call the Python bindings for the `v_I64x64x3CCMCCMCCCMCCCMCCCMF2048` model, and run through the images in the validation set. To do this, it deploys the validate.py and validate.sh helper scripts to the Raspberry Pi.
+This will SSH to the Raspberry Pi at 192.168.1.100, call the Python bindings for the `d_I224x224x3CMCMCMCMCMCMC1AS` model, and run through the images in the validation set. To do this, it deploys the validate.py and validate.sh helper scripts to the Raspberry Pi.
 
 ```
-(py36) python run_validation.py --maxfiles 10 v_I64x64x3CCMCCMCCCMCCCMCCCMF2048 192.168.1.100
+(py36) python run_validation.py --maxfiles 10 d_I224x224x3CMCMCMCMCMCMC1AS 192.168.1.100
 ```
 Note that some models do take a long time to run on the Raspberry Pi, and consume high CPU usage for the OpenBLAS operations. For these models, try a relatively small --maxfiles setting and increase as needed.
 

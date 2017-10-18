@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 160x160x3 Convolutional Neural Network
-permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048
+permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S
 ---
 
 [Back to Gallery](/ELL/gallery)
@@ -11,7 +11,7 @@ permalink: /gallery/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048
 <table>
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048.ell.zip">v_I160x160x3CCMCCMCCCMCCCMCCCMF2048.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S.ell.zip">v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>

@@ -16,19 +16,20 @@ class Extractor:
     def __init__(self, archive):
         self.archive = archive
 
-    def extract_file(self, file_extension, deleteExisting = True):
+    def extract_file(self, file_extension, delete_existing=True):
         """Extracts the first file matching the file extension"""
         _, ext = os.path.splitext(basename(self.archive))
-        if (ext == ".zip"):
+        if ext == ".zip":
             with zipfile.ZipFile(self.archive) as zf:
                 for member in zf.infolist():
                     _, e = os.path.splitext(member.filename)
-                    if (e == file_extension):
+                    if e == file_extension:
                         path = os.path.dirname(self.archive)
-                        if (deleteExisting and os.path.exists(path)):
-                            os.remove(member.filename)
+                        extracted = os.path.join(path, member.filename)
+                        if delete_existing and os.path.exists(extracted):
+                            os.remove(extracted)
                         zf.extract(member, path)
-                        return True, os.path.join(path, member.filename)
+                        return True, extracted
         else:
             return False, ""
 

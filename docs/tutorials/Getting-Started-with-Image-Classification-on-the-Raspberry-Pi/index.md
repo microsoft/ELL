@@ -47,10 +47,10 @@ cd tutorial1
 
 ## Step 2: Download pre-trained model
 
-Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip) into the `tutorial1` directory. The model file contains a pre-trained Deep Neural Network for image classification, and is one of the models available from the [ELL gallery](/ELL/gallery). The file's long name indicates the Neural Network's architecture, but don't worry about that for now and save it locally as `model.ell.zip`.
+Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip) into the `tutorial1` directory. The model file contains a pre-trained Deep Neural Network for image classification, and is one of the models available from the [ELL gallery](/ELL/gallery). The file's long name indicates the Neural Network's architecture, but don't worry about that for now and save it locally as `model.ell.zip`.
 
 ```shell
-curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1A/d_I224x224x3CMCMCMCMCMCMC1A.ell.zip
+curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip
 ```
 
 Unzip the compressed file. On Windows, note that the `unzip` utility is distributed as part of Git, for example, in `\Program Files\Git\usr\bin`.
@@ -59,11 +59,11 @@ Unzip the compressed file. On Windows, note that the `unzip` utility is distribu
 unzip model.ell.zip
 ```
 
-Rename the `d_I224x224x3CMCMCMCMCMCMC1A.ell` model file to `model.ell`:
+Rename the `d_I224x224x3CMCMCMCMCMCMC1AS.ell` model file to `model.ell`:
 
 ```shell
-[Linux/macOS] mv d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
-[Windows] ren d_I224x224x3CMCMCMCMCMCMC1A.ell model.ell
+[Linux/macOS] mv d_I224x224x3CMCMCMCMCMCMC1AS.ell model.ell
+[Windows] ren d_I224x224x3CMCMCMCMCMCMC1AS.ell model.ell
 ```
 
 Next, download the `categories.txt` file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) and save it in the `tutorial1` directory.
