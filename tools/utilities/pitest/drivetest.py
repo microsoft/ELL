@@ -7,13 +7,10 @@
 ##  Requires: Python 3.x
 ##
 ####################################################################################################
+
 import os
 from os.path import basename
 import sys
-current_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(current_path, '../pythonlibs'))
-import find_ell
-from download_helper import *
 import argparse
 import glob
 import subprocess
@@ -21,12 +18,19 @@ import json
 import operator
 from shutil import copyfile
 from shutil import rmtree
-import paramiko
 import zipfile
-import requests
-import picluster
 import socket
 import time
+
+import paramiko
+import requests
+
+current_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current_path, "../pythonlibs"))
+import find_ell
+import picluster
+from download_helper import download_file, download_and_extract_model
+from remoterunner import RemoteRunner
 
 class DriveTest:
     def __init__(self):
@@ -49,8 +53,7 @@ class DriveTest:
         self.password = "raspberry"
         self.target = "pi3"
         self.machine = None
-        self.cluser = None
-        self.ssh = None
+        self.cluster = None
         self.blas = True
         self.expression = None
         self.created_dirs = []
@@ -67,7 +70,7 @@ class DriveTest:
         self.arg_parser.add_argument("--outdir", default=self.test_dir)
         self.arg_parser.add_argument("--profile", help="enable profiling functions in the ELL module", action="store_true")
 
-        model_group = self.arg_parser.add_argument_group('model', 'options for loading a non-default model. All 3 must be specified for a non-default model to be used.')
+        model_group = self.arg_parser.add_argument_group("model", "options for loading a non-default model. All 3 must be specified for a non-default model to be used.")
         model_group.add_argument("--model", help="path to an ELL model file, the filename (without extension) will be used as the model name")
         model_group.add_argument("--labels", help="path to the labels file for evaluating the model")
 
@@ -101,9 +104,8 @@ class DriveTest:
         self.blas = self.str2bool(args.blas)
         self.test = args.test
         self.extract_model_info(args.model, args.labels)
-        self.ipaddress = self.resolve_address(args.ipaddress)
-
         self.output_dir = os.path.join(self.test_dir, self.target, self.model_name)
+        self.resolve_address(args.ipaddress)
         if not os.path.isdir(self.output_dir):
             os.makedirs(self.output_dir)
 
@@ -113,16 +115,9 @@ class DriveTest:
             self.cluster = picluster.PiBoardTable(ipaddress)
             self.machine = self.cluster.wait_for_free_machine(self.model_name)
             print("Using machine at " + self.machine.ip_address)
-            return self.machine.ip_address
+            self.ipaddress = self.machine.ip_address
         else:
-            return ipaddress
-
-    def free_machine(self):
-        if self.machine != None:
-            f = self.cluster.unlock(self.machine.ip_address)
-            if f.current_user_name != '':
-                print("Failed to free the machine at " + self.machine.ip_address)
-
+            self.ipaddress = ipaddress
 
     def extract_model_info(self, ell_model, labels_file):
         if (ell_model is None or labels_file is None):
@@ -160,7 +155,7 @@ class DriveTest:
             copyfile(path, dest)
 
     def configure_runtest(self, dest):
-        with open(os.path.join(self.ell_root, "tools/utilities/pitest/runtest.sh.in"), 'r') as f:
+        with open(os.path.join(self.ell_root, "tools/utilities/pitest/runtest.sh.in"), "r") as f:
             template = f.read()
         template = template.replace("@LABELS@", basename(self.labels_file))
         template = template.replace("@COMPILED_MODEL@", basename(self.model_name))
@@ -169,7 +164,7 @@ class DriveTest:
         output_template = os.path.join(dest, "runtest.sh")
 
         # raspberry pi requires runtest to use 0xa for newlines, so fix autocrlf that happens on windows.
-        with open(output_template, 'w', newline='\n') as of:
+        with open(output_template, "w", newline="\n") as of:
             of.write(template)
 
     def find_files_with_extension(self, path, extension):
@@ -212,7 +207,7 @@ class DriveTest:
     def make_project(self):
         if os.path.isdir(self.output_dir):
             rmtree(self.output_dir)
-        sys.path.append(os.path.join(current_path, '../../wrap'))
+        sys.path.append(os.path.join(current_path, "../../wrap"))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
         builder_args = [self.labels_file, self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
@@ -222,63 +217,7 @@ class DriveTest:
         builder.parse_command_line(builder_args)
         builder.run()
 
-    def connect_ssh(self):
-        self.ssh = paramiko.SSHClient()
-        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        print("connecting to target device at " + self.ipaddress)
-        self.ssh.connect(self.ipaddress, username=self.username, password=self.password)
-
-    def exec_remote_command(self, cmd):
-        print("remote:" + cmd)
-        output = []
-        stdin, stdout, stderr = self.ssh.exec_command(cmd)
-        while True:
-            line = stdout.readline()
-            if line != "":
-                output.append(line.strip('\n'))
-                print("..." + line.strip('\n'))
-            err = stderr.readline()
-            if err != "":
-                output.append(err.strip('\n'))
-                print("..." + err.strip('\n'))
-            if line == "" and err == "":
-                break
-
-        return output
-
-    def clean_target(self):
-        self.exec_remote_command('rm -rf {}'.format(basename(self.target_dir)))
-
-    def linux_join(self, path, name):
-        # on windows os.path.join uses backslashes which doesn't work on the pi!
-        return os.path.join(path, name).replace("\\","/")
-
-    def safe_mkdir(self, sftp,  dir):
-        if not dir in self.created_dirs:
-            print("mkdir: " + dir)
-            sftp.mkdir(dir)
-            self.created_dirs.append(dir)
-
-    def sftp_copy_dir(self, sftp, src, dest):
-        self.safe_mkdir(sftp, dest + "/")
-        for dirname, dirnames, filenames in os.walk(src):
-            target_dir = self.linux_join(dest, dirname[len(src) + 1:])
-            self.safe_mkdir(sftp, target_dir)
-            for filename in filenames:
-                src_file = os.path.join(dirname, filename)
-                print("copying:" + src_file)
-                if os.path.isfile(src_file):
-                    dest_file = self.linux_join(dest, src_file[len(src) + 1:])
-                    sftp.put(src_file, dest_file)
-
-    def publish_bits(self):
-        sftp = paramiko.SFTPClient.from_transport(self.ssh.get_transport())
-        self.sftp_copy_dir(sftp, self.output_dir, self.target_dir)
-        sftp.close()
-
-    def execute_remote_test(self):
-        self.exec_remote_command("chmod u+x {}/runtest.sh".format(self.target_dir))
-        output = self.exec_remote_command("{}/runtest.sh".format(self.target_dir))
+    def verify_remote_test(self, output):
         print("==========================================================")
         found = False
         for line in output:
@@ -296,15 +235,21 @@ class DriveTest:
                 self.get_model()
                 self.make_project()
                 self.get_bash_files()
-            self.connect_ssh()
-            self.clean_target()
-            self.publish_bits()
-            self.execute_remote_test()
-            self.free_machine()
-        except:
+
+            runner = RemoteRunner(cluster=self.cluster,
+                                  ipaddress=self.ipaddress,
+                                  username=self.username,
+                                  password=self.password,
+                                  source_dir=self.output_dir,
+                                  target_dir=self.target_dir,
+                                  command="runtest.sh",
+                                  verbose=True,
+                                  cleanup=False)
+            output = runner.run_command()
+            self.verify_remote_test(output)
+        except:            
             errorType, value, traceback = sys.exc_info()
             print("### Exception: " + str(errorType) + ": " + str(value))
-            self.free_machine()
             raise Exception("### Test Failed")
 
 

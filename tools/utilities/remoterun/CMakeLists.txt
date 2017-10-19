@@ -5,17 +5,18 @@
 find_package(PythonInterp)
 if(${PYTHONINTERP_FOUND})
 
-    set(module_name "pitest")
+    set(module_name "remoterun")
 
-    set(test_src drivetest.py runtest.sh.in coffeemug.jpg buildtask.cmd)
+    set(src remoterun.py)
 
-    add_custom_target(${module_name} DEPENDS SOURCES ${test_src})
+    add_custom_target(${module_name} DEPENDS SOURCES ${src})
     add_dependencies(${module_name} pythonlibs)
-    
+
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/utilities")
+    
     # copy files
-    foreach(FILE ${test_src})
+    foreach(FILE ${src})
         configure_file(${FILE} ${FILE} COPYONLY)
     endforeach()
-
+  
 endif()  # PYTHONINTERP_FOUND

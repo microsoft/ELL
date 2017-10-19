@@ -7,13 +7,18 @@
 
 # Usage: make_profiler.sh model_file.ell [output_directory] <compile options> 
 
-set -x
+set -e
 
 pushd .
 
 # Capture all arguments into a bash array
 all_args=("$@")
+
+# Set some defaults
 parallel="false"
+target="host"
+cleanup=true
+
 # Extract target value
 for arg in "${all_args[@]}"; do
     if [ "${prev_arg}" == "--target" ] ; then
@@ -48,21 +53,22 @@ if [ ${target} == 'pi3' ] ; then
     llc_opts=$pi3_llc_opts
 fi
 
-mkdir $profiler_directory
+echo "Compiling model profilers"
+mkdir -p $profiler_directory
 @COMPILE_EXECUTABLE@ -imap $model_file --profile --ir --objectCode --header -od $profiler_directory -ob compiled_model $@
 @COMPILE_EXECUTABLE@ -imap $model_file --ir --objectCode --header -od $profiler_directory -ob compiled_model_noprofile $@
 
 cd $profiler_directory
-@LLC_EXECUTABLE@ compiled_model.ll -o compiled_model_llc.o -O3 --filetype=obj $llc_opts
 @OPT_EXECUTABLE@ compiled_model.ll -o compiled_model_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_opt.ll -o compiled_model_opt.o -O3 --filetype=obj $llc_opts
 
-@LLC_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_llc.o -O3 --filetype=obj $llc_opts
 @OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj $llc_opts
 
 cp ../tools/utilities/profile/compiled_profile_main.cpp .
 cp ../tools/utilities/profile/compiled_exercise_model_main.cpp .
+cp ../tools/utilities/profile/OpenBLASSetup.cmake .
+cp ../tools/utilities/profile/build_and_run.sh .
 
 if [ ${parallel} == "true" ] ; then
     cp ../tools/utilities/profile/CMakeLists-compiled-parallel.txt.in ./CMakeLists.txt
@@ -70,5 +76,9 @@ else
     cp ../tools/utilities/profile/CMakeLists-compiled.txt.in ./CMakeLists.txt
 fi
 
-cp ../tools/utilities/profile/OpenBLASSetup.cmake ./OpenBLASSetup.cmake
+if [ ${cleanup} == "true" ] ; then
+    rm -rf ./*.ll
+    rm -rf ./*.bc
+fi
+
 popd

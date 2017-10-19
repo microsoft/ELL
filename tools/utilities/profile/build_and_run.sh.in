@@ -1,0 +1,74 @@
+#!/bin/sh
+
+# A script that builds and runs the CMake project
+#   - create build directory
+#   - cd to build directory, run cmake and make
+#   - run the specified command passed in as commandline parameters
+
+set -x
+
+# Create build directory and build project
+mkdir -p build
+cd build
+rm -rf *
+cmake ..
+make profile
+make exercise_model
+
+# Run profile tool with arguments given on the command line
+echo "Running ELL profiler tool"
+./profile $@
+
+# Run exercise_model tool with 10 iterations
+/bin/bash -c "time ./exercise_model 10"
+
+# Run perf tool to get low-level events
+
+# To install perf:
+#
+# uname -a  # get Linux version
+#
+# sudo apt-get install linux-perf-4.9  # (Use this for Raspbian Jesse)
+#   --or--
+# sudo apt-get install linux-tools-3.6  # for older versions of Linux (?)
+
+# perf events to try looking at:
+#
+#   cpu-time
+#   instructions
+#   cpu-cycles
+#   cache-references
+#   cache-misses
+#   LLC-loads
+#   LLC-load-misses
+#   dTLB-load-misses
+#   branches
+#   branch-misses
+#
+# other:
+#   faults
+#   L1-dcache-load-misses
+#   context-switches (cs)
+#   cpu-migrations
+
+# Note: On the ARM, we can only collect samples from 4 counters at a time
+# Note: add '-s' option to perf record and '-T' option to perf report to get per-thread info
+
+# Run perf tool to get overall stats
+echo "Getting overall perf stats"
+/bin/bash -c "perf stat -e cpu-clock,faults ./exercise_model 10"
+
+# Run perf tool to record profile data
+echo "Recording perf data"
+# Note: Diverting output to /dev/null because we keep getting "Exception: <class 'UnicodeDecodeError'>: 'utf-8' codec can't decode byte 0x98 in position 22: invalid start byte"
+#       And also because the SSH client used in RemoteRunner was freezing.
+/bin/bash -c "perf record -e cpu-clock,faults -q ./exercise_model 10 > /dev/null"
+
+# Report 1
+# echo "Perf profile data report 1"
+# /bin/bash -c "perf report --stdio --stdio-color never --sort comm,dso > report1.txt"
+# /bin/bash -c "perf report --stdio --sort comm,dso"
+
+# Report 2
+# echo "perf profile data report 2"
+# perf report --stdio --dsos=exercise_model,libc > report2.txt

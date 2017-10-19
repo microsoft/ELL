@@ -62,6 +62,7 @@ configure_file(src/compiled_profile_main.cpp compiled_profile_main.cpp COPYONLY)
 configure_file(src/compiled_exercise_model_main.cpp compiled_exercise_model_main.cpp COPYONLY)
 configure_file(make_profiler.sh.in make_profiler.sh @ONLY)
 configure_file(make_profiler.cmd.in make_profiler.cmd @ONLY)
+configure_file(build_and_run.sh.in build_and_run.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/CMake/OpenBLASSetup.cmake OpenBLASSetup.cmake COPYONLY)
 file(COPY ${CMAKE_CURRENT_BINARY_DIR}/make_profiler.sh
   DESTINATION ${GLOBAL_BIN_DIR}

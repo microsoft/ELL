@@ -1,4 +1,4 @@
-## Profile Tool
+## Interactive / JIT profile Tool
 
 The profile tool can be used to help spot bottlenecks in the compiled code for a 
 model. It compiles the model and runs it (using the JIT on the host machine), gathering
@@ -16,8 +16,6 @@ total and average time per iteration. The `burnIn` option is specifically meant 
 the problem with the first few iterations taking longer than later ones. If set, The `burnIn` 
 option specifies the number of model evaluations to compute before starting the `numIterations`
 evaluations that are measured.
-
-
 
 ### Usage
 
@@ -134,3 +132,14 @@ JSON format
   "count": 3
 }}
 ```
+
+## Compiled profile tool
+
+There is another profile tool that generates binary profiling applications to run on a target machine. You generate a project to compile on the target machine like this:
+
+```
+Windows: bin\make_profiler.cmd <model_filename> [<output_directory>] <profile options...>
+Linux/Mac: bin/make_profiler.sh <model_filename> [<output_directory>] <profile options...>
+```
+
+then copy the resulting directory to the target machine, run CMake, and build the project.

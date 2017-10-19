@@ -89,8 +89,14 @@ class PiBoardTable:
         # make the job name unique in every instance
         a.current_task_name = jobName
         r = self.update(a)
-        if r.current_user_name != self.username or r.command != "Lock" or r.current_task_name != a.current_task_name or r.lock_key != a.lock_key:
-            raise Exception("Lock failed")
+        if r.current_user_name != self.username:
+            raise Exception("Lock failed on machine {}, already taken by {}".format(ip, r.current_user_name))
+        elif r.command != "Lock":
+            raise Exception("Lock failed on machine {}, lock not granted".format(ip))
+        elif r.current_task_name != a.current_task_name:
+            raise Exception("Lock failed on machine {}, already used by task {}".format(ip, r.current_task_name))
+        elif r.lock_key != a.lock_key:
+            raise Exception("Lock failed on machine {}, lock key mismatch {}".format(ip))
         return r
     
     def unlock(self, ip):

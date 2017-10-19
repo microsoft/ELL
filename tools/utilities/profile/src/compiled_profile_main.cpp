@@ -274,7 +274,7 @@ int main(int argc, char* argv[])
         numWarmUpIterations = atoi(argv[2]);
     }
 
-    std::cout << "Profiling model with " << numWarmUpIterations << " warm-up iterations, and " << numIterations << " timed iterations" << std::endl;
+    std::cout << "Profiling model with " << numWarmUpIterations << " warm-up iterations and " << numIterations << " timed iterations" << std::endl;
 
     // add arguments to the command line parser
     ProfileArguments profileArguments;
