@@ -74,7 +74,7 @@ svg {
 
 <svg id="plot1" height="600" ></svg>
 <!-- for d3 based charting -->
-<script src="/ELL/js/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.js" integrity="sha256-xOOIPEIJM2Hn3GVaZs+VnM9J3rtaeUuHcHRXuJNO+JU=" crossorigin="anonymous"></script>
 <script src="/ELL/js/multi-line-plot.js"></script>
 <script>
 multi_line_plot("/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/Pi-Heating-Data.tsv", "plot1", "Processor Temperature ºC", null, [35,90], 60);

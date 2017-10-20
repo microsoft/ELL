@@ -8,7 +8,7 @@ permalink: /gallery/ILSVRC2012/d_I224x224x3CMCMBMBMBMBMC1AS
 
 ## ILSVRC2012 Classification: 224x224x3 Convolutional Neural Network (38.37% top 1 accuracy, 63.46% top 5 accuracy, 0.52s/frame on Raspberry Pi 3)
 
-<table>
+<table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
         <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMBMBMBMBMC1AS/d_I224x224x3CMCMBMBMBMBMC1AS.ell.zip">d_I224x224x3CMCMBMBMBMBMC1AS.ell.zip</a></td>

@@ -3,22 +3,22 @@
 # only Main files contain this front matter, not partials.
 ---
 
-@import "bootstrap/variables";
-
 //
 // Model gallery
 // --------------------------------------------------
+
+// Padding for cells in `.arch-table`.
+$arch-table-cell-padding: 3px !default;
 
 // Model architecture nested table
 .arch-table {
     border-style: none;
     > tr {
-        padding: $row-condensed-cell-padding;
+        padding: $arch-table-cell-padding;
     }
     > th,
     > td {
-        background-color: $body-bg;
         border-style: none;
-        padding: $row-condensed-cell-padding;
+        padding: $arch-table-cell-padding;
     }
 }
