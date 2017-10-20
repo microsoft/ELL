@@ -220,7 +220,7 @@ void ProfileModel(const ProfileArguments& profileArguments)
     // Warm up the system by evaluating the model some number of times
     for (int iter = 0; iter < profileArguments.numWarmUpIterations; ++iter)
     {
-        ELL_predict(input.data(), output.data());
+        ELL_Predict(input.data(), output.data());
     }
     ResetProfilingInfo();
 
@@ -228,7 +228,7 @@ void ProfileModel(const ProfileArguments& profileArguments)
     for (int iter = 0; iter < profileArguments.numIterations; ++iter)
     {
         // Exercise the model
-        ELL_predict(input.data(), output.data());
+        ELL_Predict(input.data(), output.data());
     }
 
     auto format = profileArguments.outputFormat;

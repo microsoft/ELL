@@ -26,7 +26,7 @@ namespace common
             compiledFunctionName,
             "compiledFunctionName",
             "cfn",
-            "Name for compiled function (if none specified, use <moduleName>_predict",
+            "Name for compiled function (if none specified, use <moduleName>_Predict",
             "");
 
         parser.AddOption(
@@ -147,7 +147,7 @@ namespace common
         {
             if (namespaceSpecified)
             {
-                functionName = namespacePrefix + "_predict";
+                functionName = namespacePrefix + "_Predict";
             }
             else
             {

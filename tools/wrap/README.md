@@ -17,7 +17,7 @@ See [Getting Started with Image Classification on the RaspberryPi](../../../docs
 
 ### What does this tool do exactly?
 
-If you run the tool with the additional `-v` command line option you will see the steps it is taking.  
+If you run the tool with the additional `-v` command line option you will see the steps it is taking.
 
 The output from this for building a Python callable interface on an ImageNet model for Raspberry pi 3 is shown below.
 You will see the same commands on Linux or Mac only with '/' instead of '\\' in the path names.
@@ -68,7 +68,7 @@ This describes the compiled model to CMake so that it can be referenced in C++ p
 
 Next it invokes the ell compiler to compile the given model.  The command line looks like this:
 ````
-compile -imap ImageNet.ell -cfn predict -cmn ImageNet --bitcode --swig --blas true --target pi3 -od pi3
+compile -imap ImageNet.ell -cfn Predict -cmn ImageNet --bitcode --swig --blas true --target pi3 -od pi3
 ````
 This compiler is created by the ELL build and you will find it in `~/git/ELL/build/bin` and on Windows it will be in `d:\git\ELL\ELL\build\bin\release\`.
 
@@ -89,7 +89,7 @@ On Windows we include SWIG in a nuget package, so you will find it in `d:\git\EL
 
 #### Targeting the Model
 
-Finally it uses LLC to cross-compile the model so that code runs on your specified target platform.  
+Finally it uses LLC to cross-compile the model so that code runs on your specified target platform.
 
 ````
 llc pi3\ImageNet.bc -o pi3\ImageNet.obj -filetype=obj -O3 -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53 -relocation-model=pic

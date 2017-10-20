@@ -57,7 +57,7 @@ void RunModel(const ProfileArguments& profileArguments)
     for (int iter = 0; iter < profileArguments.numIterations; ++iter)
     {
         // Exercise the model
-        ELL_predict(input.data(), output.data());
+        ELL_Predict(input.data(), output.data());
     }
 }
 

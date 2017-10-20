@@ -32,7 +32,7 @@ class ModuleBuilder:
         self.includes = []
         self.tcc = []
         self.tools = None
-        self.func_name = "predict"
+        self.func_name = "Predict"
         self.objext = "obj"
         self.tools = None
         self.language = "python"
@@ -66,7 +66,7 @@ class ModuleBuilder:
         arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
 
         args = arg_parser.parse_args(argv)
-        
+
         self.label_file = args.label_file
         self.model_file = args.model_file
 
@@ -80,14 +80,14 @@ class ModuleBuilder:
         self.blas = self.str2bool(args.blas)
 
         _, tail = os.path.split(self.model_file)
-        self.model_name =  os.path.splitext(tail)[0]        
+        self.model_name =  os.path.splitext(tail)[0]
 
     def find_files(self):
         self.cmake_template = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates/CMakeLists.%s.txt.in" % (self.language))
         if (not os.path.isfile(self.cmake_template)):
             raise Exception("Could not find CMakeLists template: %s" % (self.cmake_template))
         self.files.append(self.label_file)
-        self.files.append(os.path.join(self.ell_root, "CMake/OpenBLASSetup.cmake"))       
+        self.files.append(os.path.join(self.ell_root, "CMake/OpenBLASSetup.cmake"))
         self.includes.append(os.path.join(self.ell_root, "interfaces/common/include/CallbackInterface.h"))
         self.includes.append(os.path.join(self.ell_root, "libraries/emitters/include/ClockInterface.h"))
         self.tcc.append(os.path.join(self.ell_root, "interfaces/common/tcc/CallbackInterface.tcc"))
@@ -111,7 +111,7 @@ class ModuleBuilder:
     def create_cmake_file(self):
         with open(self.cmake_template) as f:
             template = f.read()
-        
+
         template = template.replace("@ELL_model@", self.model_name)
         template = template.replace("@Arch@", self.target)
         template = template.replace("@OBJECT_EXTENSION@", self.objext)
@@ -151,7 +151,7 @@ class ModuleBuilder:
             print("success, now you can build the '" + self.output_dir + "' folder")
         else:
             print("success, now copy the " + self.output_dir + " to your target machine and build it there")
-        
+
 if __name__ == "__main__":
     builder = ModuleBuilder()
 

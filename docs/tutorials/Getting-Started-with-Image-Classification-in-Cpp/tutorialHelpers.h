@@ -61,24 +61,23 @@ public:
     // where the first element of each pair is the index and the second is the score.
     static std::vector<std::pair<size_t, float>> GetTopN(const std::vector<float>& predictions, size_t topN = 5, double threshold = 0.20)
     {
-        std::vector<std::pair<size_t, float>> result;
-
         // initialize original index locations
         std::vector<size_t> indexes(predictions.size());
         std::iota(indexes.begin(), indexes.end(), 0);
 
         // sort indexes based on comparing prediction values
-        std::sort(indexes.begin(), indexes.end(), [&predictions](size_t index1, size_t index2)
+        std::partial_sort(indexes.begin(), indexes.begin() + topN, indexes.end(), [&predictions](size_t index1, size_t index2)
         {
             return predictions[index1] > predictions[index2];
         });
 
         // Make a std::pair and append it to the result for N predictions
-        for (size_t i = 0; i < topN; i++)
+        std::vector<std::pair<size_t, float>> result;
+        for (size_t i = 0; i < topN; ++i)
         {
             if (predictions[indexes[i]] >= threshold)
             {
-                result.emplace_back(std::pair<size_t, float>({ indexes[i], predictions[indexes[i]] }));
+                result.emplace_back(indexes[i], predictions[indexes[i]]);
             }
         }
 
@@ -89,8 +88,13 @@ public:
     static double GetMeanDuration(std::vector<double>& accumulated, double duration, size_t maxAccumulatedEntries = 30)
     {
         accumulated.emplace_back(duration);
-        if (accumulated.size() > maxAccumulatedEntries) accumulated.erase(accumulated.begin());
-        auto meanFunction = [&accumulated](double a, double b) {return a + b / accumulated.size(); };
+
+        if (accumulated.size() > maxAccumulatedEntries)
+        {
+            accumulated.erase(accumulated.begin());
+        }
+
+        auto meanFunction = [&accumulated](double a, double b) { return a + b / accumulated.size(); };
 
         return std::accumulate(accumulated.begin(), accumulated.end(), 0.0, meanFunction);
     }
@@ -98,8 +102,10 @@ public:
     // Draw a colored text block with black text inside
     static void DrawTextBlock(cv::Mat& image, const std::string& text, cv::Point topLeft, cv::Scalar color, int height = 40)
     {
-        double fontScale = 0.7;
+        const double fontScale = 0.7;
+
         cv::rectangle(image, topLeft, cv::Point(image.cols, topLeft.y + height), color, CV_FILLED);
+
         cv::putText(image, text, cv::Point(topLeft.x + height / 4, topLeft.y + (int)(height * 0.667)),
                     cv::FONT_HERSHEY_COMPLEX_SMALL, fontScale, cv::Scalar(0, 0, 0), 1, CV_AA);
     }
@@ -107,14 +113,16 @@ public:
     // Draw a header text block on an image
     static void DrawHeader(cv::Mat& image, const std::string& text)
     {
-        int blockHeight = 40;
+        const int blockHeight = 40;
+
         DrawTextBlock(image, text, cv::Point(0, 0), cv::Scalar(50, 200, 50), blockHeight);
     }
 
     // Draw a footer text block on an image
     static void DrawFooter(cv::Mat& image, const std::string& text)
     {
-        int blockHeight = 40;
+        const int blockHeight = 40;
+
         DrawTextBlock(image, text, cv::Point(0, image.rows - blockHeight), cv::Scalar(200, 100, 100), blockHeight);
     }
 };

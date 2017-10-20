@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 
         // Send the image to the compiled model and fill the predictions vector with scores, measure how long it takes
         auto start = std::chrono::steady_clock::now();
-        model_predict(input, predictions);
+        model_Predict(input, predictions);
         auto end = std::chrono::steady_clock::now();
 
         // Get the value of the top 5 predictions
