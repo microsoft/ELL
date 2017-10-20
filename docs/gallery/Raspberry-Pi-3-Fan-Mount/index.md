@@ -19,6 +19,7 @@ See also our tutorial on [Active Cooling your Raspberry Pi 3](/ELL/tutorials/Act
 |-
 | Notes | Designed by Spencer Persaud<br>Print with support material
 |=
+{: .table .table-striped .table-bordered}
 
 ## Raspberry Pi 3 Fan Mount Without Offsets
 
@@ -31,4 +32,4 @@ See also our tutorial on [Active Cooling your Raspberry Pi 3](/ELL/tutorials/Act
 |-
 | Notes | Designed by Spencer Persaud<br>Does not require support material, but requires extra nylon spacers.
 |=
-
+{: .table .table-striped .table-bordered}
