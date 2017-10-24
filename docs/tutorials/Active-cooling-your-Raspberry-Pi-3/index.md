@@ -6,7 +6,7 @@ permalink: /tutorials/Active-cooling-your-Raspberry-Pi-3/
 
 # Active cooling your Raspberry Pi 3
 
-*by Ofer Dekel*
+*by Ofer Dekel and Spencer Persaud*
 
 
 The Raspberry Pi 3 tends to overheat when pushed to its limits. When the processor's internal temperature approaches 85 degrees Celsius, it protects itself by clocking down or shutting down completely, and the performance of our AI models takes a hit.
@@ -15,7 +15,7 @@ The Raspberry Pi 3 tends to overheat when pushed to its limits. When the process
 
 These infrared images show a Pi running idle (left) and after a few minutes of running a compute-intensive AI model (right). Notice that the main processor heats up much more than any of the other components on the board. Some cooling kits for the Raspberry Pi include heatsinks for the other components, but these infrared images suggest that we should really focus on cooling the processor. In this tutorial, we will build a simple and effective active cooling solution for the Raspberry Pi 3.
 
-### Materials:
+#### Materials:
 
 * [Adafruit Aluminum Heat Sink for Raspberry Pi 3 - 15 x 15 x 15mm](https://www.adafruit.com/product/3082) (comes with a thermally conductive sticker), or equivalent.
 * [Adafruit Miniature 5V Cooling Fan for Raspberry Pi](https://www.adafruit.com/product/3368) (comes with mouting screws and nuts), or equivalent 5V 0.2A DC brushless fan, 30mm x 30mm, with mounting holes spaced 24mm apart.
@@ -24,7 +24,7 @@ These infrared images show a Pi running idle (left) and after a few minutes of r
 
 ![Pi Active Cooling Materials](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Pi-Active-Cooling-Materials.jpg)
 
-### Assembly:
+## Assembly:
 
 **Step 1:** Attach the fan to the 3D printed fan mount using the screws and nuts provided with the fan. Make sure that the fan is oriented such that it blows air towards the mount (when installed, it will blow air on the heatsink, rather than sucking air from the heatsink).
 
@@ -38,13 +38,13 @@ These infrared images show a Pi running idle (left) and after a few minutes of r
 
 ![Pi with Fan](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Pi-with-Fan.jpg)
 
-#### Mounting on the Raspberry Pi 7" Touchscreen Display
+## Mounting on the Raspberry Pi 7" Touchscreen Display
 
 Most other active cooling solutions for the Raspberry Pi come in the form of an active cooling enclosure or case. A variety of different active cooling cases can be purchased online and some of them work well. However, enclosing the Pi in a case isn't always desirable. For example, in many of our own projects, we like to mount Raspberry Pis onto the Raspberry Pi 7" Touchscreen Display. Therefore, we specifically designed our active cooling solution to be compatible with the 7" Touchscreen Display. The only difference in the assembly instructions is that we don't need nuts for the M2.5 x 12 screws. Instead, they screw directly into the M2.5 standoffs that come with the 7" Touchscreen Display.
 
 ![Pi with Fan on Display](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Pi-with-Fan-on-Display.jpg)
 
-#### Printing without standoffs
+## Printing without standoffs
 
 You may have noticed that the *Pi 3 Fan Mount* comes in two versions, with or without standoffs. If your 3D printer can print support material, then print the version with standoffs. On the other hand, if your printer only supports a single filament, you may have more luck printing the version without standoffs. In that case, you will need to add nylon spacers or standoffs to lift the plastic mount off of the Pi circuit board.
 
@@ -87,3 +87,8 @@ The `none` configuration quickly overheats. Within a few minutes, the processor 
 We were surprised to see the effectiveness of the fan in the `fan` configuration, where the processor temperature quickly stabilizes around 63 degrees. The clear winner is the `both` configuration, where the combination of fan and heat sink works like a champion, and the processor temperature remains below 50 degrees.
 
 Try to repeat the experiment with different AI workloads and different cooling configurations. To measure processor temperature, use the command `watch /opt/vc/bin/vcgencmd measure_temp`.
+
+Now that you know how to cool your Raspberry Pi, you can build a Raspberry Pi cluster.
+
+![Cluster](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/Cluster.jpg)
+
