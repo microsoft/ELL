@@ -53,12 +53,19 @@ sudo apt-get install -y llvm-3.9-dev
 This works on Ubuntu 16.04 Xenial.  If you have some other Linux version and llvm-3.9-dev is not available then
 [*LLVM*](http://llvm.org/) has more instructions on how to install it manually.
 
+### curl
+
+`curl` is a command line tool used to transfer data via URL. When files are required to be downloaded from a URL, the instructions assume you have `curl` available to perform the download. To install `curl`, type the following:
+```shell
+sudo apt-get install -y curl
+```
+
 ### SWIG 3.0.12
 
 [*SWIG*](http://swig.org) is a tool that generates Python interfaces to C++ libraries. If you intend to use ELL from Python, you must install SWIG version 3.0.12. At the time of writing this document, `apt-get` doesn't yet have the latest version of `SWIG`, so it must be installed manually
 
 ```shell
-wget http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
+curl -O http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
 tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12
 ./configure --without-pcre && make && sudo make install
 ```

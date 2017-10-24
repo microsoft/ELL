@@ -40,13 +40,19 @@ OpenBLAS is a library for fast linear algebra operations, which can significantl
 sudo apt-get install -y libopenblas-dev
 ```
 
+### curl
+`curl` is a command line tool used to transfer data via URL. When files are required to be downloaded from a URL, the instructions assume you have `curl` available to perform the download. To install `curl`, type the following:
+```shell
+sudo apt-get install -y curl
+```
+
 ### Python 3.4 via Miniconda
 Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). 
 An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
 To install Miniconda, type the following. 
 
 ```shell
-wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
+curl -O http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
 chmod +x Miniconda3-latest-Linux-armv7l.sh
 ./Miniconda3-latest-Linux-armv7l.sh
 ```

@@ -62,6 +62,8 @@ You need to repeat this activation command each time you open a new terminal and
 conda install -c conda-forge opencv
 ```
 
+Miniconda comes with useful command line tools such as `curl`, which is used to transfer data via URL. When files are required to be downloaded from a URL, the instructions assume you have `curl` available to perform the download. Ensure you activate your conda environment before running commands like `curl`.
+
 ## Building ELL
 
 We build ELL by using CMake to create a Visual Studio solution, building that solution, and optionally building Python interfaces. If you intend to build Python interfaces, make sure to activate the `py36` environment as described above.
