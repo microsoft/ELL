@@ -65,6 +65,13 @@ For example:
 
 When possible, write linear step-by-step instructions. Avoid foreshadowing the future. Avoid forks and multiple choice, instead consider making multiple separate tutorials. 
 
+#### Ensure directory names match permalink
+If a permalink contains the name of the directory where it is located, they should match exactly, including the casing.
+
+For example, `permalink: ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/`
+* Good: Should be in a directory `tutorials/Boosting-classifier-accuracy-by-grouping-categories/`
+* Bad: In a directory like `tutorials/Boosting-Classifier-Accuracy-by-Grouping-Categories`
+
 ## Other Best Practices
 
 1. Skip end punctuation on titles and lists

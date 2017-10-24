@@ -11,7 +11,7 @@ In this tutorial, we will download a pretrained image classification model from 
 
 ---
 
-![screenshot](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/Screenshot.png)
+![screenshot](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/Screenshot.png)
 
 #### Materials
 
@@ -76,7 +76,7 @@ Deploying an ELL model to the Raspberry Pi using C++ requires two steps. First, 
 These steps are performed by a handy tool named `wrap`. Run `wrap` as follows.
 
 ```shell
-python "../../tools/wrap/wrap.py" categories.txt model.ell -lang cpp -target pi3 -outdir model
+python ../../tools/wrap/wrap.py model.ell -lang cpp -target pi3 -outdir model
 ```
 
 Note that we gave `wrap` the command line option `-target pi3`, which tells it to generate machine code for execution on the Raspberry Pi. We also used the `-outdir model` option to tell `wrap` to put the output files in a directory named `model`. If all goes well, you should see the following output.
@@ -96,18 +96,18 @@ The `wrap` tool creates a `cmake` project in a new directory named `model`. The 
 
 The directory also contains a `CMakeLists.txt` file that defines a CMake project, which makes it easy to link the model with other CMake projects.
 
-Copy additional C++ helper code that makes it easier to send images to the model.
+Copy additional C++ helper code that makes it easier to send images to the model:
 
 ```shell
-[Linux/macOS] cp ../../../docs/tutorials/Getting-Started-with-Image-Classification-in-Cpp/*.h .
-[Windows] copy ..\..\..\docs\tutorials\Getting-Started-with-Image-Classification-in-Cpp\*.h .
+[Linux/macOS] cp ../../../docs/tutorials/Getting-started-with-image-classification-in-cpp/*.h .
+[Windows] copy ..\..\..\docs\tutorials\Getting-started-with-image-classification-in-cpp\*.h .
 ```
 
-A this point, you should now have a `cppTutorial` directory that contains helper C++ code, a `model` subdirectory with the compiled ELL model and a CMake project.
+A this point, you should now have a `cppTutorial` directory that contains the `categories.txt` file, helper C++ code, a `model` subdirectory with the compiled ELL model and a CMake project.
 
 ## Step 4: Call the model from a C++ program
 
-We will write a C++ program that invokes the model and run the demo on a Raspberry Pi. The program will read images from the camera, pass them to the model, and display the results. Either copy the complete code from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/tutorial.cpp) or create an empty text file named `tutorial.cpp` in the `cppTutorial` directory and copy in the code snippets below.
+We will write a C++ program that invokes the model and run the demo on a Raspberry Pi. The program will read images from the camera, pass them to the model, and display the results. Either copy the complete code from [here](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/tutorial.cpp) or create an empty text file named `tutorial.cpp` in the `cppTutorial` directory and copy in the code snippets below.
 
 First, add the required include statements. Our code depends on some STL libraries and on the OpenCV library.
 
@@ -234,7 +234,7 @@ Use the `DrawHeader` helper function to display the predicted category on the Ra
 
 ## Step 5: Create a CMake project for your program
 
-We will create a CMake project for the program that we wrote above. Either download the complete `CMakeLists.txt` from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/CMakeLists.txt), or create an empty text file named `CMakeLists.txt` and copy in the project definitions below.
+We will create a CMake project for the program that we wrote above. Either download the complete `CMakeLists.txt` from [here](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/CMakeLists.txt), or create an empty text file named `CMakeLists.txt` and copy in the project definitions below.
 
 ```cmake
 project(tutorial)
@@ -295,7 +295,7 @@ build/tutorial
 
 You should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and other types of animals.
 
-If you copied the full `tutorial.cpp` file from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-in-Cpp/tutorial.cpp), you will also see the average time in milliseconds it takes the model to process a frame.
+If you copied the full `tutorial.cpp` file from [here](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/tutorial.cpp), you will also see the average time in milliseconds it takes the model to process a frame.
 
 ## Next steps
 

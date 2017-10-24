@@ -210,7 +210,7 @@ class DriveTest:
         sys.path.append(os.path.join(current_path, "../../wrap"))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
-        builder_args = [self.labels_file, self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
+        builder_args = [self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
             "--blas", str(self.blas) ]
         if self.profile:
             builder_args.append("-profile")

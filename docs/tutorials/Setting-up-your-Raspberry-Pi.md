@@ -143,7 +143,7 @@ This change takes effect after rebooting.
 
 ### Underclocking and Overclocking
 
-Computation produces heat. Even at the default processor frequency of 700MHz, a Raspberry Pi running a serious AI workload at room temperature can overheat unless fitted with a physical cooling device. See [actively cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/). If you don't want to physically cool your Pi, you can cool it by reducing the processor frequency (underclocking).
+Computation produces heat. Even at the default processor frequency of 700MHz, a Raspberry Pi running a serious AI workload at room temperature can overheat unless fitted with a physical cooling device. See [actively cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/). If you don't want to physically cool your Pi, you can cool it by reducing the processor frequency (underclocking).
 
 If you do fit your Pi with an active cooling attachment, you can also increase the processor frequency (overclocking) without overheating. **Be warned** that overclocking your Raspberry Pi can void your warranty. Also, we've experienced some weird behavior when overclocking Raspberry Pis: some Pi units freeze up while other units lose their USB peripherals. You won't know how your specific Pi will react to overclocking until you try it. Overclocking isn't for the faint of heart - **proceed at your own risk**.
 

@@ -7,11 +7,11 @@ permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 
 *by Chris Lovett, Byron Changuion, and Ofer Dekel*
 
-In this tutorial, we will take an image classification model that was trained to recognize 1000 different image categories and use it to solve a simpler classification problem: distinguishing between *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will see how a model with low classification accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, and prints `Woof!!` if it sees a dog and `Meow!!` if it sees a cat.
+In this tutorial, we will take an image classification model that was trained to recognize 1000 different image categories and use it to solve a simpler classification problem: distinguishing between *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). We will see how a model with low classification accuracy on the original 1000-class problem can have a sufficiently high accuracy on the simpler 3-class problem. We will write a Python script that reads images from the camera, and prints `Woof!` if it sees a dog and `Meow!` if it sees a cat, as well as showing the class `Dog` or `Cat` as the window header text.
 
 ---
 
-[![screenshot](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/thumbnail.png)](https://youtu.be/SOmV8tzg_DU)
+![screenshot](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/Screenshot.jpg)
 
 #### Materials
 
@@ -30,7 +30,7 @@ In this tutorial, we will take an image classification model that was trained to
 
 The pre-trained models in the [ELL gallery](/ELL/gallery/) are trained to identify 1000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). Often times, we are only interested in a subset of these categories and we don't require the fine-grained categorization that the model was trained to provide. For example, we may want to distinguish between images of dogs versus images of cats, whereas the model is actually trained to distinguish between several different varieties of cats and over 100 different dog breeds.
 
-The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate for the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will write a script that grabs a frame from a camera, plays a barking sound when it recognizes a dog, and plays a meow sound when it recognizes a cat.
+The dogs versus cats classification problem is easier than the original 1000 class problem, so a model that isn't very accurate on the original problem may be perfectly adequate for the simpler problem. Specifically, we will use a model that has an error rate of 64% on the 1000-class problem, but only 5.7% on the 3-class problem. We will write a script that grabs a frame from a camera, outputs a `Woof!`when it recognizes a dog, and `Meow!` when it recognizes a cat.
 
 ## Step 1: Deploy a pre-trained model on the Raspberry Pi
 
@@ -40,6 +40,7 @@ Copy the following files to your Pi.
 - [dogs.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/dogs.txt)
 - [cats.txt](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/cats.txt)
 - [tutorial_helpers.py](/ELL/tutorials/shared/tutorial_helpers.py)
+- [categories.txt](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)
 
 ## Step 2: Write a script
 
@@ -70,20 +71,13 @@ def get_image_from_camera(camera):
     return None
 ```
 
-Next, define helper functions that check whether a category is contained in a category list. Since categories can sometimes have more than one text description, each category may contain several strings, separated by commas. Checking whether a category matches means checking whether any one of those elements is contained in the category name, and whether any match occurs in the set.
+Next, define helper functions that check whether a category is contained in a category list. The predicted category is the numeric index of the prediction (where the index is based on which line that category is within categories.txt), so the helper function verifies that the prediction index is contained in the set.
 
 ```python
-def labels_match(a, b):
-    x = [s.strip().lower() for s in a.split(",")]
-    y = [s.strip().lower() for s in b.split(",")]
-    for w in x:
-        if w in y:
-            return True
-    return False
-
-def label_in_set(label, label_set):
-    for x in label_set:
-        if labels_match(label, x):
+def prediction_index_in_set(prediction_index, set):
+    """Returns True if the prediction index is in the set"""
+    for x in set:
+        if prediction_index == int(x):
             return True
     return False
 ```
@@ -153,11 +147,10 @@ Check whether the prediction is part of a group.
         group = ""
         label = ""
         if top_n:
-            top = top_n[0]
-            label = categories[top[0]]
-            if label_in_set(label, dogs):
+            top = top_n[0][0]
+            if prediction_index_in_set(top, dogs):
                 group = "Dog"
-            elif label_in_set(label, cats):
+            elif prediction_index_in_set(top, cats):
                 group = "Cat"
 ```
 
@@ -200,7 +193,11 @@ example, a dog's bark can be downloaded [here](http://freesound.org/people/david
 cat's meow can be downloaded [here](https://freesound.org/people/tuberatanka/sounds/110011/).
 
 These can be used with the `play_sound` function that's available in the `tutorial_helpers` module, to play
-sounds on your computer or on the Raspberry Pi. More details on playing sounds can be found in [Notes on Playing Audio](/ELL/tutorials/Notes-on-Playing-Audio).
+sounds on your computer or on the Raspberry Pi. More details on playing sounds can be found in [Notes on Playing Audio](/ELL/tutorials/Notes-on-playing-audio).
+
+Here is a video showing the result of this tutorial being modified to play a bark or meow sound when run on images in a folder:
+
+[![screenshot](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/thumbnail.png)](https://youtu.be/SOmV8tzg_DU)
 
 ## Troubleshooting
 If you run into trouble, you can find some troubleshooting instructions at the bottom of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Setting-up-your-Raspberry-Pi).

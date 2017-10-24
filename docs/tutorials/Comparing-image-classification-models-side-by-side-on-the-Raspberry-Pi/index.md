@@ -81,8 +81,8 @@ There should now be `model1.ell` and `model2.ell` files as well as a `categories
 Use the `wrap.py` tool to compile the models and create Python wrappers. We'll use the `--outdir` option to put the models into different directories.
 
 ```shell
-python ../../tools/wrap/wrap.py categories.txt model1.ell -lang python -target pi3 -outdir model1
-python ../../tools/wrap/wrap.py categories.txt model2.ell -lang python -target pi3 -outdir model2
+python ../../tools/wrap/wrap.py model1.ell -lang python -target pi3 -outdir model1
+python ../../tools/wrap/wrap.py model2.ell -lang python -target pi3 -outdir model2
 ```
 
 You should see output similar to the following:
@@ -108,13 +108,13 @@ Also copy a few helper functions to the `sideBySide` directory.
 [Windows] copy ..\..\docs\tutorials\shared\tutorial_helpers.py .
 ```
 
-You should now have a `sideBySide` directory containing `model1` and `model2` directories as well as some helpful python utilities, which we'll use later in this tutorial.
+You should now have a `sideBySide` directory containing the `categories.txt` file, `model1` and `model2` directories as well as some helpful python utilities, which we'll use later in this tutorial.
 
 We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the `sideBySide` directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
 ## Step 4: Call your models from a Python script
 
-We will write a Python script that reads images from the camera, invokes the models one at a time, and displays the two frames side-by-side. If you just want the full script, copy it from [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/side_by_side.py). Otherwise, create an empty text file named `side_by_side.py` and copy in the code snippets below.
+We will write a Python script that reads images from the camera, invokes the models one at a time, and displays the two frames side-by-side. If you just want the full script, copy it from [here](/ELL/tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/side_by_side.py). Otherwise, create an empty text file named `side_by_side.py` and copy in the code snippets below.
 
 First, import a few dependencies, including system utilities, OpenCV, and NumPy.
 ```python
@@ -288,7 +288,7 @@ python side_by_side.py
 
 If you have a camera and display connected to your Pi, you should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them.
 
-If you downloaded the full `side_by_side.py` script from [here](/ELL/tutorials/Comparing-Image-Classification-models-side-by-side-on-the-Raspberry-Pi/side_by_side.py), you will also see the average time in milliseconds it takes each model to process a frame. Try to get a sense of the relative accuracy and speed of each model. If you compare the displayed times with the time indicated in the [ELL gallery](/ELL/gallery/), you will notice that your model runs slower than it should. The slow down is caused by inefficiencies in the Python wrapper, and we are working to fix this problem.
+If you downloaded the full `side_by_side.py` script from [here](/ELL/tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/side_by_side.py), you will also see the average time in milliseconds it takes each model to process a frame. Try to get a sense of the relative accuracy and speed of each model. If you compare the displayed times with the time indicated in the [ELL gallery](/ELL/gallery/), you will notice that your model runs slower than it should. The slow down is caused by inefficiencies in the Python wrapper, and we are working to fix this problem.
 
 ## Troubleshooting
 

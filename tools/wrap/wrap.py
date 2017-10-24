@@ -24,7 +24,6 @@ import buildtools
 class ModuleBuilder:
     def __init__(self):
         self.target = "host"
-        self.label_file = None
         self.config = None
         self.model_file = None
         self.output_dir = None
@@ -49,12 +48,11 @@ class ModuleBuilder:
             "\nThe supported languages are:\n"
             "    python   (default)\n"
             "\nThe supported target platforms are:\n"
-            "    pi3      raspberry pi 3\n"
+            "    pi3      Raspberry Pi 3\n"
             "    aarch64  arm64 Linux, works on Qualcomm DragonBoards\n"
             "    host     (default) your host computer architecture\n")
 
         # required arguments
-        arg_parser.add_argument("label_file", help="path to the labels file for the ELL model")
         arg_parser.add_argument("model_file", help="path to the ELL model file")
 
         # optional arguments
@@ -67,7 +65,6 @@ class ModuleBuilder:
 
         args = arg_parser.parse_args(argv)
 
-        self.label_file = args.label_file
         self.model_file = args.model_file
 
         self.language = args.language
@@ -86,7 +83,6 @@ class ModuleBuilder:
         self.cmake_template = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates/CMakeLists.%s.txt.in" % (self.language))
         if (not os.path.isfile(self.cmake_template)):
             raise Exception("Could not find CMakeLists template: %s" % (self.cmake_template))
-        self.files.append(self.label_file)
         self.files.append(os.path.join(self.ell_root, "CMake/OpenBLASSetup.cmake"))
         self.includes.append(os.path.join(self.ell_root, "interfaces/common/include/CallbackInterface.h"))
         self.includes.append(os.path.join(self.ell_root, "libraries/emitters/include/ClockInterface.h"))
@@ -123,14 +119,12 @@ class ModuleBuilder:
     def save_config(self):
         self.config['model'] = self.model_name
         self.config['func'] =  self.model_name + "_" + self.func_name
-        head, tail = os.path.split(self.label_file)
-        self.config['labels'] =  tail
-        configJSon = json.dumps(self.config, indent=2, sort_keys=True)
+        config_json = json.dumps(self.config, indent=2, sort_keys=True)
         head, tail = os.path.split(self.config_file)
         outputFile = os.path.join(self.output_dir, tail)
         print("creating config file: '" + outputFile + "'")
         with open(outputFile, 'w') as f:
-            f.write(configJSon)
+            f.write(config_json)
             f.close()
 
     def run(self):
