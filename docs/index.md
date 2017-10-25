@@ -29,9 +29,5 @@ Our [gallery](/ELL/gallery) is a collection of bits and pieces that you can down
 ## License
 The ELL code and sample code in our tutorials are released under the [MIT Open Source License](https://github.com/Microsoft/ELL/blob/master/LICENSE.txt). Some of the other content on this website, such as the 3D models in our gallery, are released under the [Creative Commons Attribution 4.0 license](https://creativecommons.org/licenses/by/4.0/).
 
-## Conduct and Privacy 
+## Conduct and Privacy
 ELL has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information on this code of conduct, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments. Read Microsoft's statement on [Privacy & Cookies](https://privacy.microsoft.com/en-us/privacystatement/).
-
-
-
-

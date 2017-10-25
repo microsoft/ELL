@@ -29,7 +29,7 @@ def predictor_from_cntk_model(modelFile, plotModel=False):
     z = load_model(modelFile)
     print("\nFinished loading.")
 
-    if (plotModel is True):
+    if plotModel:
         filename = os.path.join(os.path.dirname(modelFile), os.path.basename(modelFile) + ".png")
         cntk_utilities.plot_model(z, filename)
 
@@ -48,10 +48,8 @@ def predictor_from_cntk_model(modelFile, plotModel=False):
             layersToConvert)
         # Create an ELL neural network predictor from the layers
         predictor = ELL.FloatNeuralNetworkPredictor(ellLayers)
-
-    except:
-        import traceback
+    except BaseException as exception:
         print("Error occurred attempting to convert cntk layers to ELL layers")
-        traceback.print_exc()
+        raise exception
 
     return predictor
