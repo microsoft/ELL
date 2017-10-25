@@ -1,0 +1,12 @@
+---
+# this ensures Jekyll reads the file to be transformed into CSS later
+# only Main files contain this front matter, not partials.
+---
+
+// Make images responsive by default.
+// Note: If we can reference bootstrap.scss directly, this can be simplified to @include .img-responsive;
+img {
+    display:block;
+    height: auto;
+    max-width: 100%;
+}

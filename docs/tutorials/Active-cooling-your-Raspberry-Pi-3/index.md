@@ -72,7 +72,7 @@ svg {
 }
 </style>
 
-<svg id="plot1" height="600" ></svg>
+<svg id="plot1" height="600"></svg>
 <!-- for d3 based charting -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.js" integrity="sha256-xOOIPEIJM2Hn3GVaZs+VnM9J3rtaeUuHcHRXuJNO+JU=" crossorigin="anonymous"></script>
 <script src="/ELL/js/multi-line-plot.js"></script>
@@ -90,5 +90,5 @@ Try to repeat the experiment with different AI workloads and different cooling c
 
 Now that you know how to cool your Raspberry Pi, you can build a Raspberry Pi cluster.
 
-![Cluster](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/Cluster.jpg)
+![Cluster](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/Cluster.jpg)
 
