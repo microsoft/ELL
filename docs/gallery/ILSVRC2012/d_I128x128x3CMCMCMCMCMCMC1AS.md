@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/d_I128x128x3CMCMCMCMCMCMC1AS
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.17s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: s/frame<br>DragonBoard 410c @ 1.2GHz: s/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 0.17s/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>

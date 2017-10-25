@@ -56,6 +56,4 @@ def main(argv):
         os.remove(model_file_name)
 
 if __name__ == "__main__":
-    # when passed directly into parse_args, the first argument (program name)
-    # is not skipped
-    main(sys.argv[1:])
+    main(sys.argv[1:]) # drop the first argument (program name)

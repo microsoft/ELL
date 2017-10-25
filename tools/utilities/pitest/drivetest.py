@@ -25,8 +25,8 @@ import time
 import paramiko
 import requests
 
-current_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(current_path, "../pythonlibs"))
+current_script = os.path.basename(__file__)
+sys.path += ["../pythonlibs"]
 import find_ell
 import picluster
 from download_helper import download_file, download_and_extract_model
@@ -62,11 +62,21 @@ class DriveTest:
         if (not os.path.isdir(self.test_dir)):
             os.makedirs(self.test_dir)
 
+    def __enter__(self):
+        """Called when this object is instantiated with 'with'"""
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Called on cleanup of this object that was instantiated with 'with'"""
+        self.cleanup()
+
     def parse_command_line(self, argv):
+        """Parses command line arguments"""
         # required arguments
-        self.arg_parser.add_argument("ipaddress")
 
         # options
+        self.arg_parser.add_argument("--ipaddress", default=None, help="IP address of the target devices")
+        self.arg_parser.add_argument("--cluster", default=None, help="http address of the cluster server that controls access to the target devices")
         self.arg_parser.add_argument("--outdir", default=self.test_dir)
         self.arg_parser.add_argument("--profile", help="enable profiling functions in the ELL module", action="store_true")
 
@@ -84,15 +94,24 @@ class DriveTest:
         self.arg_parser.add_argument("--blas", help="enable or disable the use of Blas on the target device (default 'True')", default="True")
         self.arg_parser.add_argument("--test", help="test only, assume the outdir has already been built (default 'False')", action="store_true")
 
-        argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
         args = self.arg_parser.parse_args(argv)
 
-        self.init(args)
+        self._init(args)
+
+    def cleanup(self):
+        """Unlocks the target device if it is part of a cluster"""
+        if self.machine:
+            f = self.cluster.unlock(self.machine.ip_address)
+            if f.current_user_name:
+                print("Failed to free the machine at " + self.machine.ip_address)
+            else:
+                print("Freed machine at " + self.machine.ip_address)
 
     def str2bool(self, v):
+        """Converts a string to a bool"""
         return v.lower() in ("yes", "true", "t", "1")
 
-    def init(self, args):
+    def _init(self, args):
         self.test_dir = os.path.abspath(args.outdir)
         self.profile = args.profile
         self.target = args.target
@@ -105,21 +124,32 @@ class DriveTest:
         self.test = args.test
         self.extract_model_info(args.model, args.labels)
         self.output_dir = os.path.join(self.test_dir, self.target, self.model_name)
-        self.resolve_address(args.ipaddress)
+        self.resolve_address(args.ipaddress, args.cluster)
         if not os.path.isdir(self.output_dir):
             os.makedirs(self.output_dir)
 
-    def resolve_address(self, ipaddress):
-        if len(ipaddress) > 4 and ipaddress[:4].lower() == "http":
-            # then this is a pi cluster server, so find a free machine
-            self.cluster = picluster.PiBoardTable(ipaddress)
-            self.machine = self.cluster.wait_for_free_machine(self.model_name)
-            print("Using machine at " + self.machine.ip_address)
+    def resolve_address(self, ipaddress, cluster):
+        """Resolves the ip address of the target device and locks it if it is part of a cluster"""
+        if cluster:
+            self.cluster = picluster.PiBoardTable(cluster)
+            task = " ".join((current_script, self.model_name))
+
+            if ipaddress:
+                # A specific machine is requested, try to lock it
+                self.machine = self.cluster.lock(ipaddress, task)
+                print("Locked requested machine at " + self.machine.ip_address)
+            else:
+                # No specific machine requested, find a free machine
+                self.machine = self.cluster.wait_for_free_machine(task)
+                print("Locked machine at " + self.machine.ip_address)
+
+            # if any of the above fails, this line should throw
             self.ipaddress = self.machine.ip_address
         else:
             self.ipaddress = ipaddress
 
     def extract_model_info(self, ell_model, labels_file):
+        """Extracts information about a model"""
         if (ell_model is None or labels_file is None):
             self.model_name = "d_I160x160x3CMCMCMCMCMCMC1AS"
             self.labels_file = os.path.join(self.test_dir, "categories.txt")
@@ -142,11 +172,12 @@ class DriveTest:
                 self.model_name, ext = os.path.splitext(self.model_name)
             self.labels_file = os.path.abspath(labels_file)
 
-    def copy_files(self, list, folder):
+    def copy_files(self, filelist, folder):
+        """Copies a list of files to a folder"""
         target_dir = os.path.join(self.test_dir, folder)
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
-        for path in list:
+        for path in filelist:
             print("Copying file: " + path + " to " + target_dir)
             if not os.path.isfile(path):
                 raise Exception("expected file not found: " + path)
@@ -155,6 +186,7 @@ class DriveTest:
             copyfile(path, dest)
 
     def configure_runtest(self, dest):
+        """Creates the remote bash script"""
         with open(os.path.join(self.ell_root, "tools/utilities/pitest/runtest.sh.in"), "r") as f:
             template = f.read()
         template = template.replace("@LABELS@", basename(self.labels_file))
@@ -168,6 +200,7 @@ class DriveTest:
             of.write(template)
 
     def find_files_with_extension(self, path, extension):
+        """Searches for files with the given extension"""
         cwd = os.getcwd()
         os.chdir(path)
         files = glob.glob("*.{}".format(extension))
@@ -175,10 +208,11 @@ class DriveTest:
         return files
 
     def get_bash_files(self):
-        # copy demo files needed to run the test
+        """Copies demo files needed to run the test"""
         self.copy_files( [ os.path.join(self.ell_root, "tools/utilities/pitest/coffeemug.jpg"),
                            os.path.join(self.ell_root, "tools/utilities/pythonlibs/demo.py"),
-                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py") ], self.output_dir)
+                           os.path.join(self.ell_root, "tools/utilities/pythonlibs/demoHelper.py"),
+                           os.path.join(self.test_dir, "categories.txt")], self.output_dir)
         self.configure_runtest(self.output_dir)
 
         # avoid copying over bitcode files (as they are big)
@@ -187,7 +221,7 @@ class DriveTest:
             os.remove(os.path.join(self.output_dir, bitcode))
 
     def get_default_model(self):
-        # Download the model
+        """Downloads the default model"""
         self.ell_model = os.path.join(self.test_dir, self.model_name + '.ell')
         if (not os.path.isfile(self.ell_model)) or (not os.path.isfile(self.labels_file)) :
             print("downloading default model...")
@@ -200,14 +234,16 @@ class DriveTest:
                 local_folder=self.test_dir)
 
     def get_model(self):
+        """Initializes the user-specified model or picks the default one"""
         if self.model_name == "d_I160x160x3CMCMCMCMCMCMC1AS":
             self.get_default_model()
         print("using ELL model: " + self.model_name)
 
     def make_project(self):
+        """Creates a project for the model and target"""
         if os.path.isdir(self.output_dir):
             rmtree(self.output_dir)
-        sys.path.append(os.path.join(current_path, "../../wrap"))
+        sys.path += ["../../wrap"]
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
         builder_args = [self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
@@ -218,6 +254,7 @@ class DriveTest:
         builder.run()
 
     def verify_remote_test(self, output):
+        """Verifies the remote test results and prints a pass or fail"""
         print("==========================================================")
         found = False
         for line in output:
@@ -230,6 +267,7 @@ class DriveTest:
             print("Test failed")
 
     def run_test(self):
+        """Runs the test"""
         try:
             if not self.test:
                 self.get_model()
@@ -247,14 +285,13 @@ class DriveTest:
                                   cleanup=False)
             output = runner.run_command()
             self.verify_remote_test(output)
-        except:            
+        except:
             errorType, value, traceback = sys.exc_info()
             print("### Exception: " + str(errorType) + ": " + str(value))
             raise Exception("### Test Failed")
 
 
 if __name__ == "__main__":
-    args = sys.argv
-    tester = DriveTest()
-    tester.parse_command_line(args)
-    tester.run_test()
+    with DriveTest() as tester:
+        tester.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
+        tester.run_test()

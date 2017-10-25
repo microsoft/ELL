@@ -1,3 +1,13 @@
+####################################################################################################
+##
+##  Project:  Embedded Learning Library (ELL)
+##  File:     picluster.py
+##  Authors:  Chris Lovett
+##
+##  Requires: Python 3.x
+##
+####################################################################################################
+
 import os
 import requests
 import json

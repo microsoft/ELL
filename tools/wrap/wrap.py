@@ -148,9 +148,5 @@ class ModuleBuilder:
 
 if __name__ == "__main__":
     builder = ModuleBuilder()
-
-    argv = sys.argv
-    argv.pop(0) # when an args list is passed to parse_args, the first argument (program name) needs to be dropped
-
-    builder.parse_command_line(argv)
+    builder.parse_command_line(sys.argv[1:]) # drop the first argunent (program name)
     builder.run()
