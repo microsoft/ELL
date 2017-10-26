@@ -12,7 +12,7 @@ In this tutorial, we will download a pre-trained image classification model from
 
 ---
 
-![screenshot](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/Screenshot.jpg)
+![screenshot](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/Screenshot.jpg)
 
 #### Materials
 
@@ -83,7 +83,7 @@ Before deploying the model to the Raspberry Pi, we will practice deploying it to
 Run `wrap` as follows.
 
 ```shell
-python "../../tools/wrap/wrap.py" categories.txt model.ell -lang python -target host
+python "../../tools/wrap/wrap.py" model.ell -lang python -target host
 ```
 
 Note that we gave `wrap` the command line option `-target host`, which tells it to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi. If all goes well, you should see the following output.
@@ -115,7 +115,7 @@ We have just created a Python module named `model`. This module provides functio
 
 ## Step 4: Invoke the model on your computer
 
-The next step is to create a Python script that loads the model, sends images to it, and interprets the model's output. If you just want the full script, copy it from [here](/ELL/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/call_model.py) into the `host` directory. Otherwise, create an empty text file named `call_model.py` in the `host` directory and copy in the code snippets below.
+The next step is to create a Python script that loads the model, sends images to it, and interprets the model's output. If you just want the full script, copy it from [here](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/call_model.py) into the `host` directory. Otherwise, create an empty text file named `call_model.py` in the `host` directory and copy in the code snippets below.
 
 First, import a few dependencies and add directories to the path, to allow Python to find the module that we created above.
 
@@ -196,7 +196,7 @@ This code also looks up the category name in the `categories` array. For example
 We are ready to cross-compile the model for deployment on the Raspberry Pi. As before, run the `wrap` tool on your laptop or desktop computer, but this time specify the target platform as `pi3`. This tells the ELL compiler to generate machine code for the Raspberry Pi's ARM Cortex A53 processor.
 
 ```
-python "../../tools/wrap/wrap.py" categories.txt model.ell -lang python -target pi3
+python "../../tools/wrap/wrap.py" model.ell -lang python -target pi3
 ```
 
 The `wrap` tool creates a new directory named `pi3`, which contains a CMake project that can be used to build the desired Python module. This time, we need to build this project on the Raspberry Pi. Before moving to the Pi, we also want to copy over some Python helper code:
@@ -206,11 +206,17 @@ The `wrap` tool creates a new directory named `pi3`, which contains a CMake proj
 [Windows] copy ..\..\..\docs\tutorials\shared\tutorial_helpers.py pi3
 ```
 
+And, the `categories.txt` file containing the category text labels:
+```shell
+[Linux/macOS] cp categories.txt pi3
+[Windows] copy categories.txt pi3
+```
+
 At this point, you should have a `pi3` directory that contains a `cmake` project that builds the Python wrapper and some helpful Python utilities.
 
 ## Step 6: Write code to invoke the model on the Raspberry Pi
 
-We will write a Python script that invokes the model and runs the demo on the Raspberry Pi. The script will load the Python wrapper that we created above, read images from the camera, pass these images to the model, and display the classification results. If you just want the full script, copy it from [here](/ELL/tutorials/shared/tutorial.py). Otherwise, create an empty text file named `tutorial.py` in the `pi3` directory and copy in the code snippets below.
+We will write a Python script that invokes the model and runs the demo on the Raspberry Pi. The script will load the Python wrapper that we created above, read images from the camera, pass these images to the model, and display the classification results. If you just want the full script, copy it from [here](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/tutorial.py). Otherwise, create an empty text file named `tutorial.py` in the `pi3` directory and copy in the code snippets below.
 
 First, import a few dependencies, including system utilities, OpenCV, and NumPy.
 
@@ -346,7 +352,7 @@ python tutorial.py
 
 If you have a camera and display connected to your Pi, you should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and other types of animals.
 
-If you copied the full `tutorial.py` script from [here](/ELL/tutorials/shared/tutorial.py), you will also see the average time in milliseconds it takes the model to process each image. If you compare the displayed time with the time indicated in the [ELL gallery](/ELL/gallery/), you will notice that your model runs slower than it should. The slow down is caused by inefficiencies in the Python wrapper, and we are working to fix this problem. To run the model at its top speed, follow the [C++ version of this tutorial](/ELL/tutorials/Getting-started-with-image-classification-in-cpp).
+If you copied the full `tutorial.py` script from [here](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/tutorial.py), you will also see the average time in milliseconds it takes the model to process each image. If you compare the displayed time with the time indicated in the [ELL gallery](/ELL/gallery/), you will notice that your model runs slower than it should. The slow down is caused by inefficiencies in the Python wrapper, and we are working to fix this problem. To run the model at its top speed, follow the [C++ version of this tutorial](/ELL/tutorials/Getting-started-with-image-classification-in-cpp).
 
 ## Next steps
 

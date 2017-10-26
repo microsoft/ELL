@@ -11,7 +11,7 @@ setlocal
 set ELL_SRC=%1
 set CONDA_PATH=%2
 set OUTPUT_PATH=%3
-set RPI_IPADDR=%4
+set RPI_CLUSTER=%4
 pushd %ELL_SRC%
 
 call %CONDA_PATH%\Scripts\activate.bat ell
@@ -30,8 +30,8 @@ popd
 
 set PATH=%PATH%;%ELL_SRC%\external\OpenBLASLibs.0.2.19.3\build\native\x64\haswell\bin
 echo Running Raspberry Pi test from %ELL_SRC%\build\tools\utilities\pitest\drivetest.py
-python build\tools\utilities\pitest\drivetest.py %RPI_IPADDR% --outdir %OUTPUT_PATH%\Test
-if ERRORLEVEL 1 exit 1
+python build\tools\utilities\pitest\drivetest.py --cluster %RPI_CLUSTER% --outdir %OUTPUT_PATH%\Test
+if ERRORLEVEL 1 exit /B 1
 goto :eof
 
 endlocal

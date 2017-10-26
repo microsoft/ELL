@@ -35,7 +35,7 @@ def main(argv):
     # extract the model if it's in an archive
     unzip = ziptools.Extractor(args.cntk_model_file)
     success, filename = unzip.extract_file(".cntk")
-    if (success):
+    if success:
         print("extracted: " + filename)
     else:
         # not a zip archive
@@ -43,23 +43,17 @@ def main(argv):
 
     predictor = cntk_to_ell.predictor_from_cntk_model(filename)
 
-    input_shape = predictor.GetInputShape()
-    output_shape = predictor.GetOutputShape()
-    
-    model_file_name = os.path.splitext(filename)[0]+'.ell'
-    head, tail = os.path.split(model_file_name)
+    model_file_name = os.path.splitext(filename)[0] + '.ell'
 
     ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
     print("Saving model file: '" + model_file_name + "'")
     ell_map.Save(model_file_name)
 
-    if (args.zip_ell_model):
+    if args.zip_ell_model:
         print("Zipping model file: '" + model_file_name + ".zip'")
         zipper = ziptools.Zipper()
         zipper.zip_file(model_file_name, model_file_name + ".zip")
         os.remove(model_file_name)
 
 if __name__ == "__main__":
-    argv = sys.argv
-    argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
-    main(argv)
+    main(sys.argv[1:]) # drop the first argument (program name)

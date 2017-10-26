@@ -40,13 +40,19 @@ OpenBLAS is a library for fast linear algebra operations, which can significantl
 sudo apt-get install -y libopenblas-dev
 ```
 
+### curl
+`curl` is a command line tool used to transfer data via URL. When files are required to be downloaded from a URL, the instructions assume you have `curl` available to perform the download. To install `curl`, type the following:
+```shell
+sudo apt-get install -y curl
+```
+
 ### Python 3.4 via Miniconda
 Our tutorials require Python 3.4 on the Pi (and Python 3.6 on your computer). 
 An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
 To install Miniconda, type the following. 
 
 ```shell
-wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
+curl -O http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-armv7l.sh
 chmod +x Miniconda3-latest-Linux-armv7l.sh
 ./Miniconda3-latest-Linux-armv7l.sh
 ```
@@ -137,7 +143,7 @@ This change takes effect after rebooting.
 
 ### Underclocking and Overclocking
 
-Computation produces heat. Even at the default processor frequency of 700MHz, a Raspberry Pi running a serious AI workload at room temperature can overheat unless fitted with a physical cooling device. See [actively cooling your Pi](/ELL/tutorials/Active-Cooling-your-Raspberry-Pi-3/). If you don't want to physically cool your Pi, you can cool it by reducing the processor frequency (underclocking).
+Computation produces heat. Even at the default processor frequency of 700MHz, a Raspberry Pi running a serious AI workload at room temperature can overheat unless fitted with a physical cooling device. See [actively cooling your Pi](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3/). If you don't want to physically cool your Pi, you can cool it by reducing the processor frequency (underclocking).
 
 If you do fit your Pi with an active cooling attachment, you can also increase the processor frequency (overclocking) without overheating. **Be warned** that overclocking your Raspberry Pi can void your warranty. Also, we've experienced some weird behavior when overclocking Raspberry Pis: some Pi units freeze up while other units lose their USB peripherals. You won't know how your specific Pi will react to overclocking until you try it. Overclocking isn't for the faint of heart - **proceed at your own risk**.
 

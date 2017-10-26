@@ -132,9 +132,5 @@ class GenerateMarkdown:
 
 if __name__ == "__main__":
     program = GenerateMarkdown()
-
-    argv = sys.argv
-    argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
-    program.parse_command_line(argv)
-
+    program.parse_command_line(sys.argv[1:]) # drop the first argumnent (program name)
     program.run()

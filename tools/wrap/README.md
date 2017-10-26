@@ -1,6 +1,6 @@
 ## Wrap.py
 
-**Usage:** wrap.py label_file model_file [-lang name|-target name|-outdir name|-v]
+**Usage:** wrap.py model_file [-lang name|-target name|-outdir name|-v]
 
 This tool wraps a given ELL model in a CMake C++ buildable project that builds a language specific module that makes it possible for you to invoke the ELL model on a given target platform from your specified programming language.
 
@@ -9,11 +9,11 @@ The supported languages are:
 - `cpp`
 
 The supported target platforms are:
-- `pi3`      raspberry pi 3
+- `pi3`      Raspberry Pi 3
 - `aarch64`  arm64 Linux, works on Qualcomm DragonBoards
 - `host`     (default) your host computer architecture
 
-See [Getting Started with Image Classification on the RaspberryPi](../../../docs/tutorials/Getting-Started-with-Image-Classification-on-the-Raspberry-Pi/index.md) for an example of how to use this tool
+See [Getting Started with Image Classification on the RaspberryPi](../../../docs/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/index.md) for an example of how to use this tool
 
 ### What does this tool do exactly?
 

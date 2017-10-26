@@ -84,5 +84,4 @@ class DarknetModelTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    if not SkipTests:
-        unittest.main()
+    unittest.main()

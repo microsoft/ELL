@@ -29,22 +29,10 @@ def get_image_from_camera(camera):
     return None
 
 
-def labels_match(a, b):
-    """Returns True if an element of the comma separated label `a` is an
-    element of the comma separated label `b`
-    """
-    x = [s.strip().lower() for s in a.split(",")]
-    y = [s.strip().lower() for s in b.split(",")]
-    for w in x:
-        if w in y:
-            return True
-    return False
-
-
-def label_in_set(label, label_set):
-    """Returns True if the label is in the set of labels"""
-    for x in label_set:
-        if labels_match(label, x):
+def prediction_index_in_set(prediction_index, category_set):
+    """Returns True if the prediction index is in the set"""
+    for x in category_set:
+        if prediction_index == int(x):
             return True
     return False
 
@@ -53,10 +41,10 @@ def take_action(group):
     """Helper function to decide what action to take when we detect a group"""
     if group == "Dog":
         # A prediction in the dog category group was detected, print a `woof`
-        print("Woof!!")
+        print("Woof!")
     elif group == "Cat":
         # A prediction in the cat category group was detected, print a `meow`
-        print("Meow!!")
+        print("Meow!")
 
 
 def main():
@@ -108,11 +96,10 @@ def main():
         group = ""
         label = ""
         if top_n:
-            top = top_n[0]
-            label = categories[top[0]]
-            if label_in_set(label, dogs):
+            top = top_n[0][0]
+            if prediction_index_in_set(top, dogs):
                 group = "Dog"
-            elif label_in_set(label, cats):
+            elif prediction_index_in_set(top, cats):
                 group = "Cat"
 
         header_text = ""

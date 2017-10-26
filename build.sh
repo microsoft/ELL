@@ -53,6 +53,6 @@ fi
 
 pushd $build_dir  >/dev/null
 cmake ..
-make
-make _ELL_python
+make -j
+make -j _ELL_python
 popd >/dev/null

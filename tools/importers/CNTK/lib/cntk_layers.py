@@ -173,7 +173,7 @@ class DenseLayer(BaseLayer):
 
         includeBias = biasParameter is not None
         layer = Dense(self.layer.shape, activation=activationType, bias=includeBias)(feature)
-        
+
         layer.parameters[0].value = weightsParameter.value
         if includeBias:
             layer.parameters[1].value = biasParameter.value
@@ -285,7 +285,7 @@ class ConvolutionLayer(BaseLayer):
             raise ValueError(
                 "Error: Convolution layer node is not in block node")
 
-        self.op_name = 'Convolution'                
+        self.op_name = 'Convolution'
         # initialize weights and input characteristics
         self.input_parameter = layer.arguments[0]
         self.weights_parameter = utilities.find_parameter_by_name(
@@ -310,7 +310,7 @@ class ConvolutionLayer(BaseLayer):
             activation_type = utilities.get_cntk_activation_name(nodes)
             if activation_type:
                 self.additional_layer_text = activation_type
-        
+
     def get_input_padding_parameters(self):
         """Returns the ELL.PaddingParameters for a layer's input."""
 
@@ -416,7 +416,7 @@ class LinearLayer(BaseLayer):
     """Logic for converting a CNTK Linear layer to ELL"""
 
     def __init__(self, layer):
-        self.op_name = 'linear'
+        self.op_name = 'Linear'
         super().__init__(layer)
 
     def process(self, ellLayers):
@@ -546,7 +546,7 @@ class BasePoolingLayer(BaseLayer):
         return ELL.PaddingParameters(self.padding_scheme, padding)
 
     def get_cntk_parameters(self):
-        pad = False        
+        pad = False
         if ('autoPadding' in self.attributes and True in self.attributes['autoPadding']):
             pad = True
         poolingSize = self.attributes['poolingWindowShape']
@@ -639,11 +639,11 @@ class ActivationLayer(BaseLayer):
     def __init__(self, layer):
         if not layer.is_block:
             raise ValueError("Activation node is not a block node")
-        self.op_name = 'Activation'            
+        self.op_name = 'Activation'
         super().__init__(layer)
-            
+
         internal_nodes = utilities.get_model_layers(self.layer.block_root)
-        self.activation_type = utilities.get_ell_activation_type(internal_nodes)        
+        self.activation_type = utilities.get_ell_activation_type(internal_nodes)
         self.additional_layer_text = utilities.get_cntk_activation_name(internal_nodes)
 
     def process(self, ellLayers):
@@ -919,7 +919,7 @@ class LayerFactory():
                 return ElementTimesLayer(cntkLayer)
             elif (cntkLayer.op_name == 'LeakyReLU'):
                 return LeakyReLULayer(cntkLayer)
-            elif (cntkLayer.op_name == 'linear'):
+            elif (cntkLayer.op_name == 'Linear'):
                 return LinearLayer(cntkLayer)
             elif (cntkLayer.op_name == 'MaxPooling'):
                 return MaxPoolingLayer(cntkLayer)

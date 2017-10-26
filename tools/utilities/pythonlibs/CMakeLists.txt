@@ -10,7 +10,8 @@ if(${PYTHONINTERP_FOUND})
     set(lib_src 
         buildtools.py 
         demo.py
-        demoHelper.py 
+        demoHelper.py
+        dependency_installer.py
         download_helper.py
         find_ell.py 
         modelHelpers.py

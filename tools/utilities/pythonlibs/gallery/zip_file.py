@@ -30,6 +30,4 @@ def main(argv):
     print("Created file: '" + output_file)
 
 if __name__ == "__main__":
-    argv = sys.argv
-    argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
-    main(argv)
+    main(sys.argv[1:]) # drop the first argument (program name)

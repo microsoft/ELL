@@ -20,34 +20,49 @@ import find_ell
 import ELL
 import ell_utilities
 
+
 def convolutional_out_height(layer):
     return (int(layer['h']) + 2*int(layer['padding']) - int(layer['size'])) / int(layer['stride']) + 1
 
+
 def convolutional_out_width(layer):
     return (int(layer['w']) + 2*int(layer['padding']) - int(layer['size'])) / int(layer['stride']) + 1
+
 
 def parse_cfg(filename):
     """Parses a Darknet .cfg file and returns a list of layers. Each layer has
        properties denoting type, shape of input and outputs, padding requirements
        and anything else needed to construct up the relevant ELL layers"""
-    f = open(filename)
-    content = f.read()
-    f.close()
+    with open(filename) as f:
+        content = f.read()
     matches = re.findall('(\[.*?\])((.*?)(?=\[))', content, re.DOTALL)
     network = []
     for layer in matches:
-        layer_desc = {}
-        layer_desc['type'] = layer[0].replace('[', '').replace(']', '')
-        param_list = list(filter(None, layer[1].split('\n')))
-        for param in param_list:
-            if ("=" in param):
+        layer_desc = {'type': layer[0].replace('[', '').replace(']', '')}
+        for param in filter(None, layer[1].split('\n')):
+            if "=" in param:
                 arg, val = param.split('=')
                 layer_desc[arg] = val
         network.append(layer_desc)
 
+    def print_layer(layer):
+        PRETTY_TYPE_MAP = {
+            "convolutional": "BinaryConvolution" if layer.get("xnor") == 1 else
+                             "Convolution",
+            "connected": "FullyConnected",
+            "maxpool": "MaxPooling",
+            "avgpool": "AveragePooling",
+            "softmax": "Softmax"
+        }
+        pretty_type = PRETTY_TYPE_MAP.get(layer.get("type"))
+        if not pretty_type:
+            return
+        print(("{} :  {h}x{w}x{c}  ->  {out_h}x{out_w}x{out_c}"
+               " | input padding {inputPadding}  output padding {outputPadding}"
+               ).format(pretty_type, **layer))
+
     # add extra information needed, size calculations and properties like padding
-    for i in range(len(network)):
-        layer = network[i]
+    for i, layer in enumerate(network):
         if layer['type'] == 'net':
             layer['h'] = int(layer['height'])
             layer['w'] = int(layer['width'])
@@ -70,7 +85,7 @@ def parse_cfg(filename):
                 if ('pad' in layer):
                     if (int(layer['pad']) == 0):
                         layer['padding'] = 0
-                    else:    
+                    else:
                         layer['padding'] = int((int(layer['size']) - 1) / 2)
                 else:
                     layer['padding'] = int((int(layer['size']) - 1) / 2)
@@ -80,10 +95,6 @@ def parse_cfg(filename):
             layer['out_h'] = int(convolutional_out_height(layer))
             layer['out_w'] = int(convolutional_out_width(layer))
             layer['out_c'] = int(layer['filters'])
-            if ('xnor' in layer) and (layer['xnor'] == '1'):
-                print("binary convolutional: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'], ', pad ', layer['padding'])
-            else:
-                print("convolutional: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'], ', pad ', layer['padding'])
         elif layer['type'] == 'connected':
             layer['h'] = network[i-1]['out_h']
             layer['w'] = network[i-1]['out_w']
@@ -92,7 +103,6 @@ def parse_cfg(filename):
             layer['out_w'] = 1
             layer['out_h'] = 1
             layer['out_c'] = int(layer['output'])
-            print("connected: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'])
         elif layer['type'] == 'maxpool':
             if 'padding' not in layer:
                 layer['padding'] = int((int(layer['size']) - 1) / 2)
@@ -102,7 +112,6 @@ def parse_cfg(filename):
             layer['out_h'] = int(((int(layer['h'])) + 2 * int(layer['padding'])) / int(layer['stride']))
             layer['out_w'] = int(((int(layer['w'])) + 2 * int(layer['padding'])) / int(layer['stride']))
             layer['out_c'] = layer['c']
-            print("max_pool: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'], ', pad ', layer['padding'])
         elif layer['type'] == 'avgpool':
             layer['c'] = network[i-1]['out_c']
             layer['out_c'] = layer['c']
@@ -111,10 +120,9 @@ def parse_cfg(filename):
             layer['h'] = network[i-1]['out_h']
             layer['w'] = network[i-1]['out_w']
             layer['padding'] = 0
-            # Darknet's mean pooling is accross an entire layer. Fix up stride and size so ELL can behave that way.
+            # Darknet's average pooling is across an entire layer. Fix up stride and size so ELL can behave that way.
             layer['size'] = layer["w"]
             layer['stride'] = layer["w"]
-            print("avg_pool: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'], ', pad ', layer['padding'])
         elif layer['type'] == 'softmax':
             layer['c'] = network[i-1]['out_c']
             layer['h'] = network[i-1]['out_h']
@@ -122,7 +130,6 @@ def parse_cfg(filename):
             layer['out_c'] = layer['c']
             layer['out_h'] = layer['h']
             layer['out_w'] = layer['w']
-            print("softmax: ", layer['h'], 'x', layer['w'], 'x', layer['c'], '-> ', layer['out_h'], 'x', layer['out_w'], 'x', layer['out_c'])
         elif layer['type'] == 'region':
             layer['c'] = network[i-1]['out_c']
             layer['h'] = network[i-1]['out_h']
@@ -135,12 +142,9 @@ def parse_cfg(filename):
             layer['out_h'] = network[i-1]['out_h']
             layer['out_w'] = network[i-1]['out_w']
 
-
     # Do another pass, setting input/output shape and outpadding to next layer's padding
     # Set the ELL padding scheme and shape parameters
-    for i in range(len(network)):
-        layer = network[i]
-
+    for i, layer in enumerate(network):
         if 'padding' not in layer:
             layer['inputPadding'] = 0
             if layer['type'] == 'maxpool':
@@ -155,7 +159,7 @@ def parse_cfg(filename):
                 layer['inputPaddingScheme'] = ELL.PaddingScheme.zeros
         layer['inputShape'] = ELL.TensorShape(int(layer['h']) + 2 * int(layer['inputPadding']), int(layer['w']) + 2 * int(layer['inputPadding']), int(layer['c']))
 
-        if (i < (len(network) - 1)):
+        if i < (len(network) - 1):
             nextLayer = network[i + 1]
             if 'padding' not in nextLayer:
                 layer['outputPadding'] = 0
@@ -175,7 +179,10 @@ def parse_cfg(filename):
             layer['outputShape'] = ELL.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
             layer['outputShapeMinusPadding'] = ELL.TensorShape(int(layer['out_h']), int(layer['out_w']), int(layer['out_c']))
 
+        print_layer(layer)
+
     return network
+
 
 def create_layer_parameters(inputShape, inputPadding, inputPaddingScheme, outputShape, outputPadding, outputPaddingScheme):
     """Helper function to return ELL.LayerParameters given input and output shapes/padding/paddingScheme"""
@@ -183,6 +190,7 @@ def create_layer_parameters(inputShape, inputPadding, inputPaddingScheme, output
     outputPaddingParameters = ELL.PaddingParameters(outputPaddingScheme, outputPadding)
 
     return ELL.LayerParameters(inputShape, inputPaddingParameters, outputShape, outputPaddingParameters)
+
 
 def get_weights_tensor(weightsShape, values):
     """Returns an ELL tensor from Darknet weights. The weights are re-ordered
@@ -201,6 +209,7 @@ def get_weights_tensor(weightsShape, values):
         orderedWeights = orderedWeights.reshape((1, 1, weightsShape[0]))
 
     return ELL.FloatTensor(orderedWeights)
+
 
 def process_batch_normalization_layer(layer, apply_padding, mean_vals, variance_vals, scale_vals):
     """Returns ELL layers corresponding to a Darknet batch normalization layer"""
@@ -225,6 +234,7 @@ def process_batch_normalization_layer(layer, apply_padding, mean_vals, variance_
 
     return layers
 
+
 def get_activation_type(layer):
     """Returns an ELL.ActivationType from the layer"""
     if (layer["activation"] == 'relu'):
@@ -235,6 +245,7 @@ def get_activation_type(layer):
         return ELL.ActivationType.leaky
 
     return None
+
 
 def get_activation_layer(layer, apply_padding):
     """Return an ELL activation layer from a darknet activation"""
@@ -247,6 +258,7 @@ def get_activation_layer(layer, apply_padding):
 
     return ELL.FloatActivationLayer(layerParameters, activationType)
 
+
 def get_bias_layer(layer, apply_padding, bias_vals):
     """Return an ELL bias layer from a darknet layer"""
 
@@ -258,6 +270,7 @@ def get_bias_layer(layer, apply_padding, bias_vals):
     biasVector = ELL.FloatVector(bias_vals.ravel())
 
     return ELL.FloatBiasLayer(layerParameters, biasVector)
+
 
 def process_convolutional_layer(layer, bin_data, convolution_order):
     """Returns ELL layers corresponding to a Darknet convolutional layer"""
@@ -278,7 +291,7 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
         for i in range(int(layer['filters'])):
             scale_vals.append(struct.unpack('f', bin_data.read(4)))
         for i in range(int(layer['filters'])):
-            mean_vals.append(struct.unpack('f'   , bin_data.read(4)))
+            mean_vals.append(struct.unpack('f', bin_data.read(4)))
         for i in range(int(layer['filters'])):
             variance_vals.append(struct.unpack('f', bin_data.read(4)))
     scale_vals = np.array(scale_vals, dtype=np.float)
@@ -290,7 +303,6 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
     for i in range(num_weights):
         weight_vals.append(struct.unpack('f', bin_data.read(4)))
     weight_vals = np.array(weight_vals, dtype=np.float)
-
 
     layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
     convolutionWeightsTensor = get_weights_tensor((int(layer['filters']), layer['c'], int(layer["size"]), int(layer["size"])), weight_vals)
@@ -306,8 +318,8 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
         layers.append(ELL.FloatBinaryConvolutionalLayer(layerParameters, convolutionalParameters, convolutionWeightsTensor))
 
     # Override global ordering with layer-specific ordering
-    if ('order' in layer):
-        convolution_order = 	layer['order']
+    if 'order' in layers:
+        convolution_order = layer['order']
 
     applyBatchNormalization = False
     if ('batch_normalize' in layer) and ('dontloadscales' not in layer):
@@ -332,22 +344,25 @@ def process_convolutional_layer(layer, bin_data, convolution_order):
 
     return layers
 
+
 def get_pooling_layer(layer, poolingType):
     """Returns ELL pooling layer from Darknet pooling layer"""
 
     # Create the ELL pooling layer
     layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
     poolingParameters = ELL.PoolingParameters(int(layer["size"]), int(layer["stride"]))
-    
+
     return ELL.FloatPoolingLayer(layerParameters, poolingParameters, poolingType)
+
 
 def get_softmax_layer(layer):
     """Returns ELL softmax layer from Darknet softmax layer"""
 
     # Create the ELL pooling layer
     layerParameters = create_layer_parameters(layer['inputShape'], layer['inputPadding'], layer['inputPaddingScheme'], layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
-    
+
     return ELL.FloatSoftmaxLayer(layerParameters)
+
 
 def process_fully_connected_layer(layer, weightsData):
     """Returns ELL layers corresponding to a Darknet connected layer"""
@@ -357,16 +372,16 @@ def process_fully_connected_layer(layer, weightsData):
 
     # Create Fully Connected
     activationType = get_activation_type(layer)
-    if (activationType is None):
-        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
-    else:
+    if activationType:
         layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros)
+    else:
+        layerParameters = create_layer_parameters(layer['outputShapeMinusPadding'], 0, ELL.PaddingScheme.zeros, layer['outputShape'], layer['outputPadding'], layer['outputPaddingScheme'])
 
     bias_vals = []
     for i in range(int(layer['output'])):
         bias_vals.append(struct.unpack('f', weightsData.read(4)))
     bias_vals = np.array(bias_vals, dtype=np.float)
-        
+
     weight_vals = []
     num_weights = int(layer['output'])*int(layer['inputs'])
     for i in range(num_weights):
@@ -382,7 +397,7 @@ def process_fully_connected_layer(layer, weightsData):
 
     layers.append(ELL.FloatFullyConnectedLayer(layerParameters, weightsTensor))
 
-    if (activationType is not None):
+    if activationType:
         # Create BiasLayer
         layers.append(get_bias_layer(layer, False, bias_vals))
         # Create ActivationLayer
@@ -393,15 +408,17 @@ def process_fully_connected_layer(layer, weightsData):
 
     return layers
 
+
 def get_first_scaling_layer(nextLayerParameters):
     scaleValues = np.ones((nextLayerParameters.inputShape.channels), dtype=np.float) * [1/255]
 
-    inputShape = ELL.TensorShape(nextLayerParameters.inputShape.rows - (2 * nextLayerParameters.inputPaddingParameters.paddingSize), 
-                                    nextLayerParameters.inputShape.columns - (2 * nextLayerParameters.inputPaddingParameters.paddingSize), 
+    inputShape = ELL.TensorShape(nextLayerParameters.inputShape.rows - (2 * nextLayerParameters.inputPaddingParameters.paddingSize),
+                                    nextLayerParameters.inputShape.columns - (2 * nextLayerParameters.inputPaddingParameters.paddingSize),
                                     nextLayerParameters.inputShape.channels)
 
     layerParameters = create_layer_parameters(inputShape, 0, ELL.PaddingScheme.zeros, nextLayerParameters.inputShape, nextLayerParameters.inputPaddingParameters.paddingSize, nextLayerParameters.inputPaddingParameters.paddingScheme)
     return ELL.FloatScalingLayer(layerParameters, scaleValues.ravel())
+
 
 def process_network(network, weightsData, convolutionOrder):
     """Returns an ELL.FloatNeuralNetworkPredictor as a result of parsing the network layers"""
@@ -424,8 +441,8 @@ def process_network(network, weightsData, convolutionOrder):
             print("Skipping, ", layer['type'], "layer")
             print()
 
-    if (len(ellLayers) > 0):
-        # Darknet expects the input to be between 0 and 1, so prepend 
+    if ellLayers:
+        # Darknet expects the input to be between 0 and 1, so prepend
         # a scaling layer with a scale factor of 1/255
         parameters = ellLayers[0].parameters
         ellLayers = [get_first_scaling_layer(parameters)] + ellLayers
@@ -433,28 +450,25 @@ def process_network(network, weightsData, convolutionOrder):
     predictor = ELL.FloatNeuralNetworkPredictor(ellLayers)
     return predictor
 
+
 # Function to import a Darknet model and output the corresponding ELL neural network predictor
 def predictor_from_darknet_model(modelConfigFile, modelWeightsFile, convolutionOrder = 'cnba'):
     """Loads a Darknet model and returns an ELL.NeuralNetworkPredictor
        modelConfigFile - Name of the .cfg file for the Darknet model
        modelWightsFile - Name of the .weights file for the Darknet model
-       convolutionOrder - Optional parameter specifying order of operations in a 
-                          Darknet convolution layer. Typically, this is: 
+       convolutionOrder - Optional parameter specifying order of operations in a
+                          Darknet convolution layer. Typically, this is:
                           Convolution, BatchNormalization, Bias, Activation ('cnba').
                           It can be overridden to Convolution, Bias, Activation, BatchNormalization ('cban').
     """
-    predictor = None
-
     # Process the network config file. This gives us the layer structure of the neural network
     network = parse_cfg(modelConfigFile)
-    weightsData = open(modelWeightsFile, "rb")
-    try:
+
+    with open(modelWeightsFile, "rb") as weights_file:
         # discard the first 4 ints (4 bytes each)
-        weightsData.read(4 * 4)
+        weights_file.seek(4 * 4)
 
         # Create the predictor given the structure of the network and the given weights
-        predictor = process_network(network, weightsData, convolutionOrder)
-    finally:
-        weightsData.close()
+        predictor = process_network(network, weights_file, convolutionOrder)
 
     return predictor

@@ -10,9 +10,12 @@
 import os
 import sys
 import argparse
-import paramiko
 from itertools import islice
-from os.path import basename
+
+current_script = os.path.basename(__file__)
+sys.path += [".."] # pythonlibs
+import picluster
+from remoterunner import RemoteRunner
 
 class CopyValidationSet:
     def __init__(self):
@@ -20,34 +23,45 @@ class CopyValidationSet:
             "This script takes a CNTK val.map.txt and a path to the validation set, and copies maxfiles files\n"
             "to a target device (e.g. Raspberry Pi 3) using scp\n")
         self.ipaddress = None
+        self.cluster = None
         self.username = "pi"
         self.password = "raspberry"
         self.validation_map = None
         self.validation_path = None
         self.labels = None
-        self.maxfiles = 200
+        self.maxfiles = 50
         self.created_dirs = []
         self.target_dir = "/home/pi/validation"
+        self.machine = None
+
+    def __enter__(self):
+        """Called when this object is instantiated with 'with'"""
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Called on cleanup of this object that was instantiated with 'with'"""
+        self._cleanup()
 
     def parse_command_line(self, argv):
+        """Parses command line arguments"""
         # required arguments
         self.arg_parser.add_argument("validation_map", help="val.map.txt file containing the filenames and classes")
         self.arg_parser.add_argument("validation_path", help="path to the validation set")
         self.arg_parser.add_argument("ipaddress", help="ip address of the target device to copy to")
 
         # options
+        self.arg_parser.add_argument("--cluster", default=None, help="http address of the cluster server that controls access to the target devices")
         self.arg_parser.add_argument("--maxfiles", type=int, default=self.maxfiles, help="max number of files to copy (up to the size of the validation set)")
         self.arg_parser.add_argument("--target_dir", default=self.target_dir, help="destination directory on the target device")
         self.arg_parser.add_argument("--labels", default=None, help="path to the labels to optionally copy")
         self.arg_parser.add_argument("--username", default=self.username, help="username for the target device")
         self.arg_parser.add_argument("--password", default=self.password, help="password for the target device")
 
-        argv.pop(0) # when passed directly into parse_args, the first argument (program name) is not skipped
         args = self.arg_parser.parse_args(argv)
 
-        self.init(args)
+        self._init(args)
 
-    def init(self, args):
+    def _init(self, args):
         self.ipaddress = args.ipaddress
         self.validation_map = args.validation_map
         self.validation_path = args.validation_path
@@ -57,70 +71,62 @@ class CopyValidationSet:
         self.password = args.password
         self.target_dir = args.target_dir
 
-    def safe_mkdir(self, ssh, sftp, dir):
-        if (not dir in self.created_dirs):
-            print("mkdir: " + dir)
-            self.exec_remote_command(ssh, "rm -rf " + dir)
-            sftp.mkdir(dir)
-            self.created_dirs.append(dir)
+        if args.cluster:
+            # try to lock the machine in the cluster
+            self.cluster = picluster.PiBoardTable(args.cluster)
+            self.machine = self.cluster.lock(self.ipaddress, current_script)
+            print("Locked machine at " + self.machine.ip_address)
 
-    def linux_join(self, path, name):
-        # on windows os.path.join uses backslashes which doesn't work on the pi!
-        return os.path.join(path, name).replace("\\","/")
+    def _cleanup(self):
+        "Unlocks the target device if it is part of a cluster"
+        if self.machine:
+            f = self.cluster.unlock(self.machine.ip_address)
+            if f.current_user_name:
+                print("Failed to free the machine at " + self.machine.ip_address)
+            else:
+                print("Freed machine at " + self.machine.ip_address)
 
-    def publish(self, files):
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        print("connecting to " + self.ipaddress)
-        ssh.connect(self.ipaddress, username=self.username, password=self.password)
-        sftp = paramiko.SFTPClient.from_transport(ssh.get_transport())
+    def _get_validation_set(self):
+        "Gets the validation set based on the input requirements like maxfiles"
+        results = []
 
-        self.safe_mkdir(ssh, sftp, self.target_dir + "/")
-
-        for src_file in files:
-            if (os.path.isfile(src_file)):
-                print("copying:" + src_file)
-                dest_file = self.linux_join(self.target_dir, basename(src_file))
-                sftp.put(src_file, dest_file)
-
-        sftp.close()
-
-    def exec_remote_command(self, ssh, cmd):
-        print("remote:" + cmd)
-        output = []
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        for line in stdout:
-            output.append(line.strip('\n'))
-            print('... ' + line.strip('\n'))
-        for line in stderr:
-            output.append(line.strip('\n'))
-            print('... ' + line.strip('\n'))
-        return output
-
-    def run(self):
         with open(self.validation_map, 'r') as vm:
             subset = list(islice(vm, self.maxfiles))
-        
-        # subset contains the list to copy
-        files = []
-        for entry in subset:
-            f, c = entry.split()
-            filename = os.path.join(self.validation_path, basename(f))
-            if (not os.path.isfile(filename)):
-                raise Exception("File not found: " + filename)
-            files.append(filename)
 
-        # copy the validation map as is
-        files.append(self.validation_map)
+            # subset contains the list to copy
+            for entry in subset:
+                path, _ = entry.split()
+                filename = os.path.join(self.validation_path, os.path.basename(path))
+                if not os.path.isfile(filename):
+                    raise Exception("File not found: " + filename)
+                results.append(filename)
 
-        if (self.labels):
-            files.append(self.labels)
+            # copy the validation map as is
+            results.append(self.validation_map)
 
-        # publish files to the device
-        self.publish(files)
+            if self.labels:
+                results.append(self.labels)
+
+        return results
+
+    def _publish(self, files):
+        "Publishes files to the target device"
+        runner = RemoteRunner(cluster=self.cluster,
+                              ipaddress=self.ipaddress,
+                              username=self.username,
+                              password=self.password,
+                              source_files=files,
+                              target_dir=self.target_dir,
+                              verbose=True,
+                              cleanup=False)
+        runner.run_command()
+
+    def run(self):
+        """Main run method"""
+        files = self._get_validation_set()
+        self._publish(files)
 
 if __name__ == "__main__":
-    args = sys.argv
-    program = CopyValidationSet()
-    program.parse_command_line(args)
-    program.run()
+    with CopyValidationSet() as program:
+        program.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
+        program.run()

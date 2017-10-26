@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Notes on playing audio
-permalink: /tutorials/Notes-on-Playing-Audio/
+permalink: /tutorials/Notes-on-playing-audio/
 ---
 # Notes on playing audio
 
