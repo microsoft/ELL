@@ -1,19 +1,19 @@
 rem @echo off
-Setlocal EnableDelayedExpansion 
+Setlocal EnableDelayedExpansion
 
 cd %~dp0
 
 if EXIST external\nuget.exe goto :restore
 curl --output external\nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 if ERRORLEVEL 1 goto :nocurl
- 
+
 :restore
 external\nuget restore external/packages.config -PackagesDirectory external
 if ERRORLEVEL 1 goto :norestore
 
 REM find which supported VS version is installed
 set Vs14=0
-set Vs15=0goit 
+set Vs15=0goit
 set UseVs14=0
 set UseVs15=0
 set DEBUG=0
@@ -96,10 +96,10 @@ cmake -G "!CMakeGenerator!" "-DCMAKE_C_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" "
 if ERRORLEVEL 1 goto :nocmake
 
 :buildit
-cmake --build . --config Release
+cmake --build . --config Release -- /m
 if ERRORLEVEL 1 goto :builderror
 
-cmake --build . --target _ELL_python --config Release
+cmake --build . --target _ELL_python --config Release -- /m
 if ERRORLEVEL 1 goto :builderror
 
 goto :eof
