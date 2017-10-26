@@ -26,7 +26,10 @@ import paramiko
 import requests
 
 current_script = os.path.basename(__file__)
-sys.path += ["../pythonlibs"]
+
+# this script may be called from a different location, so we need the path relative to it
+current_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current_path, "../pythonlibs"))
 import find_ell
 import picluster
 from download_helper import download_file, download_and_extract_model
@@ -243,7 +246,7 @@ class DriveTest:
         """Creates a project for the model and target"""
         if os.path.isdir(self.output_dir):
             rmtree(self.output_dir)
-        sys.path += ["../../wrap"]
+        sys.path.append(os.path.join(current_path, "../../wrap"))
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
         builder_args = [self.ell_model, "-target", self.target, "-outdir", self.output_dir, "-v",
