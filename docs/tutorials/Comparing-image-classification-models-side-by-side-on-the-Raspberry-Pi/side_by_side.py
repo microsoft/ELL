@@ -9,20 +9,10 @@
 #
 ###############################################################################
 
-import sys
 import time
 import numpy as np
 import cv2
 import tutorial_helpers as helpers
-
-# Import models. Since they are contained in different directories, add the
-# relative paths so Python can find them
-sys.path.append("model1")
-sys.path.append("model1/build")
-sys.path.append("model1/build/Release")
-sys.path.append("model2")
-sys.path.append("model2/build")
-sys.path.append("model2/build/Release")
 
 import model1
 import model2
@@ -57,8 +47,9 @@ def main():
     input_shapes = [model.get_default_input_shape() for model in models]
 
     # Create vectors to hold the models' output predictions
-    prediction_arrays = [model.FloatVector(model.get_default_output_shape())
-                         for model in models]
+    prediction_arrays = [
+        model.FloatVector(model.get_default_output_shape().Size()) for model in
+        models]
 
     # Declare a value to hold the prediction times
     prediction_times = [list(), list()]

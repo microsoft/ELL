@@ -28,19 +28,11 @@ In this tutorial, we will download a pretrained image classification model from 
 
 ## Step 1: Create a tutorial directory
 
-Change to the directory where you built ELL and create a `tutorials` directory. In that directory, create another directory named `cppTutorial`.
-
-```shell
-cd ELL/build
-mkdir tutorials
-cd tutorials
-mkdir cppTutorial
-cd cppTutorial
-```
+Create a directory for this tutorial anywhere on your computer and `cd` into it.
 
 ## Step 2: Download a pre-trained model
 
-Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip) into the `cppTutorial` directory. The model file contains a pre-trained Deep Neural Network for image classification, and is one of the models available from the [ELL gallery](/ELL/gallery). The file's long name indicates the Neural Network's architecture, but don't worry about that for now and save it locally as `model.ell.zip`.
+Download this [compressed ELL model file](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip) into the directory. The model file contains a pre-trained Deep Neural Network for image classification, and is one of the models available from the [ELL gallery](/ELL/gallery). The file's long name indicates the Neural Network's architecture, but don't worry about that for now and save it locally as `model.ell.zip`.
 
 ```shell
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip
@@ -59,7 +51,7 @@ Then, rename it.
 [Windows] ren d_I224x224x3CMCMCMCMCMCMC1AS.ell model.ell
 ```
 
-Next, download the `categories.txt` file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) and save it in the `cppTutorial` directory.
+Next, download the `categories.txt` file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt) and save it in the directory.
 
 ```shell
 curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt
@@ -67,16 +59,16 @@ curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/ma
 
 This file contains the names of the 1000 categories that the model is trained to recognize. For example, if the model recognizes an object of category 504, we can read line 504 of `categories.txt` and see that the name of the recognized category is `coffee mug`.
 
-There should now be a `model.ell` file and a `categories.txt` file in the `cppTutorial` directory.
+There should now be a `model.ell` file and a `categories.txt` file in the directory.
 
 ## Step 3: Compile the model
 
 Deploying an ELL model to the Raspberry Pi using C++ requires two steps. First, the ELL compiler compiles `model.ell` into machine code. Next, we make all the preparations needed to wrap the compiled model in a CMake project. The result of this step is a special CMake project that contains all of the configurations and settings needed to link the compiled ELL model into a C++ project.
 
-These steps are performed by a handy tool named `wrap`. Run `wrap` as follows.
+These steps are performed by a handy tool named `wrap`. Run `wrap` as follows. Please replace `<ELL-root>` with the path to the location where you have cloned ELL, as described in the installation instructions for your platform.
 
 ```shell
-python ../../tools/wrap/wrap.py model.ell -lang cpp -target pi3 -outdir model
+python <ELL-root>/tools/wrap/wrap.py model.ell -lang cpp -target pi3 -outdir model
 ```
 
 Note that we gave `wrap` the command line option `-target pi3`, which tells it to generate machine code for execution on the Raspberry Pi. We also used the `-outdir model` option to tell `wrap` to put the output files in a directory named `model`. If all goes well, you should see the following output.
@@ -99,15 +91,15 @@ The directory also contains a `CMakeLists.txt` file that defines a CMake project
 Copy additional C++ helper code that makes it easier to send images to the model:
 
 ```shell
-[Linux/macOS] cp ../../../docs/tutorials/Getting-started-with-image-classification-in-cpp/*.h .
-[Windows] copy ..\..\..\docs\tutorials\Getting-started-with-image-classification-in-cpp\*.h .
+[Linux/macOS] cp <ELL-root>/docs/tutorials/Getting-started-with-image-classification-in-cpp/*.h .
+[Windows] copy <ELL-root>\docs\tutorials\Getting-started-with-image-classification-in-cpp\*.h .
 ```
 
-A this point, you should now have a `cppTutorial` directory that contains the `categories.txt` file, helper C++ code, a `model` subdirectory with the compiled ELL model and a CMake project.
+A this point, you should now have a directory that contains the `categories.txt` file, helper C++ code, a `model` subdirectory with the compiled ELL model and a CMake project.
 
 ## Step 4: Call the model from a C++ program
 
-We will write a C++ program that invokes the model and run the demo on a Raspberry Pi. The program will read images from the camera, pass them to the model, and display the results. Either copy the complete code from [here](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/tutorial.cpp) or create an empty text file named `tutorial.cpp` in the `cppTutorial` directory and copy in the code snippets below.
+We will write a C++ program that invokes the model and run the demo on a Raspberry Pi. The program will read images from the camera, pass them to the model, and display the results. Either copy the complete code from [here](/ELL/tutorials/Getting-started-with-image-classification-in-cpp/tutorial.cpp) or create an empty text file named `tutorial.cpp` in the directory and copy in the code snippets below.
 
 First, add the required include statements. Our code depends on some STL libraries and on the OpenCV library.
 
@@ -270,17 +262,16 @@ Finally, tell CMake to link the program with OpenCV and the ELL model.
 target_link_libraries(tutorial ${OpenCV_LIBS} model)
 ```
 
-We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the `cppTutorial` directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool. Be sure to copy the `cppTutorial/model` directory too.
+We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
 ## Step 6: Build the project on the Raspberry Pi
 
-Log into your Raspberry Pi, find the `cppTutorial` directory you just copied over, and build the CMake project.
+Log into your Raspberry Pi, find the directory you just copied over, and build the CMake project.
 
 ```shell
-cd cppTutorial
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 cd ..
 ```
@@ -290,7 +281,7 @@ cd ..
 Make sure that a camera is connected to your Pi and run the program.
 
 ```shell
-build/tutorial
+./build/tutorial
 ```
 
 You should see a window similar to the screenshot at the top of this page. Point your camera at different objects and see how the model classifies them. Look at `categories.txt` to see which categories the model is trained to recognize and try to show those objects to the model. For quick experimentation, point the camera to your computer screen and have your computer display images of different objects. For example, experiment with different dog breeds and other types of animals.

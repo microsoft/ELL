@@ -36,18 +36,12 @@ If you followed the setup instructions, you should have an environment named `py
 [Windows] activate py36
 ```
 
-Then, cd into the directory where you built ELL and create a `sideBySide` directory
-
-```shell
-cd ELL/build
-mkdir sideBySide
-cd sideBySide
-```
+Create a directory for this tutorial anywhere on your computer and `cd` into it.
 
 ## Step 2: Download two pre-trained models
 
 Download this [real-valued ELL model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.ell.zip) and this [binarized ELL model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMC1AS/d_I160x160x3CMCMBMBMBMBMC1AS.ell.zip)
-into the `sideBySide` directory. For convenience, rename them `model1.ell.zip` and `model2.ell.zip`.
+into the directory. For convenience, rename them `model1.ell.zip` and `model2.ell.zip`.
 
 ```shell
 curl --location -o model1.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.ell.zip
@@ -78,11 +72,11 @@ There should now be `model1.ell` and `model2.ell` files as well as a `categories
 
 ## Step 3: Compile the models and create Python wrappers
 
-Use the `wrap.py` tool to compile the models and create Python wrappers. We'll use the `--outdir` option to put the models into different directories.
+Use the `wrap.py` tool to compile the models and create Python wrappers. We'll use the `--outdir` option to put the models into different directories. Please replace `<ELL-root>` with the path to the location where you have cloned ELL, as described in the installation instructions for your platform.
 
 ```shell
-python ../../tools/wrap/wrap.py model1.ell -lang python -target pi3 -outdir model1
-python ../../tools/wrap/wrap.py model2.ell -lang python -target pi3 -outdir model2
+python <ELL-root>/tools/wrap/wrap.py model1.ell -lang python -target pi3 -outdir model1
+python <ELL-root>/tools/wrap/wrap.py model2.ell -lang python -target pi3 -outdir model2
 ```
 
 You should see output similar to the following:
@@ -92,49 +86,61 @@ compiling model...
 generating python interfaces for model1 in model1
 running opt...
 running llc...
-success, now you can build the 'model1' folder
+success, now copy the 'model1' folder to your target machine and build it there
 ...
 compiling model...
 generating python interfaces for model2 in model2
 running opt...
 running llc...
-success, now you can build the 'model2' folder
+success, now copy the 'model2' folder to your target machine and build it there
 ```
 
-Also copy a few helper functions to the `sideBySide` directory.
+Also copy a few helper functions to the directory.
 
 ```shell
-[Linux/macOS] cp ../../docs/tutorials/shared/tutorial_helpers.py .
-[Windows] copy ..\..\docs\tutorials\shared\tutorial_helpers.py .
+[Linux/macOS] cp <ELL-root>/docs/tutorials/shared/tutorial_helpers.py .
+[Windows] copy <ELL-root>\docs\tutorials\shared\tutorial_helpers.py .
 ```
 
-You should now have a `sideBySide` directory containing the `categories.txt` file, `model1` and `model2` directories as well as some helpful python utilities, which we'll use later in this tutorial.
+To speed up the transfer of files to the Raspberry Pi, you may want to delete the .zip and .ell files first before copying the folder:
 
-We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the `sideBySide` directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
+```shell
+[Linux/macOS] rm -f *.zip *.ell
+[Windows] del *.zip *.ell
+```
+
+You should now have a directory containing the `categories.txt` file, `model1` and `model2` directories as well as some helpful python utilities, which we'll use later in this tutorial.
+
+We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
 ## Step 4: Call your models from a Python script
 
 We will write a Python script that reads images from the camera, invokes the models one at a time, and displays the two frames side-by-side. If you just want the full script, copy it from [here](/ELL/tutorials/Comparing-image-classification-models-side-by-side-on-the-Raspberry-Pi/side_by_side.py). Otherwise, create an empty text file named `side_by_side.py` and copy in the code snippets below.
 
+Before writing the script that will use the compiled model, we also want to copy over some Python helper code:
+
+```shell
+[Linux/macOS] cp <ELL-root>/docs/tutorials/shared/tutorial_helpers.py .
+[Windows] copy <ELL-root>\docs\tutorials\shared\tutorial_helpers.py .
+```
+
 First, import a few dependencies, including system utilities, OpenCV, and NumPy.
 ```python
-import sys
 import time
 import numpy as np
 import cv2
+```
+
+Import the helper code that we copied over. Note that this must precede importing of the model as it helps find the
+requisite compiled model files.
+
+```python
 import tutorial_helpers as helpers
 ```
 
-Next, we need to import the models. Since they are contained in different directories, add the relative paths so Python can find them:
+Next, we need to import the models.
 
 ```python
-sys.path.append("model1")
-sys.path.append("model1/build")
-sys.path.append("model1/build/Release")
-sys.path.append("model2")
-sys.path.append("model2/build")
-sys.path.append("model2/build/Release")
-
 import model1
 import model2
 ```
@@ -180,8 +186,9 @@ The models expect input in a certain shape. For each model, get this shape and s
 Create arrays for each model's output.
 
 ```python
-    prediction_arrays = [model.FloatVector(model.get_default_output_shape())
-                         for model in models]
+    prediction_arrays = [
+        model.FloatVector(model.get_default_output_shape().Size()) for model in
+        models]
 ```
 
 Create a tiled image that will be used to display the two frames side-by-side. This function is provided by the helper module that we imported earlier.
@@ -256,23 +263,23 @@ if __name__ == "__main__":
     main()
 ```
 
-We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the `sideBySide` directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
+We are ready to move to the Raspberry Pi. If your Pi is accessible over the network, you can copy the directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
 ## Step 5: Build the Python wrappers on the Raspberry Pi
 
-Log into your Raspberry Pi, find the `sideBySide` directory you just copied over, and build the two CMake projects.
+Log into your Raspberry Pi, find the directory you just copied over, and build the two CMake projects.
 
 ```shell
 cd model1
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 cd ../..
 cd model2
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 cd ../..
 ```

@@ -75,7 +75,6 @@ Next, define helper functions that check whether a category is contained in a ca
 
 ```python
 def prediction_index_in_set(prediction_index, set):
-    """Returns True if the prediction index is in the set"""
     for x in set:
         if prediction_index == int(x):
             return True

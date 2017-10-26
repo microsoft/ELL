@@ -4,6 +4,7 @@
 #  File:     tutorial_helpers.py
 #  Authors:  Chris Lovett
 #            Byron Changuion
+#            Kern Handa
 #
 #  Requires: Python 3.x
 #
@@ -16,10 +17,20 @@ import platform
 import cv2
 import numpy as np
 
+# Find any child directory that matches the four deployment targets (pi3,
+# pi3_64, aarch64, host) or begins with "model". For all these directories,
+# add it and its platform-specific build directory to Python's import lookup
+# path
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(SCRIPT_PATH)
-sys.path.append(os.path.join(SCRIPT_PATH, "build"))
-sys.path.append(os.path.join(SCRIPT_PATH, "build/Release"))
+SEARCH_DIRS = [d for d in os.listdir(SCRIPT_PATH) if
+               d in ["pi3", "pi3_64", "aarch64", "host"] or
+               d.startswith("model")]
+sys.path += SEARCH_DIRS
+sys.path += [os.path.join(d, "build") for d in SEARCH_DIRS]
+if platform.system() == "Windows":
+    sys.path += [os.path.join(d, "build", "Release") for d in SEARCH_DIRS]
+else:
+    sys.path += [os.path.join(d, "build") for d in SEARCH_DIRS]
 
 
 def prepare_image_for_model(image, width, height, reorder_to_rgb=False):

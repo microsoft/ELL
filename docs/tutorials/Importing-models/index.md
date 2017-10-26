@@ -36,7 +36,7 @@ Curl provides an easy way to download files. If Curl isn't installed in your Ana
 conda install curl
 ```
 
-Choose whether you want to import a model from the CNTK file format or the Darknet file format and proceed to the relevant section below.
+Choose whether you want to import a model from the CNTK file format or the Darknet file format and proceed to the relevant section below. For the commands below, please replace `<ELL-root>` with the path to the location where you have cloned ELL, as described in the installation instructions for your platform.
 
 In the commands below, please replace `<ELL-root>` with the path to the location where ELL is cloned, as
 described in the installation instructions for your platform.
@@ -52,7 +52,7 @@ curl --location -o model.cntk https://www.cntk.ai/Models/Caffe_Converted/VGG16_I
 Next, run the importer script, making sure to provide the CNTK model as a command line parameter.
 
 ```shell
-python "<ELL-root>/tools/importers/cntk/cntk_import.py" model.cntk
+python <ELL-root>/tools/importers/cntk/cntk_import.py model.cntk
 ```
 
 You should see some output like this as the model is being imported.
@@ -108,7 +108,7 @@ curl --location -o categories.txt https://raw.githubusercontent.com/Microsoft/EL
 
 ## Importing a model from Darknet
 
-A Neural Network model in the Darknet file format can be converted into an ELL model using the *darknet_import.py* Python script, found in the `ELL/tools/importers/darknet` directory. As an example, we will import the Darknet reference model, available from the [Darknet website](https://pjreddie.com/darknet/). First, download the model to your computer.
+A Neural Network model in the Darknet file format can be converted into an ELL model using the *darknet_import.py* Python script, found in the `<ELL-root>/tools/importers/darknet` directory. As an example, we will import the Darknet reference model, available from the [Darknet website](https://pjreddie.com/darknet/). First, download the model to your computer.
 
 ```shell
 curl --location -o model.cfg https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet.cfg
@@ -118,7 +118,7 @@ curl --location -o model.weights https://pjreddie.com/media/files/darknet.weight
 Next, run the importer script, making sure to provide the model configuration file (.cfg) and model weights files (.weights) as command line parameters.
 
 ```shell
-python "<ELL-root>/tools/importers/darknet/darknet_import.py" model.cfg model.weights
+python <ELL-root>/tools/importers/darknet/darknet_import.py model.cfg model.weights
 ```
 
 You should see some output like this as the model is being imported.

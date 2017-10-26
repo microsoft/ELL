@@ -9,23 +9,14 @@
 #
 ###############################################################################
 
-import sys
-import os
 import time
 import cv2
 
-SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(SCRIPT_PATH)
-sys.path.append(os.path.join(SCRIPT_PATH, "build"))
-if os.name == "nt":
-    # required for Windows
-    sys.path.append(os.path.join(SCRIPT_PATH, "build/Release"))
+# Import helper functions
+import tutorial_helpers as helpers
 
 # Import the Python wrapper for the ELL model
 import model
-
-# Import helper functions
-import tutorial_helpers as helpers
 
 
 def get_image_from_camera(camera):
