@@ -23,7 +23,7 @@ def _format_float(value):
     return "{0:.2f}".format(value)
 
 def _lf_to_crlf(file):
-    """Utility function that converts LF delimiters to CRLF delimiters in a file"""
+    "Utility function that converts LF delimiters to CRLF delimiters in a file"
     lines = open(file, "rU").readlines()
     with open(file, "w", newline="\r\n") as f:
         f.writelines(lines)
@@ -166,7 +166,7 @@ class ModelInfoRetriever:
             os.unlink(self.model_file)
 
     def _get_data_filename(self, name, is_suffix=False):
-        """Returns the path to a file from the model directory, given the filename or a suffix"""
+        "Returns the path to a file from the model directory, given the filename or a suffix"
         if is_suffix:
             filename = os.path.join(self.modeldir, self.model + name)
         else:
@@ -177,7 +177,7 @@ class ModelInfoRetriever:
         return filename
 
     def _ensure_model_file(self):
-        """Lazy-extracts the ELL model file from zip if it doesn't exist"""
+        "Lazy-extracts the ELL model file from zip if it doesn't exist"
         try:
             filename = self._get_data_filename(".ell", is_suffix=True)
             self.model_file = filename
@@ -202,6 +202,9 @@ class ModelInfoRetriever:
             results = json.loads(f.read())
             properties["image_size"] = results["image_size"]
             properties["num_classes"] = results["num_classes"]
+
+            # optional property
+            properties["trainer"] = results.get("trainer", "CNTK 2.2")
 
         self._ensure_model_file()
         properties["size_mb"] = round(os.path.getsize(self.model_file) / (1000 * 1000))
@@ -244,7 +247,7 @@ class ModelInfoRetriever:
         return accuracy
 
     def _run_print_tool(self, print_exe_path):
-        """Runs the print tool and returns its text output as a list of lines"""
+        "Runs the print tool and returns its text output as a list of lines"
         if not os.path.isfile(print_exe_path):
             raise FileNotFoundError("{} does not exist".format(print_exe_path))
 
@@ -263,7 +266,7 @@ class ModelInfoRetriever:
         return result
 
     def _get_relevant_arch_layers(self, all_layers):
-        """Filters out only relevant layers to display in the model architecture"""
+        "Filters out only relevant layers to display in the model architecture"
         result = [LayerFactory.create_layer(x) for x in all_layers]
         return [x.as_dict() for x in result if x is not None]
 

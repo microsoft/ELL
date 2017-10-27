@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 64x64x3 Convolutional Neural Network
-permalink: /gallery/ILSVRC2012/dsf_I64x64x3CMCMCMCMCMC1AS
+permalink: /gallery/ILSVRC2012/dsf_I64x64x3CCMCCMCCMCMCMC1AS
 ---
 
 [Back to Gallery](/ELL/gallery)
@@ -11,7 +11,7 @@ permalink: /gallery/ILSVRC2012/dsf_I64x64x3CMCMCMCMCMC1AS
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dsf_I64x64x3CMCMCMCMCMC1AS/dsf_I64x64x3CMCMCMCMCMC1AS.ell.zip">dsf_I64x64x3CMCMCMCMCMC1AS.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/dsf_I64x64x3CCMCCMCCMCMCMC1AS/dsf_I64x64x3CCMCCMCCMCMCMC1AS.ell.zip">dsf_I64x64x3CCMCCMCCMCMCMC1AS.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -122,7 +122,7 @@ permalink: /gallery/ILSVRC2012/dsf_I64x64x3CMCMCMCMCMC1AS
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Lisa Ong using CNTK 2.1 </td>
+        <td colspan="3"> Trained by Lisa Ong using CNTK 2.2 </td>
     </tr>
 </table>
 

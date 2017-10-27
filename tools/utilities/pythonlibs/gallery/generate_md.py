@@ -11,6 +11,7 @@ import os
 import sys
 import argparse
 import re
+import subprocess
 
 # local helpers
 import model_info_retriever as mir
@@ -19,7 +20,23 @@ def disable_text_wrapping(text):
     """Convert spaces to non-breaking spaces so that columns don't wrap"""
     return re.sub(r" ", "&nbsp;", text)
 
+def _get_default_user():
+    proc = subprocess.Popen(["git", "config", "user.name"],
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            bufsize=0, universal_newlines=True)
+    try:
+        result, errors = proc.communicate()
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        result, errors = proc.communicate()
+
+    if errors:
+        return "Juan Lema"
+    else:
+        return " ".join(result)
+
 class GenerateMarkdown:
+    """Generates the gallery markdown for a model"""
     def __init__(self):
         self.arg_parser = argparse.ArgumentParser(
             "This script takes a model directory and generates a basic markdown file that describes the model\n")
@@ -27,8 +44,17 @@ class GenerateMarkdown:
         self.model = None
         self.outfile = None
         self.template = None
+        self.model_data = {}
+        self.printexe = None
+        self.platforms = {
+            "pi3" : "Raspberry Pi 3 (Raspbian) @ 700MHz",
+            "pi3_64" : "Raspberry Pi 3 (OpenSUSE) @ 600MHz",
+            "aarch64" : "DragonBoard 410c @ 1.2GHz"
+        }
+        self.user = _get_default_user()
 
     def parse_command_line(self, argv):
+        """Parses command line arguments"""
         # required arguments
         self.arg_parser.add_argument("modeldir", help="the directory containing the model files")
         self.arg_parser.add_argument("outfile", help="path to the output filename")
@@ -36,6 +62,7 @@ class GenerateMarkdown:
 
         # optional arguments
         self.arg_parser.add_argument("--template", help="path to the input markdown template file", default="vision_model.md.in")
+        self.arg_parser.add_argument("--user", help="user who trained the model (for attribution purposes)", nargs="+", default=self.user)
 
         args = self.arg_parser.parse_args(argv)
 
@@ -43,8 +70,7 @@ class GenerateMarkdown:
         self.model = os.path.basename(self.modeldir)
         self.outfile = args.outfile
         self.printexe = args.printexe
-        self.model_data = {}
-        self.platforms = ["pi3", "pi3_64", "aarch64"]
+        self.user = " ".join(args.user)
 
         if (not os.path.isfile(args.template)):
             raise FileNotFoundError("Template file not found: " + args.template)
@@ -55,7 +81,7 @@ class GenerateMarkdown:
         self._set_value("@PERMALINK@", permalink)
 
     def _set_value(self, key, value):
-        """Replaces keys with values in the template"""
+        "Replaces keys with values in the template"
         self.template = self.template.replace(key, str(value))
 
     def get_model_info(self):
@@ -65,13 +91,13 @@ class GenerateMarkdown:
                 "accuracy" : model_data.get_model_topN_accuracies(),
                 "architecture" : model_data.get_model_architecture(self.printexe),
                 "properties" : model_data.get_model_properties(),
-                "timings" : model_data.get_model_seconds_per_frame(self.platforms)
+                "timings" : model_data.get_model_seconds_per_frame(self.platforms.keys())
             }
 
     def _arch_layers_to_html(self, arch_layers):
-        """Formats arch_layers to HTML table rows"""
-        def _format_parameters(dict):
-            pairs = ["{}={}".format(key, dict[key]) for key in dict.keys()]
+        "Formats arch_layers to HTML table rows"
+        def _format_parameters(parameters):
+            pairs = ["{}={}".format(key, parameters[key]) for key in parameters.keys()]
             return ",&nbsp;".join(pairs)
 
         result = "\n"
@@ -109,28 +135,31 @@ class GenerateMarkdown:
         self._set_value("@MODEL_SIZE_MB@", properties["size_mb"])
         self._set_value("@NUM_CLASSES@", properties["num_classes"])
 
-        # timings per platform
-        timings = self.model_data["timings"]
-        for platform in self.platforms:
-            try:
-                self._set_value("@" + platform + "_SECONDS_PER_FRAME@", timings[platform])
-            except:
-                # leave entry empty if file isn't found (validation not run on the target)
-                # or if json is invalid (validation not complete on the target)
-                self._set_value("@" + platform + "_SECONDS_PER_FRAME@", "")
-                pass
+        # general info
+        self._set_value("@TRAINER@", properties["trainer"])
+        self._set_value("@USER@", self.user)
 
-    def save(self):
+        # timings per platform
+        timings = "<br>".join(["{}: {}s/frame".format(self.platforms[platform],
+                                                      self.model_data["timings"][platform])
+                               for platform in self.platforms.keys()
+                               if platform in self.model_data["timings"]])
+        self._set_value("@MODEL_PERFORMANCE@", timings)
+        self._set_value("@pi3_SECONDS_PER_FRAME@", self.model_data["timings"].get("pi3", ""))
+
+    def save_model_info(self):
+        """Saves information about the model to file"""
         with open(self.outfile, 'w', encoding='utf-8') as of:
             of.write(self.template)
         print("Saved to: " + self.outfile)
 
     def run(self):
+        """Main run method"""
         self.get_model_info()
         self.write_model_info()
-        self.save()
+        self.save_model_info()
 
 if __name__ == "__main__":
     program = GenerateMarkdown()
-    program.parse_command_line(sys.argv[1:]) # drop the first argumnent (program name)
+    program.parse_command_line(sys.argv[1:]) # drop the first argument (program name)
     program.run()

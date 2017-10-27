@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/@PERMALINK@
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: @pi3_SECONDS_PER_FRAME@s/frame<br>Raspberry Pi 3 (OpenSUSE) @ 600MHz: @pi3_64_SECONDS_PER_FRAME@s/frame<br>DragonBoard 410c @ 1.2GHz: @aarch64_SECONDS_PER_FRAME@s/frame </td>
+        <td colspan="3"> @MODEL_PERFORMANCE@ </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>
@@ -41,7 +41,7 @@ permalink: /gallery/ILSVRC2012/@PERMALINK@
     </tr>
     <tr>
         <td> Notes </td>
-        <td colspan="3"> Trained by Juan Lema using CNTK 2.1 </td>
+        <td colspan="3"> Trained by @USER@ using @TRAINER@ </td>
     </tr>
 </table>
 

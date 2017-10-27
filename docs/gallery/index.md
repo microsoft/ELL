@@ -12,9 +12,9 @@ Our gallery is a collection of bits and pieces that you can download and use in 
 
 ### ILSVRC2012
 
-* [64x64x3 Convolutional Neural Network (40.98% top 1 accuracy, 66.43% top 5 accuracy, 0.05s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dsb_I64x64x3CMCMCMCMCMC1AS)
-* [64x64x3 Convolutional Neural Network (44.67% top 1 accuracy, 69.70% top 5 accuracy, 0.12s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dsf_I64x64x3CMCMCMCMCMC1AS)
-* [64x64x3 Convolutional Neural Network (43.13% top 1 accuracy, 67.96% top 5 accuracy, 0.11s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dst_I64x64x3CMCMCMCMCMC1AS)
+* [64x64x3 Convolutional Neural Network (40.98% top 1 accuracy, 66.43% top 5 accuracy, 0.05s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dsb_I64x64x3CMCMCMCMCCCMC1AS)
+* [64x64x3 Convolutional Neural Network (44.67% top 1 accuracy, 69.70% top 5 accuracy, 0.12s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dsf_I64x64x3CCMCCMCCMCMCMC1AS)
+* [64x64x3 Convolutional Neural Network (43.13% top 1 accuracy, 67.96% top 5 accuracy, 0.11s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/dst_I64x64x3CCCMCMCMCMCMC1AS)
 * [128x128x3 Convolutional Neural Network (45.95% top 1 accuracy, 71.05% top 5 accuracy, 0.17s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I128x128x3CMCMCMCMCMCMC1AS)
 * [160x160x3 Convolutional Neural Network (58.13% top 1 accuracy, 80.62% top 5 accuracy, 0.30s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS)
 * [192x192x3 Convolutional Neural Network (59.01% top 1 accuracy, 81.74% top 5 accuracy, 0.41s/frame on Raspberry Pi 3)](/ELL/gallery/ILSVRC2012/d_I192x192x3CMCMCMCMCMCMC1AS)
