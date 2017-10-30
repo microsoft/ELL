@@ -50,9 +50,10 @@ void TestIRCompiler()
     TestSlidingAverage();
     TestDotProductOutput();
     TestSteppableMap(false);
+    TestLinearPredictor<double>();
+    TestLinearPredictor<float>();
     // TestSteppableMap(true); // Occassionally fails
     // TestMultiplexer(); // FAILS -- crash
-    // TestLinearPredictor(); // FAILS -- crash
     // TestForest(); // FAILS -- crash
 
     TestMatrixVectorMultiplyNode(10, 5, true);

@@ -136,7 +136,24 @@ namespace model
         /// <summary> Sets the cached output from this port </summary>
         ///
         /// <param name=values> The values this port should output </param>
-        void SetOutput(std::vector<ValueType> values) const;
+        /// <typeparam name="U"> The fundamental type used by values </typeparam>
+        template <typename U>
+        void SetOutput(std::initializer_list<U>&& values) const;
+
+        /// <summary> Sets the cached output from this port </summary>
+        ///
+        /// <param name=values> The values this port should output </param>
+        /// <typeparam name="C"> The container type that holds the values </typeparam>
+        template <typename C>
+        void SetOutput(C&& values) const;
+
+        /// <summary> Sets the cached output from this port </summary>
+        ///
+        /// <param name=begin> The iterator representing the start value </param>
+        /// <param name=end> The iterator representing the end value  </param>
+        /// <typeparam name="U"> The iterator type </typeparam>
+        template <typename It>
+        void SetOutput(It begin, It end) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

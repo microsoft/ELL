@@ -66,7 +66,7 @@
     "windowSize": 8
   }, 
   {
-    "_type": "LinearPredictorNode",
+    "_type": "LinearPredictorNode<double>",
     "_version": "0",
     "id":     "1026",
     "input": {
@@ -86,7 +86,7 @@
       "size": 12
     },
     "predictor": {
-      "_type": "LinearPredictor",
+      "_type": "LinearPredictor<double>",
       "_version": "0",
       "w": [0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1],
       "b": 0

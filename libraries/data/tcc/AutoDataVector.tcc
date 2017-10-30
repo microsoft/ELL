@@ -60,13 +60,19 @@ namespace data
     }
 
     template <typename DefaultDataVectorType>
-    void AutoDataVectorBase<DefaultDataVectorType>::AppendElement(size_t index, double value)
+    void AutoDataVectorBase<DefaultDataVectorType>::AppendElement(size_t /*index*/, double /*value*/)
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Append element not supported for AutoDataVector");
     }
 
     template <typename DefaultDataVectorType>
     double AutoDataVectorBase<DefaultDataVectorType>::Dot(const math::UnorientedConstVectorReference<double> vector) const
+    {
+        return _pInternal->Dot(vector);
+    }
+
+    template <typename DefaultDataVectorType>
+    float AutoDataVectorBase<DefaultDataVectorType>::Dot(const math::UnorientedConstVectorReference<float> vector) const
     {
         return _pInternal->Dot(vector);
     }

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     LinearPredictorNode.cpp (nodes)
+//  File:     LinearPredictorNode.tcc (nodes)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,18 +26,21 @@ namespace ell
 {
 namespace nodes
 {
-    LinearPredictorNode::LinearPredictorNode()
+    template <typename ElementType>
+    LinearPredictorNode<ElementType>::LinearPredictorNode()
         : Node({ &_input }, { &_output, &_weightedElements }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _weightedElements(this, weightedElementsPortName, 0)
     {
     }
 
-    LinearPredictorNode::LinearPredictorNode(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor)
+    template <typename ElementType>
+    LinearPredictorNode<ElementType>::LinearPredictorNode(const model::PortElements<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor)
         : Node({ &_input }, { &_output, &_weightedElements }), _input(this, input, inputPortName), _output(this, outputPortName, 1), _weightedElements(this, weightedElementsPortName, input.Size()), _predictor(predictor)
     {
         assert(input.Size() == predictor.Size());
     }
 
-    void LinearPredictorNode::WriteToArchive(utilities::Archiver& archiver) const
+    template <typename ElementType>
+    void LinearPredictorNode<ElementType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
@@ -45,7 +48,8 @@ namespace nodes
         archiver["predictor"] << _predictor;
     }
 
-    void LinearPredictorNode::ReadFromArchive(utilities::Unarchiver& archiver)
+    template <typename ElementType>
+    void LinearPredictorNode<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
@@ -53,7 +57,8 @@ namespace nodes
         archiver["predictor"] >> _predictor;
     }
 
-    void LinearPredictorNode::Copy(model::ModelTransformer& transformer) const
+    template <typename ElementType>
+    void LinearPredictorNode<ElementType>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<LinearPredictorNode>(newPortElements, _predictor);
@@ -61,31 +66,35 @@ namespace nodes
         transformer.MapNodeOutput(weightedElements, newNode->weightedElements);
     }
 
-    bool LinearPredictorNode::Refine(model::ModelTransformer& transformer) const
+    template <typename ElementType>
+    bool LinearPredictorNode<ElementType>::Refine(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
 
-        auto weightsNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetWeights().ToArray());
-        auto dotProductNode = transformer.AddNode<DotProductNode<double>>(weightsNode->output, newPortElements);
-        auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<double>>(weightsNode->output, newPortElements, emitters::BinaryOperationType::coordinatewiseMultiply);
-        auto biasNode = transformer.AddNode<ConstantNode<double>>(_predictor.GetBias());
-        auto addNode = transformer.AddNode<BinaryOperationNode<double>>(dotProductNode->output, biasNode->output, emitters::BinaryOperationType::add);
+        auto weightsNode = transformer.AddNode<ConstantNode<ElementType>>(_predictor.GetWeights().ToArray());
+        auto dotProductNode = transformer.AddNode<DotProductNode<ElementType>>(weightsNode->output, newPortElements);
+        auto coordinatewiseMultiplyNode = transformer.AddNode<BinaryOperationNode<ElementType>>(weightsNode->output, newPortElements, emitters::BinaryOperationType::coordinatewiseMultiply);
+        auto biasNode = transformer.AddNode<ConstantNode<ElementType>>(_predictor.GetBias());
+        auto addNode = transformer.AddNode<BinaryOperationNode<ElementType>>(dotProductNode->output, biasNode->output, emitters::BinaryOperationType::add);
 
         transformer.MapNodeOutput(output, addNode->output);
         transformer.MapNodeOutput(weightedElements, coordinatewiseMultiplyNode->output);
         return true;
     }
 
-    void LinearPredictorNode::Compute() const
+    template <typename ElementType>
+    void LinearPredictorNode<ElementType>::Compute() const
     {
-        auto inputDataVector = LinearPredictor::DataVectorType(_input.GetIterator());
+        using DataVectorType = typename LinearPredictorType::DataVectorType;
+        auto inputDataVector = DataVectorType(_input.GetIterator());
         _output.SetOutput({ _predictor.Predict(inputDataVector) });
         _weightedElements.SetOutput(_predictor.GetWeightedElements(inputDataVector).ToArray());
     }
 
-    LinearPredictorNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::LinearPredictor& predictor, model::ModelTransformer& transformer)
+    template <typename ElementType>
+    LinearPredictorNode<ElementType>* AddNodeToModelTransformer(const model::PortElements<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor, model::ModelTransformer& transformer)
     {
-        return transformer.AddNode<LinearPredictorNode>(input, predictor);
+        return transformer.AddNode<LinearPredictorNode<ElementType>>(input, predictor);
     }
 }
 }

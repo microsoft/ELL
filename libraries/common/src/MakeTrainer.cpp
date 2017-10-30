@@ -29,7 +29,7 @@ namespace ell
 {
 namespace common
 {
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters)
     {
         using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
 
@@ -52,7 +52,7 @@ namespace common
         }
     }
 
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSparseDataSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters)
     {
         using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
 
@@ -75,7 +75,7 @@ namespace common
         }
     }
 
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataCenteredSGDTrainer(const LossFunctionArguments& lossFunctionArguments, math::RowVector<double> center, const trainers::SGDTrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSparseDataCenteredSGDTrainer(const LossFunctionArguments& lossFunctionArguments, math::RowVector<double> center, const trainers::SGDTrainerParameters& trainerParameters)
     {
         using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
 
@@ -98,7 +98,7 @@ namespace common
         }
     }
 
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDCATrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SDCATrainerParameters& trainerParameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSDCATrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SDCATrainerParameters& trainerParameters)
     {
         using LossFunctionEnum = common::LossFunctionArguments::LossFunction;
 

@@ -65,13 +65,13 @@ namespace common
 
         // classifier
         auto inputs = model::Concat(model::MakePortElements(mean8->output), model::MakePortElements(var8->output), model::MakePortElements(mean16->output), model::MakePortElements(var16->output));
-        predictors::LinearPredictor predictor(inputs.Size());
+        predictors::LinearPredictor<double> predictor(inputs.Size());
         // Set some values into the predictor's vector
         for (size_t index = 0; index < inputs.Size(); ++index)
         {
             predictor.GetWeights()[index] = (double)(index % 5);
         }
-        model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
+        model.AddNode<nodes::LinearPredictorNode<double>>(inputs, predictor);
         return model;
     }
 
@@ -217,7 +217,8 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<double>>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormNode<float>>();
 
-        context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<bool, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::MultiplexerNode<int, bool>>();

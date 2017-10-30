@@ -38,11 +38,10 @@ namespace trainers
     /// Implements the averaged stochastic gradient descent algorithm on an L2 regularized empirical
     /// loss. This class must be have a derived class that implements DoFirstStep(), DoNextStep(), and CalculatePredictors().
     /// </summary>
-    /// <typeparam name="DerivedType"> The derived class (curiously recurring template pattern). </typeparam>
-    class SGDTrainerBase : public ITrainer<predictors::LinearPredictor>
+    class SGDTrainerBase : public ITrainer<predictors::LinearPredictor<double>>
     {
     public:
-        using PredictorType = predictors::LinearPredictor;
+        using PredictorType = predictors::LinearPredictor<double>;
 
         /// <summary> Sets the trainer's dataset. </summary>
         ///
@@ -55,7 +54,7 @@ namespace trainers
         /// <summary> Returns The averaged predictor. </summary>
         ///
         /// <returns> A const reference to the averaged predictor. </returns>
-        virtual const predictors::LinearPredictor& GetPredictor() const override { return GetAveragedPredictor(); }
+        virtual const predictors::LinearPredictor<double>& GetPredictor() const override { return GetAveragedPredictor(); }
 
     protected:
         // Instances of the base class cannot be created directly
@@ -237,7 +236,7 @@ namespace trainers
     ///
     /// <returns> A linear trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters);
 
     /// <summary> Makes a SparseDataSGD linear trainer. </summary>
     ///
@@ -247,7 +246,7 @@ namespace trainers
     ///
     /// <returns> A linear trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSparseDataSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters);
 
     /// <summary> Makes a SparseDataCenteredSGD linear trainer. </summary>
     ///
@@ -258,7 +257,7 @@ namespace trainers
     ///
     /// <returns> A linear trainer </returns>
     template <typename LossFunctionType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataCenteredSGDTrainer(const LossFunctionType& lossFunction, math::RowVector<double> center, const SGDTrainerParameters& parameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSparseDataCenteredSGDTrainer(const LossFunctionType& lossFunction, math::RowVector<double> center, const SGDTrainerParameters& parameters);
 }
 }
 

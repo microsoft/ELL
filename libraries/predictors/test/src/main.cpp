@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ForestPredictorTests.h"
+#include "LinearPredictorTests.h"
 #include "NeuralNetworkPredictorTests.h"
 #include "ProtoNNPredictorTests.h"
 
@@ -19,6 +20,10 @@ int main()
 {
     // ForestPredictor
     ForestPredictorTest();
+
+    // LinearPredictor
+    LinearPredictorTest<double>();
+    LinearPredictorTest<float>();
 
     // NeuralNetworkPredictor
     ActivationTest<float>();

@@ -130,7 +130,7 @@ namespace trainers
     }
 
     template <typename LossFunctionType, typename RegularizerType>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDCATrainer(const LossFunctionType& lossFunction, const RegularizerType& regularizer, const SDCATrainerParameters& parameters)
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSDCATrainer(const LossFunctionType& lossFunction, const RegularizerType& regularizer, const SDCATrainerParameters& parameters)
     {
         return std::make_unique<SDCATrainer<LossFunctionType, RegularizerType>>(lossFunction, regularizer, parameters);
     }

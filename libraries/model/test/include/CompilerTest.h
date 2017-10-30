@@ -31,6 +31,7 @@ void TestBinaryPredicate(bool expanded);
 void TestMultiplexer();
 void TestSlidingAverage();
 void TestDotProductOutput();
+template <typename ElementType>
 void TestLinearPredictor();
 void TestForest();
 void TestForestMap();
@@ -40,3 +41,5 @@ void TestSteppableMap(bool runJit = false);
 void TestMultiOutputMap();
 void TestMultiOutputMap2();
 void TestCompiledMapMove();
+
+#include "../tcc/CompilerTest.tcc"

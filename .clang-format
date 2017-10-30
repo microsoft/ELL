@@ -42,6 +42,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ColumnLimit: 0
 Cpp11BracedListStyle: false
 IndentWidth: 4
+IndentCaseLabels: false
 # KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: Inner

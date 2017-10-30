@@ -221,7 +221,6 @@ namespace predictors
                 break;
                 case (underlying::LayerType::softmax):
                 {
-                    auto& apiLayer = LayerAs<api::SoftmaxLayer<ElementType>>(layer);
                     underlyingLayers.push_back(std::make_unique<underlying::SoftmaxLayer<ElementType>>(parameters));
                 }
                 break;

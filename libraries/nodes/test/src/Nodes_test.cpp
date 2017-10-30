@@ -283,17 +283,6 @@ void TestBinaryOperationNodeCompute()
     }
 }
 
-void TestLinearPredictorNodeCompute()
-{
-    const int dim = 10;
-    predictors::LinearPredictor predictor(dim);
-
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(dim);
-    model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
-    // TODO: finish this test
-}
-
 void TestDemultiplexerNodeCompute()
 {
     model::Model model;
@@ -487,35 +476,6 @@ void TestSimpleForestPredictorNodeRefine()
     testing::ProcessTest("Testing SimpleForestPredictorNode refine (output)", testing::IsEqual(outputValue, refinedOutputValue));
     testing::ProcessTest("Testing SimpleForestPredictorNode refine (treeOutputs)", testing::IsEqual(treeOutputsValue, refinedTreeOutputsValue));
     testing::ProcessTest("Testing SimpleForestPredictorNode refine (edgeIndicatorVector)", testing::IsEqual(edgeIndicatorVectorValue, refinedEdgeIndicatorVectorValue));
-}
-
-void TestLinearPredictorNodeRefine()
-{
-    // make a linear predictor
-    size_t dim = 3;
-    predictors::LinearPredictor predictor(dim);
-    predictor.GetBias() = 2.0;
-    predictor.GetWeights() = math::ColumnVector<double>{ 3.0, 4.0, 5.0 };
-
-    // make a model
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto linearPredictorNode = model.AddNode<nodes::LinearPredictorNode>(inputNode->output, predictor);
-
-    // refine the model
-    model::TransformContext context;
-    model::ModelTransformer transformer;
-    auto newModel = transformer.RefineModel(model, context);
-
-    // check for equality
-    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ linearPredictorNode->output });
-    inputNode->SetInput({ 1.0, 1.0, 1.0 });
-    newInputNode->SetInput({ 1.0, 1.0, 1.0 });
-    auto modelOutputValue = model.ComputeOutput(linearPredictorNode->output)[0];
-    auto newOutputValue = newModel.ComputeOutput(newOutputElements)[0];
-
-    testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));
 }
 
 void TestDemultiplexerNodeRefine()

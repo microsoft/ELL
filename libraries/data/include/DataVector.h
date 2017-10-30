@@ -80,6 +80,13 @@ namespace data
         /// <returns> A dot product. </returns>
         virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const = 0;
 
+        /// <summary> Computes the dot product with another vector. </summary>
+        ///
+        /// <param name="vector"> The other vector. </param>
+        ///
+        /// <returns> A dot product. </returns>
+        virtual float Dot(const math::UnorientedConstVectorReference<float> vector) const = 0;
+
         /// <summary> Adds this data vector to a math::RowVector </summary>
         ///
         /// <param name="vector"> [in,out] The vector to which this data vector is added. </param>
@@ -210,6 +217,13 @@ namespace data
         ///
         /// <returns> A dot product. </returns>
         virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
+
+        /// <summary> Computes the dot product with another vector. </summary>
+        ///
+        /// <param name="vector"> The other vector. </param>
+        ///
+        /// <returns> A dot product. </returns>
+        virtual float Dot(const math::UnorientedConstVectorReference<float> vector) const override;
 
         /// <summary> Adds this data vector to a math::RowVector </summary>
         ///

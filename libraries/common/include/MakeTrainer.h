@@ -34,7 +34,7 @@ namespace common
     /// <param name="trainerParameters"> trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters);
 
     /// <summary> Makes a stochastic gradient descent trainer for sparse data. </summary>
     ///
@@ -42,7 +42,7 @@ namespace common
     /// <param name="trainerParameters"> trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSparseDataSGDTrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SGDTrainerParameters& trainerParameters);
 
     /// <summary> Makes a stochastic gradient descent trainer for centered sparse data. </summary>
     ///
@@ -51,7 +51,7 @@ namespace common
     /// <param name="trainerParameters"> trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a stochastic gradient descent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSparseDataCenteredSGDTrainer(const LossFunctionArguments& lossFunctionArguments, math::RowVector<double> center, const trainers::SGDTrainerParameters& trainerParameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSparseDataCenteredSGDTrainer(const LossFunctionArguments& lossFunctionArguments, math::RowVector<double> center, const trainers::SGDTrainerParameters& trainerParameters);
 
     /// <summary> Makes a stochastic dual coordinate ascent trainer. </summary>
     ///
@@ -59,7 +59,7 @@ namespace common
     /// <param name="trainerParameters"> trainer parameters. </param>
     ///
     /// <returns> A unique_ptr to a stochastic dual coordinate ascent trainer. </returns>
-    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor>> MakeSDCATrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SDCATrainerParameters& trainerParameters);
+    std::unique_ptr<trainers::ITrainer<predictors::LinearPredictor<double>>> MakeSDCATrainer(const LossFunctionArguments& lossFunctionArguments, const trainers::SDCATrainerParameters& trainerParameters);
 
     /// <summary> Makes a forest trainer. </summary>
     ///

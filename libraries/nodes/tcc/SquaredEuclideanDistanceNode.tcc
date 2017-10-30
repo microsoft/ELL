@@ -28,13 +28,13 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType, math::MatrixLayout layout>
-	SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode()
+    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode()
         : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _v(0, 0)
     {
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-	SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v)
+    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v)
         : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, v.NumRows()), _v(v)
     {
         assert(input.Size() == v.NumColumns());
@@ -127,11 +127,11 @@ namespace nodes
             result[r] += norm1sq + _v.GetRow(r).Norm2Squared();
         }
 
-        _output.SetOutput({ result.ToArray() });
+        _output.SetOutput(result.ToArray());
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-	SquaredEuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> v, model::ModelTransformer& transformer)
+    SquaredEuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> v, model::ModelTransformer& transformer)
     {
         return transformer.AddNode<SquaredEuclideanDistanceNode>(input, v);
     }

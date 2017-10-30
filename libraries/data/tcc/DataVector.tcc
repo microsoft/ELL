@@ -175,6 +175,26 @@ namespace data
     }
 
     template <class DerivedType>
+    float DataVectorBase<DerivedType>::Dot(const math::UnorientedConstVectorReference<float> vector) const
+    {
+        auto indexValueIterator = GetIterator<DerivedType, IterationPolicy::skipZeros>(*static_cast<const DerivedType*>(this));
+
+        float result = 0.0;
+        auto size = vector.Size();
+        while (indexValueIterator.IsValid())
+        {
+            auto indexValue = indexValueIterator.Get();
+            if (indexValue.index >= size)
+            {
+                break;
+            }
+            result += static_cast<float>(indexValue.value) * vector[indexValue.index];
+            indexValueIterator.Next();
+        }
+        return result;
+    }
+
+    template <class DerivedType>
     void DataVectorBase<DerivedType>::AddTo(math::RowVectorReference<double> vector) const
     {
         auto indexValueIterator = GetIterator<DerivedType, IterationPolicy::skipZeros>(*static_cast<const DerivedType*>(this));

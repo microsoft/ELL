@@ -22,6 +22,12 @@ namespace data
         return scalar * vector;
     }
 
+    template <typename ElementType>
+    ElementType operator*(math::UnorientedConstVectorReference<ElementType> vector, const IDataVector& dataVector)
+    {
+        return dataVector.Dot(vector);
+    }
+
     template <typename DataVectorType>
     auto Square(const DataVectorType& vector)
     {

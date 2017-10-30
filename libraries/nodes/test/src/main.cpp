@@ -37,7 +37,8 @@ int main()
         TestUnaryOperationNodeCompute();
         TestUnaryOperationNodeCompute1();
         TestBinaryOperationNodeCompute();
-        TestLinearPredictorNodeCompute();
+        TestLinearPredictorNodeCompute<double>();
+        TestLinearPredictorNodeCompute<float>();
         TestDemultiplexerNodeCompute();
         TestDTWDistanceNodeCompute();
         TestSourceNodeCompute();
@@ -67,7 +68,8 @@ int main()
         // Refine tests
         //
         TestMovingAverageNodeRefine();
-        TestLinearPredictorNodeRefine();
+        TestLinearPredictorNodeRefine<double>();
+        TestLinearPredictorNodeRefine<float>();
         TestSimpleForestPredictorNodeRefine();
         TestDemultiplexerNodeRefine();
         TestMatrixVectorProductRefine();

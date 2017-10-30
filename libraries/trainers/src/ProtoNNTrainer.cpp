@@ -309,6 +309,9 @@ namespace trainers
             case 0:
                 stepSize = safe_div(eta, pow((double)t + 1.0, (double)0.5)); //stepSize=eta/sqrt(1+t), eta is initial stepsize
                 break;
+            default:
+                stepSize = safe_div(eta, pow((double)t + 1.0, (double)0.5)); //stepSize=eta/sqrt(1+t), eta is initial stepsize
+                break;
             }
 
             lambda_new = 0.5 + 0.5 * pow(1 + 4 * lambda* lambda, 0.5);

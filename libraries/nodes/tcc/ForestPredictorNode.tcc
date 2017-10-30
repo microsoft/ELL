@@ -170,7 +170,7 @@ namespace nodes
     {
         // forest output
         auto inputDataVector = typename ForestPredictor::DataVectorType(_input.GetIterator());
-        _output.SetOutput({ _forest.Predict(inputDataVector) });
+        _output.SetOutput({_forest.Predict(inputDataVector)});
 
         // individual tree outputs
         std::vector<double> treeOutputs(_forest.NumTrees());

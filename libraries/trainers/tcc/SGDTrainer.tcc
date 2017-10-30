@@ -264,19 +264,19 @@ namespace trainers
     //
 
     template <typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<predictors::LinearPredictor<double>>> MakeSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters)
     {
         return std::make_unique<SGDTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeSparseDataSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<predictors::LinearPredictor<double>>> MakeSparseDataSGDTrainer(const LossFunctionType& lossFunction, const SGDTrainerParameters& parameters)
     {
         return std::make_unique<SparseDataSGDTrainer<LossFunctionType>>(lossFunction, parameters);
     }
 
     template <typename LossFunctionType>
-    std::unique_ptr<ITrainer<predictors::LinearPredictor>> MakeSparseDataCenteredSGDTrainer(const LossFunctionType& lossFunction, math::RowVector<double> center, const SGDTrainerParameters& parameters)
+    std::unique_ptr<ITrainer<predictors::LinearPredictor<double>>> MakeSparseDataCenteredSGDTrainer(const LossFunctionType& lossFunction, math::RowVector<double> center, const SGDTrainerParameters& parameters)
     {
         return std::make_unique<SparseDataCenteredSGDTrainer<LossFunctionType>>(lossFunction, std::move(center), parameters);
     }

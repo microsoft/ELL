@@ -90,7 +90,8 @@ int main(int argc, char* argv[])
         auto mappedDatasetDimension = map.GetOutput(0).Size();
 
         // get predictor type
-        using PredictorType = predictors::LinearPredictor;
+        using PredictorType = predictors::LinearPredictor<double>;
+        using LinearPredictorNodeType = nodes::LinearPredictorNode<double>;
 
         // set up evaluators to only evaluate on the last update of the multi-epoch trainer
         evaluators::EvaluatorParameters evaluatorParameters{ 1, false };
@@ -113,7 +114,7 @@ int main(int argc, char* argv[])
         if (trainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->SetDataset(mappedDataset.GetAnyDataset());
         trainer->Update();
-        predictors::LinearPredictor predictor(trainer->GetPredictor());
+        PredictorType predictor(trainer->GetPredictor());
         predictor.Resize(mappedDatasetDimension);
 
         // print loss and errors
@@ -134,7 +135,7 @@ int main(int argc, char* argv[])
         if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
-            auto model = common::AppendNodeToModel<nodes::LinearPredictorNode, PredictorType>(map, predictor);
+            auto model = common::AppendNodeToModel<LinearPredictorNodeType, PredictorType>(map, predictor);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }

@@ -28,14 +28,17 @@ namespace ell
 namespace predictors
 {
     /// <summary> A linear binary predictor. </summary>
-    class LinearPredictor : public IPredictor<double>, public utilities::IArchivable
+    ///
+    /// <typeparam name="ElementType"> The fundamental type used by this predictor. </typeparam>
+    template <typename ElementType>
+    class LinearPredictor : public IPredictor<ElementType>, public utilities::IArchivable
     {
     public:
         /// <summary> Type of the data vector expected by this predictor type. </summary>
         using DataVectorType = data::AutoDataVector;
 
         /// <summary> Default Constructor. </summary>
-        LinearPredictor();
+        LinearPredictor() = default;
 
         /// <summary> Constructs an instance of LinearPredictor. </summary>
         ///
@@ -46,27 +49,38 @@ namespace predictors
         ///
         /// <param name="weights"> The weights. </param>
         /// <param name="bias"> The bias. </param>
-        LinearPredictor(const math::ColumnVector<double>& weights, double bias);
+        LinearPredictor(const math::ColumnVector<ElementType>& weights, ElementType bias);
+
+        /// <summary> Constructs an instance of a LinearPredictor from an existing one. </summary>
+        ///
+        /// <param name="dim"> The dimension. </param>
+        /// <typeparam name="OtherElementType"> The fundamental type used by the other predictor.
+        /// This allows a linear predictor to be initialized from another whose fundamental type is different,
+        /// but compatible. Since trainers always output a linear predictor of type double, this can be used
+        /// to create the same predictor using float.
+        /// </typeparam>
+        template <typename OtherElementType>
+        LinearPredictor(const LinearPredictor<OtherElementType>& other);
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        math::ColumnVector<double>& GetWeights() { return _w; }
+        math::ColumnVector<ElementType>& GetWeights() { return _w; }
 
         /// <summary> Returns the underlying DoubleVector. </summary>
         ///
         /// <returns> The underlying vector. </returns>
-        const math::ConstColumnVectorReference<double>& GetWeights() const { return _w; }
+        const math::ConstColumnVectorReference<ElementType>& GetWeights() const { return _w; }
 
         /// <summary> Returns the underlying bias. </summary>
         ///
         /// <returns> The bias. </returns>
-        double& GetBias() { return _b; }
+        ElementType& GetBias() { return _b; }
 
         /// <summary> Returns the underlying bias. </summary>
         ///
         /// <returns> The bias. </returns>
-        double GetBias() const { return _b; }
+        ElementType GetBias() const { return _b; }
 
         /// <summary> Gets the dimension of the linear predictor. </summary>
         ///
@@ -83,7 +97,7 @@ namespace predictors
         /// <param name="example"> The data vector. </param>
         ///
         /// <returns> The prediction. </returns>
-        double Predict(const DataVectorType& dataVector) const;
+        ElementType Predict(const DataVectorType& dataVector) const;
 
         /// <summary> Returns a vector of dataVector elements weighted by the predictor weights. </summary>
         ///
@@ -95,7 +109,7 @@ namespace predictors
         /// <summary> Scales the linear predictor by a scalar </summary>
         ///
         /// <param name="scalar"> The scalar. </param>
-        void Scale(double scalar);
+        void Scale(ElementType scalar);
 
         /// <summary> Resets the linear predictor to the zero vector with zero bias. </summary>
         void Reset();
@@ -103,7 +117,7 @@ namespace predictors
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return "LinearPredictor"; }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("LinearPredictor"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -115,8 +129,10 @@ namespace predictors
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        math::ColumnVector<double> _w;
-        double _b;
+        math::ColumnVector<ElementType> _w;
+        ElementType _b;
     };
 }
 }
+
+#include "../tcc/LinearPredictor.tcc"

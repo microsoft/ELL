@@ -127,7 +127,6 @@ namespace neural
     void ConvolutionalLayer<ElementType>::ReceptiveFieldToColumns(ConstTensorReferenceType input, MatrixType& shapedInput)
     {
         size_t fieldVolumeSize = _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels();
-        size_t outIndex = 0;
         size_t convolutionalHeight = NumOutputRowsMinusPadding();
         size_t convolutionalWidth = NumOutputColumnsMinusPadding();
 

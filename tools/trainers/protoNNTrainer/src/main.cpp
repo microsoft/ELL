@@ -91,7 +91,6 @@ int main(int argc, char* argv[])
         auto map = common::LoadMap(mapLoadArguments);
         auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
         auto mappedDataset = common::GetMappedDataset(stream, map);
-        auto mappedDatasetDimension = map.GetOutput(0).Size();
 
         // create protonn trainer
         auto trainer = common::MakeProtoNNTrainer(mappedDataset.NumExamples(), mappedDataset.NumFeatures(), protoNNTrainerArguments);

@@ -13,7 +13,6 @@ set (src src/ActivationLayerNode.cpp
   src/DiagonalConvolutionNode.cpp
   src/FullyConnectedLayerNode.cpp
   src/IRNode.cpp
-  src/LinearPredictorNode.cpp
   src/MatrixMatrixMultiplyNode.cpp
   src/MatrixVectorMultiplyNode.cpp
   src/ProtoNNPredictorNode.cpp
@@ -85,6 +84,7 @@ set (tcc
   tcc/ExtremalValueNode.tcc
   tcc/ForestPredictorNode.tcc
   tcc/L2NormNode.tcc
+  tcc/LinearPredictorNode.tcc
   tcc/MatrixVectorProductNode.tcc
   tcc/MovingAverageNode.tcc
   tcc/MovingVarianceNode.tcc
@@ -130,12 +130,16 @@ set (test_include
   test/include/NeuralNetworkLayerNodesTest.h
   test/include/Nodes_test.h)
 
+set (test_tcc 
+  test/tcc/Nodes_test.tcc)
+
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
+source_group("tcc" FILES ${test_tcc})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include})
+add_executable(${test_name} ${test_src} ${test_include} ${test_tcc} ${include})
 target_include_directories(${test_name} PRIVATE test/include)
-target_link_libraries(${test_name} nodes testing common model predictors utilities)
+target_link_libraries(${test_name} common math model nodes predictors testing utilities)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

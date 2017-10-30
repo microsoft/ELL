@@ -41,8 +41,8 @@ void TestEvaluators()
     evaluators::EvaluatorParameters evaluatorParams{ 1, true };
     common::LossFunctionArguments lossFunctionArguments;
     lossFunctionArguments.lossFunction = common::LossFunctionArguments::LossFunction::squared;
-    predictors::LinearPredictor predictor({ 1.0, 1.0 }, 1.0);
-    auto evaluator = common::MakeEvaluator<predictors::LinearPredictor>(dataset.GetAnyDataset(), evaluatorParams, lossFunctionArguments);
+    predictors::LinearPredictor<double> predictor({ 1.0, 1.0 }, 1.0);
+    auto evaluator = common::MakeEvaluator<predictors::LinearPredictor<double>>(dataset.GetAnyDataset(), evaluatorParams, lossFunctionArguments);
 
     evaluator->Evaluate(predictor);
     evaluator->Evaluate(predictor);

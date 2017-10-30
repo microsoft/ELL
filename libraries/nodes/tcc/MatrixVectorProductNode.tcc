@@ -112,7 +112,7 @@ namespace nodes
         // result = _w * data
         math::Multiply(1.0, _w, input, 0.0, result);
 
-        _output.SetOutput({ result.ToArray() });
+        _output.SetOutput(result.ToArray());
     }
 
     template <typename ValueType, math::MatrixLayout layout>

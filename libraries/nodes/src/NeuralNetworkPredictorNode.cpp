@@ -145,7 +145,7 @@ namespace nodes
     void NeuralNetworkPredictorNode<ValueType>::Compute() const
     {
         auto inputDataVector = typename PredictorType::DataVectorType(_input.GetIterator());
-        _output.SetOutput({ _predictor.Predict(inputDataVector) });
+        _output.SetOutput(_predictor.Predict(inputDataVector));
     }
 
     // explicit specialization for float, double

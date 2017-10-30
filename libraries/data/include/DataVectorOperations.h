@@ -40,7 +40,8 @@ namespace data
     /// <param name="dataVector"> The data vector. </param>
     ///
     /// <returns> The result of the dot product. </returns>
-    double operator*(math::UnorientedConstVectorReference<double> vector, const IDataVector& dataVector);
+    template <typename ElementType>
+    ElementType operator*(math::UnorientedConstVectorReference<ElementType> vector, const IDataVector& dataVector);
 
     /// <summary> Multiplication operator (dot product) for vector and data vector. </summary>
     ///

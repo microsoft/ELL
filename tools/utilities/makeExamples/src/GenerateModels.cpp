@@ -98,13 +98,13 @@ model::Model GenerateModel1()
 
     // classifier
     auto inputs = model::Concat(model::MakePortElements(mean8->output), model::MakePortElements(var8->output), model::MakePortElements(mean16->output), model::MakePortElements(var16->output));
-    predictors::LinearPredictor predictor(inputs.Size());
+    predictors::LinearPredictor<double> predictor(inputs.Size());
     // Set some values into the predictor's vector
     for (size_t index = 0; index < inputs.Size(); ++index)
     {
         predictor.GetWeights()[index] = (double)(index % 5);
     }
-    model.AddNode<nodes::LinearPredictorNode>(inputs, predictor);
+    model.AddNode<nodes::LinearPredictorNode<double>>(inputs, predictor);
     return model;
 }
 

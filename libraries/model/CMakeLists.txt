@@ -152,6 +152,7 @@ set (compiler_test_include
 )
 
 set (compiler_test_tcc
+    test/tcc/CompilerTest.tcc
     test/tcc/ModelMaker.tcc
     test/tcc/ModelTestUtilities.tcc
 )
@@ -160,7 +161,7 @@ source_group("src" FILES ${compiler_test_src})
 source_group("include" FILES ${compiler_test_include})
 source_group("tcc" FILES ${compiler_test_tcc})
 
-add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include})
+add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include} ${compiler_test_tcc})
 target_include_directories(${compiler_test_name} PRIVATE test/include)
 target_link_libraries(${compiler_test_name} common model nodes testing utilities)
 copy_shared_libraries(${compiler_test_name})

@@ -5,7 +5,6 @@
 set (library_name predictors)
 
 set (src src/ConstantPredictor.cpp
-         src/LinearPredictor.cpp
          src/SingleElementThresholdPredictor.cpp
          src/ProtoNNPredictor.cpp)
 
@@ -20,6 +19,7 @@ set (include include/ConstantPredictor.h
              include/ProtoNNPredictor.h)
 
 set (tcc tcc/ForestPredictor.tcc
+         tcc/LinearPredictor.tcc
          tcc/SignPredictor.tcc
          tcc/NeuralNetworkPredictor.tcc
          tcc/Normalizer.tcc)
@@ -89,11 +89,13 @@ set (test_src
 
 set (test_include
   test/include/ForestPredictorTests.h
+  test/include/LinearPredictorTests.h
   test/include/ProtoNNPredictorTests.h
   test/include/NeuralNetworkPredictorTests.h
 )
 
 set (test_tcc
+  test/tcc/LinearPredictorTests.tcc
   test/tcc/NeuralNetworkPredictorTests.tcc
 )
 

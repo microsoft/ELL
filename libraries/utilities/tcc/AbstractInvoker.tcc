@@ -29,7 +29,7 @@ namespace utilities
 
     template <typename BaseType>
     template <typename ReturnType, typename FunctorType>
-    ReturnType AbstractInvoker<BaseType>::Invoke(const FunctorType& functor, const BaseType* basePointer)
+    ReturnType AbstractInvoker<BaseType>::Invoke(const FunctorType& /*functor*/, const BaseType* /*basePointer*/)
     {
         throw LogicException(LogicExceptionErrors::illegalState, "base type reference could not be matched with a derived type");
     }

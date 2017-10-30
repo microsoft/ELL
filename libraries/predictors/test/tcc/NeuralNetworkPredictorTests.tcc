@@ -716,14 +716,14 @@ void NeuralNetworkPredictorTest()
 template <typename ElementType>
 void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, int startValue = 0)
 {
-    int val = 0;
+    int val = startValue;
     tensor.Generate([&val]() { return val++; });
 }
 
 template <typename ElementType>
 void FillVector(ell::math::ColumnVector<ElementType>& vector, int startValue = 0)
 {
-    int val = 0;
+    int val = startValue;
     vector.Generate([&val]() { return val++; });
 }
 

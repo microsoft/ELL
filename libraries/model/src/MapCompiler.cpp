@@ -169,8 +169,6 @@ namespace model
 
     emitters::Variable* MapCompiler::GetVariableForElement(const PortElementBase& element)
     {
-        auto var = GetVariableForPort(*element.ReferencedPort());
-
         return GetVariableForPort(*element.ReferencedPort());
     }
 

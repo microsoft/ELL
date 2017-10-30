@@ -40,9 +40,24 @@ namespace model
     }
 
     template <typename ValueType>
-    void OutputPort<ValueType>::SetOutput(std::vector<ValueType> values) const
+    template <typename U>
+    void OutputPort<ValueType>::SetOutput(std::initializer_list<U>&& values) const
     {
-        _cachedOutput = values;
+        this->SetOutput(std::begin(values), std::end(values));
+    }
+
+    template <typename ValueType>
+    template <typename C>
+    void OutputPort<ValueType>::SetOutput(C&& values) const
+    {
+        this->SetOutput(std::begin(values), std::end(values));
+    }
+
+    template <typename ValueType>
+    template <typename It>
+    void OutputPort<ValueType>::SetOutput(It begin, It end) const
+    {
+        _cachedOutput.assign(begin, end);
     }
 
     template <typename ValueType>
