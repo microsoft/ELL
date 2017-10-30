@@ -130,6 +130,14 @@ void FillRandomVector(std::vector<ElementType>& vector, ElementType min = -1, El
 }
 
 template <typename ElementType>
+std::vector<ElementType> GetRandomVector(size_t size, ElementType min = -1, ElementType max = 1)
+{
+    std::vector<ElementType> result(size);
+    FillRandomVector(result, min, max);
+    return result;
+}
+
+template <typename ElementType>
 void FillRandomVector(ell::math::ColumnVector<ElementType>& vector, ElementType min = -1, ElementType max = 1)
 {
     Uniform<ElementType> rand(min, max);
@@ -494,17 +502,19 @@ void TestCompilableMultiplexerNode()
     VerifyCompiledOutput(map, compiledMap, signal, "MultiplexerNode");
 }
 
-void TestCompilableTypeCastNode()
+void TestCompilableTypeCastNode(size_t dimension)
 {
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<int>>(1);
+    auto inputNode = model.AddNode<model::InputNode<int>>(dimension);
     auto testNode = model.AddNode<nodes::TypeCastNode<int, double>>(inputNode->output);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
     // compare output
-    std::vector<std::vector<int>> signal = { { 1 }, { 4 }, { 7 }, { 2 }, { 4 }, { 1 }, { 11 }, { 24 }, { 92 }, { 1 } };
+    const int numEntries = 10;
+    std::vector<std::vector<int>> signal;
+    std::generate_n(std::back_inserter(signal), numEntries, [dimension]{ return GetRandomVector<int>(dimension, 0, 100); });
     VerifyCompiledOutput(map, compiledMap, signal, "TypeCastNode");
 }
 

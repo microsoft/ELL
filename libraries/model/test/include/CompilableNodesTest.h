@@ -30,7 +30,7 @@ void TestCompilableBinaryOperationNode();
 void TestCompilableScalarBinaryPredicateNode();
 void TestCompilableBinaryPredicateNode();
 void TestCompilableMultiplexerNode();
-void TestCompilableTypeCastNode();
+void TestCompilableTypeCastNode(size_t dimension);
 void TestReorderDataNode1();
 void TestReorderDataNode2();
 void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape);

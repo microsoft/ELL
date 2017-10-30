@@ -76,7 +76,9 @@ void TestIRCompiler()
     TestCompilableScalarBinaryPredicateNode();
     TestCompilableBinaryPredicateNode();
     TestCompilableMultiplexerNode();
-    TestCompilableTypeCastNode();
+    TestCompilableTypeCastNode(1);
+    TestCompilableTypeCastNode(2);
+    TestCompilableTypeCastNode(10);
     TestReorderDataNode1();
     TestReorderDataNode2();
     TestReceptiveFieldMatrixNode(1, true); // new version

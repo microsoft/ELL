@@ -45,22 +45,63 @@ namespace nodes
         auto inputType = emitters::GetVariableType<InputValueType>();
         auto outputType = emitters::GetVariableType<OutputValueType>();
 
-        // TypeCast nodes are currently only scalar. TODO: Fix them to work for vectors as well.
-        VerifyIsScalar(input);
-        VerifyIsScalar(output);
-
-        if (inputType == outputType)
+        // no-op case
+        if (inputType == outputType && IsPureVector(input))
         {
             emitters::Variable* elementVar = compiler.GetVariableForElement(input.GetInputElement(0));
             compiler.SetVariableForPort(output, elementVar); // The types are the same, so this is a no-op. Just set the output variable to be the same as the input variable
+            return;
         }
-        else
+
+        // special scalar case
+        if(IsScalar(input))
         {
             llvm::Value* inputValue = compiler.LoadPortElementVariable(input.GetInputElement(0));
             llvm::Value* outputValue = compiler.EnsurePortEmitted(output);
 
             llvm::Value* castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
             function.Store(outputValue, castElement);
+            return;
+        }
+
+        if (IsPureVector(input) && !compiler.GetCompilerParameters().unrollLoops)
+        {
+            CompileLoop(compiler, function);
+        }
+        else
+        {
+            CompileExpanded(compiler, function);
+        }
+    }
+
+    template <typename InputValueType, typename OutputValueType>
+    void TypeCastNode<InputValueType, OutputValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    {
+        auto count = input.Size();
+        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+
+        auto forLoop = function.ForLoop();
+        forLoop.Begin(count);
+        {
+            auto i = forLoop.LoadIterationVariable();
+            llvm::Value* inputValue = function.ValueAt(pInput, i);
+            llvm::Value* castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
+            function.SetValueAt(pResult, i, castElement);
+        }
+        forLoop.End();
+    }
+    
+    template <typename InputValueType, typename OutputValueType>
+    void TypeCastNode<InputValueType, OutputValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    {
+        llvm::Value* pResult = compiler.EnsurePortEmitted(output);
+
+        for (size_t i = 0; i < input.Size(); ++i)
+        {
+            llvm::Value* inputValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
+            llvm::Value* castElement = function.CastValue<InputValueType, OutputValueType>(inputValue);
+            function.SetValueAt(pResult, function.Literal((int)i), castElement);
         }
     }
 

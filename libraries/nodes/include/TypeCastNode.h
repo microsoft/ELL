@@ -10,6 +10,7 @@
 
 // model
 #include "CompilableNode.h"
+#include "CompilableNodeUtilities.h"
 #include "IRMapCompiler.h"
 #include "MapCompiler.h"
 #include "ModelTransformer.h"
@@ -67,6 +68,9 @@ namespace nodes
         virtual void WriteToArchive(utilities::Archiver& archiver) const override;
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
         virtual bool HasState() const override { return false; }
+
+        void CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+        void CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
 
         model::InputPort<InputValueType> _input;
         model::OutputPort<OutputValueType> _output;
