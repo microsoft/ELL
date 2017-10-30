@@ -26,6 +26,7 @@ void TestIR()
     TestIfElseBlockRegions(true);
     TestLogical();
     TestMutableConditionForLoop();
+    TestWhileLoop();
     TestMetadata();
     TestHeader();
     TestTwoEmitsInOneSession();

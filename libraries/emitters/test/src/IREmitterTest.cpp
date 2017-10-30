@@ -171,10 +171,10 @@ void TestLLVM()
     fnMain.SetValueAt(pOutput, fnMain.Literal(4), fnMain.Literal(20.0));
 
     auto pOtherTotal = module.Global(VariableType::Double, "g_total");
-    forLoop.Clear();
-    forLoop.Begin(data.size());
+    IRForLoopEmitter forLoop2(fnMain);
+    forLoop2.Begin(data.size());
     {
-        auto ival = forLoop.LoadIterationVariable();
+        auto ival = forLoop2.LoadIterationVariable();
         auto v = fnMain.ValueAt(pOutput, ival);
 
         llvm::Value* pRegisterSum = fnMain.Load(fnMain.PointerOffset(pRegisters, ival, fnMain.Literal(1)));
@@ -182,7 +182,7 @@ void TestLLVM()
         fnMain.OperationAndUpdate(pOtherTotal, TypedOperator::addFloat, v);
         fnMain.Printf({ fnMain.Literal("%f, %f\n"), v, pRegisterSum });
     }
-    forLoop.End();
+    forLoop2.End();
     fnMain.Printf({ fnMain.Literal("Total = %f, OtherTotal= %f\n"), fnMain.Load(pTotal), fnMain.Load(pOtherTotal) });
 
     fnMain.Return();
@@ -417,6 +417,44 @@ void TestMutableConditionForLoop()
     TestMutableConditionForLoop(false);
 }
 
+void TestWhileLoop()
+{
+    IRModuleEmitter module("WhileLoop");
+    module.DeclarePrintf();
+
+    auto add = GetOperator<double>(BinaryOperationType::add);
+    auto int8Type = GetVariableType<char>();
+    auto int32Type = GetVariableType<int32_t>();
+    auto varType = GetVariableType<double>();
+
+    auto fn = module.BeginMainFunction();
+    {
+        auto conditionVar = fn.Variable(int8Type, "cond");
+        fn.Print("Begin while loop\n");
+        auto i = fn.Variable(int32Type);
+        fn.Store(i, fn.Literal<int>(5));
+        IRWhileLoopEmitter whileLoop(fn);
+        fn.Store(conditionVar, fn.TrueBit());
+        whileLoop.Begin(conditionVar);
+        {
+            fn.Printf("i: %d\n", { fn.Load(i) });
+
+            // i++
+            fn.OperationAndUpdate(i, TypedOperator::add, fn.Literal<int>(1)); // i++
+
+            // update conditionVar (i != 10)
+            fn.Store(conditionVar, fn.Comparison(TypedComparison::notEquals, fn.Load(i), fn.Literal<int>(10)));
+        }
+        whileLoop.End();
+
+        fn.Printf("Done with while loop: i = %d\n", { fn.Load(i) });
+        fn.Return();
+    }
+
+    IRExecutionEngine jit(std::move(module));
+    jit.RunMain();
+}
+
 void TestMetadata()
 {
     IRModuleEmitter module("Metadata");
@@ -560,7 +598,7 @@ void TestStruct()
     auto function = module.BeginMainFunction();
     function.Print("Begin\n");
     // function.PrintForEach("%f\n", pRegister, data.size());
-   
+
     function.Return();
     module.EndFunction();
 

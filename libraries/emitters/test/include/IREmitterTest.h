@@ -18,6 +18,7 @@ void TestIfElseComplex();
 void TestIfElseBlockRegions(bool runJit = false);
 void TestLogical();
 void TestMutableConditionForLoop();
+void TestWhileLoop();
 void TestMetadata();
 void TestHeader();
 void TestTwoEmitsInOneSession();

@@ -655,7 +655,7 @@ namespace emitters
     {
         auto& emitter = GetEmitter();
         auto& irBuilder = emitter.GetIRBuilder();
-        for(int index = 0; index < fieldValues.size(); ++index)
+        for (int index = 0; index < fieldValues.size(); ++index)
         {
             auto field = irBuilder.CreateInBoundsGEP(structPtr, { Literal(0), Literal(index) });
             Store(field, fieldValues[index]);
@@ -786,6 +786,11 @@ namespace emitters
     IRForLoopEmitter IRFunctionEmitter::ForLoop()
     {
         return IRForLoopEmitter(*this);
+    }
+
+    IRWhileLoopEmitter IRFunctionEmitter::WhileLoop()
+    {
+        return IRWhileLoopEmitter(*this);
     }
 
     IRIfEmitter IRFunctionEmitter::If()
@@ -946,13 +951,13 @@ namespace emitters
     //
     // BLAS functions
     //
-    template<typename ValueType>
+    template <typename ValueType>
     void IRFunctionEmitter::CallGEMV(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy)
     {
         CallGEMV<ValueType>(m, n, static_cast<ValueType>(1.0), A, lda, x, incx, static_cast<ValueType>(0.0), y, incy);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void IRFunctionEmitter::CallGEMV(int m, int n, ValueType alpha, llvm::Value* A, int lda, llvm::Value* x, int incx, ValueType beta, llvm::Value* y, int incy)
     {
         auto useBlas = CanUseBlas();
@@ -979,13 +984,13 @@ namespace emitters
         Call(gemv, args);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void IRFunctionEmitter::CallGEMM(int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
     {
         CallGEMM<ValueType>(false, false, m, n, k, A, lda, B, ldb, C, ldc);
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     void IRFunctionEmitter::CallGEMM(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc)
     {
         auto useBlas = CanUseBlas();
@@ -1099,13 +1104,13 @@ namespace emitters
         _pFunction->print(out);
     }
 
-    template<>
+    template <>
     llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::steady_clock>()
     {
         return Call(GetSteadyClockFnName, nullptr /*no arguments*/);
     }
 
-    template<>
+    template <>
     llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::system_clock>()
     {
         return Call(GetSystemClockFnName, nullptr /*no arguments*/);

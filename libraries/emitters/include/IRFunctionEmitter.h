@@ -92,7 +92,7 @@ namespace emitters
         /// <param name="pointerType"> The llvm type of the pointer to return. </param>
         ///
         /// <returns> Pointer to an llvm::ConstantPointerNull that represents a null pointer of the given pointer type. </returns>
-        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType) { return _pEmitter->NullPointer(pointerType); } // STYLE discrepancy 
+        llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType) { return _pEmitter->NullPointer(pointerType); } // STYLE discrepancy
 
         /// <summary> Emit an instruction to load a function argument. </summary>
         ///
@@ -197,7 +197,7 @@ namespace emitters
         ///
         /// <returns> Pointer to the result of the function call. </returns>
         llvm::Value* Call(const std::string& name, const IRValueList& arguments);
-        
+
         /// <summary> Emit a call to a function with arguments. </summary>
         ///
         /// <param name="name"> The function name. </param>
@@ -701,7 +701,7 @@ namespace emitters
         /// <param name="pOffset"> The offset. </param>
         /// <param name="pValue"> The value to set. </param>
         llvm::Value* SetValueAt(llvm::GlobalVariable* pGlobal, llvm::Value* pOffset, llvm::Value* pValue);
-        
+
         /// <summary> Set the fields of a struct. </summary>
         ///
         /// <param name="structPtr"> The struct to be filled in. </param>
@@ -757,6 +757,11 @@ namespace emitters
         /// <returns> A for loop emitter. </returns>
         IRForLoopEmitter ForLoop();
 
+        /// <summary> Gets a while loop emitter. </summary>
+        ///
+        /// <returns> A while loop emitter. </returns>
+        IRWhileLoopEmitter WhileLoop();
+
         /// <summary> Gets an if statement emitter. </summary>
         ///
         /// <returns> An if statement emitter. </returns>
@@ -777,7 +782,7 @@ namespace emitters
         ///
         /// <returns> A task object representing the running task. </param>
         IRAsyncTask Async(llvm::Function* task);
-        
+
         /// <summary> Creates an asynchronous task. </summary>
         ///
         /// <param name="task"> The function to run asynchronously. </param>
@@ -943,7 +948,7 @@ namespace emitters
         /// <param name="content"> The content to insert for the given metadata tag. </param>
         /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
         void InsertMetadata(const std::string& tag, const std::string& content = "");
-        
+
         /// <summary> Inserts arbitrary function-level metadata into generated IR code. </summary>
         ///
         /// <param name="tag"> The tag of the metadata to set. </param>
@@ -1056,7 +1061,7 @@ namespace emitters
         /// <param name="incy"> The increment between values of y </param>
         template <typename ValueType>
         void CallGEMV(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy);
-        
+
         /// <summary> Call the matrix-vector multiply routine that computes y = alpha*A*x + beta*y </summary>
         ///
         /// <typeparam name="ValueType"> The datatype to use (must be `float` or `double`) </typeparam>
@@ -1113,28 +1118,28 @@ namespace emitters
 
         /// <summary> Indicates if the target has POSIX functions available to it. </summary>
         bool HasPosixFunctions() const;
-        
+
         /// <summary> Emits a call to the POSIX `pthread_create` function. </summary>
         llvm::Value* PthreadCreate(llvm::Value* threadVar, llvm::Value* attrPtr, llvm::Function* taskFunction, llvm::Value* taskArgument);
-        
+
         /// <summary> Emits a call to the POSIX `pthread_equal` function. </summary>
         llvm::Value* PthreadEqual(llvm::Value* thread1, llvm::Value* thread2);
-        
+
         /// <summary> Emits a call to the POSIX `pthread_exit` function. </summary>
         void PthreadExit(llvm::Value* status);
-        
+
         /// <summary> Emits a call to the POSIX `pthread_getconcurrency` function. </summary>
         llvm::Value* PthreadGetConcurrency();
-        
+
         /// <summary> Emits a call to the POSIX `pthread_detach` function. </summary>
         llvm::Value* PthreadDetach(llvm::Value* thread);
-        
+
         /// <summary> Emits a call to the POSIX `pthread_join` function. </summary>
         llvm::Value* PthreadJoin(llvm::Value* thread, llvm::Value* statusOut);
-        
+
         /// <summary> Emits a call to the POSIX `pthread_self` function. </summary>
         llvm::Value* PthreadSelf();
-        
+
         //
         // Information about the current function begin emitted
         //

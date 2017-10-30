@@ -10,6 +10,9 @@ namespace ell
 {
 namespace emitters
 {
+    //
+    // IRForLoopEmitter
+    //
     template <typename ValueType, BinaryPredicateType predicate>
     llvm::BasicBlock* IRForLoopEmitter::Begin(llvm::Value* pStart, llvm::Value* pIncrement, llvm::Value* pTestValuePointer)
     {

@@ -16,8 +16,13 @@ namespace emitters
 {
     class IRFunctionEmitter;
 
-    ///<summary> Class that simplifies for loop creation. </summary>
-    class IRForLoopEmitter
+    /// <summary> Base class for loop emitters. </summary>
+    class IRLoopEmitter
+    {
+    };
+
+    /// <summary> Class that simplifies for loop creation. </summary>
+    class IRForLoopEmitter : public IRLoopEmitter
     {
     public:
         /// <summary> Constructs an instance of IRForLoopEmitter. </summary>
@@ -84,11 +89,8 @@ namespace emitters
         template <typename ValueType, BinaryPredicateType predicate>
         llvm::BasicBlock* Begin(llvm::Value* pStart, llvm::Value* pIncrement, llvm::Value* pTestValuePointer);
 
-        /// <summary> Emit the end of this for loop. </summary>
+        /// <summary> Emits the end of this for loop. </summary>
         void End();
-
-        /// <summary> Resets this emitter, to start a new for loop. </summary>
-        void Clear();
 
     private:
         void CreateBlocks();
@@ -105,6 +107,43 @@ namespace emitters
         llvm::BasicBlock* _pIncrementBlock = nullptr; // Here we increment the iteration variable
         llvm::BasicBlock* _pAfterBlock = nullptr; // When the loop is done, we branch to this block
         llvm::Value* _pIterationVariable = nullptr;
+    };
+
+    /// <summary> Class that simplifies while loop creation. </summary>
+    class IRWhileLoopEmitter : public IRLoopEmitter
+    {
+    public:
+        /// <summary> Constructs an instance of IRWhileLoopEmitter. </summary>
+        ///
+        /// <param name="functionEmitter"> The function emitter. </param>
+        IRWhileLoopEmitter(IRFunctionEmitter& functionEmitter);
+
+        /// <summary> Emits the beginning of a while loop that uses a mutable test value. </summary>
+        ///
+        /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
+        ///
+        /// <returns> Pointer to the llvm::BasicBlock that represents the body of the loop. </returns>
+        llvm::BasicBlock* Begin(llvm::Value* pTestValuePointer);
+
+        /// <summary> Emit the end of this loop. </summary>
+        void End();
+
+        /// <summary> Gets the block containing the body of the loop. </summary>
+        ///
+        /// <returns> Pointer to an llvm::BasicBlock that represents the body of the loop. </returns>
+        llvm::BasicBlock* GetBodyBlock() { return _pBodyBlock; }
+
+    private:
+        void CreateBlocks();
+        void EmitInitialization();
+        void EmitCondition(llvm::Value* pTestValuePointer);
+        llvm::BasicBlock* PrepareBody();
+
+        IRFunctionEmitter& _functionEmitter; // Loop written into this function
+        llvm::BasicBlock* _pInitializationBlock = nullptr; // The loop is set up in this block
+        llvm::BasicBlock* _pConditionBlock = nullptr; // Here we do the loop termination check
+        llvm::BasicBlock* _pBodyBlock = nullptr; // The body of the loop
+        llvm::BasicBlock* _pAfterBlock = nullptr; // When the loop is done, we branch to this block
     };
 }
 }
