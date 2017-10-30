@@ -1,5 +1,4 @@
-#! /bin/bash
-
+#! /bin/
 # get path of current script: https://stackoverflow.com/a/39340259/207661
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -52,7 +51,7 @@ if [[ ! -d $build_dir ]]; then
 fi
 
 pushd $build_dir  >/dev/null
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j
 make -j _ELL_python
 popd >/dev/null
