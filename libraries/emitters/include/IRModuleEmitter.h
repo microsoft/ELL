@@ -579,6 +579,24 @@ namespace emitters
         /// <param name="nodeName"> The node name. </param>
         void IncludeInCallbackInterface(const std::string& functionName, const std::string& nodeName);
 
+        //
+        // Module initialization
+        //
+
+        /// <summary> Adds an initialization function to run before any (non-initialization) application code. </summary>
+        ///
+        /// <param name="function"> The function to call. Must be of type `void()`. </param>
+        /// <param name="priority"> The priority for this initialization function. Initialization functions are called in increasing order of priority. The default value is LLVM's default priority. </param>
+        /// <param name="forData"> Optional global constant that this function initializes. If the data is optimized away, then the initialization function will be also. </param>
+        void AddInitializationFunction(llvm::Function* function, int priority = 65536, llvm::Constant* forData = nullptr);
+
+        /// <summary> Adds an initialization function to run before any (non-initialization) application code. </summary>
+        ///
+        /// <param name="function"> The function to call. Must be of type `void()`. </param>
+        /// <param name="priority"> The priority for this initialization function. Initialization functions are called in increasing order of priority. The default value is LLVM's default priority.</param>
+        /// <param name="forData"> Optional global constant that this function initializes. If the data is optimized away, then the initialization function will be also. </param>
+        void AddInitializationFunction(IRFunctionEmitter& function, int priority = 65536, llvm::Constant* forData = nullptr);
+
     private:
         friend class IRFunctionEmitter;
 
@@ -653,7 +671,7 @@ namespace emitters
         llvm::GlobalVariable* AddGlobal(const std::string& name, llvm::Type* pType, llvm::Constant* pInitial, bool isConst);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const VariableTypeList* pArguments, bool isPublic);
         llvm::Function::LinkageTypes Linkage(bool isPublic);
-        llvm::ConstantAggregateZero* InitializeArray(llvm::ArrayType* pType);
+        llvm::ConstantAggregateZero* ZeroInitializer(llvm::Type* pType);
 
         //
         // LLVM global state management

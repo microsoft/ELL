@@ -54,6 +54,18 @@ namespace emitters
         _pEngine->addModule(std::move(pModule));
     }
 
+    void IRExecutionEngine::PerformInitialization()
+    {
+        EnsureEngine();
+        _pEngine->runStaticConstructorsDestructors(false);
+    }
+
+    void IRExecutionEngine::PerformFinalization()
+    {
+        EnsureEngine();
+        _pEngine->runStaticConstructorsDestructors(true);
+    }
+
     uint64_t IRExecutionEngine::GetFunctionAddress(const std::string& name)
     {
         EnsureEngine();

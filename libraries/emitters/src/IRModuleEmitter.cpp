@@ -26,6 +26,7 @@
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/raw_os_ostream.h"
+#include "llvm/Transforms/Utils/ModuleUtils.h"
 
 // stl
 #include <chrono>
@@ -347,13 +348,14 @@ namespace emitters
 
     llvm::GlobalVariable* IRModuleEmitter::Global(llvm::Type* pType, const std::string& name)
     {
-        return AddGlobal(name, pType, nullptr, false);
+        auto initializer = ZeroInitializer(pType);
+        return AddGlobal(name, pType, initializer, false);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::GlobalArray(VariableType type, const std::string& name, const size_t size)
     {
         llvm::ArrayType* pArrayType = _emitter.ArrayType(type, size);
-        return AddGlobal(name, pArrayType, InitializeArray(pArrayType), false);
+        return AddGlobal(name, pArrayType, ZeroInitializer(pArrayType), false);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::GlobalArray(const std::string& name, llvm::Type* pType, const size_t size)
@@ -361,7 +363,7 @@ namespace emitters
         assert(pType != nullptr);
 
         llvm::ArrayType* pArrayType = llvm::ArrayType::get(pType, size);
-        return AddGlobal(name, pArrayType, InitializeArray(pArrayType), false);
+        return AddGlobal(name, pArrayType, ZeroInitializer(pArrayType), false);
     }
 
     llvm::GlobalVariable* IRModuleEmitter::GlobalArray(const std::string& name, const std::vector<double>& value)
@@ -829,6 +831,19 @@ namespace emitters
     }
 
     //
+    // Module initialization
+    //
+    void IRModuleEmitter::AddInitializationFunction(llvm::Function* function, int priority, llvm::Constant* forData)
+    {
+        llvm::appendToGlobalCtors(*GetLLVMModule(), function, priority, forData);
+    }
+
+    void IRModuleEmitter::AddInitializationFunction(IRFunctionEmitter& function, int priority, llvm::Constant* forData)
+    {
+        AddInitializationFunction(function.GetFunction(), priority, forData);
+    }
+
+    //
     // Protected methods
     //
 
@@ -888,7 +903,7 @@ namespace emitters
         return isPublic ? llvm::Function::LinkageTypes::ExternalLinkage : llvm::Function::LinkageTypes::InternalLinkage;
     }
 
-    llvm::ConstantAggregateZero* IRModuleEmitter::InitializeArray(llvm::ArrayType* pType)
+    llvm::ConstantAggregateZero* IRModuleEmitter::ZeroInitializer(llvm::Type* pType)
     {
         assert(pType != nullptr);
         return llvm::ConstantAggregateZero::get(pType);

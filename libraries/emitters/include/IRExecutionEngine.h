@@ -9,8 +9,8 @@
 
 // llvm
 #include "llvm/ADT/Triple.h"
-#include "llvm/IR/Module.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/IR/Module.h"
 
 namespace ell
 {
@@ -41,6 +41,12 @@ namespace emitters
         ///
         /// <param name="pModule"> The module to add. </param>
         void AddModule(std::unique_ptr<llvm::Module> pModule);
+
+        /// <summary> Run any initialization code (e.g., static constructors) for the module. </summary>
+        void PerformInitialization();
+
+        /// <summary> Run any static destructor code for the module. </summary>
+        void PerformFinalization();
 
         /// <summary>
         /// Return the address of a named function, JITTing code as needed. Returns 0 if not found.
