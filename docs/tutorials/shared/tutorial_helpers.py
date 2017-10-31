@@ -23,15 +23,15 @@ import numpy as np
 # path
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 SEARCH_DIRS = [d for d in os.listdir(SCRIPT_PATH) if
+               os.path.isdir(d) and (
                d in ["pi3", "pi3_64", "aarch64", "host"] or
-               d.startswith("model")]
+               d.startswith("model"))]
 sys.path += SEARCH_DIRS
 sys.path += [os.path.join(d, "build") for d in SEARCH_DIRS]
 if platform.system() == "Windows":
     sys.path += [os.path.join(d, "build", "Release") for d in SEARCH_DIRS]
 else:
     sys.path += [os.path.join(d, "build") for d in SEARCH_DIRS]
-
 
 def prepare_image_for_model(image, width, height, reorder_to_rgb=False):
     """Prepare an image for use with a model. Typically, this involves:
