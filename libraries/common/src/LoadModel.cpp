@@ -155,13 +155,6 @@ namespace common
         return refinedModel;
     }
 
-    // Placeholder callback
-    template <typename ValueType>
-    bool SourceNode_EmptyCallback(std::vector<ValueType>&)
-    {
-        return false;
-    }
-
     void RegisterNodeTypes(utilities::SerializationContext& context)
     {
         context.GetTypeFactory().AddType<model::Node, model::InputNode<bool>>();
@@ -247,8 +240,8 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<float>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<double>>();
 
-        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<float, &SourceNode_EmptyCallback<float>>>();
-        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<float>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::SourceNode<double>>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SumNode<int64_t>>();

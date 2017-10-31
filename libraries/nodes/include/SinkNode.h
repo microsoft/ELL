@@ -47,15 +47,20 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
-        /// <summary> Default constructor </summary>
+        /// <summary> Default constructor (for type registration) </summary>
         SinkNode();
 
-        /// <summary> Constructor </summary>
+        /// <summary> Constructor (for emitting code) </summary>
+        ///
+        /// <param name="input"> Port elements for input values </param>
+        /// <param name="sinkFunctionName"> The sink function name to be emitted </param>
+        SinkNode(const model::PortElements<ValueType>& input, const std::string& sinkFunctionName);
+        
+        /// <summary> Constructor (for reference implementation) </summary>
         ///
         /// <param name="input"> Port elements for input values </param>
         /// <param name="sink"> The sink function that will receive output values </param>
-        /// <param name="sinkFunctionName"> The optional sink function name to be emitted </param>
-        SinkNode(const model::PortElements<ValueType>& input, SinkFunction<ValueType> sink, const std::string& sinkFunctionName = "SinkNode_OutputFunction");
+        SinkNode(const model::PortElements<ValueType>& input, SinkFunction<ValueType> sink);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

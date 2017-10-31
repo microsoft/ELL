@@ -561,29 +561,17 @@ const std::string sinkFunctionName("CompiledSteppableMap_ResultsCallback");
 TESTING_FORCE_DEFINE_SYMBOL(CompiledSteppableMap_DataCallback, bool, double*);
 TESTING_FORCE_DEFINE_SYMBOL(CompiledSteppableMap_ResultsCallback, void, double*);
 
-// Callbacks used by dynamic map
-bool SteppableMap_DataCallback(std::vector<double>& input)
-{
-    return CompiledSteppableMap_DataCallback(&input[0]);
-}
-
 template <typename ClockType>
 void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicksFunction)
 {
     const std::string stepFunctionName("TestStep");
-    std::vector<double> dynamicMapResults(c_steppableMapData.size());
 
     // Create the map
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
-    auto sourceNode = model.AddNode<nodes::SourceNode<double, &SteppableMap_DataCallback>>(inputNode->output, c_steppableMapData.size(), sourceFunctionName);
+    auto sourceNode = model.AddNode<nodes::SourceNode<double>>(inputNode->output, c_steppableMapData.size(), sourceFunctionName);
     auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(sourceNode->output);
-    auto sinkNode = model.AddNode<nodes::SinkNode<double>>(accumNode->output,
-                                                           [&dynamicMapResults](const std::vector<double>& results)
-                                                           {
-                                                               dynamicMapResults.assign(results.begin(), results.end());
-                                                           },
-                                                           sinkFunctionName);
+    auto sinkNode = model.AddNode<nodes::SinkNode<double>>(accumNode->output, sinkFunctionName);
     auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>(sinkNode->output));
 
     auto duration = std::chrono::milliseconds(20);
@@ -609,7 +597,6 @@ void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicks
         compiledSteppableMapResults.clear();
 
         VerifyCompiledOutput(map, compiledMap, timeSignal, " steppable map");
-        testing::ProcessTest("Verifying sink output", testing::IsEqual(dynamicMapResults, compiledSteppableMapResults));
     }
     else
     {
@@ -628,9 +615,6 @@ void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicks
         compiledMap.GetModule().EndFunction();
 
         PrintIR(compiledMap);
-        compiledMap.GetModule().WriteToFile(OutputPath("step.ll"));
-        compiledMap.GetModule().WriteToFile(OutputPath("step.h"));
-        compiledMap.GetModule().WriteToFile(OutputPath("step.i"));
     }
 }
 

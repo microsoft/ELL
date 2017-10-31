@@ -188,11 +188,6 @@ model::Model GenerateRefinedTreeModel(size_t numSplits)
     return refinedModel;
 }
 
-template <typename ValueType>
-bool SourceNode_EmptyCallback(std::vector<ValueType>&)
-{
-    return false;
-}
 model::SteppableMap<std::chrono::steady_clock> GenerateSteppableMap(size_t dimension, int intervalMs)
 {
     constexpr size_t timeSignalDimension = 2;
@@ -205,10 +200,10 @@ model::SteppableMap<std::chrono::steady_clock> GenerateSteppableMap(size_t dimen
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(timeSignalDimension);
-    auto sourceNode = model.AddNode<nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>(inputNode->output, dimension, dataCallbackName.str());
+    auto sourceNode = model.AddNode<nodes::SourceNode<double>>(inputNode->output, dimension, dataCallbackName.str());
     auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
     auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(sourceNode->output, constantTwoNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-    auto sinkNode = model.AddNode<nodes::SinkNode<double>>(timesNode->output, [](const std::vector<double>&) {}, resultsCallbackName.str());
+    auto sinkNode = model.AddNode<nodes::SinkNode<double>>(timesNode->output, resultsCallbackName.str());
     auto outputNode = model.AddNode<model::OutputNode<double>>(sinkNode->output);
 
     auto map = model::SteppableMap<std::chrono::steady_clock>(model, { { "input", inputNode } }, { { "output", outputNode->output } }, model::DurationType(intervalMs));

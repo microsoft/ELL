@@ -615,23 +615,16 @@ ELL_Node ELL_ModelBuilder::AddSinkNode(ELL_Model model, ELL_PortElements input, 
     {
         case ELL_PortType::real:
             newNode = model.GetModel().AddNode<ell::nodes::SinkNode<double>>(
-                ell::model::PortElements<double>(elements), [](const std::vector<double>&) {}, sinkFunctionName);
+                ell::model::PortElements<double>(elements), sinkFunctionName);
             break;
         case ELL_PortType::smallReal:
             newNode = model.GetModel().AddNode<ell::nodes::SinkNode<float>>(
-                ell::model::PortElements<float>(elements), [](const std::vector<float>&) {}, sinkFunctionName);
+                ell::model::PortElements<float>(elements), sinkFunctionName);
             break;
         default:
             throw std::invalid_argument("Error: could not create node");
     }
     return ELL_Node(newNode);
-}
-
-// This will go away once SourceNode is refactored to remove the callback template parameter
-template <typename ElementType>
-bool SourceNode_EmptyCallback(std::vector<ElementType>&)
-{
-    return false;
 }
 
 ELL_Node ELL_ModelBuilder::AddSourceNode(ELL_Model model, ELL_PortElements input, ELL_PortType outputType, 
@@ -649,11 +642,11 @@ ELL_Node ELL_ModelBuilder::AddSourceNode(ELL_Model model, ELL_PortElements input
     switch (outputType)
     {
         case ELL_PortType::real:
-            newNode = model.GetModel().AddNode<ell::nodes::SourceNode<double, &SourceNode_EmptyCallback<double>>>(
+            newNode = model.GetModel().AddNode<ell::nodes::SourceNode<double>>(
                 ell::model::PortElements<TimeTickType>(inputElements), outputSize, sourceFunctionName);
             break;
         case ELL_PortType::smallReal:
-            newNode = model.GetModel().AddNode<ell::nodes::SourceNode<float, &SourceNode_EmptyCallback<float>>>(
+            newNode = model.GetModel().AddNode<ell::nodes::SourceNode<float>>(
                 ell::model::PortElements<TimeTickType>(inputElements), outputSize, sourceFunctionName);
             break;
         default:

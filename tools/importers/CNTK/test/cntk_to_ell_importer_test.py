@@ -658,7 +658,6 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             print('Testing {0}.cntk vs ELL ({0})'.format(modelName))
             # Load the cntk model
             cntkModel = load_model(modelName + '.cntk')
-            cntk_utilities.plot_model(cntkModel, modelName + '.png')
 
             # Import the model into an ELL map live, without unarchiving
             predictor = cntk_to_ell.predictor_from_cntk_model(

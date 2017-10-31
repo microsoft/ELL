@@ -18,7 +18,7 @@ namespace model
 
     template <typename ClockType>
     SteppableMap<ClockType>::SteppableMap(const SteppableMap& other)
-        : DynamicMap(other), _lastSampleTime(other._lastSampleTime), _interval(other._interval), _numInputs(other._numInputs)
+        : DynamicMap(other), _interval(other._interval), _lastSampleTime(other._lastSampleTime), _numInputs(other._numInputs)
     {
     }
 

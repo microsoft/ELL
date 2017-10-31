@@ -302,47 +302,44 @@ void TestDemultiplexerNodeCompute()
     testing::ProcessTest("Testing DemultiplexerNode compute", testing::IsEqual(outputVec, { 0.0, 5.0 }));
 }
 
-// Callbacks
-struct SourceNodeTester
-{
-    void Initialize(const std::vector<std::vector<double>>& inputSeries)
-    {
-        it = inputSeries.begin();
-        end = inputSeries.end();
-        assert(it != end);
-    }
-
-    bool InputCallback(std::vector<double>& input)
-    {
-        if (it == end)
-        {
-            return false;
-        }
-        input = *it;
-        it++;
-        return true;
-    }
-
-private:
-    std::vector<std::vector<double>>::const_iterator it;
-    std::vector<std::vector<double>>::const_iterator end;
-} sourceNodeTester;
-
-// Needed for compile-time template non-type parameter deduction
-bool SourceNodeTester_InputCallback(std::vector<double>& input)
-{
-    return sourceNodeTester.InputCallback(input);
-}
-
 void TestSourceNodeCompute()
 {
+    // Callbacks
+    struct SourceNodeTester
+    {
+        void Initialize(const std::vector<std::vector<double>>& inputSeries)
+        {
+            it = inputSeries.begin();
+            end = inputSeries.end();
+            assert(it != end);
+        }
+
+        bool InputCallback(std::vector<double>& input)
+        {
+            if (it == end)
+            {
+                return false;
+            }
+            input = *it;
+            it++;
+            return true;
+        }
+
+    private:
+        std::vector<std::vector<double>>::const_iterator it;
+        std::vector<std::vector<double>>::const_iterator end;
+    } sourceNodeTester;
+
     const std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
     sourceNodeTester.Initialize(data);
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
-    auto sourceNode = model.AddNode<nodes::SourceNode<double, &SourceNodeTester_InputCallback>>(
-        inputNode->output, data[0].size());
+    auto sourceNode = model.AddNode<nodes::SourceNode<double>>(
+        inputNode->output, data[0].size(), [&sourceNodeTester] (std::vector<double>& input) -> bool
+        {
+            return sourceNodeTester.InputCallback(input);
+        });
 
     for (const auto& inputValue : data)
     {

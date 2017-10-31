@@ -26,19 +26,18 @@ namespace ell
 {
 namespace nodes
 {
-    // CONSIDER switching from a template parameter to an std::function member, so that the sampling
-    // function can be overwritten post-unachiving (the TypeFactory currently sets a no-op function).
+    /// <summary> A function that the SourceNode calls to receive data from user code. </summary>
     ///
     /// In device-side compiled code, the function signature should be:
     /// ```
     /// void SamplingFunction(ValueType* data)
     /// ```
     template <typename ValueType>
-    using SamplingFunction = bool (*)(std::vector<ValueType>&);
+    using SourceFunction = std::function<bool(std::vector<ValueType>&)>;
     using TimeTickType = model::TimeTickType;
 
     /// <summary> A node that provides a source of data through a sampling function callback. </summary>
-    template <typename ValueType, SamplingFunction<ValueType>>
+    template <typename ValueType>
     class SourceNode : public model::CompilableNode
     {
     public:
@@ -50,21 +49,22 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
-        /// <summary> Default constructor </summary>
+        /// <summary> Default constructor (for type registration) </summary>
         SourceNode();
 
-        /// <summary> Constructor </summary>
+        /// <summary> Constructor (for emitting code) </summary>
         ///
         /// <param name="input"> Port elements for input values (sample time, current time) </param>
         /// <param name="outputSize"> Output size </param>
-        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize);
+        /// <param name="sourceFunctionName"> The source function name to be emitted </param>
+        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, const std::string& sourceFunctionName);
 
-        /// <summary> Constructor </summary>
+        /// <summary> Constructor (for reference implementation) </summary>
         ///
         /// <param name="input"> Port elements for input values (sample time, current time) </param>
         /// <param name="outputSize"> Output size </param>
-        /// <param name="samplingFunctionName"> Sampling function name to be emitted (defaults to "SourceNode_SamplingFunction") </param>
-        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, const std::string& samplingFunctionName);
+        /// <param name="source"> The source function that will provide input values </param>
+        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, SourceFunction<ValueType> source);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -99,8 +99,10 @@ namespace nodes
     private:
         model::InputPort<TimeTickType> _input;
         model::OutputPort<ValueType> _output;
-        std::string _samplingFunctionName;
 
+        std::string _sourceFunctionName;
+        SourceFunction<ValueType> _source;
+        
         mutable std::vector<ValueType> _bufferedSample;
         mutable TimeTickType _bufferedSampleTime;
     };

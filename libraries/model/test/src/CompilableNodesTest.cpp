@@ -739,32 +739,25 @@ void TestCompilableAccumulatorNodeFunction()
 // Now test nodes that compile with callback(s)
 //
 InputCallbackTester<double> g_tester;
-InputCallbackTester<double> g_testerCompiled;
 
 // C callback (called by emitted model)
-extern "C" {
-bool CompiledSourceNode_InputCallback(double* input)
+extern "C"
 {
-    return g_testerCompiled.InputCallback(input);
-}
-}
-TESTING_FORCE_DEFINE_SYMBOL(CompiledSourceNode_InputCallback, bool, double*);
-
-// C++ callback (called by runtime model)
-bool SourceNode_InputCallback(std::vector<double>& input)
+bool CompiledSourceNode_InputCallback(double* input)
 {
     return g_tester.InputCallback(input);
 }
+}
+TESTING_FORCE_DEFINE_SYMBOL(CompiledSourceNode_InputCallback, bool, double*);
 
 void TestCompilableSourceNode(bool runJit)
 {
     const std::vector<std::vector<double>> data = { { 1, 2, 3 }, { 2, 4, 6 }, { 3, 6, 9 }, { 4, 8, 12 }, { 5, 10, 15 } };
     g_tester.Initialize(data);
-    g_testerCompiled.Initialize(data);
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
-    auto testNode = model.AddNode<nodes::SourceNode<double, &SourceNode_InputCallback>>(
+    auto testNode = model.AddNode<nodes::SourceNode<double>>(
         inputNode->output, data[0].size(), "CompiledSourceNode_InputCallback");
 
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
@@ -780,7 +773,8 @@ void TestCompilableSourceNode(bool runJit)
 }
 
 // C callback (called by emitted model)
-extern "C" {
+extern "C"
+{
 size_t g_sinkOutputSize = 0;
 std::vector<double> outputValues;
 void CompiledSinkNode_OutputCallback_Scalar(double output)
@@ -804,7 +798,7 @@ void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionNam
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(inputSize);
-    auto testNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, [](const std::vector<double>&) {}, sinkFunctionName);
+    auto testNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, sinkFunctionName);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
