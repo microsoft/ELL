@@ -82,7 +82,7 @@ namespace model
 
         DurationType _interval;
         mutable StepTimepointType _lastSampleTime;
-        size_t _numInputs;
+        size_t _numInputs = 0;
     };
 }
 }

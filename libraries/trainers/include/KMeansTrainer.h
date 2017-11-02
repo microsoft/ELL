@@ -81,16 +81,16 @@ namespace trainers
         math::ColumnMatrix<double> _means;
 
         // Are the means initialized?
-        bool _isInitialized;
+        bool _isInitialized = false;
 
         // Cluster assignment for each data point.
         math::ColumnVector<double> _clusterAssignment;
 
         // Number of iterations of KMeansTrainer algorithm.
-        size_t _iterations;
+        size_t _iterations = 0;
 
         // Number of clusters.
-        size_t _numClusters;
+        size_t _numClusters = 0;
     };
 }
 }

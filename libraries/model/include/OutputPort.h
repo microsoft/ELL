@@ -92,7 +92,7 @@ namespace model
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         size_t _size = 0;
-        mutable bool _isReferenced;
+        mutable bool _isReferenced = false;
     };
 
     /// <summary> Represents an output from a node </summary>

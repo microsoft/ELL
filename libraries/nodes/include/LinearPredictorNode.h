@@ -89,7 +89,7 @@ namespace nodes
     /// <param name="predictor"> The linear predictor. </param>
     /// <param name="transformer"> [in,out] The model transformer. </param>
     ///
-    /// <returns> The node added to the model. </returns>
+    /// <returns> The node added to the model. </returns>    
     template <typename ElementType>
     LinearPredictorNode<ElementType>* AddNodeToModelTransformer(const model::PortElements<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor, model::ModelTransformer& transformer);
 }

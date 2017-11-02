@@ -107,10 +107,10 @@ namespace utilities
         bool GetIsGroup() { return _is_group; }
     private:
         std::map<std::string, std::string> _properties;
-        bool _isGroup;
+        bool _isGroup = false;
         std::string _id;
         std::string _label;
-        bool _is_group;
+        bool _is_group = false;
     };
 
     /// <summary> Represents a directed link between two nodes in the Graph</summary>

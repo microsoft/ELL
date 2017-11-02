@@ -15,6 +15,11 @@ using namespace ell;
 template <typename ElementType>
 void LinearPredictorTest()
 {
+    // test that default constructor works.
+    predictors::LinearPredictor<ElementType> predictor0;
+    testing::ProcessTest("DefaultLinearPredictor", testing::IsEqual(predictor0.GetBias(), static_cast<ElementType>(0)));
+
+    // now test a known predictor.
     using DataVectorType = typename predictors::LinearPredictor<ElementType>::DataVectorType;
     const int dim = 5;
     math::ColumnVector<ElementType> weights({ 1, 2, 3, 4, 5 });

@@ -130,7 +130,7 @@ namespace predictors
 
     private:
         math::ColumnVector<ElementType> _w;
-        ElementType _b;
+        ElementType _b = 0;
     };
 }
 }

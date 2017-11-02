@@ -66,8 +66,8 @@ namespace data
         friend SparseBinaryDataVectorBase<IndexListType>;
 
         IndexIteratorType _indexIterator;
-        size_t _iteratorIndex;
-        size_t _size;
+        size_t _iteratorIndex = 0;
+        size_t _size = 0;
         size_t _index = 0;
     };
 
@@ -102,7 +102,7 @@ namespace data
 
         // members
         IndexIteratorType _indexIterator;
-        size_t _size;
+        size_t _size = 0;
     };
 
     /// <summary> Implements a sparse binary vector as an increasing list of the coordinates where the
