@@ -50,7 +50,7 @@ namespace neural
                 for (size_t k = 0; k < input.NumChannels(); k++)
                 {
                     ElementType value = input(i, j, k);
-                    output(i, j, k) = _activation.Apply(value, math::Triplet{i, j, k});
+                    output(i, j, k) = _activation.Apply(value, math::IntegerTriplet{i, j, k});
                 }
             }
         }

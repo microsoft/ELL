@@ -73,7 +73,8 @@ namespace nodes
     model::PortMemoryLayout NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::CalculateMemoryLayout(size_t padding, typename predictors::neural::Layer<ValueType>::Shape dataBufferSize)
     {
         // Calculate dimension parameters
-        model::Shape stride{ dataBufferSize.begin(), dataBufferSize.end() };
+        math::IntegerTriplet dataSizeArray = dataBufferSize;
+        model::Shape stride{ dataSizeArray.begin(), dataSizeArray.end() };
         model::Shape offset{ static_cast<int>(padding), static_cast<int>(padding), 0 };
         model::Shape size(stride.size());
         for (int dimensionIndex = 0; dimensionIndex < offset.size(); ++dimensionIndex)
@@ -120,7 +121,7 @@ namespace nodes
     void NeuralNetworkLayerNode<DerivedType, LayerType, ValueType>::Compute() const
     {
         auto inputVector = _input.GetValue();
-        auto inputTensor = typename LayerType::ConstTensorReferenceType{ _inputTensor.GetShape(), inputVector.data() };
+        auto inputTensor = typename LayerType::ConstTensorReferenceType{ inputVector.data(), _inputTensor.GetShape() };
         _inputTensor.CopyFrom(inputTensor);
         _layer.Compute();
         const auto& outputTensor = _layer.GetOutput();

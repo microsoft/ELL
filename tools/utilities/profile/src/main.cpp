@@ -17,7 +17,7 @@
 #include "ModelLoadArguments.h"
 
 // math
-#include "TensorShape.h"
+#include "Tensor.h"
 
 // model
 #include "DynamicMap.h"
@@ -50,7 +50,7 @@ std::vector<T> GetInputData(std::string filename, const math::TensorShape& input
 {
     if (filename != "")
     {
-        return LoadImage<T>(filename, inputShape.rows, inputShape.columns, scale, bgr2rgb ? PixelOrder::RGB : PixelOrder::BGR);
+        return LoadImage<T>(filename, inputShape.NumColumns(), inputShape.NumRows(), scale, bgr2rgb ? PixelOrder::RGB : PixelOrder::BGR);
     }
     else
     {

@@ -57,19 +57,19 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     void Add(ElementType scalar, MatrixReference<ElementType, layout> matrix)
     {
-        for (size_t i = 0; i < matrix.NumIntervals(); ++i)
+        for (size_t i = 0; i < matrix.GetMinorSize(); ++i)
         {
             Add(scalar, matrix.GetMajorVector(i));
         }
     }
 
-    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType> concept>
+    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType>>
     void operator+=(MatrixReference<MatrixElementType, layout> matrix, ScalarElementType scalar)
     {
         Add(static_cast<MatrixElementType>(scalar), matrix);
     }
 
-    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType> concept>
+    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType>>
     void operator-=(MatrixReference<MatrixElementType, layout> matrix, ScalarElementType scalar)
     {
         Add(-static_cast<MatrixElementType>(scalar), matrix);
@@ -79,6 +79,20 @@ namespace math
     void Add(ElementType value1, ConstMatrixReference<ElementType, layoutA> matrixA, ElementType value2, ConstMatrixReference<ElementType, layoutB> matrixB, MatrixReference<ElementType, layoutA> matrixC)
     {
         Internal::MatrixOperations<ImplementationType::openBlas>::Add(value1, matrixA, value2, matrixB, matrixC);
+    }
+
+    template <typename ElementType, MatrixLayout layout>
+    void RowwiseSum(ConstMatrixReference<ElementType, layout> matrix, VectorReference<ElementType, VectorOrientation::column> vector)
+    {
+        if (vector.Size() != matrix.NumRows())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible result size.");
+        }
+
+        math::ColumnVector<ElementType> ones(matrix.NumColumns());
+        ones.Fill(1.0);
+
+        Multiply(static_cast<ElementType>(1), matrix, ones, static_cast<ElementType>(0), vector);
     }
 
     template <typename ElementType, MatrixLayout layout>
@@ -101,13 +115,13 @@ namespace math
         Internal::MatrixOperations<ImplementationType::openBlas>::Multiply(scalar, matrix);
     }
 
-    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType> concept>
+    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType>>
     void operator*=(MatrixReference<MatrixElementType, layout> matrix, ScalarElementType scalar)
     {
         Multiply(static_cast<MatrixElementType>(scalar), matrix);
     }
 
-    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType> concept>
+    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType>>
     void operator/=(MatrixReference<MatrixElementType, layout> matrix, ScalarElementType scalar)
     {
         if (scalar == 0)
@@ -144,7 +158,7 @@ namespace math
         }
         else
         {
-            for (size_t i = 0; i < matrix.NumIntervals(); ++i)
+            for (size_t i = 0; i < matrix.GetMinorSize(); ++i)
             {
                 auto interval = matrix.GetMajorVector(i);
                 math::MultiplyAdd(scalarA, scalarB, interval);
@@ -184,7 +198,7 @@ namespace math
         template <typename ElementType, MatrixLayout layout>
         void MatrixOperations<ImplementationType::native>::Multiply(ElementType scalar, MatrixReference<ElementType, layout> matrix)
         {
-            for (size_t i = 0; i < matrix.NumIntervals(); ++i)
+            for (size_t i = 0; i < matrix.GetMinorSize(); ++i)
             {
                 VectorOperations<ImplementationType::native>::Multiply(scalar, matrix.GetMajorVector(i));
             }
@@ -250,7 +264,7 @@ namespace math
         template <typename ElementType, MatrixLayout layout>
         void MatrixOperations<ImplementationType::openBlas>::Multiply(ElementType scalar, MatrixReference<ElementType, layout> matrix)
         {
-            for (size_t i = 0; i < matrix.NumIntervals(); ++i)
+            for (size_t i = 0; i < matrix.GetMinorSize(); ++i)
             {
                 VectorOperations<ImplementationType::openBlas>::Multiply(scalar, matrix.GetMajorVector(i));
             }
@@ -264,7 +278,7 @@ namespace math
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix and vectors sizes.");
             }
 
-            Blas::Gemv(matrix.GetLayout(), MatrixTranspose::noTranspose, static_cast<int>(matrix.NumRows()), static_cast<int>(matrix.NumColumns()), scalarA, matrix.GetDataPointer(), static_cast<int>(matrix.GetIncrement()), vectorA.GetDataPointer(), static_cast<int>(vectorA.GetIncrement()), scalarB, vectorB.GetDataPointer(), static_cast<int>(vectorB.GetIncrement()));
+            Blas::Gemv(matrix.GetLayout(), MatrixTranspose::noTranspose, static_cast<int>(matrix.NumRows()), static_cast<int>(matrix.NumColumns()), scalarA, matrix.GetConstDataPointer(), static_cast<int>(matrix.GetIncrement()), vectorA.GetConstDataPointer(), static_cast<int>(vectorA.GetIncrement()), scalarB, vectorB.GetDataPointer(), static_cast<int>(vectorB.GetIncrement()));
         }
 
         template <typename ElementType, MatrixLayout layout>
@@ -289,7 +303,7 @@ namespace math
             }
 
             Blas::Gemm(order, MatrixTranspose::noTranspose, transposeB, static_cast<int>(matrixA.NumRows()), static_cast<int>(matrixB.NumColumns()), static_cast<int>(matrixA.NumColumns()), scalarA,
-                matrixA.GetDataPointer(), static_cast<int>(matrixA.GetIncrement()), matrixB.GetDataPointer(), static_cast<int>(matrixB.GetIncrement()), scalarB,
+                matrixA.GetConstDataPointer(), static_cast<int>(matrixA.GetIncrement()), matrixB.GetConstDataPointer(), static_cast<int>(matrixB.GetIncrement()), scalarB,
                 matrixC.GetDataPointer(), static_cast<int>(matrixC.GetIncrement()));
         }
 #endif

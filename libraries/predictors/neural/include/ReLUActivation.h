@@ -28,7 +28,7 @@ namespace neural
         /// <param name="index"> The input index. </param>
         ///
         /// <returns> The computed output. </param>
-        ElementType Apply(const ElementType input, const math::Triplet& index) const;
+        ElementType Apply(const ElementType input, const math::IntegerTriplet& index) const;
 
         /// <summary> Typename used for serialization. </summary>
         static std::string GetTypeName() { return "ReLUActivation"; }

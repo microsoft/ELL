@@ -99,7 +99,7 @@ namespace neural
     class Layer : public utilities::IArchivable
     {
     public:
-        using Shape = math::Triplet;
+        using Shape = math::TensorShape;
         using VectorType = math::ColumnVector<ElementType>;
         using MatrixType = math::RowMatrix<ElementType>;
         using MatrixReferenceType = math::ConstMatrixReference<ElementType, math::MatrixLayout::rowMajor>;
@@ -133,7 +133,7 @@ namespace neural
 
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
         Layer()
-            : _layerParameters{ math::Triplet{ 0, 0, 0 }, NoPadding(), { 0, 0, 0 }, NoPadding() }, _output(math::Triplet{ 0, 0, 0 }) {}
+            : _layerParameters{math::TensorShape{ 0, 0, 0 }, NoPadding(), { 0, 0, 0 }, NoPadding() }, _output{ 0, 0, 0 } {}
 
         /// <summary> Returns a reference to the input tensor. </summary>
         ///
@@ -260,7 +260,7 @@ namespace neural
         ///
         /// <param name="previousContext"> The `SerializationContext` to wrap </param>
         LayerSerializationContext(utilities::SerializationContext& previousContext)
-            : _previousContext(previousContext), _outputReference(math::Triplet{ 0, 0, 0 }) {}
+            : _previousContext(previousContext), _outputReference(math::IntegerTriplet{ 0, 0, 0 }) {}
 
         virtual ~LayerSerializationContext() {}
 

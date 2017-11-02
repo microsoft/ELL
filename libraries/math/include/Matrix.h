@@ -29,11 +29,11 @@ namespace math
     public:
         /// <summary> Constructs an instance of CommonMatrixBase. </summary>
         ///
+        /// <param name="pData"> Pointer to the underlying memory that contains the tensor data. </param>
         /// <param name="numRows"> Number of matrix rows. </param>
         /// <param name="numColumns"> Number of matrix columns. </param>
         /// <param name="increment"> The matrix increment. </param>
-        /// <param name="pData"> Pointer to the underlying std::vector that contains the tensor data. </param>
-        CommonMatrixBase(size_t numRows, size_t numColumns, size_t increment, ElementType* pData = nullptr);
+        CommonMatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
 
         /// <summary> Gets the number of rows. </summary>
         ///
@@ -57,7 +57,7 @@ namespace math
 
     protected:
         void Swap(CommonMatrixBase<ElementType>& other);
-        ElementType* _pData;
+        const ElementType* _pData;
         size_t _numRows;
         size_t _numColumns;
         size_t _increment;
@@ -121,20 +121,23 @@ namespace math
 
         /// <summary> Constructs a column major instance of MatrixBase> </summary>
         ///
+        /// <param name="pData"> (Optional) Pointer to the data. </param>
         /// <param name="numRows"> Number of rows. </param>
         /// <param name="numColumns"> Number of columns. </param>
-        /// <param name="pData"> (Optional) Pointer to the data. </param>
-        MatrixBase(size_t numRows, size_t numColumns, ElementType* pData = nullptr);
+        MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns);
 
-        /// <summary> Gets the number of intervals (columns of a column major matrix or rows of a row major matrix). </summary>
-        ///
-        /// <returns> The number of intervals. </returns>
-        size_t NumIntervals() const { return NumColumns(); }
+        /// \name Accessor Functions
+        /// @{
 
-        /// <summary> Gets the size of each interval (columns of a column major matrix or rows of a row major matrix). </summary>
+        /// <summary> Gets the minor size of the matrix (number of columns of a column major matrix or number of rows of a row major matrix). </summary>
         ///
-        /// <returns> The interval size. </returns>
-        size_t GetIntervalSize() const { return NumRows(); }
+        /// <returns> The minor size. </returns>
+        size_t GetMinorSize() const { return NumColumns(); }
+
+        /// <summary> Gets the major size of a matrix (size of each column of a column major matrix or size of each row of a row major matrix). </summary>
+        ///
+        /// <returns> The major size. </returns>
+        size_t GetMajorSize() const { return NumRows(); }
 
         /// <summary> Gets the row increment. </summary>
         ///
@@ -145,6 +148,8 @@ namespace math
         ///
         /// <returns> The column increment. </returns>
         size_t GetColumnIncrement() const { return GetIncrement(); }
+
+        /// @}
 
     protected:
         void Swap(MatrixBase<ElementType, MatrixLayout::columnMajor>& other);
@@ -167,20 +172,23 @@ namespace math
 
         /// <summary> Constructs a row major instance of MatrixBase> </summary>
         ///
+        /// <param name="pData"> (Optional) Pointer to the data. </param>
         /// <param name="numRows"> Number of rows. </param>
         /// <param name="numColumns"> Number of columns. </param>
-        /// <param name="pData"> (Optional) Pointer to the data. </param>
-        MatrixBase(size_t numRows, size_t numColumns, ElementType* pData = nullptr);
+        MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns);
 
-        /// <summary> Gets the number of intervals (columns of a column major matrix or rows of a row major matrix). </summary>
-        ///
-        /// <returns> The number of intervals. </returns>
-        size_t NumIntervals() const { return NumRows(); }
+        /// \name Accessor Functions
+        /// @{
 
-        /// <summary> Gets the size of each interval (columns of a column major matrix or rows of a row major matrix). </summary>
+        /// <summary> Gets the minor size of the matrix (number of columns of a column major matrix or number of rows of a row major matrix). </summary>
         ///
-        /// <returns> The interval size. </returns>
-        size_t GetIntervalSize() const { return NumColumns(); }
+        /// <returns> The minor size. </returns>
+        size_t GetMinorSize() const { return NumRows(); }
+
+        /// <summary> Gets the major size of a matrix (size of each column of a column major matrix or size of each row of a row major matrix). </summary>
+        ///
+        /// <returns> The major size. </returns>
+        size_t GetMajorSize() const { return NumColumns(); }
 
         /// <summary> Gets the row increment. </summary>
         ///
@@ -191,6 +199,8 @@ namespace math
         ///
         /// <returns> The column increment. </returns>
         size_t GetColumnIncrement() const { return 1; }
+
+        /// @}
 
     protected:
         void Swap(MatrixBase<ElementType, MatrixLayout::rowMajor>& other);
@@ -210,15 +220,24 @@ namespace math
     class ConstMatrixReference : public MatrixBase<ElementType, layout>
     {
     public:
+       using MatrixBase<ElementType, layout>::MatrixBase;
+
+        /// \name Accessor Functions
+        /// @{
+
         using CommonMatrixBase<ElementType>::NumRows;
         using CommonMatrixBase<ElementType>::NumColumns;
         using CommonMatrixBase<ElementType>::Size;
         using CommonMatrixBase<ElementType>::GetIncrement;
-        using MatrixBase<ElementType, layout>::MatrixBase;
-        using MatrixBase<ElementType, layout>::NumIntervals;
-        using MatrixBase<ElementType, layout>::GetIntervalSize;
+        using MatrixBase<ElementType, layout>::GetMinorSize;
+        using MatrixBase<ElementType, layout>::GetMajorSize;
         using MatrixBase<ElementType, layout>::GetRowIncrement;
         using MatrixBase<ElementType, layout>::GetColumnIncrement;
+
+        /// <summary> Gets the matrix layout. </summary>
+        ///
+        /// <returns> The matrix layout. </returns>
+        MatrixLayout GetLayout() const { return layout; }
 
         /// <summary> Matrix element access operator. </summary>
         ///
@@ -228,17 +247,12 @@ namespace math
         /// <summary> Gets a const pointer to the underlying data storage. </summary>
         ///
         /// <returns> Const pointer to the data. </returns>
-        const ElementType* GetDataPointer() const { return _pData; }
+        const ElementType* GetConstDataPointer() const { return _pData; }
 
-        /// <summary> Gets the matrix layout. </summary>
-        ///
-        /// <returns> The matrix layout. </returns>
-        MatrixLayout GetLayout() const { return layout; }
+        /// @}
 
-        /// <summary> Determines of this Matrix is stored in contiguous memory. </summary>
-        ///
-        /// <returns> True if contiguous, false if not. </returns>
-        bool IsContiguous() const { return GetIncrement() == GetIntervalSize(); }
+        /// \name Utility Functions
+        /// @{
 
         /// <summary> Returns a copy of the contents of the Matrix. </summary>
         ///
@@ -249,6 +263,13 @@ namespace math
         ///
         /// <param name="other"> [in,out] The other matrix. </param>
         void Swap(ConstMatrixReference<ElementType, layout>& other);
+
+        /// <summary> Determines if this Matrix is stored in contiguous memory. </summary>
+        ///
+        /// <returns> True if contiguous, false if not. </returns>
+        bool IsContiguous() const { return GetIncrement() == GetMajorSize(); }
+
+        /// @}
 
         /// \name Comparison Functions
         /// @{
@@ -339,12 +360,12 @@ namespace math
         auto GetMajorVector(size_t index) const
         {
             // STYLE intentional deviation from project style
-            return ConstVectorReference<ElementType, MatrixBase<ElementType, layout>::_intervalOrientation>(GetMajorVectorBegin(index), GetIntervalSize(), 1);
+            return ConstVectorReference<ElementType, MatrixBase<ElementType, layout>::_intervalOrientation>(GetMajorVectorBegin(index), GetMajorSize(), 1);
         }
 
-        /// <summary> Gets a reference to the matrix transpose. </summary>
+        /// <summary> Gets a reference to the transposed matrix. </summary>
         ///
-        /// <returns> A reference to the matrix transpose. </returns>
+        /// <returns> A reference to the transposed matrix. </returns>
         auto Transpose() const -> ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value>;
 
         /// <summary> Returns a vew of this matrix as a vector reference (requires the matrix to be contiguous). </summary>
@@ -356,7 +377,7 @@ namespace math
 
     protected:
         friend class ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value>;
-        ElementType* GetMajorVectorBegin(size_t index) const;
+        const ElementType* GetMajorVectorBegin(size_t index) const;
         using CommonMatrixBase<ElementType>::_pData;
     };
 
@@ -368,30 +389,35 @@ namespace math
     class MatrixReference : public ConstMatrixReference<ElementType, layout>
     {
     public:
+        /// <summary> Constructs an instance of MatrixReference. </summary>
+        ///
+        /// <param name="pData"> Pointer to the underlying std::vector that contains the tensor data. </param>
+        /// <param name="numRows"> Number of matrix rows. </param>
+        /// <param name="numColumns"> Number of matrix columns. </param>
+        /// <param name="increment"> The matrix increment. </param>
+        MatrixReference(ElementType* pData, size_t numRows, size_t numColumns, size_t increment);
+
+        /// <summary> Constructs an instance of MatrixReference. </summary>
+        ///
+        /// <param name="pData"> Pointer to the underlying std::vector that contains the tensor data. </param>
+        /// <param name="numRows"> Number of matrix rows. </param>
+        /// <param name="numColumns"> Number of matrix columns. </param>
+        MatrixReference(ElementType* pData, size_t numRows, size_t numColumns);
+
+        /// \name Accessor Functions
+        /// @{
+
         using ConstMatrixReference<ElementType, layout>::NumRows;
         using ConstMatrixReference<ElementType, layout>::NumColumns;
         using ConstMatrixReference<ElementType, layout>::Size;
         using ConstMatrixReference<ElementType, layout>::GetIncrement;
-        using ConstMatrixReference<ElementType, layout>::NumIntervals;
-        using ConstMatrixReference<ElementType, layout>::GetIntervalSize;
+        using ConstMatrixReference<ElementType, layout>::GetMinorSize;
+        using ConstMatrixReference<ElementType, layout>::GetMajorSize;
         using ConstMatrixReference<ElementType, layout>::GetRowIncrement;
         using ConstMatrixReference<ElementType, layout>::GetColumnIncrement;
-        using ConstMatrixReference<ElementType, layout>::ConstMatrixReference;
         using ConstMatrixReference<ElementType, layout>::operator();
-        using ConstMatrixReference<ElementType, layout>::GetDataPointer;
+        using ConstMatrixReference<ElementType, layout>::GetConstDataPointer;
         using ConstMatrixReference<ElementType, layout>::GetLayout;
-        using ConstMatrixReference<ElementType, layout>::IsContiguous;
-        using ConstMatrixReference<ElementType, layout>::IsEqual;
-        using ConstMatrixReference<ElementType, layout>::operator==;
-        using ConstMatrixReference<ElementType, layout>::operator!=;
-        using ConstMatrixReference<ElementType, layout>::GetConstReference;
-        using ConstMatrixReference<ElementType, layout>::GetSubMatrix;
-        using ConstMatrixReference<ElementType, layout>::GetColumn;
-        using ConstMatrixReference<ElementType, layout>::GetRow;
-        using ConstMatrixReference<ElementType, layout>::GetDiagonal;
-        using ConstMatrixReference<ElementType, layout>::GetMajorVector;
-        using ConstMatrixReference<ElementType, layout>::Transpose;
-        using ConstMatrixReference<ElementType, layout>::ReferenceAsVector;
 
         /// <summary> Matrix element access operator. </summary>
         ///
@@ -401,15 +427,14 @@ namespace math
         /// <summary> Gets a pointer to the underlying data storage. </summary>
         ///
         /// <returns> Pointer to the data. </returns>
-        ElementType* GetDataPointer() const { return _pData; }
+        ElementType* GetDataPointer() { return const_cast<ElementType*>(_pData); }
 
-        /// <summary> Swaps the contents of this matrix with the contents of another matrix. </summary>
-        ///
-        /// <param name="other"> [in,out] The other matrix. </param>
-        void Swap(MatrixReference<ElementType, layout>& other);
+        /// @}
 
-        /// \name  Content Manipulation Functions
+        /// \name Utility Functions
         /// @{
+
+        using ConstMatrixReference<ElementType, layout>::IsContiguous;
 
         /// <summary> Copies values from another matrix into this matrix. </summary>
         ///
@@ -420,6 +445,25 @@ namespace math
         ///
         /// <param name="other"> The other matrix. </param>
         void CopyFrom(ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value> other);
+
+        /// <summary> Swaps the contents of this matrix with the contents of another matrix. </summary>
+        ///
+        /// <param name="other"> [in,out] The other matrix. </param>
+        void Swap(MatrixReference<ElementType, layout>& other);
+
+        /// @}
+
+        /// \name Comparison Functions
+        /// @{
+
+        using ConstMatrixReference<ElementType, layout>::IsEqual;
+        using ConstMatrixReference<ElementType, layout>::operator==;
+        using ConstMatrixReference<ElementType, layout>::operator!=;
+
+        /// @}
+
+        /// \name  Content Manipulation Functions
+        /// @{
 
         /// <summary> Sets all matrix elements to zero. </summary>
         void Reset() { Fill(0); }
@@ -451,15 +495,24 @@ namespace math
         /// \name View Functions
         /// @{
 
+        using ConstMatrixReference<ElementType, layout>::GetConstReference;
+        using ConstMatrixReference<ElementType, layout>::GetSubMatrix;
+        using ConstMatrixReference<ElementType, layout>::GetColumn;
+        using ConstMatrixReference<ElementType, layout>::GetRow;
+        using ConstMatrixReference<ElementType, layout>::GetDiagonal;
+        using ConstMatrixReference<ElementType, layout>::GetMajorVector;
+        using ConstMatrixReference<ElementType, layout>::Transpose;
+        using ConstMatrixReference<ElementType, layout>::ReferenceAsVector;
+
         /// <summary> Gets a reference to this matrix. </summary>
         ///
         /// <returns> A reference to this matrix. </returns>
         MatrixReference<ElementType, layout> GetReference() { return *this; }
 
-        /// <summary> Gets a reference to the matrix transpose. </summary>
+        /// <summary> Gets a reference to the transposed matrix. </summary>
         ///
-        /// <returns> A reference to the matrix transpose. </returns>
-        auto Transpose() const -> MatrixReference<ElementType, TransposeMatrixLayout<layout>::value>;
+        /// <returns> A reference to the transposed matrix. </returns>
+        auto Transpose() -> MatrixReference<ElementType, TransposeMatrixLayout<layout>::value>;
 
         /// <summary> Gets a const reference to a block-shaped sub-matrix. </summary>
         ///
@@ -503,7 +556,7 @@ namespace math
         auto GetMajorVector(size_t index)
         {
             // STYLE intentional deviation from project style
-            return VectorReference<ElementType, MatrixBase<ElementType, layout>::_intervalOrientation>(GetMajorVectorBegin(index), GetIntervalSize(), 1);
+            return VectorReference<ElementType, MatrixBase<ElementType, layout>::_intervalOrientation>(GetMajorVectorBegin(index), GetMajorSize(), 1);
         }
 
         /// @}
@@ -522,36 +575,6 @@ namespace math
     class Matrix : public MatrixReference<ElementType, layout>
     {
     public:
-        using MatrixReference<ElementType, layout>::NumRows;
-        using MatrixReference<ElementType, layout>::NumColumns;
-        using MatrixReference<ElementType, layout>::Size;
-        using MatrixReference<ElementType, layout>::GetIncrement;
-        using MatrixReference<ElementType, layout>::NumIntervals;
-        using MatrixReference<ElementType, layout>::GetIntervalSize;
-        using MatrixReference<ElementType, layout>::GetRowIncrement;
-        using MatrixReference<ElementType, layout>::GetColumnIncrement;
-        using MatrixReference<ElementType, layout>::operator();
-        using MatrixReference<ElementType, layout>::GetDataPointer;
-        using MatrixReference<ElementType, layout>::GetLayout;
-        using MatrixReference<ElementType, layout>::IsContiguous;
-        using MatrixReference<ElementType, layout>::IsEqual;
-        using MatrixReference<ElementType, layout>::operator==;
-        using MatrixReference<ElementType, layout>::operator!=;
-        using MatrixReference<ElementType, layout>::GetConstReference;
-        using MatrixReference<ElementType, layout>::GetSubMatrix;
-        using MatrixReference<ElementType, layout>::GetColumn;
-        using MatrixReference<ElementType, layout>::GetRow;
-        using MatrixReference<ElementType, layout>::GetDiagonal;
-        using MatrixReference<ElementType, layout>::GetMajorVector;
-        using MatrixReference<ElementType, layout>::Transpose;
-        using MatrixReference<ElementType, layout>::ReferenceAsVector;
-        using MatrixReference<ElementType, layout>::CopyFrom;
-        using MatrixReference<ElementType, layout>::Reset;
-        using MatrixReference<ElementType, layout>::Fill;
-        using MatrixReference<ElementType, layout>::Generate;
-        using MatrixReference<ElementType, layout>::Transform;
-        using MatrixReference<ElementType, layout>::GetReference;
-
         /// <summary> Constructs an all-zeros matrix of a given size. </summary>
         ///
         /// <param name="numRows"> Number of rows in the matrix. </param>
@@ -591,13 +614,37 @@ namespace math
 
         /// <summary> Copy Constructor. </summary>
         ///
-        /// <param name="other"> [in,out] The matrix being copied. </param>
+        /// <param name="other"> The matrix being copied. </param>
         Matrix(const Matrix<ElementType, layout>& other);
 
         /// <summary> Copies a matrix of the opposite layout. </summary>
         ///
         /// <param name="other"> The matrix being copied. </param>
         Matrix(ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value> other);
+
+        /// \name Accessor Functions
+        /// @{
+
+        using MatrixReference<ElementType, layout>::NumRows;
+        using MatrixReference<ElementType, layout>::NumColumns;
+        using MatrixReference<ElementType, layout>::Size;
+        using MatrixReference<ElementType, layout>::GetIncrement;
+        using MatrixReference<ElementType, layout>::GetMinorSize;
+        using MatrixReference<ElementType, layout>::GetMajorSize;
+        using MatrixReference<ElementType, layout>::GetRowIncrement;
+        using MatrixReference<ElementType, layout>::GetColumnIncrement;
+        using MatrixReference<ElementType, layout>::operator();
+        using MatrixReference<ElementType, layout>::GetConstDataPointer;
+        using MatrixReference<ElementType, layout>::GetLayout;
+        using MatrixReference<ElementType, layout>::GetDataPointer;
+
+        /// @}
+
+        /// \name Utility Functions
+        /// @{
+
+        using ConstMatrixReference<ElementType, layout>::IsContiguous;
+        using MatrixReference<ElementType, layout>::CopyFrom;
 
         /// <summary> Assignment operator. </summary>
         ///
@@ -606,15 +653,51 @@ namespace math
         /// <returns> A reference to this matrix. </returns>
         Matrix<ElementType, layout>& operator=(Matrix<ElementType, layout> other);
 
+        /// <summary> Returns a copy of the contents of the Matrix. </summary>
+        ///
+        /// <returns> A std::vector with a copy of the contents of the Matrix. </returns>
+        std::vector<ElementType> ToArray() const { return _data; }
+
         /// <summary> Swaps the contents of this matrix with the contents of another matrix. </summary>
         ///
         /// <param name="other"> [in,out] The other matrix. </param>
         void Swap(Matrix<ElementType, layout>& other);
 
-        /// <summary> Returns a copy of the contents of the Matrix. </summary>
-        ///
-        /// <returns> A std::vector with a copy of the contents of the Matrix. </returns>
-        std::vector<ElementType> ToArray() const { return _data; }
+        /// @}
+
+        /// \name Comparison Functions
+        /// @{
+
+        using MatrixReference<ElementType, layout>::IsEqual;
+        using MatrixReference<ElementType, layout>::operator==;
+        using MatrixReference<ElementType, layout>::operator!=;
+
+        /// @}
+
+        /// \name  Content Manipulation Functions
+        /// @{
+
+        using MatrixReference<ElementType, layout>::Reset;
+        using MatrixReference<ElementType, layout>::Fill;
+        using MatrixReference<ElementType, layout>::Generate;
+        using MatrixReference<ElementType, layout>::Transform;
+
+        /// @}
+
+        /// \name View Functions
+        /// @{
+
+        using MatrixReference<ElementType, layout>::GetConstReference;
+        using MatrixReference<ElementType, layout>::GetSubMatrix;
+        using MatrixReference<ElementType, layout>::GetColumn;
+        using MatrixReference<ElementType, layout>::GetRow;
+        using MatrixReference<ElementType, layout>::GetDiagonal;
+        using MatrixReference<ElementType, layout>::GetMajorVector;
+        using MatrixReference<ElementType, layout>::Transpose;
+        using MatrixReference<ElementType, layout>::ReferenceAsVector;
+        using MatrixReference<ElementType, layout>::GetReference;
+
+        /// @}
 
     private:
         using CommonMatrixBase<ElementType>::_pData;

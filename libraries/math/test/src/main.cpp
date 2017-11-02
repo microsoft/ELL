@@ -13,12 +13,17 @@
 
 using namespace ell;
 
+template<typename ElementType, math::ImplementationType implementation>
+void RunVectorImplementationTests()
+{
+    TestVectorVectorInnerImplementation<ElementType, implementation>();
+}
+
 template<typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
 void RunOrientedVectorImplementationTests()
 {
     TestVectorVectorAddImplementation<ElementType, orientation, implementation>();
     TestVectorScalarMultiplyImplementation<ElementType, orientation, implementation>();
-    TestVectorVectorDotImplementation<ElementType, orientation, implementation>();
 }
 
 template<typename ElementType, math::VectorOrientation orientation>
@@ -69,9 +74,14 @@ void RunVectorTests()
     TestVectorNorm2<ElementType>();
     TestVectorNorm2Squared<ElementType>();
     TestVectorToArray<ElementType>();
+    TestVectorVectorInner<ElementType>();
+    TestVectorVectorOuter<ElementType>();
 
     RunOrientedVectorTests<ElementType, math::VectorOrientation::row>();
     RunOrientedVectorTests<ElementType, math::VectorOrientation::column>();
+
+    RunVectorImplementationTests<ElementType, math::ImplementationType::native>();
+    RunVectorImplementationTests<ElementType, math::ImplementationType::openBlas>();
 }
 
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
@@ -128,6 +138,7 @@ void RunMatrixLayoutTests()
     TestMatrixScalarAdd<ElementType, layout>();
     TestMatrixPlusEqualsOperator<ElementType, layout>();
     TestMatrixMinusEqualsOperator<ElementType, layout>();
+    TestMatrixRowwiseSum<ElementType, layout>();
     TestMatrixColumnwiseSum<ElementType, layout>();
     TestMatrixTimesEqualsOperator<ElementType, layout>();
     TestMatrixDivideEqualsOperator<ElementType, layout>();
@@ -146,8 +157,8 @@ template<typename ElementType>
 void RunMatrixTests()
 {
     TestMatrixGetIncrement<ElementType>();
-    TestMatrixNumIntervals<ElementType>();
-    TestMatrixGetIntervalSize<ElementType>();
+    TestMatrixGetMinorSize<ElementType>();
+    TestMatrixGetMajorSize<ElementType>();
     TestMatrixGetRowIncrement<ElementType>();
     TestMatrixGetColumnIncrement<ElementType>();
     TestMatrixToArray<ElementType>();
@@ -202,7 +213,6 @@ void RunTensorTests()
 {
     TestTensorGetSlice<ElementType>();
     TestTensorReferenceAsMatrix<ElementType>();
-    TestTensorGetLayout<ElementType>();
     TestTensorNumSlices<ElementType>();
     TestTensorNumPrimarySlices<ElementType>();
 

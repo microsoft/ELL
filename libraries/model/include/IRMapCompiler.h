@@ -18,7 +18,7 @@
 #include "IRModuleEmitter.h"
 
 // math
-#include "TensorShape.h"
+#include "Tensor.h"
 
 // model
 #include "InputPort.h"

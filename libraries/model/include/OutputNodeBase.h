@@ -15,7 +15,7 @@
 #include "OutputPort.h"
 
 // math
-#include "TensorShape.h"
+#include "Tensor.h"
 
 // utilities
 #include "IArchivable.h"

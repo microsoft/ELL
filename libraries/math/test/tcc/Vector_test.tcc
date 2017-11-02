@@ -455,27 +455,52 @@ void TestVectorElementwiseMultiply()
     testing::ProcessTest("ElementwiseMultiply(Vector, Vector)", w == r);
 }
 
+template <typename ElementType>
+void TestVectorVectorInner()
+{
+    math::RowVector<ElementType> u{ 1, 2, 3, 4, 5 };
+    math::ColumnVector<ElementType> v{ 1, -1, 2, -2, 3 };
+    ElementType result;
+    math::Inner(u, v, result);
+
+    testing::ProcessTest("Inner(Vector, Vector)", result == 12);
+}
+
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorVectorDot()
 {
     math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
     math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
-    auto dot = math::Dot(u, v);
+    auto result = math::Dot(u, v);
 
-    testing::ProcessTest("Dot(Vector, Vector)", dot == 12);
+    testing::ProcessTest("Dot(Vector, Vector)", result == 12);
 }
 
-template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
-void TestVectorVectorDotImplementation()
+template <typename ElementType>
+void TestVectorVectorOuter()
+{
+    math::ColumnVector<ElementType> u{ 1, 2, 3 };
+    math::RowVector<ElementType> v{ 1, -1 };
+    math::ColumnMatrix<ElementType> A(3, 2);
+
+    math::Outer(u, v, A);
+
+    math::ColumnMatrix<ElementType> B{ {1, -1}, {2, -2}, {3, -3} };
+    testing::ProcessTest("Outer(Vector, Vector)", A == B);
+}
+
+template <typename ElementType, math::ImplementationType implementation>
+void TestVectorVectorInnerImplementation()
 {
     auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
     using Ops = math::Internal::VectorOperations<implementation>;
 
-    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
-    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
-    auto dot = math::Internal::VectorOperations<implementation>::Dot(u, v);
+    math::RowVector<ElementType> u{ 1, 2, 3, 4, 5 };
+    math::ColumnVector<ElementType> v{ 1, -1, 2, -2, 3 };
+    ElementType result;
+    math::Internal::VectorOperations<implementation>::Inner(u, v, result);
 
-    testing::ProcessTest(implementationName + "::Dot(Vector, Vector)", dot == 12);
+    testing::ProcessTest(implementationName + "::Dot(Vector, Vector)", result == 12);
 }
 
 template <typename ElementType, math::VectorOrientation orientation>

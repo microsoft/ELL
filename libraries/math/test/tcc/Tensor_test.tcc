@@ -77,25 +77,13 @@ void TestTensorNumChannels()
     testing::ProcessTest("Tensor::NumChannels", T.NumChannels() == 30);
 }
 
-template<typename ElementType>
-void TestTensorGetLayout()
-{
-    math::ColumnRowChannelTensor<ElementType> T(10, 20, 30);
-    auto layoutT = T.GetLayout();
-
-    math::ChannelColumnRowTensor<ElementType> S(10, 20, 30);
-    auto layoutS = S.GetLayout();
-
-    testing::ProcessTest("Tensor::GetLayout", layoutT == math::Triplet{ 20, 10, 30 } && layoutS == math::Triplet{30, 20, 10});
-}
-
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensorGetShape()
 {
     math::Tensor<ElementType, dimension0, dimension1, dimension2> T(10, 20, 30);
     auto shape = T.GetShape();
 
-    testing::ProcessTest("Tensor::GetShape", shape == math::Triplet{10,20,30});
+    testing::ProcessTest("Tensor::GetShape", shape == math::TensorShape{10,20,30});
 }
 
 template<typename ElementType>

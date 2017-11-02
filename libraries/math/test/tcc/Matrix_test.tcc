@@ -69,7 +69,7 @@ void TestMatrixGetIncrement()
 }
 
 template <typename ElementType>
-void TestMatrixNumIntervals()
+void TestMatrixGetMinorSize()
 {
     math::ColumnMatrix<ElementType> M{
         { 1, 0, 4, 0 },
@@ -83,11 +83,11 @@ void TestMatrixNumIntervals()
         { 0, 0, 0, 7 }
     };
 
-    testing::ProcessTest("Matrix::NumIntervals", M.NumIntervals() == 4 && N.NumIntervals() == 3);
+    testing::ProcessTest("Matrix::GetMinorSize", M.GetMinorSize() == 4 && N.GetMinorSize() == 3);
 }
 
 template <typename ElementType>
-void TestMatrixGetIntervalSize()
+void TestMatrixGetMajorSize()
 {
     math::ColumnMatrix<ElementType> M{
         { 1, 0, 4, 0 },
@@ -101,7 +101,7 @@ void TestMatrixGetIntervalSize()
         { 0, 0, 0, 7 }
     };
 
-    testing::ProcessTest("Matrix::GetIntervalSize", M.GetIntervalSize() == 3 && N.GetIntervalSize() == 4);
+    testing::ProcessTest("Matrix::GetMajorSize", M.GetMajorSize() == 3 && N.GetMajorSize() == 4);
 }
 
 template <typename ElementType>
@@ -761,6 +761,22 @@ void TestMatrixGeneralizedMatrixAdd()
 }
 
 template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixRowwiseSum()
+{
+    math::Matrix<ElementType, layout> M{
+        { 1, 2, 0 },
+        { 0, 3, 7 }
+    };
+
+    math::ColumnVector<ElementType> v(2);
+    math::RowwiseSum(M, v);
+
+    math::ColumnVector<ElementType> u{ 3, 10 };
+
+    testing::ProcessTest("ColumnwiseSum(Matrix, Vector)", v == u);
+}
+
+template <typename ElementType, math::MatrixLayout layout>
 void TestMatrixColumnwiseSum()
 {
     math::Matrix<ElementType, layout> M{
@@ -771,7 +787,7 @@ void TestMatrixColumnwiseSum()
     math::RowVector<ElementType> v(3);
     math::ColumnwiseSum(M, v);
 
-    math::RowVector<ElementType> u{1, 5, 7};
+    math::RowVector<ElementType> u{ 1, 5, 7 };
 
     testing::ProcessTest("ColumnwiseSum(Matrix, Vector)", v == u);
 }

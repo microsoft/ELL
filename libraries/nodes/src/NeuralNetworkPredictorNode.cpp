@@ -28,7 +28,7 @@ namespace nodes
     namespace
     {
         // Handy helper function
-        size_t GetShapeSize(const math::Triplet& shape)
+        size_t GetShapeSize(const math::IntegerTriplet& shape)
         {
             return shape[0] * shape[1] * shape[2];
         }
@@ -116,8 +116,8 @@ namespace nodes
         if (padding != 0)
         {
             // If the input layer wants padding on its output, add a ReorderDataNode to add padding
-            model::PortMemoryLayout inputNodeShape({ (int)inputShape[0], (int)inputShape[1], (int)inputShape[2] });
-            model::PortMemoryLayout paddedInputNodeShape({ (int)inputShape[0], (int)inputShape[1], (int)inputShape[2] }, { (int)padding, (int)padding, 0 });
+            model::PortMemoryLayout inputNodeShape({ (int)inputShape.NumRows(), (int)inputShape.NumColumns(), (int)inputShape.NumChannels() });
+            model::PortMemoryLayout paddedInputNodeShape({ (int)inputShape.NumRows(), (int)inputShape.NumColumns(), (int)inputShape.NumChannels() }, { (int)padding, (int)padding, 0 });
             auto paddedInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInputElements, inputNodeShape, paddedInputNodeShape, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
             newInputElements = paddedInputNode->output;
         }

@@ -305,7 +305,7 @@ namespace model
             const OutputNodeBase* node = dynamic_cast<const OutputNodeBase*>(outputNodeVec[0]);
             return node->GetShape();
         }
-        return math::TensorShape();
+        return math::TensorShape(0, 0, 0);
     }
 
     Port::PortType DynamicMap::GetInputType() const

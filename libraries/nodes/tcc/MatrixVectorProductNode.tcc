@@ -44,7 +44,7 @@ namespace nodes
         archiver["w_rows"] << _w.NumRows();
         archiver["w_columns"] << _w.NumColumns();
         std::vector<double> temp;
-        temp.assign(_w.GetDataPointer(), _w.GetDataPointer() + (size_t)(_w.NumRows() * _w.NumColumns()));
+        temp.assign(_w.GetConstDataPointer(), _w.GetConstDataPointer() + (size_t)(_w.NumRows() * _w.NumColumns()));
         archiver["w"] << temp;
 
         archiver[inputPortName] << _input;

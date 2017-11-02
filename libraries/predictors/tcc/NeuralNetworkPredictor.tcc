@@ -32,7 +32,7 @@ namespace predictors
         {
             return _inputLayer->GetInputShape();
         }
-        return {};
+        return {0, 0, 0};
     }
 
     template <typename ElementType>
@@ -42,7 +42,7 @@ namespace predictors
         {
             return _layers.back()->GetOutputShape();
         }
-        return {};
+        return {0, 0, 0};
     }
 
     template <typename ElementType>

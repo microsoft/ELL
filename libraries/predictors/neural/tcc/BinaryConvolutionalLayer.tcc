@@ -24,7 +24,7 @@ namespace neural
     BinaryConvolutionalLayer<ElementType>::BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ConstTensorReferenceType& weights)
         : Layer<ElementType>(layerParameters), _convolutionalParameters(convolutionalParameters), _realValuedWeightsMatrix(0, 0), _realValuedShapedInputMatrix(0, 0), _realValuedOutputMatrix(0, 0)
     {
-        if (weights.GetDataPointer() == nullptr)
+        if (weights.GetConstDataPointer() == nullptr)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::nullReference, "weights tensor has null data field");
         }

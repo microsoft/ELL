@@ -10,7 +10,7 @@
 #ifndef SWIG
 
 // math
-#include "TensorShape.h"
+#include "Tensor.h"
 
 // neural network
 #include "Layer.h"
@@ -57,7 +57,7 @@ namespace neural
     using LayerType = ell::predictors::neural::LayerType;
     using PaddingScheme = ell::predictors::neural::PaddingScheme;
     using PaddingParameters = ell::predictors::neural::PaddingParameters;
-    using LayerShape = ell::math::TensorShape;
+    using LayerShape = ell::api::math::TensorShape;
 
     //////////////////////////////////////////////////////////////////////////
     // Common types used by the neural layers

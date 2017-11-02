@@ -8,6 +8,7 @@
 #pragma once
 
 // interfaces
+#include "MathInterface.h"
 #include "NeuralNetworkPredictorInterface.h"
 
 // neural predictor
@@ -31,9 +32,10 @@ namespace api
 {
 namespace predictors
 {
-
+    using LayerShape = ell::api::math::TensorShape;
     namespace underlying = ell::predictors::neural;
     namespace api = ell::api::predictors::neural;
+
     //////////////////////////////////////////////////////////////////////////
     // Api classes for the neural predictor
     //////////////////////////////////////////////////////////////////////////
@@ -92,17 +94,17 @@ namespace predictors
     }
 
     template <typename ElementType>
-    neural::LayerShape NeuralNetworkPredictor<ElementType>::GetInputShape() const
+    LayerShape NeuralNetworkPredictor<ElementType>::GetInputShape() const
     {
         auto shape = _predictor->GetInputShape();
-        return neural::LayerShape{ shape[0], shape[1], shape[2] };
+        return ell::api::math::TensorShape::FromMathTensorShape(shape);
     }
 
     template <typename ElementType>
-    neural::LayerShape NeuralNetworkPredictor<ElementType>::GetOutputShape() const
+    LayerShape NeuralNetworkPredictor<ElementType>::GetOutputShape() const
     {
         auto shape = _predictor->GetOutputShape();
-        return neural::LayerShape{ shape[0], shape[1], shape[2] };
+        return ell::api::math::TensorShape::FromMathTensorShape(shape);
     }
 
     template <typename ElementType>

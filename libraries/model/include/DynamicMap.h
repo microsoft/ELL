@@ -18,7 +18,7 @@
 #include "DataVector.h"
 
 // math
-#include "TensorShape.h"
+#include "Tensor.h"
 
 // utilities
 #include "Exception.h"

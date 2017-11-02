@@ -63,9 +63,9 @@ namespace nodes
         auto inputMatrix2Values = input2.GetValue();
         std::vector<ValueType> outputMatrixValues(_m * _n);
 
-        math::RowMatrixReference<ValueType> inputMatrix1Ref(_m, _k, inputMatrix1Values.data());
-        math::RowMatrixReference<ValueType> inputMatrix2Ref(_k, _n, inputMatrix2Values.data());
-        math::RowMatrixReference<ValueType> outputMatrixRef(_m, _n, outputMatrixValues.data());
+        math::RowMatrixReference<ValueType> inputMatrix1Ref(inputMatrix1Values.data(), _m, _k);
+        math::RowMatrixReference<ValueType> inputMatrix2Ref(inputMatrix2Values.data(), _k, _n);
+        math::RowMatrixReference<ValueType> outputMatrixRef(outputMatrixValues.data(), _m, _n);
 
         // TODO: transpose if necessary
         math::Multiply(static_cast<ValueType>(1.0), inputMatrix1Ref, inputMatrix2Ref, static_cast<ValueType>(0.0), outputMatrixRef);

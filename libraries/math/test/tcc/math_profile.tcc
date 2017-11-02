@@ -105,14 +105,15 @@ void ProfileVectorDot(size_t size, size_t repetitions, std::string seed)
     math::RowVector<ElementType> u(size);
     u.Generate(generator);
 
-    math::RowVector<ElementType> v(size);
+    math::ColumnVector<ElementType> v(size);
     v.Generate(generator);
 
-    double native = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::native>::Dot(u, v); }, repetitions);
+    ElementType result;
+    double native = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::native>::Inner(u, v, result); }, repetitions);
     math::Blas::SetNumThreads(1);
-    double singleBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Dot(u, v); }, repetitions);
+    double singleBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Inner(u, v, result); }, repetitions);
     math::Blas::SetNumThreads(0);
-    double multiBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Dot(u, v); }, repetitions);
+    double multiBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Inner(u, v, result); }, repetitions);
 
     std::string type = std::string("<") + typeid(ElementType).name() + ">";
     std::string vector = "Vector" + type + "[" + std::to_string(size) + "]";

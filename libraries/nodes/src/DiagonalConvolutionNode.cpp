@@ -126,9 +126,9 @@ namespace nodes
         std::vector<ValueType> output(outputSize);
         std::vector<ValueType> scratch(paddedHeight * filterWidth * batchSize);
 
-        math::RowMatrixReference<ValueType> inputMatrix(paddedHeight, numFlattenedMatrixColumns, inputData.data());
-        math::RowMatrixReference<ValueType> weightsMatrix(filterWidth * inputDepth, filterWidth * numFilters, filterWeightsData.data());
-        math::RowMatrixReference<ValueType> outputMatrix(paddedHeight, paddedWidth * numFilters, output.data()); //
+        math::RowMatrixReference<ValueType> inputMatrix(inputData.data(), paddedHeight, numFlattenedMatrixColumns);
+        math::RowMatrixReference<ValueType> weightsMatrix(filterWeightsData.data(), filterWidth * inputDepth, filterWidth * numFilters);
+        math::RowMatrixReference<ValueType> outputMatrix(output.data(), paddedHeight, paddedWidth * numFilters); //
         auto scratchData = scratch.data();
 
         for (size_t j = 0; j < numConvolutions; j++) // each pass through this loop computes 1 column of the output image, for all filters
@@ -139,7 +139,7 @@ namespace nodes
                 size_t numFiltersToUse = std::min(batchSize, numFilters - filterStart);
 
                 auto Wl = weightsMatrix.GetSubMatrix(0, filterStart * filterWidth, weightsMatrix.NumRows(), numFiltersToUse * filterWidth);
-                math::RowMatrixReference<ValueType> A(Vj.NumRows(), Wl.NumColumns(), scratch.data());
+                math::RowMatrixReference<ValueType> A(scratch.data(), Vj.NumRows(), Wl.NumColumns());
 
                 math::Multiply(static_cast<ValueType>(1.0), Vj, Wl, static_cast<ValueType>(0.0), A);
 

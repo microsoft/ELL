@@ -12,14 +12,15 @@ endif()
 
 include (OpenBLASSetup)
 
-set (src src/BlasWrapper.cpp)
+set (src src/BlasWrapper.cpp
+         src/Tensor.cpp
+)
 
 set (include include/BlasWrapper.h
              include/Common.h
              include/Matrix.h
              include/MatrixOperations.h
              include/Tensor.h
-             include/TensorShape.h
              include/TensorOperations.h
              include/Vector.h
              include/VectorOperations.h

@@ -66,7 +66,7 @@ namespace neural
         ConvolutionalLayer(const LayerParameters& layerParameters, const ConvolutionalParameters& convolutionalParameters, TensorType weights);
 
         /// <summary> Instantiates a blank instance. Used for unarchiving purposes only. </summary>
-        ConvolutionalLayer() : _weights(math::Triplet{0, 0, 0}), _shapedInput(0, 0), _weightsMatrix(0, 0), _outputMatrix(0 ,0){}
+        ConvolutionalLayer() : _weights(math::IntegerTriplet{0, 0, 0}), _shapedInput(0, 0), _weightsMatrix(0, 0), _outputMatrix(0 ,0){}
 
         /// <summary> Feeds the input forward through the layer and returns a reference to the output. </summary>
         void Compute() override;

@@ -27,9 +27,6 @@ void TestTensorNumColumns();
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensorNumChannels();
 
-template<typename ElementType>
-void TestTensorGetLayout();
-
 template<typename ElementType, math::Dimension dimension0, math::Dimension dimension1, math::Dimension dimension2>
 void TestTensorGetShape();
 

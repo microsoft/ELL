@@ -36,6 +36,7 @@ namespace predictors
     {
     public:
         using Layer = ell::api::predictors::neural::Layer<ElementType>;
+        using LayerShape = ell::api::math::TensorShape;
         using UnderlyingPredictor = ell::predictors::NeuralNetworkPredictor<ElementType>;
         using UnderlyingLayers = typename ell::predictors::NeuralNetworkPredictor<ElementType>::Layers;
         using UnderlyingInputParameters = typename ell::predictors::neural::InputLayer<ElementType>::InputParameters;
@@ -43,8 +44,8 @@ namespace predictors
 
         NeuralNetworkPredictor(const std::vector<Layer*>& layers, ElementType scaleFactor=1.0f);
         std::vector<ElementType> Predict(const std::vector<double>& input);
-        neural::LayerShape GetInputShape() const;
-        neural::LayerShape GetOutputShape() const;
+        LayerShape GetInputShape() const;
+        LayerShape GetOutputShape() const;
 
 #ifndef SWIG
         const UnderlyingPredictor& GetPredictor() const;

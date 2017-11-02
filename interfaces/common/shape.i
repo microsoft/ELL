@@ -13,6 +13,7 @@
 
 namespace ell {
 namespace api{
+namespace math{
     typedef struct TensorShape 
     {
         int rows;
@@ -20,6 +21,7 @@ namespace api{
         int channels;
         int Size() const { return rows * columns * channels; }
     } TensorShape;
+}
 }
 }
 

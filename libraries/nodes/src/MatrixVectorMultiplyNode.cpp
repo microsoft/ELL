@@ -46,7 +46,7 @@ namespace nodes
         assert(inputVector.Size() == _n);
         std::vector<ValueType> outputVectorValues(_m);
 
-        math::RowMatrixReference<ValueType> inputMatrixRef(_m, _n, inputMatrixValues.data());
+        math::RowMatrixReference<ValueType> inputMatrixRef(inputMatrixValues.data(), _m, _n);
         math::ColumnVectorReference<ValueType> inputVectorRef(inputVectorValues.data(), _n);
         math::ColumnVectorReference<ValueType> outputVectorRef(outputVectorValues.data(), _m);
 

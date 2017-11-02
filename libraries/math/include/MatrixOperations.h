@@ -65,21 +65,21 @@ namespace math
     ///
     /// <typeparam name="MatrixElementType"> Matrix element type. </typeparam>
     /// <typeparam name="layout"> Matrix layout. </typeparam>
-    /// <typeparam name="ScalarElementType"> Scalar element type. </typeparam>
+    /// <typeparam name="ScalarType"> Scalar type. </typeparam>
     /// <param name="matrix"> The matrix to which the scalar is added. </param>
     /// <param name="scalar"> The scalar. </param>
-    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType> concept = true>
-    void operator+=(MatrixReference<MatrixElementType, layout> matrix, ScalarElementType scalar);
+    template <typename MatrixElementType, MatrixLayout layout, typename ScalarType, utilities::IsFundamental<ScalarType> concept = true>
+    void operator+=(MatrixReference<MatrixElementType, layout> matrix, ScalarType scalar);
 
     /// <summary> Subtracts a scalar from a matrix, matrix -= scalar. </summary>
     ///
     /// <typeparam name="MatrixElementType"> Matrix element type. </typeparam>
     /// <typeparam name="layout"> Matrix layout type. </typeparam>
-    /// <typeparam name="ScalarElementType"> Scalar element type. </typeparam>
+    /// <typeparam name="ScalarType"> Scalar type. </typeparam>
     /// <param name="matrix"> The matrix. </param>
     /// <param name="scalar"> The scalar. </param>
-    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType> concept = true>
-    void operator-=(MatrixReference<MatrixElementType, layout> matrix, ScalarElementType scalar);
+    template <typename MatrixElementType, MatrixLayout layout, typename ScalarType, utilities::IsFundamental<ScalarType> concept = true>
+    void operator-=(MatrixReference<MatrixElementType, layout> matrix, ScalarType scalar);
 
     /// <summary> Generalized matrix matrix addition, matrixC = scalarA * matrixA + scalarB * matrixB. </summary>
     ///
@@ -93,6 +93,15 @@ namespace math
     /// <param name="matrixC"> A matrix used to store the result. </param>
     template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
     void Add(ElementType scalarA, ConstMatrixReference<ElementType, layoutA> matrixA, ElementType scalarB, ConstMatrixReference<ElementType, layoutB> matrixB, MatrixReference<ElementType, layoutA> matrixC);
+
+    /// <summary> Sums each row of a matrix and stores the results in a column vector. </summary>
+    ///
+    /// <typeparam name="ElementType"> Matrix and vector element type. </typeparam>
+    /// <typeparam name="layout"> Matrix layout. </typeparam>
+    /// <param name="matrix"> The matrix. </param>
+    /// <param name="vector"> The vector used to store the result. </param>
+    template <typename ElementType, MatrixLayout layout>
+    void RowwiseSum(ConstMatrixReference<ElementType, layout> matrix, VectorReference<ElementType, VectorOrientation::column> vector);
 
     /// <summary> Sums each column of a matrix and stores the results in a row vector. </summary>
     ///
@@ -121,21 +130,21 @@ namespace math
     ///
     /// <typeparam name="MatrixElementType"> Matrix element type. </typeparam>
     /// <typeparam name="layout"> Matrix layout type. </typeparam>
-    /// <typeparam name="ScalarElementType"> Scalar element type. </typeparam>
+    /// <typeparam name="ScalarType"> Scalar type. </typeparam>
     /// <param name="matrix"> The matrix. </param>
     /// <param name="scalar"> The scalar. </param>
-    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType> concept = true>
-    void operator*=(MatrixReference<MatrixElementType, layout> matrix, ScalarElementType scalar);
+    template <typename MatrixElementType, MatrixLayout layout, typename ScalarType, utilities::IsFundamental<ScalarType> concept = true>
+    void operator*=(MatrixReference<MatrixElementType, layout> matrix, ScalarType scalar);
 
     /// <summary> Divides a matrix by a scalar, matrix /= scalar. </summary>
     ///
     /// <typeparam name="MatrixElementType"> Matrix element type. </typeparam>
     /// <typeparam name="layout"> Matrix layout type. </typeparam>
-    /// <typeparam name="ScalarElementType"> Scalar element type. </typeparam>
+    /// <typeparam name="ScalarType"> Scalar type. </typeparam>
     /// <param name="matrix"> The matrix. </param>
     /// <param name="scalar"> The scalar. </param>
-    template <typename MatrixElementType, MatrixLayout layout, typename ScalarElementType, utilities::IsFundamental<ScalarElementType> concept = true>
-    void operator/=(MatrixReference<MatrixElementType, layout> matrix, ScalarElementType scalar);
+    template <typename MatrixElementType, MatrixLayout layout, typename ScalarType, utilities::IsFundamental<ScalarType> concept = true>
+    void operator/=(MatrixReference<MatrixElementType, layout> matrix, ScalarType scalar);
 
     /// <summary> Generalized matrix vector multiplication, vectorB = scalarA * matrix * vectorA + scalarB * vectorB. </summary>
     ///

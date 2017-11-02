@@ -113,7 +113,7 @@ namespace ell
         auto shape = params.outputShape;
 
 		result.push_back(NameValue{ "shape",  "[" + std::to_string(input.NumRows()) + "," + std::to_string(input.NumColumns()) + "," + std::to_string(input.NumChannels()) + "]->" +
-											  "[" + std::to_string(shape[0]) + "," + std::to_string(shape[1]) + "," + std::to_string(shape[2]) + "]" });
+											  "[" + std::to_string(shape.NumRows()) + "," + std::to_string(shape.NumColumns()) + "," + std::to_string(shape.NumChannels()) + "]" });
 
         auto inputpadding = params.inputPaddingParameters;
         auto outputpadding = params.outputPaddingParameters;
@@ -158,5 +158,3 @@ namespace ell
     }
 
 }
-
-#include "../tcc/LayerInspector.tcc"

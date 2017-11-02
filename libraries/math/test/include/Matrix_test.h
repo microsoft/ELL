@@ -24,10 +24,10 @@ template <typename ElementType>
 void TestMatrixGetIncrement();
 
 template <typename ElementType>
-void TestMatrixNumIntervals();
+void TestMatrixGetMinorSize();
 
 template <typename ElementType>
-void TestMatrixGetIntervalSize();
+void TestMatrixGetMajorSize();
 
 template <typename ElementType>
 void TestMatrixGetRowIncrement();
@@ -112,6 +112,9 @@ void TestMatrixMinusEqualsOperator();
 
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2, math::ImplementationType implementation>
 void TestMatrixGeneralizedMatrixAdd();
+
+template <typename ElementType, math::MatrixLayout layout>
+void TestMatrixRowwiseSum();
 
 template <typename ElementType, math::MatrixLayout layout>
 void TestMatrixColumnwiseSum();

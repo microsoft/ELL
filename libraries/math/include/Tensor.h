@@ -34,46 +34,110 @@ namespace math
     enum class Dimension { row, column, channel };
 
     // abbreviations
-    using Triplet = std::array<size_t, 3>;
+    using IntegerTriplet = std::array<size_t, 3>;
 
-    /// <summary> Helper functions for TensorLayout definition </summary>
-    template <Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    constexpr int IndexOfDimension(Dimension dimension)
+    /// <summary> Base class for TensorCoordinate and TensorShape. </summary>
+    class TensorCoordinateBase
     {
-        // STYLE discrepancy 
-        return dimension == dimension0 ? 0 : (dimension == dimension1 ? 1 : (dimension == dimension2 ? 2 : -1));
-    }
+    public:
 
-    /// <summary>
-    /// Forward declaration of TensorLayout. This class helps the tensor move back and forth from logical coordinates (row, column, channel)
-    /// to the layout coordinates (which depend on how the tensor is layed out in memory)
-    /// </summary>
-    ///
-    /// <typeparam name="dimension0"> Identity of the tensor dimension that occupies contiguous memory
-    /// (increment of 1). </typeparam>
-    /// <typeparam name="dimension1"> Identity of the tensor dimension with a minor memory increment. </typeparam>
-    /// <typeparam name="dimension2"> Identity of the tensor dimension with a major memory increment. </typeparam>
-    template <Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    struct TensorLayout
-    {
-        static Triplet ShapeToLayout(Triplet shape) { return{ shape[rowPosition], shape[columnPosition], shape[channelPosition] }; } // STYLE discrepancy 
-        static const size_t rowPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::row);
-        static const size_t columnPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::column);
-        static const size_t channelPosition = IndexOfDimension<dimension0, dimension1, dimension2>(Dimension::channel);
-        static_assert(rowPosition != -1, "Invalid layout");
-        static_assert(columnPosition != -1, "Invalid layout");
-        static_assert(channelPosition != -1, "Invalid layout");
+        /// <summary> Constructs a TensorCoordinateBase from row, column, channel values. </summary>
+        ///
+        /// <param name="rowValue"> The row value. </param>
+        /// <param name="columnValue"> The column value. </param>
+        /// <param name="channelValue"> The channel value. </param>
+        TensorCoordinateBase(size_t rowValue, size_t columnValue, size_t channelValue);
+
+        /// <summary> Constructs a TensorCoordinateBase from an IntegerTriplet. </summary>
+        ///
+        /// <param name="values"> The triplet. </param>
+        TensorCoordinateBase(IntegerTriplet values);
+
+        /// <summary> Casting operator to an IntegerTriplet. </summary>
+        ///
+        /// <returns> The result of the cast. </returns>
+        operator IntegerTriplet() const { return {_rowValue, _columnValue, _channelValue}; }
+
+        /// <summary> Casting operator to a vector equivalent to IntegerTriplet. </summary>
+        ///
+        /// <returns> The result of the cast. </returns>
+        operator std::vector<size_t>() const { return{ _rowValue, _columnValue, _channelValue }; }
+
+        /// <summary> Equality operator. </summary>
+        ///
+        /// <param name="other"> The other TensorCoordinateBase. </param>
+        ///
+        /// <returns> True if the two TensorCoordinateBases are equivalent. </returns>
+        bool operator==(const TensorCoordinateBase& other) const;
+
+        /// <summary> Inequality operator. </summary>
+        ///
+        /// <param name="other"> The other TensorCoordinateBase. </param>
+        ///
+        /// <returns> True if the two TensorCoordinateBases are not equivalent. </returns>
+        bool operator!=(const TensorCoordinateBase& other) const;
+
+        /// <summary> Gets one of the values. </summary>
+        ///
+        /// <typeparam name="dimension"> The dimension to get. </typeparam>
+        ///
+        /// <returns> The value. </returns>
+        template<Dimension dimension>
+        size_t GetValue() const;
+
+    protected:
+        size_t _rowValue;
+        size_t _columnValue;
+        size_t _channelValue;
     };
 
-    /// <summary> Helper struct that incudes all of the TensorReference internals. </summary>
-    ///
-    /// <typeparam name="ElementType"> Tensor element type. </typeparam>
-    template<typename ElementType>
-    struct TensorContents
+    /// <summary> A class that defines the shape of a tensor. </summary>
+    class TensorShape : public TensorCoordinateBase
     {
-        Triplet layout;
-        std::array<size_t, 2> increments;
-        ElementType* pData;
+    public:
+        using TensorCoordinateBase::TensorCoordinateBase;
+
+        /// <summary> Gets the number rows in the tensor. </summary>
+        ///
+        /// <returns> The number of rows in the tensor. </returns>
+        inline size_t NumRows() const { return _rowValue; }
+
+        /// <summary> Gets the number columns in the tensor. </summary>
+        ///
+        /// <returns> The number of columns in the tensor. </returns>
+        inline size_t NumColumns() const { return _columnValue; }
+
+        /// <summary> Gets the number channels in the tensor. </summary>
+        ///
+        /// <returns> The number of channels in the tensor. </returns>
+        inline size_t NumChannels() const { return _channelValue; }
+
+        /// <summary> Gets the total number of elements in the tensor. </summary>
+        ///
+        /// <returns> The total number of elements in the tensor. </returns>
+        size_t Size() const { return NumRows() * NumColumns() * NumChannels(); }
+    };
+
+    /// <summary> Represents a tensor coordinate. </summary>
+    class TensorCoordinate : public TensorCoordinateBase
+    {
+    public:
+        using TensorCoordinateBase::TensorCoordinateBase;
+
+        /// <summary> Gets the row index. </summary>
+        ///
+        /// <returns> The row index. </returns>
+        inline size_t GetRowIndex() const { return _rowValue; }
+
+        /// <summary> Gets the column index. </summary>
+        ///
+        /// <returns> The column index. </returns>
+        inline size_t GetColumnIndex() const { return _columnValue; }
+
+        /// <summary> Gets the channel index. </summary>
+        ///
+        /// <returns> The channel index. </returns>
+        inline size_t GetChannelIndex() const { return _channelValue; }
     };
 
     /// <summary> TensorSlicer is a helper class in lieu of the ability to specialize the GetSlice() function </summary>
@@ -94,65 +158,64 @@ namespace math
     class ConstTensorReference 
     {
     public:
-
         using TensorElementType = ElementType;
 
         /// <summary> Constructs an instance of ConstTensorReference. </summary>
         ///
         /// <param name="shape"> The tensor shape (always given in logical coordinates: row, column, channel). </param>
-        ConstTensorReference(Triplet shape);
+        ConstTensorReference(TensorShape shape);
         
         /// <summary> Constructs an instance of ConstTensorReference. </summary>
         ///
-        /// <param name="shape"> The tensor shape (always given in logical coordinates: row, column, channel). </param>
         /// <param name="pData"> A pointer to the data to reference. </param>
-        ConstTensorReference(Triplet shape, ElementType* pData);
+        /// <param name="shape"> The tensor shape (always given in logical coordinates: row, column, channel). </param>
+        ConstTensorReference(const ElementType* pData, TensorShape shape);
 
-        /// <summary> Element access operator. </summary>
-        ///
-        /// <param name="row"> The row. </param>
-        /// <param name="column"> The column. </param>
-        /// <param name="channel"> The channel. </param>
-        ///
-        /// <returns> A copy of a tensor element. </returns>
-        inline ElementType operator()(size_t row, size_t column, size_t channel) const;
-
-        /// <summary> Element access operator. </summary>
-        ///
-        /// <param name="coordinate"> The coordinate to access. </param>
-        ///
-        /// <returns> A copy of a tensor element. </returns>
-        inline ElementType operator()(Triplet coordinate) const;
-
-        /// <summary> Gets the total number of elements in the tensor. </summary>
-        ///
-        /// <returns> The total number of elements. </returns>
-        size_t Size() const;
+        /// \name Accessor Functions
+        /// @{
 
         /// <summary> Gets the number of rows. </summary>
         ///
         /// <returns> The number of rows. </returns>
-        size_t NumRows() const { return _contents.layout[TensorLayoutT::rowPosition]; }
+        size_t NumRows() const { return _shape.NumRows(); }
 
         /// <summary> Gets the number of columns. </summary>
         ///
         /// <returns> The number of columns. </returns>
-        size_t NumColumns() const { return _contents.layout[TensorLayoutT::columnPosition]; }
+        size_t NumColumns() const { return _shape.NumColumns(); }
 
         /// <summary> Gets the number of channels. </summary>
         ///
         /// <returns> The number of channels. </returns>
-        size_t NumChannels() const { return _contents.layout[TensorLayoutT::channelPosition]; }
+        size_t NumChannels() const { return _shape.NumChannels(); }
 
-        /// <summary> Gets the three sizes that make up the tensor's layout shape. </summary>
+        /// <summary> Gets the total number of elements in the tensor. </summary>
         ///
-        /// <returns> The layout shape. </returns>
-        Triplet GetLayout() const { return _contents.layout; }
+        /// <returns> The total number of elements. </returns>
+        size_t Size() const { return _shape.Size(); }
+
+        /// <summary> Gets the size of the dimension specified by its index. A template argument of 0 will return the size of dimension0, etc. </summary>
+        ///
+        /// <typeparam name="dimensionIndex"> The dimension index. </typeparam>
+        ///
+        /// <returns> The size of the specified dimension. </returns>
+        template<size_t dimensionIndex>
+        size_t GetSize() const;
+
+        size_t GetSize0() const { return GetSize<0>(); } // TODO
+        size_t GetSize1() const { return GetSize<1>(); }
+        size_t GetSize2() const { return GetSize<2>(); }
+
 
         /// <summary> Gets the three dimenions of the tensor in logical order (row, column, channel). </summary>
         ///
         /// <returns> The shape of the Tensor. </returns>
-        Triplet GetShape() const { return {NumRows(), NumColumns(), NumChannels()}; }
+        TensorShape GetShape() const { return _shape; }
+
+        /// <summary> Gets a const pointer to the underlying data storage. </summary>
+        ///
+        /// <returns> Const pointer to the data. </returns>
+        const ElementType* GetConstDataPointer() const { return _pData; }
 
         /// <summary>
         /// Gets the number of slices that can be returned by GetSlice.
@@ -170,6 +233,44 @@ namespace math
         ///
         /// <returns> The number of primary slices. </returns>
         size_t NumPrimarySlices() const;
+
+        /// <summary> Element access operator. </summary>
+        ///
+        /// <param name="row"> The row. </param>
+        /// <param name="column"> The column. </param>
+        /// <param name="channel"> The channel. </param>
+        ///
+        /// <returns> A copy of a tensor element. </returns>
+        inline ElementType operator()(size_t row, size_t column, size_t channel) const;
+
+        /// <summary> Element access operator. </summary>
+        ///
+        /// <param name="coordinate"> The coordinate to access. </param>
+        ///
+        /// <returns> A copy of a tensor element. </returns>
+        inline ElementType operator()(TensorCoordinate coordinate) const;
+
+        /// @}
+
+        /// \name Utility Functions
+        /// @{
+
+        /// <summary> Returns a copy of the contents of the Tensor. </summary>
+        ///
+        /// <returns> A std::vector with a copy of the contents of the Tensor. </returns>
+        std::vector<ElementType> ToArray() const;
+
+        /// <summary> Swaps the contents of this with the contents of another const tensor reference. </summary>
+        ///
+        /// <param name="other"> [in,out] The other const tensor reference. </param>
+        void Swap(ConstTensorReference<ElementType, dimension0, dimension1, dimension2>& other);
+
+        /// <summary> Determines if this Tensor is stored in contiguous memory. </summary>
+        ///
+        /// <returns> True if contiguous, false if not. </returns>
+        bool IsContiguous() const;
+
+        /// @}
 
         /// \name Comparison Functions
         /// @{
@@ -227,7 +328,7 @@ namespace math
         /// <param name="shape"> The shape of the block (always given in logical coordinates: row, column, channel). </param>
         ///
         /// <returns> The resulting ConstTensorReference. </returns>
-        ConstTensorReference<ElementType, dimension0, dimension1, dimension2> GetSubTensor(Triplet firstCoordinate, Triplet shape) const;
+        ConstTensorReference<ElementType, dimension0, dimension1, dimension2> GetSubTensor(TensorCoordinate firstCoordinate, TensorShape shape) const;
 
         /// <summary>
         /// Gets a reference to a slice of the tensor. Note that only four of the six possible slice
@@ -269,39 +370,14 @@ namespace math
 
         /// @}
 
-        /// \name Utility Functions
-        /// @{
-
-        /// <summary> Swaps the contents of this with the contents of another const tensor reference. </summary>
-        ///
-        /// <param name="other"> [in,out] The other const tensor reference. </param>
-        void Swap(ConstTensorReference<ElementType, dimension0, dimension1, dimension2>& other);
-
-        /// @}
-
-        /// <summary> Determines of this Tensor is stored in contiguous memory. </summary>
-        ///
-        /// <returns> True if contiguous, false if not. </returns>
-        bool IsContiguous() const;
-
-        /// <summary> Returns a copy of the contents of the Tensor. </summary>
-        ///
-        /// <returns> A std::vector with a copy of the contents of the Tensor. </returns>
-        std::vector<ElementType> ToArray() const;
-
-        /// <summary> Gets a const pointer to the underlying data storage. </summary>
-        ///
-        /// <returns> Const pointer to the data. </returns>
-        const ElementType* GetDataPointer() const { return _contents.pData; }
-
     protected:
-        // other protected member functions
-        ConstTensorReference(TensorContents<ElementType> contents);
-        size_t GetOffset(Triplet coordinate) const;
+        size_t GetOffset(TensorCoordinate coordinate) const;
+        ConstTensorReference(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2);
 
-        // variables
-        using TensorLayoutT = TensorLayout<dimension0, dimension1, dimension2>;
-        TensorContents<ElementType> _contents;
+        TensorShape _shape;
+        size_t _increment1;
+        size_t _increment2;
+        const ElementType* _pData;
     };
 
     /// <summary> Helper function to get the number of slices in a Tensor. </summary>
@@ -312,11 +388,11 @@ namespace math
     /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
     /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
     /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
-    /// <param name="T"> The Tensor. </param>
+    /// <param name="tensor"> The Tensor. </param>
     ///
     /// <returns> The number slices. </returns>
     template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    size_t NumSlices(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T);
+    size_t NumSlices(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor);
 
     /// <summary> Helper function to get a const tensor slice. </summary>
     ///
@@ -326,12 +402,12 @@ namespace math
     /// <typeparam name="dimension0"> Tensor dimension 0. </typeparam>
     /// <typeparam name="dimension1"> Tensor dimension 1. </typeparam>
     /// <typeparam name="dimension2"> Tensor dimension 2. </typeparam>
-    /// <param name="T"> The Tensor. </param>
+    /// <param name="tensor"> The Tensor. </param>
     /// <param name="index"> Slice index </param>
     ///
     /// <returns> The number slices. </returns>
     template<Dimension rowDimension, Dimension columnDimension, typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> T, size_t index);
+    auto GetSlice(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor, size_t index);
 
     /// <summary>
     /// A reference to a tensor. This class implements all the operations that modify tensor
@@ -349,25 +425,8 @@ namespace math
     public:
         using ConstTensorRef = ConstTensorReference<ElementType, dimension0, dimension1, dimension2>;
         using TensorElementType = typename ConstTensorRef::TensorElementType;
+
         using ConstTensorRef::ConstTensorReference;
-        using ConstTensorRef::operator();
-        using ConstTensorRef::Size;
-        using ConstTensorRef::NumRows;
-        using ConstTensorRef::NumColumns;
-        using ConstTensorRef::NumChannels;
-        using ConstTensorRef::GetLayout;
-        using ConstTensorRef::GetShape;
-        using ConstTensorRef::NumSlices;
-        using ConstTensorRef::NumPrimarySlices;
-        using ConstTensorRef::IsEqual;
-        using ConstTensorRef::operator==;
-        using ConstTensorRef::operator!=;
-        using ConstTensorRef::GetConstReference;
-        using ConstTensorRef::GetSubTensor;
-        using ConstTensorRef::GetSlice;
-        using ConstTensorRef::GetPrimarySlice;
-        using ConstTensorRef::ReferenceAsVector;
-        using ConstTensorRef::ReferenceAsMatrix;
 
         /// <summary> Constructs tensor of given shape that uses a pointer to an external buffer as the element data.
         /// This allows the Tensor to use data provided by some other source, and this Tensor does not
@@ -375,11 +434,32 @@ namespace math
         /// The buffer has (numRows * numColumns * numChannels) number of elements. </summary>
         /// </summary>
         ///
+        /// <param name="pData"> A pointer where the elements are stored. </param>
         /// <param name="numRows"> Number of rows. </param>
         /// <param name="numColumns"> Number of columns. </param>
         /// <param name="numChannels"> Number of channels. </param>
-        /// <param name="pData"> A pointer where the elements are stored. </param>
-        TensorReference(size_t numRows, size_t numColumns, size_t numChannels, ElementType* pData);
+        TensorReference(ElementType* pData, size_t numRows, size_t numColumns, size_t numChannels);
+
+        /// \name Accessor Functions
+        /// @{
+
+        using ConstTensorRef::NumRows;
+        using ConstTensorRef::NumColumns;
+        using ConstTensorRef::NumChannels;
+        using ConstTensorRef::Size;
+        using ConstTensorRef::GetSize0;
+        using ConstTensorRef::GetSize1;
+        using ConstTensorRef::GetSize2;
+        using ConstTensorRef::GetShape;
+        using ConstTensorRef::GetConstDataPointer;
+        using ConstTensorRef::NumSlices;
+        using ConstTensorRef::NumPrimarySlices;
+        using ConstTensorRef::operator();
+
+        /// <summary> Gets a pointer to the underlying data storage. </summary>
+        ///
+        /// <returns> Pointer to the data. </returns>
+        ElementType* GetDataPointer() { return const_cast<ElementType*>(_pData); }
 
         /// <summary> Element access operator. </summary>
         ///
@@ -395,12 +475,31 @@ namespace math
         /// <param name="coordinate"> The coordinate to access. </param>
         ///
         /// <returns> A reference to a tensor element. </returns>
-        inline ElementType& operator()(Triplet coordinate);
+        inline ElementType& operator()(TensorCoordinate coordinate);
+
+        /// @}
+
+        /// \name Utility Functions
+        /// @{
+
+        using ConstTensorRef::ToArray;
+        using ConstTensorRef::IsContiguous;
 
         /// <summary> Swaps the contents of this tensor reference with the contents of another tensor reference. </summary>
         ///
         /// <param name="other"> [in,out] The other tensor reference. </param>
         void Swap(TensorReference<ElementType, dimension0, dimension1, dimension2>& other);
+
+        /// @}
+
+        /// \name Comparison Functions
+        /// @{
+
+        using ConstTensorRef::IsEqual;
+        using ConstTensorRef::operator==;
+        using ConstTensorRef::operator!=;
+
+        /// @}
 
         /// \name Content Manipulation
         /// @{
@@ -454,6 +553,13 @@ namespace math
         /// \name View Functions
         /// @{
 
+        using ConstTensorRef::GetConstReference;
+        using ConstTensorRef::GetSubTensor;
+        using ConstTensorRef::GetSlice;
+        using ConstTensorRef::GetPrimarySlice;
+        using ConstTensorRef::ReferenceAsVector;
+        using ConstTensorRef::ReferenceAsMatrix;
+
         /// <summary> Gets a reference to this vector. </summary>
         ///
         /// <returns> A reference to this vector. </returns>
@@ -477,7 +583,7 @@ namespace math
         /// <param name="shape"> The shape of the block (always given in logical coordinates: row, column, channel). </param>
         ///
         /// <returns> The resulting TensorReference. </returns>
-        TensorReference<ElementType, dimension0, dimension1, dimension2> GetSubTensor(Triplet firstCoordinate, Triplet shape);
+        TensorReference<ElementType, dimension0, dimension1, dimension2> GetSubTensor(TensorCoordinate firstCoordinate, TensorShape shape);
 
         /// <summary>
         /// Gets a reference to a slice of the tensor. Note that only four of the six possible slice
@@ -520,37 +626,13 @@ namespace math
 
         /// @}
 
-        /// \name Math Functions
-        /// @{
-
-        /// <summary> Adds a constant value to this tensor. </summary>
-        ///
-        /// <param name="other"> The constant value. </param>
-        void operator+=(ElementType value);
-
-        /// <summary> Subtracts a constant value from this tensor. </summary>
-        ///
-        /// <param name="other"> The constant value. </param>
-        void operator-=(ElementType value);
-
-        /// <summary> Multiplies this tensor by a constant value. </summary>
-        ///
-        /// <param name="other"> The constant value. </param>
-        void operator*=(ElementType value);
-
-        /// <summary> Divides each element of this tensor by a constant value. </summary>
-        ///
-        /// <param name="other"> The constant value. </param>
-        void operator/=(ElementType value);
-
-        /// @}
-
     protected:
-        // abbreviations
-        using TensorLayoutT = TensorLayout<dimension0, dimension1, dimension2>;
-
-        // variables
-        using ConstTensorRef::_contents;
+        TensorReference(ElementType* pData, TensorShape shape, size_t increment1, size_t increment2);
+        using ConstTensorRef::GetOffset;
+        using ConstTensorRef::_pData;
+        using ConstTensorRef::_shape;
+        using ConstTensorRef::_increment1;
+        using ConstTensorRef::_increment2;
     };
 
     /// <summary> Implements a tensor that owns its own memory. </summary>
@@ -566,34 +648,8 @@ namespace math
     public:
         using TensorRef = TensorReference<ElementType, dimension0, dimension1, dimension2>;
         using TensorElementType = typename TensorRef::TensorElementType;
+
         using TensorRef::TensorReference;
-        using TensorRef::operator();
-        using TensorRef::Size;
-        using TensorRef::NumRows;
-        using TensorRef::NumColumns;
-        using TensorRef::NumChannels;
-        using TensorRef::GetLayout;
-        using TensorRef::GetShape;
-        using TensorRef::NumSlices;
-        using TensorRef::NumPrimarySlices;
-        using TensorRef::IsEqual;
-        using TensorRef::operator==;
-        using TensorRef::operator!=;
-        using TensorRef::GetConstReference;
-        using TensorRef::GetSubTensor;
-        using TensorRef::GetSlice;
-        using TensorRef::GetPrimarySlice;
-        using TensorRef::ReferenceAsVector;
-        using TensorRef::ReferenceAsMatrix;
-        using TensorRef::CopyFrom;
-        using TensorRef::Reset;
-        using TensorRef::Fill;
-        using TensorRef::Generate;
-        using TensorRef::GetReference;
-        using TensorRef::operator+=;
-        using TensorRef::operator-=;
-        using TensorRef::operator*=;
-        using TensorRef::operator/=;
 
         /// <summary> Constructs an empty tensor. </summary>
         Tensor();
@@ -624,7 +680,7 @@ namespace math
         /// <summary> Constructs a the zero tensor of given shape. </summary>
         ///
         /// <param name="shape"> The tensor shape (given in logical coordinates: rows, columns, channels). </param>
-        Tensor(Triplet shape);
+        Tensor(TensorShape shape);
 
         /// <summary> Copy Constructor. </summary>
         ///
@@ -642,6 +698,28 @@ namespace math
         /// <param name="list"> A triply nested initalizer list. </param>
         Tensor(std::initializer_list<std::initializer_list<std::initializer_list<ElementType>>> list);
 
+        /// \name Accessor Functions
+        /// @{
+
+        using TensorRef::NumRows;
+        using TensorRef::NumColumns;
+        using TensorRef::NumChannels;
+        using TensorRef::Size;
+        using TensorRef::GetSize0;
+        using TensorRef::GetSize1;
+        using TensorRef::GetSize2;
+        using TensorRef::GetShape;
+        using TensorRef::NumSlices;
+        using TensorRef::NumPrimarySlices;
+        using TensorRef::operator();
+
+        /// @}
+
+        /// \name Utility Functions
+        /// @{
+
+        using TensorRef::IsContiguous;
+
         /// <summary> Assignment operator. </summary>
         ///
         /// <param name="other"> The other tensor. </param>
@@ -649,8 +727,10 @@ namespace math
         /// <returns> A reference to this tensor. </returns>
         Tensor<ElementType, dimension0, dimension1, dimension2>& operator=(Tensor<ElementType, dimension0, dimension1, dimension2> other);
 
-        /// \name Utility Functions
-        /// @{
+        /// <summary> Returns a copy of the contents of the Tensor. </summary>
+        ///
+        /// <returns> A std::vector with a copy of the contents of the Tensor. </returns>
+        std::vector<ElementType> ToArray() const { return _data; }
 
         /// <summary> Swaps the contents of this tensor with the contents of another tensor. </summary>
         ///
@@ -659,19 +739,43 @@ namespace math
 
         /// @}
 
-        /// <summary> Returns a copy of the contents of the Tensor. </summary>
-        ///
-        /// <returns> A std::vector with a copy of the contents of the Tensor. </returns>
-        std::vector<ElementType> ToArray() const { return _data; }
+        /// \name Comparison Functions
+        /// @{
+
+        using TensorRef::IsEqual;
+        using TensorRef::operator==;
+        using TensorRef::operator!=;
+
+        /// @}
+
+        /// \name  Content Manipulation Functions
+        /// @{
+
+        using TensorRef::CopyFrom;
+        using TensorRef::Reset;
+        using TensorRef::Fill;
+        using TensorRef::Generate;
+        using TensorRef::GetReference;
+
+        /// @}
+
+        /// \name View Functions
+        /// @{
+
+        using TensorRef::GetConstReference;
+        using TensorRef::GetSubTensor;
+        using TensorRef::GetSlice;
+        using TensorRef::GetPrimarySlice;
+        using TensorRef::ReferenceAsVector;
+        using TensorRef::ReferenceAsMatrix;
+
+        /// @}
 
     private:
-        Tensor(size_t numRows, size_t numColumns, size_t numChannels, ElementType* pData) : TensorReference<ElementType, dimension0, dimension1, dimension2>(numRows, numColumns, numChannels, pData) {};
-
-        // abbreviation
         using ConstTensorRef = ConstTensorReference<ElementType, dimension0, dimension1, dimension2>;
-        
+        using ConstTensorRef::_pData;
+
         // the array used to store the tensor
-        using ConstTensorRef::_contents;
         std::vector<ElementType> _data;
     };
 

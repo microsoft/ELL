@@ -57,10 +57,10 @@ namespace math
     public:
         /// <summary> Constructs an instance of UnorientedConstVectorReference. </summary>
         ///
-        /// <param name="pData"> [in,out] Pointer to the data. </param>
+        /// <param name="pData"> Pointer to the data. </param>
         /// <param name="size"> The size of the vector. </param>
         /// <param name="increment"> The vector increment. </param>
-        UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment=1);
+        UnorientedConstVectorReference(const ElementType* pData, size_t size, size_t increment=1);
 
         /// <summary> Array indexer operator. </summary>
         ///
@@ -77,7 +77,7 @@ namespace math
         /// <summary> Gets a const pointer to the underlying data storage. </summary>
         ///
         /// <returns> Const pointer to the data. </returns>
-        const ElementType* GetDataPointer() const { return _pData; }
+        const ElementType* GetConstDataPointer() const { return _pData; }
 
         /// <summary> Gets the increment used in the underlying data storage. </summary>
         ///
@@ -134,7 +134,7 @@ namespace math
         /// @}
 
     protected:
-        ElementType* _pData;
+        const ElementType* _pData;
         size_t _size;
         size_t _increment;
     };
@@ -150,7 +150,7 @@ namespace math
         using UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference;
         using UnorientedConstVectorReference<ElementType>::operator[];
         using UnorientedConstVectorReference<ElementType>::Size;
-        using UnorientedConstVectorReference<ElementType>::GetDataPointer;
+        using UnorientedConstVectorReference<ElementType>::GetConstDataPointer;
         using UnorientedConstVectorReference<ElementType>::GetIncrement;
         using UnorientedConstVectorReference<ElementType>::Norm0;
         using UnorientedConstVectorReference<ElementType>::Norm1;
@@ -221,7 +221,7 @@ namespace math
         auto Transpose() const -> ConstVectorReference<ElementType, VectorBase<orientation>::transposeOrientation>
         {
             // STYLE intentional deviation from project style - long implementation should be in tcc file
-            return ConstVectorReference<ElementType, VectorBase<orientation>::transposeOrientation>(_pData, _size, _increment);
+            return ConstVectorReference<ElementType, VectorBase<orientation>::transposeOrientation>(GetConstDataPointer(), _size, _increment);
         }
 
         /// @}
@@ -286,7 +286,7 @@ namespace math
         using ConstVectorReference<ElementType, orientation>::ConstVectorReference;
         using ConstVectorReference<ElementType, orientation>::operator[];
         using ConstVectorReference<ElementType, orientation>::Size;
-        using ConstVectorReference<ElementType, orientation>::GetDataPointer;
+        using ConstVectorReference<ElementType, orientation>::GetConstDataPointer;
         using ConstVectorReference<ElementType, orientation>::GetIncrement;
         using ConstVectorReference<ElementType, orientation>::Norm0;
         using ConstVectorReference<ElementType, orientation>::Norm1;
@@ -309,7 +309,7 @@ namespace math
         /// <summary> Gets a pointer to the underlying data storage. </summary>
         ///
         /// <returns> Pointer to the data. </returns>
-        ElementType* GetDataPointer() { return _pData; }
+        ElementType* GetDataPointer() { return const_cast<ElementType*>(_pData); }
 
         /// <summary> Swaps the contents of this with the contents of another VectorReference. </summary>
         ///
@@ -378,7 +378,8 @@ namespace math
         /// <returns> A reference to the transpose of this vector. </returns>
         auto Transpose() -> VectorReference<ElementType, VectorBase<orientation>::transposeOrientation>
         {
-            return VectorReference<ElementType, VectorBase<orientation>::transposeOrientation>(_pData, _size, _increment);
+            // STYLE intentional deviation from project style - long implementation should be in tcc file
+            return VectorReference<ElementType, VectorBase<orientation>::transposeOrientation>(GetDataPointer(), _size, _increment);
         }
 
         /// @}
@@ -420,7 +421,7 @@ namespace math
     public:
         using VectorReference<ElementType, orientation>::operator[];
         using VectorReference<ElementType, orientation>::Size;
-        using VectorReference<ElementType, orientation>::GetDataPointer;
+        using VectorReference<ElementType, orientation>::GetConstDataPointer;
         using VectorReference<ElementType, orientation>::GetIncrement;
         using VectorReference<ElementType, orientation>::Norm0;
         using VectorReference<ElementType, orientation>::Norm1;
@@ -433,6 +434,7 @@ namespace math
         using VectorReference<ElementType, orientation>::GetSubVector;
         using VectorReference<ElementType, orientation>::GetReference;
         using VectorReference<ElementType, orientation>::Transpose;
+        using VectorReference<ElementType, orientation>::GetDataPointer;
         using VectorReference<ElementType, orientation>::CopyFrom;
         using VectorReference<ElementType, orientation>::Reset;
         using VectorReference<ElementType, orientation>::Fill;
@@ -461,7 +463,7 @@ namespace math
 
         /// <summary> Copy Constructor. </summary>
         ///
-        /// <param name="other"> [in,out] The vector being copied. </param>
+        /// <param name="other"> The vector being copied. </param>
         Vector(const Vector<ElementType, orientation>& other);
 
         /// <summary> Assignment operator. </summary>
@@ -484,6 +486,7 @@ namespace math
     private:
         using ConstVectorReference<ElementType, orientation>::_pData;
         using ConstVectorReference<ElementType, orientation>::_size;
+        using ConstVectorReference<ElementType, orientation>::_increment;
 
         // member variables
         std::vector<ElementType> _data;

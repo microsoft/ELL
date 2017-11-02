@@ -152,11 +152,11 @@ namespace math
     {
         DEBUG_THROW(vectorA.Size() != vectorB.Size() || vectorA.Size() != vectorB.Size(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible vector sizes."));
 
-        const ElementType* vectorAData = vectorA.GetDataPointer();
-        const ElementType* vectorBData = vectorB.GetDataPointer();
+        const ElementType* vectorAData = vectorA.GetConstDataPointer();
+        const ElementType* vectorBData = vectorB.GetConstDataPointer();
 
         size_t i = 0;
-        const ElementType* end = vectorA.GetDataPointer() + vectorA.GetIncrement() * vectorA.Size();
+        const ElementType* end = vectorA.GetConstDataPointer() + vectorA.GetIncrement() * vectorA.Size();
 
         while (vectorAData < end)
         {
@@ -167,15 +167,43 @@ namespace math
     }
 
     template <typename ElementType>
-    ElementType Dot(UnorientedConstVectorReference<ElementType> vectorA, UnorientedConstVectorReference<ElementType> vectorB)
+    void Inner(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result)
     {
-        return Internal::VectorOperations<ImplementationType::openBlas>::Dot(vectorA, vectorB);
+        Internal::VectorOperations<ImplementationType::openBlas>::Inner(vectorA, vectorB, result);
     }
 
     template <typename ElementType>
     void Multiply(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result)
     {
-        result = Dot(vectorA, vectorB);
+        Inner(vectorA, vectorB, result);
+    }
+
+    template <typename ElementType>
+    ElementType Dot(UnorientedConstVectorReference<ElementType> vectorA, UnorientedConstVectorReference<ElementType> vectorB)
+    {
+        ConstVectorReference<ElementType, VectorOrientation::row> rowVector(vectorA.GetConstDataPointer(), vectorA.Size(), vectorA.GetIncrement());
+        ConstVectorReference<ElementType, VectorOrientation::column> columnVector(vectorB.GetConstDataPointer(), vectorB.Size(), vectorB.GetIncrement());
+
+        ElementType result;
+        Inner(rowVector, columnVector, result);
+        return result;
+    }
+
+    template <typename ElementType, MatrixLayout layout>
+    void Outer(ConstVectorReference<ElementType, VectorOrientation::column> vectorA, ConstVectorReference<ElementType, VectorOrientation::row> vectorB, MatrixReference<ElementType, layout> matrix)
+    {
+        if (vectorA.Size() != matrix.NumRows() || vectorB.Size() != matrix.NumColumns())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "inconsistent vector and matrix sizes");
+        }
+
+        for (size_t i = 0; i < matrix.NumRows(); ++i)
+        {
+            for (size_t j = 0; j < matrix.NumColumns(); ++j)
+            {
+                matrix(i, j) = vectorA[i] * vectorB[j];
+            }
+        }
     }
 
     //
@@ -193,8 +221,8 @@ namespace math
             }
 
             ElementType* vectorBData = vectorB.GetDataPointer();
-            const ElementType* vectorAData = vectorA.GetDataPointer();
-            const ElementType* vectorBEnd = vectorB.GetDataPointer() + vectorB.GetIncrement() * vectorB.Size();
+            const ElementType* vectorAData = vectorA.GetConstDataPointer();
+            const ElementType* vectorBEnd = vectorB.GetConstDataPointer() + vectorB.GetIncrement() * vectorB.Size();
 
             while (vectorBData < vectorBEnd)
             {
@@ -211,18 +239,18 @@ namespace math
         }
 
         template <typename ElementType>
-        ElementType VectorOperations<ImplementationType::native>::Dot(UnorientedConstVectorReference<ElementType> vectorA, UnorientedConstVectorReference<ElementType> vectorB)
+        void VectorOperations<ImplementationType::native>::Inner(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result)
         {
             if (vectorA.Size() != vectorB.Size())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectorA and vectorB are not the same size.");
             }
 
-            const ElementType* vectorAData = vectorA.GetDataPointer();
-            const ElementType* vectorBData = vectorB.GetDataPointer();
+            const ElementType* vectorAData = vectorA.GetConstDataPointer();
+            const ElementType* vectorBData = vectorB.GetConstDataPointer();
 
-            ElementType result = 0;
-            const ElementType* end = vectorA.GetDataPointer() + vectorA.GetIncrement() * vectorA.Size();
+            result = 0;
+            const ElementType* end = vectorA.GetConstDataPointer() + vectorA.GetIncrement() * vectorA.Size();
 
             while (vectorAData < end)
             {
@@ -230,7 +258,6 @@ namespace math
                 vectorAData += vectorA.GetIncrement();
                 vectorBData += vectorB.GetIncrement();
             }
-            return result;
         }
 
 #ifdef USE_BLAS
@@ -246,7 +273,7 @@ namespace math
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectors vectorB and vectorA are not the same size.");
             }
 
-            Blas::Axpy(static_cast<int>(vectorB.Size()), value, vectorA.GetDataPointer(), static_cast<int>(vectorA.GetIncrement()), vectorB.GetDataPointer(), static_cast<int>(vectorB.GetIncrement()));
+            Blas::Axpy(static_cast<int>(vectorB.Size()), value, vectorA.GetConstDataPointer(), static_cast<int>(vectorA.GetIncrement()), vectorB.GetDataPointer(), static_cast<int>(vectorB.GetIncrement()));
         }
 
         template <typename ElementType, VectorOrientation orientation>
@@ -256,14 +283,14 @@ namespace math
         }
 
         template <typename ElementType>
-        ElementType VectorOperations<ImplementationType::openBlas>::Dot(UnorientedConstVectorReference<ElementType> vectorA, UnorientedConstVectorReference<ElementType> vectorB)
+        void VectorOperations<ImplementationType::openBlas>::Inner(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result)
         {
             if (vectorA.Size() != vectorB.Size())
             {
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "vectorA and vectorB are not the same size.");
             }
 
-            return Blas::Dot(static_cast<int>(vectorA.Size()), vectorA.GetDataPointer(), static_cast<int>(vectorA.GetIncrement()), vectorB.GetDataPointer(), static_cast<int>(vectorB.GetIncrement()));
+            result = Blas::Dot(static_cast<int>(vectorA.Size()), vectorA.GetConstDataPointer(), static_cast<int>(vectorA.GetIncrement()), vectorB.GetConstDataPointer(), static_cast<int>(vectorB.GetIncrement()));
         }
 
 #endif // USE_BLAS

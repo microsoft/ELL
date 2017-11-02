@@ -42,7 +42,7 @@ namespace model
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
         ell::math::TensorShape shape = GetShape();
-        archiver[shapeName] << std::vector<size_t>({ shape.rows, shape.columns, shape.channels });
+        archiver[shapeName] << std::vector<size_t>({ shape.NumRows(), shape.NumColumns(), shape.NumChannels() });
     }
 
     template <typename ValueType>

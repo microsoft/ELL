@@ -361,7 +361,7 @@ void ConvolutionalLayerTest()
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
     LayerParameters parameters{ input, ZeroPadding(1), outputShape, NoPadding() };
     ConvolutionalParameters convolutionalParams{ 3, 1, ConvolutionMethod::diagonal, 2 };
-    TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
+    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
         1, 3, 2, 3, 1, 1, 2, 3, 1,
@@ -370,7 +370,7 @@ void ConvolutionalLayerTest()
         0, 3, 2, 3, 1, 2, 1, 0, 2 };
     // clang-format on
     size_t vectorIndex = 0;
-    for (size_t f = 0; f < outputShape[2]; f++)
+    for (size_t f = 0; f < outputShape.NumChannels(); f++)
     {
         for (size_t k = 0; k < input.NumChannels(); k++)
         {
@@ -420,7 +420,7 @@ void BinaryConvolutionalLayerGemmTest(ell::predictors::neural::BinaryWeightsScal
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
     LayerParameters parameters{ input.GetReference(), ZeroPadding(1), outputShape, NoPadding() };
     BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm, scale };
-    TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
+    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
         1, 3, 2, 3, 1, 1, 2, 3, 1,
@@ -429,7 +429,7 @@ void BinaryConvolutionalLayerGemmTest(ell::predictors::neural::BinaryWeightsScal
         0, 3, 2, 3, 1, 2, 1, 0, 2 };
     // clang-format on
     size_t vectorIndex = 0;
-    for (size_t f = 0; f < outputShape[2]; f++)
+    for (size_t f = 0; f < outputShape.NumChannels(); f++)
     {
         for (size_t k = 0; k < input.NumChannels(); k++)
         {
@@ -515,7 +515,7 @@ void BinaryConvolutionalLayerBitwiseTest(ell::predictors::neural::BinaryWeightsS
     Shape outputShape = { 1, 2, 2 }; // Output has no padding
     LayerParameters parameters{ input.GetReference(), MinusOnePadding(1), outputShape, NoPadding() };
     BinaryConvolutionalParameters convolutionalParams{ 3, 1, BinaryConvolutionMethod::gemm, scale };
-    TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
+    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
         1, 3, 2, 3, 1, 1, 2, 3, 1,
@@ -524,7 +524,7 @@ void BinaryConvolutionalLayerBitwiseTest(ell::predictors::neural::BinaryWeightsS
         0, 3, 2, 3, 1, 2, 1, 0, 2 };
     // clang-format on
     size_t vectorIndex = 0;
-    for (size_t f = 0; f < outputShape[2]; f++)
+    for (size_t f = 0; f < outputShape.NumChannels(); f++)
     {
         for (size_t k = 0; k < input.NumChannels(); k++)
         {

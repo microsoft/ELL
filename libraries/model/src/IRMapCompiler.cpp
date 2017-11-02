@@ -208,9 +208,9 @@ namespace model
                 auto thenBlock = fn.BeginBlock("ThenBlock" + labelSuffix);
                 {
                     math::TensorShape shape = *ptr;
-                    fn.Store(rowsPtr, fn.Literal((int)shape.rows));
-                    fn.Store(columnsPtr, fn.Literal((int)shape.columns));
-                    fn.Store(channelsPtr, fn.Literal((int)shape.channels));
+                    fn.Store(rowsPtr, fn.Literal((int)shape.NumRows()));
+                    fn.Store(columnsPtr, fn.Literal((int)shape.NumColumns()));
+                    fn.Store(channelsPtr, fn.Literal((int)shape.NumChannels()));
                     fn.Return();
                 }
                 auto elseBlock = fn.BeginBlock("ElseBlock" + labelSuffix);

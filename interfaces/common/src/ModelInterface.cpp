@@ -558,22 +558,22 @@ ELL_Node ELL_ModelBuilder::AddNeuralNetworkPredictorNode(ELL_Model model, ELL_Po
     return ELL_Node(newNode);
 }
 
-ELL_Node ELL_ModelBuilder::AddInputNode(ELL_Model model, ell::math::TensorShape& tensorShape, ELL_PortType type)
+ELL_Node ELL_ModelBuilder::AddInputNode(ELL_Model model, const ell::api::math::TensorShape& tensorShape, ELL_PortType type)
 {
     ell::model::Node* newNode = nullptr;
     switch (type)
     {
         case ELL_PortType::boolean:
-            newNode = model.GetModel().AddNode<ell::model::InputNode<bool>>(tensorShape);
+            newNode = model.GetModel().AddNode<ell::model::InputNode<bool>>(tensorShape.ToMathTensorShape());
             break;
         case ELL_PortType::integer:
-            newNode = model.GetModel().AddNode<ell::model::InputNode<int>>(tensorShape);
+            newNode = model.GetModel().AddNode<ell::model::InputNode<int>>(tensorShape.ToMathTensorShape());
             break;
         case ELL_PortType::real:
-            newNode = model.GetModel().AddNode<ell::model::InputNode<double>>(tensorShape);
+            newNode = model.GetModel().AddNode<ell::model::InputNode<double>>(tensorShape.ToMathTensorShape());
             break;
         case ELL_PortType::smallReal:
-            newNode = model.GetModel().AddNode<ell::model::InputNode<float>>(tensorShape);
+            newNode = model.GetModel().AddNode<ell::model::InputNode<float>>(tensorShape.ToMathTensorShape());
             break;
         default:
             throw std::invalid_argument("Error: could not create node");
@@ -581,7 +581,7 @@ ELL_Node ELL_ModelBuilder::AddInputNode(ELL_Model model, ell::math::TensorShape&
     return ELL_Node(newNode);
 }
 
-ELL_Node ELL_ModelBuilder::AddOutputNode(ELL_Model model, ell::math::TensorShape& tensorShape, ELL_PortElements input)
+ELL_Node ELL_ModelBuilder::AddOutputNode(ELL_Model model, const ell::api::math::TensorShape& tensorShape, ELL_PortElements input)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
@@ -589,16 +589,16 @@ ELL_Node ELL_ModelBuilder::AddOutputNode(ELL_Model model, ell::math::TensorShape
     switch (type)
     {
         case ELL_PortType::boolean:
-            newNode = model.GetModel().AddNode<ell::model::OutputNode<bool>>(ell::model::PortElements<bool>(elements), tensorShape);
+            newNode = model.GetModel().AddNode<ell::model::OutputNode<bool>>(ell::model::PortElements<bool>(elements), tensorShape.ToMathTensorShape());
             break;
         case ELL_PortType::integer:
-            newNode = model.GetModel().AddNode<ell::model::OutputNode<int>>(ell::model::PortElements<int>(elements), tensorShape);
+            newNode = model.GetModel().AddNode<ell::model::OutputNode<int>>(ell::model::PortElements<int>(elements), tensorShape.ToMathTensorShape());
             break;
         case ELL_PortType::real:
-            newNode = model.GetModel().AddNode<ell::model::OutputNode<double>>(ell::model::PortElements<double>(elements), tensorShape);
+            newNode = model.GetModel().AddNode<ell::model::OutputNode<double>>(ell::model::PortElements<double>(elements), tensorShape.ToMathTensorShape());
             break;
         case ELL_PortType::smallReal:
-            newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), tensorShape);
+            newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), tensorShape.ToMathTensorShape());
             break;
         default:
             throw std::invalid_argument("Error: could not create node");
@@ -670,14 +670,14 @@ ELL_Map::ELL_Map(const std::string& filename)
     Load(filename);
 }
 
-ell::math::TensorShape ELL_Map::GetInputShape() const
+ell::api::math::TensorShape ELL_Map::GetInputShape() const
 {
-    return _map->GetInputShape();
+    return ell::api::math::TensorShape::FromMathTensorShape(_map->GetInputShape());
 }
 
-ell::math::TensorShape ELL_Map::GetOutputShape() const
+ell::api::math::TensorShape ELL_Map::GetOutputShape() const
 {
-    return _map->GetOutputShape();
+    return ell::api::math::TensorShape::FromMathTensorShape(_map->GetOutputShape());
 }
 
 std::vector<double> ELL_Map::ComputeDouble(const std::vector<double>& inputData)

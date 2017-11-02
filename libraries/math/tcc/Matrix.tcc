@@ -24,7 +24,7 @@ namespace math
     //
 
     template <typename ElementType>
-    CommonMatrixBase<ElementType>::CommonMatrixBase(size_t numRows, size_t numColumns, size_t increment, ElementType* pData)
+    CommonMatrixBase<ElementType>::CommonMatrixBase(const ElementType* pData, size_t numRows, size_t numColumns, size_t increment)
         : _pData(pData), _numRows(numRows), _numColumns(numColumns), _increment(increment)
     {
     }
@@ -45,8 +45,8 @@ namespace math
 
     // Row-major
     template <typename ElementType>
-    MatrixBase<ElementType, MatrixLayout::rowMajor>::MatrixBase(size_t numRows, size_t numColumns, ElementType* pData)
-        : CommonMatrixBase<ElementType>(numRows, numColumns, numColumns, pData)
+    MatrixBase<ElementType, MatrixLayout::rowMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns)
+        : CommonMatrixBase<ElementType>(pData, numRows, numColumns, numColumns)
     {
     }
 
@@ -58,8 +58,8 @@ namespace math
 
     // Column-major
     template <typename ElementType>
-    MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(size_t numRows, size_t numColumns, ElementType* pData)
-        : CommonMatrixBase<ElementType>(numRows, numColumns, numRows, pData)
+    MatrixBase<ElementType, MatrixLayout::columnMajor>::MatrixBase(const ElementType* pData, size_t numRows, size_t numColumns)
+        : CommonMatrixBase<ElementType>(pData, numRows, numColumns, numRows)
     {
     }
 
@@ -77,7 +77,7 @@ namespace math
     {
         DEBUG_THROW(rowIndex >= NumRows() || columnIndex >= NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "(rowIndex, columnIndex) exceeds matrix dimensions."));
 
-        return _pData[rowIndex * GetRowIncrement() + columnIndex * GetColumnIncrement()];
+        return GetConstDataPointer()[rowIndex * GetRowIncrement() + columnIndex * GetColumnIncrement()];
     }
 
     template <typename ElementType, MatrixLayout layout>
@@ -85,11 +85,11 @@ namespace math
     {
         std::vector<ElementType> v(Size());
         auto vIterator = v.begin();
-        for (size_t i = 0; i < NumIntervals(); ++i)
+        for (size_t i = 0; i < GetMinorSize(); ++i)
         {
             auto pIntervalData = GetMajorVectorBegin(i);
-            std::copy(pIntervalData, pIntervalData + GetIntervalSize(), vIterator);
-            vIterator += GetIntervalSize();
+            std::copy(pIntervalData, pIntervalData + GetMajorSize(), vIterator);
+            vIterator += GetMajorSize();
         }
         return v;
     }
@@ -108,7 +108,7 @@ namespace math
             return false;
         }
 
-        for (size_t i = 0; i < NumIntervals(); ++i)
+        for (size_t i = 0; i < GetMinorSize(); ++i)
         {
             if (!GetMajorVector(i).IsEqual(other.GetMajorVector(i), tolerance))
             {
@@ -160,7 +160,7 @@ namespace math
     {
         DEBUG_THROW(firstRow + numRows > NumRows() || firstColumn + numColumns > NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "block exceeds matrix dimensions."));
 
-        return ConstMatrixReference<ElementType, layout>(numRows, numColumns, GetIncrement(), _pData + firstRow * GetRowIncrement() + firstColumn * GetColumnIncrement());
+        return ConstMatrixReference<ElementType, layout>(GetConstDataPointer() + firstRow * GetRowIncrement() + firstColumn * GetColumnIncrement(), numRows, numColumns, GetIncrement());
     }
 
     template <typename ElementType, MatrixLayout layout>
@@ -168,7 +168,7 @@ namespace math
     {
         DEBUG_THROW(index >= NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "column index exceeds matrix dimensions."));
 
-        return ConstVectorReference<ElementType, VectorOrientation::column>(_pData + index * GetColumnIncrement(), NumRows(), GetRowIncrement());
+        return ConstVectorReference<ElementType, VectorOrientation::column>(GetConstDataPointer() + index * GetColumnIncrement(), NumRows(), GetRowIncrement());
     }
 
     template <typename ElementType, MatrixLayout layout>
@@ -176,33 +176,33 @@ namespace math
     {
         DEBUG_THROW(index >= NumRows(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "row index exceeds matrix dimensions."));
 
-        return ConstVectorReference<ElementType, VectorOrientation::row>(_pData + index * GetRowIncrement(), NumColumns(), GetColumnIncrement());
+        return ConstVectorReference<ElementType, VectorOrientation::row>(GetConstDataPointer() + index * GetRowIncrement(), NumColumns(), GetColumnIncrement());
     }
 
     template <typename ElementType, MatrixLayout layout>
     ConstVectorReference<ElementType, VectorOrientation::column> ConstMatrixReference<ElementType, layout>::GetDiagonal() const
     {
         auto size = std::min(NumColumns(), NumRows());
-        return ConstVectorReference<ElementType, VectorOrientation::column>(_pData, size, GetIncrement() + 1);
+        return ConstVectorReference<ElementType, VectorOrientation::column>(GetConstDataPointer(), size, GetIncrement() + 1);
     }
 
     template <typename ElementType, MatrixLayout layout>
     ConstVectorReference<ElementType, VectorOrientation::column> ConstMatrixReference<ElementType, layout>::ReferenceAsVector() const
     {
         DEBUG_THROW(!IsContiguous(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only flatten a matrix when its memory is contiguous"));
-        return ConstVectorReference<ElementType, VectorOrientation::column>(_pData, NumRows() * NumColumns(), 1);
+        return ConstVectorReference<ElementType, VectorOrientation::column>(GetConstDataPointer(), NumRows() * NumColumns(), 1);
     }
 
     template <typename ElementType, MatrixLayout layout>
     auto ConstMatrixReference<ElementType, layout>::Transpose() const -> ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value>
     {
-        return ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value>(NumColumns(), NumRows(), GetIncrement(), _pData);
+        return ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value>(GetConstDataPointer(), NumColumns(), NumRows(), GetIncrement());
     }
 
     template <typename ElementType, MatrixLayout layout>
-    ElementType* ConstMatrixReference<ElementType, layout>::GetMajorVectorBegin(size_t index) const
+    const ElementType* ConstMatrixReference<ElementType, layout>::GetMajorVectorBegin(size_t index) const
     {
-        return _pData + index * GetIncrement();
+        return GetConstDataPointer() + index * GetIncrement();
     }
 
     //
@@ -210,11 +210,21 @@ namespace math
     //
 
     template <typename ElementType, MatrixLayout layout>
+    MatrixReference<ElementType, layout>::MatrixReference(ElementType* pData, size_t numRows, size_t numColumns, size_t increment)
+        : ConstMatrixReference<ElementType, layout>(pData, numRows, numColumns, increment)
+    {}
+
+    template <typename ElementType, MatrixLayout layout>
+    MatrixReference<ElementType, layout>::MatrixReference(ElementType* pData, size_t numRows, size_t numColumns)
+        : ConstMatrixReference<ElementType, layout>(pData, numRows, numColumns)
+    {}
+
+    template <typename ElementType, MatrixLayout layout>
     ElementType& MatrixReference<ElementType, layout>::operator()(size_t rowIndex, size_t columnIndex)
     {
         DEBUG_THROW(rowIndex >= NumRows() || columnIndex >= NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "(rowIndex, columnIndex) exceeds matrix dimensions."));
 
-        return _pData[rowIndex * GetRowIncrement() + columnIndex * GetColumnIncrement()];
+        return GetDataPointer()[rowIndex * GetRowIncrement() + columnIndex * GetColumnIncrement()];
     }
 
     template <typename ElementType, MatrixLayout layout>
@@ -225,7 +235,7 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Matrix dimensions are not the same.");
         }
 
-        for (size_t i = 0; i < other.NumIntervals(); ++i)
+        for (size_t i = 0; i < other.GetMinorSize(); ++i)
         {
             GetMajorVector(i).CopyFrom(other.GetMajorVector(i));
         }
@@ -254,10 +264,10 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     void MatrixReference<ElementType, layout>::Fill(ElementType value)
     {
-        for (size_t i = 0; i < NumIntervals(); ++i)
+        for (size_t i = 0; i < GetMinorSize(); ++i)
         {
-            auto begin = GetMajorVectorBegin(i);
-            std::fill(begin, begin + GetIntervalSize(), value);
+            auto vector = GetMajorVector(i);
+            vector.Fill(value);
         }
     }
 
@@ -265,7 +275,7 @@ namespace math
     template <typename GeneratorType>
     void MatrixReference<ElementType, layout>::Generate(GeneratorType generator)
     {
-        for (size_t i = 0; i < NumIntervals(); ++i)
+        for (size_t i = 0; i < GetMinorSize(); ++i)
         {
             GetMajorVector(i).Generate(generator);
         }
@@ -275,16 +285,16 @@ namespace math
     template <typename TransformationType>
     void MatrixReference<ElementType, layout>::Transform(TransformationType transformation)
     {
-        for (size_t i = 0; i < NumIntervals(); ++i)
+        for (size_t i = 0; i < GetMinorSize(); ++i)
         {
             GetMajorVector(i).Transform(transformation);
         }
     }
 
     template <typename ElementType, MatrixLayout layout>
-    auto MatrixReference<ElementType, layout>::Transpose() const -> MatrixReference<ElementType, TransposeMatrixLayout<layout>::value>
+    auto MatrixReference<ElementType, layout>::Transpose() -> MatrixReference<ElementType, TransposeMatrixLayout<layout>::value>
     {
-        return MatrixReference<ElementType, TransposeMatrixLayout<layout>::value>(NumColumns(), NumRows(), GetIncrement(), _pData);
+        return MatrixReference<ElementType, TransposeMatrixLayout<layout>::value>(GetDataPointer(), NumColumns(), NumRows(), GetIncrement());
     }
 
     template <typename ElementType, MatrixLayout layout>
@@ -292,7 +302,7 @@ namespace math
     {
         DEBUG_THROW(firstRow + numRows > NumRows() || firstColumn + numColumns > NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "block exceeds matrix dimensions."));
 
-        return MatrixReference<ElementType, layout>(numRows, numColumns, GetIncrement(), _pData + firstRow * GetRowIncrement() + firstColumn * GetColumnIncrement());
+        return MatrixReference<ElementType, layout>(GetDataPointer() + firstRow * GetRowIncrement() + firstColumn * GetColumnIncrement(), numRows, numColumns, GetIncrement());
     }
 
     template <typename ElementType, MatrixLayout layout>
@@ -300,7 +310,7 @@ namespace math
     {
         DEBUG_THROW(index >= NumColumns(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "column index exceeds matrix dimensions."));
 
-        return VectorReference<ElementType, VectorOrientation::column>(_pData + index * GetColumnIncrement(), NumRows(), GetRowIncrement());
+        return VectorReference<ElementType, VectorOrientation::column>(GetDataPointer() + index * GetColumnIncrement(), NumRows(), GetRowIncrement());
     }
 
     template <typename ElementType, MatrixLayout layout>
@@ -308,21 +318,21 @@ namespace math
     {
         DEBUG_THROW(index >= NumRows(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "row index exceeds matrix dimensions."));
 
-        return VectorReference<ElementType, VectorOrientation::row>(_pData + index * GetRowIncrement(), NumColumns(), GetColumnIncrement());
+        return VectorReference<ElementType, VectorOrientation::row>(GetDataPointer() + index * GetRowIncrement(), NumColumns(), GetColumnIncrement());
     }
 
     template <typename ElementType, MatrixLayout layout>
     VectorReference<ElementType, VectorOrientation::column> MatrixReference<ElementType, layout>::GetDiagonal()
     {
         auto size = std::min(NumColumns(), NumRows());
-        return VectorReference<ElementType, VectorOrientation::column>(_pData, size, GetIncrement() + 1);
+        return VectorReference<ElementType, VectorOrientation::column>(GetDataPointer(), size, GetIncrement() + 1);
     }
 
     template <typename ElementType, MatrixLayout layout>
     VectorReference<ElementType, VectorOrientation::column> MatrixReference<ElementType, layout>::ReferenceAsVector()
     {
         DEBUG_THROW(!IsContiguous(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Can only flatten a matrix when its memory is contiguous"));
-        return VectorReference<ElementType, VectorOrientation::column>(_pData, NumRows() * NumColumns(), 1);
+        return VectorReference<ElementType, VectorOrientation::column>(GetDataPointer(), NumRows() * NumColumns(), 1);
     }
 
     //
@@ -331,14 +341,14 @@ namespace math
 
     template <typename ElementType, MatrixLayout layout>
     Matrix<ElementType, layout>::Matrix(size_t numRows, size_t numColumns)
-        : MatrixReference<ElementType, layout>(numRows, numColumns, nullptr), _data(numRows * numColumns)
+        : MatrixReference<ElementType, layout>(nullptr, numRows, numColumns), _data(numRows * numColumns)
     {
         _pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
     Matrix<ElementType, layout>::Matrix(std::initializer_list<std::initializer_list<ElementType>> list)
-        : MatrixReference<ElementType, layout>(list.size(), list.begin()->size(), nullptr), _data(list.size() * list.begin()->size())
+        : MatrixReference<ElementType, layout>(nullptr, list.size(), list.begin()->size()), _data(list.size() * list.begin()->size())
     {
         _pData = _data.data();
         auto numColumns = list.begin()->size();
@@ -360,35 +370,35 @@ namespace math
 
     template <typename ElementType, MatrixLayout layout>
     Matrix<ElementType, layout>::Matrix(size_t numRows, size_t numColumns, const std::vector<ElementType>& data)
-        : MatrixReference<ElementType, layout>(numRows, numColumns, nullptr), _data(data)
+        : MatrixReference<ElementType, layout>(nullptr, numRows, numColumns), _data(data)
     {
         _pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
     Matrix<ElementType, layout>::Matrix(size_t numRows, size_t numColumns, std::vector<ElementType>&& data)
-        : MatrixReference<ElementType, layout>(numRows, numColumns, nullptr), _data(std::move(data))
+        : MatrixReference<ElementType, layout>(nullptr, numRows, numColumns), _data(std::move(data))
     {
         _pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
     Matrix<ElementType, layout>::Matrix(Matrix<ElementType, layout>&& other)
-        : MatrixReference<ElementType, layout>(other.NumRows(), other.NumColumns(), nullptr), _data(std::move(other._data))
+        : MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()), _data(std::move(other._data))
     {
         _pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
     Matrix<ElementType, layout>::Matrix(const Matrix<ElementType, layout>& other)
-        : MatrixReference<ElementType, layout>(other.NumRows(), other.NumColumns(), nullptr), _data(other._data)
+        : MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()), _data(other._data)
     {
         _pData = _data.data();
     }
 
     template <typename ElementType, MatrixLayout layout>
     Matrix<ElementType, layout>::Matrix(ConstMatrixReference<ElementType, layout>& other)
-        : MatrixReference<ElementType, layout>(other.NumRows(), other.NumColumns(), nullptr), _data(other.NumRows() * other.NumColumns())
+        : MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()), _data(other.NumRows() * other.NumColumns())
     {
         _pData = _data.data();
         for (size_t i = 0; i < NumRows(); ++i)
@@ -402,7 +412,7 @@ namespace math
 
     template <typename ElementType, MatrixLayout layout>
     Matrix<ElementType, layout>::Matrix(ConstMatrixReference<ElementType, TransposeMatrixLayout<layout>::value> other)
-        : MatrixReference<ElementType, layout>(other.NumRows(), other.NumColumns(), nullptr), _data(other.NumRows() * other.NumColumns())
+        : MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()), _data(other.NumRows() * other.NumColumns())
     {
         _pData = _data.data();
         for (size_t i = 0; i < NumRows(); ++i)

@@ -21,7 +21,7 @@ namespace neural
         _convolutionalParameters(convolutionalParameters),
         _weights(std::move(weights)),
         _shapedInput { _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding() },
-        _weightsMatrix(_layerParameters.outputShape[2], _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()),
+        _weightsMatrix(_layerParameters.outputShape.NumChannels(), _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()),
         _outputMatrix{ NumOutputChannels(), NumOutputRowsMinusPadding() * NumOutputColumnsMinusPadding() }
     {
         if(_weights.GetDataPointer() == nullptr)
@@ -88,7 +88,7 @@ namespace neural
             const size_t mPadding = paddingSize * depth;
             const size_t numConvolutions = (inputMatrix.NumColumns() - kt) / depth + 1;
             const size_t numFiltersAtAtime = _convolutionalParameters.numFiltersAtATime;
-            const size_t numFilters = _layerParameters.outputShape[2];
+            const size_t numFilters = _layerParameters.outputShape.NumChannels();
             auto weightsMatrix = _weights.ReferenceAsMatrix().Transpose();
 
             for (size_t j = 0; j < numConvolutions; j++)
@@ -188,7 +188,7 @@ namespace neural
     template <typename ElementType>
     void ConvolutionalLayer<ElementType>::ComputeWeightsMatrix()
     {
-        _weightsMatrix = {_layerParameters.outputShape[2], _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()};
+        _weightsMatrix = {_layerParameters.outputShape.NumChannels(), _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels()};
         if (_convolutionalParameters.method == ConvolutionMethod::columnwise)
         {
             // Use the columnwise method

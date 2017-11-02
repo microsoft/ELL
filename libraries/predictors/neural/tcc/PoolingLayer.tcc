@@ -75,8 +75,8 @@ namespace neural
         const size_t inputDataPaddingSize = GetLayerParameters().inputPaddingParameters.paddingSize;
         const auto inputShape = GetInputShapeMinusPadding();
         const auto outputShape = GetOutputShapeMinusPadding();
-        const auto inputWidth = inputShape[0];
-        const auto outputWidth = outputShape[0];
+        const auto inputWidth = inputShape.NumRows();
+        const auto outputWidth = outputShape.NumRows();
         const auto stride = _poolingParameters.stride;
         const auto poolingSize = _poolingParameters.poolingSize;
 

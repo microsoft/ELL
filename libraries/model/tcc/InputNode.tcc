@@ -61,7 +61,7 @@ namespace model
         Node::WriteToArchive(archiver);
         archiver["size"] << _output.Size();
         InputShape shape = GetShape();
-        archiver["shape"] << std::vector<size_t>({ shape.rows,shape.columns,shape.channels });
+        archiver["shape"] << std::vector<size_t>({ shape.NumRows(),shape.NumColumns(),shape.NumChannels() });
     }
 
     template <typename ValueType>

@@ -25,9 +25,6 @@
 %template(FloatTensor) ell::api::math::Tensor<float>;
 %template(DoubleTensor) ell::api::math::Tensor<double>;
 
-%include <TensorShape.h>
-
-
 // Include language specific SWIG definitions that must be declared after the
 // C++ code has been wrapped by SWIG
 #ifdef SWIGPYTHON

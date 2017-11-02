@@ -19,7 +19,7 @@ namespace math
     //
 
     template <typename ElementType>
-    UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference(ElementType* pData, size_t size, size_t increment)
+    UnorientedConstVectorReference<ElementType>::UnorientedConstVectorReference(const ElementType* pData, size_t size, size_t increment)
         : _pData(pData), _size(size), _increment(increment)
     {
     }
@@ -29,7 +29,7 @@ namespace math
     {
         DEBUG_THROW(index >= _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size."));
 
-        return _pData[index * _increment];
+        return GetConstDataPointer()[index * _increment];
     }
 
     template <typename ElementType>
@@ -69,8 +69,8 @@ namespace math
     ElementType UnorientedConstVectorReference<ElementType>::Aggregate(MapperType mapper) const
     {
         ElementType result = 0;
-        const ElementType* current = _pData;
-        const ElementType* end = _pData + _size * _increment;
+        const ElementType* current = GetConstDataPointer();
+        const ElementType* end = current + _size * _increment;
         while (current < end)
         {
             result += mapper(*current);
@@ -84,9 +84,9 @@ namespace math
     {
         std::vector<ElementType> result(_size);
 
-        ElementType* data = _pData;
-        for (size_t i = 0; i < _size; ++i, data += _increment)
-            result[i] = *data;
+        const ElementType* pData = GetConstDataPointer();
+        for (size_t i = 0; i < _size; ++i, pData += _increment)
+            result[i] = *pData;
 
         return result;
     }
@@ -109,9 +109,9 @@ namespace math
             return false;
         }
 
-        const ElementType* pThis = _pData;
-        const ElementType* pThisEnd = _pData + _size * _increment;
-        const ElementType* pOther = other._pData;
+        const ElementType* pThis = GetConstDataPointer();
+        const ElementType* pThisEnd = pThis + _size * _increment;
+        const ElementType* pOther = other.GetConstDataPointer();
 
         while (pThis < pThisEnd)
         {
@@ -144,7 +144,7 @@ namespace math
     {
         DEBUG_THROW(offset + size > _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size."));
 
-        return ConstVectorReference<ElementType, orientation>(_pData + offset * _increment, size, _increment);
+        return ConstVectorReference<ElementType, orientation>(GetConstDataPointer() + offset * _increment, size, _increment);
     }
     //
     // TransformedConstVectorReference
@@ -171,7 +171,7 @@ namespace math
     {
         DEBUG_THROW(index >= _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size."));
 
-        return _pData[index * _increment];
+        return GetDataPointer()[index * _increment];
     }
 
     template <typename ElementType, VectorOrientation orientation>
@@ -189,9 +189,9 @@ namespace math
 
         DEBUG_THROW(_size != otherVector.Size(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size."));
 
-        ElementType* pData = _pData;
+        ElementType* pData = GetDataPointer();
         const ElementType* pEnd = pData + _increment * _size;
-        const ElementType* pOtherData = otherVector.GetDataPointer();
+        const ElementType* pOtherData = otherVector.GetConstDataPointer();
         const size_t otherIncrement = otherVector.GetIncrement();
 
         while (pData < pEnd)
@@ -210,8 +210,8 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
         }
 
-        ElementType* pData = _pData;
-        const ElementType* pOtherData = other.GetDataPointer();
+        ElementType* pData = GetDataPointer();
+        const ElementType* pOtherData = other.GetConstDataPointer();
         const size_t otherIncrement = other.GetIncrement();
         const ElementType* pOtherEnd = pOtherData + otherIncrement * other.Size();
 
@@ -244,8 +244,8 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     void VectorReference<ElementType, orientation>::Fill(ElementType value)
     {
-        ElementType* data = _pData;
-        ElementType* end = _pData + _size * _increment;
+        ElementType* data = GetDataPointer();
+        ElementType* end = data + _size * _increment;
 
         if (_increment == 1)
         {
@@ -265,8 +265,8 @@ namespace math
     template <typename GeneratorType>
     void VectorReference<ElementType, orientation>::Generate(GeneratorType generator)
     {
-        ElementType* data = _pData;
-        ElementType* end = _pData + _size * _increment;
+        ElementType* data = GetDataPointer();
+        ElementType* end = data + _size * _increment;
 
         while (data < end)
         {
@@ -279,8 +279,8 @@ namespace math
     template <typename TransformationType>
     void VectorReference<ElementType, orientation>::Transform(TransformationType transformation)
     {
-        ElementType* current = _pData;
-        const ElementType* end = _pData + _size * _increment;
+        ElementType* current = GetDataPointer();
+        const ElementType* end = current + _size * _increment;
         while (current < end)
         {
             *current = transformation(*current);
@@ -291,7 +291,7 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     VectorReference<ElementType, orientation> VectorReference<ElementType, orientation>::GetReference()
     {
-        return VectorReference<ElementType, orientation>(_pData, _size, _increment);
+        return VectorReference<ElementType, orientation>(GetDataPointer(), _size, _increment);
     }
 
     template <typename ElementType, VectorOrientation orientation>
@@ -299,7 +299,7 @@ namespace math
     {
         DEBUG_THROW(offset + size > _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size."));
 
-        return VectorReference<ElementType, orientation>(_pData + offset * _increment, size, _increment);
+        return VectorReference<ElementType, orientation>(GetDataPointer() + offset * _increment, size, _increment);
     }
 
     template <typename ElementType, VectorOrientation orientation>
@@ -314,9 +314,9 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
         }
 
-        ElementType* pData = _pData;
+        ElementType* pData = GetDataPointer();
         const ElementType* pEnd = pData + _increment * _size;
-        const ElementType* pOtherData = otherVector.GetDataPointer();
+        const ElementType* pOtherData = otherVector.GetConstDataPointer();
         const size_t otherIncrement = otherVector.GetIncrement();
 
         while (pData < pEnd)
@@ -335,9 +335,9 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
         }
 
-        ElementType* pData = _pData;
+        ElementType* pData = GetDataPointer();
         const ElementType* pEnd = pData + _increment * _size;
-        const ElementType* pOtherData = other.GetDataPointer();
+        const ElementType* pOtherData = other.GetConstDataPointer();
         const size_t otherIncrement = other.GetIncrement();
 
         while (pData < pEnd)
@@ -356,9 +356,9 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
         }
 
-        ElementType* pData = _pData;
+        ElementType* pData = GetDataPointer();
         const ElementType* pEnd = pData + _increment * _size;
-        const ElementType* pOtherData = other.GetDataPointer();
+        const ElementType* pOtherData = other.GetConstDataPointer();
         const size_t otherIncrement = other.GetIncrement();
 
         while (pData < pEnd)

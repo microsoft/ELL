@@ -8,6 +8,7 @@
 #pragma once
 
 #include "MatrixOperations.h"
+#include "Matrix.h"
 #include "Vector.h"
 
 using namespace ell;
@@ -129,11 +130,17 @@ void TestVectorScalarMultiplyAdd();
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorElementwiseMultiply();
 
+template <typename ElementType>
+void TestVectorVectorInner();
+
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorVectorDot();
 
-template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
-void TestVectorVectorDotImplementation();
+template <typename ElementType>
+void TestVectorVectorOuter();
+
+template <typename ElementType, math::ImplementationType implementation>
+void TestVectorVectorInnerImplementation();
 
 template<typename ElementType>
 void TestVectorArchiver();

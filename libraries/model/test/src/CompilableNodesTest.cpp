@@ -14,7 +14,7 @@
 #include "LoadModel.h" // for RegisterNodeTypes
 
 // math
-#include "TensorShape.h"
+#include "Tensor.h"
 
 // model
 #include "CompiledMap.h"
@@ -97,7 +97,7 @@ using namespace ell::predictors::neural;
 
 namespace
 {
-size_t GetShapeSize(const math::Triplet& shape)
+size_t GetShapeSize(const math::IntegerTriplet& shape)
 {
     return shape[0] * shape[1] * shape[2];
 }
@@ -1461,7 +1461,7 @@ void TestNeuralNetworkPredictorNode6()
 
     // BiasLayer
     layerParameters = { layers[0]->GetOutput(), NoPadding(), { 3, 3, 8 }, NoPadding() };
-    VectorType bias1(layerParameters.outputShape[2]);
+    VectorType bias1(layerParameters.outputShape.NumChannels());
     FillVector(bias1);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, bias1)));
 
@@ -1471,15 +1471,15 @@ void TestNeuralNetworkPredictorNode6()
 
     // BatchNormalizationLayer
     layerParameters = { layers[2]->GetOutput(), NoPadding(), { 3, 3, 8 }, NoPadding() };
-    VectorType mean(layerParameters.outputShape[2]);
-    VectorType variance(layerParameters.outputShape[2]);
+    VectorType mean(layerParameters.outputShape.NumChannels());
+    VectorType variance(layerParameters.outputShape.NumChannels());
     FillVector(mean);
     FillVector(variance);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance, 1.0e-6f, EpsilonSummand::SqrtVariance)));
 
     // ScalingLayer
     layerParameters = { layers[3]->GetOutput(), NoPadding(), { 5, 5, 8 }, { PaddingScheme::zeros, 1 } };
-    VectorType scales(layerParameters.outputShape[2]);
+    VectorType scales(layerParameters.outputShape.NumChannels());
     FillVector(scales, -3.0);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scales)));
 
@@ -1551,8 +1551,8 @@ void TestNeuralNetworkPredictorNode7()
     // layer_1 = BatchNormalizationLayer<float>(shape=[224,224,16])
     // BatchNormalizationLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 224, 224, 16 }, NoPadding() };
-    VectorType mean(layerParameters.outputShape[2]);
-    VectorType variance(layerParameters.outputShape[2]);
+    VectorType mean(layerParameters.outputShape.NumChannels());
+    VectorType variance(layerParameters.outputShape.NumChannels());
     FillRandomVector(mean);
     FillRandomVector(variance, 0.125, 1.0);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance, 1.0e-6f, EpsilonSummand::SqrtVariance)));
@@ -1560,14 +1560,14 @@ void TestNeuralNetworkPredictorNode7()
     // layer_2 = ScalingLayer<float>(shape=[224,224,16])
     // ScalingLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 224, 224, 16 }, NoPadding() };
-    VectorType scales(layerParameters.outputShape[2]);
+    VectorType scales(layerParameters.outputShape.NumChannels());
     FillRandomVector(scales);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scales)));
 
     // layer_3 = BiasLayer<float>(shape=[224,224,16])
     // BiasLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 224, 224, 16 }, NoPadding() };
-    VectorType bias(layerParameters.outputShape[2]);
+    VectorType bias(layerParameters.outputShape.NumChannels());
     FillRandomVector(bias);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, scales)));
 
@@ -1593,8 +1593,8 @@ void TestNeuralNetworkPredictorNode7()
     // layer_7 = BatchNormalizationLayer<float>(shape=[112,112,32])
     // BatchNormalizationLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 112, 112, 32 }, NoPadding() };
-    mean = VectorType(layerParameters.outputShape[2]);
-    variance = VectorType(layerParameters.outputShape[2]);
+    mean = VectorType(layerParameters.outputShape.NumChannels());
+    variance = VectorType(layerParameters.outputShape.NumChannels());
     FillRandomVector(mean);
     FillRandomVector(variance, 0.125, 1.0);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance, 1.0e-4f, EpsilonSummand::SqrtVariance)));
@@ -1602,14 +1602,14 @@ void TestNeuralNetworkPredictorNode7()
     // layer_8 = ScalingLayer<float>(shape=[112,112,32])
     // ScalingLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 112, 112, 32 }, NoPadding() };
-    scales = VectorType(layerParameters.outputShape[2]);
+    scales = VectorType(layerParameters.outputShape.NumChannels());
     FillRandomVector(scales);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scales)));
 
     // layer_9 = BiasLayer<float>(shape=[112,112,32])
     // BiasLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 112, 112, 32 }, NoPadding() };
-    bias = VectorType(layerParameters.outputShape[2]);
+    bias = VectorType(layerParameters.outputShape.NumChannels());
     FillRandomVector(bias);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, scales)));
 
@@ -1635,8 +1635,8 @@ void TestNeuralNetworkPredictorNode7()
     // layer_13 = BatchNormalizationLayer<float>(shape=[56,56,16])
     // BatchNormalizationLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 56, 56, 16 }, NoPadding() };
-    mean = VectorType(layerParameters.outputShape[2]);
-    variance = VectorType(layerParameters.outputShape[2]);
+    mean = VectorType(layerParameters.outputShape.NumChannels());
+    variance = VectorType(layerParameters.outputShape.NumChannels());
     FillRandomVector(mean);
     FillRandomVector(variance, 0.125, 1.0);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BatchNormalizationLayer<ElementType>(layerParameters, mean, variance, 1.0e-6f, EpsilonSummand::SqrtVariance)));
@@ -1644,14 +1644,14 @@ void TestNeuralNetworkPredictorNode7()
     // layer_14 = ScalingLayer<float>(shape=[56,56,16])
     // ScalingLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 56, 56, 16 }, NoPadding() };
-    scales = VectorType(layerParameters.outputShape[2]);
+    scales = VectorType(layerParameters.outputShape.NumChannels());
     FillRandomVector(scales);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scales)));
 
     // layer_15 = BiasLayer<float>(shape=[56,56,16])
     // BiasLayer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), { 56, 56, 16 }, NoPadding() };
-    bias = VectorType(layerParameters.outputShape[2]);
+    bias = VectorType(layerParameters.outputShape.NumChannels());
     FillRandomVector(bias);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new BiasLayer<ElementType>(layerParameters, scales)));
 
@@ -1669,7 +1669,7 @@ void TestNeuralNetworkPredictorNode7()
 
     // Create the predictor
     NeuralNetworkPredictor<ElementType> neuralNetwork(std::move(inputLayer), std::move(layers));
-    std::vector<ElementType> input(inputSize[0] * inputSize[1] * inputSize[2]);
+    std::vector<ElementType> input(inputSize.Size());
     FillRandomVector(input);
 
     // Create model
@@ -1924,7 +1924,7 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
 
     LayerParameters parameters{ inputWithPadding, { paddingScheme, inputPaddingSize }, outputShape, { paddingScheme, outputPaddingSize } };
     BinaryConvolutionalParameters convolutionalParams{ k, stride, BinaryConvolutionMethod::bitwise, scaleByFilterMeans ? BinaryWeightsScale::mean : BinaryWeightsScale::none };
-    TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
+    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
     int weightsSize = weights.Size();
     FillTensor(weights, -static_cast<ElementType>(weightsSize)/2);
 
@@ -1973,7 +1973,7 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
     auto convolutionMethod = (convolutionType == ConvolutionType::Diagonal) ? ConvolutionMethod::diagonal : ConvolutionMethod::columnwise;
     ConvolutionalParameters convolutionalParams{ 3, 1, convolutionMethod, 2 }; // 2 == batch size
-    TensorType weights(convolutionalParams.receptiveField * outputShape[2], convolutionalParams.receptiveField, input.NumChannels());
+    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, input.NumChannels());
     // clang-format off
     std::vector<ElementType> weightsVector{   // RowMajor then depth order
         1, 3, 2, 3, 1, 1, 2, 3, 1,
@@ -1982,7 +1982,7 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
         0, 3, 2, 3, 1, 2, 1, 0, 2 };
     // clang-format on
     size_t vectorIndex = 0;
-    for (size_t f = 0; f < outputShape[2]; f++)
+    for (size_t f = 0; f < outputShape.NumChannels(); f++)
     {
         for (size_t k = 0; k < input.NumChannels(); k++)
         {

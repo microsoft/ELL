@@ -16,7 +16,7 @@
 #include "ModelLoadArguments.h"
 
 // math
-#include "TensorShape.h"
+#include "Tensor.h"
 
 // utilities
 #include "CommandLineParser.h"
@@ -65,7 +65,7 @@ std::vector<InputType> GetInputVector(const math::TensorShape& inputShape, float
 template <typename InputType>
 std::vector<InputType> GetInputImage(std::string filename, const math::TensorShape& inputShape, float inputScale, bool bgr2rgb)
 {
-    return LoadImage<InputType>(filename, inputShape.columns, inputShape.rows, inputScale, bgr2rgb ? PixelOrder::RGB : PixelOrder::BGR);
+    return LoadImage<InputType>(filename, inputShape.NumColumns(), inputShape.NumRows(), inputScale, bgr2rgb ? PixelOrder::RGB : PixelOrder::BGR);
 }
 
 template <typename InputType>
