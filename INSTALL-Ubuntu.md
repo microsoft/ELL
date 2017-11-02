@@ -65,14 +65,14 @@ sudo apt-get install -y curl
 [*SWIG*](http://swig.org) is a tool that generates Python interfaces to C++ libraries. If you intend to use ELL from Python, you must install SWIG version 3.0.12. At the time of writing this document, `apt-get` doesn't yet have the latest version of `SWIG`, so it must be installed manually
 
 ```shell
-curl -O http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
+curl -O --location http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
 tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12
 ./configure --without-pcre && make && sudo make install
 ```
 
 ## Using ELL in Python
 
-ELL can optionally be used from Python 3.6.  
+ELL can optionally be used from Python 3.6.
 An easy way to install Python and all the required modules is with [Miniconda](https://conda.io/miniconda.html).
 Download and install Miniconda from here <https://conda.io/miniconda.html>.
 
