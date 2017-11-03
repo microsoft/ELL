@@ -202,10 +202,20 @@ namespace math
         template<size_t dimensionIndex>
         size_t GetSize() const;
 
-        size_t GetSize0() const { return GetSize<0>(); } // TODO
-        size_t GetSize1() const { return GetSize<1>(); }
-        size_t GetSize2() const { return GetSize<2>(); }
+        /// <summary> Gets the size of the first dimension. </summary>
+        ///
+        /// <returns> The size of the first dimension. </returns>
+        size_t GetSize0() const { return GetSize<0>(); }
 
+        /// <summary> Gets the size of the second dimension. </summary>
+        ///
+        /// <returns> The size of the second dimension. </returns>
+        size_t GetSize1() const { return GetSize<1>(); }
+
+        /// <summary> Gets the size of the third dimension. </summary>
+        ///
+        /// <returns> The size of the third dimension. </returns>
+        size_t GetSize2() const { return GetSize<2>(); }
 
         /// <summary> Gets the three dimenions of the tensor in logical order (row, column, channel). </summary>
         ///
@@ -374,10 +384,10 @@ namespace math
         size_t GetOffset(TensorCoordinate coordinate) const;
         ConstTensorReference(const ElementType* pData, TensorShape shape, size_t increment1, size_t increment2);
 
+        const ElementType* _pData;
         TensorShape _shape;
         size_t _increment1;
         size_t _increment2;
-        const ElementType* _pData;
     };
 
     /// <summary> Helper function to get the number of slices in a Tensor. </summary>
