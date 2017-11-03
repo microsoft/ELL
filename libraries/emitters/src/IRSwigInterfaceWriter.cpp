@@ -534,23 +534,23 @@ namespace emitters
             * as a conveniently wrapped Python type.
 
             %inline %{
-                ell::api::TensorShape get_default_input_shape() {
+                ell::api::math::TensorShape get_default_input_shape() {
                     TensorShape  s;
                     darknet_GetInputShape(index, &s);
-                    return ell::api::TensorShape{s.rows, s.columns, s.channels};
+                    return ell::api::math::TensorShape{s.rows, s.columns, s.channels};
                 }
             %} */
 
             os << "%inline %{\n";
-            os << "  ell::api::TensorShape get_default_input_shape() {\n";
+            os << "  ell::api::math::TensorShape get_default_input_shape() {\n";
             os << "    TensorShape  s;\n";
             os << "    " << moduleName << "_GetInputShape(0, &s);\n";
-            os << "    return ell::api::TensorShape{ s.rows, s.columns, s.channels };\n";
+            os << "    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };\n";
             os << "  }\n";
-            os << "  ell::api::TensorShape get_default_output_shape() {\n";
+            os << "  ell::api::math::TensorShape get_default_output_shape() {\n";
             os << "    TensorShape  s;\n";
             os << "    " << moduleName << "_GetOutputShape(0, &s);\n";
-            os << "    return ell::api::TensorShape{ s.rows, s.columns, s.channels };\n";
+            os << "    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };\n";
             os << "  }\n";
             os << "%}\n";
 
