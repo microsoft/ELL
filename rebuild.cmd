@@ -23,4 +23,4 @@ goto :eof
 
 :nodelete
 echo Error deleting 'build' folder, is it locked?
-goto :eof
+exit /B 1

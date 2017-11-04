@@ -37,11 +37,6 @@ from remoterunner import RemoteRunner
 
 class DriveTest:
     def __init__(self):
-        self.arg_parser = argparse.ArgumentParser(
-            "This script uses ELL to create a demo project for a model (default is d_I160x160x3CMCMCMCMCMCMC1AS from the ELL gallery)\n"
-            "on a target device (default is Raspberry Pi 3), pushes it to the given\n"
-            "device's ip address using ssh and scp, then executes the test.\n"
-            "The test also measures the accuracy and performance of evaluating the model.\n")
         self.ipaddress = None
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)
@@ -75,7 +70,12 @@ class DriveTest:
 
     def parse_command_line(self, argv):
         """Parses command line arguments"""
-        # required arguments
+        
+        self.arg_parser = argparse.ArgumentParser(
+            "This script uses ELL to create a demo project for a model (default is d_I160x160x3CMCMCMCMCMCMC1AS from the ELL gallery)\n"
+            "on a target device (default is Raspberry Pi 3), pushes it to the given\n"
+            "device's ip address using ssh and scp, then executes the test.\n"
+            "The test also measures the accuracy and performance of evaluating the model.\n")
 
         # options
         self.arg_parser.add_argument("--ipaddress", default=None, help="IP address of the target devices")
@@ -104,12 +104,15 @@ class DriveTest:
     def cleanup(self):
         """Unlocks the target device if it is part of a cluster"""
         if self.machine:
+            print("Unlocking machine: " + self.machine.ip_address)
             f = self.cluster.unlock(self.machine.ip_address)
             if f.current_user_name:
                 print("Failed to free the machine at " + self.machine.ip_address)
             else:
                 print("Freed machine at " + self.machine.ip_address)
 
+        print("Exiting DriveTest.cleanup")
+        
     def str2bool(self, v):
         """Converts a string to a bool"""
         return v.lower() in ("yes", "true", "t", "1")
@@ -149,6 +152,8 @@ class DriveTest:
             # if any of the above fails, this line should throw
             self.ipaddress = self.machine.ip_address
         else:
+            if not ipaddress:
+                raise Exception("Missing ipaddress or pi cluster address")
             self.ipaddress = ipaddress
 
     def extract_model_info(self, ell_model, labels_file):

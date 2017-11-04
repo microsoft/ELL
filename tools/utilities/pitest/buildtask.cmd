@@ -21,16 +21,11 @@ call .\rebuild.cmd 14
 if ERRORLEVEL 1 exit 1
 
 echo ===================================== TEST ==================================
+cd build
+cmake .. -DRPI_CLUSTER=%RPI_CLUSTER%
+if ERRORLEVEL 1 exit /B 1
 
-pushd %OUTPUT_PATH%
-if NOT EXIST Test mkdir Test
-cd Test
-if EXIST pi3 rd /s /q pi3
-popd
-
-set PATH=%PATH%;%ELL_SRC%\external\OpenBLASLibs.0.2.19.3\build\native\x64\haswell\bin
-echo Running Raspberry Pi test from %ELL_SRC%\build\tools\utilities\pitest\drivetest.py
-python build\tools\utilities\pitest\drivetest.py --cluster %RPI_CLUSTER% --outdir %OUTPUT_PATH%\Test
+ctest . --build-config release -VV
 if ERRORLEVEL 1 exit /B 1
 goto :eof
 
