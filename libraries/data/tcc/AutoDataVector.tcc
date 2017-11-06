@@ -141,7 +141,7 @@ namespace data
             includesNonFloats |= DoesCastModifyValue<float>(value);
             includesNonShorts |= DoesCastModifyValue<short>(value);
             includesNonBytes |= DoesCastModifyValue<char>(value);
-            includesNonBinary |= (value - 1.0 > APPROXIMATION_TOLERANCE || 1.0 - value > APPROXIMATION_TOLERANCE);
+            includesNonBinary |= (value != 1 && value != 0);
 
             iter.Next();
         }

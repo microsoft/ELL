@@ -43,8 +43,13 @@ namespace trainers
                 X(j, colIdx) = dataVector[j];
             }
 
-            Y((size_t)label, colIdx) = 1;
-            Y(1 - (size_t)label, colIdx) = 0;
+            for (size_t i = 0; i < Y.NumRows(); i++)
+            {
+                if (i == label)
+                    Y((size_t)i, colIdx) = 1;
+                else
+                    Y((size_t)i, colIdx) = 0;
+            }
 
             colIdx += 1;
             exampleIterator.Next();

@@ -662,17 +662,13 @@ void TestProtoNNPredictorNode()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedScoreOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ protonnPredictorNode->outputScore });
-    auto refinedLabelOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<int>{ protonnPredictorNode->outputLabel });
+    auto refinedScoreOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ protonnPredictorNode->outputScores });
 
     refinedInputNode->SetInput(input);
 
-    auto refinedScoreOutput = refinedModel.ComputeOutput(refinedScoreOutputElements)[0];
-    auto refinedLabelOutput = refinedModel.ComputeOutput(refinedLabelOutputElements)[0];
+    auto refinedScoresOutput = refinedModel.ComputeOutput(refinedScoreOutputElements);
 
-    auto computeScoreOutput = model.ComputeOutput(protonnPredictorNode->outputScore)[0];
-    auto computeLabelOutput = model.ComputeOutput(protonnPredictorNode->outputLabel)[0];
+    auto computeScoreOutput = model.ComputeOutput(protonnPredictorNode->outputScores);
 
-    testing::ProcessTest("Testing protonnPredictor node refine", testing::IsEqual(refinedLabelOutput, computeLabelOutput));
-    testing::ProcessTest("Testing protonnPredictor node refine", testing::IsEqual(refinedScoreOutput, computeScoreOutput));
+    testing::ProcessTest("Testing protonnPredictor node refine", testing::IsEqual(refinedScoresOutput, computeScoreOutput));
 }

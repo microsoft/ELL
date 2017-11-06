@@ -34,12 +34,12 @@ namespace ell
 namespace nodes
 {
     ProtoNNPredictorNode::ProtoNNPredictorNode()
-        : Node({ &_input }, { &_outputScore, &_outputLabel }), _input(this, {}, inputPortName), _outputScore(this, outputScorePortName, 0), _outputLabel(this, outputLabelPortName, 1)
+        : Node({ &_input }, { &_outputScores }), _input(this, {}, inputPortName), _outputScores(this, outputPortName, 0)
     {
     }
 
     ProtoNNPredictorNode::ProtoNNPredictorNode(const model::PortElements<double>& input, const predictors::ProtoNNPredictor& predictor)
-        : Node({ &_input }, { &_outputScore, &_outputLabel }), _input(this, input, inputPortName), _outputScore(this, outputScorePortName, 1), _outputLabel(this, outputLabelPortName, 1), _predictor(predictor)
+        : Node({ &_input }, { &_outputScores }), _input(this, input, inputPortName), _outputScores(this, outputPortName, predictor.GetNumLabels()), _predictor(predictor)
     {
         assert(input.Size() == predictor.GetDimension());
     }
@@ -48,8 +48,7 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[inputPortName] << _input;
-        archiver[outputScorePortName] << _outputScore;
-        archiver[outputLabelPortName] << _outputLabel;
+        archiver[outputPortName] << _outputScores;
         archiver["predictor"] << _predictor;
     }
 
@@ -57,8 +56,7 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[inputPortName] >> _input;
-        archiver[outputScorePortName] >> _outputScore;
-        archiver[outputLabelPortName] >> _outputLabel;
+        archiver[outputPortName] >> _outputScores;
         archiver["predictor"] >> _predictor;
     }
 
@@ -66,8 +64,7 @@ namespace nodes
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<ProtoNNPredictorNode>(newPortElements, _predictor);
-        transformer.MapNodeOutput(outputLabel, newNode->outputLabel);
-        transformer.MapNodeOutput(outputScore, newNode->outputScore);
+        transformer.MapNodeOutput(outputScores, newNode->outputScores);
     }
 
     bool ProtoNNPredictorNode::Refine(model::ModelTransformer& transformer) const
@@ -80,7 +77,6 @@ namespace nodes
 
         auto prototypes = _predictor.GetPrototypes();
         auto m = _predictor.GetNumPrototypes();
-        auto k = _predictor.GetProjectedDimension();
 
         std::vector<double> multiplier(m, _predictor.GetGamma() * _predictor.GetGamma() * -1);
         auto gammaNode = transformer.AddNode<ConstantNode<double>>(multiplier);
@@ -94,11 +90,9 @@ namespace nodes
         auto expDistanceNode = transformer.AddNode<UnaryOperationNode<double>>(scaledDistanceNode->output, emitters::UnaryOperationType::exp);
 
         // Get the prediction label
-        auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(expDistanceNode->output, _predictor.GetLabelEmbeddings());
-        auto predictionLabelNode = transformer.AddNode<ArgMaxNode<double>>(labelScoresNode->output);
+        auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(expDistanceNode->output, _predictor.GetLabelEmbeddings());        
 
-        transformer.MapNodeOutput(outputScore, predictionLabelNode->val);
-        transformer.MapNodeOutput(outputLabel, predictionLabelNode->argVal);
+        transformer.MapNodeOutput(outputScores, labelScoresNode->output);
 
         return true;
     }
@@ -107,10 +101,9 @@ namespace nodes
     {
         auto inputDataVector = ProtoNNPredictor::DataVectorType(_input.GetIterator());
 
-        predictors::ProtoNNPrediction prediction = _predictor.Predict(inputDataVector);
+        auto prediction = _predictor.Predict(inputDataVector);
 
-        _outputScore.SetOutput({ prediction.score });
-        _outputLabel.SetOutput({ (int)prediction.label });
+        _outputScores.SetOutput(prediction.ToArray());
     }
 
     ProtoNNPredictorNode* AddNodeToModelTransformer(const model::PortElements<double>& input, const predictors::ProtoNNPredictor& predictor, model::ModelTransformer& transformer)

@@ -15,6 +15,7 @@
 
 // data
 #include "Dataset.h"
+#include "Example.h"
 
 // common
 #include "AppendNodeToModel.h"
@@ -30,6 +31,9 @@
 #include "ModelSaveArguments.h"
 #include "TrainerArguments.h"
 #include "ProtoNNTrainerArguments.h"
+
+// math
+#include "MatrixOperations.h"
 
 // model
 #include "DynamicMap.h"
@@ -92,8 +96,27 @@ int main(int argc, char* argv[])
         auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
         auto mappedDataset = common::GetMappedDataset(stream, map);
 
+        // The problem is NumFeatures returns a random number from sparse dataset depending on the number of trailing zeros it 
+        // has skipped.Is if the user did NOT specify - dd auto and instead provided a real input size like - dd 784 then we use 
+        // that number instead.
+        auto dimension = mapLoadArguments.defaultInputSize != 0 ? mapLoadArguments.defaultInputSize : mappedDataset.NumFeatures();
+
+        // now optionally scale the inputs if required
+        if (dataLoadArguments.scale != 1)
+        {
+            auto numExamples = mappedDataset.NumExamples();
+            for (size_t rowIndex = 0; rowIndex < numExamples; ++rowIndex)
+            {
+                auto& example = mappedDataset[rowIndex];
+                auto data = math::ColumnVector<double>(example.GetDataVector().ToArray());
+                data *= dataLoadArguments.scale;
+                auto updated = data::AutoDataVector(data.ToArray());
+                mappedDataset[rowIndex] = data::AutoSupervisedExample(std::move(updated), example.GetMetadata());
+            }
+        }
+
         // create protonn trainer
-        auto trainer = common::MakeProtoNNTrainer(mappedDataset.NumExamples(), mappedDataset.NumFeatures(), protoNNTrainerArguments);
+        auto trainer = common::MakeProtoNNTrainer(mappedDataset.NumExamples(), dimension, protoNNTrainerArguments);
 
         // predictor type
         using PredictorType = predictors::ProtoNNPredictor;
@@ -109,6 +132,7 @@ int main(int argc, char* argv[])
         {
             std::cout << "Finished training.\n";
 
+            size_t test_index = 0;
             // print evaluation
             std::cout << "Training accuracy\n";
             {
@@ -123,10 +147,15 @@ int main(int argc, char* argv[])
                     const auto& dataVector = example.GetDataVector().ToArray();
                     auto prediction = predictor.Predict(dataVector);
 
-                    if (prediction.label == label)
+                    auto maxElement = std::max_element(prediction.GetDataPointer(), prediction.GetDataPointer() + prediction.Size());
+                    auto maxLabelIndex = maxElement - prediction.GetDataPointer();
+                    if (maxLabelIndex == label)
                         truePositive += 1;
+                    else if (protoNNTrainerArguments.verbose)
+                        std::cout << "Test " << test_index << " failed: expecting label " << label << " and got label " << maxLabelIndex << std::endl;
 
                     exampleIterator.Next();
+                    test_index++;
                 }
 
                 accuracy = truePositive / mappedDataset.NumExamples();

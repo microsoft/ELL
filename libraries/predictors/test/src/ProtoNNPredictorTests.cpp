@@ -46,12 +46,15 @@ void ProtoNNPredictorTest()
     Z(1, 0) = 0.2; Z(1, 1) = 0.4, Z(1, 2) = 0.8;
     // clang-format on
 
-    predictors::ProtoNNPrediction result = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
+    auto prediction = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
+
+    auto maxElement = std::max_element(prediction.GetDataPointer(), prediction.GetDataPointer() + prediction.Size());
+    auto maxLabelIndex = maxElement - prediction.GetDataPointer();
 
     size_t R = 1;
     double score = 1.321484;
 
-    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result.label, R));
-    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(result.score, score, 1e-6));
+    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(maxLabelIndex, R));
+    testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(*maxElement, score, 1e-6));
 }
 

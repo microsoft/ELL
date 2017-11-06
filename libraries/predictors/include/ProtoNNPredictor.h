@@ -27,13 +27,6 @@ namespace ell
 {
 namespace predictors
 {
-    /// <summary> Output of ProtoNN predictor, contains a prediction score and a label (0-based). </summary>
-    struct ProtoNNPrediction
-    {
-        double score;
-        size_t label;
-    };
-
     /// <summary> A ProtoNN predictor. </summary>
     ///
     class ProtoNNPredictor : public IPredictor<double>, public utilities::IArchivable
@@ -114,12 +107,12 @@ namespace predictors
         /// <returns> The number of labels. </returns>
         size_t GetNumLabels() const { return _Z.NumRows(); }
 
-        /// <summary> Returns the label output of the predictor for a given example. </summary>
+        /// <summary> Returns the label scores. </summary>
         ///
         /// <param name="inputVector"> The data vector. </param>
         ///
-        /// <returns> The predicted label with its score. </returns>
-        ProtoNNPrediction Predict(const DataVectorType& inputVector) const;
+        /// <returns> The predicted label scores. </returns>
+        math::ColumnVector<double> Predict(const DataVectorType& inputVector) const;
 
         /// <summary> Resets the projection predictor to the zero projection matrix. </summary>
         void Reset();

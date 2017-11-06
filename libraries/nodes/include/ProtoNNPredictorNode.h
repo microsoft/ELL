@@ -30,11 +30,9 @@ namespace nodes
         /// @name Input and Output Ports
         /// @{
         static constexpr const char* inputPortName = "input";
-        static constexpr const char* outputScorePortName = "outputScore";
-        static constexpr const char* outputLabelPortName = "outputLabel";
+        static constexpr const char* outputPortName = "output";
         const model::InputPort<double>& input = _input;
-        const model::OutputPort<double>& outputScore = _outputScore;
-        const model::OutputPort<int>& outputLabel = _outputLabel;
+        const model::OutputPort<double>& outputScores = _outputScores;
 
         /// @}
 
@@ -46,6 +44,7 @@ namespace nodes
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The signal to predict from </param>
+        /// <param name="outputSize">The size of the output vector</param>
         /// <param name="predictor"> The ProtoNN predictor to use when making the prediction. </param>
         ProtoNNPredictorNode(const model::PortElements<double>& input, const ProtoNNPredictor& predictor);
 
@@ -74,11 +73,8 @@ namespace nodes
         // Inputs
         model::InputPort<double> _input;
 
-        // Output score
-        model::OutputPort<double> _outputScore;
-
-        // Output label
-        model::OutputPort<int> _outputLabel;
+        // Output scores
+        model::OutputPort<double> _outputScores;
 
         // ProtoNN predictor
         ProtoNNPredictor _predictor;

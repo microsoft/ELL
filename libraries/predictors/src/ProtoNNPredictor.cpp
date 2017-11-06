@@ -41,6 +41,8 @@ namespace predictors
     {
         // Projection
         math::ColumnVector<double> data(inputVector.ToArray());
+        auto dimension = GetDimension();
+        data.Resize(dimension);
         math::ColumnVector<double> projectedInput(GetProjectedDimension());
         math::Multiply(1.0, _W, data, 0.0, projectedInput);
 
@@ -66,15 +68,10 @@ namespace predictors
         return labels;
     }
 
-    ProtoNNPrediction ProtoNNPredictor::Predict(const DataVectorType& inputVector) const
+    math::ColumnVector<double> ProtoNNPredictor::Predict(const DataVectorType& inputVector) const
     {
         auto labels = GetLabelScores(inputVector);
-        auto maxElement = std::max_element(labels.GetDataPointer(), labels.GetDataPointer() + labels.Size());
-        auto maxLabelIndex = maxElement - labels.GetDataPointer();
-
-        ProtoNNPrediction prediction{ *maxElement, (size_t)maxLabelIndex };
-
-        return prediction;
+        return labels;
     }
 
     void ProtoNNPredictor::WriteToArchive(utilities::Archiver& archiver) const
