@@ -89,6 +89,7 @@ namespace utilities
             // Exact match
             if (valNamePair.first == str)
             {
+                resultString = valNamePair.first;
                 result = valNamePair.second;
                 return true;
             }

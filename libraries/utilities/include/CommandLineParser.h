@@ -221,15 +221,16 @@ namespace utilities
             size_t optionNameHelpLength() const;
         };
 
-        struct case_insensitive_comparer {
-            bool operator() (const std::string& lhs, const std::string& rhs) const {
+        struct case_insensitive_comparer
+        {
+            bool operator()(const std::string& lhs, const std::string& rhs) const
+            {
                 // STYLE discrepancy
                 auto lower_lhs = ToLowercase(lhs);
                 auto lower_rhs = ToLowercase(rhs);
                 return lower_lhs < lower_rhs;
             }
         };
-
 
         std::vector<std::string> _originalArgs;
         std::string _exeName;
