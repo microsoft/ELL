@@ -213,7 +213,7 @@ void InputLayerTest()
     typename InputLayer<ElementType>::InputParameters parameters{ inputShape, NoPadding(), outputShape, ZeroPadding(1), 2.0 };
 
     InputLayer<ElementType> inputLayer(parameters);
-    inputLayer.SetInput({ 1, 2, 3, 4, 5, 6, 7, 8 });
+    inputLayer.SetInput(std::vector<ElementType>({ 1, 2, 3, 4, 5, 6, 7, 8 }));
     inputLayer.Compute();
     auto output = inputLayer.GetOutput();
     testing::ProcessTest("Testing InputLayer, values", Equals(output(1, 1, 0), 2.0) && Equals(output(1, 2, 0), 6.0) && Equals(output(2, 1, 1), 12.0) && Equals(output(2, 2, 1), 16.0));

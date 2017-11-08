@@ -112,6 +112,13 @@ namespace predictors
         /// <returns> The prediction. </returns>
         const std::vector<ElementType>& Predict(const DataVectorType& dataVector) const;
 
+        /// <summary> Returns the output of the network for a given input. </summary>
+        ///
+        /// <param name="input"> The input data. </param>
+        ///
+        /// <returns> The prediction. </returns>
+        const std::vector<ElementType>& Predict(const std::vector<ElementType>& input) const;
+
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
@@ -138,6 +145,7 @@ namespace predictors
         virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        void Compute() const;
         InputLayerReference _inputLayer;
         Layers _layers;
         mutable std::vector<ElementType> _output;

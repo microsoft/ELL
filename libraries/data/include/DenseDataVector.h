@@ -85,7 +85,7 @@ namespace data
         /// <param name="size"> The prefix size. </param>
         ///
         /// <returns> The iterator. </returns>
-        template<IterationPolicy policy>
+        template <IterationPolicy policy>
         VectorIndexValueIterator<policy, ElementType> GetIterator(size_t size) const;
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace data
         /// <typeparam name="policy"> The iteration policy. </typeparam>
         ///
         /// <returns> The iterator. </returns>
-        template<IterationPolicy policy>
+        template <IterationPolicy policy>
         VectorIndexValueIterator<policy, ElementType> GetIterator() const;
 
         /// <summary> Appends an element to the end of the data vector. </summary>
@@ -114,6 +114,16 @@ namespace data
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
         virtual size_t PrefixLength() const override { return _data.size(); }
 
+        /// <summary> Gets the data vector type (implemented by template specialization). </summary>
+        ///
+        /// <returns> The data vector type. </returns>
+        virtual IDataVector::Type GetType() const override
+        {
+            return GetStaticType();
+        }
+
+        static IDataVector::Type GetStaticType();
+
     private:
         using DataVectorBase<DenseDataVector<ElementType>>::AppendElements;
         size_t _numNonzeros = 0;
@@ -121,48 +131,16 @@ namespace data
     };
 
     /// <summary> A dense data vector with double elements. </summary>
-    struct DoubleDataVector : public DenseDataVector<double>
-    {
-        using DenseDataVector<double>::DenseDataVector;
-
-        /// <summary> Gets the data vector type. </summary>
-        ///
-        /// <returns> The data vector type. </returns>
-        virtual IDataVector::Type GetType() const override { return IDataVector::Type::DoubleDataVector; }
-    };
+    using DoubleDataVector = DenseDataVector<double>;
 
     /// <summary> A dense data vector with float elements. </summary>
-    struct FloatDataVector : public DenseDataVector<float>
-    {
-        using DenseDataVector<float>::DenseDataVector;
-
-        /// <summary> Gets the data vector type. </summary>
-        ///
-        /// <returns> The data vector type. </returns>
-        virtual IDataVector::Type GetType() const override { return IDataVector::Type::FloatDataVector; }
-    };
+    using FloatDataVector = DenseDataVector<float>;
 
     /// <summary> A dense data vector with short elements. </summary>
-    struct ShortDataVector : public DenseDataVector<short>
-    {
-        using DenseDataVector<short>::DenseDataVector;
-
-        /// <summary> Gets the data vector type. </summary>
-        ///
-        /// <returns> The data vector type. </returns>
-        virtual IDataVector::Type GetType() const override { return IDataVector::Type::ShortDataVector; }
-    };
+    using ShortDataVector = DenseDataVector<short>;
 
     /// <summary> A dense data vector with byte elements. </summary>
-    struct ByteDataVector : public DenseDataVector<char>
-    {
-        using DenseDataVector<char>::DenseDataVector;
-
-        /// <summary> Gets the data vector type. </summary>
-        ///
-        /// <returns> The data vector type. </returns>
-        virtual IDataVector::Type GetType() const override { return IDataVector::Type::ByteDataVector; }
-    };
+    using ByteDataVector = DenseDataVector<char>;
 }
 }
 

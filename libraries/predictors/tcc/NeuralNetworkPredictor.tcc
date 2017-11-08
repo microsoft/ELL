@@ -53,7 +53,25 @@ namespace predictors
             _inputLayer->SetInput(dataVector);
             _inputLayer->Compute();
         }
+        Compute();
+        return _output;
+    }
 
+    template <typename ElementType>
+    const std::vector<ElementType>& NeuralNetworkPredictor<ElementType>::Predict(const std::vector<ElementType>& input) const
+    {
+        if (_inputLayer != nullptr)
+        {
+            _inputLayer->SetInput(input);
+            _inputLayer->Compute();
+        }
+        Compute();
+        return _output;
+    }
+
+    template <typename ElementType>
+    void NeuralNetworkPredictor<ElementType>::Compute() const
+    {
         // Forward feed inputs through the layers
         for (size_t i = 0; i < _layers.size(); i++)
         {
@@ -83,8 +101,6 @@ namespace predictors
         {
             _output.assign(_output.size(), 0);
         }
-
-        return _output;
     }
 
     template <typename ElementType>

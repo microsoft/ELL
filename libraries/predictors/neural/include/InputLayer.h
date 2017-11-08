@@ -9,6 +9,9 @@
 #pragma once
 #include "Layer.h"
 
+// stl
+#include <vector>
+
 namespace ell
 {
 namespace predictors
@@ -68,6 +71,11 @@ namespace neural
         ///
         /// <param name="input"> Copies the input vector to the input tensor. </param>
         void SetInput(const DataVectorType& input);
+
+        /// <summary> Sets the input. </summary>
+        ///
+        /// <param name="input"> Copies the input vector to the input tensor. </param>
+        void SetInput(const std::vector<ElementType>& input);
 
         /// <summary> Gets a writeable reference to the input. </summary>
         ///

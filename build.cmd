@@ -96,10 +96,10 @@ cmake -G "!CMakeGenerator!" "-DCMAKE_C_COMPILER=%CPATH%bin/Hostx86/x86/cl.exe" "
 if ERRORLEVEL 1 goto :nocmake
 
 :buildit
-cmake --build . --config Release -- /m
+cmake --build . --config Release -- /m:4
 if ERRORLEVEL 1 goto :builderror
 
-cmake --build . --target _ELL_python --config Release -- /m
+cmake --build . --target _ELL_python --config Release -- /m:4
 if ERRORLEVEL 1 goto :builderror
 
 goto :eof

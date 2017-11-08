@@ -106,7 +106,7 @@ namespace neural
         using TensorType = math::Tensor<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using TensorReferenceType = math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
         using ConstTensorReferenceType = math::ConstTensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>;
-        using DataVectorType = data::FloatDataVector;
+        using DataVectorType = data::DenseDataVector<ElementType>;
 
         /// <summary> Parameters common to all layers, specifying info related to input and output of the layer. </summary>
         struct LayerParameters

@@ -7,8 +7,10 @@ set (library_name data)
 set (src src/Dataset.cpp
          src/DataVector.cpp
          src/DataVectorOperations.cpp
+         src/DenseDataVector.cpp
          src/GeneralizedSparseParsingIterator.cpp
          src/SequentialLineIterator.cpp
+         src/SparseDataVector.cpp
          src/TextLine.cpp
          src/WeightLabel.cpp)
 

@@ -74,7 +74,7 @@ namespace predictors
     }
 
     template <typename ElementType>
-    std::vector<ElementType> NeuralNetworkPredictor<ElementType>::Predict(const std::vector<double>& input)
+    std::vector<ElementType> NeuralNetworkPredictor<ElementType>::Predict(const std::vector<ElementType>& input)
     {
         std::vector<ElementType> result;
         // Call the underlying predictor with the specified input.
@@ -82,9 +82,7 @@ namespace predictors
         // api caller is going to do with it.
         if (_predictor != nullptr)
         {
-            using UnderlyingDataVectorType = typename UnderlyingPredictor::DataVectorType;
-            UnderlyingDataVectorType dataInput(input);
-            result = _predictor->Predict(dataInput);
+            result = _predictor->Predict(input);
         }
         else
         {
