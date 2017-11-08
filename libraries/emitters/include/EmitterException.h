@@ -31,6 +31,8 @@ namespace emitters
         unaryOperationNotSupported,
         // Binary predicates - operation not supported
         binaryPredicateTypeNotSupported,
+        // Illegal cast operation
+        castNotSupported,
         // Unknown Variable type
         variableTypeNotSupported,
         // Invalid index into a vector

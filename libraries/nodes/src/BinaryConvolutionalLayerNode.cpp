@@ -863,7 +863,7 @@ namespace nodes
         // The start of the binarized weights matrix for this filter
         auto weightsBegin = function.Operator(times, filterIndex, function.Literal<int>(packedRowStride));
         auto weightsBeginPtr = function.PointerOffset(pFilterWeights, weightsBegin);
-        auto weightsVector = emitter.Cast(weightsBeginPtr, vectorPointerType);
+        auto weightsVector = function.CastPointer(weightsBeginPtr, vectorPointerType);
 
         llvm::Value* filterMean = nullptr;
         if (_convolutionalParameters.weightsScale == scaleOutputByFilterMeans)
@@ -897,8 +897,8 @@ namespace nodes
                 assert(vectorSumVar != nullptr);
 
                 // cast to vector pointer
-                auto inputVector = emitter.Cast(inputBeginPtr, vectorPointerType);
-                auto paddingMaskVector = emitter.Cast(paddingMaskBeginPtr, vectorPointerType);
+                auto inputVector = function.CastPointer(inputBeginPtr, vectorPointerType);
+                auto paddingMaskVector = function.CastPointer(paddingMaskBeginPtr, vectorPointerType);
 
                 // If vector instructions are enabled, create a variable to store the running vector sum
                 function.Store(vectorSumVar, emitters::FillVector<PackedBitsType>(function, vectorType, 0));

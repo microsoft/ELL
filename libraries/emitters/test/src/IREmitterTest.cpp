@@ -148,7 +148,6 @@ void TestLLVM()
         llvm::Value* pRegisterSum = fnMain.PointerOffset(pRegisters, i, fnMain.Literal(1));
         fnMain.Store(pRegisterSum, sum);
 
-        //auto itemInt = fnMain.CastFloatToInt(item);
         IRIfEmitter ife(fnMain);
         ife.If(TypedComparison::lessThanFloat, item, fnMain.Literal(5.7));
         {

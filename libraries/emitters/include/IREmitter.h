@@ -263,7 +263,7 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents false. </returns>
         llvm::Constant* FalseBit();
 
-        /// <summary> Emit a cast operation from one type to another. </summary>
+        /// <summary> Emit a value-preserving cast operation from one type to another. </summary>
         ///
         /// <typeparam name="InputType"> The input type. </typeparam>
         /// <typeparam name="OutputType"> The output type. </typeparam>
@@ -273,21 +273,21 @@ namespace emitters
         template<typename InputType, typename OutputType>
         llvm::Value* CastValue(llvm::Value* pValue);
 
-        /// <summary> Emit a cast operation from one type to another. </summary>
+        /// <summary> Emit a bitwise ("reinterpret") cast operation from one type to another. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
         /// <param name="destinationType"> Output type. </param>
         ///
         /// <returns> Pointer to the output value. </returns>
-        llvm::Value* Cast(llvm::Value* pValue, VariableType destinationType);
+        llvm::Value* BitCast(llvm::Value* pValue, VariableType destinationType);
         
-        /// <summary> Emit a cast operation from one type to another. </summary>
+        /// <summary> Emit a bitwise ("reinterpret") cast operation from one type to another. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
         /// <param name="destinationType"> Output type. </param>
         ///
         /// <returns> Pointer to the output value. </returns>
-        llvm::Value* Cast(llvm::Value* pValue, llvm::Type* destinationType);
+        llvm::Value* BitCast(llvm::Value* pValue, llvm::Type* destinationType);
 
         /// <summary> Emit a cast operation from one pointer type to another. </summary>
         ///
@@ -296,6 +296,30 @@ namespace emitters
         ///
         /// <returns> Pointer to the output value. </returns>
         llvm::Value* CastPointer(llvm::Value* pValue, llvm::Type* destinationType);
+
+        /// <summary> Emit a cast operation from one pointer type to another. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="destinationType"> Output type. </param>
+        ///
+        /// <returns> Pointer to the output value. </returns>
+        llvm::Value* CastPointer(llvm::Value* pValue, VariableType destinationType);
+
+        /// <summary> Emit a cast from an integer type to a pointer. </summary>
+        ///
+        /// <param name="pValue"> Input value. </param>
+        /// <param name="destinationType"> Output pointer type. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        llvm::Value* CastIntToPointer(llvm::Value* pValue, llvm::Type* destinationType);
+        
+        /// <summary> Emit a cast from a pointer to an integer type. </summary>
+        ///
+        /// <param name="pValue"> Input value. </param>
+        /// <param name="destinationType"> Output type. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        llvm::Value* CastPointerToInt(llvm::Value* pValue, llvm::Type* destinationType);
 
         /// <summary> Emit a cast operation from an int to a float. </summary>
         ///
@@ -310,18 +334,19 @@ namespace emitters
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
         /// <param name="destinationType"> Output type. </param>
+        /// <param name="isSigned"> true if the integer value is signed. </param>
         ///
         /// <returns> Pointer to the output value. </returns>
-        llvm::Value* CastFloatToInt(llvm::Value* pValue, VariableType destinationType);
+        llvm::Value* CastFloatToInt(llvm::Value* pValue, VariableType destinationType, bool isSigned = true);
 
-        /// <summary> Emit a cast operation from from an int. </summary>
+        /// <summary> Emit a cast operation from from an int to an int. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
         /// <param name="destinationType"> Output type. </param>
         /// <param name="isSigned"> true if the value is signed. </param>
         ///
         /// <returns> Pointer to the output value. </returns>
-        llvm::Value* CastInt(llvm::Value* pValue, VariableType destinationType, bool isValueSigned);
+        llvm::Value* CastInt(llvm::Value* pValue, VariableType destinationType, bool isSigned);
 
         /// <summary> Emit a cast operation from from a boolean. </summary>
         ///
@@ -795,7 +820,7 @@ namespace emitters
         ///
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
         llvm::StructType* DeclareAnonymousStruct(const LLVMTypeList& fields, bool packed = false);
-
+        
         /// <summary> Gets a declaration of a Struct with the given name.</summary>
         ///
         /// <param name="name"> The struct name. </param>
@@ -809,7 +834,7 @@ namespace emitters
         ///
         /// <returns> A unique pointer to the new module. </returns>
         std::unique_ptr<llvm::Module> AddModule(const std::string& name);
-
+        
         /// <summary> Emits a memmove instruction. </summary>
         ///
         /// <param name="pSource"> Pointer to the value that holds the source address. </param>

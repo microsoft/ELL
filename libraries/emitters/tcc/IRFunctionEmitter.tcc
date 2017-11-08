@@ -29,12 +29,6 @@ namespace emitters
     }
 
     template <typename ValueType>
-    llvm::Value* IRFunctionEmitter::Cast(llvm::Value* pValue)
-    {
-        return Cast(pValue, GetVariableType<ValueType>());
-    }
-
-    template <typename ValueType>
     void IRFunctionEmitter::VectorOperator(TypedOperator type, size_t size, ValueType leftValue, llvm::Value* pRightValue, std::function<void(llvm::Value*, llvm::Value*)> aggregator)
     {
         assert(pRightValue != nullptr);

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "EmitterTypes.h"
 #include "IRAsyncTask.h"
 #include "IREmitter.h"
 #include "IRIfEmitter.h"
@@ -108,7 +109,7 @@ namespace emitters
         /// <returns> Pointer to an llvm::Value that represents the function argument. </returns>
         llvm::Value* LoadArgument(llvm::Argument& argument);
 
-        /// <summary> Emit a cast. </summary>
+        /// <summary> Emit a value-preserving cast operation from one type to another. </summary>
         ///
         /// <typeparam name="InputType"> The input type. </typeparam>
         /// <typeparam name="OuputType"> The output type. </typeparam>
@@ -124,7 +125,7 @@ namespace emitters
         /// <param name="valueType"> The type to cast to. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        llvm::Value* Cast(llvm::Value* pValue, VariableType valueType);
+        llvm::Value* BitCast(llvm::Value* pValue, VariableType valueType);
 
         /// <summary> Emit cast to a given type. </summary>
         ///
@@ -132,7 +133,7 @@ namespace emitters
         /// <param name="valueType"> The type to cast to. </param>
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        llvm::Value* Cast(llvm::Value* pValue, llvm::Type* valueType);
+        llvm::Value* BitCast(llvm::Value* pValue, llvm::Type* valueType);
 
         /// <summary> Emit pointer cast to a given pointer type. </summary>
         ///
@@ -141,6 +142,30 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         llvm::Value* CastPointer(llvm::Value* pValue, llvm::Type* valueType);
+
+        /// <summary> Emit pointer cast to a given pointer type. </summary>
+        ///
+        /// <param name="pValue"> Pointer to the input value. </param>
+        /// <param name="valueType"> The type to cast to. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        llvm::Value* CastPointer(llvm::Value* pValue, VariableType valueType);
+
+        /// <summary> Emit a cast from an integer type to a pointer. </summary>
+        ///
+        /// <param name="pValue"> Input value. </param>
+        /// <param name="destinationType"> Output pointer type. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        llvm::Value* CastIntToPointer(llvm::Value* pValue, llvm::Type* destinationType);
+
+        /// <summary> Emit a cast from a pointer to an integer type. </summary>
+        ///
+        /// <param name="pValue"> Input value. </param>
+        /// <param name="destinationType"> Output type. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
+        llvm::Value* CastPointerToInt(llvm::Value* pValue, llvm::Type* destinationType);
 
         /// <summary> Emit a cast from int to float. </summary>
         ///
@@ -172,15 +197,6 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         llvm::Value* CastBoolToInt(llvm::Value* pValue);
-
-        /// <summary> Emit a cast to a template type </summary>
-        ///
-        /// <typeparam name="ValueType"> The output type. </typeparam>
-        /// <param name="pValue"> Pointer to the input value. </param>
-        ///
-        /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
-        template <typename ValueType>
-        llvm::Value* Cast(llvm::Value* pValue);
 
         /// <summary> Emit a call to a function with a single optional argument. </summary>
         ///
@@ -231,6 +247,14 @@ namespace emitters
         ///
         /// <returns> Pointer to the result of the function call. </returns>
         llvm::Value* Return(llvm::Value* value);
+
+        /// <summary> Emit a unary operator with a scalar argument. </summary>
+        ///
+        /// <param name="type"> The operator type. </param>
+        /// <param name="value"> The argument of the operator. </param>
+        ///
+        /// <returns> Pointer to the return value of the operator. </returns>
+        llvm::Value* Operator(UnaryOperationType type, llvm::Value* value);
 
         /// <summary> Emit a binary operator with 2 scalar arguments. </summary>
         ///
@@ -550,15 +574,15 @@ namespace emitters
         ///
         /// <returns> Pointer to the resulting variable. </returns>
         llvm::AllocaInst* Variable(VariableType type, const std::string& name);
-
-        /// <summary> Emit a named stack variable. </summary>
-        ///
-        /// <param name="type"> The variable type. </param>
-        /// <param name="name"> The variable name. </param>
-        ///
-        /// <returns> Pointer to the resulting variable. </returns>
-        llvm::AllocaInst* Variable(llvm::Type* type, const std::string& name);
-
+        
+                /// <summary> Emit a named stack variable. </summary>
+                ///
+                /// <param name="type"> The variable type. </param>
+                /// <param name="name"> The variable name. </param>
+                ///
+                /// <returns> Pointer to the resulting variable. </returns>
+                llvm::AllocaInst* Variable(llvm::Type* type, const std::string& name);
+        
         /// <summary> Emit a stack array of the given size. </summary>
         ///
         /// <param name="type"> The array entry type. </param>
@@ -805,7 +829,7 @@ namespace emitters
         ///
         /// <returns> A task object representing the running task. </param>
         IRAsyncTask Async(IRFunctionEmitter& task, const std::vector<llvm::Value*>& arguments);
-
+        
         //
         // Standard C library function calls
         //

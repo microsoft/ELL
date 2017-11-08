@@ -93,13 +93,13 @@ namespace emitters
     {
         switch (scope)
         {
-            case VariableScope::local:
-            case VariableScope::input:
-            case VariableScope::output:
-                return _locals.Get(name);
+        case VariableScope::local:
+        case VariableScope::input:
+        case VariableScope::output:
+            return _locals.Get(name);
 
-            default:
-                return GetModule().GetEmittedVariable(scope, name);
+        default:
+            return GetModule().GetEmittedVariable(scope, name);
         }
     }
 
@@ -123,19 +123,34 @@ namespace emitters
         return _pEmitter->Load(&argument);
     }
 
-    llvm::Value* IRFunctionEmitter::Cast(llvm::Value* pValue, VariableType valueType)
+    llvm::Value* IRFunctionEmitter::BitCast(llvm::Value* pValue, VariableType valueType)
     {
-        return _pEmitter->Cast(pValue, valueType);
+        return _pEmitter->BitCast(pValue, valueType);
     }
 
-    llvm::Value* IRFunctionEmitter::Cast(llvm::Value* pValue, llvm::Type* valueType)
+    llvm::Value* IRFunctionEmitter::BitCast(llvm::Value* pValue, llvm::Type* valueType)
     {
-        return _pEmitter->Cast(pValue, valueType);
+        return _pEmitter->BitCast(pValue, valueType);
     }
 
     llvm::Value* IRFunctionEmitter::CastPointer(llvm::Value* pValue, llvm::Type* valueType)
     {
         return _pEmitter->CastPointer(pValue, valueType);
+    }
+
+    llvm::Value* IRFunctionEmitter::CastPointer(llvm::Value* pValue, VariableType valueType)
+    {
+        return _pEmitter->CastPointer(pValue, valueType);
+    }
+
+    llvm::Value* IRFunctionEmitter::CastIntToPointer(llvm::Value* pValue, llvm::Type* valueType)
+    {
+        return _pEmitter->CastIntToPointer(pValue, valueType);
+    }
+
+    llvm::Value* IRFunctionEmitter::CastPointerToInt(llvm::Value* pValue, llvm::Type* destinationType)
+    {
+        return _pEmitter->CastPointerToInt(pValue, destinationType);
     }
 
     llvm::Value* IRFunctionEmitter::CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned)
@@ -838,12 +853,12 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::Malloc(VariableType type, int64_t size)
     {
         IRValueList arguments = { Literal(size) };
-        return Cast(Call(MallocFnName, arguments), type);
+        return CastPointer(Call(MallocFnName, arguments), type);
     }
 
     void IRFunctionEmitter::Free(llvm::Value* pValue)
     {
-        Call(FreeFnName, Cast(pValue, VariableType::BytePointer));
+        Call(FreeFnName, CastPointer(pValue, VariableType::BytePointer));
     }
 
     llvm::Value* IRFunctionEmitter::Print(const std::string& text)

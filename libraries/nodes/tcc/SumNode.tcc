@@ -137,7 +137,7 @@ namespace nodes
         auto vectorPointerType = vectorType->getPointerTo();
 
         // cast pInput to pointer-to-vector
-        auto inputVector = emitter.Cast(pInput, vectorPointerType);
+        auto inputVector = function.CastPointer(pInput, vectorPointerType);
 
         llvm::Value* vectorAccumVar = function.Variable(vectorType, "vecAccum");
         function.Store(vectorAccumVar, emitters::FillVector<ValueType>(function, vectorType, 0));

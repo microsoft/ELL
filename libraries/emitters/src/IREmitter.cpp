@@ -9,6 +9,10 @@
 #include "IREmitter.h"
 #include "EmitterException.h"
 
+// llvm
+#include <llvm/IR/InstrTypes.h>
+#include <llvm/IR/Type.h>
+
 // stl
 #include <algorithm>
 #include <iostream>
@@ -26,7 +30,7 @@ namespace emitters
         {
             llvm::FunctionType* fType = f->getFunctionType();
             auto numArgs = args.size();
-            if(f->isVarArg()) // If the function is a varargs function, don't check the extra varargs parameters
+            if (f->isVarArg()) // If the function is a varargs function, don't check the extra varargs parameters
             {
                 numArgs = fType->getNumParams();
             }
@@ -327,7 +331,6 @@ namespace emitters
         return CastIntToFloat(pValue, VariableType::Double, true);
     }
 
-    // int64_t -> ?
     template <>
     llvm::Value* IREmitter::CastValue<int64_t, bool>(llvm::Value* pValue)
     {
@@ -420,16 +423,44 @@ namespace emitters
         return _irBuilder.CreateFPCast(pValue, Type(VariableType::Double));
     }
 
-    llvm::Value* IREmitter::Cast(llvm::Value* pValue, VariableType destinationType)
+    llvm::Value* IREmitter::BitCast(llvm::Value* pValue, VariableType destinationType)
     {
         assert(pValue != nullptr);
-        return _irBuilder.CreateBitCast(pValue, Type(destinationType));
+        return BitCast(pValue, Type(destinationType));
     }
 
-    llvm::Value* IREmitter::Cast(llvm::Value* pValue, llvm::Type* destinationType)
+    llvm::Value* IREmitter::BitCast(llvm::Value* pValue, llvm::Type* destinationType)
     {
         assert(pValue != nullptr);
-        return _irBuilder.CreateBitCast(pValue, destinationType);
+        auto valueType = pValue->getType();
+        
+        // We can't do a bit cast if the types don't have the same size
+        if (!llvm::CastInst::isBitCastable(valueType, destinationType))
+        {
+            auto currentBlock = _irBuilder.GetInsertBlock();
+            assert(currentBlock);
+            auto dataLayout = currentBlock->getModule()->getDataLayout();
+            auto size1 = dataLayout.getTypeStoreSizeInBits(valueType);
+            auto size2 = dataLayout.getTypeStoreSizeInBits(destinationType);
+            if (size1 != 0 && size2 != 0)
+            {
+                // unequal sizes: need to bitcast to an int, truncate, then bitcast to destination type
+                auto intType1 = llvm::Type::getIntNTy(_llvmContext, size1);
+                auto intType2 = llvm::Type::getIntNTy(_llvmContext, size2);
+                
+                auto intValue1 = _irBuilder.CreateBitOrPointerCast(pValue, intType1);
+                auto resizedIntValue = _irBuilder.CreateZExtOrTrunc(intValue1, intType2);
+                return _irBuilder.CreateBitOrPointerCast(resizedIntValue, destinationType);
+            }
+            else
+            {
+                throw EmitterException(EmitterError::castNotSupported, "Bad cast");
+            }
+        }
+        else
+        {
+            return _irBuilder.CreateBitOrPointerCast(pValue, destinationType);
+        }
     }
 
     llvm::Value* IREmitter::CastPointer(llvm::Value* pValue, llvm::Type* destinationType)
@@ -437,6 +468,23 @@ namespace emitters
         assert(pValue != nullptr);
         return _irBuilder.CreatePointerCast(pValue, destinationType);
     }
+    
+    llvm::Value* IREmitter::CastPointer(llvm::Value* pValue, VariableType destinationType)
+    {
+        return CastPointer(pValue, Type(destinationType));
+    }
+    
+    llvm::Value* IREmitter::CastIntToPointer(llvm::Value* pValue, llvm::Type* destinationType)
+    {
+        assert(pValue != nullptr);
+        return _irBuilder.CreateIntToPtr(pValue, destinationType);
+    }
+
+    llvm::Value* IREmitter::CastPointerToInt(llvm::Value* pValue, llvm::Type* destinationType)
+    {
+        assert(pValue != nullptr);
+        return _irBuilder.CreatePtrToInt(pValue, destinationType);
+    }    
 
     llvm::Value* IREmitter::CastIntToFloat(llvm::Value* pValue, VariableType destinationType, bool isSigned)
     {
@@ -451,36 +499,36 @@ namespace emitters
         }
     }
 
-    llvm::Value* IREmitter::CastFloatToInt(llvm::Value* pValue, VariableType destinationType)
+    llvm::Value* IREmitter::CastFloatToInt(llvm::Value* pValue, VariableType destinationType, bool isSigned)
     {
         assert(pValue != nullptr);
 
         auto type = Type(destinationType);
-        switch (destinationType)
+        if(!type->isIntegerTy())
         {
-            case VariableType::Byte:
-                return _irBuilder.CreateFPToUI(pValue, type);
+            throw EmitterException(EmitterError::notSupported);
+        }
 
-            case VariableType::Short:
-            case VariableType::Int32:
-            case VariableType::Int64:
-                return _irBuilder.CreateFPToSI(pValue, type);
-
-            default:
-                throw EmitterException(EmitterError::notSupported);
+        if(isSigned)
+        {
+            return _irBuilder.CreateFPToSI(pValue, type);
+        }
+        else
+        {
+            return _irBuilder.CreateFPToUI(pValue, type);
         }
     }
 
-    llvm::Value* IREmitter::CastInt(llvm::Value* pValue, VariableType destinationType, bool isValueSigned)
+    llvm::Value* IREmitter::CastInt(llvm::Value* pValue, VariableType destinationType, bool isSigned)
     {
         assert(pValue != nullptr);
         auto type = Type(destinationType);
-        return _irBuilder.CreateIntCast(pValue, type, isValueSigned);
+        return _irBuilder.CreateIntCast(pValue, type, isSigned);
     }
 
     llvm::Value* IREmitter::CastBool(llvm::Value* pValue)
     {
-        return Cast(pValue, VariableType::Byte);
+        return CastInt(pValue, VariableType::Byte, false);
     }
 
     llvm::ReturnInst* IREmitter::ReturnVoid()
@@ -584,14 +632,10 @@ namespace emitters
 
         llvm::Value* pTestValue = pValue;
         auto pValueType = pValue->getType();
-        if (pValueType->isIntegerTy(1))
+        if (pValueType->isIntegerTy())
         {
             // We use bytes as booleans
             pTestValue = CastInt(pValue, VariableType::Byte, false);
-        }
-        else if (!pValueType->isIntegerTy(4))
-        {
-            pTestValue = CastBool(pValue);
         }
         return Comparison(TypedComparison::equals, pTestValue, testValue ? True() : False());
     }

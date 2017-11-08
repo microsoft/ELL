@@ -68,7 +68,7 @@ namespace emitters
 
             _owningFunction.FillStruct(taskArg, _arguments);
             auto pthreadWrapperFunction = GetPthreadWrapper(taskArgType);
-            auto errCode = _owningFunction.PthreadCreate(_pthread, nullAttr, pthreadWrapperFunction, _owningFunction.Cast(taskArg, int8PtrType));
+            auto errCode = _owningFunction.PthreadCreate(_pthread, nullAttr, pthreadWrapperFunction, _owningFunction.BitCast(taskArg, int8PtrType));
         }
         else
         {
