@@ -25,6 +25,7 @@
 #include <initializer_list>
 #include <tuple>
 #include <vector>
+#include <ostream>
 
 namespace ell
 {
@@ -84,6 +85,12 @@ namespace math
         /// <returns> The value. </returns>
         template<Dimension dimension>
         size_t GetValue() const;
+
+        friend std::ostream& operator<<(std::ostream& stream, const TensorCoordinateBase& tensor)
+        {
+            stream << "(" << tensor._rowValue << ", " << tensor._columnValue << ", " << tensor._channelValue << ")";
+            return stream;
+        }
 
     protected:
         size_t _rowValue;

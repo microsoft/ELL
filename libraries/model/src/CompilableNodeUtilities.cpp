@@ -21,6 +21,7 @@
 
 // utiltiies
 #include "Exception.h"
+#include "Logger.h"
 
 // stl
 #include <functional>
@@ -32,6 +33,8 @@ namespace ell
 {
 namespace model
 {
+    using namespace logging;
+
     //
     // Helper functions
     //
@@ -43,6 +46,7 @@ namespace model
 
     bool HasSingleDescendant(const Node& node)
     {
+        Log() << DiagnosticString(node) << " has " << node.GetDependentNodes().size() << " dependent nodes" << EOL;
         return (node.GetDependentNodes().size() == 1);
     }
 
@@ -53,9 +57,7 @@ namespace model
 
     std::string IdString(const Node& node)
     {
-        std::stringstream id;
-        id << "Node_" << node.GetId();
-        return id.str();
+        return std::string{"Node_"} + to_string(node.GetId());
     }
 
     std::string DiagnosticString(const Node& node)

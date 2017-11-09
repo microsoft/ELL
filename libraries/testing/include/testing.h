@@ -142,6 +142,24 @@ namespace testing
     ///
     /// <returns> true if one of the tests failed. </returns>
     bool DidTestFail();
+
+    /// <summary> RAII helper to turn on logging for a sepcific test/scope
+    ///
+    /// Example:
+    /// ```
+    /// EnableLoggingHelper enableLogging;
+    /// ```
+    /// </summary>
+    struct EnableLoggingHelper
+    {
+        EnableLoggingHelper();
+        ~EnableLoggingHelper();
+
+        EnableLoggingHelper(const EnableLoggingHelper&) = delete;
+        EnableLoggingHelper(EnableLoggingHelper&&) = delete;
+        EnableLoggingHelper& operator=(const EnableLoggingHelper&) = delete;
+        EnableLoggingHelper& operator=(EnableLoggingHelper&&) = delete;
+    };
 }
 }
 

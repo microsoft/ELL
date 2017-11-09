@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     OutputStreamImpostor.cpp (utilities)
-//  Authors:  Chuck Jacobs, Ofer Dekel
+//  Authors:  Chuck Jacobs, Ofer Dekel, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -22,36 +22,30 @@ namespace ell
 {
 namespace utilities
 {
-    class NullStreamBuf : public std::streambuf
-    {
-        virtual int overflow(int c)
-        {
-            return std::char_traits<char>::not_eof(c) ? c : EOF;
-        }
-    };
+    static std::ofstream nullStreamBuf;
 
-    NullStreamBuf nullStreamBuf;
+    OutputStreamImpostor::OutputStreamImpostor() : _outputStream(nullStreamBuf) {}
 
-    OutputStreamImpostor::OutputStreamImpostor(StreamType streamType)
+    OutputStreamImpostor::OutputStreamImpostor(StreamType streamType) : OutputStreamImpostor()
     {
-        if (streamType == StreamType::cout)
+        switch (streamType)
         {
-            _outputStream = std::make_shared<std::ostream>(std::cout.rdbuf());
-        }
-        else if (streamType == StreamType::cerr)
-        {
-            _outputStream = std::make_shared<std::ostream>(std::cerr.rdbuf());
-        }
-        else // null
-        {
-            _outputStream = std::make_shared<std::ostream>(&nullStreamBuf);
+        case StreamType::cout:
+            _outputStream = std::cout;
+            break;
+        case StreamType::cerr:
+            _outputStream = std::cerr;
+            break;
+        default:
+            break; // delegated default ctor already sets it to nullStreamBuf
         }
     }
 
-    OutputStreamImpostor::OutputStreamImpostor(std::string filename)
-    {
-        _outputFileStream = std::make_shared<std::ofstream>(utilities::OpenOfstream(filename));
-        _outputStream = std::make_shared<std::ostream>(_outputFileStream->rdbuf());
-    }
+    OutputStreamImpostor::OutputStreamImpostor(std::ostream& stream) : _outputStream(stream) {}
+
+    OutputStreamImpostor::OutputStreamImpostor(const std::string& filename) :
+        _fileStream(std::make_shared<std::ofstream>(utilities::OpenOfstream(filename))),
+        _outputStream(*_fileStream)
+    {}
 }
 }

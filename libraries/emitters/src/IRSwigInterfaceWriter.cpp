@@ -522,7 +522,7 @@ namespace emitters
             os << "%include \"callback.i\"\n";
         }
 
-        void WriteShapeWrappers(std::ostream& os, IRModuleEmitter& moduleEmitter) 
+        void WriteShapeWrappers(std::ostream& os, IRModuleEmitter& moduleEmitter)
         {
             auto pModule = moduleEmitter.GetLLVMModule();
             std::string moduleName = pModule->getName();
@@ -541,27 +541,27 @@ namespace emitters
                 }
             %} */
 
-            os << "%inline %{\n";
-            os << "  ell::api::math::TensorShape get_default_input_shape() {\n";
-            os << "    TensorShape  s;\n";
-            os << "    " << moduleName << "_GetInputShape(0, &s);\n";
-            os << "    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };\n";
-            os << "  }\n";
-            os << "  ell::api::math::TensorShape get_default_output_shape() {\n";
-            os << "    TensorShape  s;\n";
-            os << "    " << moduleName << "_GetOutputShape(0, &s);\n";
-            os << "    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };\n";
-            os << "  }\n";
-            os << "%}\n";
+            os << "%inline %{\n"
+                  "  ell::api::math::TensorShape get_default_input_shape() {\n"
+                  "    TensorShape  s;\n"
+                  "    " << moduleName << "_GetInputShape(0, &s);\n"
+                  "    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };\n"
+                  "  }\n"
+                  "  ell::api::math::TensorShape get_default_output_shape() {\n"
+                  "    TensorShape  s;\n"
+                  "    " << moduleName << "_GetOutputShape(0, &s);\n"
+                  "    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };\n"
+                  "  }\n"
+                  "%}\n";
 
         }
 
         void WriteModuleSwigCode(std::ostream& os, IRModuleEmitter& moduleEmitter, const std::string& headerName)
         {
             // Module C++ #include
-            os << "%{\n";
-            os << "#include \"" << headerName << "\"\n";
-            os << "%}\n\n";
+            os << "%{\n"
+                  "#include \"" << headerName << "\"\n"
+                  "%}\n\n";
 
             // Module callback macros
             auto callbacks = GetFunctionsWithTag(moduleEmitter, c_callbackFunctionTagName);
@@ -577,7 +577,7 @@ namespace emitters
             std::string functionName = (predicts[0].function)->getName();
             os << "%rename (predict) " << functionName << ";\n";
             os << "#endif\n";
-    
+
             os << "%include \"" << headerName << "\"\n";
             WriteShapeWrappers(os, moduleEmitter);
         }

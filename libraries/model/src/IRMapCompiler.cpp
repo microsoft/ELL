@@ -16,10 +16,15 @@
 #include "EmitterException.h"
 #include "Variable.h"
 
+// utils
+#include "Logger.h"
+
 namespace ell
 {
 namespace model
 {
+    using namespace logging;
+
     IRMapCompiler::IRMapCompiler()
         : IRMapCompiler(MapCompilerParameters{})
     {
@@ -28,9 +33,19 @@ namespace model
     IRMapCompiler::IRMapCompiler(const MapCompilerParameters& settings)
         : MapCompiler(settings), _moduleEmitter(settings.moduleName), _profiler()
     {
+        Log() << "Initializing IR map compiler" << EOL;
+
         _moduleEmitter.SetCompilerParameters(GetMapCompilerParameters().compilerSettings);
         _moduleEmitter.SetTargetTriple(GetCompilerParameters().targetDevice.triple);
         _moduleEmitter.SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
+        Log() << "Target device triple: " << GetCompilerParameters().targetDevice.triple << EOL
+              << "Target device layout: " << GetCompilerParameters().targetDevice.dataLayout << EOL;
+
+        if (settings.compilerSettings.includeDiagnosticInfo)
+        {
+            _moduleEmitter.DeclarePrintf();
+            Log() << "Including diagnostic information in IR" << EOL;
+        }
 
         _nodeRegions.emplace_back();
     }
@@ -47,6 +62,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Compiled maps must have a single output");
         }
 
+        Log() << "Ensuring map is valid..." << EOL;
         // if output isn't a simple port, add an output node to model
         auto out = map.GetOutput(0);
         ell::math::TensorShape shape{ out.Size(), 1, 1 }; // default shape from PortElementsBase::Size()
@@ -54,9 +70,13 @@ namespace model
         if (outNodes.size() > 0)
         {
             shape = outNodes[0]->GetShape();
+            Log() << "Output nodes present. Setting shape to first output node" << EOL;
+
         }
+        Log() << "Map output shape is " << shape << EOL;
         if (!out.IsFullPortOutput())
         {
+            Log() << "Map output is not a port output, creating one..." << EOL;
             model::OutputNodeBase* outputNode = nullptr;
             switch (out.GetPortType())
             {
@@ -95,19 +115,24 @@ namespace model
 
     IRCompiledMap IRMapCompiler::Compile(DynamicMap map)
     {
+        Log() << "Compile called for map" << EOL;
         EnsureValidMap(map);
+
+        Log() << "Refining the model..." << EOL;
         model::TransformContext context{ this, [this](const model::Node& node) { return node.IsCompilable(this) ? model::NodeAction::compile : model::NodeAction::refine; } };
         map.Refine(context);
 
         // Now the model ready for compiling
         if (GetMapCompilerParameters().profile)
         {
+            Log() << "Enabling profiling in emitted IR" << EOL;
             GetModule().AddPreprocessorDefinition(GetNamespacePrefix() + "_PROFILING", "1");
         }
         _profiler = { GetModule(), map.GetModel(), GetMapCompilerParameters().profile };
         _profiler.EmitInitialization();
 
         // Now we have the refined map, compile it
+        Log() << "Compiling map..." << EOL;
         CompileMap(map, GetPredictFunctionName());
 
         // Emit runtime model APIs
@@ -350,6 +375,7 @@ namespace model
         if (currentFunction.GetCurrentRegion() == nullptr) // TODO: put this check in GetCurrentFunction()
         {
             currentFunction.AddRegion(currentFunction.GetCurrentBlock());
+            Log() << "Creating a new region for " << currentFunction.GetFunctionName() << EOL;
         }
 
         // Tag the model function for declaration in the generated headers
@@ -370,6 +396,7 @@ namespace model
         auto& currentFunction = GetModule().GetCurrentFunction();
         if (currentFunction.GetCurrentRegion() == nullptr)
         {
+            Log() << "Creating new region for node in " << currentFunction.GetFunctionName() << EOL;
             currentFunction.AddRegion(currentFunction.GetCurrentBlock());
         }
 
@@ -387,8 +414,12 @@ namespace model
         auto pCurBlock = currentFunction.GetCurrentBlock();
         if (pCurBlock != currentFunction.GetCurrentRegion()->End())
         {
+            Log() << "Current node block is not end of function " << currentFunction.GetFunctionName()
+                  << ". Setting it so it is." << EOL;
             currentFunction.GetCurrentRegion()->SetEnd(pCurBlock);
         }
+
+        Log() << "Finished compiling node " << DiagnosticString(node) << EOL;
     }
 
     void IRMapCompiler::PushScope()
@@ -412,7 +443,11 @@ namespace model
 
     const Node* IRMapCompiler::GetUniqueParent(const Node& node)
     {
+        Log() << "Trying to find unique parent of node " << DiagnosticString(node) << EOL;
         auto inputs = node.GetInputPorts();
+
+        Log() << "Node has " << inputs.size() << " input ports" << EOL;
+
         const Node* pParentNode = nullptr;
         emitters::IRBlockRegion* pParentRegion = nullptr;
         for (auto input : inputs)
@@ -426,12 +461,17 @@ namespace model
                 emitters::IRBlockRegion* pNodeRegion = GetCurrentNodeBlocks().Get(*parentNode);
                 if (pNodeRegion != nullptr)
                 {
+                    Log() << "Got block region for parent node " << DiagnosticString(*parentNode) << EOL;
                     if (pParentRegion != nullptr && pNodeRegion != pParentRegion)
                     {
                         return nullptr;
                     }
                     pParentRegion = pNodeRegion;
                     pParentNode = parentNode;
+                }
+                else
+                {
+                    Log() << "Could not get block region for parent node " << DiagnosticString(*parentNode) << EOL;
                 }
             }
         }
@@ -445,6 +485,9 @@ namespace model
         assert(pBlock != nullptr && "Got null new block");
         currentFunction.SetCurrentBlock(pBlock);
         auto currentRegion = currentFunction.AddRegion(pBlock);
+
+        Log() << "Created region for node: " << DiagnosticString(node) << EOL;
+
         GetCurrentNodeBlocks().Set(node, currentRegion);
 
         if (GetMapCompilerParameters().compilerSettings.includeDiagnosticInfo)
@@ -455,15 +498,19 @@ namespace model
 
     bool IRMapCompiler::TryMergeNodeRegion(const Node& node)
     {
+        Log() << "Trying to merge code regions for " << DiagnosticString(node) << EOL;
+
         auto pRegion = GetCurrentNodeBlocks().Get(node);
         if (pRegion == nullptr)
         {
+            Log() << "Could not get code region for " << DiagnosticString(node) << EOL;
             return false;
         }
 
         const Node* pParentNode = GetUniqueParent(node);
         if (pParentNode == nullptr)
         {
+            Log() << "Could not find a unique parent for " << DiagnosticString(node) << EOL;
             return false;
         }
 
@@ -472,9 +519,12 @@ namespace model
 
     bool IRMapCompiler::TryMergeNodeRegions(const Node& dest, const Node& src)
     {
+        Log() << "Trying to merge parent node " << DiagnosticString(dest) << " with child node " << DiagnosticString(src) << EOL;
+
         emitters::IRBlockRegion* pDestRegion = GetCurrentNodeBlocks().Get(dest);
         if (pDestRegion == nullptr)
         {
+            Log() << "Could not get code block region for parent node " << DiagnosticString(dest) << EOL;
             return false;
         }
         return TryMergeNodeIntoRegion(pDestRegion, src);
@@ -484,12 +534,16 @@ namespace model
     {
         auto& currentFunction = GetModule().GetCurrentFunction();
 
+        Log() << "Trying to merge emitted code for node " << DiagnosticString(src) << " with existing code region in " << currentFunction.GetFunctionName() << EOL;
+
         emitters::IRBlockRegion* pSrcRegion = GetCurrentNodeBlocks().Get(src);
         if (pSrcRegion == nullptr || pSrcRegion == pDestRegion)
         {
+            Log() << "Code region for node " << (pSrcRegion ? " is same as region to merge" : " null") << EOL;
             return false;
         }
 
+        Log() << "Setting end of current region to current block" << EOL;
         GetModule().GetCurrentRegion()->SetEnd(currentFunction.GetCurrentBlock());
         currentFunction.ConcatRegions(pDestRegion, pSrcRegion);
         GetCurrentNodeBlocks().Set(src, pDestRegion);

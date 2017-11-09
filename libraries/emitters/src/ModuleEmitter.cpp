@@ -111,7 +111,7 @@ namespace emitters
                 parameters.targetDevice.numBits = 64;
                 parameters.targetDevice.cpu = c_pi3Cpu;
             }
-            else if (parameters.targetDevice.deviceName == "aarch64") // arm64 linux (DragonBoard) 
+            else if (parameters.targetDevice.deviceName == "aarch64") // arm64 linux (DragonBoard)
             {
                 // need to set arch to aarch64?
                 parameters.targetDevice.triple = c_arm64Triple;
@@ -148,7 +148,7 @@ namespace emitters
     {
         WriteToFile(filePath, GetFormatFromExtension(utilities::GetFileExtension(filePath, true)));
     }
-    
+
     void ModuleEmitter::WriteToFile(const std::string& filePath, ModuleOutputFormat format)
     {
         auto stream = utilities::OpenOfstream(filePath);

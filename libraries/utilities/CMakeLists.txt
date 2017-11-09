@@ -17,6 +17,7 @@ set (src src/Archiver.cpp
          src/IntegerList.cpp
          src/IntegerStack.cpp
          src/JsonArchiver.cpp
+         src/Logger.cpp
          src/ObjectArchive.cpp
          src/ObjectArchiver.cpp
          src/OutputStreamImpostor.cpp
@@ -47,6 +48,7 @@ set (include include/AbstractInvoker.h
              include/IntegerList.h
              include/IntegerStack.h
              include/JsonArchiver.h
+             include/Logger.h
              include/MillisecondTimer.h
              include/ObjectArchive.h
              include/ObjectArchiver.h

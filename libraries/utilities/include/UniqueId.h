@@ -82,11 +82,10 @@ namespace std
 {
 /// <summary> Implements a hash function for the UniqueId class, so that it can be used with associative containers (maps, sets, and the like). </summary>
 template <>
-class hash<ell::utilities::UniqueId>
+struct hash<ell::utilities::UniqueId>
 {
-public:
-    typedef ell::utilities::UniqueId argument_type;
-    typedef std::size_t result_type;
+    using argument_type = ell::utilities::UniqueId;
+    using result_type = std::size_t;
 
     /// <summary> Computes a hash of the input value. </summary>
     ///

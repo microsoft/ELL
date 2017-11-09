@@ -9,6 +9,9 @@
 // testing
 #include "testing.h"
 
+// utilities
+#include "Logger.h"
+
 // stl
 #include <iostream>
 #include <string>
@@ -210,6 +213,16 @@ namespace testing
     bool DidTestFail()
     {
         return testFailedFlag;
+    }
+
+    EnableLoggingHelper::EnableLoggingHelper()
+    {
+        logging::ShouldLog() = true;
+    }
+
+    EnableLoggingHelper::~EnableLoggingHelper()
+    {
+        logging::ShouldLog() = false;
     }
 
     template bool IsEqual(const std::vector<std::vector<float>>& a, const std::vector<std::vector<float>>& b, double tolerance);

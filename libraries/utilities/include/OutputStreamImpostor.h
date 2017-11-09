@@ -2,17 +2,16 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     OutputStreamImpostor.h (utilities)
-//  Authors:  Chuck Jacobs, Ofer Dekel
+//  Authors:  Chuck Jacobs, Ofer Dekel, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 // stl
-#include <fstream>
 #include <memory>
 #include <ostream>
-#include <string>
+#include <functional>
 
 namespace ell
 {
@@ -30,8 +29,14 @@ namespace utilities
             null
         };
 
-        OutputStreamImpostor() = default;
-        OutputStreamImpostor(const OutputStreamImpostor&) = default;
+        OutputStreamImpostor();
+        ~OutputStreamImpostor() = default;
+
+        OutputStreamImpostor(const OutputStreamImpostor&) noexcept = default;
+        OutputStreamImpostor& operator=(const OutputStreamImpostor&) noexcept = default;
+
+        OutputStreamImpostor(OutputStreamImpostor&&) noexcept = default;
+        OutputStreamImpostor& operator=(OutputStreamImpostor&&) noexcept = default;
 
         /// <summary> Constructor that creates an object that directs output to a specified stream. </summary>
         ///
@@ -41,15 +46,24 @@ namespace utilities
         /// <summary> Constructor that creates an object that directs output to a file</summary>
         ///
         /// <param name="filename"> A filename </param>
-        OutputStreamImpostor(std::string filename);
+        OutputStreamImpostor(const std::string& filename);
+
+        /// <summary> Constructor that creates an object that directs output to an existing stream</summary>
+        ///
+        /// <param name="stream"> A stream </param>
+        OutputStreamImpostor(std::ostream& stream);
 
         /// <summary> Casting operator that returns a reference to an ostream. This allows us to use an OutputStreamImpostor
         /// in most places where an ostream would be accepted. </summary>
-        operator std::ostream&() & { return *_outputStream; }
+        ///
+        /// <returns> A reference to the underlying std::ostream object </returns>
+        operator std::ostream&() & noexcept { return _outputStream; }
 
         /// <summary> Casting operator that returns a const reference to an ostream. This allows us to use an OutputStreamImpostor
         /// in most places where a const ostream reference would be accepted. </summary>
-        operator std::ostream const&() const& { return *_outputStream; }
+        ///
+        /// <returns> A reference to the underlying std::ostream object </returns>
+        operator std::ostream const&() const& noexcept { return _outputStream; }
 
         /// <summary> Output operator that sends the given value to the output stream </summary>
         ///
@@ -58,8 +72,12 @@ namespace utilities
         std::ostream& operator<<(T&& value);
 
     private:
-        std::shared_ptr<std::ofstream> _outputFileStream;
-        std::shared_ptr<std::ostream> _outputStream;
+
+        std::shared_ptr<std::ofstream> _fileStream;
+
+        // std::reference_wrapper<T> provides convenient value semantics
+        // while retaining a reference to the underlyng `std::ostream` object
+        std::reference_wrapper<std::ostream> _outputStream;
     };
 }
 }

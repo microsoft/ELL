@@ -11,6 +11,7 @@
 // utilities
 #include "Debug.h"
 #include "Exception.h"
+#include "Logger.h"
 
 namespace ell
 {
@@ -19,6 +20,8 @@ namespace math
     template <typename ElementType, MatrixLayout layout>
     void Print(ConstMatrixReference<ElementType, layout> M, std::ostream& stream, size_t indent, size_t maxRows, size_t maxElementsPerRow)
     {
+        using namespace logging;
+
         stream << std::string(indent, ' ') << "{";
         if (M.NumRows() > 0)
         {
@@ -29,7 +32,7 @@ namespace math
         {
             for (size_t i = 1; i < M.NumRows(); ++i)
             {
-                stream << ",\n";
+                stream << "," << EOL;
                 Print(M.GetRow(i), stream, indent + 2, maxElementsPerRow);
             }
         }
@@ -37,14 +40,14 @@ namespace math
         {
             for (size_t i = 1; i < maxRows - 2; ++i)
             {
-                stream << ",\n";
+                stream << "," << EOL;
                 Print(M.GetRow(i), stream, indent + 2, maxElementsPerRow);
             }
-            stream << ",\n"
-                << std::string(indent + 2, ' ') << "...,\n";
+            stream << "," << EOL
+                << std::string(indent + 2, ' ') << "...," << EOL;
             Print(M.GetRow(M.NumRows() - 1), stream, indent + 2, maxElementsPerRow);
         }
-        stream << " }\n";
+        stream << " }" << EOL;
     }
 
     template <typename ElementType, MatrixLayout layout>

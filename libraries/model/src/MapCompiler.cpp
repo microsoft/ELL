@@ -11,10 +11,14 @@
 #include "CompilableNodeUtilities.h" // for PortTypeToVariableType
 #include "EmitterException.h"
 
+#include "Logger.h"
+
 namespace ell
 {
 namespace model
 {
+    using namespace logging;
+
     MapCompiler::MapCompiler(const MapCompilerParameters& settings)
         : _parameters(settings)
     {
@@ -29,6 +33,7 @@ namespace model
         emitters::NamedVariableTypeList mainFunctionArguments = AllocateNodeFunctionArguments(map, *pModuleEmitter);
         pModuleEmitter->BeginMapPredictFunction(functionName, mainFunctionArguments);
 
+        Log() << "Creating 'predict' function" << EOL;
         auto inputSize = map.GetInput(0)->Size();
         auto outputSize = map.GetOutput(0).Size();
         std::vector<std::string> comments = { std::string("Input size: ") + std::to_string(inputSize), std::string("Output size: ") + std::to_string(outputSize) };
@@ -39,6 +44,7 @@ namespace model
         OnEndCompileModel(map.GetModel());
 
         pModuleEmitter->EndMapPredictFunction();
+        Log() << "Finished 'predict' function" << EOL;
     }
 
     void MapCompiler::CompileNodes(Model& model)
@@ -53,6 +59,7 @@ namespace model
             auto compilableNode = const_cast<CompilableNode*>(dynamic_cast<const CompilableNode*>(&node));
             assert(compilableNode != nullptr && "Got null compilable node");
 
+            Log() << "Now compiling node " << DiagnosticString(node) << EOL;
             OnBeginCompileNode(node);
             compilableNode->CompileNode(*this);
             OnEndCompileNode(node);
@@ -158,11 +165,13 @@ namespace model
 
     void MapCompiler::PushScope()
     {
+        Log() << "Compiler creating new scope" << EOL;
         _portToVarMaps.emplace_back();
     }
 
     void MapCompiler::PopScope()
     {
+        Log() << "Compiler popping scope" << EOL;
         assert(_portToVarMaps.size() > 0);
         _portToVarMaps.pop_back();
     }

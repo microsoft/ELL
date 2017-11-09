@@ -8,6 +8,9 @@
 
 #include "MatrixOperations.h"
 
+// utilities
+#include "Logger.h"
+
 namespace ell
 {
 namespace math
@@ -39,14 +42,16 @@ namespace math
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
     void Print(ConstTensorReference<ElementType, dimension0, dimension1, dimension2> tensor, std::ostream& stream)
     {
+        using namespace logging;
+
         stream << "{ ";
         Print(tensor, stream, 0);
         for (size_t i = 1; i < tensor.NumRows(); ++i)
         {
-            stream << ",\n  ";
+            stream << "," << EOL << "  ";
             Print(tensor, stream, i);
         }
-        stream << " }\n";
+        stream << " }" << EOL;
     }
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
@@ -57,7 +62,7 @@ namespace math
     }
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
-    void Add(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor) 
+    void Add(ElementType scalar, TensorReference<ElementType, dimension0, dimension1, dimension2> tensor)
     {
         for (size_t i = 0; i < tensor.NumPrimarySlices(); ++i)
         {
@@ -66,13 +71,13 @@ namespace math
     }
 
     template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType>>
-    void operator+=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar) 
+    void operator+=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar)
     {
         Add(static_cast<TensorElementType>(scalar), tensor);
     }
 
     template <typename TensorElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2, typename ScalarType, utilities::IsFundamental<ScalarType>>
-    void operator-=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar) 
+    void operator-=(TensorReference<TensorElementType, dimension0, dimension1, dimension2> tensor, ScalarType scalar)
     {
         Add(-static_cast<TensorElementType>(scalar), tensor);
     }

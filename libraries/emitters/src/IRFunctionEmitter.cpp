@@ -13,6 +13,9 @@
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 
+// utilities
+#include "Logger.h"
+
 // stl
 #include <chrono>
 #include <iostream>
@@ -25,6 +28,8 @@ namespace ell
 {
 namespace emitters
 {
+    using namespace logging;
+
     const std::string PrintfFnName = "printf";
     const std::string MallocFnName = "malloc";
     const std::string FreeFnName = "free";
@@ -504,10 +509,13 @@ namespace emitters
     {
         assert(pTop != nullptr && pBottom != nullptr);
 
+        Log() << "Concatenating block regions";
         if (moveBlocks)
         {
+            Log() << " and placing them together";
             BlocksAfter(pTop->End(), pBottom);
         }
+        Log() << EOL;
 
         auto pPrevCurBlock = SetCurrentBlock(pTop->End());
         {

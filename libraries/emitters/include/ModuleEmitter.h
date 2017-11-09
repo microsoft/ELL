@@ -42,7 +42,7 @@ namespace emitters
         bool includeDiagnosticInfo = false;
         bool parallelize = false;
         int maxThreads = 4;
-        
+
         TargetDevice targetDevice;
     };
 
@@ -69,7 +69,7 @@ namespace emitters
         ///
         /// <param name="parameters"> The compiler settings to fill in </param>
         static void CompleteCompilerParameters(CompilerParameters& parameters);
-        
+
         // Note, this differs from IRModuleEmitter::BeginFunction only by return type
         /// <summary> Set a function declaration. Note that BeginMapPredictFunction can't be called from within a function - it completes the currently-being-emitted function </summary>
         ///

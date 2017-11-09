@@ -83,6 +83,7 @@
 
 // utilities
 #include "RandomEngines.h"
+#include "Logger.h"
 
 // stl
 #include <algorithm>
@@ -94,6 +95,7 @@
 using namespace ell;
 using namespace ell::predictors;
 using namespace ell::predictors::neural;
+using namespace ell::logging;
 
 namespace
 {
@@ -155,7 +157,7 @@ template <typename ElementType>
 void FillVector(std::vector<ElementType>& vector, ElementType startValue = 0, ElementType step = 1)
 {
     ElementType val = startValue;
-    std::generate(vector.begin(), vector.end(), [&val, step]() { 
+    std::generate(vector.begin(), vector.end(), [&val, step]() {
         auto result = val;
         val += step;
         return result; });
@@ -172,7 +174,7 @@ template <typename ElementType>
 void FillTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
 {
     ElementType val = startValue;
-    tensor.Generate([&val, step]() { 
+    tensor.Generate([&val, step]() {
         auto result = val;
         val += step;
         return result; });
@@ -192,7 +194,7 @@ template <typename ElementType>
 void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1)
 {
     ElementType val = startValue;
-    tensor.Generate([&val, step]() { 
+    tensor.Generate([&val, step]() {
         auto result = val;
         val += step;
         return result; });
@@ -405,7 +407,7 @@ void TestCompilableSumNode()
 {
     using ElementType = int64_t;
     std::vector<std::vector<ElementType>> signal = { { 1, 2, 3, 4, 5, 6 }, { 7, 8, 9, 3, 4, 5 }, { 2, 3, 2, 1, 5, 3 }, { 1, 2, 3, 4, 5, 6 }, { 7, 8, 9, 7, 4, 2 }, { 5, 2, 1, 2, 5, 9 } };
-    
+
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(signal[0].size());
     auto sumNode = model.AddNode<nodes::SumNode<ElementType>>(inputNode->output);
@@ -550,8 +552,7 @@ void TestReorderDataNode1()
 
     std::vector<ElementType> input(inputSize);
     FillVector(input, 1.0f);
-    std::cout << "Input:\n"
-              << input << std::endl;
+    Log() << "Input:" << EOL << input << EOL;
 
     // compare output
     std::vector<std::vector<ElementType>> signal = { input };
@@ -866,7 +867,7 @@ void TestMultipleOutputNodes()
     compiledMap.WriteCode(buffer, emitters::ModuleOutputFormat::ir);
 
     std::string result = buffer.str();
-    
+
     // some minimal strings for testing, full verbose string comparison might be too fragile to future code gen changes.
     auto inputFuncPos = result.find("define void @ELL_GetInputShape(i32 %index, %TensorShape* %shape");
     auto outputFuncpos = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape* %shape");
@@ -886,7 +887,7 @@ void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas)
     auto inputVectorNode = model.AddNode<nodes::ConstantNode<ValueType>>(vectorVals);
 
     auto matVecMultNode = model.AddNode<nodes::MatrixVectorMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, n, inputVectorNode->output);
-    
+
     auto map = model::DynamicMap(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matVecMultNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.useBlas = useBlas;
@@ -915,7 +916,7 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
     int ldb = n;
     int ldc = n;
     auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(inputMatrixNode->output, m, n, k, lda, matrixBNode->output, ldb, ldc);
-    
+
     auto map = model::DynamicMap(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
     model::MapCompilerParameters settings;
     settings.compilerSettings.useBlas = useBlas;
@@ -1304,7 +1305,7 @@ void TestNeuralNetworkPredictorNode4()
 
     LayerParameters layerParameters{ inputLayer->GetOutput(), { PaddingScheme::zeros, padding }, { imageSize-2*(k/2), imageSize-2*(k/2), numFilters }, NoPadding() };
     auto convolutionMethod = ConvolutionMethod::columnwise;
-    ConvolutionalParameters convolutionalParams{ k, stride, convolutionMethod, numFilters }; // 
+    ConvolutionalParameters convolutionalParams{ k, stride, convolutionMethod, numFilters }; //
     TensorType convWeights(numFilters * k, k, numChannels);
     // FillTensor(convWeights);
     convWeights.Fill(1);
@@ -1377,7 +1378,7 @@ void TestNeuralNetworkPredictorNode5()
     TensorType convWeights1(f1 * k, k, d);
     FillTensor(convWeights1, -10.0f, 0.0625f);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ConvolutionalLayer<ElementType>(layerParameters, convolutionalParams, convWeights1)));
-    
+
     // Max PoolingLayer
     layerParameters = { layers.back()->GetOutput(), ZeroPadding(1), { w/2 + 2, w/2 + 2, f1 }, ZeroPadding(1) };
     PoolingParameters poolingParameters{ 2, 2 }; // window size, stride
@@ -1845,7 +1846,7 @@ void TestBatchNormalizationLayerNode(size_t inputPaddingSize, size_t outputPaddi
 
     auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
     auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
-    Shape outputShape = { { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 } };
+    Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
     LayerParameters layerParameters{ input, inputPadding, outputShape, outputPadding };
     VectorType mean({ 5, 10 });
     VectorType variance({ 4.0, 16.0 });
@@ -1884,7 +1885,7 @@ void TestBiasLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 
     auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
     auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
-    Shape outputShape = { { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 } };
+    Shape outputShape = { 2 + 2 * outputPaddingSize, 2 + 2 * outputPaddingSize, 2 };
     LayerParameters parameters{ inputWithPadding, inputPadding, outputShape, outputPadding };
     VectorType bias({ 10, 100 });
 
@@ -2110,7 +2111,7 @@ void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSi
 
     auto inputPadding = inputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(inputPaddingSize);
     auto outputPadding = outputPaddingSize == 0 ? predictors::neural::NoPadding() : predictors::neural::ZeroPadding(outputPaddingSize);
-    Shape outputShape = { { 4 + 2 * outputPaddingSize, 1 + 2 * outputPaddingSize, 1 } };
+    Shape outputShape = { 4 + 2 * outputPaddingSize, 1 + 2 * outputPaddingSize, 1 };
     LayerParameters parameters{ input, inputPadding, outputShape, outputPadding };
     MatrixType weights(4, 8);
     for (int index = 0; index < 8; index++)
@@ -2137,7 +2138,7 @@ template <typename ElementType, template <typename> class PoolingFunction>
 void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPaddingSize, size_t outputPaddingSize, double epsilon)
 {
     std::string tname = typeid(ElementType).name();
-    std::cout << "TestPoolingLayerNode< " << tname << ">([" << inRows << "," << inCols << "],[" << outRows << "," << outCols << "], pool=" << poolingSize << ", stride=" << poolingStride << ", inpad=" << inputPaddingSize << ", outpad=" << outputPaddingSize << ", e=" << epsilon << ")\n";
+    Log() << "TestPoolingLayerNode< " << tname << ">([" << inRows << "," << inCols << "],[" << outRows << "," << outCols << "], pool=" << poolingSize << ", stride=" << poolingStride << ", inpad=" << inputPaddingSize << ", outpad=" << outputPaddingSize << ", e=" << epsilon << ")" << EOL;
 
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
@@ -2149,7 +2150,7 @@ void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size
     TensorType inputWithPadding(inRows + 2 * inputPaddingSize, inCols + 2 * inputPaddingSize, numChannels);
     TensorReferenceType input = inputWithPadding.GetSubTensor(inputPaddingSize, inputPaddingSize, 0, inRows, inCols, numChannels);
     FillTensor(input);
-    
+
     Shape outputShape = { outRows + 2 * outputPaddingSize, outCols + 2 * outputPaddingSize, numChannels };
     LayerParameters layerParameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
     PoolingParameters poolingParameters{ poolingSize, poolingStride };
@@ -2271,7 +2272,7 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     inputLayer = std::make_unique<InputLayer<ElementType>>(inputParams);
 
     LayerParameters layerParameters{ inputLayer->GetOutput(), NoPadding(), dataShape, NoPadding() };
-    
+
     // Set up initial bias layer
     layerParameters = { inputLayer->GetOutput(), NoPadding(), dataShape, NoPadding() };
     VectorType bias1(channels);
@@ -2283,7 +2284,7 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     VectorType scale1(channels);
     FillRandomVector(scale1);
     layers.push_back(std::unique_ptr<Layer<ElementType>>(new ScalingLayer<ElementType>(layerParameters, scale1)));
-    
+
     // Set up bias layer
     layerParameters = { layers.back()->GetOutput(), NoPadding(), dataShape, NoPadding() };
     VectorType bias2(channels);

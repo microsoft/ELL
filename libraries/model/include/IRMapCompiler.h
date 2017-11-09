@@ -76,13 +76,13 @@ namespace model
         /// <summary> Ensure that variable for the outport port referenced by this input port has been declared in IR </summary>
         ///
         /// <param name="port"> The port to ensure is emitted. </param>
-        /// <returns> The LLVM Value object corresponding to the port. </returns> 
+        /// <returns> The LLVM Value object corresponding to the port. </returns>
         llvm::Value* EnsurePortEmitted(const InputPortBase& port);
 
         /// <summary> Ensure that variable for the given port has been declared in IR </summary>
         ///
         /// <param name="port"> The port to ensure is emitted. </param>
-        /// <returns> The LLVM Value object corresponding to the port. </returns> 
+        /// <returns> The LLVM Value object corresponding to the port. </returns>
         llvm::Value* EnsurePortEmitted(const OutputPortBase& port);
 
         /// <summary> Ensure that variable for the given port has been declared in IR </summary>
@@ -90,20 +90,20 @@ namespace model
         /// <param name="port"> The port to ensure is emitted. </param>
         /// <param name="initialValue"> The value to initialize the output buffer with. </param>
         ///
-        /// <returns> The LLVM Value object corresponding to the port. </returns> 
+        /// <returns> The LLVM Value object corresponding to the port. </returns>
         template <typename ValueType>
         llvm::Value* EnsurePortEmitted(const OutputPortBase& port, ValueType initialValue);
 
         /// <summary> Ensure that variable for the given port element has been declared in IR </summary>
         ///
         /// <param name="port"> The port elements to ensure are emitted. </param>
-        /// <returns> The LLVM Value object corresponding to the elements. </returns> 
+        /// <returns> The LLVM Value object corresponding to the elements. </returns>
         llvm::Value* EnsurePortElementEmitted(const PortElementBase& element);
 
         /// <summary> Load the variable for the outport port referenced by this input port </summary>
         ///
         /// <param name="port"> The port to load into a register. </param>
-        /// <returns> The LLVM Value object corresponding to the port. </returns> 
+        /// <returns> The LLVM Value object corresponding to the port. </returns>
         llvm::Value* LoadPortVariable(const InputPortBase& port);
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace model
         /// </summary>
         ///
         /// <param name="port"> The port element to load into a register. </param>
-        /// <returns> The LLVM Value object corresponding to the port element. </returns> 
+        /// <returns> The LLVM Value object corresponding to the port element. </returns>
         llvm::Value* LoadPortElementVariable(const PortElementBase& element);
 
         /// <summary> Creates a new BlockRegion for the node </summary>

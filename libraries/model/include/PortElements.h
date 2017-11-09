@@ -599,11 +599,10 @@ namespace std
 {
 /// <summary> Implements a hash function for the PortRange class, so that it can be used with associative containers (maps, sets, and the like). </summary>
 template <>
-class hash<ell::model::PortElementBase>
+struct hash<ell::model::PortElementBase>
 {
-public:
-    typedef ell::model::PortElementBase argument_type;
-    typedef std::size_t result_type;
+    using argument_type = ell::model::PortElementBase;
+    using result_type = std::size_t;
 
     /// <summary> Computes a hash of the input value. </summary>
     ///
@@ -612,11 +611,10 @@ public:
 };
 
 template <>
-class hash<ell::model::PortRange>
+struct hash<ell::model::PortRange>
 {
-public:
-    typedef ell::model::PortRange argument_type;
-    typedef std::size_t result_type;
+    using argument_type = ell::model::PortRange;
+    using result_type = std::size_t ;
 
     /// <summary> Computes a hash of the input value. </summary>
     ///

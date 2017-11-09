@@ -8,7 +8,7 @@ project(ELL)
 
 # Define custom configuration types for Visual Studio
 if(CMAKE_CONFIGURATION_TYPES)
-  # Copy important configuration info from Release config to new Documentation config  
+  # Copy important configuration info from Release config to new Documentation config
   list(APPEND CMAKE_CONFIGURATION_TYPES Documentation)
   set(CMAKE_CXX_FLAGS_DOCUMENTATION ${CMAKE_CXX_FLAGS_RELEASE})
   set(CMAKE_C_FLAGS_DOCUMENTATION ${CMAKE_C_FLAGS_RELEASE})
@@ -40,18 +40,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Apply -fPIC where applicable to the platform
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if(MSVC) 
+if(MSVC)
   # Set Visual Studio-specific options
   add_definitions(-DUNICODE)
   add_compile_options(/MP)
   add_compile_options(/bigobj)
   add_compile_options(/W4)
-else() 
+else()
   # Set Clang/GCC-specific options
   add_compile_options(-Wall)
   add_compile_options(-Wno-missing-braces)
   add_compile_options(-Wmissing-field-initializers)
   add_compile_options(-fvisibility-inlines-hidden)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -gdwarf-2 -O0")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -gdwarf-2  -O0")
 endif()
 
 # Turn on ctest tests

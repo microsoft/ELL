@@ -18,6 +18,7 @@
 
 // utilities
 #include "Files.h"
+#include "Logger.h"
 
 // llvm
 #include "llvm/AsmParser/Parser.h"
@@ -35,6 +36,7 @@ namespace ell
 {
 namespace emitters
 {
+    using namespace logging;
     //
     // Public methods
     //
@@ -66,42 +68,27 @@ namespace emitters
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType)
     {
-        auto currentPos = _emitter.GetCurrentInsertPoint();
-        // assert(currentBlock != nullptr);
-        IRFunctionEmitter newFunction = Function(functionName, returnType, VariableTypeList{}, true);
-        _functionStack.emplace(newFunction, currentPos);
-        return _functionStack.top().first;
+        return BeginFunction(functionName, _emitter.Type(returnType));
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, llvm::Type* returnType)
     {
-        auto currentPos = _emitter.GetCurrentInsertPoint();
-        // assert(currentBlock != nullptr);
-        IRFunctionEmitter newFunction = Function(functionName, returnType, NamedVariableTypeList{}, true);
-        _functionStack.emplace(newFunction, currentPos);
-        return _functionStack.top().first;
+        return BeginFunction(functionName, returnType, NamedVariableTypeList{});
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, const VariableTypeList& args)
     {
-        auto currentPos = _emitter.GetCurrentInsertPoint();
-        // assert(currentBlock != nullptr);
-        IRFunctionEmitter newFunction = Function(functionName, returnType, args, true);
-        _functionStack.emplace(newFunction, currentPos);
-        return _functionStack.top().first;
+        return BeginFunction(functionName, _emitter.Type(returnType), _emitter.GetLLVMTypes(args));
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, const NamedVariableTypeList& args)
     {
-        auto currentPos = _emitter.GetCurrentInsertPoint();
-        // assert(currentBlock != nullptr);
-        IRFunctionEmitter newFunction = Function(functionName, returnType, args, true);
-        _functionStack.emplace(newFunction, currentPos);
-        return _functionStack.top().first;
+        return BeginFunction(functionName, _emitter.Type(returnType), args);
     }
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, llvm::Type* returnType, const NamedVariableTypeList& args)
     {
+        Log() << "Begin emitting IR for function " << functionName << EOL;
         auto currentPos = _emitter.GetCurrentInsertPoint();
         // assert(currentBlock != nullptr);
         IRFunctionEmitter newFunction = Function(functionName, returnType, args, true);
@@ -111,6 +98,7 @@ namespace emitters
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes)
     {
+        Log() << "Begin emitting IR for function " << functionName << EOL;
         auto currentPos = _emitter.GetCurrentInsertPoint();
         // assert(currentBlock != nullptr);
         IRFunctionEmitter newFunction = Function(functionName, returnType, argTypes, true);
@@ -146,19 +134,28 @@ namespace emitters
             auto pTerm = currentFunction.GetCurrentBlock()->getTerminator();
             if (pTerm == nullptr)
             {
+                Log() << "Function " << currentFunction.GetFunctionName() << " does not have a terminator. " << EOL;
                 if (pReturn != nullptr)
                 {
+                    Log() << "Returning non-void value." << EOL;
                     currentFunction.Return(pReturn);
                 }
                 else
                 {
+                    Log() << "Returning void." << EOL;
                     currentFunction.Return();
                 }
+            }
+            else
+            {
+                Log() << "Function " << currentFunction.GetFunctionName() << " already has a terminator" << EOL;
             }
             currentFunction.ConcatRegions();
             currentFunction.CompleteFunction(GetCompilerParameters().optimize);
         }
         _emitter.SetCurrentInsertPoint(previousPos);
+
+        Log() << "End emitting of function " << currentFunction.GetFunctionName() << EOL;
     }
 
     IRFunctionEmitter& IRModuleEmitter::GetCurrentFunction()
