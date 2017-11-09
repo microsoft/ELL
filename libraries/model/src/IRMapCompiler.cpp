@@ -31,7 +31,7 @@ namespace model
     }
 
     IRMapCompiler::IRMapCompiler(const MapCompilerParameters& settings)
-        : MapCompiler(settings), _moduleEmitter(settings.moduleName), _profiler()
+        : MapCompiler(settings), _moduleEmitter(settings.moduleName, settings.compilerSettings), _profiler()
     {
         Log() << "Initializing IR map compiler" << EOL;
 
@@ -142,8 +142,6 @@ namespace model
         _profiler.EmitModelProfilerFunctions();
 
         auto module = std::make_unique<emitters::IRModuleEmitter>(std::move(_moduleEmitter));
-        module->SetTargetTriple(GetCompilerParameters().targetDevice.triple);
-        module->SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
         return IRCompiledMap(std::move(map), GetMapCompilerParameters().mapFunctionName, std::move(module));
     }
 
@@ -188,7 +186,7 @@ namespace model
         {
             auto int32Type = ell::emitters::VariableType::Int32;
             emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
-            auto shapeType = _moduleEmitter.DeclareStruct(TensorShapeName, namedFields);
+            auto shapeType = _moduleEmitter.GetOrCreateStruct(TensorShapeName, namedFields);
             _moduleEmitter.IncludeTypeInHeader(shapeType->getName());
         }
     }

@@ -11,7 +11,6 @@
 #include "IRAssemblyWriter.h"
 #include "IRDiagnosticHandler.h"
 #include "IREmitter.h"
-#include "IRExecutionEngine.h"
 #include "IRFunctionEmitter.h"
 #include "IRRuntime.h"
 #include "LLVMUtilities.h"
@@ -32,8 +31,6 @@ namespace ell
 {
 namespace emitters
 {
-    class IRExecutionEngine;
-
     /// <summary> Object used to emit LLVM Module level instructions. </summary>
     class IRModuleEmitter : public ModuleEmitter
     {
@@ -42,7 +39,7 @@ namespace emitters
         ///
         /// <param name="emitter"> An IREmitter. </param>
         /// <param name="moduleName"> Name of the module. </param>
-        IRModuleEmitter(const std::string& moduleName);
+        IRModuleEmitter(const std::string& moduleName, const CompilerParameters& parameters);
 
         IRModuleEmitter(IRModuleEmitter&& other) = default;
         virtual ~IRModuleEmitter() = default;
@@ -51,6 +48,11 @@ namespace emitters
         // Properties of the module
         //
 
+        /// <summary> Set the base compiler settings </summary>
+        ///
+        /// <param name="parameters"> The settings for the compiler to use </param>
+        void SetCompilerParameters(const CompilerParameters& parameters) override;
+                
         /// <summary> Returns the module's name. </summary>
         std::string GetModuleName() const { return _pModule->getName(); }
 
@@ -320,7 +322,7 @@ namespace emitters
         /// <param name="fields"> The struct fields. </param>
         ///
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
-        llvm::StructType* DeclareStruct(const std::string& name, const NamedVariableTypeList& fields);
+        llvm::StructType* GetOrCreateStruct(const std::string& name, const NamedVariableTypeList& fields);
 
         /// <summary> Emit a module-scoped struct with the given fields. </summary>
         ///
@@ -328,7 +330,7 @@ namespace emitters
         /// <param name="fields"> The struct fields. </param>
         ///
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
-        llvm::StructType* DeclareStruct(const std::string& name, const NamedLLVMTypeList& fields);
+        llvm::StructType* GetOrCreateStruct(const std::string& name, const NamedLLVMTypeList& fields);
 
         /// <summary> Emit a module-scoped struct with the given fields. </summary>
         ///
@@ -336,7 +338,7 @@ namespace emitters
         /// <param name="fields"> The struct fields. </param>
         ///
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
-        llvm::StructType* DeclareStruct(const std::string& name, const LLVMTypeList& fields);
+        llvm::StructType* GetOrCreateStruct(const std::string& name, const LLVMTypeList& fields);
 
         /// <summary> Emit a module-scoped anonymous struct with the given field types. </summary>
         ///
@@ -344,7 +346,7 @@ namespace emitters
         /// <param name="packed"> If `true`, the fields will be packed together without any padding. </param>
         ///
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
-        llvm::StructType* DeclareAnonymousStruct(const LLVMTypeList& fieldTypes, bool packed = false);
+        llvm::StructType* GetAnonymousStructType(const LLVMTypeList& fieldTypes, bool packed = false);
 
         /// <summary> Gets a declaration of a Struct with the given name.</summary>
         ///
@@ -497,7 +499,7 @@ namespace emitters
         // Helpers, standard C Runtime functions, and debug support
         //
 
-        /// <summary>Emit declaration of extern printf. </summary>
+        /// <summary> Emit declaration of extern printf. </summary>
         void DeclarePrintf();
 
         /// <summary> Emit declaration of extern malloc. </summary>
@@ -580,7 +582,7 @@ namespace emitters
         void IncludeInCallbackInterface(const std::string& functionName, const std::string& nodeName);
 
         //
-        // Module initialization
+        // Module initialization / finalization
         //
 
         /// <summary> Adds an initialization function to run before any (non-initialization) application code. </summary>
@@ -596,6 +598,20 @@ namespace emitters
         /// <param name="priority"> The priority for this initialization function. Initialization functions are called in increasing order of priority. The default value is LLVM's default priority.</param>
         /// <param name="forData"> Optional global constant that this function initializes. If the data is optimized away, then the initialization function will be also. </param>
         void AddInitializationFunction(IRFunctionEmitter& function, int priority = 65536, llvm::Constant* forData = nullptr);
+
+        /// <summary> Adds a finalization function to run after any application code. </summary>
+        ///
+        /// <param name="function"> The function to call. Must be of type `void()`. </param>
+        /// <param name="priority"> The priority for this finalization function. Finalization functions are called in increasing order of priority. The default value is LLVM's default priority. </param>
+        /// <param name="forData"> Optional global constant that this function is for. If the data is optimized away, then the finalization function will be also. </param>
+        void AddFinalizationFunction(llvm::Function* function, int priority = 65536, llvm::Constant* forData = nullptr);
+
+        /// <summary> Adds a finalization function to run after any application code. </summary>
+        ///
+        /// <param name="function"> The function to call. Must be of type `void()`. </param>
+        /// <param name="priority"> The priority for this finalization function. Finalization functions are called in increasing order of priority. The default value is LLVM's default priority. </param>
+        /// <param name="forData"> Optional global constant that this function is for. If the data is optimized away, then the finalization function will be also. </param>
+        void AddFinalizationFunction(IRFunctionEmitter& function, int priority = 65536, llvm::Constant* forData = nullptr);
 
     private:
         friend class IRFunctionEmitter;
@@ -690,13 +706,19 @@ namespace emitters
         IRVariableTable _literals; // Symbol table - name to literals
         IRVariableTable _globals; // Symbol table - name to global variables
         IRRuntime _runtime; // Manages emission of runtime functions
-
         std::unique_ptr<llvm::Module> _pModule; // The LLVM Module being emitted
 
         // Info to modify how code is written out
         std::map<std::string, std::vector<std::string>> _functionComments;
         std::vector<std::pair<std::string, std::string>> _preprocessorDefinitions;
     };
+
+    //
+    // Functions
+    //
+
+    /// <summary> Convenience function for creating an `IRModuleEmitter` with the default compiler parameters, set up for the host environment </summary>
+    IRModuleEmitter MakeHostModuleEmitter(const std::string moduleName); 
 }
 }
 

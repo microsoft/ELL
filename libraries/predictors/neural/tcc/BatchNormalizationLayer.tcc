@@ -21,15 +21,15 @@ namespace neural
     {
         if (mean.Size() != variance.Size())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Size of 'mean' and 'variance' must match");
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, GetRuntimeTypeName() + ": Size of 'mean' and 'variance' must match");
         }
         if (_layerParameters.input.Size() != GetOutputMinusPadding().Size())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Expected size of input and output tensor (minus padding) to match");
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, GetRuntimeTypeName() + ": Expected size of input and output tensor (minus padding) to match");
         }
         if (mean.Size() != NumOutputChannels())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Number of 'mean' and 'variance' values must equal number of channels in output");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, GetRuntimeTypeName() + ": Number of 'mean' and 'variance' values must equal number of channels in output");
         }
 
         // Batch norm is: outputValue = (inputValue - mean) / (sqrt(variance) + _epsilon)

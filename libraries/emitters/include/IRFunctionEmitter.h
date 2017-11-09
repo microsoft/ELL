@@ -224,6 +224,14 @@ namespace emitters
 
         /// <summary> Emit a call to a function with arguments. </summary>
         ///
+        /// <param name="function"> The IRFunctionEmitter for the function to call. </param>
+        /// <param name="arguments"> The function arguments. </param>
+        ///
+        /// <returns> Pointer to the result of the function call. </returns>
+        llvm::Value* Call(IRFunctionEmitter& function, std::vector<llvm::Value*> arguments);
+
+        /// <summary> Emit a call to a function with arguments. </summary>
+        ///
         /// <param name="pFunction"> Pointer to the llvm::Function. </param>
         /// <param name="arguments"> The function arguments. </param>
         ///
@@ -577,19 +585,19 @@ namespace emitters
         /// <summary> Emit a named stack variable. </summary>
         ///
         /// <param name="type"> The variable type. </param>
-        /// <param name="name"> The variable name. </param>
+        /// <param name="namePrefix"> The variable name prefix. If more than one variable share the prefix, they will be uniqued by appending a unique index. </param>
         ///
         /// <returns> Pointer to the resulting variable. </returns>
-        llvm::AllocaInst* Variable(VariableType type, const std::string& name);
-        
-                /// <summary> Emit a named stack variable. </summary>
-                ///
-                /// <param name="type"> The variable type. </param>
-                /// <param name="name"> The variable name. </param>
-                ///
-                /// <returns> Pointer to the resulting variable. </returns>
-                llvm::AllocaInst* Variable(llvm::Type* type, const std::string& name);
-        
+        llvm::AllocaInst* Variable(VariableType type, const std::string& namePrefix);
+
+        /// <summary> Emit a named stack variable. </summary>
+        ///
+        /// <param name="type"> The variable type. </param>
+        /// <param name="namePrefix"> The variable name prefix. If more than one variable share the prefix, they will be uniqued by appending a unique index. </param>
+        ///
+        /// <returns> Pointer to the resulting variable. </returns>
+        llvm::AllocaInst* Variable(llvm::Type* type, const std::string& namePrefix);
+
         /// <summary> Emit a stack array of the given size. </summary>
         ///
         /// <param name="type"> The array entry type. </param>
@@ -741,9 +749,9 @@ namespace emitters
 
         /// <summary> Emits a pointer to a global. </summary>
         ///
-        /// <param name="pGlobal"> Pointer to the llvm global. </param>
+        /// <param name="pGlobal"> Pointer to the first entry in an llvm global array. </param>
         ///
-        /// <returns> Pointer to the llvm pointer to the llvm global. </returns>
+        /// <returns> Pointer to the first entry in the llvm global array. </returns>
         llvm::Value* Pointer(llvm::GlobalVariable* pGlobal);
 
         /// <summary> Emit a pointer to an entry in an array. </summary>
@@ -1141,6 +1149,12 @@ namespace emitters
         template <typename ValueType>
         void CallGEMM(bool transposeA, bool transposeB, int m, int n, int k, llvm::Value* A, int lda, llvm::Value* B, int ldb, llvm::Value* C, int ldc);
 
+        /// <summary> Utility function for getting number of threads used by OpenBLAS (if present) </summary>
+        llvm::Value* GetNumOpenBLASThreads();
+
+        /// <summary> Utility function for setting number of threads used by OpenBLAS (if present) </summary>
+        void SetNumOpenBLASThreads(llvm::Value* numThreads);
+
         //
         // Calling POSIX functions
         //
@@ -1170,6 +1184,13 @@ namespace emitters
 
         /// <summary> Emits a call to the POSIX `pthread_self` function. </summary>
         llvm::Value* PthreadSelf();
+
+        //
+        // Experimental functions
+        //
+
+        /// <summary> Gets the CPU id of the currently-running thread. Currently only available on Linux. Returns -1 if unavailable. </summary>
+        llvm::Value* GetCpu();
 
         //
         // Information about the current function begin emitted
@@ -1253,7 +1274,6 @@ namespace emitters
         private:
             IRFunctionEmitter& _function;
             llvm::IRBuilder<>::InsertPoint _oldPos;
-            llvm::TerminatorInst* _termInst;
         };
 
         llvm::Value* PtrOffsetA(llvm::Value* pPointer, int offset);

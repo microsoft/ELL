@@ -28,6 +28,12 @@ namespace emitters
 
         /// <summary> Indicates if the target device is a Windows system </summary>
         bool IsWindows() const;
+        
+        /// <summary> Indicates if the target device is a Linux system </summary>
+        bool IsLinux() const;
+        
+        /// <summary> Indicates if the target device is a macOS system </summary>
+        bool IsMacOS() const;
     };
 }
 }

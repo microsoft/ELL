@@ -93,8 +93,6 @@ namespace model
         _profiler.EmitModelProfilerFunctions();
 
         auto module = std::make_unique<emitters::IRModuleEmitter>(std::move(_moduleEmitter));
-        module->SetTargetTriple(GetCompilerParameters().targetDevice.triple);
-        module->SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
         return IRCompiledMap(std::move(map), GetMapCompilerParameters().mapFunctionName, std::move(module));
     }
 

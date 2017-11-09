@@ -76,7 +76,6 @@ namespace nodes
         auto&& inputStride = _inputLayout.GetStride();
         auto&& inputOffset = _inputLayout.GetOffset();
         auto&& inputSize = _inputLayout.GetActiveSize();
-        auto&& outputStride = _outputLayout.GetStride();
         auto&& outputOffset = _outputLayout.GetOffset();
 
         for (int loopIndex = 0; loopIndex < inputSize[dimension]; ++loopIndex)

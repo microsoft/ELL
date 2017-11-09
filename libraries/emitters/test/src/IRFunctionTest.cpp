@@ -59,7 +59,8 @@ using BinaryScalarDoubleFunction = double (*)(double, double);
 //
 void TestIRAddFunction()
 {
-    IRModuleEmitter module("CompilableIRAddFunction");
+    CompilerParameters compilerParameters;
+    IRModuleEmitter module("CompilableIRAddFunction", compilerParameters);
     module.DeclarePrintf();
 
     IRAddFunction<double> func;
@@ -97,7 +98,8 @@ void TestIRAddFunction()
 
 void TestIRFunction()
 {
-    IRModuleEmitter module("CompilableIRFunction");
+    CompilerParameters compilerParameters;
+    IRModuleEmitter module("CompilableIRFunction", compilerParameters);
     module.DeclarePrintf();
 
     CompilablePlusFiveFunction func;

@@ -22,18 +22,22 @@ using namespace ell;
 void TestIR()
 {
     // From IREmitterTest.h
+    TestIREmitter();
+
     TestLLVM();
     TestLLVMShiftRegister();
     TestIfElseComplex();
     TestIfElseBlockRegions(false);
     TestIfElseBlockRegions(true);
     TestLogical();
+    TestForLoop();
     TestMutableConditionForLoop();
     TestWhileLoop();
     TestMetadata();
     TestHeader();
     TestTwoEmitsInOneSession();
     TestStruct();
+    TestDuplicateStructs();
 
     // From IRFunctionTest.h
     TestIRAddFunction();
@@ -42,7 +46,8 @@ void TestIR()
 
 void TestAsyncEmitter()
 {
-    TestIRAsyncTask();
+    TestIRAsyncTask(false); // don't use threads
+    TestIRAsyncTask(true);  // do use threads (if available)
 }
 
 void TestPosixEmitter()
@@ -53,8 +58,6 @@ void TestPosixEmitter()
 
 int main()
 {
-    TestStruct();
-
     TestIR();
 
     // The tests below crash when run through the JIT

@@ -9,16 +9,29 @@
 #include "TargetDevice.h"
 #include "LLVMInclude.h"
 
+// utilities
+#include "StringUtil.h"
+
 namespace ell
 {
 namespace emitters
 {
     bool TargetDevice::IsWindows() const
     {
-        // Infer the triple from LLVM if not set
-        auto t = triple.empty() ? llvm::sys::getDefaultTargetTriple() : triple;
-        return (t == "x86_64-pc-win32" || t == "x86_64-pc-windows-msvc" ||
-                t == "i386-pc-win32" || t == "i386-pc-windows-msvc");
+        llvm::Triple tripleObj(triple.empty() ? llvm::sys::getDefaultTargetTriple() : triple);
+        return tripleObj.getOS() == llvm::Triple::Win32;
+    }
+
+    bool TargetDevice::IsLinux() const
+    {
+        llvm::Triple tripleObj(triple.empty() ? llvm::sys::getDefaultTargetTriple() : triple);
+        return tripleObj.getOS() == llvm::Triple::Linux;
+    }
+
+    bool TargetDevice::IsMacOS() const
+    {
+        llvm::Triple tripleObj(triple.empty() ? llvm::sys::getDefaultTargetTriple() : triple);
+        return tripleObj.getOS() == llvm::Triple::MacOSX || tripleObj.getOS() == llvm::Triple::Darwin;
     }
 }
 }

@@ -31,6 +31,11 @@
 using namespace ell;
 using namespace ell::emitters;
 
+
+#ifndef UNUSED
+#define UNUSED(x) (&x)
+#endif
+
 std::string g_outputBasePath = "";
 void SetOutputPathBase(std::string path)
 {
@@ -79,9 +84,26 @@ void InsertTerminators(llvm::Function* pfn, std::vector<llvm::Instruction*>& ter
     }
 }
 
+void TestIREmitter()
+{
+    llvm::LLVMContext context;
+    IREmitter emitter(context);
+
+    // Create a module
+    auto module1 = emitter.CreateModule("Module1");
+    emitter.DeclareFunction(module1.get(), "foobar");
+
+    // Create another module
+    auto module2 = emitter.CreateModule("Module1");
+    emitter.DeclareFunction(module2.get(), "foobar");
+
+    module1->dump();
+    module2->dump();
+}
+
 void TestLLVMShiftRegister()
 {
-    IRModuleEmitter module("Shifter");
+    auto module = MakeHostModuleEmitter("Shifter");
     module.DeclarePrintf();
 
     std::vector<double> data({ 1.1, 2.1, 3.1, 4.1, 5.1 });
@@ -112,10 +134,10 @@ void TestLLVMShiftRegister()
 
 void TestLLVM()
 {
-    IRModuleEmitter module("Looper");
+    auto module = MakeHostModuleEmitter("Looper");
     module.DeclarePrintf();
 
-    llvm::StructType* structType = module.DeclareStruct("ShiftRegister", { { "size", VariableType::Int32 }, { "value", VariableType::Double } });
+    llvm::StructType* structType = module.GetOrCreateStruct("ShiftRegister", { { "size", VariableType::Int32 }, { "value", VariableType::Double } });
 
     std::vector<double> data({ 3.3, 4.4, 5.5, 6.6, 7.7 });
     llvm::GlobalVariable* pData = module.ConstantArray("g_weights", data);
@@ -195,7 +217,7 @@ void TestLLVM()
 // Generate the Then, Else blocks first, then combine then in an if,else
 void TestIfElseComplex()
 {
-    IRModuleEmitter module("IfElse");
+    auto module = MakeHostModuleEmitter("IfElse");
     module.DeclarePrintf();
 
     auto fn = module.BeginMainFunction();
@@ -241,7 +263,7 @@ void TestIfElseComplex()
 
 void TestIfElseBlockRegions(bool runJit)
 {
-    IRModuleEmitter module("IfElse");
+    auto module = MakeHostModuleEmitter("IfElse");
     module.DeclarePrintf();
 
     auto fn = module.BeginMainFunction();
@@ -306,7 +328,7 @@ void TestIfElseBlockRegions(bool runJit)
 
 void TestLogical()
 {
-    IRModuleEmitter module("Logical");
+    auto module = MakeHostModuleEmitter("Logical");
     module.DeclarePrintf();
 
     auto fn = module.BeginFunction("TestLogical", VariableType::Void, { VariableType::Int32, VariableType::Int32, VariableType::Int32 });
@@ -360,9 +382,50 @@ void TestLogical()
     }
 }
 
+void TestForLoop(bool runJit)
+{
+    auto module = MakeHostModuleEmitter("ForLoop");
+    module.DeclarePrintf();
+
+    auto add = GetOperator<double>(BinaryOperationType::add);
+    auto varType = GetVariableType<double>();
+    auto fn = module.BeginFunction("TestForLoop", VariableType::Void, VariableTypeList{});
+
+    auto sum = fn.Variable(varType);
+
+    fn.Print("Begin ForLoop\n");
+    const int numIter = 10;
+    IRForLoopEmitter forLoop(fn);
+    forLoop.Begin(numIter);
+    {
+        auto i = forLoop.LoadIterationVariable();
+        fn.Printf({ fn.Literal("i: %f\n"), i });
+        fn.Store(sum, fn.Operator(add, fn.Load(sum), i));
+    }
+    forLoop.End();
+
+    fn.Return();
+    module.EndFunction();
+
+    auto fnMain = module.BeginMainFunction();
+    fnMain.Call("TestForLoop");
+    fnMain.Return();
+
+
+    if (runJit)
+    {
+        IRExecutionEngine jit(std::move(module));
+        jit.RunMain();
+    }
+    else
+    {
+        module.DebugDump();
+    }
+}
+
 void TestMutableConditionForLoop(bool runJit)
 {
-    IRModuleEmitter module("MutableConditionForLoop");
+    auto module = MakeHostModuleEmitter("MutableConditionForLoop");
     module.DeclarePrintf();
 
     auto add = GetOperator<double>(BinaryOperationType::add);
@@ -379,7 +442,7 @@ void TestMutableConditionForLoop(bool runJit)
 
     IRForLoopEmitter forLoop(fn);
     fn.Print("Begin ForLoop\n");
-    auto pForLoopBlock = forLoop.Begin<double, BinaryPredicateType::less>(&start, &increment, pTest);
+    forLoop.Begin<double, BinaryPredicateType::less>(&start, &increment, pTest);
     {
         auto i = forLoop.LoadIterationVariable();
         auto test = fn.Load(fn.PointerOffset(pTest, fn.Literal(0)));
@@ -424,13 +487,11 @@ void TestMutableConditionForLoop()
 
 void TestWhileLoop()
 {
-    IRModuleEmitter module("WhileLoop");
+    auto module = MakeHostModuleEmitter("WhileLoop");
     module.DeclarePrintf();
 
-    auto add = GetOperator<double>(BinaryOperationType::add);
     auto int8Type = GetVariableType<char>();
     auto int32Type = GetVariableType<int32_t>();
-    auto varType = GetVariableType<double>();
 
     auto fn = module.BeginMainFunction();
     {
@@ -462,7 +523,7 @@ void TestWhileLoop()
 
 void TestMetadata()
 {
-    IRModuleEmitter module("Metadata");
+    auto module = MakeHostModuleEmitter("Metadata");
 
     // Function-level metadata
     auto fn = module.BeginFunction("TestMetadata", VariableType::Void);
@@ -525,10 +586,11 @@ void TestMetadata()
 
 void TestHeader()
 {
-    IRModuleEmitter module("Predictor");
+    auto module = MakeHostModuleEmitter("Predictor");
+
     auto int32Type = ell::emitters::VariableType::Int32;
     emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
-    auto shapeType = module.DeclareStruct("Shape", namedFields);
+    auto shapeType = module.GetOrCreateStruct("Shape", namedFields);
     // test that this casues the type to show up in the module header.
     module.IncludeTypeInHeader(shapeType->getName());
 
@@ -560,20 +622,20 @@ void TestHeader()
 
 std::string EmitStruct(const char* moduleName)
 {
+    auto module = MakeHostModuleEmitter(moduleName);
     const char* TensorShapeName = "TensorShape";
-    IRModuleEmitter emitter(moduleName);
     auto int32Type = ell::emitters::VariableType::Int32;
     emitters::NamedVariableTypeList namedFields = { { "rows", int32Type }, { "columns", int32Type }, { "channels", int32Type } };
-    auto shapeType = emitter.DeclareStruct(TensorShapeName, namedFields);
-    emitter.IncludeTypeInHeader(shapeType->getName());
+    auto shapeType = module.GetOrCreateStruct(TensorShapeName, namedFields);
+    module.IncludeTypeInHeader(shapeType->getName());
 
     const emitters::NamedVariableTypeList parameters = { { "index", emitters::GetVariableType<int>() } };
-    auto function = emitter.BeginFunction("Dummy", shapeType, parameters);
+    auto function = module.BeginFunction("Dummy", shapeType, parameters);
     function.IncludeInHeader();
-    emitter.EndFunction();
+    module.EndFunction();
 
     std::ostringstream out;
-    ell::emitters::WriteModuleHeader(out, emitter);
+    ell::emitters::WriteModuleHeader(out, module);
     return out.str();
 }
 
@@ -591,22 +653,55 @@ void TestTwoEmitsInOneSession()
 
 void TestStruct()
 {
-    IRModuleEmitter module("StructTest");
+    auto module = MakeHostModuleEmitter("StructTest");
     auto& context = module.GetLLVMContext();
     auto int32Type = llvm::Type::getInt32Ty(context);
     auto int8PtrType = llvm::Type::getInt8PtrTy(context);
-    auto int8PtrPtrType = llvm::Type::getInt8PtrTy(context)->getPointerTo();
-    llvm::StructType* structType = module.DeclareStruct("s", { { "a", int32Type }, { "b", int8PtrType }, { "c", int32Type } });
+    auto doubleType = llvm::Type::getDoubleTy(context);
+    
+    llvm::StructType* structType = module.GetOrCreateStruct("MytStruct", { { "intField", int32Type }, { "ptrField", int8PtrType }, { "doubleField", doubleType } });
 
     module.DeclarePrintf();
 
     auto function = module.BeginMainFunction();
-    function.Print("Begin\n");
-    // function.PrintForEach("%f\n", pRegister, data.size());
-
-    function.Return();
+    {
+        auto structVar = function.Variable(structType, "s");
+        function.Store(function.GetStructFieldPointer(structVar, 0), function.Literal<int>(1));
+        function.Store(function.GetStructFieldPointer(structVar, 1), function.Literal("Hello"));
+        function.Store(function.GetStructFieldPointer(structVar, 2), function.Literal<double>(3.14));
+        function.Return();
+    }
     module.EndFunction();
 
     module.WriteToFile("testStruct.ll");
     module.WriteToFile("testStruct.h");
+}
+
+void TestDuplicateStructs()
+{
+    auto module = MakeHostModuleEmitter("DuplicateStructTest");
+    auto& context = module.GetLLVMContext();
+    auto int32Type = llvm::Type::getInt32Ty(context);
+    auto int8PtrType = llvm::Type::getInt8PtrTy(context);
+    auto doubleType = llvm::Type::getDoubleTy(context);
+    
+    // These should be fine --- the second GetOrCreateStruct call should return the existing type
+    llvm::StructType* struct1TypeA = module.GetOrCreateStruct("MyStruct1", { { "intField", int32Type }, { "ptrField", int8PtrType }, { "doubleField", doubleType } });
+    llvm::StructType* struct1TypeB = module.GetOrCreateStruct("MyStruct1", { { "intField", int32Type }, { "ptrField", int8PtrType }, { "doubleField", doubleType } });
+    testing::ProcessTest("Testing double-declaration of equivalent structs", struct1TypeA == struct1TypeB);
+    
+    bool gotException = false;
+    try
+    {
+        llvm::StructType* struct2TypeA = module.GetOrCreateStruct("MyStruct2", { { "intField", int32Type }, { "ptrField", int8PtrType }, { "doubleField", doubleType } });
+        llvm::StructType* struct2TypeB = module.GetOrCreateStruct("MyStruct2", { { "intField", int8PtrType }, { "ptrField", int8PtrType }, { "doubleField", doubleType } });
+        UNUSED(struct2TypeA);
+        UNUSED(struct2TypeB);
+    }
+    catch(EmitterException& exception)
+    {
+        gotException = true;
+    }
+
+    testing::ProcessTest("Testing double-declaration of non-equivalent structs", gotException);    
 }

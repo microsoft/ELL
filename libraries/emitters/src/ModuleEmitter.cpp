@@ -12,6 +12,13 @@
 // utilities
 #include "Files.h"
 
+// llvm
+#include <llvm/ADT/Triple.h>
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/Support/Host.h>
+#include <llvm/Support/TargetRegistry.h>
+#include <llvm/Target/TargetMachine.h> // for CodeGenFileType
+
 // stl
 #include <cassert>
 
@@ -55,7 +62,6 @@ namespace emitters
 
     ModuleEmitter::ModuleEmitter()
     {
-        SetCompilerParameters(_parameters);
     }
 
     // Sets the parameters (and rationalizes them)
@@ -75,7 +81,43 @@ namespace emitters
         // Set low-level args based on target name (if present)
         if (parameters.targetDevice.deviceName != "")
         {
-            if (parameters.targetDevice.deviceName == "mac")
+            if (parameters.targetDevice.deviceName == "host")
+            {
+                auto hostTripleString = llvm::sys::getProcessTriple();
+                llvm::Triple hostTriple(hostTripleString);
+
+                parameters.targetDevice.triple = hostTriple.normalize();
+                parameters.targetDevice.architecture = llvm::Triple::getArchTypeName(hostTriple.getArch());
+                parameters.targetDevice.cpu = llvm::sys::getHostCPUName();
+
+                std::string error;
+                const llvm::Target* target = llvm::TargetRegistry::lookupTarget(parameters.targetDevice.triple, error);
+                if (target == nullptr)
+                {
+                    throw EmitterException(EmitterError::targetNotSupported, std::string("Couldn't create target ") + error);
+                }
+                
+                const llvm::TargetOptions options;
+                const llvm::Reloc::Model relocModel = llvm::Reloc::Static;
+                const llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
+                std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(parameters.targetDevice.triple,
+                                                                                               parameters.targetDevice.cpu,
+                                                                                               parameters.targetDevice.features,
+                                                                                               options,
+                                                                                               relocModel,
+                                                                                               codeModel,
+                                                                                               llvm::CodeGenOpt::Level::Default));
+        
+                if (!targetMachine)
+                {
+                    throw EmitterException(EmitterError::targetNotSupported, "Unable to allocate host target machine");
+                }
+
+                assert(targetMachine);
+                llvm::DataLayout dataLayout(targetMachine->createDataLayout());
+                parameters.targetDevice.dataLayout = dataLayout.getStringRepresentation();
+            }
+            else if (parameters.targetDevice.deviceName == "mac")
             {
                 parameters.targetDevice.triple = c_macTriple;
                 parameters.targetDevice.dataLayout = c_macDataLayout;
@@ -125,7 +167,7 @@ namespace emitters
             }
             else
             {
-                // throw an exception?
+                throw EmitterException(EmitterError::targetNotSupported, std::string("Unkonwn target device name: " + parameters.targetDevice.deviceName));
             }
         }
         else

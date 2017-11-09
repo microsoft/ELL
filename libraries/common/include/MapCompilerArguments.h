@@ -40,6 +40,7 @@ namespace common
         int vectorWidth = 4;
         bool parallelize = true;
         int maxThreads = 4;
+        bool debug = false;
 
         // target machine options
         std::string target = ""; // known target names: host, mac, linux, windows, pi0, pi3, pi3_64, aarch64, ios

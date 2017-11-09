@@ -31,6 +31,13 @@ namespace emitters
     };
 
     /// <summary> Standard compiler switches. </summary>
+    enum class BlasType
+    {
+        unknown = 0,
+        openBLAS,
+        atlas
+    };
+
     struct CompilerParameters
     {
         bool unrollLoops = false;
@@ -38,10 +45,12 @@ namespace emitters
         bool allowVectorInstructions = false;
         int vectorWidth = 4;
         bool useBlas = false;
+        BlasType blasType = BlasType::unknown;
         bool optimize = true;
         bool includeDiagnosticInfo = false;
         bool parallelize = false;
         int maxThreads = 4;
+        bool debug = false;
 
         TargetDevice targetDevice;
     };
@@ -50,9 +59,6 @@ namespace emitters
     class ModuleEmitter
     {
     public:
-        /// <summary></summary>
-        ModuleEmitter();
-
         virtual ~ModuleEmitter() = default;
 
         /// <summary> Return the base compiler settings </summary>
@@ -63,7 +69,7 @@ namespace emitters
         /// <summary> Set the base compiler settings </summary>
         ///
         /// <param name="parameters"> The settings for the compiler to use </param>
-        void SetCompilerParameters(const CompilerParameters& parameters);
+        virtual void SetCompilerParameters(const CompilerParameters& parameters);
 
         /// <summary> Fills in missing values in the compiler settings </summary>
         ///
@@ -176,6 +182,7 @@ namespace emitters
         static ModuleOutputFormat GetFormatFromExtension(const std::string& extension);
 
     protected:
+        ModuleEmitter();
         void Reset();
         void FreeVariable(Variable& var);
 

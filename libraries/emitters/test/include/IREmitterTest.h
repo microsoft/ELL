@@ -12,14 +12,20 @@
 void SetOutputPathBase(std::string path);
 std::string OutputPath(const char* pRelPath);
 
+// Tests of low-level IREmitter class
+void TestIREmitter();
+
+// Tests for higher-level classes (mostly IRModuleEmitter)
 void TestLLVM();
 void TestLLVMShiftRegister();
 void TestIfElseComplex();
 void TestIfElseBlockRegions(bool runJit = false);
 void TestLogical();
-void TestMutableConditionForLoop();
+void TestForLoop(bool runJit = false);
+void TestMutableConditionForLoop(bool runJit = false);
 void TestWhileLoop();
 void TestMetadata();
 void TestHeader();
 void TestTwoEmitsInOneSession();
 void TestStruct();
+void TestDuplicateStructs();

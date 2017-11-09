@@ -97,6 +97,14 @@ namespace emitters
         template <typename ValueType>
         llvm::Function* GetGEMMFunction(bool useBlas);
 
+        // Special OpenBLAS utility functions
+        
+        /// <summary> Get the OpenBLAS function for getting the number of threads </summary>
+        llvm::Function* GetOpenBLASGetNumThreadsFunction();
+        
+        /// <summary> Get the OpenBLAS function for setting the number of threads </summary>
+        llvm::Function* GetOpenBLASSetNumThreadsFunction();
+
         //
         // Posix functions
         //
@@ -105,6 +113,8 @@ namespace emitters
     private:
         friend IRModuleEmitter;
         IRRuntime(IRModuleEmitter& module);
+        
+        llvm::Type* GetIntType(); // returns LLVM type for native `int`
 
         std::string GetNamespacePrefix() const;
 
@@ -126,31 +136,15 @@ namespace emitters
         llvm::Function* GetDotProductIntFunction();
         llvm::Function* GetDotProductFloatFunction();
 
+        // Matrix math (BLAS or native)
         llvm::Function* GetSGEMVFunction(bool useBlas);
         llvm::Function* GetSGEMMFunction(bool useBlas);
         llvm::Function* GetDGEMVFunction(bool useBlas);
         llvm::Function* GetDGEMMFunction(bool useBlas);
 
-        // POSIX threads
-        // pthread_create
-        // pthread_equal
-        // pthread_exit
-        // pthread_join
-        // pthread_self
-        // pthread_mutex_init
-        // pthread_mutex_destroy
-        // pthread_mutex_lock
-        // pthread_mutex_trylock
-        // pthread_mutex_unlock
-        // pthread_cond_init
-        // pthread_cond_destroy
-        // phtread_cond_wait
-        // pthread_cond_timedwait
-        // pthread_code_signal
-        // pthread_cond_broadcast
-        // pthread_once
-
         IRModuleEmitter& _module;
+
+        // Special runtimes for different environments or libraries
         IRPosixRuntime _posixRuntime;
 
         llvm::Function* _pDotProductFunctionFloat = nullptr;

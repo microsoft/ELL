@@ -177,11 +177,11 @@ namespace model
 
         // NodeInfo struct fields
         emitters::NamedLLVMTypeList infoFields = {{"nodeName", int8PtrType}, {"nodeType", int8PtrType}};
-        _nodeInfoType = _module->DeclareStruct(GetNamespacePrefix() + "_NodeInfo", infoFields);
+        _nodeInfoType = _module->GetOrCreateStruct(GetNamespacePrefix() + "_NodeInfo", infoFields);
         _module->IncludeTypeInHeader(_nodeInfoType->getName());
 
         emitters::NamedLLVMTypeList countersFields = {{"count", int64Type}, {"totalTime", doubleType}};        
-        _performanceCountersType = _module->DeclareStruct(GetNamespacePrefix() + "_PerformanceCounters", countersFields);
+        _performanceCountersType = _module->GetOrCreateStruct(GetNamespacePrefix() + "_PerformanceCounters", countersFields);
         _module->IncludeTypeInHeader(_performanceCountersType->getName());
     }
 

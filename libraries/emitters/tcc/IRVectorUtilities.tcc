@@ -22,6 +22,15 @@ namespace emitters
         return llvm::ConstantInt::get(type, elementValue, true);
     }
 
+    // Emit explicit vectorized code to compute the sum of all the elements in a vector.
+    // Hopefully, the vecorizing optimizer will take care of this when vecorizing simple
+    // loops to sum up values, but for other operations we may want to do it ourselves.
+    //
+    // Runs in logN time by recursively splitting the vector in half and summing the halves.
+    // Example:
+    //   <1, 2, 3, 4, 5, 6, 7, 8> --> <1, 2, 3, 4> + <5, 6, 7, 8>    ( == <6, 8, 10, 12> )
+    //   <6, 8, 10, 12> --> <6, 8> + <10, 12>    ( == <16, 20> )
+    //   <16, 20> --> 16 + 20    ( == 36 )
     template <typename ValueType>
     llvm::Value* HorizontalVectorSum(IRFunctionEmitter& function, llvm::Value* vectorValue)
     {
@@ -32,27 +41,35 @@ namespace emitters
 
         int vectorSize = vecType->getNumElements();
         IREmitter& emitter = function.GetEmitter();
-        llvm::Value* sum = function.Literal<ValueType>(0);
-        for (int entryIndex = 0; entryIndex < vectorSize; ++entryIndex)
+
+        // Take care of the edge case of 1-element vectors
+        if (vectorSize == 1)
         {
-            auto entryValue = emitter.GetIRBuilder().CreateExtractElement(vectorValue, entryIndex);
-            sum = function.Operator(emitters::GetAddForValueType<ValueType>(), sum, entryValue);
+            return emitter.GetIRBuilder().CreateExtractElement(vectorValue, static_cast<uint64_t>(0));
         }
-        return sum;
+
+        // Repeatedly split the vector into two halves, and add the two halves together
+        auto undef = llvm::UndefValue::get(type); // This undef is to tell LLVM we don't care what goes in the second operand of the shufflevector instruction
+        while (vectorSize > 2)
+        {
+            assert(vectorSize % 2 == 0); // vectorSize must be a power of 2
+            std::vector<uint32_t> elementIndices1;
+            std::vector<uint32_t> elementIndices2;
+            for (int index = 0; index < vectorSize / 2; ++index)
+            {
+                elementIndices1.push_back(index); // Collect indices [0, vectorSize/2)
+                elementIndices2.push_back((vectorSize / 2) + index); // Collect indices [vectorSize/2, vectorSize)
+            }
+            auto half1 = emitter.GetIRBuilder().CreateShuffleVector(vectorValue, undef, elementIndices1); // Extract elements [0, vectorSize/2)
+            auto half2 = emitter.GetIRBuilder().CreateShuffleVector(vectorValue, undef, elementIndices2); // Extract elements [vectorSize/2, vectorSize)
+            vectorValue = function.Operator(emitters::GetAddForValueType<ValueType>(), half1, half2);
+            vectorSize /= 2;
+        }
+
+        assert(vectorSize == 2);
+        auto half1 = emitter.GetIRBuilder().CreateExtractElement(vectorValue, static_cast<uint64_t>(0));
+        auto half2 = emitter.GetIRBuilder().CreateExtractElement(vectorValue, static_cast<uint64_t>(1));
+        return function.Operator(emitters::GetAddForValueType<ValueType>(), half1, half2);
     }
-    // TODO: implement logN version:
-    //
-    //        define i32 @sum(<8 x i32> %a) {
-    //            %v1 = shufflevector <8 x i32> %a, <8 x i32> undef, <4 x i32> <i32 0, i32 1, i32 2, i32 3>  // extract elements 0, 1, 2, 3 into new 4-element vector
-    //            %v2 = shufflevector <8 x i32> %a, <8 x i32> undef, <4 x i32> <i32 4, i32 5, i32 6, i32 7>  // extract elements 4, 5, 6, 7 into new 4-element vector
-    //            %sum1 = add <4 x i32> %v1, %v2                                                             // sum them
-    //            %v3 = shufflevector <4 x i32> %sum1, <4 x i32> undef, <2 x i32> <i32 0, i32 1>             // now extract elements 0 and 1 into new 2-element vector
-    //            %v4 = shufflevector <4 x i32> %sum1, <4 x i32> undef, <2 x i32> <i32 2, i32 3>             // and extract elements 2 and 3 into new 2-element vector
-    //            %sum2 = add <2 x i32> %v3, %v4                                                             // sum them
-    //            %v5 = extractelement <2 x i32> %sum2, i32 0                                                // extract elements 0 and 1 into scalars
-    //            %v6 = extractelement <2 x i32> %sum2, i32 1
-    //            %sum3 = add i32 %v5, %v6                                                                   // and sum them for the result
-    //            ret i32 %sum3
-    //        }
 }
 }

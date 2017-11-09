@@ -34,10 +34,27 @@ using namespace ell::emitters;
 
 using VoidReturningIntFunction = int (*)();
 
+namespace
+{
+bool CanUsePosixLibrary(IRModuleEmitter& module)
+{
+    return module.GetCompilerParameters().targetDevice.IsLinux() ||
+           module.GetCompilerParameters().targetDevice.IsMacOS();
+}
+}
+
 void TestPthreadSelf()
 {
+    // Testing this function:
     // pthread_t pthread_self(void);
-    IRModuleEmitter module("PthreadTest");
+
+    auto module = MakeHostModuleEmitter("PthreadTest");
+    if(!CanUsePosixLibrary(module))
+    {
+        std::cout << "Unable to test Posix library on this platform" << std::endl;
+        return;
+    }
+
     module.DeclarePrintf();
 
     //
@@ -62,20 +79,26 @@ void TestPthreadSelf()
 
 void TestPthreadCreate()
 {
+    // Testing this function:
     // int pthread_create(pthread_t * thread, const pthread_attr_t * attr, void * (*start_routine)(void *), void * arg);
 
-    IRModuleEmitter module("PthreadTest");
+    auto module = MakeHostModuleEmitter("PthreadTest");
+    if(!CanUsePosixLibrary(module))
+    {
+        std::cout << "Unable to test Posix library on this platform" << std::endl;
+        return;
+    }
+    
     module.DeclarePrintf();
     
     // Types
     auto& context = module.GetLLVMContext();
     auto pthreadType = module.GetRuntime().GetPosixEmitter().GetPthreadType();
     auto int8PtrType = llvm::Type::getInt8PtrTy(context);
-    auto int8PtrPtrType = int8PtrType->getPointerTo();
-    
+
     // Thread task function
     std::string taskFunctionName = "Task";
-    auto taskFunction = module.BeginFunction(taskFunctionName, VariableType::Void, { VariableType::BytePointer });
+    auto taskFunction = module.BeginFunction(taskFunctionName, VariableType::BytePointer, { VariableType::BytePointer });
     auto taskSelfVal = taskFunction.PthreadSelf();
     taskFunction.Printf("Task self = %x\n", { taskSelfVal });
     module.EndFunction();
@@ -93,7 +116,7 @@ void TestPthreadCreate()
     llvm::AllocaInst* statusVar3 = mainFunction.Variable(int8PtrType, "status3");
 
     llvm::ConstantPointerNull* nullAttr = mainFunction.NullPointer(int8PtrType);
-    llvm::ConstantPointerNull* nullArg = mainFunction.NullPointer(int8PtrPtrType);
+    llvm::ConstantPointerNull* nullArg = mainFunction.NullPointer(int8PtrType);
 
     // Create some new threads
     auto errCode1 = mainFunction.PthreadCreate(threadVar1, nullAttr, taskFunction.GetFunction(), nullArg);

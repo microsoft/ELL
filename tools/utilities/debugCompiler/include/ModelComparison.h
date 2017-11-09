@@ -9,7 +9,6 @@
 #pragma once
 
 #include "Graph.h"
-#include "IRExecutionEngine.h"
 #include "VectorStatistics.h"
 
 // model

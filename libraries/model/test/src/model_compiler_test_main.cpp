@@ -22,10 +22,6 @@ using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
-    // VerboseRegion region;
-    // TestReceptiveFieldMatrixNode(2, false); // old (slow) version -- Fails
-    // return;
-
     TestFloatNode();
     TestMultipleOutputNodes();
     TestCompilableDotProductNode2(3);

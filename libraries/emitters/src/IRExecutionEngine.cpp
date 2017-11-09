@@ -25,18 +25,18 @@ namespace emitters
         throw emitters::EmitterException(emitters::EmitterError::unexpected, msg);
     }
 
-    IRExecutionEngine::IRExecutionEngine(IRModuleEmitter&& module)
-        : IRExecutionEngine(module.TransferOwnership())
+    IRExecutionEngine::IRExecutionEngine(IRModuleEmitter&& module, bool verify)
+        : IRExecutionEngine(module.TransferOwnership(), verify)
     {
     }
 
-    IRExecutionEngine::IRExecutionEngine(std::unique_ptr<llvm::Module> pModule)
+    IRExecutionEngine::IRExecutionEngine(std::unique_ptr<llvm::Module> pModule, bool verify)
     {
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
         _pBuilder = std::make_unique<llvm::EngineBuilder>(std::move(pModule));
-        _pBuilder->setEngineKind(llvm::EngineKind::JIT).setUseOrcMCJITReplacement(false);
+        _pBuilder->setEngineKind(llvm::EngineKind::JIT).setVerifyModules(verify).setUseOrcMCJITReplacement(false);
 
         static bool installed = false;
         if (!installed)
@@ -47,22 +47,28 @@ namespace emitters
         }
     }
 
+    IRExecutionEngine::~IRExecutionEngine()
+    {
+        if(_pEngine)
+        {
+            PerformFinalization();
+        }
+    }
+
     void IRExecutionEngine::AddModule(std::unique_ptr<llvm::Module> pModule)
     {
         assert(pModule != nullptr);
         EnsureEngine();
         _pEngine->addModule(std::move(pModule));
     }
-
+    
     void IRExecutionEngine::PerformInitialization()
     {
-        EnsureEngine();
         _pEngine->runStaticConstructorsDestructors(false);
     }
 
     void IRExecutionEngine::PerformFinalization()
     {
-        EnsureEngine();
         _pEngine->runStaticConstructorsDestructors(true);
     }
 
@@ -116,6 +122,7 @@ namespace emitters
         {
             auto pEngine = _pBuilder->create();
             _pEngine.reset(pEngine);
+            PerformInitialization();
         }
     }
 }

@@ -548,6 +548,19 @@ namespace emitters
     //
     // Operations / Comparisons
     //
+    llvm::Value* IREmitter::UnaryOperation(const UnaryOperationType type, llvm::Value* value, const std::string& variableName)
+    {
+        assert(value != nullptr);
+
+        switch (type)
+        {
+            case UnaryOperationType::logicalNot:
+                return _irBuilder.CreateNot(value, variableName);
+            default:
+                throw EmitterException(EmitterError::operatorTypeNotSupported, "logicalNot is the only supported unary operator");
+        }
+    }
+    
     llvm::Value* IREmitter::BinaryOperation(const TypedOperator type, llvm::Value* pLeftValue, llvm::Value* pRightValue, const std::string& variableName)
     {
         assert(pLeftValue != nullptr);
@@ -653,9 +666,9 @@ namespace emitters
     }
 
     //
-    // AddModule
+    // CreateModule
     //
-    std::unique_ptr<llvm::Module> IREmitter::AddModule(const std::string& name)
+    std::unique_ptr<llvm::Module> IREmitter::CreateModule(const std::string& name)
     {
         return std::make_unique<llvm::Module>(name, _llvmContext);
     }
@@ -946,7 +959,10 @@ namespace emitters
 
     llvm::Value* IREmitter::GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex)
     {
-        return _irBuilder.CreateStructGEP(structPtr->getType(), structPtr, fieldIndex);
+        auto structPtrType = llvm::dyn_cast<llvm::PointerType>(structPtr->getType());
+        assert(structPtrType && "Error: must pass pointer to GetStructFieldPointer");
+        assert(structPtrType->getElementType()->isStructTy() && "Error: must pass pointer to a struct type to GetStructFieldPointer");
+        return _irBuilder.CreateStructGEP(structPtrType->getElementType(), structPtr, fieldIndex);
     }
 
     llvm::LoadInst* IREmitter::Load(llvm::Value* pPointer)
@@ -1018,6 +1034,11 @@ namespace emitters
 
     llvm::StructType* IREmitter::DeclareStruct(const std::string& name, const VariableTypeList& fields)
     {
+        llvm::StructType* type = GetStruct(name);
+        if (type != nullptr)
+        {
+            throw EmitterException(EmitterError::duplicateSymbol);
+        }
         LLVMTypeList llvmFields;
         for (const auto& field : fields)
         {
@@ -1028,6 +1049,11 @@ namespace emitters
 
     llvm::StructType* IREmitter::DeclareStruct(const std::string& name, const LLVMTypeList& fields)
     {
+        llvm::StructType* type = GetStruct(name);
+        if (type != nullptr)
+        {
+            throw EmitterException(EmitterError::duplicateSymbol);
+        }
         auto structType = llvm::StructType::create(_llvmContext, fields, name);
         _structs[name] = structType;
         return structType;
@@ -1046,7 +1072,7 @@ namespace emitters
         return structType;
     }
 
-    llvm::StructType* IREmitter::DeclareAnonymousStruct(const LLVMTypeList& fields, bool packed)
+    llvm::StructType* IREmitter::GetAnonymousStructType(const LLVMTypeList& fields, bool packed)
     {
         return llvm::StructType::get(_llvmContext, fields, packed);
     }

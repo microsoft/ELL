@@ -85,6 +85,13 @@ namespace common
             "Maximum num of parallel threads",
             4);
 
+        parser.AddOption(
+            debug,
+            "debug",
+            "dbg",
+            "Emit debug code",
+            false);
+
         parser.AddDocumentationString("");
         parser.AddDocumentationString("Target device options");
         parser.AddOption(

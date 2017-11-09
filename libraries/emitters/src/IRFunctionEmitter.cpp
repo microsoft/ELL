@@ -12,6 +12,7 @@
 #include "IREmitter.h"
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
+#include "IRAsyncTask.h"
 
 // utilities
 #include "Logger.h"
@@ -198,6 +199,12 @@ namespace emitters
         return _pEmitter->Call(ResolveFunction(name), arguments);
     }
 
+    llvm::Value* IRFunctionEmitter::Call(IRFunctionEmitter& function, std::vector<llvm::Value*> arguments)
+    {
+        assert(function.GetFunction() != nullptr);
+        return _pEmitter->Call(function.GetFunction(), arguments);
+    }
+
     llvm::Value* IRFunctionEmitter::Call(llvm::Function* pFunction, std::initializer_list<llvm::Value*> arguments)
     {
         assert(pFunction != nullptr);
@@ -218,6 +225,11 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::Return(llvm::Value* value)
     {
         return _pEmitter->Return(value);
+    }
+
+    llvm::Value* IRFunctionEmitter::Operator(UnaryOperationType type, llvm::Value* value)
+    {
+        return _pEmitter->UnaryOperation(type, value);
     }
 
     llvm::Value* IRFunctionEmitter::Operator(TypedOperator type, llvm::Value* pLeftValue, llvm::Value* pRightValue)
@@ -1061,6 +1073,18 @@ namespace emitters
         Call(gemm, args);
     }
 
+    llvm::Value* IRFunctionEmitter::GetNumOpenBLASThreads()
+    {
+        auto getNumThreadsFunction = GetModule().GetRuntime().GetOpenBLASGetNumThreadsFunction();
+        return Call(getNumThreadsFunction, {});
+    }
+
+    void IRFunctionEmitter::SetNumOpenBLASThreads(llvm::Value* numThreads)
+    {
+        auto setNumThreadsFunction = GetModule().GetRuntime().GetOpenBLASSetNumThreadsFunction();
+        Call(setNumThreadsFunction, { numThreads });
+    }
+
     //
     // Calling POSIX functions
     //
@@ -1147,6 +1171,23 @@ namespace emitters
     llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::system_clock>()
     {
         return Call(GetSystemClockFnName, nullptr /*no arguments*/);
+    }
+
+    llvm::Value* IRFunctionEmitter::GetCpu()
+    {
+        if (GetModule().GetCompilerParameters().targetDevice.IsLinux())
+        {
+            // Signature: int sched_getcpu(void);
+            auto& context = GetLLVMContext();
+            auto int32Type = llvm::Type::getInt32Ty(context);
+            auto functionType = llvm::FunctionType::get(int32Type, {}, false);
+            auto schedGetCpuFunction = static_cast<llvm::Function*>(GetModule().GetLLVMModule()->getOrInsertFunction("sched_getcpu", functionType));
+            return Call(schedGetCpuFunction, {});
+        }
+        else
+        {
+            return Literal<int>(-1);
+        }
     }
 
     llvm::LLVMContext& IRFunctionEmitter::GetLLVMContext()

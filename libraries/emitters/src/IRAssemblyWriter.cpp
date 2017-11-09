@@ -123,24 +123,23 @@ namespace emitters
         // Set the triple for the module, and retrieve it as a Triple object
         auto targetTripleStr = ellOptions.targetDevice.triple.empty() ? llvm::sys::getDefaultTargetTriple() : ellOptions.targetDevice.triple;
         module.setTargetTriple(llvm::Triple::normalize(targetTripleStr));
-        llvm::Triple targetTriple{ module.getTargetTriple() };
-
-        // Get the target-specific parser. Note that targetTriple can be modified by lookupTarget.
+        
+        // Get the target-specific parser.
         std::string error;
-        const llvm::Target* target = llvm::TargetRegistry::lookupTarget(ellOptions.targetDevice.architecture, targetTriple, error);
+        const llvm::Target* target = llvm::TargetRegistry::lookupTarget(module.getTargetTriple(), error);
         if (!target)
         {
             throw EmitterException(EmitterError::unexpected, std::string("Couldn't create target ") + error);
         }
-
+        
         llvm::TargetOptions targetOptions = MakeTargetOptions();
         targetOptions.MCOptions.AsmVerbose = ellOptions.verboseOutput;
         targetOptions.FloatABIType = ellOptions.floatABI;
-
+        
         llvm::Reloc::Model relocModel = llvm::Reloc::Static;
         llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
-
-        std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(targetTriple.getTriple(),
+        
+        std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(module.getTargetTriple(),
                                                                                        ellOptions.targetDevice.cpu,
                                                                                        ellOptions.targetDevice.features,
                                                                                        targetOptions,

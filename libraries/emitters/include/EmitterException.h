@@ -35,6 +35,8 @@ namespace emitters
         castNotSupported,
         // Unknown Variable type
         variableTypeNotSupported,
+        // Problem with struct type
+        badStructDefinition,
         // Invalid index into a vector
         indexOutOfRange,
         // Function not found
@@ -60,7 +62,9 @@ namespace emitters
         // Unknown VariableScope
         variableScopeNotSupported,
         // Metadata not found
-        metadataNotFound
+        metadataNotFound,
+        // Unknown target
+        targetNotSupported
     };
 
     using EmitterException = utilities::ErrorCodeException<EmitterError>;

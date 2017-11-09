@@ -50,13 +50,14 @@ namespace emitters
         void Sync();
 
         /// <summary> Get the return value of task </summary>
-        llvm::Value* GetReturnValue() const { return _returnValue; }
+        llvm::Value* GetReturnValue() const;
 
     private:
         friend IRFunctionEmitter;
         IRAsyncTask(IRFunctionEmitter& functionEmitter, llvm::Function* taskFunction, const std::vector<llvm::Value*>& arguments);
         IRAsyncTask(IRFunctionEmitter& functionEmitter, IRFunctionEmitter& taskFunction, const std::vector<llvm::Value*>& arguments);
 
+        bool UsePthreads() const { return _usePthreads; }
         void StartTask();
         llvm::StructType* GetTaskArgStructType();
         llvm::Function* GetPthreadWrapper(llvm::StructType* argsStructType);
@@ -64,12 +65,14 @@ namespace emitters
         IRFunctionEmitter& _owningFunction; // Loop written into this function
         llvm::Function* _taskFunction = nullptr;
         std::vector<llvm::Value*> _arguments;
+        llvm::Type* _returnType = nullptr;
         llvm::Value* _returnValue = nullptr;
         bool _started = false;
+        bool _usePthreads = false;
 
         // Pthread implementation
         llvm::Value* _pthread = nullptr;
-        llvm::Value* _statusVar = nullptr;
+        llvm::Value* _returnValuePtr = nullptr;
     };
 
     // Threadpool notes:

@@ -40,10 +40,14 @@ using UnaryScalarDoubleFunction = double (*)(double);
 //
 // Tests
 //
-void TestIRAsyncTask()
+void TestIRAsyncTask(bool parallel)
 {
-    std::cout << "Testing IRAsyncTask Function" << std::endl;
-    IRModuleEmitter module("CompilableIRFunction");
+    std::cout << "\nTesting IRAsyncTask Function in " << (parallel ? "parallel" : "serial") << " mode" << std::endl;
+    CompilerParameters compilerParameters;
+    compilerParameters.optimize = false;
+    compilerParameters.parallelize = parallel;
+    compilerParameters.targetDevice.deviceName = "host";
+    IRModuleEmitter module("IRAsyncTaskTest", compilerParameters);
     module.DeclarePrintf();
 
     // Common stuff for both functions
@@ -74,17 +78,19 @@ void TestIRAsyncTask()
     {
         auto arguments = f.Arguments().begin();
         auto argVal = &(*arguments++);
-        f.Printf("Begin async task, input: %f\n", {argVal});
+        // f.Printf("Begin async task, input: %f\n", {argVal});
         llvm::Value* asyncSum = f.Operator(emitters::GetAddForValueType<double>(), argVal, f.Literal<double>(5.0));
+        // f.Printf("End async task, output: %f\n", {asyncSum});
         f.Return(asyncSum);
     }
     module.EndFunction();
 
     asyncFunction.Print("Before calling Sync\n");
-    auto t = asyncFunction.Async(f, { asyncArg }); // TODO: pass in local values to capture == args to async function
+    auto t = asyncFunction.Async(f, { asyncArg });
     t.Sync();
-    asyncFunction.Print("After calling Sync\n");
-    asyncFunction.Return(t.GetReturnValue());
+    auto returnValue = t.GetReturnValue();
+    // asyncFunction.Printf("After calling Sync, return value: %f\n", {returnValue});
+    asyncFunction.Return(returnValue);
     module.EndFunction();
 
     // print the generated code
@@ -106,61 +112,4 @@ void TestIRAsyncTask()
     }
     testing::ProcessTest("Testing compilable syncFunction", testing::IsEqual(computedResult, syncCompiledResult));
     testing::ProcessTest("Testing compilable asyncFunction", testing::IsEqual(computedResult, asyncCompiledResult));
-    // std::cout << "Computed result " << computedResult << ", compiled: " << asyncCompiledResult << std::endl;
 }
-
-// void TestIRAsyncLambdaTask()
-// {
-//     std::cout << "Testing IRAsyncTask Function" << std::endl;
-//     IRModuleEmitter module("CompilableIRFunction");
-//     module.DeclarePrintf();
-
-//     // Common stuff for both functions
-//     NamedVariableTypeList args;
-//     args.push_back({ "x", VariableType::Double });
-
-//     //
-//     // Async task
-//     //
-//     auto& context = module.GetLLVMContext();
-//     llvm::Type* asyncReturnType = llvm::Type::getDoubleTy(context);
-//     std::string asyncFunctionName = "TestAsync";
-//     auto asyncFunction = module.BeginFunction(asyncFunctionName, VariableType::Double, args);
-
-//     asyncFunction.Print("Begin outer function\n");
-
-//     llvm::Value* asyncArg = asyncFunction.GetFunctionArgument("x");
-
-//     auto t = asyncFunction.Async(asyncArg, [](IRAsyncEmitter& t, llvm::Value& asyncArg) {
-//         auto& f = t.GetFunction();
-//         f.Print("Begin async task\n");
-//         llvm::Value* asyncSum = f.Operator(emitters::GetAddForValueType<double>(), asyncArg, f.Literal<double>(5.0));
-//         return asyncSum;
-//     });
-
-//     asyncFunction.Print("Before calling Sync\n");
-//     t.Sync();
-//     asyncFunction.Print("After calling Sync\n");
-//     asyncFunction.Return(t.GetReturnValue());
-//     module.EndFunction();
-
-//     // print the generated code
-//     module.DebugDump();
-
-//     IRExecutionEngine executionEngine(std::move(module));
-//     UnaryScalarDoubleFunction syncCompiledFunction = (UnaryScalarDoubleFunction)executionEngine.ResolveFunctionAddress(syncFunctionName);
-//     UnaryScalarDoubleFunction asyncCompiledFunction = (UnaryScalarDoubleFunction)executionEngine.ResolveFunctionAddress(asyncFunctionName);
-
-//     std::vector<double> data({ 1.1, 2.1, 3.1, 4.1, 5.1 });
-//     std::vector<double> computedResult;
-//     std::vector<double> syncCompiledResult;
-//     std::vector<double> asyncCompiledResult;
-//     for (auto x : data)
-//     {
-//         computedResult.push_back(x + 5.0);
-//         syncCompiledResult.push_back(syncCompiledFunction(x));
-//         asyncCompiledResult.push_back(asyncCompiledFunction(x));
-//     }
-//     testing::ProcessTest("Testing compilable syncFunction", testing::IsEqual(computedResult, syncCompiledResult));
-//     testing::ProcessTest("Testing compilable asyncFunction", testing::IsEqual(computedResult, asyncCompiledResult));
-// }

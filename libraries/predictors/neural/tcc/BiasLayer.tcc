@@ -20,11 +20,11 @@ namespace neural
     {
         if (this->GetInputShape() != this->GetOutputShapeMinusPadding())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "Expected size of input and output tensor (minus padding) to match");
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, GetRuntimeTypeName() + ": Expected size of input and output tensor (minus padding) to match");
         }
         if (_bias.Size() != NumOutputChannels())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Number of 'bias' values must equal number of channels in output");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, GetRuntimeTypeName() + ": Number of 'bias' values must equal number of channels in output");
         }
     }
 

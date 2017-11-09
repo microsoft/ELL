@@ -42,6 +42,10 @@ namespace emitters
 
     /// <summary> Compute the sum of the entries in a vector </summary>
     ///
+    /// Emits explicit vector code to compute the sum. Hopefully, the vecorizing optimizer will 
+    /// take care of this when vecorizing simple loops to sum up values, but for other operations
+    /// we may want to do it ourselves.
+    ///
     /// <param name="function"> The function being emitted </param>
     /// <param name="vectorValue"> The value to sum the elements of </param>
     ///

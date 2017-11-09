@@ -10,7 +10,6 @@
 #include "EmitterException.h"
 #include "IRAssemblyWriter.h"
 #include "IRDiagnosticHandler.h"
-#include "IRExecutionEngine.h"
 #include "IRHeaderWriter.h"
 #include "IRLoader.h"
 #include "IRMetadata.h"
@@ -45,16 +44,29 @@ namespace emitters
     // Constructors
     //
 
-    IRModuleEmitter::IRModuleEmitter(const std::string& moduleName)
+    IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerParameters& parameters)
         : _llvmContext(new llvm::LLVMContext()), _emitter(*_llvmContext), _runtime(*this)
     {
         InitializeLLVM();
         InitializeGlobalPassRegistry();
-        _pModule = _emitter.AddModule(moduleName);
+
+        _pModule = _emitter.CreateModule(moduleName);
+
+        SetCompilerParameters(parameters);
         if (GetCompilerParameters().includeDiagnosticInfo)
         {
             DeclarePrintf();
         }
+    }
+
+    void IRModuleEmitter::SetCompilerParameters(const CompilerParameters& parameters)
+    {
+        // Call base class implementation
+        ModuleEmitter::SetCompilerParameters(parameters);
+
+        // Set IR-specific parameters
+        SetTargetTriple(GetCompilerParameters().targetDevice.triple);
+        SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
     }
 
     //
@@ -368,13 +380,14 @@ namespace emitters
         return AddGlobal(name, _emitter.ArrayType(VariableType::Double, value.size()), _emitter.Literal(value), false);
     }
 
-    // This is the actual implementation --- we should call it something different and/or put it in IREmitter
+    // This function has the actual implementation for all the above "GlobalArray()" methods
     llvm::GlobalVariable* IRModuleEmitter::AddGlobal(const std::string& name, llvm::Type* pType, llvm::Constant* pInitial, bool isConst)
     {
         _pModule->getOrInsertGlobal(name, pType);
         auto global = _pModule->getNamedGlobal(name);
         global->setInitializer(pInitial);
         global->setConstant(isConst);
+        global->setExternallyInitialized(false);
         assert(llvm::isa<llvm::GlobalVariable>(global));
         return llvm::cast<llvm::GlobalVariable>(global);
     }
@@ -489,23 +502,17 @@ namespace emitters
     // Types
     //
 
-    llvm::StructType* IRModuleEmitter::DeclareStruct(const std::string& name, const NamedVariableTypeList& fields)
+    llvm::StructType* IRModuleEmitter::GetOrCreateStruct(const std::string& name, const NamedVariableTypeList& fields)
     {
-        std::vector<std::string> fieldNames;
-        std::vector<VariableType> types;
-        for (const auto& field : fields)
+        NamedLLVMTypeList llvmFields;
+        for(auto& field: fields)
         {
-            fieldNames.push_back(field.first);
-            types.push_back(field.second);
+            llvmFields.emplace_back(field.first, _emitter.Type(field.second));
         }
-
-        auto structType = _emitter.DeclareStruct(name, types);
-        auto tag = GetStructFieldsTagName(structType);
-        InsertMetadata(tag, fieldNames);
-        return structType;
+        return GetOrCreateStruct(name, llvmFields);
     }
 
-    llvm::StructType* IRModuleEmitter::DeclareStruct(const std::string& name, const NamedLLVMTypeList& fields)
+    llvm::StructType* IRModuleEmitter::GetOrCreateStruct(const std::string& name, const NamedLLVMTypeList& fields)
     {
         std::vector<std::string> fieldNames;
         std::vector<LLVMType> types;
@@ -515,20 +522,41 @@ namespace emitters
             types.push_back(field.second);
         }
 
-        auto structType = _emitter.DeclareStruct(name, types);
+        auto structType = GetOrCreateStruct(name, types);
         auto tag = GetStructFieldsTagName(structType);
         InsertMetadata(tag, fieldNames);
         return structType;
     }
 
-    llvm::StructType* IRModuleEmitter::DeclareStruct(const std::string& name, const LLVMTypeList& fields)
+    llvm::StructType* IRModuleEmitter::GetOrCreateStruct(const std::string& name, const LLVMTypeList& fields)
     {
+        if (auto structType = _emitter.GetStruct(name))
+        {
+            // Check that existing struct fields match the ones we're trying to create
+            auto structFields = structType->elements();
+            if(structFields.size() != fields.size())
+            {
+                throw EmitterException(EmitterError::badStructDefinition, "Fields don't match existing struct of same name");
+            }
+            else
+            {
+                for(int fieldIndex = 0; fieldIndex < fields.size(); ++fieldIndex)
+                {
+                    if(fields[fieldIndex] != structFields[fieldIndex])
+                    {
+                        throw EmitterException(EmitterError::badStructDefinition, "Fields don't match existing struct of same name");
+                    }
+                }
+            }
+            return structType;
+        }
+
         return _emitter.DeclareStruct(name, fields);
     }
 
-    llvm::StructType* IRModuleEmitter::DeclareAnonymousStruct(const LLVMTypeList& fieldTypes, bool packed)
+    llvm::StructType* IRModuleEmitter::GetAnonymousStructType(const LLVMTypeList& fieldTypes, bool packed)
     {
-        return _emitter.DeclareAnonymousStruct(fieldTypes, packed);
+        return _emitter.GetAnonymousStructType(fieldTypes, packed);
     }
 
     llvm::StructType* IRModuleEmitter::GetStruct(const std::string& name)
@@ -828,7 +856,7 @@ namespace emitters
     }
 
     //
-    // Module initialization
+    // Module initialization / finalization
     //
     void IRModuleEmitter::AddInitializationFunction(llvm::Function* function, int priority, llvm::Constant* forData)
     {
@@ -838,6 +866,16 @@ namespace emitters
     void IRModuleEmitter::AddInitializationFunction(IRFunctionEmitter& function, int priority, llvm::Constant* forData)
     {
         AddInitializationFunction(function.GetFunction(), priority, forData);
+    }
+
+    void IRModuleEmitter::AddFinalizationFunction(llvm::Function* function, int priority, llvm::Constant* forData)
+    {
+        llvm::appendToGlobalDtors(*GetLLVMModule(), function, priority, forData);
+    }
+
+    void IRModuleEmitter::AddFinalizationFunction(IRFunctionEmitter& function, int priority, llvm::Constant* forData)
+    {
+        AddFinalizationFunction(function.GetFunction(), priority, forData);
     }
 
     //
@@ -950,5 +988,17 @@ namespace emitters
 
         return registry;
     }
+
+    //
+    // Functions
+    //
+
+    IRModuleEmitter MakeHostModuleEmitter(const std::string moduleName)
+    {
+        CompilerParameters parameters;
+        parameters.targetDevice.deviceName = "host";
+        return {moduleName, parameters};
+    }
+    
 }
 }

@@ -251,17 +251,17 @@ namespace emitters
         /// <returns> Pointer to an llvm::Constant that represents true. </returns>
         llvm::Constant* TrueBit();
 
+        /// <summary> Emit a false value in a single bit. </summary>
+        ///
+        /// <returns> Pointer to an llvm::Constant that represents false. </returns>
+        llvm::Constant* FalseBit();
+        
         /// <summary> Emit a null pointer constant. </summary>
         ///
         /// <param name="pointerType"> The llvm type of the pointer to return. </param>
         ///
         /// <returns> Pointer to an llvm::ConstantPointerNull that represents a null pointer of the given pointer type. </returns>
         llvm::ConstantPointerNull* NullPointer(llvm::PointerType* pointerType);
-
-        /// <summary> Emit a false value in a single bit. </summary>
-        ///
-        /// <returns> Pointer to an llvm::Constant that represents false. </returns>
-        llvm::Constant* FalseBit();
 
         /// <summary> Emit a value-preserving cast operation from one type to another. </summary>
         ///
@@ -366,6 +366,15 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::ReturnInst that represents the return value. </returns>
         llvm::ReturnInst* Return(llvm::Value* pValue);
+
+        /// <summary> Emit a unary operation, with an optional name for the result. </summary>
+        ///
+        /// <param name="type"> The operator type. </param>
+        /// <param name="pValue"> Pointer to an llvm::Value that represents the value in the operation. </param>
+        /// <param name="variableName"> Name of the result. </param>
+        ///
+        /// <returns> Pointer to an llvm::Value that represents the operation result. </returns>
+        llvm::Value* UnaryOperation(const UnaryOperationType type, llvm::Value* pValue, const std::string& variableName = "");
 
         /// <summary> Emit a binary operation, with an optional name for the result. </summary>
         ///
@@ -813,15 +822,15 @@ namespace emitters
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
         llvm::StructType* DeclareStruct(const std::string& name, const NamedVariableTypeList& args);
 
-        /// <summary> Emit a module-scoped anonymous struct with the given fields. </summary>
+        /// <summary> Gets a type definition for an anonymous struct with the given fields. </summary>
         ///
         /// <param name="fields"> The struct fields. </param>
         /// <param name="packed"> If `true`, the fields will be packed together without any padding. </param>
         ///
         /// <returns> Pointer to the llvm::StructType that represents the emitted structure. </returns>
-        llvm::StructType* DeclareAnonymousStruct(const LLVMTypeList& fields, bool packed = false);
-        
-        /// <summary> Gets a declaration of a Struct with the given name.</summary>
+        llvm::StructType* GetAnonymousStructType(const LLVMTypeList& fields, bool packed = false);
+
+        /// <summary> Gets a type definition for a struct with the given name.</summary>
         ///
         /// <param name="name"> The struct name. </param>
         ///
@@ -833,8 +842,8 @@ namespace emitters
         /// <param name="name"> The module name. </param>
         ///
         /// <returns> A unique pointer to the new module. </returns>
-        std::unique_ptr<llvm::Module> AddModule(const std::string& name);
-        
+        std::unique_ptr<llvm::Module> CreateModule(const std::string& name);
+
         /// <summary> Emits a memmove instruction. </summary>
         ///
         /// <param name="pSource"> Pointer to the value that holds the source address. </param>
