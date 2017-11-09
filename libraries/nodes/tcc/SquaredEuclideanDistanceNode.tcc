@@ -2,16 +2,17 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     SquaredEuclideanDistanceNode.tcc (nodes)
-//  Authors:  Suresh Iyengar
+//  Authors:  Suresh Iyengar, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SquaredEuclideanDistanceNode.h"
+#include "UnaryOperationNode.h"
+#include "ConstantNode.h"
 #include "DotProductNode.h"
-#include "L2NormNode.h"
+#include "L2NormSquaredNode.h"
 #include "BinaryOperationNode.h"
 #include "MatrixVectorProductNode.h"
-#include "UnaryOperationNode.h"
 
 // math
 #include "MatrixOperations.h"
@@ -29,15 +30,15 @@ namespace nodes
 {
     template <typename ValueType, math::MatrixLayout layout>
     SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode()
-        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _v(0, 0)
+        : Node({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 1), _vectorsAsMatrix(0, 0)
     {
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& v)
-        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, v.NumRows()), _v(v)
+    SquaredEuclideanDistanceNode<ValueType, layout>::SquaredEuclideanDistanceNode(const model::PortElements<ValueType>& input, const math::Matrix<ValueType, layout>& vectorsAsMatrix)
+        : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, vectorsAsMatrix.NumRows()), _vectorsAsMatrix(vectorsAsMatrix)
     {
-        assert(input.Size() == v.NumColumns());
+        assert(input.Size() == vectorsAsMatrix.NumColumns());
     }
 
     template <typename ValueType, math::MatrixLayout layout>
@@ -45,7 +46,7 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
 
-        math::MatrixArchiver::Write(_v, "v", archiver);
+        math::MatrixArchiver::Write(_vectorsAsMatrix, "vectorsAsMatrix", archiver);
         archiver[inputPortName] << _input;
         archiver[outputPortName] << _output;
     }
@@ -55,7 +56,7 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
 
-        math::MatrixArchiver::Read(_v, "v", archiver);
+        math::MatrixArchiver::Read(_vectorsAsMatrix, "vectorsAsMatrix", archiver);
         archiver[inputPortName] >> _input;
         archiver[outputPortName] >> _output;
     }
@@ -64,7 +65,7 @@ namespace nodes
     void SquaredEuclideanDistanceNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto newNode = transformer.AddNode<SquaredEuclideanDistanceNode<ValueType, layout>>(newPortElements, _v);
+        auto newNode = transformer.AddNode<SquaredEuclideanDistanceNode<ValueType, layout>>(newPortElements, _vectorsAsMatrix);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -72,36 +73,40 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     bool SquaredEuclideanDistanceNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
+        auto inputPortElements = transformer.TransformPortElements(_input.GetPortElements());
 
-        auto normNode1 = transformer.AddNode<L2NormNode<double>>(newPortElements);
-        auto squareNormNode1 = transformer.AddNode<BinaryOperationNode<double>>(normNode1->output, normNode1->output, emitters::BinaryOperationType::coordinatewiseMultiply);
+        // P^2 => scalar value
+        auto inputNorm2SquaredNode = transformer.AddNode<L2NormSquaredNode<double>>(inputPortElements);
 
-        auto vectors = _v;
-        auto productNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(newPortElements, vectors);
+        // -2 * P * V => row-wise vector
+        auto vectorsAsMatrix = _vectorsAsMatrix;
+        vectorsAsMatrix.Transform([](double d) { return -2.0 * d; });
+        auto productNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(inputPortElements, vectorsAsMatrix);
 
-        std::vector<double> multiplier(_v.NumRows(), -2.0);
-        auto multiplierNode = transformer.AddNode<ConstantNode<ValueType>>(multiplier);
-        auto productNodeScaled = transformer.AddNode<BinaryOperationNode<double>>(productNode->output, multiplierNode->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-
-        model::PortElements<ValueType> normNode1Outputs;
-        model::PortElements<ValueType> normNode2Outputs;
-
-        for (size_t r = 0; r < _v.NumRows(); r++)
+        // Will hold the scalar value of P^2 for each row in the matrix
+        model::PortElements<ValueType> inputNorm2SquaredNodeOutputs;
+        // V^2 => row-wise vector of Norm-2 squared values of each vector in _vectorsAsMatrix
+        model::PortElements<ValueType> vectorNorm2SquaredConstantNodeOutputs;
+        for (size_t index = 0; index < _vectorsAsMatrix.NumRows(); ++index)
         {
-            normNode1Outputs.Append(squareNormNode1->output);
+            inputNorm2SquaredNodeOutputs.Append(inputNorm2SquaredNode->output);
 
-            auto matrixRow = vectors.GetRow(r);
-            auto pointNode = transformer.AddNode<ConstantNode<ValueType>>(matrixRow.ToArray());
-            auto normNode2 = transformer.AddNode<L2NormNode<double>>(pointNode->output);
-            auto squareNormNode2 = transformer.AddNode<BinaryOperationNode<double>>(normNode2->output, normNode2->output, emitters::BinaryOperationType::coordinatewiseMultiply);
-            normNode2Outputs.Append(squareNormNode2->output);
+            auto matrixRow = _vectorsAsMatrix.GetRow(index);
+            auto rowNorm2SquaredConstantNode = transformer.AddNode<ConstantNode<ValueType>>(matrixRow.Norm2Squared());
+            vectorNorm2SquaredConstantNodeOutputs.Append(rowNorm2SquaredConstantNode->output);
         }
 
-        auto distanceNode = transformer.AddNode<BinaryOperationNode<double>>(normNode1Outputs, productNodeScaled->output, emitters::BinaryOperationType::add);
-        auto squareDistanceNode = transformer.AddNode<BinaryOperationNode<double>>(normNode2Outputs, distanceNode->output, emitters::BinaryOperationType::add);
-
-        transformer.MapNodeOutput(output, squareDistanceNode->output);
+        // Add the three node outputs:
+        //   * inputNorm2SquaredNodeOutputs (A)
+        //   * vectorNorm2SquaredConstantNodeOutputs (B)
+        //   * productNode->output (C)
+        // and map it to output node
+        auto& A = inputNorm2SquaredNodeOutputs;
+        auto& B = vectorNorm2SquaredConstantNodeOutputs;
+        auto& C = productNode->output;
+        auto aPlusB = transformer.AddNode<BinaryOperationNode<double>>(A, B, emitters::BinaryOperationType::add);
+        auto aPlusBPlusC = transformer.AddNode<BinaryOperationNode<double>>(aPlusB->output, C, emitters::BinaryOperationType::add);
+        transformer.MapNodeOutput(output, aPlusBPlusC->output);
 
         return true;
     }
@@ -115,25 +120,25 @@ namespace nodes
             input[index] = _input[index];
         }
 
-        math::ColumnVector<ValueType> result(_v.NumRows());
+        math::ColumnVector<ValueType> result(_vectorsAsMatrix.NumRows());
 
         auto norm1sq = input.Norm2Squared();
 
         // result = -2 * _v * input
-        math::Multiply(-2.0, _v, input, 0.0, result);
+        math::Multiply(-2.0, _vectorsAsMatrix, input, 0.0, result);
 
-        for (size_t r = 0; r < _v.NumRows(); r++)
+        for (size_t r = 0; r < _vectorsAsMatrix.NumRows(); r++)
         {
-            result[r] += norm1sq + _v.GetRow(r).Norm2Squared();
+            result[r] += norm1sq + _vectorsAsMatrix.GetRow(r).Norm2Squared();
         }
 
         _output.SetOutput(result.ToArray());
     }
 
     template <typename ValueType, math::MatrixLayout layout>
-    SquaredEuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> v, model::ModelTransformer& transformer)
+    SquaredEuclideanDistanceNode<ValueType, layout>* AddNodeToModelTransformer(const model::PortElements<ValueType>& input, math::ConstMatrixReference<ValueType, layout> vectorsAsMatrix, model::ModelTransformer& transformer)
     {
-        return transformer.AddNode<SquaredEuclideanDistanceNode>(input, v);
+        return transformer.AddNode<SquaredEuclideanDistanceNode>(input, vectorsAsMatrix);
     }
 }
 }

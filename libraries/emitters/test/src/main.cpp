@@ -14,6 +14,9 @@
 // testing
 #include "testing.h"
 
+// set to 1 if you want to test emitted IR that is async
+#define TEST_THREAD_EMITTED_IR 0
+
 using namespace ell;
 
 void TestIR()
@@ -48,14 +51,17 @@ void TestPosixEmitter()
     TestPthreadCreate();
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     TestStruct();
-    return 0;
 
     TestIR();
-    TestAsyncEmitter();
+
+    // The tests below crash when run through the JIT
+#if TEST_THREAD_EMITTED_IR
     TestPosixEmitter();
+    TestAsyncEmitter();
+#endif // TEST_THREAD_EMITTED_IR
 
     if (testing::DidTestFail())
     {

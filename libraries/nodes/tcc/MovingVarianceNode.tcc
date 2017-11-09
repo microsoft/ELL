@@ -75,10 +75,7 @@ namespace nodes
         auto dimension = _input.Size();
         _samples.clear();
         _samples.reserve(_windowSize);
-        for (size_t index = 0; index < _windowSize; ++index)
-        {
-            _samples.push_back(std::vector<ValueType>(dimension));
-        }
+        std::generate_n(std::back_inserter(_samples), _windowSize, [dimension] { return std::vector<ValueType>(dimension); });
         _runningSum = std::vector<ValueType>(dimension);
         _runningSquaredSum = std::vector<ValueType>(dimension);
         _output.SetSize(dimension);

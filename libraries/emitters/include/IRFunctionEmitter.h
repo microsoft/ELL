@@ -382,6 +382,13 @@ namespace emitters
         /// <returns> Pointer to the logical OR of the two values. </returns>
         llvm::Value* LogicalOr(llvm::Value* pTestValue1, llvm::Value* pTestValue2);
 
+        /// <summary> Emit a logical NOT. </summary>
+        ///
+        /// <param name="pTestValue"> Pointer to the value. </param>
+        ///
+        /// <returns> Pointer to the logical NOT of the value. </returns>
+        llvm::Value* LogicalNot(llvm::Value* pTestValue);
+
         /// <summary> Remove any terminating branch instruction in the current block. </summary>
         void DeleteTerminatingBranch();
 

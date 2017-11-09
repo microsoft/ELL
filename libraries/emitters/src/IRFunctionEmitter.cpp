@@ -357,6 +357,16 @@ namespace emitters
         return pResult;
     }
 
+    llvm::Value* IRFunctionEmitter::LogicalNot(llvm::Value* pTestValue)
+    {
+        assert(pTestValue != nullptr);
+
+        llvm::Value* pResult = Variable(VariableType::Byte);
+        Store(pResult, _pEmitter->IsFalse(pTestValue));
+
+        return pResult;
+    }
+
     void IRFunctionEmitter::DeleteTerminatingBranch()
     {
         auto pTerm = GetCurrentBlock()->getTerminator();

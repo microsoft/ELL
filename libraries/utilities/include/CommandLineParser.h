@@ -78,6 +78,8 @@ namespace utilities
         /// <summary></summary>
         CommandLineParser(int argc, const char* argv[]);
 
+        virtual ~CommandLineParser() = default;
+
         /// <summary> Adds a new option to the command-line parser </summary>
         ///
         /// <param name="optionValue"> [out] A reference to the variable to get filled in by the parser </param>
@@ -296,7 +298,7 @@ namespace utilities
     };
 
     /// <summary> An exception representing an error during parsing. </summary>
-    class CommandLineParserErrorException : CommandLineParserException
+    class CommandLineParserErrorException : public CommandLineParserException
     {
     public:
         /// <summary> Returns list of parse errors that occured during parsing </summary>

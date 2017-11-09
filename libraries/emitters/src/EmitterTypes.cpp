@@ -339,6 +339,12 @@ namespace emitters
     }
 
     template <>
+    TypedOperator GetAddForValueType<bool>()
+    {
+        throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
+    }
+
+    template <>
     TypedOperator GetSubtractForValueType<float>()
     {
         return TypedOperator::subtractFloat;
@@ -360,6 +366,12 @@ namespace emitters
     TypedOperator GetSubtractForValueType<int64_t>()
     {
         return TypedOperator::subtract;
+    }
+
+    template <>
+    TypedOperator GetSubtractForValueType<bool>()
+    {
+        throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
     }
 
     template <>
@@ -387,6 +399,12 @@ namespace emitters
     }
 
     template <>
+    TypedOperator GetMultiplyForValueType<bool>()
+    {
+        throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
+    }
+
+    template <>
     TypedOperator GetDivideForValueType<float>()
     {
         return TypedOperator::divideFloat;
@@ -408,6 +426,12 @@ namespace emitters
     TypedOperator GetDivideForValueType<int64_t>()
     {
         return TypedOperator::divideSigned;
+    }
+
+    template <>
+    TypedOperator GetDivideForValueType<bool>()
+    {
+        throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
     }
 
     template <>

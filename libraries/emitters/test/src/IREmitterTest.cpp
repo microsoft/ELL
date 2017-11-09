@@ -333,6 +333,12 @@ void TestLogical()
     pResult = fn.LogicalOr(fn.Comparison(TypedComparison::equals, &val2, &val3), fn.Comparison(TypedComparison::equals, &val1, &val2));
     fn.Printf("OR False %d\n", { fn.Load(pResult) });
 
+    pResult = fn.LogicalNot(fn.Comparison(TypedComparison::equals, &val1, &val1));
+    fn.Printf("NOT True %d\n", { fn.Load(pResult) });
+
+    pResult = fn.LogicalNot(fn.Comparison(TypedComparison::equals, &val1, &val2));
+    fn.Printf("NOT False %d\n", { fn.Load(pResult) });
+
     fn.Return();
     module.EndFunction();
 

@@ -100,7 +100,7 @@ ell::predictors::NeuralNetworkPredictor<ElementType> CreateNeuralNetworkPredicto
     return neuralNetwork;
 }
 
-void TestNeuralNetworkPredictorNode()
+static void TestNeuralNetworkPredictorNode()
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
@@ -124,7 +124,7 @@ void TestNeuralNetworkPredictorNode()
     testing::ProcessTest("Testing NeuralNetworkPredictorNode compute", testing::IsEqual(modelOutput, output));
 }
 
-void TestArchiveNeuralNetworkPredictorNode()
+static void TestArchiveNeuralNetworkPredictorNode()
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
@@ -175,7 +175,7 @@ void TestArchiveNeuralNetworkPredictorNode()
     testing::ProcessTest("Testing NeuralNetworkPredictorNode archive (compute)", testing::IsEqual(modelOutput, output, eps));
 }
 
-void TestArchiveNeuralNetworkLayerNodes()
+static void TestArchiveNeuralNetworkLayerNodes()
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
@@ -226,7 +226,7 @@ void TestArchiveNeuralNetworkLayerNodes()
 // Individual layer nodes
 //
 
-void TestActivationLayerNode()
+static void TestActivationLayerNode()
 {
     using ElementType = double;
     using namespace ell::predictors;
@@ -261,7 +261,7 @@ void TestActivationLayerNode()
     testing::ProcessTest("Testing ActivationLayerNode compute", testing::IsEqual(modelOutput, output.ToArray(), eps));
 }
 
-void TestBatchNormalizationLayerNode()
+static void TestBatchNormalizationLayerNode()
 {
     using LayerType = predictors::neural::BatchNormalizationLayer<double>;
 
@@ -303,7 +303,7 @@ void TestBatchNormalizationLayerNode()
     testing::ProcessTest("Testing BatchNormalizationLayerNode compute", testing::IsEqual(modelOutput, output.ToArray(), eps));
 }
 
-void TestBiasLayerNode()
+static void TestBiasLayerNode()
 {
     using LayerType = predictors::neural::BiasLayer<double>;
 
@@ -342,7 +342,7 @@ void TestBiasLayerNode()
     testing::ProcessTest("Testing BiasLayerNode compute", testing::IsEqual(modelOutput, output.ToArray()));
 }
 
-void TestConvolutionalLayerNode()
+static void TestConvolutionalLayerNode()
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
@@ -435,7 +435,7 @@ void TestConvolutionalLayerNode()
     testing::ProcessTest("Testing ConvolutionalLayer (regular) compute", testing::IsEqual(modelOutput2, output2.ToArray()));
 }
 
-void TestBinaryConvolutionalLayerNode()
+static void TestBinaryConvolutionalLayerNode()
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
@@ -530,7 +530,7 @@ void TestBinaryConvolutionalLayerNode()
     testing::ProcessTest("Testing BinaryConvolutionalLayer (bitwise) compute", testing::IsEqual(modelOutput2, output2.ToArray()));
 }
 
-void TestFullyConnectedLayerNode()
+static void TestFullyConnectedLayerNode()
 {
     using LayerType = predictors::neural::FullyConnectedLayer<double>;
 
@@ -580,7 +580,7 @@ void TestFullyConnectedLayerNode()
     testing::ProcessTest("Testing FullyConnectedLayerNode compute", testing::IsEqual(modelOutput, output.ToArray()));
 }
 
-void TestPoolingLayerNode()
+static void TestPoolingLayerNode()
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
@@ -629,7 +629,7 @@ void TestPoolingLayerNode()
     testing::ProcessTest("Testing PoolingLayer, padding", output(0, 0, 0) == 0 && output(0, 1, 0) == 0 && output(2, 3, 1) == 0 && output(3, 3, 1) == 0);
 }
 
-void TestScalingLayerNode()
+static void TestScalingLayerNode()
 {
     using ElementType = double;
     using LayerType = predictors::neural::ScalingLayer<ElementType>;
@@ -674,7 +674,7 @@ void TestScalingLayerNode()
     testing::ProcessTest("Testing ScalingLayerNode compute", testing::IsEqual(modelOutput, output.ToArray()));
 }
 
-void TestSoftmaxLayerNode()
+static void TestSoftmaxLayerNode()
 {
     using ElementType = double;
     using LayerType = predictors::neural::SoftmaxLayer<ElementType>;
@@ -708,4 +708,22 @@ void TestSoftmaxLayerNode()
     inputNode->SetInput(input.ToArray());
     auto modelOutput = model.ComputeOutput(computeNode->output);
     testing::ProcessTest("Testing SoftmaxLayerNode compute", testing::IsEqual(modelOutput, output.ToArray()));
+}
+
+void NeuralNetworkLayerNodesTests()
+{
+    // Neural nets
+    TestNeuralNetworkPredictorNode();
+    TestActivationLayerNode();
+    TestBatchNormalizationLayerNode();
+    TestBiasLayerNode();
+    TestBinaryConvolutionalLayerNode();
+    TestConvolutionalLayerNode();
+    TestFullyConnectedLayerNode();
+    TestPoolingLayerNode();
+    TestScalingLayerNode();
+    TestSoftmaxLayerNode();
+
+    TestArchiveNeuralNetworkPredictorNode();
+    TestArchiveNeuralNetworkLayerNodes();
 }

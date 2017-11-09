@@ -12,7 +12,7 @@
 #include "BinaryOperationNode.h"
 #include "ConstantNode.h"
 #include "DotProductNode.h"
-#include "L2NormNode.h"
+#include "L2NormSquaredNode.h"
 #include "UnaryOperationNode.h"
 #include "MatrixVectorProductNode.h"
 #include "SquaredEuclideanDistanceNode.h"

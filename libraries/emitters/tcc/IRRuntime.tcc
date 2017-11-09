@@ -35,6 +35,12 @@ namespace emitters
     }
 
     template <typename ValueType>
+    llvm::Function* IRRuntime::GetTanhFunction()
+    {
+        return GetTanhFunction(GetVariableType<ValueType>());
+    }
+
+    template <typename ValueType>
     llvm::Function* IRRuntime::GetDotProductFunction()
     {
         if (std::is_integral<std::decay_t<ValueType>>::value)

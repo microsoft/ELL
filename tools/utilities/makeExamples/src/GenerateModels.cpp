@@ -18,7 +18,7 @@
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
 #include "ForestPredictorNode.h"
-#include "L2NormNode.h"
+#include "L2NormSquaredNode.h"
 #include "LinearPredictorNode.h"
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
@@ -116,10 +116,10 @@ model::Model GenerateModel2()
 
     // one "leg"
     auto mean1 = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 8);
-    auto mag1 = model.AddNode<nodes::L2NormNode<double>>(mean1->output);
+    auto mag1 = model.AddNode<nodes::L2NormSquaredNode<double>>(mean1->output);
 
     // other "leg"
-    auto mag2 = model.AddNode<nodes::L2NormNode<double>>(inputNode->output);
+    auto mag2 = model.AddNode<nodes::L2NormSquaredNode<double>>(inputNode->output);
     auto mean2 = model.AddNode<nodes::MovingAverageNode<double>>(mag2->output, 8);
 
     // combine them

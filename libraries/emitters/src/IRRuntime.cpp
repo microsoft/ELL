@@ -417,6 +417,25 @@ namespace emitters
         return _module.GetIntrinsic(llvm::Intrinsic::log, { argType });
     }
 
+    llvm::Function* IRRuntime::GetTanhFunction(VariableType argType)
+    {
+        switch (argType)
+        {
+        case VariableType::Float:
+        case VariableType::Double:
+            break;
+        default:
+            throw EmitterException(EmitterError::functionNotFound);
+        }
+
+        auto& emitter = _module.GetIREmitter();
+        const char* funcName = argType == VariableType::Double ? "tanh" : "tanhf";
+        auto valueType = emitter.Type(argType);
+        auto tanhProto = llvm::FunctionType::get(valueType, { valueType }, false);
+        _module.DeclareFunction(funcName, tanhProto);
+        return _module.GetFunction(funcName);
+    }
+
     //
     // BLAS
     //

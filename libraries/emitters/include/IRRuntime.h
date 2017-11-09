@@ -59,6 +59,12 @@ namespace emitters
         template <typename ValueType>
         llvm::Function* GetLogFunction();
 
+        /// <summary> Get the tanh function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
+        template <typename ValueType>
+        llvm::Function* GetTanhFunction();
+
         //
         // Dot product
         //
@@ -99,7 +105,7 @@ namespace emitters
     private:
         friend IRModuleEmitter;
         IRRuntime(IRModuleEmitter& module);
-        
+
         std::string GetNamespacePrefix() const;
 
         //
@@ -115,6 +121,7 @@ namespace emitters
         llvm::Function* GetAbsFunction(VariableType argType);
         llvm::Function* GetExpFunction(VariableType argType);
         llvm::Function* GetLogFunction(VariableType argType);
+        llvm::Function* GetTanhFunction(VariableType argType);
 
         llvm::Function* GetDotProductIntFunction();
         llvm::Function* GetDotProductFloatFunction();

@@ -24,7 +24,7 @@
     "windowSize": 8
   }, 
   {
-    "_type": "L2NormNode<double>",
+    "_type": "L2NormSquaredNode<double>",
     "_version": "0",
     "id":     "1037",
     "input": {
@@ -37,7 +37,7 @@
     }
   }, 
   {
-    "_type": "L2NormNode<double>",
+    "_type": "L2NormSquaredNode<double>",
     "_version": "0",
     "id":     "1038",
     "input": {

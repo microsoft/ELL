@@ -80,7 +80,7 @@ namespace nodes
         model::OutputPort<ValueType> _output;
 
         // Set of vectors
-        math::Matrix<ValueType, layout> _v;
+        math::Matrix<ValueType, layout> _vectorsAsMatrix;
     };
 
     /// <summary> Adds a SquaredEuclidean node to a model transformer. </summary>

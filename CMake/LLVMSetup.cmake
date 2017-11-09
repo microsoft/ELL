@@ -65,7 +65,7 @@ if(LLVM_FOUND)
         list(APPEND LLVM_COMPILE_OPTIONS "-fvisibility-inlines-hidden")
     endif()
 
-elseif(MSVC) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
+elseif(WIN32) # Didn't find LLVM via find_package. If we're on Windows, try installing via NuGet
     set(LLVM_PACKAGE_NAME LLVMNativeWindowsLibs.x64)
     set(LLVM_PACKAGE_VERSION 3.9.1.2)
     set(LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})

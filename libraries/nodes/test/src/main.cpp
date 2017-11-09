@@ -26,55 +26,9 @@ int main()
 {
     try
     {
-        //
-        // Compute tests
-        //
-        TestL2NormNodeCompute();
-        TestAccumulatorNodeCompute();
-        TestDelayNodeCompute();
-        TestMovingAverageNodeCompute();
-        TestMovingVarianceNodeCompute();
-        TestUnaryOperationNodeCompute();
-        TestUnaryOperationNodeCompute1();
-        TestBinaryOperationNodeCompute();
-        TestLinearPredictorNodeCompute<double>();
-        TestLinearPredictorNodeCompute<float>();
-        TestDemultiplexerNodeCompute();
-        TestDTWDistanceNodeCompute();
-        TestSourceNodeCompute();
-        TestSinkNodeCompute();
-        TestEuclideanDistanceNodeCompute();
+        NodesTests();
 
-        TestBiasLayerNode();
-        TestBatchNormalizationLayerNode();
-        TestNeuralNetworkPredictorNode();
-
-        // Neural nets
-        TestNeuralNetworkPredictorNode();
-        TestActivationLayerNode();
-        TestBatchNormalizationLayerNode();
-        TestBiasLayerNode();
-        TestBinaryConvolutionalLayerNode();
-        TestConvolutionalLayerNode();
-        TestFullyConnectedLayerNode();
-        TestPoolingLayerNode();
-        TestScalingLayerNode();
-        TestSoftmaxLayerNode();
-
-        TestArchiveNeuralNetworkPredictorNode();
-        TestArchiveNeuralNetworkLayerNodes();
-
-        //
-        // Refine tests
-        //
-        TestMovingAverageNodeRefine();
-        TestLinearPredictorNodeRefine<double>();
-        TestLinearPredictorNodeRefine<float>();
-        TestSimpleForestPredictorNodeRefine();
-        TestDemultiplexerNodeRefine();
-        TestMatrixVectorProductRefine();
-        TestEuclideanDistanceNodeRefine();
-        TestProtoNNPredictorNode();
+        NeuralNetworkLayerNodesTests();
     }
     catch (const utilities::Exception& exception)
     {

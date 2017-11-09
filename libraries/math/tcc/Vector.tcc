@@ -148,7 +148,7 @@ namespace math
     }
     //
     // TransformedConstVectorReference
-    // 
+    //
 
     template <typename ElementType, VectorOrientation orientation, typename TransformationType>
     TransformedConstVectorReference<ElementType, orientation, TransformationType>::TransformedConstVectorReference(ConstVectorReference<ElementType, orientation> vector, TransformationType transformation)
@@ -164,7 +164,7 @@ namespace math
 
     //
     // VectorReference
-    // 
+    //
 
     template <typename ElementType, VectorOrientation orientation>
     ElementType& VectorReference<ElementType, orientation>::operator[](size_t index)

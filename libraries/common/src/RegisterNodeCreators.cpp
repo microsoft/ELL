@@ -20,7 +20,7 @@
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
 #include "ForestPredictorNode.h"
-#include "L2NormNode.h"
+#include "L2NormSquaredNode.h"
 #include "LinearPredictorNode.h"
 #include "MovingAverageNode.h"
 #include "MovingVarianceNode.h"
@@ -33,7 +33,7 @@ namespace ell
 namespace common
 {
     void RegisterNodeCreators(model::ModelBuilder& builder)
-    {        
+    {
         builder.RegisterNodeCreator<model::InputNode<bool>, size_t>();
         builder.RegisterNodeCreator<model::InputNode<int>, size_t>();
         builder.RegisterNodeCreator<model::InputNode<double>, size_t>();
@@ -70,7 +70,7 @@ namespace common
         builder.RegisterNodeCreator<nodes::DotProductNode<int>, const model::PortElements<int>&, const model::PortElements<int>&>();
         builder.RegisterNodeCreator<nodes::DotProductNode<double>, const model::PortElements<double>&, const model::PortElements<double>&>();
 
-        builder.RegisterNodeCreator<nodes::L2NormNode<double>, const model::PortElements<double>&>();
+        builder.RegisterNodeCreator<nodes::L2NormSquaredNode<double>, const model::PortElements<double>&>();
 
         builder.RegisterNodeCreator<nodes::MovingAverageNode<double>, const model::PortElements<double>&, size_t>();
         builder.RegisterNodeCreator<nodes::MovingVarianceNode<double>, const model::PortElements<double>&, size_t>();

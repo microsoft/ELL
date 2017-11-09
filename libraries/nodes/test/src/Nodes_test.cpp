@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     Nodes_test.cpp (nodes_test)
-//  Authors:  Chuck Jacobs
+//  Authors:  Chuck Jacobs, Byron Changuion, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -19,7 +19,7 @@
 #include "DemultiplexerNode.h"
 #include "SquaredEuclideanDistanceNode.h"
 #include "ForestPredictorNode.h"
-#include "L2NormNode.h"
+#include "L2NormSquaredNode.h"
 #include "LinearPredictorNode.h"
 #include "MatrixVectorProductNode.h"
 #include "MovingAverageNode.h"
@@ -70,13 +70,18 @@ size_t GetShapeSize(const math::IntegerTriplet& shape)
     return shape[0] * shape[1] * shape[2];
 }
 
-double VectorMagnitude(const std::vector<double>& vec)
+double VectorMagnitudeSquared(const std::vector<double>& vec)
 {
     double sumSq = 0.0;
     for (const auto& x : vec)
         sumSq += (x * x);
 
-    return std::sqrt(sumSq);
+    return sumSq;
+}
+
+double VectorMagnitude(const std::vector<double>& vec)
+{
+    return std::sqrt(VectorMagnitudeSquared(vec));
 }
 
 double VectorMean(const std::vector<double>& vec)
@@ -106,28 +111,28 @@ double VectorVariance(const std::vector<double>& vec, double mean)
 // Test compute functions
 //
 
-void TestL2NormNodeCompute()
+static void TestL2NormSquaredNodeCompute()
 {
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::L2NormNode<double>>(inputNode->output);
+    auto outputNode = model.AddNode<nodes::L2NormSquaredNode<double>>(inputNode->output);
 
     for (int index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
-        double expectedOutput = VectorMagnitude(inputValue);
+        double expectedOutput = VectorMagnitudeSquared(inputValue);
 
         inputNode->SetInput(inputValue);
         std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
 
-        testing::ProcessTest("Testing L2NormNode output size", outputVec.size() == 1);
-        testing::ProcessTest("Testing L2NormNode compute", testing::IsEqual(outputVec[0], expectedOutput));
+        testing::ProcessTest("Testing L2NormSquaredNode output size", outputVec.size() == 1);
+        testing::ProcessTest("Testing L2NormSquaredNode compute", testing::IsEqual(outputVec[0], expectedOutput));
     }
 }
 
-void TestAccumulatorNodeCompute()
+static void TestAccumulatorNodeCompute()
 {
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
@@ -151,7 +156,7 @@ void TestAccumulatorNodeCompute()
     }
 }
 
-void TestDelayNodeCompute()
+static void TestDelayNodeCompute()
 {
     const int delay = 4;
 
@@ -175,7 +180,7 @@ void TestDelayNodeCompute()
     }
 }
 
-void TestMovingAverageNodeCompute()
+static void TestMovingAverageNodeCompute()
 {
     const int windowSize = 4;
 
@@ -196,7 +201,7 @@ void TestMovingAverageNodeCompute()
     testing::ProcessTest("Testing MovingAverageNode compute", testing::IsEqual(outputVec[0], expectedOutput));
 }
 
-void TestMovingVarianceNodeCompute()
+static void TestMovingVarianceNodeCompute()
 {
     const int windowSize = 4;
 
@@ -218,49 +223,65 @@ void TestMovingVarianceNodeCompute()
     testing::ProcessTest("Testing MovingVarianceNode compute", testing::IsEqual(outputVec[0], expectedOutput));
 }
 
-void TestUnaryOperationNodeCompute()
+static void TestUnaryOperationNodeCompute(emitters::UnaryOperationType op, double (*expectedTransform)(double))
 {
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, emitters::UnaryOperationType::sqrt);
+    auto outputNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, op);
 
-    for (int index = 0; index < data.size(); ++index)
+    for (size_t index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
 
         inputNode->SetInput(inputValue);
         std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
 
-        for (int d = 0; d < inputValue.size(); ++d)
+        for (size_t d = 0; d < inputValue.size(); ++d)
         {
-            auto expectedOutput = std::sqrt(inputValue[d]);
-            testing::ProcessTest("Testing UnaryOperationNode compute", testing::IsEqual(outputVec[d], expectedOutput));
+            auto expectedOutput = expectedTransform(inputValue[d]);
+            testing::ProcessTest("Testing UnaryOperationNode compute for " + UnaryOperations::to_string(op),
+                                 testing::IsEqual(outputVec[d], expectedOutput));
         }
     }
 }
 
-void TestUnaryOperationNodeCompute1()
+static void TestUnaryOperationNodeCompute(emitters::UnaryOperationType op, bool (*expectedTransform)(bool))
 {
-    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
+    std::vector<std::vector<bool>> data = { { true }, { false } };
+
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
-    auto outputNode = model.AddNode<nodes::UnaryOperationNode<double>>(inputNode->output, emitters::UnaryOperationType::exp);
-    for (int index = 0; index < data.size(); ++index)
+    auto inputNode = model.AddNode<model::InputNode<bool>>(data[0].size());
+    auto outputNode = model.AddNode<nodes::UnaryOperationNode<bool>>(inputNode->output, op);
+
+    for (size_t index = 0; index < data.size(); ++index)
     {
         auto inputValue = data[index];
+
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
-        for (int d = 0; d < inputValue.size(); ++d)
+        std::vector<bool> outputVec = model.ComputeOutput(outputNode->output);
+
+        for (size_t d = 0; d < inputValue.size(); ++d)
         {
-            auto expectedOutput = std::exp(inputValue[d]);
-            testing::ProcessTest("Testing UnaryOperationNode compute", testing::IsEqual(outputVec[d], expectedOutput));
+            auto expectedOutput = expectedTransform(inputValue[d]);
+            testing::ProcessTest("Testing UnaryOperationNode compute for " + UnaryOperations::to_string(op),
+                                 testing::IsEqual(outputVec[d], expectedOutput));
         }
     }
 }
 
-void TestBinaryOperationNodeCompute()
+static void TestUnaryOperationNodeCompute()
+{
+    TestUnaryOperationNodeCompute(emitters::UnaryOperationType::exp, std::exp);
+    TestUnaryOperationNodeCompute(emitters::UnaryOperationType::log, std::log);
+    TestUnaryOperationNodeCompute(emitters::UnaryOperationType::sqrt, std::sqrt);
+    TestUnaryOperationNodeCompute(emitters::UnaryOperationType::logicalNot, [](bool b) { return !b; });
+    TestUnaryOperationNodeCompute(emitters::UnaryOperationType::square, [](double d) { return d*d; });
+    TestUnaryOperationNodeCompute(emitters::UnaryOperationType::tanh, std::tanh);
+}
+
+static void TestBinaryOperationNodeCompute()
 {
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
@@ -283,7 +304,29 @@ void TestBinaryOperationNodeCompute()
     }
 }
 
-void TestDemultiplexerNodeCompute()
+template <typename ElementType>
+static void TestLinearPredictorNodeCompute()
+{
+    const int dim = 5;
+    math::ColumnVector<ElementType> weights({ 1, 2, 3, 4, 5 });
+    ElementType bias = 1.5f;
+
+    predictors::LinearPredictor<ElementType> predictor(weights, bias);
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(dim);
+    auto predictorNode = model.AddNode<nodes::LinearPredictorNode<ElementType>>(inputNode->output, predictor);
+    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(predictorNode->output);
+
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+
+    std::vector<ElementType> input{ 1.0, 2.0, 1.0, -1.0, 0.5 };
+    auto result = map.Compute<ElementType>(input);
+
+    testing::ProcessTest("TestLinearPredictorNodeCompute", testing::IsEqual(result[0], static_cast<ElementType>(8.0)));
+}
+
+static void TestDemultiplexerNodeCompute()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
@@ -356,7 +399,7 @@ void TestSourceNodeCompute()
     }
 }
 
-void TestSinkNodeCompute()
+static void TestSinkNodeCompute()
 {
     const std::vector<std::vector<double>> data = { { 12 }, { 10 }, { 8 }, { 6 }, { 4 }, { 2 } };
     std::vector<std::vector<double>> results;
@@ -375,35 +418,57 @@ void TestSinkNodeCompute()
     testing::ProcessTest("Testing SinkNode output", testing::IsEqual(data, results));
 }
 
-void TestEuclideanDistanceNodeCompute()
+static void TestSquaredEuclideanDistanceNodeCompute()
 {
-	math::RowMatrix<double> v(2, 3);
-	v(0, 0) = 1.0;
-	v(0, 1) = 0.2;
-	v(0, 2) = 0.3;
-	v(1, 0) = 0.3;
-	v(1, 1) = 0.7;
-	v(1, 2) = 0.5;
+    math::RowMatrix<double> m{
+        {1.0, 0.2, 0.3},
+        {0.3, 0.7, 0.5}
+    };
 
-	std::vector<double> input = { 1, 2, 3 };
-	std::vector<double> output = { 10.53, 8.43 };
+    std::vector<double> input = { 1, 2, 3 };
+    std::vector<double> output = { 10.53, 8.43 };
 
-	model::Model model;
-	auto inputNode = model.AddNode<model::InputNode<double>>(input.size());
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(input.size());
 
-	inputNode->SetInput(input);
+    inputNode->SetInput(input);
 
-	auto euclideanDistanceNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::columnMajor>>(inputNode->output, v);
-	auto computeOutput = model.ComputeOutput(euclideanDistanceNode->output);
+    auto sqEuclideanDistanceNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
+    auto computeOutput = model.ComputeOutput(sqEuclideanDistanceNode->output);
 
-	testing::ProcessTest("Testing Euclidean distance node compute", testing::IsEqual(output, computeOutput));
+    testing::ProcessTest("Testing squared Euclidean distance node compute", testing::IsEqual(output, computeOutput));
 }
 
 //
 // Node refinements
 //
 
-void TestMovingAverageNodeRefine()
+static void TestL2NormSquaredNodeRefine()
+{
+    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
+    auto l2NormSquaredNode = model.AddNode<nodes::L2NormSquaredNode<double>>(inputNode->output);
+
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ l2NormSquaredNode->output });
+    std::cout << "Original L2NormSquaredNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
+    for (const auto& inputValue : data)
+    {
+        inputNode->SetInput(inputValue);
+        auto outputVec1 = model.ComputeOutput(l2NormSquaredNode->output);
+        refinedInputNode->SetInput(inputValue);
+        auto outputVec2 = refinedModel.ComputeOutput(refinedOutputElements);
+
+        testing::ProcessTest("Testing L2NormSquaredNode refine", testing::IsEqual(outputVec1, outputVec2));
+    }
+}
+
+static void TestMovingAverageNodeRefine()
 {
     const int windowSize = 4;
 
@@ -418,7 +483,7 @@ void TestMovingAverageNodeRefine()
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ meanNode->output });
-    std::cout << "Original nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
+    std::cout << "Original MovingAverageNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
     for (const auto& inputValue : data)
     {
         inputNode->SetInput(inputValue);
@@ -430,7 +495,7 @@ void TestMovingAverageNodeRefine()
     }
 }
 
-void TestSimpleForestPredictorNodeRefine()
+static void TestSimpleForestPredictorNodeRefine()
 {
     // define some abbreviations
     using SplitAction = predictors::SimpleForestPredictor::SplitAction;
@@ -475,7 +540,64 @@ void TestSimpleForestPredictorNodeRefine()
     testing::ProcessTest("Testing SimpleForestPredictorNode refine (edgeIndicatorVector)", testing::IsEqual(edgeIndicatorVectorValue, refinedEdgeIndicatorVectorValue));
 }
 
-void TestDemultiplexerNodeRefine()
+static void TestSquaredEuclideanDistanceNodeRefine()
+{
+    math::RowMatrix<double> m{
+      {1.0, 0.2, 0.3},
+      {0.3, 0.7, 0.5}
+    };
+
+    std::vector<double> input = { 1, 2, 3 };
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(input.size());
+    auto sqEuclideanDistanceNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto refinedModel = transformer.RefineModel(model, context);
+    auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto refinedOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ sqEuclideanDistanceNode->output });
+    std::cout << "Original SquaredEuclideanDistanceNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
+
+    inputNode->SetInput(input);
+    auto outputVec1 = model.ComputeOutput(sqEuclideanDistanceNode->output);
+    refinedInputNode->SetInput(input);
+    auto outputVec2 = refinedModel.ComputeOutput(refinedOutputElements);
+
+    testing::ProcessTest("Testing SquaredEuclideanDistanceNode refine", testing::IsEqual(outputVec1, outputVec2));
+}
+
+template <typename ElementType>
+static void TestLinearPredictorNodeRefine()
+{
+    // make a linear predictor
+    size_t dim = 3;
+    predictors::LinearPredictor<ElementType> predictor(dim);
+    predictor.GetBias() = 2.0;
+    predictor.GetWeights() = math::ColumnVector<ElementType>{ 3.0, 4.0, 5.0 };
+
+    // make a model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(3);
+    auto linearPredictorNode = model.AddNode<nodes::LinearPredictorNode<ElementType>>(inputNode->output, predictor);
+
+    // refine the model
+    model::TransformContext context;
+    model::ModelTransformer transformer;
+    auto newModel = transformer.RefineModel(model, context);
+
+    // check for equality
+    auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
+    auto newOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<ElementType>{ linearPredictorNode->output });
+    inputNode->SetInput({ 1.0, 1.0, 1.0 });
+    newInputNode->SetInput({ 1.0, 1.0, 1.0 });
+    auto modelOutputValue = model.ComputeOutput(linearPredictorNode->output)[0];
+    auto newOutputValue = newModel.ComputeOutput(newOutputElements)[0];
+
+    testing::ProcessTest("Testing LinearPredictorNode refine", testing::IsEqual(modelOutputValue, newOutputValue));
+}
+
+static void TestDemultiplexerNodeRefine()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
@@ -486,7 +608,7 @@ void TestDemultiplexerNodeRefine()
     model::TransformContext context;
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
-    std::cout << "Original nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
+    std::cout << "Original DemultiplexerNode nodes: " << model.Size() << ", refined: " << refinedModel.Size() << std::endl;
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
     auto newSelectorNode = transformer.GetCorrespondingInputNode(selectorNode);
     auto newMuxNodeElements = transformer.GetCorrespondingOutputs(muxNode->output);
@@ -508,7 +630,7 @@ void TestDemultiplexerNodeRefine()
     testing::ProcessTest("Testing DemultiplexerNode refine", testing::IsEqual(outputVec, newOutputVec));
 }
 
-void TestDTWDistanceNodeCompute()
+static void TestDTWDistanceNodeCompute()
 {
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
@@ -530,7 +652,7 @@ void TestDTWDistanceNodeCompute()
     }
 }
 
-void TestMatrixVectorProductRefine()
+static void TestMatrixVectorProductRefine()
 {
     math::ColumnMatrix<double> w(2, 3);
     w(0, 0) = 1.0;
@@ -563,7 +685,7 @@ void TestMatrixVectorProductRefine()
     testing::ProcessTest("Testing matrix vector product node refine", testing::IsEqual(refinedOutput, computeOutput));
 }
 
-void TestEuclideanDistanceNodeRefine()
+static void TestEuclideanDistanceNodeRefine()
 {
     math::RowMatrix<double> v(2, 3);
     v(0, 0) = 1.0;
@@ -596,7 +718,7 @@ void TestEuclideanDistanceNodeRefine()
     testing::ProcessTest("Testing Euclidean distance node refine", testing::IsEqual(refinedOutput, computeOutput));
 }
 
-void TestProtoNNPredictorNode()
+static void TestProtoNNPredictorNode()
 {
     using ExampleType = predictors::ProtoNNPredictor::DataVectorType;
 
@@ -671,4 +793,39 @@ void TestProtoNNPredictorNode()
     auto computeScoreOutput = model.ComputeOutput(protonnPredictorNode->outputScores);
 
     testing::ProcessTest("Testing protonnPredictor node refine", testing::IsEqual(refinedScoresOutput, computeScoreOutput));
+}
+
+void NodesTests()
+{
+    //
+    // Compute tests
+    //
+    TestAccumulatorNodeCompute();
+    TestBinaryOperationNodeCompute();
+    TestDelayNodeCompute();
+    TestDemultiplexerNodeCompute();
+    TestDTWDistanceNodeCompute();
+    TestL2NormSquaredNodeCompute();
+    TestLinearPredictorNodeCompute<double>();
+    TestLinearPredictorNodeCompute<float>();
+    TestMovingAverageNodeCompute();
+    TestMovingVarianceNodeCompute();
+    TestSinkNodeCompute();
+    TestSourceNodeCompute();
+    TestSquaredEuclideanDistanceNodeCompute();
+    TestUnaryOperationNodeCompute();
+
+    //
+    // Refine tests
+    //
+    TestL2NormSquaredNodeRefine();
+    TestLinearPredictorNodeRefine<double>();
+    TestLinearPredictorNodeRefine<float>();
+    TestMovingAverageNodeRefine();
+    TestSimpleForestPredictorNodeRefine();
+    TestDemultiplexerNodeRefine();
+    TestMatrixVectorProductRefine();
+    TestEuclideanDistanceNodeRefine();
+    TestProtoNNPredictorNode();
+    TestSquaredEuclideanDistanceNodeRefine();
 }

@@ -97,7 +97,8 @@ namespace emitters
         log, // real only
         sqrt, // real only
         logicalNot, // bool only
-        tanh // real only
+        tanh, // real only
+        square // real only
     };
 
     ///<summary> An enumeration of strongly TYPED operations on numbers </summary>
