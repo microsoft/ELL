@@ -919,7 +919,7 @@ class LayerFactory():
                 return ElementTimesLayer(cntkLayer)
             elif (cntkLayer.op_name == 'LeakyReLU'):
                 return LeakyReLULayer(cntkLayer)
-            elif (cntkLayer.op_name == 'Linear'):
+            elif (cntkLayer.op_name == 'linear'): # Note: this op_name is lowercase
                 return LinearLayer(cntkLayer)
             elif (cntkLayer.op_name == 'MaxPooling'):
                 return MaxPoolingLayer(cntkLayer)

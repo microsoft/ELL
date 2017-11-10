@@ -52,7 +52,7 @@ curl --location -o model.cntk https://www.cntk.ai/Models/Caffe_Converted/VGG16_I
 Next, run the importer script, making sure to provide the CNTK model as a command line parameter.
 
 ```shell
-python <ELL-root>/tools/importers/cntk/cntk_import.py model.cntk
+python <ELL-root>/tools/importers/CNTK/cntk_import.py model.cntk
 ```
 
 You should see some output like this as the model is being imported.
@@ -63,37 +63,49 @@ Selected CPU as the process wide default device.
 
 Finished loading.
 Pre-processing...
-Will not process ReduceElements - skipping this layer as irrelevant.
-Will not process ClassificationError - skipping this layer as irrelevant.
-Will not process ReduceElements - skipping this layer as irrelevant.
-Will not process CrossEntropyWithSoftmax - skipping this layer as irrelevant.
-Will not process Reshape - skipping this layer as irrelevant.
-Will not process Combine - skipping this layer as irrelevant.
-Minus :  224x224x3  ->  226x226x3 | input padding 0  output padding 1
-Convolution(LeakyReLU) :  226x226x3  ->  224x224x16 | input padding 1  output padding 0
-BatchNormalization :  224x224x16  ->  224x224x16 | input padding 0  output padding 0
-MaxPooling :  224x224x16  ->  114x114x16 | input padding 0  output padding 1
-Convolution(LeakyReLU) :  114x114x16  ->  112x112x64 | input padding 1  output padding 0
-BatchNormalization :  112x112x64  ->  112x112x64 | input padding 0  output padding 0
-MaxPooling :  112x112x64  ->  58x58x64 | input padding 0  output padding 1
-Convolution(LeakyReLU) :  58x58x64  ->  56x56x64 | input padding 1  output padding 0
-BatchNormalization :  56x56x64  ->  56x56x64 | input padding 0  output padding 0
-MaxPooling :  56x56x64  ->  30x30x64 | input padding 0  output padding 1
-Convolution(LeakyReLU) :  30x30x64  ->  28x28x128 | input padding 1  output padding 0
-BatchNormalization :  28x28x128  ->  28x28x128 | input padding 0  output padding 0
-MaxPooling :  28x28x128  ->  16x16x128 | input padding 0  output padding 1
-Convolution(LeakyReLU) :  16x16x128  ->  14x14x256 | input padding 1  output padding 0
-BatchNormalization :  14x14x256  ->  14x14x256 | input padding 0  output padding 0
-MaxPooling :  14x14x256  ->  9x9x256 | input padding 0  output padding 1
-Convolution(LeakyReLU) :  9x9x256  ->  7x7x512 | input padding 1  output padding 0
-BatchNormalization :  7x7x512  ->  7x7x512 | input padding 0  output padding 0
-MaxPooling :  7x7x512  ->  6x6x512 | input padding 0  output padding 1
-Convolution(LeakyReLU) :  6x6x512  ->  4x4x1024 | input padding 1  output padding 0
-BatchNormalization :  4x4x1024  ->  4x4x1024 | input padding 0  output padding 0
-Convolution :  4x4x1024  ->  4x4x1000 | input padding 0  output padding 0
-AveragePooling :  4x4x1000  ->  1x1x1000 | input padding 0  output padding 0
-Softmax :  1x1x1000  ->  1x1x1 | input padding 0  output padding 0
 
+Will not process Dropout - skipping this layer as irrelevant.
+
+Will not process Dropout - skipping this layer as irrelevant.
+
+Will not process Combine - skipping this layer as irrelevant.
+Convolution : 226x226x3 -> 224x224x64 | input padding 1 output padding 0
+ReLU : 224x224x64 -> 226x226x64 | input padding 0 output padding 1
+Convolution : 226x226x64 -> 224x224x64 | input padding 1 output padding 0
+ReLU : 224x224x64 -> 224x224x64 | input padding 0 output padding 0
+MaxPooling : 224x224x64 -> 114x114x64 | input padding 0 output padding 1
+Convolution : 114x114x64 -> 112x112x128 | input padding 1 output padding 0
+ReLU : 112x112x128 -> 114x114x128 | input padding 0 output padding 1
+Convolution : 114x114x128 -> 112x112x128 | input padding 1 output padding 0
+ReLU : 112x112x128 -> 112x112x128 | input padding 0 output padding 0
+MaxPooling : 112x112x128 -> 58x58x128 | input padding 0 output padding 1
+Convolution : 58x58x128 -> 56x56x256 | input padding 1 output padding 0
+ReLU : 56x56x256 -> 58x58x256 | input padding 0 output padding 1
+Convolution : 58x58x256 -> 56x56x256 | input padding 1 output padding 0
+ReLU : 56x56x256 -> 58x58x256 | input padding 0 output padding 1
+Convolution : 58x58x256 -> 56x56x256 | input padding 1 output padding 0
+ReLU : 56x56x256 -> 56x56x256 | input padding 0 output padding 0
+MaxPooling : 56x56x256 -> 30x30x256 | input padding 0 output padding 1
+Convolution : 30x30x256 -> 28x28x512 | input padding 1 output padding 0
+ReLU : 28x28x512 -> 30x30x512 | input padding 0 output padding 1
+Convolution : 30x30x512 -> 28x28x512 | input padding 1 output padding 0
+ReLU : 28x28x512 -> 30x30x512 | input padding 0 output padding 1
+Convolution : 30x30x512 -> 28x28x512 | input padding 1 output padding 0
+ReLU : 28x28x512 -> 28x28x512 | input padding 0 output padding 0
+MaxPooling : 28x28x512 -> 16x16x512 | input padding 0 output padding 1
+Convolution : 16x16x512 -> 14x14x512 | input padding 1 output padding 0
+ReLU : 14x14x512 -> 16x16x512 | input padding 0 output padding 1
+Convolution : 16x16x512 -> 14x14x512 | input padding 1 output padding 0
+ReLU : 14x14x512 -> 16x16x512 | input padding 0 output padding 1
+Convolution : 16x16x512 -> 14x14x512 | input padding 1 output padding 0
+ReLU : 14x14x512 -> 14x14x512 | input padding 0 output padding 0
+MaxPooling : 14x14x512 -> 7x7x512 | input padding 0 output padding 0
+Linear : 7x7x512 -> 1x1x4096 | input padding 0 output padding 0
+ReLU : 1x1x4096 -> 1x1x4096 | input padding 0 output padding 0
+Linear : 1x1x4096 -> 1x1x4096 | input padding 0 output padding 0
+ReLU : 1x1x4096 -> 1x1x4096 | input padding 0 output padding 0
+Linear : 1x1x4096 -> 1x1x1000 | input padding 0 output padding 0
+Softmax : 1x1x1000 -> 1x1x1000 | input padding 0 output padding 0
 Finished pre-processing.
 Saving model file: 'model.ell'
 ```
