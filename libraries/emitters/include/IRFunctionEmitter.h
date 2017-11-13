@@ -649,6 +649,13 @@ namespace emitters
         /// <returns> Pointer to the stored value. </returns>
         llvm::Value* Store(llvm::Value* pPointer, llvm::Value* pValue);
 
+        /// <summary> Emit instruction to initialize a 0 value into the pointer location. </summary>
+        ///
+        /// <param name="pPointer"> Pointer to the adress where the value is being stored. </param>
+        ///
+        /// <returns> Pointer to the stored value. </returns>
+        llvm::Value* StoreZero(llvm::Value* pPointer);
+
         /// <summary> Emit a binary operation on to values, A and B, which replaces the value in B with the result. </summary>
         ///
         /// <param name="pPointer"> Pointer to the address of the left operator argument. </param>

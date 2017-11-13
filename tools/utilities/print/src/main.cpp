@@ -83,10 +83,10 @@ int main(int argc, char* argv[])
             map = common::LoadMap(modelLoadArguments.inputModelFile);
         }
 
-        if (printArguments.refine)
+        if (printArguments.refine > 0)
         {
             model::TransformContext context;
-            map.Refine(context, 100);
+            map.Refine(context, printArguments.refine);
         }
 
         // print model
@@ -94,11 +94,11 @@ int main(int argc, char* argv[])
         auto lowerOutputFormat = ToLowercase(printArguments.outputFormat);
         if (lowerOutputFormat == "dgml" || lowerOutputFormat == "dot")
         {
-            PrintGraph(map.GetModel(), lowerOutputFormat, out);
+            PrintGraph(map.GetModel(), lowerOutputFormat, out, printArguments.includeNodeId);
         }
         else
         {
-            PrintModel(map.GetModel(), out);
+            PrintModel(map.GetModel(), out, printArguments.includeNodeId);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

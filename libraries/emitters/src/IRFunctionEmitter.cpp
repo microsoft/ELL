@@ -659,6 +659,12 @@ namespace emitters
         return _pEmitter->Store(pPointer, pValue);
     }
 
+    llvm::Value* IRFunctionEmitter::StoreZero(llvm::Value* pPointer)
+    {
+        auto type = pPointer->getType();
+        return Store(pPointer, llvm::Constant::getNullValue(type));
+    }
+
     llvm::Value* IRFunctionEmitter::OperationAndUpdate(llvm::Value* pPointer, TypedOperator operation, llvm::Value* pValue)
     {
         llvm::Value* pNextVal = Operator(operation, Load(pPointer), pValue);
@@ -956,7 +962,7 @@ namespace emitters
 
     void IRFunctionEmitter::DotProductFloat(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
-        Store(pDestination, Literal(0.0));
+        StoreZero(pDestination);
         VectorOperator(TypedOperator::multiplyFloat, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
             OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
         });
@@ -964,7 +970,7 @@ namespace emitters
 
     void IRFunctionEmitter::DotProductFloat(llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
-        Store(pDestination, Literal(0.0));
+        StoreZero(pDestination);
         VectorOperator(TypedOperator::multiplyFloat, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
             OperationAndUpdate(pDestination, TypedOperator::addFloat, pValue);
         });
@@ -972,14 +978,14 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue)
     {
-        llvm::Value* pTotal = Variable(VariableType::Int32);
+        llvm::Value* pTotal = Variable(VariableType::Double);
         DotProductFloat(size, pLeftValue, pRightValue, pTotal);
         return pTotal;
     }
 
     void IRFunctionEmitter::DotProduct(int size, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
-        Store(pDestination, Literal(0));
+        StoreZero(pDestination);
         VectorOperator(TypedOperator::multiply, size, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
             OperationAndUpdate(pDestination, TypedOperator::add, pValue);
         });
@@ -987,7 +993,7 @@ namespace emitters
 
     void IRFunctionEmitter::DotProduct(llvm::Value* pSize, llvm::Value* pLeftValue, llvm::Value* pRightValue, llvm::Value* pDestination)
     {
-        Store(pDestination, Literal(0));
+        StoreZero(pDestination);
         VectorOperator(TypedOperator::multiply, pSize, pLeftValue, pRightValue, [&pDestination, this](llvm::Value* i, llvm::Value* pValue) {
             OperationAndUpdate(pDestination, TypedOperator::add, pValue);
         });

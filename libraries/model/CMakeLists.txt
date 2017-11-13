@@ -152,6 +152,7 @@ set (compiler_test_include
 )
 
 set (compiler_test_tcc
+    test/tcc/CompilableNodesTest.tcc
     test/tcc/CompilerTest.tcc
     test/tcc/ModelMaker.tcc
     test/tcc/ModelTestUtilities.tcc

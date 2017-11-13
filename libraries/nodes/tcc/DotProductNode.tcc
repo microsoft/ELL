@@ -91,7 +91,7 @@ namespace nodes
     {
         llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        function.Store(pResult, function.Literal(0.0));
+        function.Store(pResult, function.Literal<ValueType>(0.0));
         for (size_t i = 0; i < input1.Size(); ++i)
         {
             llvm::Value* pLeftValue = compiler.LoadPortElementVariable(input1.GetInputElement(i));

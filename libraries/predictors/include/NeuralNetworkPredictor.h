@@ -95,6 +95,11 @@ namespace predictors
         /// <returns> The underlying vector of layers. </returns>
         void SetLayers(Layers&& layers) { _layers = std::move(layers); } // STYLE discrepancy
 
+        /// <summary> Removes layers from the end of the neural network.  </summary>
+        ///
+        /// <param name="numberToRemove"> The number of layers to remove from the end of the neural network. </param>
+        void RemoveLastLayers(size_t numberToRemove = 1);
+
         /// <summary> Gets the dimension of the input layer. </summary>
         ///
         /// <returns> The dimension. </returns>

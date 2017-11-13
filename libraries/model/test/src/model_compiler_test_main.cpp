@@ -24,8 +24,10 @@ void TestIRCompiler()
 {
     TestFloatNode();
     TestMultipleOutputNodes();
-    TestCompilableDotProductNode2(3);
-    TestCompilableDotProductNode2(4);
+    TestCompilableDotProductNode2<float>(3);
+    TestCompilableDotProductNode2<double>(3);
+    TestCompilableDotProductNode2<float>(4);
+    TestCompilableDotProductNode2<double>(4);
 
     TestCompileIsEqual();
     TestSimpleMap(false);
@@ -84,14 +86,16 @@ void TestIRCompiler()
     // TestReceptiveFieldMatrixNode(2, false); // old (slow) version -- Fails
     TestCompilableAccumulatorNodeFunction();
     TestCompilableSourceNode(false);
-    // TestCompilableSourceNode(true); // Occassionally fails
+    // TestCompilableSourceNode(true); // Occasionally fails
     TestCompilableSinkNode(false);
     TestCompilableSinkNode(true);
     TestCompilableAccumulatorNodeFunction();
 
     TestPerformanceCounters();
-    TestCompilableDotProductNode2(3); // uses IR
-    TestCompilableDotProductNode2(4); // uses IR
+    TestCompilableDotProductNode2<float>(3); // uses IR
+    TestCompilableDotProductNode2<double>(3); // uses IR
+    TestCompilableDotProductNode2<float>(4); // uses IR
+    TestCompilableDotProductNode2<double>(4); // uses IR
 
     //
     // Neural net nodes

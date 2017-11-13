@@ -37,6 +37,7 @@ void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape);
 void TestCompilableAccumulatorNodeFunction();
 void TestCompilableSourceNode(bool runJit);
 void TestCompilableSinkNode(bool runJit);
+template <typename ElementType>
 void TestCompilableDotProductNode2(int dimension);
 void TestFloatNode();
 void TestMultipleOutputNodes();
@@ -79,3 +80,5 @@ void TestMeanPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, 
 void TestScalingLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestSoftmaxLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels);
+
+#include "../tcc/CompilableNodesTest.tcc"

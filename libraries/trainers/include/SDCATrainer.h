@@ -76,7 +76,7 @@ namespace trainers
         /// <summary> Gets information on the trained predictor. </summary>
         ///
         /// <returns> Information on the trained predictor. </returns>
-        double GetPredictorInfo() const { return _predictorInfo; }
+        SDCAPredictorInfo GetPredictorInfo() const { return _predictorInfo; }
 
     private:
         struct TrainerMetadata

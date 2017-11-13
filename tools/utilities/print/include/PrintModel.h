@@ -16,5 +16,5 @@
 
 namespace ell
 {
-void PrintModel(const model::Model& model, std::ostream& out);
+void PrintModel(const model::Model& model, std::ostream& out, bool includeNodeId);
 }

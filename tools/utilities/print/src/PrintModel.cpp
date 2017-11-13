@@ -39,12 +39,17 @@ void PrintLayerParameters(std::ostream& out, std::shared_ptr<ell::predictors::ne
     }
 }
 
-void PrintNode(const model::Node& node, std::ostream& out)
+void PrintNode(const model::Node& node, std::ostream& out, bool includeNodeId)
 {
     bool isFirstInputPort = true;
     auto nodeType = node.GetRuntimeTypeName();
+    std::string label = nodeType;
+    if (includeNodeId)
+    {
+        label.insert(0, "<id:" + to_string(node.GetId())  + ">");
+    }
     bool isInputNode = nodeType.find("InputNode") == 0;
-    out << nodeType << "(";
+    out << label << "(";
     if (isInputNode)
     {
         const auto& outputPort = node.GetOutputPorts()[0];
@@ -102,8 +107,8 @@ void PrintNode(const model::Node& node, std::ostream& out)
     }
 }
 
-void PrintModel(const model::Model& model, std::ostream& out)
+void PrintModel(const model::Model& model, std::ostream& out, bool includeNodeId)
 {
-    model.Visit([&out](const model::Node& node) { PrintNode(node, out); });
+    model.Visit([&out, includeNodeId](const model::Node& node) { PrintNode(node, out, includeNodeId); });
 }
 }

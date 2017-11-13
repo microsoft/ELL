@@ -711,6 +711,11 @@ void NeuralNetworkPredictorTest()
 
     output = neuralNetwork2.Predict(DataVectorType({ 1, 1 }));
     testing::ProcessTest("Testing NeuralNetworkPredictor from archive, Predict of XOR net for 1 1 ", Equals(output[0], 0.0));
+
+    // Remove the last 2 layers, (Dense and Bias)
+    neuralNetwork2.RemoveLastLayers(2);
+    output = neuralNetwork2.Predict(DataVectorType({ 0, 1 }));
+    testing::ProcessTest("Testing cut NeuralNetworkPredictor, predict for 0 1 ", Equals(output[0], 0.970072031) && Equals(output[1], 0.0) && Equals(output[2], 0.0));
 }
 
 template <typename ElementType>

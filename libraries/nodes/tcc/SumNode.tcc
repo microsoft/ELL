@@ -71,7 +71,7 @@ namespace nodes
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
-        function.Store(pOutput, function.Literal(0.0));
+        function.StoreZero(pOutput);
 
         const int size = input.Size();
         const int blockSize = 4;
@@ -173,7 +173,7 @@ namespace nodes
     {
         llvm::Value* pResult = compiler.EnsurePortEmitted(output);
 
-        function.Store(pResult, function.Literal(0.0));
+        function.StoreZero(pResult);
         for (size_t i = 0; i < input.Size(); ++i)
         {
             llvm::Value* pValue = compiler.LoadPortElementVariable(input.GetInputElement(i));

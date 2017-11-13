@@ -77,6 +77,11 @@ public:
     /// <returns> The predictor wrapped by this node </returns>
     const PredictorType& GetPredictor() const { return _predictor; }
 
+    /// <summary> Returns the underlying predictor </summary>
+    ///
+    /// <returns> The predictor wrapped by this node </returns>
+    PredictorType& GetPredictor() { return _predictor; }
+
     /// <summary> Gets the name of this type (for serialization). </summary>
     ///
     /// <returns> The name of this type. </returns>

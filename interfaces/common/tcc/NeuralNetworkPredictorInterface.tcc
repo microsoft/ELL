@@ -92,6 +92,12 @@ namespace predictors
     }
 
     template <typename ElementType>
+    void NeuralNetworkPredictor<ElementType>::RemoveLastLayers(size_t numLayersToRemove)
+    {
+        _predictor->RemoveLastLayers(numLayersToRemove);
+    }
+
+    template <typename ElementType>
     LayerShape NeuralNetworkPredictor<ElementType>::GetInputShape() const
     {
         auto shape = _predictor->GetInputShape();

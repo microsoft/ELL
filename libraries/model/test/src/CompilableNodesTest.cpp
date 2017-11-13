@@ -931,37 +931,6 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
     VerifyCompiledOutput(map, compiledMap, signal, "MatrixMatrixMultiplyNode");
 }
 
-void TestCompilableDotProductNode2(int dimension)
-{
-    model::Model model;
-    std::vector<double> constValue(dimension);
-    for (int index = 0; index < dimension; ++index)
-    {
-        constValue[index] = index + 0.5;
-    }
-    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
-    auto constantNode = model.AddNode<nodes::ConstantNode<double>>(constValue);
-    auto dotNode = model.AddNode<nodes::DotProductNode<double>>(inputNode->output, constantNode->output);
-    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", dotNode->output } });
-    model::IRMapCompiler compiler;
-    auto compiledMap = compiler.Compile(map);
-    PrintIR(compiledMap);
-
-    // compare output
-    std::vector<std::vector<double>> signal;
-    for (int index1 = 0; index1 < 8; ++index1)
-    {
-        std::vector<double> x;
-        for (int index2 = 0; index2 < dimension; ++index2)
-        {
-            x.push_back(index2);
-        }
-        signal.push_back(x);
-    }
-
-    VerifyCompiledOutput(map, compiledMap, signal, "DotProductNode");
-}
-
 class BinaryFunctionIRNode : public nodes::IRNode
 {
 public:

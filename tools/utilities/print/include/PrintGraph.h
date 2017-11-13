@@ -17,5 +17,5 @@
 namespace ell
 {
 void PrintGraph(const model::Model& model, const std::string& outputFormat,
-                std::ostream& out);
+                std::ostream& out, bool includeNodeId);
 }

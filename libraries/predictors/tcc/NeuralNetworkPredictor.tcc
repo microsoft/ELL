@@ -26,6 +26,20 @@ namespace predictors
     }
 
     template <typename ElementType>
+    void NeuralNetworkPredictor<ElementType>::RemoveLastLayers(size_t numberToRemove)
+    {
+        if (_layers.size() > numberToRemove)
+        {
+            _layers.resize(_layers.size() - numberToRemove);
+            _output.resize(_layers.back()->GetOutput().Size());
+        }
+        else
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::sizeMismatch, "RemoveLastLayers numberToRemove exceeds number of layers.");
+        }
+    }
+
+    template <typename ElementType>
     typename NeuralNetworkPredictor<ElementType>::Shape NeuralNetworkPredictor<ElementType>::GetInputShape() const
     {
         if (_inputLayer != nullptr)

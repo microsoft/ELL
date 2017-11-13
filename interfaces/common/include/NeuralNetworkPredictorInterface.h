@@ -44,6 +44,7 @@ namespace predictors
 
         NeuralNetworkPredictor(const std::vector<Layer*>& layers, ElementType scaleFactor=1.0f);
         std::vector<ElementType> Predict(const std::vector<ElementType>& input);
+        void RemoveLastLayers(size_t numLayersToRemove);
         LayerShape GetInputShape() const;
         LayerShape GetOutputShape() const;
 
