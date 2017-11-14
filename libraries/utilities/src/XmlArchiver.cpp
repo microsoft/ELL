@@ -86,6 +86,7 @@ namespace utilities
 
     void XmlArchiver::EndArchiveObject(const char* name, const IArchivable& value)
     {
+        unused(name);
         DecrementIndent();
         auto indent = GetCurrentIndent();
         auto typeName = XmlUtilities::EncodeTypeName(GetArchivedTypeName(value));
@@ -217,6 +218,7 @@ namespace utilities
 
     void XmlUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
+        unused(name);
         auto EncodedTypeName = XmlUtilities::EncodeTypeName(typeName);
         _tokenizer.MatchTokens({ "<", "/", EncodedTypeName, ">" });
     }
@@ -256,6 +258,7 @@ namespace utilities
 
     bool XmlUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
+        unused(typeName);
         // check for '</'
         auto token1 = _tokenizer.ReadNextToken();
         auto token2 = _tokenizer.ReadNextToken();
@@ -273,10 +276,12 @@ namespace utilities
 
     void XmlUnarchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
+        unused(typeName);
     }
 
     void XmlUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
+        unused(name, typeName);
         _tokenizer.MatchTokens({ "<", "/", "Array", ">" });
     }
 

@@ -9,6 +9,7 @@
 #include "JsonArchiver.h"
 #include "Archiver.h"
 #include "IArchivable.h"
+#include "Unused.h"
 
 #include <cassert>
 #include <cctype>
@@ -117,6 +118,7 @@ namespace utilities
 
     void JsonArchiver::ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array)
     {
+        unused(baseTypeName);
         FinishPreviousLine();
         auto indent = GetCurrentIndent();
         bool hasName = name != std::string("");
@@ -205,6 +207,7 @@ namespace utilities
     // IArchivable
     ArchivedObjectInfo JsonUnarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)
     {
+        unused(typeName);
         bool hasName = name != std::string("");
         if (hasName)
         {
@@ -260,6 +263,7 @@ namespace utilities
 
     void JsonUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
+        unused(typeName);
         bool hasName = name != std::string("");
         _tokenizer.MatchToken("}");
 
@@ -295,6 +299,7 @@ namespace utilities
 
     void JsonUnarchiver::BeginUnarchiveArray(const char* name, const std::string& typeName)
     {
+        unused(typeName);
         bool hasName = name != std::string("");
         if (hasName)
         {
@@ -306,6 +311,7 @@ namespace utilities
 
     bool JsonUnarchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
+        unused(typeName);
         auto maybeEndArray = _tokenizer.PeekNextToken();
         if (maybeEndArray == "]")
         {
@@ -319,6 +325,7 @@ namespace utilities
 
     void JsonUnarchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
+        unused(typeName);
         if (_tokenizer.PeekNextToken() == ",")
         {
             _tokenizer.ReadNextToken();
@@ -327,6 +334,7 @@ namespace utilities
 
     void JsonUnarchiver::EndUnarchiveArray(const char* name, const std::string& typeName)
     {
+        unused(typeName);
         bool hasName = name != std::string("");
         _tokenizer.MatchToken("]");
         // eat a comma if it exists

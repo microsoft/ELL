@@ -80,6 +80,12 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/private AND EXISTS ${CMAKE_SOURCE_DIR}/private/CMa
   add_subdirectory(private)
 endif()
 
+string(TOLOWER "${CMAKE_BUILD_TYPE}" lower_CMAKE_BUILD_TYPE)
+
+if(lower_CMAKE_BUILD_TYPE STREQUAL "debug")
+  add_definition(-DELL_DEBUG)
+endif()
+
 # Add SWIG-generated interfaces
 include(CommonInterfaces)
 add_subdirectory(interfaces)

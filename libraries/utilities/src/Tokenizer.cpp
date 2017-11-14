@@ -50,17 +50,18 @@ namespace utilities
         // eat whitespace and add first char
         while (IsValid())
         {
-            auto ch = GetNextCharacter();
-            if (ch == EOF)
+            auto result = GetNextCharacter();
+            if (result == EOF)
             {
                 _tokenStart = _currentPosition;
                 return token;
             }
-            else if (!std::isspace(ch))
+            auto ch = static_cast<char>(result);
+            if (!std::isspace(ch))
             {
-                token.push_back((char)ch);
-                bool isParsingString = _currentStringDelimiter != '\0';
-                bool isStringDelimiter = _stringDelimiters.find(ch) != std::string::npos;
+                token.push_back(ch);
+                auto isParsingString = _currentStringDelimiter != '\0';
+                auto isStringDelimiter = _stringDelimiters.find(ch) != std::string::npos;
                 if (isParsingString) // we're in the middle of parsing a string: probably because we just read in a quotation mark last time
                 {
                     if (isStringDelimiter)
@@ -98,11 +99,12 @@ namespace utilities
         bool prevEscaped = false;
         while (IsValid())
         {
-            auto ch = GetNextCharacter();
-            if (ch == EOF)
+            auto result = GetNextCharacter();
+            if (result == EOF)
             {
                 break;
             }
+            auto ch = static_cast<char>(result);
 
             if (_currentStringDelimiter != '\0') // we're in read-string mode
             {
@@ -122,7 +124,7 @@ namespace utilities
                 break;
             }
 
-            token.push_back((char)ch);
+            token.push_back(ch);
             prevEscaped = !prevEscaped && ch == escapeChar;
         }
 
@@ -199,7 +201,6 @@ namespace utilities
 
     bool Tokenizer::IsValid()
     {
-        bool inIsValid = (bool)_in;
         return (bool)_in || _textBuffer.size() > 0 || _peekedTokens.size() > 0;
     }
 

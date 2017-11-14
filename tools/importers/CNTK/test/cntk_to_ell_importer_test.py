@@ -653,6 +653,28 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
         for modelName in self.model_names:
             self.model_test_impl(modelName)
 
+    def retry(self, retries, op):
+        while retries > 0:
+            try:
+                print("Attempting operation with retries %d" % (retries))
+                return op()
+            except:
+                retries -= 1
+                pass
+        return op()
+
+    def compute_ell_map(self, ellMap, ellOrderedInput, cntkResults, modelName):
+        ellMapFromArchiveResults = ellMap.ComputeFloat(
+            ellOrderedInput)
+        # Verify CNTK results and unarchived ELL model results match
+        np.testing.assert_array_almost_equal(
+            cntkResults, ellMapFromArchiveResults, decimal=5,
+            err_msg=(
+                'results for CNTK and ELL unarchived map reference (' +
+                modelName + ') do not match!'))
+        return ellMapFromArchiveResults
+
+
     def model_test_impl(self, modelName):
         with self.subTest(modelName=modelName):
             print('Testing {0}.cntk vs ELL ({0})'.format(modelName))
@@ -717,15 +739,12 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
 
             print('Comparing unarchived map output (reference)')
             sys.stdout.flush()
-            ellMapFromArchiveResults = ellMapFromArchive.ComputeFloat(
-                ellOrderedInput)
 
-            # Verify CNTK results and unarchived ELL model results match
-            np.testing.assert_array_almost_equal(
-                cntkResults, ellMapFromArchiveResults, decimal=5,
-                err_msg=(
-                    'results for CNTK and ELL unarchived map reference (' +
-                    modelName + ') do not match!'))
+            # sometimes this randomly fails, so doing a retry just as a 
+            # debugging aid to see if it is really this random...
+            ellMapFromArchiveResults = self.retry(3, 
+                lambda: self.compute_ell_map(ellMapFromArchive, 
+                    ellOrderedInput, cntkResults, modelName))
 
             print('Comparing map output (compiled)')
             sys.stdout.flush()

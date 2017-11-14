@@ -241,7 +241,7 @@ namespace utilities
 #endif
             if (rc != 0)
             {
-                throw std::runtime_error(ell::utilities::stringf("mkdir failed with error code %d", errno));
+                throw std::runtime_error(ell::utilities::FormatString("mkdir failed with error code %d", errno));
             }
         }
     }
@@ -274,7 +274,7 @@ namespace utilities
 #endif
         if (rc != 0)
         {
-            throw std::runtime_error(ell::utilities::stringf("error getting current working directory: %d", rc));
+            throw std::runtime_error(ell::utilities::FormatString("error getting current working directory: %d", rc));
         }
         return utf8wd;
     }

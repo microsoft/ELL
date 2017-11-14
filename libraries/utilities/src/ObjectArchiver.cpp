@@ -9,6 +9,7 @@
 #include "ObjectArchiver.h"
 #include "Archiver.h"
 #include "IArchivable.h"
+#include "Unused.h"
 
 #include <cassert>
 #include <cctype>
@@ -99,6 +100,7 @@ namespace utilities
 
     void ObjectArchiver::ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array)
     {
+        unused(baseTypeName);
         if (std::string{ "" } == name)
         {
             _objectDescription.SetValue(array);
@@ -181,11 +183,13 @@ namespace utilities
 
     bool ObjectArchiver::BeginUnarchiveArrayItem(const std::string& typeName)
     {
+        unused(typeName);
         return true;
     }
 
     void ObjectArchiver::EndUnarchiveArrayItem(const std::string& typeName)
     {
+        unused(typeName);
     }
 }
 }

@@ -2,9 +2,9 @@
 # cmake file
 #
 
-set (library_name utilities)
+set(library_name utilities)
 
-set (src src/Archiver.cpp
+set(src src/Archiver.cpp
          src/CommandLineParser.cpp
          src/CompressedIntegerList.cpp
          src/ConformingVector.cpp
@@ -23,13 +23,14 @@ set (src src/Archiver.cpp
          src/OutputStreamImpostor.cpp
          src/PPMImageParser.cpp
          src/RandomEngines.cpp
+         src/StringUtil.cpp
          src/Tokenizer.cpp
          src/TypeName.cpp
          src/UniqueId.cpp
          src/Variant.cpp
          src/XmlArchiver.cpp)
 
-set (include include/AbstractInvoker.h
+set(include include/AbstractInvoker.h
              include/AnyIterator.h
              include/Archiver.h
              include/CommandLineParser.h
@@ -65,10 +66,11 @@ set (include include/AbstractInvoker.h
              include/TypeName.h
              include/TypeTraits.h
              include/UniqueId.h
+             include/Unused.h
              include/Variant.h
              include/XmlArchiver.h)
 
-set (tcc tcc/AbstractInvoker.tcc
+set(tcc tcc/AbstractInvoker.tcc
          tcc/AnyIterator.tcc
          tcc/Archiver.tcc
          tcc/CommandLineParser.tcc
@@ -112,7 +114,7 @@ set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 #
 set (test_name ${library_name}_test)
 
-set (test_src 
+set(test_src 
   test/src/main.cpp 
   test/src/Format_test.cpp
   test/src/FunctionUtils_test.cpp
@@ -125,7 +127,7 @@ set (test_src
   test/src/Files_test.cpp
 )
 
-set (test_include 
+set(test_include 
   test/include/Format_test.h
   test/include/FunctionUtils_test.h
   test/include/IArchivable_test.h

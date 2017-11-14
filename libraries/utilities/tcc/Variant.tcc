@@ -121,6 +121,7 @@ namespace utilities
         template <typename ValueType>
         auto GetValueStringHelper(const ValueType& value, ...) -> std::string
         {
+            unused(value);
             return "";
         }
 
@@ -207,6 +208,7 @@ namespace utilities
         template <typename InputValueType, typename OutputValueType>
         bool TryConvertValueHelper(const InputValueType& input, OutputValueType& output, ...)
         {
+            unused(input, output);
             return false;
         }
 
@@ -273,6 +275,7 @@ namespace utilities
         template <typename T, CanNotCastToInt<T> = true>
         intmax_t CastToIntMax(T&& value)
         {
+            unused(value);
             return 0;
         }
 
@@ -285,6 +288,7 @@ namespace utilities
         template <typename T, IsNotFundamental<T> = 0>
         long double CastToLongDouble(T&& value)
         {
+            unused(value);
             return 0;
         }
 
@@ -304,24 +308,28 @@ namespace utilities
         template <typename ValueType, IsNotArchivable<ValueType> concept = 0>
         void ArchiveValue(Archiver& archiver, const char* name, ValueType&& value)
         {
+            unused(archiver, name, value);
             throw InputException(InputExceptionErrors::typeMismatch, "VariantBase::ArchiveProperty called with unarchivable type");
         }
 
         template <typename ValueType, IsFundamental<ValueType> concept = 0>
         void UnarchiveValue(Unarchiver& archiver, SerializationContext& context, const char* name, ValueType&& value)
         {
+            unused(context);
             archiver.Unarchive(name, value);
         }
 
         template <typename ValueType, IsIArchivable<ValueType> concept = 0>
         void UnarchiveValue(Unarchiver& archiver, SerializationContext& context, const char* name, ValueType&& value)
         {
+            unused(context);
             archiver.Unarchive(name, value);
         }
 
         template <typename ValueType, IsNotArchivable<ValueType> concept = 0>
         void UnarchiveValue(Unarchiver& archiver, SerializationContext& context, const char* name, ValueType&& value)
         {
+            unused(archiver, context, name, value);
             throw InputException(InputExceptionErrors::typeMismatch, "VariantBase::ArchiveProperty called with unarchivable type");
         }
 

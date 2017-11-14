@@ -8,6 +8,7 @@
 
 #include "CommandLineParser.h"
 #include "StringUtil.h"
+#include "Unused.h"
 
 // stl
 #include <algorithm>
@@ -25,10 +26,12 @@ namespace utilities
     //
     void ParsedArgSet::AddArgs(CommandLineParser& parser)
     {
+        unused(parser);
     }
 
     CommandLineParseResult ParsedArgSet::PostProcess(const CommandLineParser& parser)
     {
+        unused(parser);
         return CommandLineParseResult();
     }
 

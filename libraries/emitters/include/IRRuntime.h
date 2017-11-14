@@ -81,7 +81,7 @@ namespace emitters
 
         /// <summary> Get the BLAS gemv function for the given type. </summary>
         ///
-        /// <typeparam name="ValueType"> The data type used (`float` or `double`). <typeparam>
+        /// <typeparam name="ValueType"> The data type used (`float` or `double`). </typeparam>
         /// <param name="useBlas"> Indicates whether or not to use BLAS to perform the operation. <param>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
@@ -90,7 +90,7 @@ namespace emitters
 
         /// <summary> Get the BLAS gemm function for the given type. </summary>
         ///
-        /// <typeparam name="ValueType"> The data type used (`float` or `double`) <typeparam>
+        /// <typeparam name="ValueType"> The data type used (`float` or `double`) </typeparam>
         /// <param name="useBlas"> Indicates whether or not to use BLAS to perform the operation. <param>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>

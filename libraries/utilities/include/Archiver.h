@@ -12,6 +12,7 @@
 #include "TypeFactory.h"
 #include "TypeName.h"
 #include "TypeTraits.h"
+#include "Unused.h"
 
 // stl
 #include <cstddef>
@@ -433,15 +434,15 @@ namespace utilities
 
 /// <summary> Macros to make repetitive boilerplate code in archiver implementations easier to implement. </summary>
 #define IMPLEMENT_ARCHIVE_VALUE(base, type) \
-    void base::ArchiveValue(const char* name, type value, IsFundamental<type> dummy) { WriteScalar(name, value); }
+    void base::ArchiveValue(const char* name, type value, IsFundamental<type>) { WriteScalar(name, value); }
 #define IMPLEMENT_ARCHIVE_ARRAY(base, type) \
-    void base::ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy) { WriteArray(name, value); }
+    void base::ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type>) { WriteArray(name, value); }
 
 /// <summary> Macros to make repetitive boilerplate code in unarchiver implementations easier to implement. </summary>
 #define IMPLEMENT_UNARCHIVE_VALUE(base, type) \
-    void base::UnarchiveValue(const char* name, type& value, IsFundamental<type> dummy) { ReadScalar(name, value); }
+    void base::UnarchiveValue(const char* name, type& value, IsFundamental<type>) { ReadScalar(name, value); }
 #define IMPLEMENT_UNARCHIVE_ARRAY(base, type) \
-    void base::UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type> dummy) { ReadArray(name, value); }
+    void base::UnarchiveArray(const char* name, std::vector<type>& value, IsFundamental<type>) { ReadArray(name, value); }
 }
 }
 
