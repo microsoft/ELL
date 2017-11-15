@@ -16,20 +16,17 @@ namespace nodes
 {
     template <typename ValueType>
     SinkNode<ValueType>::SinkNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+        : SinkNode({}, "", nullptr)
     {
     }
 
     template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const std::string& sinkFunctionName)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()),
-        _sinkFunctionName(sinkFunctionName), _sink([](const std::vector<ValueType>&){})
-    {
-    }
-
-    template <typename ValueType>
-    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, SinkFunction<ValueType> sink)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, _input.Size()), _sink(std::move(sink))
+    SinkNode<ValueType>::SinkNode(const model::PortElements<ValueType>& input, const std::string& sinkFunctionName, SinkFunction<ValueType> sink)
+        : CompilableNode({ &_input }, { &_output }),
+        _input(this, input, inputPortName),
+        _output(this, outputPortName, _input.Size()),
+        _sinkFunctionName(sinkFunctionName),
+        _sink(sink == nullptr ? [](const auto&){} : sink)
     {
     }
 
@@ -50,6 +47,8 @@ namespace nodes
     void SinkNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
+        std::string prefixedName(function.GetModule().GetModuleName() + "_" + _sinkFunctionName);
+        DEBUG_EMIT_PRINTF(function, prefixedName + "\n");
 
         // EvaluateInput defaults to 'pass through' in base implementation, which means
         // we always call the sink function
@@ -57,28 +56,24 @@ namespace nodes
         {
             // Callback signature: void SinkFunction(ValueType t)
             const emitters::VariableTypeList parameters = { emitters::GetVariableType<ValueType>() };
-            function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
+            function.GetModule().DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
-            llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
-            DEBUG_EMIT_PRINTF(function, _sinkFunctionName + "\n");
-
+            llvm::Function* pSinkFunction = function.GetModule().GetFunction(prefixedName);
             function.Call(pSinkFunction, { pInput });
         }
         else
         {
             // Callback signature: void SinkFunction(ValueType* array)
             const emitters::VariableTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
-            function.GetModule().DeclareFunction(_sinkFunctionName, emitters::VariableType::Void, parameters);
+            function.GetModule().DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
-            llvm::Function* pSinkFunction = function.GetModule().GetFunction(_sinkFunctionName);
-            DEBUG_EMIT_PRINTF(function, _sinkFunctionName + "\n");
-
+            llvm::Function* pSinkFunction = function.GetModule().GetFunction(prefixedName);
             function.Call(pSinkFunction, { function.PointerOffset(pInput, function.Literal(0)) });
         }
 
         // Tag the sink function as a callback that is emitted in headers
-        function.GetModule().IncludeInHeader(_sinkFunctionName);
-        function.GetModule().IncludeInCallbackInterface(_sinkFunctionName, "SinkNode");
+        function.GetModule().IncludeInHeader(prefixedName);
+        function.GetModule().IncludeInCallbackInterface(prefixedName, "SinkNode");
 
         // Set output values as well, useful when user code is in a non-event-driven mode
         if (!IsScalar(input) && !compiler.GetCompilerParameters().unrollLoops)

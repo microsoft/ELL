@@ -12,4 +12,4 @@ void TestDynamicMapCompute();
 void TestDynamicMapComputeDataVector();
 void TestDynamicMapRefine();
 void TestDynamicMapSerialization();
-void TestSteppableMapCompute();
+void TestDynamicMapClockNode();

@@ -35,12 +35,13 @@ void TestReorderDataNode1();
 void TestReorderDataNode2();
 void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape);
 void TestCompilableAccumulatorNodeFunction();
-void TestCompilableSourceNode(bool runJit);
-void TestCompilableSinkNode(bool runJit);
+void TestCompilableSourceNode();
+void TestCompilableSinkNode();
 template <typename ElementType>
 void TestCompilableDotProductNode2(int dimension);
 void TestFloatNode();
 void TestMultipleOutputNodes();
+void TestCompilableClockNode();
 
 //
 // mathy nodes

@@ -12,21 +12,17 @@ namespace nodes
 {
     template <typename ValueType>
     SourceNode<ValueType>::SourceNode()
-        : CompilableNode({ &_input }, { &_output }), _input(this, {}, inputPortName), _output(this, outputPortName, 0)
+        : SourceNode({}, 0, "", nullptr)
     {
     }
 
     template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, const std::string& sourceFunctionName)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputSize),
-        _sourceFunctionName(sourceFunctionName), _source([](std::vector<ValueType>&){ return false; })
-    {
-        _bufferedSample.resize(outputSize);
-    }
-
-    template <typename ValueType>
-    SourceNode<ValueType>::SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, SourceFunction<ValueType> source)
-        : CompilableNode({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, outputSize), _source(std::move(source))
+    SourceNode<ValueType>::SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t outputSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source)
+        : CompilableNode({ &_input }, { &_output }),
+        _input(this, input, inputPortName),
+        _output(this, outputPortName, outputSize),
+        _sourceFunctionName(sourceFunctionName),
+        _source(source == nullptr ? [](auto&){ return false; } : source)
     {
         _bufferedSample.resize(outputSize);
     }
@@ -36,7 +32,7 @@ namespace nodes
     {
         auto sampleTime = _input.GetValue(0);
 
-        if ((sampleTime != _bufferedSampleTime) && _source(_bufferedSample))
+        if (_source(_bufferedSample))
         {
             // Determine if the sample time differs from the current time
             auto currentTime = _input.GetValue(1);
@@ -66,33 +62,22 @@ namespace nodes
 
         // Callback function
         const emitters::VariableTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
-        function.GetModule().DeclareFunction(_sourceFunctionName, emitters::GetVariableType<bool>(), parameters);
-        function.GetModule().IncludeInHeader(_sourceFunctionName);
-        function.GetModule().IncludeInCallbackInterface(_sourceFunctionName, "SourceNode");
+        std::string prefixedName(function.GetModule().GetModuleName() + "_" + _sourceFunctionName);
+        function.GetModule().DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
+        function.GetModule().IncludeInHeader(prefixedName);
+        function.GetModule().IncludeInCallbackInterface(prefixedName, "SourceNode");
 
-        llvm::Function* pSamplingFunction = function.GetModule().GetFunction(_sourceFunctionName);
+        llvm::Function* pSamplingFunction = function.GetModule().GetFunction(prefixedName);
 
         // Locals
         auto sampleTime = function.ValueAt(pInput, function.Literal(0));
-        auto currentTime = function.ValueAt(pInput, function.Literal(1));
 
-        // If the requested sample time is different from cached, invoke the callback and optionally interpolate.
-        auto if1 = function.If(emitters::GetComparison<TimeTickType>(emitters::BinaryPredicateType::notEqual), sampleTime, bufferedSampleTime);
-        {
-            DEBUG_EMIT_PRINTF(function, _sourceFunctionName + "\n");
+        // Invoke the callback and optionally interpolate.
+        DEBUG_EMIT_PRINTF(function, _sourceFunctionName + "\n");
+        function.Call(pSamplingFunction, { function.PointerOffset(pBufferedSample, 0) });
 
-            auto result = function.Call(pSamplingFunction, { function.PointerOffset(pBufferedSample, 0) });
-            auto if2 = function.If(emitters::TypedComparison::equals, result, function.Literal(true));
-            {
-                auto if3 = function.If(emitters::GetComparison<TimeTickType>(emitters::BinaryPredicateType::greater), currentTime, sampleTime);
-                {
-                    // Interpolate(diff, _bufferedSample);
-                }
-                if3.End();
-            }
-            if2.End();
-        }
-        if1.End();
+        // TODO: Interpolate if there is a sample, and currentTime > sampleTime
+        // Note: currentTime can be retrieved via currentTime = function.ValueAt(pInput, function.Literal(1));
 
         // Set sample values to the output
         if (!IsScalar(output) && !compiler.GetCompilerParameters().unrollLoops)

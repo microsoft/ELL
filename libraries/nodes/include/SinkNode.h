@@ -44,23 +44,17 @@ namespace nodes
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
         const model::InputPort<ValueType>& input = _input;
-        const model::OutputPort<ValueType>& output = _output;
+        const model::OutputPort<ValueType>& output = _output; // maybe we don't need this because results are reported via callback
         /// @}
 
-        /// <summary> Default constructor (for type registration) </summary>
         SinkNode();
 
-        /// <summary> Constructor (for emitting code) </summary>
+        /// <summary> Constructor. </summary>
         ///
-        /// <param name="input"> Port elements for input values </param>
-        /// <param name="sinkFunctionName"> The sink function name to be emitted </param>
-        SinkNode(const model::PortElements<ValueType>& input, const std::string& sinkFunctionName);
-        
-        /// <summary> Constructor (for reference implementation) </summary>
-        ///
-        /// <param name="input"> Port elements for input values </param>
-        /// <param name="sink"> The sink function that will receive output values </param>
-        SinkNode(const model::PortElements<ValueType>& input, SinkFunction<ValueType> sink);
+        /// <param name="input"> Port elements for input values. </param>
+        /// <param name="sinkFunctionName"> The sink function name to be emitted. </param>
+        /// <param name="sink"> The optional sink function that will receive output values. </param>
+        SinkNode(const model::PortElements<ValueType>& input, const std::string& sinkFunctionName, SinkFunction<ValueType> sink = nullptr);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -72,11 +66,16 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer. </summary>
         ///
-        /// <param name="transformer"> The `ModelTransformer` receiving the copy  </param>
+        /// <param name="transformer"> The `ModelTransformer` receiving the copy. </param>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
+        /// <summary> Sets the sink function for this node for use in Compute(). </summary>
+        ///
+        /// <param name="function"> The sink function to set. </param>
+        void SetSinkFunction(SinkFunction<ValueType> function) { _sink = function; }
+        
     protected:
         virtual void Compute() const override;
         virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;

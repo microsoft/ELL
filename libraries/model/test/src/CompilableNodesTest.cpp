@@ -36,6 +36,7 @@
 #include "BiasLayerNode.h"
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
+#include "ClockNode.h"
 #include "ConstantNode.h"
 #include "DTWDistanceNode.h"
 #include "DelayNode.h"
@@ -739,61 +740,79 @@ void TestCompilableAccumulatorNodeFunction()
 //
 // Now test nodes that compile with callback(s)
 //
-InputCallbackTester<double> g_tester;
 
-// C callback (called by emitted model)
+// C callback (called by emitted code)
 extern "C"
 {
-bool CompiledSourceNode_InputCallback(double* input)
+size_t g_callbackCount = 0;
+const size_t g_inputSize = 5;
+bool Test_CompiledSourceNode_InputCallback(double* input)
 {
-    return g_tester.InputCallback(input);
+    Log() << "Source Input Callback " << input << EOL;
+    for (size_t i = 0; i < g_inputSize; ++i)
+    {
+        input[i] = 42.0;
+    }
+    g_callbackCount++;
+    return true;
 }
+TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSourceNode_InputCallback, bool, double*);
 }
-TESTING_FORCE_DEFINE_SYMBOL(CompiledSourceNode_InputCallback, bool, double*);
 
-void TestCompilableSourceNode(bool runJit)
+void TestCompilableSourceNode()
 {
-    const std::vector<std::vector<double>> data = { { 1, 2, 3 }, { 2, 4, 6 }, { 3, 6, 9 }, { 4, 8, 12 }, { 5, 10, 15 } };
-    g_tester.Initialize(data);
-
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
     auto testNode = model.AddNode<nodes::SourceNode<double>>(
-        inputNode->output, data[0].size(), "CompiledSourceNode_InputCallback");
+        inputNode->output,
+        g_inputSize,
+        "CompiledSourceNode_InputCallback",
+        [] (auto& input)
+        {
+            input.assign(g_inputSize, 42.0);
+            return true;
+        });
 
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
-    model::IRMapCompiler compiler;
+
+    model::MapCompilerParameters settings;
+    settings.moduleName = "Test";
+    settings.compilerSettings.optimize = true;
+
+    model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    if (runJit)
-    {
-        // compare output
-        std::vector<std::vector<model::TimeTickType>> timeSignal = { { 10, 15 }, { 20, 20 }, { 30, 45 }, { 40, 60 }, { 50, 120 } };
-        VerifyCompiledOutput(map, compiledMap, timeSignal, "SourceNode");
-    }
+    // compare output
+    std::vector<std::vector<double>> signal = { { 5, 10 }, { 100, 200 }, { 456, 789} };
+    VerifyCompiledOutput(map, compiledMap, signal, "SourceNode");
+
+    // Verify that source callbacks are actually called
+    testing::ProcessTest("Testing callback values", testing::IsEqual(g_callbackCount, signal.size()));
 }
 
-// C callback (called by emitted model)
+// C callback (called by emitted code)
 extern "C"
 {
 size_t g_sinkOutputSize = 0;
 std::vector<double> outputValues;
-void CompiledSinkNode_OutputCallback_Scalar(double output)
+void Test_CompiledSinkNode_OutputCallback_Scalar(double output)
 {
+    Log() << "Sink Output Callback (Scalar) " << output << EOL;
     assert(g_sinkOutputSize == 1);
     outputValues.push_back(output);
 }
-TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Scalar, void, double);
+TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Scalar, void, double);
 
-void CompiledSinkNode_OutputCallback_Vector(double* output)
+void Test_CompiledSinkNode_OutputCallback_Vector(double* output)
 {
+    Log() << "Sink Output Callback (Vector) " << *output << EOL;
     assert(g_sinkOutputSize > 1);
     outputValues.assign(output, output + g_sinkOutputSize); // assign reallocates as needed
 }
 }
-TESTING_FORCE_DEFINE_SYMBOL(CompiledSinkNode_OutputCallback_Vector, void, double*);
+TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSinkNode_OutputCallback_Vector, void, double*);
 
-void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionName, bool runJit)
+void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionName)
 {
     g_sinkOutputSize = inputSize;
 
@@ -801,29 +820,31 @@ void TestCompilableSinkNode(size_t inputSize, const std::string& sinkFunctionNam
     auto inputNode = model.AddNode<model::InputNode<double>>(inputSize);
     auto testNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, sinkFunctionName);
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", testNode->output } });
-    model::IRMapCompiler compiler;
+
+    model::MapCompilerParameters settings;
+    settings.moduleName = "Test";
+    settings.compilerSettings.optimize = true;
+
+    model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    if (runJit)
+    // compare output
+    std::vector<std::vector<double>> signal = { {} };
+    for (size_t i = 0; i < inputSize; ++i)
     {
-        // compare output
-        std::vector<std::vector<double>> input = { {} };
-        for (size_t i = 0; i < inputSize; ++i)
-        {
-            input[0].push_back(i * 10);
-        }
-        outputValues.clear();
-        VerifyCompiledOutput(map, compiledMap, input, "SinkNode");
-
-        // Verify that sink callbacks are actually called
-        testing::ProcessTest("Testing callback values", testing::IsEqual(outputValues, input[0]));
+        signal[0].push_back(i * 10);
     }
+    outputValues.clear();
+    VerifyCompiledOutput(map, compiledMap, signal, "SinkNode");
+
+    // Verify that sink callbacks are actually called
+    testing::ProcessTest("Testing callback values", testing::IsEqual(outputValues, signal[0]));
 }
 
-void TestCompilableSinkNode(bool runJit)
+void TestCompilableSinkNode()
 {
-    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar", runJit);
-    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector", runJit);
+    TestCompilableSinkNode(1, "CompiledSinkNode_OutputCallback_Scalar");
+    TestCompilableSinkNode(100, "CompiledSinkNode_OutputCallback_Vector");
 }
 
 void TestFloatNode()
@@ -929,6 +950,48 @@ void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas)
     FillVector(matrixAVals);
     std::vector<std::vector<ValueType>> signal = { matrixAVals };
     VerifyCompiledOutput(map, compiledMap, signal, "MatrixMatrixMultiplyNode");
+}
+
+// C callback (called by emitted code)
+extern "C"
+{
+void Test_ClockNode_LagNotificationCallback(double lag)
+{
+    Log() << "ClockNode Lag Notification Callback " << lag << EOL;
+}
+}
+TESTING_FORCE_DEFINE_SYMBOL(Test_ClockNode_LagNotificationCallback, void, double);
+
+void TestCompilableClockNode()
+{
+    constexpr short lagThreshold = 5;
+    constexpr nodes::TimeTickType interval = 50;
+
+    model::Model model;
+
+    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1);
+    auto clockNote = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold, "ClockNode_LagNotificationCallback");
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", clockNote->output } });
+
+    model::MapCompilerParameters settings;
+    settings.moduleName = "Test";
+    settings.compilerSettings.optimize = true;
+
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    // compare output
+    constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
+    std::vector<std::vector<nodes::TimeTickType>> signal = {
+        { 0 },
+        { interval*1 + thresholdTicks/2 }, // within threshold
+        { interval*2 }, // on time
+        { interval*3 + thresholdTicks }, // late
+        { interval*4 + thresholdTicks*20 }, // really late
+        { interval*5 } // on time
+    };
+
+    VerifyCompiledOutput(map, compiledMap, signal, "ClockNode");
 }
 
 class BinaryFunctionIRNode : public nodes::IRNode

@@ -14,6 +14,7 @@
 #include "BatchNormalizationLayerNode.h"
 #include "BiasLayerNode.h"
 #include "BinaryOperationNode.h"
+#include "ClockNode.h"
 #include "DTWDistanceNode.h"
 #include "DelayNode.h"
 #include "DemultiplexerNode.h"
@@ -379,7 +380,9 @@ void TestSourceNodeCompute()
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
     auto sourceNode = model.AddNode<nodes::SourceNode<double>>(
-        inputNode->output, data[0].size(), [&sourceNodeTester] (std::vector<double>& input) -> bool
+        inputNode->output, data[0].size(),
+        "SourceFunction",
+        [&sourceNodeTester] (std::vector<double>& input) -> bool
         {
             return sourceNodeTester.InputCallback(input);
         });
@@ -406,9 +409,11 @@ static void TestSinkNodeCompute()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(1);
-    auto sinkNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output, [&results](const std::vector<double>& values) {
-        results.push_back(values);
-    });
+    auto sinkNode = model.AddNode<nodes::SinkNode<double>>(inputNode->output,
+        "SinkFunction",
+        [&results](const std::vector<double>& values) {
+            results.push_back(values);
+        });
 
     for (const auto& inputValue : data)
     {
@@ -795,6 +800,51 @@ static void TestProtoNNPredictorNode()
     testing::ProcessTest("Testing protonnPredictor node refine", testing::IsEqual(refinedScoresOutput, computeScoreOutput));
 }
 
+static void TestClockNodeCompute()
+{
+    constexpr short lagThreshold = 5;
+    constexpr nodes::TimeTickType interval = 50;
+
+    model::Model model;
+
+    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1);
+    auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold,
+        "LagNotificationCallback",
+        [](nodes::TimeTickType timeLag)
+        {
+            std::cout << "LagNotificationCallback: " << timeLag << "\n";
+        });
+
+    constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
+    std::vector<std::vector<nodes::TimeTickType>> signal = {
+        { 0 },
+        { interval*1 + thresholdTicks/2 }, // within threshold
+        { interval*2 }, // on time
+        { interval*3 + thresholdTicks }, // late
+        { interval*4 + thresholdTicks*20 }, // really late
+        { interval*5 } // on time
+    };
+
+    std::vector<std::vector<nodes::TimeTickType>> expectedResults =
+    {
+        // lastIntervalTime, currentTime
+        { 0, 0 },
+        { interval*1, interval*1 + thresholdTicks/2},
+        { interval*2, interval*2 },
+        { interval*3, interval*3 + thresholdTicks },
+        { interval*4, interval*4 + thresholdTicks*20 },
+        { interval*5, interval*5 }
+    };
+
+    std::vector<std::vector<nodes::TimeTickType>> results;
+    for (const auto& input : signal)
+    {
+        inputNode->SetInput(input);
+        results.push_back(model.ComputeOutput(clockNode->output));
+    }
+    testing::ProcessTest("Testing ClockNode compute", testing::IsEqual(results, expectedResults));
+}
+
 void NodesTests()
 {
     //
@@ -802,6 +852,7 @@ void NodesTests()
     //
     TestAccumulatorNodeCompute();
     TestBinaryOperationNodeCompute();
+    TestClockNodeCompute();
     TestDelayNodeCompute();
     TestDemultiplexerNodeCompute();
     TestDTWDistanceNodeCompute();

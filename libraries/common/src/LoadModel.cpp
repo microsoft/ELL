@@ -17,6 +17,7 @@
 // nodes
 #include "BinaryOperationNode.h"
 #include "BinaryPredicateNode.h"
+#include "ClockNode.h"
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
@@ -189,6 +190,8 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryPredicateNode<double>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::ClockNode>();
 
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ConstantNode<int>>();

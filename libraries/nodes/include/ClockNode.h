@@ -1,0 +1,97 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     ClockNode.h (nodes)
+//  Authors:  Lisa Ong
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+// model
+#include "CompilableNode.h"
+#include "ModelTransformer.h"
+
+namespace ell
+{
+namespace nodes
+{
+    using TimeTickType = double;
+
+    /// <summary> A function that the node calls if the timestamp lags too far behind an interval. </summary>
+    using LagNotificationFunction = std::function<void(TimeTickType)>;
+
+    /// <summary> A node that verifies if input timestamps are within a specified time interval. </summary>
+    class ClockNode : public model::CompilableNode
+    {
+    public:
+        /// @name Input and Output Ports
+        /// @{
+        static constexpr const char* inputPortName = "input";
+        static constexpr const char* outputPortName = "output";
+        const model::InputPort<TimeTickType>& input = _input;
+        const model::OutputPort<TimeTickType>& output = _output;
+        /// @}
+
+        ClockNode();
+
+        /// <summary> Constructor. </summary>
+        ///
+        /// <param name="input"> Port elements for input value (current time). </param>
+        /// <param name="interval"> The time interval. </param>
+        /// <param name="lagThreshold">The number of intervals that the lag should reach before lagFunction is called. </param>
+        /// <param name="functionName">The lag notification name to be emitted. </param>
+        /// <param name="function">The optional lag notification function used in Compute(). </param>
+        ClockNode(const model::PortElements<TimeTickType>& input, TimeTickType interval, short lagThreshold, const std::string& functionName, LagNotificationFunction function = nullptr);
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return "ClockNode"; }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` receiving the copy. </param>
+        virtual void Copy(model::ModelTransformer& transformer) const override;
+
+        /// <summary> Sets the interval for this node. </summary>
+        ///
+        /// <param name="interval"> The interval to set. </param>
+        void SetInterval(TimeTickType interval) { _interval = interval; }
+
+        /// <summary> Sets the lag exceeded function for this node for use in Compute(). </summary>
+        ///
+        /// <param name="function"> The lag exceeded function to set. </param>
+        void SetLagNotificationFunction(LagNotificationFunction function) { _lagNotificationFunction = function; }
+
+        /// <summary> Sets the lag threshold for this node. </summary>
+        ///
+        /// <param name="threshold"> The threshold to set. </param>
+        void SetLagTheshold(uint32_t threshold) { _lagThreshold = threshold; }
+
+    protected:
+        virtual void Compute() const override;
+        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        
+        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+
+        virtual bool HasState() const override { return true; } // stored state: interval, lag threshold, lag function name
+
+    private:
+        model::InputPort<TimeTickType> _input;
+        model::OutputPort<TimeTickType> _output;
+
+        TimeTickType _interval;
+        mutable TimeTickType _lastIntervalTime;
+        short _lagThreshold;
+        LagNotificationFunction _lagNotificationFunction;
+        std::string _lagNotificationFunctionName;
+    };
+}
+}

@@ -85,12 +85,10 @@ void TestIRCompiler()
     TestReceptiveFieldMatrixNode(2, true); // new version
     // TestReceptiveFieldMatrixNode(2, false); // old (slow) version -- Fails
     TestCompilableAccumulatorNodeFunction();
-    TestCompilableSourceNode(false);
-    // TestCompilableSourceNode(true); // Occasionally fails
-    TestCompilableSinkNode(false);
-    TestCompilableSinkNode(true);
-    TestCompilableAccumulatorNodeFunction();
-
+    TestCompilableSourceNode();
+    TestCompilableSinkNode();
+    TestCompilableClockNode();
+    
     TestPerformanceCounters();
     TestCompilableDotProductNode2<float>(3); // uses IR
     TestCompilableDotProductNode2<double>(3); // uses IR
@@ -145,7 +143,7 @@ void TestIRCompiler()
     TestMaxPoolingLayerNode(8, 8, 16, 6, 6, 3, 1, 0, 1);
     TestMaxPoolingLayerNode(8, 8, 16, 6, 6, 3, 1, 0, 2);
 
-    TestMaxPoolingLayerNode(10, 10, 16, 5, 5, 3, 2, 1, 0);    
+    TestMaxPoolingLayerNode(10, 10, 16, 5, 5, 3, 2, 1, 0);
     TestMaxPoolingLayerNode(10, 10, 16, 9, 9, 2, 1, 0, 0);
 
     // test weird case we are seeing in some cntk models

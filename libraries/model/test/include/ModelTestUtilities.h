@@ -69,17 +69,4 @@ void VerifyMapOutput(const model::DynamicMap& map, std::vector<std::vector<Input
 
 void PrintDiagnostics(emitters::IRDiagnosticHandler& handler);
 
-template <typename InputType>
-struct InputCallbackTester
-{
-    void Initialize(const std::vector<std::vector<InputType>>& inputSeries);
-    bool InputCallback(std::vector<InputType>& input);
-    bool InputCallback(InputType* input);
-
-private:
-    typename std::vector<std::vector<InputType>>::const_iterator begin;
-    typename std::vector<std::vector<InputType>>::const_iterator cur;
-    typename std::vector<std::vector<InputType>>::const_iterator end;
-};
-
 #include "../tcc/ModelTestUtilities.tcc"

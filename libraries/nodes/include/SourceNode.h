@@ -12,7 +12,9 @@
 #include "CompilableNode.h"
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
-#include "SteppableMap.h"
+
+// nodes
+#include "ClockNode.h"
 
 // emitters
 #include "IRMetadata.h"
@@ -30,11 +32,11 @@ namespace nodes
     ///
     /// In device-side compiled code, the function signature should be:
     /// ```
-    /// void SamplingFunction(ValueType* data)
+    /// bool SourceFunction(ValueType* data)
     /// ```
+    /// where the bool return value is used to indicate if a new sample is available from the source
     template <typename ValueType>
     using SourceFunction = std::function<bool(std::vector<ValueType>&)>;
-    using TimeTickType = model::TimeTickType;
 
     /// <summary> A node that provides a source of data through a sampling function callback. </summary>
     template <typename ValueType>
@@ -49,22 +51,15 @@ namespace nodes
         const model::OutputPort<ValueType>& output = _output;
         /// @}
 
-        /// <summary> Default constructor (for type registration) </summary>
         SourceNode();
 
-        /// <summary> Constructor (for emitting code) </summary>
+        /// <summary> Constructor. </summary>
         ///
-        /// <param name="input"> Port elements for input values (sample time, current time) </param>
-        /// <param name="outputSize"> Output size </param>
-        /// <param name="sourceFunctionName"> The source function name to be emitted </param>
-        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, const std::string& sourceFunctionName);
-
-        /// <summary> Constructor (for reference implementation) </summary>
-        ///
-        /// <param name="input"> Port elements for input values (sample time, current time) </param>
-        /// <param name="outputSize"> Output size </param>
-        /// <param name="source"> The source function that will provide input values </param>
-        SourceNode(const model::PortElements<TimeTickType>& input, size_t outputSize, SourceFunction<ValueType> source);
+        /// <param name="input"> Port elements for input values (sample time, current time). </param>
+        /// <param name="outputSize"> Output size. </param>
+        /// <param name="sourceFunctionName"> The source function name to be emitted. </param>
+        /// <param name="source"> The optional source function that will provide input values. </param>
+        SourceNode(const model::PortElements<nodes::TimeTickType>& input, size_t outputSize, const std::string& sourceFunctionName, SourceFunction<ValueType> source = nullptr);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -76,14 +71,21 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-        /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
+        /// <summary> Makes a copy of this node in the model being constructed by the transformer. </summary>
+        ///
+        /// <param name="transformer"> The `ModelTransformer` receiving the copy. </param>
         virtual void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary> Interpolates the buffered sample to match the new time. </summary>
         ///
-        /// <param name="originalTime"> Original time for the buffered sample </param>
-        /// <param name="newTime"> New time for the buffered sample </param>
+        /// <param name="originalTime"> Original time for the buffered sample. </param>
+        /// <param name="newTime"> New time for the buffered sample. </param>
         virtual void Interpolate(TimeTickType originalTime, TimeTickType newTime) const;
+
+        /// <summary> Sets the source function for this node for use in Compute(). </summary>
+        ///
+        /// <param name="function"> The source function to set. </param>
+        void SetSourceFunction(SourceFunction<ValueType> function) { _source = function; }
 
     protected:
         virtual void Compute() const override;

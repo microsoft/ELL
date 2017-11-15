@@ -51,7 +51,7 @@ int main()
         TestDynamicMapComputeDataVector();
         TestDynamicMapRefine();
         TestDynamicMapSerialization();
-        TestSteppableMapCompute();
+        TestDynamicMapClockNode();
 
         TestCustomRefine();
 

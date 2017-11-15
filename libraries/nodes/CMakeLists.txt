@@ -5,23 +5,24 @@
 set(library_name nodes)
 
 set(src
-  src/ActivationLayerNode.cpp
-  src/BatchNormalizationLayerNode.cpp
-  src/BiasLayerNode.cpp
-  src/BinaryConvolutionalLayerNode.cpp
-  src/ConstantNode.cpp
-  src/ConvolutionalLayerNode.cpp
-  src/DiagonalConvolutionNode.cpp
-  src/FullyConnectedLayerNode.cpp
-  src/IRNode.cpp
-  src/MatrixMatrixMultiplyNode.cpp
-  src/MatrixVectorMultiplyNode.cpp
-  src/ProtoNNPredictorNode.cpp
-  src/NeuralNetworkPredictorNode.cpp
-  src/PoolingLayerNode.cpp
-  src/ScalingLayerNode.cpp
-  src/SingleElementThresholdNode.cpp
-  src/SoftmaxLayerNode.cpp
+    src/ActivationLayerNode.cpp
+    src/BatchNormalizationLayerNode.cpp
+    src/BiasLayerNode.cpp
+    src/BinaryConvolutionalLayerNode.cpp
+    src/ClockNode.cpp
+    src/ConstantNode.cpp
+    src/ConvolutionalLayerNode.cpp
+    src/DiagonalConvolutionNode.cpp
+    src/FullyConnectedLayerNode.cpp
+    src/IRNode.cpp
+    src/MatrixMatrixMultiplyNode.cpp
+    src/MatrixVectorMultiplyNode.cpp
+    src/ProtoNNPredictorNode.cpp
+    src/NeuralNetworkPredictorNode.cpp
+    src/PoolingLayerNode.cpp
+    src/ScalingLayerNode.cpp
+    src/SingleElementThresholdNode.cpp
+    src/SoftmaxLayerNode.cpp
 )
 
 set(include
@@ -34,6 +35,7 @@ set(include
     include/BinaryOperationNode.h
     include/BinaryPredicateNode.h
     include/BroadcastFunctionNode.h
+    include/ClockNode.h
     include/ConstantNode.h
     include/ConvolutionalLayerNode.h
     include/DebugSinkNode.h
