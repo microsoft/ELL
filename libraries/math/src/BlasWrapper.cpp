@@ -132,6 +132,16 @@ namespace math
             return cblas_ddot(n, x, incx, y, incy);
         }
 
+        void Ger(MatrixLayout order, int m, int n, float alpha, const float* x, int incx, const float* y, int incy, float* M, int lda)
+        {
+            cblas_sger(static_cast<CBLAS_ORDER>(GetCBlasMatrixOrder(order)), m, n, alpha, x, incx, y, incy, M, lda);
+        }
+        
+        void Ger(MatrixLayout order, int m, int n, double alpha, const double* x, int incx, const double* y, int incy, double* M, int lda)
+        {
+            cblas_dger(static_cast<CBLAS_ORDER>(GetCBlasMatrixOrder(order)), m, n, alpha, x, incx, y, incy, M, lda);
+        }
+
         void Gemv(MatrixLayout order, MatrixTranspose transpose, int m, int n, float alpha, const float* M, int lda, const float* x, int incx, float beta, float* y, int incy)
         {
             cblas_sgemv(static_cast<CBLAS_ORDER>(GetCBlasMatrixOrder(order)), static_cast<CBLAS_TRANSPOSE>(GetCBlasMatrixTranspose(transpose)), m, n, alpha, M, lda, x, incx, beta, y, incy);

@@ -18,20 +18,24 @@ void RunProfile()
 {
     const size_t repetitions = 10;
 
-    ProfileVectorAdd<ElementType>(100, 100 * repetitions);
-    ProfileVectorAdd<ElementType>(10000, 100 * repetitions);
-    ProfileVectorAdd<ElementType>(1000000, 100 * repetitions);
+    ProfileVectorScaleAdd<ElementType>(100, 100 * repetitions);
+    ProfileVectorScaleAdd<ElementType>(10000, 100 * repetitions);
+    ProfileVectorScaleAdd<ElementType>(1000000, 100 * repetitions);
 
-    ProfileVectorMultiply<ElementType>(100, 100 * repetitions);
-    ProfileVectorMultiply<ElementType>(10000, 10 * repetitions);
-    ProfileVectorMultiply<ElementType>(1000000, repetitions);
-
-    ProfileVectorDot<ElementType>(100, 100 * repetitions);
-    ProfileVectorDot<ElementType>(10000, 10 * repetitions);
-    ProfileVectorDot<ElementType>(1000000, repetitions);
+    ProfileVectorInner<ElementType>(100, 100 * repetitions);
+    ProfileVectorInner<ElementType>(10000, 10 * repetitions);
+    ProfileVectorInner<ElementType>(1000000, repetitions);
 
     constexpr auto column = math::MatrixLayout::columnMajor;
     constexpr auto row = math::MatrixLayout::rowMajor;
+
+    ProfileVectorOuter<ElementType, row>(10, 100 * repetitions);
+    ProfileVectorOuter<ElementType, row>(100, 10 * repetitions);
+    ProfileVectorOuter<ElementType, row>(1000, repetitions);
+
+    ProfileVectorOuter<ElementType, column>(10, 100 * repetitions);
+    ProfileVectorOuter<ElementType, column>(100, 10 * repetitions);
+    ProfileVectorOuter<ElementType, column>(1000, repetitions);
 
     ProfileMatrixAdd<ElementType, row, row>(10, 10, 100 * repetitions);
     ProfileMatrixAdd<ElementType, row, row>(100, 100, 10 * repetitions);

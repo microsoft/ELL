@@ -98,25 +98,10 @@ template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorAbs();
 
 template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorScalarAdd();
-
-template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorPlusEqualsOperator();
 
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorMinusEqualsOperator();
-
-template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorVectorAdd();
-
-template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
-void TestVectorVectorAddImplementation();
-
-template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorScalarMultiply();
-
-template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
-void TestVectorScalarMultiplyImplementation();
 
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorTimesEqualsOperator();
@@ -125,22 +110,124 @@ template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorDivideEqualsOperator();
 
 template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorScalarMultiplyAdd();
-
-template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorElementwiseMultiply();
-
-template <typename ElementType>
-void TestVectorVectorInner();
 
 template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorVectorDot();
 
-template <typename ElementType>
+template <typename ElementType, math::ImplementationType implementation>
+void TestVectorVectorInner();
+
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
 void TestVectorVectorOuter();
 
-template <typename ElementType, math::ImplementationType implementation>
-void TestVectorVectorInnerImplementation();
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddUpdateScalar();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddUpdateVector();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddSetScalar();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddSetScalarZero();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddSetScalarOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddSetVector();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleUpdate();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleUpdateZero();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleUpdateOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleSet();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleSetZero();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleSetOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddUpdateScalarVectorOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddUpdateScalarOnesScalar();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddUpdateOneVectorScalar();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddUpdateScalarVectorScalar();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnes();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesScalarZero();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesScalarOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesZeroScalar();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesOneScalar();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesZeroOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesOneZero();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesOneOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesZeroZero();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVector();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorScalarZero();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorScalarOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorZeroScalar();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorOneScalar();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorZeroOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorOneZero();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorOneOne();
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorZeroZero();
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorCumulativeSumUpdate();
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorConsecutiveDifferenceUpdate();
 
 template<typename ElementType>
 void TestVectorArchiver();

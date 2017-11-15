@@ -104,13 +104,13 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     bool ConstVectorReference<ElementType, orientation>::IsEqual(ConstVectorReference<ElementType, orientation> other, ElementType tolerance) const
     {
-        if (_size != other._size)
+        if (this->Size() != other.Size())
         {
             return false;
         }
 
-        const ElementType* pThis = GetConstDataPointer();
-        const ElementType* pThisEnd = pThis + _size * _increment;
+        const ElementType* pThis = this->GetConstDataPointer();
+        const ElementType* pThisEnd = pThis + this->Size() * this->GetIncrement();
         const ElementType* pOther = other.GetConstDataPointer();
 
         while (pThis < pThisEnd)
@@ -121,8 +121,8 @@ namespace math
             {
                 return false;
             }
-            pThis += _increment;
-            pOther += other._increment;
+            pThis += this->GetIncrement();
+            pOther += other.GetIncrement();
         }
         return true;
     }
@@ -142,9 +142,9 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     ConstVectorReference<ElementType, orientation> ConstVectorReference<ElementType, orientation>::GetSubVector(size_t offset, size_t size) const
     {
-        DEBUG_THROW(offset + size > _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size."));
+        DEBUG_THROW(offset + size > this->Size(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size."));
 
-        return ConstVectorReference<ElementType, orientation>(GetConstDataPointer() + offset * _increment, size, _increment);
+        return ConstVectorReference<ElementType, orientation>(this->GetConstDataPointer() + offset * this->GetIncrement(), size, this->GetIncrement());
     }
     //
     // TransformedConstVectorReference
@@ -169,9 +169,9 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     ElementType& VectorReference<ElementType, orientation>::operator[](size_t index)
     {
-        DEBUG_THROW(index >= _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size."));
+        DEBUG_THROW(index >= this->Size(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "index exceeds vector size."));
 
-        return GetDataPointer()[index * _increment];
+        return GetDataPointer()[index * this->GetIncrement()];
     }
 
     template <typename ElementType, VectorOrientation orientation>
@@ -187,17 +187,17 @@ namespace math
         const auto& otherVector = other.GetVector();
         auto transformation = other.GetTransformation();
 
-        DEBUG_THROW(_size != otherVector.Size(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size."));
+        DEBUG_THROW(this->Size() != otherVector.Size(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size."));
 
         ElementType* pData = GetDataPointer();
-        const ElementType* pEnd = pData + _increment * _size;
+        const ElementType* pEnd = pData + this->GetIncrement() * this->Size();
         const ElementType* pOtherData = otherVector.GetConstDataPointer();
         const size_t otherIncrement = otherVector.GetIncrement();
 
         while (pData < pEnd)
         {
             (*pData) = transformation(*pOtherData);
-            pData += _increment;
+            pData += this->GetIncrement();
             pOtherData += otherIncrement;
         }
     }
@@ -205,7 +205,7 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     void VectorReference<ElementType, orientation>::CopyFrom(ConstVectorReference<ElementType, orientation> other)
     {
-        if (_size != other.Size())
+        if (this->Size() != other.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
         }
@@ -215,7 +215,7 @@ namespace math
         const size_t otherIncrement = other.GetIncrement();
         const ElementType* pOtherEnd = pOtherData + otherIncrement * other.Size();
 
-        if (_increment == 1 && otherIncrement == 1)
+        if (this->GetIncrement() == 1 && otherIncrement == 1)
         {
             while (pOtherData < pOtherEnd)
             {
@@ -229,7 +229,7 @@ namespace math
             while (pOtherData < pOtherEnd)
             {
                 (*pData) = (*pOtherData);
-                pData += _increment;
+                pData += this->GetIncrement();
                 pOtherData += otherIncrement;
             }
         }
@@ -245,9 +245,9 @@ namespace math
     void VectorReference<ElementType, orientation>::Fill(ElementType value)
     {
         ElementType* data = GetDataPointer();
-        ElementType* end = data + _size * _increment;
+        ElementType* end = data + this->Size() * this->GetIncrement();
 
-        if (_increment == 1)
+        if (this->IsContiguous())
         {
             std::fill(data, end, value);
         }
@@ -256,7 +256,7 @@ namespace math
             while (data < end)
             {
                 *data = value;
-                data += _increment;
+                data += this->GetIncrement();
             }
         }
     }
@@ -266,12 +266,12 @@ namespace math
     void VectorReference<ElementType, orientation>::Generate(GeneratorType generator)
     {
         ElementType* data = GetDataPointer();
-        ElementType* end = data + _size * _increment;
+        ElementType* end = data + this->Size() * this->GetIncrement();
 
         while (data < end)
         {
             *data = static_cast<ElementType>(generator());
-            data += _increment;
+            data += this->GetIncrement();
         }
     }
 
@@ -280,26 +280,26 @@ namespace math
     void VectorReference<ElementType, orientation>::Transform(TransformationType transformation)
     {
         ElementType* current = GetDataPointer();
-        const ElementType* end = current + _size * _increment;
+        const ElementType* end = current + this->Size() * this->GetIncrement();
         while (current < end)
         {
             *current = transformation(*current);
-            current += _increment;
+            current += this->GetIncrement();
         }
     }
 
     template <typename ElementType, VectorOrientation orientation>
     VectorReference<ElementType, orientation> VectorReference<ElementType, orientation>::GetReference()
     {
-        return VectorReference<ElementType, orientation>(GetDataPointer(), _size, _increment);
+        return VectorReference<ElementType, orientation>(GetDataPointer(), this->Size(), this->GetIncrement());
     }
 
     template <typename ElementType, VectorOrientation orientation>
     VectorReference<ElementType, orientation> VectorReference<ElementType, orientation>::GetSubVector(size_t offset, size_t size)
     {
-        DEBUG_THROW(offset + size > _size, utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size."));
+        DEBUG_THROW(offset + size > this->Size(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subvector offset + subvector size exceeds vector size."));
 
-        return VectorReference<ElementType, orientation>(GetDataPointer() + offset * _increment, size, _increment);
+        return VectorReference<ElementType, orientation>(GetDataPointer() + offset * this->GetIncrement(), size, this->GetIncrement());
     }
 
     template <typename ElementType, VectorOrientation orientation>
@@ -309,20 +309,20 @@ namespace math
         const auto& otherVector = other.GetVector();
         auto transformation = other.GetTransformation();
 
-        if (_size != otherVector.Size())
+        if (this->Size() != otherVector.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
         }
 
         ElementType* pData = GetDataPointer();
-        const ElementType* pEnd = pData + _increment * _size;
+        const ElementType* pEnd = pData + this->GetIncrement() * this->Size();
         const ElementType* pOtherData = otherVector.GetConstDataPointer();
         const size_t otherIncrement = otherVector.GetIncrement();
 
         while (pData < pEnd)
         {
             (*pData) += transformation(*pOtherData);
-            pData += _increment;
+            pData += this->GetIncrement();
             pOtherData += otherIncrement;
         }
     }
@@ -330,20 +330,20 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     void VectorReference<ElementType, orientation>::operator+=(ConstVectorReference<ElementType, orientation> other)
     {
-        if (_size != other.Size())
+        if (this->Size() != other.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
         }
 
         ElementType* pData = GetDataPointer();
-        const ElementType* pEnd = pData + _increment * _size;
+        const ElementType* pEnd = pData + this->GetIncrement() * this->Size();
         const ElementType* pOtherData = other.GetConstDataPointer();
         const size_t otherIncrement = other.GetIncrement();
 
         while (pData < pEnd)
         {
             (*pData) += (*pOtherData);
-            pData += _increment;
+            pData += this->GetIncrement();
             pOtherData += otherIncrement;
         }
     }
@@ -351,20 +351,20 @@ namespace math
     template <typename ElementType, VectorOrientation orientation>
     void VectorReference<ElementType, orientation>::operator-=(ConstVectorReference<ElementType, orientation> other)
     {
-        if (_size != other.Size())
+        if (this->Size() != other.Size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "this vector and other vector are not the same size.");
         }
 
         ElementType* pData = GetDataPointer();
-        const ElementType* pEnd = pData + _increment * _size;
+        const ElementType* pEnd = pData + this->GetIncrement() * this->Size();
         const ElementType* pOtherData = other.GetConstDataPointer();
         const size_t otherIncrement = other.GetIncrement();
 
         while (pData < pEnd)
         {
             (*pData) -= (*pOtherData);
-            pData += _increment;
+            pData += this->GetIncrement();
             pOtherData += otherIncrement;
         }
     }
@@ -396,14 +396,14 @@ namespace math
 
     template <typename ElementType, VectorOrientation orientation>
     Vector<ElementType, orientation>::Vector(Vector<ElementType, orientation>&& other)
-        : VectorReference<ElementType, orientation>(nullptr, other._size, other._increment), _data(std::move(other._data))
+        : VectorReference<ElementType, orientation>(nullptr, other.Size(), other.GetIncrement()), _data(std::move(other._data))
     {
         _pData = _data.data();
     }
 
     template <typename ElementType, VectorOrientation orientation>
     Vector<ElementType, orientation>::Vector(const Vector<ElementType, orientation>& other)
-        : VectorReference<ElementType, orientation>(nullptr, other._size, other._increment), _data(other._data)
+        : VectorReference<ElementType, orientation>(nullptr, other.Size(), other.GetIncrement()), _data(other._data)
     {
         _pData = _data.data();
     }
@@ -413,7 +413,7 @@ namespace math
     {
         _data.resize(size);
         _pData = _data.data();
-        _size = size;
+        this->_size = size;
     }
 
     template <typename ElementType, VectorOrientation orientation>

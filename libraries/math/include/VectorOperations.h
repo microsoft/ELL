@@ -109,18 +109,8 @@ namespace math
 
     /// @}
 
-    /// \name Addition
+    /// \name Scalar operators
     /// @{
-
-    /// <summary> Adds a scalar to a vector. </summary>
-    /// \anchor VectorScalarAdd
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> Vector vector orientation. </typeparam>
-    /// <param name="scalar"> The scalar being added. </param>
-    /// <param name="vector"> The vector to which the scalar is added. </param>
-    template <typename ElementType, VectorOrientation orientation>
-    void Add(ElementType scalar, VectorReference<ElementType, orientation> vector);
 
     /// <summary> Adds a scalar to a vector. </summary>
     ///
@@ -142,30 +132,6 @@ namespace math
     template <typename VectorElementType, VectorOrientation orientation, typename ScalarType, utilities::IsFundamental<ScalarType> concept = true>
     void operator-=(VectorReference<VectorElementType, orientation> vector, ScalarType scalar);
 
-    /// <summary> Adds a scaled vector to another vector, lhsVector += value * rhsVector. </summary>
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> Orientation of the two vectors. </typeparam>
-    /// <param name="scalar"> The scalar that multiplies the right-hand sidevector. </param>
-    /// <param name="vectorA"> The right-hand side vector. </param>
-    /// <param name="vectorB"> The left-hand side vector. </param>
-    template <typename ElementType, VectorOrientation orientation>
-    void Add(ElementType scalar, ConstVectorReference<ElementType, orientation> vectorA, VectorReference<ElementType, orientation> vectorB);
-
-    /// @}
-
-    /// \name Multiplication
-    /// @{
-
-    /// <summary> Multiplies a vector by a scalar. </summary>
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> The vector orientation. </typeparam>
-    /// <param name="scalar"> The scalar. </param>
-    /// <param name="vector"> The vector being scaled. </param>
-    template <typename ElementType, VectorOrientation orientation>
-    void Multiply(ElementType scalar, VectorReference<ElementType, orientation> vector);
-
     /// <summary> Multiplies this vector by a constant value. </summary>
     ///
     /// <typeparam name="VectorElementType"> Vector element type. </typeparam>
@@ -186,15 +152,10 @@ namespace math
     template <typename VectorElementType, VectorOrientation orientation, typename ScalarType, utilities::IsFundamental<ScalarType> concept = true>
     void operator/=(VectorReference<VectorElementType, orientation> vector, ScalarType scalar);
 
-    /// <summary> Multiplies a vector by scalarA and then add scalarB to it, vector = scalarA * vector + scalarB. </summary>
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <typeparam name="orientation"> The vector orientation. </typeparam>
-    /// <param name="scalarA"> The scalar that multiplies the vector. </param>
-    /// <param name="scalarB"> The scalar added to the vector. </param>
-    /// <param name="vector"> The vector being modified. </param>
-    template <typename ElementType, VectorOrientation orientation>
-    void MultiplyAdd(ElementType scalarA, ElementType scalarB, VectorReference<ElementType, orientation> vector);
+    /// @}
+
+    /// \name Vector multiply
+    /// @{
 
     /// <summary> Vector vector element wise multiplication, lhsVector = rhsvectorA .* rhsvectorB. </summary>
     ///
@@ -202,9 +163,9 @@ namespace math
     /// <typeparam name="orientation"> The vector orientaton. </typeparam>
     /// <param name="vectorA"> The first right hand side vector. </param>
     /// <param name="vectorB"> The second right hand side vector. </param>
-    /// <param name="vectorC"> The left hand side vector. </param>
+    /// <param name="output"> The left hand side vector. </param>
     template <typename ElementType, VectorOrientation orientation>
-    void ElementwiseMultiply(UnorientedConstVectorReference<ElementType> vectorA, UnorientedConstVectorReference<ElementType> vectorB, VectorReference<ElementType, orientation> vectorC);
+    void ElementwiseMultiplySet(UnorientedConstVectorReference<ElementType> vectorA, UnorientedConstVectorReference<ElementType> vectorB, VectorReference<ElementType, orientation> output);
 
     /// <summary> Calculates the product of a row vector with a column vector, result = vectorA * vectorB. Same as Dot. </summary>
     ///
@@ -213,16 +174,7 @@ namespace math
     /// <param name="vectorB"> The right vector in column orientation. </param>
     /// <param name="result"> [out] The scalar used to store the result. </param>
     template <typename ElementType>
-    void Inner(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result);
-
-    /// <summary> Calculates the product of a row vector with a column vector, result = vectorA * vectorB. Same as Dot. </summary>
-    ///
-    /// <typeparam name="ElementType"> Vector element type. </typeparam>
-    /// <param name="vectorA"> The left vector in row orientation. </param>
-    /// <param name="vectorB"> The right vector in column orientation. </param>
-    /// <param name="result"> [out] The scalar used to store the result. </param>
-    template <typename ElementType>
-    void Multiply(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result);
+    void InnerProduct(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result);
 
     /// <summary>
     /// Calculates a vector dot product (between vectors in any orientation), return vectorA * vectorB
@@ -243,13 +195,161 @@ namespace math
     /// <param name="vectorB"> The right vector in row orientation. </param>
     /// <param name="result"> [out] The matrix used to store the result. </param>
     template <typename ElementType, MatrixLayout layout>
-    void Outer(ConstVectorReference<ElementType, VectorOrientation::column> vectorA, ConstVectorReference<ElementType, VectorOrientation::row> vectorB, MatrixReference<ElementType, layout> matrix);
+    void OuterProduct(ConstVectorReference<ElementType, VectorOrientation::column> vectorA, ConstVectorReference<ElementType, VectorOrientation::row> vectorB, MatrixReference<ElementType, layout> matrix);
+
+    /// @}
+
+    /// \name Addition
+    /// @{
+
+    /// <summary> Performs the linear operation vector += scalar. </summary>
+    ///
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="scalar"> The scalar. </param>
+    /// <param name="vector"> The vector, which is updated. </param>
+    template <typename ElementType, VectorOrientation orientation>
+    void AddUpdate(ElementType scalar, VectorReference<ElementType, orientation> vector);
+
+    /// <summary> Performs the linear operation vectorB += vectorA. </summary>
+    ///
+    /// <typeparam name="implementation"> The implementation. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="vectorA"> The first vector. </param>
+    /// <param name="vectorB"> The second vector, which is updated. </param>
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void AddUpdate(ConstVectorReference<ElementType, orientation> vectorA, VectorReference<ElementType, orientation> vectorB);
+
+    /// <summary> Performs the linear operation output = scalar * ones + vector. </summary>
+    ///
+    /// <typeparam name="implementation"> The implementation. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="scalar"> The scalar. </param>
+    /// <param name="vector"> The vector. </param>
+    /// <param name="output"> The output vector. </param>
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void AddSet(ElementType scalar, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output);
+
+    /// <summary> Performs the linear operation output = vectorA + vectorB. </summary>
+    ///
+    /// <typeparam name="implementation"> The implementation. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="vectorA"> The first vector. </param>
+    /// <param name="vectorB"> The second vector. </param>
+    /// <param name="output"> The output vector. </param>
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void AddSet(ConstVectorReference<ElementType, orientation> vectorA, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output);
+
+    /// @}
+
+    /// \name Scaling
+    /// @{
+
+    /// <summary> Performs the linear operation vector *= scalar </summary>
+    ///
+    /// <typeparam name="implementation"> The implementation. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="scalar"> The scalar. </param>
+    /// <param name="vector"> The vector, which is updated. </param>
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void ScaleUpdate(ElementType scalar, VectorReference<ElementType, orientation> vector);
+
+    /// <summary> Performs the linear operation output = scalarA * vectorA. </summary>
+    ///
+    /// <typeparam name="implementation"> The implementation. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="scalar"> The scalar. </param>
+    /// <param name="vector"> The vector. </param>
+    /// <param name="output"> The output. </param>
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void ScaleSet(ElementType scalar, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output);
+
+    /// @}
+
+    /// @{
+    /// <summary>
+    /// Performs the linear operation vectorB = scalarA * vectorA + scalarB * vectorB.
+    /// </summary>
+    ///
+    /// <typeparam name="implementation"> The implementation. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="scalarA"> The scalar that multiplies the first vector: either a real number or One().</param>
+    /// <param name="vectorA"> The first vector or OnesVector(). </param>
+    /// <param name="scalarB"> The scalar that multiplies the second vector: either a real number or One() </param>
+    /// <param name="vectorB"> The second vector, which is updated. </param>
+
+    // vectorB += scalarA * vectorA
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void ScaleAddUpdate(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, One, VectorReference<ElementType, orientation> vectorB);
+
+    // vectorB = scalarA * ones + scalarB * vectorB
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void ScaleAddUpdate(ElementType scalarA, OnesVector, ElementType scalarB, VectorReference<ElementType, orientation> vectorB);
+
+    // vectorB = vectorA + scalarB * vectorB
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void ScaleAddUpdate(One, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, VectorReference<ElementType, orientation> vectorB);
+
+    // vectorB = scalarA * vectorA + scalarB * vectorB
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void ScaleAddUpdate(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, VectorReference<ElementType, orientation> vectorB);
+
+    /// @}
+
+    /// @{
+    /// <summary>
+    /// Performs the linear operation output = scalarA * vectorA + scalarB * vectorB.
+    /// </summary>
+    ///
+    /// <typeparam name="implementation"> The implementation. </typeparam>
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="scalarA"> The scalar that multiplies the first vector.</param>
+    /// <param name="vectorA"> The first vector or OnesVector(). </param>
+    /// <param name="scalarB"> The scalar that multiplies the second vector.</param>
+    /// <param name="vectorB"> The second vector. </param>
+    /// <param name="output"> The output vector. </param>
+
+    // vectorC = scalarA * ones + scalarB * vectorB
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void ScaleAddSet(ElementType scalarA, OnesVector, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output);
+
+    // vectorC = scalarA * vectorA + scalarB * vectorB
+    template <ImplementationType implementation = ImplementationType::openBlas, typename ElementType, VectorOrientation orientation>
+    void ScaleAddSet(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output);
+
+    /// @}
+    
+    /// \name Cumulative sum (integral) and consecutive difference (derivative)
+    /// @{
+
+    /// <summary> Replaces a vector with its cumulative sum (vector integral). </summary>
+    ///
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="vector"> The vector. </param>
+    template <typename ElementType, VectorOrientation orientation>
+    void CumulativeSumUpdate(VectorReference<ElementType, orientation> vector);
+
+    /// <summary> Replaces a vector with the difference between consecutive elements (vector derivative). </summary>
+    ///
+    /// <typeparam name="ElementType"> The element type. </typeparam>
+    /// <typeparam name="orientation"> The vector orientation. </typeparam>
+    /// <param name="vector"> The vector. </param>
+    template <typename ElementType, VectorOrientation orientation>
+    void ConsecutiveDifferenceUpdate(VectorReference<ElementType, orientation> vector);
 
     /// @}
 
     namespace Internal
     {
-        template <ImplementationType type>
+        template <ImplementationType implementation>
         struct VectorOperations
         {};
 
@@ -258,14 +358,55 @@ namespace math
         {
             static std::string GetImplementationName() { return "Native"; }
 
-            template <typename ElementType, VectorOrientation orientation>
-            static void Add(ElementType scalar, ConstVectorReference<ElementType, orientation> vectorA, VectorReference<ElementType, orientation> vectorB);
-
-            template <typename ElementType, VectorOrientation orientation>
-            static void Multiply(ElementType scalar, VectorReference<ElementType, orientation> vector);
-
             template <typename ElementType>
-            static void Inner(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result);
+            static void InnerProduct(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result);
+
+            template <typename ElementType, MatrixLayout layout>
+            static void OuterProduct(ConstVectorReference<ElementType, VectorOrientation::column> vectorA, ConstVectorReference<ElementType, VectorOrientation::row> vectorB, MatrixReference<ElementType, layout> matrix);
+
+            // vectorB += vectorA
+            template <typename ElementType, VectorOrientation orientation>
+            static void AddUpdate(ConstVectorReference<ElementType, orientation> vectorA, VectorReference<ElementType, orientation> vectorB);
+
+            // output = scalar + vector
+            template <typename ElementType, VectorOrientation orientation>
+            static void AddSet(ElementType scalar, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output);
+
+            // output = vectorA + vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void AddSet(ConstVectorReference<ElementType, orientation> vectorA, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output);
+
+            // vector *= scalar
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleUpdate(ElementType scalar, VectorReference<ElementType, orientation> vector);
+
+            // output = scalar * vector
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleSet(ElementType scalar, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output);
+
+            // vectorB = scalarA * vectorA
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddUpdate(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, One, VectorReference<ElementType, orientation> vectorB);
+
+            // vectorB = scalarA * ones + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddUpdate(ElementType scalarA, OnesVector, ElementType scalarB, VectorReference<ElementType, orientation> vectorB);
+
+            // vectorB = vectorA + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddUpdate(One, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, VectorReference<ElementType, orientation> vectorB);
+
+            // vectorB = scalarA * vectorA + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddUpdate(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, VectorReference<ElementType, orientation> vectorB);
+
+            // vectorC = scalarA * ones + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddSet(ElementType scalarA, OnesVector, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output);
+
+            // vectorC = scalarA * vectorA + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddSet(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output);
         };
 
 #ifdef USE_BLAS
@@ -274,14 +415,55 @@ namespace math
         {
             static std::string GetImplementationName() { return "OpenBlas"; }
 
-            template <typename ElementType, VectorOrientation orientation>
-            static void Add(ElementType scalar, ConstVectorReference<ElementType, orientation> vectorA, VectorReference<ElementType, orientation> vectorB);
-
-            template <typename ElementType, VectorOrientation orientation>
-            static void Multiply(ElementType scalar, VectorReference<ElementType, orientation> vector);
-
             template <typename ElementType>
-            static void Inner(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result);
+            static void InnerProduct(ConstVectorReference<ElementType, VectorOrientation::row> vectorA, ConstVectorReference<ElementType, VectorOrientation::column> vectorB, ElementType& result);
+
+            template <typename ElementType, MatrixLayout layout>
+            static void OuterProduct(ConstVectorReference<ElementType, VectorOrientation::column> vectorA, ConstVectorReference<ElementType, VectorOrientation::row> vectorB, MatrixReference<ElementType, layout> matrix);
+
+            // vectorB += vectorA
+            template <typename ElementType, VectorOrientation orientation>
+            static void AddUpdate(ConstVectorReference<ElementType, orientation> vectorA, VectorReference<ElementType, orientation> vectorB);
+
+            // output = scalar + vector
+            template <typename ElementType, VectorOrientation orientation>
+            static void AddSet(ElementType scalar, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output);
+
+            // output = vectorA + vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void AddSet(ConstVectorReference<ElementType, orientation> vectorA, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output);
+
+            // vector *= scalar
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleUpdate(ElementType scalar, VectorReference<ElementType, orientation> vector);
+
+            // output = scalar * vector
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleSet(ElementType scalar, ConstVectorReference<ElementType, orientation> vector, VectorReference<ElementType, orientation> output);
+
+            // vectorB = scalarA * vectorA
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddUpdate(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, One, VectorReference<ElementType, orientation> vectorB);
+
+            // vectorB = scalarA * ones + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddUpdate(ElementType scalarA, OnesVector, ElementType scalarB, VectorReference<ElementType, orientation> vectorB);
+
+            // vectorB = vectorA + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddUpdate(One, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, VectorReference<ElementType, orientation> vectorB);
+
+            // vectorB = scalarA * vectorA + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddUpdate(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, VectorReference<ElementType, orientation> vectorB);
+
+            // vectorC = scalarA * ones + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddSet(ElementType scalarA, OnesVector, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output);
+
+            // vectorC = scalarA * vectorA + scalarB * vectorB
+            template <typename ElementType, VectorOrientation orientation>
+            static void ScaleAddSet(ElementType scalarA, ConstVectorReference<ElementType, orientation> vectorA, ElementType scalarB, ConstVectorReference<ElementType, orientation> vectorB, VectorReference<ElementType, orientation> output);
         };
 
 #else

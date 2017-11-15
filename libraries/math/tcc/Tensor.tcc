@@ -434,7 +434,7 @@ namespace math
     {
         DEBUG_THROW(firstCoordinate.GetRowIndex() + shape.NumRows() > this->NumRows() || firstCoordinate.GetColumnIndex() + shape.NumColumns() > this->NumColumns() || firstCoordinate.GetChannelIndex() + shape.NumChannels() > this->NumChannels(), utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "subtensor exceeds tensor dimensions."));
 
-        return TensorReference(GetDataPointer() + GetOffset(firstCoordinate), shape, _increment1, _increment2); // TODO this?
+        return TensorReference(GetDataPointer() + GetOffset(firstCoordinate), shape, _increment1, _increment2);
     }
 
     template<typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>

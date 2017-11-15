@@ -48,55 +48,45 @@ void PrintLine(std::string functionName, double native, double singleBlas, doubl
         << std::endl;
 }
 
-template <typename ElementType>
-void ProfileVectorAdd(size_t size, size_t repetitions, std::string seed)
+template <typename ElementType, typename VectorAType, math::VectorOrientation orientation>
+void ProfileVectorScaleAddWorker(ElementType scalarA, VectorAType vectorA, ElementType scalarB, math::VectorReference<ElementType, orientation> vectorB, std::string description, size_t repetitions)
+{
+    double native = GetTime([&]() { math::ScaleAddUpdate<math::ImplementationType::native>(scalarA, vectorA, scalarB, vectorB); }, repetitions);
+    math::Blas::SetNumThreads(0);
+    double multiBlas = GetTime([&]() { math::ScaleAddUpdate<math::ImplementationType::openBlas>(scalarA, vectorA, scalarB, vectorB); }, repetitions);
+    math::Blas::SetNumThreads(1);
+    double singleBlas = GetTime([&]() { math::ScaleAddUpdate<math::ImplementationType::openBlas>(scalarA, vectorA, scalarB, vectorB); }, repetitions);
+
+    std::string type = std::string("<") + typeid(ElementType).name() + ">";
+    PrintLine("ScaleAddUpdate" + type + "(" + description + ", vector)", native, singleBlas, multiBlas);
+}
+
+template<typename ElementType>
+void ProfileVectorScaleAdd(size_t size, size_t repetitions, std::string seed)
 {
     auto engine = utilities::GetRandomEngine(seed);
     std::uniform_real_distribution<ElementType> uniform(-1, 1);
     auto generator = [&]() { return uniform(engine); };
-
-    math::RowVector<ElementType> u(size);
-    u.Generate(generator);
 
     math::RowVector<ElementType> v(size);
     v.Generate(generator);
 
-    double native = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::native>::Add(static_cast<ElementType>(-7.3), u, v); }, repetitions);
-    math::Blas::SetNumThreads(0);
-    double multiBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Add(static_cast<ElementType>(-7.3), u, v); }, repetitions);
-    math::Blas::SetNumThreads(1);
-    double singleBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Add(static_cast<ElementType>(-7.3), u, v); }, repetitions);
-
-    std::string type = std::string("<") + typeid(ElementType).name() + ">";
-    std::string vector = "Vector" + type + "[" + std::to_string(size) + "]";
-    PrintLine("Add(scalar," + vector + ", " + vector + ")", native, singleBlas, multiBlas);
-}
-
-template <typename ElementType>
-void ProfileVectorMultiply(size_t size, size_t repetitions, std::string seed)
-{
-    auto engine = utilities::GetRandomEngine(seed);
-    std::uniform_real_distribution<ElementType> uniform(-1, 1);
-    auto generator = [&]() { return uniform(engine); };
-
     math::RowVector<ElementType> u(size);
     u.Generate(generator);
 
-    auto value = generator();
+    ElementType scalar = static_cast<ElementType>(-7.3);
+    ElementType one = 1.0;
 
-    double native = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::native>::Multiply(value, u); }, repetitions);
-    math::Blas::SetNumThreads(0);
-    double multiBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Multiply(value, u); }, repetitions);
-    math::Blas::SetNumThreads(1);
-    double singleBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Multiply(value, u); }, repetitions);
-
-    std::string type = std::string("<") + typeid(ElementType).name() + ">";
-    std::string vector = "Vector" + type + "[" + std::to_string(size) + "]";
-    PrintLine("Multiply(scalar, " + vector + ")", native, singleBlas, multiBlas);
+    ProfileVectorScaleAddWorker(scalar, math::OnesVector(), one, u, "scalar, ones, one", repetitions);
+    ProfileVectorScaleAddWorker(one, v, one, u, "one, vector, one", repetitions);
+    ProfileVectorScaleAddWorker(scalar, v, one, u, "scalar, vector, one", repetitions);
+    ProfileVectorScaleAddWorker(scalar, math::OnesVector(), scalar, u, "scalar, ones, scalar", repetitions);
+    ProfileVectorScaleAddWorker(one, v, scalar, u, "one, vector, scalar", repetitions);
+    ProfileVectorScaleAddWorker(scalar, v, scalar, u, "scalar, vector, scalar", repetitions);
 }
 
 template <typename ElementType>
-void ProfileVectorDot(size_t size, size_t repetitions, std::string seed)
+void ProfileVectorInner(size_t size, size_t repetitions, std::string seed)
 {
     auto engine = utilities::GetRandomEngine(seed);
     std::uniform_real_distribution<ElementType> uniform(-1, 1);
@@ -109,15 +99,42 @@ void ProfileVectorDot(size_t size, size_t repetitions, std::string seed)
     v.Generate(generator);
 
     ElementType result;
-    double native = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::native>::Inner(u, v, result); }, repetitions);
+    double native = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::native>::InnerProduct(u, v, result); }, repetitions);
     math::Blas::SetNumThreads(1);
-    double singleBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Inner(u, v, result); }, repetitions);
+    double singleBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::InnerProduct(u, v, result); }, repetitions);
     math::Blas::SetNumThreads(0);
-    double multiBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::Inner(u, v, result); }, repetitions);
+    double multiBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::InnerProduct(u, v, result); }, repetitions);
 
     std::string type = std::string("<") + typeid(ElementType).name() + ">";
     std::string vector = "Vector" + type + "[" + std::to_string(size) + "]";
     PrintLine("Dot(" + vector + ", " + vector + ")", native, singleBlas, multiBlas);
+}
+
+template <typename ElementType, math::MatrixLayout layout>
+void ProfileVectorOuter(size_t size, size_t repetitions, std::string seed)
+{
+    auto engine = utilities::GetRandomEngine(seed);
+    std::uniform_real_distribution<ElementType> uniform(-1, 1);
+    auto generator = [&]() { return uniform(engine); };
+
+    math::ColumnVector<ElementType> u(size);
+    u.Generate(generator);
+
+    math::RowVector<ElementType> v(size);
+    v.Generate(generator);
+
+    math::Matrix<ElementType, layout> S(size, size);
+
+    double native = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::native>::OuterProduct(u, v, S); }, repetitions);
+    math::Blas::SetNumThreads(1);
+    double singleBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::OuterProduct(u, v, S); }, repetitions);
+    math::Blas::SetNumThreads(0);
+    double multiBlas = GetTime([&]() { math::Internal::VectorOperations<math::ImplementationType::openBlas>::OuterProduct(u, v, S); }, repetitions);
+
+    std::string type = std::string("<") + typeid(ElementType).name() + ">";
+    std::string vector = "Vector" + type + "[" + std::to_string(size) + "]";
+    std::string functionName = "OuterProduct(" + vector + ", " + vector + ")";
+    PrintLine(functionName, native, singleBlas, multiBlas);
 }
 
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>

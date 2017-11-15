@@ -336,16 +336,6 @@ void TestVectorAbs()
 }
 
 template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorScalarAdd()
-{
-    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
-    math::Add(static_cast<ElementType>(-2.0), v);
-    math::Vector<ElementType, orientation> r{ -1, -3, 0, -4, 1 };
-
-    testing::ProcessTest("Add(scalar, Vector)", v == r);
-}
-
-template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorPlusEqualsOperator()
 {
     math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
@@ -363,54 +353,6 @@ void TestVectorMinusEqualsOperator()
     math::Vector<ElementType, orientation> r{ -1, -3, 0, -4, 1 };
 
     testing::ProcessTest("Add(scalar, Vector)", v == r);
-}
-
-template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorVectorAdd()
-{
-    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
-    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
-    math::Add(static_cast<ElementType>(-2.0), v, u);
-    math::Vector<ElementType, orientation> r{ -1, 4, -1, 8, -1 };
-
-    testing::ProcessTest("Add(scalar, Vector, Vector)", u == r);
-}
-
-template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
-void TestVectorVectorAddImplementation()
-{
-    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
-    using Ops = math::Internal::VectorOperations<implementation>;
-
-    math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
-    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
-    Ops::Add(static_cast<ElementType>(-2.0), v, u);
-    math::Vector<ElementType, orientation> r{ -1, 4, -1, 8, -1 };
-    
-    testing::ProcessTest(implementationName + "::Add(scalar, Vector, Vector)", u == r);
-}
-
-template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorScalarMultiply()
-{
-    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
-    math::Multiply(static_cast<ElementType>(-2.0), v);
-    math::Vector<ElementType, orientation> r{ -2, 2, -4, 4, -6 };
-
-    testing::ProcessTest("Multiply(scalar, Vector)", v == r);
-}
-
-template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
-void TestVectorScalarMultiplyImplementation()
-{
-    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
-    using Ops = math::Internal::VectorOperations<implementation>;
-
-    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
-    Ops::Multiply(static_cast<ElementType>(-2.0), v);
-    math::Vector<ElementType, orientation> r{ -2, 2, -4, 4, -6 };
-
-    testing::ProcessTest(implementationName + "::Multiply(scalar, Vector)", v == r);
 }
 
 template <typename ElementType, math::VectorOrientation orientation>
@@ -434,36 +376,15 @@ void TestVectorDivideEqualsOperator()
 }
 
 template <typename ElementType, math::VectorOrientation orientation>
-void TestVectorScalarMultiplyAdd()
-{
-    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2, 3 };
-    math::MultiplyAdd(static_cast<ElementType>(2.0), static_cast<ElementType>(1.0), v);
-    math::Vector<ElementType, orientation> r{ 3, -1, 5, -3, 7 };
-
-    testing::ProcessTest("MultiplyAdd(scalar, Vector)", v == r);
-}
-
-template <typename ElementType, math::VectorOrientation orientation>
 void TestVectorElementwiseMultiply()
 {
     math::Vector<ElementType, orientation> u{ 1, 2, 3, 4, 5 };
     math::Vector<ElementType, orientation> v{ 2, 0, -1, 0, 1 };
     math::Vector<ElementType, orientation> w(5);
-    math::ElementwiseMultiply(u, v, w);
+    math::ElementwiseMultiplySet(u, v, w);
     math::Vector<ElementType, orientation> r{ 2, 0, -3, 0, 5 };
 
-    testing::ProcessTest("ElementwiseMultiply(Vector, Vector)", w == r);
-}
-
-template <typename ElementType>
-void TestVectorVectorInner()
-{
-    math::RowVector<ElementType> u{ 1, 2, 3, 4, 5 };
-    math::ColumnVector<ElementType> v{ 1, -1, 2, -2, 3 };
-    ElementType result;
-    math::Inner(u, v, result);
-
-    testing::ProcessTest("Inner(Vector, Vector)", result == 12);
+    testing::ProcessTest("ElementwiseMultiplySet(Vector, Vector)", w == r);
 }
 
 template <typename ElementType, math::VectorOrientation orientation>
@@ -476,21 +397,24 @@ void TestVectorVectorDot()
     testing::ProcessTest("Dot(Vector, Vector)", result == 12);
 }
 
-template <typename ElementType>
+template <typename ElementType, math::MatrixLayout layout, math::ImplementationType implementation>
 void TestVectorVectorOuter()
 {
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+    using Ops = math::Internal::VectorOperations<implementation>;
+
     math::ColumnVector<ElementType> u{ 1, 2, 3 };
     math::RowVector<ElementType> v{ 1, -1 };
-    math::ColumnMatrix<ElementType> A(3, 2);
+    math::Matrix<ElementType, layout> A(3, 2);
 
-    math::Outer(u, v, A);
+    Ops::OuterProduct(u, v, A);
 
     math::ColumnMatrix<ElementType> B{ {1, -1}, {2, -2}, {3, -3} };
-    testing::ProcessTest("Outer(Vector, Vector)", A == B);
+    testing::ProcessTest(implementationName + "::OuterProduct(Vector, Vector)", A == B);
 }
 
 template <typename ElementType, math::ImplementationType implementation>
-void TestVectorVectorInnerImplementation()
+void TestVectorVectorInner()
 {
     auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
     using Ops = math::Internal::VectorOperations<implementation>;
@@ -498,9 +422,569 @@ void TestVectorVectorInnerImplementation()
     math::RowVector<ElementType> u{ 1, 2, 3, 4, 5 };
     math::ColumnVector<ElementType> v{ 1, -1, 2, -2, 3 };
     ElementType result;
-    math::Internal::VectorOperations<implementation>::Inner(u, v, result);
+    Ops::InnerProduct(u, v, result);
 
-    testing::ProcessTest(implementationName + "::Dot(Vector, Vector)", result == 12);
+    testing::ProcessTest(implementationName + "::InnerProduct(Vector, Vector)", result == 12);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddUpdateScalar()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::AddUpdate(a, u);
+
+    math::Vector<ElementType, orientation> w{ -2, 0, 1, 1 };
+    math::ScaleAddUpdate<implementation>(a, math::OnesVector(), static_cast<ElementType>(1), w);
+
+    math::Vector<ElementType, orientation> r{ 1, 3, 4, 4 };
+    testing::ProcessTest(implementationName + "::AddUpdate(scalar, Vector)", u == r && w == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddUpdateVector()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2 };
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::AddUpdate<implementation>(v, u);
+
+    math::Vector<ElementType, orientation> w{ -2, 0, 1, 1 };
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(1), v, static_cast<ElementType>(1), w);
+
+    math::Vector<ElementType, orientation> r{ -1, -1, 3, -1 };
+    testing::ProcessTest(implementationName + "::AddUpdate(Vector, Vector)", u == r && w == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddSetScalar()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+    math::AddSet<implementation>(a, u, z);
+
+    math::Vector<ElementType, orientation> w(4);
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), static_cast<ElementType>(1), u, w);
+
+    math::Vector<ElementType, orientation> r{ 1, 3, 4, 4 };
+    testing::ProcessTest(implementationName + "::AddSet(scalar, Vector, output)", z == r && w == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddSetScalarZero()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 0.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+    math::AddSet<implementation>(a, u, z);
+
+    math::Vector<ElementType, orientation> w(4);
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), static_cast<ElementType>(1), u, w);
+
+    testing::ProcessTest(implementationName + "::AddSet(0.0, Vector, output)", z == u && w == u);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddSetScalarOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 1.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+    math::AddSet<implementation>(a, u, z);
+
+    math::Vector<ElementType, orientation> w(4);
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), static_cast<ElementType>(1), u, w);
+
+    math::Vector<ElementType, orientation> r{ -1, 1, 2, 2 };
+    testing::ProcessTest(implementationName + "::AddSet(1.0, Vector, output)", z == r && w == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorAddSetVector()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2 };
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::AddSet<implementation>(v, u, z);
+
+    math::Vector<ElementType, orientation> w(4);
+    math::ScaleAddSet<implementation>(static_cast<ElementType>(1), v, static_cast<ElementType>(1), u, w);
+
+    math::Vector<ElementType, orientation> r{ -1, -1, 3, -1 };
+    testing::ProcessTest(implementationName + "::ScaleAddUpdate(1.0, Vector, 1.0, Vector)", z == r && w == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleUpdate()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::ScaleUpdate<implementation>(b, u);
+
+    math::Vector<ElementType, orientation> r{ -4, 0, 2, 2 };
+    testing::ProcessTest(implementationName + "::ScaleUpdate(scalar, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleUpdateZero()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType b = 0.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::ScaleUpdate<implementation>(b, u);
+
+    math::Vector<ElementType, orientation> r{ 0, 0, 0, 0 };
+    testing::ProcessTest(implementationName + "::ScaleUpdate(0.0, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleUpdateOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType b = 1.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::ScaleUpdate<implementation>(b, u);
+
+    math::Vector<ElementType, orientation> r{ -2, 0, 1, 1 };
+    testing::ProcessTest(implementationName + "::ScaleUpdate(1.0, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleSet()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2 };
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::ScaleSet<implementation>(a, v, u);
+
+    math::Vector<ElementType, orientation> r{ 3, -3, 6, -6 };
+    testing::ProcessTest(implementationName + "::ScaleSet(scalar, Vector, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleSetZero()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 0.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2 };
+    math::Vector<ElementType, orientation> u{ 2, 0, 1, 1 };
+    math::ScaleSet<implementation>(a, v, u);
+
+    math::Vector<ElementType, orientation> r{ 0, 0, 0, 0 };
+    testing::ProcessTest(implementationName + "::ScaleSet(0.0, Vector, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleSetOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 1.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2 };
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::ScaleSet<implementation>(a, v, u);
+
+    math::Vector<ElementType, orientation> r{ 1, -1, 2, -2 };
+    testing::ProcessTest(implementationName + "::ScaleSet(1.0, Vector, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddUpdateScalarVectorOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2 };
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::ScaleAddUpdate<implementation>(a, v, math::One(), u);
+
+    math::Vector<ElementType, orientation> w{ -2, 0, 1, 1 };
+    math::ScaleAddUpdate<implementation>(a, v, static_cast<ElementType>(1), w);
+
+    math::Vector<ElementType, orientation> r{ 1, -3, 7, -5 };
+    testing::ProcessTest(implementationName + "::ScaleAddUpdate(scalar, Vector, 1.0, Vector)", u == r && w == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddUpdateScalarOnesScalar()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::ScaleAddUpdate<implementation>(a, math::OnesVector(), b, u);
+
+    math::Vector<ElementType, orientation> r{ -1, 3, 5, 5 };
+    testing::ProcessTest(implementationName + "::ScaleAddUpdate(scalar, Ones, scalar, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddUpdateOneVectorScalar()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2 };
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::ScaleAddUpdate<implementation>(math::One(), v, b, u);
+
+    math::Vector<ElementType, orientation> w{ -2, 0, 1, 1 };
+    math::ScaleAddUpdate<implementation>(static_cast<ElementType>(1), v, b, w);
+
+    math::Vector<ElementType, orientation> r{ -3, -1, 4, 0 };
+    testing::ProcessTest(implementationName + "::ScaleAddUpdate(1.0, Vector, scalar, Vector)", u == r && w == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddUpdateScalarVectorScalar()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 2, -2 };
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+
+    math::ScaleAddUpdate<implementation>(a, v, b, u);
+
+    math::Vector<ElementType, orientation> r{ -1, -3, 8, -4 };
+    testing::ProcessTest(implementationName + "::ScaleAddUpdate(scalar, Vector, scalar, Vector)", u == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnes()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -1, 3, 5, 5 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(scalar, ones, scalar, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesScalarZero()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    ElementType b = 0.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), b, u, z);
+
+    math::Vector<ElementType, orientation> r{ 3, 3, 3, 3 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(scalar, ones, 0.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesScalarOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    ElementType b = 1.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), b, u, z);
+
+    math::Vector<ElementType, orientation> r{ 1, 3, 4, 4 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(scalar, ones, 1.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesZeroScalar()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 0.0;
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -4, 0, 2, 2 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(0.0, ones, scalar, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesOneScalar()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 1.0;
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -3, 1, 3, 3 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(1.0, ones, scalar, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesZeroOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 0.0;
+    ElementType b = 1.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -2, 0, 1, 1 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(0.0, ones, 1.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesOneZero()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 1.0;
+    ElementType b = 0.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), b, u, z);
+
+    math::Vector<ElementType, orientation> r{ 1, 1, 1, 1 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(1.0, ones, 0.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesOneOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 1.0;
+    ElementType b = 1.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -1, 1, 2, 2 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(1.0, ones, 1.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetOnesZeroZero()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 0.0;
+    ElementType b = 0.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, math::OnesVector(), b, u, z);
+
+    math::Vector<ElementType, orientation> r{ 0, 0, 0, 0 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(0.0, ones, 0.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVector()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 1, -1 };
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, v, b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -1, -3, 5, -1 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(scalar, Vector, scalar, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorScalarZero()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 1, -1 };
+    ElementType b = 0.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, v, b, u, z);
+
+    math::Vector<ElementType, orientation> r{ 3, -3, 3, -3 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(scalar, Vector, 0.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorScalarOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 3.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 1, -1 };
+    ElementType b = 1.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, v, b, u, z);
+
+    math::Vector<ElementType, orientation> r{ 1, -3, 4, -2 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(scalar, Vector, 1.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorZeroScalar()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 0.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 1, -1 };
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, v, b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -4, 0, 2, 2 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(0.0, Vector, scalar, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorOneScalar()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 1.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 1, -1 };
+    ElementType b = 2.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, v, b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -3, -1, 3, 1 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(1.0, Vector, scalar, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorZeroOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 0.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 1, -1 };
+    ElementType b = 1.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, v, b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -2, 0, 1, 1 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(0.0, Vector, 1.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorOneZero()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 1.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 1, -1 };
+    ElementType b = 0.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, v, b, u, z);
+
+    math::Vector<ElementType, orientation> r{ 1, -1, 1, -1 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(1.0, Vector, 0.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorOneOne()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 1.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 1, -1 };
+    ElementType b = 1.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, v, b, u, z);
+
+    math::Vector<ElementType, orientation> r{ -1, -1, 2, 0 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(1.0, Vector, 1.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
+void TestVectorScaleAddSetVectorZeroZero()
+{
+    auto implementationName = math::Internal::VectorOperations<implementation>::GetImplementationName();
+
+    ElementType a = 0.0;
+    math::Vector<ElementType, orientation> v{ 1, -1, 1, -1 };
+    ElementType b = 0.0;
+    math::Vector<ElementType, orientation> u{ -2, 0, 1, 1 };
+    math::Vector<ElementType, orientation> z(4);
+
+    math::ScaleAddSet<implementation>(a, v, b, u, z);
+
+    math::Vector<ElementType, orientation> r{ 0, 0, 0, 0 };
+    testing::ProcessTest(implementationName + "::ScaleAddSet(0.0, Vector, 0.0, Vector, output)", z == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorCumulativeSumUpdate()
+{
+    math::Vector<ElementType, orientation> v{ 1, -1, 3, 2 };
+    math::CumulativeSumUpdate(v);
+    math::Vector<ElementType, orientation> r{ 1, 0, 3, 5 };
+    testing::ProcessTest("CumulativeSumUpdate(Vector)", v == r);
+}
+
+template <typename ElementType, math::VectorOrientation orientation>
+void TestVectorConsecutiveDifferenceUpdate()
+{
+    math::Vector<ElementType, orientation> v{ 1, -1, 3, 2 };
+    math::ConsecutiveDifferenceUpdate(v);
+    math::Vector<ElementType, orientation> r{ 1, -2, 4, -1 };
+    testing::ProcessTest("ConsecutiveDifferenceUpdate(Vector)", v == r);
 }
 
 template <typename ElementType, math::VectorOrientation orientation>

@@ -95,20 +95,41 @@ namespace math
 
         /// @{
         /// <summary>
-        /// Wraps the BLAS DOT function, which computes the dot Multiply of two vectors.
+        /// Wraps the BLAS DOT function, which computes the dot product of two vectors.
         /// </summary>
         ///
         /// <param name="n"> The size of each of the arrays that store the vectors. </param>
         /// <param name="x"> Pointer to the first element of the first array. </param>
         /// <param name="incx"> The Increment of the first array. </param>
-        /// <param name="y"> Pointer to the left-hand-side array, which is modified by this procedure. </param>
+        /// <param name="y"> Pointer to the first element of the second array. </param>
         /// <param name="incy"> The Increment of the second array. </param>
         ///
-        /// <returns> The dot Multiply. </returns>
+        /// <returns> The vector dot product. </returns>
         float Dot(int n, const float* x, int incx, const float* y, int incy);
         double Dot(int n, const double* x, int incx, const double* y, int incy);
         /// @}
 
+         /// @{
+        /// <summary>
+        /// Wraps the BLAS GER function, which computes the outer product of two vectors.
+        /// </summary>
+        ///
+        /// <param name="order"> Row major or column major. </param>
+        /// <param name="m"> Number of matrix rows. </param>
+        /// <param name="n"> Number of matrix columns. </param>
+        /// <param name="alpha"> The scalar alpha, which multiplies the matrix-vector Multiply. </param>
+        /// <param name="x"> Pointer to the first element of the first array. </param>
+        /// <param name="incx"> The Increment of the first array. </param>
+        /// <param name="y"> Pointer to the first element of the second array. </param>
+        /// <param name="incy"> The Increment of the second array. </param>
+        /// <param name="M"> The left-hand side matrix M. </param>
+        /// <param name="lda"> The matrix increment. </param>
+        ///
+        /// <returns> The dot Multiply. </returns>
+        void Ger(MatrixLayout order, int m, int n, float alpha, const float* x, int incx, const float* y, int incy, float* M, int lda);
+        void Ger(MatrixLayout order, int m, int n, double alpha, const double* x, int incx, const double* y, int incy, double* M, int lda);
+        /// @}
+        
         /// @{
         /// <summary> Wraps the BLAS GEMV function, which implements generalized matrix vector multiplication, y = alpha*M*x + beta*y. </summary>
         ///

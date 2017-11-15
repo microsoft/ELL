@@ -1004,14 +1004,14 @@ void TestMatrixElementwiseMultiply()
 
     math::Matrix<ElementType, layout> C(2, 3);
 
-    math::ElementwiseMultiply(M, N, C);
+    math::ElementwiseMultiplySet(M, N, C);
 
     math::Matrix<ElementType, layout> R{
         { -1, 2, 0 },
         { 0, 3, 14 }
     };
 
-    testing::ProcessTest("ElementwiseMultiply(Matrix, Matrix, Matrix)", C == R);
+    testing::ProcessTest("ElementwiseMultiplySet(Matrix, Matrix, Matrix)", C == R);
 }
 
 template <typename ElementType, math::MatrixLayout layout>

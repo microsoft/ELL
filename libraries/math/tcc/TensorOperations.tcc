@@ -243,7 +243,7 @@ namespace math
                 for (size_t j = 0; j < tensor.GetSize0(); ++j)
                 {
                     auto u = M.GetRow(j);
-                    VectorOperations<ImplementationType::native>::Multiply(vector[j], u);
+                    ScaleUpdate(vector[j], u);
                 }
             }
         }
@@ -284,7 +284,7 @@ namespace math
                 for (size_t j = 0; j < tensor.GetSize0(); ++j)
                 {
                     auto u = M.GetRow(j);
-                    VectorOperations<ImplementationType::openBlas>::Multiply(vector[j], u);
+                    ScaleUpdate(vector[j], u);
                 }
             }
         }

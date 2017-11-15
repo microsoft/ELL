@@ -201,7 +201,7 @@ namespace math
     /// <param name="matrixB"> The second matrix. </param>
     /// <param name="matrixC"> A matrix used to store the result in the layout of first matrix. </param>
     template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
-    void ElementwiseMultiply(ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, MatrixReference<ElementType, layoutA> matrixC);
+    void ElementwiseMultiplySet(ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, MatrixReference<ElementType, layoutA> matrixC);
 
     /// @}
 

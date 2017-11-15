@@ -14,14 +14,14 @@ using namespace ell;
 // stl
 #include <string>
 
-template <typename ElementType>
-void ProfileVectorAdd(size_t size, size_t repetitions, std::string seed = "123ABC");
+template<typename ElementType>
+void ProfileVectorScaleAdd(size_t size, size_t repetitions, std::string seed = "123ABC");
 
 template <typename ElementType>
-void ProfileVectorMultiply(size_t size, size_t repetitions, std::string seed = "123ABC");
+void ProfileVectorInner(size_t size, size_t repetitions, std::string seed = "123ABC");
 
-template <typename ElementType>
-void ProfileVectorDot(size_t size, size_t repetitions, std::string seed = "123ABC");
+template <typename ElementType, math::MatrixLayout layout>
+void ProfileVectorOuter(size_t size, size_t repetitions, std::string seed = "123ABC");
 
 template <typename ElementType, math::MatrixLayout layout1, math::MatrixLayout layout2>
 void ProfileMatrixAdd(size_t numRows, size_t numColumns, size_t repetitions, std::string seed = "123ABC");

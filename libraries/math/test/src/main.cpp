@@ -16,14 +16,46 @@ using namespace ell;
 template<typename ElementType, math::ImplementationType implementation>
 void RunVectorImplementationTests()
 {
-    TestVectorVectorInnerImplementation<ElementType, implementation>();
+    TestVectorVectorInner<ElementType, implementation>();
 }
 
 template<typename ElementType, math::VectorOrientation orientation, math::ImplementationType implementation>
 void RunOrientedVectorImplementationTests()
 {
-    TestVectorVectorAddImplementation<ElementType, orientation, implementation>();
-    TestVectorScalarMultiplyImplementation<ElementType, orientation, implementation>();
+    TestVectorAddUpdateScalar<ElementType, orientation, implementation>();
+    TestVectorAddUpdateVector<ElementType, orientation, implementation>();
+    TestVectorAddSetScalar<ElementType, orientation, implementation>();
+    TestVectorAddSetScalarZero<ElementType, orientation, implementation>();
+    TestVectorAddSetScalarOne<ElementType, orientation, implementation>();
+    TestVectorAddSetVector<ElementType, orientation, implementation>();
+    TestVectorScaleUpdate<ElementType, orientation, implementation>();
+    TestVectorScaleUpdateZero<ElementType, orientation, implementation>();
+    TestVectorScaleUpdateOne<ElementType, orientation, implementation>();
+    TestVectorScaleSet<ElementType, orientation, implementation>();
+    TestVectorScaleSetZero<ElementType, orientation, implementation>();
+    TestVectorScaleSetOne<ElementType, orientation, implementation>();
+    TestVectorScaleAddUpdateScalarVectorOne<ElementType, orientation, implementation>();
+    TestVectorScaleAddUpdateScalarOnesScalar<ElementType, orientation, implementation>();
+    TestVectorScaleAddUpdateOneVectorScalar<ElementType, orientation, implementation>();
+    TestVectorScaleAddUpdateScalarVectorScalar<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetOnes<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetOnesScalarZero<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetOnesScalarOne<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetOnesZeroScalar<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetOnesZeroOne<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetOnesOneZero<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetOnesZeroOne<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetOnesZeroZero<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetOnesOneOne<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetVector<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetVectorScalarZero<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetVectorScalarOne<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetVectorZeroScalar<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetVectorZeroOne<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetVectorOneZero<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetVectorZeroOne<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetVectorZeroZero<ElementType, orientation, implementation>();
+    TestVectorScaleAddSetVectorOneOne<ElementType, orientation, implementation>();
 }
 
 template<typename ElementType, math::VectorOrientation orientation>
@@ -45,17 +77,15 @@ void RunOrientedVectorTests()
     TestVectorSquare<ElementType, orientation>();
     TestVectorSqrt<ElementType, orientation>();
     TestVectorAbs<ElementType, orientation>();
-    TestVectorScalarAdd<ElementType, orientation>();
     TestVectorPlusEqualsOperator<ElementType, orientation>();
     TestVectorMinusEqualsOperator<ElementType, orientation>();
-    TestVectorVectorAdd<ElementType, orientation>();
-    TestVectorScalarMultiply<ElementType, orientation>();
     TestVectorTimesEqualsOperator<ElementType, orientation>();
     TestVectorDivideEqualsOperator<ElementType, orientation>();
-    TestVectorScalarMultiplyAdd<ElementType, orientation>();
     TestVectorElementwiseMultiply<ElementType, orientation>();
     TestVectorVectorDot<ElementType, orientation>();
     TestVectorArchiver<ElementType, orientation>();
+    TestVectorCumulativeSumUpdate<ElementType, orientation>();
+    TestVectorConsecutiveDifferenceUpdate<ElementType, orientation>();
 
     RunOrientedVectorImplementationTests<ElementType, orientation, math::ImplementationType::native>();
     RunOrientedVectorImplementationTests<ElementType, orientation, math::ImplementationType::openBlas>();
@@ -74,8 +104,6 @@ void RunVectorTests()
     TestVectorNorm2<ElementType>();
     TestVectorNorm2Squared<ElementType>();
     TestVectorToArray<ElementType>();
-    TestVectorVectorInner<ElementType>();
-    TestVectorVectorOuter<ElementType>();
 
     RunOrientedVectorTests<ElementType, math::VectorOrientation::row>();
     RunOrientedVectorTests<ElementType, math::VectorOrientation::column>();
@@ -97,6 +125,7 @@ void RunLayoutMatrixImplementationTests()
     TestMatrixScalarMultiply<ElementType, layout, implementation>();
     TestMatrixVectorMultiply<ElementType, layout, implementation>();
     TestVectorMatrixMultiply<ElementType, layout, implementation>();
+    TestVectorVectorOuter<ElementType, layout, implementation>();
 
     RunLayoutMatrixMatrixImplementationTests<ElementType, layout, layout, implementation>();
     RunLayoutMatrixMatrixImplementationTests<ElementType, layout, math::TransposeMatrixLayout<layout>::value, implementation>();

@@ -62,7 +62,7 @@ namespace math
     {
         for (size_t i = 0; i < matrix.GetMinorSize(); ++i)
         {
-            Add(scalar, matrix.GetMajorVector(i));
+            AddUpdate(scalar, matrix.GetMajorVector(i));
         }
     }
 
@@ -164,19 +164,19 @@ namespace math
             for (size_t i = 0; i < matrix.GetMinorSize(); ++i)
             {
                 auto interval = matrix.GetMajorVector(i);
-                math::MultiplyAdd(scalarA, scalarB, interval);
+                math::ScaleAddUpdate(scalarB, OnesVector(), scalarA, interval);
             }
         }
     }
 
     template <typename ElementType, MatrixLayout layoutA, MatrixLayout layoutB>
-    void ElementwiseMultiply(ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, MatrixReference<ElementType, layoutA> matrixC)
+    void ElementwiseMultiplySet(ConstMatrixReference<ElementType, layoutA> matrixA, ConstMatrixReference<ElementType, layoutB> matrixB, MatrixReference<ElementType, layoutA> matrixC)
     {
         DEBUG_THROW(matrixA.NumRows() != matrixB.NumRows() || matrixA.NumColumns() != matrixB.NumColumns() || matrixB.NumRows() != matrixC.NumRows() || matrixB.NumColumns() != matrixC.NumColumns(), utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Incompatible matrix sizes."));
 
         for (size_t i = 0; i < matrixA.NumRows(); ++i)
         {
-            math::ElementwiseMultiply(matrixA.GetRow(i), matrixB.GetRow(i), matrixC.GetRow(i));
+            math::ElementwiseMultiplySet(matrixA.GetRow(i), matrixB.GetRow(i), matrixC.GetRow(i));
         }
     }
 
@@ -193,8 +193,8 @@ namespace math
 
             for (size_t i = 0; i < matrixA.NumRows(); ++i)
             {
-                VectorOperations<ImplementationType::native>::Add(value1, matrixA.GetRow(i), matrixC.GetRow(i));
-                VectorOperations<ImplementationType::native>::Add(value2, matrixB.GetRow(i), matrixC.GetRow(i));
+                ScaleAddUpdate<ImplementationType::native>(value1, matrixA.GetRow(i), One(), matrixC.GetRow(i));
+                ScaleAddUpdate<ImplementationType::native>(value2, matrixB.GetRow(i), One(), matrixC.GetRow(i));
             }
         }
 
@@ -203,7 +203,7 @@ namespace math
         {
             for (size_t i = 0; i < matrix.GetMinorSize(); ++i)
             {
-                VectorOperations<ImplementationType::native>::Multiply(scalar, matrix.GetMajorVector(i));
+                ScaleUpdate(scalar, matrix.GetMajorVector(i));
             }
         }
 
@@ -259,8 +259,8 @@ namespace math
 
             for (size_t i = 0; i < matrixA.NumRows(); ++i)
             {
-                VectorOperations<ImplementationType::openBlas>::Add(value1, matrixA.GetRow(i), matrixC.GetRow(i));
-                VectorOperations<ImplementationType::openBlas>::Add(value2, matrixB.GetRow(i), matrixC.GetRow(i));
+                ScaleAddUpdate<ImplementationType::openBlas>(value1, matrixA.GetRow(i), One(), matrixC.GetRow(i));
+                ScaleAddUpdate<ImplementationType::openBlas>(value2, matrixB.GetRow(i), One(), matrixC.GetRow(i));
             }
         }
 
@@ -269,7 +269,7 @@ namespace math
         {
             for (size_t i = 0; i < matrix.GetMinorSize(); ++i)
             {
-                VectorOperations<ImplementationType::openBlas>::Multiply(scalar, matrix.GetMajorVector(i));
+                ScaleUpdate(scalar, matrix.GetMajorVector(i));
             }
         }
 

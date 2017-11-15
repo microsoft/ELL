@@ -129,14 +129,14 @@ namespace trainers
 
         // full(sum(B. ^ 2, 1));
         math::ColumnMatrix<double> bSquare(B.NumRows(), B.NumColumns());
-        math::ElementwiseMultiply(B, B, bSquare);
+        math::ElementwiseMultiplySet(B, B, bSquare);
 
         math::ColumnMatrix<double> bColNormSquare(1, bSquare.NumColumns());
         math::ColumnwiseSum(bSquare, bColNormSquare.GetRow(0));
 
         // full(sum(WX. ^ 2, 1));
         math::ColumnMatrix<double> wxSquare(wx.NumRows(), wx.NumColumns());
-        math::ElementwiseMultiply(wx, wx, wxSquare);
+        math::ElementwiseMultiplySet(wx, wx, wxSquare);
 
         math::ColumnMatrix<double> wxColNormSquare(1, wxSquare.NumColumns());
         math::ColumnwiseSum(wxSquare, wxColNormSquare.GetRow(0));
@@ -546,7 +546,7 @@ namespace trainers
         math::Multiply<double>(1.0, residual, Z, 0, T);
 
         // T = D .* T
-        math::ElementwiseMultiply(T, D, T);
+        math::ElementwiseMultiplySet(T, D, T);
 
         math::ColumnMatrix<double> colMult(1, T.NumRows());
         math::ColumnwiseSum(T.Transpose(), colMult.GetRow(0));
@@ -667,7 +667,7 @@ namespace trainers
         math::Multiply<double>(1.0, residual, Z, 0, T);
 
         // T = D .* T (final output T = residual * Z * Similarity)
-        math::ElementwiseMultiply(T, Similarity, T);
+        math::ElementwiseMultiplySet(T, Similarity, T);
 
         // gradient_paramS = B (initialized gradient_paramS to prototypes)
         math::ColumnMatrix<double> gradient(B.NumRows(), B.NumColumns());

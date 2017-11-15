@@ -18,5 +18,11 @@ namespace math
         native,
         openBlas
     };
+
+    /// <summary> A stub class that represents the scalar one. </summary>
+    struct One {};
+
+    /// <summary> A stub class that represents the all-ones vector. </summary>
+    struct OnesVector {};
 }
 }

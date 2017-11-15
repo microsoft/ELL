@@ -81,10 +81,10 @@ namespace trainers
         auto k = means.NumColumns();
 
         math::ColumnMatrix<double> xSq(X.NumRows(), n);
-        math::ElementwiseMultiply(X, X, xSq);
+        math::ElementwiseMultiplySet(X, X, xSq);
 
         math::ColumnMatrix<double> muSq(means.NumRows(), k);
-        math::ElementwiseMultiply(means, means, muSq);
+        math::ElementwiseMultiplySet(means, means, muSq);
 
         math::ColumnMatrix<double> xSqNorm(1, xSq.NumColumns());
         math::ColumnwiseSum(xSq, xSqNorm.GetRow(0));
