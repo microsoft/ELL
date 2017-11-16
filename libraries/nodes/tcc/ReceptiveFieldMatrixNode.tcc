@@ -194,10 +194,6 @@ namespace nodes
                                          size_t outputHeight,
                                          llvm::Value* outputMatrix)
         {
-            auto& context = function.GetLLVMContext();
-            auto& emitter = function.GetEmitter();
-            auto& irBuilder = emitter.GetIRBuilder();
-
             // Model parameters
             const auto inputHeight = inputLayout.GetActiveSize(0);
             const auto inputWidth = inputLayout.GetActiveSize(1);
@@ -287,11 +283,7 @@ namespace nodes
                         depthLoop.Begin(inputDepth);
                         {
                             llvm::Value* channel = depthLoop.LoadIterationVariable();
-                            llvm::Value* inputDepthOffset = function.Operator(times, channel, function.Literal<int>(inputWidth * inputHeight));
                             llvm::Value* outputDepthOffset = function.Operator(times, channel, function.Literal<int>(numOutputColumns));
-
-                            // Points to beginning of the current channel in inputVolume
-                            llvm::Value* inputChannelPtr = function.PointerOffset(inputVolume, inputDepthOffset);
 
                             // Points to the beginning of the current channel in the outputMatrix
                             llvm::Value* outputChannelPtr = function.PointerOffset(outputMatrix, outputDepthOffset);
@@ -358,7 +350,6 @@ namespace nodes
             }
             else // Normal, single value-at-a-time method
             {
-                auto valueType = emitters::GetVariableType<ValueType>();
                 llvm::Value* filterWidthVal = function.Literal<int>(filterWidth);
                 llvm::Value* inputDepthVal = function.Literal<int>(inputDepth);
 
@@ -395,14 +386,12 @@ namespace nodes
                     {
                         auto outputImageRow = rowLoop.LoadIterationVariable();
                         auto inputRow = function.Operator(times, outputImageRow, function.Literal<int>(stride));
-                        // TODO: we can just globally offset the input memory pointer and get rid of this offset index:
-                        auto paddedInputRow = function.Operator(plus, inputRow, function.Literal<int>(inputLayout.GetOffset(0)));
+
                         auto columnLoop = function.ForLoop();
                         columnLoop.Begin(outputWidth);
                         {
                             auto outputImageColumn = columnLoop.LoadIterationVariable();
                             auto inputColumn = function.Operator(times, outputImageColumn, function.Literal<int>(stride));
-                            auto paddedInputColumn = function.Operator(plus, inputColumn, function.Literal<int>(inputLayout.GetOffset(1)));
 
                             // outRowOffset is the offset to the f'th row in the output S matrix
                             auto outRowOffset = function.Operator(times, f, function.Literal<int>(outputHeight * outputWidth));

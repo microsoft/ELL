@@ -58,7 +58,7 @@ namespace nodes
         emitters::Variable* pBufferedSampleVar = function.GetModule().Variables().AddVariable<emitters::InitializedVectorVariable<ValueType>>(emitters::VariableScope::global, output.Size());
         llvm::Value* pBufferedSampleTime = function.GetModule().EnsureEmitted(*pBufferedSampleTimeVar);
         llvm::Value* pBufferedSample = function.GetModule().EnsureEmitted(*pBufferedSampleVar);
-        llvm::Value* bufferedSampleTime = function.Load(pBufferedSampleTime);
+        llvm::Value* bufferedSampleTime = function.Load(pBufferedSampleTime); unused(bufferedSampleTime);
 
         // Callback function
         const emitters::VariableTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };

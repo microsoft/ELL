@@ -142,7 +142,7 @@ namespace nodes
         llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output, _paddingValue);
         assert(this->input.Size() > 1);
 
-        int outputSize = _outputMemoryLayout.GetMemorySize();
+        int outputSize = _outputMemoryLayout.GetMemorySize(); unused(outputSize);
 
         auto xLoop = function.ForLoop();
         xLoop.Begin(_outputMemoryLayout.GetActiveSize(0));

@@ -698,7 +698,7 @@ void TestDuplicateStructs()
         UNUSED(struct2TypeA);
         UNUSED(struct2TypeB);
     }
-    catch(EmitterException& exception)
+    catch(EmitterException&)
     {
         gotException = true;
     }

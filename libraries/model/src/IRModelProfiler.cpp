@@ -299,7 +299,6 @@ namespace model
     void ModelProfiler::EmitGetModelPerformanceCountersFunction()
     {
         auto& emitter = _module->GetIREmitter();
-        auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetModelPerformanceCounters", _performanceCountersType->getPointerTo());
@@ -329,7 +328,6 @@ namespace model
         auto& emitter = _module->GetIREmitter();
         auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
-        auto voidType = llvm::Type::getVoidTy(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeInfo", _nodeInfoType->getPointerTo(), { int32Type });
@@ -348,7 +346,6 @@ namespace model
         auto& emitter = _module->GetIREmitter();
         auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
-        auto voidType = llvm::Type::getVoidTy(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeTypeInfo", _nodeInfoType->getPointerTo(), { int32Type });
@@ -367,7 +364,6 @@ namespace model
         auto& emitter = _module->GetIREmitter();
         auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
-        auto voidType = llvm::Type::getVoidTy(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodePerformanceCounters", _performanceCountersType->getPointerTo(), { int32Type });
@@ -386,7 +382,6 @@ namespace model
         auto& emitter = _module->GetIREmitter();
         auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
-        auto voidType = llvm::Type::getVoidTy(context);
         auto int32Type = llvm::Type::getInt32Ty(context);
 
         auto function = _module->BeginFunction(GetNamespacePrefix() + "_GetNodeTypePerformanceCounters", _performanceCountersType->getPointerTo(), { int32Type });
@@ -401,8 +396,6 @@ namespace model
 
     void ModelProfiler::EmitPrintModelProfilingInfoFunction()
     {
-        int numModelNodes = _model->Size();
-        int numEmittedNodes = _nodePerformanceCounters.size();
         auto& emitter = _module->GetIREmitter();
         auto& context = _module->GetLLVMContext();
         auto& irBuilder = emitter.GetIRBuilder();
@@ -445,7 +438,6 @@ namespace model
 
     void ModelProfiler::EmitPrintNodeProfilingInfoFunction()
     {
-        int numModelNodes = _model->Size();
         int numEmittedNodes = _nodePerformanceCounters.size();
         auto& emitter = _module->GetIREmitter();
         auto& context = _module->GetLLVMContext();

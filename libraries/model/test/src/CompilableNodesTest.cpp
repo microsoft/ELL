@@ -1112,10 +1112,7 @@ void TestNeuralNetworkPredictorNode1()
     using ElementType = double;
     using InputParameters = typename predictors::neural::InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename predictors::neural::Layer<ElementType>::LayerParameters;
-    using TensorType = typename predictors::neural::Layer<ElementType>::TensorType;
-    using Shape = typename predictors::neural::Layer<ElementType>::Shape;
     using VectorType = typename predictors::neural::Layer<ElementType>::VectorType;
-    using MatrixType = typename predictors::neural::Layer<ElementType>::MatrixType;
     using DataVectorType = typename predictors::NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
@@ -1168,8 +1165,6 @@ void TestNeuralNetworkPredictorNode2()
     using ElementType = double;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
-    using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
     using VectorType = typename Layer<ElementType>::VectorType;
     using MatrixType = typename Layer<ElementType>::MatrixType;
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
@@ -1238,10 +1233,6 @@ void TestNeuralNetworkPredictorNode3()
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
-    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
@@ -1309,10 +1300,6 @@ void TestNeuralNetworkPredictorNode4()
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
-    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
@@ -1384,10 +1371,6 @@ void TestNeuralNetworkPredictorNode5()
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
-    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
@@ -1471,10 +1454,7 @@ void TestNeuralNetworkPredictorNode6()
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
     using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
-    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
@@ -1557,8 +1537,6 @@ void TestNeuralNetworkPredictorNode7()
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
     using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
-    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net (a prefix of darknet's tinyYolo)
 
@@ -1728,10 +1706,6 @@ void TestInputLayerNode(size_t outputPadding)
     using ElementType = double;
     using InputParameters = typename predictors::neural::InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename predictors::neural::Layer<ElementType>::LayerParameters;
-    using TensorType = typename predictors::neural::Layer<ElementType>::TensorType;
-    using Shape = typename predictors::neural::Layer<ElementType>::Shape;
-    using VectorType = typename predictors::neural::Layer<ElementType>::VectorType;
-    using MatrixType = typename predictors::neural::Layer<ElementType>::MatrixType;
     using DataVectorType = typename predictors::NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
@@ -1743,7 +1717,6 @@ void TestInputLayerNode(size_t outputPadding)
     inputLayer = std::make_unique<predictors::neural::InputLayer<ElementType>>(inputParams);
 
     // Pooling layer
-    auto&& x = inputLayer->GetOutputMinusPadding();
     const size_t poolingSize = 3;
     const size_t poolingStride = 1;
 
@@ -1780,7 +1753,6 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     using TensorType = typename Layer<ElementType>::TensorType;
     using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
-    const double eps = 1e-6;
 
     // Build a model
     TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
@@ -1826,7 +1798,6 @@ void TestParametricReLUActivationLayerNode(size_t inputPaddingSize, size_t outpu
     using TensorType = typename Layer<ElementType>::TensorType;
     using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
-    const double eps = 1e-6;
 
     // Build a model
     TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
@@ -1941,7 +1912,6 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
     using TensorType = typename Layer<ElementType>::TensorType;
     using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
 
     const size_t k = 3;
     const size_t stride = 1;
@@ -1963,7 +1933,7 @@ void TestBinaryConvolutionalLayerNode(size_t imageRows, size_t imageColumns, siz
 
     BinaryConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
     layer.Compute();
-    auto output = layer.GetOutput();
+    auto output = layer.GetOutput(); unused(output);
 
     // Create model
     model::Model model;
@@ -1991,7 +1961,6 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
     using TensorType = typename Layer<ElementType>::TensorType;
     using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
 
     assert(inputPaddingSize == 1);
     TensorType inputWithPadding(1 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
@@ -2062,7 +2031,6 @@ void TestConvolutionalLayerNode2(ConvolutionType convolutionType, size_t inputPa
     using TensorType = typename Layer<ElementType>::TensorType;
     using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
 
     const size_t numRows = 56;
     const size_t numCols = 56;
@@ -2131,7 +2099,6 @@ void TestFullyConnectedLayerNode(size_t inputPaddingSize, size_t outputPaddingSi
     using TensorReferenceType = typename LayerType::TensorReferenceType;
     using MatrixType = typename LayerType::MatrixType;
     using Shape = typename LayerType::Shape;
-    using VectorType = typename LayerType::VectorType;
 
     // Set up layer
     TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
@@ -2176,7 +2143,6 @@ void TestPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size
     using TensorType = typename Layer<ElementType>::TensorType;
     using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
-    const double eps = 1e-6;
 
     // Build a model
     TensorType inputWithPadding(inRows + 2 * inputPaddingSize, inCols + 2 * inputPaddingSize, numChannels);
@@ -2218,10 +2184,8 @@ void TestScalingLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     using LayerParameters = typename LayerType::LayerParameters;
     using TensorType = typename LayerType::TensorType;
     using TensorReferenceType = typename LayerType::TensorReferenceType;
-    using MatrixType = typename LayerType::MatrixType;
     using Shape = typename LayerType::Shape;
     using VectorType = typename LayerType::VectorType;
-    const ElementType eps = 1e-6;
 
     // Set up scaling layer
     TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
@@ -2257,7 +2221,6 @@ void TestSoftmaxLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
     using TensorType = typename Layer<ElementType>::TensorType;
     using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
-    const ElementType eps = 1e-6;
 
     // Build a model
     TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
@@ -2287,17 +2250,13 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     using ElementType = double;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
-    using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
     using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
-    using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
     typename NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename NeuralNetworkPredictor<ElementType>::Layers layers;
     Layer<ElementType>::Shape dataShape = {rows, columns, channels };
-    auto dataSize = rows * columns * channels;
+    auto dataSize = rows * columns * channels; unused(dataSize);
 
     // Input layer
     InputParameters inputParams = { dataShape, NoPadding(), dataShape, NoPadding(), 1 };

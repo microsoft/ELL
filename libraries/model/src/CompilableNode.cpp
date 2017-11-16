@@ -221,6 +221,7 @@ namespace model
     {
         int numArgs = GetInputPorts().size() + GetOutputPorts().size();
         std::vector<llvm::Value*> args;
+        args.reserve(numArgs);
 
         for (auto port : GetInputPorts())
         {

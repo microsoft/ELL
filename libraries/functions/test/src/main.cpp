@@ -139,7 +139,6 @@ bool IsLowerBound(const FunctionType& function, double bound, Range range)
 template<typename LossType>
 void LossConjugateTest(LossType loss, double dual, double label, Range comparatorRange)
 {
-    const double epsilon = 1.0e-5;
     auto objective = [&](double x) {return -x*dual + loss(x, label); };
     double negativeConjugate = -loss.Conjugate(dual, label);
     bool isLowerBound = IsLowerBound(objective, negativeConjugate, comparatorRange);

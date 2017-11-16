@@ -80,8 +80,6 @@ namespace functions
             b = fmin(upperBound, fmax(lowerBound, b));
         }
         return b * label;
-        
-        return 0;
     }
 }
 }

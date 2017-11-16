@@ -20,17 +20,17 @@ namespace model
     {
         _offset.resize(_size.size(), 0);
     }
-    
+
     PortMemoryLayout::PortMemoryLayout(const Shape& size, const Shape& padding)
     : _size(size), _offset(padding)
     {
         _stride.resize(_size.size());
-        for(int index = 0; index < _size.size(); ++index)
+        for (size_t index = 0; index < _size.size(); ++index)
         {
-            _stride[index] = _size[index] + 2*padding[index];
+            _stride[index] = _size[index] + (2 * padding[index]);
         }
     }
-    
+
     PortMemoryLayout::PortMemoryLayout(const Shape& size, const Shape& stride, const Shape& offset)
         : _size(size), _stride(stride), _offset(offset)
     {
@@ -40,7 +40,7 @@ namespace model
     {
         return std::accumulate(_size.begin(), _size.end(), 1, std::multiplies<size_t>());
     }
-    
+
     size_t PortMemoryLayout::GetMemorySize() const
     {
         return std::accumulate(_stride.begin(), _stride.end(), 1, std::multiplies<size_t>());
@@ -76,9 +76,9 @@ namespace model
         auto increment = GetCumulativeIncrement();
         auto numDimensions = NumDimensions();
         size_t result = 0;
-        for (int index = 0; index < numDimensions; ++index)
+        for (size_t index = 0; index < numDimensions; ++index)
         {
-            result += increment[index] * (location[index]+_offset[index]);
+            result += increment[index] * (location[index] + _offset[index]);
         }
         return result;
     }
@@ -132,7 +132,7 @@ namespace model
             {
                 result = function.Operator(emitters::TypedOperator::logicalOr, result, test1);
             }
-            
+
             auto test2 = function.Comparison(emitters::TypedComparison::lessThan, function.Operator(emitters::TypedOperator::subtract, location[index], function.Literal<int>(_offset[index])), function.Literal<int>(_stride[index]));
             result = function.Operator(emitters::TypedOperator::logicalOr, result, test2);
         }
@@ -171,7 +171,7 @@ namespace model
             return false;
         }
 
-        for (int index = 0; index < size; ++index)
+        for (size_t index = 0; index < size; ++index)
         {
             if (shape1[index] != shape2[index])
             {

@@ -127,7 +127,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Arg sizes don't match");
         }
 
-        for (int index = 0; index < args.size(); ++index)
+        for (size_t index = 0; index < args.size(); ++index)
         {
             auto v = args[index];
 
@@ -173,7 +173,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Arg sizes don't match");
         }
 
-        for (int index = 0; index < args.size(); ++index)
+        for (size_t index = 0; index < args.size(); ++index)
         {
             auto s = args[index];
             if (result[index].IsType<PortElementsProxy>())
