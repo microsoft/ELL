@@ -611,8 +611,10 @@ class CntkXorModelTestCase(CntkToEllTestBase):
 class CntkToEllFullModelTestBase(CntkToEllTestBase):
     CATEGORIES_URL = 'https://raw.githubusercontent.com/Microsoft/ELL-models/master/models/ILSVRC2012/categories.txt'
     MODEL_URLS = [
-        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip',
-        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMB1AS/d_I160x160x3CMCMBMBMBMBMB1AS.cntk.zip',
+        'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip'
+
+        # the binarized model is randomly failing on Windows, so it is temporarily disabled (see user story 899)
+        #'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMB1AS/d_I160x160x3CMCMBMBMBMBMB1AS.cntk.zip',
         # Uncomment the next URL to test a VGG model in the gallery.
         # This could add >20mins to each test run, so it is not included by default.
         #'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S/v_I160x160x3CCMCCMCCCMCCCMCCCMF2048S.cntk.zip'
@@ -652,16 +654,6 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
         """
         for modelName in self.model_names:
             self.model_test_impl(modelName)
-
-    def retry(self, retries, op):
-        while retries > 0:
-            try:
-                print("Attempting operation with retries %d" % (retries))
-                return op()
-            except:
-                retries -= 1
-                pass
-        return op()
 
     def compute_ell_map(self, ellMap, ellOrderedInput, cntkResults, modelName):
         ellMapFromArchiveResults = ellMap.ComputeFloat(
@@ -740,11 +732,8 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             print('Comparing unarchived map output (reference)')
             sys.stdout.flush()
 
-            # sometimes this randomly fails, so doing a retry just as a 
-            # debugging aid to see if it is really this random...
-            ellMapFromArchiveResults = self.retry(3, 
-                lambda: self.compute_ell_map(ellMapFromArchive, 
-                    ellOrderedInput, cntkResults, modelName))
+            ellMapFromArchiveResults = self.compute_ell_map(ellMapFromArchive, 
+                    ellOrderedInput, cntkResults, modelName)
 
             print('Comparing map output (compiled)')
             sys.stdout.flush()

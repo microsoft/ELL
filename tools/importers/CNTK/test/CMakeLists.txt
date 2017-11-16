@@ -12,7 +12,7 @@ if(${PYTHONINTERP_FOUND})
 
     set (test_name ${module_name}_test)
 
-    set (test_src cntk_to_ell_importer_test.py cntk_full_model_test.py)
+    set (test_src cntk_to_ell_importer_test.py)
     set (src ${test_src} cntk_full_model_test.py)
 
     set (test_data xorModel1.dnn)
