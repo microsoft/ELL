@@ -21,7 +21,6 @@ void LinearPredictorTest()
 
     // now test a known predictor.
     using DataVectorType = typename predictors::LinearPredictor<ElementType>::DataVectorType;
-    const int dim = 5;
     math::ColumnVector<ElementType> weights({ 1, 2, 3, 4, 5 });
     ElementType bias = 1.5;
 

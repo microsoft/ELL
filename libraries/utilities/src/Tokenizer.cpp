@@ -16,7 +16,7 @@
 #include <iostream>
 #include <sstream>
 
-// Note: BUFFER_SIZE must be larger than the largest readable token 
+// Note: BUFFER_SIZE must be larger than the largest readable token
 #define BUFFER_SIZE 1024*1024
 
 namespace ell
@@ -201,7 +201,7 @@ namespace utilities
 
     bool Tokenizer::IsValid()
     {
-        return (bool)_in || _textBuffer.size() > 0 || _peekedTokens.size() > 0;
+        return static_cast<bool>(_in) || !_textBuffer.empty() || !_peekedTokens.empty();
     }
 
     int Tokenizer::GetNextCharacter()
@@ -210,7 +210,7 @@ namespace utilities
         {
             ReadData();
         }
-        
+
         if(_currentPosition == _bufferEnd)
         {
             return EOF;

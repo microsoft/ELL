@@ -83,7 +83,7 @@ endif()
 string(TOLOWER "${CMAKE_BUILD_TYPE}" lower_CMAKE_BUILD_TYPE)
 
 if(lower_CMAKE_BUILD_TYPE STREQUAL "debug")
-  add_definition(-DELL_DEBUG)
+  add_definitions(-DELL_DEBUG)
 endif()
 
 # Add SWIG-generated interfaces

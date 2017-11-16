@@ -85,7 +85,6 @@ namespace neural
             const size_t depth = input.NumChannels();
             const size_t kt = _convolutionalParameters.receptiveField * depth;
             const size_t paddingSize = _layerParameters.inputPaddingParameters.paddingSize;
-            const size_t mPadding = paddingSize * depth;
             const size_t numConvolutions = (inputMatrix.NumColumns() - kt) / depth + 1;
             const size_t numFiltersAtAtime = _convolutionalParameters.numFiltersAtATime;
             const size_t numFilters = _layerParameters.outputShape.NumChannels();
@@ -162,7 +161,7 @@ namespace neural
         archiver["stride"] << _convolutionalParameters.stride;
         archiver["method"] << static_cast<int>(_convolutionalParameters.method);
         archiver["numFiltersAtATime"] << static_cast<int>(_convolutionalParameters.numFiltersAtATime);
-        
+
         math::TensorArchiver::Write(_weights, "weights", archiver);
     }
 

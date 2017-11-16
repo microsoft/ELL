@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
 #include "IPredictor.h"
 
 // math
@@ -45,6 +46,7 @@ namespace neural
         scaling,
         softmax,
     };
+
     static const std::string LayerNames[] = { "Base", "Activation", "BatchNormalization", "Bias", "BinaryConvolution", "Convolution", "FullyConnected", "Input", "Pooling", "Scaling", "Softmax" };
 
     /// <summary> Enum that represents the type of padding values in a neural network layer. </summary>
@@ -69,26 +71,40 @@ namespace neural
 
     // Typical padding parameters
     /// <summary> Function to return parameters representing no padding </summary
-    static PaddingParameters NoPadding() { return { PaddingScheme::zeros, 0 }; }
+    inline PaddingParameters NoPadding()
+    {
+        return { PaddingScheme::zeros, 0 };
+    }
 
     /// <summary> Function to return parameters that represent padding the specified pixel width with zeros. </summary
-    static PaddingParameters ZeroPadding(size_t width) { return { PaddingScheme::zeros, width };  // STYLE discrepancy
+    inline PaddingParameters ZeroPadding(size_t width)
+    {
+        return { PaddingScheme::zeros, width };
     }
 
     /// <summary> Function to return parameters that represent padding the specified pixel width with the minimum value. </summary
-    static const PaddingParameters MinPadding(size_t width) { return { PaddingScheme::min, width };  // STYLE discrepancy
+    inline const PaddingParameters MinPadding(size_t width)
+    {
+        return { PaddingScheme::min, width };
     }
 
     /// <summary> Function to return parameters that represent padding the specified pixel width with -1. </summary
-    static const PaddingParameters MinusOnePadding(size_t width) { return { PaddingScheme::minusOnes, width };  // STYLE discrepancy
+    inline const PaddingParameters MinusOnePadding(size_t width)
+    {
+        return { PaddingScheme::minusOnes, width };
     }
 
     /// <summary> Helper function to determine if a PaddingParameters struct represents no padding </summary>
-    static bool HasPadding(const PaddingParameters& padding) { return padding.paddingSize != 0;  // STYLE discrepancy
+    inline bool HasPadding(const PaddingParameters& padding)
+    {
+        return padding.paddingSize != 0;
     }
 
     /// <summary> Helper function to determine if a PaddingParameters struct represents zero padding </summary>
-    static bool HasPadding(const PaddingParameters& padding, PaddingScheme scheme) { return HasPadding(padding) && (padding.paddingScheme == scheme); } // STYLE discrepancy
+    inline bool HasPadding(const PaddingParameters& padding, PaddingScheme scheme)
+    {
+        return HasPadding(padding) && (padding.paddingScheme == scheme);
+    }
 
     /// <summary> Get the padding value to fill with </summary>
     template <typename ValueType>

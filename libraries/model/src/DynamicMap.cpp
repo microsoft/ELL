@@ -162,7 +162,7 @@ namespace model
 
     void DynamicMap::ResetOutput(size_t index, PortElementsBase outputElements)
     {
-        assert(index >= 0 && index <= _outputElements.size() && "Error: Resetting unset output");
+        assert(index <= _outputElements.size() && "Error: Resetting unset output");
         _outputElements[index] = outputElements;
         _outputElementsMap[_outputNames[index]] = outputElements;
     }

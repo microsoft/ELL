@@ -204,7 +204,6 @@ void InputLayerTest()
 {
     using namespace ell::predictors;
     using namespace ell::predictors::neural;
-    using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
 
     // Verify Input
@@ -256,7 +255,6 @@ void FullyConnectedLayerTest()
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
     using MatrixType = typename Layer<ElementType>::MatrixType;
-    using VectorType = typename Layer<ElementType>::VectorType;
 
     // Verify FullyConnectedLayer
     TensorType input(2, 2, 1);
@@ -349,7 +347,6 @@ void ConvolutionalLayerTest()
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
 
     // Verify ConvolutionalLayer with diagonal method
     TensorType input(3, 4, 2); // Input includes padding
@@ -407,7 +404,6 @@ void BinaryConvolutionalLayerGemmTest(ell::predictors::neural::BinaryWeightsScal
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Verify BinaryConvolutionalLayer with gemm method
@@ -502,7 +498,6 @@ void BinaryConvolutionalLayerBitwiseTest(ell::predictors::neural::BinaryWeightsS
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
     using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Verify BinaryConvolutionalLayer with gemm method
@@ -628,8 +623,6 @@ void NeuralNetworkPredictorTest()
     using namespace ell::predictors::neural;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
-    using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
     using VectorType = typename Layer<ElementType>::VectorType;
     using MatrixType = typename Layer<ElementType>::MatrixType;
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
@@ -740,9 +733,6 @@ void ConvolutionalArchiveTest()
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net
@@ -786,9 +776,6 @@ void BinaryConvolutionalArchiveTest()
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using Shape = typename Layer<ElementType>::Shape;
-    using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
     using DataVectorType = typename NeuralNetworkPredictor<ElementType>::DataVectorType;
 
     // Build a net

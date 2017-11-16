@@ -22,7 +22,7 @@ namespace neural
 {
     template <typename ElementType>
     BinaryConvolutionalLayer<ElementType>::BinaryConvolutionalLayer(const LayerParameters& layerParameters, const BinaryConvolutionalParameters& convolutionalParameters, const ConstTensorReferenceType& weights)
-        : Layer<ElementType>(layerParameters), _convolutionalParameters(convolutionalParameters), _realValuedWeightsMatrix(0, 0), _realValuedShapedInputMatrix(0, 0), _realValuedOutputMatrix(0, 0)
+        : Layer<ElementType>(layerParameters), _convolutionalParameters(convolutionalParameters), _realValuedShapedInputMatrix(0, 0), _realValuedWeightsMatrix(0, 0), _realValuedOutputMatrix(0, 0)
     {
         if (weights.GetConstDataPointer() == nullptr)
         {
@@ -161,7 +161,6 @@ namespace neural
             const size_t binarizedFilterSize = _binarizedWeights[0].size();
             const size_t filterDrop = filterSize % _binaryElementSize;
             const size_t filterAdjust = _binaryElementSize - filterDrop;
-            const size_t outputSize = output.NumRows() * output.NumColumns();
 
             // Iterate over filters
             for (size_t i = 0; i < output.NumRows(); ++i)
@@ -229,15 +228,12 @@ namespace neural
     void BinaryConvolutionalLayer<ElementType>::ReceptiveFieldToBinaryRows(ConstTensorReferenceType input, std::vector<std::vector<uint64_t>>& shapedInput)
     {
         const size_t fieldVolumeSize = _convolutionalParameters.receptiveField * _convolutionalParameters.receptiveField * _layerParameters.input.NumChannels();
-        const size_t packedRowSize = (fieldVolumeSize - 1) / _binaryElementSize + 1;
-        const size_t columnMax = fieldVolumeSize;
         const size_t outputHeight = NumOutputRowsMinusPadding();
         const size_t outputWidth = NumOutputColumnsMinusPadding();
         const size_t rowMax = outputWidth * outputHeight;
 
         for (size_t outRow = 0; outRow < rowMax; ++outRow)
         {
-            const size_t outOffset = (outRow * packedRowSize);
             const size_t convolutionalRow = outRow / outputWidth;
             const size_t convolutionalCol = outRow % outputWidth;
             const size_t horizontalStart = (convolutionalCol * _convolutionalParameters.stride);
@@ -467,12 +463,10 @@ namespace neural
                 // Calculate the col, row, and depth values in the convolutional field volume
                 const size_t volCol = (f / _layerParameters.input.NumChannels()) % _convolutionalParameters.receptiveField;
                 const size_t volRow = (f / _layerParameters.input.NumChannels()) / _convolutionalParameters.receptiveField;
-                const size_t volDepth = f % _layerParameters.input.NumChannels();
 
                 // Calculate where this fits in relation to the input volume
                 const intptr_t sourceCol = horizontalStart + volCol;
                 const intptr_t sourceRow = verticalStart + volRow;
-                const intptr_t sourceDepth = volDepth;
 
                 const size_t block = f / _binaryElementSize;
                 const size_t bit = f % _binaryElementSize;

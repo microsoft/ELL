@@ -138,7 +138,7 @@ set(test_include
   test/include/Variant_test.h
   test/include/Files_test.h
 )
-                  
+
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 

@@ -111,7 +111,7 @@ void TestSGDTrainer()
     auto weights = trainer->GetPredictor().GetWeights();
     for (size_t i = 0; i < weights.Size(); i++)
     {
-        printf("weight %lld == %f\n", i, weights[i]);
+        printf("weight %zu == %f\n", i, weights[i]);
     }
     auto bias = trainer->GetPredictor().GetBias();
     printf("bias == %f\n", bias);

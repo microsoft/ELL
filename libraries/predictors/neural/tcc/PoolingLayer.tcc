@@ -15,20 +15,19 @@ namespace predictors
 {
 namespace neural
 {
-    
+
     template <typename ElementType, template <typename> class PoolingFunctionType>
     PoolingLayer<ElementType, PoolingFunctionType>::PoolingLayer(const LayerParameters& layerParameters, PoolingParameters poolingParameters) :
         Layer<ElementType>(layerParameters),
         _poolingParameters(poolingParameters)
     {
     }
-    
+
     template <typename ElementType, template <typename> class PoolingFunctionType>
     void PoolingLayer<ElementType, PoolingFunctionType>::Compute()
     {
         auto input = GetInput();
         auto output = GetOutputMinusPadding();
-        const size_t inputDataPaddingSize = GetLayerParameters().inputPaddingParameters.paddingSize;
         const size_t poolingWindowSize = _poolingParameters.poolingSize;
 
         for (size_t row = 0; row < output.NumRows(); row++)
