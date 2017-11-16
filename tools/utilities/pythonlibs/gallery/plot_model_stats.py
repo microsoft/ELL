@@ -79,7 +79,13 @@ class PlotModelStats:
             type=float, default=self.plot_min_top1_accuracy)
         self.arg_parser.add_argument("--plot_targets", "-pt",
             help="list of device targets for the plot (default: pi3), valid values are ({})".format(", ".join(self.platforms_symbols.keys())),
-            nargs="+", default=self.plot_targets)
+            nargs="+", default=["pi3"])
+        self.arg_parser.add_argument("--image_size", "-i",
+            help="when specified, only plot models that have the specified image size(s) (default: all.)",
+            nargs="+", default=["all"])
+        self.arg_parser.add_argument("--model_name", "-model",
+            help="when specified, only plot models that have the specified name(s) (default: all.)",
+            nargs="+", default=["all"])
 
         args = self.arg_parser.parse_args(argv)
         if not os.path.isdir(args.models_root):
@@ -92,6 +98,8 @@ class PlotModelStats:
         self.plot_max_secs_per_frame = args.plot_max_secs_per_frame
         self.plot_min_top1_accuracy = args.plot_min_top1_accuracy
         self.plot_targets = dict.fromkeys(args.plot_targets)
+        self.image_size = args.image_size
+        self.model_name = args.model_name
 
     def find_models(self):
         """Finds the model files from the root folder"""
@@ -109,9 +117,12 @@ class PlotModelStats:
         for model in self.models:
             with mir.ModelInfoRetriever(os.path.join(self.models_root, model), model) as model_data:
                 try:
-                    accuracy = model_data.get_model_topN_accuracies()
-                    speed = model_data.get_model_seconds_per_frame(self.platforms_symbols.keys())
-                    self.model_stats.append({"model": model, "accuracy" : accuracy, "secs_per_frame" : speed})
+                    model_properties = model_data.get_model_properties()
+                    if str(model_properties['image_size']) in self.image_size or self.image_size[0] == 'all':
+                        if model_properties['model'] in self.model_name or self.model_name[0] == 'all':
+                            accuracy = model_data.get_model_topN_accuracies()
+                            speed = model_data.get_model_seconds_per_frame(self.plot_targets)
+                            self.model_stats.append({"model": model_properties['model'], "accuracy" : accuracy, "secs_per_frame" : speed})
                 except:
                     print("Could not collect stats for model '{}', skipping".format(model))
 
@@ -162,13 +173,15 @@ class PlotModelStats:
                 self.plot_series.append(self.platforms_symbols[platform]) # add the legend symbol
 
             # compute the pareto frontier
-            models = [stat["model"] for stat in self.model_stats if (platform in stat["secs_per_frame"])]
-            fx, ftop1, ftop5, fmodel = self.pareto_frontier(x, ytop1, ytop5, models, max_x=self.plot_max_secs_per_frame)
-
-            if add_to_plot:
-                frontiers = frontiers + [fx, ftop1, self.platforms_lines[platform]] # plot the frontier based on top 1
-
-            self.frontier_models.append({ 'platform' : platform, 'frontier_models' : list(zip(fmodel, fx, ftop1, ftop5)) })
+            # to compute pareto frontier we need x and top 1
+            if x != [] and ytop1 != []:         
+                models = [stat["model"] for stat in self.model_stats if (platform in stat["secs_per_frame"])]
+                fx, ftop1, ftop5, fmodel = self.pareto_frontier(x, ytop1, ytop5, models, max_x=self.plot_max_secs_per_frame)
+                self.frontier_models.append({ 'platform' : platform, 'frontier_models' : list(zip(fmodel, fx, ftop1, ftop5)) })
+                if add_to_plot:
+                    frontiers = frontiers + [fx, ftop1, self.platforms_lines[platform]] # plot the frontier based on top 1
+            else:
+                print('Could not retrieve secs per frame or top 1 accuracy metric from this model.')
 
         # put the frontiers after the series, so that we only need to specify legend once per platform
         if self.plot_series:

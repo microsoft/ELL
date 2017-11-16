@@ -13,7 +13,7 @@ if ERRORLEVEL 1 goto :norestore
 
 REM find which supported VS version is installed
 set Vs14=0
-set Vs15=0goit
+set Vs15=0
 set UseVs14=0
 set UseVs15=0
 set DEBUG=0

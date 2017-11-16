@@ -202,6 +202,7 @@ class ModelInfoRetriever:
             results = json.loads(f.read())
             properties["image_size"] = results["image_size"]
             properties["num_classes"] = results["num_classes"]
+            properties["model"] = results["model"]
 
             # optional property
             properties["trainer"] = results.get("trainer", "CNTK 2.2")
