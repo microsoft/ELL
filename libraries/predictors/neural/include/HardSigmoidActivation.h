@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ReLUActivation.h (neural)
-//  Authors:  Byron Changuion
+//  File:     HardSigmoidActivation.h (neural)
+//  Authors:  James Devine
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -17,19 +17,19 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> Implements the ReLU function: loss(x) = (x > 0) ? x : 0  </summary>
+    /// <summary> Implements the "hard sigmoid" function: loss(x) = clip(0.2x + 0.5, 0, 1) (where clip(y, a,b) == max(min(y,b),a)) </summary>
     template <typename ElementType>
-    class ReLUActivation
+    class HardSigmoidActivation
     {
     public:
-        /// <summary> Sets the output as a function of the input. </summary>
+        /// <summary> Applies the activation function to a value. </summary>
         ///
         /// <param name="input"> The input value. </param>
         ///
         /// <returns> The computed output. </param>
         ElementType Apply(const ElementType input) const;
 
-        /// <summary> Sets the output as a function of the input. </summary>
+        /// <summary> Applies the activation function to a value. </summary>
         ///
         /// <param name="input"> The input value. </param>
         /// <param name="index"> The input index. </param>
@@ -44,7 +44,7 @@ namespace neural
 
         /// <summary> Typename used for serialization. </summary>
         /// Note: In the future, this will change to include the templated element type
-        static std::string GetTypeName() { return "ReLUActivation"; }
+        static std::string GetTypeName() { return "SigmoidActivation"; }
 
         /// <summary> Archives this object. </summary>
         ///
@@ -60,4 +60,4 @@ namespace neural
 }
 }
 
-#include "../tcc/ReLUActivation.tcc"
+#include "../tcc/HardSigmoidActivation.tcc"

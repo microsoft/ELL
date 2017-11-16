@@ -141,7 +141,6 @@ namespace nodes
         auto&& inputOffset = inputLayout.GetOffset();
         auto&& inputSize = inputLayout.GetActiveSize();
         auto&& outputLayout = GetOutputLayout();
-        auto&& outputStride = outputLayout.GetStride();
         auto&& outputOffset = outputLayout.GetOffset();
         auto&& primaryInput = GetPrimaryInput();
         const auto broadcastDimension = GetBroadcastDimension();
@@ -338,7 +337,6 @@ namespace nodes
     {
         auto outputSize = model::NumElements(GetOutputLayout().GetStride());
         auto output = std::vector<ValueType>(outputSize);
-        size_t primaryInputIndex = 0;
 
         const size_t prevInputOffset = 0;
         const size_t prevOutputOffset = 0;
@@ -450,9 +448,6 @@ namespace nodes
     {
         auto outputSize = model::NumElements(GetOutputLayout().GetStride());
         auto output = std::vector<ValueType>(outputSize);
-        size_t primaryInputIndex = 0;
-        size_t secondaryInput1Index = 0;
-        size_t& secondaryInput2Index = secondaryInput1Index;
 
         const size_t prevInputOffset = 0;
         const size_t prevOutputOffset = 0;
@@ -584,9 +579,6 @@ namespace nodes
     {
         auto outputSize = model::NumElements(GetOutputLayout().GetStride());
         auto output = std::vector<ValueType>(outputSize);
-        size_t primaryInputIndex = 0;
-        size_t secondaryInput1Index = 0;
-        size_t& secondaryInput2Index = secondaryInput1Index;
 
         const size_t prevInputOffset = 0;
         const size_t prevOutputOffset = 0;

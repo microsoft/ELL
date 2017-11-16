@@ -81,5 +81,8 @@ void TestMeanPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, 
 void TestScalingLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestSoftmaxLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels);
+void TestRecurrentNode();
+void TestGRUNode();
+void TestLSTMNode();
 
 #include "../tcc/CompilableNodesTest.tcc"

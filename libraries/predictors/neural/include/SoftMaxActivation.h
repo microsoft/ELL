@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ReLUActivation.h (neural)
-//  Authors:  Byron Changuion
+//  File:     SoftmaxActivation.h (neural)
+//  Authors:  James Devine
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -10,6 +10,10 @@
 
 // math
 #include "Tensor.h"
+#include "Vector.h"
+
+// stl
+#include <memory>
 
 namespace ell
 {
@@ -17,34 +21,19 @@ namespace predictors
 {
 namespace neural
 {
-    /// <summary> Implements the ReLU function: loss(x) = (x > 0) ? x : 0  </summary>
+    /// <summary> Implements the softmax function. </summary>
     template <typename ElementType>
-    class ReLUActivation
+    class SoftMaxActivation
     {
     public:
-        /// <summary> Sets the output as a function of the input. </summary>
-        ///
-        /// <param name="input"> The input value. </param>
-        ///
-        /// <returns> The computed output. </param>
-        ElementType Apply(const ElementType input) const;
-
-        /// <summary> Sets the output as a function of the input. </summary>
-        ///
-        /// <param name="input"> The input value. </param>
-        /// <param name="index"> The input index. </param>
-        ///
-        /// <returns> The computed output. </param>
-        ElementType Apply(const ElementType input, const math::IntegerTriplet& index) const;
-
         /// <summary> Applies the activation to the input vector in-place. </summary>
         ///
-        /// <param name="input"> The input vector. </param>
+        /// <param name="input"> The input value. </param>
         void Apply(math::ColumnVector<ElementType>& input) const;
 
         /// <summary> Typename used for serialization. </summary>
         /// Note: In the future, this will change to include the templated element type
-        static std::string GetTypeName() { return "ReLUActivation"; }
+        static std::string GetTypeName() { return "SoftMaxActivation"; }
 
         /// <summary> Archives this object. </summary>
         ///
@@ -60,4 +49,4 @@ namespace neural
 }
 }
 
-#include "../tcc/ReLUActivation.tcc"
+#include "../tcc/SoftMaxActivation.tcc"

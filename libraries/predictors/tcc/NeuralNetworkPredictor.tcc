@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "NeuralNetworkPredictor.h"
-
 //stl
 #include <iostream>
 
@@ -168,8 +166,11 @@ namespace predictors
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::BinaryConvolutionalLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ConvolutionalLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::FullyConnectedLayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::GRULayer<ElementType>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::LSTMLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::PoolingLayer<ElementType, MaxPoolingFunction>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::PoolingLayer<ElementType, MeanPoolingFunction>>();
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::RecurrentLayer<ElementType, TanhActivation>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ScalingLayer<ElementType>>();
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::SoftmaxLayer<ElementType>>();
         context.GetTypeFactory().AddType<NeuralNetworkPredictor<ElementType>, NeuralNetworkPredictor<ElementType>>();

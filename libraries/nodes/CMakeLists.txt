@@ -4,28 +4,32 @@
 
 set(library_name nodes)
 
-set(src
+set(src 
     src/ActivationLayerNode.cpp
     src/BatchNormalizationLayerNode.cpp
     src/BiasLayerNode.cpp
     src/BinaryConvolutionalLayerNode.cpp
     src/ClockNode.cpp
+    src/CompiledActivationFunctions.cpp
     src/ConstantNode.cpp
     src/ConvolutionalLayerNode.cpp
     src/DiagonalConvolutionNode.cpp
     src/FullyConnectedLayerNode.cpp
+    src/GRULayerNode.cpp
     src/IRNode.cpp
+    src/LSTMLayerNode.cpp
     src/MatrixMatrixMultiplyNode.cpp
     src/MatrixVectorMultiplyNode.cpp
     src/ProtoNNPredictorNode.cpp
     src/NeuralNetworkPredictorNode.cpp
     src/PoolingLayerNode.cpp
+    src/RecurrentLayerNode.cpp
     src/ScalingLayerNode.cpp
     src/SingleElementThresholdNode.cpp
     src/SoftmaxLayerNode.cpp
 )
-
-set(include
+  
+set(include 
     include/AccumulatorNode.h
     include/ActivationLayerNode.h
     include/BatchNormalizationLayerNode.h
@@ -36,6 +40,7 @@ set(include
     include/BinaryPredicateNode.h
     include/BroadcastFunctionNode.h
     include/ClockNode.h
+    include/CompiledActivationFunctions.h
     include/ConstantNode.h
     include/ConvolutionalLayerNode.h
     include/DebugSinkNode.h
@@ -47,8 +52,10 @@ set(include
     include/ExtremalValueNode.h
     include/ForestPredictorNode.h
     include/FullyConnectedLayerNode.h
+    include/GRULayerNode.h
     include/IRNode.h
     include/LinearPredictorNode.h
+    include/LSTMLayerNode.h
     include/L2NormSquaredNode.h
     include/MovingAverageNode.h
     include/MatrixMatrixMultiplyNode.h
@@ -61,6 +68,7 @@ set(include
     include/PoolingLayerNode.h
     include/ProtoNNPredictorNode.h
     include/ReceptiveFieldMatrixNode.h
+    include/RecurrentLayerNode.h
     include/ReorderDataNode.h
     include/ScalingLayerNode.h
     include/SingleElementThresholdNode.h
@@ -74,7 +82,7 @@ set(include
     include/ValueSelectorNode.h
 )
 
-set(tcc
+set (tcc 
     tcc/AccumulatorNode.tcc
     tcc/BinaryFunctionNode.tcc
     tcc/BinaryOperationNode.tcc
@@ -95,7 +103,7 @@ set(tcc
     tcc/MovingVarianceNode.tcc
     tcc/MultiplexerNode.tcc
     tcc/NeuralNetworkLayerNode.tcc
-    tcc/NeuralNetworkPredictorNode.tcc
+    tcc/NeuralNetworkPredictorNode.tcc         
     tcc/ReceptiveFieldMatrixNode.tcc
     tcc/ReorderDataNode.tcc
     tcc/SinkNode.tcc

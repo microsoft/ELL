@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ReLUActivation.tcc (neural)
-//  Authors:  Byron Changuion
+//  File:     TanhActivation.tcc (neural)
+//  Authors:  James Devine
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -13,19 +13,19 @@ namespace predictors
 namespace neural
 {
     template <typename ElementType>
-    ElementType ReLUActivation<ElementType>::Apply(const ElementType input) const
+    ElementType TanhActivation<ElementType>::Apply(const ElementType input) const
     {
-        return ((input > 0) ? input : 0);
+        return std::tanh(input);
     }
 
     template <typename ElementType>
-    ElementType ReLUActivation<ElementType>::Apply(const ElementType input, const math::IntegerTriplet& /*index*/) const
+    ElementType TanhActivation<ElementType>::Apply(const ElementType input, const math::IntegerTriplet&) const
     {
         return Apply(input);
     }
 
     template <typename ElementType>
-    void ReLUActivation<ElementType>::Apply(math::ColumnVector<ElementType>& input) const
+    void TanhActivation<ElementType>::Apply(math::ColumnVectorReference<ElementType>& input) const
     {
         input.Transform([this](ElementType value){ return Apply(value); });
     }

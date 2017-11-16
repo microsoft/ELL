@@ -50,6 +50,9 @@ void SoftmaxLayerTest();
 template <typename ElementType>
 void NeuralNetworkPredictorTest();
 
+template <typename ElementType>
+void RecurrentLayerTest();
+
 //
 // Archive tests
 //

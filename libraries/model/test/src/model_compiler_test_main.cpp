@@ -184,6 +184,9 @@ void TestIRCompiler()
     // TestFullyConnectedLayerNode(0, 2); // Fully-connected layer nodes can't have padding (yet)
     // TestFullyConnectedLayerNode(1, 1); // Fully-connected layer nodes can't have padding (yet)
 
+    TestRecurrentNode();
+    TestGRUNode();
+    TestLSTMNode();
 }
 
 int main(int argc, char* argv[])

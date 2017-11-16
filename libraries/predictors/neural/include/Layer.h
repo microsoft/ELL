@@ -41,13 +41,29 @@ namespace neural
         binaryConvolution,
         convolution,
         fullyConnected,
+        gru,
         input,
+        lstm,
         pooling,
+        recurrent,
         scaling,
         softmax,
     };
-
-    static const std::string LayerNames[] = { "Base", "Activation", "BatchNormalization", "Bias", "BinaryConvolution", "Convolution", "FullyConnected", "Input", "Pooling", "Scaling", "Softmax" };
+    
+    static const std::string LayerNames[] = { "Base", 
+                                              "Activation", 
+                                              "BatchNormalization",
+                                              "Bias", 
+                                              "BinaryConvolution", 
+                                              "Convolution", 
+                                              "FullyConnected", 
+                                              "GRU", 
+                                              "Input", 
+                                              "LSTM", 
+                                              "Pooling", 
+                                              "Recurrent", 
+                                              "Scaling", 
+                                              "Softmax" };
 
     /// <summary> Enum that represents the type of padding values in a neural network layer. </summary>
     enum class PaddingScheme : int

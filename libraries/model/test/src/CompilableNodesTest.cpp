@@ -43,13 +43,16 @@
 #include "DotProductNode.h"
 #include "ExtremalValueNode.h"
 #include "FullyConnectedLayerNode.h"
+#include "GRULayerNode.h"
 #include "IRNode.h"
+#include "LSTMLayerNode.h"
 #include "MatrixMatrixMultiplyNode.h"
 #include "MatrixVectorMultiplyNode.h"
 #include "MultiplexerNode.h"
 #include "NeuralNetworkPredictorNode.h"
 #include "PoolingLayerNode.h"
 #include "ReceptiveFieldMatrixNode.h"
+#include "RecurrentLayerNode.h"
 #include "ReorderDataNode.h"
 #include "SinkNode.h"
 #include "SoftmaxLayerNode.h"
@@ -1984,13 +1987,13 @@ void TestConvolutionalLayerNode(ConvolutionType convolutionType, size_t inputPad
         0, 3, 2, 3, 1, 2, 1, 0, 2 };
     // clang-format on
     size_t vectorIndex = 0;
-    for (size_t f = 0; f < outputShape.NumChannels(); f++)
+    for (size_t f = 0; f < outputShape.NumChannels(); ++f)
     {
-        for (size_t k = 0; k < input.NumChannels(); k++)
+        for (size_t k = 0; k < input.NumChannels(); ++k)
         {
-            for (size_t i = 0; i < convolutionalParams.receptiveField; i++)
+            for (size_t i = 0; i < convolutionalParams.receptiveField; ++i)
             {
-                for (size_t j = 0; j < convolutionalParams.receptiveField; j++)
+                for (size_t j = 0; j < convolutionalParams.receptiveField; ++j)
                 {
                     weights(f * convolutionalParams.receptiveField + i, j, k) = weightsVector[vectorIndex++];
                 }
@@ -2301,4 +2304,242 @@ void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels)
     // compare output
     std::vector<std::vector<double>> signal = { input };
     VerifyCompiledOutput(map, compiledMap, signal, "Fused linear layers");
+}
+
+//
+// Recurrent layer nodes (Recurrent, GRU, LSTM)
+//
+
+// clang-format off
+const float wData[] = { 0.0381341, 0.55826, -0.467607, 0.264272, -0.733331, 0.464226, 0.496708, 
+                        0.0581872, -0.514144, 0.702823, -1.50401, 0.373703, 0.885559, -0.27592, 
+                        -0.116469, 0.320376, -0.534044, 1.92602, -0.567954, -0.0167191, -0.822891 };
+// clang-format on
+
+void TestRecurrentNode()
+{
+    using ElementType = double;
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+
+    VectorType biases = VectorType({ -0.0773237, 0.909263, -0.297635 });
+
+    MatrixType weights(3, 7);
+
+    int columnIndex = 0;
+
+    // transform our weights into 3 x 7 matrices (21 values)
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 7; ++j)
+        {
+            weights(i, j) = wData[columnIndex];
+
+            columnIndex++;
+        }
+    }
+
+    TensorType input(1, 1, 4);
+
+    // should output ~ 1,1,0
+    input(0, 0, 0) = 5.1;
+    input(0, 0, 1) = 3.5;
+    input(0, 0, 2) = 1.4;
+    input(0, 0, 3) = 0.2;
+
+    Shape outputShape = { 1, 1, 3 };
+    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
+
+    RecurrentLayer<ElementType, TanhActivation> recurrent(parameters, weights, biases);
+    recurrent.Compute();
+    TensorType output = recurrent.GetOutput();
+
+    recurrent.Reset();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+    auto computeNode = model.AddNode<nodes::RecurrentLayerNode<ElementType, TanhActivation>>(inputNode->output, recurrent);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    // Compile model
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    // compare computed vs. compiled output
+    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+}
+
+// clang-format off
+const float uData[] = { -0.306974, -0.314942, -0.307079, -0.0778356, -0.0929513, 0.0426045, -0.0200071, 
+                        0.508866, 0.525531, 0.345996, -0.633406, -0.519455, 0.617442, -0.0790342, 
+                        2.13148, 2.61342, -2.99549, -6.15958, 0.224837, 0.0745432, 0.154865 };
+const float rData[] = { -0.438305, -0.438798, -0.509791, 0.385411, -0.210201, -0.302488, 0.0717234, 
+                        0.259852, 0.532692, 0.675258, 0.0314993, -0.609884, -0.419196, 0.407534, 
+                        0.221932, 0.51503, -0.278936, 0.673416, 0.307534, -0.176314, 0.440408 };
+const float hData[] = { 0.0364258, 0.557955, -0.467648, 0.265914, 0.343273, -0.0306102, -0.265686, 
+                        0.241587, 0.283854, 0.232303, -0.397746, -0.191887, -0.0618932, -0.551409, 
+                        0.847701, 0.234382, -0.107097, -0.38192, 0.074817, 0.555262, 0.479104 };
+// clang-format on
+
+void TestGRUNode()
+{
+    using ElementType = double;
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+
+    VectorType updateBias = VectorType({ 0.0, 0.0, 3.95111 });
+    VectorType resetBias = VectorType({ 0.0, 0.0, 0.0 });
+    VectorType hiddenBias = VectorType({ -0.0686757, 0.0, 0.281977 });
+
+    MatrixType updateWeights(3, 7);
+    MatrixType resetWeights(3, 7);
+    MatrixType hiddenWeights(3, 7);
+
+    int columnIndex = 0;
+
+    // transform our weights into 3 x 7 matrices (21 values)
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 7; ++j)
+        {
+            updateWeights(i, j) = uData[columnIndex];
+            resetWeights(i, j) = rData[columnIndex];
+            hiddenWeights(i, j) = hData[columnIndex];
+
+            columnIndex++;
+        }
+    }
+
+    TensorType input(1, 1, 4);
+
+    // should output ~1,0,0
+    input(0, 0, 0) = 5.1;
+    input(0, 0, 1) = 3.5;
+    input(0, 0, 2) = 1.4;
+    input(0, 0, 3) = 0.2;
+
+    Shape outputShape = { 1, 1, 3 };
+    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
+
+    GRUParameters<ElementType> gruParams{ updateWeights, resetWeights, hiddenWeights, updateBias, resetBias, hiddenBias };
+    GRULayer<ElementType, TanhActivation, SigmoidActivation> gru(parameters, gruParams);
+    gru.Compute();
+    TensorType output = gru.GetOutput();
+    gru.Reset();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+    auto computeNode = model.AddNode<nodes::GRULayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, gru);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    // Compile model
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    // compare computed vs. compiled output
+    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
+}
+
+// clang-format off
+const float iData[] = { 0.739646, 0.8501, -2.15136, -2.44612, 0.0639512, -0.0492275, 0.167204, 
+                        -0.49359, 0.253341, -0.239276, 0.114082, -0.360225, 0.434314, -0.28489, 
+                        -0.573704, -0.0273829, 0.0242156, -0.600619, -0.258574, -0.312928, -0.0446059 };
+const float fData[] = { 0.0628231, 0.145727, -0.258802, -0.57547, -0.511279, -0.470488, 0.231888, 
+                        0.42041, -0.440816, -0.343813, 0.463799, -0.456978, 0.081054, 0.532126, 
+                        0.51855, -0.123881, 0.509249, 0.324012, 0.318677, -0.411882, 0.082 };
+const float cData[] = { 0.187203, 0.863434, 0.490011, -0.216801, -0.290302, 0.338456, -0.216217,
+                        -0.000121037, 0.0000392739, 0.00000052499, 0.0000676336, 0.196989, 0.312441, 0.355654,
+                        0.468885, -0.236218, 0.415782, 0.302927, -0.0503453, -0.183221, -0.500112 };
+const float oData[] = { 0.517059, 0.470772, -0.919974, -0.319515, 0.224966, 0.195129, 0.306053, 
+                        0.261489, 0.499691, 0.132338, 0.47862, 0.21803, 0.00246173, -0.0274337, 
+                        -0.385968, 0.120127, -0.360038, -0.21129, 0.0611264, -0.17212, -0.165724 };
+// clang-format on
+void TestLSTMNode()
+{
+    using ElementType = double;
+    using namespace ell::predictors;
+    using namespace ell::predictors::neural;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using Shape = typename Layer<ElementType>::Shape;
+    using VectorType = typename Layer<ElementType>::VectorType;
+    using MatrixType = typename Layer<ElementType>::MatrixType;
+
+    VectorType inputBias = VectorType({ 0.747351, -0.112848, 0.0 });
+    VectorType forgetMeBias = VectorType({ 1.0, 1.0, 1.0 });
+    VectorType candidateBias = VectorType({ 0.733668, 0.000431956, 0.0 });
+    VectorType outputBias = VectorType({ 0.385433, 0.0, 0.0 });
+
+    MatrixType inputWeights(3, 7);
+    MatrixType forgetMeWeights(3, 7);
+    MatrixType candidateWeights(3, 7);
+    MatrixType outputWeights(3, 7);
+
+    int columnIndex = 0;
+
+    // transform our weights into 3 x 7 matrices (21 values)
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 7; ++j)
+        {
+            inputWeights(i, j) = iData[columnIndex];
+            forgetMeWeights(i, j) = fData[columnIndex];
+            candidateWeights(i, j) = cData[columnIndex];
+            outputWeights(i, j) = oData[columnIndex];
+
+            columnIndex++;
+        }
+    }
+
+    TensorType input(1, 1, 4);
+
+    // should output 1,0,0
+    input(0, 0, 0) = 5.1;
+    input(0, 0, 1) = 3.5;
+    input(0, 0, 2) = 1.4;
+    input(0, 0, 3) = 0.2;
+
+    Shape outputShape = { 1, 1, 3 };
+    LayerParameters parameters{ input, NoPadding(), outputShape, NoPadding() };
+
+    LSTMParameters<ElementType> lstmParams{ inputWeights, forgetMeWeights, candidateWeights, outputWeights, inputBias, forgetMeBias, candidateBias, outputBias };
+
+    LSTMLayer<ElementType, TanhActivation, SigmoidActivation> lstm(parameters, lstmParams);
+    lstm.Compute();
+    TensorType output = lstm.GetOutput();
+    lstm.Reset();
+
+    // Create model
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(input.Size());
+    auto computeNode = model.AddNode<nodes::LSTMLayerNode<ElementType, TanhActivation, SigmoidActivation>>(inputNode->output, lstm);
+    auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    // Compile model
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.useBlas = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    // compare computed vs. compiled output
+    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+    VerifyCompiledOutput(map, compiledMap, signal, computeNode->GetRuntimeTypeName());
 }

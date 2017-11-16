@@ -661,7 +661,7 @@ namespace emitters
 
     llvm::Value* IRFunctionEmitter::StoreZero(llvm::Value* pPointer)
     {
-        auto type = pPointer->getType();
+        auto type = llvm::cast<llvm::PointerType>(pPointer->getType())->getElementType();
         return Store(pPointer, llvm::Constant::getNullValue(type));
     }
 
