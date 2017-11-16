@@ -71,34 +71,13 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
 
     include_directories(${EXTRA_INCLUDE_PATHS})
 
-    # FOREACH(file ${INTERFACE_FILES} ${INTERFACE_MAIN})
-    # 	get_filename_component(fname ${file} NAME)
-    # 	add_custon_command(OUTPUT ${fname}
-    # 		DEPENDS ${file}
-    # 		COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${file} ${fname}
-    # 		COMMENT ""
-    # 	)
-    # ENDFOREACH()
-
-    foreach(file ${INTERFACE_FILES})
-      configure_file(${file} ${file} COPYONLY)
-    endforeach()
-
-    foreach(file ${INTERFACE_SRC})
-        configure_file(${file} ${file} COPYONLY)
-    endforeach()
-
-    foreach(file ${INTERFACE_INCLUDE})
-        configure_file(${file} ${file} COPYONLY)
-    endforeach()
-
-    foreach(file ${INTERFACE_TCC})
+    foreach(file ${INTERFACE_FILES} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${INTERFACE_TCC})
         configure_file(${file} ${file} COPYONLY)
     endforeach()
 
     set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-classes -debug-typedef  -debug-template)
     if(${language} STREQUAL "javascript")
-      # Note: if compiling against older version of node, we may have to specify the 
+      # Note: if compiling against older version of node, we may have to specify the
       # V8 version explicitly. For instance, when building against electron 0.36.7,
       # add this flag to the CMAKE_SWIG_FLAGS: -DV8_VERSION=0x032530
       set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -node)
@@ -145,7 +124,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
             list(APPEND generated_sources "${generated_source}")
         endforeach()
       endif()
-      add_custom_target(${module_name} 
+      add_custom_target(${module_name}
         DEPENDS ${generated_sources})
     else()
       if(SWIG_FOUND)
@@ -153,7 +132,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
         swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} ${INTERFACE_LIBRARIES} common evaluators functions model nodes predictors trainers utilities emitters math)
 
       else()
-        add_custom_target(${PREPEND_TARGET}${module_name} 
+        add_custom_target(${PREPEND_TARGET}${module_name}
           DEPENDS ${generated_sources})
       endif()
       set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}${TARGET_NAME})
@@ -163,7 +142,7 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
     endif()
   endif()
 
-  set_property(TARGET ${PREPEND_TARGET}${module_name} PROPERTY FOLDER "interfaces") 
+  set_property(TARGET ${PREPEND_TARGET}${module_name} PROPERTY FOLDER "interfaces")
   set(SWIG_MODULE_TARGET ${SWIG_MODULE_${module_name}_REAL_NAME})
 
 endmacro() # generate_interface_module

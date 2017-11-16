@@ -4,11 +4,11 @@
 
 set (DATA_FILES testData.txt tinyTestData.txt)
 
-set (MODEL_FILES 
+set (MODEL_FILES
     arg_max.model
     identity.model
     is_equal.model
-    model_1.model 
+    model_1.model
     model_2.model
     model_3.model
     multi_out.model
@@ -33,23 +33,22 @@ set_property(TARGET dataFiles PROPERTY FOLDER "examples")
 
 # copy example data
 foreach(DATA_FILE ${DATA_FILES})
-    add_custom_command(TARGET dataFiles 
+    add_custom_command(TARGET dataFiles
                     POST_BUILD
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                     COMMAND ${CMAKE_COMMAND} -E copy ${DATA_FILE} ${CMAKE_CURRENT_BINARY_DIR})
 endforeach()
 
 #
 # Example model files
 #
-set_source_files_properties(${MODEL_FILES} PROPERTIES GENERATED TRUE)
 add_custom_target(modelFiles ALL DEPENDS ${DATA_FILES} SOURCES ${DATA_FILES})
 set_property(TARGET modelFiles PROPERTY FOLDER "examples")
 
 # copy example models
 foreach(MODEL_FILE ${MODEL_FILES})
-    add_custom_command(TARGET modelFiles 
+    add_custom_command(TARGET modelFiles
                     POST_BUILD
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                     COMMAND ${CMAKE_COMMAND} -E copy ${MODEL_FILE} ${CMAKE_CURRENT_BINARY_DIR})
 endforeach()

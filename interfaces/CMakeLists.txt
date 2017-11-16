@@ -11,60 +11,99 @@ if(LLVM_FOUND)
     add_compile_options(${LLVM_COMPILE_OPTIONS})
 endif()
 
-set (INTERFACE_SRC 
-    ../common/src/ModelInterface.cpp)
-set (INTERFACE_INCLUDE 
-    ../common/include/CallbackInterface.h
-    ../common/include/MathInterface.h
-    ../common/include/ModelInterface.h
-    ../common/include/NeuralLayersInterface.h
-    ../common/include/NeuralNetworkPredictorInterface.h
+set(_sources
+    common/src/ModelInterface.cpp
 )
-set (INTERFACE_TCC
-    ../common/tcc/CallbackInterface.tcc
-    ../common/tcc/NeuralNetworkPredictorInterface.tcc)
+foreach(src ${_sources})
+    list(APPEND INTERFACE_SRC "${CMAKE_CURRENT_LIST_DIR}/${src}")
+endforeach()
 
-set (INTERFACE_MAIN ../common/ELL.i)
+set(_sources
+    common/include/CallbackInterface.h
+    common/include/MathInterface.h
+    common/include/ModelInterface.h
+    common/include/NeuralLayersInterface.h
+    common/include/NeuralNetworkPredictorInterface.h
+)
+foreach(src ${_sources})
+    list(APPEND INTERFACE_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/${src}")
+endforeach()
 
-set (INTERFACE_FILES ../common/common.i
-                     ../common/callback.i
-                     ../common/callback_javascript_post.i
-                     ../common/callback_javascript_pre.i
-                     ../common/callback_python_post.i
-                     ../common/callback_python_pre.i
-                     ../common/loadModelAsync.i
-                     ../common/loadDatasetAsync.i
-                     ../common/dataset.i
-                     ../common/ELL_javascript_post.i
-                     ../common/ELL_javascript_pre.i
-                     ../common/ELL_python_post.i
-                     ../common/ELL_python_pre.i
-                     ../common/evaluators.i
-                     ../common/functions.i
-                     ../common/math.i
-                     ../common/math_javascript_post.i
-                     ../common/math_javascript_pre.i
-                     ../common/math_python_post.i
-                     ../common/math_python_pre.i
-                     ../common/model.i
-                     ../common/nodes.i
-                     ../common/noncopyable.i
-                     ../common/shape.i
-                     ../common/trainers.i
-                     ../common/predictors.i
-                     ../common/predictors_javascript_post.i
-                     ../common/predictors_javascript_pre.i
-                     ../common/predictors_python_post.i
-                     ../common/predictors_python_pre.i
-                     ../common/unique_ptr.i
-                     ../common/utilities.i
-                     ../common/vector.i
-                     ../common/vector_javascript_post.i
-                     ../common/vector_javascript_pre.i
-                     ../common/vector_python_post.i
-                     ../common/vector_python_pre.i)
+set(_sources
+    common/tcc/CallbackInterface.tcc
+    common/tcc/NeuralNetworkPredictorInterface.tcc
+)
+foreach(src ${_sources})
+    list(APPEND INTERFACE_TCC "${CMAKE_CURRENT_LIST_DIR}/${src}")
+endforeach()
 
-set (INTERFACE_DEPENDENCIES common data emitters evaluators functions math trainers model nodes predictors trainers utilities)
+set(_sources
+    common/ELL.i
+)
+foreach(src ${_sources})
+    list(APPEND INTERFACE_MAIN "${CMAKE_CURRENT_LIST_DIR}/${src}")
+endforeach()
+
+set(_sources
+    common/common.i
+    common/callback.i
+    common/callback_javascript_post.i
+    common/callback_javascript_pre.i
+    common/callback_python_post.i
+    common/callback_python_pre.i
+    common/loadModelAsync.i
+    common/loadDatasetAsync.i
+    common/dataset.i
+    common/ELL_javascript_post.i
+    common/ELL_javascript_pre.i
+    common/ELL_python_post.i
+    common/ELL_python_pre.i
+    common/evaluators.i
+    common/functions.i
+    common/math.i
+    common/math_javascript_post.i
+    common/math_javascript_pre.i
+    common/math_python_post.i
+    common/math_python_pre.i
+    common/model.i
+    common/nodes.i
+    common/noncopyable.i
+    common/shape.i
+    common/trainers.i
+    common/predictors.i
+    common/predictors_javascript_post.i
+    common/predictors_javascript_pre.i
+    common/predictors_python_post.i
+    common/predictors_python_pre.i
+    common/unique_ptr.i
+    common/utilities.i
+    common/vector.i
+    common/vector_javascript_post.i
+    common/vector_javascript_pre.i
+    common/vector_python_post.i
+    common/vector_python_pre.i
+)
+foreach(src ${_sources})
+    list(APPEND INTERFACE_FILES "${CMAKE_CURRENT_LIST_DIR}/${src}")
+endforeach()
+
+# We're done using the temporary _sources variable
+unset(_sources)
+
+set(INTERFACE_DEPENDENCIES
+    common
+    data
+    emitters
+    evaluators
+    functions
+    math
+    trainers
+    model
+    nodes
+    predictors
+    trainers
+    utilities
+)
 
 # Add ELL library include directories
 include_directories(common/include)
