@@ -113,7 +113,7 @@ namespace nodes
             function.Comparison(equalTime, interval, zeroInterval));
 
         function.GetModule().DeclarePrintf();
-        function.Printf({ function.Literal("%d\n"), function.Load(noLag) } );
+        function.Printf({ function.Literal("%d\n"), noLag } );
         function.Printf({ function.Literal("%f\n"), lastIntervalTime } );
 
         // Use a local scratch value to hold the intermediate computation
@@ -121,7 +121,7 @@ namespace nodes
         function.Store(scratch, lastIntervalTime);
 
         auto ifEmitter1 = function.If();
-        ifEmitter1.If(function.Load(noLag));
+        ifEmitter1.If(noLag);
         {
             function.Store(scratch, currentTime);
         }

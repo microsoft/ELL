@@ -327,56 +327,20 @@ namespace emitters
     {
         assert(pTestValue1 != nullptr);
         assert(pTestValue2 != nullptr);
-
-        llvm::Value* pResult = Variable(VariableType::Byte);
-        IRIfEmitter ifEmitter = If();
-        ifEmitter.If([&pTestValue1, this] { return _pEmitter->IsFalse(pTestValue1); });
-        {
-            Store(pResult, _pEmitter->False());
-        }
-        ifEmitter.If([&pTestValue2, this] { return _pEmitter->IsFalse(pTestValue2); });
-        {
-            Store(pResult, _pEmitter->False());
-        }
-        ifEmitter.Else();
-        {
-            Store(pResult, _pEmitter->True());
-        }
-        ifEmitter.End();
-        return pResult;
+        return Operator(TypedOperator::logicalAnd, pTestValue1, pTestValue2);
     }
 
     llvm::Value* IRFunctionEmitter::LogicalOr(llvm::Value* pTestValue1, llvm::Value* pTestValue2)
     {
         assert(pTestValue1 != nullptr);
         assert(pTestValue2 != nullptr);
-
-        llvm::Value* pResult = Variable(VariableType::Byte);
-        IRIfEmitter ifEmitter = If();
-        ifEmitter.If([&pTestValue1, this] { return _pEmitter->IsTrue(pTestValue1); });
-        {
-            Store(pResult, _pEmitter->True());
-        }
-        ifEmitter.If([&pTestValue2, this] { return _pEmitter->IsTrue(pTestValue2); });
-        {
-            Store(pResult, _pEmitter->True());
-        }
-        ifEmitter.Else();
-        {
-            Store(pResult, _pEmitter->False());
-        }
-        ifEmitter.End();
-        return pResult;
+        return Operator(TypedOperator::logicalOr, pTestValue1, pTestValue2);
     }
 
     llvm::Value* IRFunctionEmitter::LogicalNot(llvm::Value* pTestValue)
     {
         assert(pTestValue != nullptr);
-
-        llvm::Value* pResult = Variable(VariableType::Byte);
-        Store(pResult, _pEmitter->IsFalse(pTestValue));
-
-        return pResult;
+        return _pEmitter->IsFalse(pTestValue);
     }
 
     void IRFunctionEmitter::DeleteTerminatingBranch()

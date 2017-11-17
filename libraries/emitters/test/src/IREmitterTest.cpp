@@ -338,28 +338,28 @@ void TestLogical()
     llvm::Argument& val3 = *args++;
 
     auto pResult = fn.LogicalAnd(fn.Comparison(TypedComparison::equals, &val1, &val1), fn.Comparison(TypedComparison::equals, &val2, &val2));
-    fn.Printf("And TRUE: %d\n", { fn.Load(pResult) });
+    fn.Printf("And TRUE: %d\n", { pResult });
 
     pResult = fn.LogicalAnd(fn.Comparison(TypedComparison::equals, &val1, &val1), fn.Comparison(TypedComparison::equals, &val2, &val3));
-    fn.Printf("And FALSE %d\n", { fn.Load(pResult) });
+    fn.Printf("And FALSE %d\n", { pResult });
 
     pResult = fn.LogicalAnd(fn.Comparison(TypedComparison::equals, &val1, &val3), fn.Comparison(TypedComparison::equals, &val2, &val3));
-    fn.Printf("And FALSE %d\n", { fn.Load(pResult) });
+    fn.Printf("And FALSE %d\n", { pResult });
 
     pResult = fn.LogicalOr(fn.Comparison(TypedComparison::equals, &val1, &val1), fn.Comparison(TypedComparison::equals, &val2, &val3));
-    fn.Printf("OR True %d\n", { fn.Load(pResult) });
+    fn.Printf("OR True %d\n", { pResult });
 
     pResult = fn.LogicalOr(fn.Comparison(TypedComparison::equals, &val2, &val3), fn.Comparison(TypedComparison::equals, &val1, &val1));
-    fn.Printf("OR True %d\n", { fn.Load(pResult) });
+    fn.Printf("OR True %d\n", { pResult });
 
     pResult = fn.LogicalOr(fn.Comparison(TypedComparison::equals, &val2, &val3), fn.Comparison(TypedComparison::equals, &val1, &val2));
-    fn.Printf("OR False %d\n", { fn.Load(pResult) });
+    fn.Printf("OR False %d\n", { pResult });
 
     pResult = fn.LogicalNot(fn.Comparison(TypedComparison::equals, &val1, &val1));
-    fn.Printf("NOT True %d\n", { fn.Load(pResult) });
+    fn.Printf("NOT True %d\n", { pResult });
 
     pResult = fn.LogicalNot(fn.Comparison(TypedComparison::equals, &val1, &val2));
-    fn.Printf("NOT False %d\n", { fn.Load(pResult) });
+    fn.Printf("NOT False %d\n", { pResult });
 
     fn.Return();
     module.EndFunction();

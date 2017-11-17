@@ -22,6 +22,8 @@ namespace emitters
     enum class VariableType
     {
         Void = 0,
+        ///<summary> 1 bit boolean </summary>
+        Boolean,
         ///<summary> 8 bit character </summary>
         Char8,
         ///<summary> 8 bit unsigned integer </summary>
