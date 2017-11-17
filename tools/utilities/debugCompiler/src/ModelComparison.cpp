@@ -285,7 +285,6 @@ void ModelComparison::Compare(std::vector<float>& input, model::DynamicMap& refe
     llvm::Module* module = compiler.GetModule().GetLLVMModule();
     std::cout << "compiling..." << std::endl;
 
-    void* temp = (void*)(&DebugOutput);
     model::IRCompiledMap compiledMap = compiler.Compile(reference);
 
     // Windows can not do automatic resolution of symbols, so it won't find the DebugOutput function above unless I help it here.

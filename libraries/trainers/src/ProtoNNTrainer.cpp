@@ -236,8 +236,6 @@ namespace trainers
 
         size_t batchSize = maxBatchSize;
         size_t numBatches = (n + batchSize - 1) / batchSize;
-        double accuracy_train = 0.0;
-        double accuracy_test = 0.0;
 
         // Aggregate loss over the batches
         for (int i = 0; i < numBatches; ++i) {
@@ -467,7 +465,7 @@ namespace trainers
                 // Call the accelerated proximal gradient_paramS method for optimizing this parameter
                 AcceleratedProximalGradient(modelMap, parameterIndex,
                 [&]
-                (ConstColumnMatrixReference W, const size_t begin, const size_t end)
+                (ConstColumnMatrixReference /*W*/, const size_t begin, const size_t end)
                     -> math::ColumnMatrix<double> {
                     return modelMap[parameterIndex]->gradient(modelMap, X, Y, WX, SimilarityKernel(modelMap, X, WX, gamma, begin, end, recomputeWX[parameterIndex]),
                         gamma, begin, end, _parameters.lossType);
@@ -504,7 +502,7 @@ namespace trainers
     {
     }
 
-    math::ColumnMatrix<double> Param_W::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossType lossType)
+    math::ColumnMatrix<double> Param_W::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference /*WX*/, ConstColumnMatrixReference D, double gamma, size_t begin, size_t end, ProtoNNLossType lossType)
     {
         assert(end - begin == D.NumRows());
 
@@ -579,7 +577,7 @@ namespace trainers
     {
     }
 
-    math::ColumnMatrix<double> Param_Z::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference Similarity, double gamma, size_t begin, size_t end, ProtoNNLossType lossType)
+    math::ColumnMatrix<double> Param_Z::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference /*X*/, ConstColumnMatrixReference Y, ConstColumnMatrixReference /*WX*/, ConstColumnMatrixReference Similarity, double /*gamma*/, size_t begin, size_t end, ProtoNNLossType lossType)
     {
         assert(end - begin == Similarity.NumRows());
 
@@ -625,7 +623,7 @@ namespace trainers
     {
     }
 
-    math::ColumnMatrix<double> Param_B::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference X, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference Similarity, double gamma, size_t begin, size_t end, ProtoNNLossType lossType)
+    math::ColumnMatrix<double> Param_B::gradient(std::map<ProtoNNParameterIndex, std::shared_ptr<ProtoNNModelParameter>> &modelMap, ConstColumnMatrixReference /*X*/, ConstColumnMatrixReference Y, ConstColumnMatrixReference WX, ConstColumnMatrixReference Similarity, double gamma, size_t begin, size_t end, ProtoNNLossType lossType)
     {
         assert(end - begin == Similarity.NumRows());
 

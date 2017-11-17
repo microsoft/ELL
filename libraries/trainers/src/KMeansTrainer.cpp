@@ -45,7 +45,6 @@ namespace trainers
     void KMeansTrainer::initializeMeans(math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> X)
     {
         size_t N = X.NumColumns();
-        size_t K = _numClusters;
         size_t choice = rand() % N;
 
         _means.GetColumn(0).CopyFrom(X.GetColumn(choice));
@@ -151,7 +150,6 @@ namespace trainers
 
     size_t KMeansTrainer::weightedSample(math::ColumnVector<double> weights)
     {
-        size_t n = weights.Size();
         double sum = weights.Aggregate([](double x) { return x; });
 
         auto threshold = ((double)rand() / (RAND_MAX));
