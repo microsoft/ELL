@@ -62,7 +62,7 @@ namespace nodes
 
         // Callback function
         const emitters::VariableTypeList parameters = { emitters::GetPointerType(emitters::GetVariableType<ValueType>()) };
-        std::string prefixedName(function.GetModule().GetModuleName() + "_" + _sourceFunctionName);
+        std::string prefixedName(compiler.GetNamespacePrefix() + "_" + _sourceFunctionName);
         function.GetModule().DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
         function.GetModule().IncludeInHeader(prefixedName);
         function.GetModule().IncludeInCallbackInterface(prefixedName, "SourceNode");
@@ -133,7 +133,7 @@ namespace nodes
 
         auto numValues = output.Size();
         auto forLoop = function.ForLoop();
-        forLoop.Begin(0, numValues, 1);
+        forLoop.Begin(numValues);
         {
             auto i = forLoop.LoadIterationVariable();
             auto value = function.ValueAt(sample, i);

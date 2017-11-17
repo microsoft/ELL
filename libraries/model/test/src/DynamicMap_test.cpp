@@ -182,14 +182,14 @@ void TestDynamicMapClockNode()
     auto in = model.AddNode<model::InputNode<nodes::TimeTickType>>(1);
     auto clock = model.AddNode<nodes::ClockNode>(in->output, interval, lagThreshold,
         "LagNotificationCallback",
-        [&lagValues](nodes::TimeTickType timeLag)
+        [&lagValues](auto timeLag)
         {
             std::cout << "LagNotificationCallback: " << timeLag << "\n";
             lagValues.push_back(timeLag);
         });
     auto source = model.AddNode<nodes::SourceNode<double>>(clock->output, 3,
         "SourceCallback",
-        [&inputValues](std::vector<double>& input)
+        [&inputValues](auto& input)
         {
             std::cout << "SourceCallback\n";
             input.assign(3, 42.0);
@@ -198,7 +198,7 @@ void TestDynamicMapClockNode()
         });
     auto sink = model.AddNode<nodes::SinkNode<double>>(source->output,
         "SinkCallback",
-        [&outputValues] (const std::vector<double>& values)
+        [&outputValues] (const auto& values)
         {
             std::cout << "SinkCallback\n";
             outputValues.push_back(values);

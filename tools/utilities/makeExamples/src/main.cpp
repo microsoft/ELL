@@ -44,11 +44,6 @@ void SaveModels(const std::string& ext)
     common::SaveModel(GenerateMultiOutModel(3), "multi_out." + ext);
 }
 
-void SaveMaps(const std::string& ext)
-{
-    common::SaveMap(GenerateSteppableMap(10, 50), "ELL_step10." + ext);
-}
-
 int main(int argc, char* argv[])
 {
     try
@@ -64,15 +59,8 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
-        if (ModelGenerateArguments::OutputType::map == arguments.outputType)
-        {
-            SaveMaps("map");
-        }
-        else
-        {
-            // Default to generating models
-            SaveModels("model");
-        }
+        // generate models
+        SaveModels("model");
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {

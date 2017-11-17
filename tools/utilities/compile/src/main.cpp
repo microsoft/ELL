@@ -25,7 +25,6 @@
 #include "DynamicMap.h"
 #include "IRCompiledMap.h"
 #include "IRMapCompiler.h"
-#include "IRSteppableMapCompiler.h"
 #include "OutputNode.h"
 
 // stl
@@ -86,8 +85,7 @@ private:
     }
 };
 
-template <typename MapType, typename MapCompilerType>
-void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMapCompilerArguments& mapCompilerArguments, common::MapLoadArguments& mapLoadArguments, MapType& map)
+void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMapCompilerArguments& mapCompilerArguments, common::MapLoadArguments& mapLoadArguments, model::DynamicMap& map)
 {
     std::stringstream timingOutput;
 
@@ -114,7 +112,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
         common::SaveMap(map, baseFilename + "_refined.map");
     }
 
-    MapCompilerType compiler(settings);
+    model::IRMapCompiler compiler(settings);
     TimingOutputCollector timer(timingOutput, "Time to compile map", compileArguments.verbose);
     auto compiledMap = compiler.Compile(map);
     timer.Stop();
@@ -198,50 +196,10 @@ int main(int argc, char* argv[])
         }
 
         // load map and produce the desired output
-        switch (mapLoadArguments.mapType)
-        {
-            // This ugliness should go away once we move to clock nodes (and abstract the clock type from map)
-            case common::MapLoadArguments::MapType::steadyClockSteppableMap:
-            {
-                using MapType = model::SteppableMap<std::chrono::steady_clock>;
-                using MapCompilerType = model::IRSteppableMapCompiler<std::chrono::steady_clock>;
-                constexpr auto MapArgumentType = common::MapLoadArguments::MapType::steadyClockSteppableMap;
-
-                TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);
-                auto map = common::LoadMap<MapType, MapArgumentType>(mapLoadArguments);
-                timer.Stop();
-                ProduceMapOutput<MapType, MapCompilerType>(compileArguments, mapCompilerArguments, mapLoadArguments, map);
-                break;
-            }
-
-            case common::MapLoadArguments::MapType::systemClockSteppableMap:
-            {
-                using MapType = model::SteppableMap<std::chrono::system_clock>;
-                using MapCompilerType = model::IRSteppableMapCompiler<std::chrono::system_clock>;
-                constexpr auto MapArgumentType = common::MapLoadArguments::MapType::systemClockSteppableMap;
-
-                TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);
-                auto map = common::LoadMap<MapType, MapArgumentType>(mapLoadArguments);
-                timer.Stop();
-                ProduceMapOutput<MapType, MapCompilerType>(compileArguments, mapCompilerArguments, mapLoadArguments, map);
-                break;
-            }
-
-            case common::MapLoadArguments::MapType::simpleMap:
-            {
-                using MapType = model::DynamicMap;
-                using MapCompilerType = model::IRMapCompiler;
-
-                TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);
-                auto map = common::LoadMap(mapLoadArguments);
-                timer.Stop();
-                ProduceMapOutput<MapType, MapCompilerType>(compileArguments, mapCompilerArguments, mapLoadArguments, map);
-                break;
-            }
-
-            default:
-                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Error: couldn't read input file.");
-        }
+        TimingOutputCollector timer(timingOutput, "Time to load map", compileArguments.verbose);
+        auto map = common::LoadMap(mapLoadArguments);
+        timer.Stop();
+        ProduceMapOutput(compileArguments, mapCompilerArguments, mapLoadArguments, map);
 
         if (compileArguments.verbose)
         {

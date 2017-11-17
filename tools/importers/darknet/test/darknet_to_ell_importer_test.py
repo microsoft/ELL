@@ -75,11 +75,6 @@ class DarknetModelTestCase(unittest.TestCase):
         ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
         ell_map.Save("darknet_test.map")
 
-        # create a steppable map and save to file
-        ell_steppable_map = ell_utilities.ell_steppable_map_from_float_predictor(
-            predictor, 100, "DarknetTestInputCallback", "DarknetTestOutputCallback")
-        ell_steppable_map.Save("darknet_steppable_test.map")
-
         return
 
 

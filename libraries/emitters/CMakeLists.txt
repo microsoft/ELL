@@ -38,8 +38,7 @@ set (src
     src/Variable.cpp
 )
 
-set (include
-    include/ClockInterface.h
+set (include 
     include/CompilableIRFunction.h
     include/EmitterException.h
     include/EmitterTypes.h

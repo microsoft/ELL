@@ -48,7 +48,6 @@ if(${PYTHONLIBS_FOUND})
         @ELL_model@PYTHON_wrap.cxx
         @ELL_model@PYTHON_wrap.h
         include/CallbackInterface.h
-        include/ClockInterface.h
         tcc/CallbackInterface.tcc)
 
     if(WIN32)

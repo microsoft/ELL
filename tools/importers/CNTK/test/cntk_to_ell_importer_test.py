@@ -601,12 +601,6 @@ class CntkXorModelTestCase(CntkToEllTestBase):
         ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
         ell_map.Save("xor_test.map")
 
-        # create a steppable map and save to file
-        ell_steppable_map = ell_utilities.\
-            ell_steppable_map_from_float_predictor(
-                predictor, 100, "XorInputCallback", "XorOutputCallback")
-        ell_steppable_map.Save("xor_steppable_test.map")
-
 
 class CntkToEllFullModelTestBase(CntkToEllTestBase):
     CATEGORIES_URL = 'https://raw.githubusercontent.com/Microsoft/ELL-models/master/models/ILSVRC2012/categories.txt'

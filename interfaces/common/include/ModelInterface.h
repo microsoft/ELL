@@ -48,7 +48,6 @@ class ELL_InputPort;
 class ELL_Node;
 class ELL_NodeIterator;
 class ELL_OutputPort;
-class ELL_SteppableMap;
 
 //
 // ELL_ClockType
@@ -382,21 +381,6 @@ public:
     ELL_CompiledMap Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName) const;
 private:
     std::shared_ptr<ell::model::DynamicMap> _map;
-};
-
-//
-// ELL_SteppableMap
-//
-class ELL_SteppableMap
-{
-public:
-    ELL_SteppableMap(const ELL_SteppableMap& other) = default;
-    ELL_SteppableMap(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements output, ELL_ClockType clockType, int millisecondInterval);
-    void Save(const std::string& filePath) const;
-
-private:
-    std::shared_ptr<ell::model::DynamicMap> _map;
-    ELL_ClockType _clockType;
 };
 
 //

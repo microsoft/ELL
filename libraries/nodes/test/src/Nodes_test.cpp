@@ -378,7 +378,7 @@ void TestSourceNodeCompute()
     sourceNodeTester.Initialize(data);
 
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
+    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(2);
     auto sourceNode = model.AddNode<nodes::SourceNode<double>>(
         inputNode->output, data[0].size(),
         "SourceFunction",
@@ -391,8 +391,8 @@ void TestSourceNodeCompute()
     {
         using namespace std::chrono_literals;
 
-        const model::TimeTickType now = std::chrono::steady_clock::now().time_since_epoch().count();
-        std::vector<model::TimeTickType> timeInput{ now - 50, now };
+        const nodes::TimeTickType now = std::chrono::steady_clock::now().time_since_epoch().count();
+        std::vector<nodes::TimeTickType> timeInput{ now - 50, now };
         inputNode->SetInput(timeInput);
 
         auto output = model.ComputeOutput(sourceNode->output);

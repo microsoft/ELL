@@ -91,19 +91,15 @@ namespace nodes
 
         // Callback
         const emitters::VariableTypeList parameters = { emitters::GetVariableType<TimeTickType>() };
-        std::string prefixedName(function.GetModule().GetModuleName() + "_" + _lagNotificationFunctionName);
+        std::string prefixedName(compiler.GetNamespacePrefix() + "_" + _lagNotificationFunctionName);
 
         function.GetModule().DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
         function.GetModule().IncludeInHeader(prefixedName);
         function.GetModule().IncludeInCallbackInterface(prefixedName, "ClockNode");
 
         // State: _lastIntervalTime
-        // BUG: InitializedScalarVariable doesn't persist globally for release builds
-        auto pLastIntervalTimeVar = function.GetModule().Variables().AddVariable<emitters::InitializedVectorVariable<TimeTickType>>(
-            emitters::VariableScope::global,
-            std::vector<TimeTickType>({ _lastIntervalTime }));
-        auto pLastIntervalTime = function.GetModule().EnsureEmitted(*pLastIntervalTimeVar);
-        auto lastIntervalTime = function.ValueAt(pLastIntervalTime, function.Literal(0));
+        auto pLastIntervalTime = function.GetModule().Global(compiler.GetNamespacePrefix() + "_lastIntervalTime", UninitializedIntervalTime);
+        auto lastIntervalTime = function.Load(pLastIntervalTime);
 
         // No lag when:
         // 1) this is the very first call, or
@@ -111,10 +107,6 @@ namespace nodes
         auto noLag = function.LogicalOr(
             function.Comparison(equalTime, lastIntervalTime, uninitializedIntervalTime),
             function.Comparison(equalTime, interval, zeroInterval));
-
-        function.GetModule().DeclarePrintf();
-        function.Printf({ function.Literal("%d\n"), noLag } );
-        function.Printf({ function.Literal("%f\n"), lastIntervalTime } );
 
         // Use a local scratch value to hold the intermediate computation
         auto scratch = function.Variable(emitters::GetVariableType<TimeTickType>(), "scratch");
@@ -146,7 +138,7 @@ namespace nodes
         if1.End();
 
         // Update _lastInterval state
-        function.SetValueAt(pLastIntervalTime, function.Literal(0), function.Load(scratch));
+        function.Store(pLastIntervalTime, function.Load(scratch));
 
         // Set output
         auto pOutput = compiler.EnsurePortEmitted(output);

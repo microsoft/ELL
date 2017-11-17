@@ -27,7 +27,6 @@ Help text for other options:
         --modelInputs (-in) []           Model inputs to use
         --modelOutputs (-out) []         Model outputs to use
         --defaultInputSize (-d) [1]      Default size of input node
-        --mapType (-m) [simple]          Choice of map type (must match input map file): simple, clockStep, sysClockStep  {simple | clockStep | sysClockStep}
         --testFile (-tf) []              Path to the test data (an image file)
         --outputFilename (-of) [<cout>]  File for profiling output ('<cout>' for stdout, blank or '<null>' for no output)
         --timingOutput []                File for node timing detail output ('<cout>' for stdout, blank or '<null>' for no output)

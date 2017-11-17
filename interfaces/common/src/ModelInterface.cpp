@@ -22,7 +22,6 @@
 #include "InputNode.h"
 #include "OutputNode.h"
 #include "DynamicMap.h"
-#include "SteppableMap.h"
 #include "MapLoadArguments.h"
 
 // nodes
@@ -712,52 +711,6 @@ ELL_CompiledMap ELL_Map::Compile(const std::string&  targetDevice, const std::st
     ell::model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(*_map);
     return ELL_CompiledMap(std::move(compiledMap));
-}
-
-
-//
-// ELL_SteppableMap
-//
-ELL_SteppableMap::ELL_SteppableMap(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements output, ELL_ClockType clockType, int millisecondInterval) : _clockType(clockType)
-{
-    std::vector<std::pair<std::string, ell::model::InputNodeBase*>> inputs = { std::pair<std::string, ell::model::InputNodeBase*>{ "input", const_cast<ell::model::InputNodeBase*>(inputNode.GetInputNode()) } };
-    auto outputs = std::vector<std::pair<std::string, ell::model::PortElementsBase>>{ { "output", output.GetPortElements() } };
-    auto duration = ell::model::DurationType(millisecondInterval);
-
-    switch (clockType)
-    {
-        case ELL_ClockType::steadyClock:
-            _map = std::make_shared<ell::model::SteppableMap<std::chrono::steady_clock>>(model.GetModel(), inputs, outputs, duration);
-            break;
-        case ELL_ClockType::systemClock:
-            _map = std::make_shared<ell::model::SteppableMap<std::chrono::system_clock>>(model.GetModel(), inputs, outputs, duration);
-            break;
-        default:
-            throw std::invalid_argument("Error: could not create map");
-    }
-}
-
-void ELL_SteppableMap::Save(const std::string& filename) const
-{
-    switch (_clockType)
-    {
-        case ELL_ClockType::steadyClock:
-        {
-            auto map = std::dynamic_pointer_cast<const ell::model::SteppableMap<std::chrono::steady_clock>>(_map);
-            assert(map != nullptr); // coding error
-            ell::common::SaveMap(*map, filename);
-            break;
-        }
-        case ELL_ClockType::systemClock:
-        {
-            auto map = std::dynamic_pointer_cast<const ell::model::SteppableMap<std::chrono::system_clock>>(_map);
-            assert(map != nullptr); // coding error
-            ell::common::SaveMap(*map, filename);
-            break;
-        }
-        default:
-            assert(false); // coding error
-    }
 }
 
 //

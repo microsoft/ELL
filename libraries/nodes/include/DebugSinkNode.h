@@ -12,7 +12,6 @@
 #include "CompilableNode.h"
 #include "IRMapCompiler.h"
 #include "ModelTransformer.h"
-#include "SteppableMap.h"
 
 // emitters
 #include "IRMetadata.h"

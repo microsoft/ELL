@@ -47,7 +47,7 @@ namespace nodes
     void SinkNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
         llvm::Value* pInput = compiler.EnsurePortEmitted(input);
-        std::string prefixedName(function.GetModule().GetModuleName() + "_" + _sinkFunctionName);
+        std::string prefixedName(compiler.GetNamespacePrefix() + "_" + _sinkFunctionName);
         DEBUG_EMIT_PRINTF(function, prefixedName + "\n");
 
         // EvaluateInput defaults to 'pass through' in base implementation, which means
@@ -59,7 +59,7 @@ namespace nodes
             function.GetModule().DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
 
             llvm::Function* pSinkFunction = function.GetModule().GetFunction(prefixedName);
-            function.Call(pSinkFunction, { pInput });
+            function.Call(pSinkFunction, { compiler.LoadPortElementVariable(input.GetInputElement(0)) });
         }
         else
         {
@@ -122,20 +122,31 @@ namespace nodes
     template <typename ValueType>
     void SinkNode<ValueType>::SetOutputValuesLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput = compiler.EnsurePortEmitted(input);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
         auto numInputs = input.Size();
         assert(numInputs == output.Size());
 
-        auto forLoop = function.ForLoop();
-        forLoop.Begin(0, numInputs, 1);
+        // Concatenate the input ports in a similar way as OutputNodes,
+        // because SinkNodes are just callback-enabled OutputNodes.
+        auto inputElements = input.GetInputElements();
+        int rangeStart = 0;
+        for (auto range : inputElements.GetRanges())
         {
-            auto i = forLoop.LoadIterationVariable();
-            auto value = function.ValueAt(pInput, i);
-            function.SetValueAt(pOutput, i, value);
+            llvm::Value* pInput = compiler.EnsurePortEmitted(*range.ReferencedPort());
+            auto forLoop = function.ForLoop();
+            auto rangeSize = range.Size();
+            forLoop.Begin(rangeSize);
+            {
+                auto i = forLoop.LoadIterationVariable();
+                auto inputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal<int>(range.GetStartIndex()));
+                auto outputIndex = function.Operator(emitters::TypedOperator::add, i, function.Literal(rangeStart));
+                llvm::Value* value = function.ValueAt(pInput, inputIndex);
+                function.SetValueAt(pOutput, outputIndex, value);
+            }
+            forLoop.End();
+            rangeStart += rangeSize;
         }
-        forLoop.End();
     }
 
     template <typename ValueType>
@@ -149,6 +160,7 @@ namespace nodes
 
         for (size_t i = 0; i < numInputs; ++i)
         {
+            // Concatenate the input ports
             llvm::Value* value = compiler.LoadPortElementVariable(input.GetInputElement(i));
             function.SetValueAt(pOutput, function.Literal(static_cast<int>(i)), value);
         }

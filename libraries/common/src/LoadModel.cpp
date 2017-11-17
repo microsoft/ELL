@@ -319,8 +319,6 @@ namespace common
     void RegisterMapTypes(utilities::SerializationContext& context)
     {
         context.GetTypeFactory().AddType<model::DynamicMap, model::DynamicMap>();
-        context.GetTypeFactory().AddType<model::DynamicMap, model::SteppableMap<std::chrono::steady_clock>>();
-        context.GetTypeFactory().AddType<model::DynamicMap, model::SteppableMap<std::chrono::system_clock>>();
     }
 
     template <typename UnarchiverType>
@@ -397,12 +395,11 @@ namespace common
     //
     // Map
     //
-    template <>
-    model::DynamicMap LoadMap<model::DynamicMap, MapLoadArguments::MapType::simpleMap>(const MapLoadArguments& mapLoadArguments)
+    model::DynamicMap LoadMap(const MapLoadArguments& mapLoadArguments)
     {
         if (mapLoadArguments.HasMapFilename())
         {
-            return common::LoadMap<model::DynamicMap>(mapLoadArguments.inputMapFilename);
+            return common::LoadMap(mapLoadArguments.inputMapFilename);
         }
         else if (mapLoadArguments.HasModelFilename())
         {
@@ -460,6 +457,22 @@ namespace common
 
             return { model, { { "input", inputNode } }, { { "output", outputElements } } };
         }
+    }
+
+    model::DynamicMap LoadMap(const std::string& filename)
+    {
+        if (filename == "")
+        {
+            return model::DynamicMap{};
+        }
+
+        if (!utilities::IsFileReadable(filename))
+        {
+            throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound);
+        }
+
+        auto filestream = utilities::OpenIfstream(filename);
+        return LoadArchivedMap<utilities::JsonUnarchiver>(filestream);
     }
 
     void SaveMap(const model::DynamicMap& map, const std::string& filename)

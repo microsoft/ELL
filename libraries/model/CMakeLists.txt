@@ -36,7 +36,6 @@ set (include
     include/InputPort.h
     include/IRCompiledMap.h
     include/IRMapCompiler.h
-    include/IRSteppableMapCompiler.h
     include/MapCompiler.h
     include/Model.h
     include/ModelBuilder.h
@@ -50,7 +49,6 @@ set (include
     include/Port.h
     include/PortElements.h
     include/PortMemoryLayout.h
-    include/SteppableMap.h
 )
 
 set (tcc 
@@ -59,7 +57,6 @@ set (tcc
     tcc/InputPort.tcc
     tcc/IRCompiledMap.tcc
     tcc/IRMapCompiler.tcc
-    tcc/IRSteppableMapCompiler.tcc
     tcc/MapCompiler.tcc
     tcc/Model.tcc
     tcc/ModelBuilder.tcc
@@ -69,7 +66,6 @@ set (tcc
     tcc/OutputPort.tcc
     tcc/Port.tcc
     tcc/PortElements.tcc
-    tcc/SteppableMap.tcc
 )
 
 set (doc 

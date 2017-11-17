@@ -18,5 +18,11 @@ if(${PYTHONLIBS_FOUND})
         COPYONLY
     )
 
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/interfaces/python/utilities/ell_utilities.py
+        ell_utilities.py
+        COPYONLY
+    )
+
     set_property(TARGET ${module_name} PROPERTY FOLDER "interfaces/packages/ell/util")
 endif()

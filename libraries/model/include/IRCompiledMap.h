@@ -181,9 +181,6 @@ namespace model
     private:
         friend class IRMapCompiler;
     
-        template <typename ClockType>
-        friend class IRSteppableMapCompiler;
-
         IRCompiledMap(DynamicMap map, const std::string& functionName, std::unique_ptr<emitters::IRModuleEmitter> module);
 
         void EnsureExecutionEngine() const;

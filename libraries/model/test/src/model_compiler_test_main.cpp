@@ -48,10 +48,8 @@ void TestIRCompiler()
     TestBinaryPredicate(false);
     TestSlidingAverage();
     TestDotProductOutput();
-    TestSteppableMap(false);
     TestLinearPredictor<double>();
     TestLinearPredictor<float>();
-    // TestSteppableMap(true); // Occassionally fails
     // TestMultiplexer(); // FAILS -- crash
     // TestForest(); // FAILS -- crash
 
@@ -186,6 +184,7 @@ void TestIRCompiler()
     // TestFullyConnectedLayerNode(1, 1); // Fully-connected layer nodes can't have padding (yet)
 
     TestProtoNNPredictorMap();
+    TestMultiSourceSinkMap();
 
     TestRecurrentNode();
     TestGRUNode();

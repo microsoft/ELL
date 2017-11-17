@@ -59,7 +59,6 @@ class RaspberryPi(Magics):
         files = model.files() + [
             pkgdir + '/deploy/OpenBLASSetup.cmake',
             pkgdir + '/deploy/include/CallbackInterface.h',
-            pkgdir + '/deploy/include/ClockInterface.h',
             pkgdir + '/deploy/tcc/CallbackInterface.tcc',
             pkgdir + '/vision/demoHelper.py',
         ]

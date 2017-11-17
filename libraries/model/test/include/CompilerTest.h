@@ -37,11 +37,11 @@ void TestForest();
 void TestForestMap();
 
 void TestSimpleMap(bool optimize);
-void TestSteppableMap(bool runJit = false);
 void TestSqEuclideanDistanceMap();
 void TestProtoNNPredictorMap();
 void TestMultiOutputMap();
 void TestMultiOutputMap2();
+void TestMultiSourceSinkMap();
 void TestCompiledMapMove();
 
 #include "../tcc/CompilerTest.tcc"

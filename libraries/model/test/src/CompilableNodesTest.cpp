@@ -827,7 +827,7 @@ TESTING_FORCE_DEFINE_SYMBOL(Test_CompiledSourceNode_InputCallback, bool, double*
 void TestCompilableSourceNode()
 {
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
+    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(2);
     auto testNode = model.AddNode<nodes::SourceNode<double>>(
         inputNode->output,
         g_inputSize,
@@ -1047,7 +1047,8 @@ void TestCompilableClockNode()
 
     // compare output
     constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
-    std::vector<std::vector<nodes::TimeTickType>> signal = {
+    std::vector<std::vector<nodes::TimeTickType>> signal =
+    {
         { 0 },
         { interval*1 + thresholdTicks/2 }, // within threshold
         { interval*2 }, // on time

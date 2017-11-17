@@ -603,7 +603,6 @@ namespace emitters
             if (callbacks.size() > 0)
             {
                 os << "#include \"CallbackInterface.h\"\n";
-                os << "#include \"ClockInterface.h\"\n";
             }
 
             // Module definitions (a.k.a. the C/C++ header)

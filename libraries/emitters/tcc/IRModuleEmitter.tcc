@@ -20,6 +20,12 @@ namespace emitters
     }
 
     template <typename ValueType>
+    llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, ValueType value)
+    {
+        return AddGlobal(name, _emitter.Type(GetVariableType<ValueType>()), _emitter.Literal(value), false);
+    }
+
+    template <typename ValueType>
     llvm::GlobalVariable* IRModuleEmitter::ConstantArray(const std::string& name, const std::vector<ValueType>& value)
     {
         return AddGlobal(name, _emitter.ArrayType(GetVariableType<ValueType>(), value.size()), _emitter.Literal(value), true);

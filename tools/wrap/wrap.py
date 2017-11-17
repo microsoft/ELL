@@ -85,7 +85,6 @@ class ModuleBuilder:
             raise Exception("Could not find CMakeLists template: %s" % (self.cmake_template))
         self.files.append(os.path.join(self.ell_root, "CMake/OpenBLASSetup.cmake"))
         self.includes.append(os.path.join(self.ell_root, "interfaces/common/include/CallbackInterface.h"))
-        self.includes.append(os.path.join(self.ell_root, "libraries/emitters/include/ClockInterface.h"))
         self.tcc.append(os.path.join(self.ell_root, "interfaces/common/tcc/CallbackInterface.tcc"))
 
     def copy_files(self, filelist, folder):

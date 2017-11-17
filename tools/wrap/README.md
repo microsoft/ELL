@@ -28,7 +28,6 @@ First it copies some common files that are needed to build the C++ project:
 ````
 copy "d:\git\ELL\CMake/OpenBLASSetup.cmake" "pi3\OpenBLASSetup.cmake"
 copy "d:\git\ELL\interfaces/common/include/CallbackInterface.h" "pi3\include\CallbackInterface.h"
-copy "d:\git\ELL\libraries/emitters/include/ClockInterface.h" "pi3\include\ClockInterface.h"
 copy "d:\git\ELL\interfaces/common/tcc/CallbackInterface.tcc" "pi3\tcc\CallbackInterface.tcc"
 ````
 

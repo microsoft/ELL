@@ -276,24 +276,14 @@ class DemoHelper:
         import ell_utilities
 
         name = self.model_name
-        if intervalMs > 0:
-            ell_map = ell_utilities.ell_steppable_map_from_float_predictor(
-                predictor, intervalMs, name + "InputCallback", name + "OutputCallback")
-        else:
-            ell_map = ell_utilities.ell_map_from_float_predictor(predictor)
-        return ell_map
+        return ell_utilities.ell_map_from_float_predictor(predictor)
 
     def create_function(self, predictor, intervalMs=0):
         """Creates an ELL map from an ELL predictor"""
-        from ..util.ell_utilities import ell_map_from_float_predictor, ell_steppable_map_from_float_predictor
+        from ..util.ell_utilities import ell_map_from_float_predictor
 
         name = self.model_name
-        if (intervalMs > 0):
-            ell_map = ell_steppable_map_from_float_predictor(
-                predictor, intervalMs, name + "InputCallback", name + "OutputCallback")
-        else:
-            ell_map = ell_map_from_float_predictor(predictor)
-        return ell_map
+        return ell_map_from_float_predictor(predictor)
 
     def compile(self, predictor, platform, path):
         path += '/model'

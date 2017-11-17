@@ -43,15 +43,6 @@ namespace common
         /// <summary> The default size for the input of a newly-generated map (e.g., if no model/map file is specified) </summary>
         size_t defaultInputSize;
 
-        /// <summary> The type of map to load. </summary>
-        enum class MapType
-        {
-            simpleMap,
-            steadyClockSteppableMap,
-            systemClockSteppableMap
-        };
-        MapType mapType;
-
         /// <summary> Query if the arguments specify a map file. </summary>
         ///
         /// <returns> true if the arguments specify a map file. </returns>

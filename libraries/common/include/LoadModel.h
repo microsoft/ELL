@@ -50,17 +50,13 @@ namespace common
     ///
     /// <param name="filename"> The filename. </param>
     /// <returns> The loaded map. </returns>
-    template <typename MapType = model::DynamicMap>
-    MapType LoadMap(const std::string& filename);
+    model::DynamicMap LoadMap(const std::string& filename);
 
     /// <summary> Loads a map from a `MapLoadArguments` struct. </summary>
     ///
-    /// <typeparam name="MapType"> The type of map to load. </param>
-    /// <typeparam name="MapLoadArguments::MapType"> The MapLoadArguments map type to match. </param>
     /// <param name="mapLoadArguments"> The `MapLoadArguments` struct. </param>
     /// <returns> The loaded map. </returns>
-    template <typename MapType = model::DynamicMap, MapLoadArguments::MapType argMapType = MapLoadArguments::MapType::simpleMap>
-    MapType LoadMap(const MapLoadArguments& mapLoadArguments);
+    model::DynamicMap LoadMap(const MapLoadArguments& mapLoadArguments);
 
     /// <summary> Saves a map to a file. </summary>
     ///

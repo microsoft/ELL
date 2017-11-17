@@ -15,10 +15,10 @@
 #include "DynamicMap.h"
 #include "IRCompiledMap.h"
 #include "Model.h"
-#include "SteppableMap.h"
 
 // nodes
 #include "AccumulatorNode.h"
+#include "ClockNode.h"
 #include "ConstantNode.h"
 #include "DelayNode.h"
 #include "DotProductNode.h"
@@ -39,7 +39,6 @@
 #include "IRFunctionEmitter.h"
 #include "IRMapCompiler.h"
 #include "IRModuleEmitter.h"
-#include "IRSteppableMapCompiler.h"
 #include "ScalarVariable.h"
 #include "VectorVariable.h"
 
@@ -47,8 +46,8 @@
 #include "LinearPredictor.h"
 #include "ProtoNNPredictor.h"
 
-// clock interface
-#include "ClockInterface.h"
+// utilities
+#include "Logger.h"
 
 // testing
 #include "testing.h"
@@ -61,6 +60,7 @@
 #include <vector>
 
 using namespace ell;
+using namespace ell::logging;
 
 std::string outputBasePath = "";
 
@@ -646,110 +646,100 @@ void TestForest()
     compiledMap.GetModule().WriteToFile(OutputPath("forest_map.ll"));
 }
 
-const std::vector<double> c_steppableMapData{ 1, 3, 5, 7, 9, 11, 13 };
-std::vector<double> compiledSteppableMapResults(c_steppableMapData.size());
-
-extern "C" {
-// Callbacks used by compiled map
-bool CompiledSteppableMap_DataCallback(double* input)
+extern "C"
 {
-    std::copy(c_steppableMapData.begin(), c_steppableMapData.end(), input);
+// Callbacks used by compiled map
+bool TestMulti_DataCallback1(double* input)
+{
+    Log() << "Data callback 1" << EOL;
+    const std::vector<double> input1{ 1, 3, 5, 7, 9, 11, 13 };
+    std::copy(input1.begin(), input1.end(), input);
     return true;
 }
-const std::string sourceFunctionName("CompiledSteppableMap_DataCallback");
-
-void CompiledSteppableMap_ResultsCallback(double* results)
+bool TestMulti_DataCallback2(double* input)
 {
-    compiledSteppableMapResults.assign(results, results + c_steppableMapData.size());
+    Log() << "Data callback 2" << EOL;
+    const std::vector<double> input2{ 42 };
+    std::copy(input2.begin(), input2.end(), input);
+    return true;
 }
-const std::string sinkFunctionName("CompiledSteppableMap_ResultsCallback");
+
+void TestMulti_ResultsCallback_Scalar(double result)
+{
+    Log() << "Results callback (scalar): " << result << EOL;
+}
+
+void TestMulti_ResultsCallback_Vector(double* result)
+{
+    Log() << "Results callback (vector): " << result[0] << EOL;
+}
+
+void TestMulti_LagNotificationCallback(double lag)
+{
+    Log() << "Lag callback:" << lag << EOL;
+}
 }
 
 // Ensure that LLVM jit can find these symbols
-TESTING_FORCE_DEFINE_SYMBOL(CompiledSteppableMap_DataCallback, bool, double*);
-TESTING_FORCE_DEFINE_SYMBOL(CompiledSteppableMap_ResultsCallback, void, double*);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback1, bool, double*);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback2, bool, double*);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Scalar, void, double);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Vector, void, double*);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_LagNotificationCallback, void, double);
 
-template<typename ClockType>
-void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicksFunction)
+void TestMultiSourceSinkMap(bool expanded, bool optimized)
 {
-    const std::string stepFunctionName("TestStep");
-
     // Create the map
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<model::TimeTickType>>(2);
-    auto sourceNode = model.AddNode<nodes::SourceNode<double>>(inputNode->output, c_steppableMapData.size(), sourceFunctionName);
-    auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(sourceNode->output);
-    auto sinkNode = model.AddNode<nodes::SinkNode<double>>(accumNode->output, sinkFunctionName);
-    auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>(sinkNode->output));
+    constexpr short lagThreshold = 5;
+    constexpr nodes::TimeTickType interval = 40;
 
-    auto duration = std::chrono::milliseconds(20);
-    auto map = model::SteppableMap<ClockType>(
-        model,
-        { { "timeSignal", inputNode } },
-        { { "accumulatorOutput", outputNode->output } },
-        duration);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1 /*currentTime*/);
+    auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold,
+        "LagNotificationCallback");
+    auto sourceNode1 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 7,
+        "DataCallback1", [] (auto& v) { return TestMulti_DataCallback1(&v[0]); });
+    auto sourceNode2 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 1,
+        "DataCallback2", [] (auto& v) { return TestMulti_DataCallback2(&v[0]); });
+    auto sumNode = model.AddNode<nodes::SumNode<double>>(sourceNode1->output);
+    auto minusNode = model.AddNode<nodes::BinaryOperationNode<double>>(sumNode->output,
+        sourceNode2->output, emitters::BinaryOperationType::subtract);
+    auto sinkNode1 = model.AddNode<nodes::SinkNode<double>>(sumNode->output,
+        "ResultsCallback_Scalar");
+    auto sinkNode2 = model.AddNode<nodes::SinkNode<double>>(model::PortElements<double>{ sourceNode1->output, sumNode->output },
+        "ResultsCallback_Vector");
+
+    // compiled maps require a single output, so we concatenate the ports for the sink nodes
+    auto outputNode = model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ sinkNode1->output, sinkNode2->output });
+    auto map = model::DynamicMap(model, { { "time", inputNode } }, { { "output", outputNode->output } });
 
     // Compile the map
     model::MapCompilerParameters settings;
-    settings.mapFunctionName = stepFunctionName;
-    settings.moduleName = "TestStepModule";
-    model::IRSteppableMapCompiler<ClockType> compiler(settings);
+    settings.moduleName = "TestMulti";
+    settings.compilerSettings.optimize = optimized;
+    settings.compilerSettings.unrollLoops = expanded;
+
+    model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
 
-    if (runJit)
-    {
-        getTicksFunction();
+    // Compare output
+    constexpr nodes::TimeTickType thresholdTicks = lagThreshold * interval;
+    std::vector<std::vector<nodes::TimeTickType>> signal = {
+        { 0 },
+        { interval*1 + thresholdTicks/2 }, // within threshold
+        { interval*2 }, // on time
+        { interval*3 + thresholdTicks }, // late
+        { interval*4 + thresholdTicks*20 }, // really late
+        { interval*5 } // on time
+    };
 
-        // Time signal input to the model (currently unused because map internally generates a signal)
-        std::vector<std::vector<model::TimeTickType>> timeSignal{ { 0, 0 } };
-        compiledSteppableMapResults.clear();
-
-        VerifyCompiledOutput(map, compiledMap, timeSignal, " steppable map");
-    }
-    else
-    {
-        // Generate a Main method to invoke our model
-        auto mainFunction = compiledMap.GetModule().BeginMainDebugFunction();
-        emitters::IRFunctionCallArguments args(mainFunction);
-
-        // Time signal input to the model (currently unused because map internally generates a signal)
-        std::vector<model::TimeTickType> timeSignal{ 0, 0 };
-        args.Append(compiledMap.GetModule().ConstantArray("c_timeSignal", timeSignal));
-        auto pResult = args.AppendOutput(emitters::VariableType::Double, c_steppableMapData.size());
-
-        mainFunction.Call(stepFunctionName, args);
-        mainFunction.PrintForEach("%f\n", pResult, 1);
-        mainFunction.Return();
-        compiledMap.GetModule().EndFunction();
-
-        PrintIR(compiledMap);
-    }
+    VerifyCompiledOutput(map, compiledMap, signal, " multi-sink and source map");
 }
 
-// Ensure that LLVM jit can find these symbols
-TESTING_FORCE_DEFINE_SYMBOL(ELL_GetSteadyClockMilliseconds, double);
-TESTING_FORCE_DEFINE_SYMBOL(ELL_GetSystemClockMilliseconds, double);
-
-void TestSteppableMap(bool runJit)
+void TestMultiSourceSinkMap()
 {
-    TestSteppableMap<std::chrono::steady_clock>(runJit, []() {
-        auto ticks = ELL_GetSteadyClockMilliseconds();
-        if (IsVerbose())
-        {
-            std::cout << "ELL_GetSteadyClockMilliseconds() ticks: " << ticks << "\n";
-        }
-        return ticks;
-    });
-
-    // Occassional failures, investigating
-    /*
-    TestSteppableMap<std::chrono::system_clock>(runJit, []()
-    {
-        auto ticks = ELL_GetSystemClockMilliseconds();
-        if (IsVerbose())
-        {
-            std::cout << "ELL_GetSystemClockMilliseconds() ticks: " << ticks << "\n";
-        }
-        return ticks;
-    });*/
+    TestMultiSourceSinkMap(true, true);
+    TestMultiSourceSinkMap(true, false);
+    TestMultiSourceSinkMap(false, true);
+    TestMultiSourceSinkMap(false, false);
 }
