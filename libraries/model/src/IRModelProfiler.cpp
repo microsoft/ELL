@@ -106,8 +106,8 @@ namespace model
         // Compute time elapsed and increment total time counter
         auto countPtr = irBuilder.CreateInBoundsGEP(_performanceCountersType, _performanceCountersPtr, { emitter.Literal(0), emitter.Literal(0) });
         auto totalTimePtr = irBuilder.CreateInBoundsGEP(_performanceCountersPtr, { emitter.Literal(0), emitter.Literal(1) });
-        function.Store(countPtr, function.Literal<int64_t>(0));
-        function.Store(totalTimePtr, function.Literal<double>(0));
+        function.StoreZero(countPtr);
+        function.StoreZero(totalTimePtr);
     }
 
     //
@@ -180,7 +180,7 @@ namespace model
         _nodeInfoType = _module->GetOrCreateStruct(GetNamespacePrefix() + "_NodeInfo", infoFields);
         _module->IncludeTypeInHeader(_nodeInfoType->getName());
 
-        emitters::NamedLLVMTypeList countersFields = {{"count", int64Type}, {"totalTime", doubleType}};        
+        emitters::NamedLLVMTypeList countersFields = {{"count", int64Type}, {"totalTime", doubleType}};
         _performanceCountersType = _module->GetOrCreateStruct(GetNamespacePrefix() + "_PerformanceCounters", countersFields);
         _module->IncludeTypeInHeader(_performanceCountersType->getName());
     }
@@ -430,8 +430,8 @@ namespace model
 
         auto countPtr = irBuilder.CreateInBoundsGEP(modelPerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
         auto totalTimePtr = irBuilder.CreateInBoundsGEP(modelPerformanceCountersPtr, { function.Literal(0), function.Literal(1) });
-        function.Store(countPtr, function.Literal<int64_t>(0));
-        function.Store(totalTimePtr, function.Literal(0.0));
+        function.StoreZero(countPtr);
+        function.StoreZero(totalTimePtr);
 
         _module->EndFunction();
     }
@@ -520,8 +520,8 @@ namespace model
 
             auto countPtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
             auto totalTimePtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(1) });
-            function.Store(countPtr, function.Literal<int64_t>(0));
-            function.Store(totalTimePtr, function.Literal(0.0));
+            function.StoreZero(countPtr);
+            function.StoreZero(totalTimePtr);
         }
         nodeLoop.End();
 
@@ -549,8 +549,8 @@ namespace model
 
             auto countPtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(0) });
             auto totalTimePtr = irBuilder.CreateInBoundsGEP(nodePerformanceCountersPtr, { function.Literal(0), function.Literal(1) });
-            function.Store(countPtr, function.Literal<int64_t>(0));
-            function.Store(totalTimePtr, function.Literal(0.0));
+            function.StoreZero(countPtr);
+            function.StoreZero(totalTimePtr);
         }
         loop.End();
 

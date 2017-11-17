@@ -132,7 +132,7 @@ namespace nodes
             oobIfEmitter.If(outOfBounds);
             {
                 // Note: we can't return from within an if/else block, so we store the value in a local variable
-                function.Store(scratch, function.Literal(static_cast<ValueType>(0.0)));
+                function.StoreZero(scratch);
             }
             oobIfEmitter.Else();
             {

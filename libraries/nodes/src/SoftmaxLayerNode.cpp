@@ -71,7 +71,7 @@ namespace nodes
 
             void Reset(emitters::IRFunctionEmitter& function)
             {
-                function.Store(_accumValueVar, function.Literal<ValueType>(0));
+                function.StoreZero(_accumValueVar);
             }
 
             llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x)

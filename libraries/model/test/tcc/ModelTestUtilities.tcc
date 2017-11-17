@@ -69,7 +69,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
 }
 
 template<typename InputType, typename OutputType>
-void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name)
+void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
     if (!IsVerbose())
     {
@@ -86,7 +86,7 @@ void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMa
 }
 
 template<typename InputType>
-void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name)
+void PrintCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
     switch (map.GetOutput(0).GetPortType())
     {
@@ -133,7 +133,7 @@ void VerifyMapOutput(const model::DynamicMap& map, std::vector<std::vector<Input
 }
 
 template<typename InputType, typename OutputType>
-void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
+void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
 {
     bool ok = true;
     // compare output
@@ -160,7 +160,7 @@ void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledM
 }
 
 template<typename InputType>
-void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
+void VerifyCompiledOutput(const model::DynamicMap& map, const model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, double epsilon)
 {
     switch (map.GetOutput(0).GetPortType())
     {

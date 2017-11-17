@@ -173,8 +173,8 @@ namespace nodes
         llvm::Value* bestDist = function.Variable(inputType, "bestDist");
 
         // initialize variables
-        function.Store(protoIndex, function.Literal(0));
-        function.Store(dLast, function.Literal(0.0));
+        function.StoreZero(protoIndex);
+        function.StoreZero(dLast);
 
         auto forLoop = function.ForLoop();
         forLoop.Begin(_prototypeLength);
@@ -200,7 +200,7 @@ namespace nodes
             if2.End();
 
             // Get dist
-            function.Store(dist, function.Literal(0.0));
+            function.StoreZero(dist);
             auto diffLoop = function.ForLoop();
             diffLoop.Begin(_sampleDimension);
             {

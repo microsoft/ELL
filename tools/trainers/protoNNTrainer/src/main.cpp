@@ -42,7 +42,6 @@
 
 // trainer
 #include "ProtoNNTrainer.h"
-//#include "EvaluatingIncrementalTrainer.h"
 
 // predictor
 #include "ProtoNNPredictor.h"
@@ -96,8 +95,8 @@ int main(int argc, char* argv[])
         auto stream = utilities::OpenIfstream(dataLoadArguments.inputDataFilename);
         auto mappedDataset = common::GetMappedDataset(stream, map);
 
-        // The problem is NumFeatures returns a random number from sparse dataset depending on the number of trailing zeros it 
-        // has skipped.Is if the user did NOT specify - dd auto and instead provided a real input size like - dd 784 then we use 
+        // The problem is NumFeatures returns a random number from sparse dataset depending on the number of trailing zeros it
+        // has skipped.Is if the user did NOT specify - dd auto and instead provided a real input size like - dd 784 then we use
         // that number instead.
         auto dimension = mapLoadArguments.defaultInputSize != 0 ? mapLoadArguments.defaultInputSize : mappedDataset.NumFeatures();
 
@@ -150,9 +149,13 @@ int main(int argc, char* argv[])
                     auto maxElement = std::max_element(prediction.GetDataPointer(), prediction.GetDataPointer() + prediction.Size());
                     auto maxLabelIndex = maxElement - prediction.GetDataPointer();
                     if (maxLabelIndex == label)
+                    {
                         truePositive += 1;
+                    }
                     else if (protoNNTrainerArguments.verbose)
+                    {
                         std::cout << "Test " << test_index << " failed: expecting label " << label << " and got label " << maxLabelIndex << std::endl;
+                    }
 
                     exampleIterator.Next();
                     test_index++;
@@ -169,7 +172,9 @@ int main(int argc, char* argv[])
         if (modelSaveArguments.outputModelFilename != "")
         {
             // Create a model
-            auto model = common::AppendNodeToModel<nodes::ProtoNNPredictorNode, PredictorType>(map, predictor);
+            auto model = map.GetModel();
+            auto predictorNode = model.AddNode<nodes::ProtoNNPredictorNode>(map.GetOutputElements<double>(0), predictor);
+            (void) model.AddNode<model::OutputNode<double>>(predictorNode->output);
             common::SaveModel(model, modelSaveArguments.outputModelFilename);
         }
     }

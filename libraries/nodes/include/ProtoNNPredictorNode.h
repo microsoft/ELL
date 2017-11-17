@@ -32,7 +32,7 @@ namespace nodes
         static constexpr const char* inputPortName = "input";
         static constexpr const char* outputPortName = "output";
         const model::InputPort<double>& input = _input;
-        const model::OutputPort<double>& outputScores = _outputScores;
+        const model::OutputPort<double>& output = _output;
 
         /// @}
 
@@ -74,7 +74,7 @@ namespace nodes
         model::InputPort<double> _input;
 
         // Output scores
-        model::OutputPort<double> _outputScores;
+        model::OutputPort<double> _output;
 
         // ProtoNN predictor
         ProtoNNPredictor _predictor;

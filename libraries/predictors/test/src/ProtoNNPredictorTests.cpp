@@ -42,16 +42,16 @@ void ProtoNNPredictorTest()
     // numLabels * numPrototypes
     auto Z = protonnPredictor.GetLabelEmbeddings().GetReference();
     // clang-format off
-    Z(0, 0) = 0.1; Z(0, 1) = 0.3, Z(0, 2) = 0.2;
-    Z(1, 0) = 0.2; Z(1, 1) = 0.4, Z(1, 2) = 0.8;
+    Z(0, 0) = 0.1; Z(0, 1) = 0.3; Z(0, 2) = 0.2;
+    Z(1, 0) = 0.2; Z(1, 1) = 0.4; Z(1, 2) = 0.8;
     // clang-format on
 
     auto prediction = protonnPredictor.Predict(ExampleType{ 0.2, 0.5, 0.6, 0.8, 0.1 });
 
     auto maxElement = std::max_element(prediction.GetDataPointer(), prediction.GetDataPointer() + prediction.Size());
-    auto maxLabelIndex = maxElement - prediction.GetDataPointer();
+    ptrdiff_t maxLabelIndex = maxElement - prediction.GetDataPointer();
 
-    size_t R = 1;
+    ptrdiff_t R = 1;
     double score = 1.321484;
 
     testing::ProcessTest("ProtoNNPredictorTest", testing::IsEqual(maxLabelIndex, R));

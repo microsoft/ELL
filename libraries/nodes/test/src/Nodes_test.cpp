@@ -725,8 +725,6 @@ static void TestEuclideanDistanceNodeRefine()
 
 static void TestProtoNNPredictorNode()
 {
-    using ExampleType = predictors::ProtoNNPredictor::DataVectorType;
-
     size_t dim = 5, projectedDim = 4, numPrototypes = 3, numLabels = 2;
     double gamma = 0.3;
     predictors::ProtoNNPredictor protonnPredictor(dim, projectedDim, numPrototypes, numLabels, gamma);
@@ -772,9 +770,11 @@ static void TestProtoNNPredictorNode()
     // numLabels * numPrototypes
     auto Z = protonnPredictor.GetLabelEmbeddings().GetReference();
     Z(0, 0) = 0.1;
-    Z(0, 1) = 0.3, Z(0, 2) = 0.2;
+    Z(0, 1) = 0.3;
+    Z(0, 2) = 0.2;
     Z(1, 0) = 0.2;
-    Z(1, 1) = 0.4, Z(1, 2) = 0.8;
+    Z(1, 1) = 0.4;
+    Z(1, 2) = 0.8;
 
     std::vector<double> input = { 0.2, 0.5, 0.6, 0.8, 0.1 };
 
@@ -789,13 +789,13 @@ static void TestProtoNNPredictorNode()
     model::ModelTransformer transformer;
     auto refinedModel = transformer.RefineModel(model, context);
     auto refinedInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    auto refinedScoreOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ protonnPredictorNode->outputScores });
+    auto refinedScoreOutputElements = transformer.GetCorrespondingOutputs(model::PortElements<double>{ protonnPredictorNode->output});
 
     refinedInputNode->SetInput(input);
 
     auto refinedScoresOutput = refinedModel.ComputeOutput(refinedScoreOutputElements);
 
-    auto computeScoreOutput = model.ComputeOutput(protonnPredictorNode->outputScores);
+    auto computeScoreOutput = model.ComputeOutput(protonnPredictorNode->output);
 
     testing::ProcessTest("Testing protonnPredictor node refine", testing::IsEqual(refinedScoresOutput, computeScoreOutput));
 }

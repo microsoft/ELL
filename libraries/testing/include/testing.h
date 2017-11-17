@@ -23,39 +23,12 @@ namespace testing
     /// <param name="b"> The second value. </param>
     ///
     /// <returns> true if equal, false if not. </returns>
-    bool IsEqual(bool a, bool b);
-
-    /// <summary> Checks if two values are exactly equal. </summary>
-    ///
-    /// <param name="a"> The first value. </param>
-    /// <param name="b"> The second value. </param>
-    ///
-    /// <returns> true if equal, false if not. </returns>
-    bool IsEqual(int a, int b);
-
-    /// <summary> Checks if two values are exactly equal. </summary>
-    ///
-    /// <param name="a"> The first value. </param>
-    /// <param name="b"> The second value. </param>
-    ///
-    /// <returns> true if equal, false if not. </returns>
-    bool IsEqual(char a, char b);
-
-    /// <summary> Checks if two values are exactly equal. </summary>
-    ///
-    /// <param name="a"> The first value. </param>
-    /// <param name="b"> The second value. </param>
-    ///
-    /// <returns> true if equal, false if not. </returns>
-    bool IsEqual(size_t a, size_t b);
-
-    /// <summary> Checks if two values are exactly equal. </summary>
-    ///
-    /// <param name="a"> The first value. </param>
-    /// <param name="b"> The second value. </param>
-    ///
-    /// <returns> true if equal, false if not. </returns>
-    bool IsEqual(std::string a, std::string b);
+    template <typename T1, typename T2>
+    inline std::enable_if_t<!std::is_floating_point<T1>::value && !std::is_floating_point<T2>::value, bool>
+    IsEqual(T1 t1, T2 t2)
+    {
+        return t1 == t2;
+    }
 
     /// <summary> Checks if two floats are equal, up to a small numerical error. </summary>
     ///
@@ -64,16 +37,15 @@ namespace testing
     /// <param name="tolerance"> The tolerance. </param>
     ///
     /// <returns> true if equal, false if not. </returns>
-    bool IsEqual(float a, float b, float tolerance = 1.0e-8);
-
-    /// <summary> Checks if two doubles are equal, up to a small numerical error. </summary>
-    ///
-    /// <param name="a"> The first number. </param>
-    /// <param name="b"> The second number. </param>
-    /// <param name="tolerance"> The tolerance. </param>
-    ///
-    /// <returns> true if equal, false if not. </returns>
-    bool IsEqual(double a, double b, double tolerance = 1.0e-8);
+    template <
+        typename T1,
+        typename T2,
+        typename T3 = std::conditional_t<sizeof(T1) >= sizeof(T2), T1, T2>>
+    inline std::enable_if_t<std::is_floating_point<T1>::value && std::is_floating_point<T2>::value, bool>
+    IsEqual(T1 a, T2 b, T3 tolerance = 1.0e-8)
+    {
+        return (a - b < tolerance && b - a < tolerance);
+    }
 
     /// <summary>
     /// Checks if two vectors are equal.

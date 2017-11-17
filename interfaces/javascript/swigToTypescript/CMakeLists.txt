@@ -2,12 +2,12 @@
 # swigToTypescript project
 #
 
-set (tool_name ell_module_d_ts)
+set(tool_name ell_module_d_ts)
 
-set (module_files 
-    generate-d-ts.xslt
-    index.js
-    package.json
+set(module_files
+    templates/generate-d-ts.xslt
+    templates/index.js
+    templates/package.json
 )
 
 find_program(NPM_EXECUTABLE npm)
@@ -37,8 +37,9 @@ if(NPM_EXECUTABLE AND NODE_EXECUTABLE)
 
     add_dependencies(${tool_name} ${tool_name}_files ${tool_name}_install)
 
-    foreach(module_file ${module_files})
-        configure_file(${module_file} ${module_file} @ONLY)
+    foreach(module_file_template ${module_files})
+        get_filename_component(module_file ${module_file_template} NAME)
+        configure_file(${module_file_template} ${module_file} @ONLY)
         set_property(TARGET ${tool_name}_files APPEND PROPERTY OBJECT_DEPENDS ${module_file})
     endforeach()
 

@@ -623,10 +623,24 @@ namespace emitters
         return _pEmitter->Store(pPointer, pValue);
     }
 
-    llvm::Value* IRFunctionEmitter::StoreZero(llvm::Value* pPointer)
+    llvm::Value* IRFunctionEmitter::StoreZero(llvm::Value* pPointer, int numElements /* = 1 */)
     {
+        assert(numElements >= 1);
+        assert(llvm::dyn_cast<llvm::GlobalVariable>(pPointer) == nullptr && "StoreZero can't handle llvm::GlobalVariables");
+
         auto type = llvm::cast<llvm::PointerType>(pPointer->getType())->getElementType();
-        return Store(pPointer, llvm::Constant::getNullValue(type));
+
+        auto zero = llvm::Constant::getNullValue(type);
+        llvm::Value* returnValue;
+
+        for (int index = 0; index < numElements; ++index)
+        {
+            // We use SetValueAtA directly because SetValueAt tries to see if the variable
+            // is a global variable first, which is not handled by this function.
+            returnValue = SetValueAtA(pPointer, index, zero);
+        }
+
+        return returnValue;
     }
 
     llvm::Value* IRFunctionEmitter::OperationAndUpdate(llvm::Value* pPointer, TypedOperator operation, llvm::Value* pValue)

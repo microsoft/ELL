@@ -23,9 +23,13 @@
 #include "DelayNode.h"
 #include "DotProductNode.h"
 #include "ForestPredictorNode.h"
+#include "L2NormSquaredNode.h"
 #include "LinearPredictorNode.h"
+#include "MatrixVectorProductNode.h"
+#include "ProtoNNPredictorNode.h"
 #include "SinkNode.h"
 #include "SourceNode.h"
+#include "SquaredEuclideanDistanceNode.h"
 #include "SumNode.h"
 
 // emitters
@@ -41,6 +45,7 @@
 
 // predictors
 #include "LinearPredictor.h"
+#include "ProtoNNPredictor.h"
 
 // clock interface
 #include "ClockInterface.h"
@@ -133,6 +138,110 @@ void TestSimpleMap(bool optimize)
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
     VerifyCompiledOutput(map, compiledMap, signal, " map");
+}
+
+void TestSqEuclideanDistanceMap()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    math::RowMatrix<double> m{
+        { 1.2, 1.1, 0.8 },
+        { 0.6, 0.9, 1.3 },
+        { 0.3, 1.0, 0.4 },
+        { -.4, 0.2, -.7 }
+    };
+    auto sqEuclidDistNode = model.AddNode<nodes::SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(inputNode->output, m);
+    auto map = model::DynamicMap{ model, { { "input", inputNode } }, { { "output", sqEuclidDistNode->output } } };
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = true;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap.IsValid(), true));
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    VerifyCompiledOutput(map, compiledMap, signal, " map");
+}
+
+void TestProtoNNPredictorMap()
+{
+    // the values of dim, gamma, and matrices come from the result of running protoNNTrainer with the following command line
+    // protoNNTrainer -v --inputDataFilename Train-28x28_sparse.txt -dd 784 -sw 0.29 -sb 0.8 -sz 0.8 -pd 15 -l 10 -mp 5 --outputModelFilename mnist-94.model --evaluationFrequency 1 -plf L4 -ds 0.003921568627451
+
+    size_t dim = 784, projectedDim = 15, numPrototypes = 50, numLabels = 10;
+    double gamma = 0.0733256;
+    predictors::ProtoNNPredictor protonnPredictor(dim, projectedDim, numPrototypes, numLabels, gamma);
+
+    // projectedDim * dim
+    auto W = protonnPredictor.GetProjectionMatrix() =
+    {
+        #include "TestProtoNNPredictorMap_Projection.inc"
+    };
+
+    // projectedDim * numPrototypes
+    auto B = protonnPredictor.GetPrototypes() =
+    {
+        #include "TestProtoNNPredictorMap_Prototypes.inc"
+    };
+
+    // numLabels * numPrototypes
+    auto Z = protonnPredictor.GetLabelEmbeddings() =
+    {
+        #include "TestProtoNNPredictorMap_LabelEmbeddings.inc"
+    };
+
+    // MNIST training data features
+    std::vector<std::vector<double>> features =
+    {
+        #include "TestProtoNNPredictorMap_features.inc"
+    };
+
+    std::vector<std::vector<int>> labels{ { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 } };
+
+    testing::IsEqual(protonnPredictor.GetProjectedDimension(), projectedDim);
+    testing::IsEqual(protonnPredictor.GetNumPrototypes(), numPrototypes);
+    testing::IsEqual(protonnPredictor.GetNumLabels(), numLabels);
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(dim);
+    auto protonnPredictorNode = model.AddNode<nodes::ProtoNNPredictorNode>(inputNode->output, protonnPredictor);
+    auto outputNode = model.AddNode<model::OutputNode<double>>(protonnPredictorNode->output);
+    auto map = model::DynamicMap{ model, { { "input", inputNode } }, { { "output", outputNode->output } } };
+
+    model::MapCompilerParameters settings;
+    settings.compilerSettings.optimize = false;
+    settings.compilerSettings.includeDiagnosticInfo = true;
+    settings.compilerSettings.inlineOperators = false;
+    model::IRMapCompiler compiler(settings);
+    auto compiledMap = compiler.Compile(map);
+
+    testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap.IsValid(), true));
+
+    for (unsigned i = 0; i < features.size(); ++i)
+    {
+        auto& input = features[i];
+        std::transform(input.begin(), input.end(), input.begin(), [](double d) { return d / 255; });
+
+        const auto& label = labels[i];
+
+        IsEqual(input.size(), dim);
+
+        inputNode->SetInput(input);
+        auto computeOutput = model.ComputeOutput(outputNode->output);
+        testing::ProcessTest("one hot indices are incorrect for computed and actual label",
+                             IsEqual(std::max_element(label.begin(), label.end()) - label.begin(),
+                                     std::max_element(computeOutput.begin(), computeOutput.end()) - computeOutput.begin()));
+
+        map.SetInputValue(0, input);
+        auto refinedOutput = map.ComputeOutput<double>(0);
+        testing::ProcessTest("computed and refined output vectors don't match", IsEqual(computeOutput, refinedOutput, 1e-5));
+
+        compiledMap.SetInputValue(0, input);
+        auto compiledOutput = compiledMap.ComputeOutput<double>(0);
+        testing::ProcessTest("refined and compiled output vectors don't match", IsEqual(refinedOutput, compiledOutput, 1e-5));
+    }
 }
 
 void TestMultiOutputMap()
@@ -540,8 +649,7 @@ void TestForest()
 const std::vector<double> c_steppableMapData{ 1, 3, 5, 7, 9, 11, 13 };
 std::vector<double> compiledSteppableMapResults(c_steppableMapData.size());
 
-extern "C"
-{
+extern "C" {
 // Callbacks used by compiled map
 bool CompiledSteppableMap_DataCallback(double* input)
 {
@@ -561,7 +669,7 @@ const std::string sinkFunctionName("CompiledSteppableMap_ResultsCallback");
 TESTING_FORCE_DEFINE_SYMBOL(CompiledSteppableMap_DataCallback, bool, double*);
 TESTING_FORCE_DEFINE_SYMBOL(CompiledSteppableMap_ResultsCallback, void, double*);
 
-template <typename ClockType>
+template<typename ClockType>
 void TestSteppableMap(bool runJit, std::function<model::TimeTickType()> getTicksFunction)
 {
     const std::string stepFunctionName("TestStep");
@@ -624,8 +732,7 @@ TESTING_FORCE_DEFINE_SYMBOL(ELL_GetSystemClockMilliseconds, double);
 
 void TestSteppableMap(bool runJit)
 {
-    TestSteppableMap<std::chrono::steady_clock>(runJit, []()
-    {
+    TestSteppableMap<std::chrono::steady_clock>(runJit, []() {
         auto ticks = ELL_GetSteadyClockMilliseconds();
         if (IsVerbose())
         {

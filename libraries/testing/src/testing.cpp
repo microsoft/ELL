@@ -20,62 +20,6 @@ namespace ell
 {
 namespace testing
 {
-    template <typename ValueType>
-    bool IsScalarEqual(const ValueType& a, const ValueType& b)
-    {
-        return a == b;
-    }
-
-    bool IsEqual(bool a, bool b)
-    {
-        return IsScalarEqual(a, b);
-    }
-
-    bool IsEqual(char a, char b)
-    {
-        return IsScalarEqual(a, b);
-    }
-
-    bool IsEqual(int a, int b)
-    {
-        return IsScalarEqual(a, b);
-    }
-
-    bool IsEqual(size_t a, size_t b)
-    {
-        return IsScalarEqual(a, b);
-    }
-
-    bool IsEqual(const std::string& a, const std::string& b)
-    {
-        return IsScalarEqual(a, b);
-    }
-
-    bool IsEqual(float a, float b, float tolerance)
-    {
-        return (a - b < tolerance && b - a < tolerance);
-    }
-
-    bool IsEqual(double a, double b, double tolerance)
-    {
-        return (a - b < tolerance && b - a < tolerance);
-    }
-
-    bool IsEqual(float a, double b, double tolerance)
-    {
-        return (a - b < tolerance && b - a < tolerance);
-    }
-
-    bool IsEqual(double a, float b, double tolerance)
-    {
-        return (a - b < tolerance && b - a < tolerance);
-    }
-
-    bool IsEqual(float a, float b, double tolerance)
-    {
-        return (a - b < tolerance && b - a < tolerance);
-    }
-
     //
     // vectors
     //

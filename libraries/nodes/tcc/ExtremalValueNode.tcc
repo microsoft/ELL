@@ -96,7 +96,7 @@ namespace nodes
 
         auto val0 = function.ValueAt(inputVal, function.Literal(0));
         function.Store(bestVal, val0);
-        function.Store(bestIndex, function.Literal(0));
+        function.StoreZero(bestIndex);
 
         auto forLoop = function.ForLoop();
         forLoop.Begin(1, numInputs, 1);
@@ -129,7 +129,7 @@ namespace nodes
 
         llvm::Value* val0 = compiler.LoadPortElementVariable(input.GetInputElement(0));
         function.Store(bestVal, val0);
-        function.Store(bestIndex, function.Literal(0));
+        function.StoreZero(bestIndex);
 
         for (int i = 1; i < numInputs; ++i)
         {

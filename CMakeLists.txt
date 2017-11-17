@@ -18,6 +18,9 @@ if(CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_MODULE_LINKER_FLAGS_DOCUMENTATION ${CMAKE_MODULE_LINKER_FLAGS_RELEASE})
 endif()
 
+# Try to create a compilation database
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Options
 # To set an option:
 # cmake -DMyOption=ON|OFF buildDirectory

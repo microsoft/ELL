@@ -100,7 +100,7 @@ namespace predictors
         /// <summary> Gets the number of prototypes. </summary>
         ///
         /// <returns> The number of prototypes. </returns>
-        size_t GetNumPrototypes() const { return _Z.NumColumns(); }
+        size_t GetNumPrototypes() const { return _B.NumColumns(); }
 
         /// <summary> Gets the number of labels. </summary>
         ///

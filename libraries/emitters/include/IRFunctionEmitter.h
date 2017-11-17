@@ -652,9 +652,11 @@ namespace emitters
         /// <summary> Emit instruction to initialize a 0 value into the pointer location. </summary>
         ///
         /// <param name="pPointer"> Pointer to the adress where the value is being stored. </param>
+        /// <param name="numElements"> Number of elements to fill in with zero at address.
+        /// defaults to 1. </param>
         ///
         /// <returns> Pointer to the stored value. </returns>
-        llvm::Value* StoreZero(llvm::Value* pPointer);
+        llvm::Value* StoreZero(llvm::Value* pPointer, int numElements = 1);
 
         /// <summary> Emit a binary operation on to values, A and B, which replaces the value in B with the result. </summary>
         ///
@@ -851,7 +853,7 @@ namespace emitters
         ///
         /// <returns> A task object representing the running task. </param>
         IRAsyncTask Async(IRFunctionEmitter& task, const std::vector<llvm::Value*>& arguments);
-        
+
         //
         // Standard C library function calls
         //

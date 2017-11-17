@@ -88,7 +88,7 @@ void TestIRCompiler()
     TestCompilableSourceNode();
     TestCompilableSinkNode();
     TestCompilableClockNode();
-    
+
     TestPerformanceCounters();
     TestCompilableDotProductNode2<float>(3); // uses IR
     TestCompilableDotProductNode2<double>(3); // uses IR
@@ -184,6 +184,8 @@ void TestIRCompiler()
     // TestFullyConnectedLayerNode(0, 2); // Fully-connected layer nodes can't have padding (yet)
     // TestFullyConnectedLayerNode(1, 1); // Fully-connected layer nodes can't have padding (yet)
 
+    TestProtoNNPredictorMap();
+
     TestRecurrentNode();
     TestGRUNode();
     TestLSTMNode();
@@ -213,3 +215,4 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+

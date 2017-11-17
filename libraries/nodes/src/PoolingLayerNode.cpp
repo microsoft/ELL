@@ -44,7 +44,7 @@ namespace nodes
             const int posWindowExtent = windowSize / 2;
 
             // Default values for the 0 (middle) region. This is the region where the entire window covers valid input.
-            // 
+            //
             result.inputBounds.begin = -negWindowExtent;
             result.inputBounds.end = inputSize - posWindowExtent;
             result.windowBounds.begin = negWindowExtent;
@@ -82,13 +82,13 @@ namespace nodes
 
     //
     // Note: the pooling function constructors take a `staticCount` parameter. This parameter
-    // tells how many valid data values the function will be evaluated over in order to compute 
-    // the output of one pooling window. It's currently only used to determine the denominator for the 
+    // tells how many valid data values the function will be evaluated over in order to compute
+    // the output of one pooling window. It's currently only used to determine the denominator for the
     // mean pooling. The pooling functions are able to work in a mode where they know ahead of time
     // how many values they'll be evaluated over, and also in a mode where they have to count it
     // dynamically. If nonnegative, the `staticCount` parameter tells how many times the function
     // will be called (via `Accumulate`) for one pooling window. If `staticCount` < 0, then the function
-    // operates in the dynamic mode where it keeps a count of the number of times its been called. 
+    // operates in the dynamic mode where it keeps a count of the number of times its been called.
 
     //
     // MaxPoolingFunction
@@ -158,10 +158,10 @@ namespace nodes
         void Reset(emitters::IRFunctionEmitter& function, int staticCount)
         {
             _count = staticCount;
-            function.Store(_accumValueVar, function.Literal<ValueType>(0));
+            function.StoreZero(_accumValueVar);
             if (_countVar != nullptr)
             {
-                function.Store(_countVar, function.Literal(0));
+                function.StoreZero(_countVar);
             }
         }
 
@@ -289,9 +289,9 @@ namespace nodes
     }
 
     /*
-    
+
     # Splitting windowed operations into regions
-    
+
     When scanning a window of size w over a signal (assume size >=w), there are
     2w-1 possible 'regions', or amounts of overlap between the window and the
     signal:
@@ -303,9 +303,9 @@ namespace nodes
 
     In practice, we can ignore many of these regions. If the 'pad' setting is 'false', we only need
     to deal with the middle region of full overlap.
-    
-    When 'pad' is 'true', we can ignore the infinite non-overlap regionsregions and ~half of the size-1 
-    regions. The infinite regions are obvious. We can also ignore the size-1 regions where the center of 
+
+    When 'pad' is 'true', we can ignore the infinite non-overlap regionsregions and ~half of the size-1
+    regions. The infinite regions are obvious. We can also ignore the size-1 regions where the center of
     the window is outside the input signal. This gives us w regions:
 
       * floor(w/2) regions where the left part of the window doesn't overlap with the signal
@@ -325,23 +325,23 @@ namespace nodes
         look up value at input location
         evaluate function
         accumulate
-        [Note that we can easily derive the number of cells visited in this inner loop from the region, 
+        [Note that we can easily derive the number of cells visited in this inner loop from the region,
           so there is no need to count cells for operations like 'mean']
     ```
-      
+
     ## Dealing with 'pad' parameter:
     If 'pad' is 'true', output location 0 corresponds to a window centered on input location 0.
-    
-    if 'pad' is 'false', output location 0 corresponds to a window with its leftmost cell at 
+
+    if 'pad' is 'false', output location 0 corresponds to a window with its leftmost cell at
     input location 0. Equivalently, the window is centered at input location w/2.
-    
+
     Let's consider 'pad' = 'true' to be the canonical setting. Then if 'pad' is 'false', we just need
-    to offset the coordinate-mapping by w/2 (that is, output(0) -> window centered at input(w/2)). We 
+    to offset the coordinate-mapping by w/2 (that is, output(0) -> window centered at input(w/2)). We
     need to take this mapping into account when computing the output extents for the regions.
 
     ## Dealing with explicit input padding:
     Often, the input data is padded with zeros (or another appropriate value) in order for the inner loop
-    to always be able to loop over all window pixels. To deal with this situation, we can just modify the 
+    to always be able to loop over all window pixels. To deal with this situation, we can just modify the
     input data bounds to include the appropriate amount of padded data. Then the algorithm will proceed as
     in the case where 'pad' is 'false'. Note that we can easily accomodate hybrid situations, where the input
     data has been padded with zero values, but not enough data padding has been supplied. Then we just adjust
@@ -351,8 +351,8 @@ namespace nodes
     ## Dealing with stride != 1:
     Non-1 stride changes the output->input mapping by simply scaling the output value by the stride. However,
     it's important to be careful when doing the region extent mapping to make sure we don't leave off
-    the rightmost piece of the output region when truncating. (Does using half-open intervals save us here? I think so.) 
-    
+    the rightmost piece of the output region when truncating. (Does using half-open intervals save us here? I think so.)
+
     ## Customizing to deal with differences in other frameworks:
     If other frameworks have different ways of centering windows, we can deal with them in a couple of ways:
       * Explicitly pad the data with zero values in such a way that we get the same result as the framework we're trying
@@ -363,8 +363,8 @@ namespace nodes
     ## On the numbering scheme for regions:
     Regions are identified by a region number or ID, which has valid values in the interval [-(w+1), (w+1)]. If a region
     number is negative, it indicates how many elements from the negative (left-hand) side of the window are outside of the
-    input signal's area. If the region number is positive, it indicates how many elements on the right-hand side of the 
-    window are outside of the image area. A region ID of zero corresponds to the middle area of the input signal where the 
+    input signal's area. If the region number is positive, it indicates how many elements on the right-hand side of the
+    window are outside of the image area. A region ID of zero corresponds to the middle area of the input signal where the
     window is completely contained inside the image area.
 
     Example:
@@ -388,7 +388,7 @@ namespace nodes
                                          +---+---+---+---+---+---+---+---+
                                          |   |   |   |   |   |   |   |   |
                                          +---+---+---+---+---+---+---+---+
-                             
+
 
              +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
              |-1,-1|                     -1,0                      | -1,1|
@@ -458,7 +458,7 @@ namespace nodes
         // Create the pooling function
         using FType = typename PoolingFunctionT<PoolingFunctionType, ValueType>::type;
         auto paddingValue = ell::predictors::neural::GetPaddingValue<ValueType>(this->GetLayer().GetLayerParameters().inputPaddingParameters.paddingScheme);
-        FType poolingFunction{ function, windowSize * windowSize, paddingValue }; // Create the pooling function with a 'full' pooling window. 
+        FType poolingFunction{ function, windowSize * windowSize, paddingValue }; // Create the pooling function with a 'full' pooling window.
 
         // These "window extent" variables indicate the amount that the pooling window extends to the left and right (or top/bottom) of the center pixel.
         //   posWindowExtent is always floor(windowSize/2)

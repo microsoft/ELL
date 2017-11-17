@@ -114,7 +114,7 @@ namespace nodes
             auto int32Type = emitter.Type(emitters::VariableType::Int32);
 
             emitters::IRFunctionEmitter function = moduleEmitter.BeginFunction(functionName, valueType, { valuePtrType, int32Type, int32Type, int32Type, int32Type, int32Type, int32Type });
-            llvm::Value* scratch = function.Variable(emitters::GetVariableType<ValueType>(), "scratch");
+            llvm::Value* returnValue = function.Variable(emitters::GetVariableType<ValueType>(), "returnValue");
 
             auto arguments = function.Arguments().begin();
             auto inputVolume = &(*arguments++);
@@ -140,9 +140,7 @@ namespace nodes
             auto oobIfEmitter = function.If();
             oobIfEmitter.If(outOfBounds);
             {
-                // Error: can't return from within an if/else block
-                // function.Return(function.Literal(static_cast<ValueType>(0.0)));
-                function.Store(scratch, function.Literal(static_cast<ValueType>(0.0)));
+                function.StoreZero(returnValue);
             }
             oobIfEmitter.Else();
             {
@@ -151,13 +149,11 @@ namespace nodes
                 auto index = function.Operator(plus, index1, function.Operator(plus, index2, valueCol));
                 auto val = function.ValueAt(inputVolume, index);
 
-                // Error: can't return from within an if/else block
-                // function.Return(val);
-                function.Store(scratch, val);
+                function.Store(returnValue, val);
             }
             oobIfEmitter.End();
 
-            function.Return(function.Load(scratch));
+            function.Return(function.Load(returnValue));
             moduleEmitter.EndFunction();
             return function.GetFunction();
         }
@@ -772,7 +768,7 @@ namespace nodes
             useVectorInstructions = false;
         }
 
-        
+
         // TODO: get types in a way that doesn't require emitting these variables
         auto argTypes = emitters::GetLLVMTypes({ pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, pOutput, function.Literal<int32_t>(0), function.Literal<int32_t>(0) });
         auto voidType = llvm::Type::getVoidTy(context);
@@ -914,7 +910,7 @@ namespace nodes
             if (numScalarBlocks > 0)
             {
                 assert(sumVar != nullptr);
-                function.Store(sumVar, function.Literal<PackedBitsType>(0));
+                function.StoreZero(sumVar);
                 auto start = vectorSize * numVectorBlocks;
                 EmitInnerLoop(function, inputBeginPtr, paddingMaskBeginPtr, weightsBeginPtr, sumVar, popcountFunction, start, numScalarBlocks, hasZeroPadding);
             }

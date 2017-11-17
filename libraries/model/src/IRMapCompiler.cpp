@@ -37,6 +37,7 @@ namespace model
 
         _moduleEmitter.SetCompilerParameters(GetMapCompilerParameters().compilerSettings);
         _moduleEmitter.SetTargetTriple(GetCompilerParameters().targetDevice.triple);
+
         _moduleEmitter.SetTargetDataLayout(GetCompilerParameters().targetDevice.dataLayout);
         Log() << "Target device triple: " << GetCompilerParameters().targetDevice.triple << EOL
               << "Target device layout: " << GetCompilerParameters().targetDevice.dataLayout << EOL;
@@ -214,9 +215,9 @@ namespace model
         // create the final block in the case the index is out of range or there are no shapes and reutrn empty TensorShape.
         auto pDoneBlock = fn.BeginBlock("NoMatchBlock");
         {
-            fn.Store(rowsPtr, fn.Literal(0));
-            fn.Store(columnsPtr, fn.Literal(0));
-            fn.Store(channelsPtr, fn.Literal(0));
+            fn.StoreZero(rowsPtr);
+            fn.StoreZero(columnsPtr);
+            fn.StoreZero(channelsPtr);
             fn.Return();
         }
 

@@ -53,7 +53,7 @@ namespace emitters
             iLoop.Begin(m);
             {
                 auto i = iLoop.LoadIterationVariable();
-                function.Store(accum, function.Literal(static_cast<ValueType>(0.0)));
+                function.StoreZero(accum);
                 auto jLoop = function.ForLoop();
                 jLoop.Begin(n);
                 {
@@ -625,7 +625,7 @@ namespace emitters
         llvm::FunctionType* functionType = llvm::FunctionType::get(GetIntType(), { }, false);
         return static_cast<llvm::Function*>(pModule->getOrInsertFunction("openblas_get_num_threads", functionType));
     }
-    
+
     llvm::Function* IRRuntime::GetOpenBLASSetNumThreadsFunction()
     {
         // void openblas_set_num_threads(int num_threads);
