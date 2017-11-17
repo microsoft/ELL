@@ -29,6 +29,9 @@ set (src
     src/IRPosixRuntime.cpp
     src/IRRuntime.cpp
     src/IRSwigInterfaceWriter.cpp
+    src/IRTask.cpp
+    src/IRThreadPool.cpp
+    src/IRThreadUtilities.cpp
     src/LLVMUtilities.cpp
     src/ModuleEmitter.cpp
     src/TargetDevice.cpp
@@ -57,6 +60,9 @@ set (include
     include/IRPosixRuntime.h
     include/IRRuntime.h
     include/IRSwigInterfaceWriter.h
+    include/IRTask.h
+    include/IRThreadPool.h
+    include/IRThreadUtilities.h
     include/LLVMInclude.h
     include/LLVMUtilities.h
     include/ModuleEmitter.h

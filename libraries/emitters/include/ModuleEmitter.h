@@ -30,14 +30,15 @@ namespace emitters
         swigInterface
     };
 
-    /// <summary> Standard compiler switches. </summary>
+    /// <summary> List of possible BLAS implementations (for enabling implementation-specific features). </summary>
     enum class BlasType
     {
         unknown = 0,
         openBLAS,
         atlas
     };
-
+    
+    /// <summary> Standard compiler switches. </summary>
     struct CompilerParameters
     {
         bool unrollLoops = false;
@@ -49,6 +50,7 @@ namespace emitters
         bool optimize = true;
         bool includeDiagnosticInfo = false;
         bool parallelize = false;
+        bool useThreadPool = true;
         int maxThreads = 4;
         bool debug = false;
 

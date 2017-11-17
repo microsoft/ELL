@@ -128,7 +128,7 @@ All public classes, functions, and variables that are declared in .h files shoul
     ///
     /// <typeparam name="RandomAccessContainerType"> The container type, which must implement a square bracket operator. </typeparam>
     /// <param name="container"> [in,out] The container being sorted. </param>
-    template<typename RandomAccessContainerType>
+    template <typename RandomAccessContainerType>
     void InplaceSort(RandomAccessContainerType& container);
 
 

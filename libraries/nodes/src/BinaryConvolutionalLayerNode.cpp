@@ -13,6 +13,7 @@
 // emitters
 #include "IRAsyncTask.h"
 #include "IREmitter.h"
+#include "IRThreadPool.h"
 #include "IRVectorUtilities.h"
 #include "LLVMUtilities.h"
 
@@ -35,10 +36,8 @@ namespace nodes
         const auto divide = emitters::TypedOperator::divideSigned;
         const auto modulo = emitters::TypedOperator::moduloSigned;
 
-        const auto plusFloat = emitters::TypedOperator::addFloat;
         const auto minusFloat = emitters::TypedOperator::subtractFloat;
         const auto timesFloat = emitters::TypedOperator::multiplyFloat;
-        const auto divideFloat = emitters::TypedOperator::divideFloat;
 
         const auto logicalOr = emitters::TypedOperator::logicalOr;
         const auto logicalAnd = emitters::TypedOperator::logicalAnd;
@@ -84,7 +83,6 @@ namespace nodes
                                         const predictors::neural::BinaryConvolutionalParameters& convParams,
                                         llvm::Value* valueRow, llvm::Value* valueColumn, llvm::Value* valueChannel)
         {
-            const auto rowStride = inputLayout.GetStride(0);
             const auto columnStride = inputLayout.GetStride(1);
             const auto channelStride = inputLayout.GetStride(2);
 
@@ -197,7 +195,6 @@ namespace nodes
         {
             const auto numChannels = inputLayout.GetActiveSize(2);
             const auto outputImageWidth = outputLayout.GetActiveSize(1);
-            const auto outputImageHeight = outputLayout.GetActiveSize(0);
             const auto filterSize = convParams.receptiveField;
             const auto stride = convParams.stride;
             const auto convPadding = inputLayout.GetOffset(0); // TODO: decouple input data padding from convolution padding
@@ -479,14 +476,21 @@ namespace nodes
         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
     }
 
-    // TODO: Fix this to deal with convParams.stride != 1
+    // TODO: make new function that emits the contents of the task function (which is also the stuff emitted in the serial case), and call this from
+    // GetTaskFunction as well as the serial part. Removes code duplication and makes it so that we don't accidentally use 'function' inside definition of 'taskFunction'
     template <typename ValueType, typename PackedBitsType>
-    void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    emitters::IRFunctionEmitter BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::GetTaskFunction(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
     {
-        llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
+        // Get port variables
+        llvm::Value* pInputTemp = compiler.EnsurePortEmitted(input);
+        llvm::Value* pOutputTemp = compiler.EnsurePortEmitted(output);
 
-        // The workspace buffer element sizes are dependent on the processor architecture's bitness
+        // Get LLVM types
+        auto& module = function.GetModule();
+        auto& context = module.GetLLVMContext();
+        auto voidType = llvm::Type::getVoidTy(context);
+
+        // Constants
         auto elementSize = sizeof(PackedBitsType);
         auto numBits = 8 * elementSize;
         const auto inputDepth = _inputMemoryLayout.GetActiveSize(2);
@@ -495,27 +499,101 @@ namespace nodes
 
         int packedRowSize = (fieldVolumeSize - 1) / numBits + 1;
         assert(packedRowSize != 0);
-        int outputImageHeight = _outputMemoryLayout.GetActiveSize(0);
-        int outputImageWidth = _outputMemoryLayout.GetActiveSize(1);
 
-        // TODO: interleave load/compress more tightly to eliminate need for a scratch variable to hold the whole row
-        llvm::AllocaInst* realValueRow = function.Variable(emitters::GetVariableType<ValueType>(), fieldVolumeSize);
-        auto outputRowLoop = function.ForLoop();
-        outputRowLoop.Begin(outputImageWidth * outputImageHeight);
+        auto argTypes = emitters::GetLLVMTypes({ pInputTemp, pOutputTemp, function.Literal<int32_t>(0), function.Literal<int32_t>(0) });
+        emitters::IRFunctionEmitter taskFunction = function.GetModule().BeginFunction(utilities::to_string(GetId()) + "_task", voidType, argTypes);
         {
-            auto outputRowIndex = outputRowLoop.LoadIterationVariable();
-            LoadRow<ValueType>(function,
-                               pInput,
-                               this->GetInputMemoryLayout(),
-                               outputRowIndex,
-                               this->GetOutputMemoryLayout(),
-                               _convolutionalParameters,
-                               realValueRow);
+            auto arguments = taskFunction.Arguments().begin();
+            auto pInput = &(*arguments++);
+            auto pOutput = &(*arguments++);
+            auto begin = &(*arguments++);
+            auto end = &(*arguments++);
 
-            auto outputRow = function.PointerOffset(pOutput, function.Operator(times, outputRowIndex, function.Literal<int>(packedRowSize)));
-            CompressRow<ValueType, PackedBitsType>(function, realValueRow, outputRow, fieldVolumeSize);
+            // TODO: interleave load/compress more tightly to eliminate need for a scratch variable to hold a whole row
+            llvm::AllocaInst* realValueRow = taskFunction.Variable(emitters::GetVariableType<ValueType>(), fieldVolumeSize);
+            auto outputRowLoop = taskFunction.ForLoop();
+            outputRowLoop.Begin(begin, end, taskFunction.Literal<int>(1));
+            {
+                auto outputRowIndex = outputRowLoop.LoadIterationVariable();
+                LoadRow<ValueType>(taskFunction,
+                                   pInput,
+                                   this->GetInputMemoryLayout(),
+                                   outputRowIndex,
+                                   this->GetOutputMemoryLayout(),
+                                   _convolutionalParameters,
+                                   realValueRow);
+
+                auto outputRow = taskFunction.PointerOffset(pOutput, taskFunction.Operator(times, outputRowIndex, taskFunction.Literal<int>(packedRowSize)));
+                CompressRow<ValueType, PackedBitsType>(taskFunction, realValueRow, outputRow, fieldVolumeSize);
+            }
+            outputRowLoop.End();
+            taskFunction.Return();
         }
-        outputRowLoop.End();
+        function.GetModule().EndFunction();
+
+        return taskFunction;
+    }
+
+    // TODO: Fix this to deal with convParams.stride != 1
+    template <typename ValueType, typename PackedBitsType>
+    void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    {
+        // Get port variables
+        llvm::Value* pInput = compiler.EnsurePortEmitted(this->input);
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(this->output);
+
+        const auto& compilerSettings = compiler.GetCompilerParameters();
+
+        // The workspace buffer element sizes are dependent on the processor architecture's bitness
+        auto elementSize = sizeof(PackedBitsType);
+        auto numBits = 8 * elementSize;
+        const auto inputDepth = _inputMemoryLayout.GetActiveSize(2);
+        const auto filterWidth = _convolutionalParameters.receptiveField;
+        const auto fieldVolumeSize = filterWidth * filterWidth * inputDepth;
+
+        const auto packedRowSize = (fieldVolumeSize - 1) / numBits + 1;
+        assert(packedRowSize != 0);
+        const auto outputImageHeight = _outputMemoryLayout.GetActiveSize(0);
+        const auto outputImageWidth = _outputMemoryLayout.GetActiveSize(1);
+        const auto numOutputRows = outputImageWidth * outputImageHeight;
+
+        const auto numDesiredTasks = compilerSettings.maxThreads;
+        const int taskSize = CeilDiv(numOutputRows, numDesiredTasks);
+        const int numTasks = CeilDiv(numOutputRows, taskSize);
+        if (compilerSettings.parallelize && numTasks > 1)
+        {
+            auto taskFunction = GetTaskFunction(compiler, function);
+            std::vector<std::vector<llvm::Value*>> taskArgs;
+            for (int taskIndex = 0; taskIndex < numTasks; ++taskIndex)
+            {
+                auto start = taskIndex * taskSize;
+                auto end = std::min((taskIndex + 1) * taskSize, numOutputRows);
+                taskArgs.push_back({ pInput, pOutput, function.Literal<int32_t>(start), function.Literal<int32_t>(end) });
+            }
+            auto tasks = function.StartTasks(taskFunction, taskArgs);
+            tasks.WaitAll(function);
+        }
+        else
+        {
+            // TODO: interleave load/compress more tightly to eliminate need for a scratch variable to hold the whole row
+            llvm::AllocaInst* realValueRow = function.Variable(emitters::GetVariableType<ValueType>(), fieldVolumeSize);
+            auto outputRowLoop = function.ForLoop();
+            outputRowLoop.Begin(numOutputRows);
+            {
+                auto outputRowIndex = outputRowLoop.LoadIterationVariable();
+                LoadRow<ValueType>(function,
+                                   pInput,
+                                   this->GetInputMemoryLayout(),
+                                   outputRowIndex,
+                                   this->GetOutputMemoryLayout(),
+                                   _convolutionalParameters,
+                                   realValueRow);
+
+                auto outputRow = function.PointerOffset(pOutput, function.Operator(times, outputRowIndex, function.Literal<int>(packedRowSize)));
+                CompressRow<ValueType, PackedBitsType>(function, realValueRow, outputRow, fieldVolumeSize);
+            }
+            outputRowLoop.End();
+        }
     }
 
     template <typename ValueType, typename PackedBitsType>
@@ -659,28 +737,22 @@ namespace nodes
             useVectorInstructions = false;
         }
 
-        if (compilerSettings.parallelize)
+        const int numDesiredTasks = compilerSettings.maxThreads;
+        const int taskSize = CeilDiv(numFilters, numDesiredTasks);
+        const int numTasks = CeilDiv(numFilters, taskSize);
+        if (compilerSettings.parallelize && numTasks > 1)
         {
-            const int numDesiredTasks = compilerSettings.maxThreads;
-            const int taskSize = CeilDiv(numFilters, numDesiredTasks);
-            const int numTasks = CeilDiv(numFilters, taskSize);
-            const int filtersPerBlock = taskSize;
-
             auto taskFunction = GetTaskFunction(compiler, function);
-            std::vector<emitters::IRAsyncTask> tasks;
+            std::vector<std::vector<llvm::Value*>> taskArgs;
             for (int taskIndex = 0; taskIndex < numTasks; ++taskIndex)
             {
-                auto start = taskIndex * filtersPerBlock;
-                auto end = std::min((taskIndex + 1) * filtersPerBlock, numFilters);
-                auto task = function.Async(taskFunction, { pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, pOutput, function.Literal<int32_t>(start), function.Literal<int32_t>(end) });
-                tasks.push_back(task);
+                auto start = taskIndex * taskSize;
+                auto end = std::min((taskIndex + 1) * taskSize, numFilters);
+                std::vector<llvm::Value*> args = { pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, pOutput, function.Literal<int32_t>(start), function.Literal<int32_t>(end) };
+                taskArgs.push_back(args);
             }
-
-            // Now wait for the tasks to finish
-            for (auto& task : tasks)
-            {
-                task.Sync();
-            }
+            auto tasks = function.StartTasks(taskFunction, taskArgs);
+            tasks.WaitAll(function);
         }
         else // single-threaded
         {
@@ -721,13 +793,14 @@ namespace nodes
         llvm::Value* pInputPaddingMaskSums = compiler.EnsurePortEmitted(inputPaddingMaskSums);
         llvm::Value* pOutput = compiler.EnsurePortEmitted(output);
 
-        // Get compiler settings
         const auto& compilerSettings = compiler.GetCompilerParameters();
 
         // Get LLVM types
         auto& module = function.GetModule();
         auto& context = module.GetLLVMContext();
+        auto voidType = llvm::Type::getVoidTy(context);
 
+        // Constants
         // Input / output memory layouts (of the original node)
         const auto& inputLayout = this->GetInputMemoryLayout();
         const auto& inputSize = inputLayout.GetActiveSize();
@@ -768,11 +841,9 @@ namespace nodes
             useVectorInstructions = false;
         }
 
-
         // TODO: get types in a way that doesn't require emitting these variables
         auto argTypes = emitters::GetLLVMTypes({ pInput, pFilterWeights, pFilterMeans, pInputPaddingMask, pInputPaddingMaskSums, pOutput, function.Literal<int32_t>(0), function.Literal<int32_t>(0) });
-        auto voidType = llvm::Type::getVoidTy(context);
-        auto taskFunction = function.GetModule().BeginFunction("BinaryXnorTask", voidType, argTypes);
+        emitters::IRFunctionEmitter taskFunction = function.GetModule().BeginFunction(utilities::to_string(GetId()) + "_task", voidType, argTypes);
         {
             auto arguments = taskFunction.Arguments().begin();
             auto pInput = &(*arguments++);

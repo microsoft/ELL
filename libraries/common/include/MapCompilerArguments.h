@@ -39,6 +39,7 @@ namespace common
         bool enableVectorization = true;
         int vectorWidth = 4;
         bool parallelize = true;
+        bool useThreadPool = true;
         int maxThreads = 4;
         bool debug = false;
 

@@ -1,0 +1,55 @@
+#!/bin/sh
+
+#
+# Usage: remote_test.sh <ip address> <username> [<password>]
+#
+
+
+cleanup=false
+
+target=pi3
+ip=$1
+username=$2
+password=$3
+
+password_arg=""
+if [ "${password}" != "" ] ; then
+  password_arg="--password ${password} "
+fi
+
+# Ensure prerequisites are built
+make -s compile
+make -s make_profiler
+make -s remoterun
+make -s makeProfileModels
+
+# Create example models for profiling
+bin/makeProfileModels
+
+# Useful models to test:
+# model_name=binary_conv_160x160x3x8.ell
+# model_name=binary_conv_160x160x3x8-dense_10.ell
+# model_name=binary_darknet_160x160x3_real.ell
+# model_name=d_I160x160x3CMCMBMBMBMBMB1AS.ell
+model_name=dsb_I64x64x3CMCMCMCMCCCMC1AS.ell
+
+serial_dir=profile_${target}_serial
+async_dir=profile_${target}_async
+threadpool_dir=profile_${target}_threadpool
+
+command=build_and_run.sh
+
+echo "Creating profilers"
+bin/make_profiler.sh $model_name $serial_dir --target $target 
+bin/make_profiler.sh $model_name $async_dir --target $target -par -th 4 -tp false
+bin/make_profiler.sh $model_name $threadpool_dir --target $target -par -th 4 -tp true
+
+echo "Running serial version"
+python tools/utilities/remoterun/remoterun.py --ipaddress $ip --source_dir $serial_dir --target_dir $serial_dir --username $username --command $command -v $password_arg --cleanup $cleanup
+
+echo "Running async version"
+python tools/utilities/remoterun/remoterun.py --ipaddress $ip --source_dir $async_dir --target_dir $async_dir --username $username --command $command -v $password_arg --cleanup $cleanup
+
+echo "Running threadpool version"
+python tools/utilities/remoterun/remoterun.py --ipaddress $ip --source_dir $threadpool_dir --target_dir $threadpool_dir --username $username --command $command -v $password_arg --cleanup $cleanup
+

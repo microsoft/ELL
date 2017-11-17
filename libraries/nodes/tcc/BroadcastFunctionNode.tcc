@@ -135,6 +135,7 @@ namespace nodes
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing:  if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
+        //       If broadcastDimension = outermost dimension (0), we may want to parallelize over that dimension
         const auto numDimensions = NumPrimaryInputDimensions();
         auto&& inputLayout = GetInputLayout();
         auto&& inputStride = inputLayout.GetStride();
@@ -186,10 +187,69 @@ namespace nodes
         }
     }
 
+    // wrapper around EmitComputeDimensionLoop for use by parallel tasks
+    template <typename ValueType, typename FunctionType>
+    emitters::IRFunctionEmitter BroadcastFunctionNode<ValueType, FunctionType>::GetTaskFunction(model::IRMapCompiler& compiler,
+                                                                                                emitters::IRFunctionEmitter& function,
+                                                                                                const emitters::LLVMTypeList& portTypes) const
+    {
+        auto& module = function.GetModule();
+        auto& emitter = module.GetIREmitter();
+        auto& context = module.GetLLVMContext();
+        auto int32Type = emitter.Type(emitters::VariableType::Int32);
+        auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
+        auto valuePtrType = valueType->getPointerTo();
+        auto voidType = llvm::Type::getVoidTy(context);
+
+        // ASSUME dimension == 0 --- we're only parallelizing on the outermost loop
+        int dimension = 0;
+        llvm::Value* prevInputDimensionOffset = nullptr;
+        llvm::Value* prevOutputDimensionOffset = nullptr;
+
+        emitters::LLVMTypeList argTypes = portTypes;
+        // int numValuePorts = 2 + NumSecondaryInputs(); // primary input, secondary inputs, output
+        // argTypes.insert(argTypes.end(), numValuePorts, valuePtrType);
+        argTypes.insert(argTypes.end(), 2, int32Type); // begin, end
+
+        auto taskFunction = function.GetModule().BeginFunction(utilities::to_string(GetId()) + "_task", voidType, argTypes);
+        {
+            // get stuff from arguments
+            auto arguments = taskFunction.Arguments().begin();
+            auto primaryInput = &(*arguments++);
+            std::vector<llvm::Value*> secondaryInputs;
+            std::vector<llvm::Value*> secondaryValues;
+            for (int index = 0; index < NumSecondaryInputs(); ++index)
+            {
+                auto secondaryInput = &(*arguments++);
+                // if we really have an input, push it, else push a nullptr (note: we know this at compile-time)
+                if (IsSecondaryInputPresent(index))
+                {
+                    secondaryInputs.push_back(secondaryInput);
+                }
+                else
+                {
+                    secondaryInputs.push_back(nullptr);
+                }
+                secondaryValues.push_back(nullptr);
+            }
+            auto output = &(*arguments++);
+            auto begin = &(*arguments++);
+            auto end = &(*arguments++);
+
+            EmitComputeDimensionLoop(compiler, taskFunction, dimension, begin, end, primaryInput, secondaryInputs, output, prevInputDimensionOffset, prevOutputDimensionOffset, secondaryValues);
+            taskFunction.Return();
+        }
+        function.GetModule().EndFunction();
+
+        return taskFunction;
+    }
+
     // Note: secondaryValues is passed by non-const reference to avoid copies. It doesn't function as an output parameter.
     template <typename ValueType, typename FunctionType>
     void BroadcastFunctionNode<ValueType, FunctionType>::EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function,
                                                                                   size_t dimension,
+                                                                                  llvm::Value* begin,
+                                                                                  llvm::Value* end,
                                                                                   llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs,
                                                                                   llvm::Value* output,
                                                                                   llvm::Value* prevInputDimensionOffset, llvm::Value* prevOutputDimensionOffset,
@@ -197,7 +257,7 @@ namespace nodes
     {
         // Note: It should be easy to unroll the last K levels by putting a real loop here when dimension < k
         //       Or, instead of unrolling, vectorizing --- if broadcastDimension = 1, let secondaryValue be a vector and load it one loop previous
-
+        //       If broadcastDimension = outermost dimension (0), we may want to parallelize over that dimension
         const auto numDimensions = NumPrimaryInputDimensions();
         auto&& inputLayout = GetInputLayout();
         auto&& inputStride = inputLayout.GetStride();
@@ -211,7 +271,7 @@ namespace nodes
         const auto secondaryInputSize = GetSecondaryInputSize();
 
         auto loop = function.ForLoop();
-        loop.Begin(inputSize[dimension]);
+        loop.Begin(begin, end, function.Literal(1));
         {
             auto loopIndex = loop.LoadIterationVariable();
 
@@ -247,11 +307,12 @@ namespace nodes
                     auto&& secondaryInput = secondaryInputs[index];
                     if (secondaryInputSize == 1) // scalar
                     {
-                        secondaryValues[index] = secondaryInput;
+                        secondaryValues[index] = IsSecondaryInputPresent(index) ? secondaryInput : nullptr;
                     }
                     else
                     {
-                        secondaryValues[index] = secondaryInput == nullptr ? nullptr : function.ValueAt(secondaryInput, loopIndex);
+                        //                        assert(IsSecondaryInputPresent(index) == (secondaryInput != nullptr));
+                        secondaryValues[index] = IsSecondaryInputPresent(index) ? function.ValueAt(secondaryInput, loopIndex) : nullptr;
                     }
                 }
             }
@@ -259,7 +320,9 @@ namespace nodes
             if (dimension < numDimensions - 1)
             {
                 // Recursive call to emit nested loop
-                EmitComputeDimensionLoop(compiler, function, dimension + 1, primaryInput, secondaryInputs, output, thisInputDimensionOffset, thisOutputDimensionOffset, secondaryValues);
+                auto nextBegin = function.Literal<int>(0);
+                auto nextEnd = function.Literal<int>(inputSize[dimension + 1]);
+                EmitComputeDimensionLoop(compiler, function, dimension + 1, nextBegin, nextEnd, primaryInput, secondaryInputs, output, thisInputDimensionOffset, thisOutputDimensionOffset, secondaryValues);
             }
             else
             {
@@ -270,6 +333,128 @@ namespace nodes
             }
         }
         loop.End();
+    }
+
+    template <typename ValueType, typename FunctionType>
+    bool BroadcastFunctionNode<ValueType, FunctionType>::IsSecondaryInputPresent(int index) const
+    {
+        auto secondaryInput = GetSecondaryInput(index);
+        if (secondaryInput)
+        {
+            return secondaryInput->Size() > 0;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    template <typename ValueType, typename FunctionType>
+    void BroadcastFunctionNode<ValueType, FunctionType>::Compute() const
+    {
+        auto outputSize = model::NumElements(GetOutputLayout().GetStride());
+        auto output = std::vector<ValueType>(outputSize);
+
+        const size_t prevInputOffset = 0;
+        const size_t prevOutputOffset = 0;
+        std::vector<ValueType> secondaryValues(NumSecondaryInputs(), static_cast<ValueType>(0));
+        ComputeDimensionLoop(0, output, prevInputOffset, prevOutputOffset, secondaryValues);
+
+        GetOutput().SetOutput(output);
+    }
+
+    template <typename ValueType, typename FunctionType>
+    void BroadcastFunctionNode<ValueType, FunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    {
+        const auto& compilerSettings = compiler.GetCompilerParameters();
+        const auto broadcastDimension = GetBroadcastDimension();
+
+        auto& module = function.GetModule();
+        auto& emitter = module.GetIREmitter();
+        auto valueType = emitter.Type(emitters::GetVariableType<ValueType>());
+        auto valuePtrType = valueType->getPointerTo();
+
+        const auto& primaryInput = GetPrimaryInput();
+        auto primaryInputSize = primaryInput.Size();
+        auto&& inputLayout = GetInputLayout();
+        auto&& inputSize = inputLayout.GetActiveSize();
+        auto secondaryInputSize = GetSecondaryInputSize();
+        assert(secondaryInputSize == 0 || primaryInputSize % secondaryInputSize == 0);
+
+        llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
+        std::vector<llvm::Value*> secondaryInputs;
+        std::vector<llvm::Value*> secondaryValues;
+        for (int index = 0; index < NumSecondaryInputs(); ++index)
+        {
+            auto secondaryInputPort = GetSecondaryInput(index);
+            auto secondaryInputSize = secondaryInputPort->Size();
+            llvm::Value* secondaryInput = (secondaryInputSize > 0) ? compiler.EnsurePortEmitted(*secondaryInputPort) : function.NullPointer(valuePtrType);
+            secondaryInputs.push_back(secondaryInput);
+            secondaryValues.push_back(nullptr);
+        }
+        llvm::Value* pOutput = compiler.EnsurePortEmitted(GetOutput(), this->GetOutputPadding());
+
+        // Call recursive function to emit nested loops
+        // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
+        // Note: We can potentially fuse adjacent loops if memory is contiguous --- it can be done by preprocessing size/stride vectors
+        llvm::Value* prevInputDimensionOffset = nullptr;
+        llvm::Value* prevOutputDimensionOffset = nullptr;
+
+        bool allSecondaryInputsValid = true;
+        for (int index = 0; index < NumSecondaryInputs(); ++index)
+        {
+            if (!IsSecondaryInputPresent(index))
+            {
+                allSecondaryInputsValid = false;
+            }
+        }
+
+        const int minimumTaskSize = 4000;
+        if (compilerSettings.parallelize && allSecondaryInputsValid && primaryInputSize > 2 * minimumTaskSize)
+        {
+            // computes ceil(a/b)
+            auto CeilDiv = [](int a, int b) {
+                return (a - 1) / b + 1;
+            };
+
+            // TODO: fix up logic for deciding how many tasks to use.
+            //   want to specify minimum amount of work per task, and create fewer tasks
+            //   if we don't have enough work.
+            auto numOuterIterations = inputSize[0];
+            const int numDesiredTasks = compilerSettings.maxThreads;
+            int taskSize = std::max(CeilDiv(primaryInputSize, numDesiredTasks), minimumTaskSize);
+            const int numTasks = std::min(CeilDiv(primaryInputSize, taskSize), compilerSettings.maxThreads);
+            taskSize = CeilDiv(numOuterIterations, numTasks);
+
+            // Ugly type-getting code to get around the type of the emitted port variables being different depending
+            // on whether the node is inlined (or something).
+            emitters::LLVMTypeList taskFunctionArgTypes{ pPrimaryInput->getType() };
+            for (auto& secondaryInput : secondaryInputs)
+            {
+                taskFunctionArgTypes.push_back(secondaryInput->getType());
+            }
+            taskFunctionArgTypes.push_back(pOutput->getType());
+
+            auto taskFunction = this->GetTaskFunction(compiler, function, taskFunctionArgTypes);
+            std::vector<std::vector<llvm::Value*>> taskArgs;
+            for (int taskIndex = 0; taskIndex < numTasks; ++taskIndex)
+            {
+                auto begin = function.Literal<int>(taskIndex * taskSize);
+                auto end = function.Literal<int>(std::min((taskIndex + 1) * taskSize, numOuterIterations));
+
+                std::vector<llvm::Value*> args{ pPrimaryInput };
+                args.insert(args.end(), secondaryInputs.begin(), secondaryInputs.end());
+                args.insert(args.end(), { pOutput, begin, end });
+            }
+            auto tasks = function.StartTasks(taskFunction, taskArgs);
+            tasks.WaitAll(function);                
+        }
+        else
+        {
+            auto begin = function.Literal<int>(0);
+            auto end = function.Literal<int>(inputSize[0]);
+            EmitComputeDimensionLoop(compiler, function, 0, begin, end, pPrimaryInput, secondaryInputs, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, secondaryValues);
+        }
     }
 
     template <typename ValueType, typename FunctionType>
@@ -330,37 +515,6 @@ namespace nodes
                                                                                                 this->GetOutputLayout(),
                                                                                                 broadcastFunction);
         transformer.MapNodeOutput(output, newNode->output);
-    }
-
-    template <typename ValueType, typename FunctionType>
-    void BroadcastUnaryFunctionNode<ValueType, FunctionType>::Compute() const
-    {
-        auto outputSize = model::NumElements(GetOutputLayout().GetStride());
-        auto output = std::vector<ValueType>(outputSize);
-
-        const size_t prevInputOffset = 0;
-        const size_t prevOutputOffset = 0;
-        std::vector<ValueType> secondaryValues{};
-        ComputeDimensionLoop(0, output, prevInputOffset, prevOutputOffset, secondaryValues);
-
-        _output.SetOutput(output);
-    }
-
-    template <typename ValueType, typename FunctionType>
-    void BroadcastUnaryFunctionNode<ValueType, FunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
-    {
-        auto primaryInputSize = primaryInput.Size();
-
-        llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output, this->GetOutputPadding());
-
-        // Call recursive function to emit nested loops
-        // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
-        // Note: We can potentially fuse adjacent loops if memory is contiguous --- it can be done by preprocessing size/stride vectors
-        llvm::Value* prevInputDimensionOffset = nullptr;
-        llvm::Value* prevOutputDimensionOffset = nullptr;
-        std::vector<llvm::Value*> secondaryValues{};
-        EmitComputeDimensionLoop(compiler, function, 0, pPrimaryInput, {}, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, secondaryValues);
     }
 
     template <typename ValueType, typename FunctionType>
@@ -441,41 +595,6 @@ namespace nodes
                                                                                                  this->GetOutputLayout(),
                                                                                                  GetFunction());
         transformer.MapNodeOutput(output, newNode->output);
-    }
-
-    template <typename ValueType, typename FunctionType>
-    void BroadcastBinaryFunctionNode<ValueType, FunctionType>::Compute() const
-    {
-        auto outputSize = model::NumElements(GetOutputLayout().GetStride());
-        auto output = std::vector<ValueType>(outputSize);
-
-        const size_t prevInputOffset = 0;
-        const size_t prevOutputOffset = 0;
-        std::vector<ValueType> secondaryValues{ 0 };
-        ComputeDimensionLoop(0, output, prevInputOffset, prevOutputOffset, secondaryValues);
-
-        _output.SetOutput(output);
-    }
-
-    template <typename ValueType, typename FunctionType>
-    void BroadcastBinaryFunctionNode<ValueType, FunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
-    {
-        auto primaryInputSize = primaryInput.Size();
-        auto secondaryInputSize = secondaryInput.Size();
-
-        assert(primaryInputSize % secondaryInputSize == 0);
-
-        llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
-        llvm::Value* pSecondaryInput = compiler.EnsurePortEmitted(secondaryInput);
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output, this->GetOutputPadding());
-
-        // Call recursive function to emit nested loops
-        // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
-        // Note: We can potentially fuse adjacent loops if memory is contiguous --- it can be done by preprocessing size/stride vectors
-        llvm::Value* prevInputDimensionOffset = nullptr;
-        llvm::Value* prevOutputDimensionOffset = nullptr;
-        std::vector<llvm::Value*> secondaryValues{ nullptr };
-        EmitComputeDimensionLoop(compiler, function, 0, pPrimaryInput, { pSecondaryInput }, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, secondaryValues);
     }
 
     template <typename ValueType, typename FunctionType>
@@ -572,50 +691,6 @@ namespace nodes
                                                                                                   this->GetOutputLayout(),
                                                                                                   GetFunction());
         transformer.MapNodeOutput(output, newNode->output);
-    }
-
-    template <typename ValueType, typename FunctionType>
-    void BroadcastTernaryFunctionNode<ValueType, FunctionType>::Compute() const
-    {
-        auto outputSize = model::NumElements(GetOutputLayout().GetStride());
-        auto output = std::vector<ValueType>(outputSize);
-
-        const size_t prevInputOffset = 0;
-        const size_t prevOutputOffset = 0;
-        std::vector<ValueType> secondaryValues{ 0, 0 };
-        ComputeDimensionLoop(0, output, prevInputOffset, prevOutputOffset, secondaryValues);
-
-        _output.SetOutput(output);
-    }
-
-    template <typename ValueType, typename FunctionType>
-    void BroadcastTernaryFunctionNode<ValueType, FunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
-    {
-        auto primaryInputSize = primaryInput.Size();
-        auto secondaryInput1Size = secondaryInput1.Size();
-        auto secondaryInput2Size = secondaryInput2.Size();
-        bool hasInput1 = secondaryInput1.Size() > 0;
-        bool hasInput2 = secondaryInput2.Size() > 0;
-        // assert(primaryInputSize == _output.Size());
-
-        auto secondaryInputSize = std::max(secondaryInput1Size, secondaryInput2Size);
-
-        assert(primaryInputSize % secondaryInputSize == 0);
-        assert(secondaryInput1Size == secondaryInput2Size || !hasInput1 || !hasInput2);
-        assert(hasInput1 || hasInput2);
-
-        llvm::Value* pPrimaryInput = compiler.EnsurePortEmitted(primaryInput);
-        llvm::Value* pSecondaryInput1 = hasInput1 ? compiler.EnsurePortEmitted(secondaryInput1) : nullptr;
-        llvm::Value* pSecondaryInput2 = hasInput2 ? compiler.EnsurePortEmitted(secondaryInput2) : nullptr;
-        llvm::Value* pOutput = compiler.EnsurePortEmitted(output, this->GetOutputPadding());
-
-        // Call recursive function to emit nested loops
-        // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
-        // Note: We can potentially fuse adjacent loops if memory is contiguous --- it can be done by preprocessing size/stride vectors
-        llvm::Value* prevInputDimensionOffset = nullptr;
-        llvm::Value* prevOutputDimensionOffset = nullptr;
-        std::vector<llvm::Value*> secondaryValues{ nullptr, nullptr };
-        EmitComputeDimensionLoop(compiler, function, 0, pPrimaryInput, { pSecondaryInput1, pSecondaryInput2 }, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, secondaryValues);
     }
 
     template <typename ValueType, typename FunctionType>

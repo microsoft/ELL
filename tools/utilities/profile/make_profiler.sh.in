@@ -65,15 +65,17 @@ cd $profiler_directory
 @OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj $llc_opts
 
-cp ../tools/utilities/profile/compiled_profile_main.cpp .
-cp ../tools/utilities/profile/compiled_exercise_model_main.cpp .
+rm -f *.ll
+
+cp ../tools/utilities/profile/CompiledProfile_main.cpp .
+cp ../tools/utilities/profile/CompiledExerciseModel_main.cpp .
 cp ../tools/utilities/profile/OpenBLASSetup.cmake .
 cp ../tools/utilities/profile/build_and_run.sh .
 
 if [ ${parallel} == "true" ] ; then
-    cp ../tools/utilities/profile/CMakeLists-compiled-parallel.txt.in ./CMakeLists.txt
+    cp ../tools/utilities/profile/CMakeLists-device-parallel.txt.in ./CMakeLists.txt
 else
-    cp ../tools/utilities/profile/CMakeLists-compiled.txt.in ./CMakeLists.txt
+    cp ../tools/utilities/profile/CMakeLists-device.txt.in ./CMakeLists.txt
 fi
 
 if [ ${cleanup} == "true" ] ; then

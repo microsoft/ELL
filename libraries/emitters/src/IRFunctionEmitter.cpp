@@ -8,11 +8,12 @@
 
 #include "IRFunctionEmitter.h"
 #include "EmitterException.h"
+#include "IRAsyncTask.h"
 #include "IRBlockRegion.h"
 #include "IREmitter.h"
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
-#include "IRAsyncTask.h"
+#include "IRThreadPool.h"
 
 // utilities
 #include "Logger.h"
@@ -87,12 +88,6 @@ namespace emitters
         AddRegion(pBlock);
         _pEmitter->SetCurrentBlock(pBlock); // if/when we get our own IREmitter, this statefulness won't be so objectionable
         _entryBlock = pBlock;
-    }
-
-    IRBlockRegion* IRFunctionEmitter::AddRegion(llvm::BasicBlock* pBlock)
-    {
-        _pCurRegion = _regions.Add(pBlock);
-        return _pCurRegion;
     }
 
     llvm::Value* IRFunctionEmitter::GetEmittedVariable(const VariableScope scope, const std::string& name)
@@ -832,24 +827,54 @@ namespace emitters
         return IRIfEmitter(*this, comparison, pValue, pTestValue);
     }
 
-    IRAsyncTask IRFunctionEmitter::Async(llvm::Function* taskFunction)
+    //
+    // Individual async tasks
+    //
+    IRTask IRFunctionEmitter::StartAsyncTask(llvm::Function* taskFunction)
     {
-        return Async(taskFunction, {});
+        return StartAsyncTask(taskFunction, {});
     }
 
-    IRAsyncTask IRFunctionEmitter::Async(IRFunctionEmitter& taskFunction)
+    IRTask IRFunctionEmitter::StartAsyncTask(IRFunctionEmitter& taskFunction)
     {
-        return Async(taskFunction, {});
+        return StartAsyncTask(taskFunction, {});
     }
 
-    IRAsyncTask IRFunctionEmitter::Async(llvm::Function* taskFunction, const std::vector<llvm::Value*>& arguments)
+    IRTask IRFunctionEmitter::StartAsyncTask(llvm::Function* taskFunction, const std::vector<llvm::Value*>& arguments)
     {
         return IRAsyncTask(*this, taskFunction, arguments);
     }
 
-    IRAsyncTask IRFunctionEmitter::Async(IRFunctionEmitter& taskFunction, const std::vector<llvm::Value*>& arguments)
+    IRTask IRFunctionEmitter::StartAsyncTask(IRFunctionEmitter& taskFunction, const std::vector<llvm::Value*>& arguments)
     {
         return IRAsyncTask(*this, taskFunction, arguments);
+    }
+
+    //
+    // Array of tasks
+    //
+    IRTaskArray IRFunctionEmitter::StartTasks(IRFunctionEmitter& taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments)
+    {
+        return StartTasks(taskFunction.GetFunction(), arguments);
+    }
+
+    IRTaskArray IRFunctionEmitter::StartTasks(llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments)
+    {
+        auto& compilerSettings = GetModule().GetCompilerParameters();
+        if (compilerSettings.parallelize && compilerSettings.useThreadPool && !compilerSettings.targetDevice.IsWindows())
+        {
+            auto& threadPool = GetModule().GetThreadPool();
+            return threadPool.AddTasks(*this, taskFunction, arguments);
+        }
+        else
+        {
+            std::vector<IRAsyncTask> tasks;
+            for (const auto& arg : arguments)
+            {
+                tasks.push_back({ *this, taskFunction, arg });
+            }
+            return tasks;
+        }
     }
 
     void IRFunctionEmitter::Optimize()
@@ -1120,42 +1145,75 @@ namespace emitters
         return Call(selfFunction, {});
     }
 
+    llvm::Value* IRFunctionEmitter::PthreadMutexInit(llvm::Value* mutexPtr, llvm::Value* attrPtr)
+    {
+        auto initFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadMutexInitFunction();
+        return Call(initFunction, { mutexPtr, attrPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadMutexDestroy(llvm::Value* mutexPtr)
+    {
+        auto destroyFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadMutexDestroyFunction();
+        return Call(destroyFunction, { mutexPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadMutexLock(llvm::Value* mutexPtr)
+    {
+        auto lockFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadMutexLockFunction();
+        return Call(lockFunction, { mutexPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadMutexTryLock(llvm::Value* mutexPtr)
+    {
+        auto trylockFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadMutexTryLockFunction();
+        return Call(trylockFunction, { mutexPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadMutexUnlock(llvm::Value* mutexPtr)
+    {
+        auto unlockFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadMutexUnlockFunction();
+        return Call(unlockFunction, { mutexPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadCondInit(llvm::Value* condPtr, llvm::Value* condAttrPtr)
+    {
+        auto initFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadCondInitFunction();
+        return Call(initFunction, { condPtr, condAttrPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadCondDestroy(llvm::Value* condPtr)
+    {
+        auto destroyFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadCondDestroyFunction();
+        return Call(destroyFunction, { condPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadCondWait(llvm::Value* condPtr, llvm::Value* mutexPtr)
+    {
+        auto waitFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadCondWaitFunction();
+        return Call(waitFunction, { condPtr, mutexPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadCondTimedwait(llvm::Value* condPtr, llvm::Value* mutexPtr, llvm::Value* timespecPtr)
+    {
+        auto timedwaitFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadCondTimedwaitFunction();
+        return Call(timedwaitFunction, { condPtr, mutexPtr, timespecPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadCondSignal(llvm::Value* condPtr)
+    {
+        auto signalFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadCondSignalFunction();
+        return Call(signalFunction, { condPtr });
+    }
+
+    llvm::Value* IRFunctionEmitter::PthreadCondBroadcast(llvm::Value* condPtr)
+    {
+        auto broadcastFunction = GetModule().GetRuntime().GetPosixEmitter().GetPthreadCondBroadcastFunction();
+        return Call(broadcastFunction, { condPtr });
+    }
+
     //
+    // Experimental functions 
     //
-    //
-
-    llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)
-    {
-        llvm::Function* pFunction = GetLLVMModule()->getFunction(name);
-        if (pFunction == nullptr)
-        {
-            throw EmitterException(EmitterError::functionNotFound);
-        }
-        return pFunction;
-    }
-
-    void IRFunctionEmitter::Dump()
-    {
-        WriteToStream(std::cout);
-    }
-
-    void IRFunctionEmitter::WriteToStream(std::ostream& os)
-    {
-        llvm::raw_os_ostream out(os);
-        _pFunction->print(out);
-    }
-
-    template <>
-    llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::steady_clock>()
-    {
-        return Call(GetSteadyClockFnName, nullptr /*no arguments*/);
-    }
-
-    template <>
-    llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::system_clock>()
-    {
-        return Call(GetSystemClockFnName, nullptr /*no arguments*/);
-    }
 
     llvm::Value* IRFunctionEmitter::GetCpu()
     {
@@ -1174,6 +1232,16 @@ namespace emitters
         }
     }
 
+    //
+    // Information about the current function begin emitted
+    //
+
+    IRBlockRegion* IRFunctionEmitter::AddRegion(llvm::BasicBlock* pBlock)
+    {
+        _pCurRegion = _regions.Add(pBlock);
+        return _pCurRegion;
+    }
+
     llvm::LLVMContext& IRFunctionEmitter::GetLLVMContext()
     {
         return _pModuleEmitter->GetLLVMContext();
@@ -1182,6 +1250,21 @@ namespace emitters
     IREmitter& IRFunctionEmitter::GetEmitter()
     {
         return *_pEmitter;
+    }
+
+    //
+    // Serialization
+    //
+
+    void IRFunctionEmitter::Dump()
+    {
+        WriteToStream(std::cout);
+    }
+
+    void IRFunctionEmitter::WriteToStream(std::ostream& os)
+    {
+        llvm::raw_os_ostream out(os);
+        _pFunction->print(out);
     }
 
     //
@@ -1215,6 +1298,32 @@ namespace emitters
     void IRFunctionEmitter::IncludeInStepTimeInterface(const std::string& functionName)
     {
         InsertMetadata(c_stepTimeFunctionTagName, functionName);
+    }
+
+    //
+    // Internal functions
+    //
+    
+    llvm::Function* IRFunctionEmitter::ResolveFunction(const std::string& name)
+    {
+        llvm::Function* pFunction = GetLLVMModule()->getFunction(name);
+        if (pFunction == nullptr)
+        {
+            throw EmitterException(EmitterError::functionNotFound);
+        }
+        return pFunction;
+    }
+
+    template <>
+    llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::steady_clock>()
+    {
+        return Call(GetSteadyClockFnName, nullptr /*no arguments*/);
+    }
+
+    template <>
+    llvm::Value* IRFunctionEmitter::GetClockMilliseconds<std::chrono::system_clock>()
+    {
+        return Call(GetSystemClockFnName, nullptr /*no arguments*/);
     }
 
     bool IRFunctionEmitter::CanUseBlas() const
@@ -1256,7 +1365,7 @@ namespace emitters
     }
 
     //
-    // Explicit specializations
+    // Explicit instantiations
     //
     template void IRFunctionEmitter::CallGEMV<float>(int m, int n, llvm::Value* A, int lda, llvm::Value* x, int incx, llvm::Value* y, int incy);
 

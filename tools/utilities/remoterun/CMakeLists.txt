@@ -11,7 +11,6 @@ if(${PYTHONINTERP_FOUND})
 
     add_custom_target(${module_name} DEPENDS SOURCES ${src})
     add_dependencies(${module_name} pythonlibs)
-
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/utilities")
     
     # copy files

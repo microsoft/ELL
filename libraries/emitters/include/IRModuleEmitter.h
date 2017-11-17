@@ -13,6 +13,7 @@
 #include "IREmitter.h"
 #include "IRFunctionEmitter.h"
 #include "IRRuntime.h"
+#include "IRThreadPool.h"
 #include "LLVMUtilities.h"
 #include "ModuleEmitter.h"
 #include "ScalarVariable.h"
@@ -54,6 +55,8 @@ namespace emitters
         void SetCompilerParameters(const CompilerParameters& parameters) override;
                 
         /// <summary> Returns the module's name. </summary>
+        ///
+        /// <returns> The module's name. </returns>
         std::string GetModuleName() const { return _pModule->getName(); }
 
         //
@@ -520,6 +523,18 @@ namespace emitters
         /// <summary> Get the diagnostic handler. </summary>
         IRDiagnosticHandler& GetDiagnosticHandler();
 
+        /// <summary> Check the module for errors </summary>
+        ///
+        /// <returns> `true` if there are errors </returns>
+        bool CheckForErrors();
+
+        /// <summary> Check the module for errors and report them to an output stream </summary>
+        ///
+        /// <param name="stream"> The stream to write to. </param>
+        ///
+        /// <returns> `true` if there are errors </returns>
+        bool CheckForErrors(std::ostream& stream);
+
         /// <summary> Emit LLVM IR to std::out for debugging. </summary>
         void DebugDump();
 
@@ -677,6 +692,9 @@ namespace emitters
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType>& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, llvm::Type* returnType, const std::vector<llvm::Type*>& argTypes, bool isPublic = false);
 
+        // Get a reference to the thread pool
+        IRThreadPool& GetThreadPool() { return _threadPool; }
+
         // Actual code output implementations
         void WriteHeader(std::ostream& stream);
         void WriteToLLVMStream(llvm::raw_ostream& stream, ModuleOutputFormat format, MachineCodeOutputOptions options);
@@ -706,6 +724,7 @@ namespace emitters
         IRVariableTable _literals; // Symbol table - name to literals
         IRVariableTable _globals; // Symbol table - name to global variables
         IRRuntime _runtime; // Manages emission of runtime functions
+        IRThreadPool _threadPool; // A pool of worker threads -- gets initialized the first time it's used (?)
         std::unique_ptr<llvm::Module> _pModule; // The LLVM Module being emitted
 
         // Info to modify how code is written out

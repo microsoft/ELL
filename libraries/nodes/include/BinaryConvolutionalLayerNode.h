@@ -136,6 +136,8 @@ namespace nodes
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
+        emitters::IRFunctionEmitter GetTaskFunction(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function);
+
         // Input
         model::InputPort<ValueType> _input;
 

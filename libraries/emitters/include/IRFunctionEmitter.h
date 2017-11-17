@@ -14,6 +14,7 @@
 #include "IRIfEmitter.h"
 #include "IRLoopEmitter.h"
 #include "IROptimizer.h"
+#include "IRTask.h"
 #include "LLVMInclude.h"
 #include "Variable.h"
 
@@ -824,35 +825,51 @@ namespace emitters
         /// <returns> An IRIfEmitter. </returns>
         IRIfEmitter If(TypedComparison comparison, llvm::Value* pValue, llvm::Value* pTestValue);
 
-        /// <summary> Creates an asynchronous task. </summary>
+        /// <summary> Creates an asynchronous task on a new thread. </summary>
         ///
         /// <param name="task"> The function to run asynchronously. </param>
         ///
         /// <returns> A task object representing the running task. </param>
-        IRAsyncTask Async(llvm::Function* task);
+        IRTask StartAsyncTask(llvm::Function* task);
 
-        /// <summary> Creates an asynchronous task. </summary>
+        /// <summary> Creates an asynchronous task on a new thread. </summary>
         ///
         /// <param name="task"> The function to run asynchronously. </param>
         ///
         /// <returns> A task object representing the running task. </param>
-        IRAsyncTask Async(IRFunctionEmitter& task);
+        IRTask StartAsyncTask(IRFunctionEmitter& task);
 
-        /// <summary> Creates an asynchronous task. </summary>
+        /// <summary> Creates an asynchronous task on a new thread. </summary>
         ///
         /// <param name="task"> The function to run asynchronously. </param>
         /// <param name="arguments"> The arguments to the task function. </param>
         ///
         /// <returns> A task object representing the running task. </param>
-        IRAsyncTask Async(llvm::Function* task, const std::vector<llvm::Value*>& arguments);
+        IRTask StartAsyncTask(llvm::Function* task, const std::vector<llvm::Value*>& arguments);
 
-        /// <summary> Creates an asynchronous task. </summary>
+        /// <summary> Creates an asynchronous task on a new thread. </summary>
         ///
         /// <param name="task"> The function to run asynchronously. </param>
         /// <param name="arguments"> The arguments to the task function. </param>
         ///
         /// <returns> A task object representing the running task. </param>
-        IRAsyncTask Async(IRFunctionEmitter& task, const std::vector<llvm::Value*>& arguments);
+        IRTask StartAsyncTask(IRFunctionEmitter& task, const std::vector<llvm::Value*>& arguments);
+
+        /// <summary> Starts an array of tasks using the thread pool, or new threads, depending on the value of the `useThreadPool` compiler setting. </summary>
+        ///
+        /// <param name="taskFunction"> The function to run asynchronously with many different arguments. </param>
+        /// <param name="arguments"> For each task, a vector of arguments for that task. </param>
+        ///
+        /// <returns> A task array object representing the running tasks. </param>
+        IRTaskArray StartTasks(IRFunctionEmitter& taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments);
+
+        /// <summary> Starts an array of tasks using the thread pool, or new threads, depending on the value of the `useThreadPool` compiler setting. </summary>
+        ///
+        /// <param name="taskFunction"> The function to run asynchronously with many different arguments. </param>
+        /// <param name="arguments"> For each task, a vector of arguments for that task. </param>
+        ///
+        /// <returns> A task array object representing the running tasks. </param>
+        IRTaskArray StartTasks(llvm::Function* taskFunction, const std::vector<std::vector<llvm::Value*>>& arguments);
 
         //
         // Standard C library function calls
@@ -1193,6 +1210,39 @@ namespace emitters
 
         /// <summary> Emits a call to the POSIX `pthread_self` function. </summary>
         llvm::Value* PthreadSelf();
+
+        /// <summary> Emits a call to the POSIX `pthread_mutex_init` function. </summary>
+        llvm::Value* PthreadMutexInit(llvm::Value* mutexPtr, llvm::Value* attrPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_mutex_destroy` function. </summary>
+        llvm::Value* PthreadMutexDestroy(llvm::Value* mutexPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_mutex_lock` function. </summary>
+        llvm::Value* PthreadMutexLock(llvm::Value* mutexPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_mutex_trylock` function. </summary>
+        llvm::Value* PthreadMutexTryLock(llvm::Value* mutexPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_mutex_unlock` function. </summary>
+        llvm::Value* PthreadMutexUnlock(llvm::Value* mutexPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_cond_init` function. </summary>
+        llvm::Value* PthreadCondInit(llvm::Value* condPtr, llvm::Value* condAttrPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_cond_destroy` function. </summary>
+        llvm::Value* PthreadCondDestroy(llvm::Value* condPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_cond_wait` function. </summary>
+        llvm::Value* PthreadCondWait(llvm::Value* condPtr, llvm::Value* mutexPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_cond_timedwait` function. </summary>
+        llvm::Value* PthreadCondTimedwait(llvm::Value* condPtr, llvm::Value* mutexPtr, llvm::Value* timespecPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_cond_signal` function. </summary>
+        llvm::Value* PthreadCondSignal(llvm::Value* condPtr);
+
+        /// <summary> Emits a call to the POSIX `pthread_cond_broadcast` function. </summary>
+        llvm::Value* PthreadCondBroadcast(llvm::Value* condPtr);
 
         //
         // Experimental functions

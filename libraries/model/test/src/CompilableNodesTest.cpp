@@ -1280,11 +1280,12 @@ void TestNeuralNetworkPredictorNode2()
     auto map = model::DynamicMap(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
 
     model::MapCompilerParameters settings;
+    settings.compilerSettings.parallelize = false;
     settings.compilerSettings.optimize = true;
     model::IRMapCompiler compiler(settings);
     auto compiledMap = compiler.Compile(map);
-    PrintIR(compiledMap);
 
+    PrintIR(compiledMap);
     // compare output
     std::vector<std::vector<double>> signal = { input };
     VerifyCompiledOutput(map, compiledMap, signal, predictorNode->GetRuntimeTypeName() + "_2");

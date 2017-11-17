@@ -220,7 +220,6 @@ namespace model
         return{ sinkNodes.begin(), sinkNodes.end() };
     }
 
-
     void DynamicMap::FixTransformedIO(ModelTransformer& transformer)
     {
         for (auto& inputNode : _inputNodes)

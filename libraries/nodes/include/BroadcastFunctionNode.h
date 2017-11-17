@@ -8,6 +8,12 @@
 
 #pragma once
 
+// emitters
+#include "IRAsyncTask.h"
+#include "IREmitter.h"
+#include "IRVectorUtilities.h"
+#include "LLVMUtilities.h"
+
 // model
 #include "CompilableNode.h"
 #include "CompilableNodeUtilities.h"
@@ -53,13 +59,13 @@ namespace nodes
     /// There are no secondary inputs.
     ///
     /// </summary>
-    template <typename ValueType, typename FunctionType>
+    template<typename ValueType, typename FunctionType>
     class BroadcastFunctionNode;
 
     //
     // Base class for unary function types
     //
-    template <typename ValueType>
+    template<typename ValueType>
     class BroadcastUnaryFunction
     {
     public:
@@ -100,7 +106,7 @@ namespace nodes
     //
     // Base class for binary function types
     //
-    template <typename ValueType>
+    template<typename ValueType>
     class BroadcastBinaryFunction
     {
     public:
@@ -143,7 +149,7 @@ namespace nodes
     //
     // Base class for ternary function types
     //
-    template <typename ValueType>
+    template<typename ValueType>
     class BroadcastTernaryFunction
     {
     public:
@@ -188,7 +194,7 @@ namespace nodes
     //
     // Special type of ternary function: the linear function  y = x*a + b
     //
-    template <typename ValueType>
+    template<typename ValueType>
     class BroadcastLinearFunction : public BroadcastTernaryFunction<ValueType>
     {
     public:
@@ -220,7 +226,7 @@ namespace nodes
     //
     // Base class for broadcast nodes
     //
-    template <typename ValueType, typename FunctionType>
+    template<typename ValueType, typename FunctionType>
     class BroadcastFunctionNode : public model::CompilableNode
     {
     public:
@@ -252,11 +258,17 @@ namespace nodes
 
         virtual const model::InputPort<ValueType>& GetPrimaryInput() const = 0;
         virtual const model::InputPort<ValueType>* GetSecondaryInput(int index) const = 0;
+        virtual const model::OutputPort<ValueType>& GetOutput() const = 0;
+        bool IsSecondaryInputPresent(int index) const;
         FunctionType GetFunction() const { return _function; }
+
+        void Compute() const override;
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
         // Helpers for generating nested loops to visit all input/output values
         void ComputeDimensionLoop(size_t dimension, std::vector<ValueType>& output, size_t prevInputDimensionOffset, size_t prevOutputDimensionOffset, std::vector<ValueType>& secondaryValues) const;
-        void EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs, llvm::Value* output, llvm::Value* prevInputDimensionOffset, llvm::Value* prevOutputDimensionOffset, std::vector<llvm::Value*>& secondaryValues) const;
+        void EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, llvm::Value* begin, llvm::Value* end, llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs, llvm::Value* output, llvm::Value* prevInputDimensionOffset, llvm::Value* prevOutputDimensionOffset, std::vector<llvm::Value*>& secondaryValues) const;
+        emitters::IRFunctionEmitter GetTaskFunction(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, const emitters::LLVMTypeList& portTypes) const;
 
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
@@ -275,7 +287,7 @@ namespace nodes
     //
     // BroadcastUnaryFunctionNode
     //
-    template <typename ValueType, typename FunctionType>
+    template<typename ValueType, typename FunctionType>
     class BroadcastUnaryFunctionNode : public BroadcastFunctionNode<ValueType, FunctionType>
     {
     public:
@@ -328,13 +340,12 @@ namespace nodes
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
 
         void Copy(model::ModelTransformer& transformer) const override;
-        void Compute() const override;
-        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         const model::InputPort<ValueType>& GetPrimaryInput() const override { return primaryInput; }
         const model::InputPort<ValueType>* GetSecondaryInput(int index) const override;
+        const model::OutputPort<ValueType>& GetOutput() const override { return output; }
 
     private:
         using BroadcastFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop;
@@ -350,7 +361,7 @@ namespace nodes
     //
     // BroadcastBinaryFunctionNode
     //
-    template <typename ValueType, typename FunctionType>
+    template<typename ValueType, typename FunctionType>
     class BroadcastBinaryFunctionNode : public BroadcastFunctionNode<ValueType, FunctionType>
     {
     public:
@@ -408,13 +419,12 @@ namespace nodes
         using BroadcastFunctionNode<ValueType, FunctionType>::NumElements;
 
         void Copy(model::ModelTransformer& transformer) const override;
-        void Compute() const override;
-        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         const model::InputPort<ValueType>& GetPrimaryInput() const override { return primaryInput; }
         const model::InputPort<ValueType>* GetSecondaryInput(int index) const override;
+        const model::OutputPort<ValueType>& GetOutput() const override { return output; }
 
     private:
         using BroadcastFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop;
@@ -431,7 +441,7 @@ namespace nodes
     //
     // BroadcastTernaryFunctionNode
     //
-    template <typename ValueType, typename FunctionType>
+    template<typename ValueType, typename FunctionType>
     class BroadcastTernaryFunctionNode : public BroadcastFunctionNode<ValueType, FunctionType>
     {
     public:
@@ -490,13 +500,12 @@ namespace nodes
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
 
         void Copy(model::ModelTransformer& transformer) const override;
-        void Compute() const override;
-        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         const model::InputPort<ValueType>& GetPrimaryInput() const override { return primaryInput; }
         const model::InputPort<ValueType>* GetSecondaryInput(int index) const override;
+        const model::OutputPort<ValueType>& GetOutput() const override { return output; }
 
     private:
         using BroadcastFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop;
@@ -514,7 +523,7 @@ namespace nodes
     //
     // Special case of BroadcastTernaryFuncitonNode, using a linear function
     //
-    template <typename ValueType>
+    template<typename ValueType>
     class BroadcastLinearFunctionNode : public BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>
     {
     public:

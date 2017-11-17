@@ -1,5 +1,5 @@
 #
-# CMake file for compiled profilers with parallelism enabled
+# CMake file for compiled profilers
 #
 
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
@@ -17,7 +17,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #
 
 set (src 
-  compiled_profile_main.cpp
+  CompiledProfile_main.cpp
   )
 
 source_group("src" FILES ${src})
@@ -26,11 +26,11 @@ source_group("tcc" FILES ${tcc})
 
 # Version using ELL's native object file output
 add_executable(profile ${src} ${include} ${tcc})
-target_link_libraries(profile ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS} -pthread)
+target_link_libraries(profile ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS})
 
 # Version with LLVM's opt tool optimizing ELL's IR output and then compiling with llc
 add_executable(profile_opt ${src} ${include} ${tcc})
-target_link_libraries(profile_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} -pthread)
+target_link_libraries(profile_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS})
 
 
 #
@@ -38,7 +38,7 @@ target_link_libraries(profile_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt
 #
 
 set (src 
-  compiled_exercise_model_main.cpp
+  CompiledExerciseModel_main.cpp
   )
 
 source_group("src" FILES ${src})
@@ -47,8 +47,8 @@ source_group("tcc" FILES ${tcc})
 
 # Version using ELL's native object file output
 add_executable(exercise_model ${src} ${include} ${tcc})
-target_link_libraries(exercise_model ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS} -pthread)
+target_link_libraries(exercise_model ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model.o ${BLAS_LIBS})
 
 # Version with LLVM's opt tool optimizing ELL's IR output and then compiling with llc
 add_executable(exercise_model_opt ${src} ${include} ${tcc})
-target_link_libraries(exercise_model_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS} -pthread)
+target_link_libraries(exercise_model_opt ${CMAKE_CURRENT_SOURCE_DIR}/compiled_model_opt.o ${BLAS_LIBS})

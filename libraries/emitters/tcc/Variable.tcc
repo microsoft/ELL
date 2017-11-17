@@ -26,7 +26,7 @@ namespace emitters
     //
     // VariableAllocator
     //
-    template<typename VarType, typename... Args>
+    template <typename VarType, typename... Args>
     VarType* VariableAllocator::AddVariable(Args&&... args)
     {
         static_assert(std::is_base_of<Variable, VarType>::value, "AddVariable requires you inherit from Variable");
@@ -37,26 +37,26 @@ namespace emitters
         return pVar;
     }
 
-    template<typename ElementType>
+    template <typename ElementType>
     Variable* VariableAllocator::AddScalarVariable(VariableScope scope)
     {
         return AddVariable<ScalarVariable<ElementType>>(scope);
     }
 
-    template<typename ElementType>
+    template <typename ElementType>
     Variable* VariableAllocator::AddScalarVariable(VariableScope scope, ElementType value)
     {
         return AddVariable<InitializedScalarVariable<ElementType>>(scope, value);
     }
 
-    template<typename ElementType>
+    template <typename ElementType>
     Variable* VariableAllocator::AddVectorVariable(VariableScope scope, int size)
     {
         return AddVariable<VectorVariable<ElementType>>(scope, size);
     }
 
     /// <summary> Add a vector, with all elements initialized to a given value </summary>
-    template<typename ElementType>
+    template <typename ElementType>
     Variable* VariableAllocator::AddVectorVariable(VariableScope scope, int size, ElementType value)
     {
         std::vector<ElementType> data(size, value);
@@ -64,7 +64,7 @@ namespace emitters
     }
 
     /// <summary> Add a vector, initialized to a given vector </summary>
-    template<typename ElementType>
+    template <typename ElementType>
     Variable* VariableAllocator::AddVectorVariable(VariableScope scope, const std::vector<ElementType>& data)
     {
         return AddVariable<InitializedVectorVariable<ElementType>>(scope, data);

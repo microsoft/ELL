@@ -79,6 +79,13 @@ namespace common
             false);
 
         parser.AddOption(
+            useThreadPool,
+            "threadPool",
+            "tp",
+            "Use thread pool for parallelization (if parallelization enabled)",
+            true);
+
+        parser.AddOption(
             maxThreads,
             "threads",
             "th",

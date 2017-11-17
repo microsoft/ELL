@@ -41,10 +41,10 @@ cd %profiler_directory%
 @OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj %llc_opts%
 
-copy ..\tools\utilities\profile\compiled_profile_main.cpp .
-copy ..\tools\utilities\profile\compiled_exercise_model_main.cpp .
+copy ..\tools\utilities\profile\CompiledProfile_main.cpp .
+copy ..\tools\utilities\profile\CompiledExerciseModel_main.cpp .
 copy ..\tools\utilities\profile\build_and_run.sh .
-copy ..\tools\utilities\profile\CMakeLists-compiled.txt.in .\CMakeLists.txt
+copy ..\tools\utilities\profile\CMakeLists-device-parallel.txt.in .\CMakeLists.txt
 copy ..\tools\utilities\profile\OpenBLASSetup.cmake .\OpenBLASSetup.cmake
 popd
 

@@ -45,6 +45,8 @@ namespace emitters
         badFunctionDefinition,
         // function called with incorrect arguments
         badFunctionArguments,
+        // used a null function
+        nullFunction,
         // Write to output stream failed
         writeStreamFailed,
         // Parser error

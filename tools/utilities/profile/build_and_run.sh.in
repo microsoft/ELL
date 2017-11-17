@@ -5,25 +5,32 @@
 #   - cd to build directory, run cmake and make
 #   - run the specified command passed in as commandline parameters
 
-set -x
-
 # Create build directory and build project
 mkdir -p build
 cd build
 rm -rf *
-cmake ..
-make profile
-make exercise_model
+# cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -s
+
+# export OPENBLAS_NUM_THREADS=1
 
 # Run profile tool with arguments given on the command line
-echo "Running ELL profiler tool"
-./profile $@
+echo "Running ELL profiler tool -- normal"
+/bin/bash -c "./profile 100 20"
+
+echo "Running ELL profiler tool -- opt"
+/bin/bash -c "./profile_opt 100 20"
 
 # Run exercise_model tool with 10 iterations
-/bin/bash -c "time ./exercise_model 10"
+echo "Timing ELL exercise tool -- normal"
+/bin/bash -c "time ./exercise_model 100"
+
+echo "Timing ELL exercise tool -- opt"
+/bin/bash -c "time ./exercise_model_opt 100"
 
 # Run perf tool to get low-level events
-
+#
 # To install perf:
 #
 # uname -a  # get Linux version
@@ -55,14 +62,17 @@ echo "Running ELL profiler tool"
 # Note: add '-s' option to perf record and '-T' option to perf report to get per-thread info
 
 # Run perf tool to get overall stats
-echo "Getting overall perf stats"
-/bin/bash -c "perf stat -e cpu-clock,faults ./exercise_model 10"
+echo "Getting overall perf stats -- normal"
+/bin/bash -c "perf stat -e cpu-cycles,instructions,cache-misses ./exercise_model 100"
+
+echo "Getting overall perf stats -- opt"
+/bin/bash -c "perf stat -e cpu-cycles,instructions,cache-misses ./exercise_model_opt 100"
 
 # Run perf tool to record profile data
-echo "Recording perf data"
+# echo "Recording perf data"
 # Note: Diverting output to /dev/null because we keep getting "Exception: <class 'UnicodeDecodeError'>: 'utf-8' codec can't decode byte 0x98 in position 22: invalid start byte"
 #       And also because the SSH client used in RemoteRunner was freezing.
-/bin/bash -c "perf record -e cpu-clock,faults -q ./exercise_model 10 > /dev/null"
+# /bin/bash -c "perf record -e cpu-clock,faults -q ./exercise_model 10 > /dev/null"
 
 # Report 1
 # echo "Perf profile data report 1"

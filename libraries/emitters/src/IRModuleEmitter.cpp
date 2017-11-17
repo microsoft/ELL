@@ -20,13 +20,14 @@
 #include "Logger.h"
 
 // llvm
-#include "llvm/AsmParser/Parser.h"
-#include "llvm/Bitcode/ReaderWriter.h"
-#include "llvm/IR/TypeBuilder.h"
-#include "llvm/Support/TargetSelect.h"
-#include "llvm/Support/ToolOutputFile.h"
-#include "llvm/Support/raw_os_ostream.h"
-#include "llvm/Transforms/Utils/ModuleUtils.h"
+#include <llvm/AsmParser/Parser.h>
+#include <llvm/Bitcode/ReaderWriter.h>
+#include <llvm/IR/TypeBuilder.h>
+#include <llvm/IR/Verifier.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/ToolOutputFile.h>
+#include <llvm/Support/raw_os_ostream.h>
+#include <llvm/Transforms/Utils/ModuleUtils.h>
 
 // stl
 #include <chrono>
@@ -45,7 +46,7 @@ namespace emitters
     //
 
     IRModuleEmitter::IRModuleEmitter(const std::string& moduleName, const CompilerParameters& parameters)
-        : _llvmContext(new llvm::LLVMContext()), _emitter(*_llvmContext), _runtime(*this)
+        : _llvmContext(new llvm::LLVMContext()), _emitter(*_llvmContext), _runtime(*this), _threadPool(*this)
     {
         InitializeLLVM();
         InitializeGlobalPassRegistry();
@@ -352,6 +353,8 @@ namespace emitters
 
     llvm::GlobalVariable* IRModuleEmitter::Global(VariableType type, const std::string& name)
     {
+        auto pType = _emitter.Type(type);
+        auto initializer = ZeroInitializer(pType);
         return AddGlobal(name, _emitter.Type(type), _emitter.Zero(type), false);
     }
 
@@ -380,7 +383,7 @@ namespace emitters
         return AddGlobal(name, _emitter.ArrayType(VariableType::Double, value.size()), _emitter.Literal(value), false);
     }
 
-    // This function has the actual implementation for all the above "GlobalArray()" methods
+    // This function has the actual implementation for all the above Global/GlobalArray() methods
     llvm::GlobalVariable* IRModuleEmitter::AddGlobal(const std::string& name, llvm::Type* pType, llvm::Constant* pInitial, bool isConst)
     {
         _pModule->getOrInsertGlobal(name, pType);
@@ -800,6 +803,18 @@ namespace emitters
         return *_diagnosticHandler;
     }
 
+    bool IRModuleEmitter::CheckForErrors()
+    {
+        return llvm::verifyModule(*_pModule);
+    }
+    
+    bool IRModuleEmitter::CheckForErrors(std::ostream& stream)
+    {
+        llvm::raw_os_ostream out(stream);
+        return llvm::verifyModule(*_pModule, &out);
+    }
+    
+    
     void IRModuleEmitter::DebugDump()
     {
         GetLLVMModule()->dump();

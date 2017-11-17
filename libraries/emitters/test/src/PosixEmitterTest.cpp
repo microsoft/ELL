@@ -95,7 +95,7 @@ void TestPthreadCreate()
     auto& context = module.GetLLVMContext();
     auto pthreadType = module.GetRuntime().GetPosixEmitter().GetPthreadType();
     auto int8PtrType = llvm::Type::getInt8PtrTy(context);
-
+    
     // Thread task function
     std::string taskFunctionName = "Task";
     auto taskFunction = module.BeginFunction(taskFunctionName, VariableType::BytePointer, { VariableType::BytePointer });

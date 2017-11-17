@@ -8,9 +8,9 @@
 
 #include "IRAsyncTask.h"
 #include "IRFunctionEmitter.h"
-#include "IRModuleEmitter.h"
-
 #include "IRHeaderWriter.h"
+#include "IRModuleEmitter.h"
+#include "IRThreadUtilities.h"
 
 // utilities
 #include "Exception.h"
@@ -23,13 +23,13 @@ namespace ell
 namespace emitters
 {
     IRAsyncTask::IRAsyncTask(IRFunctionEmitter& owningFunction, llvm::Function* taskFunction, const std::vector<llvm::Value*>& arguments)
-        : _owningFunction(owningFunction), _taskFunction(taskFunction), _arguments(arguments)
+        : _taskFunction(taskFunction), _arguments(arguments)
     {
-        _usePthreads = owningFunction.GetModule().GetCompilerParameters().parallelize;
+        const auto& compilerParameters = owningFunction.GetModule().GetCompilerParameters();
+        _usePthreads = compilerParameters.parallelize && !compilerParameters.targetDevice.IsWindows();
         if (UsePthreads())
         {
-            std::cout << "Starting in async mode" << std::endl;
-            StartTask();
+            Run(owningFunction);
         }
     }
 
@@ -38,107 +38,56 @@ namespace emitters
     {
     }
 
-    void IRAsyncTask::Run()
+    void IRAsyncTask::Run(IRFunctionEmitter& function)
     {
-        StartTask();
-    }
+        auto& module = function.GetModule();
+        auto& context = function.GetLLVMContext();
+        auto int8PtrType = llvm::Type::getInt8PtrTy(context);
 
-    void IRAsyncTask::StartTask()
-    {
-        if (_started)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Task already started");
-        }
-        _started = true;
+        // Allocate a stack variable for the return value
+        _returnValuePtr = function.Variable(int8PtrType, "returnValue");
+        _returnType = _taskFunction->getReturnType();
 
         // call function
         if (UsePthreads())
         {
-            auto& module = _owningFunction.GetModule();
-            auto& context = _owningFunction.GetLLVMContext();
-            auto int8PtrType = llvm::Type::getInt8PtrTy(context);
             auto pthreadType = module.GetRuntime().GetPosixEmitter().GetPthreadType();
-            auto taskArgType = GetTaskArgStructType();
-            llvm::ConstantPointerNull* nullAttr = _owningFunction.NullPointer(int8PtrType);
+            auto taskArgType = GetTaskArgStructType(module, _taskFunction);
+            llvm::ConstantPointerNull* nullAttr = function.NullPointer(int8PtrType);
 
             // Create stack variables for thread, argument struct, and output status
-            auto taskArg = _owningFunction.Variable(taskArgType, "taskArg");
-            _pthread = _owningFunction.Variable(pthreadType, "thread");
-            _returnValuePtr = _owningFunction.Variable(int8PtrType, "status");
-            _returnType = _taskFunction->getReturnType();
-            
-            _owningFunction.FillStruct(taskArg, _arguments);
-            auto pthreadWrapperFunction = GetPthreadWrapper(taskArgType);
-            auto errCode = _owningFunction.PthreadCreate(_pthread, nullAttr, pthreadWrapperFunction, _owningFunction.BitCast(taskArg, int8PtrType));
+            auto taskArg = function.Variable(taskArgType, "taskArg");
+            _pthread = function.Variable(pthreadType, "thread");
+            function.FillStruct(taskArg, _arguments);
+            auto pthreadWrapperFunction = GetTaskWrapperFunction(module, _taskFunction);
+            auto errCode = function.PthreadCreate(_pthread, nullAttr, pthreadWrapperFunction, function.CastPointer(taskArg, int8PtrType));
         }
         else
         {
-            std::cout << "Starting in deferred mode" << std::endl;
-            _returnValue = _owningFunction.Call(_taskFunction, _arguments);
+            function.Store(_returnValuePtr, function.Call(_taskFunction, _arguments));
         }
     }
 
-    llvm::Function* IRAsyncTask::GetPthreadWrapper(llvm::StructType* taskArgType)
-    {
-        auto& module = _owningFunction.GetModule();
-        auto& context = _owningFunction.GetLLVMContext();
-        auto& emitter = _owningFunction.GetEmitter();
-        auto& irBuilder = emitter.GetIRBuilder();
-        auto int8PtrType = llvm::Type::getInt8PtrTy(context);
-        llvm::ConstantPointerNull* nullPtr = _owningFunction.NullPointer(int8PtrType);
-
-        auto taskFunctionName = _taskFunction->getGlobalIdentifier();
-        auto wrapperFunctionName = std::string("wrap_") + taskFunctionName;
-
-        if (module.HasFunction(wrapperFunctionName))
-        {
-            return module.GetFunction(wrapperFunctionName);
-        }
-
-        auto pthreadFunction = _owningFunction.GetModule().BeginFunction(wrapperFunctionName, emitters::VariableType::BytePointer, { emitters::VariableType::BytePointer });
-        {
-            auto& threadEmitter = pthreadFunction.GetEmitter();
-            auto& threadIrBuilder = threadEmitter.GetIRBuilder();
-            auto arguments = pthreadFunction.Arguments().begin();
-            auto threadArg = &(*arguments);
-            auto argStructPtr = pthreadFunction.CastPointer(threadArg, taskArgType->getPointerTo());
-
-            // Should be a 1:1 correspondence between args and fields in the struct
-            auto numFields = taskArgType->getNumElements();
-            std::vector<llvm::Value*> taskFunctionArgs;
-
-            for (int fieldIndex = 0; fieldIndex < numFields; ++fieldIndex)
-            {
-                auto fieldPtr = threadIrBuilder.CreateInBoundsGEP(argStructPtr, { pthreadFunction.Literal(0), pthreadFunction.Literal(fieldIndex) });
-                taskFunctionArgs.push_back(pthreadFunction.Load(fieldPtr));
-            }
-
-            auto returnValue = pthreadFunction.Call(_taskFunction, taskFunctionArgs);
-            pthreadFunction.Return(pthreadFunction.BitCast(returnValue, int8PtrType));
-        }
-        _owningFunction.GetModule().EndFunction();
-        return pthreadFunction.GetFunction();
-    }
-
-    void IRAsyncTask::Sync()
+    void IRAsyncTask::Wait(IRFunctionEmitter& functionEmitter)
     {
         if (UsePthreads())
         {
-            auto errCode = _owningFunction.PthreadJoin(_owningFunction.Load(_pthread), _returnValuePtr);
-            auto rawReturnValue = _owningFunction.Load(_returnValuePtr);
-            _returnValue = _owningFunction.BitCast(rawReturnValue, _returnType);
+            auto errCode = functionEmitter.PthreadJoin(functionEmitter.Load(_pthread), _returnValuePtr);
+            _returnValue = functionEmitter.Load(_returnValuePtr);
+            auto castReturnValue = functionEmitter.BitCast(_returnValue, _returnType);
         }
         else
         {
-            StartTask();
+            Run(functionEmitter);
+            _returnValue = functionEmitter.Load(_returnValuePtr);
         }
     }
 
-    llvm::Value* IRAsyncTask::GetReturnValue() const
+    llvm::Value* IRAsyncTask::GetReturnValue(IRFunctionEmitter& functionEmitter) const
     {
-        if (UsePthreads())
+        if(_returnType != nullptr)
         {
-            return _returnValue;
+            return functionEmitter.BitCast(_returnValue, _returnType);
         }
         else
         {
@@ -146,16 +95,20 @@ namespace emitters
         }
     }
 
-    llvm::StructType* IRAsyncTask::GetTaskArgStructType()
+    llvm::Value* IRAsyncTask::IsNull(IRFunctionEmitter& functionEmitter)
     {
-        std::string taskFunctionName = _taskFunction->getGlobalIdentifier();
-        auto& module = _owningFunction.GetModule();
-        std::vector<llvm::Type*> argTypes;
-        for (auto& argument : _taskFunction->args())
+        return functionEmitter.FalseBit();
+    }
+
+    //
+    // Utility function
+    //
+    void SyncAllTasks(IRFunctionEmitter& function, std::vector<IRAsyncTask>& tasks)
+    {
+        for (auto& task : tasks)
         {
-            argTypes.push_back(argument.getType());
+            task.Wait(function);
         }
-        return module.GetAnonymousStructType(argTypes);
     }
 }
 }

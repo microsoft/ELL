@@ -48,6 +48,10 @@ void TestAsyncEmitter()
 {
     TestIRAsyncTask(false); // don't use threads
     TestIRAsyncTask(true);  // do use threads (if available)
+
+    TestParallelTasks(false, false); // deferred mode (no threads)
+    TestParallelTasks(true, false);  // async mode (always spin up a new thread)
+    // TestParallelTasks(true, true);   // threadpool mode -- threadpool sometimes crashes or hangs when run in the JIT
 }
 
 void TestPosixEmitter()
@@ -59,12 +63,8 @@ void TestPosixEmitter()
 int main()
 {
     TestIR();
-
-    // The tests below crash when run through the JIT
-#if TEST_THREAD_EMITTED_IR
     TestPosixEmitter();
     TestAsyncEmitter();
-#endif // TEST_THREAD_EMITTED_IR
 
     if (testing::DidTestFail())
     {

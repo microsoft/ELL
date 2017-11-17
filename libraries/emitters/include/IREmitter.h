@@ -226,7 +226,7 @@ namespace emitters
         /// <param name="value"> The pointer value. </param>
         ///
         /// <returns> Pointer to an llvm::Constant that represents an pointer. </returns>
-        template<typename ValueType>
+        template <typename ValueType>
         llvm::Constant* Pointer(ValueType* ptr);
 
         /// <summary> Emit a Zero value of the given type. </summary>
@@ -255,7 +255,7 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::Constant that represents false. </returns>
         llvm::Constant* FalseBit();
-        
+
         /// <summary> Emit a null pointer constant. </summary>
         ///
         /// <param name="pointerType"> The llvm type of the pointer to return. </param>
@@ -270,7 +270,7 @@ namespace emitters
         /// <param name="pValue"> Pointer to the input value. </param>
         ///
         /// <returns> Pointer to the output value. </returns>
-        template<typename InputType, typename OutputType>
+        template <typename InputType, typename OutputType>
         llvm::Value* CastValue(llvm::Value* pValue);
 
         /// <summary> Emit a bitwise ("reinterpret") cast operation from one type to another. </summary>
@@ -280,7 +280,7 @@ namespace emitters
         ///
         /// <returns> Pointer to the output value. </returns>
         llvm::Value* BitCast(llvm::Value* pValue, VariableType destinationType);
-        
+
         /// <summary> Emit a bitwise ("reinterpret") cast operation from one type to another. </summary>
         ///
         /// <param name="pValue"> Pointer to the input value. </param>
@@ -312,7 +312,7 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::Value that represents the casted value. </returns>
         llvm::Value* CastIntToPointer(llvm::Value* pValue, llvm::Type* destinationType);
-        
+
         /// <summary> Emit a cast from a pointer to an integer type. </summary>
         ///
         /// <param name="pValue"> Input value. </param>
@@ -712,7 +712,7 @@ namespace emitters
         ///
         /// <returns> A pointer the specified field in the struct. </returns>
         llvm::Value* GetStructFieldPointer(llvm::Value* structPtr, int fieldIndex);
-        
+
         /// <summary> Emits an instruction to load a value referenced by a pointer into a register. </summary>
         ///
         /// <param name="pPointer"> Pointer to the adress being. </param>

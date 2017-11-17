@@ -9,12 +9,14 @@
 ####################################################################################################
 
 import argparse
+import distutils.util
 import os
 import sys
 
 import getpass
 
-sys.path += ["../pythonlibs"]
+current_path = os.path.dirname(os.path.abspath(__file__))
+sys.path += [os.path.join(current_path, '../pythonlibs')]
 from remoterunner import RemoteRunner
 
 if __name__ == "__main__":
@@ -29,16 +31,17 @@ if __name__ == "__main__":
     arg_parser.add_argument("--copyback_dir", help="the directory on the host machine to copy files to (default: current directory)", default=".")
     arg_parser.add_argument("--username", help="the username for the target device", required=True)
     arg_parser.add_argument("--password", help="the password for the target device (optional: prompts if not present)")
-    arg_parser.add_argument("--command", help="the command to run on the target device", nargs="*")
+    arg_parser.add_argument("--command", help="the command to run on the target device", nargs="*", default=[])
     arg_parser.add_argument("--logfile", help="filename to log output to")
     arg_parser.add_argument("--verbose", "-v", help="print output to the screen", action="store_true")
-    arg_parser.add_argument("--cleanup", help="delete files from device after running", default=True)
-    arg_parser.add_argument("--timeout", type=int, help="maximum time in seconds for the job to rune (default 300)", default=300)
+    arg_parser.add_argument("--cleanup", help="delete files from device after running", type=distutils.util.strtobool, default="true")
+    arg_parser.add_argument("--timeout", type=int, help="maximum time in seconds for the job to run (default 300)", default=300)
     arg_parser.add_argument("--all", help="run the command on all machines in the cluster (default False)", action="store_true")
     
     args = arg_parser.parse_args()
     
     command = ' '.join(args.command)
+
     if args.password:
         password = args.password
     else:
