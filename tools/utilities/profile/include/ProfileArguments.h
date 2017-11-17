@@ -44,6 +44,6 @@ struct ParsedProfileArguments : public ProfileArguments, public utilities::Parse
     /// <summary> Adds the arguments. </summary>
     ///
     /// <param name="parser"> [in,out] The parser. </param>
-    virtual void AddArgs(utilities::CommandLineParser& parser);
+    void AddArgs(utilities::CommandLineParser& parser) override;
 };
 }

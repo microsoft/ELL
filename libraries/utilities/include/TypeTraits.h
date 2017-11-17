@@ -27,7 +27,7 @@ namespace utilities
         static constexpr bool IsVectorChecker(...);
 
     public:
-        static const bool value = IsVectorChecker<ValueType>(0);
+        static const bool value = IsVectorChecker<ValueType>(nullptr);
     };
 
     /// <summary> Enabled if ValueType is a boolean. </summary>

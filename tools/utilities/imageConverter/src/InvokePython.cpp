@@ -87,7 +87,7 @@ void ExecutePythonScript(const std::string& script, const std::vector<std::strin
     
     for (size_t i = 0; i < argc; i++)
     {
-        argv[i] = Py_DecodeLocale(args[i].c_str(), NULL);
+        argv[i] = Py_DecodeLocale(args[i].c_str(), nullptr);
     }
 
     PySys_SetArgvEx((int)argc, argv, 0);

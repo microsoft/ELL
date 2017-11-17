@@ -48,39 +48,39 @@ namespace model
         /// <param name="other"> The compiled map being moved. </param>
         IRCompiledMap(IRCompiledMap&& other);
 
-        virtual ~IRCompiledMap() = default;
+        ~IRCompiledMap() override = default;
 
         /// <summary> Output the compiled model to the given file </summary>
         ///
         /// <param name="filePath"> The file to write to </param>
-        virtual void WriteCode(const std::string& filePath) const override;
+        void WriteCode(const std::string& filePath) const override;
 
         /// <summary> Output the compiled model to the given file with the given format </summary>
         ///
         /// <param name="filePath"> The file to write to </param>
         /// <param name="format"> The format to write out </param>
-        virtual void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format) const override;
+        void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format) const override;
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
         /// <param name="filePath"> The path to the file to write </param>
-        virtual void WriteCodeHeader(const std::string& filePath) const override;
+        void WriteCodeHeader(const std::string& filePath) const override;
 
         /// <summary> Output the compiled model to an output stream with the given format </summary>
         ///
         /// <param name="stream"> The stream to write to </param>
         /// <param name="format"> The format to write out </param>
-        virtual void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format) const override;
+        void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format) const override;
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
         /// <param name="streawm"> The stream to write the prototype to </param>
-        virtual void WriteCodeHeader(std::ostream& stream) const override;
+        void WriteCodeHeader(std::ostream& stream) const override;
 
         /// <summary> Output a 'C'-style function prototype for the compiled function </summary>
         ///
         /// <returns> A string with the function prototype </returns>
-        virtual std::string GetCodeHeaderString() const override;
+        std::string GetCodeHeaderString() const override;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -90,12 +90,12 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Can this compiled map be used? </summary>
         ///
         /// <returns> true if active, false if not. </returns>
-        virtual bool IsValid() const override;
+        bool IsValid() const override;
 
         /// <summary> Gets a reference to the underlying IRModuleEmitter. </summary>
         ///
@@ -166,17 +166,17 @@ namespace model
         void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
         void WriteCode(std::ostream& stream, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
 
-        virtual void SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) const override;
-        virtual void SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const override;
-        virtual void SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const override;
-        virtual void SetNodeInput(model::InputNode<float>* node, const std::vector<float>& inputValues) const override;
-        virtual void SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues) const override;
+        void SetNodeInput(model::InputNode<bool>* node, const std::vector<bool>& inputValues) const override;
+        void SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues) const override;
+        void SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues) const override;
+        void SetNodeInput(model::InputNode<float>* node, const std::vector<float>& inputValues) const override;
+        void SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues) const override;
 
-        virtual std::vector<bool> ComputeBoolOutput(const model::PortElementsBase& outputs) const override;
-        virtual std::vector<int> ComputeIntOutput(const model::PortElementsBase& outputs) const override;
-        virtual std::vector<int64_t> ComputeInt64Output(const model::PortElementsBase& outputs) const override;
-        virtual std::vector<float> ComputeFloatOutput(const model::PortElementsBase& outputs) const override;
-        virtual std::vector<double> ComputeDoubleOutput(const model::PortElementsBase& outputs) const override;
+        std::vector<bool> ComputeBoolOutput(const model::PortElementsBase& outputs) const override;
+        std::vector<int> ComputeIntOutput(const model::PortElementsBase& outputs) const override;
+        std::vector<int64_t> ComputeInt64Output(const model::PortElementsBase& outputs) const override;
+        std::vector<float> ComputeFloatOutput(const model::PortElementsBase& outputs) const override;
+        std::vector<double> ComputeDoubleOutput(const model::PortElementsBase& outputs) const override;
 
     private:
         friend class IRMapCompiler;

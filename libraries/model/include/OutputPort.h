@@ -46,7 +46,7 @@ namespace model
         /// <summary> Returns the size of the output </summary>
         ///
         /// <returns> The size of the output </returns>
-        virtual size_t Size() const override { return _size; }
+        size_t Size() const override { return _size; }
 
         /// <summary> Sets the size of the output </summary>
         ///
@@ -78,18 +78,18 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
         /// <summary> Adds an object's properties to an `Archiver` </summary>
         ///
         /// <param name="archiver"> The `Archiver` to add the values from the object to </param>
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
 
         /// <summary> Sets the internal state of the object according to the archiver passed in </summary>
         ///
         /// <param name="archiver"> The `Archiver` to get state from </param>
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         size_t _size = 0;
         mutable bool _isReferenced = false;
@@ -124,14 +124,14 @@ namespace model
         /// <summary> Gets the output of this port, converted to `double`. </summary>
         ///
         /// <returns> The output of this port, converted to `double`. </returns>
-        virtual std::vector<double> GetDoubleOutput() const override;
+        std::vector<double> GetDoubleOutput() const override;
 
         /// <summary> Gets the output of an element, converted to a `double`. </summary>
         ///
         /// <param name="index"> The index of the element to return. </param>
         ///
         /// <returns> The output element, converted to a `double`. </returns>
-        virtual double GetDoubleOutput(size_t index) const override;
+        double GetDoubleOutput(size_t index) const override;
 
         /// <summary> Sets the cached output from this port </summary>
         ///
@@ -163,11 +163,11 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         mutable std::vector<ValueType> _cachedOutput;

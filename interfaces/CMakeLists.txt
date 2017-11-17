@@ -6,7 +6,7 @@ include (CommonInterfaces)
 # Get include directories for LLVM
 include (LLVMSetup)
 if(LLVM_FOUND)
-    include_directories(${LLVM_INCLUDE_DIRS})
+    include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
     add_definitions(${LLVM_DEFINITIONS})
     add_compile_options(${LLVM_COMPILE_OPTIONS})
 endif()

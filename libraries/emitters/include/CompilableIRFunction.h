@@ -59,14 +59,14 @@ namespace emitters
         /// <param name="x"> One of the values to add </param>
         /// <param name="y"> The other value to add </param>
         /// <returns> The sum x+y </returns>
-        virtual ValueType Compute(ValueType x, ValueType y) const override;
+        ValueType Compute(ValueType x, ValueType y) const override;
 
         /// <summary> Emits LLVM IR that computes the sum of two values </summary>
         /// 
         /// <param name="x"> One of the values to add </param>
         /// <param name="y"> The other value to add </param>
         /// <returns> The sum x+y </returns>
-        virtual llvm::Value* Compile(IRFunctionEmitter& function, llvm::Value* x, llvm::Value* y) const override;
+        llvm::Value* Compile(IRFunctionEmitter& function, llvm::Value* x, llvm::Value* y) const override;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -76,7 +76,7 @@ namespace emitters
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
     };
 }
 }

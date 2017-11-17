@@ -33,13 +33,13 @@ struct ParsedPrintArguments : public PrintArguments, public utilities::ParsedArg
     /// <summary> Adds the arguments. </summary>
     ///
     /// <param name="parser"> [in,out] The parser. </param>
-    virtual void AddArgs(utilities::CommandLineParser& parser);
+    void AddArgs(utilities::CommandLineParser& parser) override;
 
     /// <summary> Check arguments. </summary>
     ///
     /// <param name="parser"> The parser. </param>
     ///
     /// <returns> An utilities::CommandLineParseResult. </returns>
-    virtual utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser);
+    utilities::CommandLineParseResult PostProcess(const utilities::CommandLineParser& parser) override;
 };
 }

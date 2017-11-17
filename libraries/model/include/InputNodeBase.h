@@ -56,10 +56,10 @@ namespace model
 
     protected:
         InputNodeBase(OutputPortBase& output, ell::math::TensorShape shape);
-        virtual bool ShouldCompileInline() const override { return true; }
-        virtual bool HasState() const override { return false; }
+        bool ShouldCompileInline() const override { return true; }
+        bool HasState() const override { return false; }
         void SetShape(const ell::math::TensorShape& shape) { _shape = shape; }  // STYLE discrepancy
-        virtual ell::utilities::ArchiveVersion GetArchiveVersion() const override;
+        ell::utilities::ArchiveVersion GetArchiveVersion() const override;
     private:
         OutputPortBase& _outputBase;
         ell::math::TensorShape _shape;

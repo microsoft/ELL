@@ -69,12 +69,12 @@ namespace data
         AutoDataVectorBase(std::vector<double> vec);
 
         /// <summary> Not Implemented. </summary>
-        virtual void AppendElement(size_t index, double value) override;
+        void AppendElement(size_t index, double value) override;
 
         /// <summary> Gets the data vector type. </summary>
         ///
         /// <returns> The data vector type. </returns>
-        virtual IDataVector::Type GetType() const override { return IDataVector::Type::AutoDataVector; }
+        IDataVector::Type GetType() const override { return IDataVector::Type::AutoDataVector; }
 
         /// <summary> Gets the type of the internal data vector stored inside the auto data vector. </summary>
         ///
@@ -88,31 +88,31 @@ namespace data
         /// </summary>
         ///
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
-        virtual size_t PrefixLength() const override { return _pInternal->PrefixLength(); }
+        size_t PrefixLength() const override { return _pInternal->PrefixLength(); }
 
         /// <summary> Computes the 2-norm of the vector. </summary>
         ///
         /// <returns> The squared 2-norm of the vector. </returns>
-        virtual double Norm2Squared() const override { return _pInternal->Norm2Squared(); }
+        double Norm2Squared() const override { return _pInternal->Norm2Squared(); }
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
         /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
+        double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
         /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        virtual float Dot(const math::UnorientedConstVectorReference<float> vector) const override;
+        float Dot(const math::UnorientedConstVectorReference<float> vector) const override;
 
         /// <summary> Adds this data vector to a math::RowVector </summary>
         ///
         /// <param name="vector"> [in,out] The vector that this DataVector is added to. </param>
-        virtual void AddTo(math::RowVectorReference<double> vector) const override;
+        void AddTo(math::RowVectorReference<double> vector) const override;
 
         /// <summary>
         /// Adds a sparsely transformed version of this data vector to a math::RowVector.
@@ -130,14 +130,14 @@ namespace data
         /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override { return _pInternal->ToArray(); };
+        std::vector<double> ToArray() const override { return _pInternal->ToArray(); };
 
         /// <summary> Copies the contents of this DataVector into a double array of a given size. </summary>
         ///
         /// <param name="size"> The desired array size. </param>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray(size_t size) const override;
+        std::vector<double> ToArray(size_t size) const override;
 
         /// <summary> Copies this data vector into another type of data vector. </summary>
         ///
@@ -163,7 +163,7 @@ namespace data
         /// <summary> Human readable printout to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write to. </param>
-        virtual void Print(std::ostream& os) const override;
+        void Print(std::ostream& os) const override;
 
     private:
         // helper function used by ctors to choose the type of data vector to use

@@ -141,12 +141,12 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
         size_t GetDataOffset() const; // offset for logical entry {0,0,0...}
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
     
     private:
         Shape _size; // the "active" area of the memory

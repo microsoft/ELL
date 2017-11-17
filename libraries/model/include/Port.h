@@ -41,7 +41,7 @@ namespace model
         Port() = default;
         Port(const Port& other) = delete;
         Port(Port&& other) = default;
-        virtual ~Port() = default;
+        ~Port() override = default;
 
         /// <summary> Returns the node the output port connected to this port belongs to </summary>
         ///
@@ -78,15 +78,15 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
 
     protected:
         Port(const class Node* node, std::string name, PortType type)
             : _node(node), _name(name), _type(type) {}
 
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         // _node keeps info on where the input is coming from

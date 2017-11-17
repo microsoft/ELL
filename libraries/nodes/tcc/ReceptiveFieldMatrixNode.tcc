@@ -64,7 +64,7 @@ namespace nodes
             const auto columnStride = inputLayout.GetStride(1);
             const auto channelStride = inputLayout.GetStride(2);
 
-            llvm::Value* index = 0;
+            llvm::Value* index = nullptr;
             // TODO: actually use the entries in dataOrder to compute the indices
             if(dataOrder == std::array<int, 3>({0, 1, 2})) // row, column, channel order
             {

@@ -63,15 +63,15 @@ namespace trainers
         /// <summary> Sets the trainer's dataset. </summary>
         ///
         /// <param name="anyDataset"> A dataset. </param>
-        virtual void SetDataset(const data::AnyDataset& anyDataset) override;
+        void SetDataset(const data::AnyDataset& anyDataset) override;
 
         /// <summary> Updates the state of the trainer by performing a learning epoch. </summary>
-        virtual void Update() override;
+        void Update() override;
 
         /// <summary> Gets the trained predictor. </summary>
         ///
         /// <returns> A const reference to the predictor. </returns>
-        virtual const predictors::LinearPredictor<double>& GetPredictor() const override { return _predictor; }
+        const predictors::LinearPredictor<double>& GetPredictor() const override { return _predictor; }
 
         /// <summary> Gets information on the trained predictor. </summary>
         ///

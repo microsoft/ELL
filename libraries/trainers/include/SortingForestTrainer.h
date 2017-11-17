@@ -54,8 +54,8 @@ namespace trainers
 
     protected:
         using ForestTrainer<SplitRuleType, EdgePredictorType, BoosterType>::_dataset;
-        virtual SplitCandidate GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;
-        virtual std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) override;
+        SplitCandidate GetBestSplitRuleAtNode(SplittableNodeId nodeId, Range range, Sums sums) override;
+        std::vector<EdgePredictorType> GetEdgePredictors(const NodeStats& nodeStats) override;
 
     private:
         void SortNodeDataset(Range range, size_t featureIndex);

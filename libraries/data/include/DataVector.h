@@ -209,26 +209,26 @@ namespace data
         /// <summary> Computes the 2-norm of the vector. </summary>
         ///
         /// <returns> The squared 2-norm of the vector. </returns>
-        virtual double Norm2Squared() const override;
+        double Norm2Squared() const override;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
         /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
+        double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
 
         /// <summary> Computes the dot product with another vector. </summary>
         ///
         /// <param name="vector"> The other vector. </param>
         ///
         /// <returns> A dot product. </returns>
-        virtual float Dot(const math::UnorientedConstVectorReference<float> vector) const override;
+        float Dot(const math::UnorientedConstVectorReference<float> vector) const override;
 
         /// <summary> Adds this data vector to a math::RowVector </summary>
         ///
         /// <param name="vector"> [in,out] The vector to which this data vector is added. </param>
-        virtual void AddTo(math::RowVectorReference<double> vector) const override;
+        void AddTo(math::RowVectorReference<double> vector) const override;
 
         /// <summary> Adds a transformed version of this data vector to a math::RowVector. </summary>
         ///
@@ -248,14 +248,14 @@ namespace data
         /// <summary> Copies the contents of this DataVector into a double array of size PrefixLength(). </summary>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray() const override { return ToArray(PrefixLength()); }
+        std::vector<double> ToArray() const override { return ToArray(PrefixLength()); }
 
         /// <summary> Copies the contents of this DataVector into a double array of a given size. </summary>
         ///
         /// <param name="size"> The desired array size. </param>
         ///
         /// <returns> The array. </returns>
-        virtual std::vector<double> ToArray(size_t size) const override;
+        std::vector<double> ToArray(size_t size) const override;
 
         /// <summary> Copies the contents of a data vector to another data vector. </summary>
         ///
@@ -293,7 +293,7 @@ namespace data
         /// <summary> Human readable printout to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] Stream to write to. </param>
-        virtual void Print(std::ostream& os) const override;
+        void Print(std::ostream& os) const override;
     };
 
     /// <summary> Wrapper for AddTransformedTo that hides the template specifier. </summary>

@@ -79,28 +79,28 @@ namespace utilities
             const ValueType& GetValue() const { return _value; }
             void SetValue(const ValueType& value);
 
-            virtual std::unique_ptr<VariantBase> Clone() const override;
-            virtual std::string ToString() const override;
-            virtual std::string GetStoredTypeName() const override;
-            virtual bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
-            virtual bool IsIntegralType() const override { return std::is_integral<ValueType>::value; }
-            virtual bool IsFloatingPointType() const override { return std::is_floating_point<ValueType>::value; }
-            virtual bool IsEnumType() const override { return std::is_enum<ValueType>::value; }
+            std::unique_ptr<VariantBase> Clone() const override;
+            std::string ToString() const override;
+            std::string GetStoredTypeName() const override;
+            bool IsPrimitiveType() const override { return std::is_fundamental<ValueType>::value; }
+            bool IsIntegralType() const override { return std::is_integral<ValueType>::value; }
+            bool IsFloatingPointType() const override { return std::is_floating_point<ValueType>::value; }
+            bool IsEnumType() const override { return std::is_enum<ValueType>::value; }
 
-            virtual void ParseInto(const std::string& s) override;
-            virtual bool TryParseInto(const std::string& s) override;
+            void ParseInto(const std::string& s) override;
+            bool TryParseInto(const std::string& s) override;
 
-            virtual bool IsIArchivable() const override { return !IsPrimitiveType(); }
-            virtual bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
+            bool IsIArchivable() const override { return !IsPrimitiveType(); }
+            bool IsPointer() const override { return std::is_pointer<ValueType>::value; }
 
             // Getting value as a fundamental type (of the largest width)
-            virtual intmax_t GetIntValue() const override;
-            virtual long double GetFloatValue() const override;
-            virtual void SetIntValue(intmax_t value) override;
-            virtual void SetFloatValue(long double value) override;
+            intmax_t GetIntValue() const override;
+            long double GetFloatValue() const override;
+            void SetIntValue(intmax_t value) override;
+            void SetFloatValue(long double value) override;
 
-            virtual void ArchiveProperty(const char* name, Archiver& archiver) const override;
-            virtual void UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context) override;
+            void ArchiveProperty(const char* name, Archiver& archiver) const override;
+            void UnarchiveProperty(const char* name, Unarchiver& archiver, SerializationContext& context) override;
 
         private:
             friend class Variant;

@@ -78,26 +78,26 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Makes a copy of this node into the model being constructed by the transformer </summary>
         ///
         /// <param name="transformer"> The `ModelTransformer` object currently creating a new model </param>
-        virtual void Copy(model::ModelTransformer& transformer) const override;
+        void Copy(model::ModelTransformer& transformer) const override;
 
     protected:
-        virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override
+        void Compute() const override;
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
 
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
+        void ReadFromArchive(utilities::Unarchiver& archiver) override
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
-        virtual bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
+        bool HasState() const override { return true; } // stored state: convolutional parameters and memory layout
 
 
     private:

@@ -60,15 +60,15 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
         ///
         /// <returns> true if  this node is able to compile itself to code. </returns>
-        virtual bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
+        bool IsCompilable(const model::MapCompiler* compiler) const override { return false; }
 
     protected:
-        virtual bool Refine(model::ModelTransformer& transformer) const override;
+        bool Refine(model::ModelTransformer& transformer) const override;
     };
 
     //
@@ -140,20 +140,20 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        virtual void Copy(model::ModelTransformer& transformer) const override;
+        void Copy(model::ModelTransformer& transformer) const override;
         void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        virtual bool HasState() const override { return true; }
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        bool HasState() const override { return true; }
 
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override
+        void WriteToArchive(utilities::Archiver& archiver) const override
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }
 
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
+        void ReadFromArchive(utilities::Unarchiver& archiver) override
         {
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
         }

@@ -201,7 +201,7 @@ namespace nodes
         /// <param name="a"> The first secondary value </param>
         /// <param name="b"> The second secondary value </param>
         /// <returns> The value the function f(x,a,b) = ax + b </returns>
-        virtual ValueType Compute(ValueType x, ValueType a, ValueType b) const override;
+        ValueType Compute(ValueType x, ValueType a, ValueType b) const override;
         using BroadcastTernaryFunction<ValueType>::Compute;
 
         /// <summary> Emits IR to compute a value </summary>
@@ -210,7 +210,7 @@ namespace nodes
         /// <param name="a"> The first secondary value </param>
         /// <param name="b"> The second secondary value </param>
         /// <returns> The value the function f(x,a,b) = ax + b </returns>
-        virtual llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* a, llvm::Value* b) const override;
+        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x, llvm::Value* a, llvm::Value* b) const override;
         using BroadcastTernaryFunction<ValueType>::Compile;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
@@ -248,7 +248,7 @@ namespace nodes
         size_t GetBroadcastDimension() const { return _broadcastDimension; }
         size_t NumPrimaryInputDimensions() const { return _inputLayout.NumDimensions(); }
 
-        virtual bool HasState() const override { return true; } // stored state: function, broadcast dimension, and padding value
+        bool HasState() const override { return true; } // stored state: function, broadcast dimension, and padding value
 
         virtual const model::InputPort<ValueType>& GetPrimaryInput() const = 0;
         virtual const model::InputPort<ValueType>* GetSecondaryInput(int index) const = 0;
@@ -258,8 +258,8 @@ namespace nodes
         void ComputeDimensionLoop(size_t dimension, std::vector<ValueType>& output, size_t prevInputDimensionOffset, size_t prevOutputDimensionOffset, std::vector<ValueType>& secondaryValues) const;
         void EmitComputeDimensionLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, size_t dimension, llvm::Value* primaryInput, const std::vector<llvm::Value*>& secondaryInputs, llvm::Value* output, llvm::Value* prevInputDimensionOffset, llvm::Value* prevOutputDimensionOffset, std::vector<llvm::Value*>& secondaryValues) const;
 
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         ValueType GetOutputPadding() const { return _paddingValue; }
 
@@ -302,13 +302,13 @@ namespace nodes
                                    ValueType padding = 0);
 
         /// <summary></summary>
-        virtual int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
+        int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
 
         /// <summary></summary>
-        virtual int GetSecondaryInputSize() const override { return 0; }
+        int GetSecondaryInputSize() const override { return 0; }
 
         /// <summary></summary>
-        virtual int NumSecondaryInputs() const override { return 0; }
+        int NumSecondaryInputs() const override { return 0; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -318,7 +318,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
@@ -327,14 +327,14 @@ namespace nodes
         using BroadcastFunctionNode<ValueType, FunctionType>::NumPrimaryInputDimensions;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
 
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-        virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void Copy(model::ModelTransformer& transformer) const override;
+        void Compute() const override;
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        virtual const model::InputPort<ValueType>& GetPrimaryInput() const override { return primaryInput; }
-        virtual const model::InputPort<ValueType>* GetSecondaryInput(int index) const override;
+        const model::InputPort<ValueType>& GetPrimaryInput() const override { return primaryInput; }
+        const model::InputPort<ValueType>* GetSecondaryInput(int index) const override;
 
     private:
         using BroadcastFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop;
@@ -381,13 +381,13 @@ namespace nodes
                                     ValueType padding = 0);
 
         /// <summary></summary>
-        virtual int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
+        int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
 
         /// <summary></summary>
-        virtual int GetSecondaryInputSize() const override { return _secondaryInput.Size(); }
+        int GetSecondaryInputSize() const override { return _secondaryInput.Size(); }
 
         /// <summary></summary>
-        virtual int NumSecondaryInputs() const override { return 1; }
+        int NumSecondaryInputs() const override { return 1; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -397,7 +397,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
@@ -407,14 +407,14 @@ namespace nodes
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
         using BroadcastFunctionNode<ValueType, FunctionType>::NumElements;
 
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-        virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void Copy(model::ModelTransformer& transformer) const override;
+        void Compute() const override;
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        virtual const model::InputPort<ValueType>& GetPrimaryInput() const override { return primaryInput; }
-        virtual const model::InputPort<ValueType>* GetSecondaryInput(int index) const override;
+        const model::InputPort<ValueType>& GetPrimaryInput() const override { return primaryInput; }
+        const model::InputPort<ValueType>* GetSecondaryInput(int index) const override;
 
     private:
         using BroadcastFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop;
@@ -464,13 +464,13 @@ namespace nodes
                                      ValueType padding = 0);
 
         /// <summary></summary>
-        virtual int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
+        int GetPrimaryInputSize() const override { return _primaryInput.Size(); }
 
         /// <summary></summary>
-        virtual int GetSecondaryInputSize() const override { return std::max(_secondaryInput1.Size(), _secondaryInput2.Size()); }
+        int GetSecondaryInputSize() const override { return std::max(_secondaryInput1.Size(), _secondaryInput2.Size()); }
 
         /// <summary></summary>
-        virtual int NumSecondaryInputs() const override { return 2; }
+        int NumSecondaryInputs() const override { return 2; }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -480,7 +480,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
         using BroadcastFunctionNode<ValueType, FunctionType>::GetInputLayout;
@@ -489,14 +489,14 @@ namespace nodes
         using BroadcastFunctionNode<ValueType, FunctionType>::NumPrimaryInputDimensions;
         using BroadcastFunctionNode<ValueType, FunctionType>::GetFunction;
 
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-        virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void Copy(model::ModelTransformer& transformer) const override;
+        void Compute() const override;
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        virtual const model::InputPort<ValueType>& GetPrimaryInput() const override { return primaryInput; }
-        virtual const model::InputPort<ValueType>* GetSecondaryInput(int index) const override;
+        const model::InputPort<ValueType>& GetPrimaryInput() const override { return primaryInput; }
+        const model::InputPort<ValueType>* GetSecondaryInput(int index) const override;
 
     private:
         using BroadcastFunctionNode<ValueType, FunctionType>::ComputeDimensionLoop;
@@ -540,15 +540,15 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
-        virtual bool IsCompilable(const model::MapCompiler* compiler) const override;
+        bool IsCompilable(const model::MapCompiler* compiler) const override;
 
     protected:
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-        virtual bool Refine(model::ModelTransformer& transformer) const override;
-        virtual bool HasState() const override { return false; }
+        void Copy(model::ModelTransformer& transformer) const override;
+        bool Refine(model::ModelTransformer& transformer) const override;
+        bool HasState() const override { return false; }
         bool HasScale() const { return secondaryInput1.Size() != 0; }
         bool HasBias() const { return secondaryInput2.Size() != 0; }
 

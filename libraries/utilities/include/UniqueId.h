@@ -55,7 +55,7 @@ namespace utilities
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Stream output </summary>
         friend std::ostream& operator<<(std::ostream& stream, const UniqueId& id);
@@ -64,8 +64,8 @@ namespace utilities
         friend std::string to_string(const UniqueId& id);
 
     protected:
-        virtual void WriteToArchive(Archiver& archiver) const override;
-        virtual void ReadFromArchive(Unarchiver& archiver) override;
+        void WriteToArchive(Archiver& archiver) const override;
+        void ReadFromArchive(Unarchiver& archiver) override;
 
     private:
         friend std::hash<UniqueId>;

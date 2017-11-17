@@ -206,7 +206,7 @@ macro(generate_emitted_interface_module MODEL_NAME MODEL_LIBRARIES COMMON_PATH L
       message(STATUS "Using python found at: ${PYTHON_EXECUTABLE}")
       message(STATUS "Using python libraries found at: ${PYTHON_LIBRARY}")
 
-      include_directories(${COMMON_PATH} ${PYTHON_INCLUDE_PATH})
+      include_directories(${COMMON_PATH} SYSTEM ${PYTHON_INCLUDE_PATH})
 
       generate_interface_module(${MODEL_NAME} ${MODEL_NAME} ${language} ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_LIBRARIES} "")
 

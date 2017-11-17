@@ -61,20 +61,20 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        virtual void Copy(model::ModelTransformer& transformer) const override;
+        void Copy(model::ModelTransformer& transformer) const override;
 
         /// <summary>Return the window size</summary>
         size_t GetWindowSize() const { return _windowSize; }
 
     protected:
-        virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        virtual bool HasState() const override { return true; }
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void Compute() const override;
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        bool HasState() const override { return true; }
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         // Inputs
         model::InputPort<ValueType> _input;

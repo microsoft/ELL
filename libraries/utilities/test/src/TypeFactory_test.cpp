@@ -36,17 +36,17 @@ class Derived1 : public Base
 public:
     static std::string GetTypeName() { return "Derived1"; }
 
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
+    std::string GetRuntimeTypeName() const override { return GetTypeName(); };
 
     // for the purpose of testing
-    virtual void Set() override
+    void Set() override
     {
         x = 5;
         y = -17.3;
         s = "test";
     }
 
-    virtual bool Check() override
+    bool Check() override
     {
         if (x == 5 && y == -17.3 && s == "test") return true;
         return false;
@@ -63,16 +63,16 @@ class Derived2 : public Base
 public:
     static std::string GetTypeName() { return "Derived2"; }
 
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); };
+    std::string GetRuntimeTypeName() const override { return GetTypeName(); };
 
     // for the purpose of testing
-    virtual void Set() override
+    void Set() override
     {
         v.push_back(7.0f);
         v.push_back(8.0f);
     }
 
-    virtual bool Check() override
+    bool Check() override
     {
         if (v.size() != 2) return false;
         if (v[0] == 7.0f && v[1] == 8.0f) return true;

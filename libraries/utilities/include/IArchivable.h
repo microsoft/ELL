@@ -77,7 +77,7 @@ namespace utilities
 
     class ArchivedAsPrimitive : public IArchivable
     {
-        virtual bool ArchiveAsPrimitive() const { return true; }
+        bool ArchiveAsPrimitive() const override { return true; }
     };
 }
 }

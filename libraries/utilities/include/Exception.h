@@ -22,7 +22,7 @@ namespace utilities
         /// <summary></summary>
         Exception(const std::string& message) : _message(message) { }  // STYLE discrepancy 
 
-        virtual ~Exception() = default;
+        ~Exception() override = default;
 
         /// <summary> Gets the message. </summary>
         ///

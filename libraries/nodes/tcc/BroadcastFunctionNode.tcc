@@ -612,8 +612,8 @@ namespace nodes
         // Call recursive function to emit nested loops
         // Note: We could just offset the input pointer at beginning instead of adding offset every time through the loop
         // Note: We can potentially fuse adjacent loops if memory is contiguous --- it can be done by preprocessing size/stride vectors
-        llvm::Value* prevInputDimensionOffset = 0;
-        llvm::Value* prevOutputDimensionOffset = 0;
+        llvm::Value* prevInputDimensionOffset = nullptr;
+        llvm::Value* prevOutputDimensionOffset = nullptr;
         std::vector<llvm::Value*> secondaryValues{ nullptr, nullptr };
         EmitComputeDimensionLoop(compiler, function, 0, pPrimaryInput, { pSecondaryInput1, pSecondaryInput2 }, pOutput, prevInputDimensionOffset, prevOutputDimensionOffset, secondaryValues);
     }

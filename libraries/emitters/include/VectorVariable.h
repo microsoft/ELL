@@ -26,10 +26,10 @@ namespace emitters
         VectorVariable(const VariableScope scope, const size_t size, int flags = Variable::VariableFlags::isMutable);
 
         /// <summary> The size of the vector </summary>
-        virtual size_t Dimension() const override { return _size; }
+        size_t Dimension() const override { return _size; }
 
         /// <summary> Is this variable a scalar? Returns false. </summary>
-        virtual bool IsScalar() const override { return false; }
+        bool IsScalar() const override { return false; }
 
     private:
         int _size;

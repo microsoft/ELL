@@ -35,7 +35,7 @@ namespace model
     {
     public:
         Node() = default;
-        virtual ~Node() = default;
+        ~Node() override = default;
 
         /// <summary> Type to use for our node id </summary>
         typedef utilities::UniqueId NodeId;
@@ -169,8 +169,8 @@ namespace model
 
         // We're supplying a base implementation from WriteToArchive and ReadFromArchive, but also
         // declaring them as abstract so that subclasses need to implement this themselves.
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override = 0; 
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override = 0;
+        void WriteToArchive(utilities::Archiver& archiver) const override = 0; 
+        void ReadFromArchive(utilities::Unarchiver& archiver) override = 0;
 
     private:
         friend class Model;

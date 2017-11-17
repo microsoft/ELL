@@ -10,7 +10,7 @@ if(NOT LLVM_FOUND)
   return()
 endif()
 
-set (src 
+set (src
     src/EmitterTypes.cpp
     src/IRAssemblyWriter.cpp
     src/IRAsyncTask.cpp
@@ -35,7 +35,7 @@ set (src
     src/Variable.cpp
 )
 
-set (include 
+set (include
     include/ClockInterface.h
     include/CompilableIRFunction.h
     include/EmitterException.h
@@ -67,7 +67,7 @@ set (include
     include/VectorVariable.h
 )
 
-set (tcc 
+set (tcc
     tcc/CompilableIRFunction.tcc
     tcc/EmitterTypes.tcc
     tcc/IRFunctionEmitter.tcc
@@ -85,7 +85,8 @@ source_group("include" FILES ${include})
 source_group("tcc" FILES ${tcc})
 
 add_library(${library_name} ${src} ${include} ${tcc})
-target_include_directories(${library_name} PUBLIC include ${LLVM_INCLUDE_DIRS})
+target_include_directories(${library_name} PUBLIC include)
+target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 target_link_libraries(${library_name} utilities ${LLVM_LIBS})
 target_compile_definitions(${library_name} PUBLIC ${LLVM_DEFINITIONS})
 target_compile_options(${library_name} PUBLIC ${LLVM_COMPILE_OPTIONS})
@@ -110,7 +111,7 @@ set (test_src
   test/src/PosixEmitterTest.cpp
 )
 
-set (test_include 
+set (test_include
   test/include/AsyncEmitterTest.h
   test/include/IREmitterTest.h
   test/include/IRFunctionTest.h

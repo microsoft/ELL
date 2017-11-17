@@ -43,16 +43,16 @@ struct TestStruct : public utilities::IArchivable
     TestStruct(int a, float b, double c)
         : a(a), b(b), c(c) {}
     static std::string GetTypeName() { return "TestStruct"; }
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+    std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    virtual void WriteToArchive(utilities::Archiver& archiver) const override
+    void WriteToArchive(utilities::Archiver& archiver) const override
     {
         archiver.Archive("a", a);
         archiver.Archive("b", b);
         archiver.Archive("c", c);
     }
 
-    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
+    void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
         // what about _type?
         archiver.Unarchive("a", a);

@@ -177,7 +177,7 @@ namespace data
         ///
         /// <param name="index"> Zero-based index of the. </param>
         /// <param name="value"> The value. </param>
-        virtual void AppendElement(size_t index, double value) override;
+        void AppendElement(size_t index, double value) override;
 
         /// <summary>
         /// A data vector has infinite dimension and ends with a suffix of zeros. This function returns
@@ -186,24 +186,24 @@ namespace data
         /// </summary>
         ///
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
-        virtual size_t PrefixLength() const override;
+        size_t PrefixLength() const override;
 
         /// <summary> Computes the vector squared 2-norm. </summary>
         ///
         /// <returns> The squared 2-norm of the vector. </returns>
-        virtual double Norm2Squared() const override { return static_cast<double>(_indexList.Size()); }
+        double Norm2Squared() const override { return static_cast<double>(_indexList.Size()); }
 
         /// <summary> Computes the Dot product. </summary>
         ///
         /// <param name="p_other"> The other. </param>
         ///
         /// <returns> A double. </returns>
-        virtual double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
+        double Dot(const math::UnorientedConstVectorReference<double> vector) const override;
 
         /// <summary> Adds this data vector to a math::RowVector </summary>
         ///
         /// <param name="vector"> [in,out] The vector that this DataVector is added to. </param>
-        virtual void AddTo(math::RowVectorReference<double> vector) const override;
+        void AddTo(math::RowVectorReference<double> vector) const override;
 
     private:
         using DataVectorBase<SparseBinaryDataVectorBase<IndexListType>>::AppendElements;
@@ -218,7 +218,7 @@ namespace data
         /// <summary> Gets the data vector type. </summary>
         ///
         /// <returns> The data vector type. </returns>
-        virtual IDataVector::Type GetType() const override { return IDataVector::Type::SparseBinaryDataVector; }
+        IDataVector::Type GetType() const override { return IDataVector::Type::SparseBinaryDataVector; }
     };
 }
 }

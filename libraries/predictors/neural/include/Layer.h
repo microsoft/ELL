@@ -156,7 +156,7 @@ namespace neural
             PaddingParameters outputPaddingParameters;
         };
 
-        virtual ~Layer() = default;
+        ~Layer() override = default;
 
         /// <summary> Initializes this class with the required information regarding inputs and outputs. </summary>
         ///
@@ -242,11 +242,11 @@ namespace neural
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
 
@@ -294,12 +294,12 @@ namespace neural
         LayerSerializationContext(utilities::SerializationContext& previousContext)
             : _previousContext(previousContext), _outputReference(math::IntegerTriplet{ 0, 0, 0 }) {}
 
-        virtual ~LayerSerializationContext() {}
+        ~LayerSerializationContext() override {}
 
         /// <summary> Gets the type factory associated with this context. </summary>
         ///
         /// <returns> The type factory associated with this context. </returns>
-        virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _previousContext.GetTypeFactory(); }
+        utilities::GenericTypeFactory& GetTypeFactory() override { return _previousContext.GetTypeFactory(); }
 
         /// <summary> Sets the output reference to be saved in the context.
         ///

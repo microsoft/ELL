@@ -60,7 +60,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
         ///
@@ -84,20 +84,20 @@ namespace nodes
         IRNode(const std::vector<model::InputPortBase*>& inputPorts, const std::vector<model::OutputPortBase*>& outputPorts, const std::string& functionName, const std::string& irCode);
         IRNode(const std::vector<model::InputPortBase*>& inputPorts, const std::vector<model::OutputPortBase*>& outputPorts, const std::string& functionName, const std::string& irCode, const emitters::NamedVariableTypeList& extraArgs);
 
-        virtual void Compute() const override;
+        void Compute() const override;
 
-        virtual bool HasPrecompiledIR() const override;
-        virtual std::string GetPrecompiledIR() const override;
+        bool HasPrecompiledIR() const override;
+        std::string GetPrecompiledIR() const override;
 
-        virtual std::string GetCompiledFunctionName() const override;
-        virtual emitters::NamedVariableTypeList GetNodeFunctionStateParameterList(model::IRMapCompiler& compiler) const override;
-        virtual std::vector<llvm::Value*> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override;
+        std::string GetCompiledFunctionName() const override;
+        emitters::NamedVariableTypeList GetNodeFunctionStateParameterList(model::IRMapCompiler& compiler) const override;
+        std::vector<llvm::Value*> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override;
 
         emitters::NamedVariableTypeList GetInputTypes();
         emitters::NamedVariableTypeList GetOutputTypes();
         const emitters::NamedVariableTypeList& GetExtraArgs() const { return _extraArgs; }
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         std::string _functionName;

@@ -35,13 +35,13 @@ namespace nodes
     class ReLUActivationFunction : public BroadcastUnaryFunction<ValueType>
     {
     public:
-        virtual ~ReLUActivationFunction() = default;
+        ~ReLUActivationFunction() override = default;
 
         /// <summary> Computes the ReLU activation (on the host machine) </summary>
         ///
         /// <param name="x"> The value </param>
         /// <returns> The value of the function ReLU(x) </returns>
-        virtual ValueType Compute(ValueType x) const override;
+        ValueType Compute(ValueType x) const override;
         using BroadcastUnaryFunction<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the ReLU activation function </summary>
@@ -50,7 +50,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the function ReLU(x) </returns>
-        virtual llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
@@ -83,7 +83,7 @@ namespace nodes
         ///
         /// <param name="x"> The value </param>
         /// <returns> The value of the function LeakyReLU(x) </returns>
-        virtual ValueType Compute(ValueType x) const override;
+        ValueType Compute(ValueType x) const override;
         using BroadcastUnaryFunction<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the leaky ReLU activation function </summary>
@@ -92,7 +92,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the function LeakyReLU(x) </returns>
-        virtual llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
@@ -129,7 +129,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the function Sigmoid(x) </returns>
-        virtual ValueType Compute(ValueType x) const override;
+        ValueType Compute(ValueType x) const override;
         using BroadcastUnaryFunction<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the sigmoid activation function </summary>
@@ -137,7 +137,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         /// <returns> The value of the function Sigmoid(x) </returns>
         ///
-        virtual llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
@@ -166,7 +166,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the hard sigmoid function) </returns>
-        virtual ValueType Compute(ValueType x) const override;
+        ValueType Compute(ValueType x) const override;
         using BroadcastUnaryFunction<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the hard sigmoid activation function </summary>
@@ -174,7 +174,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the function Sigmoid(x) </returns>
-        virtual llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
+        llvm::Value* Compile(emitters::IRFunctionEmitter& function, llvm::Value* x) const override;
         using BroadcastUnaryFunction<ValueType>::Compile;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
@@ -205,7 +205,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         ///
         /// <returns> The value of the function tanh(x) </returns>
-        virtual ValueType Compute(ValueType x) const override;
+        ValueType Compute(ValueType x) const override;
         using BroadcastUnaryFunction<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the tanh activation function </summary>

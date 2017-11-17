@@ -51,10 +51,10 @@ namespace model
 
     protected:
         OutputNodeBase(InputPortBase& input, OutputPortBase& output, ell::math::TensorShape shape);
-        virtual bool ShouldCompileInline() const override { return true; }
-        virtual bool HasState() const override { return false; }
-        virtual void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        virtual ell::utilities::ArchiveVersion GetArchiveVersion() const override;
+        bool ShouldCompileInline() const override { return true; }
+        bool HasState() const override { return false; }
+        void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        ell::utilities::ArchiveVersion GetArchiveVersion() const override;
 
         void SetShape(const OutputShape& shape) { _shape = shape; } // STYLE discrepancy
     private:

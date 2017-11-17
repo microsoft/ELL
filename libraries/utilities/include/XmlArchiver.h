@@ -52,7 +52,7 @@ namespace utilities
 #endif
         DECLARE_ARCHIVE_VALUE_OVERRIDE(float);
         DECLARE_ARCHIVE_VALUE_OVERRIDE(double);
-        virtual void ArchiveValue(const char* name, const std::string& value) override;
+        void ArchiveValue(const char* name, const std::string& value) override;
 
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(bool);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(char);
@@ -66,13 +66,13 @@ namespace utilities
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(float);
         DECLARE_ARCHIVE_ARRAY_OVERRIDE(double);
 
-        virtual void ArchiveArray(const char* name, const std::vector<std::string>& array) override;
-        virtual void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) override;
+        void ArchiveArray(const char* name, const std::vector<std::string>& array) override;
+        void ArchiveArray(const char* name, const std::string& baseTypeName, const std::vector<const IArchivable*>& array) override;
 
-        virtual void BeginArchiveObject(const char* name, const IArchivable& value) override;
-        virtual void EndArchiveObject(const char* name, const IArchivable& value) override;
+        void BeginArchiveObject(const char* name, const IArchivable& value) override;
+        void EndArchiveObject(const char* name, const IArchivable& value) override;
 
-        virtual void EndArchiving() override;
+        void EndArchiving() override;
 
     private:
         // Serialization
@@ -124,7 +124,7 @@ namespace utilities
 #endif
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(float);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(double);
-        virtual void UnarchiveValue(const char* name, std::string& value) override;
+        void UnarchiveValue(const char* name, std::string& value) override;
 
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(bool);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(char);
@@ -137,16 +137,16 @@ namespace utilities
 #endif
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(float);
         DECLARE_UNARCHIVE_ARRAY_OVERRIDE(double);
-        virtual void UnarchiveArray(const char* name, std::vector<std::string>& array) override;
-        virtual void BeginUnarchiveArray(const char* name, const std::string& typeName) override;
-        virtual bool BeginUnarchiveArrayItem(const std::string& typeName) override;
-        virtual void EndUnarchiveArrayItem(const std::string& typeName) override;
-        virtual void EndUnarchiveArray(const char* name, const std::string& typeName) override;
+        void UnarchiveArray(const char* name, std::vector<std::string>& array) override;
+        void BeginUnarchiveArray(const char* name, const std::string& typeName) override;
+        bool BeginUnarchiveArrayItem(const std::string& typeName) override;
+        void EndUnarchiveArrayItem(const std::string& typeName) override;
+        void EndUnarchiveArray(const char* name, const std::string& typeName) override;
 
-        virtual ArchivedObjectInfo BeginUnarchiveObject(const char* name, const std::string& typeName) override;
-        virtual void EndUnarchiveObject(const char* name, const std::string& typeName) override;
+        ArchivedObjectInfo BeginUnarchiveObject(const char* name, const std::string& typeName) override;
+        void EndUnarchiveObject(const char* name, const std::string& typeName) override;
 
-        virtual void EndUnarchiving() override;
+        void EndUnarchiving() override;
 
     private:
         // Deserialization

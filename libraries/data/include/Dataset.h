@@ -87,15 +87,15 @@ namespace data
             /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
             ///
             /// <returns> true if the iterator is currently pointing to a valid iterate. </returns>
-            virtual bool IsValid() const override { return _current < _end; }
+            bool IsValid() const override { return _current < _end; }
 
             /// <summary> Proceeds to the Next iterate. </summary>
-            virtual void Next() override { ++_current; }
+            void Next() override { ++_current; }
 
             /// <summary> Gets the current example pointer to by the iterator. </summary>
             ///
             /// <returns> The example. </returns>
-            virtual IteratorExampleType Get() const override { return _current->template CopyAs<IteratorExampleType>(); }
+            IteratorExampleType Get() const override { return _current->template CopyAs<IteratorExampleType>(); }
 
         private:
             InternalIteratorType _current;

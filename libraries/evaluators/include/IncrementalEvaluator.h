@@ -69,17 +69,17 @@ namespace evaluators
         /// <param name="basePredictor"> The base predictor. </param>
         /// <param name="basePredictorWeight"> The weight of the base predictor in the ensemble. </param>
         /// <param name="evaluationRescale"> A rescaling coefficient applied to the current predictions of the entire ensemble, but not recorded in the evaluator. </param>
-        virtual void IncrementalEvaluate(const BasePredictorType& basePredictor, double basePredictorWeight = 1.0, double evaluationRescale = 1.0) override;
+        void IncrementalEvaluate(const BasePredictorType& basePredictor, double basePredictorWeight = 1.0, double evaluationRescale = 1.0) override;
 
         /// <summary> Gets the goodness of the most recent evaluation, according to the first aggregator. </summary>
         ///
         /// <returns> The goodness of the most recent evaluation. </returns>
-        virtual double GetGoodness() const override;
+        double GetGoodness() const override;
 
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] The output stream. </param>
-        virtual void Print(std::ostream& os) const override;
+        void Print(std::ostream& os) const override;
 
     private:
         std::vector<double> _predictions;

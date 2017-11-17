@@ -74,8 +74,8 @@ namespace nodes
         NeuralNetworkLayerNodeBase();
         NeuralNetworkLayerNodeBase(const model::PortElements<ValueType>& input, const NeuralNetworkLayerNodeParameters& parameters, size_t outputSize);
 
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         // Input
         model::InputPort<ValueType> _input;
@@ -114,19 +114,19 @@ namespace nodes
         const LayerType& GetLayer() const { return _layer; }
 
         /// <summary> Gets information about the input memory layout </summary>
-        virtual model::PortMemoryLayout& GetInputMemoryLayout() override { return _inputLayout; }
+        model::PortMemoryLayout& GetInputMemoryLayout() override { return _inputLayout; }
 
         /// <summary> Gets information about the input memory layout </summary>
-        virtual const model::PortMemoryLayout& GetInputMemoryLayout() const override { return _inputLayout; }
+        const model::PortMemoryLayout& GetInputMemoryLayout() const override { return _inputLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
-        virtual const model::PortMemoryLayout& GetOutputMemoryLayout() const override { return _outputLayout; }
+        const model::PortMemoryLayout& GetOutputMemoryLayout() const override { return _outputLayout; }
 
         /// <summary> Gets information about the output memory layout </summary>
-        virtual model::PortMemoryLayout& GetOutputMemoryLayout() override { return _outputLayout; }
+        model::PortMemoryLayout& GetOutputMemoryLayout() override { return _outputLayout; }
 
         /// <summary> Gets the LayerParameters from the layer wrapped by this node </summary>
-        virtual typename predictors::neural::Layer<ValueType>::LayerParameters GetLayerParameters() const override { return _layer.GetLayerParameters(); }
+        typename predictors::neural::Layer<ValueType>::LayerParameters GetLayerParameters() const override { return _layer.GetLayerParameters(); }
 
         /// <summary> Indicates whether or not to include data padding on the input or output </summary>
 
@@ -135,17 +135,17 @@ namespace nodes
     protected:
         size_t NumInputDimensions() const { return _inputLayout.NumDimensions(); }
         model::PortMemoryLayout CalculateMemoryLayout(size_t padding, typename predictors::neural::Layer<ValueType>::Shape dataBufferSize);
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-        virtual void Compute() const override;
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void Copy(model::ModelTransformer& transformer) const override;
+        void Compute() const override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
         
         using NeuralNetworkLayerNodeBase<ValueType>::_input;
         using NeuralNetworkLayerNodeBase<ValueType>::_output;
 
         mutable typename LayerType::TensorType _inputTensor;
         mutable LayerType _layer; // mutable to get around Compute being non-const
-        virtual bool HasState() const override { return true; } // stored state: inputLayout, outputLayout
+        bool HasState() const override { return true; } // stored state: inputLayout, outputLayout
 
     private:
         model::PortMemoryLayout _inputLayout;

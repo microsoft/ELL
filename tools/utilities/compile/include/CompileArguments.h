@@ -49,7 +49,7 @@ struct ParsedCompileArguments : public CompileArguments, public utilities::Parse
     /// <summary> Adds the arguments to the command line parser. </summary>
     ///
     /// <param name="parser"> [in,out] The parser. </param>
-    virtual void AddArgs(utilities::CommandLineParser& parser) override;
+    void AddArgs(utilities::CommandLineParser& parser) override;
 
     model::MapCompilerParameters GetMapCompilerParameters(const std::string& baseFilename);
 };

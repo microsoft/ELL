@@ -39,15 +39,15 @@ namespace model
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if valid, false if not. </returns>
-        virtual bool IsValid() const override { return _currentNode != nullptr; }
+        bool IsValid() const override { return _currentNode != nullptr; }
 
         /// <summary> Proceeds to the Next item. </summary>
-        virtual void Next() override;
+        void Next() override;
 
         /// <summary> Returns a const reference to the current item. </summary>
         ///
         /// <returns> A const reference to the current item; </returns>
-        virtual const Node* Get() const override { return _currentNode; }
+        const Node* Get() const override { return _currentNode; }
 
     private:
         friend class Model;
@@ -176,7 +176,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Print a human-readable representation of the model. </summary>
         ///
@@ -196,9 +196,9 @@ namespace model
 
     protected:
         // Serialization-related methods
-        virtual utilities::ArchiveVersion GetArchiveVersion() const override;
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        utilities::ArchiveVersion GetArchiveVersion() const override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         friend class NodeIterator;
@@ -223,7 +223,7 @@ namespace model
         /// <summary> Gets the type factory associated with this context. </summary>
         ///
         /// <returns> The type factory associated with this context. </returns>
-        virtual utilities::GenericTypeFactory& GetTypeFactory() override { return _previousContext.GetTypeFactory(); }
+        utilities::GenericTypeFactory& GetTypeFactory() override { return _previousContext.GetTypeFactory(); }
 
         /// <summary> Sets the model this map is deserializing
         ///

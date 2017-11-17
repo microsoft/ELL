@@ -181,7 +181,7 @@ namespace data
         ///
         /// <param name="index"> Zero-based index of the element, must be bigger than the biggest current index. </param>
         /// <param name="value"> The element value. </param>
-        virtual void AppendElement(size_t index, double value) override;
+        void AppendElement(size_t index, double value) override;
 
         /// <summary>
         /// A data vector has infinite dimension and ends with a suffix of zeros. This function returns
@@ -190,12 +190,12 @@ namespace data
         /// </summary>
         ///
         /// <returns> The first index of the suffix of zeros at the end of this vector. </returns>
-        virtual size_t PrefixLength() const override;
+        size_t PrefixLength() const override;
 
         /// <summary> Gets the data vector type (implemented by template specialization). </summary>
         ///
         /// <returns> The data vector type. </returns>
-        virtual IDataVector::Type GetType() const override
+        IDataVector::Type GetType() const override
         {
             return GetStaticType();
         }

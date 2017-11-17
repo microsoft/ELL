@@ -41,7 +41,7 @@ namespace model
 
         CompiledMap(CompiledMap&& other) = default;
 
-        virtual ~CompiledMap() = default;
+        ~CompiledMap() override = default;
 
         /// <summary> Get the name of function this map compiles to </summary>
         ///
@@ -93,7 +93,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
         CompiledMap(DynamicMap map, std::string functionName);

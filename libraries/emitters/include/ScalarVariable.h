@@ -22,7 +22,7 @@ namespace emitters
         ScalarVariable(const VariableScope scope, int flags = VariableFlags::isMutable);
 
         ///<summary>Returns true</summary>
-        virtual bool IsScalar() const override { return true; }
+        bool IsScalar() const override { return true; }
     };
 
     ///<summary>A literal scalar</summary>

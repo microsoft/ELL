@@ -66,17 +66,17 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
+        void Copy(ModelTransformer& transformer) const override;
 
     protected:
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     protected:
-        virtual void Compute() const override;
+        void Compute() const override;
         InputPort<ValueType> _input;
         OutputPort<ValueType> _output;
     };

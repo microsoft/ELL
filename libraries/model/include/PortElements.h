@@ -175,7 +175,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Equality operator. </summary>
         ///
@@ -194,8 +194,8 @@ namespace model
         void Append(const PortRange& other);
 
     protected:
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         const OutputPortBase* _referencedPort = nullptr;
@@ -275,7 +275,7 @@ namespace model
         /// <param name="ranges"> The ranges to construct this PortElements from. </param>
         PortElementsBase(const std::vector<PortRange>& ranges);
 
-        virtual ~PortElementsBase() = default;
+        ~PortElementsBase() override = default;
 
         /// <summary> Returns the type of the values referenced </summary>
         ///
@@ -334,13 +334,13 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
         void ComputeSize();
         void AddRange(const PortRange& range);
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         std::vector<PortRange> _ranges;
@@ -441,7 +441,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         //
         using value_type = ValueType;
@@ -526,8 +526,8 @@ namespace model
         bool IsFixedSize() const { return _isFixedSize; }
 
     protected:
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         friend class PortElementsProxy;
@@ -574,8 +574,8 @@ namespace model
         static std::string GetTypeName() { return "PortElementProxy"; }
 
     protected:
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
         std::vector<PortRangeProxy> _ranges;

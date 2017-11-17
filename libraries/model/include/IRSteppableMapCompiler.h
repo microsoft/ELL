@@ -36,8 +36,8 @@ namespace model
         IRCompiledMap Compile(SteppableMap<ClockType> map);
 
     protected:
-        virtual void EmitModelAPIFunctions(const DynamicMap& map) override;
-        virtual std::string GetPredictFunctionName() const override;
+        void EmitModelAPIFunctions(const DynamicMap& map) override;
+        std::string GetPredictFunctionName() const override;
 
     private:
         void EnsureValidMap(SteppableMap<ClockType>& map);

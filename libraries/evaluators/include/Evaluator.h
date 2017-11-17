@@ -74,12 +74,12 @@ namespace evaluators
         /// <summary> Runs the given predictor on the evaluation set, invokes each of the aggregators on the output, and logs the result. </summary>
         ///
         /// <param name="predictor"> The predictor. </param>
-        virtual void Evaluate(const PredictorType& predictor) override;
+        void Evaluate(const PredictorType& predictor) override;
 
         /// <summary> Gets the goodness of the most recent evaluation, according to the first aggregator. </summary>
         ///
         /// <returns> The goodness of the most recent evaluation. </returns>
-        virtual double GetGoodness() const override;
+        double GetGoodness() const override;
 
         /// <summary> Returns a vector of names that describe the evaluation values represented in this Evaluator. </summary>
         ///
@@ -95,7 +95,7 @@ namespace evaluators
         /// <summary> Prints the logged evaluations to an output stream. </summary>
         ///
         /// <param name="os"> [in,out] The output stream. </param>
-        virtual void Print(std::ostream& os) const override;
+        void Print(std::ostream& os) const override;
 
     protected:
         void EvaluateZero();

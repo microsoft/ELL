@@ -43,15 +43,15 @@ namespace data
         /// <summary> Returns true if the iterator is currently pointing to a valid iterate. </summary>
         ///
         /// <returns> true if the iterator is valid, false otherwise. </returns>
-        virtual bool IsValid() const override { return _textLineIterator.IsValid(); }
+        bool IsValid() const override { return _textLineIterator.IsValid(); }
 
         /// <summary> Proceeds to the next example. </summary>
-        virtual void Next() override;
+        void Next() override;
 
         /// <summary> Gets the current example. </summary>
         ///
         /// <returns> A SupervisedExample. </returns>
-        virtual AutoSupervisedExample Get() const override;
+        AutoSupervisedExample Get() const override;
 
     private:
         void ReadExample();

@@ -41,7 +41,7 @@ namespace model
         /// <param name="interval"> The interval used for running (stepping) model computes. </param>
         SteppableMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs, DurationType interval);
 
-        virtual ~SteppableMap() = default;
+        ~SteppableMap() override = default;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -51,7 +51,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Gets the interval used for running model computes. </summary>
         ///
@@ -64,12 +64,12 @@ namespace model
         DurationType GetWaitTimeForNextCompute() const;
 
     protected:
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
-        virtual std::vector<bool> ComputeBoolOutput(const PortElementsBase& outputs) const override;
-        virtual std::vector<int> ComputeIntOutput(const PortElementsBase& outputs) const override;
-        virtual std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs) const override;
+        std::vector<bool> ComputeBoolOutput(const PortElementsBase& outputs) const override;
+        std::vector<int> ComputeIntOutput(const PortElementsBase& outputs) const override;
+        std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs) const override;
 
     private:
         template <typename OutputType, typename ComputeFunction>

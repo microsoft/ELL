@@ -74,7 +74,7 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
         model::Shape ReorderInputToOutputLocation(model::Shape inputLocation) const;
@@ -83,13 +83,13 @@ namespace nodes
         std::vector<llvm::Value*> ReorderInputToOutputLocation(std::vector<llvm::Value*> inputLocation) const;
         std::vector<llvm::Value*> ReorderOutputToInputLocation(std::vector<llvm::Value*> outputLocation) const;
 
-        virtual void Copy(model::ModelTransformer& transformer) const override;
-        virtual void Compute() const override;
-        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        void Copy(model::ModelTransformer& transformer) const override;
+        void Compute() const override;
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
-        virtual bool HasState() const override { return true; } // stored state: inputShape, outputShape, paddingValue
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        bool HasState() const override { return true; } // stored state: inputShape, outputShape, paddingValue
     
     private:
         // Input

@@ -242,16 +242,16 @@ public:
         : Node({ &_input }, { &_output }), _input(this, input, inputPortName), _output(this, outputPortName, input.Size()){};
 
     static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("SplittingNode"); }
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+    std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
-    virtual void Copy(model::ModelTransformer& transformer) const override
+    void Copy(model::ModelTransformer& transformer) const override
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         auto newNode = transformer.AddNode<SplittingNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    virtual bool Refine(model::ModelTransformer& transformer) const override
+    bool Refine(model::ModelTransformer& transformer) const override
     {
         auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
         model::PortElements<ValueType> in1;
@@ -281,20 +281,20 @@ public:
     static constexpr const char* inputPortName = "input";
     static constexpr const char* outputPortName = "output";
 
-    virtual void WriteToArchive(utilities::Archiver& archiver) const override
+    void WriteToArchive(utilities::Archiver& archiver) const override
     {
         archiver["input"] << _input;
         archiver["output"] << _output;
     }
 
-    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
+    void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
         archiver["input"] >> _input;
         archiver["output"] >> _output;
     }
 
 protected:
-    virtual void Compute() const override { _output.SetOutput(_input.GetValue()); }
+    void Compute() const override { _output.SetOutput(_input.GetValue()); }
 
 private:
     model::InputPort<ValueType> _input;

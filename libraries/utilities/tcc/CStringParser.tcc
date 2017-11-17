@@ -319,7 +319,7 @@ namespace utilities
             return ParseResult::beginComment;
         }
 
-        char* pEnd = 0;
+        char* pEnd = nullptr;
         auto parseResult = cParse(pStr, pEnd, value);
         pStr = pEnd;
 

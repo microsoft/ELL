@@ -75,19 +75,19 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-        virtual void Copy(ModelTransformer& transformer) const override;
+        void Copy(ModelTransformer& transformer) const override;
 
         /// <summary></summary>
         size_t Size() const { return _output.Size(); }
 
     protected:
-        virtual void Compute() const override;
-        virtual void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void Compute() const override;
+        void Compile(IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
     private:
         std::vector<ValueType> _inputValues;
         OutputPort<ValueType> _output;

@@ -42,7 +42,7 @@ namespace emitters
         IRModuleEmitter(const std::string& moduleName, const CompilerParameters& parameters);
 
         IRModuleEmitter(IRModuleEmitter&& other) = default;
-        virtual ~IRModuleEmitter() = default;
+        ~IRModuleEmitter() override = default;
 
         //
         // Properties of the module
@@ -87,10 +87,10 @@ namespace emitters
         ///
         /// <param name="functionName"> The name of the function. </param>
         /// <param name="args"> The arguments to the function. </param>
-        virtual void BeginMapPredictFunction(const std::string& functionName, NamedVariableTypeList& args) override;
+        void BeginMapPredictFunction(const std::string& functionName, NamedVariableTypeList& args) override;
 
         /// <summary> Ends the current model prediction function. </summary>
-        virtual void EndMapPredictFunction() override { EndFunction(); }
+        void EndMapPredictFunction() override { EndFunction(); }
 
         /// <summary> Begins an IR function with no arguments and directs subsequent commands to it. </summary>
         ///
@@ -364,20 +364,20 @@ namespace emitters
         /// <param name="functionName"> The name of the function. </param>
         ///
         /// <returns> `true` if the function has any comments associated with it. </returns>
-        virtual bool HasFunctionComments(const std::string& functionName) override;
+        bool HasFunctionComments(const std::string& functionName) override;
 
         /// <summary> Get the comments associated with the given function. </summary>
         ///
         /// <param name="functionName"> The name of the function. </param>
         ///
         /// <returns> The comments for the function, as a vector of strings. </returns>
-        virtual std::vector<std::string> GetFunctionComments(const std::string& functionName) override;
+        std::vector<std::string> GetFunctionComments(const std::string& functionName) override;
 
         /// <summary> Associates some comment text with the given function. </summary>
         ///
         /// <param name="functionName"> The name of the function. </param>
         /// <param name="comments"> The comments for the function. </param>
-        virtual void SetFunctionComments(const std::string& functionName, const std::vector<std::string>& comments) override;
+        void SetFunctionComments(const std::string& functionName, const std::vector<std::string>& comments) override;
 
         /// <summary> Gets any preprocessor definitions set for the module. </summary>
         ///
@@ -395,7 +395,7 @@ namespace emitters
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> `true` if the module has the metadata associated with it. </returns>
-        virtual bool HasMetadata(const std::string& tag) override;
+        bool HasMetadata(const std::string& tag) override;
 
         /// <summary> Indicates if a given function has the associated metadata. </summary>
         ///
@@ -403,14 +403,14 @@ namespace emitters
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> `true` if the function has the metadata associated with it. </returns>
-        virtual bool HasFunctionMetadata(const std::string& functionName, const std::string& tag) override;
+        bool HasFunctionMetadata(const std::string& functionName, const std::string& tag) override;
 
         /// <summary> Gets the metadata associated with the module. </summary>
         ///
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> The metadata values, as a vector of strings. </returns>
-        virtual std::vector<std::vector<std::string>> GetMetadata(const std::string& tag) override;
+        std::vector<std::vector<std::string>> GetMetadata(const std::string& tag) override;
 
         /// <summary> Gets the metadata associated with a given function. </summary>
         ///
@@ -418,14 +418,14 @@ namespace emitters
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> The metadata values, as a vector of strings. </returns>
-        virtual std::vector<std::string> GetFunctionMetadata(const std::string& functionName, const std::string& tag) override;
+        std::vector<std::string> GetFunctionMetadata(const std::string& functionName, const std::string& tag) override;
 
         /// <summary> Associates metadata with the module. </summary>
         ///
         /// <param name="tag"> The metadata tag. </param>
         /// <param name="content"> Optional metadata value. </param>
         /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
-        virtual void InsertMetadata(const std::string& tag, const std::vector<std::string>& value = { "" }) override;
+        void InsertMetadata(const std::string& tag, const std::vector<std::string>& value = { "" }) override;
 
         /// <summary> Associates metadata with a given function. </summary>
         ///
@@ -433,7 +433,7 @@ namespace emitters
         /// <param name="tag"> The metadata tag. </param>
         /// <param name="content"> Optional metadata value. </param>
         /// <remarks> To insert well-known metadata, prefer the "IncludeInXXX" metadata methods. </remarks>
-        virtual void InsertFunctionMetadata(const std::string& functionName, const std::string& tag, const std::vector<std::string>& value = { "" }) override;
+        void InsertFunctionMetadata(const std::string& functionName, const std::string& tag, const std::vector<std::string>& value = { "" }) override;
 
         //
         // Code output / input
@@ -448,7 +448,7 @@ namespace emitters
         ///
         /// <param name="filePath"> Full pathname of the file. </param>
         /// <param name="format"> The format of the output. </param>
-        virtual void WriteToFile(const std::string& filePath, ModuleOutputFormat format) override;
+        void WriteToFile(const std::string& filePath, ModuleOutputFormat format) override;
 
         /// <summary> Output the compiled module to an output file with the given format. </summary>
         ///
@@ -461,7 +461,7 @@ namespace emitters
         ///
         /// <param name="stream"> The stream to write to. </param>
         /// <param name="format"> The format of the output. </param>
-        virtual void WriteToStream(std::ostream& stream, ModuleOutputFormat format) override;
+        void WriteToStream(std::ostream& stream, ModuleOutputFormat format) override;
 
         /// <summary> Output the compiled module to an output stream with the given format. </summary>
         ///

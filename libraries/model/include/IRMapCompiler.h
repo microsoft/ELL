@@ -124,14 +124,14 @@ namespace model
         ///
         /// <param name="node"> The node we're compiling </param>
         /// <returns> `true` if the regions were merged </returns>
-        virtual bool TryMergeNodeRegion(const Node& node) override;
+        bool TryMergeNodeRegion(const Node& node) override;
 
         /// <summary> Tries to merge the BlockRegion for the current node into the BlockRegion from another node </summary>
         ///
         /// <param name="dest"> The node we merging into </param>
         /// <param name="src"> The node we're compiling </param>
         /// <returns> `true` if the regions were merged </returns>
-        virtual bool TryMergeNodeRegions(const Node& dest, const Node& src) override;
+        bool TryMergeNodeRegions(const Node& dest, const Node& src) override;
 
         /// <summary>
         /// Returns the `IRBlockRegion` that computes the given element's value, if
@@ -154,13 +154,13 @@ namespace model
         std::string GetNamespacePrefix() const;
 
     protected:
-        virtual void OnBeginCompileModel(const Model& model) override;
-        virtual void OnEndCompileModel(const Model& model) override;
-        virtual void OnBeginCompileNode(const Node& node) override;
-        virtual void OnEndCompileNode(const Node& node) override;
-        virtual void PushScope() override;
-        virtual void PopScope() override;
-        virtual emitters::ModuleEmitter* GetModuleEmitter() override { return &_moduleEmitter; }
+        void OnBeginCompileModel(const Model& model) override;
+        void OnEndCompileModel(const Model& model) override;
+        void OnBeginCompileNode(const Node& node) override;
+        void OnEndCompileNode(const Node& node) override;
+        void PushScope() override;
+        void PopScope() override;
+        emitters::ModuleEmitter* GetModuleEmitter() override { return &_moduleEmitter; }
         void EnsureValidMap(DynamicMap& map);
         virtual std::string GetPredictFunctionName() const;
         virtual void EmitModelAPIFunctions(const DynamicMap& map);

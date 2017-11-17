@@ -90,10 +90,10 @@ public:
     /// <summary> Gets the name of this type (for serialization). </summary>
     ///
     /// <returns> The name of this type. </returns>
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+    std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     /// <summary> Makes a copy of this node in the model being constructed by the transformer </summary>
-    virtual void Copy(model::ModelTransformer& transformer) const override;
+    void Copy(model::ModelTransformer& transformer) const override;
     
     /// <summary> Options to control how the network is compiled into nodes </summary>
     struct NetworkCompileOptions
@@ -115,10 +115,10 @@ public:
     };
     
 protected:
-    virtual void Compute() const override;
-    virtual bool Refine(model::ModelTransformer& transformer) const override;
-    virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+    void Compute() const override;
+    bool Refine(model::ModelTransformer& transformer) const override;
+    void WriteToArchive(utilities::Archiver& archiver) const override;
+    void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
 private:
     NeuralNetworkLayerNodeBase<ValueType>* AddLayerNode(model::ModelTransformer& transformer, Layer& layer, const model::PortElements<ValueType>& layerInputs, const NetworkCompileOptions& options, NetworkCompileState& state) const;

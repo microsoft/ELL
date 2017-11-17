@@ -1078,7 +1078,7 @@ public:
     }
 
 protected:
-    virtual void Copy(model::ModelTransformer& transformer) const override
+    void Copy(model::ModelTransformer& transformer) const override
     {
         auto newInput1 = transformer.TransformPortElements(_input1.GetPortElements());
         auto newInput2 = transformer.TransformPortElements(_input2.GetPortElements());
@@ -1086,7 +1086,7 @@ protected:
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    virtual std::vector<llvm::Value*> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override
+    std::vector<llvm::Value*> GetNodeFunctionStateArguments(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& currentFunction) const override
     {
         int inputSize = _input1.Size();
         assert(inputSize == _input2.Size());

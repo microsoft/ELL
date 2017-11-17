@@ -59,10 +59,10 @@ namespace nodes
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Indicates if this node is able to compile itself to code. </summary>
-        virtual bool IsCompilable(const model::MapCompiler* compiler) const override { return true; }
+        bool IsCompilable(const model::MapCompiler* compiler) const override { return true; }
 
     protected:
         template <typename PoolingFunctionT>
@@ -78,7 +78,7 @@ namespace nodes
                                            const model::Shape& inputIncrement,
                                            PoolingFunctionT& poolingFunction);
 
-        virtual void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
         using BaseType::HasState;
         using BaseType::GetLayer;
     };

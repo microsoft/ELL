@@ -34,20 +34,20 @@ public:
     int GetA() const { return _a; }
     double GetB() const { return _b; }
 
-    virtual void WriteToArchive(utilities::Archiver& archiver) const override
+    void WriteToArchive(utilities::Archiver& archiver) const override
     {
         archiver["a"] << _a;
         archiver["b"] << _b;
     }
 
-    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
+    void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
         archiver["a"] >> _a;
         archiver["b"] >> _b;
     }
 
     static std::string GetTypeName() { return "InnerObject"; }
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+    std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
 private:
     int _a = 0;
@@ -62,20 +62,20 @@ public:
         : InnerObject(a, b), _c(c) {}
     std::string GetC() { return _c; }
 
-    virtual void WriteToArchive(utilities::Archiver& archiver) const override
+    void WriteToArchive(utilities::Archiver& archiver) const override
     {
         InnerObject::WriteToArchive(archiver);
         archiver["c"] << _c;
     }
 
-    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
+    void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
         InnerObject::ReadFromArchive(archiver);
         archiver["c"] >> _c;
     }
 
     static std::string GetTypeName() { return "DerivedObject"; }
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+    std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
 private:
     std::string _c = "";
@@ -90,20 +90,20 @@ public:
     std::string GetName() { return _name; }
     InnerObject GetInner() { return _inner; }
 
-    virtual void WriteToArchive(utilities::Archiver& archiver) const override
+    void WriteToArchive(utilities::Archiver& archiver) const override
     {
         archiver["name"] << _name;
         archiver["obj"] << _inner;
     }
 
-    virtual void ReadFromArchive(utilities::Unarchiver& archiver) override
+    void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
         archiver["name"] >> _name;
         archiver["obj"] >> _inner;
     }
 
     static std::string GetTypeName() { return "OuterObject"; }
-    virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+    std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
 private:
     std::string _name;

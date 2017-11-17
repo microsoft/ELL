@@ -129,7 +129,7 @@ namespace predictors
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
             /// <returns> The name of this type. </returns>
-            virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+            std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
             /// <summary> Prints a human readable description of the edge, indented by a given number of tabs - used for debugging. </summary>
             ///
@@ -138,8 +138,8 @@ namespace predictors
             void PrintLine(std::ostream& os, size_t tabs = 0) const;
 
         protected:
-            virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-            virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+            void WriteToArchive(utilities::Archiver& archiver) const override;
+            void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
@@ -183,11 +183,11 @@ namespace predictors
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
             /// <returns> The name of this type. </returns>
-            virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+            std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         protected:
-            virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-            virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+            void WriteToArchive(utilities::Archiver& archiver) const override;
+            void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         private:
             friend ForestPredictor<SplitRuleType, EdgePredictorType>;
@@ -329,7 +329,7 @@ namespace predictors
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
         //
@@ -341,8 +341,8 @@ namespace predictors
 
         void VisitEdgePathToLeaf(const DataVectorType& input, size_t interiorNodeIndex, std::function<void(const InteriorNode&, size_t edgePosition)> operation) const;
 
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         //
         //  member variables

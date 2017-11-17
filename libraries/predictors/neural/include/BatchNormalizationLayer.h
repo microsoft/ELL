@@ -63,7 +63,7 @@ namespace predictors
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
             /// <returns> The name of this type. </returns>
-            virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+            std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
             /// <summary> Returns the value to scale the output by. </summary>
             ///
@@ -76,8 +76,8 @@ namespace predictors
             const VectorType& GetBias() const { return _additionValues; }
 
         protected:
-            virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-            virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+            void WriteToArchive(utilities::Archiver& archiver) const override;
+            void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         private:
             using Layer<ElementType>::_layerParameters;

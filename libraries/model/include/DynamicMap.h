@@ -64,7 +64,7 @@ namespace model
         /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
         DynamicMap(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
 
-        virtual ~DynamicMap() = default;
+        ~DynamicMap() override = default;
 
         /// <summary> Gets the model wrapped by this map </summary>
         ///
@@ -296,7 +296,7 @@ namespace model
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        virtual std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
         /// <summary> Swaps the contents of two maps. </summary>
         ///
@@ -326,8 +326,8 @@ namespace model
         void AddInput(const std::string& inputName, InputNodeBase* inputNode);
         void AddOutput(const std::string& outputName, PortElementsBase outputElements);
 
-        virtual void WriteToArchive(utilities::Archiver& archiver) const override;
-        virtual void ReadFromArchive(utilities::Unarchiver& archiver) override;
+        void WriteToArchive(utilities::Archiver& archiver) const override;
+        void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
         virtual void SetNodeInput(InputNode<bool>* node, const std::vector<bool>& inputValues) const;
         virtual void SetNodeInput(InputNode<int>* node, const std::vector<int>& inputValues) const;
@@ -341,7 +341,7 @@ namespace model
         virtual std::vector<float> ComputeFloatOutput(const PortElementsBase& outputs) const;
         virtual std::vector<double> ComputeDoubleOutput(const PortElementsBase& outputs) const;
 
-        virtual ell::utilities::ArchiveVersion GetArchiveVersion() const override;
+        ell::utilities::ArchiveVersion GetArchiveVersion() const override;
 
     private:
         Model _model;
