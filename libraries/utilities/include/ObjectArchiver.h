@@ -47,6 +47,13 @@ namespace utilities
         /// <returns> The `ObjectArchive` containing the information  for the archived object </returns>
         const ObjectArchive& GetObjectArchive() { return _objectDescription; }
 
+        /// <summary> Indicates if a property with the given name is available to be read next </summary>
+        ///
+        /// <param name="name"> The name of the property </param>
+        ///
+        /// <returns> true if a property with the given name can be read next </returns>
+        bool HasNextPropertyName(const std::string& name) override;        
+
     protected:
         // Serialization
         DECLARE_ARCHIVE_VALUE_OVERRIDE(bool);

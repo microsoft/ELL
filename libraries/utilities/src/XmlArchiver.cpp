@@ -223,6 +223,11 @@ namespace utilities
         _tokenizer.MatchTokens({ "<", "/", EncodedTypeName, ">" });
     }
 
+    bool XmlUnarchiver::HasNextPropertyName(const std::string& name)
+    {
+        assert(false && "Unimplemented");
+        return false;
+    }
     //
     // Arrays
     //

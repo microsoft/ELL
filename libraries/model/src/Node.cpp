@@ -220,7 +220,7 @@ namespace model
 
     void Node::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        NodeId oldId;
+        NodeId oldId;        
         archiver["id"] >> oldId;
         _id = oldId;
         auto& context = archiver.GetContext();

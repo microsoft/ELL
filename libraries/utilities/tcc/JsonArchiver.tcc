@@ -129,7 +129,7 @@ namespace utilities
 
         // read string
         auto valueToken = _tokenizer.ReadNextToken();
-        if(std::is_same<ValueType, uint64_t>())
+        if (std::is_same<ValueType, uint64_t>())
             value = static_cast<ValueType>(std::stoull(valueToken));
         else
             value = static_cast<ValueType>(std::stoll(valueToken));

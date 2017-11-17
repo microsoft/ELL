@@ -78,6 +78,11 @@ namespace utilities
         }
     }
 
+    bool ObjectArchiver::HasNextPropertyName(const std::string& name)
+    {
+        return _objectDescription.HasProperty(name);
+    }
+    
     //
     // Arrays
     //

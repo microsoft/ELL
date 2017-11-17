@@ -47,17 +47,53 @@ struct TestStruct : public utilities::IArchivable
 
     void WriteToArchive(utilities::Archiver& archiver) const override
     {
-        archiver.Archive("a", a);
-        archiver.Archive("b", b);
-        archiver.Archive("c", c);
+        archiver["a"] << a;
+        archiver["b"] << b;
+        archiver["c"] << c;
     }
 
     void ReadFromArchive(utilities::Unarchiver& archiver) override
     {
-        // what about _type?
-        archiver.Unarchive("a", a);
-        archiver.Unarchive("b", b);
-        archiver.Unarchive("c", c);
+        auto objInfo = archiver.GetCurrentObjectInfo();
+        testing::ProcessTest("GetCurrentObjectInfo test", objInfo.type == "TestStruct");
+        testing::ProcessTest("HasNextPropertyName test", archiver.HasNextPropertyName("a"));
+        testing::ProcessTest("HasNextPropertyName test", !archiver.HasNextPropertyName("z"));
+        archiver["a"] >> a;
+        archiver["b"] >> b;
+        testing::ProcessTest("HasNextPropertyName test", archiver.HasNextPropertyName("c"));
+        testing::ProcessTest("HasNextPropertyName test", !archiver.HasNextPropertyName("z"));
+        archiver["c"] >> c;
+    }
+};
+
+struct OptionalValueStruct : public utilities::IArchivable
+{
+    int a = 0;
+    int b = 0;
+    bool hasB = true;
+
+    OptionalValueStruct() = default;
+    OptionalValueStruct(int a)
+        : a(a), hasB(false) {}
+    OptionalValueStruct(int a, int b)
+        : a(a), b(b) {}
+    static std::string GetTypeName() { return "OptionalValueStruct"; }
+    std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+    void WriteToArchive(utilities::Archiver& archiver) const override
+    {
+        archiver["a"] << a;
+        if (hasB)
+        {
+            archiver["b"] << b;
+        }
+    }
+
+    void ReadFromArchive(utilities::Unarchiver& archiver) override
+    {
+        auto objInfo = archiver.GetCurrentObjectInfo();
+        archiver["a"] >> a;
+        archiver.OptionalProperty("b", -1) >> b;
     }
 };
 
@@ -190,6 +226,20 @@ void TestUnarchiver()
         TestStruct val;
         unarchiver.Unarchive("s", val);
         testing::ProcessTest("Deserialize IArchivable check", val.a == 1 && val.b == 2.2f && val.c == 3.3);
+    }
+
+    {
+        std::stringstream strstream;
+        {
+            ArchiverType archiver(strstream);
+            OptionalValueStruct testStruct(1);
+            archiver.Archive("s", testStruct);
+        }
+
+        UnarchiverType unarchiver(strstream, context);
+        OptionalValueStruct val;
+        unarchiver.Unarchive("s", val);
+        testing::ProcessTest("Deserialize IArchivable with optional values check", val.a == 1 && val.b == -1); // -1 is default value
     }
 
     {

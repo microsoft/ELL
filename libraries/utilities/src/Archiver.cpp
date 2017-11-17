@@ -26,6 +26,16 @@ namespace utilities
         return !(a == b);
     }
 
+    bool operator==(const ArchivedObjectInfo& a, const ArchivedObjectInfo& b)
+    {
+        return (a.type == b.type) && (a.version == b.version);
+    }
+
+    bool operator!=(const ArchivedObjectInfo& a, const ArchivedObjectInfo& b)
+    {
+        return !(a == b);
+    }
+
     //
     // PropertyArchiver class
     //
@@ -95,9 +105,15 @@ namespace utilities
         _contexts.push_back(context);
     }
 
+    ArchivedObjectInfo Unarchiver::GetCurrentObjectInfo() const
+    {
+        return _objectInfo.back();
+    }
+
     void Unarchiver::UnarchiveValue(const char* name, IArchivable& value)
     {
         auto objInfo = BeginUnarchiveObject(name, GetArchivedTypeName(value));
+        _objectInfo.push_back(objInfo);
         // Check for matching version
         if (objInfo.version != value.GetArchiveVersion())
         {
@@ -106,6 +122,8 @@ namespace utilities
         auto typeName = objInfo.type;
         UnarchiveObject(name, value);
         EndUnarchiveObject(name, typeName);
+
+        _objectInfo.pop_back();
     }
 
     ArchivedObjectInfo Unarchiver::BeginUnarchiveObject(const char* name, const std::string& typeName)

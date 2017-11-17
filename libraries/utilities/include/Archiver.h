@@ -81,6 +81,9 @@ namespace utilities
         ArchiveVersion version;
     };
 
+    bool operator==(const ArchivedObjectInfo& a, const ArchivedObjectInfo& b);
+    bool operator!=(const ArchivedObjectInfo& a, const ArchivedObjectInfo& b);
+
 /// <summary> Macros to make repetitive boilerplate code in archiver implementations easier to implement. </summary>
 #define DECLARE_ARCHIVE_VALUE_BASE(type) virtual void ArchiveValue(const char* name, type value, IsFundamental<type> dummy = 0) = 0;
 #define DECLARE_ARCHIVE_ARRAY_BASE(type) virtual void ArchiveArray(const char* name, const std::vector<type>& value, IsFundamental<type> dummy = 0) = 0;
@@ -283,6 +286,26 @@ namespace utilities
             std::string _propertyName;
         };
 
+        /// <summary> Represents an unarchiver that is scoped to an optional property. </summary>
+        template <typename DefaultValueType>
+        class OptionalPropertyUnarchiver
+        {
+        public:
+            /// <summary> Reads the property from the archive. </summary>
+            ///
+            /// <typeparam name="ValueType"> The type of the property. </typeparam>
+            /// <param name="value"> The variable to read the property into. </param>
+            template <typename ValueType>
+            void operator>>(ValueType&& value);
+
+        private:
+            friend class Unarchiver;
+            OptionalPropertyUnarchiver(Unarchiver& unarchiver, const std::string& name, const DefaultValueType& defaultValue);
+            Unarchiver& _unarchiver;
+            std::string _propertyName;
+            DefaultValueType _defaultValue;
+        };
+
         /// <summary> Constructor </summary>
         ///
         /// <param name="context"> The initial `SerializationContext` to use </param>
@@ -315,6 +338,21 @@ namespace utilities
         /// <param name="name"> The name of the property </param>
         PropertyUnarchiver operator[](const std::string& name);
 
+        /// <summary> Get an unarchiver for an optional property. </summary>
+        ///
+        /// <typeparam name="DefaultValueType"> The type of the default value provided for the property </typeparam>
+        /// <param name="name"> The name of the property </param>
+        /// <param name="defaultValue"> The value to use for the property if it is not present </param>
+        template <typename DefaultValueType>
+        OptionalPropertyUnarchiver<DefaultValueType> OptionalProperty(const std::string& name, const DefaultValueType& defaultValue);
+
+        /// <summary> Indicates if a property with the given name is available to be read next </summary>
+        ///
+        /// <param name="name"> The name of the property </param>
+        ///
+        /// <returns> true if a property with the given name can be read next </returns>
+        virtual bool HasNextPropertyName(const std::string& name) = 0;
+
         /// <summary> Set a new serialization context to be current </summary>
         ///
         /// <param name="context"> The context </param>
@@ -327,6 +365,11 @@ namespace utilities
         ///
         /// <returns> The current serialization context </returns>
         SerializationContext& GetContext() { return _contexts.back(); }
+
+        /// <summary> Get the information about the object currently being unarchived </summary>
+        ///
+        /// <returns> The ArchivedObjectInfo for the object currently being unarchived </returns>
+        ArchivedObjectInfo GetCurrentObjectInfo() const;
 
     protected:
         DECLARE_UNARCHIVE_VALUE_BASE(bool);
@@ -373,6 +416,7 @@ namespace utilities
     private:
         SerializationContext _baseContext;
         std::vector<std::reference_wrapper<SerializationContext>> _contexts;
+        std::vector<ArchivedObjectInfo> _objectInfo;
 
         // non-vector standard thing
         template <typename ValueType, IsNotVector<ValueType> concept1 = 0, IsNotArchivedAsPrimitive<ValueType> concept2 = 0>

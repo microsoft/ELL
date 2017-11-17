@@ -109,6 +109,28 @@ namespace utilities
     }
 
     //
+    // OptionalPropertyUnarchiver class
+    //
+    template <typename DefaultValueType>
+    Unarchiver::OptionalPropertyUnarchiver<DefaultValueType>::OptionalPropertyUnarchiver(Unarchiver& archiver, const std::string& name, const DefaultValueType& defaultValue)
+    : _unarchiver(archiver), _propertyName(name), _defaultValue(defaultValue)
+    {};
+
+    template <typename DefaultValueType>
+    template <typename ValueType>
+    void Unarchiver::OptionalPropertyUnarchiver<DefaultValueType>::operator>>(ValueType&& value)
+    {
+        if (_unarchiver.HasNextPropertyName(_propertyName))
+        {
+            _unarchiver.Unarchive(_propertyName.c_str(), value);
+        }
+        else
+        {
+            value = _defaultValue;
+        }
+    }
+
+    //
     // Unarchiver class
     //
     template <typename ValueType>
@@ -127,6 +149,12 @@ namespace utilities
     void Unarchiver::Unarchive(const char* name, ValueType&& value)
     {
         UnarchiveItem(name, value);
+    }
+
+    template <typename DefaultValueType>
+    Unarchiver::OptionalPropertyUnarchiver<DefaultValueType> Unarchiver::OptionalProperty(const std::string& name, const DefaultValueType& defaultValue)
+    {
+        return OptionalPropertyUnarchiver<DefaultValueType>(*this, name, defaultValue);
     }
 
     // types:
@@ -160,10 +188,13 @@ namespace utilities
     {
         auto baseTypeName = GetArchivedTypeName<ValueType>();
         auto objInfo = BeginUnarchiveObject(name, baseTypeName);
+        _objectInfo.push_back(objInfo);
         auto encodedTypeName = objInfo.type;
         std::unique_ptr<ValueType> newPtr = GetContext().GetTypeFactory().Construct<ValueType>(encodedTypeName);
         UnarchiveObject(name, *newPtr);
         EndUnarchiveObject(name, encodedTypeName);
+        // TODO: assert back of _objectInfo == objInfo
+        _objectInfo.pop_back();
         value = std::move(newPtr);
     }
 

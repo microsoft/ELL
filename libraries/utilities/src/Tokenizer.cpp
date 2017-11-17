@@ -211,7 +211,7 @@ namespace utilities
             ReadData();
         }
 
-        if(_currentPosition == _bufferEnd)
+        if (_currentPosition == _bufferEnd)
         {
             return EOF;
         }
@@ -232,7 +232,7 @@ namespace utilities
         // Allocate textBuffer if it's empty
         auto oldLength = _bufferEnd - _tokenStart;
         auto oldOffset = _currentPosition - _tokenStart;
-        if(_textBuffer.size() == 0)
+        if (_textBuffer.empty())
         {
             _textBuffer.resize(BUFFER_SIZE, '\0');
             _bufferEnd = _textBuffer.end();

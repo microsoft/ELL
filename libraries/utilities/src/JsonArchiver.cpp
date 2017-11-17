@@ -261,6 +261,44 @@ namespace utilities
         }
     }
 
+    bool JsonUnarchiver::HasNextPropertyName(const std::string& name)
+    {
+        bool ok = true;
+        std::string nextPropertyName = "";
+        std::vector<std::string> readTokens;
+        if (_tokenizer.TryMatchToken("\""))
+        {
+            readTokens.push_back("\"");
+            nextPropertyName = _tokenizer.ReadNextToken();
+            readTokens.push_back(nextPropertyName);
+            if (_tokenizer.TryMatchToken("\""))
+            {
+                readTokens.push_back("\"");
+                if (_tokenizer.TryMatchToken(":"))
+                {
+                    readTokens.push_back(":");
+                }
+                else
+                {
+                    ok = false;
+                }
+            }
+            else
+            {
+                ok = false;
+            }
+        }
+
+        // put back all read tokens
+        while (!readTokens.empty())
+        {
+            _tokenizer.PutBackToken(readTokens.back());
+            readTokens.pop_back();
+        }
+
+        return ok && nextPropertyName == name;
+    }
+
     void JsonUnarchiver::EndUnarchiveObject(const char* name, const std::string& typeName)
     {
         unused(typeName);

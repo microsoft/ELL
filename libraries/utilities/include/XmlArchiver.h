@@ -112,6 +112,13 @@ namespace utilities
         /// <param name="inputStream"> The stream to read data from. </summary>
         XmlUnarchiver(std::istream& inputStream, SerializationContext context);
 
+        /// <summary> Indicates if a property with the given name is available to be read next </summary>
+        ///
+        /// <param name="name"> The name of the property </param>
+        ///
+        /// <returns> true if a property with the given name can be read next </returns>
+        bool HasNextPropertyName(const std::string& name) override;        
+        
     protected:
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(bool);
         DECLARE_UNARCHIVE_VALUE_OVERRIDE(char);
