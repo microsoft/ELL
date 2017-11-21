@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "MatrixVectorProductNode.h"
-#include "DotProductNode.h"
+#include "MatrixVectorMultiplyNode.h"
 
 // math
 #include "MatrixOperations.h"
@@ -79,22 +79,21 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     bool MatrixVectorProductNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
     {
-        auto newPortElements = transformer.TransformPortElements(_input.GetPortElements());
-        auto projectionMatrix = _w;
+        auto newInput = transformer.TransformPortElements(_input.GetPortElements());
 
-        model::PortElements<ValueType> dotProductOutputs;
-
-        for (size_t r = 0; r < _w.NumRows(); r++)
+        // Make sure we have a RowMatrix (because that's what MatrixVectorMultiplyNode wants)
+        math::RowMatrix<ValueType> projectionMatrix(_w);
+        auto projectionMatrixValue = projectionMatrix.ToArray();
+        auto projectionMatrixNode = transformer.AddNode<ConstantNode<ValueType>>(projectionMatrixValue);
+        auto m = projectionMatrix.NumRows();
+        auto n = projectionMatrix.NumColumns();
+        auto matrixStride = projectionMatrix.GetIncrement();
+        if(matrixStride == 0 || matrixStride < m)
         {
-            auto matrixRow = projectionMatrix.GetRow(r);
-            auto rowData = matrixRow.ToArray();
-            auto weightsNode = transformer.AddNode<ConstantNode<ValueType>>(rowData);
-            auto dotProductNode = transformer.AddNode<DotProductNode<ValueType>>(weightsNode->output, newPortElements);
-            dotProductOutputs.Append(dotProductNode->output);
+            utilities::InputException(utilities::InputExceptionErrors::badData, "Matrix has an invalid stride");
         }
-
-        transformer.MapNodeOutput(output, dotProductOutputs);
-
+        auto matrixMultiplyNode = transformer.AddNode<MatrixVectorMultiplyNode<ValueType>>(projectionMatrixNode->output, m, n, matrixStride, newInput);
+        transformer.MapNodeOutput(output, matrixMultiplyNode->output);
         return true;
     }
 
