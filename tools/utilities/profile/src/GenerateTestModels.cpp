@@ -146,7 +146,6 @@ model::DynamicMap GenerateBinaryConvolutionModel(size_t imageRows, size_t imageC
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
 
     const size_t k = 3;
@@ -191,7 +190,6 @@ model::DynamicMap GenerateBinaryConvolutionPlusDenseModel(size_t imageRows, size
     using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using MatrixType = typename Layer<ElementType>::MatrixType;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
 
     const size_t inputPaddingSize = 1;
@@ -283,11 +281,8 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
 {
     using ElementType = float;
     using InputParameters = typename InputLayer<ElementType>::InputParameters;
-    using LayerParameters = typename Layer<ElementType>::LayerParameters;
     using VectorType = typename Layer<ElementType>::VectorType;
-    using MatrixType = typename Layer<ElementType>::MatrixType;
     using TensorType = typename Layer<ElementType>::TensorType;
-    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
     using Shape = typename Layer<ElementType>::Shape;
 
     const bool scaleByFilterMeans = true;
@@ -295,8 +290,6 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     const size_t imageRows = 160;
     const size_t imageColumns = 160;
     const size_t numChannels = 3;
-    const size_t filterSize = 3;
-    const auto scaling = scaleByFilterMeans ? BinaryWeightsScale::mean : BinaryWeightsScale::none;
     typename predictors::NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename predictors::NeuralNetworkPredictor<ElementType>::Layers layers;
 

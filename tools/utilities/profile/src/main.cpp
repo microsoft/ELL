@@ -70,7 +70,6 @@ template <typename InputType>
 std::vector<InputType> GetModelInput(model::DynamicMap& map, const ProfileArguments& profileArguments)
 {
     auto inputShape = map.GetInputShape();
-    auto outputSize = map.GetOutputSize();
     std::vector<InputType> input = GetInputData<InputType>(profileArguments.inputTestFile, inputShape, 1.0f, true);
     return input;
 }
@@ -372,9 +371,6 @@ void ProfileModel(model::DynamicMap& map, const ProfileArguments& profileArgumen
 
         if (printTimingChart)
         {
-            auto modelStats = compiledMap.GetModelPerformanceCounters();
-            double totalTime = modelStats->totalTime;
-
             for (int nodeIndex = 0; nodeIndex < numNodes; ++nodeIndex)
             {
                 auto stats = compiledMap.GetNodePerformanceCounters(nodeIndex);

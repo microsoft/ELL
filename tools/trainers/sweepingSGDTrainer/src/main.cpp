@@ -70,8 +70,12 @@ int main(int argc, char* argv[])
         // parse command line
         commandLineParser.Parse();
 
+        // default random seed
+        const std::string defaultRandomSeed = "123";
+
         // manually define regularization parameters to sweep over
         std::vector<double> regularization{ 1.0e-0, 1.0e-1, 1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5, 1.0e-6 };
+        std::vector<std::string> randomSeeds(regularization.size(), defaultRandomSeed);
 
         if (trainerArguments.verbose)
         {
@@ -98,7 +102,7 @@ int main(int argc, char* argv[])
         evaluators::EvaluatorParameters evaluatorParameters{ 1, false };
 
         // create trainers
-        auto generator = common::MakeParametersEnumerator<trainers::SGDTrainerParameters>(regularization);
+        auto generator = common::MakeParametersEnumerator<trainers::SGDTrainerParameters>(regularization, randomSeeds);
         std::vector<trainers::EvaluatingTrainer<PredictorType>> evaluatingTrainers;
         std::vector<std::shared_ptr<evaluators::IEvaluator<PredictorType>>> evaluators;
         for (size_t i = 0; i < regularization.size(); ++i)

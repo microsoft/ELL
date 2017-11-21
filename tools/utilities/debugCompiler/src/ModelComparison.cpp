@@ -454,7 +454,6 @@ void ModelComparison::WriteNodeRow(std::ostream& outputStream, std::string id, s
 
     auto validRefTensor = refTensor.GetSubTensor(layerData.offset[0], layerData.offset[1], layerData.offset[2], layerData.size[0], layerData.size[1], layerData.size[2]);
     auto validCompiledTensor = compiledTensor.GetSubTensor(layerData.offset[0], layerData.offset[1], layerData.offset[2], layerData.size[0], layerData.size[1], layerData.size[2]);
-    auto validDiffTensor = diffTensor.GetSubTensor(layerData.offset[0], layerData.offset[1], layerData.offset[2], layerData.size[0], layerData.size[1], layerData.size[2]);
 
     VectorStatistics refStats(validRefTensor);
     VectorStatistics compiledStats(validCompiledTensor);

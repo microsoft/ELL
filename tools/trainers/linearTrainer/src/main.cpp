@@ -141,12 +141,12 @@ int main(int argc, char* argv[])
             trainer = common::MakeSGDTrainer(trainerArguments.lossFunctionArguments, { linearTrainerArguments.regularization, linearTrainerArguments.randomSeedString });
             break;
         case LinearTrainerArguments::Algorithm::SparseDataSGD:
-            trainer = common::MakeSparseDataSGDTrainer(trainerArguments.lossFunctionArguments, { linearTrainerArguments.regularization });
+            trainer = common::MakeSparseDataSGDTrainer(trainerArguments.lossFunctionArguments, { linearTrainerArguments.regularization, linearTrainerArguments.randomSeedString });
             break;
         case LinearTrainerArguments::Algorithm::SparseDataCenteredSGD:
             {
                 auto mean = trainers::CalculateMean(mappedDataset.GetAnyDataset());
-                trainer = common::MakeSparseDataCenteredSGDTrainer(trainerArguments.lossFunctionArguments, mean, { linearTrainerArguments.regularization });
+                trainer = common::MakeSparseDataCenteredSGDTrainer(trainerArguments.lossFunctionArguments, mean, { linearTrainerArguments.regularization, linearTrainerArguments.randomSeedString });
                 break;
             }
         case LinearTrainerArguments::Algorithm::SDCA:

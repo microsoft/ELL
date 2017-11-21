@@ -125,9 +125,6 @@ int main(int argc, char* argv[])
         // create protonn trainer
         auto trainer = common::MakeProtoNNTrainer(protoNNTrainerArguments);
 
-        // predictor type
-        using PredictorType = predictors::ProtoNNPredictor;
-
         // Train the predictor
         if (protoNNTrainerArguments.verbose) std::cout << "Training ..." << std::endl;
         trainer->SetDataset(mappedDataset.GetAnyDataset(0, mappedDataset.NumExamples()));
