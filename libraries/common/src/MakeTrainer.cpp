@@ -140,9 +140,9 @@ namespace common
         }
     }
 
-    std::unique_ptr<trainers::ITrainer<predictors::ProtoNNPredictor>> MakeProtoNNTrainer(size_t numExamples, size_t numFeatures, const trainers::ProtoNNTrainerParameters& parameters)
+    std::unique_ptr<trainers::ITrainer<predictors::ProtoNNPredictor>> MakeProtoNNTrainer(const trainers::ProtoNNTrainerParameters& parameters)
     {
-        return trainers::MakeProtoNNTrainer(numExamples, numFeatures, parameters);
+        return trainers::MakeProtoNNTrainer(parameters);
     }
 }
 }

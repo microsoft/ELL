@@ -1,12 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     ModelInterface.h (interfaces)
+//  File:     ModelInterface.cpp (interfaces)
 //  Authors:  Chuck Jacobs, Kirk Olynyk
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ModelInterface.h"
+#include "DatasetInterface.h"
+#include "DatasetInterfaceImpl.h"
 
 // common
 #include "LoadModel.h"
@@ -657,11 +659,21 @@ ELL_Node ELL_ModelBuilder::AddSourceNode(ELL_Model model, ELL_PortElements input
 //
 // ELL_Map
 //
+ELL_Map::ELL_Map()
+{
+    _map = std::make_shared<ell::model::DynamicMap>();
+}
+
 ELL_Map::ELL_Map(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements output)
 {
     std::vector<std::pair<std::string, ell::model::InputNodeBase*>> inputs = { std::pair<std::string, ell::model::InputNodeBase*>{ "input", const_cast<ell::model::InputNodeBase*>(inputNode.GetInputNode()) } };
     auto outputs = std::vector<std::pair<std::string, ell::model::PortElementsBase>>{ { "output", output.GetPortElements() } };
     _map = std::make_shared<ell::model::DynamicMap>(model.GetModel(), inputs, outputs);
+}
+
+ELL_Map::ELL_Map(std::shared_ptr<ell::model::DynamicMap>& map)
+    : _map(map)
+{
 }
 
 ELL_Map::ELL_Map(const std::string& filename)
@@ -677,6 +689,16 @@ ell::api::math::TensorShape ELL_Map::GetInputShape() const
 ell::api::math::TensorShape ELL_Map::GetOutputShape() const
 {
     return ell::api::math::TensorShape::FromMathTensorShape(_map->GetOutputShape());
+}
+
+
+std::vector<double> ELL_Map::ComputeDouble(const AutoDataVector& inputData)
+{
+    const ell::data::AutoDataVector& data = *(inputData._impl->_vector);
+    // not sure why the template can't match these types...
+    //return _map->Compute<double>(data);
+    _map->SetInputValue(0, data);
+    return _map->ComputeOutput<double>(0);
 }
 
 std::vector<double> ELL_Map::ComputeDouble(const std::vector<double>& inputData)

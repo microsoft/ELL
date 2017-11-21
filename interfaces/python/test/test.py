@@ -20,17 +20,23 @@ try:
     import nodes_test
     import linear_test
     import evaluators_test
+    import protonn_trainer_test
+    import dataset_test
+    import vector_test
 
     tests = [
-        (functions_test.test,     "functions_test"),
-        (model_test.test,         "model_test"),
-        (common_test.test,        "common_test"),
-        (trainers_test.test,      "trainers_test"),
-        (predictors_test.test,    "predictors_test"),
-        (nodes_test.test,         "nodes_test"),
-        (linear_test.test,        "linear_test"),
-        (evaluators_test.test,    "evaluators_test"),
-        (modelbuilder_test.test,  "modelbuilder_test")
+        (functions_test.test,       "functions_test"),
+        (dataset_test.test,         "dataset_test"),
+        (vector_test.test,          "vector_test"),
+        (model_test.test,           "model_test"),
+        (common_test.test,          "common_test"),
+        (trainers_test.test,        "trainers_test"),
+        (predictors_test.test,      "predictors_test"),
+        (nodes_test.test,           "nodes_test"),
+        (linear_test.test,          "linear_test"),
+        (evaluators_test.test,      "evaluators_test"),
+        (modelbuilder_test.test,    "modelbuilder_test"),
+        (protonn_trainer_test.test, "protonn_trainer_test")
     ]
 except ImportError:
      print("Import failed")

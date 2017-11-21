@@ -77,6 +77,8 @@
 %include "math.i"
 %include "predictors.i"
 %include "model.i"
+%include "trainers.i"
+%include "dataset.i"
 
 #if defined(SWIGJAVASCRIPT)
 // Interface for NaN callbacks

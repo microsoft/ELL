@@ -114,6 +114,13 @@ namespace predictors
         /// <returns> The predicted label scores. </returns>
         math::ColumnVector<double> Predict(const DataVectorType& inputVector) const;
 
+        /// <summary> Returns the label scores. </summary>
+        ///
+        /// <param name="inputVector"> The data vector. </param>
+        ///
+        /// <returns> The predicted label scores. </returns>
+        math::ColumnVector<double> Predict(const std::vector<double>& inputVector) const;
+
         /// <summary> Resets the projection predictor to the zero projection matrix. </summary>
         void Reset();
 
@@ -132,7 +139,7 @@ namespace predictors
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        math::ColumnVector<double> GetLabelScores(const DataVectorType& inputVector) const;
+        math::ColumnVector<double> GetLabelScores(const std::vector<double> &inputVector) const;
 
         // Input dimension
         size_t _dimension;

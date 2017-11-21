@@ -33,6 +33,7 @@ if platform.system() == "Windows":
 else:
     sys.path += [os.path.join(d, "build") for d in SEARCH_DIRS]
 
+
 def prepare_image_for_model(image, width, height, reorder_to_rgb=False):
     """Prepare an image for use with a model. Typically, this involves:
         - Resize and center crop to the required width and height while

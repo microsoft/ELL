@@ -300,7 +300,7 @@ model::DynamicMap GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     typename predictors::NeuralNetworkPredictor<ElementType>::InputLayerReference inputLayer;
     typename predictors::NeuralNetworkPredictor<ElementType>::Layers layers;
 
-    ElementType eps = 1e-6;
+    ElementType eps = static_cast<ElementType>(1e-6);
     auto epsVar = EpsilonSummand::Variance;
 
     Shape inputShape = { imageRows, imageColumns, numChannels };

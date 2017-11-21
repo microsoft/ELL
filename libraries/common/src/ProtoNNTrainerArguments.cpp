@@ -29,17 +29,17 @@ namespace common
             "l",
             "The number of labels", 2);
 
-        parser.AddOption(lambdaW,
+        parser.AddOption(sparsityW,
             "sparsityW",
             "sw",
             "The sparsity parameter for W", 1.0);
 
-        parser.AddOption(lambdaB,
+        parser.AddOption(sparsityB,
             "sparsityB",
             "sb",
             "The sparsity parameter for B", 1.0);
 
-        parser.AddOption(lambdaZ,
+        parser.AddOption(sparsityZ,
             "sparsityZ",
             "sz",
             "The sparsity parameter for Z",	1.0);
@@ -50,19 +50,19 @@ namespace common
             "The gamma value",
             -1.0);
 
-        parser.AddOption(lossType,
+        parser.AddOption(lossFunction,
             "protonnLossFunction",
             "plf",
             "Choice of loss function",
-            { { "L2", trainers::ProtoNNLossType::L2 },{ "L4", trainers::ProtoNNLossType::L4 } }, "L4");
+            { { "L2", trainers::ProtoNNLossFunction::L2 },{ "L4", trainers::ProtoNNLossFunction::L4 } }, "L4");
 
-        parser.AddOption(numIters,
+        parser.AddOption(numIterations,
             "numIterations",
             "nIter",
             "Number of outer iterations",
             20);
 
-        parser.AddOption(numInnerIters,
+        parser.AddOption(numInnerIterations,
             "numInnerIterations",
             "nInnerIter",
             "Number of inner iterations",

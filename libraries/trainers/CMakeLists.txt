@@ -53,7 +53,7 @@ source_group("doc" FILES ${doc})
 
 add_library(${library_name} ${src} ${include} ${tcc} ${doc})
 target_include_directories(${library_name} PUBLIC include)
-target_link_libraries(${library_name} evaluators predictors)
+target_link_libraries(${library_name} utilities evaluators predictors)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 

@@ -72,10 +72,10 @@ namespace data
         /// <returns> The data vector. </returns>
         const DataVectorType& GetDataVector() const { return *_dataVector.get(); }
 
-        /// <summary> Gets a shared_ptr to the data vector. </summary>
+        /// <summary> Gets the shared pointer to the data vector. </summary>
         ///
-        /// <returns> The data vector. </returns>
-        std::shared_ptr<const DataVectorType> GetDataVectorPointer() const { return _dataVector; }
+        /// <returns> The data vector shared pointer. </returns>
+        std::shared_ptr<const DataVectorType> GetSharedDataVector() const { return _dataVector; }
 
         /// <summary> Gets the metadata. </summary>
         ///

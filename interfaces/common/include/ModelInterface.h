@@ -42,6 +42,7 @@ namespace ELL_API
 //
 // Forward declarations
 //
+class AutoDataVector;
 class ELL_CompiledMap;
 class ELL_DynamicMap;
 class ELL_InputPort;
@@ -369,9 +370,14 @@ private:
 class ELL_Map
 {
 public:
+    ELL_Map();
     ELL_Map(const ELL_Map& other) = default;
     ELL_Map(ELL_Model model, ELL_InputNode inputNode, ELL_PortElements output);
     ELL_Map(const std::string& filename);
+#ifndef SWIG
+    ELL_Map(std::shared_ptr<ell::model::DynamicMap>& map);
+#endif
+    std::vector<double> ComputeDouble(const AutoDataVector& inputData);
     std::vector<double> ComputeDouble(const std::vector<double>& inputData);
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);
     void Save(const std::string& filename) const;
@@ -379,6 +385,9 @@ public:
     ell::api::math::TensorShape GetInputShape() const;
     ell::api::math::TensorShape GetOutputShape() const;
     ELL_CompiledMap Compile(const std::string&  targetDevice, const std::string& moduleName, const std::string& functionName) const;
+#ifndef SWIG
+    std::shared_ptr<ell::model::DynamicMap> GetInnerMap() { return _map; }
+#endif
 private:
     std::shared_ptr<ell::model::DynamicMap> _map;
 };

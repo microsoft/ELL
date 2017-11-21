@@ -15,8 +15,11 @@
 #include <array>
 #include <vector>
 #include <stddef.h>
-
 #endif
+
+// Note: this has to be outside the above #ifndef SWIG otherwise SWIG doesn't know what std::max_element is doing
+// and wrongly reports "swig/python detected a memory leak of type '__int64 *', no destructor found."
+#include <algorithm>
 
 namespace ell
 {
@@ -24,6 +27,17 @@ namespace api
 {
 namespace math
 {
+    // this is handy in Javascript where there is no numpy and even in Python
+    // because the conversion from DoubleVector to numpy array is slow.
+    template<typename ElementType>
+    long Argmax(std::vector<ElementType>& buffer)
+    {
+        auto result = std::max_element(buffer.begin(), buffer.end());
+        auto index = result - buffer.begin();
+        return static_cast<long>(index);
+    }
+
+
     struct TensorShape
     {
         size_t rows;

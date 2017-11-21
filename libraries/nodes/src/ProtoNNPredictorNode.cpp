@@ -101,9 +101,22 @@ namespace nodes
 
     void ProtoNNPredictorNode::Compute() const
     {
-        auto inputDataVector = ProtoNNPredictor::DataVectorType(_input.GetIterator());
+        auto indexValueIterator = _input.GetIterator();
 
-        auto prediction = _predictor.Predict(inputDataVector);
+        // densify the index/value pairs directly into a std::vector, which avoids making a copy via DoubleDataVector.
+        std::vector<double> inputData;
+        size_t pos = 0;
+        while (indexValueIterator.IsValid())
+        {
+            auto current = indexValueIterator.Get();
+            auto index = current.index;
+            double value = current.value;
+            inputData.resize(index + 1);
+            inputData.back() = value;
+            indexValueIterator.Next();
+        }
+
+        auto prediction = _predictor.Predict(inputData);
 
         _output.SetOutput(prediction.ToArray());
     }

@@ -307,6 +307,18 @@ namespace model
         /// <summary>Prune away unused parts of internal model. </summary>
         void Prune();
 
+        /// <summary> Adds the given input node to the map. </summary>
+        ///
+        /// <param name="inputName"> Name of the input. </param>
+        /// <param name="inputNode"> The input node. </param>
+        void AddInput(const std::string& inputName, InputNodeBase* inputNode);
+
+        /// <summary> Adds the given output node to the map. </summary>
+        ///
+        /// <param name="outputName"> Name of the output. </param>
+        /// <param name="inputNode"> The output elements. </param>
+        void AddOutput(const std::string& outputName, PortElementsBase outputElements);
+
     protected:
         template<typename DataVectorType, typename ElementsType, data::IsDataVector<DataVectorType> Concept = true>
         void SetInputValue(InputNodeBase* node, const DataVectorType& inputValues) const;
@@ -322,9 +334,6 @@ namespace model
 
         template<typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         DataVectorType ComputeOutput(const PortElementsBase& elements) const;
-
-        void AddInput(const std::string& inputName, InputNodeBase* inputNode);
-        void AddOutput(const std::string& outputName, PortElementsBase outputElements);
 
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;

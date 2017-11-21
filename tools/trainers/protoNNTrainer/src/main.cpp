@@ -10,8 +10,6 @@
 #include "CommandLineParser.h"
 #include "Exception.h"
 #include "Files.h"
-#include "OutputStreamImpostor.h"
-#include "RandomEngines.h"
 
 // data
 #include "Dataset.h"
@@ -55,6 +53,28 @@
 #include <stdexcept>
 
 using namespace ell;
+
+void CreateMap(predictors::ProtoNNPredictor& predictor, ell::model::DynamicMap& map)
+{
+    auto numFeatures = predictor.GetDimension();
+
+    model::Model& model = map.GetModel();
+
+    // add the input node.
+    auto inputNode = model.AddNode<model::InputNode<double>>(numFeatures);
+
+    // add the predictor node, taking input from the input node
+    model::PortElements<double> inputElements(inputNode->output);
+    auto predictorNode = model.AddNode<nodes::ProtoNNPredictorNode>(inputElements, predictor);
+
+    // add an output node taking input from the predictor node.
+    auto outputNode = model.AddNode<model::OutputNode<double>>(predictorNode->output);
+    model::PortElements<double> outputElements(outputNode->output);
+
+    // name the inputs and outputs to the map.
+    map.AddInput("input", inputNode);
+    map.AddOutput("output", outputElements);
+}
 
 int main(int argc, char* argv[])
 {
@@ -101,22 +121,9 @@ int main(int argc, char* argv[])
         // that number instead.
         auto dimension = mapLoadArguments.defaultInputSize != 0 ? mapLoadArguments.defaultInputSize : mappedDataset.NumFeatures();
 
-        // now optionally scale the inputs if required
-        if (dataLoadArguments.scale != 1)
-        {
-            auto numExamples = mappedDataset.NumExamples();
-            for (size_t rowIndex = 0; rowIndex < numExamples; ++rowIndex)
-            {
-                auto& example = mappedDataset[rowIndex];
-                auto data = math::ColumnVector<double>(example.GetDataVector().ToArray());
-                data *= dataLoadArguments.scale;
-                auto updated = data::AutoDataVector(data.ToArray());
-                mappedDataset[rowIndex] = data::AutoSupervisedExample(std::move(updated), example.GetMetadata());
-            }
-        }
-
+        protoNNTrainerArguments.numFeatures = dimension;
         // create protonn trainer
-        auto trainer = common::MakeProtoNNTrainer(mappedDataset.NumExamples(), dimension, protoNNTrainerArguments);
+        auto trainer = common::MakeProtoNNTrainer(protoNNTrainerArguments);
 
         // predictor type
         using PredictorType = predictors::ProtoNNPredictor;
@@ -172,11 +179,10 @@ int main(int argc, char* argv[])
         // Save predictor model
         if (modelSaveArguments.outputModelFilename != "")
         {
-            // Create a model
-            auto model = map.GetModel();
-            auto predictorNode = model.AddNode<nodes::ProtoNNPredictorNode>(map.GetOutputElements<double>(0), predictor);
-            (void) model.AddNode<model::OutputNode<double>>(predictorNode->output);
-            common::SaveModel(model, modelSaveArguments.outputModelFilename);
+            // Create a DynamicMap
+            model::DynamicMap map;
+            CreateMap(predictor, map);
+            common::SaveMap(map, modelSaveArguments.outputModelFilename);
         }
     }
     catch (const utilities::CommandLineParserPrintHelpException& exception)

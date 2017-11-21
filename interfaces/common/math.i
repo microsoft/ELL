@@ -25,6 +25,9 @@
 %template(FloatTensor) ell::api::math::Tensor<float>;
 %template(DoubleTensor) ell::api::math::Tensor<double>;
 
+%template(DoubleArgmax) ell::api::math::Argmax<double>;
+%template(FloatArgmax) ell::api::math::Argmax<float>;
+
 // Include language specific SWIG definitions that must be declared after the
 // C++ code has been wrapped by SWIG
 #ifdef SWIGPYTHON

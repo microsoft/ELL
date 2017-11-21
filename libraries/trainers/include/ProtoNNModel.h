@@ -19,35 +19,54 @@ namespace ell
 {
 namespace trainers
 {
-    enum ProtoNNLossType { L2, L4 };
+#if !defined(SWIG)
+    enum class ProtoNNLossFunction { L2, L4 };
+#endif
 
     /// <summary> Parameters for the ProtoNN trainer. </summary>
     struct ProtoNNTrainerParameters
     {
-        size_t projectedDimension;
-        size_t numPrototypesPerLabel;
-        size_t numPrototypes;
+        ///<summary>The number of features</summary>
+        size_t numFeatures;
+
+        ///<summary>The number of labels</summary>
         size_t numLabels;
-        double lambdaW;
-        double lambdaZ;
-        double lambdaB;
+
+        ///<summary>The projected dimension</summary>
+        size_t projectedDimension;
+
+        ///<summary>The number of prototypes per label</summary>
+        size_t numPrototypesPerLabel;
+
+        ///<summary>The sparsity parameter for W</summary>
+        double sparsityW;
+
+        ///<summary>The sparsity parameter for Z</summary>
+        double sparsityZ;
+
+        ///<summary>The sparsity parameter for B</summary>
+        double sparsityB;
+
+        ///<summary>The gamma value</summary>
         double gamma;
-        ProtoNNLossType lossType;
-        size_t numIters;
-        size_t numInnerIters;
+
+        ///<summary>The choice of loss function</summary>
+#if defined(SWIG)
+        int lossFunction;
+#else
+        ProtoNNLossFunction lossFunction;
+#endif
+
+        ///<summary>The number of iterations for training</summary>
+        size_t numIterations;
+
+        ///<summary>The number of inner iterations for training</summary>
+        size_t numInnerIterations;
+
+        ///<summary>Whether to output diagnostic information to std::cout.</summary>
         bool verbose;
     };
 
-    enum ProtoNNParameterIndex { W = 0, B, Z };
-
-    typedef math::ConstMatrixReference<double, math::MatrixLayout::columnMajor> ConstColumnMatrixReference;
-
-	namespace ProtoNN
-	{
-		static const double ArmijoStepTolerance = 0.02;
-
-		static const double DefaultStepSize = 0.2;
-	}
 }
 }
 

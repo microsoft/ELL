@@ -37,10 +37,10 @@ namespace predictors
         _gamma = 0.0;
     }
 
-    math::ColumnVector<double> ProtoNNPredictor::GetLabelScores(const DataVectorType& inputVector) const
+    math::ColumnVector<double> ProtoNNPredictor::GetLabelScores(const std::vector<double>& inputVector) const
     {
         // Projection
-        math::ColumnVector<double> data(inputVector.ToArray());
+        math::ColumnVector<double> data(inputVector);
         auto dimension = GetDimension();
         data.Resize(dimension);
         math::ColumnVector<double> projectedInput(GetProjectedDimension());
@@ -69,6 +69,12 @@ namespace predictors
     }
 
     math::ColumnVector<double> ProtoNNPredictor::Predict(const DataVectorType& inputVector) const
+    {
+        auto labels = GetLabelScores(inputVector.ToArray());
+        return labels;
+    }
+
+    math::ColumnVector<double> ProtoNNPredictor::Predict(const std::vector<double>& inputVector) const
     {
         auto labels = GetLabelScores(inputVector);
         return labels;

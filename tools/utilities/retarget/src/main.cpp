@@ -252,12 +252,12 @@ std::vector<data::AutoSupervisedDataset> CreateDatasetsForOneVersusRest(data::Au
             if (example.GetMetadata().classIndex == i)
             {
                 // Positive case
-                return data::AutoSupervisedExample(example.GetDataVectorPointer(), data::WeightLabel{ weightPositiveCase, 1.0 });
+                return data::AutoSupervisedExample(example.GetSharedDataVector(), data::WeightLabel{ weightPositiveCase, 1.0 });
             }
             else
             {
                 // Negative case
-                return data::AutoSupervisedExample(example.GetDataVectorPointer(), data::WeightLabel{ weightNegativeCase, -1.0 });
+                return data::AutoSupervisedExample(example.GetSharedDataVector(), data::WeightLabel{ weightNegativeCase, -1.0 });
             }
         });
     }

@@ -225,6 +225,7 @@ namespace utilities
 
     bool XmlUnarchiver::HasNextPropertyName(const std::string& name)
     {
+        unused(name);
         assert(false && "Unimplemented");
         return false;
     }

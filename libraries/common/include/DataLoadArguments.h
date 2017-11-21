@@ -31,8 +31,6 @@ namespace common
         // not exposed on the command line
         size_t parsedDataDimension = 0;
 
-        ///<summary> Whether to post process the data set and apply the given scale </summary>
-        double scale = 1;
     };
 
     /// <summary> A version of DataLoadArguments that adds its members to the command line parser. </summary>

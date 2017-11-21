@@ -37,13 +37,6 @@ namespace common
             "dd",
             "Number of elements to read from each data vector",
             "");
-
-        parser.AddOption(
-            scale,
-            "dataScale",
-            "ds",
-            "Scale data after loading by given amount",
-            1);
     }
 
     utilities::CommandLineParseResult ParsedDataLoadArguments::PostProcess(const utilities::CommandLineParser& parser)
